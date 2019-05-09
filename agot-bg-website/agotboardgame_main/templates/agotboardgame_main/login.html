@@ -1,0 +1,35 @@
+{% extends "./base.html" %}
+
+{% block title %}
+Login
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 360px; margin: 0 auto;margin-top: 80px">
+    <h3>Log in</h3>
+    <!--<form>
+        <div class="form-group">
+            <input class="form-control" placeholder="Username/Email" id="username" />
+        </div>
+        <div class="form-group">
+            <input class="form-control" placeholder="Password" id="password" />
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-block">Log in</button>
+        </div>
+        <div class="form-group text-right">
+            <a href="#" class="btn btn-link'>Forgot password ?</a>
+        </div>
+    </form>
+    <hr/>-->
+    <a href="{% url 'social:begin' 'google-oauth2' %}?next=/" class="btn btn-social btn-google btn-block">
+        <span class="fab fa-google"></span> Sign in with Google
+    </a>
+    <a href="{% url 'social:begin' 'discord' %}?next=/"
+       class="btn btn-social btn-block"
+       style="background-color: #7289DA; border-color: rgba(0,0,0,.2)"
+    >
+        <span class="fab fa-discord"></span> Sign in with Discord
+    </a>
+</div>
+{% endblock %}
