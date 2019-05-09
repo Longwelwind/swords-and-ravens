@@ -1,0 +1,477 @@
+{
+  "tracks": {
+    "ironThrone": ["baratheon", "lannister", "stark", "martell", "greyjoy", "tyrell"],
+    "fiefdoms": ["greyjoy", "tyrell", "martell", "stark", "baratheon", "lannister"],
+    "kingsCourt": ["lannister", "stark", "martell", "baratheon", "tyrell", "greyjoy"]
+  },
+  "units": {
+    "winterfell": [
+      {
+        "unitType": "footman",
+        "house": "stark",
+        "quantity": 1
+      },
+      {
+        "unitType": "knight",
+        "house": "stark",
+        "quantity": 1
+      }
+    ],
+    "white-harbor": [
+      {
+        "unitType": "footman",
+        "house": "stark",
+        "quantity": 1
+      }
+    ],
+    "the-shivering-sea": [
+      {
+        "unitType": "ship",
+        "house": "stark",
+        "quantity": 1
+      }
+    ],
+    "pyke": [
+      {
+        "unitType": "footman",
+        "house": "greyjoy",
+        "quantity": 1
+      }
+    ],
+    "port-of-pyke": [
+      {
+        "unitType": "ship",
+        "house": "greyjoy",
+        "quantity": 1
+      }
+    ],
+    "ironmans-bay": [
+      {
+        "unitType": "ship",
+        "house": "greyjoy",
+        "quantity": 1
+      }
+    ],
+    "greywater-watch": [
+      {
+        "unitType": "footman",
+        "house": "greyjoy",
+        "quantity": 1
+      }
+    ],
+    "lannisport": [
+      {
+        "unitType": "footman",
+        "house": "lannister",
+        "quantity": 1
+      },
+      {
+        "unitType": "knight",
+        "house": "lannister",
+        "quantity": 1
+      }
+    ],
+    "the-golden-sound": [
+      {
+        "unitType": "ship",
+        "house": "lannister",
+        "quantity": 1
+      }
+    ],
+    "stoney-sept": [
+      {
+        "unitType": "footman",
+        "house": "lannister",
+        "quantity": 1
+      }
+    ],
+    "dragonstone": [
+      {
+        "unitType": "footman",
+        "house": "baratheon",
+        "quantity": 1
+      },
+      {
+        "unitType": "knight",
+        "house": "baratheon",
+        "quantity": 1
+      }
+    ],
+    "shipbreaker-bay": [
+      {
+        "unitType": "ship",
+        "house": "baratheon",
+        "quantity": 2
+      }
+    ],
+    "kingswood": [
+      {
+        "unitType": "footman",
+        "house": "baratheon",
+        "quantity": 1
+      }
+    ],
+    "highgarden": [
+      {
+        "unitType": "footman",
+        "house": "tyrell",
+        "quantity": 1
+      },
+      {
+        "unitType": "knight",
+        "house": "tyrell",
+        "quantity": 1
+      }
+    ],
+    "redwyne-straights": [
+      {
+        "unitType": "ship",
+        "house": "tyrell",
+        "quantity": 1
+      }
+    ],
+    "dornish-marches": [
+      {
+        "unitType": "footman",
+        "house": "tyrell",
+        "quantity": 1
+      }
+    ],
+    "sea-of-dorne": [
+      {
+        "unitType": "ship",
+        "house": "martell",
+        "quantity": 1
+      }
+    ],
+    "sunspear": [
+      {
+        "unitType": "footman",
+        "house": "martell",
+        "quantity": 1
+      },
+      {
+        "unitType": "knight",
+        "house": "martell",
+        "quantity": 1
+      }
+    ],
+    "salt-shore": [
+      {
+        "unitType": "footman",
+        "house": "martell",
+        "quantity": 1
+      }
+    ]
+  },
+  "starredOrderRestrictions": [3, 3, 2, 1],
+  "supplyRestrictions": [
+    [2, 2],
+    [3, 2],
+    [3, 2, 2],
+    [3, 2, 2, 2],
+    [3, 3, 2, 2],
+    [4, 3, 2, 2],
+    [4, 3, 2, 2, 2]
+  ],
+  "westerosCards": [
+    [
+      {
+        "type": "last-days-of-summer"
+      },
+      {
+        "type": "supply",
+        "quantity": 3
+      },
+      {
+        "type": "mustering",
+        "quantity": 3
+      },
+      {
+        "type": "thrones-of-blades",
+        "quantity": 2
+      },
+      {
+        "type": "winter-is-coming"
+      }
+    ],
+    [
+      {
+        "type": "game-of-thrones",
+        "quantity": 3
+      },
+      {
+        "type": "dark-wings-dark-words",
+        "quantity": 2
+      },
+      {
+        "type": "winter-is-coming"
+      },
+      {
+        "type": "clash-of-kings",
+        "quantity": 3
+      },
+      {
+        "type": "last-days-of-summer"
+      }
+    ],
+    [
+      {
+        "type": "put-to-the-sword",
+        "quantity": 2
+      },
+      {
+        "type": "storm-of-swords"
+      },
+      {
+        "type": "rains-of-autumn"
+      },
+      {
+        "type": "sea-of-storms"
+      },
+      {
+        "type": "web-of-lies"
+      },
+      {
+        "type": "feast-for-crows"
+      },
+      {
+        "type": "last-days-of-summer"
+      }
+    ]
+  ],
+  "wildlingCards": [
+    {
+      "type": "silence-at-the-wall"
+    },
+    {
+      "type": "preemptive-raid"
+    }
+  ],
+  "houses": {
+    "lannister": {
+      "name": "Lannister",
+      "color": "#dc3545",
+      "houseCards": {
+        "tywin-lannister": {
+          "name": "Tywin Lannister",
+          "combatStrength": 4
+        },
+        "ser-gregor-clegane": {
+          "name": "Ser Gregor Clegane",
+          "combatStrength": 3,
+          "swordIcons": 3
+        },
+        "ser-jaime-lannister": {
+          "name": "Ser Jaime Lannister",
+          "combatStrength": 3,
+          "swordIcons": 1
+        },
+        "the-hound": {
+          "name": "The hound",
+          "combatStrength": 2,
+          "fortificationIcons": 2
+        },
+        "ser-kevan-lannister": {
+          "name": "Ser Kevan Lannister",
+          "combatStrength": 1
+        },
+        "tyrion-lannister": {
+          "name": "Tyrion Lannister",
+          "combatStrength": 1
+        },
+        "cersei-lannister": {
+          "name": "Cersei Lannister"
+        }
+      },
+      "supplyLevel": 2
+    },
+    "stark": {
+      "name": "Stark",
+      "color": "#f8f9fa",
+      "houseCards": {
+        "eddard-stark": {
+          "name": "Eddard Stark",
+          "combatStrength": 4,
+          "swordIcons": 2
+        },
+        "robb-stark": {
+          "name": "Robb Stark",
+          "combatStrength": 3
+        },
+        "roose-bolton": {
+          "name": "Roose Bolton",
+          "combatStrength": 2
+        },
+        "greatjon-umber": {
+          "name": "Greatjon Umber",
+          "combatStrength": 2,
+          "swordIcons": 1
+        },
+        "ser-rodrick-cassel": {
+          "name": "Ser Rodrick Cassel",
+          "combatStrength": 1,
+          "fortificationIcons": 2
+        },
+        "the-blackfish": {
+          "name": "The Blackfish",
+          "combatStrength": 1
+        },
+        "catelyn-stark": {
+          "name": "Catelyn Stark"
+        }
+      },
+      "supplyLevel": 1
+    },
+    "baratheon": {
+      "name": "Baratheon",
+      "color": "#ffc107",
+      "houseCards": {
+        "stannis-baratheon": {
+          "name": "Stannis Baratheon",
+          "combatStrength": 4
+        },
+        "renly-baratheon": {
+          "name": "Renly Baratheon",
+          "combatStrength": 3
+        },
+        "ser-davos-seaworth": {
+          "name": "Ser Davos Seaworth",
+          "combatStrength": 2
+        },
+        "brienne-of-tarth": {
+          "name": "Brienne of Tarth",
+          "combatStrength": 2,
+          "swordIcons": 1,
+          "towerIcons": 1
+        },
+        "salladhor-saan": {
+          "name": "Salladhor Saan",
+          "combatStrength": 1
+        },
+        "melisandre": {
+          "name": "Melisandre",
+          "combatStrength": 1
+        },
+        "patchface": {
+          "name": "Patchface"
+        }
+      },
+      "supplyLevel": 2
+    },
+    "greyjoy": {
+      "name": "Greyjoy",
+      "color": "#6c757d",
+      "houseCards": {
+        "euron-crows-eye": {
+          "name": "Euron Crow's Eye",
+          "combatStrength": 4,
+          "swordIcons": 1
+        },
+        "victarion-greyjoy": {
+          "name": "Victarion Greyjoy",
+          "combatStrength": 3
+        },
+        "balon-greyjoy": {
+          "name": "Balon Greyjoy",
+          "combatStrength": 2
+        },
+        "theon-greyjoy": {
+          "name": "Theon Greyjoy",
+          "combatStrength": 2
+        },
+        "dagmar-cleftjaw": {
+          "name": "Dagmar Cleftjaw",
+          "combatStrength": 1,
+          "swordIcons": 1,
+          "fortificationIcons": 1
+        },
+        "asha-greyjoy": {
+          "name": "Asha Greyjoy",
+          "combatStrength": 1
+        },
+        "aeron-damphair": {
+          "name": "Aeron Damphair"
+        }
+      },
+      "supplyLevel": 2
+    },
+    "martell": {
+      "name": "Martell",
+      "color": "orange",
+      "houseCards": {
+        "the-red-viper": {
+          "name": "The Red Viper",
+          "combatStrength": 4,
+          "swordIcons": 2,
+          "towerIcons": 1
+        },
+        "areo-hotah": {
+          "name": "Areo Hotah",
+          "combatStrength": 3,
+          "fortificationIcons": 1
+        },
+        "darkstar": {
+          "name": "Darkstar",
+          "combatStrength": 2,
+          "swordIcons": 1
+        },
+        "obara-sand": {
+          "name": "Obara Sand",
+          "combatStrength": 2,
+          "swordIcons": 1
+        },
+        "arianne-martell": {
+          "name": "Arianne Martell",
+          "combatStrength": 1
+        },
+        "nymeria-sand": {
+          "name": "Nymeria Sand",
+          "combatStrength": 1
+        },
+        "doran-martell": {
+          "name": "Doran Martell"
+        }
+      },
+      "supplyLevel": 2
+    },
+    "tyrell": {
+      "name": "Tyrell",
+      "color": "#28a745",
+      "houseCards": {
+        "mace-tyrell": {
+          "name": "Mace Tyrell",
+          "combatStrength": 4
+        },
+        "ser-loras-tyrell": {
+          "name": "Ser Loras Tyrell",
+          "combatStrength": 3
+        },
+        "randyll-tarly": {
+          "name": "Randyll Tarly",
+          "combatStrength": 2,
+          "swordIcons": 1
+        },
+        "ser-garlan-tyrell": {
+          "name": "Ser Garlan Tyrell",
+          "combatStrength": 2,
+          "swordIcons": 2
+        },
+        "margaery-tyrell": {
+          "name": "Margaery Tyrell",
+          "combatStrength": 1,
+          "fortificationIcons": 1
+        },
+        "alester-florent": {
+          "name": "Alester Florent",
+          "combatStrength": 1,
+          "fortificationIcons": 1
+        },
+        "queen-of-thorns": {
+          "name": "Queen of Thorns"
+        }
+      },
+      "supplyLevel": 2
+    }
+  }
+}

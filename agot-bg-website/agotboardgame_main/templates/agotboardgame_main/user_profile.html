@@ -1,0 +1,56 @@
+{% extends "./base.html" %}
+
+{% block title %}
+{{ viewed_user.username }}
+{% endblock %}
+
+
+{% block content %}
+<h3>{{ viewed_user.username }}</h3>
+<div class="row">
+    <div class="col-lg-6"></div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Games</h4>
+                <table class="table table-hover table-sm">
+                    {% for player in viewed_user.playeringame_set.all %}
+                        <tr>
+                            <td class="align-middle text-center" style="width: 75px">
+                                {% if player.game.state == "IN_LOBBY" %}
+                                    <span class="badge badge-pill badge-success">Open</span>
+                                {% elif player.game.state == "ONGOING" %}
+                                    <span class="badge badge-pill badge-warning">Ongoing</span>
+                                {% endif %}
+                            </td>
+                            <td class="align-middle">
+                                {{ player.game.name }}
+                            </td>
+                            <td class="align-middle" style="width: 1px">
+                                <a class="btn btn-primary btn-sm"
+                                   href="/play/{{ player.game.id }}"
+                                   target="_blank"
+                                >
+                                    Join
+                                </a>
+                            </td>
+                            <td class="align-middle" style="width: 1px">
+                                <a class="btn btn-primary btn-sm"
+                                   href="/play/{{ player.game.id }}/{{ viewed_user.id }}"
+                                   target="_blank"
+                                >
+                                    Join as
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">No games</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

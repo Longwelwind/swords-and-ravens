@@ -1,0 +1,33 @@
+name: CI
+
+on: [push]
+
+jobs:
+  game-server-test:
+    name: Game Server Test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install dependencies
+      run: |
+        cd agot-bg-game-server
+        yarn install
+    - name: Run tests
+      run: |
+        cd agot-bg-game-server
+        yarn run test
+  game-server-build:
+    name: Game Server Build
+    runs-on: ubuntu-latest
+    needs: [game-server-test]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build game-server Docker image
+      run: docker build . -f ./game_server.Dockerfile
+  website-build:
+    name: Website Build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build website Docker image
+      run: docker build . -f ./website.Dockerfile

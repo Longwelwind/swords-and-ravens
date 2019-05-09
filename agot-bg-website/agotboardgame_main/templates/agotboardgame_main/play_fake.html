@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sample page for /play</title>
+</head>
+<body>
+    <div style="display: flex; justify-content: center; align-items: center">
+        <p>
+            This file will be replaced by the <code>index.html</code> of <code>agot-board-game</code>
+            at build time.
+        </p>
+        <p>
+            In this page, the following variables will be inserted:
+        </p>
+        <li>
+            <ul>GAME_ID: <code>{{ auth_data.GAME_ID }}</code></ul>
+            <ul>USER_ID: <code>{{ auth_data.USER_ID }}</code></ul>
+            <ul>AUTH_TOKEN: <code>{{ auth_data.AUTH_TOKEN }}</code></ul>
+        </li>
+        <p>
+            These variables will be picked up by the client and allow it to authenticate itself
+            to the game server.
+        </p>
+    </div>
+</body>
+</html>

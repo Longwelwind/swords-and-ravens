@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/"/>
+    <meta charset="UTF-8">
+    <title>A Game Of Thrones: The Board Game</title>
+</head>
+<body>
+    <div id="root"></div>
+    <!--
+    In production, the Django app will insert the auth data into the HTML
+    via this tag.
+    "display: none" is there to make sure that the "{{...}}" isn't shown
+    during development via webpack-dev-server.
+    -->
+    <div style="display: none">
+        {{ auth_data|json_script:"auth-data" }}
+    </div>
+</body>
+</html>
