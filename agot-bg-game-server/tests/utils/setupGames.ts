@@ -277,7 +277,7 @@ export function setupAtPlanningGameState(
     }, userSetupOptions).expectGameState<PlanningGameState>(PlanningGameState);
 }
 
-interface SetupOptions {
+export interface SetupOptions {
     houses: {[houseId: string]: SetupOptionsHouse};
     units: {[regionId: string]: {type: string; allegiance: string; wounded?: boolean}[]};
     regions: {[regionId: string]: SetupOptionsRegion};

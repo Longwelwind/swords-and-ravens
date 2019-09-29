@@ -26,7 +26,7 @@ const crowKillers = new CrowKillers(
 const wildlingCardTypes = new BetterMap([
     [silenceAtTheWall.id, silenceAtTheWall],
     [preemptiveRaid.id, preemptiveRaid],
-    //[crowKillers.id, crowKillers]
+    [crowKillers.id, crowKillers]
 ]);
 
 export default wildlingCardTypes;
