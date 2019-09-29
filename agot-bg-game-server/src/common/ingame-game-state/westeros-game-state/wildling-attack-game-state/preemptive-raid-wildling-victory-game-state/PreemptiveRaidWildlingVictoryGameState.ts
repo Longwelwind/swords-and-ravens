@@ -17,7 +17,7 @@ enum PreemptiveRaidStep {
     REDUCING_INFLUENCE_TRACKS
 }
 
-export default class PreemptiveRaidWildlingVictoryGameState extends GameState<WildlingAttackGameState, SimpleChoiceGameState | SelectUnitsGameState> {
+export default class PreemptiveRaidWildlingVictoryGameState extends GameState<WildlingAttackGameState, SimpleChoiceGameState | SelectUnitsGameState<PreemptiveRaidWildlingVictoryGameState>> {
     step: PreemptiveRaidStep = PreemptiveRaidStep.CHOOSING;
 
     get game(): Game {

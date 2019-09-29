@@ -11,7 +11,7 @@ import SelectUnitsGameState, {SerializedSelectUnitsGameState} from "../../../../
 import House from "../../../../game-data-structure/House";
 import Game from "../../../../game-data-structure/Game";
 
-export default class ChooseCasualtiesGameState extends GameState<CombatGameState, SelectUnitsGameState> {
+export default class ChooseCasualtiesGameState extends GameState<CombatGameState, SelectUnitsGameState<ChooseCasualtiesGameState>> {
 
     get combatGameState(): CombatGameState {
         return this.parentGameState;
@@ -66,7 +66,7 @@ export default class ChooseCasualtiesGameState extends GameState<CombatGameState
         return chooseCasualtiesGameState;
     }
 
-    deserializeChildGameState(data: SerializedChooseCasualtiesGameState["childGameState"]): SelectUnitsGameState {
+    deserializeChildGameState(data: SerializedChooseCasualtiesGameState["childGameState"]): ChooseCasualtiesGameState["childGameState"] {
         return SelectUnitsGameState.deserializeFromServer(this, data);
     }
 }

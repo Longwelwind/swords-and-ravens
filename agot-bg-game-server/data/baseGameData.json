@@ -246,6 +246,9 @@
     },
     {
       "type": "preemptive-raid"
+    },
+    {
+      "type": "crow-killers"
     }
   ],
   "houses": {
