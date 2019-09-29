@@ -12,9 +12,14 @@ import WildlingCard from "../../game-data-structure/wildling-card/WildlingCard";
 import PreemptiveRaidWildlingVictoryGameState
     , {SerializedPreemptiveRaidWildlingVictoryGameState} from "./preemptive-raid-wildling-victory-game-state/PreemptiveRaidWildlingVictoryGameState";
 import SimpleChoiceGameState, {SerializedSimpleChoiceGameState} from "../../simple-choice-game-state/SimpleChoiceGameState";
+import CrowKillersWildlingVictoryGameState
+    , {SerializedCrowKillersWildlingVictoryGameState} from "./crow-killers-wildling-victory-game-state/CrowKillersWildlingVictoryGameState";
+import CrowKillersNightsWatchVictoryGameState
+    , {SerializedCrowKillersNightsWatchVictoryGameState} from "./crow-killers-nights-watch-victory-game-state/CrowKillersNightsWatchVictoryGameState";
 
 export default class WildlingAttackGameState extends GameState<WesterosGameState,
     BiddingGameState<WildlingAttackGameState> | SimpleChoiceGameState | PreemptiveRaidWildlingVictoryGameState
+    | CrowKillersWildlingVictoryGameState | CrowKillersNightsWatchVictoryGameState
 > {
     participatingHouses: House[];
     // Client-side, `wildlingCard` is null before the bidding phase is over
@@ -81,7 +86,7 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
         return this.westerosGameState.game;
     }
 
-    firstStart(wildlingStrength: number, participatingHouses: House[] = []) {
+    firstStart(wildlingStrength: number, participatingHouses: House[] = []): void {
         this.wildlingStrength = wildlingStrength;
         this.participatingHouses = participatingHouses;
 
@@ -91,11 +96,11 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
         this.setChildGameState(new BiddingGameState(this)).firstStart(this.game.houses.values);
     }
 
-    onPlayerMessage(player: Player, message: ClientMessage) {
+    onPlayerMessage(player: Player, message: ClientMessage): void {
         this.childGameState.onPlayerMessage(player, message);
     }
 
-    onServerMessage(message: ServerMessage) {
+    onServerMessage(message: ServerMessage): void {
         if (message.type == "reveal-wildling-card") {
             this.wildlingCard = this.game.wildlingDeck.find(c => c.id == message.wildlingCard) as WildlingCard;
         } else {
@@ -103,7 +108,7 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
         }
     }
 
-    onBiddingGameStateEnd(results: [number, House[]][]) {
+    onBiddingGameStateEnd(results: [number, House[]][]): void {
         this.biddingResults = results;
 
         // Reveal the wildling card to the players
@@ -147,7 +152,7 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
         }
     }
 
-    onSimpleChoiceGameStateEnd(choice: number) {
+    onSimpleChoiceGameStateEnd(choice: number): void {
         if (this.nightsWatchWon) {
             this.proceedNightsWatchWon(this.highestBidders[choice]);
         } else {
@@ -155,7 +160,7 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
         }
     }
 
-    onDecideBiggestEnd(chosen: House) {
+    onDecideBiggestEnd(chosen: House): void {
         if (this.nightsWatchWon) {
             this.proceedNightsWatchWon(chosen);
         } else {
@@ -163,19 +168,19 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
         }
     }
 
-    proceedNightsWatchWon(highestBidder: House) {
+    proceedNightsWatchWon(highestBidder: House): void {
         this._highestBidder = highestBidder;
 
         this.wildlingCard.type.executeNightsWatchWon(this);
     }
 
-    proceedWildlingWon(lowestBidder: House) {
+    proceedWildlingWon(lowestBidder: House): void {
         this._lowestBidder = lowestBidder;
 
         this.wildlingCard.type.executeWildlingWon(this);
     }
 
-    onWildlingCardExecuteEnd() {
+    onWildlingCardExecuteEnd(): void {
         // Bury the wildling card
         this.game.wildlingDeck.push(this.wildlingCard);
 
@@ -225,14 +230,17 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
     }
 
     deserializeChildGameState(data: SerializedWildlingAttackGameState["childGameState"]): WildlingAttackGameState["childGameState"] {
-        if (data.type == "bidding") {
-            return BiddingGameState.deserializeFromServer(this, data);
-        } else if (data.type == "simple-choice") {
-            return SimpleChoiceGameState.deserializeFromServer(this, data);
-        } else if (data.type == "preemptive-raid-wildling-victory") {
-            return PreemptiveRaidWildlingVictoryGameState.deserializeFromServer(this, data);
-        } {
-            throw new Error();
+        switch(data.type) {
+            case "bidding":
+                return BiddingGameState.deserializeFromServer(this, data);
+            case "crow-killers-wildling-victory":
+                return CrowKillersWildlingVictoryGameState.deserializeFromServer(this, data);
+            case "preemptive-raid-wildling-victory":
+                return PreemptiveRaidWildlingVictoryGameState.deserializeFromServer(this, data);
+            case "simple-choice":
+                return SimpleChoiceGameState.deserializeFromServer(this, data);
+            case "crow-killers-nights-watch-victory":
+                return CrowKillersNightsWatchVictoryGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -241,7 +249,8 @@ export interface SerializedWildlingAttackGameState {
     type: "wildling-attack";
     wildlingStrength: number;
     participatingHouses: string[];
-    childGameState: SerializedBiddingGameState | SerializedSimpleChoiceGameState | SerializedPreemptiveRaidWildlingVictoryGameState;
+    childGameState: SerializedBiddingGameState | SerializedSimpleChoiceGameState | SerializedPreemptiveRaidWildlingVictoryGameState
+        | SerializedCrowKillersWildlingVictoryGameState | SerializedCrowKillersNightsWatchVictoryGameState;
     wildlingCard: number | null;
     biddingResults: [number, string[]][] | null;
     highestBidder: string | null;

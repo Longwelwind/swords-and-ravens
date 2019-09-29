@@ -8,10 +8,11 @@ import WildlingAttackGameState
     from "../../src/common/ingame-game-state/westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
 import * as _ from "lodash";
 import BetterMap from "../../src/utils/BetterMap";
+import setupAtWildlingAttackGameState from "../utils/setupAtWildlingAttackGameState";
 
 describe("preemptive raid wildling card", () => {
     it("on a wildling victory, allows 2 units to be destroyed anywhere", () => {
-        setupAtPlanningGameState({
+        setupAtWildlingAttackGameState({
             wildlingDeck: [{type: "preemptive-raid"}],
             wildlingStrength: 10,
             units: {
@@ -28,12 +29,6 @@ describe("preemptive raid wildling card", () => {
                 ]
             }
         }).execute(globalContext => {
-            globalContext.forEachClients((_, planning) => planning.ready());
-
-            // A full turn will pass with nothing happening.
-            // At the beginning of the next turn, a wildling attack should occur
-            return globalContext.expectGameState<BiddingGameState<WildlingAttackGameState>>(BiddingGameState);
-        }).execute(globalContext => {
             globalContext.lannister.as((_, bidding) => bidding.bid(1));
             globalContext.baratheon.as((_, bidding) => bidding.bid(2));
             globalContext.greyjoy.as((_, bidding) => bidding.bid(0));
@@ -43,7 +38,7 @@ describe("preemptive raid wildling card", () => {
         }).execute(globalContext => {
             globalContext.greyjoy.as((_, simpleChoice) => simpleChoice.choose(0));
 
-            return globalContext.expectGameState<SelectUnitsGameState>(SelectUnitsGameState);
+            return globalContext.expectGameState<SelectUnitsGameState<any>>(SelectUnitsGameState);
         }).execute(globalContext => {
             globalContext.greyjoy.as((context, selectUnits) => selectUnits.selectUnits(new BetterMap([
                 [context.theReach, [context.theReach.units.values[0]]],
@@ -58,7 +53,6 @@ describe("preemptive raid wildling card", () => {
             });
         });
     });
-
 
     it("on a night's watch victory, triggers a new wildling attack of strength 6 without the highest bidder", () => {
         setupAtPlanningGameState({
