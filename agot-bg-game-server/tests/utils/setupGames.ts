@@ -192,7 +192,7 @@ function setup4PlayersGameIngame(
         };
     };
 
-    return setup4PlayersGame({
+    const serializedIngame: SerializedIngameGameState = {
         type: "ingame",
         players: [
             {
@@ -213,7 +213,7 @@ function setup4PlayersGameIngame(
             }
         ],
         game: {
-            lastUnitId: lastUnitId,
+            lastUnitId: -1,
             wildlingStrength: setupOptions.wildlingStrength,
             wildlingDeck: setupOptions.wildlingDeck.map(c => ({id: ++lastWildlingCardId, type: c.type})),
             starredOrderRestrictions: [3, 3, 2, 1],
@@ -263,7 +263,10 @@ function setup4PlayersGameIngame(
             skipRavenPhase: setupOptions.skipRavenPhase
         },
         childGameState: serializedIngameChildGameState
-    });
+    };
+    serializedIngame.game.lastUnitId = lastUnitId;
+
+    return setup4PlayersGame(serializedIngame);
 }
 
 export function setupAtPlanningGameState(
@@ -277,7 +280,7 @@ export function setupAtPlanningGameState(
     }, userSetupOptions).expectGameState<PlanningGameState>(PlanningGameState);
 }
 
-interface SetupOptions {
+export interface SetupOptions {
     houses: {[houseId: string]: SetupOptionsHouse};
     units: {[regionId: string]: {type: string; allegiance: string; wounded?: boolean}[]};
     regions: {[regionId: string]: SetupOptionsRegion};

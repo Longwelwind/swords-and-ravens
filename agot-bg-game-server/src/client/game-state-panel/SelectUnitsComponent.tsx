@@ -13,7 +13,7 @@ import {observable} from "mobx";
 import {observer} from "mobx-react";
 
 @observer
-export default class SelectUnitsComponent extends Component<GameStateComponentProps<SelectUnitsGameState>> {
+export default class SelectUnitsComponent extends Component<GameStateComponentProps<SelectUnitsGameState<any>>> {
     @observable selectedUnits = new BetterMap<Region, Unit[]>();
 
     unitClickListener: any;

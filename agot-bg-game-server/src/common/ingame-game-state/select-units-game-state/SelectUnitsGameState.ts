@@ -14,7 +14,7 @@ interface SelectUnitsParentGameState extends GameState<any, any> {
     onSelectUnitsEnd: (house: House, selectedUnit: [Region, Unit[]][]) => void;
 }
 
-export default class SelectUnitsGameState extends GameState<SelectUnitsParentGameState> {
+export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> extends GameState<P> {
     house: House;
     possibleUnits: Unit[];
     count: number;
@@ -81,7 +81,7 @@ export default class SelectUnitsGameState extends GameState<SelectUnitsParentGam
         };
     }
 
-    static deserializeFromServer(parent: SelectUnitsParentGameState, data: SerializedSelectUnitsGameState): SelectUnitsGameState {
+    static deserializeFromServer<P extends SelectUnitsParentGameState>(parent: P, data: SerializedSelectUnitsGameState): SelectUnitsGameState<P> {
         const selectUnits = new SelectUnitsGameState(parent);
 
         selectUnits.house = parent.game.houses.get(data.house);
