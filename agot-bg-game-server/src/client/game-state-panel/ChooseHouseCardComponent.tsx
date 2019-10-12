@@ -9,6 +9,7 @@ import GameStateComponentProps from "./GameStateComponentProps";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
+import _ from "lodash";
 
 @observer
 export default class ChooseHouseCardComponent extends Component<GameStateComponentProps<ChooseHouseCardGameState>> {
@@ -39,31 +40,16 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
         );
     }
 
-    chooseHouseCard(houseCard: HouseCard) {
+    chooseHouseCard(houseCard: HouseCard): void {
         this.props.gameState.chooseHouseCard(houseCard);
     }
 
     getWaitingForHouses(): House[] {
-        const waitingForHouses: House[] = [];
-
-        if (!this.props.gameState.attackerHouseCardChosen) {
-            waitingForHouses.push(this.props.gameState.combatGameState.attacker);
-        }
-        if (!this.props.gameState.defenderHouseCardChosen) {
-            waitingForHouses.push(this.props.gameState.combatGameState.defender);
-        }
-
-        return waitingForHouses;
+        return _.difference(this.props.gameState.combatGameState.houseCombatDatas.keys, this.props.gameState.houseCards.keys);
     }
 
     shouldChooseHouseCard(): boolean {
-        return (
-                this.props.gameClient.doesControlHouse(this.props.gameState.combatGameState.attacker)
-                && !this.props.gameState.attackerHouseCardChosen
-            ) || (
-                this.props.gameClient.doesControlHouse(this.props.gameState.combatGameState.defender)
-                && !this.props.gameState.defenderHouseCardChosen
-        );
+        return this.getWaitingForHouses().some(h => this.props.gameClient.doesControlHouse(h));
     }
 
     getChoosableHouseCards(): HouseCard[] {

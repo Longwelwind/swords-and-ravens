@@ -44,13 +44,7 @@ interface ResolveMarchOrder {
 
 interface DeclareSupport {
     type: "declare-support";
-    supportTarget: SupportTarget;
-}
-
-export enum SupportTarget {
-    ATTACKER,
-    DEFENDER,
-    NONE
+    supportedHouseId: string | null;
 }
 
 interface UseValyrianSteelBlade {

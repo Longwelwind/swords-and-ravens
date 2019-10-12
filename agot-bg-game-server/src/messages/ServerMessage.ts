@@ -2,7 +2,6 @@ import {SerializedSeeTopWildlingCardGameState} from "../common/ingame-game-state
 import {SerializedGameState} from "../common/GameState";
 import {SerializedUnit} from "../common/ingame-game-state/game-data-structure/Unit";
 import {SerializedUser} from "../server/User";
-import {SupportTarget} from "./ClientMessage";
 import {HouseCardState} from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady
@@ -55,19 +54,17 @@ interface PlayerReady {
 interface SupportDeclared {
     type: "support-declared";
     houseId: string;
-    supportTarget: SupportTarget;
+    supportedHouseId: string | null;
 }
 
 interface HouseCardChosen {
     type: "house-card-chosen";
-    // "true" means attacker, "false" means defender
-    attackerOrDefender: boolean;
+    houseId: string;
 }
 
 interface RevealHouseCard {
     type: "reveal-house-card";
-    attackerHouseCard: string;
-    defenderHouseCard: string;
+    houseCardIds: [string, string][];
 }
 
 interface CombatImmediatelyKilledUnits {

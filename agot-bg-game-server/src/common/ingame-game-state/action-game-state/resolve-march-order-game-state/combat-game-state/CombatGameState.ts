@@ -10,7 +10,7 @@ import * as _ from "lodash";
 import DeclareSupportGameState, {SerializedDeclareSupportGameState} from "./declare-support-game-state/DeclareSupportGameState";
 import {ServerMessage} from "../../../../../messages/ServerMessage";
 import Player from "../../../Player";
-import {ClientMessage, SupportTarget} from "../../../../../messages/ClientMessage";
+import {ClientMessage} from "../../../../../messages/ClientMessage";
 import ChooseHouseCardGameState, {SerializedChooseHouseCardGameState} from "./choose-house-card-game-state/ChooseHouseCardGameState";
 import EntireGame from "../../../../EntireGame";
 import Game from "../../../game-data-structure/Game";
@@ -22,23 +22,62 @@ import DefenseOrderType from "../../../game-data-structure/order-types/DefenseOr
 import MarchOrderType from "../../../game-data-structure/order-types/MarchOrderType";
 import BetterMap from "../../../../../utils/BetterMap";
 
+
+export interface HouseCombatData {
+    army: Unit[];
+    region: Region;
+    houseCard: HouseCard | null;
+}
+
 export default class CombatGameState extends GameState<
     ResolveMarchOrderGameState,
     DeclareSupportGameState | ChooseHouseCardGameState | UseValyrianSteelBladeGameState
     | ChooseCasualtiesGameState | ChooseRetreatRegionGameState
 > {
-    attackingRegion: Region;
-    combatRegion: Region;
-    attacker: House;
-    defender: House;
-    army: Unit[];
-    valyrianSteelBladeUser: House | null;
-    attackerHouseCard: HouseCard | null;
-    defenderHouseCard: HouseCard | null;
     winner: House | null;
     loser: House | null;
 
-    supporters = new BetterMap<House, SupportTarget>();
+    attacker: House;
+    defender: House;
+    houseCombatDatas: BetterMap<House, HouseCombatData>;
+    valyrianSteelBladeUser: House | null;
+
+    // The key is the supporting house and the value is the supported house.
+    // The value is always either attacker or defender or null if the supporter
+    // decided to support no-one.
+    supporters = new BetterMap<House, House | null>();
+
+    get attackingRegion(): Region {
+        return this.attackingHouseCombatData.region;
+    }
+
+    get defendingRegion(): Region {
+        return this.defendingHouseCombatData.region;
+    }
+
+    get attackingArmy(): Unit[] {
+        return this.attackingHouseCombatData.army;
+    }
+
+    get defendingArmy(): Unit[] {
+        return this.defendingHouseCombatData.army;
+    }
+
+    get attackerHouseCard(): HouseCard | null {
+        return this.attackingHouseCombatData.houseCard;
+    }
+
+    get defenderHouseCard(): HouseCard | null {
+        return this.defendingHouseCombatData.houseCard;
+    }
+
+    get attackingHouseCombatData(): HouseCombatData {
+        return this.houseCombatDatas.get(this.attacker);
+    }
+
+    get defendingHouseCombatData(): HouseCombatData {
+        return this.houseCombatDatas.get(this.defender);
+    }
 
     get resolveMarchOrderGameState(): ResolveMarchOrderGameState {
         return this.parentGameState;
@@ -69,11 +108,12 @@ export default class CombatGameState extends GameState<
     }
 
     firstStart(attackerComingFrom: Region, combatRegion: Region, attacker: House, defender: House, army: Unit[]): void {
-        this.attackingRegion = attackerComingFrom;
         this.attacker = attacker;
         this.defender = defender;
-        this.combatRegion = combatRegion;
-        this.army = army;
+        this.houseCombatDatas = new BetterMap([
+            [attacker, {region: attackerComingFrom, army: army, houseCard: null}],
+            [defender, {region: combatRegion, army: combatRegion.units.values, houseCard: null}]
+        ]);
 
         // Begin by the declaration of support
         if (!this.proceedNextSupportDeclaration()) {
@@ -90,10 +130,6 @@ export default class CombatGameState extends GameState<
     }
 
     proceedResolveCombat(): void {
-        if (!this.attackerHouseCard || !this.defenderHouseCard) {
-            throw new Error();
-        }
-
         const attackerTotalStrength = this.getTotalCombatStrength(this.attacker);
         const defenderTotalStrength = this.getTotalCombatStrength(this.defender);
 
@@ -110,11 +146,23 @@ export default class CombatGameState extends GameState<
             loserId: this.loser.id
         });
 
-        const locationLoserArmy = this.attacker == this.loser ? this.attackingRegion : this.combatRegion;
-        const loserArmy = this.attacker == this.loser ? this.army : this.combatRegion.units.values;
+        const locationLoserArmy = this.attacker == this.loser ? this.attackingRegion : this.defendingRegion;
+        const loserArmy = this.attacker == this.loser ? this.attackingArmy : this.defendingArmy;
 
-        const winnerSwordIcons = this.attacker == this.winner ? this.attackerHouseCard.swordIcons : this.defenderHouseCard.swordIcons;
-        const loserTowerIcons = this.attacker == this.loser ? this.attackerHouseCard.towerIcons : this.defenderHouseCard.towerIcons;
+        const winnerSwordIcons = this.attacker == this.winner
+            ? this.attackerHouseCard
+                ? this.attackerHouseCard.swordIcons
+                : 0
+            : this.defenderHouseCard
+                ? this.defenderHouseCard.swordIcons
+                : 0;
+        const loserTowerIcons = this.attacker == this.loser
+            ? this.attackerHouseCard
+                ? this.attackerHouseCard.towerIcons
+                : 0
+            : this.defenderHouseCard
+                ? this.defenderHouseCard.towerIcons
+                : 0;
 
         const loserCasualtiesCount = Math.max(0, winnerSwordIcons - loserTowerIcons);
 
@@ -159,21 +207,13 @@ export default class CombatGameState extends GameState<
     }
 
     getHouseCardCombatStrength(house: House): number {
-        if (house != this.attacker && house != this.defender) {
-            throw new Error(`getHouseCardCombatStrength was called with house "${house.id}" which isn't the attacker nor the defender`);
-        }
-
-        const houseCard = house == this.attacker ? this.attackerHouseCard : this.defenderHouseCard;
+        const houseCard = this.houseCombatDatas.get(house).houseCard;
 
         return houseCard ? houseCard.combatStrength : 0;
     }
 
     getBaseCombatStrength(house: House): number {
-        const army = this.attacker == house ? this.army : this.defender == house ? this.combatRegion.units.values : null;
-
-        if (!army) {
-            throw new Error("getBaseCombatStrength was called with house \"" + house.id + "\" which isn't the attacker nor the defender");
-        }
+        const army = this.houseCombatDatas.get(house).army;
 
         const isAttackingAStructure = this.isAttackingAStructure(house);
 
@@ -181,45 +221,33 @@ export default class CombatGameState extends GameState<
     }
 
     getOrderBonus(house: House): number {
-        const army = this.attacker == house ? this.army : this.defender == house ? this.combatRegion.units.values : null;
+        const combatHouseData = this.houseCombatDatas.get(house);
 
-        if (!army) {
-            throw new Error("getBaseCombatStrength was called with house \"" + house.id + "\" which isn't the attacker nor the defender");
+        if (!this.actionGameState.ordersOnBoard.has(combatHouseData.region)) {
+            return 0;
         }
 
-        if (this.attacker == house) {
-            if (this.actionGameState.ordersOnBoard.has(this.attackingRegion)) {
-                const order = this.actionGameState.ordersOnBoard.get(this.attackingRegion);
+        const order = this.actionGameState.ordersOnBoard.get(combatHouseData.region);
 
-                // This should technically always be true since the attack was triggered by
-                // a march order in attackingRegion in the first place.
-                if (order.type instanceof MarchOrderType) {
-                    return order.type.attackModifier;
-                }
+        if (house == this.attacker) {
+            // This should technically always be true since the attack was triggered by
+            // a march order in attackingRegion in the first place.
+            if (order.type instanceof MarchOrderType) {
+                return order.type.attackModifier;
             }
         } else {
-            if (this.actionGameState.ordersOnBoard.has(this.combatRegion)) {
-                const order = this.actionGameState.ordersOnBoard.get(this.combatRegion);
-
-                if (order.type instanceof DefenseOrderType) {
-                    return order.type.defenseModifier;
-                }
+            if (order.type instanceof DefenseOrderType) {
+                return order.type.defenseModifier;
             }
         }
 
         return 0;
     }
 
-    getSupportStrengthForSide(house: House): number {
-        const target = house == this.attacker ? SupportTarget.ATTACKER : house == this.defender ? SupportTarget.DEFENDER : SupportTarget.NONE;
-
-        if (target == SupportTarget.NONE) {
-            throw new Error("getSupportStrength was called with house \"" + house.id + "\" which isn't the attacker nor the defender");
-        }
-
+    getSupportStrengthForSide(supportedHouse: House): number {
         return this.supporters.entries
-            .filter(([_house, supportTarget]) => supportTarget == target)
-            .map(([house, _]) => this.actionGameState.getSupportCombatStrength(house, this.combatRegion))
+            .filter(([_house, supHouse]) => supportedHouse == supHouse)
+            .map(([house, _]) => this.actionGameState.getSupportCombatStrength(house, this.defendingRegion))
             .reduce(_.add, 0);
     }
 
@@ -229,7 +257,7 @@ export default class CombatGameState extends GameState<
 
     isAttackingAStructure(house: House): boolean {
         if (house == this.attacker) {
-            return this.combatRegion.castleLevel > 0;
+            return this.defendingRegion.castleLevel > 0;
         }
 
         return false;
@@ -303,20 +331,20 @@ export default class CombatGameState extends GameState<
 
         if (this.loser == this.defender) {
             // A retreat doesn't need to be done if there are no units left
-            if (this.combatRegion.units.size > 0) {
-                if (this.world.getValidRetreatRegions(this.combatRegion, this.loser, this.combatRegion.units.values).length > 0) {
+            if (this.defendingRegion.units.size > 0) {
+                if (this.world.getValidRetreatRegions(this.defendingRegion, this.loser, this.defendingRegion.units.values).length > 0) {
                     // The defender must choose a retreat location
-                    this.setChildGameState(new ChooseRetreatRegionGameState(this)).firstStart(this.loser, this.combatRegion, this.combatRegion.units.values);
+                    this.setChildGameState(new ChooseRetreatRegionGameState(this)).firstStart(this.loser, this.defendingRegion, this.defendingRegion.units.values);
 
                     return;
                 } else {
                     // If there are no available retreat regions, kill all the remaining units
-                    this.combatRegion.units.values.forEach(u => this.combatRegion.units.delete(u.id));
+                    this.defendingRegion.units.values.forEach(u => this.defendingRegion.units.delete(u.id));
 
                     this.entireGame.broadcastToClients({
                         type: "remove-units",
-                        regionId: this.combatRegion.id,
-                        unitIds: this.combatRegion.units.values.map(u => u.id)
+                        regionId: this.defendingRegion.id,
+                        unitIds: this.defendingRegion.units.values.map(u => u.id)
                     });
                 }
             }
@@ -328,15 +356,15 @@ export default class CombatGameState extends GameState<
     proceedEndOfCombat(): void {
         // If the attacker won, move his units to the attacked region
         if (this.winner == this.attacker) {
-            this.resolveMarchOrderGameState.moveUnits(this.attackingRegion, this.army, this.combatRegion);
+            this.resolveMarchOrderGameState.moveUnits(this.attackingRegion, this.attackingArmy, this.defendingRegion);
         } else {
             // If he lost, wound his units
-            this.army.forEach(u => u.wounded = true);
+            this.attackingArmy.forEach(u => u.wounded = true);
 
             this.entireGame.broadcastToClients({
                 type: "units-wounded",
                 regionId: this.attackingRegion.id,
-                unitIds: this.army.map(u => u.id)
+                unitIds: this.attackingArmy.map(u => u.id)
             });
         }
 
@@ -352,8 +380,7 @@ export default class CombatGameState extends GameState<
         }
 
         // Put the house cards as used, and if it's the last, retrieve all house cards.
-        this.markHouseAsUsed(this.attacker, this.attackerHouseCard);
-        this.markHouseAsUsed(this.defender, this.defenderHouseCard);
+        this.houseCombatDatas.forEach(({houseCard}, house) => this.markHouseAsUsed(house, houseCard));
 
         this.resolveMarchOrderGameState.onCombatGameStateEnd(this.attacker);
     }
@@ -444,7 +471,7 @@ export default class CombatGameState extends GameState<
 
     getPossibleSupportingHouses(): House[] {
         return _.uniq(
-            this.actionGameState.getPossibleSupportingRegions(this.combatRegion)
+            this.actionGameState.getPossibleSupportingRegions(this.defendingRegion)
             // Since a region that contains units _must_ be controlled by a house,
             // r.getController() can be safely casted
             .map(({region}) => region.getController() as House)
@@ -462,16 +489,16 @@ export default class CombatGameState extends GameState<
     serializeToClient(admin: boolean, player: Player | null): SerializedCombatGameState {
         return {
             type: "combat",
-            attackingRegionId: this.attackingRegion.id,
-            combatRegionId: this.combatRegion.id,
             attackerId: this.attacker.id,
             defenderId: this.defender.id,
-            army: this.army.map(u => u.id),
-            attackerHouseCard: this.attackerHouseCard ? this.attackerHouseCard.id : null,
-            defenderHouseCard: this.defenderHouseCard ? this.defenderHouseCard.id : null,
             winner: this.winner ? this.winner.id : null,
             loser: this.loser ? this.loser.id : null,
-            supporters: this.supporters.entries.map(([house, supportTarget]) => [house.id, supportTarget]),
+            houseCombatDatas: this.houseCombatDatas.map((house, houseCombatData) => [house.id, {
+                houseCardId: houseCombatData.houseCard ? houseCombatData.houseCard.id : null,
+                army: houseCombatData.army.map(u => u.id),
+                regionId: houseCombatData.region.id
+            }]),
+            supporters: this.supporters.entries.map(([house, supportedHouse]) => [house.id, supportedHouse ? supportedHouse.id : null]),
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -479,19 +506,29 @@ export default class CombatGameState extends GameState<
     static deserializeFromServer(resolveMarchOrderGameState: ResolveMarchOrderGameState, data: SerializedCombatGameState): CombatGameState {
         const combatGameState = new CombatGameState(resolveMarchOrderGameState);
 
-        combatGameState.attackingRegion = resolveMarchOrderGameState.world.regions.get(data.attackingRegionId);
         combatGameState.attacker = resolveMarchOrderGameState.game.houses.get(data.attackerId);
         combatGameState.defender = resolveMarchOrderGameState.game.houses.get(data.defenderId);
         combatGameState.winner = data.winner ? resolveMarchOrderGameState.game.houses.get(data.winner) : null;
         combatGameState.loser = data.loser ? resolveMarchOrderGameState.game.houses.get(data.loser) : null;
-        combatGameState.army = data.army.map(uid => combatGameState.attackingRegion.units.get(uid));
-        combatGameState.combatRegion = resolveMarchOrderGameState.world.regions.get(data.combatRegionId);
-        combatGameState.supporters = new BetterMap<House, SupportTarget>(
-            data.supporters.map(([houseId, supportTarget]) => [resolveMarchOrderGameState.game.houses.get(houseId), supportTarget])
-        );
-        combatGameState.attackerHouseCard = data.attackerHouseCard ? combatGameState.attacker.houseCards.get(data.attackerHouseCard) : null;
-        combatGameState.defenderHouseCard = data.defenderHouseCard ? combatGameState.defender.houseCards.get(data.defenderHouseCard) : null;
+        combatGameState.houseCombatDatas = new BetterMap(data.houseCombatDatas.map(([houseId, {regionId, houseCardId, army}]) => {
+            const house = resolveMarchOrderGameState.game.houses.get(houseId);
+            const region = resolveMarchOrderGameState.game.world.regions.get(regionId);
 
+            return [
+                house,
+                {
+                    army: army.map(uid => region.units.get(uid)),
+                    region,
+                    houseCard: houseCardId ? house.houseCards.get(houseCardId) : null
+                }
+            ]
+        }));
+        combatGameState.supporters = new BetterMap(
+            data.supporters.map(([houseId, supportedHouseId]) => [
+                resolveMarchOrderGameState.game.houses.get(houseId),
+                supportedHouseId ? resolveMarchOrderGameState.game.houses.get(supportedHouseId) : null
+            ])
+        );
         combatGameState.childGameState = combatGameState.deserializeChildGameState(data.childGameState);
 
         return combatGameState;
@@ -516,16 +553,12 @@ export default class CombatGameState extends GameState<
 
 export interface SerializedCombatGameState {
     type: "combat";
-    attackingRegionId: string;
-    combatRegionId: string;
     attackerId: string;
     defenderId: string;
     winner: string | null;
     loser: string | null;
-    army: number[];
-    supporters: [string, SupportTarget][];
-    attackerHouseCard: string | null;
-    defenderHouseCard: string | null;
+    supporters: [string, string | null][];
+    houseCombatDatas: [string, {houseCardId: string | null; army: number[]; regionId: string}][];
     childGameState: SerializedDeclareSupportGameState | SerializedChooseHouseCardGameState
         | SerializedUseValyrianSteelBladeGameState | SerializedChooseCasualtiesGameState
         | SerializedChooseRetreatRegionGameState;

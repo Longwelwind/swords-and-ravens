@@ -88,11 +88,6 @@ export default class UseRavenGameState extends GameState<ActionGameState, Choose
         } else if (data.type == "replace-order") {
             return ReplaceOrderGameState.deserializeFromServer(this, data);
         } else if (data.type == "see-top-wildling-card") {
-            this.entireGame.log(
-                `The holder of the Raven Token (${this.ravenHolder.name}) chose`,
-                ` to do nothing.`
-            );
-
             return SeeTopWildlingCardGameState.deserializeFromServer(this, data);
         } else {
             throw new Error();

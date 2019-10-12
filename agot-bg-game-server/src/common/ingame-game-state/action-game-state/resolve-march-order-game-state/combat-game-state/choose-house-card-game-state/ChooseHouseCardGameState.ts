@@ -7,12 +7,12 @@ import EntireGame from "../../../../../EntireGame";
 import {ServerMessage} from "../../../../../../messages/ServerMessage";
 import {observable} from "mobx";
 import House from "../../../../game-data-structure/House";
+import BetterMap from "../../../../../../utils/BetterMap";
 
 export default class ChooseHouseCardGameState extends GameState<CombatGameState> {
-    @observable attackerHouseCardChosen = false;
-    attackerHouseCard: HouseCard | null;
-    @observable defenderHouseCardChosen = false;
-    defenderHouseCard: HouseCard | null;
+    // A null value for a key can be present client-side, it indicates
+    // that a house card was chosen but it may not be shown to the player.
+    @observable houseCards = new BetterMap<House, HouseCard | null>();
 
     get combatGameState(): CombatGameState {
         return this.parentGameState;
@@ -28,80 +28,61 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
     onServerMessage(message: ServerMessage): void {
         if (message.type == "house-card-chosen") {
-            if (message.attackerOrDefender) {
-                this.attackerHouseCardChosen = true;
-            } else {
-                this.defenderHouseCardChosen = true;
-            }
+            const house = this.combatGameState.game.houses.get(message.houseId);
+
+            this.houseCards.set(house, null);
         } else if (message.type == "reveal-house-card") {
-            this.combatGameState.attackerHouseCard = this.combatGameState.attacker.houseCards.get(message.attackerHouseCard);
-            this.combatGameState.defenderHouseCard = this.combatGameState.defender.houseCards.get(message.defenderHouseCard);
+            const houseCards: [House, HouseCard][] = message.houseCardIds.map(([houseId, houseCardId]) => [
+                this.combatGameState.game.houses.get(houseId),
+                this.combatGameState.game.houses.get(houseId).houseCards.get(houseCardId)
+            ]);
+
+            houseCards.forEach(([house, houseCard]) => this.combatGameState.houseCombatDatas.get(house).houseCard = houseCard);
         }
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "choose-house-card") {
-            if (player.house == this.combatGameState.attacker) {
-                if (this.combatGameState.attackerHouseCard != null) {
-                    return;
-                }
-
-                const houseCard = this.combatGameState.attacker.houseCards.get(message.houseCardId);
-
-                if (!this.getChoosableCards(player.house).includes(houseCard)) {
-                    return;
-                }
-
-                this.attackerHouseCardChosen = true;
-                this.attackerHouseCard = houseCard;
-
-                this.entireGame.broadcastToClients({
-                    type: "house-card-chosen",
-                    attackerOrDefender: true
-                });
-
-                this.checkEndOfGameState();
-            } else if (player.house == this.combatGameState.defender) {
-                if (this.combatGameState.defenderHouseCard != null) {
-                    return;
-                }
-
-                const houseCard = this.combatGameState.defender.houseCards.get(message.houseCardId);
-
-                if (!this.getChoosableCards(player.house).includes(houseCard)) {
-                    return;
-                }
-
-                this.defenderHouseCardChosen = true;
-                this.defenderHouseCard = houseCard;
-
-                this.entireGame.broadcastToClients({
-                    type: "house-card-chosen",
-                    attackerOrDefender: false
-                });
-
-                this.checkEndOfGameState();
+            if (!this.combatGameState.houseCombatDatas.has(player.house)) {
+                return;
             }
-        }
-    }
 
-    private checkEndOfGameState(): void {
-        if (this.attackerHouseCard && this.defenderHouseCard) {
-            this.combatGameState.attackerHouseCard = this.attackerHouseCard;
-            this.combatGameState.defenderHouseCard = this.defenderHouseCard;
+            const houseCard = player.house.houseCards.get(message.houseCardId);
 
-            this.entireGame.log(
-                `**${this.combatGameState.attacker.name}** chooses **${this.attackerHouseCard.name}**  `,
-                `**${this.combatGameState.defender.name}** chooses **${this.defenderHouseCard.name}**`
-            );
+            if (!this.getChoosableCards(player.house).includes(houseCard)) {
+                return;
+            }
+
+            this.houseCards.set(player.house, houseCard);
 
             this.entireGame.broadcastToClients({
-                type: "reveal-house-card",
-                attackerHouseCard: this.attackerHouseCard.id,
-                defenderHouseCard: this.defenderHouseCard.id
+                type: "house-card-chosen",
+                houseId: player.house.id
             });
 
-            this.combatGameState.onChooseHouseCardGameStateEnd();
+            if (this.houseCards.size == 2) {
+                this.houseCards.forEach((houseCard, house) => this.combatGameState.houseCombatDatas.get(house).houseCard = houseCard);
+
+                // "this.combatGameState.attackingHouseCombatData.houseCard" and
+                // "this.combatGameState.defendingHouseCombatData.houseCard" will always be non-null
+                // since they have just been set before, thus the two "ts-ignore". They could be later set to null
+                // because of Tyrion Lannister, for example.
+                this.entireGame.log(
+                    // @ts-ignore
+                    `**${this.combatGameState.attacker.name}** chooses **${this.combatGameState.attackingHouseCombatData.houseCard.name}**  `,
+                    // @ts-ignore
+                    `**${this.combatGameState.defender.name}** chooses **${this.combatGameState.defendingHouseCombatData.houseCard.name}**`
+                );
+
+                this.entireGame.broadcastToClients({
+                    type: "reveal-house-card",
+                    // Same here, the houseCards will always be non-null
+                    // @ts-ignore
+                    houseCardIds: this.combatGameState.houseCombatDatas.map((h, hcd) => [h.id, hcd.houseCard.id])
+                });
+
+                this.combatGameState.onChooseHouseCardGameStateEnd();
+            }
         }
     }
 
@@ -120,27 +101,20 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         return "Choose a general";
     }
 
-    serializeToClient(admin: boolean, player: Player | null): SerializedChooseHouseCardGameState {
+    serializeToClient(_admin: boolean, _player: Player | null): SerializedChooseHouseCardGameState {
         return {
             type: "choose-house-card",
-            attackerHouseCardChosen: this.attackerHouseCardChosen,
-            attackerHouseCardId: this.attackerHouseCard && (admin || (player && player.house == this.combatGameState.attacker))
-                ? this.attackerHouseCard.id
-                : null,
-            defenderHouseCardChosen: this.defenderHouseCardChosen,
-            defenderHouseCardId: this.defenderHouseCard && (admin || (player && player.house == this.combatGameState.defender))
-                ? this.defenderHouseCard.id
-                : null
+            houseCards: this.houseCards.map((h, hc) => [h.id, hc ? hc.id : null])
         };
     }
 
     static deserializeFromServer(combatGameState: CombatGameState, data: SerializedChooseHouseCardGameState): ChooseHouseCardGameState {
         const chooseHouseCardGameState = new ChooseHouseCardGameState(combatGameState);
 
-        chooseHouseCardGameState.attackerHouseCard = data.attackerHouseCardId ? combatGameState.attacker.houseCards.get(data.attackerHouseCardId) : null;
-        chooseHouseCardGameState.attackerHouseCardChosen = data.attackerHouseCardChosen;
-        chooseHouseCardGameState.defenderHouseCard = data.defenderHouseCardId ? combatGameState.defender.houseCards.get(data.defenderHouseCardId) : null;
-        chooseHouseCardGameState.defenderHouseCardChosen = data.defenderHouseCardChosen;
+        chooseHouseCardGameState.houseCards = new BetterMap(data.houseCards.map(([hid, hcid]) => [
+            combatGameState.game.houses.get(hid),
+            hcid ? combatGameState.game.houses.get(hid).houseCards.get(hcid) : null
+        ]));
 
         return chooseHouseCardGameState;
     }
@@ -148,8 +122,5 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
 export interface SerializedChooseHouseCardGameState {
     type: "choose-house-card";
-    attackerHouseCardChosen: boolean;
-    attackerHouseCardId: string | null;
-    defenderHouseCardChosen: boolean;
-    defenderHouseCardId: string | null;
+    houseCards: [string, string | null][];
 }
