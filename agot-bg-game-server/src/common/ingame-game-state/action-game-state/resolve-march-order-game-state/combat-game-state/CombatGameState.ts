@@ -21,6 +21,7 @@ import ChooseRetreatRegionGameState, {SerializedChooseRetreatRegionGameState} fr
 import DefenseOrderType from "../../../game-data-structure/order-types/DefenseOrderType";
 import MarchOrderType from "../../../game-data-structure/order-types/MarchOrderType";
 import BetterMap from "../../../../../utils/BetterMap";
+import HouseCardAbility from "../../../game-data-structure/house-card/HouseCardAbility";
 
 
 export interface HouseCombatData {
@@ -150,12 +151,8 @@ export default class CombatGameState extends GameState<
         const loserArmy = this.attacker == this.loser ? this.attackingArmy : this.defendingArmy;
 
         const winnerSwordIcons = this.attacker == this.winner
-            ? this.attackerHouseCard
-                ? this.attackerHouseCard.swordIcons
-                : 0
-            : this.defenderHouseCard
-                ? this.defenderHouseCard.swordIcons
-                : 0;
+            ? this.getHouseCardSwordIcons(this.attacker)
+            : this.getHouseCardSwordIcons(this.defender);
         const loserTowerIcons = this.attacker == this.loser
             ? this.attackerHouseCard
                 ? this.attackerHouseCard.towerIcons
@@ -204,12 +201,6 @@ export default class CombatGameState extends GameState<
         } else {
             this.proceedRetreat();
         }
-    }
-
-    getHouseCardCombatStrength(house: House): number {
-        const houseCard = this.houseCombatDatas.get(house).houseCard;
-
-        return houseCard ? houseCard.combatStrength : 0;
     }
 
     getBaseCombatStrength(house: House): number {
@@ -467,6 +458,49 @@ export default class CombatGameState extends GameState<
         }
 
         return null;
+    }
+
+    getHouseCardCombatStrength(house: House): number {
+        return this.getStatOfHouseCard(
+            house,
+            hc => hc.combatStrength,
+            (h, hc, a, ahc) => a.modifyCombatStrength(this, h, hc, ahc)
+        );
+    }
+
+    getHouseCardSwordIcons(house: House): number {
+        return this.getStatOfHouseCard(
+            house,
+            hc => hc.swordIcons,
+            (h, hc, a, ahc) => a.modifySwordIcons(this, h, hc, ahc)
+        );
+    }
+
+    getStatOfHouseCard(
+        affectedHouse: House,
+        baseAmount: (hc: HouseCard) => number,
+        abilityModify: (house: House, houseCard: HouseCard, ability: HouseCardAbility, affectedHouseCard: HouseCard) => number
+    ): number {
+        const affectedHouseCard = this.houseCombatDatas.get(affectedHouse).houseCard;
+
+        if (affectedHouseCard == null) {
+            return 0;
+        }
+
+        return this.getOrderResolutionHouseCard().reduce((s, h) => {
+            const houseCard = this.houseCombatDatas.get(h).houseCard;
+
+            if (houseCard == null) {
+                return s;
+            }
+
+            return houseCard.ability ? s + abilityModify(h, houseCard, houseCard.ability, affectedHouseCard) : s;
+        }, baseAmount(affectedHouseCard));
+    }
+
+
+    getOrderResolutionHouseCard(): House[] {
+        return _.sortBy(this.houseCombatDatas.keys, [h => this.game.ironThroneTrack.indexOf(h)]);
     }
 
     getPossibleSupportingHouses(): House[] {

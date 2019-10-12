@@ -1,4 +1,5 @@
 import HouseCardAbility from "./HouseCardAbility";
+import houseCardAbilities from "./houseCardAbilities";
 
 export default class HouseCard {
     id: string;
@@ -37,7 +38,7 @@ export default class HouseCard {
             data.combatStrength,
             data.swordIcons,
             data.towerIcons,
-            null
+            data.abilityId ? houseCardAbilities.get(data.abilityId) : null
         );
 
         houseCard.state = data.state;

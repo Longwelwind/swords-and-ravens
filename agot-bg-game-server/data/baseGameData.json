@@ -393,7 +393,8 @@
         },
         "theon-greyjoy": {
           "name": "Theon Greyjoy",
-          "combatStrength": 2
+          "combatStrength": 2,
+          "ability": "theon-greyjoy"
         },
         "dagmar-cleftjaw": {
           "name": "Dagmar Cleftjaw",

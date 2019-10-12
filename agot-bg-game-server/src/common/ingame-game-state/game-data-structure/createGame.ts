@@ -15,6 +15,7 @@ import WildlingCard from "./wildling-card/WildlingCard";
 import wildlingCardTypes from "./wildling-card/wildlingCardTypes";
 import BetterMap from "../../../utils/BetterMap";
 import * as _ from "lodash";
+import houseCardAbilities from "./house-card/houseCardAbilities";
 
 interface TiledSquareObject {
     name: string;
@@ -67,6 +68,7 @@ interface HouseCardData {
     combatStrength?: number;
     swordIcons?: number;
     towerIcons?: number;
+    ability?: string;
 }
 
 export default function createGame(housesToCreate: string[]): Game {
@@ -87,7 +89,7 @@ export default function createGame(housesToCreate: string[]): Game {
                             houseCardData.combatStrength ? houseCardData.combatStrength : 0,
                             houseCardData.swordIcons ? houseCardData.swordIcons : 0,
                             houseCardData.towerIcons ? houseCardData.towerIcons : 0,
-                            null
+                            houseCardData.ability ? houseCardAbilities.get(houseCardData.ability) : null
                         );
 
                         return [houseCardId, houseCard];
