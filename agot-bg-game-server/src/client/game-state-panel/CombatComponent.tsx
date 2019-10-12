@@ -53,7 +53,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                             <tr>
                                 <td>Region</td>
                                 <td>{this.combatGameState.attackingRegion.name}</td>
-                                <td>{this.combatGameState.combatRegion.name}</td>
+                                <td>{this.combatGameState.defendingRegion.name}</td>
                             </tr>
                             <tr>
                                 <td>Army</td>

@@ -1,7 +1,7 @@
 import CombatGameState from "../CombatGameState";
 import GameState from "../../../../../GameState";
 import House from "../../../../game-data-structure/House";
-import {ClientMessage, SupportTarget} from "../../../../../../messages/ClientMessage";
+import {ClientMessage} from "../../../../../../messages/ClientMessage";
 import Player from "../../../../Player";
 import EntireGame from "../../../../../EntireGame";
 import {ServerMessage} from "../../../../../../messages/ServerMessage";
@@ -42,25 +42,30 @@ export default class DeclareSupportGameState extends GameState<CombatGameState> 
                 return;
             }
 
-            const supportTarget = message.supportTarget;
-            this.combatGameState.supporters.set(this.house, supportTarget);
+            const supportedHouse = message.supportedHouseId ? this.game.houses.get(message.supportedHouseId) : null;
 
-            if (supportTarget == SupportTarget.NONE) {
+            if (supportedHouse != null) {
+                if (supportedHouse != this.combatGameState.attacker && supportedHouse != this.combatGameState.defender) {
+                    return;
+                }
+            }
+
+            this.combatGameState.supporters.set(this.house, supportedHouse);
+
+            if (supportedHouse) {
                 this.entireGame.log(
-                    `**${player.house.name}** supports no-one`
+                    `**${player.house.name}** supports **${supportedHouse.name}**`
                 );
             } else {
-                const house = supportTarget == SupportTarget.DEFENDER ? this.combatGameState.defender : this.combatGameState.attacker;
-
                 this.entireGame.log(
-                    `**${player.house.name}** supports **${house.name}**`
+                    `**${player.house.name}** supports no-one`
                 );
             }
 
             this.entireGame.broadcastToClients({
                 type: "support-declared",
                 houseId: this.house.id,
-                supportTarget: supportTarget
+                supportedHouseId: supportedHouse ? supportedHouse.id : null
             });
 
             this.combatGameState.onDeclareSupportGameStateEnd();
@@ -70,16 +75,16 @@ export default class DeclareSupportGameState extends GameState<CombatGameState> 
     onServerMessage(message: ServerMessage): void {
         if (message.type == "support-declared") {
             const house = this.game.houses.get(message.houseId);
-            const supportTarget = message.supportTarget;
+            const supportedHouse = message.supportedHouseId ? this.game.houses.get(message.supportedHouseId) : null;
 
-            this.combatGameState.supporters.set(house, supportTarget);
+            this.combatGameState.supporters.set(house, supportedHouse);
         }
     }
 
-    choose(supportTarget: SupportTarget): void {
+    choose(house: House | null): void {
         this.entireGame.sendMessageToServer({
             type: "declare-support",
-            supportTarget: supportTarget
+            supportedHouseId: house ? house.id : null
         });
     }
 
