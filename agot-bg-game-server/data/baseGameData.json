@@ -36,6 +36,11 @@
         "unitType": "footman",
         "house": "greyjoy",
         "quantity": 1
+      },
+      {
+        "unitType": "knight",
+        "house": "greyjoy",
+        "quantity": 1
       }
     ],
     "port-of-pyke": [
@@ -67,6 +72,13 @@
       },
       {
         "unitType": "knight",
+        "house": "lannister",
+        "quantity": 1
+      }
+    ],
+    "port-of-lannisport": [
+      {
+        "unitType": "ship",
         "house": "lannister",
         "quantity": 1
       }
