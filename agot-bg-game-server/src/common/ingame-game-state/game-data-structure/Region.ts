@@ -26,7 +26,7 @@ export default class Region {
     powerTokenSlot: Point;
 
     get hasStructure(): boolean {
-        return this.garrison > 0;
+        return this.castleLevel > 0;
     }
 
     constructor(
