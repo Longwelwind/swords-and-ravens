@@ -352,7 +352,8 @@
         },
         "ser-davos-seaworth": {
           "name": "Ser Davos Seaworth",
-          "combatStrength": 2
+          "combatStrength": 2,
+          "ability": "ser-davos-seaworth"
         },
         "brienne-of-tarth": {
           "name": "Brienne of Tarth",
