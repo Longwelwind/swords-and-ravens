@@ -1,20 +1,25 @@
-import CombatGameState from "../CombatGameState";
-import GameState from "../../../../../GameState";
-import Unit from "../../../../game-data-structure/Unit";
-import Region from "../../../../game-data-structure/Region";
-import Player from "../../../../Player";
-import {ServerMessage} from "../../../../../../messages/ServerMessage";
-import {ClientMessage} from "../../../../../../messages/ClientMessage";
-import IngameGameState from "../../../../IngameGameState";
-import EntireGame from "../../../../../EntireGame";
-import SelectUnitsGameState, {SerializedSelectUnitsGameState} from "../../../../select-units-game-state/SelectUnitsGameState";
-import House from "../../../../game-data-structure/House";
-import Game from "../../../../game-data-structure/Game";
+import CombatGameState from "../../CombatGameState";
+import GameState from "../../../../../../GameState";
+import Unit from "../../../../../game-data-structure/Unit";
+import Region from "../../../../../game-data-structure/Region";
+import Player from "../../../../../Player";
+import {ServerMessage} from "../../../../../../../messages/ServerMessage";
+import {ClientMessage} from "../../../../../../../messages/ClientMessage";
+import IngameGameState from "../../../../../IngameGameState";
+import EntireGame from "../../../../../../EntireGame";
+import SelectUnitsGameState, {SerializedSelectUnitsGameState} from "../../../../../select-units-game-state/SelectUnitsGameState";
+import House from "../../../../../game-data-structure/House";
+import Game from "../../../../../game-data-structure/Game";
+import PostCombatGameState from "../PostCombatGameState";
 
-export default class ChooseCasualtiesGameState extends GameState<CombatGameState, SelectUnitsGameState<ChooseCasualtiesGameState>> {
+export default class ChooseCasualtiesGameState extends GameState<PostCombatGameState, SelectUnitsGameState<ChooseCasualtiesGameState>> {
+
+    get postCombatGameState(): PostCombatGameState {
+        return this.parentGameState;
+    }
 
     get combatGameState(): CombatGameState {
-        return this.parentGameState;
+        return this.postCombatGameState.parentGameState;
     }
 
     get ingameGameState(): IngameGameState {
@@ -47,7 +52,7 @@ export default class ChooseCasualtiesGameState extends GameState<CombatGameState
     onSelectUnitsEnd(_house: House, selectedUnits: [Region, Unit[]][]): void {
         const [region, units] = selectedUnits[0];
 
-        this.combatGameState.onChooseCasualtiesGameStateEnd(region, units);
+        this.postCombatGameState.onChooseCasualtiesGameStateEnd(region, units);
     }
 
     onServerMessage(_message: ServerMessage): void {
@@ -58,8 +63,8 @@ export default class ChooseCasualtiesGameState extends GameState<CombatGameState
         return "Choose casualties";
     }
 
-    static deserializeFromServer(combatGameState: CombatGameState, data: SerializedChooseCasualtiesGameState): ChooseCasualtiesGameState {
-        const chooseCasualtiesGameState = new ChooseCasualtiesGameState(combatGameState);
+    static deserializeFromServer(postCombatGameState: PostCombatGameState, data: SerializedChooseCasualtiesGameState): ChooseCasualtiesGameState {
+        const chooseCasualtiesGameState = new ChooseCasualtiesGameState(postCombatGameState);
 
         chooseCasualtiesGameState.childGameState = chooseCasualtiesGameState.deserializeChildGameState(data.childGameState);
 

@@ -1,29 +1,30 @@
-import GameState from "../../../../../GameState";
-import CombatGameState from "../CombatGameState";
-import Region from "../../../../game-data-structure/Region";
-import House from "../../../../game-data-structure/House";
-import {ServerMessage} from "../../../../../../messages/ServerMessage";
-import {ClientMessage} from "../../../../../../messages/ClientMessage";
-import Player from "../../../../Player";
-import World from "../../../../game-data-structure/World";
-import Unit from "../../../../game-data-structure/Unit";
-import EntireGame from "../../../../../EntireGame";
+import GameState from "../../../../../../GameState";
+import CombatGameState from "../../CombatGameState";
+import Region from "../../../../../game-data-structure/Region";
+import House from "../../../../../game-data-structure/House";
+import {ServerMessage} from "../../../../../../../messages/ServerMessage";
+import {ClientMessage} from "../../../../../../../messages/ClientMessage";
+import Player from "../../../../../Player";
+import World from "../../../../../game-data-structure/World";
+import Unit from "../../../../../game-data-structure/Unit";
+import EntireGame from "../../../../../../EntireGame";
+import PostCombatGameState from "../PostCombatGameState";
 
-export default class ChooseRetreatRegionGameState extends GameState<CombatGameState> {
+export default class ChooseRetreatRegionGameState extends GameState<PostCombatGameState> {
     house: House;
     startingRegion: Region;
     army: Unit[];
 
-    get combatGameState(): CombatGameState {
+    get postCombatGameState(): PostCombatGameState {
         return this.parentGameState;
     }
 
     get world(): World {
-        return this.combatGameState.world;
+        return this.postCombatGameState.world;
     }
 
     get entireGame(): EntireGame {
-        return this.combatGameState.entireGame;
+        return this.postCombatGameState.entireGame;
     }
 
     firstStart(house: House, startingRegion: Region, army: Unit[]) {
@@ -48,7 +49,7 @@ export default class ChooseRetreatRegionGameState extends GameState<CombatGameSt
                 `**${this.house.name}** retreats to **${chosenRetreatRegion.name}**`
             );
 
-            this.combatGameState.onChooseRetreatLocationGameStateEnd(this.house, this.startingRegion, this.army, chosenRetreatRegion);
+            this.postCombatGameState.onChooseRetreatLocationGameStateEnd(this.house, this.startingRegion, this.army, chosenRetreatRegion);
         }
     }
 
@@ -73,11 +74,11 @@ export default class ChooseRetreatRegionGameState extends GameState<CombatGameSt
         return "Choose retreat region";
     }
 
-    static deserializeFromServer(combatGameState: CombatGameState, data: SerializedChooseRetreatRegionGameState): ChooseRetreatRegionGameState {
-        const chooseRetreatRegion = new ChooseRetreatRegionGameState(combatGameState);
+    static deserializeFromServer(postCombat: PostCombatGameState, data: SerializedChooseRetreatRegionGameState): ChooseRetreatRegionGameState {
+        const chooseRetreatRegion = new ChooseRetreatRegionGameState(postCombat);
 
-        chooseRetreatRegion.house = combatGameState.game.houses.get(data.houseId);
-        chooseRetreatRegion.startingRegion = combatGameState.world.regions.get(data.startingRegionId);
+        chooseRetreatRegion.house = postCombat.game.houses.get(data.houseId);
+        chooseRetreatRegion.startingRegion = postCombat.world.regions.get(data.startingRegionId);
         chooseRetreatRegion.army = data.army.map(uid => chooseRetreatRegion.startingRegion.units.get(uid));
 
         return chooseRetreatRegion;

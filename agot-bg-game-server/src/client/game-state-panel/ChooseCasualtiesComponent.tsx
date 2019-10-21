@@ -1,7 +1,7 @@
 import {observer} from "mobx-react";
 import {Component, ReactNode} from "react";
 import ChooseCasualtiesGameState
-    from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/choose-casualties-game-state/ChooseCasualtiesGameState";
+    from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/choose-casualties-game-state/ChooseCasualtiesGameState";
 import React from "react";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Col from "react-bootstrap/Col";

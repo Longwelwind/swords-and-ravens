@@ -12,16 +12,13 @@ import ChooseHouseCardComponent from "./ChooseHouseCardComponent";
 import UseValyrianSteelBladeGameState
     from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/use-valyrian-steel-blade-game-state/UseValyrianSteelBladeGameState";
 import UseValyrianSteelBladeComponent from "./UseValyrianSteelBladeComponent";
-import ChooseCasualtiesGameState
-    from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/choose-casualties-game-state/ChooseCasualtiesGameState";
-import ChooseCasualtiesComponent from "./ChooseCasualtiesComponent";
-import ChooseRetreatRegionGameState
-    from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/choose-retreat-region-game-state/ChooseRetreatRegionGameState";
-import ChooseRetreatRegionComponent from "./ChooseRetreatRegionComponent";
 import House from "../../common/ingame-game-state/game-data-structure/House";
 import GameStateComponentProps from "./GameStateComponentProps";
 import renderChildGameState from "../utils/renderChildGameState";
 import Table from "react-bootstrap/Table";
+import PostCombatGameState
+    from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState";
+import PostCombatComponent from "./PostCombatComponent";
 
 @observer
 export default class CombatComponent extends Component<GameStateComponentProps<CombatGameState>> {
@@ -93,8 +90,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                     [DeclareSupportGameState, DeclareSupportComponent],
                     [ChooseHouseCardGameState, ChooseHouseCardComponent],
                     [UseValyrianSteelBladeGameState, UseValyrianSteelBladeComponent],
-                    [ChooseCasualtiesGameState, ChooseCasualtiesComponent],
-                    [ChooseRetreatRegionGameState, ChooseRetreatRegionComponent]
+                    [PostCombatGameState, PostCombatComponent],
                 ])}
             </>
         );

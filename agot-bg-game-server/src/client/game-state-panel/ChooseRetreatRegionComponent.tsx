@@ -1,7 +1,7 @@
 import {observer} from "mobx-react";
 import {Component} from "react";
 import ChooseRetreatRegionGameState
-    from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/choose-retreat-region-game-state/ChooseRetreatRegionGameState";
+    from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/choose-retreat-region-game-state/ChooseRetreatRegionGameState";
 import React from "react";
 import {observable} from "mobx";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
