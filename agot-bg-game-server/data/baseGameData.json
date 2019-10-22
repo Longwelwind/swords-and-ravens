@@ -348,7 +348,8 @@
         },
         "renly-baratheon": {
           "name": "Renly Baratheon",
-          "combatStrength": 3
+          "combatStrength": 3,
+          "ability": "renly-baratheon"
         },
         "ser-davos-seaworth": {
           "name": "Ser Davos Seaworth",

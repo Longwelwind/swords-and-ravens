@@ -6,7 +6,7 @@ import {HouseCardState} from "../common/ingame-game-state/game-data-structure/ho
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady
     | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | NewTurn | RemovePlacedOrder
-    | MoveUnits | CombatFinished
+    | MoveUnits
     | UnitsWounded | RevealHouseCard | BeginSeeTopWildlingCard
     | RavenOrderReplaced | ProceedWesterosCard | ChangeGarrison
      | BidDone | GameStateChange | SupplyAdjusted
@@ -185,10 +185,4 @@ interface MoveUnits {
 
 interface NewTurn {
     type: "new-turn";
-}
-
-interface CombatFinished {
-    type: "combat-finished";
-    winnerId: string;
-    loserId: string;
 }

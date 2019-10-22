@@ -11,6 +11,9 @@ import GameStateComponentProps from "./GameStateComponentProps";
 import renderChildGameState from "../utils/renderChildGameState";
 import PostCombatGameState
     from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState";
+import AfterWinnerDeterminationComponent from "./house-card-abilities/AfterWinnerDeterminationComponent";
+import AfterWinnerDeterminationGameState
+    from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/AfterWinnerDeterminationGameState";
 
 @observer
 export default class PostCombatComponent extends Component<GameStateComponentProps<PostCombatGameState>> {
@@ -26,7 +29,8 @@ export default class PostCombatComponent extends Component<GameStateComponentPro
                 </div>
                 {renderChildGameState(this.props, [
                     [ChooseCasualtiesGameState, ChooseCasualtiesComponent],
-                    [ChooseRetreatRegionGameState, ChooseRetreatRegionComponent]
+                    [ChooseRetreatRegionGameState, ChooseRetreatRegionComponent],
+                    [AfterWinnerDeterminationGameState, AfterWinnerDeterminationComponent]
                 ])}
             </>
         );

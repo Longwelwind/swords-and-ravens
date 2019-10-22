@@ -12,8 +12,12 @@ import Region from "../../../../game-data-structure/Region";
 import Unit from "../../../../game-data-structure/Unit";
 import {ClientMessage} from "../../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../../messages/ServerMessage";
+import AfterWinnerDeterminationGameState
+    , {SerializedAfterWinnerDeterminationGameState} from "./after-winner-determination-game-state/AfterWinnerDeterminationGameState";
 
-export default class PostCombatGameState extends GameState<CombatGameState, ChooseRetreatRegionGameState | ChooseCasualtiesGameState> {
+export default class PostCombatGameState extends GameState<
+    CombatGameState, ChooseRetreatRegionGameState | ChooseCasualtiesGameState | AfterWinnerDeterminationGameState
+> {
     winner: House;
     loser: House;
 
@@ -48,11 +52,40 @@ export default class PostCombatGameState extends GameState<CombatGameState, Choo
                 : this.game.whoIsAheadInTrack(this.game.fiefdomsTrack, this.attacker, this.defender);
         this.loser = this.winner == this.attacker ? this.defender : this.attacker;
 
+        this.entireGame.log(
+            `Combat result`,
+            ``,
+            `| | Attacker | Defender |`,
+            `|-|-|-|`,
+            `| Army | ${this.combat.getBaseCombatStrength(this.attacker)} (+${this.combat.getOrderBonus(this.attacker)}) | ${this.combat.getBaseCombatStrength(this.defender)} (+${this.combat.getOrderBonus(this.defender)}) |`,
+            `| Support | ${this.combat.getSupportStrengthForSide(this.attacker)} | ${this.combat.getSupportStrengthForSide(this.defender)} |`,
+            `| House Card | ${this.combat.getHouseCardCombatStrength(this.attacker)} | ${this.combat.getHouseCardCombatStrength(this.defender)} |`,
+            `| Valyrian Steel Blade | ${this.combat.getValyrianBladeBonus(this.attacker)} | ${this.combat.getValyrianBladeBonus(this.defender)} |`,
+            `| Total | ${this.combat.getTotalCombatStrength(this.attacker)} | ${this.combat.getTotalCombatStrength(this.defender)} |`
+        );
+
+        this.setChildGameState(new AfterWinnerDeterminationGameState(this)).firstStart();
+    }
+
+    onChooseCasualtiesGameStateEnd(region: Region, selectedCasualties: Unit[]): void {
+        // Remove the selected casualties
+        selectedCasualties.forEach(u => region.units.delete(u.id));
+
         this.entireGame.broadcastToClients({
-            type: "combat-finished",
-            winnerId: this.winner.id,
-            loserId: this.loser.id
+            type: "remove-units",
+            regionId: region.id,
+            unitIds: selectedCasualties.map(u => u.id)
         });
+
+        if (this.loser == this.defender) {
+            this.proceedRetreat();
+            return;
+        }
+
+        this.proceedEndOfCombat();
+    }
+
+    onAfterWinnerDeterminationFinish(): void {
 
         const locationLoserArmy = this.attacker == this.loser ? this.combat.attackingRegion : this.combat.defendingRegion;
         const loserArmy = this.attacker == this.loser ? this.combat.attackingArmy : this.combat.defendingArmy;
@@ -85,18 +118,6 @@ export default class PostCombatGameState extends GameState<CombatGameState, Choo
 
         const loserArmyLeft = _.difference(loserArmy, immediatelyKilledLoserUnits);
 
-        this.entireGame.log(
-            `Combat result`,
-            ``,
-            `| | Attacker | Defender |`,
-            `|-|-|-|`,
-            `| Army | ${this.combat.getBaseCombatStrength(this.attacker)} (+${this.combat.getOrderBonus(this.attacker)}) | ${this.combat.getBaseCombatStrength(this.defender)} (+${this.combat.getOrderBonus(this.defender)}) |`,
-            `| Support | ${this.combat.getSupportStrengthForSide(this.attacker)} | ${this.combat.getSupportStrengthForSide(this.defender)} |`,
-            `| House Card | ${this.combat.getHouseCardCombatStrength(this.attacker)} | ${this.combat.getHouseCardCombatStrength(this.defender)} |`,
-            `| Valyrian Steel Blade | ${this.combat.getValyrianBladeBonus(this.attacker)} | ${this.combat.getValyrianBladeBonus(this.defender)} |`,
-            `| Total | ${this.combat.getTotalCombatStrength(this.attacker)} | ${this.combat.getTotalCombatStrength(this.defender)} |`
-        );
-
         if (loserCasualtiesCount > 0) {
             if (loserCasualtiesCount < loserArmyLeft.length) {
                 this.setChildGameState(new ChooseCasualtiesGameState(this)).firstStart(this.loser, loserArmyLeft, loserCasualtiesCount);
@@ -108,24 +129,6 @@ export default class PostCombatGameState extends GameState<CombatGameState, Choo
         } else {
             this.proceedRetreat();
         }
-    }
-
-    onChooseCasualtiesGameStateEnd(region: Region, selectedCasualties: Unit[]): void {
-        // Remove the selected casualties
-        selectedCasualties.forEach(u => region.units.delete(u.id));
-
-        this.entireGame.broadcastToClients({
-            type: "remove-units",
-            regionId: region.id,
-            unitIds: selectedCasualties.map(u => u.id)
-        });
-
-        if (this.loser == this.defender) {
-            this.proceedRetreat();
-            return;
-        }
-
-        this.proceedEndOfCombat();
     }
 
     proceedRetreat(): void {
@@ -281,6 +284,8 @@ export default class PostCombatGameState extends GameState<CombatGameState, Choo
                 return ChooseRetreatRegionGameState.deserializeFromServer(this, data);
             case "choose-casualties":
                 return ChooseCasualtiesGameState.deserializeFromServer(this, data);
+            case "after-winner-determination":
+                return AfterWinnerDeterminationGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -289,5 +294,7 @@ export interface SerializedPostCombatGameState {
     type: "post-combat";
     winner: string;
     loser: string;
-    childGameState: SerializedChooseRetreatRegionGameState | SerializedChooseCasualtiesGameState;
+    childGameState: SerializedChooseRetreatRegionGameState
+        | SerializedChooseCasualtiesGameState
+        | SerializedAfterWinnerDeterminationGameState;
 }
