@@ -21,6 +21,7 @@ import MarchOrderType from "../../../game-data-structure/order-types/MarchOrderT
 import BetterMap from "../../../../../utils/BetterMap";
 import HouseCardAbility from "../../../game-data-structure/house-card/HouseCardAbility";
 import PostCombatGameState, {SerializedPostCombatGameState} from "./post-combat-game-state/PostCombatGameState";
+import SupportOrderType from "../../../game-data-structure/order-types/SupportOrderType";
 
 
 export interface HouseCombatData {
@@ -219,9 +220,6 @@ export default class CombatGameState extends GameState<
             const units = message.unitIds.map(uid => region.units.get(uid));
 
             units.forEach(u => u.wounded = true);
-        } else if (message.type == "combat-finished") {
-            this.winner = this.game.houses.get(message.winnerId);
-            this.loser = this.game.houses.get(message.loserId);
         } else {
             this.childGameState.onServerMessage(message);
         }
@@ -300,9 +298,13 @@ export default class CombatGameState extends GameState<
         return _.sortBy(this.houseCombatDatas.keys, [h => this.game.ironThroneTrack.indexOf(h)]);
     }
 
+    getPossibleSupportingRegions(): {region: Region; support: SupportOrderType}[] {
+        return this.actionGameState.getPossibleSupportingRegions(this.defendingRegion);
+    }
+
     getPossibleSupportingHouses(): House[] {
         return _.uniq(
-            this.actionGameState.getPossibleSupportingRegions(this.defendingRegion)
+            this.getPossibleSupportingRegions()
             // Since a region that contains units _must_ be controlled by a house,
             // r.getController() can be safely casted
             .map(({region}) => region.getController() as House)
