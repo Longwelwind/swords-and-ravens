@@ -3,6 +3,7 @@ import BetterMap from "../../../../utils/BetterMap";
 import TheonGreyjoyHouseCardAbility from "./TheonGreyjoyHouseCardAbility";
 import SerDavosSeaworthHouseCardAbility from "./SerDavosSeaworthHouseCardAbility";
 import RenlyBaratheonHouseCardAbility from "./RenlyBaratheonHouseCardAbility";
+import TywinLannisterHouseCardAbility from "./TywinLannisterHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -19,11 +20,16 @@ export const renlyBaratheon = new RenlyBaratheonHouseCardAbility(
     "If you win this combat, you may upgrade one of your participating Footmen" +
     + " (or one supporting Baratheon Footmen) to a Knight."
 );
+export const tywinLannister = new TywinLannisterHouseCardAbility(
+    "tywin-lannister",
+    "If you win this combat, gain two Power tokens."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
     [serDavosSeaworth.id, serDavosSeaworth],
-    [renlyBaratheon.id, renlyBaratheon]
+    [renlyBaratheon.id, renlyBaratheon],
+    [tywinLannister.id, tywinLannister]
 ]);
 
 export default houseCardAbilities;
