@@ -270,7 +270,8 @@
       "houseCards": {
         "tywin-lannister": {
           "name": "Tywin Lannister",
-          "combatStrength": 4
+          "combatStrength": 4,
+          "ability": "tywin-lannister"
         },
         "ser-gregor-clegane": {
           "name": "Ser Gregor Clegane",
