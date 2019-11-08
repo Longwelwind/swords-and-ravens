@@ -16,10 +16,13 @@ import BetterMap from "../../utils/BetterMap";
 import House from "./game-data-structure/House";
 import Unit from "./game-data-structure/Unit";
 import PlanningRestriction from "./game-data-structure/westeros-card/planning-restriction/PlanningRestriction";
+import GameLogManager, {SerializedGameLogManager} from "./game-data-structure/GameLogManager";
+import {GameLogData} from "./game-data-structure/GameLog";
 
 export default class IngameGameState extends GameState<EntireGame, WesterosGameState | PlanningGameState | ActionGameState> {
     players: BetterMap<User, Player> = new BetterMap<User, Player>();
     game: Game;
+    gameLogManager: GameLogManager = new GameLogManager(this);
 
     get entireGame(): EntireGame {
         return this.parentGameState;
@@ -38,6 +41,10 @@ export default class IngameGameState extends GameState<EntireGame, WesterosGameS
         this.players = new BetterMap(futurePlayers.map((house, user) => [user, new Player(user, this.game.houses.get(house))]));
 
         this.beginNewTurn();
+    }
+
+    log(data: GameLogData): void {
+        this.gameLogManager.log(data);
     }
 
     onActionGameStateFinish(): void {
@@ -69,7 +76,7 @@ export default class IngameGameState extends GameState<EntireGame, WesterosGameS
 
     beginNewTurn(): void {
         this.game.turn++;
-        this.entireGame.log(`Turn **${this.game.turn}**`);
+        this.log({type: "turn-begin", turn: this.game.turn});
 
         this.game.valyrianSteelBladeUsed = false;
 
@@ -150,6 +157,8 @@ export default class IngameGameState extends GameState<EntireGame, WesterosGameS
             this.game.turn++;
             this.game.valyrianSteelBladeUsed = false;
             this.world.regions.forEach(r => r.units.forEach(u => u.wounded = false));
+        } else if (message.type == "add-game-log") {
+            this.gameLogManager.logs.push({data: message.data, time: new Date(message.time * 1000)});
         } else if (message.type == "change-tracker") {
             const newOrder = message.tracker.map(hid => this.game.houses.get(hid));
 
@@ -181,6 +190,7 @@ export default class IngameGameState extends GameState<EntireGame, WesterosGameS
             type: "ingame",
             players: this.players.values.map(p => p.serializeToClient()),
             game: this.game.serializeToClient(admin),
+            gameLogManager: this.gameLogManager.serializeToClient(),
             childGameState: this.childGameState.serializeToClient(admin, player),
         };
     }
@@ -192,6 +202,7 @@ export default class IngameGameState extends GameState<EntireGame, WesterosGameS
         ingameGameState.players = new BetterMap(
             data.players.map(p => [entireGame.users.get(p.userId), Player.deserializeFromServer(ingameGameState, p)])
         );
+        ingameGameState.gameLogManager = GameLogManager.deserializeFromServer(ingameGameState, data.gameLogManager);
         ingameGameState.childGameState = ingameGameState.deserializeChildGameState(data.childGameState);
 
         return ingameGameState;
@@ -214,5 +225,6 @@ export interface SerializedIngameGameState {
     type: "ingame";
     players: SerializedPlayer[];
     game: SerializedGame;
+    gameLogManager: SerializedGameLogManager;
     childGameState: SerializedPlanningGameState | SerializedActionGameState | SerializedWesterosGameState;
 }

@@ -84,10 +84,11 @@ export default class WesterosGameState extends GameState<IngameGameState,
         // Add the wildling strength of each card
         const addedWildlingStrength = this.revealedCards.map(c => c.type.wildlingStrength).reduce(_.add, 0);
 
-        this.entireGame.log(
-            `Westeros cards are drawn: ${this.revealedCards.map(c => `**${c.type.name}**`).join(', ')}  `,
-            addedWildlingStrength > 0 ? `Wildling strength increased by ${addedWildlingStrength}` : ""
-        );
+        this.ingameGameState.log({
+            type: "westeros-cards-drawn",
+            westerosCardTypes: this.revealedCards.map(c => c.type.id),
+            addedWildlingStrength: addedWildlingStrength
+        });
 
 
         if (addedWildlingStrength > 0) {
@@ -134,10 +135,11 @@ export default class WesterosGameState extends GameState<IngameGameState,
     }
 
     executeCard(card: WesterosCard): void {
-        this.entireGame.log(
-            `(${this.currentCardI + 1}) **${card.type.name}**  `,
-            this.currentCard.type.description
-        );
+        this.ingameGameState.log({
+            type: "westeros-card-executed",
+            westerosCardType: card.type.id,
+            cardI: this.currentCardI
+        });
 
         card.type.execute(this);
 

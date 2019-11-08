@@ -6,16 +6,16 @@ import {ClientMessage} from "../messages/ClientMessage";
 import User, {SerializedUser} from "../server/User";
 import {observable} from "mobx";
 import * as _ from "lodash";
-import GameLogManager, {SerializedGameLogManager} from "./GameLogManager";
+import GameLogManager, {SerializedGameLogManager} from "./ingame-game-state/game-data-structure/GameLogManager";
 import BetterMap from "../utils/BetterMap";
 import Game from "./ingame-game-state/game-data-structure/Game";
 import House from "./ingame-game-state/game-data-structure/House";
+import {GameLogData} from "./ingame-game-state/game-data-structure/GameLog";
 
 export default class EntireGame extends GameState<null, LobbyGameState | IngameGameState> {
     id: string;
 
     @observable users = new BetterMap<string, User>();
-    gameLogManager: GameLogManager = new GameLogManager(this);
     ownerUserId: string;
 
     onSendClientMessage: (message: ClientMessage) => void;
@@ -29,10 +29,6 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
     firstStart() {
         this.setChildGameState(new LobbyGameState(this)).firstStart();
-    }
-
-    log(...lines: string[]) {
-        this.gameLogManager.log(lines.join("\n"));
     }
 
     proceedToIngameGameState(futurePlayers: BetterMap<string, User>) {
@@ -104,8 +100,6 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             // Get the GameState for whose the childGameState must change
             const parentGameState = this.getGameStateNthLevelDown(level - 1);
             parentGameState.childGameState = parentGameState.deserializeChildGameState(serializedGameState);
-        } else if (message.type == "game-log") {
-            this.gameLogManager.logs.push({message: message.message, time: new Date(message.time * 1000)});
         } else if (message.type == "new-user") {
             const user = User.deserializeFromServer(this, message.user);
 
@@ -176,7 +170,6 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             id: this.id,
             users: this.users.values.map(u => u.serializeToClient()),
             ownerUserId: this.ownerUserId,
-            gameLogManager: this.gameLogManager.serializeToClient(),
             childGameState: this.childGameState.serializeToClient(user)
         };
     }
@@ -186,7 +179,6 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
         entireGame.users = new BetterMap<string, User>(data.users.map((ur: any) => [ur.id, User.deserializeFromServer(entireGame, ur)]));
         entireGame.ownerUserId = data.ownerUserId;
-        entireGame.gameLogManager = GameLogManager.deserializeFromServer(entireGame, data.gameLogManager);
         entireGame.childGameState = entireGame.deserializeChildGameState(data.childGameState);
 
         return entireGame;
@@ -207,6 +199,5 @@ export interface SerializedEntireGame {
     id: string;
     users: SerializedUser[];
     ownerUserId: string;
-    gameLogManager: SerializedGameLogManager;
     childGameState: SerializedLobbyGameState | SerializedIngameGameState;
 }

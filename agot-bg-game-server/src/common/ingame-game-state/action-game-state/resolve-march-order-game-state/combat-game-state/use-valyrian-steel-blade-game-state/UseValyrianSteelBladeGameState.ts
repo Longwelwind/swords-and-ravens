@@ -36,10 +36,6 @@ export default class UseValyrianSteelBladeGameState extends GameState<CombatGame
                 this.combatGameState.valyrianSteelBladeUser = this.house;
             }
 
-            this.entireGame.log(
-                `**${this.house.name}** chooses not to use its Valyrian Steel Blade`
-            );
-
             this.combatGameState.onUseValyrianSteelBladeGameStateEnd();
         }
     }

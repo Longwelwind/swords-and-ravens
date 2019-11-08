@@ -39,16 +39,6 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
             if (this.getHousesLeftToBid().length == 0) {
                 // All players had bid
 
-                // Log the results
-                this.entireGame.log(
-                    `Bidding results`,
-                    ``,
-                    `| | |`,
-                    `|-|-|`,
-                    ..._.sortBy(this.bids.entries, ([_, bid]) => -bid)
-                        .map(([house, bid]) => `| ${house.name} | ${bid} |`)
-                );
-
                 // Remove the power tokens
                 this.bids.entries.forEach(([house, bid]) => {
                     house.powerTokens -= bid;

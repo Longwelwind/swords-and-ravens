@@ -117,12 +117,6 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
             wildlingCard: this.wildlingCard.id
         });
 
-        this.entireGame.log(
-            `Total bid: **${this.totalBid}** - Wildling Strength: **${this.wildlingStrength}**  `,
-            this.nightsWatchWon ? "The Night's Watch **won**" : "The Night's Watch **lost**",
-            `The revealed Wildling Card is ${this.wildlingCard.type.name}`
-        );
-
         if (this.nightsWatchWon) {
             // Wildling attack has been rebuffed
             // Check if there a single highest bidder or if there needs to be a decision from the iron throne holder

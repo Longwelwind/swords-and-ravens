@@ -52,17 +52,25 @@ export default class PostCombatGameState extends GameState<
                 : this.game.whoIsAheadInTrack(this.game.fiefdomsTrack, this.attacker, this.defender);
         this.loser = this.winner == this.attacker ? this.defender : this.attacker;
 
-        this.entireGame.log(
-            `Combat result`,
-            ``,
-            `| | Attacker | Defender |`,
-            `|-|-|-|`,
-            `| Army | ${this.combat.getBaseCombatStrength(this.attacker)} (+${this.combat.getOrderBonus(this.attacker)}) | ${this.combat.getBaseCombatStrength(this.defender)} (+${this.combat.getOrderBonus(this.defender)}) |`,
-            `| Support | ${this.combat.getSupportStrengthForSide(this.attacker)} | ${this.combat.getSupportStrengthForSide(this.defender)} |`,
-            `| House Card | ${this.combat.getHouseCardCombatStrength(this.attacker)} | ${this.combat.getHouseCardCombatStrength(this.defender)} |`,
-            `| Valyrian Steel Blade | ${this.combat.getValyrianBladeBonus(this.attacker)} | ${this.combat.getValyrianBladeBonus(this.defender)} |`,
-            `| Total | ${this.combat.getTotalCombatStrength(this.attacker)} | ${this.combat.getTotalCombatStrength(this.defender)} |`
-        );
+        this.combat.ingameGameState.log({
+            type: "combat-result",
+            winner: this.winner.id,
+            stats: [this.attacker, this.defender].map(h => {
+                const houseCard = this.combat.houseCombatDatas.get(h).houseCard;
+
+                return {
+                    house: h.id,
+                    region: this.combat.houseCombatDatas.get(h).region.id,
+                    army: this.combat.getBaseCombatStrength(h),
+                    orderBonus: this.combat.getOrderBonus(h),
+                    support: this.combat.getSupportStrengthForSide(h),
+                    houseCard: houseCard ? houseCard.id : null,
+                    houseCardStrength: this.combat.getHouseCardCombatStrength(h),
+                    valyrianSteelBlade: this.combat.getValyrianBladeBonus(h),
+                    total: this.combat.getTotalCombatStrength(h)
+                }
+            })
+        });
 
         this.setChildGameState(new AfterWinnerDeterminationGameState(this)).firstStart();
     }

@@ -8,6 +8,7 @@ import {ServerMessage} from "../../../../../../messages/ServerMessage";
 import {observable} from "mobx";
 import House from "../../../../game-data-structure/House";
 import BetterMap from "../../../../../../utils/BetterMap";
+import IngameGameState from "../../../../IngameGameState";
 
 export default class ChooseHouseCardGameState extends GameState<CombatGameState> {
     // A null value for a key can be present client-side, it indicates
@@ -20,6 +21,10 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
     get entireGame(): EntireGame {
         return this.combatGameState.entireGame;
+    }
+
+    get ingameGameState(): IngameGameState {
+        return this.combatGameState.ingameGameState;
     }
 
     firstStart(): void {
@@ -67,12 +72,15 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                 // "this.combatGameState.defendingHouseCombatData.houseCard" will always be non-null
                 // since they have just been set before, thus the two "ts-ignore". They could be later set to null
                 // because of Tyrion Lannister, for example.
-                this.entireGame.log(
-                    // @ts-ignore
-                    `**${this.combatGameState.attacker.name}** chooses **${this.combatGameState.attackingHouseCombatData.houseCard.name}**  `,
-                    // @ts-ignore
-                    `**${this.combatGameState.defender.name}** chooses **${this.combatGameState.defendingHouseCombatData.houseCard.name}**`
-                );
+                this.ingameGameState.log({
+                    type: "house-card-chosen",
+                    houseCards: [
+                        // @ts-ignore
+                        [this.combatGameState.attacker.id, this.combatGameState.attackingHouseCombatData.houseCard.id],
+                        // @ts-ignore
+                        [this.combatGameState.defender.id, this.combatGameState.defendingHouseCombatData.houseCard.id]
+                    ]
+                });
 
                 this.entireGame.broadcastToClients({
                     type: "reveal-house-card",

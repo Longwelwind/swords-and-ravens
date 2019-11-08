@@ -36,9 +36,6 @@ function setup4PlayersGame(serializedEntireGameChildGameState: SerializedEntireG
                 name: "4"
             }
         ],
-        gameLogManager: {
-            logs: []
-        },
         childGameState: serializedEntireGameChildGameState
     };
 
@@ -261,6 +258,9 @@ function setup4PlayersGameIngame(
                 createWesterosDeck(setupOptions.thirdWesterosDeck)
             ],
             skipRavenPhase: setupOptions.skipRavenPhase
+        },
+        gameLogManager: {
+            logs: []
         },
         childGameState: serializedIngameChildGameState
     };
