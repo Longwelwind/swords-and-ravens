@@ -109,13 +109,12 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             });
 
             if (movesThatDontTriggerAttack.length > 0) {
-                this.entireGame.log(
-                    `**${this.house.name}** marched:`,
-                    ``,
-                    ...movesThatDontTriggerAttack.map(([r, us]) =>
-                        `${us.map(u => u.type.name).join(', ')} to **${r.name}**`
-                    )
-                );
+                this.actionGameState.ingameGameState.log({
+                    type: "march-resolved",
+                    house: this.house.id,
+                    startingRegion: startingRegion.id,
+                    moves: movesThatDontTriggerAttack.map(([r, us]) => [r.id, us.map(u => u.type.id)])
+                });
             }
 
             // If there was a move that trigger a fight, do special processing
@@ -128,10 +127,14 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                 if (enemy) {
                     // Attack against an other house
 
-                    this.entireGame.log(
-                        `**${this.house.name}** attacked **${enemy.name}** from **${startingRegion.name}**`,
-                        ` to **${region.name}** with ${army.map(u => u.type.name).join(", ")}`
-                    );
+                    this.actionGameState.ingameGameState.log({
+                        type: "attack",
+                        attacker: this.house.id,
+                        attacked: enemy.id,
+                        attackingRegion: startingRegion.id,
+                        attackedRegion: region.id,
+                        units: army.map(u => u.type.id)
+                    });
 
                     this.resolveMarchOrderGameState.proceedToCombat(startingRegion, region, this.house, enemy, army);
                     return;
@@ -142,10 +145,15 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                     region.garrison = 0;
                     this.resolveMarchOrderGameState.moveUnits(startingRegion, army, region);
 
-                    this.entireGame.log(
-                        `**${this.house.name}** attacked a neutral force from **${startingRegion.name}**`,
-                        ` to **${region.name}** with ${army.map(u => u.type.name).join(", ")}`
-                    );
+
+                    this.actionGameState.ingameGameState.log({
+                        type: "attack",
+                        attacker: this.house.id,
+                        attacked: null,
+                        attackingRegion: startingRegion.id,
+                        attackedRegion: region.id,
+                        units: army.map(u => u.type.id)
+                    });
 
                     this.entireGame.broadcastToClients({
                         type: "change-garrison",

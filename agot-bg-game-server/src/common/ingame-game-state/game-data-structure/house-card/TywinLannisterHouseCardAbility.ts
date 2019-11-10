@@ -7,8 +7,6 @@ import HouseCard from "./HouseCard";
 export default class TywinLannisterHouseCardAbility extends HouseCardAbility {
     afterWinnerDetermination(afterWinnerDetermination: AfterWinnerDeterminationGameState, house: House, _houseCard: HouseCard): void {
         if (afterWinnerDetermination.postCombatGameState.winner == house) {
-            afterWinnerDetermination.entireGame.log(`**Tywin Lannister**: **${house.name}** gains 2 power tokens.`);
-
             house.changePowerTokens(2);
 
             afterWinnerDetermination.entireGame.broadcastToClients({

@@ -59,11 +59,6 @@ export default class ReplaceOrderGameState extends GameState<UseRavenGameState> 
 
             this.actionGameState.ordersOnBoard.set(region, order);
 
-            this.entireGame.log(
-                `The holder of the Raven Token (${this.ravenHolder.name}) changed his **${replacedOrder.type.name}**`,
-                ` into a **${order.type.name}** in **${region.name}**`
-            );
-
             this.entireGame.broadcastToClients({
                 type: "raven-order-replaced",
                 regionId: region.id,

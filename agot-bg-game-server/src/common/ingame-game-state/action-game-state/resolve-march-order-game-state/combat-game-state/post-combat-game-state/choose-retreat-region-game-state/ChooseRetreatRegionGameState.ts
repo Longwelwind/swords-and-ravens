@@ -45,10 +45,6 @@ export default class ChooseRetreatRegionGameState extends GameState<PostCombatGa
                 return;
             }
 
-            this.entireGame.log(
-                `**${this.house.name}** retreats to **${chosenRetreatRegion.name}**`
-            );
-
             this.postCombatGameState.onChooseRetreatLocationGameStateEnd(this.house, this.startingRegion, this.army, chosenRetreatRegion);
         }
     }

@@ -52,15 +52,11 @@ export default class DeclareSupportGameState extends GameState<CombatGameState> 
 
             this.combatGameState.supporters.set(this.house, supportedHouse);
 
-            if (supportedHouse) {
-                this.entireGame.log(
-                    `**${player.house.name}** supports **${supportedHouse.name}**`
-                );
-            } else {
-                this.entireGame.log(
-                    `**${player.house.name}** supports no-one`
-                );
-            }
+            this.ingameGameState.log({
+                type: "support-declared",
+                supporter: player.house.id,
+                supported: supportedHouse ? supportedHouse.id : null
+            });
 
             this.entireGame.broadcastToClients({
                 type: "support-declared",

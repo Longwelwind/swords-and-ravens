@@ -38,6 +38,7 @@ import mammothImage from "../../public/images/icons/mammoth.svg";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import housePowerTokensImages from "./housePowerTokensImages";
 import marked from "marked";
+import GameLogListComponent from "./GameLogListComponent";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -296,25 +297,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </Row>
                     <Row>
                         <Col>
-                            <Card style={{height: "350px", overflowY: "scroll"}}>
-                                <Card.Body>
-                                    {this.props.gameState.parentGameState.gameLogManager.logs.reverse().map((l, i) => (
-                                        <Row key={i}>
-                                            <Col xs="auto" className="text-muted">
-                                                <small>
-                                                    {l.time.getHours().toString().padStart(2, "0")}
-                                                    :{l.time.getMinutes().toString().padStart(2, "0")}
-                                                </small>
-                                            </Col>
-                                            <Col>
-                                                <div className="game-log-content"
-                                                    dangerouslySetInnerHTML={{__html: this.compileGameLog(l.message)}}>
-                                                </div>
-                                            </Col>
-                                        </Row>
-                                    ))}
-                                </Card.Body>
-                            </Card>
+                            <GameLogListComponent ingameGameState={this.props.gameState} />
                         </Col>
                     </Row>
                 </Col>

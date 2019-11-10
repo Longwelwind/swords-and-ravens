@@ -94,21 +94,12 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
                     });
                 }
 
-                this.entireGame.log(
-                    `${this.house.name} raids **${raidedHouse.name}**'s **${orderTarget.type.name}** order`,
-                    ` from **${targetRegion.name}**`
-                );
-
                 this.actionGameState.ordersOnBoard.delete(targetRegion);
                 this.entireGame.broadcastToClients({
                     type: "action-phase-change-order",
                     region: targetRegion.id,
                     order: null
                 });
-            } else {
-                this.entireGame.log(
-                    `**${this.house.name}** resolves a raid order at **${orderRegion.name}**`
-                );
             }
 
             this.actionGameState.ordersOnBoard.delete(orderRegion);

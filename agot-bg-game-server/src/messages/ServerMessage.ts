@@ -3,6 +3,7 @@ import {SerializedGameState} from "../common/GameState";
 import {SerializedUnit} from "../common/ingame-game-state/game-data-structure/Unit";
 import {SerializedUser} from "../server/User";
 import {HouseCardState} from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
+import {GameLogData} from "../common/ingame-game-state/game-data-structure/GameLog";
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady
     | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | NewTurn | RemovePlacedOrder
@@ -10,7 +11,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | UnitsWounded | RevealHouseCard | BeginSeeTopWildlingCard
     | RavenOrderReplaced | ProceedWesterosCard | ChangeGarrison
      | BidDone | GameStateChange | SupplyAdjusted
-    | ChangeControlPowerToken | ChangePowerToken | ChangeWildlingStrength | GameLog | RevealWildlingCard
+    | ChangeControlPowerToken | ChangePowerToken | ChangeWildlingStrength | AddGameLog | RevealWildlingCard
     | RemoveUnits | AddUnits | ChangeTracker | ActionPhaseChangeOrder | ChangeStateHouseCard;
 
 interface AuthenticationResponse {
@@ -29,9 +30,9 @@ interface HouseChosen {
     players: [string, string][];
 }
 
-interface GameLog {
-    type: "game-log";
-    message: string;
+interface AddGameLog {
+    type: "add-game-log";
+    data: GameLogData;
     time: number;
 }
 
