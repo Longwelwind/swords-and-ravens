@@ -137,9 +137,28 @@ export default class CombatGameState extends GameState<
     getBaseCombatStrength(house: House): number {
         const army = this.houseCombatDatas.get(house).army;
 
-        const isAttackingAStructure = this.isAttackingAStructure(house);
+        return this.getCombatStrengthOfArmy(house, army, false);
+    }
 
-        return this.game.getCombatStrengthOfArmy(army, isAttackingAStructure);
+    getCombatStrengthOfArmy(houseSide: House, army: Unit[], support: boolean): number {
+        return army
+            .filter(u => !u.wounded)
+            .map(u => this.getCombatStrengthOfUnit(houseSide, u, support))
+            .reduce(_.add, 0);
+    }
+
+    getCombatStrengthOfUnit(houseSide: House, unit: Unit, support: boolean): number {
+        const attackingAStructure = this.isAttackingAStructure(unit.allegiance);
+
+        return this.getOrderResolutionHouseCard().reduce((s, h) => {
+            const houseCard = this.houseCombatDatas.get(h).houseCard;
+
+            if (houseCard == null) {
+                return s;
+            }
+
+            return houseCard.ability ? s + houseCard.ability.modifyUnitCombatStrength(this, h, houseCard, houseSide, unit, support, s) : s;
+        }, unit.getCombatStrength(attackingAStructure));
     }
 
     getOrderBonus(house: House): number {
@@ -169,7 +188,14 @@ export default class CombatGameState extends GameState<
     getSupportStrengthForSide(supportedHouse: House): number {
         return this.supporters.entries
             .filter(([_house, supHouse]) => supportedHouse == supHouse)
-            .map(([house, _]) => this.actionGameState.getSupportCombatStrength(house, this.defendingRegion))
+            .map(([house, _supHouse]) => {
+                // Compute the total strength that this supporting house is bringing
+                // to the combat
+                return this.getPossibleSupportingRegions()
+                    .filter(({region}) => region.getController() == house)
+                    .map(({region}) => this.getCombatStrengthOfArmy(supportedHouse, region.units.values, true))
+                    .reduce(_.add, 0);
+            })
             .reduce(_.add, 0);
     }
 

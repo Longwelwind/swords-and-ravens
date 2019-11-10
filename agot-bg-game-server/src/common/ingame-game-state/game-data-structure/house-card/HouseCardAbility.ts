@@ -3,6 +3,8 @@ import House from "../House";
 import HouseCard from "./HouseCard";
 import AfterWinnerDeterminationGameState
     from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/AfterWinnerDeterminationGameState";
+import Unit from "../Unit";
+import Region from "../Region";
 
 export default class HouseCardAbility {
     id: string;
@@ -26,6 +28,10 @@ export default class HouseCardAbility {
     }
 
     modifyTowerIcons(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _affectedHouseCard: HouseCard): number {
+        return 0;
+    }
+
+    modifyUnitCombatStrength(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _houseSide: House, _affectedUnit: Unit, _support: boolean, _currentStrength: number): number {
         return 0;
     }
 }

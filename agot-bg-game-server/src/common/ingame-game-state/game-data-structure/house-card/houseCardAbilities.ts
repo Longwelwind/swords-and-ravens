@@ -4,6 +4,7 @@ import TheonGreyjoyHouseCardAbility from "./TheonGreyjoyHouseCardAbility";
 import SerDavosSeaworthHouseCardAbility from "./SerDavosSeaworthHouseCardAbility";
 import RenlyBaratheonHouseCardAbility from "./RenlyBaratheonHouseCardAbility";
 import TywinLannisterHouseCardAbility from "./TywinLannisterHouseCardAbility";
+import SalladhorSaanHouseCardAbility from "./SalladhorSaanHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -24,12 +25,18 @@ export const tywinLannister = new TywinLannisterHouseCardAbility(
     "tywin-lannister",
     "If you win this combat, gain two Power tokens."
 );
+export const salladhorSaan = new SalladhorSaanHouseCardAbility(
+    "salladhor-saan",
+    "If you are being supported in this combat, the combat strength of all"
+    + "non-Baratheon ships is reduced to zero."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
     [serDavosSeaworth.id, serDavosSeaworth],
     [renlyBaratheon.id, renlyBaratheon],
-    [tywinLannister.id, tywinLannister]
+    [tywinLannister.id, tywinLannister],
+    [salladhorSaan.id, salladhorSaan]
 ]);
 
 export default houseCardAbilities;
