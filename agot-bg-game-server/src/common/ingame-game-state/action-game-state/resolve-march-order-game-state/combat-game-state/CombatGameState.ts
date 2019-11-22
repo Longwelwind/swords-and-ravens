@@ -297,6 +297,14 @@ export default class CombatGameState extends GameState<
         );
     }
 
+    getHouseCardTowerIcons(house: House): number {
+        return this.getStatOfHouseCard(
+            house,
+            hc => hc.towerIcons,
+            (h, hc, a, ahc) => a.modifyTowerIcons(this, h, hc, ahc)
+        );
+    }
+
     getStatOfHouseCard(
         affectedHouse: House,
         baseAmount: (hc: HouseCard) => number,

@@ -102,12 +102,8 @@ export default class PostCombatGameState extends GameState<
             ? this.combat.getHouseCardSwordIcons(this.attacker)
             : this.combat.getHouseCardSwordIcons(this.defender);
         const loserTowerIcons = this.attacker == this.loser
-            ? this.combat.attackerHouseCard
-                ? this.combat.attackerHouseCard.towerIcons
-                : 0
-            : this.combat.defenderHouseCard
-                ? this.combat.defenderHouseCard.towerIcons
-                : 0;
+            ? this.combat.getHouseCardTowerIcons(this.attacker)
+            : this.combat.getHouseCardTowerIcons(this.defender);
 
         const loserCasualtiesCount = Math.max(0, winnerSwordIcons - loserTowerIcons);
 
