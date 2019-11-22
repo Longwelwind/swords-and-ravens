@@ -408,7 +408,8 @@
         },
         "asha-greyjoy": {
           "name": "Asha Greyjoy",
-          "combatStrength": 1
+          "combatStrength": 1,
+          "ability": "asha-greyjoy"
         },
         "aeron-damphair": {
           "name": "Aeron Damphair"

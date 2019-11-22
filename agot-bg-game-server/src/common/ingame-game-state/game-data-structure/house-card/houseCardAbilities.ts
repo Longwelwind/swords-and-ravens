@@ -5,6 +5,7 @@ import SerDavosSeaworthHouseCardAbility from "./SerDavosSeaworthHouseCardAbility
 import RenlyBaratheonHouseCardAbility from "./RenlyBaratheonHouseCardAbility";
 import TywinLannisterHouseCardAbility from "./TywinLannisterHouseCardAbility";
 import SalladhorSaanHouseCardAbility from "./SalladhorSaanHouseCardAbility";
+import AshaGreyjoyHouseCardAbilities from "./AshaGreyjoyHouseCardAbilities";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -30,13 +31,19 @@ export const salladhorSaan = new SalladhorSaanHouseCardAbility(
     "If you are being supported in this combat, the combat strength of all"
     + "non-Baratheon ships is reduced to zero."
 );
+export const ashaGreyjoy = new AshaGreyjoyHouseCardAbilities(
+    "asha-greyjoy",
+    "If you are not being supported in this combat, this card gains"
+    + " two sword icons and one fortification icon."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
     [serDavosSeaworth.id, serDavosSeaworth],
     [renlyBaratheon.id, renlyBaratheon],
     [tywinLannister.id, tywinLannister],
-    [salladhorSaan.id, salladhorSaan]
+    [salladhorSaan.id, salladhorSaan],
+    [ashaGreyjoy.id, ashaGreyjoy]
 ]);
 
 export default houseCardAbilities;
