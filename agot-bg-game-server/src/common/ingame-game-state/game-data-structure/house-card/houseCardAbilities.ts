@@ -6,6 +6,7 @@ import RenlyBaratheonHouseCardAbility from "./RenlyBaratheonHouseCardAbility";
 import TywinLannisterHouseCardAbility from "./TywinLannisterHouseCardAbility";
 import SalladhorSaanHouseCardAbility from "./SalladhorSaanHouseCardAbility";
 import AshaGreyjoyHouseCardAbilities from "./AshaGreyjoyHouseCardAbilities";
+import QueenOfThornsHouseCardAbility from "./QueenOfThornsHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -36,6 +37,12 @@ export const ashaGreyjoy = new AshaGreyjoyHouseCardAbilities(
     "If you are not being supported in this combat, this card gains"
     + " two sword icons and one fortification icon."
 );
+export const queenOfThorns = new QueenOfThornsHouseCardAbility(
+    "queen-of-thorns",
+    "Immediately remove one of your opponent's Order tokens in any one area"
+    + " adjacent to the embattled area. You may not remove the March Order token"
+    + " used to start this combat."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -43,7 +50,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [renlyBaratheon.id, renlyBaratheon],
     [tywinLannister.id, tywinLannister],
     [salladhorSaan.id, salladhorSaan],
-    [ashaGreyjoy.id, ashaGreyjoy]
+    [ashaGreyjoy.id, ashaGreyjoy],
+    [queenOfThorns.id, queenOfThorns]
 ]);
 
 export default houseCardAbilities;

@@ -1,7 +1,8 @@
 export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | ResolveMarchOrder | DeclareSupport
     | UseValyrianSteelBlade | ChooseHouseCard | ChooseCasualties | ChooseRetreatRegion | ChooseRavenAction
     | ChooseTopWildlingCardAction | ReplaceOrder | SkipReplaceOrder | ResolveRaid | Bid | ChooseChoice
-    | DecideBiggest | ReconcileArmies | Muster | ResolveTies | SelectUnits | LaunchGame | ChooseHouse;
+    | DecideBiggest | ReconcileArmies | Muster | ResolveTies | SelectUnits | LaunchGame | ChooseHouse
+    | SelectOrders;
 
 interface Ping {
     type: "ping";
@@ -102,6 +103,11 @@ interface ResolveRaid {
     type: "resolve-raid";
     orderRegionId: string;
     targetRegionId: string | null;
+}
+
+interface SelectOrders {
+    type: "select-orders";
+    regions: string[];
 }
 
 interface Bid {

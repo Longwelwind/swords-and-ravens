@@ -489,7 +489,8 @@
           "fortificationIcons": 1
         },
         "queen-of-thorns": {
-          "name": "Queen of Thorns"
+          "name": "Queen of Thorns",
+          "ability": "queen-of-thorns"
         }
       },
       "supplyLevel": 2
