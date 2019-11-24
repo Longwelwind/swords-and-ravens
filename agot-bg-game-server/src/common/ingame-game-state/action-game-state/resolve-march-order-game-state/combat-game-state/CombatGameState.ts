@@ -22,6 +22,8 @@ import BetterMap from "../../../../../utils/BetterMap";
 import HouseCardAbility from "../../../game-data-structure/house-card/HouseCardAbility";
 import PostCombatGameState, {SerializedPostCombatGameState} from "./post-combat-game-state/PostCombatGameState";
 import SupportOrderType from "../../../game-data-structure/order-types/SupportOrderType";
+import ImmediatelyHouseCardAbilitiesResolutionGameState
+    , {SerializedImmediatelyHouseCardAbilitiesResolutionGameState} from "./immediately-house-card-abilities-resolution-game-state/ImmediatelyHouseCardAbilitiesResolutionGameState";
 
 
 export interface HouseCombatData {
@@ -33,7 +35,7 @@ export interface HouseCombatData {
 export default class CombatGameState extends GameState<
     ResolveMarchOrderGameState,
     DeclareSupportGameState | ChooseHouseCardGameState | UseValyrianSteelBladeGameState
-    | PostCombatGameState
+    | ImmediatelyHouseCardAbilitiesResolutionGameState | PostCombatGameState
 > {
     winner: House | null;
     loser: House | null;
@@ -216,6 +218,14 @@ export default class CombatGameState extends GameState<
     }
 
     onChooseHouseCardGameStateEnd(): void {
+        this.proceedImmediatelyResolution();
+    }
+
+    proceedImmediatelyResolution(): void {
+        this.setChildGameState(new ImmediatelyHouseCardAbilitiesResolutionGameState(this)).firstStart();
+    }
+
+    onImmediatelyResolutionFinish(): void {
         // Check if the sword has not been used this round
         if (!this.game.valyrianSteelBladeUsed) {
             // Check if one of the two participants can use the sword
@@ -407,6 +417,8 @@ export default class CombatGameState extends GameState<
                 return UseValyrianSteelBladeGameState.deserializeFromServer(this, data);
             case "post-combat":
                 return PostCombatGameState.deserializeFromServer(this, data);
+            case "immediately-house-card-abilities-resolution":
+                return ImmediatelyHouseCardAbilitiesResolutionGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -418,5 +430,6 @@ export interface SerializedCombatGameState {
     supporters: [string, string | null][];
     houseCombatDatas: [string, {houseCardId: string | null; army: number[]; regionId: string}][];
     childGameState: SerializedDeclareSupportGameState | SerializedChooseHouseCardGameState
-        | SerializedUseValyrianSteelBladeGameState | SerializedPostCombatGameState;
+        | SerializedUseValyrianSteelBladeGameState | SerializedPostCombatGameState
+        | SerializedImmediatelyHouseCardAbilitiesResolutionGameState;
 }

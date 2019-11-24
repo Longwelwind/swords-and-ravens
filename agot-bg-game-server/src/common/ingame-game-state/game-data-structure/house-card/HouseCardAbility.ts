@@ -5,6 +5,8 @@ import AfterWinnerDeterminationGameState
     from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/AfterWinnerDeterminationGameState";
 import Unit from "../Unit";
 import Region from "../Region";
+import ImmediatelyHouseCardAbilitiesResolutionGameState
+    from "../../action-game-state/resolve-march-order-game-state/combat-game-state/immediately-house-card-abilities-resolution-game-state/ImmediatelyHouseCardAbilitiesResolutionGameState";
 
 export default class HouseCardAbility {
     id: string;
@@ -15,8 +17,12 @@ export default class HouseCardAbility {
         this.description = description;
     }
 
-    afterWinnerDetermination(afterWinnerDetermination: AfterWinnerDeterminationGameState, _house: House, _houseCard: HouseCard): void {
-        afterWinnerDetermination.onHouseCardResolutionFinish();
+    afterWinnerDetermination(afterWinnerDetermination: AfterWinnerDeterminationGameState, house: House, _houseCard: HouseCard): void {
+        afterWinnerDetermination.childGameState.onHouseCardResolutionFinish(house);
+    }
+
+    immediatelyResolution(immediatelyResolutionState: ImmediatelyHouseCardAbilitiesResolutionGameState, house: House, _houseCard: HouseCard): void {
+        immediatelyResolutionState.childGameState.onHouseCardResolutionFinish(house);
     }
 
     modifyCombatStrength(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _affectedHouseCard: HouseCard): number {

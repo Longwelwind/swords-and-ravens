@@ -19,6 +19,10 @@ import Table from "react-bootstrap/Table";
 import PostCombatGameState
     from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState";
 import PostCombatComponent from "./PostCombatComponent";
+import ImmediatelyHouseCardAbilitiesResolutionGameState
+    from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/immediately-house-card-abilities-resolution-game-state/ImmediatelyHouseCardAbilitiesResolutionGameState";
+import ImmediatelyHouseCardAbilitiesResolutionComponent
+    from "./house-card-abilities/ImmediatelyHouseCardAbilitiesResolutionComponent";
 
 @observer
 export default class CombatComponent extends Component<GameStateComponentProps<CombatGameState>> {
@@ -91,6 +95,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                     [ChooseHouseCardGameState, ChooseHouseCardComponent],
                     [UseValyrianSteelBladeGameState, UseValyrianSteelBladeComponent],
                     [PostCombatGameState, PostCombatComponent],
+                    [ImmediatelyHouseCardAbilitiesResolutionGameState, ImmediatelyHouseCardAbilitiesResolutionComponent]
                 ])}
             </>
         );
