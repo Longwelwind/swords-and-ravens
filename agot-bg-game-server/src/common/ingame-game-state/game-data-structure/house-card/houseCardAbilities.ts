@@ -8,6 +8,7 @@ import SalladhorSaanHouseCardAbility from "./SalladhorSaanHouseCardAbility";
 import AshaGreyjoyHouseCardAbilities from "./AshaGreyjoyHouseCardAbilities";
 import QueenOfThornsHouseCardAbility from "./QueenOfThornsHouseCardAbility";
 import VictarionGreyjoyHouseCardAbility from "./VictarionGreyjoyHouseCardAbility";
+import BalonGreyjoyHouseCardAbility from "./BalonGreyjoyHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -49,6 +50,10 @@ export const victarionGreyjoy = new VictarionGreyjoyHouseCardAbility(
     "If you are attacking, all of you participating Ships (including"
      + " supporting Greyjoy Ships) add +2 to combat strength instead of +1."
 );
+export const balonGreyjoy = new BalonGreyjoyHouseCardAbility(
+    "balon-greyjoy",
+    "The printed combat strength of your opponent's House card is reduced to 0."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -59,6 +64,7 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [ashaGreyjoy.id, ashaGreyjoy],
     [queenOfThorns.id, queenOfThorns],
     [victarionGreyjoy.id, victarionGreyjoy],
+    [balonGreyjoy.id, balonGreyjoy],
 ]);
 
 export default houseCardAbilities;

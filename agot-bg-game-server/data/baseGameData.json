@@ -394,7 +394,8 @@
         },
         "balon-greyjoy": {
           "name": "Balon Greyjoy",
-          "combatStrength": 2
+          "combatStrength": 2,
+          "ability": "balon-greyjoy"
         },
         "theon-greyjoy": {
           "name": "Theon Greyjoy",
