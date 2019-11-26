@@ -389,7 +389,8 @@
         },
         "victarion-greyjoy": {
           "name": "Victarion Greyjoy",
-          "combatStrength": 3
+          "combatStrength": 3,
+          "ability": "victarion-greyjoy"
         },
         "balon-greyjoy": {
           "name": "Balon Greyjoy",

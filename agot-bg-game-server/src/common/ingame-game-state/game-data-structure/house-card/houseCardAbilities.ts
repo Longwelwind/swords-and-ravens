@@ -7,6 +7,7 @@ import TywinLannisterHouseCardAbility from "./TywinLannisterHouseCardAbility";
 import SalladhorSaanHouseCardAbility from "./SalladhorSaanHouseCardAbility";
 import AshaGreyjoyHouseCardAbilities from "./AshaGreyjoyHouseCardAbilities";
 import QueenOfThornsHouseCardAbility from "./QueenOfThornsHouseCardAbility";
+import VictarionGreyjoyHouseCardAbility from "./VictarionGreyjoyHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -43,6 +44,11 @@ export const queenOfThorns = new QueenOfThornsHouseCardAbility(
     + " adjacent to the embattled area. You may not remove the March Order token"
     + " used to start this combat."
 );
+export const victarionGreyjoy = new VictarionGreyjoyHouseCardAbility(
+    "victarion-greyjoy",
+    "If you are attacking, all of you participating Ships (including"
+     + " supporting Greyjoy Ships) add +2 to combat strength instead of +1."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -51,7 +57,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [tywinLannister.id, tywinLannister],
     [salladhorSaan.id, salladhorSaan],
     [ashaGreyjoy.id, ashaGreyjoy],
-    [queenOfThorns.id, queenOfThorns]
+    [queenOfThorns.id, queenOfThorns],
+    [victarionGreyjoy.id, victarionGreyjoy],
 ]);
 
 export default houseCardAbilities;
