@@ -453,7 +453,8 @@
           "combatStrength": 1
         },
         "doran-martell": {
-          "name": "Doran Martell"
+          "name": "Doran Martell",
+          "ability": "doran-martell"
         }
       },
       "supplyLevel": 2

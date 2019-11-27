@@ -8,12 +8,13 @@ import HouseCard from "../../../../game-data-structure/house-card/HouseCard";
 import Player from "../../../../Player";
 import {ClientMessage} from "../../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../../messages/ServerMessage";
+import DoranMartellAbilityGameState, {SerializedDoranMartellAbilityGameState} from "./doran-martell-ability-game-state/DoranMartellAbilityGameState";
 
 export default class ImmediatelyHouseCardAbilitiesResolutionGameState extends GameState<
     CombatGameState,
     HouseCardResolutionGameState<
         ImmediatelyHouseCardAbilitiesResolutionGameState,
-        QueenOfThornsAbilityGameState
+        QueenOfThornsAbilityGameState | DoranMartellAbilityGameState
     >
 > {
     get combatGameState(): CombatGameState {
@@ -65,6 +66,8 @@ export default class ImmediatelyHouseCardAbilitiesResolutionGameState extends Ga
         switch (data.type) {
             case "queen-of-thorns":
                 return QueenOfThornsAbilityGameState.deserializeFromServer(houseCardResolution, data);
+            case "doran-martell-ability":
+                return DoranMartellAbilityGameState.deserializeFromServer(houseCardResolution, data);
         }
     }
 
@@ -76,12 +79,14 @@ export default class ImmediatelyHouseCardAbilitiesResolutionGameState extends Ga
         return immediately;
     }
 
-    deserializeChildGameState(data: SerializedImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"]): HouseCardResolutionGameState<ImmediatelyHouseCardAbilitiesResolutionGameState, QueenOfThornsAbilityGameState> {
+    deserializeChildGameState(data: SerializedImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"]): ImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"] {
         return HouseCardResolutionGameState.deserializeFromServer(this, data);
     }
 }
 
 export interface SerializedImmediatelyHouseCardAbilitiesResolutionGameState {
     type: "immediately-house-card-abilities-resolution";
-    childGameState: SerializedHouseCardResolutionGameState<SerializedQueenOfThornsAbilityGameState>;
+    childGameState: SerializedHouseCardResolutionGameState<
+        SerializedQueenOfThornsAbilityGameState | SerializedDoranMartellAbilityGameState
+        >;
 }
