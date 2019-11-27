@@ -9,6 +9,7 @@ import AshaGreyjoyHouseCardAbilities from "./AshaGreyjoyHouseCardAbilities";
 import QueenOfThornsHouseCardAbility from "./QueenOfThornsHouseCardAbility";
 import VictarionGreyjoyHouseCardAbility from "./VictarionGreyjoyHouseCardAbility";
 import BalonGreyjoyHouseCardAbility from "./BalonGreyjoyHouseCardAbility";
+import DoranMartellHouseCardAbility from "./DoranMartellHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -54,6 +55,10 @@ export const balonGreyjoy = new BalonGreyjoyHouseCardAbility(
     "balon-greyjoy",
     "The printed combat strength of your opponent's House card is reduced to 0."
 );
+export const doranMartell = new DoranMartellHouseCardAbility(
+    "doran-martell",
+    "Immediately move your opponent to the bottom of one Influence track of your choice."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -65,6 +70,7 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [queenOfThorns.id, queenOfThorns],
     [victarionGreyjoy.id, victarionGreyjoy],
     [balonGreyjoy.id, balonGreyjoy],
+    [doranMartell.id, doranMartell],
 ]);
 
 export default houseCardAbilities;

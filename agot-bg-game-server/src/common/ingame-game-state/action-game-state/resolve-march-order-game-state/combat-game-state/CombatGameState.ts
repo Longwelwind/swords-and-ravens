@@ -363,6 +363,10 @@ export default class CombatGameState extends GameState<
             + this.getHouseCardCombatStrength(house);
     }
 
+    getEnemy(house: House): House {
+        return house == this.attacker ? this.defender : this.attacker;
+    }
+
     serializeToClient(admin: boolean, player: Player | null): SerializedCombatGameState {
         return {
             type: "combat",
