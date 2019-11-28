@@ -39,6 +39,7 @@ import House from "../common/ingame-game-state/game-data-structure/House";
 import housePowerTokensImages from "./housePowerTokensImages";
 import marked from "marked";
 import GameLogListComponent from "./GameLogListComponent";
+import HouseCardComponent from "./game-state-panel/utils/HouseCardComponent";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -248,21 +249,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             </Row>
                                             <Row className="justify-content-center">
                                                 {_.sortBy(p.house.houseCards.values, hc => hc.combatStrength).map(hc => (
-                                                    <OverlayTrigger
-                                                        overlay={
-                                                            <div className="house-card-full" style={{backgroundImage: `url(${houseCardImages.get(hc.id)})`}}/>
-                                                        }
-                                                        delay={{show: 120, hide: 0}}
-                                                        placement="right"
+                                                    <HouseCardComponent
+                                                        houseCard={hc}
+                                                        placement="auto"
                                                         key={hc.id}
-                                                    >
-                                                        <Col xs="auto">
-                                                            <div className="house-card-icon hover-weak-outline"
-                                                                 style={{backgroundImage: `url(${hc.state == HouseCardState.AVAILABLE ? houseCardImages.get(hc.id) : houseCardsBackImages.get(p.house.id)})`}}>
-
-                                                            </div>
-                                                        </Col>
-                                                    </OverlayTrigger>
+                                                        house={p.house}
+                                                    />
                                                 ))}
                                             </Row>
                                         </ListGroupItem>

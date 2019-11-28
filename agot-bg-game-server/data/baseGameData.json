@@ -373,7 +373,8 @@
           "combatStrength": 1
         },
         "patchface": {
-          "name": "Patchface"
+          "name": "Patchface",
+          "ability": "patchface"
         }
       },
       "supplyLevel": 2

@@ -2,7 +2,7 @@ export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | ResolveMa
     | UseValyrianSteelBlade | ChooseHouseCard | ChooseCasualties | ChooseRetreatRegion | ChooseRavenAction
     | ChooseTopWildlingCardAction | ReplaceOrder | SkipReplaceOrder | ResolveRaid | Bid | ChooseChoice
     | DecideBiggest | ReconcileArmies | Muster | ResolveTies | SelectUnits | LaunchGame | ChooseHouse
-    | SelectOrders;
+    | SelectOrders | SelectHouseCard;
 
 interface Ping {
     type: "ping";
@@ -148,4 +148,9 @@ interface ResolveTies {
 interface SelectUnits {
     type: "select-units";
     units: [string, number[]][];
+}
+
+interface SelectHouseCard {
+    type: "select-house-card";
+    houseCard: string;
 }
