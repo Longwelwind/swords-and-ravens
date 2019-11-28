@@ -1,5 +1,6 @@
 import HouseCardAbility from "./HouseCardAbility";
 import houseCardAbilities from "./houseCardAbilities";
+import {observable} from "mobx";
 
 export default class HouseCard {
     id: string;
@@ -8,7 +9,7 @@ export default class HouseCard {
     swordIcons: number;
     towerIcons: number;
     ability: HouseCardAbility | null;
-    state: HouseCardState = HouseCardState.AVAILABLE;
+    @observable state: HouseCardState = HouseCardState.AVAILABLE;
 
     constructor(id: string, name: string, combatStrength: number, swordIcons: number, towerIcons: number, ability: HouseCardAbility | null) {
         this.id = id;

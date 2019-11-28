@@ -11,6 +11,7 @@ import WesterosCard, {SerializedWesterosCard} from "./westeros-card/WesterosCard
 import shuffle from "../../../utils/shuffle";
 import WildlingCard, {SerializedWildlingCard} from "./wildling-card/WildlingCard";
 import BetterMap from "../../../utils/BetterMap";
+import HouseCard from "./house-card/HouseCard";
 
 export const MAX_WILDLING_STRENGTH = 12;
 
@@ -175,6 +176,16 @@ export default class Game {
         });
 
         return _.sortBy(armySizes.values.filter(s => s > 0), s => -s);
+    }
+
+    getHouseCardById(id: string): HouseCard {
+        const houseCard = _.flatMap(this.houses.values, h => h.houseCards.values).find(hc => hc.id == id);
+
+        if (houseCard == null) {
+            throw new Error();
+        }
+
+        return houseCard;
     }
 
     getCountHeldStructures(house: House): BetterMap<number, number> {

@@ -10,6 +10,7 @@ import QueenOfThornsHouseCardAbility from "./QueenOfThornsHouseCardAbility";
 import VictarionGreyjoyHouseCardAbility from "./VictarionGreyjoyHouseCardAbility";
 import BalonGreyjoyHouseCardAbility from "./BalonGreyjoyHouseCardAbility";
 import DoranMartellHouseCardAbility from "./DoranMartellHouseCardAbility";
+import PatchfaceHouseCardAbility from "./PatchfaceHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -59,6 +60,10 @@ export const doranMartell = new DoranMartellHouseCardAbility(
     "doran-martell",
     "Immediately move your opponent to the bottom of one Influence track of your choice."
 );
+export const patchface = new PatchfaceHouseCardAbility(
+    "patchface",
+    "After combat, you may look at your opponent's hand and discard one card of your choice."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -71,6 +76,7 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [victarionGreyjoy.id, victarionGreyjoy],
     [balonGreyjoy.id, balonGreyjoy],
     [doranMartell.id, doranMartell],
+    [patchface.id, patchface],
 ]);
 
 export default houseCardAbilities;

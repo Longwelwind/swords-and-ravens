@@ -14,9 +14,13 @@ import {ClientMessage} from "../../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../../messages/ServerMessage";
 import AfterWinnerDeterminationGameState
     , {SerializedAfterWinnerDeterminationGameState} from "./after-winner-determination-game-state/AfterWinnerDeterminationGameState";
+import AfterCombatHouseCardAbilitiesGameState
+    , {SerializedAfterCombatHouseCardAbilitiesGameState} from "./after-combat-house-card-abilities-game-state/AfterCombatHouseCardAbilitiesGameState";
 
 export default class PostCombatGameState extends GameState<
-    CombatGameState, ChooseRetreatRegionGameState | ChooseCasualtiesGameState | AfterWinnerDeterminationGameState
+    CombatGameState,
+    ChooseRetreatRegionGameState | ChooseCasualtiesGameState | AfterWinnerDeterminationGameState
+    | AfterCombatHouseCardAbilitiesGameState
 > {
     winner: House;
     loser: House;
@@ -230,6 +234,10 @@ export default class PostCombatGameState extends GameState<
         // Put the house cards as used, and if it's the last, retrieve all house cards.
         this.combat.houseCombatDatas.forEach(({houseCard}, house) => this.markHouseAsUsed(house, houseCard));
 
+        this.setChildGameState(new AfterCombatHouseCardAbilitiesGameState(this)).firstStart();
+    }
+
+    onAfterCombatHouseCardAbilitiesFinish(): void {
         this.combat.resolveMarchOrderGameState.onCombatGameStateEnd(this.attacker);
     }
 
@@ -290,6 +298,8 @@ export default class PostCombatGameState extends GameState<
                 return ChooseCasualtiesGameState.deserializeFromServer(this, data);
             case "after-winner-determination":
                 return AfterWinnerDeterminationGameState.deserializeFromServer(this, data);
+            case "after-combat-house-card-abilities":
+                return AfterCombatHouseCardAbilitiesGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -300,5 +310,6 @@ export interface SerializedPostCombatGameState {
     loser: string;
     childGameState: SerializedChooseRetreatRegionGameState
         | SerializedChooseCasualtiesGameState
-        | SerializedAfterWinnerDeterminationGameState;
+        | SerializedAfterWinnerDeterminationGameState
+        | SerializedAfterCombatHouseCardAbilitiesGameState;
 }

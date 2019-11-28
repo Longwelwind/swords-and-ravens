@@ -4,9 +4,10 @@ import HouseCard from "./HouseCard";
 import AfterWinnerDeterminationGameState
     from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/AfterWinnerDeterminationGameState";
 import Unit from "../Unit";
-import Region from "../Region";
 import ImmediatelyHouseCardAbilitiesResolutionGameState
     from "../../action-game-state/resolve-march-order-game-state/combat-game-state/immediately-house-card-abilities-resolution-game-state/ImmediatelyHouseCardAbilitiesResolutionGameState";
+import AfterCombatHouseCardAbilitiesGameState
+    from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-combat-house-card-abilities-game-state/AfterCombatHouseCardAbilitiesGameState";
 
 export default class HouseCardAbility {
     id: string;
@@ -15,6 +16,10 @@ export default class HouseCardAbility {
     constructor(id: string, description: string) {
         this.id = id;
         this.description = description;
+    }
+
+    afterCombat(afterCombat: AfterCombatHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {
+        afterCombat.childGameState.onHouseCardResolutionFinish(house);
     }
 
     afterWinnerDetermination(afterWinnerDetermination: AfterWinnerDeterminationGameState, house: House, _houseCard: HouseCard): void {
