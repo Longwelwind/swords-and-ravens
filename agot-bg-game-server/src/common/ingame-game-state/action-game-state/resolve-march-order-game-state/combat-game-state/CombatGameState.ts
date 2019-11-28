@@ -24,6 +24,8 @@ import PostCombatGameState, {SerializedPostCombatGameState} from "./post-combat-
 import SupportOrderType from "../../../game-data-structure/order-types/SupportOrderType";
 import ImmediatelyHouseCardAbilitiesResolutionGameState
     , {SerializedImmediatelyHouseCardAbilitiesResolutionGameState} from "./immediately-house-card-abilities-resolution-game-state/ImmediatelyHouseCardAbilitiesResolutionGameState";
+import Order from "../../../game-data-structure/Order";
+import orders from "../../../game-data-structure/orders";
 
 
 export interface HouseCombatData {
@@ -40,6 +42,7 @@ export default class CombatGameState extends GameState<
     winner: House | null;
     loser: House | null;
 
+    order: Order;
     attacker: House;
     defender: House;
     houseCombatDatas: BetterMap<House, HouseCombatData>;
@@ -110,7 +113,8 @@ export default class CombatGameState extends GameState<
         super(resolveMarchOrderGameState);
     }
 
-    firstStart(attackerComingFrom: Region, combatRegion: Region, attacker: House, defender: House, army: Unit[]): void {
+    firstStart(attackerComingFrom: Region, combatRegion: Region, attacker: House, defender: House, army: Unit[], order: Order): void {
+        this.order = order;
         this.attacker = attacker;
         this.defender = defender;
         this.houseCombatDatas = new BetterMap([
@@ -370,6 +374,7 @@ export default class CombatGameState extends GameState<
     serializeToClient(admin: boolean, player: Player | null): SerializedCombatGameState {
         return {
             type: "combat",
+            order: this.order.id,
             attackerId: this.attacker.id,
             defenderId: this.defender.id,
             houseCombatDatas: this.houseCombatDatas.map((house, houseCombatData) => [house.id, {
@@ -385,6 +390,7 @@ export default class CombatGameState extends GameState<
     static deserializeFromServer(resolveMarchOrderGameState: ResolveMarchOrderGameState, data: SerializedCombatGameState): CombatGameState {
         const combatGameState = new CombatGameState(resolveMarchOrderGameState);
 
+        combatGameState.order = orders.get(data.order);
         combatGameState.attacker = resolveMarchOrderGameState.game.houses.get(data.attackerId);
         combatGameState.defender = resolveMarchOrderGameState.game.houses.get(data.defenderId);
         combatGameState.houseCombatDatas = new BetterMap(data.houseCombatDatas.map(([houseId, {regionId, houseCardId, army}]) => {
@@ -429,6 +435,7 @@ export default class CombatGameState extends GameState<
 
 export interface SerializedCombatGameState {
     type: "combat";
+    order: number;
     attackerId: string;
     defenderId: string;
     supporters: [string, string | null][];

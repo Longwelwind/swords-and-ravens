@@ -136,7 +136,9 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                         units: army.map(u => u.type.id)
                     });
 
-                    this.resolveMarchOrderGameState.proceedToCombat(startingRegion, region, this.house, enemy, army);
+                    this.resolveMarchOrderGameState.proceedToCombat(
+                        startingRegion, region, this.house, enemy, army, this.actionGameState.ordersOnBoard.get(startingRegion)
+                    );
                     return;
                 } else {
                     // Attack against a neutral force

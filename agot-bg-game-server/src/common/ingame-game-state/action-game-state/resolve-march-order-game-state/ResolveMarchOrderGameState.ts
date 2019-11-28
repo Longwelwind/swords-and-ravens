@@ -12,6 +12,7 @@ import CombatGameState, {SerializedCombatGameState} from "./combat-game-state/Co
 import Region from "../../game-data-structure/Region";
 import Unit from "../../game-data-structure/Unit";
 import Game from "../../game-data-structure/Game";
+import Order from "../../game-data-structure/Order";
 
 export default class ResolveMarchOrderGameState extends GameState<ActionGameState, ResolveSingleMarchOrderGameState | CombatGameState> {
     constructor(actionGameState: ActionGameState) {
@@ -65,8 +66,8 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         this.setChildGameState(new ResolveSingleMarchOrderGameState(this)).firstStart(houseToResolve);
     }
 
-    proceedToCombat(attackerComingFrom: Region, combatRegion: Region, attacker: House, defender: House, army: Unit[]): void {
-        this.setChildGameState(new CombatGameState(this)).firstStart(attackerComingFrom, combatRegion, attacker, defender, army);
+    proceedToCombat(attackerComingFrom: Region, combatRegion: Region, attacker: House, defender: House, army: Unit[], order: Order): void {
+        this.setChildGameState(new CombatGameState(this)).firstStart(attackerComingFrom, combatRegion, attacker, defender, army, order);
     }
 
     getNextHouseToResolveMarchOrder(lastHouseToResolve: House | null): House | null {
