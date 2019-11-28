@@ -470,7 +470,8 @@
         },
         "ser-loras-tyrell": {
           "name": "Ser Loras Tyrell",
-          "combatStrength": 3
+          "combatStrength": 3,
+          "ability": "ser-loras-tyrell"
         },
         "randyll-tarly": {
           "name": "Randyll Tarly",

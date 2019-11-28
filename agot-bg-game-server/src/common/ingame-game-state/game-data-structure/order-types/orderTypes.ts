@@ -4,6 +4,7 @@ import SupportOrderType from "./SupportOrderType";
 import ConsolidatePowerOrderType from "./ConsolidatePowerOrderType";
 import RaidOrderType from "./RaidOrderType";
 import DefenseOrderType from "./DefenseOrderType";
+import BetterMap from "../../../../utils/BetterMap";
 
 export const marchMinusOne = new MarchOrderType("march-minus-one", "March -1", false, -1);
 export const march = new MarchOrderType("march", "March", false, 0);
@@ -21,7 +22,7 @@ export const specialConsolidatePower = new ConsolidatePowerOrderType("special-co
 export const raid = new RaidOrderType("raid", "Raid", false);
 export const specialRaid = new RaidOrderType("special-raid", "Starred Raid", true);
 
-const orderTypes = new Map<string, OrderType>([
+const orderTypes = new BetterMap<string, OrderType>([
     [marchMinusOne.id, marchMinusOne],
     [march.id, march],
     [defensePlusOne.id, defensePlusOne],

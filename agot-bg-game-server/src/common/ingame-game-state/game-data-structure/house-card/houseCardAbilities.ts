@@ -11,6 +11,7 @@ import VictarionGreyjoyHouseCardAbility from "./VictarionGreyjoyHouseCardAbility
 import BalonGreyjoyHouseCardAbility from "./BalonGreyjoyHouseCardAbility";
 import DoranMartellHouseCardAbility from "./DoranMartellHouseCardAbility";
 import PatchfaceHouseCardAbility from "./PatchfaceHouseCardAbility";
+import SerLorasTyrellHouseCardAbility from "./SerLorasTyrellHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -64,6 +65,11 @@ export const patchface = new PatchfaceHouseCardAbility(
     "patchface",
     "After combat, you may look at your opponent's hand and discard one card of your choice."
 );
+export const serLorasTyrell = new SerLorasTyrellHouseCardAbility(
+    "ser-loras-tyrell",
+    "If you are attacking and win this combat, move the March Order token into the conquered area"
+    + " (instead of discarding it). The March Order token may be resolved again later this round."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -77,6 +83,7 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [balonGreyjoy.id, balonGreyjoy],
     [doranMartell.id, doranMartell],
     [patchface.id, patchface],
+    [serLorasTyrell.id, serLorasTyrell],
 ]);
 
 export default houseCardAbilities;
