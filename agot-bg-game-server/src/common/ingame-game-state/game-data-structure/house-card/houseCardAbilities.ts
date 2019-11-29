@@ -14,6 +14,7 @@ import PatchfaceHouseCardAbility from "./PatchfaceHouseCardAbility";
 import SerLorasTyrellHouseCardAbility from "./SerLorasTyrellHouseCardAbility";
 import StannisBaratheonHouseCardAbility from "./StannisBaratheonHouseCardAbility";
 import NymeriaSandHouseCardAbility from "./NymeriaSandHouseCardAbility";
+import RooseBoltonHouseCardAbility from "./RooseBoltonHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -82,6 +83,11 @@ export const nymeriaSand = new NymeriaSandHouseCardAbility(
     "If you are defending, this card gains a fortification icon."
     + " If you are attacking, this card gains a sword icon."
 );
+export const rooseBolton = new RooseBoltonHouseCardAbility(
+    "roose-bolton",
+    "If you lose this combat, return your entire House card discard pile into your hand"
+    + " (including this card)."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -98,6 +104,7 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [serLorasTyrell.id, serLorasTyrell],
     [stannisBaratheon.id, stannisBaratheon],
     [nymeriaSand.id, nymeriaSand],
+    [rooseBolton.id, rooseBolton],
 ]);
 
 export default houseCardAbilities;
