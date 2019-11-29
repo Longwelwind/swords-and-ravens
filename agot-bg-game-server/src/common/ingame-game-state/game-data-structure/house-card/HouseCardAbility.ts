@@ -8,6 +8,8 @@ import ImmediatelyHouseCardAbilitiesResolutionGameState
     from "../../action-game-state/resolve-march-order-game-state/combat-game-state/immediately-house-card-abilities-resolution-game-state/ImmediatelyHouseCardAbilitiesResolutionGameState";
 import AfterCombatHouseCardAbilitiesGameState
     from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-combat-house-card-abilities-game-state/AfterCombatHouseCardAbilitiesGameState";
+import CancelHouseCardAbilitiesGameState
+    from "../../action-game-state/resolve-march-order-game-state/combat-game-state/cancel-house-card-abilities-game-state/CancelHouseCardAbilitiesGameState";
 
 export default class HouseCardAbility {
     id: string;
@@ -16,6 +18,10 @@ export default class HouseCardAbility {
     constructor(id: string, description: string) {
         this.id = id;
         this.description = description;
+    }
+
+    cancel(cancelResolutionState: CancelHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {
+        cancelResolutionState.childGameState.onHouseCardResolutionFinish(house);
     }
 
     afterCombat(afterCombat: AfterCombatHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {

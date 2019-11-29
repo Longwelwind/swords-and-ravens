@@ -36,13 +36,6 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
             const house = this.combatGameState.game.houses.get(message.houseId);
 
             this.houseCards.set(house, null);
-        } else if (message.type == "reveal-house-card") {
-            const houseCards: [House, HouseCard][] = message.houseCardIds.map(([houseId, houseCardId]) => [
-                this.combatGameState.game.houses.get(houseId),
-                this.combatGameState.game.houses.get(houseId).houseCards.get(houseCardId)
-            ]);
-
-            houseCards.forEach(([house, houseCard]) => this.combatGameState.houseCombatDatas.get(house).houseCard = houseCard);
         }
     }
 
@@ -83,7 +76,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                 });
 
                 this.entireGame.broadcastToClients({
-                    type: "reveal-house-card",
+                    type: "change-combat-house-card",
                     // Same here, the houseCards will always be non-null
                     // @ts-ignore
                     houseCardIds: this.combatGameState.houseCombatDatas.map((h, hcd) => [h.id, hcd.houseCard.id])

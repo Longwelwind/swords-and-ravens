@@ -8,7 +8,7 @@ import {GameLogData} from "../common/ingame-game-state/game-data-structure/GameL
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady
     | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | NewTurn | RemovePlacedOrder
     | MoveUnits
-    | UnitsWounded | RevealHouseCard | BeginSeeTopWildlingCard
+    | UnitsWounded | ChangeCombatHouseCard | BeginSeeTopWildlingCard
     | RavenOrderReplaced | ProceedWesterosCard | ChangeGarrison
      | BidDone | GameStateChange | SupplyAdjusted
     | ChangeControlPowerToken | ChangePowerToken | ChangeWildlingStrength | AddGameLog | RevealWildlingCard
@@ -63,9 +63,9 @@ interface HouseCardChosen {
     houseId: string;
 }
 
-interface RevealHouseCard {
-    type: "reveal-house-card";
-    houseCardIds: [string, string][];
+interface ChangeCombatHouseCard {
+    type: "change-combat-house-card";
+    houseCardIds: [string, string | null][];
 }
 
 interface CombatImmediatelyKilledUnits {

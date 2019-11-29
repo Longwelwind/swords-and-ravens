@@ -30,7 +30,11 @@ export default class PatchfaceAbilityGameState extends GameState<
         this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(house, choosableHouseCards);
     }
 
-    onSelectHouseCardFinish(house: House, houseCard: HouseCard): void {
+    onSelectHouseCardFinish(house: House, houseCard: HouseCard | null): void {
+        if (houseCard == null) {
+            return;
+        }
+
         houseCard.state = HouseCardState.USED;
 
         this.combat().entireGame.broadcastToClients({
