@@ -13,6 +13,7 @@ import DoranMartellHouseCardAbility from "./DoranMartellHouseCardAbility";
 import PatchfaceHouseCardAbility from "./PatchfaceHouseCardAbility";
 import SerLorasTyrellHouseCardAbility from "./SerLorasTyrellHouseCardAbility";
 import StannisBaratheonHouseCardAbility from "./StannisBaratheonHouseCardAbility";
+import NymeriaSandHouseCardAbility from "./NymeriaSandHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -76,6 +77,11 @@ export const stannisBaratheon = new StannisBaratheonHouseCardAbility(
     "If your opponent has a higher position on the Iron Throne Influence track than you,"
     + " this card gains +1 combat strength."
 );
+export const nymeriaSand = new NymeriaSandHouseCardAbility(
+    "nymeria-sand",
+    "If you are defending, this card gains a fortification icon."
+    + " If you are attacking, this card gains a sword icon."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -91,6 +97,7 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [patchface.id, patchface],
     [serLorasTyrell.id, serLorasTyrell],
     [stannisBaratheon.id, stannisBaratheon],
+    [nymeriaSand.id, nymeriaSand],
 ]);
 
 export default houseCardAbilities;
