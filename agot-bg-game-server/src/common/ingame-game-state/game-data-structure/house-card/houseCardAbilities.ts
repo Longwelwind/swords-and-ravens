@@ -12,6 +12,7 @@ import BalonGreyjoyHouseCardAbility from "./BalonGreyjoyHouseCardAbility";
 import DoranMartellHouseCardAbility from "./DoranMartellHouseCardAbility";
 import PatchfaceHouseCardAbility from "./PatchfaceHouseCardAbility";
 import SerLorasTyrellHouseCardAbility from "./SerLorasTyrellHouseCardAbility";
+import StannisBaratheonHouseCardAbility from "./StannisBaratheonHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -70,6 +71,11 @@ export const serLorasTyrell = new SerLorasTyrellHouseCardAbility(
     "If you are attacking and win this combat, move the March Order token into the conquered area"
     + " (instead of discarding it). The March Order token may be resolved again later this round."
 );
+export const stannisBaratheon = new StannisBaratheonHouseCardAbility(
+    "stannis-baratheon",
+    "If your opponent has a higher position on the Iron Throne Influence track than you,"
+    + " this card gains +1 combat strength."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -84,6 +90,7 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [doranMartell.id, doranMartell],
     [patchface.id, patchface],
     [serLorasTyrell.id, serLorasTyrell],
+    [stannisBaratheon.id, stannisBaratheon],
 ]);
 
 export default houseCardAbilities;
