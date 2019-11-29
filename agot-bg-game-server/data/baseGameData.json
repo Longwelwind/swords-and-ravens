@@ -317,7 +317,8 @@
         },
         "roose-bolton": {
           "name": "Roose Bolton",
-          "combatStrength": 2
+          "combatStrength": 2,
+          "ability": "roose-bolton"
         },
         "greatjon-umber": {
           "name": "Greatjon Umber",

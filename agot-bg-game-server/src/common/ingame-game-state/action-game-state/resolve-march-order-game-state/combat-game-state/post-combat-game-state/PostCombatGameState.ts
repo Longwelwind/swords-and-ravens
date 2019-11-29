@@ -76,6 +76,9 @@ export default class PostCombatGameState extends GameState<
             })
         });
 
+        // Put the house cards as used
+        this.combat.houseCombatDatas.forEach(({houseCard}, house) => this.markHouseAsUsed(house, houseCard));
+
         this.setChildGameState(new AfterWinnerDeterminationGameState(this)).firstStart();
     }
 
@@ -230,9 +233,6 @@ export default class PostCombatGameState extends GameState<
                 order: null
             });
         }
-
-        // Put the house cards as used, and if it's the last, retrieve all house cards.
-        this.combat.houseCombatDatas.forEach(({houseCard}, house) => this.markHouseAsUsed(house, houseCard));
 
         this.setChildGameState(new AfterCombatHouseCardAbilitiesGameState(this)).firstStart();
     }
