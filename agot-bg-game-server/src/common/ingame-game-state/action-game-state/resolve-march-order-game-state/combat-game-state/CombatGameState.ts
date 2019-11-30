@@ -26,6 +26,8 @@ import ImmediatelyHouseCardAbilitiesResolutionGameState
     , {SerializedImmediatelyHouseCardAbilitiesResolutionGameState} from "./immediately-house-card-abilities-resolution-game-state/ImmediatelyHouseCardAbilitiesResolutionGameState";
 import Order from "../../../game-data-structure/Order";
 import orders from "../../../game-data-structure/orders";
+import CancelHouseCardAbilitiesGameState
+    , {SerializedCancelHouseCardAbilitiesGameState} from "./cancel-house-card-abilities-game-state/CancelHouseCardAbilitiesGameState";
 
 
 export interface HouseCombatData {
@@ -38,6 +40,7 @@ export default class CombatGameState extends GameState<
     ResolveMarchOrderGameState,
     DeclareSupportGameState | ChooseHouseCardGameState | UseValyrianSteelBladeGameState
     | ImmediatelyHouseCardAbilitiesResolutionGameState | PostCombatGameState
+    | CancelHouseCardAbilitiesGameState
 > {
     winner: House | null;
     loser: House | null;
@@ -222,6 +225,14 @@ export default class CombatGameState extends GameState<
     }
 
     onChooseHouseCardGameStateEnd(): void {
+        this.proceedCancelHouseCardAbilities();
+    }
+
+    proceedCancelHouseCardAbilities(): void {
+        this.setChildGameState(new CancelHouseCardAbilitiesGameState(this)).firstStart();
+    }
+
+    onCancelHouseCardAbilitiesFinish(): void {
         this.proceedImmediatelyResolution();
     }
 
@@ -260,6 +271,13 @@ export default class CombatGameState extends GameState<
             const units = message.unitIds.map(uid => region.units.get(uid));
 
             units.forEach(u => u.wounded = true);
+        } else if (message.type == "change-combat-house-card") {
+            const houseCards: [House, HouseCard | null][] = message.houseCardIds.map(([houseId, houseCardId]) => [
+                this.game.houses.get(houseId),
+                houseCardId ? this.game.houses.get(houseId).houseCards.get(houseCardId) : null
+            ]);
+
+            houseCards.forEach(([house, houseCard]) => this.houseCombatDatas.get(house).houseCard = houseCard);
         } else {
             this.childGameState.onServerMessage(message);
         }
@@ -429,6 +447,8 @@ export default class CombatGameState extends GameState<
                 return PostCombatGameState.deserializeFromServer(this, data);
             case "immediately-house-card-abilities-resolution":
                 return ImmediatelyHouseCardAbilitiesResolutionGameState.deserializeFromServer(this, data);
+            case "cancel-house-card-abilities":
+                return CancelHouseCardAbilitiesGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -442,5 +462,6 @@ export interface SerializedCombatGameState {
     houseCombatDatas: [string, {houseCardId: string | null; army: number[]; regionId: string}][];
     childGameState: SerializedDeclareSupportGameState | SerializedChooseHouseCardGameState
         | SerializedUseValyrianSteelBladeGameState | SerializedPostCombatGameState
-        | SerializedImmediatelyHouseCardAbilitiesResolutionGameState;
+        | SerializedImmediatelyHouseCardAbilitiesResolutionGameState
+        | SerializedCancelHouseCardAbilitiesGameState;
 }

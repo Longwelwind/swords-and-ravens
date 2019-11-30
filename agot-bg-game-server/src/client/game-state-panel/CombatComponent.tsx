@@ -23,6 +23,9 @@ import ImmediatelyHouseCardAbilitiesResolutionGameState
     from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/immediately-house-card-abilities-resolution-game-state/ImmediatelyHouseCardAbilitiesResolutionGameState";
 import ImmediatelyHouseCardAbilitiesResolutionComponent
     from "./house-card-abilities/ImmediatelyHouseCardAbilitiesResolutionComponent";
+import CancelHouseCardAbilitiesGameState
+    from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/cancel-house-card-abilities-game-state/CancelHouseCardAbilitiesGameState";
+import CancelHouseCardAbilitiesComponent from "./house-card-abilities/CancelHouseCardAbilitiesComponent";
 
 @observer
 export default class CombatComponent extends Component<GameStateComponentProps<CombatGameState>> {
@@ -95,7 +98,8 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                     [ChooseHouseCardGameState, ChooseHouseCardComponent],
                     [UseValyrianSteelBladeGameState, UseValyrianSteelBladeComponent],
                     [PostCombatGameState, PostCombatComponent],
-                    [ImmediatelyHouseCardAbilitiesResolutionGameState, ImmediatelyHouseCardAbilitiesResolutionComponent]
+                    [ImmediatelyHouseCardAbilitiesResolutionGameState, ImmediatelyHouseCardAbilitiesResolutionComponent],
+                    [CancelHouseCardAbilitiesGameState, CancelHouseCardAbilitiesComponent]
                 ])}
             </>
         );

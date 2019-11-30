@@ -294,7 +294,8 @@
         },
         "tyrion-lannister": {
           "name": "Tyrion Lannister",
-          "combatStrength": 1
+          "combatStrength": 1,
+          "ability": "tyrion-lannister"
         },
         "cersei-lannister": {
           "name": "Cersei Lannister"

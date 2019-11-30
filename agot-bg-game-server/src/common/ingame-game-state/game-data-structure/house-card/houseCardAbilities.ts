@@ -15,6 +15,7 @@ import SerLorasTyrellHouseCardAbility from "./SerLorasTyrellHouseCardAbility";
 import StannisBaratheonHouseCardAbility from "./StannisBaratheonHouseCardAbility";
 import NymeriaSandHouseCardAbility from "./NymeriaSandHouseCardAbility";
 import RooseBoltonHouseCardAbility from "./RooseBoltonHouseCardAbility";
+import TyrionLannisterHouseCardAbility from "./TyrionLannisterHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -88,6 +89,12 @@ export const rooseBolton = new RooseBoltonHouseCardAbility(
     "If you lose this combat, return your entire House card discard pile into your hand"
     + " (including this card)."
 );
+export const tyrionLannister = new TyrionLannisterHouseCardAbility(
+    "tyrion-lannister",
+    "You may immediately cancel your opponent's chosen House card and return it to his hand. He"
+    + " must then choose a different House card to reveal, if he has no other House cards in hand, he"
+    + " cannot use a House card this combat."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -105,6 +112,7 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [stannisBaratheon.id, stannisBaratheon],
     [nymeriaSand.id, nymeriaSand],
     [rooseBolton.id, rooseBolton],
+    [tyrionLannister.id, tyrionLannister]
 ]);
 
 export default houseCardAbilities;
