@@ -3,7 +3,8 @@
 
 <html lang="en">
 <head>
-    <title>AGoT Board Game - {% block title %}{% endblock %}</title>
+    <title>Swords and Ravens</title>
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
     {% bootstrap_css %}
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.css"
@@ -26,7 +27,10 @@
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <a class="navbar-brand" href="/">👑 AGoT Board Game</a>
+        <a class="navbar-brand" href="/">
+            <img class="d-inline-block align-top" width="30" src="{% static 'raven.svg' %}" />
+            Swords and Ravens
+        </a>
         <button
             class="navbar-toggler"
             type="button"
