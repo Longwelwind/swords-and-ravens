@@ -16,6 +16,7 @@ import StannisBaratheonHouseCardAbility from "./StannisBaratheonHouseCardAbility
 import NymeriaSandHouseCardAbility from "./NymeriaSandHouseCardAbility";
 import RooseBoltonHouseCardAbility from "./RooseBoltonHouseCardAbility";
 import TyrionLannisterHouseCardAbility from "./TyrionLannisterHouseCardAbility";
+import SerKevanLannisterHouseCardAbility from "./SerKevanLannisterHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -95,6 +96,11 @@ export const tyrionLannister = new TyrionLannisterHouseCardAbility(
     + " must then choose a different House card to reveal, if he has no other House cards in hand, he"
     + " cannot use a House card this combat."
 );
+export const serKevanLannister = new SerKevanLannisterHouseCardAbility(
+    "ser-kevan-lannister",
+    "If you are attacking, all of your participating Footmen (including supporting"
+    + " Lannister footmen) add +2 combat strength instead of +1."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -112,7 +118,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [stannisBaratheon.id, stannisBaratheon],
     [nymeriaSand.id, nymeriaSand],
     [rooseBolton.id, rooseBolton],
-    [tyrionLannister.id, tyrionLannister]
+    [tyrionLannister.id, tyrionLannister],
+    [serKevanLannister.id, serKevanLannister],
 ]);
 
 export default houseCardAbilities;
