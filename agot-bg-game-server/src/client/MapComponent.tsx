@@ -16,6 +16,7 @@ import orderImages from "./orderImages";
 import unitImages from "./unitImages";
 import classNames = require("classnames");
 import housePowerTokensImages from "./housePowerTokensImages";
+import garrisonTokens from "./garrisonTokens";
 
 interface MapComponentProps {
     gameClient: GameClient;
@@ -31,6 +32,17 @@ export default class MapComponent extends Component<MapComponentProps> {
                 <div style={{position: "relative"}}>
                     {this.props.ingameGameState.world.regions.values.map(r => (
                         <div key={r.id}>
+                            {r.garrison > 0 && (
+                                <div
+                                    className="garrison-token hover-weak-outline"
+                                    style={{
+                                        backgroundImage: `url(${garrisonTokens.get(r.id)})`,
+                                        left: r.unitSlot.x, top: r.unitSlot.y
+                                    }}
+                                >
+                                </div>
+
+                            )}
                             <div
                                 className="units-container"
                                 style={{left: r.unitSlot.x, top: r.unitSlot.y}}

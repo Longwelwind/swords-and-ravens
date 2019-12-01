@@ -15086,6 +15086,11 @@
                          "value":2
                         }, 
                         {
+                         "name":"garrison",
+                         "type":"int",
+                         "value":2
+                        }, 
+                        {
                          "name":"id",
                          "type":"string",
                          "value":"lannisport"
@@ -15126,6 +15131,11 @@
                          "name":"crownIcons",
                          "type":"int",
                          "value":1
+                        }, 
+                        {
+                         "name":"garrison",
+                         "type":"int",
+                         "value":2
                         }, 
                         {
                          "name":"id",
@@ -15472,6 +15482,11 @@
                          "name":"crownIcons",
                          "type":"int",
                          "value":1
+                        }, 
+                        {
+                         "name":"garrison",
+                         "type":"int",
+                         "value":2
                         }, 
                         {
                          "name":"id",
@@ -15852,6 +15867,11 @@
                          "value":1
                         }, 
                         {
+                         "name":"garrison",
+                         "type":"int",
+                         "value":2
+                        }, 
+                        {
                          "name":"id",
                          "type":"string",
                          "value":"dragonstone"
@@ -15936,6 +15956,11 @@
                          "name":"crownIcons",
                          "type":"int",
                          "value":1
+                        }, 
+                        {
+                         "name":"garrison",
+                         "type":"int",
+                         "value":2
                         }, 
                         {
                          "name":"id",
@@ -16356,6 +16381,11 @@
                  "properties":[
                         {
                          "name":"castleLevel",
+                         "type":"int",
+                         "value":2
+                        }, 
+                        {
+                         "name":"garrison",
                          "type":"int",
                          "value":2
                         }, 

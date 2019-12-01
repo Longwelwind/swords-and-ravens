@@ -50,6 +50,17 @@ $grid-gutter-width: 1rem;
   transform: translate(-50%, -50%);
 }
 
+.map .garrison-token {
+  width: 69px;
+  height: 40px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  // This allows the garrison to be center on the position-absolute reference points
+  transform: translate(-50%, -50%);
+  position: absolute;
+}
+
 .map .power-token {
    position: absolute;
    width: 29px;
