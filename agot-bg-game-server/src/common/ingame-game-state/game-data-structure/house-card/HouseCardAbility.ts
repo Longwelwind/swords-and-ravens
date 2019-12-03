@@ -10,6 +10,8 @@ import AfterCombatHouseCardAbilitiesGameState
     from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-combat-house-card-abilities-game-state/AfterCombatHouseCardAbilitiesGameState";
 import CancelHouseCardAbilitiesGameState
     from "../../action-game-state/resolve-march-order-game-state/combat-game-state/cancel-house-card-abilities-game-state/CancelHouseCardAbilitiesGameState";
+import Order from "../Order";
+import DefenseOrderType from "../order-types/DefenseOrderType";
 
 export default class HouseCardAbility {
     id: string;
@@ -49,6 +51,10 @@ export default class HouseCardAbility {
     }
 
     modifyUnitCombatStrength(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _houseSide: House, _affectedUnit: Unit, _support: boolean, _currentStrength: number): number {
+        return 0;
+    }
+
+    modifyDefenseOrderBonus(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _defenseOrderType: DefenseOrderType, _currentBonus: number): number {
         return 0;
     }
 }

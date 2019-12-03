@@ -187,7 +187,10 @@ export default class CombatGameState extends GameState<
             }
         } else {
             if (order.type instanceof DefenseOrderType) {
-                return order.type.defenseModifier;
+                return this.computeModifiedStat(
+                    order.type.defenseModifier,
+                    (h, hc, hca, cv) => hca.modifyDefenseOrderBonus(this, h, hc, order.type as DefenseOrderType, cv)
+                );
             }
         }
 
@@ -359,6 +362,17 @@ export default class CombatGameState extends GameState<
         }, baseAmount(affectedHouseCard));
     }
 
+    computeModifiedStat(baseValue: number, abilityModify: (house: House, houseCard: HouseCard, houseCardAbility: HouseCardAbility, currentValue: number) => number): number {
+        return this.getOrderResolutionHouseCard().reduce((s, h) => {
+            const houseCard = this.houseCombatDatas.get(h).houseCard;
+
+            if (houseCard == null) {
+                return s;
+            }
+
+            return houseCard.ability ? s + abilityModify(h, houseCard, houseCard.ability, s) : s;
+        }, baseValue);
+    }
 
     getOrderResolutionHouseCard(): House[] {
         return _.sortBy(this.houseCombatDatas.keys, [h => this.game.ironThroneTrack.indexOf(h)]);
