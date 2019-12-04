@@ -420,7 +420,8 @@
           "ability": "asha-greyjoy"
         },
         "aeron-damphair": {
-          "name": "Aeron Damphair"
+          "name": "Aeron Damphair",
+          "ability": "aeron-damphair"
         }
       },
       "supplyLevel": 2

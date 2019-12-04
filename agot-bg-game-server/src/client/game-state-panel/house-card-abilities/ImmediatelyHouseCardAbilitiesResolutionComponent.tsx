@@ -10,6 +10,9 @@ import QueenOfThornsAbilityComponent from "./QueenOfThornsAbilityComponent";
 import DoranMartellAbilityGameState
     from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/immediately-house-card-abilities-resolution-game-state/doran-martell-ability-game-state/DoranMartellAbilityGameState";
 import DoranMartellAbilityComponent from "./DoranMartellAbilityComponent";
+import AeronDamphairAbilityGameState
+    from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/immediately-house-card-abilities-resolution-game-state/aeron-damphair-ability-game-state/AeronDamphairAbilityGameState";
+import AeronDamphairAbilityComponent from "./AeronDamphairAbilityComponent";
 
 
 @observer
@@ -17,7 +20,8 @@ export default class ImmediatelyHouseCardAbilitiesResolutionComponent extends Co
     render(): ReactNode {
         return renderChildGameState({...this.props, gameState: this.props.gameState.childGameState}, [
             [QueenOfThornsAbilityGameState, QueenOfThornsAbilityComponent],
-            [DoranMartellAbilityGameState, DoranMartellAbilityComponent]
+            [DoranMartellAbilityGameState, DoranMartellAbilityComponent],
+            [AeronDamphairAbilityGameState, AeronDamphairAbilityComponent],
         ]);
     }
 }

@@ -18,6 +18,7 @@ import RooseBoltonHouseCardAbility from "./RooseBoltonHouseCardAbility";
 import TyrionLannisterHouseCardAbility from "./TyrionLannisterHouseCardAbility";
 import SerKevanLannisterHouseCardAbility from "./SerKevanLannisterHouseCardAbility";
 import CatelynStarkHouseCardAbility from "./CatelynStarkHouseCardAbility";
+import AeronDamphairHouseCardAbility from "./AeronDamphairHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -106,6 +107,11 @@ export const catelynStark = new CatelynStarkHouseCardAbility(
     "catelyn-stark",
     "If you have a Defense Order token in the embattled area, its value is doubled."
 );
+export const aeronDamphair = new AeronDamphairHouseCardAbility(
+    "aeron-damphair",
+    "You may immediately discard two of your available Power tokens to discard Aeron"
+    + " Damphair and choose a different House card from your hand (if able)"
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -126,6 +132,7 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [tyrionLannister.id, tyrionLannister],
     [serKevanLannister.id, serKevanLannister],
     [catelynStark.id, catelynStark],
+    [aeronDamphair.id, aeronDamphair],
 ]);
 
 export default houseCardAbilities;

@@ -5,7 +5,6 @@ import House from "../../../../../game-data-structure/House";
 import Player from "../../../../../Player";
 import Game from "../../../../../game-data-structure/Game";
 import CombatGameState from "../../CombatGameState";
-import QueenOfThornsAbilityGameState from "../queen-of-thorns-ability-game-state/QueenOfThornsAbilityGameState";
 import _ from "lodash";
 import {ClientMessage} from "../../../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../../../messages/ServerMessage";

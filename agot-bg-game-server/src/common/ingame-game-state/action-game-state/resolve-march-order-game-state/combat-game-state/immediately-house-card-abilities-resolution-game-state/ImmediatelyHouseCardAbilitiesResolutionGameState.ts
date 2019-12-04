@@ -9,12 +9,13 @@ import Player from "../../../../Player";
 import {ClientMessage} from "../../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../../messages/ServerMessage";
 import DoranMartellAbilityGameState, {SerializedDoranMartellAbilityGameState} from "./doran-martell-ability-game-state/DoranMartellAbilityGameState";
+import AeronDamphairAbilityGameState, {SerializedAeronDamphairAbilityGameState} from "./aeron-damphair-ability-game-state/AeronDamphairAbilityGameState";
 
 export default class ImmediatelyHouseCardAbilitiesResolutionGameState extends GameState<
     CombatGameState,
     HouseCardResolutionGameState<
         ImmediatelyHouseCardAbilitiesResolutionGameState,
-        QueenOfThornsAbilityGameState | DoranMartellAbilityGameState
+        QueenOfThornsAbilityGameState | DoranMartellAbilityGameState | AeronDamphairAbilityGameState
     >
 > {
     get combatGameState(): CombatGameState {
@@ -68,6 +69,8 @@ export default class ImmediatelyHouseCardAbilitiesResolutionGameState extends Ga
                 return QueenOfThornsAbilityGameState.deserializeFromServer(houseCardResolution, data);
             case "doran-martell-ability":
                 return DoranMartellAbilityGameState.deserializeFromServer(houseCardResolution, data);
+            case "aeron-damphair-ability":
+                return AeronDamphairAbilityGameState.deserializeFromServer(houseCardResolution, data);
         }
     }
 
@@ -88,5 +91,6 @@ export interface SerializedImmediatelyHouseCardAbilitiesResolutionGameState {
     type: "immediately-house-card-abilities-resolution";
     childGameState: SerializedHouseCardResolutionGameState<
         SerializedQueenOfThornsAbilityGameState | SerializedDoranMartellAbilityGameState
-        >;
+        | SerializedAeronDamphairAbilityGameState
+    >;
 }
