@@ -337,7 +337,8 @@
           "combatStrength": 1
         },
         "catelyn-stark": {
-          "name": "Catelyn Stark"
+          "name": "Catelyn Stark",
+          "ability": "catelyn-stark"
         }
       },
       "supplyLevel": 1

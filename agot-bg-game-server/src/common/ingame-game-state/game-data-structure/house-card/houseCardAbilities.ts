@@ -17,6 +17,7 @@ import NymeriaSandHouseCardAbility from "./NymeriaSandHouseCardAbility";
 import RooseBoltonHouseCardAbility from "./RooseBoltonHouseCardAbility";
 import TyrionLannisterHouseCardAbility from "./TyrionLannisterHouseCardAbility";
 import SerKevanLannisterHouseCardAbility from "./SerKevanLannisterHouseCardAbility";
+import CatelynStarkHouseCardAbility from "./CatelynStarkHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -101,6 +102,10 @@ export const serKevanLannister = new SerKevanLannisterHouseCardAbility(
     "If you are attacking, all of your participating Footmen (including supporting"
     + " Lannister footmen) add +2 combat strength instead of +1."
 );
+export const catelynStark = new CatelynStarkHouseCardAbility(
+    "catelyn-stark",
+    "If you have a Defense Order token in the embattled area, its value is doubled."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -120,6 +125,7 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [rooseBolton.id, rooseBolton],
     [tyrionLannister.id, tyrionLannister],
     [serKevanLannister.id, serKevanLannister],
+    [catelynStark.id, catelynStark],
 ]);
 
 export default houseCardAbilities;
