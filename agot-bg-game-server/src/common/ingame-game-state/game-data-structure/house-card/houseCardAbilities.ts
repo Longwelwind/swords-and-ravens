@@ -19,6 +19,7 @@ import TyrionLannisterHouseCardAbility from "./TyrionLannisterHouseCardAbility";
 import SerKevanLannisterHouseCardAbility from "./SerKevanLannisterHouseCardAbility";
 import CatelynStarkHouseCardAbility from "./CatelynStarkHouseCardAbility";
 import AeronDamphairHouseCardAbility from "./AeronDamphairHouseCardAbility";
+import ArianneMartellHouseCardAbility from "./ArianneMartellHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -112,6 +113,11 @@ export const aeronDamphair = new AeronDamphairHouseCardAbility(
     "You may immediately discard two of your available Power tokens to discard Aeron"
     + " Damphair and choose a different House card from your hand (if able)"
 );
+export const arianneMartell = new ArianneMartellHouseCardAbility(
+    "arianne-martell",
+    "If you are defending and lose this combat, your opponent may not move his units into the embattled area."
+    + " They return to the area from which they marched. Your own units must still retreat."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -133,6 +139,7 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [serKevanLannister.id, serKevanLannister],
     [catelynStark.id, catelynStark],
     [aeronDamphair.id, aeronDamphair],
+    [arianneMartell.id, arianneMartell],
 ]);
 
 export default houseCardAbilities;
