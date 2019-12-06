@@ -211,7 +211,11 @@ export default class PostCombatGameState extends GameState<
     proceedEndOfCombat(): void {
         // If the attacker won, move his units to the attacked region
         if (this.winner == this.attacker) {
-            this.combat.resolveMarchOrderGameState.moveUnits(this.combat.attackingRegion, this.combat.attackingArmy, this.combat.defendingRegion);
+        // This movement can be prevented by house cards (e.g. Arianne Martell)
+            // This movement can be prevented by house cards (e.g. Arianne Martell)
+            if (!this.isAttackingArmyMovementPrevented()) {
+                this.combat.resolveMarchOrderGameState.moveUnits(this.combat.attackingRegion, this.combat.attackingArmy, this.combat.defendingRegion);
+            }
         } else {
             // If he lost, wound his units
             this.combat.attackingArmy.forEach(u => u.wounded = true);
@@ -235,6 +239,18 @@ export default class PostCombatGameState extends GameState<
         }
 
         this.setChildGameState(new AfterCombatHouseCardAbilitiesGameState(this)).firstStart();
+    }
+
+    isAttackingArmyMovementPrevented(): boolean {
+        return this.combat.getOrderResolutionHouseCard().reduce((s, h) => {
+            const houseCard = this.combat.houseCombatDatas.get(h).houseCard;
+
+            if (houseCard == null) {
+                return s;
+            }
+
+            return houseCard.ability ? s || houseCard.ability.doesPreventAttackingArmyFromMoving(this, h, houseCard) : s;
+        }, false);
     }
 
     onAfterCombatHouseCardAbilitiesFinish(): void {

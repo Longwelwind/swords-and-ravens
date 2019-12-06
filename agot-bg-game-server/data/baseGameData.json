@@ -453,7 +453,8 @@
         },
         "arianne-martell": {
           "name": "Arianne Martell",
-          "combatStrength": 1
+          "combatStrength": 1,
+          "ability": "arianne-martell"
         },
         "nymeria-sand": {
           "name": "Nymeria Sand",

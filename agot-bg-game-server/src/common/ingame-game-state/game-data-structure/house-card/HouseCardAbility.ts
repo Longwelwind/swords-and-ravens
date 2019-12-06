@@ -12,6 +12,8 @@ import CancelHouseCardAbilitiesGameState
     from "../../action-game-state/resolve-march-order-game-state/combat-game-state/cancel-house-card-abilities-game-state/CancelHouseCardAbilitiesGameState";
 import Order from "../Order";
 import DefenseOrderType from "../order-types/DefenseOrderType";
+import PostCombatGameState
+    from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState";
 
 export default class HouseCardAbility {
     id: string;
@@ -56,5 +58,9 @@ export default class HouseCardAbility {
 
     modifyDefenseOrderBonus(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _defenseOrderType: DefenseOrderType, _currentBonus: number): number {
         return 0;
+    }
+
+    doesPreventAttackingArmyFromMoving(_postCombat: PostCombatGameState, _house: House, _houseCard: HouseCard): boolean {
+        return false;
     }
 }
