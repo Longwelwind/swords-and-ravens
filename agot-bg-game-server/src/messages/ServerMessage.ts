@@ -7,7 +7,7 @@ import {GameLogData} from "../common/ingame-game-state/game-data-structure/GameL
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady
     | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | NewTurn | RemovePlacedOrder
-    | MoveUnits
+    | MoveUnits | CombatChangeArmy
     | UnitsWounded | ChangeCombatHouseCard | BeginSeeTopWildlingCard
     | RavenOrderReplaced | ProceedWesterosCard | ChangeGarrison
      | BidDone | GameStateChange | SupplyAdjusted
@@ -72,6 +72,13 @@ interface CombatImmediatelyKilledUnits {
     type: "combat-immediately-killed-units";
     regionId: string;
     unitIds: number[];
+}
+
+interface CombatChangeArmy {
+    type: "combat-change-army";
+    house: string;
+    region: string;
+    army: number[];
 }
 
 interface ChangeStateHouseCard {

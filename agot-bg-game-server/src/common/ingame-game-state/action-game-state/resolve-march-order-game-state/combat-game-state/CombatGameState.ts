@@ -281,6 +281,12 @@ export default class CombatGameState extends GameState<
             ]);
 
             houseCards.forEach(([house, houseCard]) => this.houseCombatDatas.get(house).houseCard = houseCard);
+        } else if (message.type == "combat-change-army") {
+            const house = this.game.houses.get(message.house);
+            const region = this.game.world.regions.get(message.region);
+            const units = message.army.map(uid => region.units.get(uid));
+
+            this.houseCombatDatas.get(house).army = units;
         } else {
             this.childGameState.onServerMessage(message);
         }

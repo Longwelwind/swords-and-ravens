@@ -474,7 +474,8 @@
       "houseCards": {
         "mace-tyrell": {
           "name": "Mace Tyrell",
-          "combatStrength": 4
+          "combatStrength": 4,
+          "ability": "mace-tyrell"
         },
         "ser-loras-tyrell": {
           "name": "Ser Loras Tyrell",
