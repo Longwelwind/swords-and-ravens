@@ -20,6 +20,7 @@ import SerKevanLannisterHouseCardAbility from "./SerKevanLannisterHouseCardAbili
 import CatelynStarkHouseCardAbility from "./CatelynStarkHouseCardAbility";
 import AeronDamphairHouseCardAbility from "./AeronDamphairHouseCardAbility";
 import ArianneMartellHouseCardAbility from "./ArianneMartellHouseCardAbility";
+import MaceTyrellHouseCardAbility from "./MaceTyrellHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -118,6 +119,10 @@ export const arianneMartell = new ArianneMartellHouseCardAbility(
     "If you are defending and lose this combat, your opponent may not move his units into the embattled area."
     + " They return to the area from which they marched. Your own units must still retreat."
 );
+export const maceTyrell = new MaceTyrellHouseCardAbility(
+    "mace-tyrell",
+    "Immediately destroy one of your opponent's attacking or defending Footmen units."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -140,6 +145,7 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [catelynStark.id, catelynStark],
     [aeronDamphair.id, aeronDamphair],
     [arianneMartell.id, arianneMartell],
+    [maceTyrell.id, maceTyrell],
 ]);
 
 export default houseCardAbilities;

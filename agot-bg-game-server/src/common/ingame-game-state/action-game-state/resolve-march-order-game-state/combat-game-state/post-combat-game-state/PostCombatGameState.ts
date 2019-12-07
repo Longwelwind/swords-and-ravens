@@ -211,7 +211,7 @@ export default class PostCombatGameState extends GameState<
     proceedEndOfCombat(): void {
         // If the attacker won, move his units to the attacked region
         if (this.winner == this.attacker) {
-        // This movement can be prevented by house cards (e.g. Arianne Martell)
+            // It might be that there are no
             // This movement can be prevented by house cards (e.g. Arianne Martell)
             if (!this.isAttackingArmyMovementPrevented()) {
                 this.combat.resolveMarchOrderGameState.moveUnits(this.combat.attackingRegion, this.combat.attackingArmy, this.combat.defendingRegion);
