@@ -299,7 +299,8 @@
           "ability": "tyrion-lannister"
         },
         "cersei-lannister": {
-          "name": "Cersei Lannister"
+          "name": "Cersei Lannister",
+          "ability": "cersei-lannister"
         }
       },
       "supplyLevel": 2

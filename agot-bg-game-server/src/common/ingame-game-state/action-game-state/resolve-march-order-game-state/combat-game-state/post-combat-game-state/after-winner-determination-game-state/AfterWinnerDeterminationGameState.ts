@@ -9,12 +9,13 @@ import {ServerMessage} from "../../../../../../../messages/ServerMessage";
 import {ClientMessage} from "../../../../../../../messages/ClientMessage";
 import RenlyBaratheonAbilityGameState, { SerializedRenlyBaratheonAbilityGameState } from "./renly-baratheon-ability-game-state/RenlyBaratheonAbilityGameState";
 import PostCombatGameState from "../PostCombatGameState";
+import CerseiLannisterAbilityGameState, {SerializedCerseiLannisterAbilityGameState} from "./cersei-lannister-ability-game-state/CerseiLannisterAbilityGameState";
 
 export default class AfterWinnerDeterminationGameState extends GameState<
     PostCombatGameState,
     HouseCardResolutionGameState<
         AfterWinnerDeterminationGameState,
-        RenlyBaratheonAbilityGameState
+        RenlyBaratheonAbilityGameState | CerseiLannisterAbilityGameState
     >>
 {
     get postCombatGameState(): PostCombatGameState {
@@ -79,11 +80,15 @@ export default class AfterWinnerDeterminationGameState extends GameState<
         switch (data.type) {
             case "renly-baratheon-ability":
                 return RenlyBaratheonAbilityGameState.deserializeFromServer(houseCardResolution, data);
+            case "cersei-lannister-ability":
+                return CerseiLannisterAbilityGameState.deserializeFromServer(houseCardResolution, data);
         }
     }
 }
 
 export interface SerializedAfterWinnerDeterminationGameState {
     type: "after-winner-determination";
-    childGameState: SerializedHouseCardResolutionGameState<SerializedRenlyBaratheonAbilityGameState>;
+    childGameState: SerializedHouseCardResolutionGameState<
+        SerializedRenlyBaratheonAbilityGameState | SerializedCerseiLannisterAbilityGameState
+    >;
 }

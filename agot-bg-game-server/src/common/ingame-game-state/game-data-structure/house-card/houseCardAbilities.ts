@@ -21,6 +21,7 @@ import CatelynStarkHouseCardAbility from "./CatelynStarkHouseCardAbility";
 import AeronDamphairHouseCardAbility from "./AeronDamphairHouseCardAbility";
 import ArianneMartellHouseCardAbility from "./ArianneMartellHouseCardAbility";
 import MaceTyrellHouseCardAbility from "./MaceTyrellHouseCardAbility";
+import CerseiLannisterHouseCardAbility from "./CerseiLannisterHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -123,6 +124,11 @@ export const maceTyrell = new MaceTyrellHouseCardAbility(
     "mace-tyrell",
     "Immediately destroy one of your opponent's attacking or defending Footmen units."
 );
+export const cerseiLannister = new CerseiLannisterHouseCardAbility(
+    "cersei-lannister",
+    "If you win this combat, you may remove of the losing opponent's"
+    + " Order tokens from anywhere on the board."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -146,6 +152,7 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [aeronDamphair.id, aeronDamphair],
     [arianneMartell.id, arianneMartell],
     [maceTyrell.id, maceTyrell],
+    [cerseiLannister.id, cerseiLannister],
 ]);
 
 export default houseCardAbilities;
