@@ -259,6 +259,18 @@ export default class CombatGameState extends GameState<
         this.proceedResolveCombat();
     }
 
+    areCasulatiesPrevented(affectedHouse: House): boolean {
+        return this.getOrderResolutionHouseCard().reduce((s, h) => {
+            const houseCard = this.houseCombatDatas.get(h).houseCard;
+
+            if (houseCard == null) {
+                return s;
+            }
+
+            return houseCard.ability ? s || houseCard.ability.doesPreventCasualties(this, h, houseCard, affectedHouse) : s;
+        }, false);
+    }
+
     onPlayerMessage(player: Player, message: ClientMessage): void {
         this.childGameState.onPlayerMessage(player, message);
     }

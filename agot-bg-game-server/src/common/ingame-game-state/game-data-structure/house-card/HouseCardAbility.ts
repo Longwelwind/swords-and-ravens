@@ -63,4 +63,8 @@ export default class HouseCardAbility {
     doesPreventAttackingArmyFromMoving(_postCombat: PostCombatGameState, _house: House, _houseCard: HouseCard): boolean {
         return false;
     }
+
+    doesPreventCasualties(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _affectedHouse: House): boolean {
+        return false;
+    }
 }

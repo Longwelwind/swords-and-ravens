@@ -335,7 +335,8 @@
         },
         "the-blackfish": {
           "name": "The Blackfish",
-          "combatStrength": 1
+          "combatStrength": 1,
+          "ability": "the-blackfish"
         },
         "catelyn-stark": {
           "name": "Catelyn Stark",
