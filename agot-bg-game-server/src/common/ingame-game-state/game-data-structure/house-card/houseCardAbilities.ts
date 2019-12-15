@@ -22,6 +22,7 @@ import AeronDamphairHouseCardAbility from "./AeronDamphairHouseCardAbility";
 import ArianneMartellHouseCardAbility from "./ArianneMartellHouseCardAbility";
 import MaceTyrellHouseCardAbility from "./MaceTyrellHouseCardAbility";
 import CerseiLannisterHouseCardAbility from "./CerseiLannisterHouseCardAbility";
+import TheBlackfishHouseCardAbility from "./TheBlackfishHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -129,6 +130,11 @@ export const cerseiLannister = new CerseiLannisterHouseCardAbility(
     "If you win this combat, you may remove of the losing opponent's"
     + " Order tokens from anywhere on the board."
 );
+export const theBlackfish = new TheBlackfishHouseCardAbility(
+    "the-blackfish",
+    "You do not take casualties in this combat from"
+    + " House card abilities, Combat icons, or Tides of Battles cards."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -153,6 +159,7 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [arianneMartell.id, arianneMartell],
     [maceTyrell.id, maceTyrell],
     [cerseiLannister.id, cerseiLannister],
+    [theBlackfish.id, theBlackfish],
 ]);
 
 export default houseCardAbilities;

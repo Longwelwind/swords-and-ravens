@@ -25,9 +25,12 @@ export default class MaceTyrellAbilityGameState extends GameState<
     }
 
     firstStart(house: House): void {
+        const enemy = this.combatGameState.getEnemy(house);
         const availableFootmen = this.getAvailableFootmen(house);
 
         if (availableFootmen.length == 0) {
+            this.parentGameState.onHouseCardResolutionFinish(house);
+        } else if (this.combatGameState.areCasulatiesPrevented(enemy)) {
             this.parentGameState.onHouseCardResolutionFinish(house);
         } else {
             this.setChildGameState(new SelectUnitsGameState(this)).firstStart(

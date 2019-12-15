@@ -130,16 +130,21 @@ export default class PostCombatGameState extends GameState<
         const loserArmyLeft = _.difference(loserArmy, immediatelyKilledLoserUnits);
 
         if (loserCasualtiesCount > 0) {
-            if (loserCasualtiesCount < loserArmyLeft.length) {
-                this.setChildGameState(new ChooseCasualtiesGameState(this)).firstStart(this.loser, loserArmyLeft, loserCasualtiesCount);
-            } else {
-                // If the count of casualties is bigger or equal than the remaining army, a ChooseCasualtiesGameSTate
-                // is not needed. The army left can be exterminated.
-                this.onChooseCasualtiesGameStateEnd(locationLoserArmy, loserArmyLeft);
+            // Check if casualties are prevented this combat
+            if (!this.combat.areCasulatiesPrevented(this.loser)) {
+                if (loserCasualtiesCount < loserArmyLeft.length) {
+                    this.setChildGameState(new ChooseCasualtiesGameState(this)).firstStart(this.loser, loserArmyLeft, loserCasualtiesCount);
+                } else {
+                    // If the count of casualties is bigger or equal than the remaining army, a ChooseCasualtiesGameSTate
+                    // is not needed. The army left can be exterminated.
+                    this.onChooseCasualtiesGameStateEnd(locationLoserArmy, loserArmyLeft);
+                }
+
+                return;
             }
-        } else {
-            this.proceedRetreat();
         }
+
+        this.proceedRetreat();
     }
 
     proceedRetreat(): void {
@@ -252,6 +257,8 @@ export default class PostCombatGameState extends GameState<
             return houseCard.ability ? s || houseCard.ability.doesPreventAttackingArmyFromMoving(this, h, houseCard) : s;
         }, false);
     }
+
+
 
     onAfterCombatHouseCardAbilitiesFinish(): void {
         this.combat.resolveMarchOrderGameState.onCombatGameStateEnd(this.attacker);
