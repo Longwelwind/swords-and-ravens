@@ -23,6 +23,7 @@ import ArianneMartellHouseCardAbility from "./ArianneMartellHouseCardAbility";
 import MaceTyrellHouseCardAbility from "./MaceTyrellHouseCardAbility";
 import CerseiLannisterHouseCardAbility from "./CerseiLannisterHouseCardAbility";
 import TheBlackfishHouseCardAbility from "./TheBlackfishHouseCardAbility";
+import RobbStarkHouseCardAbility from "./RobbStarkHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -135,6 +136,11 @@ export const theBlackfish = new TheBlackfishHouseCardAbility(
     "You do not take casualties in this combat from"
     + " House card abilities, Combat icons, or Tides of Battles cards."
 );
+export const robbStark = new RobbStarkHouseCardAbility(
+    "robb-stark",
+    "If you win this combat, you may choose the area to which your opponent's retreats."
+    + " You must choose a legal area where your opponent loses the fewest units."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -160,6 +166,7 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [maceTyrell.id, maceTyrell],
     [cerseiLannister.id, cerseiLannister],
     [theBlackfish.id, theBlackfish],
+    [robbStark.id, robbStark],
 ]);
 
 export default houseCardAbilities;

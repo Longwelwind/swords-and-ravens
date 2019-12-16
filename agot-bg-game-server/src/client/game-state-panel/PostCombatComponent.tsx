@@ -4,9 +4,6 @@ import * as React from "react";
 import ChooseCasualtiesGameState
     from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/choose-casualties-game-state/ChooseCasualtiesGameState";
 import ChooseCasualtiesComponent from "./ChooseCasualtiesComponent";
-import ChooseRetreatRegionGameState
-    from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/choose-retreat-region-game-state/ChooseRetreatRegionGameState";
-import ChooseRetreatRegionComponent from "./ChooseRetreatRegionComponent";
 import GameStateComponentProps from "./GameStateComponentProps";
 import renderChildGameState from "../utils/renderChildGameState";
 import PostCombatGameState
@@ -17,6 +14,9 @@ import AfterWinnerDeterminationGameState
 import AfterCombatHouseCardAbilitiesGameState
     from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-combat-house-card-abilities-game-state/AfterCombatHouseCardAbilitiesGameState";
 import AfterCombatHouseCardAbilitiesComponent from "./house-card-abilities/AfterCombatHouseCardAbilitiesComponent";
+import ResolveRetreatGameState
+    from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/resolve-retreat-game-state/ResolveRetreatGameState";
+import ResolveRetreatComponent from "./ResolveRetreatComponent";
 
 @observer
 export default class PostCombatComponent extends Component<GameStateComponentProps<PostCombatGameState>> {
@@ -32,7 +32,7 @@ export default class PostCombatComponent extends Component<GameStateComponentPro
                 </div>
                 {renderChildGameState(this.props, [
                     [ChooseCasualtiesGameState, ChooseCasualtiesComponent],
-                    [ChooseRetreatRegionGameState, ChooseRetreatRegionComponent],
+                    [ResolveRetreatGameState, ResolveRetreatComponent],
                     [AfterWinnerDeterminationGameState, AfterWinnerDeterminationComponent],
                     [AfterCombatHouseCardAbilitiesGameState, AfterCombatHouseCardAbilitiesComponent]
                 ])}

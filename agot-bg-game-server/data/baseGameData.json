@@ -316,7 +316,8 @@
         },
         "robb-stark": {
           "name": "Robb Stark",
-          "combatStrength": 3
+          "combatStrength": 3,
+          "ability": "robb-stark"
         },
         "roose-bolton": {
           "name": "Roose Bolton",

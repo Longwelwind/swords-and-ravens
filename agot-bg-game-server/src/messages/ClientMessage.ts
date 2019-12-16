@@ -1,8 +1,8 @@
 export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | ResolveMarchOrder | DeclareSupport
-    | UseValyrianSteelBlade | ChooseHouseCard | ChooseCasualties | ChooseRetreatRegion | ChooseRavenAction
+    | UseValyrianSteelBlade | ChooseHouseCard | ChooseCasualties | ChooseRavenAction
     | ChooseTopWildlingCardAction | ReplaceOrder | SkipReplaceOrder | ResolveRaid | Bid | ChooseChoice
     | DecideBiggest | ReconcileArmies | Muster | ResolveTies | SelectUnits | LaunchGame | ChooseHouse
-    | SelectOrders | SelectHouseCard;
+    | SelectOrders | SelectHouseCard | SelectRegion;
 
 interface Ping {
     type: "ping";
@@ -61,11 +61,6 @@ interface ChooseHouseCard {
 interface ChooseCasualties {
     type: "choose-casualties";
     chosenCasualties: number[];
-}
-
-interface ChooseRetreatRegion {
-    type: "choose-retreat-region";
-    regionId: string;
 }
 
 interface ChooseRavenAction {
@@ -153,4 +148,9 @@ interface SelectUnits {
 interface SelectHouseCard {
     type: "select-house-card";
     houseCard: string;
+}
+
+interface SelectRegion {
+    type: "select-region";
+    region: string;
 }

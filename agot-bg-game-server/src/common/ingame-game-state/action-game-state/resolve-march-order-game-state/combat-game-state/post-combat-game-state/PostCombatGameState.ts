@@ -1,6 +1,5 @@
 import GameState from "../../../../../GameState";
-import CombatGameState from "../CombatGameState";
-import ChooseRetreatRegionGameState, {SerializedChooseRetreatRegionGameState} from "./choose-retreat-region-game-state/ChooseRetreatRegionGameState";
+import CombatGameState, {HouseCombatData} from "../CombatGameState";
 import Player from "../../../../Player";
 import House from "../../../../game-data-structure/House";
 import * as _ from "lodash";
@@ -16,10 +15,11 @@ import AfterWinnerDeterminationGameState
     , {SerializedAfterWinnerDeterminationGameState} from "./after-winner-determination-game-state/AfterWinnerDeterminationGameState";
 import AfterCombatHouseCardAbilitiesGameState
     , {SerializedAfterCombatHouseCardAbilitiesGameState} from "./after-combat-house-card-abilities-game-state/AfterCombatHouseCardAbilitiesGameState";
+import ResolveRetreatGameState, {SerializedResolveRetreatGameState} from "./resolve-retreat-game-state/ResolveRetreatGameState";
 
 export default class PostCombatGameState extends GameState<
     CombatGameState,
-    ChooseRetreatRegionGameState | ChooseCasualtiesGameState | AfterWinnerDeterminationGameState
+    ResolveRetreatGameState | ChooseCasualtiesGameState | AfterWinnerDeterminationGameState
     | AfterCombatHouseCardAbilitiesGameState
 > {
     winner: House;
@@ -43,6 +43,14 @@ export default class PostCombatGameState extends GameState<
 
     get defender(): House {
         return this.combat.defender;
+    }
+
+    get loserCombatData(): HouseCombatData {
+        return this.combat.houseCombatDatas.get(this.loser);
+    }
+
+    get winnerCombatData(): HouseCombatData {
+        return this.combat.houseCombatDatas.get(this.winner);
     }
 
     firstStart(): void {
@@ -85,6 +93,16 @@ export default class PostCombatGameState extends GameState<
     onChooseCasualtiesGameStateEnd(region: Region, selectedCasualties: Unit[]): void {
         // Remove the selected casualties
         selectedCasualties.forEach(u => region.units.delete(u.id));
+        // Remove them from the house combat datas
+        const loserCombatData = this.combat.houseCombatDatas.get(this.loser);
+        loserCombatData.army = _.without(loserCombatData.army, ...selectedCasualties);
+
+        this.entireGame.broadcastToClients({
+            type: "combat-change-army",
+            region: region.id,
+            house: this.loser.id,
+            army: loserCombatData.army.map(u => u.id)
+        });
 
         this.entireGame.broadcastToClients({
             type: "remove-units",
@@ -148,36 +166,18 @@ export default class PostCombatGameState extends GameState<
     }
 
     proceedRetreat(): void {
-        if (!this.loser) {
-            throw new Error();
+        // A retreat is only triggered if, after resolving casualties, there are
+        // remaining troops in the loser's army.
+        if (this.combat.houseCombatDatas.get(this.loser).army.length > 0) {
+            this.setChildGameState(new ResolveRetreatGameState(this))
+                .firstStart();
+            return;
         }
 
-        if (this.loser == this.defender) {
-            // A retreat doesn't need to be done if there are no units left
-            if (this.combat.defendingRegion.units.size > 0) {
-                if (this.world.getValidRetreatRegions(this.combat.defendingRegion, this.loser, this.combat.defendingRegion.units.values).length > 0) {
-                    // The defender must choose a retreat location
-                    this.setChildGameState(new ChooseRetreatRegionGameState(this))
-                        .firstStart(
-                            this.loser,
-                            this.combat.defendingRegion,
-                            this.combat.defendingRegion.units.values
-                        );
+        this.onResolveRetreatFinish();
+    }
 
-                    return;
-                } else {
-                    // If there are no available retreat regions, kill all the remaining units
-                    this.combat.defendingRegion.units.values.forEach(u => this.combat.defendingRegion.units.delete(u.id));
-
-                    this.entireGame.broadcastToClients({
-                        type: "remove-units",
-                        regionId: this.combat.defendingRegion.id,
-                        unitIds: this.combat.defendingRegion.units.values.map(u => u.id)
-                    });
-                }
-            }
-        }
-
+    onResolveRetreatFinish(): void {
         this.proceedEndOfCombat();
     }
 
@@ -189,30 +189,6 @@ export default class PostCombatGameState extends GameState<
         this.childGameState.onServerMessage(message);
     }
 
-    onChooseRetreatLocationGameStateEnd(house: House, startingRegion: Region, army: Unit[], retreatRegion: Region): void {
-        // Mark those as wounded
-        army.forEach(u => u.wounded = true);
-
-        this.entireGame.broadcastToClients({
-            type: "units-wounded",
-            regionId: startingRegion.id,
-            unitIds: army.map(u => u.id)
-        });
-
-        // Retreat those unit to this location
-        army.forEach(u => startingRegion.units.delete(u.id));
-        army.forEach(u => retreatRegion.units.set(u.id, u));
-
-        this.entireGame.broadcastToClients({
-            type: "move-units",
-            from: startingRegion.id,
-            to: retreatRegion.id,
-            units: army.map(u => u.id)
-        });
-
-        this.proceedEndOfCombat();
-    }
-
     proceedEndOfCombat(): void {
         // If the attacker won, move his units to the attacked region
         if (this.winner == this.attacker) {
@@ -221,15 +197,6 @@ export default class PostCombatGameState extends GameState<
             if (!this.isAttackingArmyMovementPrevented()) {
                 this.combat.resolveMarchOrderGameState.moveUnits(this.combat.attackingRegion, this.combat.attackingArmy, this.combat.defendingRegion);
             }
-        } else {
-            // If he lost, wound his units
-            this.combat.attackingArmy.forEach(u => u.wounded = true);
-
-            this.entireGame.broadcastToClients({
-                type: "units-wounded",
-                regionId: this.combat.attackingRegion.id,
-                unitIds: this.combat.attackingArmy.map(u => u.id)
-            });
         }
 
         // Remove the order
@@ -315,8 +282,8 @@ export default class PostCombatGameState extends GameState<
 
     deserializeChildGameState(data: SerializedPostCombatGameState["childGameState"]): PostCombatGameState["childGameState"] {
         switch (data.type) {
-            case "choose-retreat-region":
-                return ChooseRetreatRegionGameState.deserializeFromServer(this, data);
+            case "resolve-retreat":
+                return ResolveRetreatGameState.deserializeFromServer(this, data);
             case "choose-casualties":
                 return ChooseCasualtiesGameState.deserializeFromServer(this, data);
             case "after-winner-determination":
@@ -331,7 +298,7 @@ export interface SerializedPostCombatGameState {
     type: "post-combat";
     winner: string;
     loser: string;
-    childGameState: SerializedChooseRetreatRegionGameState
+    childGameState: SerializedResolveRetreatGameState
         | SerializedChooseCasualtiesGameState
         | SerializedAfterWinnerDeterminationGameState
         | SerializedAfterCombatHouseCardAbilitiesGameState;
