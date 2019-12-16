@@ -1,40 +1,36 @@
 import {observer} from "mobx-react";
-import {Component} from "react";
-import ChooseRetreatRegionGameState
-    from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/choose-retreat-region-game-state/ChooseRetreatRegionGameState";
+import {Component, ReactNode} from "react";
 import React from "react";
 import {observable} from "mobx";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
 import * as _ from "lodash";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Button from "react-bootstrap/Button";
-import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import SelectRegionGameState from "../../common/ingame-game-state/select-region-game-state/SelectRegionGameState";
 
 @observer
-export default class ChooseRetreatRegionComponent extends Component<GameStateComponentProps<ChooseRetreatRegionGameState>> {
+export default class SelectRegionComponent extends Component<GameStateComponentProps<SelectRegionGameState<any>>> {
     @observable selectedRegion: Region | null;
 
     regionClickListener: any;
     highlightRegionListener: any;
 
-    render() {
+    render(): ReactNode {
         return (
-            <Row>
-                <Col xs={12}>The defender must choose a region for its unit to retreat to</Col>
+            <>
                 <Col xs={12}>
                     {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
                         <>
-                            Click on the region for your defending units to retreat to
-                            {this.selectedRegion != null && (
-                                <Button onClick={() => this.confirm()}>Confirm</Button>
-                            )}
+                            <Button onClick={() => this.confirm()} disabled={this.selectedRegion == null}>
+                                Confirm
+                            </Button>
                         </>
                     ) : (
                         <div className="text-center">Waiting for {this.props.gameState.house.name}...</div>
                     )}
                 </Col>
-            </Row>
+            </>
         );
     }
 
@@ -51,7 +47,7 @@ export default class ChooseRetreatRegionComponent extends Component<GameStateCom
     shouldHighlightRegion(r: Region): boolean {
         if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
             if (this.selectedRegion == null) {
-                return this.props.gameState.getValidRetreatRegions().includes(r);
+                return this.props.gameState.regions.includes(r);
             } else {
                 return this.selectedRegion == r;
             }
@@ -60,8 +56,8 @@ export default class ChooseRetreatRegionComponent extends Component<GameStateCom
         return false;
     }
 
-    private onRegionClick(r: Region) {
-        if (!this.props.gameState.getValidRetreatRegions().includes(r)) {
+    private onRegionClick(r: Region): void {
+        if (!this.props.gameState.regions.includes(r)) {
             return;
         }
 
@@ -72,11 +68,11 @@ export default class ChooseRetreatRegionComponent extends Component<GameStateCom
         }
     }
 
-    private confirm() {
+    private confirm(): void {
         if (!this.selectedRegion) {
             return;
         }
 
-        this.props.gameState.choose(this.selectedRegion);
+        this.props.gameState.select(this.selectedRegion);
     }
 }
