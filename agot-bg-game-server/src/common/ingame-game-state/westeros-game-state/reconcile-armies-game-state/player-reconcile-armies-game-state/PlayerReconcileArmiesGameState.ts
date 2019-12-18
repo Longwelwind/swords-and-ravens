@@ -11,10 +11,10 @@ import BetterMap from "../../../../../utils/BetterMap";
 import EntireGame from "../../../../EntireGame";
 import UnitType from "../../../game-data-structure/UnitType";
 
-export default class PlayerReconcileArmiesGameState extends GameState<ReconcileArmiesGameState> {
+export default class PlayerReconcileArmiesGameState extends GameState<ReconcileArmiesGameState<any>> {
     house: House;
 
-    get reconcileArmiesGameState(): ReconcileArmiesGameState {
+    get reconcileArmiesGameState(): ReconcileArmiesGameState<any> {
         return this.parentGameState;
     }
 
@@ -82,7 +82,7 @@ export default class PlayerReconcileArmiesGameState extends GameState<ReconcileA
         }
     }
 
-    static deserializeFromServer(reconcileArmies: ReconcileArmiesGameState, data: SerializedPlayerReconcileArmiesGameState): PlayerReconcileArmiesGameState {
+    static deserializeFromServer(reconcileArmies: ReconcileArmiesGameState<any>, data: SerializedPlayerReconcileArmiesGameState): PlayerReconcileArmiesGameState {
         const playerReconcileArmies = new PlayerReconcileArmiesGameState(reconcileArmies);
 
         playerReconcileArmies.house = reconcileArmies.game.houses.get(data.house);

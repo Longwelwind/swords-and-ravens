@@ -1,5 +1,4 @@
 import GameState from "../../../GameState";
-import WesterosGameState from "../WesterosGameState";
 import PlayerReconcileArmiesGameState, {SerializedPlayerReconcileArmiesGameState} from "./player-reconcile-armies-game-state/PlayerReconcileArmiesGameState";
 import House from "../../game-data-structure/House";
 import Game from "../../game-data-structure/Game";
@@ -7,22 +6,18 @@ import {ClientMessage} from "../../../../messages/ClientMessage";
 import Player from "../../Player";
 import {ServerMessage} from "../../../../messages/ServerMessage";
 
-type Trigger = {onReconcileArmiesGameStateEnd(westerosGameState: WesterosGameState): void};
+interface ParentGameState extends GameState<any, any> {
+    game: Game;
+    onReconcileArmiesGameStateEnd(): void;
+}
 
-export default class ReconcileArmiesGameState extends GameState<WesterosGameState, PlayerReconcileArmiesGameState> {
-    trigger: Trigger;
-
-    get westerosGameState(): WesterosGameState {
-        return this.parentGameState;
-    }
+export default class ReconcileArmiesGameState<P extends ParentGameState> extends GameState<P, PlayerReconcileArmiesGameState> {
 
     get game(): Game {
-        return this.westerosGameState.game;
+        return this.parentGameState.game;
     }
 
-    firstStart(trigger: Trigger): void {
-        this.trigger = trigger;
-
+    firstStart(): void {
         this.proceedReconcileArmies(null);
     }
 
@@ -36,7 +31,7 @@ export default class ReconcileArmiesGameState extends GameState<WesterosGameStat
 
     proceedReconcileArmies(lastReconciled: House | null) {
         if (lastReconciled == this.game.ironThroneTrack[this.game.ironThroneTrack.length - 1]) {
-            this.trigger.onReconcileArmiesGameStateEnd(this.westerosGameState);
+            this.parentGameState.onReconcileArmiesGameStateEnd();
             return;
         }
 
@@ -61,8 +56,8 @@ export default class ReconcileArmiesGameState extends GameState<WesterosGameStat
         };
     }
 
-    static deserializeFromServer(westeros: WesterosGameState, data: SerializedReconcileArmiesGameState): ReconcileArmiesGameState {
-        const reconcileArmies = new ReconcileArmiesGameState(westeros);
+    static deserializeFromServer(parent: ParentGameState, data: SerializedReconcileArmiesGameState): ReconcileArmiesGameState<any> {
+        const reconcileArmies = new ReconcileArmiesGameState(parent);
         reconcileArmies.childGameState = reconcileArmies.deserializeChildGameState(data.childGameState);
         return reconcileArmies;
     }
