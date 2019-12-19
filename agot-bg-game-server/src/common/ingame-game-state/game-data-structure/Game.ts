@@ -188,6 +188,12 @@ export default class Game {
         return houseCard;
     }
 
+    changeSupply(house: House, delta: number): void {
+        const newSupply = Math.max(0, Math.min(house.supplyLevel + delta, this.supplyRestrictions.length - 1));
+
+        house.supplyLevel = newSupply;
+    }
+
     getCountHeldStructures(house: House): BetterMap<number, number> {
         const counts = new BetterMap<number, number>();
 

@@ -15,10 +15,6 @@ export default class SupplyWesterosCardType extends WesterosCardType {
         });
 
         // Check if any house needs to reconcile his armies
-        westeros.setChildGameState(new ReconcileArmiesGameState(westeros)).firstStart(this);
-    }
-
-    onReconcileArmiesGameStateEnd(westerosGameState: WesterosGameState) {
-        westerosGameState.onWesterosCardEnd();
+        westeros.setChildGameState(new ReconcileArmiesGameState(westeros)).firstStart();
     }
 }

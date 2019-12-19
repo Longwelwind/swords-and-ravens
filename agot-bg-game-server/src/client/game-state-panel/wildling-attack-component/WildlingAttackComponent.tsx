@@ -18,6 +18,9 @@ import CrowKillersNightsWatchVictoryGameState
     from "../../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/crow-killers-nights-watch-victory-game-state/CrowKillersNightsWatchVictoryGameState";
 import CrowKillersNigthsWatchVictoryComponent from "./CrowKillersNigthsWatchVictoryComponent";
 import {Col, Row} from "react-bootstrap";
+import RattleshirtsRaidersWildlingVictoryGameState
+    from "../../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/rattleshirts-raiders-wildling-victory-game-state/RattleshirtsRaidersWildlingVictoryGameState";
+import RattleshirtsRaidersWildlingVictoryComponent from "./RattleshirtsRaidersWildlingVictoryComponent";
 
 @observer
 export default class WildlingAttackComponent extends Component<GameStateComponentProps<WildlingAttackGameState>> {
@@ -34,7 +37,8 @@ export default class WildlingAttackComponent extends Component<GameStateComponen
                     [BiddingGameState, BiddingComponent],
                     [PreemptiveRaidWildlingVictoryGameState, PreemptiveRaidWildlingVictoryComponent],
                     [CrowKillersWildlingVictoryGameState, CrowKillersWildlingVictoryComponent],
-                    [CrowKillersNightsWatchVictoryGameState, CrowKillersNigthsWatchVictoryComponent]
+                    [CrowKillersNightsWatchVictoryGameState, CrowKillersNigthsWatchVictoryComponent],
+                    [RattleshirtsRaidersWildlingVictoryGameState, RattleshirtsRaidersWildlingVictoryComponent],
                 ])}
             </Row>
         );

@@ -2,6 +2,7 @@ import SilenceAtTheWall from "./SilenceAtTheWall";
 import BetterMap from "../../../../utils/BetterMap";
 import PreemptiveRaidWildlingCardType from "./PreemptiveRaidWildlingCardType";
 import CrowKillers from "./CrowKillers";
+import RattleshirtsRaiders from "./RattleshirtsRaiders";
 
 
 export const silenceAtTheWall = new SilenceAtTheWall(
@@ -22,11 +23,18 @@ export const crowKillers = new CrowKillers(
     "Replaces 2 of their Knights with available Footmen. Any knight unable to be replaced is destroyed.",
     "May immediately replace up to 2 of his Footmen, anywhere, with available Knights."
 );
+export const rattleshirtsRaiders = new RattleshirtsRaiders(
+    "rattleshirts-raiders", "Rattleshirt's Raiders",
+    "Is reduced 2 positions on the Supply track (to no lower than 0).",
+    "Is reduced 1 position on the Supply track (to no lower than 0).",
+    "is increased 1 position on the Supply track (to no higher than 6)."
+);
 
 const wildlingCardTypes = new BetterMap([
     [silenceAtTheWall.id, silenceAtTheWall],
     [preemptiveRaid.id, preemptiveRaid],
-    [crowKillers.id, crowKillers]
+    [crowKillers.id, crowKillers],
+    [rattleshirtsRaiders.id, rattleshirtsRaiders]
 ]);
 
 export default wildlingCardTypes;

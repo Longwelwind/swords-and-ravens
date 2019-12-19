@@ -21,7 +21,7 @@ import ThronesOfBladesGameState, {SerializedThronesOfBladesGameState} from "./th
 import DarkWingsDarkWordsGameState, {SerializedDarkWingsDarkWordsGameState} from "./dark-wings-dark-words-game-state/DarkWingsDarkWordsGameState";
 
 export default class WesterosGameState extends GameState<IngameGameState,
-    WildlingAttackGameState | ReconcileArmiesGameState | MusteringGameState | ClashOfKingsGameState
+    WildlingAttackGameState | ReconcileArmiesGameState<WesterosGameState> | MusteringGameState | ClashOfKingsGameState
     | PutToTheSwordGameState | ThronesOfBladesGameState | DarkWingsDarkWordsGameState
 > {
     revealedCards: WesterosCard[];
@@ -116,6 +116,10 @@ export default class WesterosGameState extends GameState<IngameGameState,
 
     onWildlingAttackGameStateEnd(): void {
         this.executeNextCard();
+    }
+
+    onReconcileArmiesGameStateEnd(): void {
+        this.onWesterosCardEnd();
     }
 
     executeNextCard(): void {
