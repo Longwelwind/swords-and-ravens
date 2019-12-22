@@ -18,11 +18,13 @@ import CrowKillersNightsWatchVictoryGameState
     , {SerializedCrowKillersNightsWatchVictoryGameState} from "./crow-killers-nights-watch-victory-game-state/CrowKillersNightsWatchVictoryGameState";
 import RattleshirtsRaidersWildlingVictoryGameState
     , {SerializedRattleshirtsRaidersWildlingVictoryGameState} from "./rattleshirts-raiders-wildling-victory-game-state/RattleshirtsRaidersWildlingVictoryGameState";
+import MassingOnTheMilkwaterWildlingVictoryGameState
+    , {SerializedMassingOnTheMilkwaterWildlingVictoryGameState} from "./massing-on-the-milkwater-wildling-victory-game-state/MassingOnTheMilkwaterWildlingVictoryGameState";
 
 export default class WildlingAttackGameState extends GameState<WesterosGameState,
     BiddingGameState<WildlingAttackGameState> | SimpleChoiceGameState | PreemptiveRaidWildlingVictoryGameState
     | CrowKillersWildlingVictoryGameState | CrowKillersNightsWatchVictoryGameState
-    | RattleshirtsRaidersWildlingVictoryGameState
+    | RattleshirtsRaidersWildlingVictoryGameState | MassingOnTheMilkwaterWildlingVictoryGameState
 > {
     participatingHouses: House[];
     // Client-side, `wildlingCard` is null before the bidding phase is over
@@ -240,6 +242,8 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
                 return CrowKillersNightsWatchVictoryGameState.deserializeFromServer(this, data);
             case "rattleshirts-raiders-wildling-victory":
                 return RattleshirtsRaidersWildlingVictoryGameState.deserializeFromServer(this, data);
+            case "massing-on-the-milkwater-wildling-victory":
+                return MassingOnTheMilkwaterWildlingVictoryGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -250,7 +254,7 @@ export interface SerializedWildlingAttackGameState {
     participatingHouses: string[];
     childGameState: SerializedBiddingGameState | SerializedSimpleChoiceGameState | SerializedPreemptiveRaidWildlingVictoryGameState
         | SerializedCrowKillersWildlingVictoryGameState | SerializedCrowKillersNightsWatchVictoryGameState
-        | SerializedRattleshirtsRaidersWildlingVictoryGameState;
+        | SerializedRattleshirtsRaidersWildlingVictoryGameState | SerializedMassingOnTheMilkwaterWildlingVictoryGameState;
     wildlingCard: number | null;
     biddingResults: [number, string[]][] | null;
     highestBidder: string | null;

@@ -3,6 +3,7 @@ import BetterMap from "../../../../utils/BetterMap";
 import PreemptiveRaidWildlingCardType from "./PreemptiveRaidWildlingCardType";
 import CrowKillers from "./CrowKillers";
 import RattleshirtsRaiders from "./RattleshirtsRaiders";
+import MassingOnTheMilkwater from "./MassingOnTheMilkwater";
 
 
 export const silenceAtTheWall = new SilenceAtTheWall(
@@ -29,12 +30,21 @@ export const rattleshirtsRaiders = new RattleshirtsRaiders(
     "Is reduced 1 position on the Supply track (to no lower than 0).",
     "is increased 1 position on the Supply track (to no higher than 6)."
 );
+export const massingOnTheMilkwater = new MassingOnTheMilkwater(
+    "massing-on-the-milkwater", "Massing on the Milkwater",
+    "If they have more than one House card in his hand, he discards all cards with"
+    + " the highest combat strength",
+    "If they have have more than one House card in their hand, they must choose and "
+    + " discard one of those cards.",
+    "Returns his entire House card discard into his hand."
+);
 
 const wildlingCardTypes = new BetterMap([
     [silenceAtTheWall.id, silenceAtTheWall],
     [preemptiveRaid.id, preemptiveRaid],
     [crowKillers.id, crowKillers],
-    [rattleshirtsRaiders.id, rattleshirtsRaiders]
+    [rattleshirtsRaiders.id, rattleshirtsRaiders],
+    [massingOnTheMilkwater.id, massingOnTheMilkwater],
 ]);
 
 export default wildlingCardTypes;

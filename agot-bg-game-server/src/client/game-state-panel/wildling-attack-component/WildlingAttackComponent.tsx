@@ -21,6 +21,9 @@ import {Col, Row} from "react-bootstrap";
 import RattleshirtsRaidersWildlingVictoryGameState
     from "../../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/rattleshirts-raiders-wildling-victory-game-state/RattleshirtsRaidersWildlingVictoryGameState";
 import RattleshirtsRaidersWildlingVictoryComponent from "./RattleshirtsRaidersWildlingVictoryComponent";
+import MassingOnTheMilkwaterWildlingVictoryGameState
+    from "../../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/massing-on-the-milkwater-wildling-victory-game-state/MassingOnTheMilkwaterWildlingVictoryGameState";
+import MassingOnTheMilkwaterWildlingVictoryComponent from "./MassingOnTheMilkwaterWildlingVictoryComponent";
 
 @observer
 export default class WildlingAttackComponent extends Component<GameStateComponentProps<WildlingAttackGameState>> {
@@ -39,6 +42,7 @@ export default class WildlingAttackComponent extends Component<GameStateComponen
                     [CrowKillersWildlingVictoryGameState, CrowKillersWildlingVictoryComponent],
                     [CrowKillersNightsWatchVictoryGameState, CrowKillersNigthsWatchVictoryComponent],
                     [RattleshirtsRaidersWildlingVictoryGameState, RattleshirtsRaidersWildlingVictoryComponent],
+                    [MassingOnTheMilkwaterWildlingVictoryGameState, MassingOnTheMilkwaterWildlingVictoryComponent],
                 ])}
             </Row>
         );
