@@ -20,11 +20,14 @@ import RattleshirtsRaidersWildlingVictoryGameState
     , {SerializedRattleshirtsRaidersWildlingVictoryGameState} from "./rattleshirts-raiders-wildling-victory-game-state/RattleshirtsRaidersWildlingVictoryGameState";
 import MassingOnTheMilkwaterWildlingVictoryGameState
     , {SerializedMassingOnTheMilkwaterWildlingVictoryGameState} from "./massing-on-the-milkwater-wildling-victory-game-state/MassingOnTheMilkwaterWildlingVictoryGameState";
+import AKingBeyondTheWallWildlingVictoryGameState, {SerializedAKingBeyondTheWallWildlingVictoryGameState} from "./a-king-beyond-the-wall-wildling-victory-game-state/AKingBeyondTheWallWildlingVictoryGameState";
+import AKingBeyondTheWallNightsWatchVictoryGameState, {SerializedAKingBeyondTheWallNightsWatchVictoryGameState} from "./a-king-beyond-the-wall-nights-watch-victory-game-state/AKingBeyondTheWallNightsWatchVictoryGameState";
 
 export default class WildlingAttackGameState extends GameState<WesterosGameState,
     BiddingGameState<WildlingAttackGameState> | SimpleChoiceGameState | PreemptiveRaidWildlingVictoryGameState
     | CrowKillersWildlingVictoryGameState | CrowKillersNightsWatchVictoryGameState
     | RattleshirtsRaidersWildlingVictoryGameState | MassingOnTheMilkwaterWildlingVictoryGameState
+    | AKingBeyondTheWallWildlingVictoryGameState | AKingBeyondTheWallNightsWatchVictoryGameState
 > {
     participatingHouses: House[];
     // Client-side, `wildlingCard` is null before the bidding phase is over
@@ -244,6 +247,10 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
                 return RattleshirtsRaidersWildlingVictoryGameState.deserializeFromServer(this, data);
             case "massing-on-the-milkwater-wildling-victory":
                 return MassingOnTheMilkwaterWildlingVictoryGameState.deserializeFromServer(this, data);
+            case "a-king-beyond-the-wall-wildling-victory":
+                return AKingBeyondTheWallWildlingVictoryGameState.deserializeFromServer(this, data);
+            case "a-king-beyond-the-wall-nights-watch-victory":
+                return AKingBeyondTheWallNightsWatchVictoryGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -254,7 +261,8 @@ export interface SerializedWildlingAttackGameState {
     participatingHouses: string[];
     childGameState: SerializedBiddingGameState | SerializedSimpleChoiceGameState | SerializedPreemptiveRaidWildlingVictoryGameState
         | SerializedCrowKillersWildlingVictoryGameState | SerializedCrowKillersNightsWatchVictoryGameState
-        | SerializedRattleshirtsRaidersWildlingVictoryGameState | SerializedMassingOnTheMilkwaterWildlingVictoryGameState;
+        | SerializedRattleshirtsRaidersWildlingVictoryGameState | SerializedMassingOnTheMilkwaterWildlingVictoryGameState
+        | SerializedAKingBeyondTheWallWildlingVictoryGameState | SerializedAKingBeyondTheWallNightsWatchVictoryGameState;
     wildlingCard: number | null;
     biddingResults: [number, string[]][] | null;
     highestBidder: string | null;

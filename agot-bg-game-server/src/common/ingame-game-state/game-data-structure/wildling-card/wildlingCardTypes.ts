@@ -4,6 +4,7 @@ import PreemptiveRaidWildlingCardType from "./PreemptiveRaidWildlingCardType";
 import CrowKillers from "./CrowKillers";
 import RattleshirtsRaiders from "./RattleshirtsRaiders";
 import MassingOnTheMilkwater from "./MassingOnTheMilkwater";
+import AKingBeyondTheWall from "./AKingBeyondTheWall";
 
 
 export const silenceAtTheWall = new SilenceAtTheWall(
@@ -38,6 +39,14 @@ export const massingOnTheMilkwater = new MassingOnTheMilkwater(
     + " discard one of those cards.",
     "Returns his entire House card discard into his hand."
 );
+export const aKingBeyondTheWall = new AKingBeyondTheWall(
+    "a-king-beyond-the-wall", "A King Beyond the Wall",
+    "Moves their tokens to the lowest position of every Influence track",
+    "In turn order, each player chooses either the Fiefdoms or King's Court Influence"
+    + " track and moves their token to the lowest position of that track.",
+    "Moves their token to the top of one Influence track of his choice then takes the appropriate"
+    + " Dominance token."
+);
 
 const wildlingCardTypes = new BetterMap([
     [silenceAtTheWall.id, silenceAtTheWall],
@@ -45,6 +54,7 @@ const wildlingCardTypes = new BetterMap([
     [crowKillers.id, crowKillers],
     [rattleshirtsRaiders.id, rattleshirtsRaiders],
     [massingOnTheMilkwater.id, massingOnTheMilkwater],
+    [aKingBeyondTheWall.id, aKingBeyondTheWall]
 ]);
 
 export default wildlingCardTypes;
