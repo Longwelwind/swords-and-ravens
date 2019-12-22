@@ -24,6 +24,12 @@ import RattleshirtsRaidersWildlingVictoryComponent from "./RattleshirtsRaidersWi
 import MassingOnTheMilkwaterWildlingVictoryGameState
     from "../../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/massing-on-the-milkwater-wildling-victory-game-state/MassingOnTheMilkwaterWildlingVictoryGameState";
 import MassingOnTheMilkwaterWildlingVictoryComponent from "./MassingOnTheMilkwaterWildlingVictoryComponent";
+import AKingBeyondTheWallWildlingVictoryGameState
+    from "../../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/a-king-beyond-the-wall-wildling-victory-game-state/AKingBeyondTheWallWildlingVictoryGameState";
+import AKingBeyondTheWallWildlingVictoryComponent from "./AKingBeyondTheWallWildlingVictoryComponent";
+import AKingBeyondTheWallNightsWatchVictoryGameState
+    from "../../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/a-king-beyond-the-wall-nights-watch-victory-game-state/AKingBeyondTheWallNightsWatchVictoryGameState";
+import AKingBeyondTheWallNightsWatchVictoryComponent from "./AKingBeyondTheWallNightsWatchVictoryComponent";
 
 @observer
 export default class WildlingAttackComponent extends Component<GameStateComponentProps<WildlingAttackGameState>> {
@@ -43,6 +49,8 @@ export default class WildlingAttackComponent extends Component<GameStateComponen
                     [CrowKillersNightsWatchVictoryGameState, CrowKillersNigthsWatchVictoryComponent],
                     [RattleshirtsRaidersWildlingVictoryGameState, RattleshirtsRaidersWildlingVictoryComponent],
                     [MassingOnTheMilkwaterWildlingVictoryGameState, MassingOnTheMilkwaterWildlingVictoryComponent],
+                    [AKingBeyondTheWallWildlingVictoryGameState, AKingBeyondTheWallWildlingVictoryComponent],
+                    [AKingBeyondTheWallNightsWatchVictoryGameState, AKingBeyondTheWallNightsWatchVictoryComponent],
                 ])}
             </Row>
         );
