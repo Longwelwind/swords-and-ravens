@@ -30,6 +30,12 @@ import AKingBeyondTheWallWildlingVictoryComponent from "./AKingBeyondTheWallWild
 import AKingBeyondTheWallNightsWatchVictoryGameState
     from "../../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/a-king-beyond-the-wall-nights-watch-victory-game-state/AKingBeyondTheWallNightsWatchVictoryGameState";
 import AKingBeyondTheWallNightsWatchVictoryComponent from "./AKingBeyondTheWallNightsWatchVictoryComponent";
+import MammothRidersWildlingVictoryGameState
+    from "../../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/mammoth-riders-wildling-victory-game-state/MammothRidersWildlingVictoryGameState";
+import MammothRidersWildlingVictoryComponent from "./MammothRidersWildlingVictoryComponent";
+import MammothRidersNightsWatchVictoryGameState
+    from "../../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/mammoth-riders-nights-watch-victory-game-state/MammothRidersNightsWatchVictoryGameState";
+import MammothRidersNightsWatchVictoryComponent from "./MammothRidersNightsWatchVictoryComponent";
 
 @observer
 export default class WildlingAttackComponent extends Component<GameStateComponentProps<WildlingAttackGameState>> {
@@ -51,6 +57,8 @@ export default class WildlingAttackComponent extends Component<GameStateComponen
                     [MassingOnTheMilkwaterWildlingVictoryGameState, MassingOnTheMilkwaterWildlingVictoryComponent],
                     [AKingBeyondTheWallWildlingVictoryGameState, AKingBeyondTheWallWildlingVictoryComponent],
                     [AKingBeyondTheWallNightsWatchVictoryGameState, AKingBeyondTheWallNightsWatchVictoryComponent],
+                    [MammothRidersWildlingVictoryGameState, MammothRidersWildlingVictoryComponent],
+                    [MammothRidersNightsWatchVictoryGameState, MammothRidersNightsWatchVictoryComponent],
                 ])}
             </Row>
         );
