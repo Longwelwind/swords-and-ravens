@@ -117,6 +117,10 @@ export default class Game {
         );
     }
 
+    getUnitsOfHouse(house: House): [Region, Unit[]][] {
+        return this.world.regions.values.filter(r => r.getController() == house && r.units.size > 0).map(r => [r, r.units.values]);
+    }
+
     getNameInfluenceTrack(i: number): string {
         if (i == 0) {
             return "Iron Throne";

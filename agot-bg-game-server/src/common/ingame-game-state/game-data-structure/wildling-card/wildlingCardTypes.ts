@@ -5,6 +5,7 @@ import CrowKillers from "./CrowKillers";
 import RattleshirtsRaiders from "./RattleshirtsRaiders";
 import MassingOnTheMilkwater from "./MassingOnTheMilkwater";
 import AKingBeyondTheWall from "./AKingBeyondTheWall";
+import MammothRiders from "./MammothRiders";
 
 
 export const silenceAtTheWall = new SilenceAtTheWall(
@@ -47,6 +48,12 @@ export const aKingBeyondTheWall = new AKingBeyondTheWall(
     "Moves their token to the top of one Influence track of his choice then takes the appropriate"
     + " Dominance token."
 );
+export const mammothRiders = new MammothRiders(
+    "mammoth-riders", "Mammoth Riders",
+    "Destroys 3 of their units anywhere.",
+    "Destroys 2 of their units anywhere.",
+    "May retrieve 1 House card of their choice from their House card discard pile."
+);
 
 const wildlingCardTypes = new BetterMap([
     [silenceAtTheWall.id, silenceAtTheWall],
@@ -54,7 +61,8 @@ const wildlingCardTypes = new BetterMap([
     [crowKillers.id, crowKillers],
     [rattleshirtsRaiders.id, rattleshirtsRaiders],
     [massingOnTheMilkwater.id, massingOnTheMilkwater],
-    [aKingBeyondTheWall.id, aKingBeyondTheWall]
+    [aKingBeyondTheWall.id, aKingBeyondTheWall],
+    [mammothRiders.id, mammothRiders]
 ]);
 
 export default wildlingCardTypes;
