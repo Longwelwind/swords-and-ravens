@@ -24,6 +24,8 @@ import AKingBeyondTheWallWildlingVictoryGameState, {SerializedAKingBeyondTheWall
 import AKingBeyondTheWallNightsWatchVictoryGameState, {SerializedAKingBeyondTheWallNightsWatchVictoryGameState} from "./a-king-beyond-the-wall-nights-watch-victory-game-state/AKingBeyondTheWallNightsWatchVictoryGameState";
 import MammothRidersWildlingVictoryGameState, {SerializedMammothRidersWildlingVictoryGameState} from "./mammoth-riders-wildling-victory-game-state/MammothRidersWildlingVictoryGameState";
 import MammothRidersNightsWatchVictoryGameState, {SerializedMammothRidersNightsWatchVictoryGameState} from "./mammoth-riders-nights-watch-victory-game-state/MammothRidersNightsWatchVictoryGameState";
+import TheHordeDescendsWildlingVictoryGameState, {SerializedTheHordeDescendsWildlingVictoryGameState} from "./the-horde-descends-wildling-victory-game-state/TheHordeDescendsWildlingVictoryGameState";
+import TheHordeDescendsNightsWatchVictoryGameState, {SerializedTheHordeDescendsNightsWatchVictoryGameState} from "./the-horde-descends-nights-watch-victory-game-state/TheHordeDescendsNightsWatchVictoryGameState";
 
 export default class WildlingAttackGameState extends GameState<WesterosGameState,
     BiddingGameState<WildlingAttackGameState> | SimpleChoiceGameState | PreemptiveRaidWildlingVictoryGameState
@@ -31,6 +33,7 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
     | RattleshirtsRaidersWildlingVictoryGameState | MassingOnTheMilkwaterWildlingVictoryGameState
     | AKingBeyondTheWallWildlingVictoryGameState | AKingBeyondTheWallNightsWatchVictoryGameState
     | MammothRidersWildlingVictoryGameState | MammothRidersNightsWatchVictoryGameState
+    | TheHordeDescendsWildlingVictoryGameState | TheHordeDescendsNightsWatchVictoryGameState
 > {
     participatingHouses: House[];
     // Client-side, `wildlingCard` is null before the bidding phase is over
@@ -258,6 +261,10 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
                 return MammothRidersNightsWatchVictoryGameState.deserializeFromServer(this, data);
             case "mammoth-riders-wildling-victory":
                 return MammothRidersWildlingVictoryGameState.deserializeFromServer(this, data);
+            case "the-horde-descends-wildling-victory":
+                return TheHordeDescendsWildlingVictoryGameState.deserializeFromServer(this, data);
+            case "the-horde-descends-nights-watch-victory":
+                return TheHordeDescendsNightsWatchVictoryGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -270,7 +277,8 @@ export interface SerializedWildlingAttackGameState {
         | SerializedCrowKillersWildlingVictoryGameState | SerializedCrowKillersNightsWatchVictoryGameState
         | SerializedRattleshirtsRaidersWildlingVictoryGameState | SerializedMassingOnTheMilkwaterWildlingVictoryGameState
         | SerializedAKingBeyondTheWallWildlingVictoryGameState | SerializedAKingBeyondTheWallNightsWatchVictoryGameState
-        | SerializedMammothRidersWildlingVictoryGameState | SerializedMammothRidersNightsWatchVictoryGameState;
+        | SerializedMammothRidersWildlingVictoryGameState | SerializedMammothRidersNightsWatchVictoryGameState
+        | SerializedTheHordeDescendsWildlingVictoryGameState | SerializedTheHordeDescendsNightsWatchVictoryGameState;
     wildlingCard: number | null;
     biddingResults: [number, string[]][] | null;
     highestBidder: string | null;

@@ -16,7 +16,6 @@ import ResolveConsolidatePowerGameState
 import ConsolidatePowerOrderType from "../../../game-data-structure/order-types/ConsolidatePowerOrderType";
 import {ServerMessage} from "../../../../../messages/ServerMessage";
 import RegionKind from "../../../game-data-structure/RegionKind";
-import MusteringGameState from "../MusteringGameState";
 
 export type Mustering = {from: Unit | null; region: Region; to: UnitType};
 
@@ -26,11 +25,18 @@ export enum PlayerMusteringType {
     THE_HORDE_DESCENDS_WILDLING_CARD = 2
 }
 
+interface ParentGameState extends GameState<any, any> {
+    game: Game;
+    entireGame: EntireGame;
+
+    onPlayerMusteringEnd(house: House, musterings: Region[]): void;
+}
+
 /**
  * This GameState handles mustering for the Westeros card "Mustering", a mustering from a consolidated power
  * token and a mustering from the Wildling card "The Horde Descends".
  */
-export default class PlayerMusteringGameState extends GameState<ResolveConsolidatePowerGameState | MusteringGameState> {
+export default class PlayerMusteringGameState extends GameState<ParentGameState> {
     house: House;
     type: PlayerMusteringType;
 
@@ -295,7 +301,7 @@ export default class PlayerMusteringGameState extends GameState<ResolveConsolida
         }
     }
 
-    static deserializeFromServer(parent: PlayerMusteringGameState["parentGameState"], data: SerializedPlayerMusteringGameState): PlayerMusteringGameState {
+    static deserializeFromServer(parent: ParentGameState, data: SerializedPlayerMusteringGameState): PlayerMusteringGameState {
         const playerMustering = new PlayerMusteringGameState(parent);
 
         playerMustering.house = parent.game.houses.get(data.house);
