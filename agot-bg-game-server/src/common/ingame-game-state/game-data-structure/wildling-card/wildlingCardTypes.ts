@@ -7,6 +7,7 @@ import MassingOnTheMilkwater from "./MassingOnTheMilkwater";
 import AKingBeyondTheWall from "./AKingBeyondTheWall";
 import MammothRiders from "./MammothRiders";
 import TheHordeDescends from "./TheHordeDescends";
+import SkinchangerScout from "./SkinchangerScout";
 
 
 export const silenceAtTheWall = new SilenceAtTheWall(
@@ -63,6 +64,12 @@ export const theHordeDescends = new TheHordeDescends(
     "May muster forces (following normal mustering rules) in any one Castle or Stronghold area"
     + " they controls."
 );
+export const skinchangerScout = new SkinchangerScout(
+    "skinchanger-scout", "Skinchanger Scout",
+    "Discards all available Power tokens.",
+    "Discards 2 available Power tokens, or as many as they are able.",
+    "All Power tokens they bid on this attack are immediately returned to their available Power."
+);
 
 const wildlingCardTypes = new BetterMap([
     [silenceAtTheWall.id, silenceAtTheWall],
@@ -73,6 +80,7 @@ const wildlingCardTypes = new BetterMap([
     [aKingBeyondTheWall.id, aKingBeyondTheWall],
     [mammothRiders.id, mammothRiders],
     [theHordeDescends.id, theHordeDescends],
+    [skinchangerScout.id, skinchangerScout],
 ]);
 
 export default wildlingCardTypes;
