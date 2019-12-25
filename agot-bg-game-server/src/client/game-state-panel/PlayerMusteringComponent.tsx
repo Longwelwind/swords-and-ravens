@@ -120,12 +120,13 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
     }
 
     canSubmit(): boolean {
-        if (this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
-            return this.musterings.size == 1;
-        } else if (this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD) {
-            return true;
-        } else {
-            return false;
+        switch (this.props.gameState.type) {
+            case PlayerMusteringType.MUSTERING_WESTEROS_CARD:
+                return true;
+            case PlayerMusteringType.STARRED_CONSOLIDATE_POWER:
+                return this.musterings.size == 1;
+            case PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD:
+                return true;
         }
     }
 
@@ -174,6 +175,12 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                     return this.props.gameState.game.world.regions.values
                         .filter(r => r.getController() == this.props.gameState.house && r.castleLevel > 0)
                         .includes(region);
+                } else if (this.props.gameState.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD) {
+                    if (this.musterings.size == 0) {
+                        return this.props.gameState.game.world.regions.values
+                            .filter(r => r.getController() == this.props.gameState.house && r.castleLevel > 0)
+                            .includes(region);
+                    }
                 }
             } else {
                 return this.selectedRegion == region;

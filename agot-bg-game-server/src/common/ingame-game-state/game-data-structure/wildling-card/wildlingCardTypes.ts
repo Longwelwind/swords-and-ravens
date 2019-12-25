@@ -6,6 +6,7 @@ import RattleshirtsRaiders from "./RattleshirtsRaiders";
 import MassingOnTheMilkwater from "./MassingOnTheMilkwater";
 import AKingBeyondTheWall from "./AKingBeyondTheWall";
 import MammothRiders from "./MammothRiders";
+import TheHordeDescends from "./TheHordeDescends";
 
 
 export const silenceAtTheWall = new SilenceAtTheWall(
@@ -54,6 +55,14 @@ export const mammothRiders = new MammothRiders(
     "Destroys 2 of their units anywhere.",
     "May retrieve 1 House card of their choice from their House card discard pile."
 );
+export const theHordeDescends = new TheHordeDescends(
+    "the-horde-descends", "The Horde Descends",
+    "Destroy 2 of their units at one of his Castles or Strongholds. If unable,"
+    + " they destroys 2 of his units anywhere.",
+    "Destroys 1 of their units anywhere.",
+    "May muster forces (following normal mustering rules) in any one Castle or Stronghold area"
+    + " they controls."
+);
 
 const wildlingCardTypes = new BetterMap([
     [silenceAtTheWall.id, silenceAtTheWall],
@@ -62,7 +71,8 @@ const wildlingCardTypes = new BetterMap([
     [rattleshirtsRaiders.id, rattleshirtsRaiders],
     [massingOnTheMilkwater.id, massingOnTheMilkwater],
     [aKingBeyondTheWall.id, aKingBeyondTheWall],
-    [mammothRiders.id, mammothRiders]
+    [mammothRiders.id, mammothRiders],
+    [theHordeDescends.id, theHordeDescends],
 ]);
 
 export default wildlingCardTypes;
