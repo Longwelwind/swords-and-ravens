@@ -126,6 +126,55 @@ $grid-gutter-width: 1rem;
   border-radius: 6px;
 }
 
+.card {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+$game-card-width: 280px;
+$game-card-height: 439px;
+$medium-scale: 0.5;
+$small-scale: 0.2;
+
+.vertical-card {
+  @extend .card;
+
+  width: $game-card-width;
+  height: $game-card-height;
+}
+
+.vertical-card.medium {
+  width: $game-card-width * $medium-scale;
+  height: $game-card-height * $medium-scale;
+}
+
+.vertical-card.small {
+  width: $game-card-width * $small-scale;
+  height: $game-card-height * $small-scale;
+}
+
+.horizontal-card {
+  @extend .card;
+
+  width: $game-card-height;
+  height: $game-card-width;
+}
+
+.horizontal-card.medium {
+  width: $game-card-height * $medium-scale;
+  height: $game-card-width * $medium-scale;
+}
+
+.horizontal-card.small {
+  width: $game-card-height * $small-scale;
+  height: $game-card-width * $small-scale;
+}
+
+.horizontal-card.slot {
+  border: 2px dashed gray;
+}
+
 .influence-icon {
   width: 36px;
   height: 36px;

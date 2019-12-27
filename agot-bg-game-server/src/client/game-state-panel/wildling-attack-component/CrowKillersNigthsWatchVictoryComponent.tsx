@@ -14,7 +14,7 @@ export default class CrowKillersNigthsWatchVictoryComponent extends Component<Ga
         return (
             <>
                 <Col xs={12}>
-                    <b>{this.props.gameState.childGameState.house.name}</b> may immediately replace up to 2 of his
+                    <b>{this.props.gameState.childGameState.house.name}</b> may immediately replace up to {this.props.gameState.childGameState.count} of his
                     Footmen with Knights.
                 </Col>
                 {renderChildGameState(this.props, [

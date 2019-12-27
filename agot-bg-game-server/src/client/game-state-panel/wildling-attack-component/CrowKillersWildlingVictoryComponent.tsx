@@ -15,7 +15,7 @@ export default class CrowKillersWildlingVictoryComponent extends Component<GameS
         return (
             <>
                 <Col xs={12}>
-                    <b>{this.props.gameState.childGameState.house.name}</b> replaces 2 of their Knights with
+                    <b>{this.props.gameState.childGameState.house.name}</b> replaces {this.props.gameState.childGameState.count} of their Knights with
                     available Footmen.
                 </Col>
                 {renderChildGameState(this.props, [

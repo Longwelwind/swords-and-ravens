@@ -36,7 +36,7 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
     | TheHordeDescendsWildlingVictoryGameState | TheHordeDescendsNightsWatchVictoryGameState
 > {
     participatingHouses: House[];
-    // Client-side, `wildlingCard` is null before the bidding phase is over
+    // Client-side, `card` is null before the bidding phase is over
     wildlingCard: WildlingCard;
     wildlingStrength: number;
     _highestBidder: House | null;
@@ -104,8 +104,9 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
         this.wildlingStrength = wildlingStrength;
         this.participatingHouses = participatingHouses;
 
-        // Draw the first card from the wildling deck
+        // Draw and bury the first card from the wildling deck
         this.wildlingCard = this.game.wildlingDeck.shift() as WildlingCard;
+        this.game.wildlingDeck.push(this.wildlingCard);
 
         this.setChildGameState(new BiddingGameState(this)).firstStart(this.game.houses.values);
     }
@@ -125,9 +126,20 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
     onBiddingGameStateEnd(results: [number, House[]][]): void {
         this.biddingResults = results;
 
+        this.westerosGameState.ingameGameState.log({
+            type: "wildling-bidding",
+            results: results.map(([bid, houses]) => [bid, houses.map(h => h.id)]),
+            nightsWatchVictory: this.nightsWatchWon
+        });
+
         // Reveal the wildling card to the players
         this.entireGame.broadcastToClients({
             type: "reveal-wildling-card",
+            wildlingCard: this.wildlingCard.id
+        });
+
+        this.westerosGameState.ingameGameState.log({
+            type: "wildling-card-revealed",
             wildlingCard: this.wildlingCard.id
         });
 
@@ -162,8 +174,23 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
 
     onSimpleChoiceGameStateEnd(choice: number): void {
         if (this.nightsWatchWon) {
-            this.proceedNightsWatchWon(this.highestBidders[choice]);
+            const highestBidder = this.highestBidders[choice];
+
+            this.westerosGameState.ingameGameState.log({
+                type: "highest-bidder-chosen",
+                highestBidder: highestBidder.id
+            });
+
+            this.proceedNightsWatchWon(highestBidder);
         } else {
+            const lowestBidder = this.lowestBidders[choice];
+
+            this.westerosGameState.ingameGameState.log({
+                type: "lowest-bidder-chosen",
+                lowestBidder: lowestBidder.id
+            });
+
+
             this.proceedWildlingWon(this.lowestBidders[choice]);
         }
     }
@@ -189,9 +216,6 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
     }
 
     onWildlingCardExecuteEnd(): void {
-        // Bury the wildling card
-        this.game.wildlingDeck.push(this.wildlingCard);
-
         // Change the wildling strength based on the result of wildling attack
         if (this.nightsWatchWon) {
             this.game.wildlingStrength = 0;
@@ -213,7 +237,9 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
             childGameState: this.childGameState.serializeToClient(admin, player),
             participatingHouses: this.participatingHouses.map(h => h.id),
             // Only give the wildling card after the bidding phase
-            wildlingCard: this.biddingResults ? this.wildlingCard.id : null,
+            wildlingCard: admin
+                ? this.wildlingCard.id
+                : this.biddingResults ? this.wildlingCard.id : null,
             biddingResults: this.biddingResults ? this.biddingResults.map(([bid, houses]) => ([bid, houses.map(h => h.id)])) : null,
             lowestBidder: this._lowestBidder ? this._lowestBidder.id : null,
             highestBidder: this._highestBidder ? this._highestBidder.id : null

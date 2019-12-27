@@ -4,7 +4,8 @@ export default interface GameLog {
 }
 
 export type GameLogData = TurnBegin | SupportDeclared | HouseCardChosen | Attack | MarchResolved
-    | WesterosCardExecuted | WesterosCardDrawn | CombatResult;
+    | WesterosCardExecuted | WesterosCardDrawn | CombatResult | WildlingCardRevealed | WildlingBidding
+    | HighestBidderChosen | LowestBidderChosen;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -64,4 +65,25 @@ interface CombatResult {
         valyrianSteelBlade: number;
         total: number;
     }[];
+}
+
+interface WildlingCardRevealed {
+    type: "wildling-card-revealed";
+    wildlingCard: number;
+}
+
+interface WildlingBidding {
+    type: "wildling-bidding";
+    results: [number, string[]][];
+    nightsWatchVictory: boolean;
+}
+
+interface HighestBidderChosen {
+    type: "highest-bidder-chosen";
+    highestBidder: string;
+}
+
+interface LowestBidderChosen {
+    type: "lowest-bidder-chosen";
+    lowestBidder: string;
 }

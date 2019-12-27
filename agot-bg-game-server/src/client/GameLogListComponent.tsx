@@ -14,6 +14,8 @@ import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
 import {westerosCardTypes} from "../common/ingame-game-state/game-data-structure/westeros-card/westerosCardTypes";
 import {observer} from "mobx-react";
+import WildlingCardComponent from "./game-state-panel/utils/WildlingCardComponent";
+import WildlingCard from "../common/ingame-game-state/game-data-structure/wildling-card/WildlingCard";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -180,6 +182,59 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                                 </tr>
                             </table>
                         </p>
+                    </>
+                );
+            case "wildling-card-revealed":
+                console.log(this.game.wildlingDeck);
+                const wildlingCard = this.game.wildlingDeck.find(wc => wc.id == data.wildlingCard) as WildlingCard;
+
+                return (
+                    <>
+                        Wildling card revealed:
+                        <Row className="justify-content-center">
+                            <Col xs="auto">
+                                <WildlingCardComponent cardType={wildlingCard.type} size="small" tooltip={true} placement="auto"/>
+                            </Col>
+                        </Row>
+                    </>
+                );
+            case "wildling-bidding":
+                const results: [number, House[]][] = data.results.map(([bid, hids]) => [bid, hids.map(hid => this.game.houses.get(hid))]);
+
+                return (
+                    <>
+                        Wildling bidding results:
+                        <table>
+                            {results.map(([bid, houses]) => houses.map(h => (
+                                <tr key={h.id}>
+                                    <td>{h.name}</td>
+                                    <td>{bid}</td>
+                                </tr>
+                            )))}
+                        </table>
+                        {data.nightsWatchVictory ? (
+                            <>The <strong>Night's Watch</strong> won!</>
+                        ) : (
+                            <>The <strong>Wildling</strong> won!</>
+                        )}
+                    </>
+                );
+
+            case "lowest-bidder-chosen":
+                const lowestBidder = this.game.houses.get(data.lowestBidder);
+
+                return (
+                    <>
+                        <strong>{lowestBidder.name}</strong> was chosen as the lowest bidder.
+                    </>
+                );
+
+            case "highest-bidder-chosen":
+                const highestBidder = this.game.houses.get(data.highestBidder);
+
+                return (
+                    <>
+                        <strong>{highestBidder.name}</strong> was chosen as the highest bidder.
                     </>
                 );
         }

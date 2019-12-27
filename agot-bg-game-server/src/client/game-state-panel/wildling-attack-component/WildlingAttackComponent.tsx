@@ -42,33 +42,49 @@ import TheHordeDescendsWildlingVictoryComponent from "./TheHordeDescendsWildling
 import TheHordeDescendsNightsWatchVictoryGameState
     from "../../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/the-horde-descends-nights-watch-victory-game-state/TheHordeDescendsNightsWatchVictoryGameState";
 import TheHordeDescendsNightsWatchVictoryComponent from "./TheHordeDescendsNightsWatchVictoryComponent";
+import ListGroupItem from "react-bootstrap/ListGroupItem";
+import WildlingCardComponent from "../utils/WildlingCardComponent";
 
 @observer
 export default class WildlingAttackComponent extends Component<GameStateComponentProps<WildlingAttackGameState>> {
     render(): ReactNode {
+        const wildlingCardType = this.props.gameState.wildlingCard ? this.props.gameState.wildlingCard.type : null;
         return (
-            <Row>
-                {this.props.gameState.wildlingCard && (
-                    <Col xs={12}>
-                        Wildling card: {this.props.gameState.wildlingCard.type.name}
-                    </Col>
+            <>
+                {wildlingCardType && (
+                    <ListGroupItem>
+                        <Row className="justify-content-center">
+                            <Col xs="auto">
+                                <WildlingCardComponent cardType={wildlingCardType}/>
+                            </Col>
+                        </Row>
+                    </ListGroupItem>
                 )}
-                {renderChildGameState<WildlingAttackGameState>(this.props, [
-                    [SimpleChoiceGameState, SimpleChoiceComponent],
-                    [BiddingGameState, BiddingComponent],
-                    [PreemptiveRaidWildlingVictoryGameState, PreemptiveRaidWildlingVictoryComponent],
-                    [CrowKillersWildlingVictoryGameState, CrowKillersWildlingVictoryComponent],
-                    [CrowKillersNightsWatchVictoryGameState, CrowKillersNigthsWatchVictoryComponent],
-                    [RattleshirtsRaidersWildlingVictoryGameState, RattleshirtsRaidersWildlingVictoryComponent],
-                    [MassingOnTheMilkwaterWildlingVictoryGameState, MassingOnTheMilkwaterWildlingVictoryComponent],
-                    [AKingBeyondTheWallWildlingVictoryGameState, AKingBeyondTheWallWildlingVictoryComponent],
-                    [AKingBeyondTheWallNightsWatchVictoryGameState, AKingBeyondTheWallNightsWatchVictoryComponent],
-                    [MammothRidersWildlingVictoryGameState, MammothRidersWildlingVictoryComponent],
-                    [MammothRidersNightsWatchVictoryGameState, MammothRidersNightsWatchVictoryComponent],
-                    [TheHordeDescendsWildlingVictoryGameState, TheHordeDescendsWildlingVictoryComponent],
-                    [TheHordeDescendsNightsWatchVictoryGameState, TheHordeDescendsNightsWatchVictoryComponent],
-                ])}
-            </Row>
+                <ListGroupItem>
+                    <Row>
+                        {this.props.gameState.childGameState instanceof BiddingGameState && (
+                            <Col xs={12}>
+                                All houses bid Power tokens to overcome the Wildling attack!
+                            </Col>
+                        )}
+                        {renderChildGameState<WildlingAttackGameState>(this.props, [
+                            [SimpleChoiceGameState, SimpleChoiceComponent],
+                            [BiddingGameState, BiddingComponent],
+                            [PreemptiveRaidWildlingVictoryGameState, PreemptiveRaidWildlingVictoryComponent],
+                            [CrowKillersWildlingVictoryGameState, CrowKillersWildlingVictoryComponent],
+                            [CrowKillersNightsWatchVictoryGameState, CrowKillersNigthsWatchVictoryComponent],
+                            [RattleshirtsRaidersWildlingVictoryGameState, RattleshirtsRaidersWildlingVictoryComponent],
+                            [MassingOnTheMilkwaterWildlingVictoryGameState, MassingOnTheMilkwaterWildlingVictoryComponent],
+                            [AKingBeyondTheWallWildlingVictoryGameState, AKingBeyondTheWallWildlingVictoryComponent],
+                            [AKingBeyondTheWallNightsWatchVictoryGameState, AKingBeyondTheWallNightsWatchVictoryComponent],
+                            [MammothRidersWildlingVictoryGameState, MammothRidersWildlingVictoryComponent],
+                            [MammothRidersNightsWatchVictoryGameState, MammothRidersNightsWatchVictoryComponent],
+                            [TheHordeDescendsWildlingVictoryGameState, TheHordeDescendsWildlingVictoryComponent],
+                            [TheHordeDescendsNightsWatchVictoryGameState, TheHordeDescendsNightsWatchVictoryComponent],
+                        ])}
+                    </Row>
+                </ListGroupItem>
+            </>
         );
     }
 }
