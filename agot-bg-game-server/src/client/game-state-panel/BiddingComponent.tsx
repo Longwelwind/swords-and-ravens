@@ -15,15 +15,12 @@ export default class BiddingComponent<ParentGameState extends BiddingGameStatePa
     render() {
         return (
             <>
-                <p>
-                    All houses of Westeros can bid a certain amount of power tokens
-                </p>
-                <p className="text-center">
-                    {this.props.gameClient.authenticatedPlayer
-                        && this.props.gameState.canBid(this.props.gameClient.authenticatedPlayer.house) ? (
-                        <>
+                {this.props.gameClient.authenticatedPlayer
+                    && this.props.gameState.canBid(this.props.gameClient.authenticatedPlayer.house) ? (
+                    <>
+                        <Col xs={12}>
                             <Row className="justify-content-center">
-                                <Col xs="auto" className="d-flex align-items-center">
+                                <Col xs="auto">
                                     <input
                                         type="range"
                                         className="custom-range"
@@ -32,21 +29,23 @@ export default class BiddingComponent<ParentGameState extends BiddingGameStatePa
                                         value={this.powerTokens}
                                         onChange={e => this.powerTokens = parseInt(e.target.value)}
                                     />
+                                </Col>
+                                <Col xs="auto">
                                     <div style={{marginLeft: "10px"}}>
                                         {this.powerTokens}
                                     </div>
                                 </Col>
                             </Row>
-                            <Row className="justify-content-center">
-                                <Col xs="auto">
-                                    <Button onClick={() => this.bid(this.powerTokens)}>Confirm</Button>
-                                </Col>
-                            </Row>
-                        </>
-                    ) : (
-                        <>Waiting for {this.props.gameState.getHousesLeftToBid().map(h => h.name).join(", ")}...</>
-                    )}
-                </p>
+                        </Col>
+                        <Col xs={12} className="text-center">
+                            <Button onClick={() => this.bid(this.powerTokens)}>Confirm</Button>
+                        </Col>
+                    </>
+                ) : (
+                    <Col xs={12} className="text-center">
+                        Waiting for {this.props.gameState.getHousesLeftToBid().map(h => h.name).join(", ")}
+                    </Col>
+                )}
             </>
         );
     }

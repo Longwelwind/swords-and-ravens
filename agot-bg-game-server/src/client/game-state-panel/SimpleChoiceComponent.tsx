@@ -11,7 +11,7 @@ import Col from "react-bootstrap/Col";
 export default class SimpleChoiceComponent extends Component<GameStateComponentProps<SimpleChoiceGameState>> {
     render() {
         return (
-            <Row>
+            <>
                 <Col xs={12}>
                     {this.props.gameState.description}
                 </Col>
@@ -28,7 +28,7 @@ export default class SimpleChoiceComponent extends Component<GameStateComponentP
                         <>Waiting for {this.props.gameState.house.name}...</>
                     )}
                 </Col>
-            </Row>
+            </>
         );
     }
 

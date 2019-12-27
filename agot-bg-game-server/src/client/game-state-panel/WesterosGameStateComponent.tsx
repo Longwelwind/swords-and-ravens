@@ -33,8 +33,10 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
                 <ListGroupItem>
                     <strong>Westeros Phase</strong>
                 </ListGroupItem>
-                <ListGroupItem>
-                    {this.props.gameState.childGameState instanceof PutToTheSwordGameState ? (
+                {this.props.gameState.childGameState instanceof WildlingAttackGameState && this.props.gameState.currentCardI == 0 ? (
+                    renderChildGameState(this.props, [[WildlingAttackGameState, WildlingAttackComponent]])
+                ) : (
+                    this.props.gameState.childGameState instanceof PutToTheSwordGameState ? (
                         <SimpleChoiceComponent gameClient={this.props.gameClient}
                                                gameState={this.props.gameState.childGameState.childGameState}
                                                mapControls={this.props.mapControls}/>
@@ -51,8 +53,8 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
                         [ReconcileArmiesGameState, ReconcileArmiesComponent],
                         [ClashOfKingsGameState, ClashOfKingsComponent],
                         [MusteringGameState, MusteringComponent]
-                    ])}
-                </ListGroupItem>
+                    ])
+                )}
             </>
         );
     }
