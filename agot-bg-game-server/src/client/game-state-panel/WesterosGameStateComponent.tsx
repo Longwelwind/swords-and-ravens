@@ -24,6 +24,9 @@ import ThronesOfBladesGameState
     from "../../common/ingame-game-state/westeros-game-state/thrones-of-blades-game-state/ThronesOfBladesGameState";
 import GameStateComponentProps from "./GameStateComponentProps";
 import renderChildGameState from "../utils/renderChildGameState";
+import Col from "react-bootstrap/Col";
+import Row from "react-bootstrap/Row";
+import WesterosCardComponent from "./utils/WesterosCardComponent";
 
 @observer
 export default class WesterosGameStateComponent extends Component<GameStateComponentProps<WesterosGameState>> {
@@ -33,24 +36,33 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
                 {this.props.gameState.childGameState instanceof WildlingAttackGameState && this.props.gameState.currentCardI == 0 ? (
                     renderChildGameState(this.props, [[WildlingAttackGameState, WildlingAttackComponent]])
                 ) : (
-                    this.props.gameState.childGameState instanceof PutToTheSwordGameState ? (
-                        <SimpleChoiceComponent gameClient={this.props.gameClient}
-                                               gameState={this.props.gameState.childGameState.childGameState}
-                                               mapControls={this.props.mapControls}/>
-                    ) : this.props.gameState.childGameState instanceof DarkWingsDarkWordsGameState ? (
-                        <SimpleChoiceComponent gameClient={this.props.gameClient}
-                                               gameState={this.props.gameState.childGameState.childGameState}
-                                               mapControls={this.props.mapControls}/>
-                    ) : this.props.gameState.childGameState instanceof ThronesOfBladesGameState ? (
-                        <SimpleChoiceComponent gameClient={this.props.gameClient}
-                                               gameState={this.props.gameState.childGameState.childGameState}
-                                               mapControls={this.props.mapControls}/>
-                    ) : renderChildGameState(this.props, [
-                        [WildlingAttackGameState, WildlingAttackComponent],
-                        [ReconcileArmiesGameState, ReconcileArmiesComponent],
-                        [ClashOfKingsGameState, ClashOfKingsComponent],
-                        [MusteringGameState, MusteringComponent]
-                    ])
+                    <>
+                        <ListGroupItem>
+                            <Row className="justify-content-center">
+                                <Col xs="auto">
+                                    <WesterosCardComponent cardType={this.props.gameState.currentCard.type}/>
+                                </Col>
+                            </Row>
+                        </ListGroupItem>
+                        {this.props.gameState.childGameState instanceof PutToTheSwordGameState ? (
+                            <SimpleChoiceComponent gameClient={this.props.gameClient}
+                                                   gameState={this.props.gameState.childGameState.childGameState}
+                                                   mapControls={this.props.mapControls}/>
+                        ) : this.props.gameState.childGameState instanceof DarkWingsDarkWordsGameState ? (
+                            <SimpleChoiceComponent gameClient={this.props.gameClient}
+                                                   gameState={this.props.gameState.childGameState.childGameState}
+                                                   mapControls={this.props.mapControls}/>
+                        ) : this.props.gameState.childGameState instanceof ThronesOfBladesGameState ? (
+                            <SimpleChoiceComponent gameClient={this.props.gameClient}
+                                                   gameState={this.props.gameState.childGameState.childGameState}
+                                                   mapControls={this.props.mapControls}/>
+                        ) : renderChildGameState(this.props, [
+                            [WildlingAttackGameState, WildlingAttackComponent],
+                            [ReconcileArmiesGameState, ReconcileArmiesComponent],
+                            [ClashOfKingsGameState, ClashOfKingsComponent],
+                            [MusteringGameState, MusteringComponent]
+                        ])}
+                    </>
                 )}
             </>
         );
