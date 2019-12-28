@@ -25,9 +25,6 @@ export default class PlanningComponent extends Component<GameStateComponentProps
         return (
             <>
                 <ListGroupItem>
-                    Planning Phase
-                </ListGroupItem>
-                <ListGroupItem>
                     <Row>
                         <Col xs={12}>
                             Assign an order to each region in which one of your unit is present.

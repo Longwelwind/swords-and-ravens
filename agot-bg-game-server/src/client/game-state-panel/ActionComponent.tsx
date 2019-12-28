@@ -23,9 +23,6 @@ export default class ActionComponent extends Component<GameStateComponentProps<A
         return (
             <>
                 <ListGroupItem>
-                    <strong>Action Phase</strong>
-                </ListGroupItem>
-                <ListGroupItem>
                     {renderChildGameState(this.props, [
                         [UseRavenGameState, UseRavenGameStatePanelComponent],
                         [ResolveMarchOrderGameState, ResolveMarchOrderComponent],
