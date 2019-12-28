@@ -16,6 +16,7 @@ import {westerosCardTypes} from "../common/ingame-game-state/game-data-structure
 import {observer} from "mobx-react";
 import WildlingCardComponent from "./game-state-panel/utils/WildlingCardComponent";
 import WildlingCard from "../common/ingame-game-state/game-data-structure/wildling-card/WildlingCard";
+import WesterosCardComponent from "./game-state-panel/utils/WesterosCardComponent";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -113,9 +114,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <>
-                        (<b>{data.cardI + 1}</b>) <b>{westerosCardType.name}</b>
                         <p>
-                            {westerosCardType.description}
+                            Executing the next Westeros card:
+                        </p>
+                        <p>
+                            <Row className="justify-content-center">
+                                <Col xs="auto">
+                                    <WesterosCardComponent cardType={westerosCardType} size="small" tooltip={true}/>
+                                </Col>
+                            </Row>
                         </p>
                     </>
                 );
@@ -125,7 +132,18 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <>
-                        Drawn westeros cards: {drawnWesterosCardTypes.map(wct => wct.name).join(", ")}.
+                        <p>
+                            Westeros cards were drawn:
+                        </p>
+                        <p>
+                            <Row className="justify-content-around">
+                                {drawnWesterosCardTypes.map((wct, i) => (
+                                    <Col xs="auto" key={i}>
+                                        <WesterosCardComponent cardType={wct} size="small" tooltip={true}/>
+                                    </Col>
+                                ))}
+                            </Row>
+                        </p>
                         {data.addedWildlingStrength > 0 && (
                             <p>Wildling strength increased by {data.addedWildlingStrength}</p>
                         )}
