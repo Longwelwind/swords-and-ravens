@@ -1,4 +1,4 @@
-import {Component} from "react";
+import {Component, ReactNode} from "react";
 import GameClient from "./GameClient";
 import * as React from "react";
 import {observer} from "mobx-react";
@@ -40,6 +40,7 @@ import housePowerTokensImages from "./housePowerTokensImages";
 import marked from "marked";
 import GameLogListComponent from "./GameLogListComponent";
 import HouseCardComponent from "./game-state-panel/utils/HouseCardComponent";
+import Game from "../common/ingame-game-state/game-data-structure/Game";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -50,11 +51,17 @@ interface IngameComponentProps {
 export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
 
-    get game() {
+    get game(): Game {
         return this.props.gameState.game;
     }
 
-    render() {
+    render(): ReactNode {
+        const phases = [
+            {name: "Westeros", gameState: WesterosGameState, component: WesterosGameStateComponent},
+            {name: "Planning", gameState: PlanningGameState, component: PlanningComponent},
+            {name: "Action", gameState: ActionGameState, component: ActionComponent}
+        ];
+
         return (
             <>
                 <Col xs={12} lg={3}>
@@ -278,11 +285,26 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         <Col>
                             <Card>
                                 <ListGroup variant="flush">
-                                    {renderChildGameState({mapControls: this.mapControls, ...this.props}, [
-                                        [WesterosGameState, WesterosGameStateComponent],
-                                        [PlanningGameState, PlanningComponent],
-                                        [ActionGameState, ActionComponent]
-                                    ])}
+                                    <ListGroupItem>
+                                        <Row className="justify-content-between">
+                                            {phases.map((phase, i) => (
+                                                <Col xs="auto" key={i}>
+                                                    {this.props.gameState.childGameState instanceof phase.gameState ? (
+                                                        <strong className="weak-outline">{phase.name} phase</strong>
+                                                    ) : (
+                                                        <span className="text-muted">
+                                                            {phase.name} phase
+                                                        </span>
+                                                    )}
+
+                                                </Col>
+                                            ))}
+                                        </Row>
+                                    </ListGroupItem>
+                                    {renderChildGameState(
+                                        {mapControls: this.mapControls, ...this.props},
+                                        phases.map(phase => [phase.gameState, phase.component])
+                                    )}
                                 </ListGroup>
                             </Card>
                         </Col>

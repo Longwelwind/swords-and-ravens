@@ -30,9 +30,6 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
     render() {
         return (
             <>
-                <ListGroupItem>
-                    <strong>Westeros Phase</strong>
-                </ListGroupItem>
                 {this.props.gameState.childGameState instanceof WildlingAttackGameState && this.props.gameState.currentCardI == 0 ? (
                     renderChildGameState(this.props, [[WildlingAttackGameState, WildlingAttackComponent]])
                 ) : (
