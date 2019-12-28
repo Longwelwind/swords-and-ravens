@@ -8,11 +8,16 @@ import House from "../../game-data-structure/House";
 import {ClientMessage} from "../../../../messages/ClientMessage";
 import Player from "../../Player";
 import {ServerMessage} from "../../../../messages/ServerMessage";
+import IngameGameState from "../../IngameGameState";
 
 export default class MusteringGameState extends GameState<WesterosGameState, PlayerMusteringGameState> {
 
     get game() {
         return this.parentGameState.game;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.ingameGameState;
     }
 
     firstStart() {

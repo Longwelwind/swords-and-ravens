@@ -271,8 +271,8 @@ $strong-outline: rgba($outline-color, 0.8);
   animation: 1s ease-out 3s infinite normal both running background_fade;
 }
 
-.game-log-content p {
-  margin-bottom: 6px;
+.game-log-content p, .game-log-content ul {
+  margin-bottom: 0.5em;
 }
 
 .game-log-content p:last-child {
