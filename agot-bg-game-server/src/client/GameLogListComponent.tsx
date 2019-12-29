@@ -16,6 +16,8 @@ import {westerosCardTypes} from "../common/ingame-game-state/game-data-structure
 import {observer} from "mobx-react";
 import WildlingCardComponent from "./game-state-panel/utils/WildlingCardComponent";
 import WildlingCard from "../common/ingame-game-state/game-data-structure/wildling-card/WildlingCard";
+import WesterosCardComponent from "./game-state-panel/utils/WesterosCardComponent";
+import _ from "lodash";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -93,7 +95,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 );
 
             case "march-resolved":
-                const house = this.game.houses.get(data.house);
+                let house = this.game.houses.get(data.house);
                 const startingRegion = this.world.regions.get(data.startingRegion);
                 const moves: [Region, UnitType[]][] = data.moves.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
 
@@ -113,9 +115,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <>
-                        (<b>{data.cardI + 1}</b>) <b>{westerosCardType.name}</b>
                         <p>
-                            {westerosCardType.description}
+                            Executing the next Westeros card:
+                        </p>
+                        <p>
+                            <Row className="justify-content-center">
+                                <Col xs="auto">
+                                    <WesterosCardComponent cardType={westerosCardType} size="small" tooltip={true}/>
+                                </Col>
+                            </Row>
                         </p>
                     </>
                 );
@@ -125,7 +133,18 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <>
-                        Drawn westeros cards: {drawnWesterosCardTypes.map(wct => wct.name).join(", ")}.
+                        <p>
+                            Westeros cards were drawn:
+                        </p>
+                        <p>
+                            <Row className="justify-content-around">
+                                {drawnWesterosCardTypes.map((wct, i) => (
+                                    <Col xs="auto" key={i}>
+                                        <WesterosCardComponent cardType={wct} size="small" tooltip={true}/>
+                                    </Col>
+                                ))}
+                            </Row>
+                        </p>
                         {data.addedWildlingStrength > 0 && (
                             <p>Wildling strength increased by {data.addedWildlingStrength}</p>
                         )}
@@ -235,6 +254,37 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <>
                         <strong>{highestBidder.name}</strong> was chosen as the highest bidder.
+                    </>
+                );
+
+            case "player-mustered":
+                house = this.game.houses.get(data.house);
+                    const musterings = _.flatMap(data.musterings.map(([_, musterements]: [string, {region: string, from: string | null, to: string}[]]) =>
+                    musterements.map(({region, from, to}) => ({
+                        region: this.game.world.regions.get(region),
+                        from: from ? unitTypes.get(from) : null,
+                        to: unitTypes.get(to)
+                    }))
+                ));
+
+                return (
+                    <>
+                        <p>
+                            <strong>{house.name}</strong> mustered:
+                        </p>
+                        <ul>
+                            {musterings.map(({region, from, to}) => (
+                                <li>
+                                    {from ? (
+                                        <>
+                                            A <strong>{to.name}</strong> from a <strong>{from.name}</strong> in <strong>{region.name}</strong>
+                                        </>
+                                    ) : (
+                                        <>A <strong>{to.name}</strong> in <strong>{region.name}</strong></>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
                     </>
                 );
         }

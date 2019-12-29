@@ -14,6 +14,7 @@ import PlayerMusteringGameState, {
     SerializedPlayerMusteringGameState
 } from "../../westeros-game-state/mustering-game-state/player-mustering-game-state/PlayerMusteringGameState";
 import Region from "../../game-data-structure/Region";
+import IngameGameState from "../../IngameGameState";
 
 export default class ResolveConsolidatePowerGameState extends GameState<ActionGameState, PlayerMusteringGameState> {
     get game(): Game {
@@ -26,6 +27,10 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
 
     get actionGameState(): ActionGameState {
         return this.parentGameState;
+    }
+
+    get ingame(): IngameGameState {
+        return this.actionGameState.ingameGameState;
     }
 
     firstStart(): void {

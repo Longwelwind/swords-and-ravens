@@ -16,6 +16,7 @@ import ResolveConsolidatePowerGameState
 import ConsolidatePowerOrderType from "../../../game-data-structure/order-types/ConsolidatePowerOrderType";
 import {ServerMessage} from "../../../../../messages/ServerMessage";
 import RegionKind from "../../../game-data-structure/RegionKind";
+import IngameGameState from "../../../IngameGameState";
 
 export type Mustering = {from: Unit | null; region: Region; to: UnitType};
 
@@ -28,6 +29,7 @@ export enum PlayerMusteringType {
 interface ParentGameState extends GameState<any, any> {
     game: Game;
     entireGame: EntireGame;
+    ingame: IngameGameState;
 
     onPlayerMusteringEnd(house: House, musterings: Region[]): void;
 }
@@ -161,6 +163,14 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
             this.entireGame.broadcastToClients({
                 type: "add-units",
                 units: totalAddedUnits.entries.map(([region, units]) => ([region.id, units.map(u => u.serializeToClient())]))
+            });
+
+            this.parentGameState.ingame.log({
+                type: "player-mustered",
+                house: this.house.id,
+                musterings: musterings.map((region, musterings) =>
+                    [region.id, musterings.map(m => ({region: m.region.id, from: m.from ? m.from.type.id : null, to: m.to.id}))]
+                )
             });
 
             this.parentGameState.onPlayerMusteringEnd(this.house, musterings.entries.map(([region, _]) => region));

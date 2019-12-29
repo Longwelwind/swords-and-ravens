@@ -132,8 +132,8 @@ $grid-gutter-width: 1rem;
   background-repeat: no-repeat;
 }
 
-$game-card-width: 280px;
-$game-card-height: 439px;
+$game-card-width: 270px;
+$game-card-height: 1.57 * $game-card-width;
 $medium-scale: 0.5;
 $small-scale: 0.2;
 
@@ -269,6 +269,10 @@ $strong-outline: rgba($outline-color, 0.8);
 
 .game-log-entry {
   animation: 1s ease-out 3s infinite normal both running background_fade;
+}
+
+.game-log-content p, .game-log-content ul {
+  margin-bottom: 0.5em;
 }
 
 .game-log-content p:last-child {

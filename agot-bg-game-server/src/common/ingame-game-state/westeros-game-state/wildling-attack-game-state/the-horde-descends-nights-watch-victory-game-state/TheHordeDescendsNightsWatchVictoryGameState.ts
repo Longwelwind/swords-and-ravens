@@ -9,6 +9,7 @@ import PlayerMusteringGameState, {
     SerializedPlayerMusteringGameState
 } from "../../mustering-game-state/player-mustering-game-state/PlayerMusteringGameState";
 import House from "../../../game-data-structure/House";
+import IngameGameState from "../../../IngameGameState";
 
 export default class TheHordeDescendsNightsWatchVictoryGameState extends GameState<
     WildlingAttackGameState,
@@ -16,6 +17,10 @@ export default class TheHordeDescendsNightsWatchVictoryGameState extends GameSta
     > {
     get game(): Game {
         return this.parentGameState.game;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.parentGameState.ingameGameState;
     }
 
     firstStart(): void {

@@ -5,7 +5,7 @@ export default interface GameLog {
 
 export type GameLogData = TurnBegin | SupportDeclared | HouseCardChosen | Attack | MarchResolved
     | WesterosCardExecuted | WesterosCardDrawn | CombatResult | WildlingCardRevealed | WildlingBidding
-    | HighestBidderChosen | LowestBidderChosen;
+    | HighestBidderChosen | LowestBidderChosen | PlayerMustered;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -86,4 +86,10 @@ interface HighestBidderChosen {
 interface LowestBidderChosen {
     type: "lowest-bidder-chosen";
     lowestBidder: string;
+}
+
+interface PlayerMustered {
+    type: "player-mustered";
+    house: string;
+    musterings: [string, {from: string | null; to: string; region: string}[]][];
 }
