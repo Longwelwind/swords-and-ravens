@@ -147,7 +147,6 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                     region.garrison = 0;
                     this.resolveMarchOrderGameState.moveUnits(startingRegion, army, region);
 
-
                     this.actionGameState.ingameGameState.log({
                         type: "attack",
                         attacker: this.house.id,
@@ -173,7 +172,9 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                 order: null
             });
 
-            this.resolveMarchOrderGameState.onResolveSingleMarchOrderGameStateFinish(this.house);
+            if (!this.parentGameState.ingameGameState.checkVictoryConditions()) {
+                this.resolveMarchOrderGameState.onResolveSingleMarchOrderGameStateFinish(this.house);
+            }
         }
     }
 

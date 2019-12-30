@@ -1,4 +1,6 @@
 {
+  "structuresCountNeededToWin": 7,
+  "maxTurns": 10,
   "tracks": {
     "ironThrone": ["baratheon", "lannister", "stark", "martell", "greyjoy", "tyrell"],
     "fiefdoms": ["greyjoy", "tyrell", "martell", "stark", "baratheon", "lannister"],

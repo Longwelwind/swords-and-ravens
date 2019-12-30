@@ -43,6 +43,8 @@ import HouseCardComponent from "./game-state-panel/utils/HouseCardComponent";
 import Game from "../common/ingame-game-state/game-data-structure/Game";
 import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
 import unitImages from "./unitImages";
+import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
+import GameEndedComponent from "./game-state-panel/GameEndedComponent";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -58,7 +60,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     render(): ReactNode {
-        const phases = [
+        const phases: {name: string; gameState: any; component: typeof Component}[] = [
             {name: "Westeros", gameState: WesterosGameState, component: WesterosGameStateComponent},
             {name: "Planning", gameState: PlanningGameState, component: PlanningComponent},
             {name: "Action", gameState: ActionGameState, component: ActionComponent}
@@ -307,25 +309,30 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         <Col>
                             <Card>
                                 <ListGroup variant="flush">
-                                    <ListGroupItem>
-                                        <Row className="justify-content-between">
-                                            {phases.map((phase, i) => (
-                                                <Col xs="auto" key={i}>
-                                                    {this.props.gameState.childGameState instanceof phase.gameState ? (
-                                                        <strong className="weak-outline">{phase.name} phase</strong>
-                                                    ) : (
-                                                        <span className="text-muted">
+                                    {phases.some(phase => this.props.gameState.childGameState instanceof phase.gameState) && (
+                                        <ListGroupItem>
+                                            <Row className="justify-content-between">
+                                                {phases.map((phase, i) => (
+                                                    <Col xs="auto" key={i}>
+                                                        {this.props.gameState.childGameState instanceof phase.gameState ? (
+                                                            <strong className="weak-outline">{phase.name} phase</strong>
+                                                        ) : (
+                                                            <span className="text-muted">
                                                             {phase.name} phase
                                                         </span>
-                                                    )}
+                                                        )}
 
-                                                </Col>
-                                            ))}
-                                        </Row>
-                                    </ListGroupItem>
+                                                    </Col>
+                                                ))}
+                                            </Row>
+                                        </ListGroupItem>
+                                    )}
                                     {renderChildGameState(
                                         {mapControls: this.mapControls, ...this.props},
-                                        phases.map(phase => [phase.gameState, phase.component])
+                                        _.concat(
+                                            phases.map(phase => [phase.gameState, phase.component] as [any, typeof Component]),
+                                            [[GameEndedGameState, GameEndedComponent]]
+                                        )
                                     )}
                                 </ListGroup>
                             </Card>

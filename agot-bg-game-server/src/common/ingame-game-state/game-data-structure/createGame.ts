@@ -106,6 +106,8 @@ export default function createGame(housesToCreate: string[]): Game {
         })
     );
 
+    game.maxTurns = baseGameData.maxTurns;
+    game.structuresCountNeededToWin = baseGameData.structuresCountNeededToWin;
     game.supplyRestrictions = baseGameData.supplyRestrictions;
 
     // Load tracks starting positions

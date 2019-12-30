@@ -12,6 +12,7 @@ import shuffle from "../../../utils/shuffle";
 import WildlingCard, {SerializedWildlingCard} from "./wildling-card/WildlingCard";
 import BetterMap from "../../../utils/BetterMap";
 import HouseCard from "./house-card/HouseCard";
+import {land} from "./regionTypes";
 
 export const MAX_WILDLING_STRENGTH = 12;
 
@@ -31,6 +32,8 @@ export default class Game {
     starredOrderRestrictions: number[];
     westerosDecks: WesterosCard[][];
     skipRavenPhase: boolean;
+    structuresCountNeededToWin: number;
+    maxTurns: number;
 
     get ironThroneHolder(): House {
         return this.getTokenHolder(this.ironThroneTrack);
@@ -102,6 +105,23 @@ export default class Game {
         }
 
         return nextHouse;
+    }
+
+    areVictoryConditionsFulfilled(): boolean {
+        const numberStructuresPerHouse = this.houses.values.map(h => this.getTotalHeldStructures(h));
+
+        return numberStructuresPerHouse.some(n => n >= this.structuresCountNeededToWin);
+    }
+
+    getPotentialWinner(): House {
+        const victoryConditions = [
+            (h: House) => -this.getTotalHeldStructures(h),
+            (h: House) => -this.world.regions.values.filter(r => r.getController() == h).filter(r => r.type == land),
+            (h: House) => -h.supplyLevel,
+            (h: House) => this.ironThroneTrack.indexOf(h)
+        ];
+
+        return _.sortBy(this.houses.values, victoryConditions)[0];
     }
 
     getCountUnitsOfType(house: House, unitType: UnitType): number {
@@ -280,7 +300,9 @@ export default class Game {
             supplyRestrictions: this.supplyRestrictions,
             wildlingDeck: this.wildlingDeck.map(c => c.serializeToClient()),
             starredOrderRestrictions: this.starredOrderRestrictions,
-            skipRavenPhase: this.skipRavenPhase
+            skipRavenPhase: this.skipRavenPhase,
+            structuresCountNeededToWin: this.structuresCountNeededToWin,
+            maxTurns: this.maxTurns
         };
     }
 
@@ -300,6 +322,8 @@ export default class Game {
         game.wildlingDeck = data.wildlingDeck.map(c => WildlingCard.deserializeFromServer(c));
         game.starredOrderRestrictions = data.starredOrderRestrictions;
         game.skipRavenPhase = data.skipRavenPhase;
+        game.structuresCountNeededToWin = data.structuresCountNeededToWin;
+        game.maxTurns = data.maxTurns;
 
         return game;
     }
@@ -319,4 +343,6 @@ export interface SerializedGame {
     wildlingDeck: SerializedWildlingCard[];
     supplyRestrictions: number[][];
     skipRavenPhase: boolean;
+    structuresCountNeededToWin: number;
+    maxTurns: number;
 }
