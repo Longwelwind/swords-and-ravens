@@ -233,6 +233,8 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                     .filter(rule => rule.from
                         ? this.getPotentialUnitForUpgrading(musterings, recruitmentRegion, rule.from) != null
                         : true)
+                    // Check that the mustering doesn't hit unit limits
+                    .filter(rule => this.game.getAvailableUnitsOfType(this.house, rule.to) > 0)
                     // Check that the mustering respects supply
                     // An upgrade always respect supply (one unit is removed, one unit is added)
                     // A mustering may break supply
