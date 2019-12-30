@@ -88,7 +88,7 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         return null;
     }
 
-    moveUnits(from: Region, units: Unit[], to: Region): void {
+    moveUnits(from: Region, units: Unit[], to: Region): boolean {
         const controllerToRegion = to.getController();
 
         if (controllerToRegion != units[0].allegiance) {
@@ -124,6 +124,8 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
             to: to.id,
             units: units.map(u => u.id)
         });
+
+        return this.ingameGameState.checkVictoryConditions();
     }
 
     onPlayerMessage(player: Player, message: ClientMessage) {

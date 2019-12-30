@@ -216,6 +216,8 @@ function setup4PlayersGameIngame(
             }
         ],
         game: {
+            maxTurns: 10,
+            structuresCountNeededToWin: 7,
             lastUnitId: -1,
             wildlingStrength: setupOptions.wildlingStrength,
             wildlingDeck: setupOptions.wildlingDeck.map(c => ({id: ++lastWildlingCardId, type: c.type})),

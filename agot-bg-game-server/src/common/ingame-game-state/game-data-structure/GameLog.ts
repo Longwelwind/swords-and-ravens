@@ -5,7 +5,7 @@ export default interface GameLog {
 
 export type GameLogData = TurnBegin | SupportDeclared | HouseCardChosen | Attack | MarchResolved
     | WesterosCardExecuted | WesterosCardDrawn | CombatResult | WildlingCardRevealed | WildlingBidding
-    | HighestBidderChosen | LowestBidderChosen | PlayerMustered;
+    | HighestBidderChosen | LowestBidderChosen | PlayerMustered | WinnerDeclared;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -92,4 +92,9 @@ interface PlayerMustered {
     type: "player-mustered";
     house: string;
     musterings: [string, {from: string | null; to: string; region: string}[]][];
+}
+
+interface WinnerDeclared {
+    type: "winner-declared";
+    winner: string;
 }

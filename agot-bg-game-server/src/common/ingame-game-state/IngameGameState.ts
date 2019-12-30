@@ -18,8 +18,12 @@ import Unit from "./game-data-structure/Unit";
 import PlanningRestriction from "./game-data-structure/westeros-card/planning-restriction/PlanningRestriction";
 import GameLogManager, {SerializedGameLogManager} from "./game-data-structure/GameLogManager";
 import {GameLogData} from "./game-data-structure/GameLog";
+import GameEndedGameState, {SerializedGameEndedGameState} from "./game-ended-game-state/GameEndedGameState";
 
-export default class IngameGameState extends GameState<EntireGame, WesterosGameState | PlanningGameState | ActionGameState> {
+export default class IngameGameState extends GameState<
+    EntireGame,
+    WesterosGameState | PlanningGameState | ActionGameState | GameEndedGameState
+> {
     players: BetterMap<User, Player> = new BetterMap<User, Player>();
     game: Game;
     gameLogManager: GameLogManager = new GameLogManager(this);
@@ -75,6 +79,12 @@ export default class IngameGameState extends GameState<EntireGame, WesterosGameS
     }
 
     beginNewTurn(): void {
+        if (this.game.turn == this.game.maxTurns) {
+            const winner = this.game.getPotentialWinner();
+            this.setChildGameState(new GameEndedGameState(this)).firstStart(winner);
+            return;
+        }
+
         this.game.turn++;
         this.log({type: "turn-begin", turn: this.game.turn});
 
@@ -100,6 +110,24 @@ export default class IngameGameState extends GameState<EntireGame, WesterosGameS
             const player = this.players.get(user);
 
             this.childGameState.onPlayerMessage(player, message);
+        }
+    }
+
+    checkVictoryConditions(): boolean {
+        if (this.game.areVictoryConditionsFulfilled()) {
+            // Game is finished
+            const winner = this.game.getPotentialWinner();
+
+            this.log({
+                type: "winner-declared",
+                winner: winner.id
+            });
+
+            this.setChildGameState(new GameEndedGameState(this)).firstStart(winner);
+
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -208,15 +236,16 @@ export default class IngameGameState extends GameState<EntireGame, WesterosGameS
         return ingameGameState;
     }
 
-    deserializeChildGameState(data: SerializedIngameGameState["childGameState"]) {
-        if (data.type == "planning") {
-            return PlanningGameState.deserializeFromServer(this, data);
-        } else if (data.type == "action") {
-            return ActionGameState.deserializeFromServer(this, data);
-        } else if (data.type == "westeros") {
-            return WesterosGameState.deserializeFromServer(this, data);
-        } else {
-            throw new Error();
+    deserializeChildGameState(data: SerializedIngameGameState["childGameState"]): IngameGameState["childGameState"] {
+        switch (data.type) {
+            case "westeros":
+                return WesterosGameState.deserializeFromServer(this, data);
+            case "planning":
+                return PlanningGameState.deserializeFromServer(this, data);
+            case "action":
+                return ActionGameState.deserializeFromServer(this, data);
+            case "game-ended":
+                return GameEndedGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -226,5 +255,6 @@ export interface SerializedIngameGameState {
     players: SerializedPlayer[];
     game: SerializedGame;
     gameLogManager: SerializedGameLogManager;
-    childGameState: SerializedPlanningGameState | SerializedActionGameState | SerializedWesterosGameState;
+    childGameState: SerializedPlanningGameState | SerializedActionGameState | SerializedWesterosGameState
+        | SerializedGameEndedGameState;
 }

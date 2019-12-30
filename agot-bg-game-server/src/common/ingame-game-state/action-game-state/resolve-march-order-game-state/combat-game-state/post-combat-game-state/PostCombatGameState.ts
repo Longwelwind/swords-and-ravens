@@ -228,7 +228,9 @@ export default class PostCombatGameState extends GameState<
 
 
     onAfterCombatHouseCardAbilitiesFinish(): void {
-        this.combat.resolveMarchOrderGameState.onCombatGameStateEnd(this.attacker);
+        if (!this.parentGameState.ingameGameState.checkVictoryConditions()) {
+            this.combat.resolveMarchOrderGameState.onCombatGameStateEnd(this.attacker);
+        }
     }
 
     markHouseAsUsed(house: House, houseCard: HouseCard | null): void {

@@ -287,6 +287,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         </ul>
                     </>
                 );
+
+            case "winner-declared":
+                return (
+                    <>Game ended</>
+                );
         }
     }
 }
