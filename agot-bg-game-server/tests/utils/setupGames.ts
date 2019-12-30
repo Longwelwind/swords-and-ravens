@@ -185,7 +185,13 @@ function setup4PlayersGameIngame(
                     hco.towerIcons ? hco.towerIcons : 0, hco.abilityId ? hco.abilityId : null,
                     hco.state ? hco.state : HouseCardState.AVAILABLE
                 )
-            )
+            ),
+            unitLimits: [
+                ["footman", 10],
+                ["knight", 5],
+                ["ship", 6],
+                ["siege-engine", 2]
+            ] as [string, number][]
         };
     };
 

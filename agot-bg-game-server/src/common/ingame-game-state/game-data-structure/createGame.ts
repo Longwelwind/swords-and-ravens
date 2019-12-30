@@ -95,8 +95,12 @@ export default function createGame(housesToCreate: string[]): Game {
                         return [houseCardId, houseCard];
                     })
             );
+            const unitLimits = new BetterMap(
+                Object.entries(houseData.unitLimits as {[key: string]: number})
+                    .map(([unitTypeId, limit]) => [unitTypes.get(unitTypeId), limit])
+            );
 
-            const house = new House(hid, houseData.name, houseData.color, houseCards, 5, houseData.supplyLevel);
+            const house = new House(hid, houseData.name, houseData.color, houseCards, unitLimits, 5, houseData.supplyLevel);
 
             return [hid, house];
         })

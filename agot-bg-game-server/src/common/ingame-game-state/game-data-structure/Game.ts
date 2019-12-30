@@ -104,6 +104,14 @@ export default class Game {
         return nextHouse;
     }
 
+    getCountUnitsOfType(house: House, unitType: UnitType): number {
+        return this.world.getUnitsOfHouse(house).filter(u => u.type == unitType).length;
+    }
+
+    getAvailableUnitsOfType(house: House, unitType: UnitType): number {
+        return house.unitLimits.get(unitType) - this.getCountUnitsOfType(house, unitType);
+    }
+
     createUnit(unitType: UnitType, allegiance: House): Unit {
         this.lastUnitId++;
         return new Unit(this.lastUnitId, unitType, allegiance);

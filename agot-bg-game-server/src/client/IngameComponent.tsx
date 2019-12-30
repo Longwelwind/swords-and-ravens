@@ -41,6 +41,8 @@ import marked from "marked";
 import GameLogListComponent from "./GameLogListComponent";
 import HouseCardComponent from "./game-state-panel/utils/HouseCardComponent";
 import Game from "../common/ingame-game-state/game-data-structure/Game";
+import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
+import unitImages from "./unitImages";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -235,6 +237,26 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     <a href={`/user/${p.user.id}`} target="_blank">
                                                         <small>{p.user.name}</small>
                                                     </a>
+                                                </Col>
+                                                <Col xs="auto">
+                                                    <Row className="justify-content-center align-items-center" style={{width: 110}}>
+                                                        {unitTypes.values.map(type => (
+                                                            <Col xs={6} key={type.id}>
+                                                                <Row className="justify-content-center no-gutters align-items-center">
+                                                                    <Col xs="auto">
+                                                                        {this.game.getAvailableUnitsOfType(p.house, type)}
+                                                                    </Col>
+                                                                    <Col xs="auto" style={{marginLeft: 4}}>
+                                                                        <div className="unit-icon small hover-weak-outline"
+                                                                             style={{
+                                                                                 backgroundImage: `url(${unitImages.get(p.house.id).get(type.id)})`,
+                                                                             }}
+                                                                        />
+                                                                    </Col>
+                                                                </Row>
+                                                            </Col>
+                                                        ))}
+                                                    </Row>
                                                 </Col>
                                                 <Col xs="auto" className="d-flex align-items-center">
                                                     <div style={{fontSize: "18px"}}>{this.game.getTotalHeldStructures(p.house)}</div>

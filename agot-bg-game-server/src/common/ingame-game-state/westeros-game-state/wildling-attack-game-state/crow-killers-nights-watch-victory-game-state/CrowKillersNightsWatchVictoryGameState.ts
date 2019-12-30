@@ -18,6 +18,22 @@ export default class CrowKillersNightsWatchVictoryGameState extends GameState<Wi
     }
 
     firstStart(): void {
+        const house = this.parentGameState.highestBidder;
+        let count = 2;
+
+        const availableFootmen = this.getAllFootmen();
+
+        count = Math.min(count, availableFootmen.length);
+
+        const availableKnights = this.game.getAvailableUnitsOfType(house, knight);
+
+        count = Math.min(count, availableKnights);
+
+        if (count == 0) {
+            this.parentGameState.onWildlingCardExecuteEnd();
+            return;
+        }
+
         this.setChildGameState(new SelectUnitsGameState(this)).firstStart(
             this.parentGameState.highestBidder,
             this.getAllFootmen(),

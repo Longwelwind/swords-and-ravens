@@ -27,11 +27,13 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
     firstStart(house: House): void {
         const upgradableFootmen = this.getUpgradableFootmen(house);
 
-        if (upgradableFootmen.length > 0) {
+        if (this.game.getAvailableUnitsOfType(house, knight) == 0) {
+            this.parentGameState.parentGameState.onHouseCardResolutionFinish();
+        } else if (upgradableFootmen.length == 0) {
+            this.parentGameState.parentGameState.onHouseCardResolutionFinish();
+        } else {
             this.setChildGameState(new SelectUnitsGameState(this))
                 .firstStart(house, upgradableFootmen, 1);
-        } else {
-            this.parentGameState.parentGameState.onHouseCardResolutionFinish();
         }
     }
 
@@ -56,7 +58,7 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
     onSelectUnitsEnd(house: House, selectedUnit: [Region, Unit[]][]): void {
         // Upgrade the footmen to a knight
         // Even tough they should be only one unit in "selectedUnit",
-        // the following code is generic for all units in it.
+        // the following code is generic for all units in it.house
         selectedUnit.forEach(([region, footmenToRemove]) => {
             footmenToRemove.forEach(u => region.units.delete(u.id));
 

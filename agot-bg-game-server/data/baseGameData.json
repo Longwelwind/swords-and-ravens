@@ -285,6 +285,12 @@
     "lannister": {
       "name": "Lannister",
       "color": "#dc3545",
+      "unitLimits": {
+        "footman": 10,
+        "knight": 5,
+        "ship": 6,
+        "siege-engine": 2
+      },
       "houseCards": {
         "tywin-lannister": {
           "name": "Tywin Lannister",
@@ -326,6 +332,12 @@
     "stark": {
       "name": "Stark",
       "color": "#f8f9fa",
+      "unitLimits": {
+        "footman": 10,
+        "knight": 5,
+        "ship": 6,
+        "siege-engine": 2
+      },
       "houseCards": {
         "eddard-stark": {
           "name": "Eddard Stark",
@@ -367,6 +379,12 @@
     "baratheon": {
       "name": "Baratheon",
       "color": "#ffc107",
+      "unitLimits": {
+        "footman": 10,
+        "knight": 5,
+        "ship": 6,
+        "siege-engine": 2
+      },
       "houseCards": {
         "stannis-baratheon": {
           "name": "Stannis Baratheon",
@@ -408,6 +426,12 @@
     "greyjoy": {
       "name": "Greyjoy",
       "color": "#6c757d",
+      "unitLimits": {
+        "footman": 10,
+        "knight": 5,
+        "ship": 6,
+        "siege-engine": 2
+      },
       "houseCards": {
         "euron-crows-eye": {
           "name": "Euron Crow's Eye",
@@ -450,6 +474,12 @@
     "martell": {
       "name": "Martell",
       "color": "orange",
+      "unitLimits": {
+        "footman": 10,
+        "knight": 5,
+        "ship": 6,
+        "siege-engine": 2
+      },
       "houseCards": {
         "the-red-viper": {
           "name": "The Red Viper",
@@ -492,6 +522,12 @@
     "tyrell": {
       "name": "Tyrell",
       "color": "#28a745",
+      "unitLimits": {
+        "footman": 10,
+        "knight": 5,
+        "ship": 6,
+        "siege-engine": 2
+      },
       "houseCards": {
         "mace-tyrell": {
           "name": "Mace Tyrell",
