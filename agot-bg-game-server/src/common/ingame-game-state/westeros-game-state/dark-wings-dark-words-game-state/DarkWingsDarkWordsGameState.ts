@@ -26,6 +26,12 @@ export default class DarkWingsDarkWordsGameState extends GameState<WesterosGameS
     }
 
     onSimpleChoiceGameStateEnd(choice: number) {
+        this.parentGameState.ingameGameState.log({
+            type: "dark-wings-dark-words-choice",
+            house: this.childGameState.house.id,
+            choice
+        });
+
         if (choice == 0) {
             clashOfKings.execute(this.parentGameState);
         } else if (choice == 1) {

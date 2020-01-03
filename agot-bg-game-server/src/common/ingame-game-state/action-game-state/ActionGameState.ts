@@ -43,6 +43,10 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
     firstStart(ordersOnBoard: BetterMap<Region, Order>): void {
         this.ordersOnBoard = ordersOnBoard;
 
+        this.ingameGameState.log({
+            type: "action-phase-began"
+        });
+
         if (!this.game.skipRavenPhase) {
             this.setChildGameState(new UseRavenGameState(this)).firstStart();
         } else {

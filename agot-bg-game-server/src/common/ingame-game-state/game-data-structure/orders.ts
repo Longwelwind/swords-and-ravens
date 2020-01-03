@@ -15,7 +15,7 @@ export const marchOrder = new Order(2, march);
 
 export const firstSupportOrder = new Order(7, support);
 
-const orders = new BetterMap([
+const orders = new BetterMap<number, Order>([
     [marchMinusOneOrder.id, marchMinusOneOrder],
     [marchOrder.id, marchOrder],
     [3, new Order(3, marchPlusOne)],

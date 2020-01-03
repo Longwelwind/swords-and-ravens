@@ -10,7 +10,7 @@ import Player from "../../Player";
 import {ClientMessage} from "../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../messages/ServerMessage";
 
-export default class ThronesOfBladesGameState extends GameState<WesterosGameState, SimpleChoiceGameState> {
+export default class AThroneOfBladesGameState extends GameState<WesterosGameState, SimpleChoiceGameState> {
     get game(): Game {
         return this.parentGameState.game;
     }
@@ -23,6 +23,12 @@ export default class ThronesOfBladesGameState extends GameState<WesterosGameStat
     }
 
     onSimpleChoiceGameStateEnd(choice: number): void {
+        this.parentGameState.ingameGameState.log({
+            type: "a-throne-of-blades-choice",
+            house: this.childGameState.house.id,
+            choice
+        });
+
         if (choice == 0) {
             mustering.execute(this.parentGameState);
         } else if (choice == 1) {
@@ -40,27 +46,27 @@ export default class ThronesOfBladesGameState extends GameState<WesterosGameStat
         this.childGameState.onServerMessage(message);
     }
 
-    serializeToClient(admin: boolean, player: Player | null): SerializedThronesOfBladesGameState {
+    serializeToClient(admin: boolean, player: Player | null): SerializedAThroneOfBladesGameState {
         return {
-            type: "thrones-of-blades",
+            type: "a-throne-of-blades",
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
 
-    static deserializeFromServer(westeros: WesterosGameState, data: SerializedThronesOfBladesGameState): ThronesOfBladesGameState {
-        const putToTheSword = new ThronesOfBladesGameState(westeros);
+    static deserializeFromServer(westeros: WesterosGameState, data: SerializedAThroneOfBladesGameState): AThroneOfBladesGameState {
+        const putToTheSword = new AThroneOfBladesGameState(westeros);
 
         putToTheSword.childGameState = putToTheSword.deserializeChildGameState(data.childGameState);
 
         return putToTheSword;
     }
 
-    deserializeChildGameState(data: SerializedThronesOfBladesGameState["childGameState"]): SimpleChoiceGameState {
+    deserializeChildGameState(data: SerializedAThroneOfBladesGameState["childGameState"]): SimpleChoiceGameState {
         return SimpleChoiceGameState.deserializeFromServer(this, data);
     }
 }
 
-export interface SerializedThronesOfBladesGameState {
-    type: "thrones-of-blades";
+export interface SerializedAThroneOfBladesGameState {
+    type: "a-throne-of-blades";
     childGameState: SerializedSimpleChoiceGameState;
 }

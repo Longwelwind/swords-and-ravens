@@ -11,6 +11,7 @@ import BetterMap from "../utils/BetterMap";
 import Game from "./ingame-game-state/game-data-structure/Game";
 import House from "./ingame-game-state/game-data-structure/House";
 import {GameLogData} from "./ingame-game-state/game-data-structure/GameLog";
+import GameEndedGameState from "./ingame-game-state/game-ended-game-state/GameEndedGameState";
 
 export default class EntireGame extends GameState<null, LobbyGameState | IngameGameState> {
     id: string;
@@ -131,6 +132,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         if (this.childGameState instanceof LobbyGameState) {
             return "IN_LOBBY";
         } else {
+            const ingame = this.childGameState;
+            if (ingame.childGameState instanceof GameEndedGameState) {
+                return "FINISHED";
+            }
             return "ONGOING";
         }
     }

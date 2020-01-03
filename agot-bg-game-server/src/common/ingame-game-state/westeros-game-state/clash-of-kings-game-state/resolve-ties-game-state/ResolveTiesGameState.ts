@@ -68,7 +68,7 @@ export default class ResolveTiesGameState extends GameState<ClashOfKingsGameStat
                 })
             );
 
-            this.parentGameState.onResolveTiesGameState(finalOrdering);
+            this.parentGameState.onResolveTiesGameState(this.bidResults, finalOrdering);
         }
     }
 

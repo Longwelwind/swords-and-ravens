@@ -42,6 +42,16 @@ export default class SeeTopWildlingCardGameState extends GameState<UseRavenGameS
                 const removedCard = this.useRavenGameState.game.wildlingDeck.shift() as WildlingCard;
 
                 this.useRavenGameState.game.wildlingDeck.push(removedCard);
+
+                this.ingameGameState.log({
+                    type: "raven-holder-wildling-card-put-bottom",
+                    ravenHolder: this.ravenHolder.id
+                });
+            } else {
+                this.ingameGameState.log({
+                    type: "raven-holder-wildling-card-put-top",
+                    ravenHolder: this.ravenHolder.id
+                });
             }
 
             this.useRavenGameState.onSeeTopWildlingCardGameStateEnd();

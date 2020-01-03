@@ -21,6 +21,12 @@ export default class PutToTheSwordGameState extends GameState<WesterosGameState,
     }
 
     onSimpleChoiceGameStateEnd(choice: number) {
+        this.parentGameState.ingameGameState.log({
+            type: "put-to-the-sword-choice",
+            house: this.childGameState.house.id,
+            choice
+        });
+
         if (choice == 0) {
             rainsOfAutumn.execute(this.parentGameState);
         } else if (choice == 1) {

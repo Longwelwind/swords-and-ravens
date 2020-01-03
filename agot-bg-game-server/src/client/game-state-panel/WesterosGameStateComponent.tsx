@@ -20,8 +20,8 @@ import PutToTheSwordGameState
 import SimpleChoiceComponent from "./SimpleChoiceComponent";
 import DarkWingsDarkWordsGameState
     from "../../common/ingame-game-state/westeros-game-state/dark-wings-dark-words-game-state/DarkWingsDarkWordsGameState";
-import ThronesOfBladesGameState
-    from "../../common/ingame-game-state/westeros-game-state/thrones-of-blades-game-state/ThronesOfBladesGameState";
+import AThroneOfBladesGameState
+    from "../../common/ingame-game-state/westeros-game-state/thrones-of-blades-game-state/AThroneOfBladesGameState";
 import GameStateComponentProps from "./GameStateComponentProps";
 import renderChildGameState from "../utils/renderChildGameState";
 import Col from "react-bootstrap/Col";
@@ -50,7 +50,7 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
                     <SimpleChoiceComponent gameClient={this.props.gameClient}
                                            gameState={this.props.gameState.childGameState.childGameState}
                                            mapControls={this.props.mapControls}/>
-                ) : this.props.gameState.childGameState instanceof ThronesOfBladesGameState ? (
+                ) : this.props.gameState.childGameState instanceof AThroneOfBladesGameState ? (
                     <SimpleChoiceComponent gameClient={this.props.gameClient}
                                            gameState={this.props.gameState.childGameState.childGameState}
                                            mapControls={this.props.mapControls}/>

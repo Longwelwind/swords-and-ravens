@@ -33,7 +33,13 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
         this.childGameState.onServerMessage(message);
     }
 
-    onBiddingGameStateEnd(results: [number, House[]][]) {
+    onBiddingGameStateEnd(results: [number, House[]][]): void {
+        this.parentGameState.ingameGameState.log({
+            type: "clash-of-kings-bidding-done",
+            trackerI: this.currentTrackI,
+            results: results.map(([bid, houses]) => [bid, houses.map(h => h.id)])
+        });
+
         // Check if there's at least one tie.
         if (results.some(([_, houses]) => houses.length > 1)) {
             // Ask the iron throne holder to resolve them
@@ -42,11 +48,17 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
             // No ties, simply proceed
             const finalOrdering = results.map(([_, houses]) => houses[0]);
 
-            this.onResolveTiesGameState(finalOrdering);
+            this.onResolveTiesGameState(results, finalOrdering);
         }
     }
 
-    onResolveTiesGameState(finalOrdering: House[]) {
+    onResolveTiesGameState(_biddingResults: [number, House[]][], finalOrdering: House[]): void {
+        this.parentGameState.ingameGameState.log({
+            type: "clash-of-kings-final-ordering",
+            trackerI: this.currentTrackI,
+            finalOrder: finalOrdering.map(h => h.id)
+        });
+
         // The concept of tracks probably should have been generalized (so that the game
         // has a list of tracks, instead of 3 different variables, one for each track).
         // This would have made the code easier, but what is done is done.

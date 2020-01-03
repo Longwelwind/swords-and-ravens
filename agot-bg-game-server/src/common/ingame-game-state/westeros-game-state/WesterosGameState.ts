@@ -17,12 +17,12 @@ import ClashOfKingsGameState, {SerializedClashOfKingsGameState} from "./clash-of
 import PlanningRestriction from "../game-data-structure/westeros-card/planning-restriction/PlanningRestriction";
 import planningRestrictions from "../game-data-structure/westeros-card/planning-restriction/planningRestrictions";
 import PutToTheSwordGameState, {SerializedPutToTheSwordGameState} from "./put-to-the-swords-game-state/PutToTheSwordGameState";
-import ThronesOfBladesGameState, {SerializedThronesOfBladesGameState} from "./thrones-of-blades-game-state/ThronesOfBladesGameState";
+import AThroneOfBladesGameState, {SerializedAThroneOfBladesGameState} from "./thrones-of-blades-game-state/AThroneOfBladesGameState";
 import DarkWingsDarkWordsGameState, {SerializedDarkWingsDarkWordsGameState} from "./dark-wings-dark-words-game-state/DarkWingsDarkWordsGameState";
 
 export default class WesterosGameState extends GameState<IngameGameState,
     WildlingAttackGameState | ReconcileArmiesGameState<WesterosGameState> | MusteringGameState | ClashOfKingsGameState
-    | PutToTheSwordGameState | ThronesOfBladesGameState | DarkWingsDarkWordsGameState
+    | PutToTheSwordGameState | AThroneOfBladesGameState | DarkWingsDarkWordsGameState
 > {
     revealedCards: WesterosCard[];
     @observable currentCardI = -1;
@@ -71,6 +71,10 @@ export default class WesterosGameState extends GameState<IngameGameState,
     }
 
     firstStart(): void {
+        this.ingameGameState.log({
+            type: "westeros-phase-began"
+        });
+
         // Reveal the top cards of each deck
         this.revealedCards = this.game.westerosDecks.map(deck => {
             const card = deck.shift() as WesterosCard;
@@ -180,8 +184,8 @@ export default class WesterosGameState extends GameState<IngameGameState,
             return ClashOfKingsGameState.deserializeFromServer(this, data);
         } else if (data.type == "put-to-the-sword") {
             return PutToTheSwordGameState.deserializeFromServer(this, data);
-        } else if (data.type == "thrones-of-blades") {
-            return ThronesOfBladesGameState.deserializeFromServer(this, data);
+        } else if (data.type == "a-throne-of-blades") {
+            return AThroneOfBladesGameState.deserializeFromServer(this, data);
         } else if (data.type == "dark-wings-dark-words") {
             return DarkWingsDarkWordsGameState.deserializeFromServer(this, data);
         } else  {
@@ -197,5 +201,5 @@ export interface SerializedWesterosGameState {
     planningRestrictions: string[];
     childGameState: SerializedWildlingAttackGameState
         | SerializedReconcileArmiesGameState | SerializedMusteringGameState | SerializedClashOfKingsGameState
-        | SerializedPutToTheSwordGameState | SerializedThronesOfBladesGameState | SerializedDarkWingsDarkWordsGameState;
+        | SerializedPutToTheSwordGameState | SerializedAThroneOfBladesGameState | SerializedDarkWingsDarkWordsGameState;
 }
