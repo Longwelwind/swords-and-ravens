@@ -18,13 +18,17 @@ import WildlingCardComponent from "./game-state-panel/utils/WildlingCardComponen
 import WildlingCard from "../common/ingame-game-state/game-data-structure/wildling-card/WildlingCard";
 import WesterosCardComponent from "./game-state-panel/utils/WesterosCardComponent";
 import _ from "lodash";
+import joinReactNodes from "./utils/joinReactNodes";
+import orders from "../common/ingame-game-state/game-data-structure/orders";
+// @ts-ignore
+import autoscroll from "autoscroll-react";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
 }
 
 @observer
-export default class GameLogListComponent extends Component<GameLogListComponentProps> {
+class GameLogListComponent extends Component<GameLogListComponentProps> {
     get game(): Game {
         return this.props.ingameGameState.game;
     }
@@ -37,7 +41,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         return (
             <Card style={{height: "350px", overflowY: "scroll"}}>
                 <Card.Body>
-                    {this.props.ingameGameState.gameLogManager.logs.reverse().map((l, i) => (
+                    {this.props.ingameGameState.gameLogManager.logs.map((l, i) => (
                         <Row key={i}>
                             <Col xs="auto" className="text-muted">
                                 <small>
@@ -60,7 +64,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
     renderGameLogData(data: GameLogData): ReactNode {
         switch (data.type) {
             case "turn-begin":
-                return <>Turn <b>{data.turn}</b></>;
+                return <Row className="justify-content-center">
+                    <Col xs="auto"><hr/></Col>
+                    <Col xs="auto">
+                        <h4>Turn <b>{data.turn}</b></h4>
+                    </Col>
+                    <Col xs="auto"><hr/></Col>
+                </Row>;
 
             case "support-declared":
                 const supporter = this.game.houses.get(data.supporter);
@@ -72,7 +82,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 }
 
             case "house-card-chosen":
-                const houseCards: [House, HouseCard][] = data.houseCards.map(([houseId, houseCardId]) => {
+                let houseCards: [House, HouseCard][] = data.houseCards.map(([houseId, houseCardId]) => {
                     const house = this.game.houses.get(houseId);
                     return [house, house.houseCards.get(houseCardId)];
                 });
@@ -90,7 +100,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <>
                         <b>{attacker.name}</b> attacked <b>{attacked ? attacked.name : "a neutral force"}</b> from <b>{attackingRegion.name}</b>
-                        to <b>{attackedRegion.name}</b> with {army.map(ut => ut.name).join(', ')}.
+                        to <b>{attackedRegion.name}</b> with {joinReactNodes(army.map(ut => ut.name), ', ')}.
                     </>
                 );
 
@@ -104,7 +114,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         <b>{house.name}</b> marched from <b>{startingRegion.name}</b>:
                         <ul>
                             {moves.map(([region, unitTypes]) => (
-                                <li key={region.id}>{unitTypes.map((ut, i) => <b key={i}>{ut.name}</b>).join(", ")} to <b>{region.name}</b></li>
+                                <li key={region.id}>
+                                    {joinReactNodes(unitTypes.map((ut, i) => <b key={i}>{ut.name}</b>), ", ")} to <b>{region.name}</b>
+                                </li>
                             ))}
                         </ul>
                     </>
@@ -115,9 +127,6 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <>
-                        <p>
-                            Executing the next Westeros card:
-                        </p>
                         <p>
                             <Row className="justify-content-center">
                                 <Col xs="auto">
@@ -292,6 +301,172 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <>Game ended</>
                 );
+
+            case "raven-holder-wildling-card-put-bottom":
+                house = this.game.houses.get(data.ravenHolder);
+
+                return (
+                    <p>
+                        <strong>{house.name}</strong>, holder of the Raven token, chose to see the card at the top
+                        of the wildling card deck and to move it at the bottom of the deck.
+                    </p>
+                );
+
+            case "raven-holder-wildling-card-put-top":
+                house = this.game.houses.get(data.ravenHolder);
+
+                return (
+                    <p>
+                        <strong>{house.name}</strong>, holder of the Raven token, chose to see the card at the top
+                        of the wildling card deck and to leave it at the top of the deck.
+                    </p>
+                );
+
+            case "raid-done":
+                const raider = this.game.houses.get(data.raider);
+                const raiderRegion = this.world.regions.get(data.raiderRegion);
+                const raidee = data.raidee ? this.game.houses.get(data.raidee) : null;
+                const raidedRegion = data.raidedRegion ? this.world.regions.get(data.raidedRegion) : null;
+                const orderRaided = data.orderRaided ? orders.get(data.orderRaided) : null;
+
+                // Those 3 variables will always be all null or all non-null
+                if (raidee && raidedRegion && orderRaided) {
+                    return (
+                        <p>
+                            <strong>{raider.name}</strong> raided <strong>{raidee.name}</strong>'s <strong>{orderRaided.type.name}</strong>
+                            in <strong>{raidedRegion.name}</strong> from <strong>{raiderRegion.name}</strong>
+                        </p>
+                    );
+                } else {
+                    return (
+                        <p>
+                            <strong>{raider.name}</strong> raided nothing from <strong>{raiderRegion.name}</strong>
+                        </p>
+                    );
+                }
+
+            case "a-throne-of-blades-choice":
+                house = this.game.houses.get(data.house);
+
+                return (
+                    <p>
+                        <strong>{house.name}</strong>, holder of the Iron Throne token, chose to
+                        {data.choice == 0 ? (
+                            <>trigger a Mustering.</>
+                        ) : data.choice == 1 ? (
+                            <>trigger a Supply.</>
+                        ) : (
+                            <>trigger nothing.</>
+                        )}
+                    </p>
+                );
+
+            case "dark-wings-dark-words-choice":
+                house = this.game.houses.get(data.house);
+
+                return (
+                    <p>
+                        <strong>{house.name}</strong>, holder of the Raven token, chose to
+                        {data.choice == 0 ? (
+                            <>trigger a Clash of Kings.</>
+                        ) : data.choice == 1 ? (
+                            <>trigger a Game of Thrones.</>
+                        ) : (
+                            <>trigger nothing.</>
+                        )}
+                    </p>
+                );
+
+            case "put-to-the-sword-choice":
+                house = this.game.houses.get(data.house);
+
+                return (
+                    <p>
+                        <strong>{house.name}</strong>, holder of the Valyrian Sword token, chose to
+                        {data.choice == 0 ? (
+                            <>forbid <strong>March +1</strong> orders from being played during this Planning phase.</>
+                        ) : data.choice == 1 ? (
+                            <>forbid <strong>Defense</strong> orders from being played during this Planning phase.</>
+                        ) : (
+                            <>trigger nothing.</>
+                        )}
+                    </p>
+                );
+
+            case "winter-is-coming":
+                const drawnCardType = westerosCardTypes.get(data.drawnCardType);
+
+                return <>
+                    <strong>Winter is coming:</strong> the Westeros deck was shuffled and the new Westeros card drawn
+                    is <strong>{drawnCardType.name}</strong>.
+                </>;
+
+            case "westeros-phase-began":
+                return <Row className="justify-content-center">
+                    <Col xs="auto">
+                        <h6>Westeros Phase</h6>
+                    </Col>
+                </Row>;
+
+            case "planning-phase-began":
+                return <Row className="justify-content-center">
+                    <Col xs="auto">
+                        <h6>Planning Phase</h6>
+                    </Col>
+                </Row>;
+
+            case "action-phase-began":
+                return <Row className="justify-content-center">
+                    <Col xs="auto">
+                        <h6>Action Phase</h6>
+                    </Col>
+                </Row>;
+
+            case "combat-valyrian-sword-used":
+                house = this.game.houses.get(data.house);
+
+                return <><strong>{house.name}</strong> used the <strong>Valyrian Sword</strong>.</>;
+
+            case "combat-house-card-chosen":
+                houseCards = data.houseCards.map(([hid, hcid]) => {
+                    const house = this.game.houses.get(hid);
+                    return [house, house.houseCards.get(hcid)];
+                });
+
+                return <>
+                    <p>House cards were chosen:</p>
+                    <ul>
+                        {houseCards.map(([h, hc]) => (
+                            <li key={h.id}><strong>{h.name}</strong> chose <strong>{hc.name}</strong></li>
+                        ))}
+                    </ul>
+                </>;
+
+            case "clash-of-kings-final-ordering":
+                const finalOrder = data.finalOrder.map(hid => this.game.houses.get(hid));
+
+                return <>
+                    <p>
+                        Final order for {this.game.getNameInfluenceTrack(data.trackerI)}:
+                        {joinReactNodes(finalOrder.map(h => <strong key={h.id}>{h.name}</strong>), ", ")}
+                    </p>
+                </>;
+
+            case "clash-of-kings-bidding-done":
+                const bids = _.flatMap(data.results.map(([bid, hids]) => hids.map(hid => [bid, this.game.houses.get(hid)] as [number, House])));
+
+                return <>
+                    <p>
+                        Houses bid for the {this.game.getNameInfluenceTrack(data.trackerI)}:
+                    </p>
+                    <ul>
+                        {bids.map(([bid, house]) => (
+                            <li key={house.id}><strong>{house.name}</strong> bid <strong>{bid}</strong></li>
+                        ))}
+                    </ul>
+                </>;
         }
     }
 }
+
+export default autoscroll(GameLogListComponent);

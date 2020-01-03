@@ -5,7 +5,11 @@ export default interface GameLog {
 
 export type GameLogData = TurnBegin | SupportDeclared | HouseCardChosen | Attack | MarchResolved
     | WesterosCardExecuted | WesterosCardDrawn | CombatResult | WildlingCardRevealed | WildlingBidding
-    | HighestBidderChosen | LowestBidderChosen | PlayerMustered | WinnerDeclared;
+    | HighestBidderChosen | LowestBidderChosen | PlayerMustered | WinnerDeclared
+    | RavenHolderWildlingCardPutBottom | RavenHolderWildlingCardPutTop | RaidDone | DarkWingsDarkWordsChoice
+    | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan
+    | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
+    | ActionPhaseBegan | PlanningPhaseBegan;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -97,4 +101,80 @@ interface PlayerMustered {
 interface WinnerDeclared {
     type: "winner-declared";
     winner: string;
+}
+
+interface RavenHolderWildlingCardPutBottom {
+    type: "raven-holder-wildling-card-put-bottom";
+    ravenHolder: string;
+}
+
+interface RavenHolderWildlingCardPutTop {
+    type: "raven-holder-wildling-card-put-top";
+    ravenHolder: string;
+}
+
+interface RaidDone {
+    type: "raid-done";
+    raider: string;
+    raidee: string | null;
+    raiderRegion: string;
+    raidedRegion: string | null;
+    orderRaided: number | null;
+}
+
+interface DarkWingsDarkWordsChoice {
+    type: "dark-wings-dark-words-choice";
+    house: string;
+    choice: number;
+}
+
+interface PutToTheSwordChoice {
+    type: "put-to-the-sword-choice";
+    house: string;
+    choice: number;
+}
+
+interface AThroneOfBladesChoice {
+    type: "a-throne-of-blades-choice";
+    house: string;
+    choice: number;
+}
+
+interface WinterIsComing {
+    type: "winter-is-coming";
+    drawnCardType: string;
+}
+
+interface WesterosPhaseBegan {
+    type: "westeros-phase-began";
+}
+
+interface CombatHouseCardChosen {
+    type: "combat-house-card-chosen";
+    houseCards: [string, string][];
+}
+
+interface CombatValyrianSwordUsed {
+    type: "combat-valyrian-sword-used";
+    house: string;
+}
+
+interface ClashOfKingsBiddingDone {
+    type: "clash-of-kings-bidding-done";
+    trackerI: number;
+    results: [number, string[]][];
+}
+
+interface ClashOfKingsFinalOrdering {
+    type: "clash-of-kings-final-ordering";
+    trackerI: number;
+    finalOrder: string[];
+}
+
+interface ActionPhaseBegan {
+    type: "action-phase-began";
+}
+
+interface PlanningPhaseBegan {
+    type: "planning-phase-began";
 }

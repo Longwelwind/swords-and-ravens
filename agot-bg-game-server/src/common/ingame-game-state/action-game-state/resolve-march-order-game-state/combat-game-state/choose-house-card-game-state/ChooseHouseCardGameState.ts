@@ -82,6 +82,16 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                     houseCardIds: this.combatGameState.houseCombatDatas.map((h, hcd) => [h.id, hcd.houseCard.id])
                 });
 
+                this.ingameGameState.log({
+                    type: "combat-house-card-chosen",
+                    houseCards: [
+                        // @ts-ignore
+                        [this.combatGameState.attacker.id, this.combatGameState.attackingHouseCombatData.houseCard.id],
+                        // @ts-ignore
+                        [this.combatGameState.defender.id, this.combatGameState.defendingHouseCombatData.houseCard.id]
+                    ]
+                });
+
                 this.combatGameState.onChooseHouseCardGameStateEnd();
             }
         }

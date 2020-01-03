@@ -16,6 +16,11 @@ export default class WinterIsComingWesterosCardType extends WesterosCardType {
         // The wildling icons on the newly drawn cards are _not_ added to the wildling threat. They can
         // then be safely ignored.
 
+        westerosGameState.ingameGameState.log({
+            type: "winter-is-coming",
+            drawnCardType: drawnCard.type.id
+        });
+
         westerosGameState.revealedCards[i] = drawnCard;
         westerosGameState.executeCard(drawnCard);
     }

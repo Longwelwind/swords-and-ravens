@@ -100,6 +100,24 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
                     region: targetRegion.id,
                     order: null
                 });
+
+                this.ingameGameState.log({
+                    type: "raid-done",
+                    raider: player.house.id,
+                    raidee: targetRegion.id,
+                    raiderRegion: orderRegion.id,
+                    raidedRegion: targetRegion.id,
+                    orderRaided: orderTarget.id
+                });
+            } else {
+                this.ingameGameState.log({
+                    type: "raid-done",
+                    raider: player.house.id,
+                    raiderRegion: orderRegion.id,
+                    raidedRegion: null,
+                    raidee: null,
+                    orderRaided: null
+                });
             }
 
             this.actionGameState.ordersOnBoard.delete(orderRegion);

@@ -34,6 +34,11 @@ export default class UseValyrianSteelBladeGameState extends GameState<CombatGame
 
             if (message.use) {
                 this.combatGameState.valyrianSteelBladeUser = this.house;
+
+                this.combatGameState.ingameGameState.log({
+                    type: "combat-valyrian-sword-used",
+                    house: player.house.id
+                });
             }
 
             this.combatGameState.onUseValyrianSteelBladeGameStateEnd();

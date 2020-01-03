@@ -5,7 +5,7 @@ import SupplyWesterosCardType from "./SupplyWesterosCardType";
 import MusteringWesterosCardType from "./MusteringWesterosCardType";
 import PutToTheSwordWesterosCardType from "./PutToTheSwordWesterosCardType";
 import DarkWingDarkWordsWesterosCardType from "./DarkWingDarkWordsWesterosCardType";
-import ThronesOfBladesWesterosCardType from "./ThronesOfBladesWesterosCardType";
+import AThroneOfBladesWesterosCardType from "./AThroneOfBladesWesterosCardType";
 import WinterIsComingWesterosCardType from "./WinterIsComingWesterosCardType";
 import ClashOfKingsWesterosCardType from "./ClashOfKingsWesterosCardType";
 import FeastForCrowsWesterosCardType from "./FeastForCrowsWesterosCardType";
@@ -22,7 +22,7 @@ export const winterIsComing = new WinterIsComingWesterosCardType("winter-is-comi
 export const supply = new SupplyWesterosCardType("supply", "Supply", "Adjust Supply track. Reconcile armies.");
 export const gameOfThrones = new GameOfThronesWesterosCardType("game-of-thrones", "Game of Thrones", "Each house gains power tokens for each controlled crown icons and ports");
 export const mustering = new MusteringWesterosCardType("mustering", "Mustering", "Recruit new units in strongholds and castles");
-export const thronesOfBlades = new ThronesOfBladesWesterosCardType("thrones-of-blades", "Thrones of Blades", "The holder of the Iron Throne token chooses whether a) everyone updates their Supply then reconciles armies b) everyone muster units, or c) this card has no effect.", 2);
+export const aThroneOfBlades = new AThroneOfBladesWesterosCardType("a-throne-of-blades", "A Throne of Blades", "The holder of the Iron Throne token chooses whether a) everyone updates their Supply then reconciles armies b) everyone muster units, or c) this card has no effect.", 2);
 
 export const clashOfKings = new ClashOfKingsWesterosCardType("clash-of-kings", "Clash of Kings", "Bid on the three Influence tracks.");
 export const darkWingsDarkWords = new DarkWingDarkWordsWesterosCardType("dark-wings-dark-words", "Dark Wings, Dark Words", "The holder of the Messenger Raven token chooses whether &) everyone bids on the  three Influence tracks b) everyone collects one Power token for every power icon present in areas they control, or c) this card has no effect", 2);
@@ -41,7 +41,7 @@ export const westerosCardTypes = new BetterMap<string, WesterosCardType>([
     [supply.id, supply],
     [gameOfThrones.id, gameOfThrones],
     [mustering.id, mustering],
-    [thronesOfBlades.id, thronesOfBlades],
+    [aThroneOfBlades.id, aThroneOfBlades],
     [clashOfKings.id, clashOfKings],
     [darkWingsDarkWords.id, darkWingsDarkWords],
     [feastForCrows.id, feastForCrows],

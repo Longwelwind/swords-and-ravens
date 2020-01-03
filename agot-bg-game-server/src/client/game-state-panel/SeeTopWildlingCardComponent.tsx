@@ -9,6 +9,7 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import {SeeTopWildlingCardAction} from "../../messages/ClientMessage";
+import WildlingCardComponent from "./utils/WildlingCardComponent";
 
 @observer
 export default class SeeTopWildlingCardComponent extends Component<GameStateComponentProps<SeeTopWildlingCardGameState>> {
@@ -25,12 +26,7 @@ export default class SeeTopWildlingCardComponent extends Component<GameStateComp
                     <Row className="justify-content-center">
                         {this.props.gameClient.doesControlHouse(this.props.gameState.ravenHolder) && (
                             <Col xs="auto">
-                                <div className="wildling-card-full"
-                                     style={{
-                                         backgroundImage: `url(${wildlingCardImages.get(this.props.gameState.topWildlingCard.type.id)})`
-                                     }}
-                                >
-                                </div>
+                                <WildlingCardComponent cardType={this.props.gameState.topWildlingCard.type}/>
                             </Col>
                         )}
                     </Row>
