@@ -38,19 +38,20 @@ export default class TyrionLannisterAbilityGameState extends GameState<
 
     onSimpleChoiceGameStateEnd(choice: number): void {
         const house = this.childGameState.house;
+        const enemy = this.combatGameState.getEnemy(house);
 
         if (choice == 0) {
             const choosableHouseCards = this.getChoosableHouseCards(house);
 
             // The enemy may not have any available house cards
             if (choosableHouseCards.length == 0) {
-                this.changeHouseCardEnemy(this.combatGameState.getEnemy(house), null);
+                this.changeHouseCardEnemy(enemy, null);
                 this.parentGameState.onHouseCardResolutionFinish(house);
                 return;
             }
 
             this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(
-                house,
+                enemy,
                 choosableHouseCards
             );
         } else {
