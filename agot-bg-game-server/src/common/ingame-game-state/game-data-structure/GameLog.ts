@@ -3,7 +3,7 @@ export default interface GameLog {
     data: GameLogData;
 }
 
-export type GameLogData = TurnBegin | SupportDeclared | HouseCardChosen | Attack | MarchResolved
+export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | WesterosCardExecuted | WesterosCardDrawn | CombatResult | WildlingCardRevealed | WildlingBidding
     | HighestBidderChosen | LowestBidderChosen | PlayerMustered | WinnerDeclared
     | RavenHolderWildlingCardPutBottom | RavenHolderWildlingCardPutTop | RaidDone | DarkWingsDarkWordsChoice

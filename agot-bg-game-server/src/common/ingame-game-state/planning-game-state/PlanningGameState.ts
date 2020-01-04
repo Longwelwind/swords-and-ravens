@@ -45,6 +45,10 @@ export default class PlanningGameState extends GameState<IngameGameState> {
     }
 
     firstStart(planningRestrictions: PlanningRestriction[]): void {
+        this.ingameGameState.log({
+            type: "planning-phase-began"
+        });
+
         this.planningRestrictions = planningRestrictions;
     }
 
