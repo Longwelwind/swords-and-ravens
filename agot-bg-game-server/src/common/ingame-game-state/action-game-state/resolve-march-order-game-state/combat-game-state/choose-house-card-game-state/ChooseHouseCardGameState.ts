@@ -66,7 +66,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                 // since they have just been set before, thus the two "ts-ignore". They could be later set to null
                 // because of Tyrion Lannister, for example.
                 this.ingameGameState.log({
-                    type: "house-card-chosen",
+                    type: "combat-house-card-chosen",
                     houseCards: [
                         // @ts-ignore
                         [this.combatGameState.attacker.id, this.combatGameState.attackingHouseCombatData.houseCard.id],
@@ -80,16 +80,6 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                     // Same here, the houseCards will always be non-null
                     // @ts-ignore
                     houseCardIds: this.combatGameState.houseCombatDatas.map((h, hcd) => [h.id, hcd.houseCard.id])
-                });
-
-                this.ingameGameState.log({
-                    type: "combat-house-card-chosen",
-                    houseCards: [
-                        // @ts-ignore
-                        [this.combatGameState.attacker.id, this.combatGameState.attackingHouseCombatData.houseCard.id],
-                        // @ts-ignore
-                        [this.combatGameState.defender.id, this.combatGameState.defendingHouseCombatData.houseCard.id]
-                    ]
                 });
 
                 this.combatGameState.onChooseHouseCardGameStateEnd();

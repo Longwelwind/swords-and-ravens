@@ -81,14 +81,6 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     return <><b>{supporter.name}</b> supported no-one.</>;
                 }
 
-            case "house-card-chosen":
-                let houseCards: [House, HouseCard][] = data.houseCards.map(([houseId, houseCardId]) => {
-                    const house = this.game.houses.get(houseId);
-                    return [house, house.houseCards.get(houseCardId)];
-                });
-
-                return houseCards.map(([house, houseCard]) => <><b>{house.name}</b> chooses <b>{houseCard.name}</b><br/></>);
-
             case "attack":
                 const attacker = this.game.houses.get(data.attacker);
                 // A "null" for "attacked" means it was an attack against a neutral force
@@ -166,6 +158,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     house: this.game.houses.get(stat.house),
                     region: this.world.regions.get(stat.region)
                 }));
+                const winner = this.game.houses.get(data.winner);
 
                 return (
                     <>
@@ -210,6 +203,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                                 </tr>
                             </table>
                         </p>
+                        <p><strong>{winner.name}</strong> won the fight!</p>
                     </>
                 );
             case "wildling-card-revealed":
@@ -428,7 +422,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 return <><strong>{house.name}</strong> used the <strong>Valyrian Sword</strong>.</>;
 
             case "combat-house-card-chosen":
-                houseCards = data.houseCards.map(([hid, hcid]) => {
+                const houseCards = data.houseCards.map(([hid, hcid]) => {
                     const house = this.game.houses.get(hid);
                     return [house, house.houseCards.get(hcid)];
                 });
