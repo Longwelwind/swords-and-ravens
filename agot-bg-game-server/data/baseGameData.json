@@ -312,7 +312,7 @@
         "the-hound": {
           "name": "The hound",
           "combatStrength": 2,
-          "fortificationIcons": 2
+          "towerIcons": 2
         },
         "ser-kevan-lannister": {
           "name": "Ser Kevan Lannister",
@@ -364,7 +364,7 @@
         "ser-rodrick-cassel": {
           "name": "Ser Rodrick Cassel",
           "combatStrength": 1,
-          "fortificationIcons": 2
+          "towerIcons": 2
         },
         "the-blackfish": {
           "name": "The Blackfish",
@@ -459,7 +459,7 @@
           "name": "Dagmar Cleftjaw",
           "combatStrength": 1,
           "swordIcons": 1,
-          "fortificationIcons": 1
+          "towerIcons": 1
         },
         "asha-greyjoy": {
           "name": "Asha Greyjoy",
@@ -492,7 +492,7 @@
         "areo-hotah": {
           "name": "Areo Hotah",
           "combatStrength": 3,
-          "fortificationIcons": 1
+          "towerIcons": 1
         },
         "darkstar": {
           "name": "Darkstar",
@@ -554,12 +554,12 @@
         "margaery-tyrell": {
           "name": "Margaery Tyrell",
           "combatStrength": 1,
-          "fortificationIcons": 1
+          "towerIcons": 1
         },
         "alester-florent": {
           "name": "Alester Florent",
           "combatStrength": 1,
-          "fortificationIcons": 1
+          "towerIcons": 1
         },
         "queen-of-thorns": {
           "name": "Queen of Thorns",

@@ -20,6 +20,7 @@ import ResolveConsolidatePowerGameState, {SerializedResolveConsolidatePowerGameS
 import ConsolidatePowerOrderType from "../game-data-structure/order-types/ConsolidatePowerOrderType";
 import SupportOrderType from "../game-data-structure/order-types/SupportOrderType";
 import * as _ from "lodash";
+import {port} from "../game-data-structure/regionTypes";
 
 export default class ActionGameState extends GameState<IngameGameState, UseRavenGameState | ResolveRaidOrderGameState | ResolveMarchOrderGameState | ResolveConsolidatePowerGameState> {
     @observable ordersOnBoard: BetterMap<Region, Order>;
@@ -119,6 +120,8 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
         return this.game.world.getNeighbouringRegions(attackedRegion)
             .filter(r => this.ordersOnBoard.has(r))
             .filter(r => this.ordersOnBoard.get(r).type instanceof SupportOrderType)
+            // A port can't support the adjacent land region
+            .filter(r => !(r.type == port && this.game.world.getAdjacentLandOfPort(r) == attackedRegion))
             .map(region => ({region, support: this.ordersOnBoard.get(region).type as SupportOrderType}));
     }
 

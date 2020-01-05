@@ -9,7 +9,7 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | RavenHolderWildlingCardPutBottom | RavenHolderWildlingCardPutTop | RaidDone | DarkWingsDarkWordsChoice
     | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
-    | ActionPhaseBegan | PlanningPhaseBegan;
+    | ActionPhaseBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingAttack;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -177,4 +177,9 @@ interface ActionPhaseBegan {
 
 interface PlanningPhaseBegan {
     type: "planning-phase-began";
+}
+
+interface WildlingStrengthTriggerWildlingAttack {
+    type: "wildling-strength-trigger-wildling-attack";
+    wildlingStrength: number;
 }

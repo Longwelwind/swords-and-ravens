@@ -35,7 +35,8 @@ module.exports = (env, argv) => {
         },
         plugins: [
             new HtmlWebpackPlugin({
-                template: "public/index.html"
+                template: "public/index.html",
+                favicon: "./public/images/favicon.ico"
             }),
             new webpack.EnvironmentPlugin({
                 NODE_ENV: argv.mode,

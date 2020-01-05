@@ -65,11 +65,11 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
         switch (data.type) {
             case "turn-begin":
                 return <Row className="justify-content-center">
-                    <Col xs="auto"><hr/></Col>
+                    <Col xs={true}><hr/></Col>
                     <Col xs="auto">
                         <h4>Turn <b>{data.turn}</b></h4>
                     </Col>
-                    <Col xs="auto"><hr/></Col>
+                    <Col xs={true}><hr/></Col>
                 </Row>;
 
             case "support-declared":
@@ -398,21 +398,21 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
             case "westeros-phase-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h6>Westeros Phase</h6>
+                        <h6><strong>Westeros Phase</strong></h6>
                     </Col>
                 </Row>;
 
             case "planning-phase-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h6>Planning Phase</h6>
+                        <h6><strong>Planning Phase</strong></h6>
                     </Col>
                 </Row>;
 
             case "action-phase-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h6>Action Phase</h6>
+                        <h6><strong>Action Phase</strong></h6>
                     </Col>
                 </Row>;
 
@@ -458,6 +458,11 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                             <li key={house.id}><strong>{house.name}</strong> bid <strong>{bid}</strong></li>
                         ))}
                     </ul>
+                </>;
+
+            case "wildling-strength-trigger-wildling-attack":
+                return <>
+                    <strong>Wildling strength</strong> reached <strong>{data.wildlingStrength}</strong>, triggering a <strong>Wildling attack</strong>
                 </>;
         }
     }

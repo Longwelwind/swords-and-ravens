@@ -5,7 +5,7 @@ import Unit from "./Unit";
 import House from "./House";
 import Game from "./Game";
 import BetterMap from "../../../utils/BetterMap";
-import {sea} from "./regionTypes";
+import {land, port, sea} from "./regionTypes";
 import * as _ from "lodash";
 
 export default class World {
@@ -123,6 +123,9 @@ export default class World {
 
     getValidRetreatRegions(startingRegion: Region, house: House, army: Unit[]): Region[] {
         return this.getReachableRegions(startingRegion, house, army)
+            // A retreat can be done in a port only if the adjacent land area is controlled
+            // by the retreater
+            .filter(r => !(r.type == port && this.getAdjacentLandOfPort(r).getController() != house))
             // Remove regions with enemy units
             .filter(r => !(r.getController() != house && r.units.size > 0));
     }
@@ -135,6 +138,16 @@ export default class World {
         }
 
         return adjacentSeas[0];
+    }
+
+    getAdjacentLandOfPort(region: Region): Region {
+        const adjacentLands = this.getNeighbouringRegions(region).filter(r => r.type == land);
+
+        if (adjacentLands.length != 1) {
+            throw new Error(`Port "${region.id}" has more than one adjacent land regions`);
+        }
+
+        return adjacentLands[0];
     }
 
     getUnitsOfHouse(house: House): Unit[] {
