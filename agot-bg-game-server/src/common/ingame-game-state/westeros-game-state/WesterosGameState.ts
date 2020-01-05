@@ -105,6 +105,11 @@ export default class WesterosGameState extends GameState<IngameGameState,
 
             if (this.game.wildlingStrength == MAX_WILDLING_STRENGTH) {
                 // Trigger a wildling attack
+                this.ingameGameState.log({
+                    type: "wildling-strength-trigger-wildling-attack",
+                    wildlingStrength: this.game.wildlingStrength
+                });
+
                 this.triggerWildlingAttack();
                 return;
             }

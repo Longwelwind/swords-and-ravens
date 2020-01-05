@@ -459,6 +459,11 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                         ))}
                     </ul>
                 </>;
+
+            case "wildling-strength-trigger-wildling-attack":
+                return <>
+                    <strong>Wildling strength</strong> reached <strong>{data.wildlingStrength}</strong>, triggering a <strong>Wildling attack</strong>
+                </>;
         }
     }
 }
