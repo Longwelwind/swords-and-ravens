@@ -2,7 +2,7 @@ export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | ResolveMa
     | UseValyrianSteelBlade | ChooseHouseCard | ChooseCasualties | ChooseRavenAction
     | ChooseTopWildlingCardAction | ReplaceOrder | SkipReplaceOrder | ResolveRaid | Bid | ChooseChoice
     | DecideBiggest | ReconcileArmies | Muster | ResolveTies | SelectUnits | LaunchGame | ChooseHouse
-    | SelectOrders | SelectHouseCard | SelectRegion;
+    | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings;
 
 interface Ping {
     type: "ping";
@@ -153,4 +153,13 @@ interface SelectHouseCard {
 interface SelectRegion {
     type: "select-region";
     region: string;
+}
+
+interface ChangeSettings {
+    type: "change-settings";
+    settings: UserSettings;
+}
+
+export interface UserSettings {
+    pbemMode: boolean;
 }

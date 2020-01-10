@@ -32,6 +32,7 @@ import ravenImage from "../../public/images/icons/raven.svg";
 import diamondHiltImage from "../../public/images/icons/diamond-hilt.svg";
 import hourglassImage from "../../public/images/icons/hourglass.svg";
 import mammothImage from "../../public/images/icons/mammoth.svg";
+import envelopeImage from "../../public/images/icons/envelope.svg";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import housePowerTokensImages from "./housePowerTokensImages";
 import marked from "marked";
@@ -42,6 +43,8 @@ import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes
 import unitImages from "./unitImages";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
 import GameEndedComponent from "./game-state-panel/GameEndedComponent";
+import Button from "react-bootstrap/Button";
+import SettingsRowComponent from "./SettingsRowComponent";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -302,6 +305,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </div>
                 </Col>
                 <Col xs={12} lg={3}>
+                    {this.props.gameClient.authenticatedUser && (
+                        <Row className="stackable">
+                            <SettingsRowComponent
+                                gameClient={this.props.gameClient}
+                                authenticatedUser={this.props.gameClient.authenticatedUser}
+                            />
+                        </Row>
+                    )}
                     <Row className="stackable">
                         <Col>
                             <Card>
