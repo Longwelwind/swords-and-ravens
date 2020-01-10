@@ -1,5 +1,6 @@
 import {observable} from "mobx";
 import EntireGame from "./EntireGame";
+import User from "../server/User";
 
 type AnyGameState = GameState<any, any> | null;
 
@@ -53,6 +54,14 @@ export default class GameState<ParentGameState extends AnyGameState, ChildGameSt
             return this.childGameState.getPhaseName();
         } else {
             throw new Error("getPhaseName should be overriden for leaf ingameGameState state");
+        }
+    }
+
+    getWaitedUsers(): User[] {
+        if (this.childGameState) {
+            return this.childGameState.getWaitedUsers();
+        } else {
+            throw new Error("getWaitedUsers should be overriden for leaf state");
         }
     }
 

@@ -15,6 +15,7 @@ import Game from "../game-data-structure/Game";
 import PlanningRestriction from "../game-data-structure/westeros-card/planning-restriction/PlanningRestriction";
 import planningRestrictions from "../game-data-structure/westeros-card/planning-restriction/planningRestrictions";
 import House from "../game-data-structure/House";
+import User from "../../../server/User";
 
 export default class PlanningGameState extends GameState<IngameGameState> {
     planningRestrictions: PlanningRestriction[];
@@ -188,6 +189,10 @@ export default class PlanningGameState extends GameState<IngameGameState> {
             this.ingameGameState.players.values,
             this.readyPlayers
         );
+    }
+
+    getWaitedUsers(): User[] {
+        return this.getNotReadyPlayers().map(p => p.user);
     }
 
     getAvailableOrders(house: House): Order[] {

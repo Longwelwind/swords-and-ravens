@@ -13,6 +13,7 @@ import Region from "../../game-data-structure/Region";
 import Unit from "../../game-data-structure/Unit";
 import Game from "../../game-data-structure/Game";
 import Order from "../../game-data-structure/Order";
+import User from "../../../../server/User";
 
 export default class ResolveMarchOrderGameState extends GameState<ActionGameState, ResolveSingleMarchOrderGameState | CombatGameState> {
     constructor(actionGameState: ActionGameState) {

@@ -113,6 +113,16 @@ export default class IngameGameState extends GameState<
         }
     }
 
+    getControllerOfHouse(house: House): Player {
+        const player = this.players.values.find(p => p.house == house);
+
+        if (player == null) {
+            throw new Error();
+        }
+
+        return player;
+    }
+
     checkVictoryConditions(): boolean {
         if (this.game.areVictoryConditionsFulfilled()) {
             // Game is finished

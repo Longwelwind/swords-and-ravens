@@ -21,6 +21,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
+    onWaitedUsers: (users: User[]) => void;
 
     constructor(id: string, ownerId: string) {
         super(null);
@@ -68,6 +69,12 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 gameState.needsToBeTransmittedToClient = false;
 
                 gameState = gameState.childGameState;
+            }
+
+            // Get which users' turn it is
+            const users = this.leafState.getWaitedUsers();
+            if (this.onWaitedUsers) {
+                this.onWaitedUsers(users);
             }
         }
     }
