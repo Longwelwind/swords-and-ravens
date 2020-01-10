@@ -20,5 +20,6 @@ from django.urls import path, include
 urlpatterns = [
     path('', include('agotboardgame_main.urls')),
     url('', include('social_django.urls', namespace='social')),
+    path('api/', include('api.urls')),
     path('admin/', admin.site.urls),
 ]
