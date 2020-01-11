@@ -7,10 +7,15 @@ import {ServerMessage} from "../../../../../messages/ServerMessage";
 import HouseCard, {HouseCardState} from "../../../game-data-structure/house-card/HouseCard";
 import WildlingCardEffectInTurnOrderGameState from "../WildlingCardEffectInTurnOrderGameState";
 import _ from "lodash";
+import IngameGameState from "../../../IngameGameState";
 
 export default class MassingOnTheMilkwaterWildlingVictoryGameState extends WildlingCardEffectInTurnOrderGameState<
     SelectHouseCardGameState<MassingOnTheMilkwaterWildlingVictoryGameState>
 > {
+    get ingame(): IngameGameState {
+        return this.parentGameState.parentGameState.ingame;
+    }
+
     executeForLowestBidder(house: House): void {
         const availableHouseCards = house.houseCards.values.filter(hc => hc.state == HouseCardState.AVAILABLE);
 

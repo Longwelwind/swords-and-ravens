@@ -6,12 +6,17 @@ import {ServerMessage} from "../../../../../messages/ServerMessage";
 import Game from "../../../game-data-structure/Game";
 import SimpleChoiceGameState, {SerializedSimpleChoiceGameState} from "../../../simple-choice-game-state/SimpleChoiceGameState";
 import _ from "lodash";
+import IngameGameState from "../../../IngameGameState";
 
 export default class AKingBeyondTheWallNightsWatchVictoryGameState extends GameState<
     WildlingAttackGameState, SimpleChoiceGameState
 > {
     get game(): Game {
         return this.parentGameState.game;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.parentGameState.ingame;
     }
 
     firstStart(): void {

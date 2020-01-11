@@ -7,6 +7,7 @@ import IngameGameState from "../../../IngameGameState";
 import EntireGame from "../../../../EntireGame";
 import House from "../../../game-data-structure/House";
 import WildlingCard from "../../../game-data-structure/wildling-card/WildlingCard";
+import User from "../../../../../server/User";
 
 export default class SeeTopWildlingCardGameState extends GameState<UseRavenGameState> {
     // Will be null client-side for players who can't see the card
@@ -67,6 +68,10 @@ export default class SeeTopWildlingCardGameState extends GameState<UseRavenGameS
 
     onServerMessage(message: ServerMessage) {
 
+    }
+
+    getWaitedUsers(): User[] {
+        return [this.parentGameState.ingameGameState.getControllerOfHouse(this.ravenHolder).user];
     }
 
     getPhaseName(): string {

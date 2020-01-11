@@ -6,10 +6,15 @@ import Game from "../../game-data-structure/Game";
 import Player from "../../Player";
 import {ClientMessage} from "../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../messages/ServerMessage";
+import IngameGameState from "../../IngameGameState";
 
 export default class PutToTheSwordGameState extends GameState<WesterosGameState, SimpleChoiceGameState> {
     get game(): Game {
         return this.parentGameState.game;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.ingame;
     }
 
     firstStart() {
@@ -21,7 +26,7 @@ export default class PutToTheSwordGameState extends GameState<WesterosGameState,
     }
 
     onSimpleChoiceGameStateEnd(choice: number) {
-        this.parentGameState.ingameGameState.log({
+        this.parentGameState.ingame.log({
             type: "put-to-the-sword-choice",
             house: this.childGameState.house.id,
             choice

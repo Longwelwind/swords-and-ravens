@@ -9,6 +9,7 @@ import Region from "../../../game-data-structure/Region";
 import Unit from "../../../game-data-structure/Unit";
 import House from "../../../game-data-structure/House";
 import _ from "lodash";
+import IngameGameState from "../../../IngameGameState";
 
 export default class TheHordeDescendsWildlingVictoryGameState extends WildlingCardEffectInTurnOrderGameState<
     SelectUnitsGameState<TheHordeDescendsWildlingVictoryGameState>
@@ -19,6 +20,10 @@ export default class TheHordeDescendsWildlingVictoryGameState extends WildlingCa
 
     get wildlingAttack(): WildlingAttackGameState {
         return this.parentGameState;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.parentGameState.ingame;
     }
 
     executeForLowestBidder(house: House): void {

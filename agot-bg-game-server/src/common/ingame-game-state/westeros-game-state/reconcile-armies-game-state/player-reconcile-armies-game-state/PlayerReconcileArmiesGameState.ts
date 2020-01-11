@@ -10,6 +10,7 @@ import Game from "../../../game-data-structure/Game";
 import BetterMap from "../../../../../utils/BetterMap";
 import EntireGame from "../../../../EntireGame";
 import UnitType from "../../../game-data-structure/UnitType";
+import User from "../../../../../server/User";
 
 export default class PlayerReconcileArmiesGameState extends GameState<ReconcileArmiesGameState<any>> {
     house: House;
@@ -74,6 +75,10 @@ export default class PlayerReconcileArmiesGameState extends GameState<ReconcileA
 
     isEnoughToReconcile(removedUnits: BetterMap<Region, Unit[]>) {
         return !this.game.hasTooMuchArmies(this.house, new BetterMap<Region, UnitType[]>(), removedUnits);
+    }
+
+    getWaitedUsers(): User[] {
+        return [this.parentGameState.ingame.getControllerOfHouse(this.house).user];
     }
 
     serializeToClient(): SerializedPlayerReconcileArmiesGameState {

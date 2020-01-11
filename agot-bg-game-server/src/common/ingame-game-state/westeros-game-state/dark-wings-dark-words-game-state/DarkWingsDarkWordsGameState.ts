@@ -8,10 +8,15 @@ import Game from "../../game-data-structure/Game";
 import Player from "../../Player";
 import {ClientMessage} from "../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../messages/ServerMessage";
+import IngameGameState from "../../IngameGameState";
 
 export default class DarkWingsDarkWordsGameState extends GameState<WesterosGameState, SimpleChoiceGameState> {
     get game(): Game {
         return this.parentGameState.game;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.ingame;
     }
 
     firstStart() {
@@ -26,7 +31,7 @@ export default class DarkWingsDarkWordsGameState extends GameState<WesterosGameS
     }
 
     onSimpleChoiceGameStateEnd(choice: number) {
-        this.parentGameState.ingameGameState.log({
+        this.parentGameState.ingame.log({
             type: "dark-wings-dark-words-choice",
             house: this.childGameState.house.id,
             choice

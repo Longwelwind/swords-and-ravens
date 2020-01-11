@@ -6,6 +6,8 @@ import Player from "../../../../Player";
 import Game from "../../../../game-data-structure/Game";
 import {ServerMessage} from "../../../../../../messages/ServerMessage";
 import EntireGame from "../../../../../EntireGame";
+import IngameGameState from "../../../../IngameGameState";
+import User from "../../../../../../server/User";
 
 export default class UseValyrianSteelBladeGameState extends GameState<CombatGameState> {
     house: House;
@@ -20,6 +22,10 @@ export default class UseValyrianSteelBladeGameState extends GameState<CombatGame
 
     get entireGame(): EntireGame {
         return this.combatGameState.entireGame;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.ingameGameState;
     }
 
     firstStart(house: House): void {
@@ -43,6 +49,10 @@ export default class UseValyrianSteelBladeGameState extends GameState<CombatGame
 
             this.combatGameState.onUseValyrianSteelBladeGameStateEnd();
         }
+    }
+
+    getWaitedUsers(): User[] {
+        return [this.ingame.getControllerOfHouse(this.house).user];
     }
 
     getPhaseName(): string {

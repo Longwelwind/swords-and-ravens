@@ -9,10 +9,15 @@ import Game from "../../game-data-structure/Game";
 import Player from "../../Player";
 import {ClientMessage} from "../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../messages/ServerMessage";
+import IngameGameState from "../../IngameGameState";
 
 export default class AThroneOfBladesGameState extends GameState<WesterosGameState, SimpleChoiceGameState> {
     get game(): Game {
         return this.parentGameState.game;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.ingame;
     }
 
     firstStart(): void {
@@ -23,7 +28,7 @@ export default class AThroneOfBladesGameState extends GameState<WesterosGameStat
     }
 
     onSimpleChoiceGameStateEnd(choice: number): void {
-        this.parentGameState.ingameGameState.log({
+        this.parentGameState.ingame.log({
             type: "a-throne-of-blades-choice",
             house: this.childGameState.house.id,
             choice

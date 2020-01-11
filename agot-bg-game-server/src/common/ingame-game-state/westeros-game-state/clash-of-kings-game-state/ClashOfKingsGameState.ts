@@ -7,12 +7,17 @@ import House from "../../game-data-structure/House";
 import Game from "../../game-data-structure/Game";
 import {ClientMessage} from "../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../messages/ServerMessage";
+import IngameGameState from "../../IngameGameState";
 
 export default class ClashOfKingsGameState extends GameState<WesterosGameState, BiddingGameState<ClashOfKingsGameState> | ResolveTiesGameState> {
     currentTrackI = -1;
 
     get game(): Game {
         return this.parentGameState.game;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.ingame;
     }
 
     firstStart() {
@@ -34,7 +39,7 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
     }
 
     onBiddingGameStateEnd(results: [number, House[]][]): void {
-        this.parentGameState.ingameGameState.log({
+        this.parentGameState.ingame.log({
             type: "clash-of-kings-bidding-done",
             trackerI: this.currentTrackI,
             results: results.map(([bid, houses]) => [bid, houses.map(h => h.id)])
@@ -53,7 +58,7 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
     }
 
     onResolveTiesGameState(_biddingResults: [number, House[]][], finalOrdering: House[]): void {
-        this.parentGameState.ingameGameState.log({
+        this.parentGameState.ingame.log({
             type: "clash-of-kings-final-ordering",
             trackerI: this.currentTrackI,
             finalOrder: finalOrdering.map(h => h.id)

@@ -10,6 +10,7 @@ import {ServerMessage} from "../../../../../../../messages/ServerMessage";
 import {SerializedDoranMartellAbilityGameState} from "../doran-martell-ability-game-state/DoranMartellAbilityGameState";
 import SelectHouseCardGameState, {SerializedSelectHouseCardGameState} from "../../../../../select-house-card-game-state/SelectHouseCardGameState";
 import HouseCard, {HouseCardState} from "../../../../../game-data-structure/house-card/HouseCard";
+import IngameGameState from "../../../../../IngameGameState";
 
 export default class AeronDamphairAbilityGameState extends GameState<
     ImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"],
@@ -21,6 +22,10 @@ export default class AeronDamphairAbilityGameState extends GameState<
 
     get combatGameState(): CombatGameState {
         return this.parentGameState.combatGameState;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.parentGameState.parentGameState.ingameGameState;
     }
 
     firstStart(house: House): void {

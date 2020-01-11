@@ -7,6 +7,7 @@ import EntireGame from "../../../../../EntireGame";
 import {ServerMessage} from "../../../../../../messages/ServerMessage";
 import IngameGameState from "../../../../IngameGameState";
 import Game from "../../../../game-data-structure/Game";
+import User from "../../../../../../server/User";
 
 export default class DeclareSupportGameState extends GameState<CombatGameState> {
     house: House;
@@ -75,6 +76,10 @@ export default class DeclareSupportGameState extends GameState<CombatGameState> 
 
             this.combatGameState.supporters.set(house, supportedHouse);
         }
+    }
+
+    getWaitedUsers(): User[] {
+        return [this.ingameGameState.getControllerOfHouse(this.house).user];
     }
 
     choose(house: House | null): void {

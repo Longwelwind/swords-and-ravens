@@ -17,7 +17,7 @@ export default class MusteringGameState extends GameState<WesterosGameState, Pla
     }
 
     get ingame(): IngameGameState {
-        return this.parentGameState.ingameGameState;
+        return this.parentGameState.ingame;
     }
 
     firstStart() {

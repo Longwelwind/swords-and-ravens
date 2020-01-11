@@ -5,10 +5,13 @@ import {ServerMessage} from "../../../messages/ServerMessage";
 import Player from "../Player";
 import {ClientMessage} from "../../../messages/ClientMessage";
 import Region from "../game-data-structure/Region";
+import IngameGameState from "../IngameGameState";
+import User from "../../../server/User";
 
 
 interface ParentGameState extends GameState<any, any> {
     game: Game;
+    ingame: IngameGameState;
 
     onSelectRegionFinish(house: House, region: Region): void;
 }
@@ -50,6 +53,10 @@ export default class SelectRegionGameState<P extends ParentGameState> extends Ga
     }
 
     onServerMessage(_message: ServerMessage): void { }
+
+    getWaitedUsers(): User[] {
+        return [this.parentGameState.ingame.getControllerOfHouse(this.house).user];
+    }
 
     serializeToClient(_admin: boolean, _player: Player | null): SerializedSelectRegionGameState {
         return {

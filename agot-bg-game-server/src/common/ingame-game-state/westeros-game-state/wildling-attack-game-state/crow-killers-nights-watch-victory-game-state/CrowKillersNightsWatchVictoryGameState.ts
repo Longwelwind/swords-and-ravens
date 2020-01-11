@@ -10,11 +10,16 @@ import Unit from "../../../game-data-structure/Unit";
 import {footman, knight} from "../../../game-data-structure/unitTypes";
 import Game from "../../../game-data-structure/Game";
 import _ from "lodash";
+import IngameGameState from "../../../IngameGameState";
 
 export default class CrowKillersNightsWatchVictoryGameState extends GameState<WildlingAttackGameState, SelectUnitsGameState<CrowKillersNightsWatchVictoryGameState>> {
 
     get game(): Game {
         return this.parentGameState.game;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.parentGameState.ingame;
     }
 
     firstStart(): void {

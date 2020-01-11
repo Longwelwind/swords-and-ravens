@@ -70,7 +70,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                             )}
                         </div>
                     ))}
-                    {/*this.props.ingameGameState.world.regions.values.filter(r => r.type != port).map(r => (
+                    {/*this.props.ingame.world.regions.values.filter(r => r.type != port).map(r => (
                         <Card
                             key={"name-" + r.id}
                             style={{left: r.nameSlot.x, top: r.nameSlot.y}}

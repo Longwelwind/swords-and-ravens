@@ -8,6 +8,7 @@ import Game from "../../../game-data-structure/Game";
 import SimpleChoiceGameState, {SerializedSimpleChoiceGameState} from "../../../simple-choice-game-state/SimpleChoiceGameState";
 import SelectHouseCardGameState, {SerializedSelectHouseCardGameState} from "../../../select-house-card-game-state/SelectHouseCardGameState";
 import HouseCard, {HouseCardState} from "../../../game-data-structure/house-card/HouseCard";
+import IngameGameState from "../../../IngameGameState";
 
 export default class MammothRidersNightsWatchVictoryGameState extends GameState<
     WildlingAttackGameState,
@@ -15,6 +16,10 @@ export default class MammothRidersNightsWatchVictoryGameState extends GameState<
 > {
     get game(): Game {
         return this.parentGameState.game;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.parentGameState.ingame;
     }
 
     firstStart(): void {

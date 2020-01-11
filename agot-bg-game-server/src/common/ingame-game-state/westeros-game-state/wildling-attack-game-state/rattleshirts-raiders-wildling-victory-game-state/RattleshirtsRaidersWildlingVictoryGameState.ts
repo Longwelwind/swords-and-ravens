@@ -6,6 +6,7 @@ import {ClientMessage} from "../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../messages/ServerMessage";
 import Game from "../../../game-data-structure/Game";
 import _ from "lodash";
+import IngameGameState from "../../../IngameGameState";
 
 export default class RattleshirtsRaidersWildlingVictoryGameState extends GameState<
     WildlingAttackGameState,
@@ -17,6 +18,10 @@ export default class RattleshirtsRaidersWildlingVictoryGameState extends GameSta
 
     get wildlingAttack(): WildlingAttackGameState {
         return this.parentGameState;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.parentGameState.ingame;
     }
 
     firstStart(): void {

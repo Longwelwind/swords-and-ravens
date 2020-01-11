@@ -20,7 +20,7 @@ export default class TheHordeDescendsNightsWatchVictoryGameState extends GameSta
     }
 
     get ingame(): IngameGameState {
-        return this.parentGameState.parentGameState.ingameGameState;
+        return this.parentGameState.parentGameState.ingame;
     }
 
     firstStart(): void {

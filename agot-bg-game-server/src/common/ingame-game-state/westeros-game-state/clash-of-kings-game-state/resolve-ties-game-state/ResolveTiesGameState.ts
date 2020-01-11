@@ -7,6 +7,7 @@ import {ServerMessage} from "../../../../../messages/ServerMessage";
 import * as _ from "lodash";
 import EntireGame from "../../../../EntireGame";
 import Game from "../../../game-data-structure/Game";
+import User from "../../../../../server/User";
 
 export default class ResolveTiesGameState extends GameState<ClashOfKingsGameState> {
     // Sorted in descending order of bid.
@@ -81,6 +82,10 @@ export default class ResolveTiesGameState extends GameState<ClashOfKingsGameStat
             type: "resolve-ties",
             resolvedTies: resolvedTies.map(houses => houses.map(h => h.id))
         });
+    }
+
+    getWaitedUsers(): User[] {
+        return [this.parentGameState.parentGameState.ingame.getControllerOfHouse(this.decider).user];
     }
 
     getTiesToResolve(): {trackerPlace: number; houses: House[]}[] {

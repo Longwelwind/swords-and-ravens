@@ -53,7 +53,7 @@ export default class GameState<ParentGameState extends AnyGameState, ChildGameSt
         if (this.childGameState) {
             return this.childGameState.getPhaseName();
         } else {
-            throw new Error("getPhaseName should be overriden for leaf ingameGameState state");
+            throw new Error("getPhaseName should be overriden for leaf ingame state");
         }
     }
 

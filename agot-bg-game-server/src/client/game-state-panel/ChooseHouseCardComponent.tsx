@@ -32,7 +32,7 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
                         </Row>
                     ) : (
                         <div>
-                            Waiting for {this.getWaitingForHouses().map(h => h.name).join(" and ")} to choose their House Cards...
+                            Waiting for {this.props.gameState.getWaitingForHouses().map(h => h.name).join(" and ")} to choose their House Cards...
                         </div>
                     )}
                 </Col>
@@ -44,12 +44,8 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
         this.props.gameState.chooseHouseCard(houseCard);
     }
 
-    getWaitingForHouses(): House[] {
-        return _.difference(this.props.gameState.combatGameState.houseCombatDatas.keys, this.props.gameState.houseCards.keys);
-    }
-
     shouldChooseHouseCard(): boolean {
-        return this.getWaitingForHouses().some(h => this.props.gameClient.doesControlHouse(h));
+        return this.props.gameState.getWaitingForHouses().some(h => this.props.gameClient.doesControlHouse(h));
     }
 
     getChoosableHouseCards(): HouseCard[] {

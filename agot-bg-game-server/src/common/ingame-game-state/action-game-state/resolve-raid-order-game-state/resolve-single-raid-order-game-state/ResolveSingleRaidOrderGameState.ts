@@ -13,6 +13,7 @@ import ActionGameState from "../../ActionGameState";
 import RaidOrderType from "../../../game-data-structure/order-types/RaidOrderType";
 import ConsolidatePowerOrderType from "../../../game-data-structure/order-types/ConsolidatePowerOrderType";
 import {raid} from "../../../game-data-structure/order-types/orderTypes";
+import User from "../../../../../server/User";
 
 export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRaidOrderGameState> {
     house: House;
@@ -129,6 +130,10 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
 
             this.resolveRaidOrderGameState.onResolveSingleRaidOrderGameStateEnd(this.house);
         }
+    }
+
+    getWaitedUsers(): User[] {
+        return [this.ingameGameState.getControllerOfHouse(this.house).user];
     }
 
     getRegionWithRaidOrders(): Region[] {

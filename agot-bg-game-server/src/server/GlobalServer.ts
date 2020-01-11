@@ -158,7 +158,7 @@ export default class GlobalServer {
 
         // Bind listeners
         entireGame.onSendClientMessage = _ => {
-            console.error("Server instance of ingameGameState tried to send a client message");
+            console.error("Server instance of ingame tried to send a client message");
         };
         entireGame.onSendServerMessage = (users, message) => {
             this.onSendServerMessage(users, message);

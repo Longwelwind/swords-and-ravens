@@ -6,9 +6,12 @@ import Game from "../game-data-structure/Game";
 import {ClientMessage} from "../../../messages/ClientMessage";
 import {ServerMessage} from "../../../messages/ServerMessage";
 import EntireGame from "../../EntireGame";
+import IngameGameState from "../IngameGameState";
+import User from "../../../server/User";
 
 export interface ParentGameState extends GameState<any, any> {
     entireGame: EntireGame;
+    ingame: IngameGameState;
     game: Game;
 
     onSelectOrdersFinish(selectedOrders: Region[]): void;
@@ -46,6 +49,10 @@ export default class SelectOrdersGameState<P extends ParentGameState> extends Ga
     }
 
     onServerMessage(_message: ServerMessage): void {
+    }
+
+    getWaitedUsers(): User[] {
+        return [this.parentGameState.ingame.getControllerOfHouse(this.house).user];
     }
 
     selectOrders(regions: Region[]): void {

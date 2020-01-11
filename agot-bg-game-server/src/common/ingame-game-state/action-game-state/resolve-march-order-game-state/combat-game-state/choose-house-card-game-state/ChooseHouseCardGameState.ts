@@ -9,6 +9,8 @@ import {observable} from "mobx";
 import House from "../../../../game-data-structure/House";
 import BetterMap from "../../../../../../utils/BetterMap";
 import IngameGameState from "../../../../IngameGameState";
+import _ from "lodash";
+import User from "../../../../../../server/User";
 
 export default class ChooseHouseCardGameState extends GameState<CombatGameState> {
     // A null value for a key can be present client-side, it indicates
@@ -85,6 +87,14 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                 this.combatGameState.onChooseHouseCardGameStateEnd();
             }
         }
+    }
+
+    getWaitingForHouses(): House[] {
+        return _.difference(this.combatGameState.houseCombatDatas.keys, this.houseCards.keys);
+    }
+
+    getWaitedUsers(): User[] {
+        return this.getWaitingForHouses().map(h => this.ingameGameState.getControllerOfHouse(h).user);
     }
 
     getChoosableCards(house: House): HouseCard[] {

@@ -11,6 +11,7 @@ import ActionGameState from "../../ActionGameState";
 import Region from "../../../game-data-structure/Region";
 import Order from "../../../game-data-structure/Order";
 import BetterMap from "../../../../../utils/BetterMap";
+import User from "../../../../../server/User";
 
 export default class ReplaceOrderGameState extends GameState<UseRavenGameState> {
     get useRavenGameState(): UseRavenGameState {
@@ -69,6 +70,10 @@ export default class ReplaceOrderGameState extends GameState<UseRavenGameState> 
         } else if (message.type == "skip-replace-order") {
             this.useRavenGameState.onReplaceOrderGameStateEnd();
         }
+    }
+
+    getWaitedUsers(): User[] {
+        return [this.parentGameState.ingameGameState.getControllerOfHouse(this.ravenHolder).user];
     }
 
     getAvailableOrders(replacedOrder: Order): Order[] {

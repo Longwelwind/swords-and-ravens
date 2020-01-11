@@ -5,10 +5,13 @@ import HouseCard from "../game-data-structure/house-card/HouseCard";
 import {ServerMessage} from "../../../messages/ServerMessage";
 import Player from "../Player";
 import {ClientMessage} from "../../../messages/ClientMessage";
+import IngameGameState from "../IngameGameState";
+import User from "../../../server/User";
 
 
 interface ParentGameState extends GameState<any, any> {
     game: Game;
+    ingame: IngameGameState;
 
     onSelectHouseCardFinish(house: House, houseCard: HouseCard): void;
 }
@@ -43,6 +46,10 @@ export default class SelectHouseCardGameState<P extends ParentGameState> extends
 
             this.parentGameState.onSelectHouseCardFinish(this.house, houseCard);
         }
+    }
+
+    getWaitedUsers(): User[] {
+        return [this.parentGameState.ingame.getControllerOfHouse(this.house).user];
     }
 
     onServerMessage(_message: ServerMessage): void { }

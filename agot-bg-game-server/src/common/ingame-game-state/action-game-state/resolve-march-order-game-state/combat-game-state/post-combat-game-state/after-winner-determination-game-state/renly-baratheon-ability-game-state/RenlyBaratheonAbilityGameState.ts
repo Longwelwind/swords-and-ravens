@@ -11,6 +11,7 @@ import CombatGameState from "../../../CombatGameState";
 import {footman, knight} from "../../../../../../game-data-structure/unitTypes";
 import _ from "lodash";
 import Region from "../../../../../../game-data-structure/Region";
+import IngameGameState from "../../../../../../IngameGameState";
 
 export default class RenlyBaratheonAbilityGameState extends GameState<
     AfterWinnerDeterminationGameState["childGameState"],
@@ -22,6 +23,10 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
 
     get combatGameState(): CombatGameState {
         return this.parentGameState.combatGameState;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.parentGameState.parentGameState.parentGameState.ingameGameState;
     }
 
     firstStart(house: House): void {

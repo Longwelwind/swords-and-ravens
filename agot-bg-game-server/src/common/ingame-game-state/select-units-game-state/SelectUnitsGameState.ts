@@ -8,9 +8,12 @@ import Unit from "../game-data-structure/Unit";
 import House from "../game-data-structure/House";
 import * as _ from "lodash";
 import BetterMap from "../../../utils/BetterMap";
+import IngameGameState from "../IngameGameState";
+import User from "../../../server/User";
 
 interface SelectUnitsParentGameState extends GameState<any, any> {
     game: Game;
+    ingame: IngameGameState;
     onSelectUnitsEnd: (house: House, selectedUnit: [Region, Unit[]][]) => void;
 }
 
@@ -64,6 +67,10 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
             type: "select-units",
             units: units.map((region, units) => [region.id, units.map(u => u.id)])
         });
+    }
+
+    getWaitedUsers(): User[] {
+        return [this.parentGameState.ingame.getControllerOfHouse(this.house).user];
     }
 
     onServerMessage(_message: ServerMessage): void { }

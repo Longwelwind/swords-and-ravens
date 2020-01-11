@@ -17,6 +17,7 @@ import ConsolidatePowerOrderType from "../../../game-data-structure/order-types/
 import {ServerMessage} from "../../../../../messages/ServerMessage";
 import RegionKind from "../../../game-data-structure/RegionKind";
 import IngameGameState from "../../../IngameGameState";
+import User from "../../../../../server/User";
 
 export type Mustering = {from: Unit | null; region: Region; to: UnitType};
 
@@ -185,6 +186,10 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 recruitements.map(({from, to, region}) => ({from: from ? from.id : null, to: to.id, region: region.id}))
             ])
         });
+    }
+
+    getWaitedUsers(): User[] {
+        return [this.parentGameState.ingame.getControllerOfHouse(this.house).user];
     }
 
     isMusteringValid(musterings: BetterMap<Region, Mustering[]>): boolean {
