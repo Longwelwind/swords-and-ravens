@@ -8,6 +8,7 @@ import CombatGameState from "../../CombatGameState";
 import _ from "lodash";
 import {ClientMessage} from "../../../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../../../messages/ServerMessage";
+import IngameGameState from "../../../../../IngameGameState";
 
 export default class DoranMartellAbilityGameState extends GameState<
     ImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"],
@@ -19,6 +20,10 @@ export default class DoranMartellAbilityGameState extends GameState<
 
     get combatGameState(): CombatGameState {
         return this.parentGameState.combatGameState;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.parentGameState.parentGameState.ingameGameState;
     }
 
     onSimpleChoiceGameStateEnd(choice: number): void {

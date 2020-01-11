@@ -22,7 +22,7 @@ export default class ChooseCasualtiesGameState extends GameState<PostCombatGameS
         return this.postCombatGameState.parentGameState;
     }
 
-    get ingameGameState(): IngameGameState {
+    get ingame(): IngameGameState {
         return this.combatGameState.ingameGameState;
     }
 
@@ -31,7 +31,7 @@ export default class ChooseCasualtiesGameState extends GameState<PostCombatGameS
     }
 
     get game(): Game {
-        return this.ingameGameState.game;
+        return this.ingame.game;
     }
 
     firstStart(house: House, possibleCasualties: Unit[], casualties: number): void {

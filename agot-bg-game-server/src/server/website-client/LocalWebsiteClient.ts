@@ -30,4 +30,8 @@ export default class LocalWebsiteClient implements WebsiteClient {
     async saveGame(gameId: string, serializedGame: any, viewOfGame: any, players: {userId: string; data: object}[], state: string, version: string): Promise<void> {
         // Do nothing
     }
+
+    async notifyUsers(_gameId: string, _userIds: string[]): Promise<void> {
+        // Do Nothing
+    }
 }

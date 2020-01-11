@@ -21,19 +21,23 @@ function setup4PlayersGame(serializedEntireGameChildGameState: SerializedEntireG
         users: [
             {
                 id: "1",
-                name: "1"
+                name: "1",
+                settings: {pbemMode: false}
             },
             {
                 id: "2",
-                name: "2"
+                name: "2",
+                settings: {pbemMode: false}
             },
             {
                 id: "3",
-                name: "3"
+                name: "3",
+                settings: {pbemMode: false}
             },
             {
                 id: "4",
-                name: "4"
+                name: "4",
+                settings: {pbemMode: false}
             }
         ],
         childGameState: serializedEntireGameChildGameState

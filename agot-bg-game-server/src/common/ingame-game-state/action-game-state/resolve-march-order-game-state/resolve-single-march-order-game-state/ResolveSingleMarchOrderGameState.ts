@@ -14,6 +14,7 @@ import {observable} from "mobx";
 import Game from "../../../game-data-structure/Game";
 import BetterMap from "../../../../../utils/BetterMap";
 import RegionKind from "../../../game-data-structure/RegionKind";
+import User from "../../../../../server/User";
 
 export default class ResolveSingleMarchOrderGameState extends GameState<ResolveMarchOrderGameState> {
     @observable house: House;
@@ -185,6 +186,10 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
         return moves.every(
             ([regionToward, army], i) => this.getValidTargetRegions(startingRegion, moves.slice(0, i), army).includes(regionToward)
         );
+    }
+
+    getWaitedUsers(): User[] {
+        return [this.actionGameState.ingameGameState.getControllerOfHouse(this.house).user];
     }
 
     /**

@@ -4,6 +4,7 @@ import Player from "../Player";
 import {ClientMessage} from "../../../messages/ClientMessage";
 import {ServerMessage} from "../../../messages/ServerMessage";
 import IngameGameState from "../IngameGameState";
+import User from "../../../server/User";
 
 export default class GameEndedGameState extends GameState<IngameGameState> {
     winner: House;
@@ -17,6 +18,10 @@ export default class GameEndedGameState extends GameState<IngameGameState> {
     }
 
     onServerMessage(_message: ServerMessage): void {
+    }
+
+    getWaitedUsers(): User[] {
+        return [];
     }
 
     serializeToClient(_admin: boolean, _player: Player | null): SerializedGameEndedGameState{

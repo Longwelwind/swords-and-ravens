@@ -158,11 +158,12 @@ export default class GlobalServer {
 
         // Bind listeners
         entireGame.onSendClientMessage = _ => {
-            console.error("Server instance of ingameGameState tried to send a client message");
+            console.error("Server instance of ingame tried to send a client message");
         };
         entireGame.onSendServerMessage = (users, message) => {
             this.onSendServerMessage(users, message);
         };
+        entireGame.onWaitedUsers = (users) => this.onWaitedUsers(entireGame, users);
 
         this.loadedGames.set(gameId, entireGame);
 
@@ -176,6 +177,9 @@ export default class GlobalServer {
         return entireGame;
     }
 
+    onWaitedUsers(game: EntireGame, users: User[]): void {
+        this.websiteClient.notifyUsers(game.id, users.map(u => u.id));
+    }
 
     onClose(client: WebSocket) {
         console.log("Connection closed.");

@@ -9,6 +9,7 @@ import House from "../../../../../../game-data-structure/House";
 import CombatGameState from "../../../CombatGameState";
 import Game from "../../../../../../game-data-structure/Game";
 import HouseCard, {HouseCardState} from "../../../../../../game-data-structure/house-card/HouseCard";
+import IngameGameState from "../../../../../../IngameGameState";
 
 export default class PatchfaceAbilityGameState extends GameState<
     AfterCombatHouseCardAbilitiesGameState["childGameState"],
@@ -16,6 +17,10 @@ export default class PatchfaceAbilityGameState extends GameState<
 > {
     get game(): Game {
         return this.combat().game;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.parentGameState.parentGameState.parentGameState.ingameGameState;
     }
 
     combat(): CombatGameState {

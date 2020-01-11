@@ -7,8 +7,12 @@ import Region from "../../../game-data-structure/Region";
 import {ClientMessage} from "../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../messages/ServerMessage";
 import WildlingAttackGameState from "../WildlingAttackGameState";
+import IngameGameState from "../../../IngameGameState";
 
 export default class MammothRidersWildlingVictoryGameState extends WildlingCardEffectInTurnOrderGameState<SelectUnitsGameState<MammothRidersWildlingVictoryGameState>> {
+    get ingame(): IngameGameState {
+        return this.parentGameState.parentGameState.ingame;
+    }
 
     executeForLowestBidder(house: House): void {
         this.executeForHouse(house, 3);

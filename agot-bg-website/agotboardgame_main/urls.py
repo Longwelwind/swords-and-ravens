@@ -10,7 +10,7 @@ urlpatterns = [
     path('register/', views.register),
     path('games/', views.games),
     path('user/<uuid:user_id>', views.user_profile),
-    path('play/<uuid:game_id>', views.play),
+    path('play/<uuid:game_id>', views.play, name='play'),
     path('play/<uuid:game_id>/<uuid:user_id>', views.play),
     url('', include('django_prometheus.urls'))
 ]

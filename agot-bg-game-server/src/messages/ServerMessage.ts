@@ -4,15 +4,17 @@ import {SerializedUnit} from "../common/ingame-game-state/game-data-structure/Un
 import {SerializedUser} from "../server/User";
 import {HouseCardState} from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import {GameLogData} from "../common/ingame-game-state/game-data-structure/GameLog";
+import {UserSettings} from "./ClientMessage";
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady
     | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | NewTurn | RemovePlacedOrder
     | MoveUnits | CombatChangeArmy
     | UnitsWounded | ChangeCombatHouseCard | BeginSeeTopWildlingCard
     | RavenOrderReplaced | ProceedWesterosCard | ChangeGarrison
-     | BidDone | GameStateChange | SupplyAdjusted
+    | BidDone | GameStateChange | SupplyAdjusted
     | ChangeControlPowerToken | ChangePowerToken | ChangeWildlingStrength | AddGameLog | RevealWildlingCard
-    | RemoveUnits | AddUnits | ChangeTracker | ActionPhaseChangeOrder | ChangeStateHouseCard;
+    | RemoveUnits | AddUnits | ChangeTracker | ActionPhaseChangeOrder | ChangeStateHouseCard
+    | SettingsChanged;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -193,4 +195,10 @@ interface MoveUnits {
 
 interface NewTurn {
     type: "new-turn";
+}
+
+interface SettingsChanged {
+    type: "settings-changed";
+    user: string;
+    settings: UserSettings;
 }

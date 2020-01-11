@@ -26,6 +26,7 @@ import MammothRidersWildlingVictoryGameState, {SerializedMammothRidersWildlingVi
 import MammothRidersNightsWatchVictoryGameState, {SerializedMammothRidersNightsWatchVictoryGameState} from "./mammoth-riders-nights-watch-victory-game-state/MammothRidersNightsWatchVictoryGameState";
 import TheHordeDescendsWildlingVictoryGameState, {SerializedTheHordeDescendsWildlingVictoryGameState} from "./the-horde-descends-wildling-victory-game-state/TheHordeDescendsWildlingVictoryGameState";
 import TheHordeDescendsNightsWatchVictoryGameState, {SerializedTheHordeDescendsNightsWatchVictoryGameState} from "./the-horde-descends-nights-watch-victory-game-state/TheHordeDescendsNightsWatchVictoryGameState";
+import IngameGameState from "../../IngameGameState";
 
 export default class WildlingAttackGameState extends GameState<WesterosGameState,
     BiddingGameState<WildlingAttackGameState> | SimpleChoiceGameState | PreemptiveRaidWildlingVictoryGameState
@@ -100,6 +101,10 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
         return this.westerosGameState.game;
     }
 
+    get ingame(): IngameGameState {
+        return this.parentGameState.ingame;
+    }
+
     firstStart(wildlingStrength: number, participatingHouses: House[] = []): void {
         this.wildlingStrength = wildlingStrength;
         this.participatingHouses = participatingHouses;
@@ -126,7 +131,7 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
     onBiddingGameStateEnd(results: [number, House[]][]): void {
         this.biddingResults = results;
 
-        this.westerosGameState.ingameGameState.log({
+        this.westerosGameState.ingame.log({
             type: "wildling-bidding",
             results: results.map(([bid, houses]) => [bid, houses.map(h => h.id)]),
             nightsWatchVictory: this.nightsWatchWon
@@ -138,7 +143,7 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
             wildlingCard: this.wildlingCard.id
         });
 
-        this.westerosGameState.ingameGameState.log({
+        this.westerosGameState.ingame.log({
             type: "wildling-card-revealed",
             wildlingCard: this.wildlingCard.id
         });
@@ -176,7 +181,7 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
         if (this.nightsWatchWon) {
             const highestBidder = this.highestBidders[choice];
 
-            this.westerosGameState.ingameGameState.log({
+            this.westerosGameState.ingame.log({
                 type: "highest-bidder-chosen",
                 highestBidder: highestBidder.id
             });
@@ -185,7 +190,7 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
         } else {
             const lowestBidder = this.lowestBidders[choice];
 
-            this.westerosGameState.ingameGameState.log({
+            this.westerosGameState.ingame.log({
                 type: "lowest-bidder-chosen",
                 lowestBidder: lowestBidder.id
             });

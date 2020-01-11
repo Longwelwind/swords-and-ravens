@@ -9,6 +9,7 @@ import Region from "../../../../../game-data-structure/Region";
 import ActionGameState from "../../../../ActionGameState";
 import House from "../../../../../game-data-structure/House";
 import CombatGameState from "../../CombatGameState";
+import IngameGameState from "../../../../../IngameGameState";
 
 export default class QueenOfThornsAbilityGameState extends GameState<
     ImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"],
@@ -24,6 +25,10 @@ export default class QueenOfThornsAbilityGameState extends GameState<
 
     get actionGameState(): ActionGameState {
         return this.combatGameState.actionGameState;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.parentGameState.parentGameState.ingameGameState;
     }
 
     firstStart(house: House): void {

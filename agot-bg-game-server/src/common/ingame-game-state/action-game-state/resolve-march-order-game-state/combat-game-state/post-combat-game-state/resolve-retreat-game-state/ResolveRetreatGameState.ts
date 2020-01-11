@@ -12,6 +12,7 @@ import House from "../../../../../game-data-structure/House";
 import SelectRegionGameState, {SerializedSelectRegionGameState} from "../../../../../select-region-game-state/SelectRegionGameState";
 import Unit from "../../../../../game-data-structure/Unit";
 import Game from "../../../../../game-data-structure/Game";
+import IngameGameState from "../../../../../IngameGameState";
 
 export default class ResolveRetreatGameState extends GameState<
     PostCombatGameState,
@@ -24,6 +25,10 @@ export default class ResolveRetreatGameState extends GameState<
 
     get game(): Game {
         return this.postCombat.game;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.parentGameState.ingameGameState;
     }
 
     get postCombat(): PostCombatGameState {

@@ -6,10 +6,14 @@ import {ServerMessage} from "../../../../../messages/ServerMessage";
 import WildlingCardEffectInTurnOrderGameState from "../WildlingCardEffectInTurnOrderGameState";
 import SimpleChoiceGameState, {SerializedSimpleChoiceGameState} from "../../../simple-choice-game-state/SimpleChoiceGameState";
 import _ from "lodash";
+import IngameGameState from "../../../IngameGameState";
 
 export default class AKingBeyondTheWallWildlingVictoryGameState extends WildlingCardEffectInTurnOrderGameState<
     SimpleChoiceGameState
 > {
+    get ingame(): IngameGameState {
+        return this.parentGameState.parentGameState.ingame;
+    }
 
     executeForLowestBidder(house: House): void {
         this.game.influenceTracks.forEach((t, i) => {

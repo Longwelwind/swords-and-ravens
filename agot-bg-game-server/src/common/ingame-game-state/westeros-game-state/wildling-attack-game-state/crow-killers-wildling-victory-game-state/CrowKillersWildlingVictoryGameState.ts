@@ -9,8 +9,12 @@ import Region from "../../../game-data-structure/Region";
 import {ClientMessage} from "../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../messages/ServerMessage";
 import WildlingAttackGameState from "../WildlingAttackGameState";
+import IngameGameState from "../../../IngameGameState";
 
 export default class CrowKillersWildlingVictoryGameState extends WildlingCardEffectInTurnOrderGameState<SelectUnitsGameState<CrowKillersWildlingVictoryGameState>> {
+    get ingame(): IngameGameState {
+        return this.parentGameState.parentGameState.ingame;
+    }
 
     executeForLowestBidder(house: House): void {
         // Replace all of his knights by footmen

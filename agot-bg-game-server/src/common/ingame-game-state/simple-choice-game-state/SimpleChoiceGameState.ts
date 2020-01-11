@@ -4,9 +4,12 @@ import House from "../game-data-structure/House";
 import {ClientMessage} from "../../../messages/ClientMessage";
 import {ServerMessage} from "../../../messages/ServerMessage";
 import Game from "../game-data-structure/Game";
+import IngameGameState from "../IngameGameState";
+import User from "../../../server/User";
 
 interface ParentGameState extends GameState<any, any> {
     game: Game;
+    ingame: IngameGameState;
     onSimpleChoiceGameStateEnd: (choice: number) => void;
 }
 
@@ -44,6 +47,10 @@ export default class SimpleChoiceGameState extends GameState<ParentGameState> {
 
             this.parentGameState.onSimpleChoiceGameStateEnd(choice);
         }
+    }
+
+    getWaitedUsers(): User[] {
+        return [this.parentGameState.ingame.getControllerOfHouse(this.house).user];
     }
 
     getPhaseName(): string {

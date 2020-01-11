@@ -5,9 +5,11 @@ import Game from "../../game-data-structure/Game";
 import {ClientMessage} from "../../../../messages/ClientMessage";
 import Player from "../../Player";
 import {ServerMessage} from "../../../../messages/ServerMessage";
+import IngameGameState from "../../IngameGameState";
 
 interface ParentGameState extends GameState<any, any> {
     game: Game;
+    ingame: IngameGameState;
     onReconcileArmiesGameStateEnd(): void;
 }
 
@@ -15,6 +17,10 @@ export default class ReconcileArmiesGameState<P extends ParentGameState> extends
 
     get game(): Game {
         return this.parentGameState.game;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.ingame;
     }
 
     firstStart(): void {

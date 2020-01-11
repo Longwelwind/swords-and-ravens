@@ -10,6 +10,7 @@ import {ClientMessage} from "../../../../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../../../../messages/ServerMessage";
 import Region from "../../../../../../game-data-structure/Region";
 import ActionGameState from "../../../../../ActionGameState";
+import IngameGameState from "../../../../../../IngameGameState";
 
 export default class CerseiLannisterAbilityGameState extends GameState<
     AfterWinnerDeterminationGameState["childGameState"],
@@ -25,6 +26,10 @@ export default class CerseiLannisterAbilityGameState extends GameState<
 
     get combatGameState(): CombatGameState {
         return this.parentGameState.combatGameState;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.parentGameState.parentGameState.parentGameState.ingameGameState;
     }
 
     firstStart(house: House): void {

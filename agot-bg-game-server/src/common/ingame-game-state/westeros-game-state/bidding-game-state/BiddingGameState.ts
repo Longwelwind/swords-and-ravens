@@ -7,9 +7,12 @@ import Game from "../../game-data-structure/Game";
 import * as _ from "lodash";
 import {observable} from "mobx";
 import BetterMap from "../../../../utils/BetterMap";
+import User from "../../../../server/User";
+import IngameGameState from "../../IngameGameState";
 
 export interface BiddingGameStateParent extends GameState<any, any> {
     game: Game;
+    ingame: IngameGameState;
     onBiddingGameStateEnd: (results: [number, House[]][]) => void;
 }
 
@@ -79,6 +82,10 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
             type: "bid",
             powerTokens: powerTokens
         });
+    }
+
+    getWaitedUsers(): User[] {
+        return this.getHousesLeftToBid().map(h => this.parentGameState.ingame.getControllerOfHouse(h).user);
     }
 
     canBid(house: House): boolean {

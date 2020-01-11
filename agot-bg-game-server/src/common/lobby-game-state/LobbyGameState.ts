@@ -85,6 +85,10 @@ export default class LobbyGameState extends GameState<EntireGame> {
         });
     }
 
+    getWaitedUsers(): User[] {
+        return [];
+    }
+
     getPhaseName(): string {
         return "Lobby";
     }

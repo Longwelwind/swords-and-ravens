@@ -32,6 +32,8 @@ RUN SECRET_KEY=not_used \
     SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=not_used \
     SOCIAL_AUTH_DISCORD_KEY=not_used \
     SOCIAL_AUTH_DISCORD_SECRET=not_used \
+    EMAIL_HOST_USER=not_used \
+    EMAIL_HOST_PASSWORD=not_used \
     python manage.py collectstatic
 
 RUN mkdir /django_metrics

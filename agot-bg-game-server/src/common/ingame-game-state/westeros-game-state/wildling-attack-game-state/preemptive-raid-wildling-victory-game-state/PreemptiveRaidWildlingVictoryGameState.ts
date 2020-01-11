@@ -10,6 +10,7 @@ import * as _ from "lodash";
 import SelectUnitsGameState, {SerializedSelectUnitsGameState} from "../../../select-units-game-state/SelectUnitsGameState";
 import Unit from "../../../game-data-structure/Unit";
 import Region from "../../../game-data-structure/Region";
+import IngameGameState from "../../../IngameGameState";
 
 enum PreemptiveRaidStep {
     CHOOSING,
@@ -22,6 +23,10 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
 
     get game(): Game {
         return this.parentGameState.game;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.parentGameState.ingame;
     }
 
     get highestInfluenceTracks(): number[] {

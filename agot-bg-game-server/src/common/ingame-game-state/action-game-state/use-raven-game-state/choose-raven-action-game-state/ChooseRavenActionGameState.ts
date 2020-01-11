@@ -5,6 +5,7 @@ import {ServerMessage} from "../../../../../messages/ServerMessage";
 import UseRavenGameState from "../UseRavenGameState";
 import EntireGame from "../../../../EntireGame";
 import House from "../../../game-data-structure/House";
+import User from "../../../../../server/User";
 
 export default class ChooseRavenActionGameState extends GameState<UseRavenGameState> {
     get useRavenGameState(): UseRavenGameState {
@@ -28,6 +29,10 @@ export default class ChooseRavenActionGameState extends GameState<UseRavenGameSt
             type: "choose-raven-action",
             action: action
         });
+    }
+
+    getWaitedUsers(): User[] {
+        return [this.parentGameState.ingameGameState.getControllerOfHouse(this.ravenHolder).user];
     }
 
     onPlayerMessage(player: Player, message: ClientMessage) {

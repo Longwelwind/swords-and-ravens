@@ -36,12 +36,12 @@ export default class WesterosGameState extends GameState<IngameGameState,
         return this.revealedCards[this.currentCardI];
     }
 
-    get ingameGameState(): IngameGameState {
+    get ingame(): IngameGameState {
         return this.parentGameState;
     }
 
     get game(): Game {
-        return this.ingameGameState.game;
+        return this.ingame.game;
     }
 
     get world(): World {
@@ -49,7 +49,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
     }
 
     get entireGame(): EntireGame {
-        return this.ingameGameState.entireGame;
+        return this.ingame.entireGame;
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -71,7 +71,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
     }
 
     firstStart(): void {
-        this.ingameGameState.log({
+        this.ingame.log({
             type: "westeros-phase-began"
         });
 
@@ -88,7 +88,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
         // Add the wildling strength of each card
         const addedWildlingStrength = this.revealedCards.map(c => c.type.wildlingStrength).reduce(_.add, 0);
 
-        this.ingameGameState.log({
+        this.ingame.log({
             type: "westeros-cards-drawn",
             westerosCardTypes: this.revealedCards.map(c => c.type.id),
             addedWildlingStrength: addedWildlingStrength
@@ -105,7 +105,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
 
             if (this.game.wildlingStrength == MAX_WILDLING_STRENGTH) {
                 // Trigger a wildling attack
-                this.ingameGameState.log({
+                this.ingame.log({
                     type: "wildling-strength-trigger-wildling-attack",
                     wildlingStrength: this.game.wildlingStrength
                 });
@@ -143,12 +143,12 @@ export default class WesterosGameState extends GameState<IngameGameState,
             this.executeCard(this.currentCard);
         } else {
             // Last card processed, go to next phase
-            this.ingameGameState.onWesterosGameStateFinish(this.planningRestrictions);
+            this.ingame.onWesterosGameStateFinish(this.planningRestrictions);
         }
     }
 
     executeCard(card: WesterosCard): void {
-        this.ingameGameState.log({
+        this.ingame.log({
             type: "westeros-card-executed",
             westerosCardType: card.type.id,
             cardI: this.currentCardI

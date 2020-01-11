@@ -1,6 +1,8 @@
 import WebsiteClient, {StoredGameData, StoredUserData} from "./WebsiteClient";
 import {Client} from "pg";
+import {post} from "request-promise";
 
+const MASTER_API_BASE_URL = process.env.MASTER_API_BASE_URL || "http://localhost:8000/api";
 
 export default class LiveWebsiteClient implements WebsiteClient {
     pgClient: Client;
@@ -73,5 +75,9 @@ export default class LiveWebsiteClient implements WebsiteClient {
         );
 
         await this.pgClient.query("COMMIT");
+    }
+
+    async notifyUsers(gameId: string, userIds: string[]): Promise<void> {
+        await post(`${MASTER_API_BASE_URL}/notify/${gameId}`, {body: {users: userIds}, json: true});
     }
 }

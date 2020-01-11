@@ -21,6 +21,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
+    onWaitedUsers: (users: User[]) => void;
 
     constructor(id: string, ownerId: string) {
         super(null);
@@ -69,6 +70,12 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
                 gameState = gameState.childGameState;
             }
+
+            // Get which users' turn it is
+            const users = this.leafState.getWaitedUsers().filter(u => u.settings.pbemMode);
+            if (this.onWaitedUsers) {
+                this.onWaitedUsers(users);
+            }
         }
     }
 
@@ -88,8 +95,19 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         return user;
     }
 
-    onClientMessage(user: User, message: ClientMessage) {
-        this.childGameState.onClientMessage(user, message);
+    onClientMessage(user: User, message: ClientMessage): void {
+        if (message.type == "change-settings") {
+            user.settings = message.settings;
+
+            this.broadcastToClients({
+                type: "settings-changed",
+                user: user.id,
+                settings: user.settings
+            })
+        } else {
+            this.childGameState.onClientMessage(user, message);
+        }
+
 
         this.checkGameStateChanged();
     }
@@ -105,6 +123,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             const user = User.deserializeFromServer(this, message.user);
 
             this.users.set(user.id, user);
+        } else if (message.type == "settings-changed") {
+            const user = this.users.get(message.user);
+
+            user.settings = message.settings;
         } else {
             this.childGameState.onServerMessage(message);
         }

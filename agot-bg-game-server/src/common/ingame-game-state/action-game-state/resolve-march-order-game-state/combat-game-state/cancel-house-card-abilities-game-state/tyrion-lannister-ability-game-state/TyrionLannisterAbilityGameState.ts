@@ -10,6 +10,7 @@ import CancelHouseCardAbilitiesGameState from "../CancelHouseCardAbilitiesGameSt
 import SelectHouseCardGameState, {SerializedSelectHouseCardGameState} from "../../../../../select-house-card-game-state/SelectHouseCardGameState";
 import HouseCard, {HouseCardState} from "../../../../../game-data-structure/house-card/HouseCard";
 import SimpleChoiceGameState, {SerializedSimpleChoiceGameState} from "../../../../../simple-choice-game-state/SimpleChoiceGameState";
+import IngameGameState from "../../../../../IngameGameState";
 
 export default class TyrionLannisterAbilityGameState extends GameState<
     CancelHouseCardAbilitiesGameState["childGameState"],
@@ -22,6 +23,10 @@ export default class TyrionLannisterAbilityGameState extends GameState<
 
     get combatGameState(): CombatGameState {
         return this.parentGameState.combatGameState;
+    }
+
+    get ingame(): IngameGameState {
+        return this.combatGameState.ingameGameState;
     }
 
     get actionGameState(): ActionGameState {
