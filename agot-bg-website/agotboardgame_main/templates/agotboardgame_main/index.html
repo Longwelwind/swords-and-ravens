@@ -1,11 +1,13 @@
 {% extends "./base.html" %}
 
+{% load static %}
+
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col col-sm-12 col-md-9 mb-3">
+    <div class="col col-sm-12 mb-3">
         <div class="card">
             <div class="card-body">
-                <h3 class="card-title">Welcome to this beta-test!</h3>
+                <h3 class="card-title">Welcome to this open beta-test!</h3>
                 <p>
                     At the moment, the focus is to finish implementing the base game and polish the existing features.
                 </p>
@@ -20,6 +22,20 @@
                 <p>
                     Feedbacks and other remarks can also be posted on
                     the <a href="https://discord.gg/wWgCdvM">Discord</a>!
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col col-sm-12 col-md-5">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">What to test</h3>
+                <p>
+                    The implementation of the <strong>rules</strong> of the game is the priority. Feel free to play as
+                    you want, but don't hesitate to check if the game reacts correctly to <strong>edge cases</strong> (special
+                    combinations of house cards, for example).
                 </p>
             </div>
         </div>
