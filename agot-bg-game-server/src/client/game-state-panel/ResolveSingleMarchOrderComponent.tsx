@@ -50,9 +50,9 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                         {this.plannedMoves.size > 0 && (
                             <p>
                                 {this.plannedMoves.entries.map(([region, units]) => (
-                                    <span key={region.id}>
+                                    <div key={region.id}>
                                         {units.map(u => u.type.name).join(", ")} => {region.name}
-                                    </span>
+                                    </div>
                                 ))}
                             </p>
                         )}

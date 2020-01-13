@@ -91,8 +91,8 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
 
                 return (
                     <>
-                        <b>{attacker.name}</b> attacked <b>{attacked ? attacked.name : "a neutral force"}</b> from <b>{attackingRegion.name}</b>
-                        to <b>{attackedRegion.name}</b> with {joinReactNodes(army.map(ut => ut.name), ', ')}.
+                        <b>{attacker.name}</b> attacked <b>{attacked ? attacked.name : "a neutral force"}</b> from <b>{attackingRegion.name}</b> to <b>
+                        {attackedRegion.name}</b> with {joinReactNodes(army.map(ut => ut.name), ', ')}.
                     </>
                 );
 
@@ -441,8 +441,8 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
 
                 return <>
                     <p>
-                        Final order for {this.game.getNameInfluenceTrack(data.trackerI)}:
-                        {joinReactNodes(finalOrder.map(h => <strong key={h.id}>{h.name}</strong>), ", ")}
+                        Final order for {this.game.getNameInfluenceTrack(data.trackerI)}: {
+                        joinReactNodes(finalOrder.map(h => <strong key={h.id}>{h.name}</strong>), ", ")}
                     </p>
                 </>;
 
