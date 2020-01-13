@@ -21,9 +21,8 @@ export default class ClashOfKingsComponent extends Component<GameStateComponentP
             <ListGroupItem>
                 <Row>
                     <Col xs={12}>
-                        Houses bid for
-                        the <strong>{this.props.gameState.game.getNameInfluenceTrack(this.props.gameState.currentTrackI)}</strong>
-                        track.
+                        Houses bid for the <strong>
+                        {this.props.gameState.game.getNameInfluenceTrack(this.props.gameState.currentTrackI)}</strong> track.
                     </Col>
                     {renderChildGameState(this.props, [
                         [BiddingGameState, BiddingComponent],
