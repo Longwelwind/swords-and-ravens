@@ -127,7 +127,9 @@ export default class World {
             // by the retreater
             .filter(r => !(r.type == port && this.getAdjacentLandOfPort(r).getController() != house))
             // Remove regions with enemy units
-            .filter(r => !(r.getController() != house && r.units.size > 0));
+            .filter(r => !(r.getController() != house && r.units.size > 0))
+            // Remove regions with neutral forces
+            .filter(r => !(r.garrison > 0 && r.getController() == null));
     }
 
     getAdjacentSeaOfPort(region: Region): Region {

@@ -65,10 +65,10 @@ export default class Region {
             return possibleController;
         } else {
             // controlPowerToken supersedes a superControlPowerToken
-            if (this.superControlPowerToken) {
-                return this.superControlPowerToken;
-            } else {
+            if (this.controlPowerToken) {
                 return this.controlPowerToken;
+            } else {
+                return this.superControlPowerToken;
             }
         }
     }
