@@ -137,11 +137,20 @@ export default class PostCombatGameState extends GameState<
 
         if (immediatelyKilledLoserUnits.length > 0) {
             immediatelyKilledLoserUnits.forEach(u => locationLoserArmy.units.delete(u.id));
+            this.loserCombatData.army = _.difference(this.loserCombatData.army, immediatelyKilledLoserUnits);
 
+            // TODO: This packet should be replaced by RemoveUnits
             this.entireGame.broadcastToClients({
                 type: "combat-immediately-killed-units",
                 regionId: locationLoserArmy.id,
                 unitIds: immediatelyKilledLoserUnits.map(u => u.id)
+            });
+
+            this.entireGame.broadcastToClients({
+                type: "combat-change-army",
+                house: this.loser.id,
+                region: locationLoserArmy.id,
+                army: this.loserCombatData.army.map(u => u.id)
             });
         }
 
