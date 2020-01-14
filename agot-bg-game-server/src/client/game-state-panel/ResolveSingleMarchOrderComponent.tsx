@@ -125,7 +125,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
 
     shouldHighlightRegion(region: Region): boolean {
         if (this.selectedMarchOrderRegion != null && this.selectedUnits.length > 0) {
-            if (this.props.gameState.world.getReachableRegions(this.selectedMarchOrderRegion, this.props.gameState.house, this.selectedUnits).includes(region)) {
+            if (this.props.gameState.getValidTargetRegions(this.selectedMarchOrderRegion, this.plannedMoves.entries, this.selectedUnits).includes(region)) {
                 return true;
             }
         }
