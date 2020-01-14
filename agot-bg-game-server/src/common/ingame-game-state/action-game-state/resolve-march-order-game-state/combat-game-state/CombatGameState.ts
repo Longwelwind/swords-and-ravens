@@ -205,7 +205,19 @@ export default class CombatGameState extends GameState<
                 // to the combat
                 return this.getPossibleSupportingRegions()
                     .filter(({region}) => region.getController() == house)
-                    .map(({region}) => this.getCombatStrengthOfArmy(supportedHouse, region.units.values, true))
+                    .map(({region}) => {
+                        const strengthOfArmy = this.getCombatStrengthOfArmy(supportedHouse, region.units.values, true);
+                        // Take into account the possible support order bonus
+                        const supportOrder = this.actionGameState.ordersOnBoard.get(region);
+
+                        if (!(supportOrder.type instanceof SupportOrderType)) {
+                            throw new Error();
+                        }
+
+                        const supportOrderBonus = supportOrder.type.supportModifier;
+
+                        return strengthOfArmy + supportOrderBonus;
+                    })
                     .reduce(_.add, 0);
             })
             .reduce(_.add, 0);
