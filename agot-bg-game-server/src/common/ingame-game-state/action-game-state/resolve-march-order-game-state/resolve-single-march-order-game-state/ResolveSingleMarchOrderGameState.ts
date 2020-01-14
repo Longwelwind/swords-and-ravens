@@ -15,6 +15,7 @@ import Game from "../../../game-data-structure/Game";
 import BetterMap from "../../../../../utils/BetterMap";
 import RegionKind from "../../../game-data-structure/RegionKind";
 import User from "../../../../../server/User";
+import MarchOrderType from "../../../game-data-structure/order-types/MarchOrderType";
 
 export default class ResolveSingleMarchOrderGameState extends GameState<ResolveMarchOrderGameState> {
     @observable house: House;
@@ -214,7 +215,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             // to overcome the neutral force
             .filter(r => {
                 if (r.getController() == null && r.garrison > 0) {
-                    return this.hasEnoughToAttackNeutralForce(movingArmy, r);
+                    return this.hasEnoughToAttackNeutralForce(startingRegion, movingArmy, r);
                 }
 
                 return true;
@@ -246,8 +247,16 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
         return this.actionGameState.getRegionsWithMarchOrderOfHouse(this.house);
     }
 
-    hasEnoughToAttackNeutralForce(army: Unit[], targetRegion: Region): boolean {
-        return this.game.getCombatStrengthOfArmy(army, targetRegion.hasStructure) + this.actionGameState.getSupportCombatStrength(this.house, targetRegion) >= targetRegion.garrison;
+    hasEnoughToAttackNeutralForce(startingRegion: Region, army: Unit[], targetRegion: Region): boolean {
+        const marchOrder = this.actionGameState.ordersOnBoard.get(startingRegion);
+
+        if (!(marchOrder.type instanceof MarchOrderType)) {
+            throw new Error();
+        }
+
+        return this.game.getCombatStrengthOfArmy(army, targetRegion.hasStructure)
+            + this.actionGameState.getSupportCombatStrength(this.house, targetRegion)
+            + marchOrder.type.attackModifier >= targetRegion.garrison;
     }
 
     sendMoves(startingRegion: Region, moves: BetterMap<Region, Unit[]>, placePowerToken: boolean): void {
