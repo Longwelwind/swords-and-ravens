@@ -15494,6 +15494,11 @@
                          "value":"winterfell"
                         }, 
                         {
+                         "name":"superController",
+                         "type":"string",
+                         "value":"stark"
+                        }, 
+                        {
                          "name":"supplyIcons",
                          "type":"int",
                          "value":1
