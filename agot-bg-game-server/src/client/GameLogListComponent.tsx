@@ -464,6 +464,16 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 return <>
                     <strong>Wildling strength</strong> reached <strong>{data.wildlingStrength}</strong>, triggering a <strong>Wildling attack</strong>
                 </>;
+            case "march-order-removed":
+                house = this.game.houses.get(data.house);
+                // A "null" for "attacked" means it was an attack against a neutral force
+                const region = this.game.world.regions.get(data.region);
+
+                return <>
+                    <p>
+                        <strong>{house.name}</strong> removed his march order in <strong>{region.name}</strong>.
+                    </p>
+                </>;
         }
     }
 }

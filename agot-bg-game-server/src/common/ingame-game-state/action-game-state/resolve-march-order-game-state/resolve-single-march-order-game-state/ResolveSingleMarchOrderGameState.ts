@@ -166,6 +166,14 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                 }
             }
 
+            if(moves.length == 0) {
+                this.actionGameState.ingameGameState.log({
+                    type: "march-order-removed",
+                    house: this.house.id,
+                    region: startingRegion.id
+                });
+            }
+
             // Remove the order
             this.actionGameState.ordersOnBoard.delete(startingRegion);
             this.entireGame.broadcastToClients({
