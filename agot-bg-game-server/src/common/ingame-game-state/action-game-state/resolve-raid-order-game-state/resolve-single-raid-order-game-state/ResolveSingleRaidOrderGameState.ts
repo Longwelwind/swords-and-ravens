@@ -105,7 +105,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
                 this.ingameGameState.log({
                     type: "raid-done",
                     raider: player.house.id,
-                    raidee: targetRegion.id,
+                    raidee: raidedHouse.id,
                     raiderRegion: orderRegion.id,
                     raidedRegion: targetRegion.id,
                     orderRaided: orderTarget.id
