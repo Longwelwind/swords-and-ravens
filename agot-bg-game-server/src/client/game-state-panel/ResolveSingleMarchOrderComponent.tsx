@@ -196,6 +196,12 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
             return;
         }
 
+        if(this.plannedMoves.size == 0) {
+            if(!confirm("Do you want to remove your march order?")) {
+                return;
+            }
+        }
+
         this.props.gameState.sendMoves(
             this.selectedMarchOrderRegion,
             this.plannedMoves,
