@@ -14,7 +14,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | BidDone | GameStateChange | SupplyAdjusted
     | ChangeControlPowerToken | ChangePowerToken | ChangeWildlingStrength | AddGameLog | RevealWildlingCard
     | RemoveUnits | AddUnits | ChangeTracker | ActionPhaseChangeOrder | ChangeStateHouseCard
-    | SettingsChanged | NextTrack;
+    | SettingsChanged | ChangeValyrianSteelBladeUse | NextTrack;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -203,7 +203,13 @@ interface SettingsChanged {
     settings: UserSettings;
 }
 
+interface ChangeValyrianSteelBladeUse {
+    type: "change-valyrian-steel-blade-use";
+    used: boolean;
+}
+
 interface NextTrack {
     type: "next-track";
     nextTrack: number;
 }
+

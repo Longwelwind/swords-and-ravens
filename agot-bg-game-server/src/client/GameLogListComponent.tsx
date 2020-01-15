@@ -178,8 +178,8 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                                 </tr>
                                 <tr>
                                     <td>Army</td>
-                                    <td>{stats[0].army} (+{stats[1].orderBonus})</td>
-                                    <td>{stats[1].army} (+{stats[0].orderBonus})</td>
+                                    <td>{stats[0].army} (+{stats[1].orderBonus + stats[1].garrison})</td>
+                                    <td>{stats[1].army} (+{stats[0].orderBonus + stats[0].garrison})</td>
                                 </tr>
                                 <tr>
                                     <td>Support</td>
