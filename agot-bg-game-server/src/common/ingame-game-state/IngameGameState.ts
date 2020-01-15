@@ -207,6 +207,9 @@ export default class IngameGameState extends GameState<
             } else if (message.trackerI == 2) {
                 this.game.kingsCourtTrack = newOrder;
             }
+        } else
+        if (message.type == "change-valyrian-steel-blade-use") {
+            this.game.valyrianSteelBladeUsed = message.used;
         } else {
             this.childGameState.onServerMessage(message);
         }
