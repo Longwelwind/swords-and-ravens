@@ -76,6 +76,7 @@ export default class PostCombatGameState extends GameState<
                     army: this.combat.getBaseCombatStrength(h),
                     orderBonus: this.combat.getOrderBonus(h),
                     support: this.combat.getSupportStrengthForSide(h),
+                    garrison: this.combat.getGarrisonCombatStrength(h),
                     houseCard: houseCard ? houseCard.id : null,
                     houseCardStrength: this.combat.getHouseCardCombatStrength(h),
                     valyrianSteelBlade: this.combat.getValyrianBladeBonus(h),

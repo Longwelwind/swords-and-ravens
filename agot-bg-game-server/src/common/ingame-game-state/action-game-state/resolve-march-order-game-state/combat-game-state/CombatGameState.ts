@@ -346,6 +346,14 @@ export default class CombatGameState extends GameState<
         return null;
     }
 
+    getGarrisonCombatStrength(house: House): number {
+        if (house == this.defender) {
+            return this.defendingRegion.garrison;
+        }
+
+        return 0;
+    }
+
     getHouseCardCombatStrength(house: House): number {
         return this.getStatOfHouseCard(
             house,
@@ -426,7 +434,8 @@ export default class CombatGameState extends GameState<
             + this.getOrderBonus(house)
             + this.getSupportStrengthForSide(house)
             + this.getValyrianBladeBonus(house)
-            + this.getHouseCardCombatStrength(house);
+            + this.getHouseCardCombatStrength(house)
+            + this.getGarrisonCombatStrength(house);
     }
 
     getEnemy(house: House): House {
