@@ -8,6 +8,9 @@ import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import House from "../../common/ingame-game-state/game-data-structure/House";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
+import ConditionalWrap from "../utils/ConditionalWrap";
 
 @observer
 export default class DeclareSupportComponent extends Component<GameStateComponentProps<DeclareSupportGameState>> {
@@ -20,16 +23,31 @@ export default class DeclareSupportComponent extends Component<GameStateComponen
                 <Col xs={12}>
                     {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
                         <Row className="justify-content-center">
-                            <Col xs="auto">
-                                <Button onClick={() => this.choose(this.props.gameState.combatGameState.attacker)}>
-                                    {this.props.gameState.combatGameState.attacker.name} (Attacker)
-                                </Button>
-                            </Col>
-                            <Col xs="auto">
-                                <Button onClick={() => this.choose(this.props.gameState.combatGameState.defender)}>
-                                    {this.props.gameState.combatGameState.defender.name} (Defender)
-                                </Button>
-                            </Col>
+                            {this.props.gameState.combatGameState.houseCombatDatas.keys.map(h => (
+                                <Col xs="auto" key={h.id}>
+                                    <ConditionalWrap
+                                        condition={!this.canChoose(h)}
+                                        wrap={c =>
+                                            <OverlayTrigger
+                                                overlay={
+                                                    <Tooltip id="support-choice-restricted">
+                                                        You can't support the enemy in a combat you are involved.
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                {c}
+                                            </OverlayTrigger>
+                                        }
+                                    >
+                                        <Button
+                                            onClick={() => this.choose(h)}
+                                            disabled={!this.canChoose(h)}
+                                        >
+                                            {h.name} ({h == this.props.gameState.combatGameState.attacker ? "Attacker" : "Defender"})
+                                        </Button>
+                                    </ConditionalWrap>
+                                </Col>
+                            ))}
                             <Col xs="auto">
                                 <Button onClick={() => this.choose(null)}>
                                     None
@@ -44,6 +62,10 @@ export default class DeclareSupportComponent extends Component<GameStateComponen
                 </Col>
             </Row>
         );
+    }
+
+    canChoose(supportedHouse: House): boolean {
+        return this.props.gameState.isRestrictedToHimself() ? supportedHouse == this.props.gameState.house : true;
     }
 
     choose(house: House | null) {
