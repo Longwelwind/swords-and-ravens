@@ -63,11 +63,17 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                                 <td>Army</td>
                                 <td>
                                     {this.combatGameState.getBaseCombatStrength(this.attacker)} (+
-                                    {this.combatGameState.getOrderBonus(this.combatGameState.attacker)})
+                                    {
+                                        this.combatGameState.getOrderBonus(this.combatGameState.attacker)
+                                        + this.combatGameState.getGarrisonCombatStrength(this.combatGameState.attacker)
+                                    })
                                 </td>
                                 <td>
                                     {this.combatGameState.getBaseCombatStrength(this.defender)} (+
-                                    {this.combatGameState.getOrderBonus(this.combatGameState.defender)})
+                                    {
+                                        this.combatGameState.getOrderBonus(this.combatGameState.defender)
+                                        + this.combatGameState.getGarrisonCombatStrength(this.combatGameState.defender)
+                                    })
                                 </td>
                             </tr>
                             <tr>

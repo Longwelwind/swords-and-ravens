@@ -64,6 +64,7 @@ interface CombatResult {
         army: number;
         orderBonus: number;
         support: number;
+        garrison: number;
         houseCard: string | null;
         houseCardStrength: number;
         valyrianSteelBlade: number;

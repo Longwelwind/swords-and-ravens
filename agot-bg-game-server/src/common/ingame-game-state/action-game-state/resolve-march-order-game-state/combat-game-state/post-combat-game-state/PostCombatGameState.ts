@@ -76,6 +76,7 @@ export default class PostCombatGameState extends GameState<
                     army: this.combat.getBaseCombatStrength(h),
                     orderBonus: this.combat.getOrderBonus(h),
                     support: this.combat.getSupportStrengthForSide(h),
+                    garrison: this.combat.getGarrisonCombatStrength(h),
                     houseCard: houseCard ? houseCard.id : null,
                     houseCardStrength: this.combat.getHouseCardCombatStrength(h),
                     valyrianSteelBlade: this.combat.getValyrianBladeBonus(h),
@@ -83,6 +84,17 @@ export default class PostCombatGameState extends GameState<
                 }
             })
         });
+
+        // If there was a defeated garrison, remove it
+        if (this.loser == this.combat.defender && this.combat.defendingRegion.garrison > 0) {
+            this.combat.defendingRegion.garrison = 0;
+
+            this.entireGame.broadcastToClients({
+                type: "change-garrison",
+                region: this.combat.defendingRegion.id,
+                newGarrison: 0
+            });
+        }
 
         // Put the house cards as used
         this.combat.houseCombatDatas.forEach(({houseCard}, house) => this.markHouseAsUsed(house, houseCard));
