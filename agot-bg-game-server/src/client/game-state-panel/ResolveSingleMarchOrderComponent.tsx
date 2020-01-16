@@ -1,4 +1,4 @@
-import {Component} from "react";
+import {Component, ReactNode} from "react";
 import ResolveSingleMarchOrderGameState
     from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/resolve-single-march-order-game-state/ResolveSingleMarchOrderGameState";
 import React from "react";
@@ -14,13 +14,15 @@ import BetterMap from "../../utils/BetterMap";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
 
 @observer
 export default class ResolveSingleMarchOrderComponent extends Component<GameStateComponentProps<ResolveSingleMarchOrderGameState>> {
     @observable selectedMarchOrderRegion: Region | null;
     @observable selectedUnits: Unit[] = [];
     @observable plannedMoves = new BetterMap<Region, Unit[]>();
-    @observable placePowerToken = false;
+    @observable leavePowerToken = false;
 
     regionClickListener: any;
     unitClickListener: any;
@@ -30,6 +32,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     shouldHighlightUnitListener: any;
 
     render() {
+
         return (
             <>
                 <p>
@@ -56,41 +59,26 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                 ))}
                             </p>
                         )}
-                        <div>
-                            {this.selectedMarchOrderRegion != null && (
-                                <>
-                                    {this.props.gameState.canDecideToLeavePowerToken(
-                                        this.selectedMarchOrderRegion,
-                                        this.plannedMoves
-                                    ) && (
-                                        <Row className="justify-content-center">
-                                            <Col xs="auto">
-                                                <Form.Check
-                                                    label="Leave a Power Token"
-                                                    checked={this.placePowerToken}
-                                                    onChange={() => this.placePowerToken = !this.placePowerToken}
-                                                />
-                                            </Col>
-                                        </Row>
-                                    )}
-                                    <Row className="justify-content-center">
-                                        <Col xs="auto">
-                                            <Button onClick={() => this.confirm()}>
-                                                Confirm
-                                            </Button>
-                                        </Col>
-                                        <Col xs="auto">
-                                            <Button
-                                                variant="danger"
-                                                onClick={() => this.reset()}
-                                            >
-                                                Cancel
-                                            </Button>
-                                        </Col>
-                                    </Row>
-                                </>
-                            )}
-                        </div>
+                        {this.selectedMarchOrderRegion != null && (
+                            <div>
+                                {this.renderLeavePowerToken(this.selectedMarchOrderRegion)}
+                                <Row className="justify-content-center">
+                                    <Col xs="auto">
+                                        <Button onClick={() => this.confirm()}>
+                                            Confirm
+                                        </Button>
+                                    </Col>
+                                    <Col xs="auto">
+                                        <Button
+                                            variant="danger"
+                                            onClick={() => this.reset()}
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </Col>
+                                </Row>
+                            </div>
+                        )}
                     </>
                 ) : (
                     <div>
@@ -98,6 +86,44 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                     </div>
                 )}
             </>
+        );
+    }
+
+    renderLeavePowerToken(startingRegion: Region): ReactNode | null {
+        const {success, reason} = this.props.gameState.canLeavePowerToken(
+            startingRegion,
+            this.plannedMoves
+        );
+
+        return (
+            <Row className="justify-content-center">
+                <Col xs="auto">
+                    <OverlayTrigger overlay={
+                        <Tooltip id={"leave-power-token"}>
+                            {reason == "already-capital" ? (
+                                <>Your capital is always controlled by your house, thus not requiring a Power
+                                    token to be left when leaving the area to keep control of it.</>
+                            ) : reason == "already-power-token" ? (
+                                <>A Power token is already present.</>
+                            ) : reason == "no-power-token-available" ? (
+                                "You don't have any available Power token."
+                            ) : reason == "not-a-land" ? (
+                                "Power tokens can only be left on land areas."
+                            ) : reason == "no-all-units-go" ? (
+                                "All units must leave the area in order to leave a Power token."
+                            ) : "Leaving a Power token in an area maintain the control your house has on it, even"
+                                + " if all units your units leave the area."}
+                        </Tooltip>
+                    }>
+                        <Form.Check
+                            label="Leave a Power Token"
+                            checked={this.leavePowerToken}
+                            onChange={() => this.leavePowerToken = !this.leavePowerToken}
+                            disabled={!success}
+                        />
+                    </OverlayTrigger>
+                </Col>
+            </Row>
         );
     }
 
@@ -205,7 +231,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         this.props.gameState.sendMoves(
             this.selectedMarchOrderRegion,
             this.plannedMoves,
-            this.placePowerToken
+            this.leavePowerToken
         );
 
         this.reset();

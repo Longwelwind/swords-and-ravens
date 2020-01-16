@@ -88,7 +88,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             const movesThatDontTriggerAttack = _.difference(moves, movesThatTriggerAttack);
 
             // Check if the player was capable of placing a power token
-            if (this.canDecideToLeavePowerToken(startingRegion, new BetterMap(moves)) && message.placePowerToken) {
+            if (this.canLeavePowerToken(startingRegion, new BetterMap(moves)).success && message.leavePowerToken) {
                 startingRegion.controlPowerToken = this.house;
                 this.house.powerTokens -= 1;
 
@@ -267,12 +267,12 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             + marchOrder.type.attackModifier >= targetRegion.garrison;
     }
 
-    sendMoves(startingRegion: Region, moves: BetterMap<Region, Unit[]>, placePowerToken: boolean): void {
+    sendMoves(startingRegion: Region, moves: BetterMap<Region, Unit[]>, leavePowerToken: boolean): void {
         this.entireGame.sendMessageToServer({
             type: "resolve-march-order",
             moves: moves.entries.map(([region, units]) => [region.id, units.map(u => u.id)]),
             startingRegionId: startingRegion.id,
-            placePowerToken: placePowerToken
+            leavePowerToken: leavePowerToken
         });
     }
 
@@ -297,25 +297,29 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
         return "Resolve a March Order";
     }
 
-    canDecideToLeavePowerToken(startingRegion: Region, moves: BetterMap<Region, Unit[]>): boolean {
+    canLeavePowerToken(startingRegion: Region, moves: BetterMap<Region, Unit[]>): {success: boolean; reason: string} {
         if (startingRegion.superControlPowerToken == this.house) {
-            return false;
+            return {success: false, reason: "already-capital"};
         }
 
         if (startingRegion.controlPowerToken) {
-            return false;
+            return {success: false, reason: "already-power-token"};
         }
 
         if (this.house.powerTokens == 0) {
-            return false;
+            return {success: false, reason: "no-power-token-available"};
         }
 
         if (startingRegion.type.kind != RegionKind.LAND) {
-            return false;
+            return {success: false, reason: "not-a-land"};
         }
 
         // The player can place a power token if all units go out
-        return _.sum(moves.values.map(us => us.length)) == startingRegion.units.size;
+        if (_.sum(moves.values.map(us => us.length)) < startingRegion.units.size) {
+            return {success: false, reason: "no-all-units-go"}
+        }
+
+        return {success: true, reason: "ok"};
     }
 
     static deserializeFromServer(resolveMarchOrderGameState: ResolveMarchOrderGameState, data: SerializedResolveSingleMarchOrderGameState): ResolveSingleMarchOrderGameState {
