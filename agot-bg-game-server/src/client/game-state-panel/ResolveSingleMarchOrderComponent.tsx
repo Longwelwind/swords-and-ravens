@@ -66,7 +66,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                         <Row className="justify-content-center">
                                             <Col xs="auto">
                                                 <Form.Check
-                                                    label="Place an Power Token"
+                                                    label="Leave a Power Token"
                                                     checked={this.placePowerToken}
                                                     onChange={() => this.placePowerToken = !this.placePowerToken}
                                                 />
@@ -194,6 +194,12 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     confirm(): void {
         if (!this.selectedMarchOrderRegion) {
             return;
+        }
+
+        if(this.plannedMoves.size == 0) {
+            if(!confirm("Do you want to remove your march order?")) {
+                return;
+            }
         }
 
         this.props.gameState.sendMoves(

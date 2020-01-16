@@ -327,8 +327,8 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 if (raidee && raidedRegion && orderRaided) {
                     return (
                         <p>
-                            <strong>{raider.name}</strong> raided <strong>{raidee.name}</strong>'s <strong>{orderRaided.type.name}</strong>
-                            in <strong>{raidedRegion.name}</strong> from <strong>{raiderRegion.name}</strong>
+                            <strong>{raider.name}</strong> raided <strong>{raidee.name}</strong>'s <strong>{orderRaided.type.name}
+                            </strong> in <strong>{raidedRegion.name}</strong> from <strong>{raiderRegion.name}</strong>
                         </p>
                     );
                 } else {
@@ -463,6 +463,15 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
             case "wildling-strength-trigger-wildling-attack":
                 return <>
                     <strong>Wildling strength</strong> reached <strong>{data.wildlingStrength}</strong>, triggering a <strong>Wildling attack</strong>
+                </>;
+            case "march-order-removed":
+                house = this.game.houses.get(data.house);
+                const region = this.game.world.regions.get(data.region);
+
+                return <>
+                    <p>
+                        <strong>{house.name}</strong> removed his march order in <strong>{region.name}</strong>.
+                    </p>
                 </>;
         }
     }

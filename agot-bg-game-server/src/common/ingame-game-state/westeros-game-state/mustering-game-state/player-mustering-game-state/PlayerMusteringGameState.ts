@@ -291,6 +291,11 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         return region.castleLevel - this.getUsedPoints(region, musterings.tryGet(region, []));
     }
 
+    anyPointsLeft(musterings: BetterMap<Region, Mustering[]>) : boolean {
+        const controlledCastles = this.game.world.getControlledRegions(this.house).filter(r => r.castleLevel > 0);
+        return controlledCastles.some(r => this.getPointsLeft(r, musterings) > 0);
+    }
+
     getUsedPoints(region: Region, musterings: Mustering[]): number {
         return _.sum(musterings.map(m => getCostOfMusteringRule(m.from ? m.from.type : null, m.to)));
     }

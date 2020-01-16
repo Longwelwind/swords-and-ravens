@@ -9,7 +9,7 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | RavenHolderWildlingCardPutBottom | RavenHolderWildlingCardPutTop | RaidDone | DarkWingsDarkWordsChoice
     | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
-    | ActionPhaseBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingAttack;
+    | ActionPhaseBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingAttack | MarchOrderRemoved;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -183,4 +183,10 @@ interface PlanningPhaseBegan {
 interface WildlingStrengthTriggerWildlingAttack {
     type: "wildling-strength-trigger-wildling-attack";
     wildlingStrength: number;
+}
+
+interface MarchOrderRemoved {
+    type: "march-order-removed";
+    house: string;
+    region: string;
 }

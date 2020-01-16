@@ -151,6 +151,12 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
     }
 
     submit(): void {
+        if(this.props.gameState.anyPointsLeft(this.musterings)) {
+            if(!confirm('You have not used all of your mustering points. Continue anyway?')){
+                return;
+            }    
+        }
+
         this.props.gameState.muster(this.musterings);
     }
 
