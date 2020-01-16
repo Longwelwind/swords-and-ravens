@@ -124,7 +124,7 @@ export default class PlanningComponent extends Component<GameStateComponentProps
 
     onReadyClick(): void {
         if (this.props.gameClient.authenticatedPlayer
-            && !this.props.gameState.ordersAssignedToAllPossibleRegions(this.props.gameClient.authenticatedPlayer.house)) {
+            && !this.props.gameState.areOrdersAssignedToAllPossibleRegions(this.props.gameClient.authenticatedPlayer.house)) {
             if (!confirm('You haven\'t assigned an Order token to all of your areas. Continue anyway?')) {
                 return;
             }

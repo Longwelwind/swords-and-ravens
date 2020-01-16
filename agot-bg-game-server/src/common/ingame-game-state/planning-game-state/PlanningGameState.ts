@@ -208,7 +208,7 @@ export default class PlanningGameState extends GameState<IngameGameState> {
         return this.readyPlayers.includes(player);
     }
 
-    ordersAssignedToAllPossibleRegions(house: House) :boolean {
+    areOrdersAssignedToAllPossibleRegions(house: House): boolean {
         const possibleRegions = this.getPossibleRegionsForOrders(house);
         return possibleRegions.every(r => this.placedOrders.has(r));
     }
