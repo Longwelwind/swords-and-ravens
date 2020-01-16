@@ -40,7 +40,7 @@ interface ResolveMarchOrder {
     type: "resolve-march-order";
     startingRegionId: string;
     moves: [string, number[]][];
-    placePowerToken: boolean;
+    leavePowerToken: boolean;
 }
 
 interface DeclareSupport {
