@@ -97,7 +97,8 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                                 </Col>
                                 <Col>
                                     {this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER &&
-                                         this.selectedRegion != null && (
+                                         this.selectedRegion != null && 
+                                         this.props.gameState.getPointsLeft(this.selectedRegion, this.musterings) == 2 && (
                                             <Button onClick={() => this.submitForPT()}>Get 2 power tokens</Button>
                                         )
                                     }
