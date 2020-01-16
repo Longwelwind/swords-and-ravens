@@ -327,8 +327,8 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 if (raidee && raidedRegion && orderRaided) {
                     return (
                         <p>
-                            <strong>{raider.name}</strong> raided <strong>{raidee.name}</strong>'s <strong>{orderRaided.type.name}</strong>
-                            in <strong>{raidedRegion.name}</strong> from <strong>{raiderRegion.name}</strong>
+                            <strong>{raider.name}</strong> raided <strong>{raidee.name}</strong>'s <strong>{orderRaided.type.name}
+                            </strong> in <strong>{raidedRegion.name}</strong> from <strong>{raiderRegion.name}</strong>
                         </p>
                     );
                 } else {

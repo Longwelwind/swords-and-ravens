@@ -66,7 +66,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                         <Row className="justify-content-center">
                                             <Col xs="auto">
                                                 <Form.Check
-                                                    label="Place an Power Token"
+                                                    label="Leave a Power Token"
                                                     checked={this.placePowerToken}
                                                     onChange={() => this.placePowerToken = !this.placePowerToken}
                                                 />
