@@ -346,11 +346,11 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     <p>
                         <strong>{house.name}</strong>, holder of the Iron Throne token, chose to
                         {data.choice == 0 ? (
-                            <>trigger a Mustering.</>
+                            <> trigger a Mustering.</>
                         ) : data.choice == 1 ? (
-                            <>trigger a Supply.</>
+                            <> trigger a Supply.</>
                         ) : (
-                            <>trigger nothing.</>
+                            <> trigger nothing.</>
                         )}
                     </p>
                 );
@@ -362,11 +362,11 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     <p>
                         <strong>{house.name}</strong>, holder of the Raven token, chose to
                         {data.choice == 0 ? (
-                            <>trigger a Clash of Kings.</>
+                            <> trigger a Clash of Kings.</>
                         ) : data.choice == 1 ? (
-                            <>trigger a Game of Thrones.</>
+                            <> trigger a Game of Thrones.</>
                         ) : (
-                            <>trigger nothing.</>
+                            <> trigger nothing.</>
                         )}
                     </p>
                 );
@@ -378,11 +378,11 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     <p>
                         <strong>{house.name}</strong>, holder of the Valyrian Sword token, chose to
                         {data.choice == 0 ? (
-                            <>forbid <strong>March +1</strong> orders from being played during this Planning phase.</>
+                            <> forbid <strong>March +1</strong> orders from being played during this Planning phase.</>
                         ) : data.choice == 1 ? (
-                            <>forbid <strong>Defense</strong> orders from being played during this Planning phase.</>
+                            <> forbid <strong>Defense</strong> orders from being played during this Planning phase.</>
                         ) : (
-                            <>trigger nothing.</>
+                            <> trigger nothing.</>
                         )}
                     </p>
                 );
