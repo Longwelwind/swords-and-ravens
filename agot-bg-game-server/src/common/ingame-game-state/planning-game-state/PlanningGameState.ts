@@ -62,7 +62,7 @@ export default class PlanningGameState extends GameState<IngameGameState> {
             const order = message.orderId ?orders.get(message.orderId) : null;
             const region = this.world.regions.get(message.regionId);
 
-            if (!this.getPossibleRegionOrders(player.house).includes(region)) {
+            if (!this.getPossibleRegionsForOrders(player.house).includes(region)) {
                 return;
             }
 
@@ -117,8 +117,8 @@ export default class PlanningGameState extends GameState<IngameGameState> {
         }
     }
 
-    getPossibleRegionOrders(house: House): Region[] {
-        return this.game.world.regions.values.filter(r => r.getController() == house && r.units.size > 0);
+    getPossibleRegionsForOrders(house: House): Region[] {
+        return this.game.world.getControlledRegions(house).filter(r => r.units.size > 0);
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedPlanningGameState {
@@ -206,6 +206,11 @@ export default class PlanningGameState extends GameState<IngameGameState> {
 
     isReady(player: Player) {
         return this.readyPlayers.includes(player);
+    }
+
+    ordersAssignedToAllPossibleRegions(house: House) :boolean {
+        const possibleRegions = this.getPossibleRegionsForOrders(house);
+        return possibleRegions.every(r => this.placedOrders.has(r));
     }
 
     static deserializeFromServer(ingameGameState: IngameGameState, data: SerializedPlanningGameState): PlanningGameState {
