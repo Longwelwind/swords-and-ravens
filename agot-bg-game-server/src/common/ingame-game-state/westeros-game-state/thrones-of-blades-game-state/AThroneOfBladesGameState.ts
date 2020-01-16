@@ -22,7 +22,7 @@ export default class AThroneOfBladesGameState extends GameState<WesterosGameStat
 
     firstStart(): void {
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(this.game.ironThroneHolder,
-            "The holden of the Iron Throne can choose between Mustering, Supply or None.",
+            "The holder of the Iron Throne can choose between Mustering, Supply or None.",
             ["Mustering", "Supply", "None"]
         );
     }

@@ -115,7 +115,7 @@ export default class PlanningComponent extends Component<GameStateComponentProps
     shouldHighlightRegion(r: Region): boolean {
         if (this.props.gameClient.authenticatedPlayer) {
             if (this.selectedOrder != null) {
-                return this.props.gameState.getPossibleRegionOrders(this.props.gameClient.authenticatedPlayer.house).includes(r);
+                return this.props.gameState.getPossibleRegionsForOrders(this.props.gameClient.authenticatedPlayer.house).includes(r);
             }
         }
 
@@ -123,6 +123,13 @@ export default class PlanningComponent extends Component<GameStateComponentProps
     }
 
     onReadyClick(): void {
+        if (this.props.gameClient.authenticatedPlayer
+            && !this.props.gameState.areOrdersAssignedToAllPossibleRegions(this.props.gameClient.authenticatedPlayer.house)) {
+            if (!confirm('You haven\'t assigned an Order token to all of your areas. Continue anyway?')) {
+                return;
+            }
+        }
+
         this.props.gameState.ready();
     }
 }
