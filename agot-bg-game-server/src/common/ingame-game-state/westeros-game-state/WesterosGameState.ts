@@ -57,7 +57,11 @@ export default class WesterosGameState extends GameState<IngameGameState,
     }
 
     onServerMessage(message: ServerMessage): void {
-        this.childGameState.onServerMessage(message);
+        if (message.type == "proceed-westeros-card") {
+            this.currentCardI = message.currentCardI;
+        } else {
+            this.childGameState.onServerMessage(message);
+        }
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedWesterosGameState {
