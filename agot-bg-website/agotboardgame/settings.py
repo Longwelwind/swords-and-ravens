@@ -15,6 +15,9 @@ import sys
 from builtins import bool
 
 import environ
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
 env = environ.Env(
     DEBUG=(bool, False)
 )
@@ -190,16 +193,10 @@ DEFAULT_FROM_MAIL = 'Swords and Ravens <admin@swordsandravens.net>'
 
 # Logging
 
-LOGGING = {
-    'version': 1,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'stream': sys.stdout,
-        }
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO'
-    }
-}
+if not DEBUG and os.environ.get('SENTRY_DSN') is not None:
+    sentry_sdk.init(
+        environment="production",
+        dsn=env('SENTRY_DSN'),
+        integrations=[DjangoIntegration()],
+        send_default_pii=True
+    )
