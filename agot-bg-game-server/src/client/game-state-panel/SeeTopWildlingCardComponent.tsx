@@ -15,7 +15,7 @@ import WildlingCardComponent from "./utils/WildlingCardComponent";
 export default class SeeTopWildlingCardComponent extends Component<GameStateComponentProps<SeeTopWildlingCardGameState>> {
     render() {
         return (
-            <Row>
+            <>
                 <Col xs={12}>
                     The holder of the Raven sees the card at the top of the Wildling Deck
                     and may choose to either leave it at the top, or put it at the bottom
@@ -46,7 +46,7 @@ export default class SeeTopWildlingCardComponent extends Component<GameStateComp
                         <>Waiting for {this.props.gameState.ravenHolder.name}...</>
                     )}
                 </Col>
-            </Row>
+            </>
         );
     }
 

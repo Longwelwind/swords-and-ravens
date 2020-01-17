@@ -15,7 +15,7 @@ import _ from "lodash";
 export default class ChooseHouseCardComponent extends Component<GameStateComponentProps<ChooseHouseCardGameState>> {
     render() {
         return (
-            <Row>
+            <>
                 <Col xs={12}>
                     The attacker and the defender must choose a House Card
                 </Col>
@@ -36,7 +36,7 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
                         </div>
                     )}
                 </Col>
-            </Row>
+            </>
         );
     }
 

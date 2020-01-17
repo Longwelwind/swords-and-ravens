@@ -17,6 +17,7 @@ import AfterCombatHouseCardAbilitiesComponent from "./house-card-abilities/After
 import ResolveRetreatGameState
     from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/resolve-retreat-game-state/ResolveRetreatGameState";
 import ResolveRetreatComponent from "./ResolveRetreatComponent";
+import Col from "react-bootstrap/Col";
 
 @observer
 export default class PostCombatComponent extends Component<GameStateComponentProps<PostCombatGameState>> {
@@ -27,9 +28,9 @@ export default class PostCombatComponent extends Component<GameStateComponentPro
     render(): ReactNode {
         return (
             <>
-                <div>
+                <Col xs={12} className="text-center">
                     Winner: {this.postCombat.winner.name}
-                </div>
+                </Col>
                 {renderChildGameState(this.props, [
                     [ChooseCasualtiesGameState, ChooseCasualtiesComponent],
                     [ResolveRetreatGameState, ResolveRetreatComponent],

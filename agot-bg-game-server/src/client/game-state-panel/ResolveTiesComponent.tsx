@@ -27,7 +27,7 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
 
     render(): ReactNode {
         return (
-            <Row>
+            <>
                 <Col xs={12}>
                     The holder of the iron throne can resolve the ties of the bidding.
                 </Col>
@@ -69,7 +69,7 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
                 ) : (
                     <Col xs={12} className="text-center">Waiting for {this.props.gameState.decider.name}...</Col>
                 )}
-            </Row>
+            </>
         );
     }
 

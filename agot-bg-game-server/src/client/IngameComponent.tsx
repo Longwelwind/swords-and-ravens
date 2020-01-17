@@ -293,6 +293,16 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </ListGroup>
                             </Card>
                         </Col>
+                        <Col xs={12}>
+                            {this.props.gameClient.authenticatedUser && (
+                                <Row className="stackable">
+                                    <SettingsRowComponent
+                                        gameClient={this.props.gameClient}
+                                        authenticatedUser={this.props.gameClient.authenticatedUser}
+                                    />
+                                </Row>
+                            )}
+                        </Col>
                     </Row>
                 </Col>
                 <Col xs="auto">
@@ -305,14 +315,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </div>
                 </Col>
                 <Col xs={12} lg={3}>
-                    {this.props.gameClient.authenticatedUser && (
-                        <Row className="stackable">
-                            <SettingsRowComponent
-                                gameClient={this.props.gameClient}
-                                authenticatedUser={this.props.gameClient.authenticatedUser}
-                            />
-                        </Row>
-                    )}
                     <Row className="stackable">
                         <Col>
                             <Card>

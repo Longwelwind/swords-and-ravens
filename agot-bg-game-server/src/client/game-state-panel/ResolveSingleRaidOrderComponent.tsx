@@ -26,39 +26,40 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
     render() {
         return (
             <>
-                <p>
-                    A raid order may be resolved by {this.props.gameState.house.name}.
-                </p>
-                <p>
-                    {this.props.gameClient.authenticatedPlayer && this.props.gameState.house == this.props.gameClient.authenticatedPlayer.house ? (
-                        <div className="text-center">
-                            {this.selectedOrderRegion == null ? (
-                                <>Select a raid order token to resolve it</>
-                            ) : (
-                                <>
-                                    {this.selectedTargetRegion == null ? (
-                                        <>Select a target region to raid</>
-                                    ) : (
-                                        <>Target: {this.selectedTargetRegion.name}</>
-                                    )}
-
-                                    <Row className="justify-content-center">
-                                        <Col xs="auto">
-                                            <Button onClick={() => this.confirm()}>Confirm</Button>
-                                        </Col>
-                                        <Col xs="auto">
-                                            <Button onClick={() => this.reset()}>Reset</Button>
-                                        </Col>
-                                    </Row>
-                                </>
-                            )}
-                        </div>
+                <Col xs={12} className="text-center">
+                    {this.props.gameState.house.name} must resolve one of its raid orders.
+                </Col>
+                {this.props.gameClient.authenticatedPlayer && this.props.gameState.house == this.props.gameClient.authenticatedPlayer.house ? (
+                    this.selectedOrderRegion == null ? (
+                        <Col xs={12} className="text-center">
+                            Select a raid order token to resolve it
+                        </Col>
                     ) : (
-                        <div className="text-center">
-                            Waiting for {this.props.gameState.house.name}...
-                        </div>
-                    )}
-                </p>
+                        <>
+                            <Col xs={12} className="text-center">
+                                {this.selectedTargetRegion == null ? (
+                                    <>Select a target region to raid, or click on <strong>Confirm</strong> to just remove the order.</>
+                                ) : (
+                                    <>Target: {this.selectedTargetRegion.name}</>
+                                )}
+                            </Col>
+                            <Col xs={12}>
+                                <Row className="justify-content-center">
+                                    <Col xs="auto">
+                                        <Button onClick={() => this.confirm()}>Confirm</Button>
+                                    </Col>
+                                    <Col xs="auto">
+                                        <Button onClick={() => this.reset()}>Reset</Button>
+                                    </Col>
+                                </Row>
+                            </Col>
+                        </>
+                    )
+                ) : (
+                    <Col xs={12} className="text-center">
+                        Waiting for {this.props.gameState.house.name}...
+                    </Col>
+                )}
             </>
         );
     }

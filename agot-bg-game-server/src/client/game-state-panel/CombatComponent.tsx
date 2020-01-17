@@ -26,6 +26,7 @@ import ImmediatelyHouseCardAbilitiesResolutionComponent
 import CancelHouseCardAbilitiesGameState
     from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/cancel-house-card-abilities-game-state/CancelHouseCardAbilitiesGameState";
 import CancelHouseCardAbilitiesComponent from "./house-card-abilities/CancelHouseCardAbilitiesComponent";
+import Col from "react-bootstrap/Col";
 
 @observer
 export default class CombatComponent extends Component<GameStateComponentProps<CombatGameState>> {
@@ -44,7 +45,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
     render() {
         return (
             <>
-                <div>
+                <Col xs={12}>
                     <Table size="sm">
                         <thead>
                             <tr>
@@ -98,7 +99,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                             </tr>
                         </tbody>
                     </Table>
-                </div>
+                </Col>
                 {renderChildGameState(this.props, [
                     [DeclareSupportGameState, DeclareSupportComponent],
                     [ChooseHouseCardGameState, ChooseHouseCardComponent],

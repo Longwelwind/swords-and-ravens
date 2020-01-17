@@ -14,12 +14,12 @@ export default class ChooseRavenActionComponent extends Component<GameStateCompo
     render() {
         return (
             <>
-                <p>
+                <Col xs={12} className="text-center">
                     The holder of the Raven token may now choose to replace an order or to see the top
                     card of the wildling deck
-                </p>
-                <p>
-                    {this.props.gameClient.doesControlHouse(this.props.gameState.ravenHolder) ? (
+                </Col>
+                {this.props.gameClient.doesControlHouse(this.props.gameState.ravenHolder) ? (
+                    <Col xs={12}>
                         <Row className="justify-content-center">
                             <Col xs="auto">
                                 <Button onClick={() => this.choose(RavenAction.REPLACE_ORDER)}>Replace an order</Button>
@@ -31,12 +31,12 @@ export default class ChooseRavenActionComponent extends Component<GameStateCompo
                                 <Button onClick={() => this.choose(RavenAction.NONE)}>Skip</Button>
                             </Col>
                         </Row>
-                    ) : (
-                        <div className="text-center">
-                            Waiting for {this.props.gameState.ravenHolder.name}...
-                        </div>
-                    )}
-                </p>
+                    </Col>
+                ) : (
+                    <Col xs={12} className="text-center">
+                        Waiting for {this.props.gameState.ravenHolder.name}...
+                    </Col>
+                )}
             </>
         );
     }

@@ -16,7 +16,7 @@ import ConditionalWrap from "../utils/ConditionalWrap";
 export default class DeclareSupportComponent extends Component<GameStateComponentProps<DeclareSupportGameState>> {
     render() {
         return (
-            <Row>
+            <>
                 <Col xs={12}>
                     {this.props.gameState.house.name} may support one belligerent of the fight
                 </Col>
@@ -60,7 +60,7 @@ export default class DeclareSupportComponent extends Component<GameStateComponen
                         </div>
                     )}
                 </Col>
-            </Row>
+            </>
         );
     }
 

@@ -16,6 +16,7 @@ import ResolveConsolidatePowerComponent from "./ResolveConsolidatePowerComponent
 import ResolveRaidOrderGameState
     from "../../common/ingame-game-state/action-game-state/resolve-raid-order-game-state/ResolveRaidOrderGameState";
 import ResolveRaidOrderComponent from "./ResolveRaidOrderComponent";
+import Row from "react-bootstrap/Row";
 
 @observer
 export default class ActionComponent extends Component<GameStateComponentProps<ActionGameState>> {
@@ -23,12 +24,14 @@ export default class ActionComponent extends Component<GameStateComponentProps<A
         return (
             <>
                 <ListGroupItem>
-                    {renderChildGameState(this.props, [
-                        [UseRavenGameState, UseRavenGameStatePanelComponent],
-                        [ResolveMarchOrderGameState, ResolveMarchOrderComponent],
-                        [ResolveConsolidatePowerGameState, ResolveConsolidatePowerComponent],
-                        [ResolveRaidOrderGameState, ResolveRaidOrderComponent]
-                    ])}
+                    <Row>
+                        {renderChildGameState(this.props, [
+                            [UseRavenGameState, UseRavenGameStatePanelComponent],
+                            [ResolveMarchOrderGameState, ResolveMarchOrderComponent],
+                            [ResolveConsolidatePowerGameState, ResolveConsolidatePowerComponent],
+                            [ResolveRaidOrderGameState, ResolveRaidOrderComponent]
+                        ])}
+                    </Row>
                 </ListGroupItem>
             </>
         );
