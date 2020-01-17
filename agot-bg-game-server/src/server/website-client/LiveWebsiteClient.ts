@@ -2,9 +2,10 @@ import WebsiteClient, {StoredGameData, StoredUserData} from "./WebsiteClient";
 import {Client} from "pg";
 import {post} from "request-promise";
 
-const MASTER_API_BASE_URL = process.env.MASTER_API_BASE_URL || "http://localhost:8000/api";
-
 export default class LiveWebsiteClient implements WebsiteClient {
+    masterApiBaseUrl: string;
+    masterApiUsername: string;
+    masterApiPassword: string;
     pgClient: Client;
 
     constructor() {
@@ -15,6 +16,10 @@ export default class LiveWebsiteClient implements WebsiteClient {
         this.pgClient = new Client({
             connectionString: process.env.DATABASE_URL
         });
+
+        this.masterApiBaseUrl = process.env.MASTER_API_BASE_URL || "http://localhost:8000/api";
+        this.masterApiUsername = process.env.MASTER_API_USERNAME || "DummyUsername";
+        this.masterApiPassword = process.env.MASTER_API_PASSWORD || "DummyPassword";
     }
 
     async init() {
@@ -78,6 +83,9 @@ export default class LiveWebsiteClient implements WebsiteClient {
     }
 
     async notifyUsers(gameId: string, userIds: string[]): Promise<void> {
-        await post(`${MASTER_API_BASE_URL}/notify/${gameId}`, {body: {users: userIds}, json: true});
+        await post(`${this.masterApiBaseUrl}/notify/${gameId}`, {
+            body: {users: userIds},
+            json: true,
+        }).auth(this.masterApiUsername, this.masterApiPassword, true);
     }
 }
