@@ -33,7 +33,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
 
     render(): ReactNode {
         return (
-            <Row>
+            <>
                 <Col xs={12}>
                     {this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER ? (
                         <>House {this.house.name} can use one of its starred consolidate power to muster units</>
@@ -115,7 +115,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                         Waiting for {this.house.name}...
                     </Col>
                 )}
-            </Row>
+            </>
         );
     }
 
@@ -154,7 +154,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         if(this.props.gameState.anyPointsLeft(this.musterings)) {
             if(!confirm('You have not used all of your mustering points. Continue anyway?')){
                 return;
-            }    
+            }
         }
 
         this.props.gameState.muster(this.musterings);

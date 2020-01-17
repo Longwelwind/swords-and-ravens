@@ -23,7 +23,7 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
 
     render() {
         return (
-            <Row>
+            <>
                 <Col xs={12}>
                     The holder of the Raven token may now choose to replace one of its order.
                 </Col>
@@ -58,7 +58,7 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
                         Waiting for {this.props.gameState.ravenHolder.name}...
                     </Col>
                 )}
-            </Row>
+            </>
         );
     }
 

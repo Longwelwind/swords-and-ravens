@@ -9,6 +9,7 @@ import * as _ from "lodash";
 import {observer} from "mobx-react";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Button from "react-bootstrap/Button";
+import Col from "react-bootstrap/Col";
 
 @observer
 export default class PlayerReconcileArmiesComponent extends Component<GameStateComponentProps<PlayerReconcileArmiesGameState>> {
@@ -18,10 +19,10 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
     render() {
         return (
             <>
-                <div>
+                <Col xs={12}>
                     Players need to reconcile their armies according to the supply track.
-                </div>
-                <div>
+                </Col>
+                <Col xs={12}>
                     {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
                         <>
                             {this.unitsToRemove.entries.map(([region, units]) => (
@@ -33,7 +34,7 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
                     ) : (
                         <>Waiting for {this.props.gameState.house.name}...</>
                     )}
-                </div>
+                </Col>
             </>
         );
     }

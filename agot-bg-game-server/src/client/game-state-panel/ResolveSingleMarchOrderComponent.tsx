@@ -35,13 +35,13 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
 
         return (
             <>
-                <p>
+                <Col xs={12} className="text-center">
                     <strong>{this.props.gameState.house.name}</strong> must resolve one of
                     its march orders.
-                </p>
+                </Col>
                 {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
                     <>
-                        <p className="text-center">
+                        <Col xs={12} className="text-center">
                             {this.selectedMarchOrderRegion == null ? (
                                 "Click on one of your march order"
                             ) : this.selectedUnits.length == 0 ? (
@@ -49,41 +49,43 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                             ) : (
                                 "Click on a neighbouring region, or click on other units of the marching region"
                             )}
-                        </p>
+                        </Col>
                         {this.plannedMoves.size > 0 && (
-                            <p>
+                            <Col xs={12} className="text-center">
                                 {this.plannedMoves.entries.map(([region, units]) => (
                                     <div key={region.id}>
                                         {units.map(u => u.type.name).join(", ")} => {region.name}
                                     </div>
                                 ))}
-                            </p>
+                            </Col>
                         )}
                         {this.selectedMarchOrderRegion != null && (
-                            <div>
+                            <>
                                 {this.renderLeavePowerToken(this.selectedMarchOrderRegion)}
-                                <Row className="justify-content-center">
-                                    <Col xs="auto">
-                                        <Button onClick={() => this.confirm()}>
-                                            Confirm
-                                        </Button>
-                                    </Col>
-                                    <Col xs="auto">
-                                        <Button
-                                            variant="danger"
-                                            onClick={() => this.reset()}
-                                        >
-                                            Cancel
-                                        </Button>
-                                    </Col>
-                                </Row>
-                            </div>
+                                <Col xs={12}>
+                                    <Row className="justify-content-center">
+                                        <Col xs="auto">
+                                            <Button onClick={() => this.confirm()}>
+                                                Confirm
+                                            </Button>
+                                        </Col>
+                                        <Col xs="auto">
+                                            <Button
+                                                variant="danger"
+                                                onClick={() => this.reset()}
+                                            >
+                                                Cancel
+                                            </Button>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                            </>
                         )}
                     </>
                 ) : (
-                    <div>
+                    <Col xs={12} className="text-center">
                         Waiting for {this.props.gameState.house.name} to resolve one of its march order...
-                    </div>
+                    </Col>
                 )}
             </>
         );
@@ -96,34 +98,32 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         );
 
         return (
-            <Row className="justify-content-center">
-                <Col xs="auto">
-                    <OverlayTrigger overlay={
-                        <Tooltip id={"leave-power-token"}>
-                            {reason == "already-capital" ? (
-                                <>Your capital is always controlled by your house, thus not requiring a Power
-                                    token to be left when leaving the area to keep control of it.</>
-                            ) : reason == "already-power-token" ? (
-                                <>A Power token is already present.</>
-                            ) : reason == "no-power-token-available" ? (
-                                "You don't have any available Power token."
-                            ) : reason == "not-a-land" ? (
-                                "Power tokens can only be left on land areas."
-                            ) : reason == "no-all-units-go" ? (
-                                "All units must leave the area in order to leave a Power token."
-                            ) : "Leaving a Power token in an area maintain the control your house has on it, even"
-                                + " if all units your units leave the area."}
-                        </Tooltip>
-                    }>
-                        <Form.Check
-                            label="Leave a Power Token"
-                            checked={this.leavePowerToken}
-                            onChange={() => this.leavePowerToken = !this.leavePowerToken}
-                            disabled={!success}
-                        />
-                    </OverlayTrigger>
-                </Col>
-            </Row>
+            <Col xs={12} className="text-center">
+                <OverlayTrigger overlay={
+                    <Tooltip id={"leave-power-token"}>
+                        {reason == "already-capital" ? (
+                            <>Your capital is always controlled by your house, thus not requiring a Power
+                                token to be left when leaving the area to keep control of it.</>
+                        ) : reason == "already-power-token" ? (
+                            <>A Power token is already present.</>
+                        ) : reason == "no-power-token-available" ? (
+                            "You don't have any available Power token."
+                        ) : reason == "not-a-land" ? (
+                            "Power tokens can only be left on land areas."
+                        ) : reason == "no-all-units-go" ? (
+                            "All units must leave the area in order to leave a Power token."
+                        ) : "Leaving a Power token in an area maintain the control your house has on it, even"
+                            + " if all units your units leave the area."}
+                    </Tooltip>
+                }>
+                    <Form.Check
+                        label="Leave a Power Token"
+                        checked={this.leavePowerToken}
+                        onChange={() => this.leavePowerToken = !this.leavePowerToken}
+                        disabled={!success}
+                    />
+                </OverlayTrigger>
+            </Col>
         );
     }
 

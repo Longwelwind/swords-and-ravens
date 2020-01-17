@@ -12,7 +12,7 @@ import Col from "react-bootstrap/Col";
 export default class UseValyrianSteelBladeComponent extends Component<GameStateComponentProps<UseValyrianSteelBladeGameState>> {
     render() {
         return (
-            <Row>
+            <>
                 <Col xs={12}>
                     The holder of the Valyrian Steel Blade may choose to use it...
                 </Col>
@@ -32,7 +32,7 @@ export default class UseValyrianSteelBladeComponent extends Component<GameStateC
                         </div>
                     )}
                 </Col>
-            </Row>
+            </>
         );
     }
 
