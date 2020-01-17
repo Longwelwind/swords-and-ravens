@@ -9,7 +9,8 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | RavenHolderWildlingCardPutBottom | RavenHolderWildlingCardPutTop | RaidDone | DarkWingsDarkWordsChoice
     | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
-    | ActionPhaseBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingAttack | MarchOrderRemoved;
+    | ActionPhaseBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingAttack | MarchOrderRemoved
+    | StarredConsolidatePowerForPowerTokens;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -189,4 +190,11 @@ interface MarchOrderRemoved {
     type: "march-order-removed";
     house: string;
     region: string;
+}
+
+interface StarredConsolidatePowerForPowerTokens {
+    type: "starred-consolidate-power-for-power-tokens";
+    house: string;
+    region: string;
+    powerTokenCount: number;
 }

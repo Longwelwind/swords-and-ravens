@@ -153,6 +153,35 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 });
             });
 
+            if (this.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
+                if (musterings.size > 0) {
+                    const entry = musterings.entries[0];
+                    const startingRegion = entry[0];
+                    if (entry[1].length == 0) {
+                        // The CP was resolved to get Power tokens
+                        const gainedPowerTokens = this.getPotentialGainedPowerTokens(startingRegion);
+
+                        this.house.changePowerTokens(gainedPowerTokens);
+
+                        this.entireGame.broadcastToClients({
+                            type: "change-power-token",
+                            houseId: this.house.id,
+                            powerTokenCount: this.house.powerTokens
+                        });
+
+                        this.parentGameState.ingame.log({
+                            type: "starred-consolidate-power-for-power-tokens",
+                            house: this.house.id,
+                            region: startingRegion.id,
+                            powerTokenCount: gainedPowerTokens
+                        });
+
+                        this.parentGameState.onPlayerMusteringEnd(this.house, [startingRegion]);
+                        return;
+                    }
+                }
+            }
+
             totalRemovedUnits.forEach((units, region) => {
                 this.entireGame.broadcastToClients({
                     type: "remove-units",
@@ -166,6 +195,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 units: totalAddedUnits.entries.map(([region, units]) => ([region.id, units.map(u => u.serializeToClient())]))
             });
 
+            if (musterings.map((_, r) => r.length))
             this.parentGameState.ingame.log({
                 type: "player-mustered",
                 house: this.house.id,
@@ -187,6 +217,15 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
             ])
         });
     }
+
+    getPotentialGainedPowerTokens(region: Region): number {
+        if (this.type != PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
+            throw new Error();
+        }
+
+        return 1 + region.crownIcons;
+    }
+
 
     getWaitedUsers(): User[] {
         return [this.parentGameState.ingame.getControllerOfHouse(this.house).user];
@@ -291,7 +330,11 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         return region.castleLevel - this.getUsedPoints(region, musterings.tryGet(region, []));
     }
 
-    anyPointsLeft(musterings: BetterMap<Region, Mustering[]>) : boolean {
+    anyPointsLeft(musterings: BetterMap<Region, Mustering[]>): boolean {
+        if (this.type != PlayerMusteringType.MUSTERING_WESTEROS_CARD) {
+            return false;
+        }
+
         const controlledCastles = this.game.world.getControlledRegions(this.house).filter(r => r.castleLevel > 0);
         return controlledCastles.some(r => this.getPointsLeft(r, musterings) > 0);
     }

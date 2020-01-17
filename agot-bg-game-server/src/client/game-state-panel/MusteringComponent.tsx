@@ -8,10 +8,18 @@ import GameStateComponentProps from "./GameStateComponentProps";
 import renderChildGameState from "../utils/renderChildGameState";
 import PlayerMusteringGameState
     from "../../common/ingame-game-state/westeros-game-state/mustering-game-state/player-mustering-game-state/PlayerMusteringGameState";
+import ListGroupItem from "react-bootstrap/ListGroupItem";
+import Row from "react-bootstrap/Row";
 
 @observer
 export default class MusteringComponent extends Component<GameStateComponentProps<MusteringGameState>> {
     render() {
-        return renderChildGameState(this.props, [[PlayerMusteringGameState, PlayerMusteringComponent]]);
+        return (
+            <ListGroupItem>
+                <Row>
+                    {renderChildGameState(this.props, [[PlayerMusteringGameState, PlayerMusteringComponent]])}
+                </Row>
+            </ListGroupItem>
+        );
     }
 }

@@ -16,6 +16,9 @@ import Col from "react-bootstrap/Col";
 import Order from "../../common/ingame-game-state/game-data-structure/Order";
 import ConsolidatePowerOrderType
     from "../../common/ingame-game-state/game-data-structure/order-types/ConsolidatePowerOrderType";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
+import classNames from "classnames";
 
 @observer
 export default class PlayerMusteringComponent extends Component<GameStateComponentProps<PlayerMusteringGameState>> {
@@ -61,15 +64,17 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                                 ))}
                             </Col>
                         )}
-                        <Col xs={12}>
-                            {this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER ? (
-                                <>Click on a starred consolidate power to initiate a recruitment from there.</>
-                            ) : this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD ? (
-                                <>Click on a region to initiate a recruitement from there.</>
-                            ) : this.props.gameState.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD && (
-                                <>...</>
-                            )}
-                        </Col>
+                        {!(this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER && this.musterings.size > 0) && (
+                            <Col xs={12}>
+                                {this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER ? (
+                                    <>Click on a starred consolidate power to resolve it.</>
+                                ) : this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD ? (
+                                    <>Click on a region to initiate a recruitement from there.</>
+                                ) : this.props.gameState.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD && (
+                                    <>...</>
+                                )}
+                            </Col>
+                        )}
                         {this.selectedRegion && (
                             <>
                                 <Col xs={12}>
@@ -91,21 +96,37 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                             </>
                         )}
                         <Col xs={12}>
-                            <Row className="justify-content-between">
+                            <Row className="justify-content-center">
                                 <Col xs="auto">
                                     <Button disabled={!this.canSubmit()} onClick={() => this.submit()}>Submit</Button>
                                 </Col>
-                                <Col>
-                                    {this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER &&
-                                         this.selectedRegion != null && (
-                                            <Button onClick={() => this.submitForPT()}>Get 2 power tokens</Button>
-                                        )
-                                    }
-                                </Col>
+                                {this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER && (
+                                    <Col xs="auto" className={classNames({"invisible": this.selectedRegion == null})}>
+                                        <OverlayTrigger
+                                            overlay={
+                                                <Tooltip id="starred-consolidate-power">
+                                                    Resolve this Starred Consolidate Power as a normal Consolidate
+                                                    Power to gain Power tokens.
+                                                </Tooltip>
+                                            }
+                                        >
+                                            <Button
+                                                onClick={() => this.submitForPT()}
+                                                disabled={this.selectedRegion == null || (this.musterings.size > 0 && this.musterings.entries[0][1].length > 0)}
+                                            >
+                                                Get {this.selectedRegion ? this.props.gameState.getPotentialGainedPowerTokens(this.selectedRegion) : 0} power tokens
+                                            </Button>
+                                        </OverlayTrigger>
+                                    </Col>
+                                )}
                                 <Col xs="auto">
-                                    {this.musterings.size > 0 && (
-                                        <Button variant="danger" onClick={() => this.reset()}>Reset</Button>
-                                    )}
+                                    <Button
+                                        variant="danger"
+                                        disabled={this.musterings.size == 0}
+                                        onClick={() => this.reset()}
+                                    >
+                                        Reset
+                                    </Button>
                                 </Col>
                             </Row>
                         </Col>
@@ -124,7 +145,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
             case PlayerMusteringType.MUSTERING_WESTEROS_CARD:
                 return true;
             case PlayerMusteringType.STARRED_CONSOLIDATE_POWER:
-                return this.musterings.size == 1;
+                return this.selectedRegion != null || this.musterings.size > 0;
             case PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD:
                 return true;
         }
@@ -203,6 +224,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
             }
 
             this.selectedRegion = region;
+            this.musterings.set(this.selectedRegion, []);
         }
     }
 

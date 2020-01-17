@@ -466,12 +466,22 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 </>;
             case "march-order-removed":
                 house = this.game.houses.get(data.house);
-                const region = this.game.world.regions.get(data.region);
+                let region = this.game.world.regions.get(data.region);
 
                 return <>
                     <p>
                         <strong>{house.name}</strong> removed his march order in <strong>{region.name}</strong>.
                     </p>
+                </>;
+
+            case "starred-consolidate-power-for-power-tokens":
+                house = this.game.houses.get(data.house);
+                region = this.world.regions.get(data.region);
+                const countPowerToken = data.powerTokenCount;
+
+                return <>
+                    <strong>{house.name}</strong> resolved a Starred Consolidate Power Order token
+                    in <strong>{region.name}</strong> to gain <strong>{countPowerToken}</strong> Power tokens.
                 </>;
         }
     }
