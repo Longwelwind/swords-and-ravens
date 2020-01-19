@@ -2,10 +2,6 @@ import WebsiteClient, {StoredGameData, StoredUserData} from "./WebsiteClient";
 
 export default class LocalWebsiteClient implements WebsiteClient {
 
-    async init(): Promise<void> {
-        // Do nothing
-    }
-
     async getGame(gameId: string): Promise<StoredGameData> {
         if (gameId != "1") {
             throw new Error();

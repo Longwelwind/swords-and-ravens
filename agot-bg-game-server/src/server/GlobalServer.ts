@@ -22,7 +22,7 @@ export default class GlobalServer {
     constructor(server: Server) {
         this.server = server;
 
-        if (process.env.DATABASE_URL != null) {
+        if (process.env.MASTER_API_ENABLED != null) {
             console.log("Launching with live-website client");
             this.websiteClient = new LiveWebsiteClient();
         } else {
@@ -43,8 +43,6 @@ export default class GlobalServer {
                 this.onClose(client);
             });
         });
-
-        await this.websiteClient.init();
     }
 
     onSendServerMessage(users: User[], message: ServerMessage) {
@@ -146,7 +144,6 @@ export default class GlobalServer {
 
         // Otherwise, try to fetch it in the database
         const gameData = await this.websiteClient.getGame(gameId);
-
         if (!gameData) {
             return null;
         }
