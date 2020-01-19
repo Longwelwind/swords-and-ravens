@@ -19,6 +19,7 @@ import ConsolidatePowerOrderType
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import classNames from "classnames";
+import ConfirmDialog from "../utils/ConfirmDialog";
 
 @observer
 export default class PlayerMusteringComponent extends Component<GameStateComponentProps<PlayerMusteringGameState>> {
@@ -29,6 +30,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
     orderClickListener: any;
     highlightRegionListener: any;
     highlightOrderListener: any;
+    dialog: ConfirmDialog | null;
 
     get house(): House {
         return this.props.gameState.house;
@@ -114,7 +116,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                                                 onClick={() => this.submitForPT()}
                                                 disabled={this.selectedRegion == null || (this.musterings.size > 0 && this.musterings.entries[0][1].length > 0)}
                                             >
-                                                Get {this.selectedRegion ? this.props.gameState.getPotentialGainedPowerTokens(this.selectedRegion) : 0} power tokens
+                                                Get {this.selectedRegion ? this.props.gameState.getPotentialGainedPowerTokens(this.selectedRegion) : 0} power token(s)
                                             </Button>
                                         </OverlayTrigger>
                                     </Col>
@@ -136,6 +138,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                         Waiting for {this.house.name}...
                     </Col>
                 )}
+                <ConfirmDialog ref={(component) => { this.dialog = component }}></ConfirmDialog>
             </>
         );
     }
@@ -172,13 +175,23 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
     }
 
     submit(): void {
-        if(this.props.gameState.anyPointsLeft(this.musterings)) {
-            if(!confirm('You have not used all of your mustering points. Continue anyway?')){
-                return;
-            }
+        if (!this.dialog || !this.props.gameState.anyPointsLeft(this.musterings)) {
+            this.props.gameState.muster(this.musterings);
+            return;
         }
 
-        this.props.gameState.muster(this.musterings);
+        this.dialog.show({
+            body: (
+                <p>
+                    You haven't used all of your mustering points.<br />Continue anyway?
+                </p>
+            ),
+            title: null,
+            noAction: null,
+            yesAction: () => {
+                this.props.gameState.muster(this.musterings);
+            }
+        });
     }
 
     componentDidMount(): void {

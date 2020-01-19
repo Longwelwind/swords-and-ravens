@@ -196,14 +196,13 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
             });
 
             if (musterings.map((_, r) => r.length))
-            this.parentGameState.ingame.log({
-                type: "player-mustered",
-                house: this.house.id,
-                musterings: musterings.map((region, musterings) =>
-                    [region.id, musterings.map(m => ({region: m.region.id, from: m.from ? m.from.type.id : null, to: m.to.id}))]
-                )
-            });
-
+                this.parentGameState.ingame.log({
+                    type: "player-mustered",
+                    house: this.house.id,
+                    musterings: musterings.map((region, musterings) =>
+                        [region.id, musterings.map(m => ({region: m.region.id, from: m.from ? m.from.type.id : null, to: m.to.id}))]
+                    )
+                });
             this.parentGameState.onPlayerMusteringEnd(this.house, musterings.entries.map(([region, _]) => region));
         }
     }
@@ -284,7 +283,6 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                         const alreadyMusteredUnits = flattenedMusterings.filter(m => m.to == rule.to).length;
                         // Musterings might have freed units that can be used to realize musterings
                         const freedUnits = flattenedMusterings.filter(m => m.from && m.from.type == rule.to).length;
-                      
                         return this.game.getAvailableUnitsOfType(this.house, rule.to) + freedUnits - alreadyMusteredUnits;
                       })
                     // Check that the mustering respects supply
@@ -340,7 +338,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
 
     anyPointsLeft(musterings: BetterMap<Region, Mustering[]>): boolean {
         if (this.type != PlayerMusteringType.MUSTERING_WESTEROS_CARD) {
-            return false;
+            return false; // todo: make this work for cp* also
         }
 
         const controlledCastles = this.game.world.getControlledRegions(this.house).filter(r => r.castleLevel > 0);

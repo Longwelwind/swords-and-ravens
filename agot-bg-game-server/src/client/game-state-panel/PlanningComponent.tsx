@@ -13,6 +13,7 @@ import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import OrderGridComponent from "./utils/OrderGridComponent";
+import ConfirmDialog from "./../utils/ConfirmDialog"
 
 @observer
 export default class PlanningComponent extends Component<GameStateComponentProps<PlanningGameState>> {
@@ -20,6 +21,7 @@ export default class PlanningComponent extends Component<GameStateComponentProps
     regionClickListener: any;
     orderClickListener: any;
     highlightRegionListener: any;
+    dialog: ConfirmDialog | null;
 
     render() {
         return (
@@ -59,6 +61,7 @@ export default class PlanningComponent extends Component<GameStateComponentProps
                         </Col>
                     </Row>
                 </ListGroupItem>
+                <ConfirmDialog ref={(component) => { this.dialog = component }}></ConfirmDialog>
             </>
         );
     }
@@ -123,13 +126,27 @@ export default class PlanningComponent extends Component<GameStateComponentProps
     }
 
     onReadyClick(): void {
-        if (this.props.gameClient.authenticatedPlayer
-            && !this.props.gameState.areOrdersAssignedToAllPossibleRegions(this.props.gameClient.authenticatedPlayer.house)) {
-            if (!confirm('You haven\'t assigned an Order token to all of your areas. Continue anyway?')) {
-                return;
-            }
+        const house = this.props.gameClient.authenticatedPlayer ? this.props.gameClient.authenticatedPlayer.house : null;
+        if (!house || !this.dialog) {
+            this.props.gameState.ready();
+            return;
         }
 
-        this.props.gameState.ready();
+        if (!this.props.gameState.areOrdersAssignedToAllPossibleRegions(house)) {
+            this.dialog.show({
+                body: (
+                    <p>
+                        You haven't assigned an Order token to all of your areas.<br />Continue anyway?
+                    </p>
+                ),
+                title: null,
+                noAction: null,
+                yesAction: () => {
+                    this.props.gameState.ready();
+                }
+            });
+        } else {
+            this.props.gameState.ready();
+        }
     }
 }

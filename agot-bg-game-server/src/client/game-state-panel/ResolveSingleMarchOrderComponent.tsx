@@ -16,6 +16,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
+import ConfirmDialog from "../utils/ConfirmDialog";
 
 @observer
 export default class ResolveSingleMarchOrderComponent extends Component<GameStateComponentProps<ResolveSingleMarchOrderGameState>> {
@@ -30,6 +31,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     shouldHighlightRegionListener: any;
     shouldHighlightOrderListener: any;
     shouldHighlightUnitListener: any;
+    dialog: ConfirmDialog | null;
 
     render() {
 
@@ -98,33 +100,36 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         );
 
         return (
-            <Col xs={12} className="text-center">
-                <OverlayTrigger overlay={
-                    <Tooltip id={"leave-power-token"}>
-                        {reason == "already-capital" ? (
-                            <>Your capital is always controlled by your house, thus not requiring a Power
-                                token to be left when leaving the area to keep control of it.</>
-                        ) : reason == "already-power-token" ? (
-                            <>A Power token is already present.</>
-                        ) : reason == "no-power-token-available" ? (
-                            "You don't have any available Power token."
-                        ) : reason == "not-a-land" ? (
-                            "Power tokens can only be left on land areas."
-                        ) : reason == "no-all-units-go" ? (
-                            "All units must leave the area in order to leave a Power token."
-                        ) : "Leaving a Power token in an area maintain the control your house has on it, even"
-                            + " if all units your units leave the area."}
-                    </Tooltip>
-                }>
-                    <Form.Check
+            <>
+                <Col xs={12} className="text-center">
+                    <OverlayTrigger overlay={
+                        <Tooltip id={"leave-power-token"}>
+                            {reason == "already-capital" ? (
+                                <>Your capital is always controlled by your house, thus not requiring a Power
+                                    token to be left when leaving the area to keep control of it.</>
+                            ) : reason == "already-power-token" ? (
+                                <>A Power token is already present.</>
+                            ) : reason == "no-power-token-available" ? (
+                                "You don't have any available Power token."
+                            ) : reason == "not-a-land" ? (
+                                "Power tokens can only be left on land areas."
+                            ) : reason == "no-all-units-go" ? (
+                                "All units must leave the area in order to leave a Power token."
+                            ) : "Leaving a Power token in an area maintain the control your house has on it, even"
+                                + " if all units your units leave the area."}
+                        </Tooltip>
+                    }>
+                        <Form.Check
                         id="chk-leave-pt"
-                        label="Leave a Power Token"
-                        checked={this.leavePowerToken}
-                        onChange={() => this.leavePowerToken = !this.leavePowerToken}
-                        disabled={!success}
-                    />
-                </OverlayTrigger>
-            </Col>
+                            label="Leave a Power Token"
+                            checked={this.leavePowerToken}
+                            onChange={() => this.leavePowerToken = !this.leavePowerToken}
+                            disabled={!success}
+                        />
+                    </OverlayTrigger>
+                </Col>
+                <ConfirmDialog ref={(component) => { this.dialog = component }}></ConfirmDialog>
+            </>
         );
     }
 
@@ -224,10 +229,25 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
             return;
         }
 
-        if(this.plannedMoves.size == 0) {
-            if(!confirm("Do you want to remove your march order?")) {
-                return;
-            }
+        if (this.plannedMoves.size == 0 && this.dialog) {
+            this.dialog.show({
+                body: (
+                    <p>
+                        Do you want to remove your march order?
+                    </p>
+                ),
+                title: null,
+                noAction: null,
+                yesAction: () => this.sendMoves()
+            });
+        } else {
+            this.sendMoves();
+        }
+    }
+
+    sendMoves(): void {
+        if (!this.selectedMarchOrderRegion) {
+            return;
         }
 
         this.props.gameState.sendMoves(
