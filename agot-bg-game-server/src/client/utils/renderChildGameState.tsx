@@ -6,7 +6,8 @@ import * as React from "react";
 
 export default function renderChildGameState<E extends GameState<any, any>>(
     props: {gameClient: GameClient; mapControls: MapControls; gameState: E},
-    possibleChild: [any, typeof Component][]
+    possibleChild: [any, any][],
+    ref: (c: Component) => void = () => {}
 ): ReactNode {
     const childEntry = possibleChild.find(([GameStateClass, ComponentClass]) => props.gameState.childGameState instanceof GameStateClass);
 
@@ -16,5 +17,10 @@ export default function renderChildGameState<E extends GameState<any, any>>(
 
     const [GameStateClass, ComponentClass] = childEntry;
 
-    return <ComponentClass gameClient={props.gameClient} mapControls={props.mapControls} gameState={props.gameState.childGameState} />;
+    return <ComponentClass
+        gameClient={props.gameClient}
+        mapControls={props.mapControls}
+        gameState={props.gameState.childGameState}
+        ref={(c: any) => c ? ref(c) : null}
+    />;
 }

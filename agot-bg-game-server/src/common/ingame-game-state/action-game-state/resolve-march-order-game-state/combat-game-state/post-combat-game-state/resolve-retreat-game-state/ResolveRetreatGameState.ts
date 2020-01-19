@@ -13,11 +13,14 @@ import SelectRegionGameState, {SerializedSelectRegionGameState} from "../../../.
 import Unit from "../../../../../game-data-structure/Unit";
 import Game from "../../../../../game-data-structure/Game";
 import IngameGameState from "../../../../../IngameGameState";
+import BetterMap from "../../../../../../../utils/BetterMap";
+import _ from "lodash";
 
 export default class ResolveRetreatGameState extends GameState<
     PostCombatGameState,
     SelectRegionGameState<ResolveRetreatGameState> | SelectUnitsGameState<ResolveRetreatGameState>
 > {
+    retreatRegion: Region;
 
     get combat(): CombatGameState {
         return this.postCombat.combat;
@@ -99,34 +102,67 @@ export default class ResolveRetreatGameState extends GameState<
     }
 
     onSelectRegionFinish(_house: House, retreatRegion: Region): void {
-        // Todo: Take supply into account when retreating
         const loserCombatData = this.postCombat.loserCombatData;
         const army = loserCombatData.army;
-        // Mark those as wounded
-        army.forEach(u => u.wounded = true);
+        this.retreatRegion = retreatRegion;
 
-        this.entireGame.broadcastToClients({
-            type: "units-wounded",
-            regionId: loserCombatData.region.id,
-            unitIds: army.map(u => u.id)
-        });
+        // Check if this retreat region require casualties
+        const casualties = this.getCasualtiesOfRetreatRegion(retreatRegion);
+        if (casualties > 0) {
+            // The loser must sacrifice some of their units
+            this.setChildGameState(new SelectUnitsGameState(this)).firstStart(this.postCombat.loser, army, casualties);
+            return;
+        }
 
-        // Retreat those unit to this location
-        army.forEach(u => loserCombatData.region.units.delete(u.id));
-        army.forEach(u => retreatRegion.units.set(u.id, u));
-
-        this.entireGame.broadcastToClients({
-            type: "move-units",
-            from: loserCombatData.region.id,
-            to: retreatRegion.id,
-            units: army.map(u => u.id)
-        });
-
-        this.postCombat.onResolveRetreatFinish();
+        // Otherwise, proceed with no casualties
+        this.onSelectUnitsEnd(this.postCombat.loser, []);
     }
 
-    onSelectUnitsEnd(_house: House, _selectedUnit: [Region, Unit[]][]): void {
-        // Todo
+    onSelectUnitsEnd(loser: House, selectedUnits: [Region, Unit[]][]): void {
+        // Kill the casualties of the retreat selected by the loser
+        selectedUnits.forEach(([region, units]) => {
+            units.forEach(u => region.units.delete(u.id));
+            this.postCombat.loserCombatData.army = _.difference(this.postCombat.loserCombatData.army, units);
+
+            this.entireGame.broadcastToClients({
+                type: "combat-change-army",
+                house: this.postCombat.loser.id,
+                region: this.postCombat.loserCombatData.region.id,
+                army: this.postCombat.loserCombatData.army.map(u => u.id)
+            });
+
+            this.entireGame.broadcastToClients({
+                type: "remove-units",
+                regionId: this.postCombat.loserCombatData.region.id,
+                unitIds: units.map(u => u.id)
+            });
+        });
+
+        const armyLeft = this.postCombat.loserCombatData.army;
+
+        if (armyLeft.length > 0) {
+            // Mark those as wounded
+            armyLeft.forEach(u => u.wounded = true);
+
+            this.entireGame.broadcastToClients({
+                type: "units-wounded",
+                regionId: this.postCombat.loserCombatData.region.id,
+                unitIds: armyLeft.map(u => u.id)
+            });
+
+            // Retreat those unit to this location
+            armyLeft.forEach(u => this.postCombat.loserCombatData.region.units.delete(u.id));
+            armyLeft.forEach(u => this.retreatRegion.units.set(u.id, u));
+
+            this.entireGame.broadcastToClients({
+                type: "move-units",
+                from: this.postCombat.loserCombatData.region.id,
+                to: this.retreatRegion.id,
+                units: armyLeft.map(u => u.id)
+            });
+        }
+
+        this.postCombat.onResolveRetreatFinish();
     }
 
     getOverridenRetreatLocationChooser(retreater: House): House | null {
@@ -157,9 +193,36 @@ export default class ResolveRetreatGameState extends GameState<
         );
     }
 
+    getCasualtiesOfRetreatRegion(retreatRegion: Region): number {
+        // To find the number of casualties that a specific retreat region will inflict,
+        // simulate a movement of an increasing number of units and find at which number of units
+        // the user has too much armies for their supplies.
+        // This number represents the number of units the player will be able to keep.
+        // Assumption: all units have the same weight when it comes to supply.
+        const retreatingArmy = this.postCombat.loserCombatData.army;
+
+        const indexTooMuch = retreatingArmy.findIndex((_, i) => {
+            const retreatingUnits = retreatingArmy.slice(0, i + 1);
+            const potentiallyKilledUnits = retreatingArmy.slice(i + 1, retreatingArmy.length);
+
+            return this.game.hasTooMuchArmies(
+                this.postCombat.loser,
+                new BetterMap([[retreatRegion, retreatingUnits.map(u => u.type)]]),
+                new BetterMap([[this.postCombat.loserCombatData.region, potentiallyKilledUnits]])
+            );
+        });
+
+        if (indexTooMuch > -1) {
+            return retreatingArmy.length - indexTooMuch;
+        } else {
+            return 0;
+        }
+    }
+
     serializeToClient(admin: boolean, player: Player | null): SerializedResolveRetreatGameState {
         return {
             type: "resolve-retreat",
+            retreatRegion: this.retreatRegion ? this.retreatRegion.id : null,
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -167,6 +230,9 @@ export default class ResolveRetreatGameState extends GameState<
     static deserializeFromServer(postCombat: PostCombatGameState, data: SerializedResolveRetreatGameState): ResolveRetreatGameState {
         const resolveRetreat = new ResolveRetreatGameState(postCombat);
 
+        if (data.retreatRegion) {
+            resolveRetreat.retreatRegion = postCombat.game.world.regions.get(data.retreatRegion);
+        }
         resolveRetreat.childGameState = resolveRetreat.deserializeChildGameState(data.childGameState);
 
         return resolveRetreat;
@@ -184,5 +250,6 @@ export default class ResolveRetreatGameState extends GameState<
 
 export interface SerializedResolveRetreatGameState {
     type: "resolve-retreat";
+    retreatRegion: string | null;
     childGameState: SerializedSelectRegionGameState | SerializedSelectUnitsGameState;
 }

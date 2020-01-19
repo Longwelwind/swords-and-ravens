@@ -22,7 +22,11 @@ export default class SelectRegionComponent extends Component<GameStateComponentP
                 <Col xs={12}>
                     {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
                         <>
-                            {this.selectedRegion && <p>{this.selectedRegion.name}</p>}
+                            {this.selectedRegion && (
+                                <p className="text-center">
+                                    Selected region: {this.selectedRegion.name}
+                                </p>
+                            )}
                             <Button onClick={() => this.confirm()} disabled={this.selectedRegion == null}>
                                 Confirm
                             </Button>
