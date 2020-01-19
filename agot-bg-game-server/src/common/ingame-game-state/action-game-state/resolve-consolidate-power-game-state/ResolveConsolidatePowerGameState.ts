@@ -117,6 +117,11 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
         }
 
         this.actionGameState.ordersOnBoard.delete(region);
+        this.entireGame.broadcastToClients({
+            type: "action-phase-change-order",
+            region: region.id,
+            order: null
+        });
 
         this.proceedNextResolve(house);
     }
