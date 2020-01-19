@@ -32,13 +32,13 @@ class Game(models.Model):
     state = models.TextField(default=IN_LOBBY)
 
     def is_in_game(self, user):
-        return user in self.playeringame_set.all()
+        return user in self.players.all()
 
     def __str__(self):
         return f"{self.name} ({self.id})"
 
 
 class PlayerInGame(models.Model):
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, related_name='players', on_delete=models.CASCADE)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     data = JSONField()

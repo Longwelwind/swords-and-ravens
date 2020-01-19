@@ -28,7 +28,7 @@ def games(request):
         games = sorted(games, key=lambda row: [IN_LOBBY, ONGOING].index(row.state))
 
         for game in games:
-            game.is_user_in_game = request.user in [player_in_game.user for player_in_game in game.playeringame_set.all()]
+            game.is_user_in_game = request.user in [player_in_game.user for player_in_game in game.players.all()]
 
         return render(request, "agotboardgame_main/games.html", {
             "games": games
