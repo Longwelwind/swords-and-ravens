@@ -51,6 +51,10 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         return this.parentGameState.entireGame;
     }
 
+    get parentResolveConsolidatePowerGameState(): ResolveConsolidatePowerGameState | null {
+        return this.parentGameState instanceof ResolveConsolidatePowerGameState ? this.parentGameState : null;
+    }
+
     firstStart(house: House, type: PlayerMusteringType): void {
         this.house = house;
         this.type = type;
@@ -337,12 +341,24 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
     }
 
     anyPointsLeft(musterings: BetterMap<Region, Mustering[]>): boolean {
-        if (this.type != PlayerMusteringType.MUSTERING_WESTEROS_CARD) {
-            return false; // todo: make this work for cp* also
-        }
-
         const controlledCastles = this.game.world.getControlledRegions(this.house).filter(r => r.castleLevel > 0);
-        return controlledCastles.some(r => this.getPointsLeft(r, musterings) > 0);
+        switch(this.type) {
+            case PlayerMusteringType.MUSTERING_WESTEROS_CARD:
+                return controlledCastles.some(r => this.getPointsLeft(r, musterings) > 0);
+            case PlayerMusteringType.STARRED_CONSOLIDATE_POWER:
+                if(!this.parentResolveConsolidatePowerGameState) {
+                    return false;
+                }
+                
+                const starredCpRegions = this.parentResolveConsolidatePowerGameState.actionGameState.getRegionsWithStarredConsolidatePowerOrderOfHouse(this.house);
+                if(starredCpRegions.length == 1) {
+                    return this.getPointsLeft(starredCpRegions[0], musterings) > 0;
+                }
+
+                return false;
+            case PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD:
+                return false; // todo: test this scenario!
+        }
     }
 
     getUsedPoints(region: Region, musterings: Mustering[]): number {

@@ -139,7 +139,7 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
             currentHouseToCheck = this.game.getNextInTurnOrder(currentHouseToCheck);
         }
 
-        // If no house has any march order available, return null
+        // If no house has any CP* order available, return null
         return null;
     }
 
