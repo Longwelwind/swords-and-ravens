@@ -12,6 +12,7 @@ import RaidOrderType from "../../common/ingame-game-state/game-data-structure/or
 import Order from "../../common/ingame-game-state/game-data-structure/Order";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
+import ConfirmDialog from "../utils/ConfirmDialog";
 
 @observer
 export default class ResolveSingleRaidOrderComponent extends Component<GameStateComponentProps<ResolveSingleRaidOrderGameState>> {
@@ -22,6 +23,7 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
     orderClickListener: any;
     shouldHighlightOrderListener: any;
     shouldHighlightRegionListener: any;
+    dialog: ConfirmDialog | null;
 
     render() {
         return (
@@ -60,13 +62,34 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
                         Waiting for {this.props.gameState.house.name}...
                     </Col>
                 )}
+                <ConfirmDialog ref={(component) => { this.dialog = component }}></ConfirmDialog>
             </>
         );
     }
 
     confirm() {
-        if (this.selectedOrderRegion) {
+        if (!this.selectedOrderRegion) {
+            return;
+        }
+
+        if(this.selectedTargetRegion != null || this.dialog == null) {
             this.props.gameState.resolveRaid(this.selectedOrderRegion, this.selectedTargetRegion);
+        }
+        else {
+            this.dialog.show({
+                body: (
+                    <p>
+                        Do you want to remove your <strong>Raid</strong> order?
+                    </p>
+                ),
+                title: null,
+                noAction: null,
+                yesAction: () => {
+                    if(this.selectedOrderRegion) {
+                        this.props.gameState.resolveRaid(this.selectedOrderRegion, this.selectedTargetRegion);
+                    }
+                }
+            });
         }
     }
 

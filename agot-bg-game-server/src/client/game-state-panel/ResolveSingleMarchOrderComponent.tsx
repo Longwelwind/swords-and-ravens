@@ -233,7 +233,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
             this.dialog.show({
                 body: (
                     <p>
-                        Do you want to remove your march order?
+                        Do you want to remove your <strong>March</strong> order?
                     </p>
                 ),
                 title: null,
