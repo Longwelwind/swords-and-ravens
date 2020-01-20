@@ -148,7 +148,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
             case PlayerMusteringType.MUSTERING_WESTEROS_CARD:
                 return true;
             case PlayerMusteringType.STARRED_CONSOLIDATE_POWER:
-                return this.selectedRegion != null || this.musterings.size > 0;
+                return this.musterings.size > 0;
             case PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD:
                 return true;
         }
