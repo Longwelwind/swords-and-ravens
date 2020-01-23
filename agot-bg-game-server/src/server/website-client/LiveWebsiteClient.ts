@@ -79,7 +79,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
     }
 
     async notifyUsers(gameId: string, userIds: string[]): Promise<void> {
-        await post(`${this.masterApiBaseUrl}/notify/${gameId}/`, {
+        await post(`${this.masterApiBaseUrl}/notify/${gameId}`, {
             body: {users: userIds},
             json: true,
         }).auth(this.masterApiUsername, this.masterApiPassword, true);
