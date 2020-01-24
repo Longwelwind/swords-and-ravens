@@ -117,6 +117,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                     </Tooltip>
                 }>
                     <Form.Check
+                        id="chk-leave-pt"
                         label="Leave a Power Token"
                         checked={this.leavePowerToken}
                         onChange={() => this.leavePowerToken = !this.leavePowerToken}
@@ -215,6 +216,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         this.selectedMarchOrderRegion = null;
         this.selectedUnits = [];
         this.plannedMoves = new BetterMap<Region, Unit[]>();
+        this.leavePowerToken = false;
     }
 
     confirm(): void {
