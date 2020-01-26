@@ -38,27 +38,21 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
     }
 
     render(): ReactNode {
-        return (
-            <Card style={{height: "350px", overflowY: "scroll"}}>
-                <Card.Body>
-                    {this.props.ingameGameState.gameLogManager.logs.map((l, i) => (
-                        <Row key={i}>
-                            <Col xs="auto" className="text-muted">
-                                <small>
-                                    {l.time.getHours().toString().padStart(2, "0")}
-                                    :{l.time.getMinutes().toString().padStart(2, "0")}
-                                </small>
-                            </Col>
-                            <Col>
-                                <div className="game-log-content">
-                                    {this.renderGameLogData(l.data)}
-                                </div>
-                            </Col>
-                        </Row>
-                    ))}
-                </Card.Body>
-            </Card>
-        );
+        return this.props.ingameGameState.gameLogManager.logs.map((l, i) => (
+            <Row key={i}>
+                <Col xs="auto" className="text-muted">
+                    <small>
+                        {l.time.getHours().toString().padStart(2, "0")}
+                        :{l.time.getMinutes().toString().padStart(2, "0")}
+                    </small>
+                </Col>
+                <Col>
+                    <div className="game-log-content">
+                        {this.renderGameLogData(l.data)}
+                    </div>
+                </Col>
+            </Row>
+        ));
     }
 
     renderGameLogData(data: GameLogData): ReactNode {

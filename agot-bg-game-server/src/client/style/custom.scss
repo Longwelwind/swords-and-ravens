@@ -291,3 +291,7 @@ $strong-outline: rgba($outline-color, 0.8);
 hr {
   border-color: white;
 }
+
+.nav-link.active {
+  background-color: $dark !important;
+}

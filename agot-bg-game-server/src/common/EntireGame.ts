@@ -22,6 +22,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
+    publicChatRoomId: string;
+    // Keys are the two users participating in the private chat.
+    // A pair of user is sorted alphabetically by their id when used as a key.
+    privateChatRoomsIds: BetterMap<User, BetterMap<User, string>> = new BetterMap();
 
     constructor(id: string, ownerId: string) {
         super(null);
@@ -29,7 +33,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         this.ownerUserId = ownerId;
     }
 
-    firstStart() {
+    firstStart(): void {
         this.setChildGameState(new LobbyGameState(this)).firstStart();
     }
 
@@ -197,6 +201,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             id: this.id,
             users: this.users.values.map(u => u.serializeToClient()),
             ownerUserId: this.ownerUserId,
+            publicChatRoomId: this.publicChatRoomId,
+            privateChatRoomIds: this.privateChatRoomsIds.map((u1, v) => [u1.id, v.map((u2, rid) => [u2.id, rid])]),
             childGameState: this.childGameState.serializeToClient(user)
         };
     }
@@ -207,6 +213,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         entireGame.users = new BetterMap<string, User>(data.users.map((ur: any) => [ur.id, User.deserializeFromServer(entireGame, ur)]));
         entireGame.ownerUserId = data.ownerUserId;
         entireGame.childGameState = entireGame.deserializeChildGameState(data.childGameState);
+        entireGame.publicChatRoomId = data.publicChatRoomId;
 
         return entireGame;
     }
@@ -227,4 +234,6 @@ export interface SerializedEntireGame {
     users: SerializedUser[];
     ownerUserId: string;
     childGameState: SerializedLobbyGameState | SerializedIngameGameState;
+    publicChatRoomId: string;
+    privateChatRoomIds: [string, [string, string][]][];
 }

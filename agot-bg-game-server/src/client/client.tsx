@@ -6,16 +6,20 @@ import GameClient, {AuthData} from "./GameClient";
 
 function getAuthData(): AuthData {
     if (process.env.NODE_ENV == "development") {
-        // In development, parse the URL to find the user id with
+        // In development, parse the URL to find the user id, the game token and/or the game id with
         // which we should authenticate.
         // Other fields are dumb fields that won't be read by the server.
-        const userId = location.hash.substr(1);
+        const urlContent = location.hash.substr(1);
+        const urlData = urlContent.split('.');
+        const userId = urlData[0];
+        const authToken = urlData.length > 1 ? urlData[1] : userId;
+        const gameId = urlData.length > 2 ? urlData[2] : "1";
 
         if (!userId) {
             throw new Error("No user id in the URL");
         }
 
-        return {userId, gameId: "1", authToken: userId}
+        return {userId, gameId, authToken}
     } else if (process.env.NODE_ENV == "production") {
         // Find the data that has been included in the HTML by Django
         const authDataElement = document.getElementById("auth-data");

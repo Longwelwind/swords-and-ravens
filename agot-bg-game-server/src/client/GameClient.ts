@@ -6,6 +6,7 @@ import User from "../server/User";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import Player from "../common/ingame-game-state/Player";
 import House from "../common/ingame-game-state/game-data-structure/House";
+import ChatClient from "./chat-client/ChatClient";
 
 export interface AuthData {
     userId: string;
@@ -28,7 +29,8 @@ export default class GameClient {
     @observable entireGame: EntireGame | null = null;
 
     @observable authenticated = false;
-    @observable authenticatedUser: User | null = null;
+    @observable authenticatedUser: User | null = null
+    chatClient: ChatClient = new ChatClient(this);
 
     authData: AuthData;
 
@@ -141,6 +143,9 @@ export default class GameClient {
 
             this.authenticated = true;
             this.authenticatedUser = this.entireGame.users.get(message.userId);
+
+            // Create the public chat room and connect to it
+            this.chatClient.addChannel(this.entireGame.publicChatRoomId);
 
             this.connectionState = ConnectionState.SYNCED;
         } else {
