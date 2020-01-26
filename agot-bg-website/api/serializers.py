@@ -2,6 +2,7 @@ from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
 
 from agotboardgame_main.models import User, Game, PlayerInGame
+from chat.models import Room, UserInRoom
 
 
 class UserSerializer(ModelSerializer):
@@ -40,3 +41,34 @@ class GameSerializer(ModelSerializer):
         instance.save()
 
         return instance
+
+
+class UserInRoomSerializer(ModelSerializer):
+    user = PrimaryKeyRelatedField(queryset=User.objects.all())
+
+    class Meta:
+        model = UserInRoom
+        fields = ['user']
+
+
+class RoomSerializer(ModelSerializer):
+    users = UserInRoomSerializer(many=True)
+
+    class Meta:
+        model = Room
+        fields = ['id', 'name', 'public', 'max_retrieve_count', 'users']
+
+    def create(self, validated_data):
+        room = Room(
+            name=validated_data.pop('name'),
+            public=validated_data.pop('public'),
+            max_retrieve_count=validated_data.pop('max_retrieve_count')
+        )
+
+        users_data = validated_data.pop('users')
+        for user_data in users_data:
+            UserInRoom.objects.create(room=room, **user_data)
+
+        room.save()
+
+        return room

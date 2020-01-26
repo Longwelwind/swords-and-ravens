@@ -1,6 +1,5 @@
 import uuid
 
-from django import template
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import JSONField
