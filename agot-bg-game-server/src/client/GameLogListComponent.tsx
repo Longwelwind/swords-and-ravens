@@ -113,13 +113,11 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
 
                 return (
                     <>
-                        <p>
-                            <Row className="justify-content-center">
-                                <Col xs="auto">
-                                    <WesterosCardComponent cardType={westerosCardType} size="small" tooltip={true}/>
-                                </Col>
-                            </Row>
-                        </p>
+                        <Row className="justify-content-center">
+                            <Col xs="auto">
+                                <WesterosCardComponent cardType={westerosCardType} size="small" tooltip={true}/>
+                            </Col>
+                        </Row>
                     </>
                 );
 
@@ -131,15 +129,13 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                         <p>
                             Westeros cards were drawn:
                         </p>
-                        <p>
-                            <Row className="justify-content-around">
-                                {drawnWesterosCardTypes.map((wct, i) => (
-                                    <Col xs="auto" key={i}>
-                                        <WesterosCardComponent cardType={wct} size="small" tooltip={true}/>
-                                    </Col>
-                                ))}
-                            </Row>
-                        </p>
+                        <Row className="justify-content-around">
+                            {drawnWesterosCardTypes.map((wct, i) => (
+                                <Col xs="auto" key={i}>
+                                    <WesterosCardComponent cardType={wct} size="small" tooltip={true} />
+                                </Col>
+                            ))}
+                        </Row>
                         {data.addedWildlingStrength > 0 && (
                             <p>Wildling strength increased by {data.addedWildlingStrength}</p>
                         )}
@@ -158,18 +154,20 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     <>
                         <p>Combat result</p>
 
-                        <p>
-                            <table>
+                        <table>
+                            <thead>
                                 <tr>
-                                    <th/>
+                                    <th />
                                     <th>Attacker</th>
                                     <th>Defender</th>
                                 </tr>
                                 <tr>
-                                    <th/>
+                                    <th />
                                     <th>{stats[0].house.name}</th>
                                     <th>{stats[1].house.name}</th>
                                 </tr>
+                            </thead>
+                            <tbody>
                                 <tr>
                                     <td>Army</td>
                                     <td>{stats[0].army} (+{stats[1].orderBonus + stats[1].garrison})</td>
@@ -195,8 +193,8 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                                     <td>{stats[0].total}</td>
                                     <td>{stats[1].total}</td>
                                 </tr>
-                            </table>
-                        </p>
+                            </tbody>
+                        </table>
                         <p><strong>{winner.name}</strong> won the fight!</p>
                     </>
                 );
