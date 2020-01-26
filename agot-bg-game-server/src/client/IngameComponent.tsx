@@ -45,6 +45,9 @@ import GameEndedGameState from "../common/ingame-game-state/game-ended-game-stat
 import GameEndedComponent from "./game-state-panel/GameEndedComponent";
 import Button from "react-bootstrap/Button";
 import SettingsRowComponent from "./SettingsRowComponent";
+import Nav from "react-bootstrap/Nav";
+import Tab from "react-bootstrap/Tab";
+import ChatComponent from "./chat-client/ChatComponent";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -350,7 +353,30 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </Row>
                     <Row>
                         <Col>
-                            <GameLogListComponent ingameGameState={this.props.gameState} />
+                            <Card>
+                                <Tab.Container defaultActiveKey="chat">
+                                    <Card.Header>
+                                        <Nav variant="tabs">
+                                            <Nav.Item>
+                                                <Nav.Link eventKey="chat">Chat</Nav.Link>
+                                            </Nav.Item>
+                                            <Nav.Item>
+                                                <Nav.Link eventKey="game-logs">Game Logs</Nav.Link>
+                                            </Nav.Item>
+                                        </Nav>
+                                    </Card.Header>
+                                    <Card.Body style={{height: "350px", overflowY: "scroll"}}>
+                                        <Tab.Content className="h-100">
+                                            <Tab.Pane eventKey="chat" className="h-100">
+                                                <ChatComponent gameClient={this.props.gameClient} ingame={this.props.gameState} />
+                                            </Tab.Pane>
+                                            <Tab.Pane eventKey="game-logs">
+                                                <GameLogListComponent ingameGameState={this.props.gameState} />
+                                            </Tab.Pane>
+                                        </Tab.Content>
+                                    </Card.Body>
+                                </Tab.Container>
+                            </Card>
                         </Col>
                     </Row>
                 </Col>

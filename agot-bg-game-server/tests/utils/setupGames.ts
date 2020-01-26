@@ -18,6 +18,8 @@ function setup4PlayersGame(serializedEntireGameChildGameState: SerializedEntireG
     const serializedEntireGame: SerializedEntireGame = {
         id: "1",
         ownerUserId: "1",
+        publicChatRoomId: "1",
+        privateChatRoomIds: [],
         users: [
             {
                 id: "1",

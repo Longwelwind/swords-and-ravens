@@ -6,6 +6,7 @@ from django.shortcuts import render, get_object_or_404
 from django.template.loader import select_template
 
 from agotboardgame_main.models import Game, ONGOING, IN_LOBBY, User
+from chat.models import Room
 
 
 def index(request):
@@ -30,8 +31,11 @@ def games(request):
         for game in games:
             game.is_user_in_game = request.user in [player_in_game.user for player_in_game in game.players.all()]
 
+        public_room_id = Room.objects.get(name='public').id
+
         return render(request, "agotboardgame_main/games.html", {
-            "games": games
+            "games": games,
+            'public_room_id': public_room_id
         })
     elif request.method == "POST":
         if not request.user.has_perm("agotboardgame_main.add_game"):
