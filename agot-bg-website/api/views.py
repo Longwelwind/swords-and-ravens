@@ -5,13 +5,14 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
-from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
+from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, CreateModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from agotboardgame.settings import DEFAULT_FROM_MAIL
 from agotboardgame_main.models import User, Game
-from api.serializers import UserSerializer, GameSerializer
+from api.serializers import UserSerializer, GameSerializer, RoomSerializer
+from chat.models import Room
 
 LOGGER = logging.getLogger(__name__)
 
@@ -24,6 +25,11 @@ class UserViewSet(RetrieveModelMixin, GenericViewSet):
 class GameViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     queryset = Game.objects.all()
     serializer_class = GameSerializer
+
+
+class RoomViewSet(CreateModelMixin, GenericViewSet):
+    queryset = Room.objects.all()
+    serializer_class = RoomSerializer
 
 
 @api_view(['POST'])

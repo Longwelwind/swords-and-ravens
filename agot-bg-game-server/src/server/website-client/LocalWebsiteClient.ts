@@ -30,4 +30,8 @@ export default class LocalWebsiteClient implements WebsiteClient {
     async notifyUsers(_gameId: string, _userIds: string[]): Promise<void> {
         // Do Nothing
     }
+
+    async createPublicChatRoom(name: string): Promise<string> {
+        return `chat-${name}`;
+    }
 }

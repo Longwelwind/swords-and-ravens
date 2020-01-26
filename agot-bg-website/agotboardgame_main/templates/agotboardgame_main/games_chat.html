@@ -1,0 +1,101 @@
+<div id="chat-container" style="height: 252px"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/preact/8.5.2/preact.min.js"
+        integrity="sha256-uE3E2W7iyrYJy+/48n4qGW6IgqbRFBjALmSYLHzJtSs="
+        crossorigin="anonymous">
+</script>
+<script type="module">
+    import { h, Component, render } from 'https://unpkg.com/preact?module';
+    import htm from 'https://unpkg.com/htm?module';
+    const html = htm.bind(h);
+
+    let publicRoomId = '{{ public_room_id }}';
+    let isAuthenticated = '{{ user.is_authenticated }}' == 'True';
+    let chatWebsocket = null;
+
+    class Chat extends Component {
+        state = {
+            input: '',
+            state: 0,
+            messages: []
+        };
+
+        componentDidMount() {
+            const url = window.location;
+            chatWebsocket = new WebSocket((url.protocol == 'http:' ? 'ws:' : 'wss:') + '//' + url.host + '/ws/chat/room/' + publicRoomId);
+            chatWebsocket.onopen = () => {
+                this.setState({state: 1});
+                chatWebsocket.send(JSON.stringify({type: 'chat_retrieve', count: 10}));
+            };
+            chatWebsocket.onmessage = m => {
+                const data = JSON.parse(m.data);
+                console.log(data);
+
+                if (data.type == 'chat_message') {
+                    this.addMessage(data);
+                } else if (data.type == 'chat_messages_retrieved') {
+                    data.messages.forEach(d => this.addMessage(d));
+                }
+            };
+            chatWebsocket.onclose = () => this.setState({state: 2});
+        }
+
+        addMessage(data) {
+            this.setState(state => {
+                const messages = state.messages.concat({username: data.user_username, text: data.text, created_at: new Date(Date.parse(data.created_at))});
+                return {messages};
+            });
+        }
+
+        sendMessage(e) {
+            e.preventDefault();
+            const data = {type: 'chat_message', text: this.state.input};
+            chatWebsocket.send(JSON.stringify(data));
+            this.setState({input: ''});
+        }
+
+        render() {
+            return html`
+                <div style="overflow-y: scroll; overflow-x: hidden; height: 200px; background-color: #444; border-radius: 4px" class="p-2 mb-3">
+                    <div class="row">
+                        ${this.state.messages.slice().reverse().map(m => html`
+                            <div class="col-12">
+                                <div class="row flex-nowrap no-gutters">
+                                    <div class="col-auto mx-1" style="margin-top: 0.2rem;">
+                                        <small class="text-muted">${('0' + m.created_at.getHours()).slice(-2)}:${('0' + m.created_at.getMinutes()).slice(-2)}</small>
+                                    </div>
+                                    <div class="col-auto mx-2">
+                                        <strong>${m.username}</strong>
+                                    </div>
+                                    <div class="col" style="overflow-wrap: break-all; max-width: 650px;">
+                                        ${m.text}
+                                    </div>
+                                </div>
+                            </div>
+                        `)}
+                    </div>
+                </div>
+                <form id="chat-message-form" class="mb-0">
+                    <div class="form-row align-items-center">
+                        <div class="col">
+                            <input type="text"
+                                   class="form-control"
+                                   id="chat-message"
+                                   placeholder="Message"
+                                   value=${this.state.input}
+                                   onInput=${e => this.setState({input: e.target.value})}/>
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit"
+                                    class="btn btn-primary"
+                                    onClick=${e => this.sendMessage(e)}>
+                                Send
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            `;
+        }
+    }
+
+    render(h(Chat), document.getElementById('chat-container'));
+</script>

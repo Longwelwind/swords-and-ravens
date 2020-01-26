@@ -27,7 +27,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
 
     async getGame(gameId: string): Promise<StoredGameData | null> {
         try {
-            const response = await this.request.get(`${this.masterApiBaseUrl}/game/${gameId}/`);
+            const response = await this.request.get(`${this.masterApiBaseUrl}/game/${gameId}`);
 
             return {
                 id: response.id,
@@ -48,7 +48,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
 
     async getUser(userId: string): Promise<StoredUserData | null> {
         try {
-            const response = await this.request.get(`${this.masterApiBaseUrl}/user/${userId}/`);
+            const response = await this.request.get(`${this.masterApiBaseUrl}/user/${userId}`);
 
             return {
                 id: response.id,
@@ -66,8 +66,21 @@ export default class LiveWebsiteClient implements WebsiteClient {
         }
     }
 
+    async createPublicChatRoom(name: string): Promise<string> {
+        const response = await this.request.post(`${this.masterApiBaseUrl}/room`, {
+            body: {
+                name,
+                public: true,
+                users: [],
+                max_retrieve_count: null
+            }
+        });
+
+        return response.id;
+    }
+
     async saveGame(gameId: string, serializedGame: any, viewOfGame: any, players: {userId: string; data: object}[], state: string, version: string): Promise<void> {
-        await this.request.patch(`${this.masterApiBaseUrl}/game/${gameId}/`, {
+        await this.request.patch(`${this.masterApiBaseUrl}/game/${gameId}`, {
             body: {
                 serialized_game: serializedGame,
                 state,
