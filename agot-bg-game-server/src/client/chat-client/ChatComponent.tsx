@@ -49,7 +49,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                 <Form.Control type="text" value={this.inputText} onChange={(e: any) => this.inputText = e.target.value} />
                             </Col>
                             <Col xs="auto">
-                                <Button type="submit" onClick={() => this.send()}>Send</Button>
+                                <Button type="submit" onClick={(e: any) => {this.send(); e.preventDefault()}}>Send</Button>
                             </Col>
                         </Row>
                     </Form>
