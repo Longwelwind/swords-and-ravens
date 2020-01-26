@@ -7,3 +7,9 @@ services:
       POSTGRES_PASSWORD: example
     ports:
       - 5432:5432
+  redis:
+    image: redis:5.0
+    restart: always
+    ports:
+      - 6379:6379
+
