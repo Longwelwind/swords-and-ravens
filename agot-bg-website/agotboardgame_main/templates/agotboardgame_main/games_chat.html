@@ -13,11 +13,13 @@
     let chatWebsocket = null;
 
     class Chat extends Component {
-        state = {
-            input: '',
-            state: 0,
-            messages: []
-        };
+        constructor() {
+            this.state = {
+                input: '',
+                state: 0,
+                messages: []
+            };
+        }
 
         componentDidMount() {
             const url = window.location;
