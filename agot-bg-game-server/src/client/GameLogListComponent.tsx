@@ -368,7 +368,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
 
                 return (
                     <p>
-                        <strong>{house.name}</strong>, holder of the Valyrian Sword token, chose to
+                        <strong>{house.name}</strong>, holder of the Valyrian Steel Blade token, chose to
                         {data.choice == 0 ? (
                             <> forbid <strong>March +1</strong> orders from being played during this Planning phase.</>
                         ) : data.choice == 1 ? (

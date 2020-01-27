@@ -124,7 +124,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                 ) : i == 1 ? (
                                                                     <>
                                                                         <b>Fiefdoms Track</b><br />
-                                                                        Once per turn, the holder of Valyrian Sword can use his sword
+                                                                        Once per turn, the holder of Valyrian Steel Blade can use the blade
                                                                         to increase by one the combat strength of his army in a combat.<br />
                                                                         In case of a tie in a combat, the winner is the house which is
                                                                         the highest in this tracker.

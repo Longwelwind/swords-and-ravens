@@ -17,6 +17,8 @@ import unitImages from "./unitImages";
 import classNames = require("classnames");
 import housePowerTokensImages from "./housePowerTokensImages";
 import garrisonTokens from "./garrisonTokens";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import ConditionalWrap from "./utils/ConditionalWrap";
 
 interface MapComponentProps {
     gameClient: GameClient;
@@ -43,6 +45,17 @@ export default class MapComponent extends Component<MapComponentProps> {
                                 </div>
 
                             )}
+                            {r.controlPowerToken && (
+                                <div
+                                    className="power-token hover-weak-outline"
+                                    style={{
+                                        left: r.powerTokenSlot.x,
+                                        top: r.powerTokenSlot.y,
+                                        backgroundImage: `url(${housePowerTokensImages.get(r.controlPowerToken.id)})`
+                                    }}
+                                >
+                                </div>
+                            )}
                             <div
                                 className="units-container"
                                 style={{left: r.unitSlot.x, top: r.unitSlot.y}}
@@ -57,17 +70,6 @@ export default class MapComponent extends Component<MapComponentProps> {
                                          }}/>
                                 ))}
                             </div>
-                            {r.controlPowerToken && (
-                                <div
-                                    className="power-token hover-weak-outline"
-                                    style={{
-                                        left: r.powerTokenSlot.x,
-                                        top: r.powerTokenSlot.y,
-                                        backgroundImage: `url(${housePowerTokensImages.get(r.controlPowerToken.id)})`
-                                    }}
-                                >
-                                </div>
-                            )}
                         </div>
                     ))}
                     {/*this.props.ingame.world.regions.values.filter(r => r.type != port).map(r => (
@@ -118,7 +120,7 @@ export default class MapComponent extends Component<MapComponentProps> {
 
             const backgroundUrl = order ? orderImages.get(order.type.id) : houseOrderImages.get(controller.id);
 
-            return this.renderOrder(r, order, backgroundUrl);
+            return this.renderOrder(r, order, backgroundUrl, false);
         }
 
         return false;
@@ -131,19 +133,27 @@ export default class MapComponent extends Component<MapComponentProps> {
 
         const order = actionGameState.ordersOnBoard.get(r);
 
-        return this.renderOrder(r, order, orderImages.get(order.type.id));
+        return this.renderOrder(r, order, orderImages.get(order.type.id), true);
     }
 
-    renderOrder(region: Region, order: Order| null, backgroundUrl: string): ReactNode {
+    renderOrder(region: Region, order: Order| null, backgroundUrl: string, isActionGameState: boolean): ReactNode {
         return (
-            <div className={classNames("order-container", "hover-weak-outline", {"medium-outline hover-strong-outline clickable": order ? this.shouldHighlightOrder(region, order) : false})}
-                 style={{left: region.orderSlot.x, top: region.orderSlot.y}}
-                 onClick={() => order ? this.onOrderClick(region, order) : undefined}
-                 key={"region-" + region.id}
+            <div className={classNames("order-container", "hover-weak-outline", { "medium-outline hover-strong-outline clickable": order ? this.shouldHighlightOrder(region, order) : false })}
+                style={{ left: region.orderSlot.x, top: region.orderSlot.y }}
+                onClick={() => order ? this.onOrderClick(region, order) : undefined}
+                key={"region-" + region.id}
             >
-                <div className="order-icon" style={{
-                    backgroundImage: `url(${backgroundUrl})`
-                }}/>
+                <ConditionalWrap condition={isActionGameState}
+                    wrap={child => 
+                        <OverlayTrigger overlay={
+                            <Tooltip id={"order-owner"}>
+                                {this.getController(region)}
+                            </Tooltip>
+                        } delay={{ show: 750, hide: 250 }}>
+                            {child}
+                        </OverlayTrigger>}>
+                        <div className="order-icon" style={{ backgroundImage: `url(${backgroundUrl})` }} />
+                </ConditionalWrap>
             </div>
         );
     }
@@ -186,5 +196,10 @@ export default class MapComponent extends Component<MapComponentProps> {
 
     shouldHighlightUnit(region: Region, unit: Unit): boolean {
         return this.props.mapControls.shouldHighlightUnit.some(f => f(region, unit));
+    }
+
+    getController(region: Region): string | null {
+        const controller = region.getController();
+        return (controller ? controller.name : null);
     }
 }
