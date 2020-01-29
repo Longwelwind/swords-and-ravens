@@ -79,5 +79,6 @@ export default class SelectRegionComponent extends Component<GameStateComponentP
         }
 
         this.props.gameState.select(this.selectedRegion);
+        this.selectedRegion = null;
     }
 }
