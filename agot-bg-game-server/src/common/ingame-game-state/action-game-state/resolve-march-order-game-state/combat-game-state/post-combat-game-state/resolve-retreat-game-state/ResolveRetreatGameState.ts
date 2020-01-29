@@ -203,12 +203,11 @@ export default class ResolveRetreatGameState extends GameState<
 
         const indexTooMuch = retreatingArmy.findIndex((_, i) => {
             const retreatingUnits = retreatingArmy.slice(0, i + 1);
-            const potentiallyKilledUnits = retreatingArmy.slice(i + 1, retreatingArmy.length);
-
+            
             return this.game.hasTooMuchArmies(
                 this.postCombat.loser,
                 new BetterMap([[retreatRegion, retreatingUnits.map(u => u.type)]]),
-                new BetterMap([[this.postCombat.loserCombatData.region, potentiallyKilledUnits]])
+                new BetterMap([[this.postCombat.loserCombatData.region, retreatingUnits]])
             );
         });
 
