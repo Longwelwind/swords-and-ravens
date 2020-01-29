@@ -81,7 +81,7 @@ export default class ResolveRetreatGameState extends GameState<
                 // where the least units are lost.
                 // TODO: Add constraints
                 this.setChildGameState(new SelectRegionGameState(this))
-                    .firstStart(finalChooser, this.getValidRetreatRegions());
+                    .firstStart(finalChooser, possibleRetreatRegions);
             }
         } else {
             // The loser is the defender...
@@ -89,14 +89,14 @@ export default class ResolveRetreatGameState extends GameState<
                 // ...and the chooser was not overriden:
                 // The loser chooses the location of the retreat
                 this.setChildGameState(new SelectRegionGameState(this))
-                    .firstStart(finalChooser, this.getValidRetreatRegions());
+                    .firstStart(finalChooser, possibleRetreatRegions);
             } else {
                 // ...and the chooser was overriden:
                 // The chooser can choose the retreat location, with the constraint
                 // where the least units are lost.
                 // Todo: Add constraints
                 this.setChildGameState(new SelectRegionGameState(this))
-                    .firstStart(finalChooser, this.getValidRetreatRegions());
+                    .firstStart(finalChooser, possibleRetreatRegions);
             }
         }
     }
@@ -186,11 +186,18 @@ export default class ResolveRetreatGameState extends GameState<
     }
 
     getValidRetreatRegions(): Region[] {
-        return this.world.getValidRetreatRegions(
-            this.combat.defendingRegion,
-            this.postCombat.loser,
-            this.postCombat.loserCombatData.army
-        );
+        const regionsWithTheirCasualties =
+            this.world.getValidRetreatRegions(
+                this.combat.defendingRegion,
+                this.postCombat.loser,
+                this.postCombat.loserCombatData.army
+            ).map(r => [r, this.getCasualtiesOfRetreatRegion(r)] as [Region, number]);
+
+        // Get lowest casualty value
+        const lowestCasualty = _.min(_.flatMap(regionsWithTheirCasualties.map(([_, c]) => c)));
+
+        // filter regions for lowest casualty value
+        return regionsWithTheirCasualties.filter(([_, c]) => c == lowestCasualty).map(([r, _]) => r);
     }
 
     getCasualtiesOfRetreatRegion(retreatRegion: Region): number {
