@@ -131,7 +131,7 @@ $grid-gutter-width: 1rem;
   border-radius: 6px;
 }
 
-.card {
+.game-card {
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -141,43 +141,54 @@ $game-card-width: 270px;
 $game-card-height: 1.57 * $game-card-width;
 $medium-scale: 0.5;
 $small-scale: 0.2;
+$tiny-scale: 0.12;
 
-.vertical-card {
-  @extend .card;
+.vertical-game-card {
+  @extend .game-card;
 
   width: $game-card-width;
   height: $game-card-height;
 }
 
-.vertical-card.medium {
+.vertical-game-card.medium {
   width: $game-card-width * $medium-scale;
   height: $game-card-height * $medium-scale;
 }
 
-.vertical-card.small {
+.vertical-game-card.small {
   width: $game-card-width * $small-scale;
   height: $game-card-height * $small-scale;
 }
 
-.horizontal-card {
-  @extend .card;
+.vertical-game-card.tiny {
+  width: $game-card-width * $tiny-scale;
+  height: $game-card-height * $tiny-scale;
+}
+
+.horizontal-game-card {
+  @extend .game-card;
 
   width: $game-card-height;
   height: $game-card-width;
 }
 
-.horizontal-card.medium {
+.horizontal-game-card.medium {
   width: $game-card-height * $medium-scale;
   height: $game-card-width * $medium-scale;
 }
 
-.horizontal-card.small {
+.horizontal-game-card.small {
   width: $game-card-height * $small-scale;
   height: $game-card-width * $small-scale;
 }
 
-.horizontal-card.slot {
-  border: 2px dashed gray;
+.horizontal-game-card.tiny {
+  width: $game-card-height * $tiny-scale;
+  height: $game-card-width * $tiny-scale;
+}
+
+.game-card-slot {
+  border: 1px dashed gray;
 }
 
 .influence-icon {

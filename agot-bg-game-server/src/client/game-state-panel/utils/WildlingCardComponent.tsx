@@ -21,7 +21,7 @@ export default class WildlingCardComponent extends Component<WildlingCardProps> 
             <OverlayTrigger
                 overlay={
                     this.props.tooltip ? <div
-                        className="vertical-card"
+                        className="vertical-game-card"
                         style={{
                             backgroundImage: this.props.cardType ? `url(${wildlingCardImages.get(this.props.cardType.id)})` : undefined
                         }}
@@ -31,7 +31,7 @@ export default class WildlingCardComponent extends Component<WildlingCardProps> 
                 placement={this.props.placement}
             >
                 <div
-                    className={classNames("vertical-card hover-weak-outline", this.props.size, {"slot": this.props.cardType == null})}
+                    className={classNames("vertical-game-card hover-weak-outline", this.props.size, {"slot": this.props.cardType == null})}
                     style={{
                         backgroundImage: this.props.cardType ? `url(${wildlingCardImages.get(this.props.cardType.id)})` : undefined
                     }}

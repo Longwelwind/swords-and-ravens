@@ -1,5 +1,5 @@
 import {observer} from "mobx-react";
-import {Component} from "react";
+import {Component, ReactNode} from "react";
 import CombatGameState
     from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import DeclareSupportGameState
@@ -27,6 +27,7 @@ import CancelHouseCardAbilitiesGameState
     from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/cancel-house-card-abilities-game-state/CancelHouseCardAbilitiesGameState";
 import CancelHouseCardAbilitiesComponent from "./house-card-abilities/CancelHouseCardAbilitiesComponent";
 import Col from "react-bootstrap/Col";
+import CombatInfoComponent from "../CombatInfoComponent";
 
 @observer
 export default class CombatComponent extends Component<GameStateComponentProps<CombatGameState>> {
@@ -42,63 +43,40 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
         return this.combatGameState.defender;
     }
 
-    render() {
+    render(): ReactNode {
         return (
             <>
                 <Col xs={12}>
-                    <Table size="sm">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Attacker ({this.props.gameState.attacker.name})</th>
-                                <th>Defender ({this.props.gameState.defender.name})</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Region</td>
-                                <td>{this.combatGameState.attackingRegion.name}</td>
-                                <td>{this.combatGameState.defendingRegion.name}</td>
-                            </tr>
-                            <tr>
-                                <td>Army</td>
-                                <td>
-                                    {this.combatGameState.getBaseCombatStrength(this.attacker)} (+
-                                    {
-                                        this.combatGameState.getOrderBonus(this.combatGameState.attacker)
-                                        + this.combatGameState.getGarrisonCombatStrength(this.combatGameState.attacker)
-                                    })
-                                </td>
-                                <td>
-                                    {this.combatGameState.getBaseCombatStrength(this.defender)} (+
-                                    {
-                                        this.combatGameState.getOrderBonus(this.combatGameState.defender)
-                                        + this.combatGameState.getGarrisonCombatStrength(this.combatGameState.defender)
-                                    })
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Support</td>
-                                <td>{this.combatGameState.getSupportStrengthForSide(this.attacker)}</td>
-                                <td>{this.combatGameState.getSupportStrengthForSide(this.defender)}</td>
-                            </tr>
-                            <tr>
-                                <td>House Card</td>
-                                <td>{this.combatGameState.getHouseCardCombatStrength(this.attacker)}</td>
-                                <td>{this.combatGameState.getHouseCardCombatStrength(this.defender)}</td>
-                            </tr>
-                            <tr>
-                                <td>Valyrian Steel Blade</td>
-                                <td>{this.combatGameState.getValyrianBladeBonus(this.attacker)}</td>
-                                <td>{this.combatGameState.getValyrianBladeBonus(this.defender)}</td>
-                            </tr>
-                            <tr>
-                                <td>Total</td>
-                                <td>{this.combatGameState.getTotalCombatStrength(this.attacker)}</td>
-                                <td>{this.combatGameState.getTotalCombatStrength(this.defender)}</td>
-                            </tr>
-                        </tbody>
-                    </Table>
+                    {!(this.props.gameState.childGameState instanceof PostCombatGameState) && (
+                        <CombatInfoComponent
+                            housesCombatData={[
+                                {
+                                    house: this.attacker,
+                                    houseCard: this.props.gameState.attackerHouseCard,
+                                    region: this.props.gameState.attackingRegion,
+                                    army: this.combatGameState.getBaseCombatStrength(this.attacker),
+                                    orderBonus: this.combatGameState.getOrderBonus(this.attacker),
+                                    garrison: this.combatGameState.getGarrisonCombatStrength(this.attacker),
+                                    support: this.combatGameState.getSupportStrengthForSide(this.attacker),
+                                    houseCardStrength: this.combatGameState.getHouseCardCombatStrength(this.attacker),
+                                    valyrianSteelBlade: this.combatGameState.getValyrianBladeBonus(this.attacker),
+                                    total: this.combatGameState.getTotalCombatStrength(this.attacker),
+                                },
+                                {
+                                    house: this.defender,
+                                    houseCard: this.props.gameState.defenderHouseCard,
+                                    region: this.props.gameState.defendingRegion,
+                                    army: this.combatGameState.getBaseCombatStrength(this.defender),
+                                    orderBonus: this.combatGameState.getOrderBonus(this.defender),
+                                    garrison: this.combatGameState.getGarrisonCombatStrength(this.defender),
+                                    support: this.combatGameState.getSupportStrengthForSide(this.defender),
+                                    houseCardStrength: this.combatGameState.getHouseCardCombatStrength(this.defender),
+                                    valyrianSteelBlade: this.combatGameState.getValyrianBladeBonus(this.defender),
+                                    total: this.combatGameState.getTotalCombatStrength(this.defender),
+                                }
+                            ]}
+                        />
+                    )}
                 </Col>
                 {renderChildGameState(this.props, [
                     [DeclareSupportGameState, DeclareSupportComponent],
