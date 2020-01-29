@@ -14969,6 +14969,11 @@
                          "value":1
                         }, 
                         {
+                            "name": "supplyIcons",
+                            "type": "int",
+                            "value": 1
+                        },
+                        {
                          "name":"id",
                          "type":"string",
                          "value":"kingswood"
@@ -15595,7 +15600,7 @@
                 {
                  "height":21.0180960680781,
                  "id":79,
-                 "name":"The Shony Shore",
+                 "name":"The Stony Shore",
                  "properties":[
                         {
                          "name":"id",
