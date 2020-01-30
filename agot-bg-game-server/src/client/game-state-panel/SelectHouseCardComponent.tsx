@@ -31,13 +31,14 @@ export default class SelectHouseCardComponent extends Component<GameStateCompone
                                     {this.props.gameState.houseCards.map(hc => (
                                         // The house argument is used to decide which card-back is used
                                         // Since we will never show a back-card here, we can give whatever value fits.
-                                        <HouseCardComponent
-                                            houseCard={hc}
-                                            placement="auto"
-                                            house={this.props.gameState.house}
-                                            selected={this.selectedHouseCard == hc}
-                                            onClick={() => this.selectedHouseCard != hc ? this.selectedHouseCard = hc : this.selectedHouseCard = null}
-                                        />
+                                        <Col xs="auto" key={hc.id}>
+                                            <HouseCardComponent
+                                                houseCard={hc}
+                                                size="tiny"
+                                                selected={this.selectedHouseCard == hc}
+                                                onClick={() => this.selectedHouseCard != hc ? this.selectedHouseCard = hc : this.selectedHouseCard = null}
+                                            />
+                                        </Col>
                                     ))}
                                 </Row>
                             </Col>

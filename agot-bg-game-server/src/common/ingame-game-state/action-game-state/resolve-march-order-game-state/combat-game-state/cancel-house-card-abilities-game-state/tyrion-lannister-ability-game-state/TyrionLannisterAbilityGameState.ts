@@ -86,8 +86,9 @@ export default class TyrionLannisterAbilityGameState extends GameState<
         };
     }
 
-    onSelectHouseCardFinish(house: House, houseCard: HouseCard): void {
-        this.changeHouseCardEnemy(this.combatGameState.getEnemy(house), houseCard);
+    onSelectHouseCardFinish(enemy: House, houseCard: HouseCard): void {
+        const house = this.combatGameState.getEnemy(enemy);
+        this.changeHouseCardEnemy(enemy, houseCard);
 
         this.parentGameState.onHouseCardResolutionFinish(house);
     }

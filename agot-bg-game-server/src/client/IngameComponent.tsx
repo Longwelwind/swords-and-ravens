@@ -32,7 +32,6 @@ import ravenImage from "../../public/images/icons/raven.svg";
 import diamondHiltImage from "../../public/images/icons/diamond-hilt.svg";
 import hourglassImage from "../../public/images/icons/hourglass.svg";
 import mammothImage from "../../public/images/icons/mammoth.svg";
-import envelopeImage from "../../public/images/icons/envelope.svg";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import housePowerTokensImages from "./housePowerTokensImages";
 import marked from "marked";
@@ -43,11 +42,12 @@ import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes
 import unitImages from "./unitImages";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
 import GameEndedComponent from "./game-state-panel/GameEndedComponent";
-import Button from "react-bootstrap/Button";
 import SettingsRowComponent from "./SettingsRowComponent";
 import Nav from "react-bootstrap/Nav";
 import Tab from "react-bootstrap/Tab";
 import ChatComponent from "./chat-client/ChatComponent";
+import {HouseCardState} from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
+import HouseCardBackComponent from "./game-state-panel/utils/HouseCardBackComponent";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -283,12 +283,20 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             </Row>
                                             <Row className="justify-content-center">
                                                 {_.sortBy(p.house.houseCards.values, hc => hc.combatStrength).map(hc => (
-                                                    <HouseCardComponent
-                                                        houseCard={hc}
-                                                        placement="auto"
-                                                        key={hc.id}
-                                                        house={p.house}
-                                                    />
+                                                    <Col xs="auto" key={hc.id}>
+                                                        {hc.state == HouseCardState.AVAILABLE ? (
+                                                            <HouseCardComponent
+                                                                houseCard={hc}
+                                                                size="tiny"
+                                                            />
+                                                        ) : (
+                                                            <HouseCardBackComponent
+                                                                house={p.house}
+                                                                houseCard={hc}
+                                                                size="tiny"
+                                                            />
+                                                        )}
+                                                    </Col>
                                                 ))}
                                             </Row>
                                         </ListGroupItem>

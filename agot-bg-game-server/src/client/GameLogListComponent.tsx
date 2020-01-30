@@ -22,6 +22,7 @@ import joinReactNodes from "./utils/joinReactNodes";
 import orders from "../common/ingame-game-state/game-data-structure/orders";
 // @ts-ignore
 import autoscroll from "autoscroll-react";
+import CombatInfoComponent from "./CombatInfoComponent";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -143,58 +144,21 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 );
 
             case "combat-result":
-                const stats = data.stats.map(stat => ({
-                    ...stat,
-                    house: this.game.houses.get(stat.house),
-                    region: this.world.regions.get(stat.region)
-                }));
+                const houseCombatDatas = data.stats.map(stat => {
+                    const house = this.game.houses.get(stat.house);
+                    return {
+                        ...stat,
+                        house,
+                        region: this.world.regions.get(stat.region),
+                        houseCard: stat.houseCard != null ? house.houseCards.get(stat.houseCard) : null,
+                    };
+                });
                 const winner = this.game.houses.get(data.winner);
 
                 return (
                     <>
                         <p>Combat result</p>
-
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th />
-                                    <th>Attacker</th>
-                                    <th>Defender</th>
-                                </tr>
-                                <tr>
-                                    <th />
-                                    <th>{stats[0].house.name}</th>
-                                    <th>{stats[1].house.name}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Army</td>
-                                    <td>{stats[0].army} (+{stats[1].orderBonus + stats[1].garrison})</td>
-                                    <td>{stats[1].army} (+{stats[0].orderBonus + stats[0].garrison})</td>
-                                </tr>
-                                <tr>
-                                    <td>Support</td>
-                                    <td>{stats[0].support}</td>
-                                    <td>{stats[1].support}</td>
-                                </tr>
-                                <tr>
-                                    <td>House Card</td>
-                                    <td>{stats[0].houseCardStrength}</td>
-                                    <td>{stats[1].houseCardStrength}</td>
-                                </tr>
-                                <tr>
-                                    <td>Valyrian Steel Blade</td>
-                                    <td>{stats[0].valyrianSteelBlade}</td>
-                                    <td>{stats[1].valyrianSteelBlade}</td>
-                                </tr>
-                                <tr>
-                                    <td>Total</td>
-                                    <td>{stats[0].total}</td>
-                                    <td>{stats[1].total}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <CombatInfoComponent housesCombatData={houseCombatDatas}/>
                         <p><strong>{winner.name}</strong> won the fight!</p>
                     </>
                 );

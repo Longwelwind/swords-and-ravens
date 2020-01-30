@@ -20,7 +20,7 @@ export default class WesterosCardComponent extends Component<WesterosCardProps> 
             <OverlayTrigger
                 overlay={
                     this.props.tooltip ? <div
-                        className="horizontal-card"
+                        className="horizontal-game-card"
                         style={{
                             backgroundImage: this.props.cardType ? `url(${westerosCardImages.get(this.props.cardType.id)})` : undefined
                         }}
@@ -31,7 +31,7 @@ export default class WesterosCardComponent extends Component<WesterosCardProps> 
                 placement="auto"
             >
                 <div
-                    className={classNames("horizontal-card hover-weak-outline", this.props.size, {"slot": this.props.cardType == null})}
+                    className={classNames("horizontal-game-card hover-weak-outline", this.props.size)}
                     style={{
                         backgroundImage: this.props.cardType ? `url(${westerosCardImages.get(this.props.cardType.id)})` : undefined
                     }}
