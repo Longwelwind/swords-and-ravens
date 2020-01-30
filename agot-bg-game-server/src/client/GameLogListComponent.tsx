@@ -454,6 +454,27 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                         ))}
                     </ul>
                 </>;
+
+            case "tyrion-lannister-choice-made":
+                house = this.game.houses.get(data.house);
+                let affectedHouse = this.game.houses.get(data.affectedHouse);
+                const chooseToReplace = data.chooseToReplace;
+
+                return <>
+                    <strong>Tyrion Lannister</strong>: <strong>{house.name}</strong> {chooseToReplace && "not"} to force
+                    <strong>{affectedHouse.name}</strong> to choose a new House card.
+                </>;
+
+            case "tyrion-lannister-house-card-replaced":
+                affectedHouse = this.game.houses.get(data.affectedHouse);
+                const newHouseCard = data.newHouseCard ? affectedHouse.houseCards.get(data.newHouseCard) : null;
+
+                return newHouseCard ? (
+                    <><strong>{affectedHouse.name}</strong> chose <strong>{newHouseCard.name}.</strong></>
+                ) : (
+                    <><strong>{affectedHouse.name}</strong> had no other available House card</>
+                );
+
         }
     }
 }

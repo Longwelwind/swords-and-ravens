@@ -10,7 +10,8 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
     | ActionPhaseBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingAttack | MarchOrderRemoved
-    | StarredConsolidatePowerForPowerTokens | ArmiesReconciled;
+    | StarredConsolidatePowerForPowerTokens | ArmiesReconciled
+    | TyrionLannisterHouseCardReplaced | TyrionLannisterChoiceMade;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -203,4 +204,19 @@ interface ArmiesReconciled {
     type: "armies-reconciled";
     house: string;
     armies: [string, string[]][];
+}
+
+interface TyrionLannisterChoiceMade {
+    type: "tyrion-lannister-choice-made";
+    house: string;
+    affectedHouse: string;
+    chooseToReplace: boolean;
+}
+
+interface TyrionLannisterHouseCardReplaced {
+    type: "tyrion-lannister-house-card-replaced";
+    house: string;
+    affectedHouse: string;
+    oldHouseCard: string;
+    newHouseCard: string | null;
 }

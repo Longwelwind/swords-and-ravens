@@ -45,13 +45,19 @@ export default class TyrionLannisterAbilityGameState extends GameState<
         const house = this.childGameState.house;
         const enemy = this.combatGameState.getEnemy(house);
 
+        this.ingame.log({
+            type: "tyrion-lannister-choice-made",
+            house: house.id,
+            affectedHouse: enemy.id,
+            chooseToReplace: choice == 0
+        });
+
         if (choice == 0) {
             const choosableHouseCards = this.getChoosableHouseCards(house);
 
             // The enemy may not have any available house cards
             if (choosableHouseCards.length == 0) {
-                this.changeHouseCardEnemy(enemy, null);
-                this.parentGameState.onHouseCardResolutionFinish(house);
+                this.onSelectHouseCardFinish(enemy, null);
                 return;
             }
 
@@ -86,9 +92,25 @@ export default class TyrionLannisterAbilityGameState extends GameState<
         };
     }
 
-    onSelectHouseCardFinish(enemy: House, houseCard: HouseCard): void {
+    onSelectHouseCardFinish(enemy: House, houseCard: HouseCard | null): void {
         const house = this.combatGameState.getEnemy(enemy);
+        const oldHouseCard = this.combatGameState.houseCombatDatas.get(enemy).houseCard;
+
+        // The house card of the enemy should never be null at this point.
+        // It can be after if they had no available other house cards.
+        if (oldHouseCard == null) {
+            throw new Error();
+        }
+
         this.changeHouseCardEnemy(enemy, houseCard);
+
+        this.ingame.log({
+            type: "tyrion-lannister-house-card-replaced",
+            house: house.id,
+            affectedHouse: enemy.id,
+            oldHouseCard: oldHouseCard.id,
+            newHouseCard: houseCard ? houseCard.id : null
+        });
 
         this.parentGameState.onHouseCardResolutionFinish(house);
     }
