@@ -58,6 +58,12 @@ export default class PlayerReconcileArmiesGameState extends GameState<ReconcileA
                 });
             });
 
+            this.parentGameState.ingame.log({
+                type: "armies-reconciled",
+                house: this.house.id,
+                armies: removedUnits.map((r, us) => [r.id, us.map(u => u.type.id)])
+            });
+
             this.reconcileArmiesGameState.onPlayerReconcileArmiesGameStateEnd(this.house);
         }
     }

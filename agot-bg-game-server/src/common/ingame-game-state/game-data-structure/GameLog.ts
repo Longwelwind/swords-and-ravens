@@ -10,7 +10,7 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
     | ActionPhaseBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingAttack | MarchOrderRemoved
-    | StarredConsolidatePowerForPowerTokens;
+    | StarredConsolidatePowerForPowerTokens | ArmiesReconciled;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -197,4 +197,10 @@ interface StarredConsolidatePowerForPowerTokens {
     house: string;
     region: string;
     powerTokenCount: number;
+}
+
+interface ArmiesReconciled {
+    type: "armies-reconciled";
+    house: string;
+    armies: [string, string[]][];
 }

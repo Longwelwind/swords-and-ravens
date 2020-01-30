@@ -439,6 +439,21 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     <strong>{house.name}</strong> resolved a Starred Consolidate Power Order token
                     in <strong>{region.name}</strong> to gain <strong>{countPowerToken}</strong> Power tokens.
                 </>;
+
+            case "armies-reconciled":
+                house = this.game.houses.get(data.house);
+                const armies = data.armies.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))] as [Region, UnitType[]]);
+
+                return <>
+                    <p>
+                        <strong>{house.name}</strong> reconciled their armies by removing:
+                    </p>
+                    <ul>
+                        {armies.map(([region, unitTypes]) => (
+                            <li key={region.id}>{region.name}: {unitTypes.map(ut => ut.name).join(", ")}</li>
+                        ))}
+                    </ul>
+                </>;
         }
     }
 }
