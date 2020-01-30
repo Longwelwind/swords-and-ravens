@@ -131,15 +131,15 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
 
         // Check each house in order to find one that has a starred consolidate power
         for (let i = 0;i < this.game.houses.size;i++) {
-            const regions = this.actionGameState.getRegionsWithStarredConsolidatePowerOrderOfHouse(currentHouseToCheck);
-            if (regions.length > 0) {
+            const region = this.actionGameState.getRegionWithStarredConsolidatePowerOrderOfHouse(currentHouseToCheck);
+            if (region) {
                 return currentHouseToCheck;
             }
 
             currentHouseToCheck = this.game.getNextInTurnOrder(currentHouseToCheck);
         }
 
-        // If no house has any march order available, return null
+        // If no house has any CP order available, return null
         return null;
     }
 

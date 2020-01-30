@@ -76,7 +76,7 @@ export default class ResolveRaidOrderGameState extends GameState<ActionGameState
             currentHouseToCheck = this.game.getNextInTurnOrder(currentHouseToCheck);
         }
 
-        // If no house has any march order available, return null
+        // If no house has any raid order available, return null
         return null;
     }
 

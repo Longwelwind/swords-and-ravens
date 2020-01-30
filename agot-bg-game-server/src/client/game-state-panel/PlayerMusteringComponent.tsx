@@ -78,7 +78,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                         {this.selectedRegion && (
                             <>
                                 <Col xs={12}>
-                                    From {this.selectedRegion.name}, you can ({this.props.gameState.getPointsLeft(this.selectedRegion, this.musterings)} points left):
+                                    From {this.selectedRegion.name}, you have ({this.props.gameState.getPointsLeft(this.selectedRegion, this.musterings)} points left):
                                 </Col>
                                 <Col xs={12}>
                                     <Row>
@@ -172,7 +172,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
     }
 
     submit(): void {
-        if(this.props.gameState.anyPointsLeft(this.musterings)) {
+        if(this.props.gameState.anyUsablePointsLeft(this.musterings)) {
             if(!confirm('You have not used all of your mustering points. Continue anyway?')){
                 return;
             }

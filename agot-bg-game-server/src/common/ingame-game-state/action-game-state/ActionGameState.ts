@@ -109,11 +109,13 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
             .map(([region, _order]) => region);
     }
 
-    getRegionsWithStarredConsolidatePowerOrderOfHouse(house: House): Region[] {
-        return this.ordersOnBoard.entries
+    getRegionWithStarredConsolidatePowerOrderOfHouse(house: House): Region | null {
+        const regions = this.ordersOnBoard.entries
             .filter(([region, _order]) => region.getController() == house)
             .filter(([_region, order]) => order.type instanceof ConsolidatePowerOrderType && order.type.starred)
             .map(([region, _order]) => region);
+
+        return regions.length == 1 ? regions[0] : null;
     }
 
     getPossibleSupportingRegions(attackedRegion: Region): {region: Region; support: SupportOrderType}[] {

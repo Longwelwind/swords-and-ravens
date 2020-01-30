@@ -20,6 +20,7 @@ import IngameGameState from "../../../IngameGameState";
 import User from "../../../../../server/User";
 
 export type Mustering = {from: Unit | null; region: Region; to: UnitType};
+export type MusteringRule = (Mustering & {cost: number});
 
 export enum PlayerMusteringType {
     MUSTERING_WESTEROS_CARD = 0,
@@ -49,6 +50,10 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
 
     get entireGame(): EntireGame {
         return this.parentGameState.entireGame;
+    }
+
+    get parentResolveConsolidatePowerGameState(): ResolveConsolidatePowerGameState | null {
+        return this.parentGameState instanceof ResolveConsolidatePowerGameState ? this.parentGameState : null;
     }
 
     firstStart(house: House, type: PlayerMusteringType): void {
@@ -196,14 +201,14 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
             });
 
             if (musterings.map((_, r) => r.length))
-            this.parentGameState.ingame.log({
-                type: "player-mustered",
-                house: this.house.id,
-                musterings: musterings.map((region, musterings) =>
-                    [region.id, musterings.map(m => ({region: m.region.id, from: m.from ? m.from.type.id : null, to: m.to.id}))]
-                )
-            });
-
+                this.parentGameState.ingame.log({
+                    type: "player-mustered",
+                    house: this.house.id,
+                    musterings: musterings.map((region, musterings) =>
+                        [region.id, musterings.map(m => ({region: m.region.id, from: m.from ? m.from.type.id : null, to: m.to.id}))]
+                    )
+                });
+            
             this.parentGameState.onPlayerMusteringEnd(this.house, musterings.entries.map(([region, _]) => region));
         }
     }
@@ -253,8 +258,8 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
             });
         });
     }
-
-    getValidMusteringRules(originatingRegion: Region, musterings: BetterMap<Region, Mustering[]>): {region: Region; rules: (Mustering & {cost: number})[]}[] {
+    
+    getValidMusteringRules(originatingRegion: Region, musterings: BetterMap<Region, Mustering[]>): {region: Region; rules: MusteringRule[]}[] {
         const possibleRecruitementRegions = [originatingRegion]
             .concat(this.game.world.getNeighbouringRegions(originatingRegion)
                 .filter(r => r.type.kind == RegionKind.SEA)
@@ -335,19 +340,34 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
     }
 
     getPointsLeft(region: Region, musterings: BetterMap<Region, Mustering[]>) {
-        return region.castleLevel - this.getUsedPoints(region, musterings.tryGet(region, []));
+        return region.castleLevel - this.getUsedPoints(musterings.tryGet(region, []));
     }
 
-    anyPointsLeft(musterings: BetterMap<Region, Mustering[]>): boolean {
-        if (this.type != PlayerMusteringType.MUSTERING_WESTEROS_CARD) {
-            return false;
-        }
-
+    anyUsablePointsLeft(musterings: BetterMap<Region, Mustering[]>): boolean {
         const controlledCastles = this.game.world.getControlledRegions(this.house).filter(r => r.castleLevel > 0);
-        return controlledCastles.some(r => this.getPointsLeft(r, musterings) > 0);
+
+        switch(this.type) {
+            case PlayerMusteringType.MUSTERING_WESTEROS_CARD:
+                // return true if there is any valid mustering rule for any controlled castle unused
+                return _.flatMap(controlledCastles.map(c => _.flatMap(this.getValidMusteringRules(c, musterings).map(({region , rules}) => rules)))).length > 0;
+            case PlayerMusteringType.STARRED_CONSOLIDATE_POWER:
+                if(!this.parentResolveConsolidatePowerGameState) {
+                    return false;
+                }
+                
+                const region = this.parentResolveConsolidatePowerGameState.actionGameState.getRegionWithStarredConsolidatePowerOrderOfHouse(this.house);
+                if(region) {
+                    // return true if there is there are valid mustering rules left for the starred cp region
+                    return _.flatMap(this.getValidMusteringRules(region, musterings).map(({region, rules}) => rules)).length > 0;
+                }
+
+                return false;
+            case PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD:
+                return false; // todo: test this scenario!
+        }
     }
 
-    getUsedPoints(region: Region, musterings: Mustering[]): number {
+    getUsedPoints(musterings: Mustering[]): number {
         return _.sum(musterings.map(m => getCostOfMusteringRule(m.from ? m.from.type : null, m.to)));
     }
 
