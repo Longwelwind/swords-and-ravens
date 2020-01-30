@@ -437,7 +437,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
 
                 return <>
                     <strong>{house.name}</strong> resolved a Starred Consolidate Power Order token
-                    in <strong>{region.name}</strong> to gain <strong>{countPowerToken}</strong> Power tokens.
+                    in <strong>{region.name}</strong> to gain <strong>{countPowerToken}</strong> Power token{countPowerToken > 0 && "s"}.
                 </>;
 
             case "armies-reconciled":
