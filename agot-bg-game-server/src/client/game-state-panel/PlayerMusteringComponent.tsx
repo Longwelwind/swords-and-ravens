@@ -114,7 +114,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                                                 onClick={() => this.submitForPT()}
                                                 disabled={this.selectedRegion == null || (this.musterings.size > 0 && this.musterings.entries[0][1].length > 0)}
                                             >
-                                                Get {this.selectedRegion ? this.props.gameState.getPotentialGainedPowerTokens(this.selectedRegion) : 0} power tokens
+                                                Get {this.props.gameState.getPotentialGainedPowerTokens(this.selectedRegion)} power token{this.props.gameState.getPotentialGainedPowerTokens(this.selectedRegion) > 1 && "s"}
                                             </Button>
                                         </OverlayTrigger>
                                     </Col>

@@ -223,9 +223,13 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         });
     }
 
-    getPotentialGainedPowerTokens(region: Region): number {
+    getPotentialGainedPowerTokens(region: Region | null): number {
         if (this.type != PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
             throw new Error();
+        }
+
+        if(region == null) {
+            return 0;
         }
 
         return 1 + region.crownIcons;
