@@ -475,6 +475,13 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     <><strong>{affectedHouse.name}</strong> had no other available House card</>
                 );
 
+            case "arianne-martell-prevent-movement":
+                const enemyHouse = this.game.houses.get(data.enemyHouse);
+
+                return <>
+                    <strong>Arianne Martell</strong>: <strong>{enemyHouse.name}</strong> cannot move their attacking
+                    army to the embattled area.
+                </>;
         }
     }
 }

@@ -11,7 +11,8 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
     | ActionPhaseBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingAttack | MarchOrderRemoved
     | StarredConsolidatePowerForPowerTokens | ArmiesReconciled
-    | TyrionLannisterHouseCardReplaced | TyrionLannisterChoiceMade;
+    | TyrionLannisterHouseCardReplaced | TyrionLannisterChoiceMade
+    | ArianneMartellPreventMovement;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -219,4 +220,10 @@ interface TyrionLannisterHouseCardReplaced {
     affectedHouse: string;
     oldHouseCard: string;
     newHouseCard: string | null;
+}
+
+interface ArianneMartellPreventMovement {
+    type: "arianne-martell-prevent-movement";
+    house: string;
+    enemyHouse: string;
 }

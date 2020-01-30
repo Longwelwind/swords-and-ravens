@@ -6,6 +6,16 @@ import PostCombatGameState
 
 export default class ArianneMartellHouseCardAbility extends HouseCardAbility {
     doesPreventAttackingArmyFromMoving(postCombat: PostCombatGameState, house: House, _houseCard: HouseCard): boolean {
-        return postCombat.loser == house && postCombat.defender == house;
+        if (postCombat.loser == house && postCombat.defender == house) {
+            postCombat.parentGameState.ingameGameState.log({
+                type: "arianne-martell-prevent-movement",
+                house: house.id,
+                enemyHouse: postCombat.combat.getEnemy(house).id
+            });
+
+            return true;
+        }
+
+        return false;
     }
 }
