@@ -500,6 +500,25 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     <strong>Loras Tyrell</strong>: The <strong>{order.type.name}</strong> order was moved
                     to <strong>{embattledRegion.name}</strong>.
                 </>;
+
+            case "queen-of-thorns-no-order-available":
+                house = this.game.houses.get(data.house);
+                affectedHouse = this.game.houses.get(data.affectedHouse);
+
+                return <>
+                    <strong>Queen of Thorns</strong>: <strong>{affectedHouse.name}</strong> had no adjacent order tokens.
+                </>;
+
+            case "queen-of-thorns-order-removed":
+                house = this.game.houses.get(data.house);
+                affectedHouse = this.game.houses.get(data.affectedHouse);
+                region = this.world.regions.get(data.region);
+                const removedOrder = orders.get(data.orderRemoved);
+
+                return <>
+                    <strong>Queen of Thorns</strong>: <strong>{house.name}</strong> removed
+                    a <strong>{removedOrder.type.name}</strong> of <strong>{affectedHouse.name}</strong> in <strong>{region.name}</strong>.
+                </>;
         }
     }
 }

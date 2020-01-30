@@ -37,12 +37,18 @@ export default class QueenOfThornsAbilityGameState extends GameState<
         if (removableOrders.length > 0) {
             this.setChildGameState(new SelectOrdersGameState(this)).firstStart(house, removableOrders, 1);
         } else {
+            this.ingame.log({
+                type: "queen-of-thorns-no-order-available",
+                house: house.id,
+                affectedHouse: this.combatGameState.getEnemy(house).id
+            });
+
             this.parentGameState.onHouseCardResolutionFinish(house);
         }
     }
 
     getRemovableOrders(house: House): Region[] {
-        const enemy = this.combatGameState.attacker == house ? this.combatGameState.defender : this.combatGameState.attacker;
+        const enemy = this.combatGameState.getEnemy(house);
 
         return this.game.world.getNeighbouringRegions(this.combatGameState.defendingRegion)
             // Remove regions that don't contain an order
@@ -71,6 +77,8 @@ export default class QueenOfThornsAbilityGameState extends GameState<
     }
 
     onSelectOrdersFinish(regions: Region[]): void {
+        const region = regions[0];
+        const removedOrder = this.actionGameState.ordersOnBoard.get(regions[0]);
         // Remove the order
         regions.forEach(r => this.actionGameState.ordersOnBoard.delete(r));
 
@@ -80,6 +88,14 @@ export default class QueenOfThornsAbilityGameState extends GameState<
                 region: r.id,
                 order: null
             })
+        });
+
+        this.ingame.log({
+            type: "queen-of-thorns-order-removed",
+            house: this.childGameState.house.id,
+            affectedHouse: this.combatGameState.getEnemy(this.childGameState.house).id,
+            orderRemoved: removedOrder.id,
+            region: region.id
         });
 
         this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);
