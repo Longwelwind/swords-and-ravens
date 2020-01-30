@@ -66,6 +66,12 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
 
     confirm() {
         if (this.selectedOrderRegion) {
+            if(this.selectedTargetRegion == null) {
+                if(!window.confirm("Do you want to remove your Raid order?")) {
+                    return;
+                }
+            }
+
             this.props.gameState.resolveRaid(this.selectedOrderRegion, this.selectedTargetRegion);
         }
     }
