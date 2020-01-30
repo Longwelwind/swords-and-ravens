@@ -519,6 +519,15 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     <strong>Queen of Thorns</strong>: <strong>{house.name}</strong> removed
                     a <strong>{removedOrder.type.name}</strong> of <strong>{affectedHouse.name}</strong> in <strong>{region.name}</strong>.
                 </>;
+
+            case "tywin-lannister-power-tokens-gained":
+                house = this.game.houses.get(data.house);
+                const powerTokensGained = data.powerTokensGained;
+
+                return <>
+                    <strong>Tywin Lannister</strong>: <strong>{house.name}</strong> gained {powerTokensGained} Power
+                    tokens.
+                </>;
         }
     }
 }
