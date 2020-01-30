@@ -72,7 +72,7 @@ export default class AeronDamphairAbilityGameState extends GameState<
         this.entireGame.broadcastToClients({
             type: "change-state-house-card",
             houseId: house.id,
-            cardIds: [houseCard.id],
+            cardIds: [aeronDamphairHouseCard.id],
             state: HouseCardState.USED
         });
 
