@@ -16,6 +16,12 @@ export default class RooseBoltonHouseCardAbility extends HouseCardAbility {
                 cardIds: houseCards.map(hc => hc.id),
                 state: HouseCardState.AVAILABLE
             });
+
+            afterWinnerDetermination.combatGameState.ingameGameState.log({
+                type: "roose-bolton-house-cards-returned",
+                house: house.id,
+                houseCards: houseCards.map(hc => hc.id)
+            });
         }
 
         afterWinnerDetermination.childGameState.onHouseCardResolutionFinish(house);

@@ -378,7 +378,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 return <><strong>{house.name}</strong> used the <strong>Valyrian Sword</strong>.</>;
 
             case "combat-house-card-chosen":
-                const houseCards = data.houseCards.map(([hid, hcid]) => {
+                let houseCards = data.houseCards.map(([hid, hcid]) => {
                     const house = this.game.houses.get(hid);
                     return [house, house.houseCards.get(hcid)];
                 });
@@ -481,6 +481,15 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 return <>
                     <strong>Arianne Martell</strong>: <strong>{enemyHouse.name}</strong> cannot move their attacking
                     army to the embattled area.
+                </>;
+
+            case "roose-bolton-house-cards-returned":
+                house = this.game.houses.get(data.house);
+                const returnedHouseCards = data.houseCards.map(hcid => house.houseCards.get(hcid));
+
+                return <>
+                    <strong>Roose Bolton</strong>: <strong>{house.name}</strong> took back all discarded House
+                    cards ({returnedHouseCards.map(hc => hc).join(", ")}).
                 </>;
         }
     }

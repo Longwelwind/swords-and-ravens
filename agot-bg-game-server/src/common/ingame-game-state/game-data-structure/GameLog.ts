@@ -12,7 +12,8 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | ActionPhaseBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingAttack | MarchOrderRemoved
     | StarredConsolidatePowerForPowerTokens | ArmiesReconciled
     | TyrionLannisterHouseCardReplaced | TyrionLannisterChoiceMade
-    | ArianneMartellPreventMovement;
+    | ArianneMartellPreventMovement
+    | RooseBoltonHouseCardsReturned;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -226,4 +227,10 @@ interface ArianneMartellPreventMovement {
     type: "arianne-martell-prevent-movement";
     house: string;
     enemyHouse: string;
+}
+
+interface RooseBoltonHouseCardsReturned {
+    type: "roose-bolton-house-cards-returned";
+    house: string;
+    houseCards: string[];
 }
