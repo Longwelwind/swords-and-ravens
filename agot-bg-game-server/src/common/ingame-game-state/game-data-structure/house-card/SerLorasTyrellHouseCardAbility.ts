@@ -18,6 +18,13 @@ export default class SerLorasTyrellHouseCardAbility extends HouseCardAbility {
                 region: afterCombat.combatGameState.defendingRegion.id,
                 order: afterCombat.combatGameState.order.id
             });
+
+            afterCombat.parentGameState.combat.ingameGameState.log({
+                type: "loras-tyrell-attack-order-moved",
+                house: house.id,
+                region: afterCombat.combatGameState.defendingRegion.id,
+                order: afterCombat.combatGameState.order.id
+            });
         }
 
         afterCombat.childGameState.onHouseCardResolutionFinish(house);

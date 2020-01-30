@@ -491,6 +491,15 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     <strong>Roose Bolton</strong>: <strong>{house.name}</strong> took back all discarded House
                     cards ({returnedHouseCards.map(hc => hc).join(", ")}).
                 </>;
+
+            case "loras-tyrell-attack-order-moved":
+                const order = orders.get(data.order);
+                const embattledRegion = this.world.regions.get(data.region);
+
+                return <>
+                    <strong>Loras Tyrell</strong>: The <strong>{order.type.name}</strong> order was moved
+                    to <strong>{embattledRegion.name}</strong>.
+                </>;
         }
     }
 }
