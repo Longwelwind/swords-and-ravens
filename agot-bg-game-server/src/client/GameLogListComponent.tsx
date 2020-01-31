@@ -553,6 +553,28 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     <strong>{region.name}</strong>.
                 </>;
 
+            case "mace-tyrell-casualties-prevented":
+                house = this.game.houses.get(data.house);
+
+                return <>
+                    <strong>Mace Tyrell</strong>: Casualties were prevented by <strong>Robb Stark</strong>.
+                </>;
+
+            case "mace-tyrell-no-footman-available":
+                house = this.game.houses.get(data.house);
+
+                return <>
+                    <strong>Mace Tyrell</strong>: No enemy footman were available to be killed.
+                </>;
+
+            case "mace-tyrell-footman-killed":
+                house = this.game.houses.get(data.house);
+                region = this.world.regions.get(data.region);
+
+                return <>
+                    <strong>Mace Tyrell</strong>: <strong>{house.name}</strong> killed an enemy footman
+                    in <strong>{region.name}</strong>.
+                </>;
         }
     }
 }
