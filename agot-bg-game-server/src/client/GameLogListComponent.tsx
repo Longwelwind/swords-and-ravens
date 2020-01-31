@@ -528,6 +528,31 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     <strong>Tywin Lannister</strong>: <strong>{house.name}</strong> gained {powerTokensGained} Power
                     tokens.
                 </>;
+
+            case "renly-baratheon-no-knight-available":
+                house = this.game.houses.get(data.house);
+
+                return <>
+                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> had no available knight to upgrade
+                    to.
+                </>;
+
+            case "renly-baratheon-no-footman-available":
+                house = this.game.houses.get(data.house);
+
+                return <>
+                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> had no available footman to upgrade.
+                </>;
+
+            case "renly-baratheon-footman-upgraded-to-knight":
+                house = this.game.houses.get(data.house);
+                region = this.world.regions.get(data.region);
+
+                return <>
+                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> upgraded a footman to a knight in
+                    <strong>{region.name}</strong>.
+                </>;
+
         }
     }
 }

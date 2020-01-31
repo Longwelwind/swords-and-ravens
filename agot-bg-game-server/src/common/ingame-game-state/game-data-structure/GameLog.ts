@@ -13,7 +13,8 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | StarredConsolidatePowerForPowerTokens | ArmiesReconciled
     | TyrionLannisterHouseCardReplaced | TyrionLannisterChoiceMade
     | ArianneMartellPreventMovement | LorasTyrellAttackOrderMoved | TywinLannisterPowerTokensGained
-    | RooseBoltonHouseCardsReturned | QueenOfThornsOrderRemoved | QueenOfThornsNoOrderAvailable;
+    | RooseBoltonHouseCardsReturned | QueenOfThornsOrderRemoved | QueenOfThornsNoOrderAvailable
+    | RenlyBaratheonNoFootmanAvailable | RenlyBaratheonNoKnightAvailable | RenlyBaratheonFootmanUpgradedToKnight;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -260,4 +261,20 @@ interface TywinLannisterPowerTokensGained {
     type: "tywin-lannister-power-tokens-gained";
     house: string;
     powerTokensGained: number;
+}
+
+interface RenlyBaratheonNoFootmanAvailable {
+    type: "renly-baratheon-no-footman-available";
+    house: string;
+}
+
+interface RenlyBaratheonNoKnightAvailable {
+    type: "renly-baratheon-no-knight-available";
+    house: string;
+}
+
+interface RenlyBaratheonFootmanUpgradedToKnight {
+    type: "renly-baratheon-footman-upgraded-to-knight";
+    house: string;
+    region: string;
 }

@@ -33,8 +33,18 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
         const upgradableFootmen = this.getUpgradableFootmen(house);
 
         if (this.game.getAvailableUnitsOfType(house, knight) == 0) {
+            this.ingame.log({
+                type: "renly-baratheon-no-knight-available",
+                house: house.id
+            });
+
             this.parentGameState.parentGameState.onHouseCardResolutionFinish();
         } else if (upgradableFootmen.length == 0) {
+            this.ingame.log({
+                type: "renly-baratheon-no-footman-available",
+                house: house.id
+            });
+
             this.parentGameState.parentGameState.onHouseCardResolutionFinish();
         } else {
             this.setChildGameState(new SelectUnitsGameState(this))
@@ -77,6 +87,12 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
             const knightsToAdd = footmenToRemove.map(_ => this.game.createUnit(knight, house));
 
             knightsToAdd.forEach(u => region.units.set(u.id, u));
+
+            this.ingame.log({
+                type: "renly-baratheon-footman-upgraded-to-knight",
+                house: house.id,
+                region: region.id
+            });
 
             this.entireGame.broadcastToClients({
                 type: "add-units",
