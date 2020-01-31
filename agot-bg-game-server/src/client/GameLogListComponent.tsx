@@ -592,6 +592,15 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     a <strong>{removedOrder.type.name}</strong> order
                     of <strong>{affectedHouse.name}</strong> in <strong>{region.name}</strong>.
                 </>;
+
+            case "robb-stark-retreat-location-overriden":
+                house = this.game.houses.get(data.house);
+                affectedHouse = this.game.houses.get(data.affectedHouse);
+
+                return <>
+                    <strong>Robb Stark</strong>: <strong>{house.name}</strong> chose the retreat location of the
+                    retreating army of <strong>{affectedHouse.name}</strong>.
+                </>;
         }
     }
 }

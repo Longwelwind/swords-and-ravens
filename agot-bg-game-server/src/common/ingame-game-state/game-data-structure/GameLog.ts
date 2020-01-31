@@ -16,7 +16,7 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | RooseBoltonHouseCardsReturned | QueenOfThornsOrderRemoved | QueenOfThornsNoOrderAvailable
     | RenlyBaratheonNoFootmanAvailable | RenlyBaratheonNoKnightAvailable | RenlyBaratheonFootmanUpgradedToKnight
     | MaceTyrellNoFootmanAvailable | MaceTyrellCasualtiesPrevented | MaceTyrellFootmanKilled
-    | CerseiLannisterNoOrderAvailable | CerseiLannisterOrderRemoved;
+    | CerseiLannisterNoOrderAvailable | CerseiLannisterOrderRemoved | RobbStarkRetreatRegionOverriden;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -307,4 +307,10 @@ interface CerseiLannisterOrderRemoved {
     affectedHouse: string;
     region: string;
     order: number;
+}
+
+interface RobbStarkRetreatRegionOverriden {
+    type: "robb-stark-retreat-location-overriden";
+    house: string;
+    affectedHouse: string;
 }
