@@ -513,7 +513,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 house = this.game.houses.get(data.house);
                 affectedHouse = this.game.houses.get(data.affectedHouse);
                 region = this.world.regions.get(data.region);
-                const removedOrder = orders.get(data.orderRemoved);
+                let removedOrder = orders.get(data.orderRemoved);
 
                 return <>
                     <strong>Queen of Thorns</strong>: <strong>{house.name}</strong> removed
@@ -574,6 +574,23 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 return <>
                     <strong>Mace Tyrell</strong>: <strong>{house.name}</strong> killed an enemy footman
                     in <strong>{region.name}</strong>.
+                </>;
+
+            case "cersei-lannister-no-order-available":
+                return <>
+                    <strong>Cersei Lannister</strong>: There were no order to be removed.
+                </>;
+
+            case "cersei-lannister-order-removed":
+                house = this.game.houses.get(data.house);
+                affectedHouse = this.game.houses.get(data.affectedHouse);
+                region = this.world.regions.get(data.region);
+                removedOrder = orders.get(data.order);
+
+                return <>
+                    <strong>Cersei Lannister</strong>: <strong>{house.name}</strong> removed
+                    a <strong>{removedOrder.type.name}</strong> order
+                    of <strong>{affectedHouse.name}</strong> in <strong>{region.name}</strong>.
                 </>;
         }
     }

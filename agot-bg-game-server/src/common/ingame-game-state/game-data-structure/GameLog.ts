@@ -15,7 +15,8 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | ArianneMartellPreventMovement | LorasTyrellAttackOrderMoved | TywinLannisterPowerTokensGained
     | RooseBoltonHouseCardsReturned | QueenOfThornsOrderRemoved | QueenOfThornsNoOrderAvailable
     | RenlyBaratheonNoFootmanAvailable | RenlyBaratheonNoKnightAvailable | RenlyBaratheonFootmanUpgradedToKnight
-    | MaceTyrellNoFootmanAvailable | MaceTyrellCasualtiesPrevented | MaceTyrellFootmanKilled;
+    | MaceTyrellNoFootmanAvailable | MaceTyrellCasualtiesPrevented | MaceTyrellFootmanKilled
+    | CerseiLannisterNoOrderAvailable | CerseiLannisterOrderRemoved;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -294,4 +295,16 @@ interface MaceTyrellFootmanKilled {
     type: "mace-tyrell-footman-killed";
     house: string;
     region: string;
+}
+
+interface CerseiLannisterNoOrderAvailable {
+    type: "cersei-lannister-no-order-available";
+}
+
+interface CerseiLannisterOrderRemoved {
+    type: "cersei-lannister-order-removed";
+    house: string;
+    affectedHouse: string;
+    region: string;
+    order: number;
 }

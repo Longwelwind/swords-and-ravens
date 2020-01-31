@@ -47,6 +47,15 @@ export default class CerseiLannisterAbilityGameState extends GameState<
         if (choice == 0) {
             const availableRegions = this.getAvailableRegionsWithOrders(house);
 
+            if (availableRegions.length == 0) {
+                this.ingame.log({
+                    type: "cersei-lannister-no-order-available"
+                });
+
+                this.parentGameState.onHouseCardResolutionFinish(house);
+                return;
+            }
+
             this.setChildGameState(new SelectOrdersGameState(this)).firstStart(house, availableRegions, 1);
         } else {
             this.parentGameState.onHouseCardResolutionFinish(house);
@@ -65,14 +74,23 @@ export default class CerseiLannisterAbilityGameState extends GameState<
 
     onSelectOrdersFinish(regions: Region[]): void {
         // Remove the order
-        regions.forEach(r => this.actionGameState.ordersOnBoard.delete(r));
-
         regions.forEach(r => {
+            const order = this.actionGameState.ordersOnBoard.get(r);
+            this.actionGameState.ordersOnBoard.delete(r);
+
             this.actionGameState.entireGame.broadcastToClients({
                 type: "action-phase-change-order",
                 region: r.id,
                 order: null
-            })
+            });
+
+            this.ingame.log({
+                type: "cersei-lannister-order-removed",
+                house: this.childGameState.house.id,
+                affectedHouse: this.combatGameState.getEnemy(this.childGameState.house).id,
+                region: r.id,
+                order: order.id
+            });
         });
 
         this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);
