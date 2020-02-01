@@ -13,6 +13,7 @@ import Col from "react-bootstrap/Col";
 import House from "../../common/ingame-game-state/game-data-structure/House";
 import {observable} from "mobx";
 import Row from "react-bootstrap/Row";
+import { ListGroupItem } from "react-bootstrap";
 
 @observer
 export default class PlayerReconcileArmiesComponent extends Component<GameStateComponentProps<PlayerReconcileArmiesGameState>> {
@@ -27,35 +28,53 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
 
     render(): ReactNode {
         return (
-            <>
-                <Col xs={12} className="text-center">
-                    <strong>{this.props.gameState.house.name}</strong> must reconcile their armies according to their supply limits.
-                </Col>
-                {this.props.gameClient.doesControlHouse(this.house) ? (
-                    <>
+            <ListGroupItem>
+                <Row>
+                    <Col xs={12} className="text-center">
+                        <strong>{this.props.gameState.house.name}</strong> must reconcile their armies according to their supply limits.
+                    </Col>
+                    {this.props.gameClient.doesControlHouse(this.house) ? (
                         <Col xs={12}>
-                            {this.unitsToRemove.entries.map(([region, units]) => (
-                                <div key={region.id}>{region.name}: {units.map(u => u.type.name).join(", ")}</div>
-                            ))}
-                            <Row className="justify-content-center">
-                                <Col xs="auto">
-                                    <Button disabled={!this.props.gameState.isEnoughToReconcile(this.unitsToRemove)} onClick={() => this.confirm()}>Confirm</Button>
-                                </Col>
-                                <Col xs="auto">
-                                    <Button disabled={this.unitsToRemove.size == 0} onClick={() => this.reset()}>Reset</Button>
-                                </Col>
-                            </Row>
+                            {this.renderButtonsAndReconcilementStatus()}
                         </Col>
-                    </>
-                ) : (
-                    <Col xs={12} className="text-center">Waiting for {this.house.name}...</Col>
-                )}
-            </>
+                    ) : (
+                            <Col xs={12} className="text-center">Waiting for {this.house.name}...</Col>
+                        )
+                    }
+                </Row>
+            </ListGroupItem>
         );
+    }
+
+    private renderButtonsAndReconcilementStatus(): ReactNode | null {
+        const { reconciled, reason } = this.props.gameState.checkReconcilement(this.unitsToRemove);
+
+        return (<>
+            {this.unitsToRemove.entries.map(([region, units]) => (
+                <Row className="justify-content-center" style={{paddingBottom: 10}}>
+                    <div>{region.name}: {units.map(u => u.type.name).join(", ")}</div>
+                </Row>
+            ))}
+            <Row className="justify-content-center">
+                <Col xs="auto">
+                    <Button disabled={!reconciled} onClick={() => this.confirm()}>Confirm</Button>
+                </Col>
+                <Col xs="auto">
+                    <Button disabled={this.unitsToRemove.size == 0} onClick={() => this.reset()}>Reset</Button>
+                </Col>
+            </Row>
+            <Row>
+                <div style={{paddingTop: 10}}>{reason}</div>
+            </Row>
+        </>);
     }
 
     onUnitClick(region: Region, unit: Unit): void {
         if (!this.props.gameClient.doesControlHouse(this.house)) {
+            return;
+        }
+
+        if(region.units.size <= 1) {
             return;
         }
 
@@ -81,6 +100,16 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
     }
 
     shouldHighlightUnit(_region: Region, unit: Unit): boolean {
+        // single units doesn't count as army and thus they don't need to be removed
+        const regionOfUnit = this.props.gameState.game.world.getControlledRegions(unit.allegiance).filter(r => r.units.has(unit.id));
+        if(regionOfUnit.length != 1) {
+            throw new Error("There must be exactly one region with that unit");
+        }
+
+        if(regionOfUnit[0].units.size == 1) {
+            return false;
+        }
+
         if (this.props.gameClient.doesControlHouse(this.house)) {
             return _.difference(this.props.gameState.game.world.getUnitsOfHouse(this.house), _.flatMap(this.unitsToRemove.map((_, u) => u))).includes(unit);
         }
