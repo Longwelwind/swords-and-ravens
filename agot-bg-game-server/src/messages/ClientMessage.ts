@@ -25,7 +25,7 @@ interface PlaceOrder {
 
 interface ChooseHouse {
     type: "choose-house";
-    house: string;
+    house: string | null;
 }
 
 interface Ready {
