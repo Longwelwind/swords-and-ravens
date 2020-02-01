@@ -44,9 +44,13 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                                     </i>
                                                 </div>
                                             </Col>
-                                            {!this.props.gameState.players.has(h) && (
+                                            {!this.props.gameState.players.has(h) ? (
                                                 <Col xs="auto">
                                                     <Button onClick={() => this.choose(h)}>Choose</Button>
+                                                </Col>
+                                            ) : (
+                                                <Col xs="auto">
+                                                    <Button variant="danger" onClick={() => this.leave()}>Leave</Button>
                                                 </Col>
                                             )}
                                         </Row>
@@ -77,5 +81,9 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
 
     choose(house: LobbyHouse): void {
         this.props.gameState.chooseHouse(house);
+    }
+
+    leave(): void {
+        this.props.gameState.chooseHouse(null);
     }
 }

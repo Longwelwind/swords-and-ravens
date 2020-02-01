@@ -38,10 +38,10 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
             this.entireGame.proceedToIngameGameState(new BetterMap(this.players.map((h, u) => ([h.id, u]))));
         } else if (message.type == "choose-house") {
-            const house = this.availableHouses.get(message.house);
+            const house = message.house ? this.availableHouses.get(message.house) : null;
 
             // Check if the house is available
-            if (this.players.has(house)) {
+            if (house && this.players.has(house)) {
                 return;
             }
 
@@ -50,7 +50,9 @@ export default class LobbyGameState extends GameState<EntireGame> {
                     this.players.delete(house);
                 }
             });
-            this.players.set(house, user);
+            if (house) {
+                this.players.set(house, user);
+            }
 
             this.entireGame.broadcastToClients({
                 type: "house-chosen",
@@ -72,10 +74,10 @@ export default class LobbyGameState extends GameState<EntireGame> {
         }
     }
 
-    chooseHouse(house: LobbyHouse): void {
+    chooseHouse(house: LobbyHouse | null): void {
         this.entireGame.sendMessageToServer({
             type: "choose-house",
-            house: house.id
+            house: house ? house.id : null
         });
     }
 
