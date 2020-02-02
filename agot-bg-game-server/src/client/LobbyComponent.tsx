@@ -48,7 +48,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                                 <Col xs="auto">
                                                     <Button onClick={() => this.choose(h)}>Choose</Button>
                                                 </Col>
-                                            ) : (
+                                            ) : this.props.gameState.players.get(h) == this.props.gameClient.authenticatedUser && (
                                                 <Col xs="auto">
                                                     <Button variant="danger" onClick={() => this.leave()}>Leave</Button>
                                                 </Col>
