@@ -230,6 +230,10 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
             }
         }
 
+        if(!this.confirmPossibleUnitLoss(this.selectedMarchOrderRegion)) {
+            return;
+        }
+
         this.props.gameState.sendMoves(
             this.selectedMarchOrderRegion,
             this.plannedMoves,
@@ -237,6 +241,62 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         );
 
         this.reset();
+    }
+
+    confirmPossibleUnitLoss(startingRegion: Region): boolean {
+        // No problems when starting region has no castle
+        if(!startingRegion.hasStructure) {
+            return true;
+        }
+
+        // No problems when user leaves a Power Token
+        if(this.leavePowerToken) {
+            return true;
+        }
+
+        // No problems when an unit stays in the starting region
+        if (_.flatMap(this.plannedMoves.values).length != startingRegion.units.size) {
+            return true;
+        }
+
+        let shipsWillBeLost = false;
+        let attackingUnitsWillBeDestroyedOnCombatLoss = false;
+
+        // If a house initiates a battle from an enemy capital and loses the combat it has no valid retreat region and thus all units will be destroyed
+        if (startingRegion.superControlPowerToken
+            && startingRegion.superControlPowerToken != this.props.gameState.house
+            && this.props.gameState.getMovesThatTriggerAttack(this.plannedMoves.entries).length > 0) {
+                attackingUnitsWillBeDestroyedOnCombatLoss = true;
+        }
+
+        // Check if ships will be destroyed by that move
+        const adjacentPortOfCastle = this.props.gameState.world.getAdjacentPortOfCastle(startingRegion);
+        if(adjacentPortOfCastle && adjacentPortOfCastle.units.size > 0) {
+            shipsWillBeLost = true;
+        }
+
+        if(!attackingUnitsWillBeDestroyedOnCombatLoss && !shipsWillBeLost) {
+            // No units will be lost by that move
+            return true;
+        }
+
+        // Start the message this way to not extra handle canLeavePowerToken()
+        let message = "You do not to leave a Power Token. Be aware\n";
+
+        if(shipsWillBeLost) {
+            message += `\tthat you will lose all your ships in ${adjacentPortOfCastle ? adjacentPortOfCastle.name : "adjacent port"}`;
+            if(attackingUnitsWillBeDestroyedOnCombatLoss) {
+                message += " and\n";
+            }
+        }
+
+        if(attackingUnitsWillBeDestroyedOnCombatLoss) {
+            message += "\tthat your army will be destroyed in case you lose the pending combat"
+        }
+
+        message += ".\n\nDo you want to continue?";
+
+        return window.confirm(message);
     }
 
     componentDidMount(): void {
