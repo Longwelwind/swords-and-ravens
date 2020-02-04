@@ -11,6 +11,7 @@ import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import houseInfluenceImages from "./houseInfluenceImages";
 import classNames = require("classnames");
+import ChatComponent from "./chat-client/ChatComponent";
 
 interface LobbyComponentProps {
     gameClient: GameClient;
@@ -57,6 +58,16 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                     </ListGroupItem>
                                 ))}
                             </ListGroup>
+                        </Card>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <Card>
+                            <Card.Body style={{height: "300px"}}>
+                                <ChatComponent gameClient={this.props.gameClient}
+                                               entireGame={this.props.gameState.entireGame}/>
+                            </Card.Body>
                         </Card>
                     </Col>
                 </Row>

@@ -9,10 +9,11 @@ import Form from "react-bootstrap/Form";
 import {observable} from "mobx";
 import IngameGameState from "../../common/ingame-game-state/IngameGameState";
 import ChatClient from "./ChatClient";
+import EntireGame from "../../common/EntireGame";
 
 interface ChatComponentProps {
     gameClient: GameClient;
-    ingame: IngameGameState;
+    entireGame: EntireGame;
 }
 
 @observer
@@ -27,7 +28,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
         return (
             <div className="d-flex flex-column h-100">
                 <div className="flex-grow-1 mb-3 overflow-auto">
-                    {this.chatClient.channels.get(this.props.ingame.entireGame.publicChatRoomId).messages.slice().reverse().map(m => (
+                    {this.chatClient.channels.get(this.props.entireGame.publicChatRoomId).messages.slice().reverse().map(m => (
                         <Row noGutters={true} className="flex-nowrap">
                             <Col xs="auto" style={{width: "38px"}} className="text-center">
                                 <small
@@ -63,7 +64,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
             return;
         }
 
-        this.chatClient.sendMessage(this.chatClient.channels.get(this.props.ingame.entireGame.publicChatRoomId), this.inputText);
+        this.chatClient.sendMessage(this.chatClient.channels.get(this.props.entireGame.publicChatRoomId), this.inputText);
         this.inputText = "";
     }
 }
