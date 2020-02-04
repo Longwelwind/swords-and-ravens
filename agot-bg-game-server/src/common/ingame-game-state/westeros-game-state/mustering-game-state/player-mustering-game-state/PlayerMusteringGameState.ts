@@ -284,7 +284,6 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                         const alreadyMusteredUnits = flattenedMusterings.filter(m => m.to == rule.to).length;
                         // Musterings might have freed units that can be used to realize musterings
                         const freedUnits = flattenedMusterings.filter(m => m.from && m.from.type == rule.to).length;
-                      
                         return this.game.getAvailableUnitsOfType(this.house, rule.to) + freedUnits - alreadyMusteredUnits;
                       })
                     // Check that the mustering respects supply
