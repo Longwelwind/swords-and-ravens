@@ -13,9 +13,10 @@ import Region from "../../game-data-structure/Region";
 import Unit from "../../game-data-structure/Unit";
 import Game from "../../game-data-structure/Game";
 import Order from "../../game-data-structure/Order";
-import User from "../../../../server/User";
+import { port } from "../../game-data-structure/regionTypes";
+import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameState } from "./take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
 
-export default class ResolveMarchOrderGameState extends GameState<ActionGameState, ResolveSingleMarchOrderGameState | CombatGameState> {
+export default class ResolveMarchOrderGameState extends GameState<ActionGameState, ResolveSingleMarchOrderGameState | CombatGameState | TakeControlOfEnemyPortGameState> {
     constructor(actionGameState: ActionGameState) {
         super(actionGameState);
     }
@@ -45,13 +46,27 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
     }
 
     onResolveSingleMarchOrderGameStateFinish(house: House): void {
-        // Check if an other march order can be resolved
+        // Last march is completely handled
+        // Now is the time to ...
+        //   ... check if ships can be converted
+        const analyzePortResult = this.isTakeControlOfEnemyPortGameStateRequired();
+        if(analyzePortResult) {
+            this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(analyzePortResult.port, analyzePortResult.newController, house);
+            return;
+        }
+
+        //   ... check victory conditions
+        if(this.ingameGameState.checkVictoryConditions()) {
+            return;
+        }
+
+        //   ... check if an other march order can be resolved
         this.proceedNextResolveSingleMarchOrder(house);
     }
 
-    onCombatGameStateEnd(house: House): void {
+    onTakeControlOfEnemyPortFinish(lastHouseThatResolvedMarchOrder: House) {
         // Check if an other march order can be resolved
-        this.proceedNextResolveSingleMarchOrder(house);
+        this.onResolveSingleMarchOrderGameStateFinish(lastHouseThatResolvedMarchOrder);
     }
 
     proceedNextResolveSingleMarchOrder(lastHouseToResolve: House | null = null): void {
@@ -65,6 +80,25 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         }
 
         this.setChildGameState(new ResolveSingleMarchOrderGameState(this)).firstStart(houseToResolve);
+    }
+
+    destroyAllShipsInPort(portRegion: Region): number {
+        if(portRegion.type != port) {
+            throw new Error("This method is intended to only be used for destroying ships in ports")
+        }
+
+        this.removePossibleOrdersInPort(portRegion);
+
+        const shipsToDestroy = portRegion.units.map((id, _unit) => id);
+        shipsToDestroy.forEach(id => portRegion.units.delete(id));
+
+        this.entireGame.broadcastToClients({
+            type: "remove-units",
+            regionId: portRegion.id,
+            unitIds: shipsToDestroy
+        });
+
+        return shipsToDestroy.length;
     }
 
     proceedToCombat(attackerComingFrom: Region, combatRegion: Region, attacker: House, defender: House, army: Unit[], order: Order): void {
@@ -89,7 +123,7 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         return null;
     }
 
-    moveUnits(from: Region, units: Unit[], to: Region): boolean {
+    moveUnits(from: Region, units: Unit[], to: Region) {
         const controllerToRegion = to.getController();
 
         if (controllerToRegion != units[0].allegiance) {
@@ -125,8 +159,48 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
             to: to.id,
             units: units.map(u => u.id)
         });
+    }
 
-        return this.ingameGameState.checkVictoryConditions();
+    private removePossibleOrdersInPort(portRegion: Region) {
+        if(portRegion.type != port) {
+            throw new Error("This method is intended to only be used for removing orders of destroyed or taken ships")
+        }
+
+        if (this.actionGameState.ordersOnBoard.has(portRegion)) {
+            this.actionGameState.ordersOnBoard.delete(portRegion);
+            this.entireGame.broadcastToClients({
+                type: "action-phase-change-order",
+                region: portRegion.id,
+                order: null
+            });
+        }
+    }
+
+    private isTakeControlOfEnemyPortGameStateRequired(): {port: Region, newController: House} | null {
+        // Find ports with enemy ships
+        const portsWithEnemyShips = this.world.regions.values.filter(r => r.type == port
+            && r.units.size > 0
+            && r.getController() != this.world.getAdjacentLandOfPort(r).getController());
+
+            if(portsWithEnemyShips.length == 0) {
+            return null;
+        }
+
+        const adjacentCastleController = this.world.getAdjacentLandOfPort(portsWithEnemyShips[0]).getController();
+        if(adjacentCastleController) {
+            // A castle with ships in port has been conquered
+            this.removePossibleOrdersInPort(portsWithEnemyShips[0]);
+
+            // return TakeControlOfEnemyPortGameState required
+            return {
+                port: portsWithEnemyShips[0],
+                newController: adjacentCastleController
+            }
+        }
+        // An else path can be omitted here as immediately destroyed ships by empty castle
+        // has been handled by resolve single march order game state already
+
+        throw new Error("adjacentCastleController should never be null");
     }
 
     onPlayerMessage(player: Player, message: ClientMessage) {
@@ -152,11 +226,13 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         return resolveMarchOrderGameState;
     }
 
-    deserializeChildGameState(data: SerializedResolveMarchOrderGameState["childGameState"]): ResolveSingleMarchOrderGameState | CombatGameState {
+    deserializeChildGameState(data: SerializedResolveMarchOrderGameState["childGameState"]): ResolveSingleMarchOrderGameState | CombatGameState | TakeControlOfEnemyPortGameState {
         if (data.type == "resolve-single-march") {
             return ResolveSingleMarchOrderGameState.deserializeFromServer(this, data);
         } else if (data.type == "combat") {
             return CombatGameState.deserializeFromServer(this, data);
+        } else if (data.type == "take-control-of-enemy-port") {
+            return TakeControlOfEnemyPortGameState.deserializeFromServer(this, data);
         } else {
             throw new Error();
         }
@@ -165,5 +241,5 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
 
 export interface SerializedResolveMarchOrderGameState {
     type: "resolve-march-order";
-    childGameState: SerializedResolveSingleMarchOrderGameState | SerializedCombatGameState;
+    childGameState: SerializedResolveSingleMarchOrderGameState | SerializedCombatGameState | SerializedTakeControlOfEnemyPortGameState;
 }

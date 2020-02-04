@@ -10,7 +10,7 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
     | ActionPhaseBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingAttack | MarchOrderRemoved
-    | StarredConsolidatePowerForPowerTokens | ArmiesReconciled
+    | StarredConsolidatePowerForPowerTokens | ArmiesReconciled | EnemyPortTaken | ShipsDestroyedByEmptyCastle
     | TyrionLannisterHouseCardReplaced | TyrionLannisterChoiceMade
     | ArianneMartellPreventMovement | LorasTyrellAttackOrderMoved | TywinLannisterPowerTokensGained
     | RooseBoltonHouseCardsReturned | QueenOfThornsOrderRemoved | QueenOfThornsNoOrderAvailable
@@ -313,4 +313,20 @@ interface RobbStarkRetreatRegionOverriden {
     type: "robb-stark-retreat-location-overriden";
     house: string;
     affectedHouse: string;
+}
+
+interface EnemyPortTaken {
+    type: "enemy-port-taken";
+    oldController: string;
+    newController: string;
+    shipCount: number;
+    port: string;
+}
+
+interface ShipsDestroyedByEmptyCastle {
+    type: "ships-destroyed-by-empty-castle";
+    house: string;
+    castle: string;
+    port: string;
+    shipCount: number;
 }
