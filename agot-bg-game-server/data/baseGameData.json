@@ -178,7 +178,10 @@
       }
     ]
   },
-  "starredOrderRestrictions": [3, 3, 2, 1],
+  "starredOrderRestrictions": [
+    [3, 2, 1, 0],
+    [3, 3, 2, 1, 0, 0, 0, 3]
+  ],
   "supplyRestrictions": [
     [2, 2],
     [3, 2],
