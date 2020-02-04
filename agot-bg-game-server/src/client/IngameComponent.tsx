@@ -376,7 +376,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     <Card.Body style={{height: "350px", overflowY: "scroll"}}>
                                         <Tab.Content className="h-100">
                                             <Tab.Pane eventKey="chat" className="h-100">
-                                                <ChatComponent gameClient={this.props.gameClient} ingame={this.props.gameState} />
+                                                <ChatComponent gameClient={this.props.gameClient} entireGame={this.props.gameState.entireGame} />
                                             </Tab.Pane>
                                             <Tab.Pane eventKey="game-logs">
                                                 <GameLogListComponent ingameGameState={this.props.gameState} />
