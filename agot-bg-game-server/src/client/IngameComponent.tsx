@@ -127,7 +127,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                         Once per turn, the holder of Valyrian Steel Blade can use the blade
                                                                         to increase by one the combat strength of his army in a combat.<br />
                                                                         In case of a tie in a combat, the winner is the house which is
-                                                                        the highest in this tracker.
+                                                                        the highest in this tracker.<br/><br/>
+                                                                        {this.props.gameState.game.valyrianSteelBladeUsed ? (
+                                                                            <>The Valyrian Steel Blade has been used this turn</>
+                                                                        ) : (
+                                                                            <>The Valyrian Steel Blade is available</>
+                                                                        )}
                                                                     </>
                                                                 ) : (
                                                                     <>
