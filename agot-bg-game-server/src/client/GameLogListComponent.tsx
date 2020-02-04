@@ -378,7 +378,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 return <><strong>{house.name}</strong> used the <strong>Valyrian Sword</strong>.</>;
 
             case "combat-house-card-chosen":
-                const houseCards = data.houseCards.map(([hid, hcid]) => {
+                let houseCards = data.houseCards.map(([hid, hcid]) => {
                     const house = this.game.houses.get(hid);
                     return [house, house.houseCards.get(hcid)];
                 });
@@ -437,7 +437,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
 
                 return <>
                     <strong>{house.name}</strong> resolved a Starred Consolidate Power Order token
-                    in <strong>{region.name}</strong> to gain <strong>{countPowerToken}</strong> Power tokens.
+                    in <strong>{region.name}</strong> to gain <strong>{countPowerToken}</strong> Power token{countPowerToken > 0 && "s"}.
                 </>;
 
             case "armies-reconciled":
@@ -453,6 +453,153 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                             <li key={region.id}>{region.name}: {unitTypes.map(ut => ut.name).join(", ")}</li>
                         ))}
                     </ul>
+                </>;
+
+            case "tyrion-lannister-choice-made":
+                house = this.game.houses.get(data.house);
+                let affectedHouse = this.game.houses.get(data.affectedHouse);
+                const chooseToReplace = data.chooseToReplace;
+
+                return <>
+                    <strong>Tyrion Lannister</strong>: <strong>{house.name}</strong> {chooseToReplace && "not"} to force
+                    <strong>{affectedHouse.name}</strong> to choose a new House card.
+                </>;
+
+            case "tyrion-lannister-house-card-replaced":
+                affectedHouse = this.game.houses.get(data.affectedHouse);
+                const newHouseCard = data.newHouseCard ? affectedHouse.houseCards.get(data.newHouseCard) : null;
+
+                return newHouseCard ? (
+                    <><strong>{affectedHouse.name}</strong> chose <strong>{newHouseCard.name}.</strong></>
+                ) : (
+                    <><strong>{affectedHouse.name}</strong> had no other available House card</>
+                );
+
+            case "arianne-martell-prevent-movement":
+                const enemyHouse = this.game.houses.get(data.enemyHouse);
+
+                return <>
+                    <strong>Arianne Martell</strong>: <strong>{enemyHouse.name}</strong> cannot move their attacking
+                    army to the embattled area.
+                </>;
+
+            case "roose-bolton-house-cards-returned":
+                house = this.game.houses.get(data.house);
+                const returnedHouseCards = data.houseCards.map(hcid => house.houseCards.get(hcid));
+
+                return <>
+                    <strong>Roose Bolton</strong>: <strong>{house.name}</strong> took back all discarded House
+                    cards ({returnedHouseCards.map(hc => hc).join(", ")}).
+                </>;
+
+            case "loras-tyrell-attack-order-moved":
+                const order = orders.get(data.order);
+                const embattledRegion = this.world.regions.get(data.region);
+
+                return <>
+                    <strong>Loras Tyrell</strong>: The <strong>{order.type.name}</strong> order was moved
+                    to <strong>{embattledRegion.name}</strong>.
+                </>;
+
+            case "queen-of-thorns-no-order-available":
+                house = this.game.houses.get(data.house);
+                affectedHouse = this.game.houses.get(data.affectedHouse);
+
+                return <>
+                    <strong>Queen of Thorns</strong>: <strong>{affectedHouse.name}</strong> had no adjacent order tokens.
+                </>;
+
+            case "queen-of-thorns-order-removed":
+                house = this.game.houses.get(data.house);
+                affectedHouse = this.game.houses.get(data.affectedHouse);
+                region = this.world.regions.get(data.region);
+                let removedOrder = orders.get(data.orderRemoved);
+
+                return <>
+                    <strong>Queen of Thorns</strong>: <strong>{house.name}</strong> removed
+                    a <strong>{removedOrder.type.name}</strong> of <strong>{affectedHouse.name}</strong> in <strong>{region.name}</strong>.
+                </>;
+
+            case "tywin-lannister-power-tokens-gained":
+                house = this.game.houses.get(data.house);
+                const powerTokensGained = data.powerTokensGained;
+
+                return <>
+                    <strong>Tywin Lannister</strong>: <strong>{house.name}</strong> gained {powerTokensGained} Power
+                    tokens.
+                </>;
+
+            case "renly-baratheon-no-knight-available":
+                house = this.game.houses.get(data.house);
+
+                return <>
+                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> had no available knight to upgrade
+                    to.
+                </>;
+
+            case "renly-baratheon-no-footman-available":
+                house = this.game.houses.get(data.house);
+
+                return <>
+                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> had no available footman to upgrade.
+                </>;
+
+            case "renly-baratheon-footman-upgraded-to-knight":
+                house = this.game.houses.get(data.house);
+                region = this.world.regions.get(data.region);
+
+                return <>
+                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> upgraded a footman to a knight in
+                    <strong>{region.name}</strong>.
+                </>;
+
+            case "mace-tyrell-casualties-prevented":
+                house = this.game.houses.get(data.house);
+
+                return <>
+                    <strong>Mace Tyrell</strong>: Casualties were prevented by <strong>Robb Stark</strong>.
+                </>;
+
+            case "mace-tyrell-no-footman-available":
+                house = this.game.houses.get(data.house);
+
+                return <>
+                    <strong>Mace Tyrell</strong>: No enemy footman were available to be killed.
+                </>;
+
+            case "mace-tyrell-footman-killed":
+                house = this.game.houses.get(data.house);
+                region = this.world.regions.get(data.region);
+
+                return <>
+                    <strong>Mace Tyrell</strong>: <strong>{house.name}</strong> killed an enemy footman
+                    in <strong>{region.name}</strong>.
+                </>;
+
+            case "cersei-lannister-no-order-available":
+                return <>
+                    <strong>Cersei Lannister</strong>: There were no order to be removed.
+                </>;
+
+            case "cersei-lannister-order-removed":
+                house = this.game.houses.get(data.house);
+                affectedHouse = this.game.houses.get(data.affectedHouse);
+                region = this.world.regions.get(data.region);
+                removedOrder = orders.get(data.order);
+
+                return <>
+                    <strong>Cersei Lannister</strong>: <strong>{house.name}</strong> removed
+                    a <strong>{removedOrder.type.name}</strong> order
+                    of <strong>{affectedHouse.name}</strong> in <strong>{region.name}</strong>.
+                </>;
+
+            case "robb-stark-retreat-location-overriden":
+                house = this.game.houses.get(data.house);
+                affectedHouse = this.game.houses.get(data.affectedHouse);
+
+                return <>
+                    <strong>Robb Stark</strong>: <strong>{house.name}</strong> chose the retreat location of the
+                    retreating army of <strong>{affectedHouse.name}</strong>.
                 </>;
         }
     }

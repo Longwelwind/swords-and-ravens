@@ -10,7 +10,13 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
     | ActionPhaseBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingAttack | MarchOrderRemoved
-    | StarredConsolidatePowerForPowerTokens | ArmiesReconciled;
+    | StarredConsolidatePowerForPowerTokens | ArmiesReconciled
+    | TyrionLannisterHouseCardReplaced | TyrionLannisterChoiceMade
+    | ArianneMartellPreventMovement | LorasTyrellAttackOrderMoved | TywinLannisterPowerTokensGained
+    | RooseBoltonHouseCardsReturned | QueenOfThornsOrderRemoved | QueenOfThornsNoOrderAvailable
+    | RenlyBaratheonNoFootmanAvailable | RenlyBaratheonNoKnightAvailable | RenlyBaratheonFootmanUpgradedToKnight
+    | MaceTyrellNoFootmanAvailable | MaceTyrellCasualtiesPrevented | MaceTyrellFootmanKilled
+    | CerseiLannisterNoOrderAvailable | CerseiLannisterOrderRemoved | RobbStarkRetreatRegionOverriden;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -203,4 +209,108 @@ interface ArmiesReconciled {
     type: "armies-reconciled";
     house: string;
     armies: [string, string[]][];
+}
+
+interface TyrionLannisterChoiceMade {
+    type: "tyrion-lannister-choice-made";
+    house: string;
+    affectedHouse: string;
+    chooseToReplace: boolean;
+}
+
+interface TyrionLannisterHouseCardReplaced {
+    type: "tyrion-lannister-house-card-replaced";
+    house: string;
+    affectedHouse: string;
+    oldHouseCard: string;
+    newHouseCard: string | null;
+}
+
+interface ArianneMartellPreventMovement {
+    type: "arianne-martell-prevent-movement";
+    house: string;
+    enemyHouse: string;
+}
+
+interface RooseBoltonHouseCardsReturned {
+    type: "roose-bolton-house-cards-returned";
+    house: string;
+    houseCards: string[];
+}
+
+interface LorasTyrellAttackOrderMoved {
+    type: "loras-tyrell-attack-order-moved";
+    house: string;
+    order: number;
+    region: string;
+}
+
+interface QueenOfThornsNoOrderAvailable {
+    type: "queen-of-thorns-no-order-available";
+    house: string;
+    affectedHouse: string;
+}
+
+interface QueenOfThornsOrderRemoved {
+    type: "queen-of-thorns-order-removed";
+    house: string;
+    affectedHouse: string;
+    orderRemoved: number;
+    region: string;
+}
+
+interface TywinLannisterPowerTokensGained {
+    type: "tywin-lannister-power-tokens-gained";
+    house: string;
+    powerTokensGained: number;
+}
+
+interface RenlyBaratheonNoFootmanAvailable {
+    type: "renly-baratheon-no-footman-available";
+    house: string;
+}
+
+interface RenlyBaratheonNoKnightAvailable {
+    type: "renly-baratheon-no-knight-available";
+    house: string;
+}
+
+interface RenlyBaratheonFootmanUpgradedToKnight {
+    type: "renly-baratheon-footman-upgraded-to-knight";
+    house: string;
+    region: string;
+}
+
+interface MaceTyrellNoFootmanAvailable {
+    type: "mace-tyrell-no-footman-available";
+    house: string;
+}
+
+interface MaceTyrellCasualtiesPrevented {
+    type: "mace-tyrell-casualties-prevented";
+    house: string;
+}
+
+interface MaceTyrellFootmanKilled {
+    type: "mace-tyrell-footman-killed";
+    house: string;
+    region: string;
+}
+
+interface CerseiLannisterNoOrderAvailable {
+    type: "cersei-lannister-no-order-available";
+}
+
+interface CerseiLannisterOrderRemoved {
+    type: "cersei-lannister-order-removed";
+    house: string;
+    affectedHouse: string;
+    region: string;
+    order: number;
+}
+
+interface RobbStarkRetreatRegionOverriden {
+    type: "robb-stark-retreat-location-overriden";
+    house: string;
+    affectedHouse: string;
 }

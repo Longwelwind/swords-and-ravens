@@ -7,12 +7,18 @@ import HouseCard from "./HouseCard";
 export default class TywinLannisterHouseCardAbility extends HouseCardAbility {
     afterWinnerDetermination(afterWinnerDetermination: AfterWinnerDeterminationGameState, house: House, _houseCard: HouseCard): void {
         if (afterWinnerDetermination.postCombatGameState.winner == house) {
-            house.changePowerTokens(2);
+            const powerTokensGained = house.changePowerTokens(2);
 
             afterWinnerDetermination.entireGame.broadcastToClients({
                 type: "change-power-token",
                 houseId: house.id,
                 powerTokenCount: house.powerTokens
+            });
+
+            afterWinnerDetermination.combatGameState.ingameGameState.log({
+                type: "tywin-lannister-power-tokens-gained",
+                house: house.id,
+                powerTokensGained: powerTokensGained
             });
         }
 

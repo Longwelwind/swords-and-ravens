@@ -34,8 +34,18 @@ export default class MaceTyrellAbilityGameState extends GameState<
         const availableFootmen = this.getAvailableFootmen(house);
 
         if (availableFootmen.length == 0) {
+            this.ingame.log({
+                type: "mace-tyrell-no-footman-available",
+                house: house.id
+            });
+
             this.parentGameState.onHouseCardResolutionFinish(house);
         } else if (this.combatGameState.areCasulatiesPrevented(enemy)) {
+            this.ingame.log({
+                type: "mace-tyrell-casualties-prevented",
+                house: house.id
+            });
+
             this.parentGameState.onHouseCardResolutionFinish(house);
         } else {
             this.setChildGameState(new SelectUnitsGameState(this)).firstStart(
@@ -71,6 +81,12 @@ export default class MaceTyrellAbilityGameState extends GameState<
                 type: "remove-units",
                 regionId: region.id,
                 unitIds: units.map(u => u.id)
+            });
+
+            this.ingame.log({
+                type: "mace-tyrell-footman-killed",
+                house: house.id,
+                region: region.id
             });
         });
 

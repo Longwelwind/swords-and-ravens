@@ -25,9 +25,13 @@ export default class House {
         this.supplyLevel = supplyLevel;
     }
 
-    changePowerTokens(delta: number) {
+    changePowerTokens(delta: number): number {
+        const originalValue = this.powerTokens;
+
         this.powerTokens += delta;
         this.powerTokens = Math.max(0, Math.min(this.powerTokens, MAX_POWER_TOKENS));
+
+        return this.powerTokens - originalValue;
     }
 
     serializeToClient(): SerializedHouse {
