@@ -601,6 +601,20 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     <strong>Robb Stark</strong>: <strong>{house.name}</strong> chose the retreat location of the
                     retreating army of <strong>{affectedHouse.name}</strong>.
                 </>;
+            case "retreat-region-chosen":
+                return <>
+                {data.regionTo ?
+                    <>
+                        <strong>{data.house}</strong> retreats from <strong>
+                        {data.regionFrom}</strong> to <strong>{data.regionTo}</strong>.
+                    </> :
+                    <><strong>{data.house}</strong> was not able to retreat from <strong>{data.regionFrom}</strong>.</>}
+                </>;
+            case "retreat-casualties-suffered":
+                return <>
+                    <p><strong>{data.house}</strong> suffered casualties from the retreat:</p>
+                    <p>{data.units.join(", ")}</p>
+                </>;
         }
     }
 }

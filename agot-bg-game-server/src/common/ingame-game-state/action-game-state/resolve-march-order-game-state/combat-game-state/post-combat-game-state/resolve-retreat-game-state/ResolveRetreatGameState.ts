@@ -66,10 +66,10 @@ export default class ResolveRetreatGameState extends GameState<
             // No retreat regions available
             if (this.combat.attacker == this.postCombat.loser) {
                 // If attacker lost all units from attacking region will be destroyed
-                this.destroyAllUnits(this.combat.attackingRegion);
+                this.destroyAllUnits(this.combat.attackingRegion, this.postCombat.loser);
             } else {
                 // If defender lost all units from defender are destroyed
-                this.destroyAllUnits(this.combat.defendingRegion);
+                this.destroyAllUnits(this.combat.defendingRegion, this.postCombat.loser);
             }
 
             this.postCombat.onResolveRetreatFinish();
@@ -83,16 +83,28 @@ export default class ResolveRetreatGameState extends GameState<
         }
     }
 
-    private destroyAllUnits(region: Region) {
-        // todo: retreat not possible and all killed units
-
-        const unitsToKill = region.units.values.map(u => u.id);
-        unitsToKill.forEach(uid => region.units.delete(uid));
+    private destroyAllUnits(region: Region, affectedHouse: House) {
+        const unitIdsToKill = region.units.values.map(u => u.id);
+        const unitTypesToKill = region.units.values.map(u => u.type.name);
+        unitIdsToKill.forEach(uid => region.units.delete(uid));
 
         this.entireGame.broadcastToClients({
             type: "remove-units",
             regionId: region.id,
-            unitIds: unitsToKill
+            unitIds: unitIdsToKill
+        });
+
+        this.ingame.log({
+            type: "retreat-region-chosen",
+            house: affectedHouse.name,
+            regionFrom: region.name,
+            regionTo: null
+        });
+
+        this.ingame.log({
+            type: "retreat-casualties-suffered",
+            house: affectedHouse.name,
+            units: unitTypesToKill
         });
     }
 
@@ -101,17 +113,21 @@ export default class ResolveRetreatGameState extends GameState<
         const army = loserCombatData.army;
         this.retreatRegion = retreatRegion;
 
+        this.ingame.log({
+            type: "retreat-region-chosen",
+            house: this.postCombat.loser.name,
+            regionFrom: this.combat.defendingRegion.name,
+            regionTo: retreatRegion.name
+        })
+
         // Check if this retreat region require casualties
         const casualties = this.getCasualtiesOfRetreatRegion(retreatRegion);
-
-        // todo: pass house to selectunitsgamestate to log who decided the retreat
         if (casualties > 0) {
             // The loser must sacrifice some of their units
             this.setChildGameState(new SelectUnitsGameState(this)).firstStart(this.postCombat.loser, army, casualties);
             return;
         }
 
-        // todo: pass the house to on selectunitsend to log who decided the retreat
         // Otherwise, proceed with no casualties
         this.onSelectUnitsEnd(this.postCombat.loser, []);
     }
@@ -129,11 +145,16 @@ export default class ResolveRetreatGameState extends GameState<
                 army: this.postCombat.loserCombatData.army.map(u => u.id)
             });
 
-            // todo: send units that have been killed by this retreat
             this.entireGame.broadcastToClients({
                 type: "remove-units",
                 regionId: this.postCombat.loserCombatData.region.id,
                 unitIds: units.map(u => u.id)
+            });
+
+            this.ingame.log({
+                type: "retreat-casualties-suffered",
+                house: this.postCombat.loser.name,
+                units: units.map(u => u.type.name)
             });
         });
 
@@ -153,7 +174,6 @@ export default class ResolveRetreatGameState extends GameState<
             armyLeft.forEach(u => this.postCombat.loserCombatData.region.units.delete(u.id));
             armyLeft.forEach(u => this.retreatRegion.units.set(u.id, u));
 
-            // todo: send units that retreat and where
             this.entireGame.broadcastToClients({
                 type: "move-units",
                 from: this.postCombat.loserCombatData.region.id,
