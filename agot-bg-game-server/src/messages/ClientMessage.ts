@@ -2,7 +2,7 @@ export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | ResolveMa
     | UseValyrianSteelBlade | ChooseHouseCard | ChooseCasualties | ChooseRavenAction
     | ChooseTopWildlingCardAction | ReplaceOrder | SkipReplaceOrder | ResolveRaid | Bid | ChooseChoice
     | DecideBiggest | ReconcileArmies | Muster | ResolveTies | SelectUnits | LaunchGame | ChooseHouse
-    | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings;
+    | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings | CreatePrivateChatRoom;
 
 interface Ping {
     type: "ping";
@@ -162,4 +162,9 @@ interface ChangeSettings {
 
 export interface UserSettings {
     pbemMode: boolean;
+}
+
+interface CreatePrivateChatRoom {
+    type: "create-private-chat-room";
+    otherUser: string;
 }

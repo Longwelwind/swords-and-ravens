@@ -10,6 +10,10 @@ logger = logging.getLogger(__name__)
 
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.room = None
+
     async def connect(self):
         user = self.scope['user']
         room_id = self.scope['url_route']['kwargs']['room_id']
@@ -27,10 +31,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 await self.close()
                 return
 
-            # TODO: There's probably a more efficient way of checking if there is a UserInRoom
-            # entry for this user.
-            users = await database_sync_to_async(lambda: room.users.all())()
-            if user not in users:
+            is_user_part_of_room = await database_sync_to_async(lambda: room.users.filter(user=user).exists())()
+            if not is_user_part_of_room:
                 await self.close()
                 return
 
@@ -46,10 +48,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     async def disconnect(self, close_code):
         # Leave room group
-        await self.channel_layer.group_discard(
-            str(self.room.id),
-            self.channel_name
-        )
+        if self.room is not None:
+            await self.channel_layer.group_discard(
+                str(self.room.id),
+                self.channel_name
+            )
 
     async def receive_json(self, data):
         user = self.scope['user']

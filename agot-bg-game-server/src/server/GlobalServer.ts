@@ -10,6 +10,7 @@ import LiveWebsiteClient from "./website-client/LiveWebsiteClient";
 import BetterMap from "../utils/BetterMap";
 import schema from "./ClientMessage.json";
 import Ajv, {ValidateFunction} from "ajv";
+import _ from "lodash";
 
 export default class GlobalServer {
     server: Server;
@@ -121,9 +122,39 @@ export default class GlobalServer {
                 return;
             }
 
-            user.entireGame.onClientMessage(user, message);
+            const entireGame = user.entireGame;
 
-            this.saveGame(user.entireGame);
+            // Chat related messages are handled by GlobalServer because they must use the website client
+            if (message.type == "create-private-chat-room") {
+                const otherUser = user.entireGame.users.get(message.otherUser);
+                // Check if a chat room has not already been started between these 2 users
+                const users = _.sortBy([user, otherUser], u => u.id);
+
+                if (entireGame.privateChatRoomsIds.has(users[0]) && entireGame.privateChatRoomsIds.get(users[0]).has(users[1])) {
+                    return;
+                }
+
+                // Create a chat room between these 2 players
+                const roomId = await this.websiteClient.createPrivateChatRoom(users, `Chat room for ${users.map(u => u.name).join(" and ")}`);
+
+                if (!entireGame.privateChatRoomsIds.has(users[0])) {
+                    entireGame.privateChatRoomsIds.set(users[0], new BetterMap());
+                }
+
+                entireGame.privateChatRoomsIds.get(users[0]).set(users[1], roomId);
+
+                users.forEach(u => {
+                    u.send({
+                        type: "new-private-chat-room",
+                        users: users.map(u => u.id),
+                        roomId
+                    });
+                });
+            } else {
+                entireGame.onClientMessage(user, message);
+            }
+
+            this.saveGame(entireGame);
         }
     }
 

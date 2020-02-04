@@ -7,6 +7,7 @@ import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import Player from "../common/ingame-game-state/Player";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import ChatClient from "./chat-client/ChatClient";
+import BetterMap from "../utils/BetterMap";
 
 export interface AuthData {
     userId: string;
@@ -144,10 +145,34 @@ export default class GameClient {
             this.authenticated = true;
             this.authenticatedUser = this.entireGame.users.get(message.userId);
 
-            // Create the public chat room and connect to it
+            // Connect the public chat room
             this.chatClient.addChannel(this.entireGame.publicChatRoomId);
 
+            // Connect to the private chat rooms
+            this.entireGame.privateChatRoomsIds
+                .map((_, betterMap) => betterMap.map((_, roomId) => roomId)
+                    .forEach(roomId => this.chatClient.addChannel(roomId))
+                );
+
             this.connectionState = ConnectionState.SYNCED;
+        } else if (message.type == "new-private-chat-room") {
+            if (this.entireGame == null) {
+                return;
+            }
+
+            // Launch a WebSocket connection to this chat room
+            this.chatClient.addChannel(message.roomId);
+
+            // @ts-ignore
+            const users = message.users.map(uid => this.entireGame.users.get(uid));
+
+            if (!this.entireGame.privateChatRoomsIds.has(users[0])) {
+                this.entireGame.privateChatRoomsIds.set(users[0], new BetterMap());
+            }
+
+            this.entireGame.privateChatRoomsIds.get(users[0]).set(users[1], message.roomId);
+
+
         } else {
             if (!this.entireGame) {
                 console.error("Message other than \"authenticate-response\" received but entireGame == null");

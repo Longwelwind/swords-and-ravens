@@ -1,4 +1,5 @@
 import WebsiteClient, {StoredGameData, StoredUserData} from "./WebsiteClient";
+import User from "../User";
 
 export default class LocalWebsiteClient implements WebsiteClient {
 
@@ -33,5 +34,9 @@ export default class LocalWebsiteClient implements WebsiteClient {
 
     async createPublicChatRoom(name: string): Promise<string> {
         return `chat-${name}`;
+    }
+
+    async createPrivateChatRoom(users: User[], name: string): Promise<string> {
+        return `private-chat-between-${users.map(u => u.name).join("-")}`;
     }
 }

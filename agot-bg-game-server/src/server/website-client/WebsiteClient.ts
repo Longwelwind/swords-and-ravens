@@ -1,3 +1,5 @@
+import User from "../User";
+
 export interface StoredGameData {
     id: string;
     ownerId: string;
@@ -17,4 +19,5 @@ export default interface WebsiteClient {
     saveGame(gameId: string, serializedGame: object, viewOfGame: object, players: {userId: string; data: object}[], state: string, version: string): Promise<void>;
     notifyUsers(gameId: string, userIds: string[]): Promise<void>;
     createPublicChatRoom(name: string): Promise<string>;
+    createPrivateChatRoom(users: User[], name: string): Promise<string>;
 }

@@ -2,6 +2,7 @@ import WebsiteClient, {StoredGameData, StoredUserData} from "./WebsiteClient";
 import requestPromise, {post} from "request-promise";
 import {RequestAPI} from "request";
 import {StatusCodeError} from "request-promise/errors";
+import User from "../User";
 
 export default class LiveWebsiteClient implements WebsiteClient {
     masterApiBaseUrl: string;
@@ -96,5 +97,18 @@ export default class LiveWebsiteClient implements WebsiteClient {
             body: {users: userIds},
             json: true,
         }).auth(this.masterApiUsername, this.masterApiPassword, true);
+    }
+
+    async createPrivateChatRoom(users: User[], name: string): Promise<string> {
+        const response = await this.request.post(`${this.masterApiBaseUrl}/room`, {
+            body: {
+                name,
+                public: false,
+                users: users.map(u => ({user: u.id})),
+                max_retrieve_count: null
+            }
+        });
+
+        return response.id;
     }
 }
