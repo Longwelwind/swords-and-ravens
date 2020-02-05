@@ -25,7 +25,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     publicChatRoomId: string;
     // Keys are the two users participating in the private chat.
     // A pair of user is sorted alphabetically by their id when used as a key.
-    privateChatRoomsIds: BetterMap<User, BetterMap<User, string>> = new BetterMap();
+    @observable privateChatRoomsIds: BetterMap<User, BetterMap<User, string>> = new BetterMap();
 
     constructor(id: string, ownerId: string) {
         super(null);
@@ -214,6 +214,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         entireGame.ownerUserId = data.ownerUserId;
         entireGame.childGameState = entireGame.deserializeChildGameState(data.childGameState);
         entireGame.publicChatRoomId = data.publicChatRoomId;
+        entireGame.privateChatRoomsIds = new BetterMap(data.privateChatRoomIds.map(([uid1, bm]) => [
+            entireGame.users.get(uid1),
+            new BetterMap(bm.map(([uid2, roomId]) => [entireGame.users.get(uid2), roomId]))
+        ]));
 
         return entireGame;
     }

@@ -14,6 +14,7 @@ import EntireGame from "../../common/EntireGame";
 interface ChatComponentProps {
     gameClient: GameClient;
     entireGame: EntireGame;
+    roomId: string;
 }
 
 @observer
@@ -28,7 +29,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
         return (
             <div className="d-flex flex-column h-100">
                 <div className="flex-grow-1 mb-3 overflow-auto">
-                    {this.chatClient.channels.get(this.props.entireGame.publicChatRoomId).messages.slice().reverse().map(m => (
+                    {this.chatClient.channels.get(this.props.roomId).messages.slice().reverse().map(m => (
                         <Row noGutters={true} className="flex-nowrap">
                             <Col xs="auto" style={{width: "38px"}} className="text-center">
                                 <small
@@ -64,7 +65,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
             return;
         }
 
-        this.chatClient.sendMessage(this.chatClient.channels.get(this.props.entireGame.publicChatRoomId), this.inputText);
+        this.chatClient.sendMessage(this.chatClient.channels.get(this.props.roomId), this.inputText);
         this.inputText = "";
     }
 }

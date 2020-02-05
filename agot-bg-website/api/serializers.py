@@ -65,10 +65,10 @@ class RoomSerializer(ModelSerializer):
             max_retrieve_count=validated_data.pop('max_retrieve_count')
         )
 
+        room.save()
+
         users_data = validated_data.pop('users')
         for user_data in users_data:
             UserInRoom.objects.create(room=room, **user_data)
-
-        room.save()
 
         return room

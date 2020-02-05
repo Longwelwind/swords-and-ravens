@@ -1,6 +1,6 @@
+import * as React from "react";
 import {Component, ReactNode} from "react";
 import GameClient from "./GameClient";
-import * as React from "react";
 import {observer} from "mobx-react";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import MapComponent from "./MapComponent";
@@ -23,7 +23,6 @@ import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faStar} from "@fortawesome/free-solid-svg-icons/faStar";
 import Tooltip from "react-bootstrap/Tooltip";
-import classNames = require("classnames");
 import Badge from "react-bootstrap/Badge";
 import barrelImage from "../../public/images/icons/barrel.svg";
 import castleImage from "../../public/images/icons/castle.svg";
@@ -32,6 +31,7 @@ import ravenImage from "../../public/images/icons/raven.svg";
 import diamondHiltImage from "../../public/images/icons/diamond-hilt.svg";
 import hourglassImage from "../../public/images/icons/hourglass.svg";
 import mammothImage from "../../public/images/icons/mammoth.svg";
+import chatBubble from "../../public/images/icons/chat-bubble.svg";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import housePowerTokensImages from "./housePowerTokensImages";
 import marked from "marked";
@@ -48,6 +48,11 @@ import Tab from "react-bootstrap/Tab";
 import ChatComponent from "./chat-client/ChatComponent";
 import {HouseCardState} from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import HouseCardBackComponent from "./game-state-panel/utils/HouseCardBackComponent";
+import Dropdown from "react-bootstrap/Dropdown";
+import User from "../server/User";
+import Player from "../common/ingame-game-state/Player";
+import {observable} from "mobx";
+import classNames = require("classnames");
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -57,6 +62,7 @@ interface IngameComponentProps {
 @observer
 export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
+    @observable currentOpenedTab: string = "chat";
 
     get game(): Game {
         return this.props.gameState.game;
@@ -367,7 +373,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     <Row>
                         <Col>
                             <Card>
-                                <Tab.Container defaultActiveKey="chat">
+                                <Tab.Container activeKey={this.currentOpenedTab} onSelect={k => this.currentOpenedTab = k}>
                                     <Card.Header>
                                         <Nav variant="tabs">
                                             <Nav.Item>
@@ -376,16 +382,46 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             <Nav.Item>
                                                 <Nav.Link eventKey="game-logs">Game Logs</Nav.Link>
                                             </Nav.Item>
+                                            {this.getPrivateChatRooms().map(({user, roomId}) => (
+                                                <Nav.Item key={roomId}>
+                                                    <Nav.Link eventKey={roomId}>
+                                                        {user.name}
+                                                    </Nav.Link>
+                                                </Nav.Item>
+                                            ))}
+                                            <Nav.Item>
+                                                <Dropdown>
+                                                    <Dropdown.Toggle id="private-chat-room-dropdown" variant="link">
+                                                        <img src={chatBubble} width={16} />
+                                                    </Dropdown.Toggle>
+                                                    <Dropdown.Menu>
+                                                        {this.getOtherPlayers().map(p => (
+                                                            <Dropdown.Item onClick={() => this.onNewPrivateChatRoomClick(p)} key={p.user.id}>
+                                                                {p.user.name}
+                                                            </Dropdown.Item>
+                                                        ))}
+                                                    </Dropdown.Menu>
+                                                </Dropdown>
+                                            </Nav.Item>
                                         </Nav>
                                     </Card.Header>
                                     <Card.Body style={{height: "350px", overflowY: "scroll"}}>
                                         <Tab.Content className="h-100">
                                             <Tab.Pane eventKey="chat" className="h-100">
-                                                <ChatComponent gameClient={this.props.gameClient} entireGame={this.props.gameState.entireGame} />
+                                                <ChatComponent gameClient={this.props.gameClient}
+                                                               entireGame={this.props.gameState.entireGame}
+                                                               roomId={this.props.gameState.entireGame.publicChatRoomId} />
                                             </Tab.Pane>
                                             <Tab.Pane eventKey="game-logs">
                                                 <GameLogListComponent ingameGameState={this.props.gameState} />
                                             </Tab.Pane>
+                                            {this.getPrivateChatRooms().map(({roomId}) => (
+                                                <Tab.Pane eventKey={roomId} key={roomId} className="h-100">
+                                                    <ChatComponent gameClient={this.props.gameClient}
+                                                                   entireGame={this.props.gameState.entireGame}
+                                                                   roomId={roomId}/>
+                                                </Tab.Pane>
+                                            ))}
                                         </Tab.Content>
                                     </Card.Body>
                                 </Tab.Container>
@@ -403,6 +439,34 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             {name: "Fiefdoms", tracker: this.game.fiefdomsTrack, stars: false},
             {name: "King's Court", tracker: this.game.kingsCourtTrack, stars: true},
         ]
+    }
+
+    onNewPrivateChatRoomClick(p: Player): void {
+        const users = _.sortBy([this.props.gameClient.authenticatedUser as User, p.user], u => u.id);
+
+        if (!this.props.gameState.entireGame.privateChatRoomsIds.has(users[0]) || !this.props.gameState.entireGame.privateChatRoomsIds.get(users[0]).has(users[1])) {
+            // Create a new chat room for this player
+            this.props.gameState.entireGame.sendMessageToServer({
+                type: "create-private-chat-room",
+                otherUser: p.user.id
+            });
+        } else {
+            // The room already exists
+            // Set the current tab to this user
+            this.currentOpenedTab = this.props.gameState.entireGame.privateChatRoomsIds.get(users[0]).get(users[1]);
+        }
+    }
+
+    getPrivateChatRooms(): {user: User; roomId: string}[] {
+        return _.flatMap(this.props.gameState.entireGame.privateChatRoomsIds.map((u1, bm) => bm.map((u2, roomId) => {
+            const otherUser = this.props.gameClient.authenticatedUser == u1 ? u2 : u1;
+
+            return {user: otherUser, roomId};
+        })));
+    }
+
+    getOtherPlayers(): Player[] {
+        return this.props.gameState.players.values.filter(p => p.user != this.props.gameClient.authenticatedUser);
     }
 
     getHousesAtSupplyLevel(supplyLevel: number): House[] {
