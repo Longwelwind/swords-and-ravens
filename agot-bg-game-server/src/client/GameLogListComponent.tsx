@@ -601,6 +601,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     <strong>Robb Stark</strong>: <strong>{house.name}</strong> chose the retreat location of the
                     retreating army of <strong>{affectedHouse.name}</strong>.
                 </>;
+
             case "retreat-region-chosen":
                 return <>
                 {data.regionTo ?
@@ -610,10 +611,23 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     </> :
                     <><strong>{data.house}</strong> was not able to retreat from <strong>{data.regionFrom}</strong>.</>}
                 </>;
+
             case "retreat-casualties-suffered":
                 return <>
                     <p><strong>{data.house}</strong> suffered casualties from the retreat:</p>
                     <p>{data.units.join(", ")}</p>
+                </>
+
+            case "enemy-port-taken":
+                return <>
+                    {data.shipCount > 0
+                        ? <><strong>{data.newController}</strong> has converted {data.shipCount} ship{data.shipCount == 1 ? "" : "s"} from <strong>{data.oldController}</strong> in <strong></strong>{data.port}.</>
+                        : <><strong>{data.newController}</strong> has destroyed all <strong>{data.oldController}</strong> ships in <strong></strong>{data.port}.</>}
+                </>;
+
+            case "ships-destroyed-by-empty-castle":
+                return <>
+                    <><strong>{data.house}</strong> lost {data.shipCount} ship{data.shipCount>1?"s":""} in <strong>{data.port}</strong> because of leaving <strong>{data.castle}</strong> empty.</>
                 </>;
         }
     }

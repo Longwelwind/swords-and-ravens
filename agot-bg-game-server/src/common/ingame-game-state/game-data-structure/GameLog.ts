@@ -10,7 +10,7 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
     | ActionPhaseBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingAttack | MarchOrderRemoved
-    | StarredConsolidatePowerForPowerTokens | ArmiesReconciled
+    | StarredConsolidatePowerForPowerTokens | ArmiesReconciled | EnemyPortTaken | ShipsDestroyedByEmptyCastle
     | TyrionLannisterHouseCardReplaced | TyrionLannisterChoiceMade
     | ArianneMartellPreventMovement | LorasTyrellAttackOrderMoved | TywinLannisterPowerTokensGained
     | RooseBoltonHouseCardsReturned | QueenOfThornsOrderRemoved | QueenOfThornsNoOrderAvailable
@@ -327,4 +327,20 @@ interface RetreatCasualtiesSuffered {
     type: "retreat-casualties-suffered";
     house: string;
     units: string[];
+}
+
+interface EnemyPortTaken {
+    type: "enemy-port-taken";
+    oldController: string;
+    newController: string;
+    shipCount: number;
+    port: string;
+}
+
+interface ShipsDestroyedByEmptyCastle {
+    type: "ships-destroyed-by-empty-castle";
+    house: string;
+    castle: string;
+    port: string;
+    shipCount: number;
 }

@@ -152,6 +152,22 @@ export default class World {
         return adjacentLands[0];
     }
 
+    getAdjacentPortOfCastle(region: Region | null): Region | null {
+        if(!region || !region.hasStructure) {
+            return null;
+        }
+
+        const adjacentPorts = this.getNeighbouringRegions(region).filter(r => r.type == port);
+
+        if(adjacentPorts.length == 0) {
+            return null;
+        } else if(adjacentPorts.length == 1) {
+            return adjacentPorts[0];
+        }
+
+        throw new Error(`${region.id} has more than one adjacent ports`);
+    }
+
     getUnitsOfHouse(house: House): Unit[] {
         return _.flatMap(this.regions.values.map(r => r.units.values)).filter(u => u.allegiance == house);
     }
