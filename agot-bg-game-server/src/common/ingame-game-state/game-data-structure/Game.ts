@@ -12,7 +12,7 @@ import shuffle from "../../../utils/shuffle";
 import WildlingCard, {SerializedWildlingCard} from "./wildling-card/WildlingCard";
 import BetterMap from "../../../utils/BetterMap";
 import HouseCard from "./house-card/HouseCard";
-import {land} from "./regionTypes";
+import {land, port} from "./regionTypes";
 
 export const MAX_WILDLING_STRENGTH = 12;
 
@@ -256,6 +256,15 @@ export default class Game {
 
         for (let i = 0;i < armySizes.length;i++) {
             if (armySizes[i] > allowedArmySizes[i]) {
+                return true;
+            }
+        }
+
+        // Special port supply rule: Ports can only contain a maximum of 3 units
+        for (var p of addedUnits.keys.filter(r => r.type == port)) {
+            // Filter for units of house as it is possible that the port still contains enemy ships
+            // which will be removed after TakeControlOfEnemyPortGameState
+            if(p.units.values.filter(u => u.allegiance == house).length + addedUnits.get(p).length > 3) {
                 return true;
             }
         }

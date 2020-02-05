@@ -73,6 +73,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             }
 
             if (!this.areValidMoves(startingRegion, moves)) {
+                // todo: Add reason
                 return;
             }
 
@@ -118,6 +119,8 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                     moves: movesThatDontTriggerAttack.map(([r, us]) => [r.id, us.map(u => u.type.id)])
                 });
             }
+
+            this.destroyPossibleShipsInAdjacentPortIfNecessary(startingRegion, movesThatTriggerAttack);
 
             // If there was a move that trigger a fight, do special processing
             if (movesThatTriggerAttack.length > 0) {
@@ -182,9 +185,46 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                 order: null
             });
 
-            if (!this.parentGameState.ingameGameState.checkVictoryConditions()) {
-                this.resolveMarchOrderGameState.onResolveSingleMarchOrderGameStateFinish(this.house);
-            }
+            this.resolveMarchOrderGameState.onResolveSingleMarchOrderGameStateFinish(this.house);
+        }
+    }
+
+    private destroyPossibleShipsInAdjacentPortIfNecessary(startingRegion: Region, movesThatTriggerAttack: [Region, Unit[]][]) {
+        // Check if user left a simple castle empty
+        // If so, destroy all existing ships in possible adjacent port
+        // This has to be done now as user would keep control of the ships in case he initiates a battle but loses it
+
+        if (startingRegion.superControlPowerToken) {
+            // Regain ships to the original owner of a capital is handled later
+            // in parentGameState onResolveSingleMarchOrderFinished
+            return;
+        }
+
+        // Check if all units left the starting region.
+        if(!(movesThatTriggerAttack.length == 0 && startingRegion.getController() != this.house)) {
+            return;
+        }
+
+        // In case of a pending combat it's a bit more complicated
+        // as the attacking units are still present in the starting region
+        // and thus getController() can't be used. We have to check if all units
+        // marched to combat in that case.
+        if (!(_.flatMap(movesThatTriggerAttack.map(([_, units]) => units)).length == startingRegion.units.size)) {
+            return;
+        }
+
+        const portOfStartingRegion = this.game.world.getAdjacentPortOfCastle(startingRegion);
+        if (portOfStartingRegion && portOfStartingRegion.units.size > 0) {
+            // Starting region has a port with ships in it, so destroy them
+            const destroyedShipCount = this.parentGameState.destroyAllShipsInPort(portOfStartingRegion);
+
+            this.parentGameState.ingameGameState.log({
+                type: "ships-destroyed-by-empty-castle",
+                castle: startingRegion.name,
+                house: this.house.name,
+                port: portOfStartingRegion.name,
+                shipCount: destroyedShipCount
+            });
         }
     }
 

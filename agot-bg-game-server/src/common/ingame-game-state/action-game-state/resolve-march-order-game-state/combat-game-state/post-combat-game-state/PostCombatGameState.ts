@@ -246,12 +246,8 @@ export default class PostCombatGameState extends GameState<
         }, false);
     }
 
-
-
     onAfterCombatHouseCardAbilitiesFinish(): void {
-        if (!this.parentGameState.ingameGameState.checkVictoryConditions()) {
-            this.combat.resolveMarchOrderGameState.onCombatGameStateEnd(this.attacker);
-        }
+        this.combat.resolveMarchOrderGameState.onResolveSingleMarchOrderGameStateFinish(this.attacker);
     }
 
     markHouseAsUsed(house: House, houseCard: HouseCard | null): void {
