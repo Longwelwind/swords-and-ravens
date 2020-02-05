@@ -89,7 +89,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             const movesThatDontTriggerAttack = _.difference(moves, movesThatTriggerAttack);
 
             // Check if the player was capable of placing a power token
-            if (this.canLeavePowerToken(startingRegion, new BetterMap(moves)).success && message.leavePowerToken) {
+            if (message.leavePowerToken && this.canLeavePowerToken(startingRegion, new BetterMap(moves)).success) {
                 startingRegion.controlPowerToken = this.house;
                 this.house.powerTokens -= 1;
 
