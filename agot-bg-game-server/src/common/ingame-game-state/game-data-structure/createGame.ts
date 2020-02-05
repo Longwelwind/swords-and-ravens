@@ -280,12 +280,8 @@ export default function createGame(housesToCreate: string[]): Game {
         });
     });
 
-    for (let i=0; i<baseGameData.starredOrderRestrictions.length; i++) {
-        if(game.houses.size <= baseGameData.starredOrderRestrictions[i].length) {
-            game.starredOrderRestrictions = baseGameData.starredOrderRestrictions[i];
-            break;
-        }
-    }
+    game.starredOrderRestrictions = baseGameData.starredOrderRestrictions[baseGameData.starredOrderRestrictions.findIndex(
+        restrictions => game.houses.size <= restrictions.length)];
 
     game.skipRavenPhase = false;
 
