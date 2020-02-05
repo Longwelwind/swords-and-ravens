@@ -47,64 +47,78 @@ export default class ResolveRetreatGameState extends GameState<
     }
 
     firstStart(): void {
-        const possibleRetreatRegions = this.getValidRetreatRegions();
-
-        if (possibleRetreatRegions.length == 0) {
-            // No retreat regions available
-            // All units are killed on the spot
-            this.combat.defendingRegion.units.values.forEach(u => this.combat.defendingRegion.units.delete(u.id));
-
-            this.entireGame.broadcastToClients({
-                type: "remove-units",
-                regionId: this.combat.defendingRegion.id,
-                unitIds: this.combat.defendingRegion.units.values.map(u => u.id)
-            });
-
-            this.postCombat.onResolveRetreatFinish();
-            return;
-        }
-
         // House cards may override the chooser of the retreat location
+        // and this has to be considered when getting valid retreat regions
         const overridenChooser = this.getOverridenRetreatLocationChooser(this.postCombat.loser);
         const finalChooser = overridenChooser ? overridenChooser : this.postCombat.loser;
 
-        // There are 4 possible situations:
-        if (this.postCombat.loser == this.combat.attacker) {
-            // The loser is the attacker...
-            if (overridenChooser == null) {
-                // ...and the chooser was not overriden:
-                // The units retreat automatically to the region they came from.
-                this.onSelectRegionFinish(finalChooser, this.combat.attackingRegion);
+        const possibleRetreatRegions = this.getValidRetreatRegions(
+            this.combat.attackingRegion,
+            this.combat.defendingRegion,
+            this.combat.attacker,
+            this.postCombat.loser,
+            this.combat.attackingArmy,
+            this.postCombat.loserCombatData.army,
+            finalChooser
+        );
+
+        if (possibleRetreatRegions.length == 0) {
+            // No retreat regions available
+            if (this.combat.attacker == this.postCombat.loser) {
+                // If attacker lost all units from attacking region will be destroyed
+                this.destroyAllUnits(this.combat.attackingRegion, this.postCombat.loser);
             } else {
-                // ...and the chooser was overriden:
-                // The chooser can choose the retreat location, which the constraints
-                // where the least units are lost.
-                // TODO: Add constraints
-                this.setChildGameState(new SelectRegionGameState(this))
-                    .firstStart(finalChooser, possibleRetreatRegions);
+                // If defender lost all units from defender are destroyed
+                this.destroyAllUnits(this.combat.defendingRegion, this.postCombat.loser);
             }
+
+            this.postCombat.onResolveRetreatFinish();
+            return;
+        } else if (possibleRetreatRegions.length == 1) {
+            // The units can retreat automatically
+            this.onSelectRegionFinish(finalChooser, possibleRetreatRegions[0]);
         } else {
-            // The loser is the defender...
-            if (overridenChooser == null) {
-                // ...and the chooser was not overriden:
-                // The loser chooses the location of the retreat
-                this.setChildGameState(new SelectRegionGameState(this))
+            this.setChildGameState(new SelectRegionGameState(this))
                     .firstStart(finalChooser, possibleRetreatRegions);
-            } else {
-                // ...and the chooser was overriden:
-                // The chooser can choose the retreat location, with the constraint
-                // where the least units are lost.
-                // Todo: Add constraints
-                this.setChildGameState(new SelectRegionGameState(this))
-                    .firstStart(finalChooser, possibleRetreatRegions);
-            }
         }
+    }
+
+    private destroyAllUnits(region: Region, affectedHouse: House) {
+        const unitIdsToKill = region.units.values.map(u => u.id);
+        const unitTypesToKill = region.units.values.map(u => u.type.name);
+        unitIdsToKill.forEach(uid => region.units.delete(uid));
+
+        this.entireGame.broadcastToClients({
+            type: "remove-units",
+            regionId: region.id,
+            unitIds: unitIdsToKill
+        });
+
+        this.ingame.log({
+            type: "retreat-region-chosen",
+            house: affectedHouse.name,
+            regionFrom: region.name,
+            regionTo: null
+        });
+
+        this.ingame.log({
+            type: "retreat-casualties-suffered",
+            house: affectedHouse.name,
+            units: unitTypesToKill
+        });
     }
 
     onSelectRegionFinish(_house: House, retreatRegion: Region): void {
         const loserCombatData = this.postCombat.loserCombatData;
         const army = loserCombatData.army;
         this.retreatRegion = retreatRegion;
+
+        this.ingame.log({
+            type: "retreat-region-chosen",
+            house: this.postCombat.loser.name,
+            regionFrom: this.combat.defendingRegion.name,
+            regionTo: retreatRegion.name
+        })
 
         // Check if this retreat region require casualties
         const casualties = this.getCasualtiesOfRetreatRegion(retreatRegion);
@@ -135,6 +149,12 @@ export default class ResolveRetreatGameState extends GameState<
                 type: "remove-units",
                 regionId: this.postCombat.loserCombatData.region.id,
                 unitIds: units.map(u => u.id)
+            });
+
+            this.ingame.log({
+                type: "retreat-casualties-suffered",
+                house: this.postCombat.loser.name,
+                units: units.map(u => u.type.name)
             });
         });
 
@@ -185,19 +205,58 @@ export default class ResolveRetreatGameState extends GameState<
         this.childGameState.onServerMessage(message);
     }
 
-    getValidRetreatRegions(): Region[] {
-        const regionsWithTheirCasualties =
-            this.world.getValidRetreatRegions(
-                this.combat.defendingRegion,
-                this.postCombat.loser,
-                this.postCombat.loserCombatData.army
-            ).map(r => [r, this.getCasualtiesOfRetreatRegion(r)] as [Region, number]);
+    getValidRetreatRegions(attackingRegion: Region, defendingRegion: Region, attacker: House, loser: House, attackingArmy: Unit[], loserArmy: Unit[], finalChooser: House): Region[] {
+        let possibleRetreatRegions = this.world.getValidRetreatRegions(
+            defendingRegion,
+            loser,
+            loserArmy
+        );
+
+        if(attacker == loser) {
+            // Attacker lost the battle. Check if he can retreat back to the attacking region.
+            // Because it might be blocked for retreat if ...
+            const attackingRegionIsBlockedForRetreat =
+            // ... attacking region is a capital ...
+            attackingRegion.superControlPowerToken != null
+            // ... but not the attackers capital and ...
+            && attackingRegion.superControlPowerToken != attacker
+            // ... attacker left no Power Token and ...
+            && attackingRegion.controlPowerToken != attacker
+            // ... all units marched to combat
+            && attackingArmy.length == attackingRegion.units.size;
+
+            if(finalChooser == attacker) {
+                // Final chooser is the attacker himself
+                possibleRetreatRegions = attackingRegionIsBlockedForRetreat
+                    // If attacking region is blocked there is no possible retreat area.
+                    ? []
+                    // Otherwise there is only the attacking region
+                    : [attackingRegion];
+
+                    // We can omit the supply check as attacker will never exceed supply by retreating back to the attacking region
+                return possibleRetreatRegions;
+            } else {
+                // Final chooser is someone else.
+                // He can decide to retreat the units to a valid region adjacent to the combat
+                if (attackingRegionIsBlockedForRetreat) {
+                    // But if attacking region is blocked it must be filtered out
+                    possibleRetreatRegions = possibleRetreatRegions.filter(r => r != attackingRegion);
+                }
+            }
+        }
+        // No need for else path here.
+        // If defender lost the battle he or the final chooser
+        // has to choose a retreat region from possible retreat regions
+
+        // Now take supply into account and calculate the casualty values per possible retreat region
+        const casualtiesPerRegion =
+            possibleRetreatRegions.map(r => [r, this.getCasualtiesOfRetreatRegion(r)] as [Region, number]);
 
         // Get lowest casualty value
-        const lowestCasualty = _.min(_.flatMap(regionsWithTheirCasualties.map(([_, c]) => c)));
+        const lowestCasualty = _.min(_.flatMap(casualtiesPerRegion.map(([_, c]) => c)));
 
-        // filter regions for lowest casualty value
-        return regionsWithTheirCasualties.filter(([_, c]) => c == lowestCasualty).map(([r, _]) => r);
+        // Filter regions for lowest casualty value
+        return casualtiesPerRegion.filter(([_, c]) => c == lowestCasualty).map(([r, _]) => r);
     }
 
     getCasualtiesOfRetreatRegion(retreatRegion: Region): number {

@@ -16,7 +16,8 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | RooseBoltonHouseCardsReturned | QueenOfThornsOrderRemoved | QueenOfThornsNoOrderAvailable
     | RenlyBaratheonNoFootmanAvailable | RenlyBaratheonNoKnightAvailable | RenlyBaratheonFootmanUpgradedToKnight
     | MaceTyrellNoFootmanAvailable | MaceTyrellCasualtiesPrevented | MaceTyrellFootmanKilled
-    | CerseiLannisterNoOrderAvailable | CerseiLannisterOrderRemoved | RobbStarkRetreatRegionOverriden;
+    | CerseiLannisterNoOrderAvailable | CerseiLannisterOrderRemoved | RobbStarkRetreatRegionOverriden
+    | RetreatRegionChosen | RetreatCasualtiesSuffered;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -313,6 +314,19 @@ interface RobbStarkRetreatRegionOverriden {
     type: "robb-stark-retreat-location-overriden";
     house: string;
     affectedHouse: string;
+}
+
+interface RetreatRegionChosen {
+    type: "retreat-region-chosen";
+    house: string;
+    regionFrom: string;
+    regionTo: string | null;
+}
+
+interface RetreatCasualtiesSuffered {
+    type: "retreat-casualties-suffered";
+    house: string;
+    units: string[];
 }
 
 interface EnemyPortTaken {
