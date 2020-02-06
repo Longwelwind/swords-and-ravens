@@ -197,14 +197,15 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 units: totalAddedUnits.entries.map(([region, units]) => ([region.id, units.map(u => u.serializeToClient())]))
             });
 
-            if (musterings.map((_, r) => r.length))
-            this.parentGameState.ingame.log({
-                type: "player-mustered",
-                house: this.house.id,
-                musterings: musterings.map((region, musterings) =>
-                    [region.id, musterings.map(m => ({region: m.region.id, from: m.from ? m.from.type.id : null, to: m.to.id}))]
-                )
-            });
+            if (_.sum(musterings.map((_, r) => r.length)) > 0) {
+                this.parentGameState.ingame.log({
+                    type: "player-mustered",
+                    house: this.house.id,
+                    musterings: musterings.map((region, musterings) =>
+                        [region.id, musterings.map(m => ({region: m.region.id, from: m.from ? m.from.type.id : null, to: m.to.id}))]
+                    )
+                });
+            }
 
             this.parentGameState.onPlayerMusteringEnd(this.house, musterings.entries.map(([region, _]) => region));
         }
