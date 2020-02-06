@@ -19,6 +19,8 @@ import RegionKind from "../../../game-data-structure/RegionKind";
 import IngameGameState from "../../../IngameGameState";
 import User from "../../../../../server/User";
 
+type MusteringRule = (Mustering & {cost: number});
+
 export type Mustering = {from: Unit | null; region: Region; to: UnitType};
 
 export enum PlayerMusteringType {
@@ -254,7 +256,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         });
     }
 
-    getValidMusteringRules(originatingRegion: Region, musterings: BetterMap<Region, Mustering[]>): {region: Region; rules: (Mustering & {cost: number})[]}[] {
+    getValidMusteringRules(originatingRegion: Region, musterings: BetterMap<Region, Mustering[]>): {region: Region; rules: MusteringRule[]}[] {
         const possibleRecruitementRegions = [originatingRegion]
             .concat(this.game.world.getNeighbouringRegions(originatingRegion)
                 .filter(r => r.type.kind == RegionKind.SEA)
@@ -338,13 +340,30 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         return region.castleLevel - this.getUsedPoints(region, musterings.tryGet(region, []));
     }
 
-    anyPointsLeft(musterings: BetterMap<Region, Mustering[]>): boolean {
-        if (this.type != PlayerMusteringType.MUSTERING_WESTEROS_CARD) {
-            return false;
-        }
-
+    anyUsablePointsLeft(musterings: BetterMap<Region, Mustering[]>): boolean {
         const controlledCastles = this.game.world.getControlledRegions(this.house).filter(r => r.castleLevel > 0);
-        return controlledCastles.some(r => this.getPointsLeft(r, musterings) > 0);
+
+        switch(this.type) {
+            case PlayerMusteringType.MUSTERING_WESTEROS_CARD:
+                // Return true if there is any valid mustering rule for any controlled castle unused
+                return _.flatMap(controlledCastles.map(c => _.flatMap(this.getValidMusteringRules(c, musterings).map(({region , rules}) => rules)))).length > 0;
+            case PlayerMusteringType.STARRED_CONSOLIDATE_POWER:
+                const parentResolveConsolidatePowerGameState: ResolveConsolidatePowerGameState | null = this.parentGameState instanceof ResolveConsolidatePowerGameState ? this.parentGameState : null;
+                if(!parentResolveConsolidatePowerGameState) {
+                    return false;
+                }
+
+                const regions = parentResolveConsolidatePowerGameState.actionGameState.getRegionsWithStarredConsolidatePowerOrderOfHouse(this.house);
+                const region = regions.length > 0 ? regions[0] : null;
+                if(region) {
+                    // Return true if there is there are valid mustering rules left for the starred CP region
+                    return _.flatMap(this.getValidMusteringRules(region, musterings).map(({region, rules}) => rules)).length > 0;
+                }
+
+                return false;
+            case PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD:
+                return false; // todo: Make this work for the wilding card also
+        }
     }
 
     getUsedPoints(region: Region, musterings: Mustering[]): number {
