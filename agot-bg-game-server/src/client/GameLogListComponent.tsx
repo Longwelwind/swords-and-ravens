@@ -632,6 +632,55 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
 
             case "silence-at-the-wall-executed":
                 return <><strong>Silence at the Wall</strong>: Nothing happened.</>;
+
+            case "preemptive-raid-choice-done":
+                house = this.game.houses.get(data.house);
+
+                if (data.choice == 0) {
+                    return <>
+                        <strong>Preemptive Raid</strong>: <strong>{house.name}</strong> chose to kill 2 of their
+                        units.
+                    </>;
+                } else {
+                    return <>
+                        <strong>Preemptive Raid</strong>: <strong>{house.name}</strong> chose to reduce 2 positions
+                        on their highest Influence track.
+                    </>;
+                }
+
+            case "preemptive-raid-track-reduced":
+                const chooser = data.chooser ? this.game.houses.get(data.chooser) : null;
+                house = this.game.houses.get(data.house);
+                const trackName = this.game.getNameInfluenceTrack(data.trackI);
+
+                if (chooser == null) {
+                    return <>
+                        <strong>{house.name}</strong> was reduced 2 positions on the <strong>{trackName}</strong> track.
+                    </>;
+                } else {
+                    return <>
+                        <strong>{chooser.name}</strong> chose to reduce <strong>{house.name}</strong> 2 positions
+                        on the <strong>{trackName}</strong> track.
+                    </>;
+                }
+
+            case "preemptive-raid-units-killed":
+                house = this.game.houses.get(data.house);
+                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))] as [Region, UnitType[]]);
+
+                return <>
+                    <strong>{house.name}</strong> chose to
+                    kill {joinReactNodes(units.map(([region, units]) => <>{joinReactNodes(units.map((u, i) => <strong key={i}>{u.name}</strong>), ", ")} in <strong>{region.name}</strong></>), " and ")}.
+                </>;
+
+            case "preemptive-raid-wildling-attack":
+                house = this.game.houses.get(data.house);
+
+                return <>
+                    <strong>Preemptive Raid</strong>: A new Wildling Attack with
+                    strength <strong>{data.wildlingStrength}</strong> was triggered
+                    where <strong>{house.name}</strong> will not be participating.
+                </>;
         }
     }
 }

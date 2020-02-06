@@ -17,7 +17,8 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | RenlyBaratheonNoFootmanAvailable | RenlyBaratheonNoKnightAvailable | RenlyBaratheonFootmanUpgradedToKnight
     | MaceTyrellNoFootmanAvailable | MaceTyrellCasualtiesPrevented | MaceTyrellFootmanKilled
     | CerseiLannisterNoOrderAvailable | CerseiLannisterOrderRemoved | RobbStarkRetreatRegionOverriden
-    | RetreatRegionChosen | RetreatCasualtiesSuffered | SilenceAtTheWallExecuted;
+    | RetreatRegionChosen | RetreatCasualtiesSuffered | SilenceAtTheWallExecuted
+    | PreemptiveRaidChoiceDone | PreemptiveRaidTrackReduced | PreemptiveRaidUnitsKilled | PreemptiveRaidWildlingAttack;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -347,4 +348,29 @@ interface ShipsDestroyedByEmptyCastle {
 
 interface SilenceAtTheWallExecuted {
     type: "silence-at-the-wall-executed";
+}
+
+interface PreemptiveRaidChoiceDone {
+    type: "preemptive-raid-choice-done";
+    house: string;
+    choice: number;
+}
+
+interface PreemptiveRaidUnitsKilled {
+    type: "preemptive-raid-units-killed";
+    house: string;
+    units: [string, string[]][];
+}
+
+interface PreemptiveRaidTrackReduced {
+    type: "preemptive-raid-track-reduced";
+    chooser: string | null;
+    house: string;
+    trackI: number;
+}
+
+interface PreemptiveRaidWildlingAttack {
+    type: "preemptive-raid-wildling-attack";
+    house: string;
+    wildlingStrength: number;
 }
