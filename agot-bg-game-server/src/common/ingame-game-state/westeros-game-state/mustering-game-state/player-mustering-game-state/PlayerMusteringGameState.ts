@@ -337,7 +337,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
     }
 
     getPointsLeft(region: Region, musterings: BetterMap<Region, Mustering[]>) {
-        return region.castleLevel - this.getUsedPoints(region, musterings.tryGet(region, []));
+        return region.castleLevel - this.getUsedPoints(musterings.tryGet(region, []));
     }
 
     anyUsablePointsLeft(musterings: BetterMap<Region, Mustering[]>): boolean {
@@ -366,7 +366,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         }
     }
 
-    getUsedPoints(region: Region, musterings: Mustering[]): number {
+    getUsedPoints(musterings: Mustering[]): number {
         return _.sum(musterings.map(m => getCostOfMusteringRule(m.from ? m.from.type : null, m.to)));
     }
 
