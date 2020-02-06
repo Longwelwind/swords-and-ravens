@@ -18,7 +18,9 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | MaceTyrellNoFootmanAvailable | MaceTyrellCasualtiesPrevented | MaceTyrellFootmanKilled
     | CerseiLannisterNoOrderAvailable | CerseiLannisterOrderRemoved | RobbStarkRetreatRegionOverriden
     | RetreatRegionChosen | RetreatCasualtiesSuffered | SilenceAtTheWallExecuted
-    | PreemptiveRaidChoiceDone | PreemptiveRaidTrackReduced | PreemptiveRaidUnitsKilled | PreemptiveRaidWildlingAttack;
+    | PreemptiveRaidChoiceDone | PreemptiveRaidTrackReduced | PreemptiveRaidUnitsKilled | PreemptiveRaidWildlingAttack
+    | MassingOnTheMilkwaterHouseCardsBack | MassingOnTheMilkwaterWildlingVictory
+    | MassingOnTheMilkwaterHouseCardsRemoved;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -373,4 +375,21 @@ interface PreemptiveRaidWildlingAttack {
     type: "preemptive-raid-wildling-attack";
     house: string;
     wildlingStrength: number;
+}
+
+interface MassingOnTheMilkwaterHouseCardsBack {
+    type: "massing-on-the-milkwater-house-cards-back";
+    house: string;
+    houseCardsReturned: string[];
+}
+
+interface MassingOnTheMilkwaterWildlingVictory {
+    type: "massing-on-the-milkwater-wildling-victory";
+    lowestBidder: string;
+}
+
+interface MassingOnTheMilkwaterHouseCardsRemoved {
+    type: "massing-on-the-milkwater-house-cards-removed";
+    house: string;
+    houseCardsUsed: string[];
 }

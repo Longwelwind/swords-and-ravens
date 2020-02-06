@@ -199,7 +199,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 );
 
             case "lowest-bidder-chosen":
-                const lowestBidder = this.game.houses.get(data.lowestBidder);
+                let lowestBidder = this.game.houses.get(data.lowestBidder);
 
                 return (
                     <>
@@ -680,6 +680,31 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     <strong>Preemptive Raid</strong>: A new Wildling Attack with
                     strength <strong>{data.wildlingStrength}</strong> was triggered
                     where <strong>{house.name}</strong> will not be participating.
+                </>;
+
+            case "massing-on-the-milkwater-house-cards-back":
+                house = this.game.houses.get(data.house);
+                const houseCardsReturned = data.houseCardsReturned.map(hcid => house.houseCards.get(hcid));
+
+                return <>
+                    <strong>Massing on the Milkwater</strong>: <strong>{house.name}</strong> took
+                    back {joinReactNodes(houseCardsReturned.map(hc => <strong key={hc.id}>{hc.name}</strong>), ", ")}
+                </>;
+
+            case "massing-on-the-milkwater-wildling-victory":
+                lowestBidder = this.game.houses.get(data.lowestBidder);
+
+                return <>
+                    <strong>Massing on the Milkwater</strong>: <strong>{lowestBidder.name}</strong> discards all House
+                    cards with the highest combat strength, all other houses must discard one House card.
+                </>;
+
+            case "massing-on-the-milkwater-house-cards-removed":
+                house = this.game.houses.get(data.house);
+                const houseCardsUsed = data.houseCardsUsed.map(hcid => house.houseCards.get(hcid));
+
+                return <>
+                    <strong>{house.name}</strong> discarded {joinReactNodes(houseCardsUsed.map(hc => <strong key={hc.id}>{hc.name}</strong>), ", ")}.
                 </>;
         }
     }
