@@ -17,7 +17,7 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | RenlyBaratheonNoFootmanAvailable | RenlyBaratheonNoKnightAvailable | RenlyBaratheonFootmanUpgradedToKnight
     | MaceTyrellNoFootmanAvailable | MaceTyrellCasualtiesPrevented | MaceTyrellFootmanKilled
     | CerseiLannisterNoOrderAvailable | CerseiLannisterOrderRemoved | RobbStarkRetreatRegionOverriden
-    | RetreatRegionChosen | RetreatCasualtiesSuffered;
+    | RetreatRegionChosen | RetreatCasualtiesSuffered | SilenceAtTheWallExecuted;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -343,4 +343,8 @@ interface ShipsDestroyedByEmptyCastle {
     castle: string;
     port: string;
     shipCount: number;
+}
+
+interface SilenceAtTheWallExecuted {
+    type: "silence-at-the-wall-executed";
 }

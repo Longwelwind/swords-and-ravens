@@ -629,6 +629,9 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 return <>
                     <><strong>{data.house}</strong> lost {data.shipCount} ship{data.shipCount>1?"s":""} in <strong>{data.port}</strong> because of leaving <strong>{data.castle}</strong> empty.</>
                 </>;
+
+            case "silence-at-the-wall-executed":
+                return <><strong>Silence at the Wall</strong>: Nothing happened.</>;
         }
     }
 }
