@@ -20,7 +20,8 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | RetreatRegionChosen | RetreatCasualtiesSuffered | SilenceAtTheWallExecuted
     | PreemptiveRaidChoiceDone | PreemptiveRaidTrackReduced | PreemptiveRaidUnitsKilled | PreemptiveRaidWildlingAttack
     | MassingOnTheMilkwaterHouseCardsBack | MassingOnTheMilkwaterWildlingVictory
-    | MassingOnTheMilkwaterHouseCardsRemoved;
+    | MassingOnTheMilkwaterHouseCardsRemoved
+    | AKingBeyondTheWallHighestTopTrack | AKingBeyondTheWallHouseReduceTrack | AKingBeyondTheWallLowestReduceTracks;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -392,4 +393,21 @@ interface MassingOnTheMilkwaterHouseCardsRemoved {
     type: "massing-on-the-milkwater-house-cards-removed";
     house: string;
     houseCardsUsed: string[];
+}
+
+interface AKingBeyondTheWallLowestReduceTracks {
+    type: "a-king-beyond-the-wall-lowest-reduce-tracks";
+    lowestBidder: string;
+}
+
+interface AKingBeyondTheWallHouseReduceTrack {
+    type: "a-king-beyond-the-wall-house-reduce-track";
+    house: string;
+    trackI: number;
+}
+
+interface AKingBeyondTheWallHighestTopTrack {
+    type: "a-king-beyond-the-wall-highest-top-track";
+    house: string;
+    trackI: number;
 }

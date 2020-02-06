@@ -651,7 +651,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
             case "preemptive-raid-track-reduced":
                 const chooser = data.chooser ? this.game.houses.get(data.chooser) : null;
                 house = this.game.houses.get(data.house);
-                const trackName = this.game.getNameInfluenceTrack(data.trackI);
+                let trackName = this.game.getNameInfluenceTrack(data.trackI);
 
                 if (chooser == null) {
                     return <>
@@ -705,6 +705,32 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
 
                 return <>
                     <strong>{house.name}</strong> discarded {joinReactNodes(houseCardsUsed.map(hc => <strong key={hc.id}>{hc.name}</strong>), ", ")}.
+                </>;
+
+            case "a-king-beyond-the-wall-highest-top-track":
+                house = this.game.houses.get(data.house);
+                trackName = this.game.getNameInfluenceTrack(data.trackI);
+
+                return <>
+                    <strong>A King Beyond the Wall</strong>: <strong>{house.name}</strong> chose to move at the top
+                    of the <strong>{trackName}</strong> track.
+                </>;
+
+            case "a-king-beyond-the-wall-lowest-reduce-tracks":
+                lowestBidder = this.game.houses.get(data.lowestBidder);
+
+                return <>
+                    <strong>A King Beyond the Wall</strong>: <strong>{lowestBidder.name}</strong> was moved to the
+                    bottom of all influence tracks.
+                </>;
+
+            case "a-king-beyond-the-wall-house-reduce-track":
+                house = this.game.houses.get(data.house);
+                trackName = this.game.getNameInfluenceTrack(data.trackI);
+
+                return <>
+                    <strong>A King Beyond the Wall</strong>: <strong>{house.name}</strong> chose to move at the bottom
+                    of the <strong>{trackName}</strong> influence track.
                 </>;
         }
     }

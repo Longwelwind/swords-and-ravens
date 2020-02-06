@@ -25,6 +25,11 @@ export default class AKingBeyondTheWallWildlingVictoryGameState extends Wildling
                 trackerI: i,
                 tracker: t.map(h => h.id)
             });
+
+            this.ingame.log({
+                type: "a-king-beyond-the-wall-lowest-reduce-tracks",
+                lowestBidder: house.id
+            });
         });
 
         this.proceedNextHouse(house);
@@ -47,6 +52,12 @@ export default class AKingBeyondTheWallWildlingVictoryGameState extends Wildling
             type: "change-tracker",
             trackerI: choice + 1,
             tracker: track.map(h => h.id)
+        });
+
+        this.ingame.log({
+            type: "a-king-beyond-the-wall-house-reduce-track",
+            house: house.id,
+            trackI: choice
         });
 
         this.proceedNextHouse(house);
