@@ -21,7 +21,8 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | PreemptiveRaidChoiceDone | PreemptiveRaidTrackReduced | PreemptiveRaidUnitsKilled | PreemptiveRaidWildlingAttack
     | MassingOnTheMilkwaterHouseCardsBack | MassingOnTheMilkwaterWildlingVictory
     | MassingOnTheMilkwaterHouseCardsRemoved
-    | AKingBeyondTheWallHighestTopTrack | AKingBeyondTheWallHouseReduceTrack | AKingBeyondTheWallLowestReduceTracks;
+    | AKingBeyondTheWallHighestTopTrack | AKingBeyondTheWallHouseReduceTrack | AKingBeyondTheWallLowestReduceTracks
+    | MammothRidersDestroyUnits | MammothRidersReturnCard;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -410,4 +411,16 @@ interface AKingBeyondTheWallHighestTopTrack {
     type: "a-king-beyond-the-wall-highest-top-track";
     house: string;
     trackI: number;
+}
+
+interface MammothRidersDestroyUnits {
+    type: "mammoth-riders-destroy-units";
+    house: string;
+    units: [string, string[]][];
+}
+
+interface MammothRidersReturnCard {
+    type: "mammoth-riders-return-card";
+    house: string;
+    houseCard: string;
 }

@@ -666,7 +666,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
 
             case "preemptive-raid-units-killed":
                 house = this.game.houses.get(data.house);
-                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))] as [Region, UnitType[]]);
+                let units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))] as [Region, UnitType[]]);
 
                 return <>
                     <strong>{house.name}</strong> chose to
@@ -731,6 +731,24 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 return <>
                     <strong>A King Beyond the Wall</strong>: <strong>{house.name}</strong> chose to move at the bottom
                     of the <strong>{trackName}</strong> influence track.
+                </>;
+
+            case "mammoth-riders-destroy-units":
+                house = this.game.houses.get(data.house);
+                units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
+
+                return <>
+                    <strong>Mammoth Riders</strong>: <strong>{house.name}</strong> chose to
+                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map(ut => <strong>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), ", ")}.
+                </>;
+
+            case "mammoth-riders-return-card":
+                house = this.game.houses.get(data.house);
+                const houseCard = house.houseCards.get(data.houseCard);
+
+                return <>
+                    <strong>Mammoth Riders</strong>: <strong>{house.name}</strong> chose to
+                    discard <strong>{houseCard.name}</strong>.
                 </>;
         }
     }

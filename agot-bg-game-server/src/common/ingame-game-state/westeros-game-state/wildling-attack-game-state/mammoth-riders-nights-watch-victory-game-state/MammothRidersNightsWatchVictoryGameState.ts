@@ -59,6 +59,12 @@ export default class MammothRidersNightsWatchVictoryGameState extends GameState<
             state: HouseCardState.AVAILABLE
         });
 
+        this.ingame.log({
+            type: "mammoth-riders-return-card",
+            house: house.id,
+            houseCard: houseCard.id
+        });
+
         this.parentGameState.onWildlingCardExecuteEnd();
     }
 
