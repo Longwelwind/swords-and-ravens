@@ -22,7 +22,7 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | MassingOnTheMilkwaterHouseCardsBack | MassingOnTheMilkwaterWildlingVictory
     | MassingOnTheMilkwaterHouseCardsRemoved
     | AKingBeyondTheWallHighestTopTrack | AKingBeyondTheWallHouseReduceTrack | AKingBeyondTheWallLowestReduceTracks
-    | MammothRidersDestroyUnits | MammothRidersReturnCard;
+    | MammothRidersDestroyUnits | MammothRidersReturnCard | TheHordeDescendsHighestMuster | TheHordeDescendsUnitsKilled;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -423,4 +423,15 @@ interface MammothRidersReturnCard {
     type: "mammoth-riders-return-card";
     house: string;
     houseCard: string;
+}
+
+interface TheHordeDescendsHighestMuster {
+    type: "the-horde-descends-highest-muster";
+    house: string;
+}
+
+interface TheHordeDescendsUnitsKilled {
+    type: "the-horde-descends-units-killed";
+    house: string;
+    units: [string, string[]][];
 }
