@@ -18,13 +18,17 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
 
     executeForLowestBidder(house: House): void {
         // Replace all of his knights by footmen
-        this.game.world
+        const knightsToTransform = this.game.world
             .getControlledRegions(house)
-            .forEach(r => {
-                const knightsToRemove = r.units.values.filter(u => u.type == knight);
+            .map(r => [r, r.units.values.filter(u => u.type == knight)] as [Region, Unit[]]);
 
-                this.transformIntoFootman(house, r, knightsToRemove);
-            });
+        knightsToTransform.forEach(([region, knights]) => this.transformIntoFootman(house, region, knights));
+
+        this.ingame.log({
+            type: "crow-killers-knights-replaced",
+            house: house.id,
+            units: knightsToTransform.map(([region, knights]) => [region.id, knights.map(k => k.type.id)])
+        });
 
         this.proceedNextHouse(house);
     }
@@ -70,6 +74,12 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
     onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][]): void {
         selectedUnits.forEach(([region, knights]) => {
             this.transformIntoFootman(house, region, knights);
+        });
+
+        this.ingame.log({
+            type: "crow-killers-knights-replaced",
+            house: house.id,
+            units: selectedUnits.map(([region, knights]) => [region.id, knights.map(k => k.type.id)])
         });
 
         this.proceedNextHouse(house);

@@ -767,6 +767,23 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     <strong>The Horde Descends</strong>: <strong>{house.name}</strong> chose to
                     destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map(ut => <strong>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), ", ")}.
                 </>;
+
+            case "crow-killers-knights-replaced":
+                house = this.game.houses.get(data.house);
+                units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
+
+                return <>
+                    <strong>Crow Killers</strong>: <strong>{house.name}</strong> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><strong>{unitTypes.length}</strong> Knights in <strong>{region.name}</strong></>), ", ")} by Footmen.
+                </>;
+
+            case "crow-killers-footman-upgraded":
+                house = this.game.houses.get(data.house);
+                units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
+
+                return <>
+                    <strong>Crow Killers</strong>: <strong>{house.name}</strong> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><strong>{unitTypes.length}</strong> Footmen in <strong>{region.name}</strong></>), ", ")} by Knights.
+                </>;
+
         }
     }
 }
