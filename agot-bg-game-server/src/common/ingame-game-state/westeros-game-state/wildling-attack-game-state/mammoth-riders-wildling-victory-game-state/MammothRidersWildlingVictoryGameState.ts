@@ -51,6 +51,12 @@ export default class MammothRidersWildlingVictoryGameState extends WildlingCardE
             });
         });
 
+        this.ingame.log({
+            type: "mammoth-riders-destroy-units",
+            house: house.id,
+            units: selectedUnits.map(([region, units]) => [region.id, units.map(u => u.type.id)])
+        });
+
         this.proceedNextHouse(house);
     }
 

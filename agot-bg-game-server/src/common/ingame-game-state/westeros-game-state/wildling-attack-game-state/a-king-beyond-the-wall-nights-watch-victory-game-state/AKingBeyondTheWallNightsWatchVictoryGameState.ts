@@ -34,6 +34,12 @@ export default class AKingBeyondTheWallNightsWatchVictoryGameState extends GameS
         _.pull(track, house);
         track.unshift(house);
 
+        this.ingame.log({
+            type: "a-king-beyond-the-wall-highest-top-track",
+            house: house.id,
+            trackI: choice
+        });
+
         this.entireGame.broadcastToClients({
             type: "change-tracker",
             trackerI: choice,

@@ -1,5 +1,6 @@
 import WildlingCardType from "./WildlingCardType";
 import WildlingAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
+import House from "../House";
 
 export default class SkinchangerScout extends WildlingCardType {
     executeNightsWatchWon(wildlingAttack: WildlingAttackGameState): void {
@@ -18,21 +19,35 @@ export default class SkinchangerScout extends WildlingCardType {
             powerTokenCount: house.powerTokens
         });
 
+        wildlingAttack.ingame.log({
+            type: "skinchanger-scout-nights-watch-victory",
+            house: wildlingAttack.highestBidder.id,
+            powerToken: amount
+        });
+
         wildlingAttack.onWildlingCardExecuteEnd();
     }
 
     executeWildlingWon(wildlingAttack: WildlingAttackGameState): void {
         const lowestBidder = wildlingAttack.lowestBidder;
-        [wildlingAttack.lowestBidder].concat(wildlingAttack.participatingHouses.filter(h => h != lowestBidder)).map((h, i) => {
-            const amount = i == 0 ? -h.powerTokens : -2;
+        const powerTokensToLose = [wildlingAttack.lowestBidder]
+            .concat(wildlingAttack.participatingHouses.filter(h => h != lowestBidder))
+            .map((h, i) => [h, i == 0 ? -h.powerTokens : -2] as [House, number]);
 
-            h.changePowerTokens(amount);
+        powerTokensToLose.forEach(([house, powerTokens]) => {
+            house.changePowerTokens(powerTokens);
 
             wildlingAttack.entireGame.broadcastToClients({
                 type: "change-power-token",
-                houseId: h.id,
-                powerTokenCount: h.powerTokens
+                houseId: house.id,
+                powerTokenCount: house.powerTokens
             });
+        });
+
+        wildlingAttack.ingame.log({
+            type: "skinchanger-scout-wildling-victory",
+            house: wildlingAttack.lowestBidder.id,
+            powerTokensLost: powerTokensToLose.map(([house, amount]) => [house.id, amount])
         });
 
         wildlingAttack.onWildlingCardExecuteEnd();

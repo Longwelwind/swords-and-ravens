@@ -58,6 +58,12 @@ export default class CrowKillersNightsWatchVictoryGameState extends GameState<Wi
             this.transformIntoKnight(house, region, footmen);
         });
 
+        this.ingame.log({
+            type: "crow-killers-footman-upgraded",
+            house: house.id,
+            units: selectedUnits.map(([region, units]) => [region.id, units.map(u => u.type.id)])
+        });
+
         this.parentGameState.onWildlingCardExecuteEnd();
     }
 
@@ -79,7 +85,6 @@ export default class CrowKillersNightsWatchVictoryGameState extends GameState<Wi
             type: "add-units",
             units: [[region.id, knightsToAdd.map(u => u.serializeToClient())]]
         });
-
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {

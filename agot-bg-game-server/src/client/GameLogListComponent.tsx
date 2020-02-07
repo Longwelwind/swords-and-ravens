@@ -199,7 +199,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 );
 
             case "lowest-bidder-chosen":
-                const lowestBidder = this.game.houses.get(data.lowestBidder);
+                let lowestBidder = this.game.houses.get(data.lowestBidder);
 
                 return (
                     <>
@@ -629,6 +629,207 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 return <>
                     <><strong>{data.house}</strong> lost {data.shipCount} ship{data.shipCount>1?"s":""} in <strong>{data.port}</strong> because of leaving <strong>{data.castle}</strong> empty.</>
                 </>;
+
+            case "silence-at-the-wall-executed":
+                return <><strong>Silence at the Wall</strong>: Nothing happened.</>;
+
+            case "preemptive-raid-choice-done":
+                house = this.game.houses.get(data.house);
+
+                if (data.choice == 0) {
+                    return <>
+                        <strong>Preemptive Raid</strong>: <strong>{house.name}</strong> chose to kill 2 of their
+                        units.
+                    </>;
+                } else {
+                    return <>
+                        <strong>Preemptive Raid</strong>: <strong>{house.name}</strong> chose to reduce 2 positions
+                        on their highest Influence track.
+                    </>;
+                }
+
+            case "preemptive-raid-track-reduced":
+                const chooser = data.chooser ? this.game.houses.get(data.chooser) : null;
+                house = this.game.houses.get(data.house);
+                let trackName = this.game.getNameInfluenceTrack(data.trackI);
+
+                if (chooser == null) {
+                    return <>
+                        <strong>{house.name}</strong> was reduced 2 positions on the <strong>{trackName}</strong> track.
+                    </>;
+                } else {
+                    return <>
+                        <strong>{chooser.name}</strong> chose to reduce <strong>{house.name}</strong> 2 positions
+                        on the <strong>{trackName}</strong> track.
+                    </>;
+                }
+
+            case "preemptive-raid-units-killed":
+                house = this.game.houses.get(data.house);
+                let units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))] as [Region, UnitType[]]);
+
+                return <>
+                    <strong>{house.name}</strong> chose to
+                    kill {joinReactNodes(units.map(([region, units]) => <>{joinReactNodes(units.map((u, i) => <strong key={i}>{u.name}</strong>), ", ")} in <strong>{region.name}</strong></>), " and ")}.
+                </>;
+
+            case "preemptive-raid-wildling-attack":
+                house = this.game.houses.get(data.house);
+
+                return <>
+                    <strong>Preemptive Raid</strong>: A new Wildling Attack with
+                    strength <strong>{data.wildlingStrength}</strong> was triggered
+                    where <strong>{house.name}</strong> will not be participating.
+                </>;
+
+            case "massing-on-the-milkwater-house-cards-back":
+                house = this.game.houses.get(data.house);
+                const houseCardsReturned = data.houseCardsReturned.map(hcid => house.houseCards.get(hcid));
+
+                return <>
+                    <strong>Massing on the Milkwater</strong>: <strong>{house.name}</strong> took
+                    back {joinReactNodes(houseCardsReturned.map(hc => <strong key={hc.id}>{hc.name}</strong>), ", ")}
+                </>;
+
+            case "massing-on-the-milkwater-wildling-victory":
+                lowestBidder = this.game.houses.get(data.lowestBidder);
+
+                return <>
+                    <strong>Massing on the Milkwater</strong>: <strong>{lowestBidder.name}</strong> discards all House
+                    cards with the highest combat strength, all other houses must discard one House card.
+                </>;
+
+            case "massing-on-the-milkwater-house-cards-removed":
+                house = this.game.houses.get(data.house);
+                const houseCardsUsed = data.houseCardsUsed.map(hcid => house.houseCards.get(hcid));
+
+                return <>
+                    <strong>{house.name}</strong> discarded {joinReactNodes(houseCardsUsed.map(hc => <strong key={hc.id}>{hc.name}</strong>), ", ")}.
+                </>;
+
+            case "a-king-beyond-the-wall-highest-top-track":
+                house = this.game.houses.get(data.house);
+                trackName = this.game.getNameInfluenceTrack(data.trackI);
+
+                return <>
+                    <strong>A King Beyond the Wall</strong>: <strong>{house.name}</strong> chose to move at the top
+                    of the <strong>{trackName}</strong> track.
+                </>;
+
+            case "a-king-beyond-the-wall-lowest-reduce-tracks":
+                lowestBidder = this.game.houses.get(data.lowestBidder);
+
+                return <>
+                    <strong>A King Beyond the Wall</strong>: <strong>{lowestBidder.name}</strong> was moved to the
+                    bottom of all influence tracks.
+                </>;
+
+            case "a-king-beyond-the-wall-house-reduce-track":
+                house = this.game.houses.get(data.house);
+                trackName = this.game.getNameInfluenceTrack(data.trackI);
+
+                return <>
+                    <strong>A King Beyond the Wall</strong>: <strong>{house.name}</strong> chose to move at the bottom
+                    of the <strong>{trackName}</strong> influence track.
+                </>;
+
+            case "mammoth-riders-destroy-units":
+                house = this.game.houses.get(data.house);
+                units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
+
+                return <>
+                    <strong>Mammoth Riders</strong>: <strong>{house.name}</strong> chose to
+                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map(ut => <strong>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), ", ")}.
+                </>;
+
+            case "mammoth-riders-return-card":
+                house = this.game.houses.get(data.house);
+                const houseCard = house.houseCards.get(data.houseCard);
+
+                return <>
+                    <strong>Mammoth Riders</strong>: <strong>{house.name}</strong> chose to
+                    discard <strong>{houseCard.name}</strong>.
+                </>;
+
+            case "the-horde-descends-highest-muster":
+                house = this.game.houses.get(data.house);
+
+                return <>
+                    <strong>The Horde Descends</strong>: <strong>{house.name}</strong> may muster forces in any one
+                    Castle or Stronghold they control.
+                </>;
+
+            case "the-horde-descends-units-killed":
+                house = this.game.houses.get(data.house);
+                units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
+
+                return <>
+                    <strong>The Horde Descends</strong>: <strong>{house.name}</strong> chose to
+                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map(ut => <strong>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), ", ")}.
+                </>;
+
+            case "crow-killers-knights-replaced":
+                house = this.game.houses.get(data.house);
+                units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
+
+                return <>
+                    <strong>Crow Killers</strong>: <strong>{house.name}</strong> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><strong>{unitTypes.length}</strong> Knights in <strong>{region.name}</strong></>), ", ")} by Footmen.
+                </>;
+
+            case "crow-killers-footman-upgraded":
+                house = this.game.houses.get(data.house);
+                units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
+
+                return <>
+                    <strong>Crow Killers</strong>: <strong>{house.name}</strong> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><strong>{unitTypes.length}</strong> Footmen in <strong>{region.name}</strong></>), ", ")} by Knights.
+                </>;
+
+            case "skinchanger-scout-nights-watch-victory":
+                house = this.game.houses.get(data.house);
+
+                return <>
+                    <strong>Skinchanger Scout</strong>: <strong>{house.name}</strong> gets
+                    back <strong>{data.powerToken}</strong> Power tokens.
+                </>;
+
+            case "skinchanger-scout-wildling-victory":
+                house = this.game.houses.get(data.house);
+                const powerTokensLost = data.powerTokensLost.map(([hid, amount]) => [this.game.houses.get(hid), amount] as [House, number]);
+
+                return <>
+                    <p>
+                        <strong>Skinchanger Scout</strong>: <strong>{house.name}</strong> lost all of their Power
+                        tokens, all other houses lost 2 Power tokens.
+                    </p>
+                    <ul>
+                        {powerTokensLost.map(([house, amount]) => (
+                            <li key={house.id}><strong>{house.name}</strong> lost <strong>{amount}</strong> Power tokens.</li>
+                        ))}
+                    </ul>
+                </>;
+
+            case "rattleshirts-raiders-nights-watch-victory":
+                house = this.game.houses.get(data.house);
+
+                return <>
+                    <strong>Rattleshirt's Raiders</strong>: <strong>{house.name}</strong> gained one level of supply,
+                    and is now at <strong>{data.newSupply}</strong>.
+                </>;
+
+            case "rattleshirts-raiders-wildling-victory":
+                lowestBidder = this.game.houses.get(data.lowestBidder);
+                const newSupply = data.newSupply.map(([hid, supply]) => [this.game.houses.get(hid), supply] as [House, number]);
+
+                return <>
+                    <strong>Rattleshirt's Raiders</strong>: <strong>{lowestBidder.name}</strong> lost 3 levels of supply,
+                    all other houses lost 2 levels of supply.
+                    <ul>
+                        {newSupply.map(([house, supply]) => (
+                            <li key={house.id}><strong>{house.name}</strong> is now at <strong>{supply}</strong>.</li>
+                        ))}
+                    </ul>
+                </>;
+
         }
     }
 }

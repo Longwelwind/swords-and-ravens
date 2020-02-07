@@ -37,6 +37,12 @@ export default class MassingOnTheMilkwaterWildlingVictoryGameState extends Wildl
             cardIds: cardsToDiscard.map(hc => hc.id)
         });
 
+        this.ingame.log({
+            type: "massing-on-the-milkwater-house-cards-removed",
+            house: this.parentGameState.lowestBidder.id,
+            houseCardsUsed: cardsToDiscard.map(hc => hc.id)
+        });
+
         this.proceedNextHouse(house);
     }
 
@@ -59,6 +65,12 @@ export default class MassingOnTheMilkwaterWildlingVictoryGameState extends Wildl
             houseId: house.id,
             state: HouseCardState.USED,
             cardIds: [houseCard.id]
+        });
+
+        this.ingame.log({
+            type: "massing-on-the-milkwater-house-cards-removed",
+            house: house.id,
+            houseCardsUsed: [houseCard.id]
         });
 
         this.proceedNextHouse(house);

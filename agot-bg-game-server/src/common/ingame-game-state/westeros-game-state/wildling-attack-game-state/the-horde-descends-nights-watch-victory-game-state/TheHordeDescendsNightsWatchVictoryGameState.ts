@@ -24,6 +24,11 @@ export default class TheHordeDescendsNightsWatchVictoryGameState extends GameSta
     }
 
     firstStart(): void {
+        this.ingame.log({
+            type: "the-horde-descends-highest-muster",
+            house: this.parentGameState.highestBidder.id
+        });
+
         this.setChildGameState(new PlayerMusteringGameState(this))
             .firstStart(this.parentGameState.highestBidder, PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD);
     }

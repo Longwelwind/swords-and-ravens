@@ -17,7 +17,15 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | RenlyBaratheonNoFootmanAvailable | RenlyBaratheonNoKnightAvailable | RenlyBaratheonFootmanUpgradedToKnight
     | MaceTyrellNoFootmanAvailable | MaceTyrellCasualtiesPrevented | MaceTyrellFootmanKilled
     | CerseiLannisterNoOrderAvailable | CerseiLannisterOrderRemoved | RobbStarkRetreatRegionOverriden
-    | RetreatRegionChosen | RetreatCasualtiesSuffered;
+    | RetreatRegionChosen | RetreatCasualtiesSuffered | SilenceAtTheWallExecuted
+    | PreemptiveRaidChoiceDone | PreemptiveRaidTrackReduced | PreemptiveRaidUnitsKilled | PreemptiveRaidWildlingAttack
+    | MassingOnTheMilkwaterHouseCardsBack | MassingOnTheMilkwaterWildlingVictory
+    | MassingOnTheMilkwaterHouseCardsRemoved
+    | AKingBeyondTheWallHighestTopTrack | AKingBeyondTheWallHouseReduceTrack | AKingBeyondTheWallLowestReduceTracks
+    | MammothRidersDestroyUnits | MammothRidersReturnCard | TheHordeDescendsHighestMuster | TheHordeDescendsUnitsKilled
+    | CrowKillersFootmanUpgraded | CrowKillersKnightsReplaced
+    | SkinchangerScoutNightsWatchVictory | SkinchangerScoutWildlingVictory
+    | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -343,4 +351,126 @@ interface ShipsDestroyedByEmptyCastle {
     castle: string;
     port: string;
     shipCount: number;
+}
+
+interface SilenceAtTheWallExecuted {
+    type: "silence-at-the-wall-executed";
+}
+
+interface PreemptiveRaidChoiceDone {
+    type: "preemptive-raid-choice-done";
+    house: string;
+    choice: number;
+}
+
+interface PreemptiveRaidUnitsKilled {
+    type: "preemptive-raid-units-killed";
+    house: string;
+    units: [string, string[]][];
+}
+
+interface PreemptiveRaidTrackReduced {
+    type: "preemptive-raid-track-reduced";
+    chooser: string | null;
+    house: string;
+    trackI: number;
+}
+
+interface PreemptiveRaidWildlingAttack {
+    type: "preemptive-raid-wildling-attack";
+    house: string;
+    wildlingStrength: number;
+}
+
+interface MassingOnTheMilkwaterHouseCardsBack {
+    type: "massing-on-the-milkwater-house-cards-back";
+    house: string;
+    houseCardsReturned: string[];
+}
+
+interface MassingOnTheMilkwaterWildlingVictory {
+    type: "massing-on-the-milkwater-wildling-victory";
+    lowestBidder: string;
+}
+
+interface MassingOnTheMilkwaterHouseCardsRemoved {
+    type: "massing-on-the-milkwater-house-cards-removed";
+    house: string;
+    houseCardsUsed: string[];
+}
+
+interface AKingBeyondTheWallLowestReduceTracks {
+    type: "a-king-beyond-the-wall-lowest-reduce-tracks";
+    lowestBidder: string;
+}
+
+interface AKingBeyondTheWallHouseReduceTrack {
+    type: "a-king-beyond-the-wall-house-reduce-track";
+    house: string;
+    trackI: number;
+}
+
+interface AKingBeyondTheWallHighestTopTrack {
+    type: "a-king-beyond-the-wall-highest-top-track";
+    house: string;
+    trackI: number;
+}
+
+interface MammothRidersDestroyUnits {
+    type: "mammoth-riders-destroy-units";
+    house: string;
+    units: [string, string[]][];
+}
+
+interface MammothRidersReturnCard {
+    type: "mammoth-riders-return-card";
+    house: string;
+    houseCard: string;
+}
+
+interface TheHordeDescendsHighestMuster {
+    type: "the-horde-descends-highest-muster";
+    house: string;
+}
+
+interface TheHordeDescendsUnitsKilled {
+    type: "the-horde-descends-units-killed";
+    house: string;
+    units: [string, string[]][];
+}
+
+interface CrowKillersKnightsReplaced {
+    type: "crow-killers-knights-replaced";
+    house: string;
+    units: [string, string[]][];
+}
+
+interface CrowKillersFootmanUpgraded {
+    type: "crow-killers-footman-upgraded";
+    house: string;
+    units: [string, string[]][];
+}
+
+interface SkinchangerScoutNightsWatchVictory {
+    type: "skinchanger-scout-nights-watch-victory";
+    house: string;
+    powerToken: number;
+}
+
+interface SkinchangerScoutWildlingVictory {
+    type: "skinchanger-scout-wildling-victory";
+    house: string;
+    powerTokensLost: [string, number][];
+}
+
+interface RattleshirtsRaidersNightsWatchVictory {
+    type: "rattleshirts-raiders-nights-watch-victory";
+    house: string;
+    newSupply: number;
+}
+
+interface RattleshirtsRaidersWildlingVictory {
+    type: "rattleshirts-raiders-wildling-victory";
+    lowestBidder: string;
+    newSupply: [string, number][];
 }

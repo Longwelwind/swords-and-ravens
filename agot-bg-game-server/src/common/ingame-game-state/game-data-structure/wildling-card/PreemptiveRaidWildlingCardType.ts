@@ -7,9 +7,17 @@ import PreemptiveRaidWildlingVictoryGameState
 
 export default class PreemptiveRaidWildlingCardType extends WildlingCardType {
     executeNightsWatchWon(wildlingAttack: WildlingAttackGameState): void {
+        const wildlingStrength = 6;
+
+        wildlingAttack.ingame.log({
+            type: "preemptive-raid-wildling-attack",
+            house: wildlingAttack.highestBidder.id,
+            wildlingStrength: wildlingStrength
+        });
+
         wildlingAttack.parentGameState
             .setChildGameState(new WildlingAttackGameState(wildlingAttack.parentGameState))
-            .firstStart(6, _.difference(wildlingAttack.game.houses.values, [wildlingAttack.highestBidder as House]));
+            .firstStart(wildlingStrength, _.difference(wildlingAttack.game.houses.values, [wildlingAttack.highestBidder as House]));
     }
 
     executeWildlingWon(wildlingAttack: WildlingAttackGameState): void {

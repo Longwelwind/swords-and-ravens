@@ -19,10 +19,21 @@ export default class MassingOnTheMilkwater extends WildlingCardType {
             cardIds: usedHouseCards.map(hc => hc.id)
         });
 
+        wildlingAttack.ingame.log({
+            type: "massing-on-the-milkwater-house-cards-back",
+            house: highestBidder.id,
+            houseCardsReturned: usedHouseCards.map(hc => hc.id)
+        });
+
         wildlingAttack.onWildlingCardExecuteEnd();
     }
 
     executeWildlingWon(wildlingAttack: WildlingAttackGameState): void {
+        wildlingAttack.ingame.log({
+            type: "massing-on-the-milkwater-wildling-victory",
+            lowestBidder: wildlingAttack.lowestBidder.id
+        });
+
         wildlingAttack.setChildGameState(new MassingOnTheMilkwaterWildlingVictoryGameState(wildlingAttack))
             .firstStart();
     }

@@ -77,6 +77,12 @@ export default class TheHordeDescendsWildlingVictoryGameState extends WildlingCa
             });
         });
 
+        this.ingame.log({
+            type: "the-horde-descends-units-killed",
+            house: house.id,
+            units: selectedUnits.map(([region, units]) => [region.id, units.map(u => u.type.id)])
+        });
+
         this.proceedNextHouse(house);
     }
 

@@ -54,6 +54,12 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
     }
 
     onSimpleChoiceGameStateEnd(choice: number): void {
+        this.ingame.log({
+            type: "preemptive-raid-choice-done",
+            house: this.parentGameState.lowestBidder.id,
+            choice: choice
+        });
+
         if (this.step == PreemptiveRaidStep.CHOOSING) {
             if (choice == 0) {
                 this.step = PreemptiveRaidStep.DESTROYING_UNITS;
@@ -76,7 +82,7 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
                         highestInfluenceTracks.map(i => this.game.getNameInfluenceTrack(i))
                     );
                 } else {
-                    this.proceedReduceInfluenceTrack();
+                    this.proceedReduceInfluenceTrack(highestInfluenceTracks[0]);
                 }
                 this.step = PreemptiveRaidStep.REDUCING_INFLUENCE_TRACKS;
             }
@@ -97,11 +103,18 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
             });
         });
 
+        this.ingame.log({
+            type: "preemptive-raid-units-killed",
+            house: house.id,
+            units: units.map(([region, units]) => [region.id, units.map(u => u.type.id)])
+        });
+
         this.parentGameState.onWildlingCardExecuteEnd();
     }
 
-    proceedReduceInfluenceTrack(influenceTrack = 0): void {
-        const tracker = this.game.getInfluenceTrackByI(influenceTrack);
+    proceedReduceInfluenceTrack(highestInfluenceTrackI: number, chooser: House | null = null): void {
+        const influenceTrackI = this.highestInfluenceTracks[highestInfluenceTrackI];
+        const tracker = this.game.getInfluenceTrackByI(influenceTrackI);
 
         const currentPosition = tracker.indexOf(this.parentGameState.lowestBidder);
 
@@ -110,9 +123,16 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
         // "currentPosition + 1" to be tracker.length (and thus not changing anything).
         tracker.splice(currentPosition + 1, 0, this.parentGameState.lowestBidder);
 
+        this.ingame.log({
+            type: "preemptive-raid-track-reduced",
+            house: this.parentGameState.lowestBidder.id,
+            chooser: chooser ? chooser.id : null,
+            trackI: influenceTrackI
+        });
+
         this.parentGameState.entireGame.broadcastToClients({
             type: "change-tracker",
-            trackerI: influenceTrack,
+            trackerI: influenceTrackI,
             tracker: tracker.map(h => h.id)
         })
     }
