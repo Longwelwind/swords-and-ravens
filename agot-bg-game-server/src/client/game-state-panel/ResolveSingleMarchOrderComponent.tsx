@@ -174,6 +174,10 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
             }
         }
 
+        if(!this.confirmPossibleUnitLoss(this.selectedMarchOrderRegion)) {
+            return;
+        }
+
         this.props.gameState.sendMoves(
             this.selectedMarchOrderRegion,
             this.plannedMoves,
@@ -181,6 +185,36 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         );
 
         this.reset();
+    }
+
+    confirmPossibleUnitLoss(startingRegion: Region): boolean {
+        const casualtiesByResolvingMarch = this.props.gameState.getPossibleCasualtiesByResolvingMarch(startingRegion, this.plannedMoves.entries, this.leavePowerToken);
+
+        if(!(casualtiesByResolvingMarch.attackingUnitsWillBeDestroyedOnCombatLoss 
+                || casualtiesByResolvingMarch.shipsWillBeDestroyed 
+                || casualtiesByResolvingMarch.capitalOwnerCanRegainShips)) {
+            // No units will be lost by that move
+            return true;
+        }
+
+        // Start the message this way to not extra handle canLeavePowerToken()
+        let message = "You do not to leave a Power Token. Be aware\n";
+
+        if(casualtiesByResolvingMarch.shipsWillBeDestroyed || casualtiesByResolvingMarch.capitalOwnerCanRegainShips) {
+            const adjacentPortOfCastle = this.props.gameState.world.getAdjacentPortOfCastle(startingRegion);
+            message += `  - that you will lose all your ships in ${adjacentPortOfCastle ? adjacentPortOfCastle.name : "adjacent port"}`;
+            if(casualtiesByResolvingMarch.attackingUnitsWillBeDestroyedOnCombatLoss) {
+                message += " and\n";
+            }
+        }
+
+        if(casualtiesByResolvingMarch.attackingUnitsWillBeDestroyedOnCombatLoss) {
+            message += "  - that your army will be destroyed in case you lose the pending combat"
+        }
+
+        message += ".\n\nDo you want to continue?";
+
+        return window.confirm(message);
     }
 
     modifyOrdersOnMap(): [Region, Partial<OrderOnMapProperties>][] {

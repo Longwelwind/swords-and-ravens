@@ -90,13 +90,18 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         this.removePossibleOrdersInPort(portRegion);
 
         const shipsToDestroy = portRegion.units.map((id, _unit) => id);
-        shipsToDestroy.forEach(id => portRegion.units.delete(id));
 
-        this.entireGame.broadcastToClients({
-            type: "remove-units",
-            regionId: portRegion.id,
-            unitIds: shipsToDestroy
-        });
+        if(shipsToDestroy.length == 0) {
+            console.warn(`destroyAllShipsInPort() called but ${portRegion.id} does not contain any ship`);
+        } else {
+            shipsToDestroy.forEach(id => portRegion.units.delete(id));
+
+            this.entireGame.broadcastToClients({
+                type: "remove-units",
+                regionId: portRegion.id,
+                unitIds: shipsToDestroy
+            });
+        }
 
         return shipsToDestroy.length;
     }

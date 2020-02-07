@@ -106,6 +106,10 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                 });
             }
 
+            // Call this before all moves are executed to use a common 'at least one unit stayed in starting region' check
+            // which also can be used by the component
+            this.destroyPossibleShipsInAdjacentPortIfNecessary(startingRegion, moves, message.leavePowerToken);
+
             // Execute the moves that don't trigger a fight
             movesThatDontTriggerAttack.forEach(([region, units]) => {
                 this.resolveMarchOrderGameState.moveUnits(startingRegion, units, region);
@@ -119,8 +123,6 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                     moves: movesThatDontTriggerAttack.map(([r, us]) => [r.id, us.map(u => u.type.id)])
                 });
             }
-
-            this.destroyPossibleShipsInAdjacentPortIfNecessary(startingRegion, movesThatTriggerAttack);
 
             // If there was a move that trigger a fight, do special processing
             if (movesThatTriggerAttack.length > 0) {
@@ -189,40 +191,78 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
         }
     }
 
-    private destroyPossibleShipsInAdjacentPortIfNecessary(startingRegion: Region, movesThatTriggerAttack: [Region, Unit[]][]) {
-        // Check if user left a simple castle empty
-        // If so, destroy all existing ships in possible adjacent port
-        // This has to be done now as user would keep control of the ships in case he initiates a battle but loses it
+    getPossibleCasualtiesByResolvingMarch(
+        startingRegion: Region,
+        plannedMoves: [Region, Unit[]][],
+        leavePowerToken: boolean): {capitalOwnerCanRegainShips: boolean, shipsWillBeDestroyed: boolean, attackingUnitsWillBeDestroyedOnCombatLoss: boolean} {
+        const result = {capitalOwnerCanRegainShips: false, shipsWillBeDestroyed: false, attackingUnitsWillBeDestroyedOnCombatLoss: false};
 
-        if (startingRegion.superControlPowerToken) {
-            // Regain ships to the original owner of a capital is handled later
-            // in parentGameState onResolveSingleMarchOrderFinished
+        // No casualties when starting region has no castle
+        if (!startingRegion.hasStructure) {
+            return result;
+        }
+
+        // No casualties when user leaves a Power Token or a Power Token is already present
+        if (leavePowerToken || startingRegion.controlPowerToken == this.house) {
+            return result;
+        }
+
+        // No casualties when an unit stays in the starting region
+        if (_.sum(plannedMoves.map(([r, u]) => u.length)) < startingRegion.units.size) {
+            return result;
+        }
+
+        const adjacentPort = this.world.getAdjacentPortOfCastle(startingRegion);
+        let shipsPresent = false;
+
+        if(adjacentPort && adjacentPort.units.size > 0) {
+            shipsPresent = true;
+        }
+
+        // In case the user leaves an enemy capital without leaving an unit or Power Token there ...
+        if (startingRegion.superControlPowerToken && startingRegion.superControlPowerToken != this.house) {
+            if(shipsPresent) {
+                // ... and ships are present they can be converted back to the capital owner
+                result.capitalOwnerCanRegainShips = true;
+            }
+
+            if(this.getMovesThatTriggerAttack(plannedMoves).length > 0) {
+                // ... and triggers an attack
+                // the units won't be able to retreat if the combat is lost
+                result.attackingUnitsWillBeDestroyedOnCombatLoss = true;
+            }
+        }
+
+        // In case the user leaves any other castle without leaving an unit or Power Token there ...
+        if (!startingRegion.superControlPowerToken && shipsPresent) {
+            // ... all ships will be immediately destroyed
+            result.shipsWillBeDestroyed = true;
+        }
+
+        return result;
+    }
+
+    private destroyPossibleShipsInAdjacentPortIfNecessary(startingRegion: Region, moves: [Region, Unit[]][], leavePowerToken: boolean) {
+        // Check if this march will cause ships to be destroyed ...
+        const possibleCasualtiesByResolvingMarch = this.getPossibleCasualtiesByResolvingMarch(startingRegion, moves, leavePowerToken);
+        
+        if (!possibleCasualtiesByResolvingMarch.shipsWillBeDestroyed) {
             return;
         }
 
-        // Check if all units left the starting region.
-        if(!(movesThatTriggerAttack.length == 0 && startingRegion.getController() != this.house)) {
-            return;
+        // ... because then it has to be done now to avoid keeping control of the ships in case of possible retreat to the starting area
+        const adjacentPort = this.world.getAdjacentPortOfCastle(startingRegion);
+        if (!adjacentPort) {
+            throw new Error("shipsWillBeDestroyed is true but getAdjacentPortOfCastle(startingRegion) returned null");
         }
 
-        // In case of a pending combat it's a bit more complicated
-        // as the attacking units are still present in the starting region
-        // and thus getController() can't be used. We have to check if all units
-        // marched to combat in that case.
-        if (!(_.flatMap(movesThatTriggerAttack.map(([_, units]) => units)).length == startingRegion.units.size)) {
-            return;
-        }
-
-        const portOfStartingRegion = this.game.world.getAdjacentPortOfCastle(startingRegion);
-        if (portOfStartingRegion && portOfStartingRegion.units.size > 0) {
-            // Starting region has a port with ships in it, so destroy them
-            const destroyedShipCount = this.parentGameState.destroyAllShipsInPort(portOfStartingRegion);
-
+        const destroyedShipCount = this.parentGameState.destroyAllShipsInPort(adjacentPort);
+        if (destroyedShipCount > 0) {
             this.parentGameState.ingameGameState.log({
                 type: "ships-destroyed-by-empty-castle",
                 castle: startingRegion.name,
                 house: this.house.name,
-                port: portOfStartingRegion.name,
+                port: adjacentPort.name,
                 shipCount: destroyedShipCount
             });
         }
