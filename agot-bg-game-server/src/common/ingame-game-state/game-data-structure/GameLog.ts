@@ -24,7 +24,8 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | AKingBeyondTheWallHighestTopTrack | AKingBeyondTheWallHouseReduceTrack | AKingBeyondTheWallLowestReduceTracks
     | MammothRidersDestroyUnits | MammothRidersReturnCard | TheHordeDescendsHighestMuster | TheHordeDescendsUnitsKilled
     | CrowKillersFootmanUpgraded | CrowKillersKnightsReplaced
-    | SkinchangerScoutNightsWatchVictory | SkinchangerScoutWildlingVictory;
+    | SkinchangerScoutNightsWatchVictory | SkinchangerScoutWildlingVictory
+    | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -460,4 +461,16 @@ interface SkinchangerScoutWildlingVictory {
     type: "skinchanger-scout-wildling-victory";
     house: string;
     powerTokensLost: [string, number][];
+}
+
+interface RattleshirtsRaidersNightsWatchVictory {
+    type: "rattleshirts-raiders-nights-watch-victory";
+    house: string;
+    newSupply: number;
+}
+
+interface RattleshirtsRaidersWildlingVictory {
+    type: "rattleshirts-raiders-wildling-victory";
+    lowestBidder: string;
+    newSupply: [string, number][];
 }

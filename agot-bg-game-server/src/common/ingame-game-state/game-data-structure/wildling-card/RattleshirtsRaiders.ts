@@ -13,6 +13,12 @@ export default class RattleshirtsRaiders extends WildlingCardType {
             supplies: [[wildlingAttack.highestBidder.id, wildlingAttack.highestBidder.supplyLevel]]
         });
 
+        wildlingAttack.ingame.log({
+            type: "rattleshirts-raiders-nights-watch-victory",
+            house: wildlingAttack.highestBidder.id,
+            newSupply: wildlingAttack.highestBidder.supplyLevel
+        });
+
         wildlingAttack.onWildlingCardExecuteEnd();
     }
 

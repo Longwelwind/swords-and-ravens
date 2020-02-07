@@ -36,6 +36,12 @@ export default class RattleshirtsRaidersWildlingVictoryGameState extends GameSta
             supplies: this.wildlingAttack.game.houses.values.map(h => [h.id, h.supplyLevel])
         });
 
+        this.ingame.log({
+            type: "rattleshirts-raiders-wildling-victory",
+            lowestBidder: this.wildlingAttack.lowestBidder.id,
+            newSupply: this.wildlingAttack.game.houses.values.map(h => [h.id, h.supplyLevel])
+        });
+
         this.setChildGameState(new ReconcileArmiesGameState(this)).firstStart();
     }
 

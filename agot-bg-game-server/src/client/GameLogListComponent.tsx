@@ -808,6 +808,28 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     </ul>
                 </>;
 
+            case "rattleshirts-raiders-nights-watch-victory":
+                house = this.game.houses.get(data.house);
+
+                return <>
+                    <strong>Rattleshirt's Raiders</strong>: <strong>{house.name}</strong> gained one level of supply,
+                    and is now at <strong>{data.newSupply}</strong>.
+                </>;
+
+            case "rattleshirts-raiders-wildling-victory":
+                lowestBidder = this.game.houses.get(data.lowestBidder);
+                const newSupply = data.newSupply.map(([hid, supply]) => [this.game.houses.get(hid), supply] as [House, number]);
+
+                return <>
+                    <strong>Rattleshirt's Raiders</strong>: <strong>{lowestBidder.name}</strong> lost 3 levels of supply,
+                    all other houses lost 2 levels of supply.
+                    <ul>
+                        {newSupply.map(([house, supply]) => (
+                            <li key={house.id}><strong>{house.name}</strong> is now at <strong>{supply}</strong>.</li>
+                        ))}
+                    </ul>
+                </>;
+
         }
     }
 }
