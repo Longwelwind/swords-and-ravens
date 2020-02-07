@@ -27,20 +27,24 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "bid") {
-            if (!this.participatingHouses.includes(player.house)) {
-                return;
-            }
-
-            const bid = Math.max(0, Math.min(message.powerTokens, player.house.powerTokens));
-            this.bids.set(player.house, bid);
-
-            this.entireGame.broadcastToClients({
-                type: "bid-done",
-                houseId: player.house.id
-            });
-
-            this.checkAndProceedEndOfBidding();
+            this.setBid(player.house, message.powerTokens);
         }
+    }
+
+    private setBid(house: House, value: number): void {
+        if (!this.participatingHouses.includes(house)) {
+            return;
+        }
+
+        const bid = Math.max(0, Math.min(value, house.powerTokens));
+        this.bids.set(house, bid);
+
+        this.entireGame.broadcastToClients({
+            type: "bid-done",
+            houseId: house.id
+        });
+
+        this.checkAndProceedEndOfBidding();
     }
 
     checkAndProceedEndOfBidding(): void {
@@ -106,16 +110,10 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
 
     firstStart(participatingHouses: House[] = []): void {
         this.participatingHouses = participatingHouses;
-
-        // Already make the bidding for houses that have 0 power tokens
-        this.participatingHouses.forEach(h => {
-            if (h.powerTokens == 0) {
-                this.bids.set(h, 0);
-            }
+        // Houses with no Power Tokens automatically bid 0
+        this.participatingHouses.filter(h => h.powerTokens == 0).forEach(h => {
+            this.setBid(h, 0);
         });
-
-        // All houses might have been fast-tracked, check if the bidding is over
-        this.checkAndProceedEndOfBidding();
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedBiddingGameState {
