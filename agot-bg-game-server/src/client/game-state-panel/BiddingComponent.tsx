@@ -10,7 +10,7 @@ import Col from "react-bootstrap/Col";
 
 @observer
 export default class BiddingComponent<ParentGameState extends BiddingGameStateParent> extends Component<GameStateComponentProps<BiddingGameState<ParentGameState>>> {
-    @observable powerTokens = 0;
+    @observable powerTokensToBid = 0;
 
     render() {
         return (
@@ -26,19 +26,20 @@ export default class BiddingComponent<ParentGameState extends BiddingGameStatePa
                                         className="custom-range"
                                         min={0}
                                         max={this.props.gameClient.authenticatedPlayer.house.powerTokens}
-                                        value={this.powerTokens}
-                                        onChange={e => this.powerTokens = parseInt(e.target.value)}
+                                        value={this.powerTokensToBid}
+                                        onChange={e => this.powerTokensToBid = parseInt(e.target.value)}
+                                        disabled={this.props.gameClient.authenticatedPlayer.house.powerTokens==0}
                                     />
                                 </Col>
                                 <Col xs="auto">
                                     <div style={{marginLeft: "10px"}}>
-                                        {this.powerTokens}
+                                        {this.powerTokensToBid}
                                     </div>
                                 </Col>
                             </Row>
                         </Col>
                         <Col xs={12} className="text-center">
-                            <Button onClick={() => this.bid(this.powerTokens)}>Confirm</Button>
+                            <Button onClick={() => this.bid(this.powerTokensToBid)}>Confirm</Button>
                         </Col>
                     </>
                 ) : (
@@ -52,5 +53,7 @@ export default class BiddingComponent<ParentGameState extends BiddingGameStatePa
 
     bid(powerTokens: number) {
         this.props.gameState.bid(powerTokens);
+        // Reset Power Tokens for next bidding.
+        this.powerTokensToBid = 0;
     }
 }
