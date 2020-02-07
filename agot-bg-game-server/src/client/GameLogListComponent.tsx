@@ -784,6 +784,30 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     <strong>Crow Killers</strong>: <strong>{house.name}</strong> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><strong>{unitTypes.length}</strong> Footmen in <strong>{region.name}</strong></>), ", ")} by Knights.
                 </>;
 
+            case "skinchanger-scout-nights-watch-victory":
+                house = this.game.houses.get(data.house);
+
+                return <>
+                    <strong>Skinchanger Scout</strong>: <strong>{house.name}</strong> gets
+                    back <strong>{data.powerToken}</strong> Power tokens.
+                </>;
+
+            case "skinchanger-scout-wildling-victory":
+                house = this.game.houses.get(data.house);
+                const powerTokensLost = data.powerTokensLost.map(([hid, amount]) => [this.game.houses.get(hid), amount] as [House, number]);
+
+                return <>
+                    <p>
+                        <strong>Skinchanger Scout</strong>: <strong>{house.name}</strong> lost all of their Power
+                        tokens, all other houses lost 2 Power tokens.
+                    </p>
+                    <ul>
+                        {powerTokensLost.map(([house, amount]) => (
+                            <li key={house.id}><strong>{house.name}</strong> lost <strong>{amount}</strong> Power tokens.</li>
+                        ))}
+                    </ul>
+                </>;
+
         }
     }
 }

@@ -23,7 +23,8 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | MassingOnTheMilkwaterHouseCardsRemoved
     | AKingBeyondTheWallHighestTopTrack | AKingBeyondTheWallHouseReduceTrack | AKingBeyondTheWallLowestReduceTracks
     | MammothRidersDestroyUnits | MammothRidersReturnCard | TheHordeDescendsHighestMuster | TheHordeDescendsUnitsKilled
-    | CrowKillersFootmanUpgraded | CrowKillersKnightsReplaced;
+    | CrowKillersFootmanUpgraded | CrowKillersKnightsReplaced
+    | SkinchangerScoutNightsWatchVictory | SkinchangerScoutWildlingVictory;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -447,4 +448,16 @@ interface CrowKillersFootmanUpgraded {
     type: "crow-killers-footman-upgraded";
     house: string;
     units: [string, string[]][];
+}
+
+interface SkinchangerScoutNightsWatchVictory {
+    type: "skinchanger-scout-nights-watch-victory";
+    house: string;
+    powerToken: number;
+}
+
+interface SkinchangerScoutWildlingVictory {
+    type: "skinchanger-scout-wildling-victory";
+    house: string;
+    powerTokensLost: [string, number][];
 }
