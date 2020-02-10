@@ -50,7 +50,7 @@ export default class ResolveRaidOrderGameState extends GameState<ActionGameState
     }
 
     proceedNextResolveSingleRaidOrder(lastHouseToResolve: House | null = null): void {
-        const houseToResolve = this.getNextHouseToResolveMarchOrder(lastHouseToResolve);
+        const houseToResolve = this.getNextHouseToResolveRaidOrder(lastHouseToResolve);
 
         if (houseToResolve == null) {
             // All raid orders have been executed
@@ -62,7 +62,7 @@ export default class ResolveRaidOrderGameState extends GameState<ActionGameState
         this.setChildGameState(new ResolveSingleRaidOrderGameState(this)).firstStart(houseToResolve);
     }
 
-    getNextHouseToResolveMarchOrder(lastHouseToResolve: House | null): House | null {
+    getNextHouseToResolveRaidOrder(lastHouseToResolve: House | null): House | null {
         let currentHouseToCheck = lastHouseToResolve ? this.game.getNextInTurnOrder(lastHouseToResolve) : this.game.getTurnOrder()[0];
 
         // Check each house in order to find one that has an available March order.
@@ -76,7 +76,7 @@ export default class ResolveRaidOrderGameState extends GameState<ActionGameState
             currentHouseToCheck = this.game.getNextInTurnOrder(currentHouseToCheck);
         }
 
-        // If no house has any march order available, return null
+        // If no house has any raid order available, return null
         return null;
     }
 

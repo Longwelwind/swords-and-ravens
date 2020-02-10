@@ -197,14 +197,15 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 units: totalAddedUnits.entries.map(([region, units]) => ([region.id, units.map(u => u.serializeToClient())]))
             });
 
-            if (musterings.map((_, r) => r.length))
-            this.parentGameState.ingame.log({
-                type: "player-mustered",
-                house: this.house.id,
-                musterings: musterings.map((region, musterings) =>
-                    [region.id, musterings.map(m => ({region: m.region.id, from: m.from ? m.from.type.id : null, to: m.to.id}))]
-                )
-            });
+            if (_.sum(musterings.map((_, r) => r.length)) > 0) {
+                this.parentGameState.ingame.log({
+                    type: "player-mustered",
+                    house: this.house.id,
+                    musterings: musterings.map((region, musterings) =>
+                        [region.id, musterings.map(m => ({region: m.region.id, from: m.from ? m.from.type.id : null, to: m.to.id}))]
+                    )
+                });
+            }
 
             this.parentGameState.onPlayerMusteringEnd(this.house, musterings.entries.map(([region, _]) => region));
         }
@@ -286,7 +287,6 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                         const alreadyMusteredUnits = flattenedMusterings.filter(m => m.to == rule.to).length;
                         // Musterings might have freed units that can be used to realize musterings
                         const freedUnits = flattenedMusterings.filter(m => m.from && m.from.type == rule.to).length;
-                      
                         return this.game.getAvailableUnitsOfType(this.house, rule.to) + freedUnits - alreadyMusteredUnits;
                       })
                     // Check that the mustering respects supply
@@ -337,7 +337,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
     }
 
     getPointsLeft(region: Region, musterings: BetterMap<Region, Mustering[]>) {
-        return region.castleLevel - this.getUsedPoints(region, musterings.tryGet(region, []));
+        return region.castleLevel - this.getUsedPoints(musterings.tryGet(region, []));
     }
 
     anyUsablePointsLeft(musterings: BetterMap<Region, Mustering[]>): boolean {
@@ -366,7 +366,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         }
     }
 
-    getUsedPoints(region: Region, musterings: Mustering[]): number {
+    getUsedPoints(musterings: Mustering[]): number {
         return _.sum(musterings.map(m => getCostOfMusteringRule(m.from ? m.from.type : null, m.to)));
     }
 
