@@ -213,25 +213,32 @@ export default class PostCombatGameState extends GameState<
     proceedEndOfCombat(): void {
         // If the attacker won, move his units to the attacked region
         if (this.winner == this.attacker) {
-            // It might be that there are no
-            // This movement can be prevented by house cards (e.g. Arianne Martell)
+            // It might be that this movement can be prevented by house cards (e.g. Arianne Martell)
             if (!this.isAttackingArmyMovementPrevented()) {
                 this.combat.resolveMarchOrderGameState.moveUnits(this.combat.attackingRegion, this.combat.attackingArmy, this.combat.defendingRegion);
+            } else {
+                // Defender had to retreat
+                // Therefore possible orders in defending region need to be removed
+                this.removeOrderFromRegion(this.combat.defendingRegion);
             }
         }
 
-        // Remove the order
-        // The order may not be present in the attacking region, e.g. with Loras Tyrell
-        if (this.combat.actionGameState.ordersOnBoard.has(this.combat.attackingRegion)) {
-            this.combat.actionGameState.ordersOnBoard.delete(this.combat.attackingRegion);
+        // Remove the order from attacking region
+        this.removeOrderFromRegion(this.combat.attackingRegion);
+
+        this.setChildGameState(new AfterCombatHouseCardAbilitiesGameState(this)).firstStart();
+    }
+
+    removeOrderFromRegion(region: Region) {
+        // Always check if there is an order to be removed as e.g. Arianne or Loras might lead to an orphaned order
+        if (this.combat.actionGameState.ordersOnBoard.has(region)) {
+            this.combat.actionGameState.ordersOnBoard.delete(region);
             this.entireGame.broadcastToClients({
                 type: "action-phase-change-order",
-                region: this.combat.attackingRegion.id,
+                region: region.id,
                 order: null
             });
         }
-
-        this.setChildGameState(new AfterCombatHouseCardAbilitiesGameState(this)).firstStart();
     }
 
     isAttackingArmyMovementPrevented(): boolean {

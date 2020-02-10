@@ -7,7 +7,10 @@ import AfterCombatHouseCardAbilitiesGameState
 export default class SerLorasTyrellHouseCardAbility extends HouseCardAbility {
 
     afterCombat(afterCombat: AfterCombatHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {
-        if (afterCombat.postCombatGameState.winner == house && afterCombat.combatGameState.attacker == house) {
+        if (afterCombat.postCombatGameState.winner == house
+                && afterCombat.combatGameState.attacker == house
+                && !afterCombat.postCombatGameState.isAttackingArmyMovementPrevented()) {
+
             afterCombat.combatGameState.actionGameState.ordersOnBoard.set(
                 afterCombat.combatGameState.defendingRegion,
                 afterCombat.combatGameState.order
