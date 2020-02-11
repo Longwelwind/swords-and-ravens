@@ -185,10 +185,12 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 });
             });
         } else if (this.childGameState instanceof IngameGameState) {
+            const waitedForUsers = this.childGameState.getWaitedUsers();
+
             this.childGameState.players.forEach((player, user) => {
                 players.push({
                     userId: user.id,
-                    data: {"house": player.house.id}
+                    data: {"house": player.house.id, "waited_for": waitedForUsers.includes(user)}
                 });
             });
         }

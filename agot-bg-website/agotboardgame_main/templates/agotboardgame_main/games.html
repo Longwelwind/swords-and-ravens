@@ -34,8 +34,12 @@ Games -
                                         {% endif %}
                                     </td>
                                     <td class="align-middle">
-                                        {% if game.is_user_in_game %}
-                                            <span class="badge badge-pill badge-info">Playing</span>
+                                        {% if game.player_in_game %}
+                                            {% if game.player_in_game.data.waited_for %}
+                                                <span class="badge badge-pill badge-danger">YOUR TURN</span>
+                                            {% else %}
+                                                <span class="badge badge-pill badge-info">Playing</span>
+                                            {% endif %}
                                         {% endif %}
 
                                         {{ game.name }}
