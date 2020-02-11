@@ -29,7 +29,8 @@ def games(request):
         games = sorted(games, key=lambda row: [IN_LOBBY, ONGOING].index(row.state))
 
         for game in games:
-            game.is_user_in_game = request.user in [player_in_game.user for player_in_game in game.players.all()]
+            player_in_game = game.players.filter(user=request.user).first()
+            game.player_in_game = player_in_game
 
         public_room_id = Room.objects.get(name='public').id
 
