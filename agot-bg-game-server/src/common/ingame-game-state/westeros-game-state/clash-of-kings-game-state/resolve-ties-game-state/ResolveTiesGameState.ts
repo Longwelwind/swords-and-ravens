@@ -113,6 +113,15 @@ export default class ResolveTiesGameState extends GameState<ClashOfKingsGameStat
             .filter(({trackerPlace, houses}) => houses.length > 1);
     }
 
+    getBidOfHouse(house: House): number {
+        const index = this.bidResults.findIndex(([bid, houses], i) => houses.includes(house));
+        if(index > -1) {
+            return this.bidResults[index][0];
+        }
+
+        return -1;
+    }
+
     serializeToClient(admin: boolean, player: Player | null): SerializedResolveTiesGameState {
         return {
             type: "resolve-ties",
