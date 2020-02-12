@@ -76,6 +76,8 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
                 if (highestInfluenceTracks.length > 1) {
                     // If the lowest bidder has multiple "highest" influence tracks, the iron
                     // throne holder chooses one.
+                    this.step = PreemptiveRaidStep.REDUCING_INFLUENCE_TRACKS;
+
                     this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
                         this.game.ironThroneHolder,
                         "The holder of the Iron Throne chooses which influence tracks will be reduced",
@@ -84,10 +86,9 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
                 } else {
                     this.proceedReduceInfluenceTrack(highestInfluenceTracks[0]);
                 }
-                this.step = PreemptiveRaidStep.REDUCING_INFLUENCE_TRACKS;
             }
         } else if (this.step == PreemptiveRaidStep.REDUCING_INFLUENCE_TRACKS) {
-            this.proceedReduceInfluenceTrack(choice);
+            this.proceedReduceInfluenceTrack(this.highestInfluenceTracks[choice], this.game.ironThroneHolder);
         }
     }
 
@@ -112,16 +113,15 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
         this.parentGameState.onWildlingCardExecuteEnd();
     }
 
-    proceedReduceInfluenceTrack(highestInfluenceTrackI: number, chooser: House | null = null): void {
-        const influenceTrackI = this.highestInfluenceTracks[highestInfluenceTrackI];
+    proceedReduceInfluenceTrack(influenceTrackI: number, chooser: House | null = null): void {
         const tracker = this.game.getInfluenceTrackByI(influenceTrackI);
 
         const currentPosition = tracker.indexOf(this.parentGameState.lowestBidder);
 
         tracker.splice(currentPosition, 1);
         // If currentPosition == tracker.length, splice will correctly consider
-        // "currentPosition + 1" to be tracker.length (and thus not changing anything).
-        tracker.splice(currentPosition + 1, 0, this.parentGameState.lowestBidder);
+        // "currentPosition + 2" to be tracker.length (and thus not changing anything).
+        tracker.splice(currentPosition + 2, 0, this.parentGameState.lowestBidder);
 
         this.ingame.log({
             type: "preemptive-raid-track-reduced",
@@ -135,6 +135,8 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
             trackerI: influenceTrackI,
             tracker: tracker.map(h => h.id)
         })
+
+        this.parentGameState.onWildlingCardExecuteEnd();
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
