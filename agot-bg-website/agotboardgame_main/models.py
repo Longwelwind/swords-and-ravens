@@ -36,6 +36,11 @@ class Game(models.Model):
     def __str__(self):
         return f"{self.name} ({self.id})"
 
+    class Meta:
+        permissions = [
+            ("can_play_as_another_player", "Can impersonate an other player in a game")
+        ]
+
 
 class PlayerInGame(models.Model):
     game = models.ForeignKey(Game, related_name='players', on_delete=models.CASCADE)
