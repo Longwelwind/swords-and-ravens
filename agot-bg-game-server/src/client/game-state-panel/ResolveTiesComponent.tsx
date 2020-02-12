@@ -29,7 +29,7 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
         return (
             <>
                 <Col xs={12}>
-                    The holder of the iron throne can resolve the ties of the bidding.
+                    The holder of the Iron Throne can resolve the ties of the bidding.
                 </Col>
                 {this.props.gameClient.doesControlHouse(this.props.gameState.decider) ? (
                     <>
@@ -42,6 +42,7 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
                                                  style={{backgroundImage: `url(${houseInfluenceImages.get(h.id)})`}}>
                                             </div>
                                         </div>
+                                        <div className="text-center" style={{fontSize: "18px", marginBottom: "5px"}}>{this.props.gameState.getBidOfHouse(h)}</div>
                                         <div className="btn-group btn-group-xs">
                                             <button
                                                 className="btn btn-primary"
