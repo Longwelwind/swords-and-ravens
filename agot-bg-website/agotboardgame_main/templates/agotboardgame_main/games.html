@@ -56,7 +56,11 @@ Games -
                                                 title="You must be logged in to join or observe a game"
                                             {% endif %}
                                         >
-                                            Join
+                                            {% if not game.player_in_game %}
+                                                Join
+                                            {% else %}
+                                                Rejoin
+                                            {% endif %}
                                         </a>
                                     </td>
                                 </tr>
