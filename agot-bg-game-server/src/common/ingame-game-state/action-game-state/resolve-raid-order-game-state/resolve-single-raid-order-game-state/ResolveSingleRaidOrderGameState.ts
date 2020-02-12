@@ -12,7 +12,6 @@ import IngameGameState from "../../../IngameGameState";
 import ActionGameState from "../../ActionGameState";
 import RaidOrderType from "../../../game-data-structure/order-types/RaidOrderType";
 import ConsolidatePowerOrderType from "../../../game-data-structure/order-types/ConsolidatePowerOrderType";
-import {raid} from "../../../game-data-structure/order-types/orderTypes";
 import User from "../../../../../server/User";
 
 export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRaidOrderGameState> {
@@ -146,6 +145,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
 
     getRaidableRegions(orderRegion: Region, raid: RaidOrderType): Region[] {
         return this.world.getNeighbouringRegions(orderRegion)
+            .filter(r => r.getController() != this.house)
             .filter(r => this.actionGameState.ordersOnBoard.has(r))
             .filter(r => raid.isValidRaidableOrder(this.actionGameState.ordersOnBoard.get(r)))
             .filter(r => r.type.kind == orderRegion.type.kind || orderRegion.type.canAdditionalyRaid == r.type.kind);
