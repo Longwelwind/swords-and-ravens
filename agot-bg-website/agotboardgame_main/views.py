@@ -57,7 +57,8 @@ def games(request):
 
 @login_required
 def play(request, game_id, user_id=None):
-    if user_id:
+    # Specifying a user_id allows users to impersonate other players in a game
+    if user_id and request.user.has_perm("agotboardgame_main.can_play_as_another_player"):
         user = get_object_or_404(User, id=user_id)
     else:
         user = request.user

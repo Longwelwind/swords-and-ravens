@@ -34,14 +34,16 @@
                                     Join
                                 </a>
                             </td>
-                            <td class="align-middle" style="width: 1px">
-                                <a class="btn btn-primary btn-sm"
-                                   href="/play/{{ player.game.id }}/{{ viewed_user.id }}"
-                                   target="_blank"
-                                >
-                                    Join as
-                                </a>
-                            </td>
+                            {% if perms.agotboardgame_main.can_play_as_another_player %}
+                                <td class="align-middle" style="width: 1px">
+                                    <a class="btn btn-primary btn-sm"
+                                       href="/play/{{ player.game.id }}/{{ viewed_user.id }}"
+                                       target="_blank"
+                                    >
+                                        Join as
+                                    </a>
+                                </td>
+                            {% endif %}
                         </tr>
                     {% empty %}
                         <tr>
