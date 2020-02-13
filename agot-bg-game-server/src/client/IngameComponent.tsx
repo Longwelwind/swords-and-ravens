@@ -53,6 +53,7 @@ import User from "../server/User";
 import Player from "../common/ingame-game-state/Player";
 import {observable} from "mobx";
 import classNames = require("classnames");
+import {Channel} from "./chat-client/ChatClient";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -377,14 +378,17 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     <Card.Header>
                                         <Nav variant="tabs">
                                             <Nav.Item>
-                                                <Nav.Link eventKey="chat">Chat</Nav.Link>
+                                                <Nav.Link eventKey="game-logs">Game Logs</Nav.Link>
                                             </Nav.Item>
                                             <Nav.Item>
-                                                <Nav.Link eventKey="game-logs">Game Logs</Nav.Link>
+                                                <Nav.Link eventKey="chat" className={classNames({"new-event": this.publicChatRoom.areThereNewMessage})}>
+                                                    Chat
+                                                </Nav.Link>
                                             </Nav.Item>
                                             {this.getPrivateChatRooms().map(({user, roomId}) => (
                                                 <Nav.Item key={roomId}>
-                                                    <Nav.Link eventKey={roomId}>
+                                                    <Nav.Link eventKey={roomId}
+                                                              className={classNames({"new-event": this.getPrivateChatRoomForPlayer(user).areThereNewMessage})}>
                                                         {user.name}
                                                     </Nav.Link>
                                                 </Nav.Item>
@@ -410,7 +414,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             <Tab.Pane eventKey="chat" className="h-100">
                                                 <ChatComponent gameClient={this.props.gameClient}
                                                                entireGame={this.props.gameState.entireGame}
-                                                               roomId={this.props.gameState.entireGame.publicChatRoomId} />
+                                                               roomId={this.props.gameState.entireGame.publicChatRoomId}
+                                                               currentlyViewed={this.currentOpenedTab == "chat"}/>
                                             </Tab.Pane>
                                             <Tab.Pane eventKey="game-logs">
                                                 <GameLogListComponent ingameGameState={this.props.gameState} />
@@ -419,7 +424,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 <Tab.Pane eventKey={roomId} key={roomId} className="h-100">
                                                     <ChatComponent gameClient={this.props.gameClient}
                                                                    entireGame={this.props.gameState.entireGame}
-                                                                   roomId={roomId}/>
+                                                                   roomId={roomId}
+                                                                   currentlyViewed={this.currentOpenedTab == roomId}/>
                                                 </Tab.Pane>
                                             ))}
                                         </Tab.Content>
@@ -439,6 +445,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             {name: "Fiefdoms", tracker: this.game.fiefdomsTrack, stars: false},
             {name: "King's Court", tracker: this.game.kingsCourtTrack, stars: true},
         ]
+    }
+
+    get publicChatRoom(): Channel {
+        return this.props.gameClient.chatClient.channels.get(this.props.gameState.entireGame.publicChatRoomId);
     }
 
     onNewPrivateChatRoomClick(p: Player): void {
@@ -463,6 +473,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
             return {user: otherUser, roomId};
         })));
+    }
+
+    getPrivateChatRoomForPlayer(u: User): Channel {
+        const users = _.sortBy([this.props.gameClient.authenticatedUser as User, u], u => u.id);
+
+        return this.props.gameClient.chatClient.channels.get(this.props.gameState.entireGame.privateChatRoomsIds.get(users[0]).get(users[1]));
     }
 
     getOtherPlayers(): Player[] {
