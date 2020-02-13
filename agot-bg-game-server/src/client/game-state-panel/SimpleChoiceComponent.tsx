@@ -9,7 +9,7 @@ import Col from "react-bootstrap/Col";
 
 @observer
 export default class SimpleChoiceComponent extends Component<GameStateComponentProps<SimpleChoiceGameState>> {
-    render() {
+    render(): JSX.Element {
         return (
             <>
                 <Col xs={12}>
@@ -19,7 +19,7 @@ export default class SimpleChoiceComponent extends Component<GameStateComponentP
                     {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
                         <Row className="justify-content-center">
                             {this.props.gameState.choices.map((s, i) => (
-                                <Col xs="auto">
+                                <Col xs="auto" key={i}>
                                     <Button onClick={() => this.choose(i)}>{s}</Button>
                                 </Col>
                             ))}
@@ -32,7 +32,7 @@ export default class SimpleChoiceComponent extends Component<GameStateComponentP
         );
     }
 
-    choose(choice: number) {
+    choose(choice: number): void {
         this.props.gameState.choose(choice);
     }
 }

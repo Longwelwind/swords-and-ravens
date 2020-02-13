@@ -13,13 +13,13 @@ interface OrderGridProps {
 }
 
 export default class OrderGridComponent extends Component<OrderGridProps> {
-    render() {
+    render(): JSX.Element {
         return (
             <Row className="justify-content-center">
                 <Col xs="auto">
                     <Row style={{width: "180px"}} className="no-gutters justify-content-center">
                         {this.props.orders.map(o => (
-                            <Col xs="auto" className="p-1">
+                            <Col xs="auto" className="p-1" key={o.id}>
                                 <div className={classNames(
                                         "order-icon",
                                         {"clickable": this.isOrderAvailable(o) && this.props.selectedOrder != o},
@@ -40,11 +40,11 @@ export default class OrderGridComponent extends Component<OrderGridProps> {
         );
     }
 
-    isOrderAvailable(o: Order) {
+    isOrderAvailable(o: Order): boolean {
         return this.props.availableOrders.includes(o);
     }
 
-    onOrderClick(o: Order) {
+    onOrderClick(o: Order): void {
         if (!this.isOrderAvailable(o)) {
             return;
         }

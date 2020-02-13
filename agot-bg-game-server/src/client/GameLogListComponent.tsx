@@ -1,12 +1,10 @@
 import {Component, ReactNode} from "react";
 import React from "react";
-import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import {GameLogData} from "../common/ingame-game-state/game-data-structure/GameLog";
 import Game from "../common/ingame-game-state/game-data-structure/Game";
-import HouseCard from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
 import World from "../common/ingame-game-state/game-data-structure/World";
@@ -191,7 +189,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                             )))}
                         </table>
                         {data.nightsWatchVictory ? (
-                            <>The <strong>Night's Watch</strong> won!</>
+                            <>The <strong>Night&apos;s Watch</strong> won!</>
                         ) : (
                             <>The <strong>Wildling</strong> won!</>
                         )}
@@ -218,7 +216,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
 
             case "player-mustered":
                 house = this.game.houses.get(data.house);
-                    const musterings = _.flatMap(data.musterings.map(([_, musterements]: [string, {region: string, from: string | null, to: string}[]]) =>
+                    const musterings = _.flatMap(data.musterings.map(([_, musterements]: [string, {region: string; from: string | null; to: string}[]]) =>
                     musterements.map(({region, from, to}) => ({
                         region: this.game.world.regions.get(region),
                         from: from ? unitTypes.get(from) : null,
@@ -232,8 +230,8 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                             <strong>{house.name}</strong> mustered:
                         </p>
                         <ul>
-                            {musterings.map(({region, from, to}) => (
-                                <li>
+                            {musterings.map(({region, from, to}, i) => (
+                                <li key={i}>
                                     {from ? (
                                         <>
                                             A <strong>{to.name}</strong> from a <strong>{from.name}</strong> in <strong>{region.name}</strong>
@@ -283,7 +281,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 if (raidee && raidedRegion && orderRaided) {
                     return (
                         <p>
-                            <strong>{raider.name}</strong> raided <strong>{raidee.name}</strong>'s <strong>{orderRaided.type.name}
+                            <strong>{raider.name}</strong> raided <strong>{raidee.name}</strong>&apos;s <strong>{orderRaided.type.name}
                             </strong> in <strong>{raidedRegion.name}</strong> from <strong>{raiderRegion.name}</strong>
                         </p>
                     );
@@ -378,7 +376,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 return <><strong>{house.name}</strong> used the <strong>Valyrian Sword</strong>.</>;
 
             case "combat-house-card-chosen":
-                let houseCards = data.houseCards.map(([hid, hcid]) => {
+                const houseCards = data.houseCards.map(([hid, hcid]) => {
                     const house = this.game.houses.get(hid);
                     return [house, house.houseCards.get(hcid)];
                 });
@@ -739,7 +737,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
 
                 return <>
                     <strong>Mammoth Riders</strong>: <strong>{house.name}</strong> chose to
-                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map(ut => <strong>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), ", ")}.
+                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <strong key={i}>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), ", ")}.
                 </>;
 
             case "mammoth-riders-return-card":
@@ -765,7 +763,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
 
                 return <>
                     <strong>The Horde Descends</strong>: <strong>{house.name}</strong> chose to
-                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map(ut => <strong>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), ", ")}.
+                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <strong key={i}>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), ", ")}.
                 </>;
 
             case "crow-killers-knights-replaced":
@@ -812,7 +810,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 house = this.game.houses.get(data.house);
 
                 return <>
-                    <strong>Rattleshirt's Raiders</strong>: <strong>{house.name}</strong> gained one level of supply,
+                    <strong>Rattleshirt&apos;s Raiders</strong>: <strong>{house.name}</strong> gained one level of supply,
                     and is now at <strong>{data.newSupply}</strong>.
                 </>;
 
@@ -821,7 +819,7 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                 const newSupply = data.newSupply.map(([hid, supply]) => [this.game.houses.get(hid), supply] as [House, number]);
 
                 return <>
-                    <strong>Rattleshirt's Raiders</strong>: <strong>{lowestBidder.name}</strong> lost 3 levels of supply,
+                    <strong>Rattleshirt&apos;s Raiders</strong>: <strong>{lowestBidder.name}</strong> lost 3 levels of supply,
                     all other houses lost 2 levels of supply.
                     <ul>
                         {newSupply.map(([house, supply]) => (
