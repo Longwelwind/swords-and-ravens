@@ -4,7 +4,7 @@ import logging
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
-from chat.models import Room, Message
+from chat.models import Room, Message, UserInRoom
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +13,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.room = None
+        self.user_in_room = None
 
     async def connect(self):
         user = self.scope['user']
@@ -25,16 +26,24 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.close()
             return
 
+        if user.is_authenticated:
+            self.user_in_room = await database_sync_to_async(lambda: room.users.prefetch_related('last_viewed_message').filter(user=user).first())()
+        else:
+            self.user_in_room = None
+
         # Check if the user has access to this channel
         if not room.public:
             if not user.is_authenticated:
                 await self.close()
                 return
 
-            is_user_part_of_room = await database_sync_to_async(lambda: room.users.filter(user=user).exists())()
-            if not is_user_part_of_room:
+            if not self.user_in_room:
                 await self.close()
                 return
+
+        # Always create a UserInRoom entity for each user that connected to this channel
+        if not self.user_in_room and user.is_authenticated:
+            self.user_in_room = await database_sync_to_async(lambda: UserInRoom.objects.create(user=user, room=room))()
 
         self.room = room
 
@@ -78,12 +87,27 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 str(self.room.id),
                 {
                     'type': 'chat_message',
+                    'id': message.id,
                     'text': message.text,
                     'user_id': str(message.user.id),
                     'user_username': user.username,
                     'created_at': message.created_at.isoformat()
                 }
             )
+        if type == 'chat_view_message':
+            message_id = data['message_id']
+
+            if not self.user_in_room:
+                logger.warning(f'An unauthenticated used tried to mark a message as viewed in room "{self.room.id}"')
+
+            message = await database_sync_to_async(lambda: Message.objects.get(id=message_id))()
+
+            if not message:
+                logger.warning(f'A user tried to mark a non-existent message (id: {message_id}) as viewed (user_id: {self.user_in_room.user.id})')
+
+            self.user_in_room.last_viewed_message = message
+
+            await database_sync_to_async(lambda: self.user_in_room.save())()
         elif type == 'chat_retrieve':
             count = count = data['count']
 
@@ -94,22 +118,28 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 lambda: reversed(Message.objects.filter(room=self.room).prefetch_related('user').order_by('-created_at')[:count])
             )()
 
+            # Also include the last message viewed in the response
+            last_viewed_message = self.user_in_room.last_viewed_message if self.user_in_room else None
+
             await self.send_json({
                 'type': 'chat_messages_retrieved',
                 'messages': [
-                    {'text': message.text, 'user_id': str(message.user.id), 'user_username': message.user.username, 'created_at': message.created_at.isoformat()}
+                    {'id': message.id, 'text': message.text, 'user_id': str(message.user.id), 'user_username': message.user.username, 'created_at': message.created_at.isoformat()}
                     for message in messages
-                ]
+                ],
+                'last_viewed_message': last_viewed_message.id if last_viewed_message else None
             })
 
     async def chat_message(self, event):
         text = event['text']
+        id = event['id']
         user_id = event['user_id']
-        user_username = event['user_username'];
+        user_username = event['user_username']
         created_at = event['created_at']
 
         await self.send_json({
             'type': 'chat_message',
+            'id': id,
             'text': text,
             'user_id': user_id,
             'user_username': user_username,

@@ -67,7 +67,8 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                             <Card.Body style={{height: "300px"}}>
                                 <ChatComponent gameClient={this.props.gameClient}
                                                entireGame={this.props.gameState.entireGame}
-                                               roomId={this.props.gameState.entireGame.publicChatRoomId}/>
+                                               roomId={this.props.gameState.entireGame.publicChatRoomId}
+                                               currentlyViewed={true}/>
                             </Card.Body>
                         </Card>
                     </Col>

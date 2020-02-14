@@ -7,14 +7,20 @@ import React from "react";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import {observable} from "mobx";
-import IngameGameState from "../../common/ingame-game-state/IngameGameState";
-import ChatClient from "./ChatClient";
+import ChatClient, {Channel} from "./ChatClient";
 import EntireGame from "../../common/EntireGame";
 
 interface ChatComponentProps {
     gameClient: GameClient;
     entireGame: EntireGame;
     roomId: string;
+    /**
+     * This property indicates whether this component can be viewed by the user.
+     * If the component is inside a Tab component, it can hidden if an other Tab is opened.
+     * This property allows the component to mark know whether or not the new messages are seen by the user
+     * and thus if they can be marked as seen.
+     */
+    currentlyViewed: boolean;
 }
 
 @observer
@@ -25,11 +31,15 @@ export default class ChatComponent extends Component<ChatComponentProps> {
         return this.props.gameClient.chatClient;
     }
 
+    get channel(): Channel {
+        return this.chatClient.channels.get(this.props.roomId);
+    }
+
     render(): ReactNode {
         return (
             <div className="d-flex flex-column h-100">
                 <div className="flex-grow-1 mb-3 overflow-auto">
-                    {this.chatClient.channels.get(this.props.roomId).messages.slice().reverse().map(m => (
+                    {this.channel.messages.slice().reverse().map(m => (
                         <Row noGutters={true} className="flex-nowrap">
                             <Col xs="auto" style={{width: "38px"}} className="text-center">
                                 <small
@@ -67,5 +77,26 @@ export default class ChatComponent extends Component<ChatComponentProps> {
 
         this.chatClient.sendMessage(this.chatClient.channels.get(this.props.roomId), this.inputText);
         this.inputText = "";
+    }
+
+    componentDidMount(): void {
+        this.channel.onMessage = () => this.onMessage();
+    }
+
+    componentWillUnmount(): void {
+        this.channel.onMessage = null;
+    }
+
+    componentDidUpdate(_prevProps: Readonly<ChatComponentProps>, _prevState: Readonly<{}>, _snapshot?: any): void {
+        if (this.props.currentlyViewed) {
+            this.chatClient.markAsViewed(this.channel);
+        }
+    }
+
+    onMessage(): void {
+        console.log(this.props.currentlyViewed);
+        if (this.props.currentlyViewed) {
+            this.chatClient.markAsViewed(this.channel);
+        }
     }
 }
