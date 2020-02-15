@@ -95,13 +95,17 @@ export default class Region {
     static deserializeFromServer(game: Game, data: SerializedRegion): Region {
         const units = new BetterMap<number, Unit>(data.units.map(u => [u.id, Unit.deserializeFromServer(game, u)]));
 
-        return new Region(
+        const region = new Region(
             data.id, data.name, data.nameSlot, regionTypes.get(data.type),
             data.unitSlot, data.orderSlot, data.powerTokenSlot, data.crownIcons, data.supplyIcons, data.castleLevel, data.garrison,
             data.superControlPowerToken ? game.houses.get(data.superControlPowerToken) : null,
             data.controlPowerToken ? game.houses.get(data.controlPowerToken) : null,
             units
         );
+
+        units.values.forEach(u => u.region = region);
+
+        return region;
     }
 }
 

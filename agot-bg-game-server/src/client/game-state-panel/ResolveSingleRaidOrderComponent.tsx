@@ -12,6 +12,7 @@ import RaidOrderType from "../../common/ingame-game-state/game-data-structure/or
 import Order from "../../common/ingame-game-state/game-data-structure/Order";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
+import {OrderOnMapProperties} from "../MapControls";
 
 @observer
 export default class ResolveSingleRaidOrderComponent extends Component<GameStateComponentProps<ResolveSingleRaidOrderGameState>> {
@@ -19,9 +20,7 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
     @observable orderInOrderRegion: RaidOrderType | null;
     @observable selectedTargetRegion: Region | null;
 
-    orderClickListener: any;
-    shouldHighlightOrderListener: any;
-    shouldHighlightRegionListener: any;
+    modifyOrdersOnMapCallback: any;
 
     render() {
         return (
@@ -64,25 +63,21 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
         );
     }
 
-    confirm() {
+    confirm(): void {
         if (this.selectedOrderRegion) {
             this.props.gameState.resolveRaid(this.selectedOrderRegion, this.selectedTargetRegion);
         }
     }
 
-    reset() {
+    reset(): void {
         this.selectedOrderRegion = null;
         this.orderInOrderRegion = null;
         this.selectedTargetRegion = null;
     }
 
-    onOrderClick(r: Region, order: Order) {
+    onOrderClick(r: Region): void {
         if (this.props.gameClient.authenticatedPlayer && this.props.gameState.house == this.props.gameClient.authenticatedPlayer.house) {
             if (this.selectedOrderRegion == null || this.orderInOrderRegion == null) {
-                if (r.getController() != this.props.gameState.house) {
-                    return;
-                }
-
                 const order = this.props.gameState.actionGameState.ordersOnBoard.tryGet(r, null);
                 if (!order) {
                     return;
@@ -95,46 +90,36 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
                 this.selectedOrderRegion = r;
                 this.orderInOrderRegion = order.type;
             } else {
-                if (!this.props.gameState.getRaidableRegions(this.selectedOrderRegion, this.orderInOrderRegion).includes(r)) {
-                    return;
-                }
-
                 this.selectedTargetRegion = r;
             }
         }
     }
 
-    shouldHighlightRegion(r: Region): boolean {
-        if (this.props.gameClient.authenticatedPlayer && this.props.gameState.house == this.props.gameClient.authenticatedPlayer.house) {
-            if (this.selectedOrderRegion != null && this.orderInOrderRegion != null) {
-                return this.props.gameState.getRaidableRegions(this.selectedOrderRegion, this.orderInOrderRegion).includes(r);
-            }
-        }
-
-        return false;
-    }
-
-    shouldHighlightOrder(r: Region, o: Order): boolean {
-        if (this.props.gameClient.authenticatedPlayer && this.props.gameState.house == this.props.gameClient.authenticatedPlayer.house) {
+    modifyOrdersOnMap(): [Region, Partial<OrderOnMapProperties>][] {
+        if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
             if (this.selectedOrderRegion == null || this.orderInOrderRegion == null) {
-                return this.props.gameState.getRegionWithRaidOrders().includes(r);
-            } else if (this.selectedTargetRegion == null) {
-                return this.props.gameState.getRaidableRegions(this.selectedOrderRegion, this.orderInOrderRegion).includes(r);
+                // Highlight the Raid orders of the house
+                return this.props.gameState.getRegionWithRaidOrders().map(r => [
+                    r,
+                    {highlight: {active: true}, onClick: () => this.onOrderClick(r)}
+                ])
+            } else {
+                // Highlight the possible raidable orders from the select Raid order
+                return this.props.gameState.getRaidableRegions(this.selectedOrderRegion, this.orderInOrderRegion).map(r => [
+                    r,
+                    {highlight: {active: true}, onClick: () => this.onOrderClick(r)}
+                ])
             }
         }
 
-        return false;
+        return [];
     }
 
     componentDidMount(): void {
-        this.props.mapControls.onOrderClick.push(this.orderClickListener = (r: Region, o: Order) => this.onOrderClick(r, o));
-        this.props.mapControls.shouldHighlightOrder.push(this.shouldHighlightOrderListener = (r: Region, o: Order) => this.shouldHighlightOrder(r, o));
-        this.props.mapControls.shouldHighlightRegion.push(this.shouldHighlightRegionListener = (r: Region) => this.shouldHighlightRegion(r));
+        this.props.mapControls.modifyOrdersOnMap.push(this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap());
     }
 
     componentWillUnmount(): void {
-        _.pull(this.props.mapControls.onOrderClick, this.orderClickListener);
-        _.pull(this.props.mapControls.shouldHighlightOrder, this.shouldHighlightOrderListener);
-        _.pull(this.props.mapControls.shouldHighlightRegion, this.shouldHighlightRegionListener);
+        _.pull(this.props.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
     }
 }

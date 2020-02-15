@@ -6,7 +6,7 @@ import Border from "../common/ingame-game-state/game-data-structure/Border";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
 import Unit from "../common/ingame-game-state/game-data-structure/Unit";
 import PlanningGameState from "../common/ingame-game-state/planning-game-state/PlanningGameState";
-import MapControls from "./MapControls";
+import MapControls, {OrderOnMapProperties, RegionOnMapProperties} from "./MapControls";
 import {observer} from "mobx-react";
 import ActionGameState from "../common/ingame-game-state/action-game-state/ActionGameState";
 import Order from "../common/ingame-game-state/game-data-structure/Order";
@@ -17,8 +17,10 @@ import unitImages from "./unitImages";
 import classNames = require("classnames");
 import housePowerTokensImages from "./housePowerTokensImages";
 import garrisonTokens from "./garrisonTokens";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import {OverlayTrigger, Tooltip} from "react-bootstrap";
 import ConditionalWrap from "./utils/ConditionalWrap";
+import BetterMap from "../utils/BetterMap";
+import _ from "lodash";
 
 interface MapComponentProps {
     gameClient: GameClient;
@@ -30,7 +32,8 @@ interface MapComponentProps {
 export default class MapComponent extends Component<MapComponentProps> {
     render(): ReactNode {
         return (
-            <div className="map" style={{backgroundImage: `url(${backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem"}}>
+            <div className="map"
+                 style={{backgroundImage: `url(${backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem"}}>
                 <div style={{position: "relative"}}>
                     {this.props.ingameGameState.world.regions.values.map(r => (
                         <div key={r.id}>
@@ -43,7 +46,6 @@ export default class MapComponent extends Component<MapComponentProps> {
                                     }}
                                 >
                                 </div>
-
                             )}
                             {r.controlPowerToken && (
                                 <div
@@ -56,118 +58,168 @@ export default class MapComponent extends Component<MapComponentProps> {
                                 >
                                 </div>
                             )}
-                            <div
-                                className="units-container"
-                                style={{left: r.unitSlot.x, top: r.unitSlot.y}}
-                            >
-                                {r.units.values.map(u => (
-                                    <div key={u.id}
-                                         onClick={() => this.onUnitClick(r, u)}
-                                         className={classNames("unit-icon hover-weak-outline", {"medium-outline hover-strong-outline": this.shouldHighlightUnit(r, u)})}
-                                         style={{
-                                             backgroundImage: `url(${unitImages.get(u.allegiance.id).get(u.type.id)})`,
-                                             opacity: u.wounded ? 0.5 : 1
-                                         }}/>
-                                ))}
-                            </div>
                         </div>
                     ))}
-                    {/*this.props.ingame.world.regions.values.filter(r => r.type != port).map(r => (
-                        <Card
-                            key={"name-" + r.id}
-                            style={{left: r.nameSlot.x, top: r.nameSlot.y}}
-                            className="region-label"
-                        >
-                            {r.name + "*".repeat(r.crownIcons) + (r.controlPowerToken ? r.controlPowerToken.name.substr(0, 1) : r.superControlPowerToken ? r.superControlPowerToken.name.substr(0, 1) : "")}
-                        </Card>
-                    ))*/}
-                    <div>
-                        {this.props.ingameGameState.world.regions.values.map(r => (
-                            this.props.ingameGameState.childGameState instanceof PlanningGameState ? (
-                                this.displayOrderPlanningGameState(this.props.ingameGameState.childGameState, r)
-                            ) : this.props.ingameGameState.childGameState instanceof ActionGameState && (
-                                this.displayOrderActionGameState(this.props.ingameGameState.childGameState, r)
-                            )
-                        ))}
-                    </div>
+                    {this.renderUnits()}
+                    {this.renderOrders()}
                 </div>
                 <svg style={{width: "741px", height: "1378px"}}>
-                    {this.props.ingameGameState.world.regions.values.map(r => (
-                        <polygon
-                            points={this.getRegionPath(r)} fill="white"
-                            fillRule="evenodd"
-                            className={classNames("region-area", {"highlighted-region-area clickable": this.shouldHighlightRegion(r)})}
-                            onClick={() => this.onRegionClick(r)}
-                            key={r.id}
-                        />
-                    ))}
+                    {this.renderRegions()}
                 </svg>
             </div>
         )
     }
 
-    displayOrderPlanningGameState(planningGameState: PlanningGameState, r: Region): ReactNode {
-        const orderPresent = planningGameState.placedOrders.has(r);
-        const order = orderPresent ? planningGameState.placedOrders.get(r) : null;
+    renderRegions(): ReactNode {
+        const propertiesForRegions = this.getModifiedPropertiesForEntities<Region, RegionOnMapProperties>(
+            this.props.ingameGameState.world.regions.values,
+            this.props.mapControls.modifyRegionsOnMap,
+            {highlight: null, onClick: null}
+        );
 
-        if (orderPresent) {
-            const controller = r.getController();
+        return propertiesForRegions.entries.map(([region, properties]) => {
+            return <polygon key={region.id}
+                            points={this.getRegionPath(region)}
+                            fill="white"
+                            fillRule="evenodd"
+                            className={classNames(
+                                "region-area",
+                                properties.highlight != null ? {
+                                    "clickable": true,
+                                    // Whatever the strength of the highlight defined, show the same
+                                    // highlightness
+                                    "highlighted-region-area": true
+                                } : {}
+                            )}
+                            onClick={properties.onClick != null ? properties.onClick : undefined}/>;
+        });
+    }
 
-            if (!controller) {
-                // Should never happen. If there's an order, there's a controller.
-                throw new Error();
+    renderUnits(): ReactNode {
+        const propertiesForUnits = this.getModifiedPropertiesForEntities(
+            _.flatMap(this.props.ingameGameState.world.regions.values.map(r => r.units.values)),
+            this.props.mapControls.modifyUnitsOnMap,
+            {highlight: null, onClick: null}
+        );
+
+        return this.props.ingameGameState.world.regions.values.map(r => (
+            <div
+                key={r.id}
+                className="units-container"
+                style={{left: r.unitSlot.x, top: r.unitSlot.y}}
+            >
+                {r.units.values.map(u => {
+                    const property = propertiesForUnits.get(u);
+
+                    return <div key={u.id}
+                                onClick={property.onClick ? property.onClick : undefined}
+                                className={classNames(
+                                    "unit-icon hover-weak-outline",
+                                    property.highlight ? {
+                                        "medium-outline hover-strong-outline": true
+                                    } : {}
+                                )}
+                                style={{
+                                    backgroundImage: `url(${unitImages.get(u.allegiance.id).get(u.type.id)})`,
+                                    opacity: u.wounded ? 0.5 : 1
+                                }}/>;
+                })}
+            </div>
+        ));
+    }
+
+    renderOrders(): ReactNode {
+        const propertiesForOrders = this.getModifiedPropertiesForEntities<Region, OrderOnMapProperties>(
+            _.flatMap(this.props.ingameGameState.world.regions.values),
+            this.props.mapControls.modifyOrdersOnMap,
+            {highlight: null, onClick: null}
+        );
+
+        return propertiesForOrders.map((region, properties) => {
+
+            if (this.props.ingameGameState.childGameState instanceof PlanningGameState) {
+                const planningGameState = this.props.ingameGameState.childGameState;
+                const orderPresent = planningGameState.placedOrders.has(region);
+                const order = orderPresent ? planningGameState.placedOrders.get(region) : null;
+
+                if (orderPresent) {
+                    const controller = region.getController();
+
+                    if (!controller) {
+                        // Should never happen. If there's an order, there's a controller.
+                        throw new Error();
+                    }
+
+                    const backgroundUrl = order ? orderImages.get(order.type.id) : houseOrderImages.get(controller.id);
+
+                    return this.renderOrder(region, order, backgroundUrl, properties, false);
+                }
+            } else if (this.props.ingameGameState.childGameState instanceof ActionGameState) {
+                const actionGameState = this.props.ingameGameState.childGameState;
+
+                if (!actionGameState.ordersOnBoard.has(region)) {
+                    return;
+                }
+
+                const order = actionGameState.ordersOnBoard.get(region);
+
+                return this.renderOrder(region, order, orderImages.get(order.type.id), properties, true);
             }
 
-            const backgroundUrl = order ? orderImages.get(order.type.id) : houseOrderImages.get(controller.id);
-
-            return this.renderOrder(r, order, backgroundUrl, false);
-        }
-
-        return false;
+            return false;
+        });
     }
 
-    displayOrderActionGameState(actionGameState: ActionGameState, r: Region): ReactNode {
-        if (!actionGameState.ordersOnBoard.has(r)) {
-            return;
-        }
+    /**
+     * This is used to call modifyRegionOnMap, modifyUnitOnMap and merge the properties
+     * of an entity (Region, Unit, ...) that have been modified by `...GameStateComponent` classes.
+     * @param entities
+     * @param modifyPropertiesFunctions
+     * @param defaultProperties
+     */
+    getModifiedPropertiesForEntities<Entity, Property>(entities: Entity[], modifyPropertiesFunctions: (() => [Entity, Partial<Property>][])[], defaultProperties: Property): BetterMap<Entity, Property> {
+        // Create a Map of properties for all regions that will be shown
+        const propertiesForEntities = new BetterMap<Entity, Property>();
+        entities.forEach(entity => {
+            propertiesForEntities.set(entity, defaultProperties);
+        });
 
-        const order = actionGameState.ordersOnBoard.get(r);
+        modifyPropertiesFunctions.forEach(modifyPropertiesFunction => {
+            const modifiedPropertiesForEntities = modifyPropertiesFunction();
 
-        return this.renderOrder(r, order, orderImages.get(order.type.id), true);
+            modifiedPropertiesForEntities.forEach(([entity, modifiedProperties]) => {
+                propertiesForEntities.set(entity, _.merge(propertiesForEntities.get(entity), modifiedProperties));
+            });
+        });
+
+        return propertiesForEntities;
     }
 
-    renderOrder(region: Region, order: Order| null, backgroundUrl: string, isActionGameState: boolean): ReactNode {
+    renderOrder(region: Region, order: Order | null, backgroundUrl: string, properties: OrderOnMapProperties, isActionGameState: boolean): ReactNode {
         return (
-            <div className={classNames("order-container", "hover-weak-outline", { "medium-outline hover-strong-outline clickable": order ? this.shouldHighlightOrder(region, order) : false })}
-                style={{ left: region.orderSlot.x, top: region.orderSlot.y }}
-                onClick={() => order ? this.onOrderClick(region, order) : undefined}
-                key={"region-" + region.id}
+            <div className={classNames(
+                    "order-container", "hover-weak-outline",
+                    properties.highlight ? {
+                        "medium-outline hover-strong-outline clickable": properties.highlight.active
+                    } : null
+                )}
+                 style={{left: region.orderSlot.x, top: region.orderSlot.y}}
+                 onClick={properties.onClick ? properties.onClick : undefined}
+                 key={"region-" + region.id}
             >
                 <ConditionalWrap condition={isActionGameState}
-                    wrap={child => 
-                        <OverlayTrigger overlay={
-                            <Tooltip id={"order-owner"}>
-                                {this.getController(region)}
-                            </Tooltip>
-                        } delay={{ show: 750, hide: 250 }}>
-                            {child}
-                        </OverlayTrigger>}>
-                        <div className="order-icon" style={{ backgroundImage: `url(${backgroundUrl})` }} />
+                                 wrap={child =>
+                                     <OverlayTrigger overlay={
+                                         <Tooltip id={"order-owner"}>
+                                             {this.getController(region)}
+                                         </Tooltip>
+                                     } delay={{show: 750, hide: 250}}>
+                                         {child}
+                                     </OverlayTrigger>}>
+                    <div className="order-icon" style={{backgroundImage: `url(${backgroundUrl})`}}/>
                 </ConditionalWrap>
             </div>
         );
-    }
-
-    onUnitClick(region: Region, unit: Unit): void {
-        this.props.mapControls.onUnitClick.forEach(f => f(region, unit));
-    }
-
-    onRegionClick(region: Region): void {
-        this.props.mapControls.onRegionClick.forEach(f => f(region));
-    }
-
-    onOrderClick(region: Region, order: Order): void {
-        this.props.mapControls.onOrderClick.forEach(f => f(region, order));
     }
 
     getBorderPathD(border: Border): string {
@@ -184,18 +236,6 @@ export default class MapComponent extends Component<MapComponentProps> {
         const points = this.props.ingameGameState.world.getContinuousBorder(region);
 
         return points.map(p => p.x + "," + p.y).join(" ");
-    }
-
-    shouldHighlightRegion(region: Region): boolean {
-        return this.props.mapControls.shouldHighlightRegion.some(f => f(region));
-    }
-
-    shouldHighlightOrder(region: Region, order: Order): boolean {
-        return this.props.mapControls.shouldHighlightOrder.some(f => f(region, order));
-    }
-
-    shouldHighlightUnit(region: Region, unit: Unit): boolean {
-        return this.props.mapControls.shouldHighlightUnit.some(f => f(region, unit));
     }
 
     getController(region: Region): string | null {

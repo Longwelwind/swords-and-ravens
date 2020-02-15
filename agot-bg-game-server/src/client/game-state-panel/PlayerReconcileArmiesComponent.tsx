@@ -13,13 +13,13 @@ import Col from "react-bootstrap/Col";
 import House from "../../common/ingame-game-state/game-data-structure/House";
 import {observable} from "mobx";
 import Row from "react-bootstrap/Row";
+import {UnitOnMapProperties} from "../MapControls";
 
 @observer
 export default class PlayerReconcileArmiesComponent extends Component<GameStateComponentProps<PlayerReconcileArmiesGameState>> {
     @observable unitsToRemove: BetterMap<Region, Unit[]> = new BetterMap();
 
-    unitClickListener: any;
-    shouldHighlightUnitListener: any;
+    modifyUnitsOnMapCallback: any;
 
     get house(): House {
         return this.props.gameState.house;
@@ -54,38 +54,24 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
         );
     }
 
-    onUnitClick(region: Region, unit: Unit): void {
-        if (!this.props.gameClient.doesControlHouse(this.house)) {
-            return;
+    onUnitClick(unit: Unit): void {
+        // If there's no array for this region, add one
+        if (!this.unitsToRemove.has(unit.region)) {
+            this.unitsToRemove.set(unit.region, []);
         }
 
-        if (region.getController() == this.house) {
-            // If there's no array for this region, add one
-            if (!this.unitsToRemove.has(region)) {
-                this.unitsToRemove.set(region, []);
-            }
-
-            if (!this.unitsToRemove.get(region).includes(unit)) {
-                // Add the clicked unit
-                this.unitsToRemove.get(region).push(unit);
-            } else {
-                // Remove the clicked unit
-                _.pull(this.unitsToRemove.get(region), unit);
-            }
-
-            // If the array for this region is now empty, remove it
-            if (this.unitsToRemove.get(region).length == 0) {
-                this.unitsToRemove.delete(region);
-            }
-        }
-    }
-
-    shouldHighlightUnit(_region: Region, unit: Unit): boolean {
-        if (this.props.gameClient.doesControlHouse(this.house)) {
-            return _.difference(this.props.gameState.game.world.getUnitsOfHouse(this.house), _.flatMap(this.unitsToRemove.map((_, u) => u))).includes(unit);
+        if (!this.unitsToRemove.get(unit.region).includes(unit)) {
+            // Add the clicked unit
+            this.unitsToRemove.get(unit.region).push(unit);
+        } else {
+            // Remove the clicked unit
+            _.pull(this.unitsToRemove.get(unit.region), unit);
         }
 
-        return false;
+        // If the array for this region is now empty, remove it
+        if (this.unitsToRemove.get(unit.region).length == 0) {
+            this.unitsToRemove.delete(unit.region);
+        }
     }
 
     confirm(): void {
@@ -97,13 +83,25 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
         this.unitsToRemove = new BetterMap();
     }
 
+    modifyUnitsOnMap(): [Unit, Partial<UnitOnMapProperties>][] {
+        if (this.props.gameClient.doesControlHouse(this.house)) {
+            return this.props.gameState.game.world.getUnitsOfHouse(this.house).map(u => [
+                u,
+                {
+                    highlight: !_.flatMap(this.unitsToRemove.map((_, us) => us)).includes(u) ? {active: true} : null,
+                    onClick: () => this.onUnitClick(u)
+                }
+            ]);
+        }
+
+        return [];
+    }
+
     componentDidMount(): void {
-        this.props.mapControls.onUnitClick.push(this.unitClickListener = (r: Region, u: Unit) => this.onUnitClick(r, u));
-        this.props.mapControls.shouldHighlightUnit.push(this.shouldHighlightUnitListener = (r: Region, u: Unit) => this.shouldHighlightUnit(r, u));
+        this.props.mapControls.modifyUnitsOnMap.push(this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap());
     }
 
     componentWillUnmount(): void {
-        _.pull(this.props.mapControls.onRegionClick, this.unitClickListener);
-        _.pull(this.props.mapControls.shouldHighlightUnit, this.shouldHighlightUnitListener);
+        _.pull(this.props.mapControls.modifyUnitsOnMap, this.modifyUnitsOnMapCallback);
     }
 }

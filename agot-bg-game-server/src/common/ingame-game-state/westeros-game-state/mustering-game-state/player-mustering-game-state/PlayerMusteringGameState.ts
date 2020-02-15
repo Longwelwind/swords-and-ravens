@@ -149,7 +149,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                         totalAddedUnits.set(region, []);
                     }
 
-                    const unit = this.game.createUnit(to, this.house);
+                    const unit = this.game.createUnit(region, to, this.house);
                     region.units.set(unit.id, unit);
                     totalAddedUnits.get(region).push(unit);
                 });

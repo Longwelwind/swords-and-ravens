@@ -152,6 +152,7 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
 
         units.forEach(u => from.units.delete(u.id));
         units.forEach(u => to.units.set(u.id, u));
+        units.forEach(u => u.region = to);
 
         this.entireGame.broadcastToClients({
             type: "move-units",

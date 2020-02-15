@@ -77,7 +77,7 @@ export default class CrowKillersNightsWatchVictoryGameState extends GameState<Wi
         });
 
         // Replace them by footman
-        const knightsToAdd = footmenToRemove.map(_ => this.game.createUnit(knight, house));
+        const knightsToAdd = footmenToRemove.map(_ => this.game.createUnit(region, knight, house));
 
         knightsToAdd.forEach(u => region.units.set(u.id, u));
 

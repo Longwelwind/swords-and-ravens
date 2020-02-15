@@ -1,4 +1,4 @@
-import {Component} from "react";
+import {Component, ReactNode} from "react";
 import PlanningGameState from "../../common/ingame-game-state/planning-game-state/PlanningGameState";
 import orders from "../../common/ingame-game-state/game-data-structure/orders";
 import {observable} from "mobx";
@@ -13,15 +13,15 @@ import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import OrderGridComponent from "./utils/OrderGridComponent";
+import {OrderOnMapProperties, RegionOnMapProperties} from "../MapControls";
 
 @observer
 export default class PlanningComponent extends Component<GameStateComponentProps<PlanningGameState>> {
     @observable selectedOrder: Order | null;
-    regionClickListener: any;
-    orderClickListener: any;
-    highlightRegionListener: any;
+    modifyRegionsOnMapCallback: any;
+    modifyOrdersOnMapCallback: any;
 
-    render() {
+    render(): ReactNode {
         return (
             <>
                 <ListGroupItem>
@@ -63,7 +63,7 @@ export default class PlanningComponent extends Component<GameStateComponentProps
         );
     }
 
-    selectOrder(order: Order) {
+    selectOrder(order: Order): void {
         if (this.selectedOrder == order) {
             this.selectedOrder = null;
         } else {
@@ -79,23 +79,46 @@ export default class PlanningComponent extends Component<GameStateComponentProps
     }
 
     componentDidMount(): void {
-        this.props.mapControls.onRegionClick.push(this.regionClickListener = (r: Region) => this.onRegionClick(r));
-        this.props.mapControls.onOrderClick.push(this.orderClickListener = (r: Region, o: Order) => this.onOrderClick(r, o));
-        this.props.mapControls.shouldHighlightRegion.push(this.highlightRegionListener = (r: Region) => this.shouldHighlightRegion(r));
+        this.props.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
+        this.props.mapControls.modifyOrdersOnMap.push(this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap());
     }
 
     componentWillUnmount(): void {
-        _.pull(this.props.mapControls.onRegionClick, this.regionClickListener);
-        _.pull(this.props.mapControls.onOrderClick, this.orderClickListener);
-        _.pull(this.props.mapControls.shouldHighlightRegion, this.highlightRegionListener);
+        _.pull(this.props.mapControls.modifyRegionsOnMap, this.modifyRegionsOnMapCallback);
+        _.pull(this.props.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
+    }
+
+    modifyRegionsOnMap(): [Region, Partial<RegionOnMapProperties>][] {
+        if (this.props.gameClient.authenticatedPlayer) {
+            if (this.selectedOrder != null) {
+                return this.props.gameState.getPossibleRegionsForOrders(this.props.gameClient.authenticatedPlayer.house).map(r => ([
+                    r,
+                    {
+                        highlight: {active: true},
+                        onClick: () => this.onRegionClick(r)
+                    }
+                ]));
+            }
+        }
+
+        return [];
+    }
+
+    modifyOrdersOnMap(): [Region, Partial<OrderOnMapProperties>][] {
+        if (this.props.gameClient.authenticatedPlayer) {
+            return this.props.gameState.getPossibleRegionsForOrders(this.props.gameClient.authenticatedPlayer.house).map(r => ([
+                r,
+                {
+                    onClick: () => this.onOrderClick(r)
+                }
+            ]));
+        }
+
+        return [];
     }
 
     onRegionClick(region: Region): void {
-        if (!this.selectedOrder) {
-            return;
-        }
-
-        if (this.props.gameClient.authenticatedPlayer && region.getController() != this.props.gameClient.authenticatedPlayer.house) {
+        if (!this.props.gameClient.authenticatedPlayer) {
             return;
         }
 
@@ -103,23 +126,17 @@ export default class PlanningComponent extends Component<GameStateComponentProps
         this.selectedOrder = null;
     }
 
-    onOrderClick(region: Region, _order: Order) {
-        // Clicking on a placed order removes it
-        if (this.props.gameClient.authenticatedPlayer && region.getController() != this.props.gameClient.authenticatedPlayer.house) {
+    onOrderClick(region: Region): void {
+        if (!this.props.gameClient.authenticatedPlayer) {
             return;
         }
 
-        this.props.gameState.assignOrder(region, this.selectedOrder);
-    }
-
-    shouldHighlightRegion(r: Region): boolean {
-        if (this.props.gameClient.authenticatedPlayer) {
-            if (this.selectedOrder != null) {
-                return this.props.gameState.getPossibleRegionsForOrders(this.props.gameClient.authenticatedPlayer.house).includes(r);
-            }
+        if (this.selectedOrder != null) {
+            this.props.gameState.assignOrder(region, this.selectedOrder);
+            this.selectedOrder = null;
+        } else {
+            this.props.gameState.assignOrder(region, null);
         }
-
-        return false;
     }
 
     onReadyClick(): void {

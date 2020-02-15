@@ -11,13 +11,13 @@ import Button from "react-bootstrap/Button";
 import BetterMap from "../../utils/BetterMap";
 import {observable} from "mobx";
 import {observer} from "mobx-react";
+import {UnitOnMapProperties} from "../MapControls";
 
 @observer
 export default class SelectUnitsComponent extends Component<GameStateComponentProps<SelectUnitsGameState<any>>> {
     @observable selectedUnits = new BetterMap<Region, Unit[]>();
 
-    unitClickListener: any;
-    shouldHighlightUnitListener: any;
+    modifyUnitOnMapCallback: any;
 
     render(): ReactNode {
         return (
@@ -54,6 +54,21 @@ export default class SelectUnitsComponent extends Component<GameStateComponentPr
         this.props.gameState.selectUnits(this.selectedUnits);
     }
 
+    getSelectableUnits(): Unit[] {
+        if (this.countSelectedUnits() == this.props.gameState.count) {
+            return [];
+        }
+
+        return _.difference(this.props.gameState.possibleUnits, _.flatMap(this.selectedUnits.map((_r, us) => us)));
+    }
+
+    modifyUnitOnMap(): [Unit, Partial<UnitOnMapProperties>][] {
+        return this.getSelectableUnits().map(u => [
+            u,
+            {highlight: {active: true}, onClick: () => this.onUnitClick(u.region, u)}
+        ] as [Unit, Partial<UnitOnMapProperties>]);
+    }
+
     onUnitClick(region: Region, unit: Unit): void {
         if (this.getSelectableUnits().includes(unit)) {
             if (!this.selectedUnits.has(region)) {
@@ -64,26 +79,12 @@ export default class SelectUnitsComponent extends Component<GameStateComponentPr
         }
     }
 
-    shouldHighlightUnit(region: Region, unit: Unit): boolean {
-        return this.getSelectableUnits().includes(unit);
-    }
-
-    getSelectableUnits(): Unit[] {
-        if (this.countSelectedUnits() == this.props.gameState.count) {
-            return [];
-        }
-
-        return _.difference(this.props.gameState.possibleUnits, _.flatMap(this.selectedUnits.map((_r, us) => us)));
-    }
-
     componentDidMount(): void {
-        this.props.mapControls.onUnitClick.push(this.unitClickListener = (r: Region, u: Unit) => this.onUnitClick(r, u));
-        this.props.mapControls.shouldHighlightUnit.push(this.shouldHighlightUnitListener = (r: Region, u: Unit) => this.shouldHighlightUnit(r, u));
+        this.props.mapControls.modifyUnitsOnMap.push(this.modifyUnitOnMapCallback = () => this.modifyUnitOnMap());
     }
 
     componentWillUnmount(): void {
-        _.pull(this.props.mapControls.onUnitClick, this.unitClickListener);
-        _.pull(this.props.mapControls.shouldHighlightUnit, this.shouldHighlightUnitListener);
+        _.pull(this.props.mapControls.modifyUnitsOnMap, this.modifyUnitOnMapCallback);
     }
 
     reset(): void {

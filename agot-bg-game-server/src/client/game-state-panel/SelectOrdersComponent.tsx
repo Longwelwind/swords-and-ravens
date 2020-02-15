@@ -10,13 +10,13 @@ import Region from "../../common/ingame-game-state/game-data-structure/Region";
 import {observable} from "mobx";
 import Order from "../../common/ingame-game-state/game-data-structure/Order";
 import _ from "lodash";
+import {OrderOnMapProperties} from "../MapControls";
 
 @observer
 export default class SelectOrdersComponent extends Component<GameStateComponentProps<SelectOrdersGameState<ParentGameState>>> {
     @observable selectedRegions: Region[] = [];
 
-    orderClickListener: any;
-    shouldHighlightOrderListener: any;
+    modifyOrdersOnMapCallback: any;
 
     render(): ReactNode {
         return (
@@ -53,27 +53,32 @@ export default class SelectOrdersComponent extends Component<GameStateComponentP
         this.props.gameState.selectOrders(this.selectedRegions);
     }
 
-    onOrderClick(region: Region, _order: Order): void {
-        if (this.props.gameState.possibleRegions.includes(region) && !this.selectedRegions.includes(region)) {
+    onOrderClick(region: Region): void {
+        if (!this.selectedRegions.includes(region)) {
             this.selectedRegions.push(region);
+        } else {
+            _.pull(this.selectedRegions, region);
         }
     }
 
-    shouldHighlightOrder(region: Region, _order: Order): boolean {
-        if (this.selectedRegions.includes(region)) {
-            return false;
+    modifyOrdersOnMap(): [Region, Partial<OrderOnMapProperties>][] {
+        if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
+            if (this.selectedRegions.length < this.props.gameState.count) {
+                return this.props.gameState.possibleRegions.map(r => [
+                    r,
+                    {highlight: {active: true}, onClick: () => this.onOrderClick(r)}
+                ]);
+            }
         }
 
-        return this.props.gameState.possibleRegions.includes(region);
+        return [];
     }
 
     componentDidMount(): void {
-        this.props.mapControls.onOrderClick.push(this.orderClickListener = (r: Region, o: Order) => this.onOrderClick(r, o));
-        this.props.mapControls.shouldHighlightOrder.push(this.shouldHighlightOrderListener= (r: Region, o: Order) => this.shouldHighlightOrder(r, o));
+        this.props.mapControls.modifyOrdersOnMap.push(this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap());
     }
 
     componentWillUnmount(): void {
-        _.pull(this.props.mapControls.onOrderClick, this.orderClickListener);
-        _.pull(this.props.mapControls.shouldHighlightOrder, this.shouldHighlightOrderListener);
+        _.pull(this.props.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
     }
 }

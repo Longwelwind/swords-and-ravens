@@ -55,7 +55,7 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
         });
 
         // Replace them by footman
-        const footmenToAdd = knightsToRemove.map(_ => this.game.createUnit(footman, house));
+        const footmenToAdd = knightsToRemove.map(_ => this.game.createUnit(region, footman, house));
 
         footmenToAdd.forEach(u => region.units.set(u.id, u));
 

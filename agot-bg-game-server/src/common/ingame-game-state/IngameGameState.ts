@@ -186,6 +186,7 @@ export default class IngameGameState extends GameState<
             units.forEach(u => {
                 from.units.delete(u.id);
                 to.units.set(u.id, u);
+                u.region = to;
             });
         } else if (message.type == "change-power-token") {
             const house = this.game.houses.get(message.houseId);
