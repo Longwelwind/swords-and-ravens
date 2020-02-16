@@ -19,6 +19,7 @@ import planningRestrictions from "../game-data-structure/westeros-card/planning-
 import PutToTheSwordGameState, {SerializedPutToTheSwordGameState} from "./put-to-the-swords-game-state/PutToTheSwordGameState";
 import AThroneOfBladesGameState, {SerializedAThroneOfBladesGameState} from "./thrones-of-blades-game-state/AThroneOfBladesGameState";
 import DarkWingsDarkWordsGameState, {SerializedDarkWingsDarkWordsGameState} from "./dark-wings-dark-words-game-state/DarkWingsDarkWordsGameState";
+import WinterIsComingWesterosCardType from "../game-data-structure/westeros-card/WinterIsComingWesterosCardType";
 
 export default class WesterosGameState extends GameState<IngameGameState,
     WildlingsAttackGameState | ReconcileArmiesGameState<WesterosGameState> | MusteringGameState | ClashOfKingsGameState
@@ -83,11 +84,30 @@ export default class WesterosGameState extends GameState<IngameGameState,
         this.revealedCards = this.game.westerosDecks.map(deck => {
             const card = deck.shift() as WesterosCard;
 
+            card.discarded = true;
+
             // Burry the card at the bottom of the deck
             deck.push(card);
 
             return card;
         });
+
+        // Execute winter is coming now
+        let winterIsComingPresent = true;
+        while(winterIsComingPresent) {
+            winterIsComingPresent = false;
+            for (let i=0; i<this.revealedCards.length; i++) {
+                const card = this.revealedCards[i];
+                if(card.type instanceof WinterIsComingWesterosCardType) {
+                    winterIsComingPresent = true;
+                    this.currentCardI = i;
+                    this.executeCard(card);
+                    break;
+                }
+            }
+        }
+
+        this.currentCardI = -1;
 
         // Add the wildling strength of each card
         const addedWildlingStrength = this.revealedCards.map(c => c.type.wildlingStrength).reduce(_.add, 0);
@@ -154,12 +174,10 @@ export default class WesterosGameState extends GameState<IngameGameState,
     executeCard(card: WesterosCard): void {
         this.ingame.log({
             type: "westeros-card-executed",
-            westerosCardType: card.type.id,
-            cardI: this.currentCardI
+            westerosCardType: card.type.id
         });
 
         card.type.execute(this);
-
     }
 
     onWesterosCardEnd(): void {
