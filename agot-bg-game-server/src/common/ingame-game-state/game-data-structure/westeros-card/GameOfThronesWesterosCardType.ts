@@ -34,6 +34,11 @@ export default class GameOfThronesWesterosCardType extends WesterosCardType {
             });
         });
 
+        westeros.ingame.log({
+            type: "game-of-thrones-power-tokens-gained",
+            gains: gains.map(([house, gain]) => [house.id, gain])
+        });
+
         westeros.onWesterosCardEnd();
     }
 }
