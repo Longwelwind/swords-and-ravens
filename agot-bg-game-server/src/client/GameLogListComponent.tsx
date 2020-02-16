@@ -18,8 +18,6 @@ import WesterosCardComponent from "./game-state-panel/utils/WesterosCardComponen
 import _ from "lodash";
 import joinReactNodes from "./utils/joinReactNodes";
 import orders from "../common/ingame-game-state/game-data-structure/orders";
-// @ts-ignore
-import autoscroll from "autoscroll-react";
 import CombatInfoComponent from "./CombatInfoComponent";
 
 interface GameLogListComponentProps {
@@ -27,7 +25,7 @@ interface GameLogListComponentProps {
 }
 
 @observer
-class GameLogListComponent extends Component<GameLogListComponentProps> {
+export default class GameLogListComponent extends Component<GameLogListComponentProps> {
     get game(): Game {
         return this.props.ingameGameState.game;
     }
@@ -828,8 +826,17 @@ class GameLogListComponent extends Component<GameLogListComponentProps> {
                     </ul>
                 </>;
 
+            case "game-of-thrones-power-tokens-gained":
+                const gains = data.gains.map(([hid, gain]) => [this.game.houses.get(hid), gain] as [House, number]);
+
+                return <>
+                    <ul>
+                        {gains.map(([house, gain]) => (
+                            <li key={house.id}><strong>{house.name}</strong> gained <strong>{gain}</strong> Power tokens.</li>
+                        ))}
+                    </ul>
+                </>;
+
         }
     }
 }
-
-export default autoscroll(GameLogListComponent);

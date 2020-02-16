@@ -54,6 +54,8 @@ import Player from "../common/ingame-game-state/Player";
 import {observable} from "mobx";
 import classNames = require("classnames");
 import {Channel} from "./chat-client/ChatClient";
+// @ts-ignore
+import ScrollToBottom from "react-scroll-to-bottom";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -409,7 +411,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             </Nav.Item>
                                         </Nav>
                                     </Card.Header>
-                                    <Card.Body style={{height: "350px", overflowY: "scroll"}}>
+                                    <Card.Body style={{height: "350px"}}>
                                         <Tab.Content className="h-100">
                                             <Tab.Pane eventKey="chat" className="h-100">
                                                 <ChatComponent gameClient={this.props.gameClient}
@@ -417,8 +419,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                roomId={this.props.gameState.entireGame.publicChatRoomId}
                                                                currentlyViewed={this.currentOpenedTab == "chat"}/>
                                             </Tab.Pane>
-                                            <Tab.Pane eventKey="game-logs">
-                                                <GameLogListComponent ingameGameState={this.props.gameState} />
+                                            <Tab.Pane eventKey="game-logs" className="h-100">
+                                                <ScrollToBottom className="h-100">
+                                                    <GameLogListComponent ingameGameState={this.props.gameState} />
+                                                </ScrollToBottom>
                                             </Tab.Pane>
                                             {this.getPrivateChatRooms().map(({roomId}) => (
                                                 <Tab.Pane eventKey={roomId} key={roomId} className="h-100">

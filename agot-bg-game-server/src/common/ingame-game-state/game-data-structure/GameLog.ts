@@ -25,7 +25,8 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | MammothRidersDestroyUnits | MammothRidersReturnCard | TheHordeDescendsHighestMuster | TheHordeDescendsUnitsKilled
     | CrowKillersFootmanUpgraded | CrowKillersKnightsReplaced
     | SkinchangerScoutNightsWatchVictory | SkinchangerScoutWildlingVictory
-    | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory;
+    | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory
+    | GameOfThronesPowerTokensGained;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -473,4 +474,9 @@ interface RattleshirtsRaidersWildlingVictory {
     type: "rattleshirts-raiders-wildling-victory";
     lowestBidder: string;
     newSupply: [string, number][];
+}
+
+interface GameOfThronesPowerTokensGained {
+    type: "game-of-thrones-power-tokens-gained";
+    gains: [string, number][];
 }
