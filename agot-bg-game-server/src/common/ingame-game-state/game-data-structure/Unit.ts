@@ -2,9 +2,11 @@ import UnitType from "./UnitType";
 import House from "./House";
 import unitTypes from "./unitTypes";
 import Game from "./Game";
+import Region from "./Region";
 
 export default class Unit {
     id: number;
+    region: Region;
     type: UnitType;
     wounded = false;
     allegiance: House;

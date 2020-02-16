@@ -76,7 +76,7 @@ export default class TakeControlOfEnemyPortGameState extends GameState<ResolveMa
             // Add ships for new controller
             let shipsToAdd: Unit[] = [];
             for(let i=0;i<choice;i++) {
-                shipsToAdd.push(this.game.createUnit(ship, this.newController));
+                shipsToAdd.push(this.game.createUnit(this.port, ship, this.newController));
             }
 
             shipsToAdd.forEach(ship => this.port.units.set(ship.id, ship));

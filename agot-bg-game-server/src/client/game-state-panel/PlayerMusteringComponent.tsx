@@ -19,16 +19,17 @@ import ConsolidatePowerOrderType
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import classNames from "classnames";
+import {OrderOnMapProperties, RegionOnMapProperties} from "../MapControls";
+import ResolveConsolidatePowerGameState
+    from "../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/ResolveConsolidatePowerGameState";
 
 @observer
 export default class PlayerMusteringComponent extends Component<GameStateComponentProps<PlayerMusteringGameState>> {
     @observable selectedRegion: Region | null;
     @observable musterings = new BetterMap<Region, Mustering[]>();
 
-    regionClickListener: any;
-    orderClickListener: any;
-    highlightRegionListener: any;
-    highlightOrderListener: any;
+    modifyRegionsOnMapCallback: any;
+    modifyOrdersOnMapCallback: any;
 
     get house(): House {
         return this.props.gameState.house;
@@ -181,41 +182,73 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         this.props.gameState.muster(this.musterings);
     }
 
-    componentDidMount(): void {
-        this.props.mapControls.onRegionClick.push(this.regionClickListener = (r: Region) => this.onRegionClick(r));
-        this.props.mapControls.onOrderClick.push(this.orderClickListener = (r: Region, o: Order) => this.onOrderClick(r, o));
-        this.props.mapControls.shouldHighlightRegion.push(this.highlightRegionListener = (r: Region) => this.shouldHighlightRegion(r));
-        this.props.mapControls.shouldHighlightOrder.push(this.highlightOrderListener = (r: Region, o: Order) => this.shouldHighlightOrder(r, o));
-    }
-
-    componentWillUnmount(): void {
-        _.pull(this.props.mapControls.onRegionClick, this.regionClickListener);
-        _.pull(this.props.mapControls.onOrderClick, this.orderClickListener);
-        _.pull(this.props.mapControls.shouldHighlightRegion, this.highlightRegionListener);
-        _.pull(this.props.mapControls.shouldHighlightOrder, this.highlightOrderListener);
-    }
-
-    private shouldHighlightRegion(region: Region): boolean {
+    modifyRegionsOnMap(): [Region, Partial<RegionOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
-            if (this.selectedRegion == null) {
-                if (this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD) {
+            if (this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD) {
+                return this.props.gameState.game.world.regions.values
+                    .filter(r => r.getController() == this.props.gameState.house && r.castleLevel > 0)
+                    .map(r => [
+                        r,
+                        {
+                            highlight: {active: true},
+                            onClick: () => this.onRegionClick(r)
+                        }
+                    ]);
+            } else if (this.props.gameState.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD) {
+                if (this.musterings.size == 0) {
                     return this.props.gameState.game.world.regions.values
                         .filter(r => r.getController() == this.props.gameState.house && r.castleLevel > 0)
-                        .includes(region);
-                } else if (this.props.gameState.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD) {
-                    if (this.musterings.size == 0) {
-                        return this.props.gameState.game.world.regions.values
-                            .filter(r => r.getController() == this.props.gameState.house && r.castleLevel > 0)
-                            .includes(region);
-                    }
+                        .map(r => [
+                            r,
+                            {
+                                highlight: {active: true},
+                                onClick: () => this.onRegionClick(r)
+                            }
+                        ]);
                 }
-            } else {
-                return this.selectedRegion == region;
             }
         }
 
-        return false;
+        return [];
     }
+
+    modifyOrdersOnMap(): [Region, Partial<OrderOnMapProperties>][] {
+        if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
+            if (this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
+                if (this.selectedRegion == null) {
+                    return this.props.gameState.game.world.getControlledRegions(this.props.gameState.house).filter(r => {
+                        const ordersOnBoard = (this.props.gameState.parentGameState as ResolveConsolidatePowerGameState).actionGameState.ordersOnBoard;
+                        if (!ordersOnBoard.has(r)) {
+                            return false;
+                        }
+
+                        const order = ordersOnBoard.get(r);
+
+                        return order.type instanceof ConsolidatePowerOrderType && order.type.starred;
+                    }).map(r => [
+                        r,
+                        {
+                            highlight: {active: true},
+                            onClick: () => this.onOrderClick(r)
+                        }
+                    ]);
+                }
+            }
+        }
+
+        return [];
+    }
+
+    componentDidMount(): void {
+        this.props.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
+        this.props.mapControls.modifyOrdersOnMap.push(this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap());
+    }
+
+    componentWillUnmount(): void {
+        _.pull(this.props.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
+        _.pull(this.props.mapControls.modifyRegionsOnMap, this.modifyRegionsOnMapCallback);
+    }
+
 
     private onRegionClick(region: Region) {
         if (region.getController() == this.props.gameState.house) {
@@ -228,20 +261,10 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         }
     }
 
-    private shouldHighlightOrder(r: Region, o: Order): boolean {
+    private onOrderClick(r: Region): void {
         if (this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
             if (this.selectedRegion == null) {
-                return this.props.gameClient.doesControlHouse(r.getController()) && o.type instanceof ConsolidatePowerOrderType;
-            }
-        }
-
-        return false;
-    }
-
-    private onOrderClick(r: Region, o: Order): void {
-        if (this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
-            if (this.selectedRegion == null) {
-                if (this.props.gameClient.doesControlHouse(r.getController()) && o.type instanceof ConsolidatePowerOrderType) {
+                if (this.props.gameClient.doesControlHouse(r.getController())) {
                     this.selectedRegion = r;
                 }
             }

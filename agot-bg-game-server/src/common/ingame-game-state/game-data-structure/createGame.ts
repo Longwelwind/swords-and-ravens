@@ -273,7 +273,7 @@ export default function createGame(housesToCreate: string[]): Game {
             const quantity = unitData.quantity;
 
             for (let i = 0;i < quantity;i++) {
-                const unit = game.createUnit(unitType, house);
+                const unit = game.createUnit(region, unitType, house);
 
                 region.units.set(unit.id, unit);
             }

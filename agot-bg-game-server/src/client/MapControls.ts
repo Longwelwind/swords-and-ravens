@@ -3,12 +3,27 @@ import Unit from "../common/ingame-game-state/game-data-structure/Unit";
 import Order from "../common/ingame-game-state/game-data-structure/Order";
 import {observable} from "mobx";
 
-export default class MapControls {
-    onRegionClick: ((r: Region) => void)[] = [];
-    onOrderClick: ((r: Region, o: Order) => void)[] = [];
-    onUnitClick: ((region: Region, u: Unit) => void)[] = [];
+interface HighlightProperties {
+    active: boolean;
+}
 
-    @observable shouldHighlightRegion: ((region: Region) => boolean)[] = [];
-    @observable shouldHighlightUnit: ((region: Region, unit: Unit) => boolean)[] = [];
-    @observable shouldHighlightOrder: ((region: Region, order: Order) => boolean)[] = [];
+export interface RegionOnMapProperties {
+    highlight: HighlightProperties | null;
+    onClick: (() => void) | null;
+}
+
+export interface UnitOnMapProperties {
+    highlight: HighlightProperties | null;
+    onClick: (() => void) | null;
+}
+
+export interface OrderOnMapProperties {
+    highlight: HighlightProperties | null;
+    onClick: (() => void) | null;
+}
+
+export default class MapControls {
+    @observable modifyRegionsOnMap: (() => [Region, Partial<RegionOnMapProperties>][])[] = [];
+    @observable modifyUnitsOnMap: (() => [Unit, Partial<UnitOnMapProperties>][])[] = [];
+    @observable modifyOrdersOnMap: (() => [Region, Partial<OrderOnMapProperties>][])[] = [];
 }

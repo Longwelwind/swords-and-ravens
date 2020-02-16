@@ -132,9 +132,12 @@ export default class Game {
         return house.unitLimits.get(unitType) - this.getCountUnitsOfType(house, unitType);
     }
 
-    createUnit(unitType: UnitType, allegiance: House): Unit {
+    createUnit(region: Region, unitType: UnitType, allegiance: House): Unit {
         this.lastUnitId++;
-        return new Unit(this.lastUnitId, unitType, allegiance);
+        const unit = new Unit(this.lastUnitId, unitType, allegiance);
+        unit.region = region;
+
+        return unit;
     }
 
     getControlledSupplyIcons(house: House): number {

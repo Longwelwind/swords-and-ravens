@@ -16,6 +16,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
+import {OrderOnMapProperties, RegionOnMapProperties, UnitOnMapProperties} from "../MapControls";
 
 @observer
 export default class ResolveSingleMarchOrderComponent extends Component<GameStateComponentProps<ResolveSingleMarchOrderGameState>> {
@@ -24,14 +25,11 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     @observable plannedMoves = new BetterMap<Region, Unit[]>();
     @observable leavePowerToken = false;
 
-    regionClickListener: any;
-    unitClickListener: any;
-    orderClickListener: any;
-    shouldHighlightRegionListener: any;
-    shouldHighlightOrderListener: any;
-    shouldHighlightUnitListener: any;
+    modifyRegionsOnMapCallback: any;
+    modifyUnitsOnMapCallback: any;
+    modifyOrdersOnMapCallback: any;
 
-    render() {
+    render(): ReactNode {
 
         return (
             <>
@@ -129,16 +127,10 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     }
 
     onUnitClick(region: Region, unit: Unit): void {
-        if (this.selectedMarchOrderRegion != null && this.selectedMarchOrderRegion == region) {
-            if (!this.isUnitAvailable(region, unit)) {
-                return;
-            }
-
-            this.selectedUnits.push(unit);
-        }
+        this.selectedUnits.push(unit);
     }
 
-    isUnitAvailable(region: Region, unit: Unit): boolean {
+    isUnitAvailable(unit: Unit): boolean {
         if (this.selectedUnits.indexOf(unit) != -1) {
             return false;
         }
@@ -150,66 +142,18 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         return true;
     }
 
-    shouldHighlightRegion(region: Region): boolean {
-        if (this.selectedMarchOrderRegion != null && this.selectedUnits.length > 0) {
-            if (this.props.gameState.getValidTargetRegions(this.selectedMarchOrderRegion, this.plannedMoves.entries, this.selectedUnits).includes(region)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    shouldHighlightOrder(region: Region, order: Order): boolean {
-        if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
-            if (this.selectedMarchOrderRegion == null) {
-                return this.props.gameState.getRegionsWithMarchOrder().includes(region);
-            }
-        }
-
-        return false;
-    }
-
-    shouldHighlightUnit(region: Region, unit: Unit): boolean {
-        if (this.selectedMarchOrderRegion != null) {
-            return this.selectedMarchOrderRegion == region && this.isUnitAvailable(region, unit);
-        }
-
-        return false;
-    }
-
     onRegionClick(region: Region): void {
-        if (!this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
-            return;
-        }
+        const alreadyGoingUnits = this.plannedMoves.has(region) ? this.plannedMoves.get(region) as Unit[] : [];
 
-        if (this.selectedMarchOrderRegion != null && this.selectedUnits.length > 0) {
-            const alreadyGoingUnits = this.plannedMoves.has(region) ? this.plannedMoves.get(region) as Unit[] : [];
+        const newGoingArmy = alreadyGoingUnits.concat(this.selectedUnits);
 
-            const newGoingArmy = alreadyGoingUnits.concat(this.selectedUnits);
+        this.plannedMoves.set(region, newGoingArmy);
 
-            // Check if this army can go there
-            if (this.props.gameState.world.getReachableRegions(
-                this.selectedMarchOrderRegion,
-                this.props.gameState.house,
-                newGoingArmy
-            ).indexOf(region) == -1) {
-                return;
-            }
-
-            this.plannedMoves.set(region, newGoingArmy);
-
-            this.selectedUnits = [];
-        }
+        this.selectedUnits = [];
     }
 
-    onOrderClick(region: Region, order: Order): void {
-        if (!this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
-            return;
-        }
-
-        if (this.selectedMarchOrderRegion == null && order.type instanceof MarchOrderType) {
-            this.selectedMarchOrderRegion = region;
-        }
+    onOrderClick(region: Region): void {
+        this.selectedMarchOrderRegion = region;
     }
 
     reset(): void {
@@ -239,21 +183,54 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         this.reset();
     }
 
+    modifyOrdersOnMap(): [Region, Partial<OrderOnMapProperties>][] {
+        if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
+            if (this.selectedMarchOrderRegion == null) {
+                return this.props.gameState.getRegionsWithMarchOrder().map(r => [
+                    r,
+                    {highlight: {active: true}, onClick: () => this.onOrderClick(r)}
+                ]);
+            }
+        }
+
+        return [];
+    }
+
+    modifyUnitsOnMap(): [Unit, Partial<UnitOnMapProperties>][] {
+        if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
+            if (this.selectedMarchOrderRegion != null) {
+                return this.selectedMarchOrderRegion.units.values.filter(u => this.isUnitAvailable(u)).map(u => [
+                    u,
+                    {highlight: {active: true}, onClick: () => this.onUnitClick(this.selectedMarchOrderRegion as Region, u)}
+                ]);
+            }
+        }
+
+        return [];
+    }
+
+    modifyRegionsOnMap(): [Region, Partial<RegionOnMapProperties>][] {
+        if (this.selectedMarchOrderRegion != null && this.selectedUnits.length > 0) {
+            return this.props.gameState.getValidTargetRegions(this.selectedMarchOrderRegion, this.plannedMoves.entries, this.selectedUnits).map(r => [
+                r,
+                {highlight: {active: true}, onClick: () => this.onRegionClick(r)}
+            ]);
+        }
+
+        return [];
+    }
+
     componentDidMount(): void {
-        this.props.mapControls.onUnitClick.push(this.unitClickListener = (r: Region, u: Unit) => this.onUnitClick(r, u));
-        this.props.mapControls.onOrderClick.push(this.orderClickListener = (r: Region, o: Order) => this.onOrderClick(r, o));
-        this.props.mapControls.onRegionClick.push(this.regionClickListener = (r: Region) => this.onRegionClick(r));
-        this.props.mapControls.shouldHighlightRegion.push(this.shouldHighlightRegionListener = (r: Region) => this.shouldHighlightRegion(r));
-        this.props.mapControls.shouldHighlightOrder.push(this.shouldHighlightOrderListener = (r: Region, o: Order) => this.shouldHighlightOrder(r, o));
-        this.props.mapControls.shouldHighlightUnit.push(this.shouldHighlightUnitListener = (r: Region, u: Unit) => this.shouldHighlightUnit(r, u));
+        this.props.mapControls.modifyOrdersOnMap.push(this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap());
+        this.props.mapControls.modifyUnitsOnMap.push(this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap());
+        this.props.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
+
     }
 
     componentWillUnmount(): void {
-        _.pull(this.props.mapControls.onUnitClick, this.unitClickListener);
-        _.pull(this.props.mapControls.onRegionClick, this.regionClickListener);
-        _.pull(this.props.mapControls.onOrderClick, this.orderClickListener);
-        _.pull(this.props.mapControls.shouldHighlightRegion, this.shouldHighlightRegionListener);
-        _.pull(this.props.mapControls.shouldHighlightOrder, this.shouldHighlightOrderListener);
-        _.pull(this.props.mapControls.shouldHighlightUnit, this.shouldHighlightUnitListener);
+        _.pull(this.props.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
+        _.pull(this.props.mapControls.modifyUnitsOnMap, this.modifyUnitsOnMapCallback);
+        _.pull(this.props.mapControls.modifyRegionsOnMap, this.modifyRegionsOnMapCallback);
+
     }
 }

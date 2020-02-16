@@ -8,13 +8,13 @@ import GameStateComponentProps from "./GameStateComponentProps";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import SelectRegionGameState from "../../common/ingame-game-state/select-region-game-state/SelectRegionGameState";
+import {RegionOnMapProperties} from "../MapControls";
 
 @observer
 export default class SelectRegionComponent extends Component<GameStateComponentProps<SelectRegionGameState<any>>> {
     @observable selectedRegion: Region | null;
 
-    regionClickListener: any;
-    highlightRegionListener: any;
+    modifyRegionsOnMapCallback: any;
 
     render(): ReactNode {
         return (
@@ -39,33 +39,33 @@ export default class SelectRegionComponent extends Component<GameStateComponentP
         );
     }
 
-    componentDidMount(): void {
-        this.props.mapControls.onRegionClick.push(this.regionClickListener = (r: Region) => this.onRegionClick(r));
-        this.props.mapControls.shouldHighlightRegion.push(this.highlightRegionListener = (r: Region) => this.shouldHighlightRegion(r));
-    }
-
-    componentWillUnmount(): void {
-        _.pull(this.props.mapControls.onRegionClick, this.regionClickListener);
-        _.pull(this.props.mapControls.shouldHighlightRegion, this.highlightRegionListener);
-    }
-
-    shouldHighlightRegion(r: Region): boolean {
+    modifyRegionsOnMap(): [Region, Partial<RegionOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
             if (this.selectedRegion == null) {
-                return this.props.gameState.regions.includes(r);
+                return this.props.gameState.regions.map(r => ([
+                    r,
+                    {highlight: {active: true}, onClick: () => this.onRegionClick(r)}
+                ]));
             } else {
-                return this.selectedRegion == r;
+                return [[
+                    this.selectedRegion,
+                    {highlight: {active: true}, onClick: () => this.onRegionClick(this.selectedRegion as Region)}
+                ]];
             }
         }
 
-        return false;
+        return [];
+    }
+
+    componentDidMount(): void {
+        this.props.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
+    }
+
+    componentWillUnmount(): void {
+        _.pull(this.props.mapControls.modifyRegionsOnMap, this.modifyRegionsOnMapCallback);
     }
 
     private onRegionClick(r: Region): void {
-        if (!this.props.gameState.regions.includes(r)) {
-            return;
-        }
-
         if (this.selectedRegion == r) {
             this.selectedRegion = null;
         } else {

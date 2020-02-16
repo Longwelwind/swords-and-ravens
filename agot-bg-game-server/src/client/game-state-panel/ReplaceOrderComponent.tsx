@@ -1,5 +1,5 @@
 import {observer} from "mobx-react";
-import {Component} from "react";
+import {Component, ReactNode} from "react";
 import ReplaceOrderGameState
     from "../../common/ingame-game-state/action-game-state/use-raven-game-state/replace-order-game-state/ReplaceOrderGameState";
 import React from "react";
@@ -13,15 +13,16 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import OrderGridComponent from "./utils/OrderGridComponent";
 import orders from "../../common/ingame-game-state/game-data-structure/orders";
+import {OrderOnMapProperties} from "../MapControls";
 
 @observer
 export default class ReplaceOrderComponent extends Component<GameStateComponentProps<ReplaceOrderGameState>> {
     @observable selectedRegion: Region | null;
     @observable selectedOrder: Order | null;
 
-    orderClickListener: any;
+    modifyOrdersOnMapCallback: any;
 
-    render() {
+    render(): ReactNode {
         return (
             <>
                 <Col xs={12}>
@@ -54,7 +55,7 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
                         </Col>
                     </>
                 ) : (
-                    <Col xs={12}>
+                    <Col xs={12} className="text-center">
                         Waiting for {this.props.gameState.ravenHolder.name}...
                     </Col>
                 )}
@@ -62,7 +63,7 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
         );
     }
 
-    onOrderClick(region: Region, order: Order) {
+    onOrderClick(region: Region): void {
         if (region.getController() == this.props.gameState.ravenHolder) {
             if (this.selectedRegion == region) {
                 this.selectedRegion = null;
@@ -81,21 +82,35 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
         }
     }
 
-    replaceOrder() {
+    replaceOrder(): void {
         if (this.selectedRegion && this.selectedOrder) {
             this.props.gameState.replaceOrder(this.selectedRegion, this.selectedOrder);
         }
     }
 
+    modifyOrdersOnMap(): [Region, Partial<OrderOnMapProperties>][] {
+        if (this.props.gameClient.doesControlHouse(this.props.gameState.ravenHolder)) {
+            return this.props.gameState.ingameGameState.game.world.getControlledRegions(this.props.gameState.ravenHolder).map(r => [
+                r,
+                {
+                    highlight: this.selectedRegion == null || this.selectedOrder == null || (this.selectedRegion == r) ? {active: true} : null,
+                    onClick: () => this.onOrderClick(r)
+                }
+            ])
+        }
+
+        return [];
+    }
+
     componentDidMount(): void {
-        this.props.mapControls.onOrderClick.push(this.orderClickListener = (r: Region, o: Order) => this.onOrderClick(r, o));
+        this.props.mapControls.modifyOrdersOnMap.push(this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap());
     }
 
     componentWillUnmount(): void {
-        _.pull(this.props.mapControls.onOrderClick, this.orderClickListener);
+        _.pull(this.props.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
     }
 
-    private skip() {
+    private skip(): void {
         this.props.gameState.skip();
     }
 }
