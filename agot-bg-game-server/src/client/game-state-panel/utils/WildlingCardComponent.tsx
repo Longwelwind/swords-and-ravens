@@ -28,6 +28,7 @@ export default class WildlingCardComponent extends Component<WildlingCardProps> 
                     /> : <div/>
                 }
                 delay={{show: 120, hide: 0}}
+                popperConfig={{modifiers: {preventOverflow: {boundariesElement: "viewport"}}}}
                 placement={this.props.placement}
             >
                 <div
