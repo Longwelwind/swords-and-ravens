@@ -362,7 +362,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
 
                 return false;
             case PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD:
-                return false; // todo: Make this work for the wilding card also
+                return false; // todo: Make this work for the wildling card also
         }
     }
 
