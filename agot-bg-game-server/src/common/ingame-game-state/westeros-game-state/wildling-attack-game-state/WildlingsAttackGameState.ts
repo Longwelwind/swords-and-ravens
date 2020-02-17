@@ -149,7 +149,7 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
         });
 
         if (this.nightsWatchWon) {
-            // Wildling attack has been rebuffed
+            // Wildlings attack has been rebuffed
             // Check if there a single highest bidder or if there needs to be a decision from the iron throne holder
             if (this.highestBidders.length > 1) {
                 this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
@@ -162,7 +162,7 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
 
             this.proceedNightsWatchWon(this.highestBidders[0]);
         } else {
-            // Wildling attack was successful
+            // Wildlings attack was successful
             // Check if there a single lowest bidder or if there needs to be a decision from the iron throne holder
             if (this.lowestBidders.length > 1) {
                 this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
@@ -221,7 +221,7 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
     }
 
     onWildlingCardExecuteEnd(): void {
-        // Change the wildling strength based on the result of wildling attack
+        // Change the wildling strength based on the result of wildlings attack
         if (this.nightsWatchWon) {
             this.game.wildlingStrength = 0;
         } else {
@@ -252,20 +252,20 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
     }
 
     static deserializeFromServer(westerosGameState: WesterosGameState, data: SerializedWildlingsAttackGameState): WildlingsAttackGameState {
-        const wildlingAttackGameState = new WildlingsAttackGameState(westerosGameState);
+        const wildlingsAttackGameState = new WildlingsAttackGameState(westerosGameState);
 
-        wildlingAttackGameState.wildlingStrength = data.wildlingStrength;
-        wildlingAttackGameState.participatingHouses = data.participatingHouses.map(hid => westerosGameState.game.houses.get(hid));
-        wildlingAttackGameState.childGameState = wildlingAttackGameState.deserializeChildGameState(data.childGameState);
+        wildlingsAttackGameState.wildlingStrength = data.wildlingStrength;
+        wildlingsAttackGameState.participatingHouses = data.participatingHouses.map(hid => westerosGameState.game.houses.get(hid));
+        wildlingsAttackGameState.childGameState = wildlingsAttackGameState.deserializeChildGameState(data.childGameState);
         if (data.wildlingCard) {
-            wildlingAttackGameState.wildlingCard = wildlingAttackGameState.game.wildlingDeck.find(c => c.id == data.wildlingCard) as WildlingCard;
+            wildlingsAttackGameState.wildlingCard = wildlingsAttackGameState.game.wildlingDeck.find(c => c.id == data.wildlingCard) as WildlingCard;
         }
-        wildlingAttackGameState.biddingResults = data.biddingResults ? data.biddingResults.map(([bid, hids]) => ([bid, hids.map(hid => westerosGameState.game.houses.get(hid))])) : null;
-        wildlingAttackGameState._lowestBidder = data.lowestBidder ? westerosGameState.game.houses.get(data.lowestBidder) : null;
-        wildlingAttackGameState._highestBidder = data.highestBidder ? westerosGameState.game.houses.get(data.highestBidder) : null;
+        wildlingsAttackGameState.biddingResults = data.biddingResults ? data.biddingResults.map(([bid, hids]) => ([bid, hids.map(hid => westerosGameState.game.houses.get(hid))])) : null;
+        wildlingsAttackGameState._lowestBidder = data.lowestBidder ? westerosGameState.game.houses.get(data.lowestBidder) : null;
+        wildlingsAttackGameState._highestBidder = data.highestBidder ? westerosGameState.game.houses.get(data.highestBidder) : null;
 
 
-        return wildlingAttackGameState;
+        return wildlingsAttackGameState;
     }
 
     deserializeChildGameState(data: SerializedWildlingsAttackGameState["childGameState"]): WildlingsAttackGameState["childGameState"] {

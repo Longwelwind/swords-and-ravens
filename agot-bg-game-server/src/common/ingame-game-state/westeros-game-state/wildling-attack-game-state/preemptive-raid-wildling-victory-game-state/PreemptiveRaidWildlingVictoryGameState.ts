@@ -1,4 +1,4 @@
-import WildlingsAttackGameState from "../WildlingAttackGameState";
+import WildlingsAttackGameState from "../WildlingsAttackGameState";
 import GameState from "../../../../GameState";
 import {ServerMessage} from "../../../../../messages/ServerMessage";
 import Player from "../../../Player";
@@ -158,8 +158,8 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
         };
     }
 
-    static deserializeFromServer(wildlingAttack: WildlingsAttackGameState, data: SerializedPreemptiveRaidWildlingVictoryGameState): PreemptiveRaidWildlingVictoryGameState {
-        const preemptiveRaidWildlingVictory = new PreemptiveRaidWildlingVictoryGameState(wildlingAttack);
+    static deserializeFromServer(wildlingsAttack: WildlingsAttackGameState, data: SerializedPreemptiveRaidWildlingVictoryGameState): PreemptiveRaidWildlingVictoryGameState {
+        const preemptiveRaidWildlingVictory = new PreemptiveRaidWildlingVictoryGameState(wildlingsAttack);
 
         preemptiveRaidWildlingVictory.childGameState = preemptiveRaidWildlingVictory.deserializeChildGameState(data.childGameState);
         preemptiveRaidWildlingVictory.step = data.step;

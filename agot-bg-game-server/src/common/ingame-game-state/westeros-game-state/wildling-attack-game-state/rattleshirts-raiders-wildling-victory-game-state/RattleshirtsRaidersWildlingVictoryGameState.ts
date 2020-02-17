@@ -1,4 +1,4 @@
-import WildlingsAttackGameState from "../WildlingAttackGameState";
+import WildlingsAttackGameState from "../WildlingsAttackGameState";
 import GameState from "../../../../GameState";
 import ReconcileArmiesGameState, {SerializedReconcileArmiesGameState} from "../../reconcile-armies-game-state/ReconcileArmiesGameState";
 import Player from "../../../Player";
@@ -16,7 +16,7 @@ export default class RattleshirtsRaidersWildlingVictoryGameState extends GameSta
         return this.parentGameState.game;
     }
 
-    get wildlingAttack(): WildlingsAttackGameState {
+    get wildlingsAttack(): WildlingsAttackGameState {
         return this.parentGameState;
     }
 
@@ -25,21 +25,21 @@ export default class RattleshirtsRaidersWildlingVictoryGameState extends GameSta
     }
 
     firstStart(): void {
-        [this.wildlingAttack.lowestBidder].concat(_.without(this.wildlingAttack.game.houses.values, this.wildlingAttack.lowestBidder)).forEach((house, i) => {
+        [this.wildlingsAttack.lowestBidder].concat(_.without(this.wildlingsAttack.game.houses.values, this.wildlingsAttack.lowestBidder)).forEach((house, i) => {
             const delta = i == 0 ? 2 : 1;
 
-            this.wildlingAttack.game.changeSupply(house, -delta);
+            this.wildlingsAttack.game.changeSupply(house, -delta);
         });
 
-        this.wildlingAttack.entireGame.broadcastToClients({
+        this.wildlingsAttack.entireGame.broadcastToClients({
             type: "supply-adjusted",
-            supplies: this.wildlingAttack.game.houses.values.map(h => [h.id, h.supplyLevel])
+            supplies: this.wildlingsAttack.game.houses.values.map(h => [h.id, h.supplyLevel])
         });
 
         this.ingame.log({
             type: "rattleshirts-raiders-wildling-victory",
-            lowestBidder: this.wildlingAttack.lowestBidder.id,
-            newSupply: this.wildlingAttack.game.houses.values.map(h => [h.id, h.supplyLevel])
+            lowestBidder: this.wildlingsAttack.lowestBidder.id,
+            newSupply: this.wildlingsAttack.game.houses.values.map(h => [h.id, h.supplyLevel])
         });
 
         this.setChildGameState(new ReconcileArmiesGameState(this)).firstStart();
@@ -64,8 +64,8 @@ export default class RattleshirtsRaidersWildlingVictoryGameState extends GameSta
         };
     }
 
-    static deserializeFromServer(wildlingAttack: WildlingsAttackGameState, data: SerializedRattleshirtsRaidersWildlingVictoryGameState): RattleshirtsRaidersWildlingVictoryGameState {
-        const rattleshirtsRaidersWildlingVictory = new RattleshirtsRaidersWildlingVictoryGameState(wildlingAttack);
+    static deserializeFromServer(wildlingsAttack: WildlingsAttackGameState, data: SerializedRattleshirtsRaidersWildlingVictoryGameState): RattleshirtsRaidersWildlingVictoryGameState {
+        const rattleshirtsRaidersWildlingVictory = new RattleshirtsRaidersWildlingVictoryGameState(wildlingsAttack);
 
         rattleshirtsRaidersWildlingVictory.childGameState = rattleshirtsRaidersWildlingVictory.deserializeChildGameState(data.childGameState);
 

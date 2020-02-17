@@ -1,7 +1,7 @@
 import {observer} from "mobx-react";
 import {Component, default as React, ReactNode} from "react";
 import WildlingsAttackGameState
-    from "../../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
+    from "../../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/WildlingsAttackGameState";
 import BiddingGameState from "../../../common/ingame-game-state/westeros-game-state/bidding-game-state/BiddingGameState";
 import BiddingComponent from "../BiddingComponent";
 import SimpleChoiceGameState from "../../../common/ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";

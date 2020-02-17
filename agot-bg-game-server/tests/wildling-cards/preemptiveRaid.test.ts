@@ -5,14 +5,14 @@ import SimpleChoiceGameState from "../../src/common/ingame-game-state/simple-cho
 import SelectUnitsGameState from "../../src/common/ingame-game-state/select-units-game-state/SelectUnitsGameState";
 import PlanningGameState from "../../src/common/ingame-game-state/planning-game-state/PlanningGameState";
 import WildlingsAttackGameState
-    from "../../src/common/ingame-game-state/westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
+    from "../../src/common/ingame-game-state/westeros-game-state/wildling-attack-game-state/WildlingsAttackGameState";
 import * as _ from "lodash";
 import BetterMap from "../../src/utils/BetterMap";
-import setupAtWildlingAttackGameState from "../utils/setupAtWildlingAttackGameState";
+import setupAtwildlingsAttackGameState from "../utils/setupAtWildlingsAttackGameState";
 
 describe("preemptive raid wildling card", () => {
     it("on a wildling victory, allows 2 units to be destroyed anywhere", () => {
-        setupAtWildlingAttackGameState({
+        setupAtwildlingsAttackGameState({
             wildlingDeck: [{type: "preemptive-raid"}],
             wildlingStrength: 10,
             units: {

@@ -1,5 +1,5 @@
 import GameState from "../../../../GameState";
-import WildlingsAttackGameState from "../WildlingAttackGameState";
+import WildlingsAttackGameState from "../WildlingsAttackGameState";
 import Player from "../../../Player";
 import {ClientMessage} from "../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../messages/ServerMessage";

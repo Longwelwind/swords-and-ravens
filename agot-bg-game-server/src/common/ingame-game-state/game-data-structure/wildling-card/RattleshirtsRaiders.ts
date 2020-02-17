@@ -1,29 +1,29 @@
 import WildlingCardType from "./WildlingCardType";
-import WildlingsAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
+import WildlingsAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingsAttackGameState";
 import _ from "lodash";
 import RattleshirtsRaidersWildlingVictoryGameState
     from "../../westeros-game-state/wildling-attack-game-state/rattleshirts-raiders-wildling-victory-game-state/RattleshirtsRaidersWildlingVictoryGameState";
 
 export default class RattleshirtsRaiders extends WildlingCardType {
-    executeNightsWatchWon(wildlingAttack: WildlingsAttackGameState): void {
-        wildlingAttack.game.changeSupply(wildlingAttack.highestBidder, 1);
+    executeNightsWatchWon(wildlingsAttack: WildlingsAttackGameState): void {
+        wildlingsAttack.game.changeSupply(wildlingsAttack.highestBidder, 1);
 
-        wildlingAttack.entireGame.broadcastToClients({
+        wildlingsAttack.entireGame.broadcastToClients({
             type: "supply-adjusted",
-            supplies: [[wildlingAttack.highestBidder.id, wildlingAttack.highestBidder.supplyLevel]]
+            supplies: [[wildlingsAttack.highestBidder.id, wildlingsAttack.highestBidder.supplyLevel]]
         });
 
-        wildlingAttack.ingame.log({
+        wildlingsAttack.ingame.log({
             type: "rattleshirts-raiders-nights-watch-victory",
-            house: wildlingAttack.highestBidder.id,
-            newSupply: wildlingAttack.highestBidder.supplyLevel
+            house: wildlingsAttack.highestBidder.id,
+            newSupply: wildlingsAttack.highestBidder.supplyLevel
         });
 
-        wildlingAttack.onWildlingCardExecuteEnd();
+        wildlingsAttack.onWildlingCardExecuteEnd();
     }
 
-    executeWildlingWon(wildlingAttack: WildlingsAttackGameState): void {
-        wildlingAttack.setChildGameState(new RattleshirtsRaidersWildlingVictoryGameState(wildlingAttack))
+    executeWildlingWon(wildlingsAttack: WildlingsAttackGameState): void {
+        wildlingsAttack.setChildGameState(new RattleshirtsRaidersWildlingVictoryGameState(wildlingsAttack))
             .firstStart();
     }
 }

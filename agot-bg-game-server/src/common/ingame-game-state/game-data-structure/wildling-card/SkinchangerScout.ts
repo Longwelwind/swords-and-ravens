@@ -1,55 +1,55 @@
 import WildlingCardType from "./WildlingCardType";
-import WildlingsAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
+import WildlingsAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingsAttackGameState";
 import House from "../House";
 
 export default class SkinchangerScout extends WildlingCardType {
-    executeNightsWatchWon(wildlingAttack: WildlingsAttackGameState): void {
-        if (wildlingAttack.biddingResults == null) {
+    executeNightsWatchWon(wildlingsAttack: WildlingsAttackGameState): void {
+        if (wildlingsAttack.biddingResults == null) {
             throw new Error();
         }
 
-        const amount = wildlingAttack.biddingResults[0][0];
-        const house = wildlingAttack.highestBidder;
+        const amount = wildlingsAttack.biddingResults[0][0];
+        const house = wildlingsAttack.highestBidder;
 
         house.changePowerTokens(amount);
 
-        wildlingAttack.entireGame.broadcastToClients({
+        wildlingsAttack.entireGame.broadcastToClients({
             type: "change-power-token",
             houseId: house.id,
             powerTokenCount: house.powerTokens
         });
 
-        wildlingAttack.ingame.log({
+        wildlingsAttack.ingame.log({
             type: "skinchanger-scout-nights-watch-victory",
-            house: wildlingAttack.highestBidder.id,
+            house: wildlingsAttack.highestBidder.id,
             powerToken: amount
         });
 
-        wildlingAttack.onWildlingCardExecuteEnd();
+        wildlingsAttack.onWildlingCardExecuteEnd();
     }
 
-    executeWildlingWon(wildlingAttack: WildlingsAttackGameState): void {
-        const lowestBidder = wildlingAttack.lowestBidder;
-        const powerTokensToLose = [wildlingAttack.lowestBidder]
-            .concat(wildlingAttack.participatingHouses.filter(h => h != lowestBidder))
+    executeWildlingWon(wildlingsAttack: WildlingsAttackGameState): void {
+        const lowestBidder = wildlingsAttack.lowestBidder;
+        const powerTokensToLose = [wildlingsAttack.lowestBidder]
+            .concat(wildlingsAttack.participatingHouses.filter(h => h != lowestBidder))
             .map((h, i) => [h, i == 0 ? -h.powerTokens : -2] as [House, number]);
 
         powerTokensToLose.forEach(([house, powerTokens]) => {
             house.changePowerTokens(powerTokens);
 
-            wildlingAttack.entireGame.broadcastToClients({
+            wildlingsAttack.entireGame.broadcastToClients({
                 type: "change-power-token",
                 houseId: house.id,
                 powerTokenCount: house.powerTokens
             });
         });
 
-        wildlingAttack.ingame.log({
+        wildlingsAttack.ingame.log({
             type: "skinchanger-scout-wildling-victory",
-            house: wildlingAttack.lowestBidder.id,
+            house: wildlingsAttack.lowestBidder.id,
             powerTokensLost: powerTokensToLose.map(([house, amount]) => [house.id, amount])
         });
 
-        wildlingAttack.onWildlingCardExecuteEnd();
+        wildlingsAttack.onWildlingCardExecuteEnd();
     }
 }

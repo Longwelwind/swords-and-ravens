@@ -8,7 +8,7 @@ import getById from "../../../utils/getById";
 import Player from "../Player";
 import EntireGame from "../../EntireGame";
 import * as _ from "lodash";
-import WildlingsAttackGameState, {SerializedWildlingsAttackGameState} from "./wildling-attack-game-state/WildlingAttackGameState";
+import WildlingsAttackGameState, {SerializedWildlingsAttackGameState} from "./wildling-attack-game-state/WildlingsAttackGameState";
 import {ClientMessage} from "../../../messages/ClientMessage";
 import {ServerMessage} from "../../../messages/ServerMessage";
 import ReconcileArmiesGameState, {SerializedReconcileArmiesGameState} from "./reconcile-armies-game-state/ReconcileArmiesGameState";
@@ -108,7 +108,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
             });
 
             if (this.game.wildlingStrength == MAX_WILDLING_STRENGTH) {
-                // Trigger a wildling attack
+                // Trigger a wildlings attack
                 this.ingame.log({
                     type: "wildling-strength-trigger-wildlings-attack",
                     wildlingStrength: this.game.wildlingStrength

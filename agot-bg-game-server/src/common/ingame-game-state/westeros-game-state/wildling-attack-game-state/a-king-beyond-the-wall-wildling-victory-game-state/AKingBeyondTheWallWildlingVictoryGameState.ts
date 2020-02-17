@@ -1,4 +1,4 @@
-import WildlingsAttackGameState from "../WildlingAttackGameState";
+import WildlingsAttackGameState from "../WildlingsAttackGameState";
 import House from "../../../game-data-structure/House";
 import Player from "../../../Player";
 import {ClientMessage} from "../../../../../messages/ClientMessage";
@@ -76,8 +76,8 @@ export default class AKingBeyondTheWallWildlingVictoryGameState extends Wildling
         }
     }
 
-    static deserializeFromServer(wildlingAttack: WildlingsAttackGameState, data: SerializedAKingBeyondTheWallWildlingVictoryGameState): AKingBeyondTheWallWildlingVictoryGameState {
-        const aKingBeyondTheWall = new AKingBeyondTheWallWildlingVictoryGameState(wildlingAttack);
+    static deserializeFromServer(wildlingsAttack: WildlingsAttackGameState, data: SerializedAKingBeyondTheWallWildlingVictoryGameState): AKingBeyondTheWallWildlingVictoryGameState {
+        const aKingBeyondTheWall = new AKingBeyondTheWallWildlingVictoryGameState(wildlingsAttack);
 
         aKingBeyondTheWall.childGameState = aKingBeyondTheWall.deserializeChildGameState(data.childGameState);
 

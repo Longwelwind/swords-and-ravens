@@ -1,5 +1,5 @@
 import GameState from "../../../../GameState";
-import WildlingsAttackGameState from "../WildlingAttackGameState";
+import WildlingsAttackGameState from "../WildlingsAttackGameState";
 import SelectUnitsGameState, {SerializedSelectUnitsGameState} from "../../../select-units-game-state/SelectUnitsGameState";
 import Player from "../../../Player";
 import {ClientMessage} from "../../../../../messages/ClientMessage";

@@ -3,10 +3,10 @@ import BiddingGameState from "../../src/common/ingame-game-state/westeros-game-s
 import PlanningGameState from "../../src/common/ingame-game-state/planning-game-state/PlanningGameState";
 import SimpleChoiceGameState from "../../src/common/ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
 import WildlingsAttackGameState
-    from "../../src/common/ingame-game-state/westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
+    from "../../src/common/ingame-game-state/westeros-game-state/wildling-attack-game-state/WildlingsAttackGameState";
 
-describe("wildling attack game state", () => {
-    it("handles correctly a simple wildling attack where the night's watch wins", () => {
+describe("wildlings attack game state", () => {
+    it("handles correctly a simple wildlings attack where the night's watch wins", () => {
         setupAtPlanningGameState({
             wildlingStrength: 10
         }).execute(globalContext => {
@@ -29,7 +29,7 @@ describe("wildling attack game state", () => {
         });
     });
 
-    it("handles correctly a simple wildling attack where the wildling wins", () => {
+    it("handles correctly a simple wildlings attack where the wildling wins", () => {
         setupAtPlanningGameState({
             wildlingStrength: 8
         }).execute(globalContext => {
@@ -51,7 +51,7 @@ describe("wildling attack game state", () => {
         });
     });
 
-    it("handles correctly a wildling attack where the wildling wins and there is a tie", () => {
+    it("handles correctly a wildlings attack where the wildling wins and there is a tie", () => {
         setupAtPlanningGameState({
             wildlingStrength: 8,
             ironThroneTrack: ["greyjoy", "stark", "baratheon", "lannister"]

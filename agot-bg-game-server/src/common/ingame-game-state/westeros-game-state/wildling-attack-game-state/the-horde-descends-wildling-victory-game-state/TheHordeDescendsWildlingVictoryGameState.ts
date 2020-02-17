@@ -1,4 +1,4 @@
-import WildlingsAttackGameState from "../WildlingAttackGameState";
+import WildlingsAttackGameState from "../WildlingsAttackGameState";
 import Player from "../../../Player";
 import {ClientMessage} from "../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../messages/ServerMessage";
@@ -18,7 +18,7 @@ export default class TheHordeDescendsWildlingVictoryGameState extends WildlingCa
         return this.parentGameState.game;
     }
 
-    get wildlingAttack(): WildlingsAttackGameState {
+    get wildlingsAttack(): WildlingsAttackGameState {
         return this.parentGameState;
     }
 
@@ -93,8 +93,8 @@ export default class TheHordeDescendsWildlingVictoryGameState extends WildlingCa
         };
     }
 
-    static deserializeFromServer(wildlingAttack: WildlingsAttackGameState, data: SerializedTheHordeDescendsWildlingVictoryGameState): TheHordeDescendsWildlingVictoryGameState {
-        const theHordeDescends = new TheHordeDescendsWildlingVictoryGameState(wildlingAttack);
+    static deserializeFromServer(wildlingsAttack: WildlingsAttackGameState, data: SerializedTheHordeDescendsWildlingVictoryGameState): TheHordeDescendsWildlingVictoryGameState {
+        const theHordeDescends = new TheHordeDescendsWildlingVictoryGameState(wildlingsAttack);
 
         theHordeDescends.childGameState = theHordeDescends.deserializeChildGameState(data.childGameState);
 

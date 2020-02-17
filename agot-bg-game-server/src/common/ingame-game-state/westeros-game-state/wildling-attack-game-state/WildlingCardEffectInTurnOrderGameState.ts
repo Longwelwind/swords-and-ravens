@@ -1,5 +1,5 @@
 import GameState from "../../../GameState";
-import WildlingsAttackGameState from "./WildlingAttackGameState";
+import WildlingsAttackGameState from "./WildlingsAttackGameState";
 import Game from "../../game-data-structure/Game";
 import House from "../../game-data-structure/House";
 
@@ -46,7 +46,7 @@ export default abstract class WildlingCardEffectInTurnOrderGameState<C extends G
     }
 
     getNextHouseInEveryoneElse(previousHouse: House): House | null {
-        // Compute the turn order only with the participants of the wildling attack and without
+        // Compute the turn order only with the participants of the wildlings attack and without
         // the lowest bidder.
         const turnOrder = this.parentGameState.game.ironThroneTrack
             .filter(h => h != this.parentGameState.lowestBidder)

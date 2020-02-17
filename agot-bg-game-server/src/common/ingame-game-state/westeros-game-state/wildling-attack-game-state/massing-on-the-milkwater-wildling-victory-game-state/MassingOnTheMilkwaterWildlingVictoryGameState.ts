@@ -1,4 +1,4 @@
-import WildlingsAttackGameState from "../WildlingAttackGameState";
+import WildlingsAttackGameState from "../WildlingsAttackGameState";
 import SelectHouseCardGameState, {SerializedSelectHouseCardGameState} from "../../../select-house-card-game-state/SelectHouseCardGameState";
 import House from "../../../game-data-structure/House";
 import Player from "../../../Player";
@@ -89,8 +89,8 @@ export default class MassingOnTheMilkwaterWildlingVictoryGameState extends Wildl
         }
     }
 
-    static deserializeFromServer(wildlingAttack: WildlingsAttackGameState, data: SerializedMassingOnTheMilkwaterWildlingVictoryGameState): MassingOnTheMilkwaterWildlingVictoryGameState {
-        const massingOnTheMilkwater = new MassingOnTheMilkwaterWildlingVictoryGameState(wildlingAttack);
+    static deserializeFromServer(wildlingsAttack: WildlingsAttackGameState, data: SerializedMassingOnTheMilkwaterWildlingVictoryGameState): MassingOnTheMilkwaterWildlingVictoryGameState {
+        const massingOnTheMilkwater = new MassingOnTheMilkwaterWildlingVictoryGameState(wildlingsAttack);
 
         massingOnTheMilkwater.childGameState = massingOnTheMilkwater.deserializeChildGameState(data.childGameState);
 

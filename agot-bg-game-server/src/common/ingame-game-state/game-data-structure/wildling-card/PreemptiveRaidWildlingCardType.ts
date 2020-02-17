@@ -1,26 +1,26 @@
 import WildlingCardType from "./WildlingCardType";
-import WildlingsAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
+import WildlingsAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingsAttackGameState";
 import House from "../House";
 import * as _ from "lodash";
 import PreemptiveRaidWildlingVictoryGameState
     from "../../westeros-game-state/wildling-attack-game-state/preemptive-raid-wildling-victory-game-state/PreemptiveRaidWildlingVictoryGameState";
 
 export default class PreemptiveRaidWildlingCardType extends WildlingCardType {
-    executeNightsWatchWon(wildlingAttack: WildlingsAttackGameState): void {
+    executeNightsWatchWon(wildlingsAttack: WildlingsAttackGameState): void {
         const wildlingStrength = 6;
 
-        wildlingAttack.ingame.log({
+        wildlingsAttack.ingame.log({
             type: "preemptive-raid-wildlings-attack",
-            house: wildlingAttack.highestBidder.id,
+            house: wildlingsAttack.highestBidder.id,
             wildlingStrength: wildlingStrength
         });
 
-        wildlingAttack.parentGameState
-            .setChildGameState(new WildlingsAttackGameState(wildlingAttack.parentGameState))
-            .firstStart(wildlingStrength, _.difference(wildlingAttack.game.houses.values, [wildlingAttack.highestBidder as House]));
+        wildlingsAttack.parentGameState
+            .setChildGameState(new WildlingsAttackGameState(wildlingsAttack.parentGameState))
+            .firstStart(wildlingStrength, _.difference(wildlingsAttack.game.houses.values, [wildlingsAttack.highestBidder as House]));
     }
 
-    executeWildlingWon(wildlingAttack: WildlingsAttackGameState): void {
-        wildlingAttack.setChildGameState(new PreemptiveRaidWildlingVictoryGameState(wildlingAttack)).firstStart();
+    executeWildlingWon(wildlingsAttack: WildlingsAttackGameState): void {
+        wildlingsAttack.setChildGameState(new PreemptiveRaidWildlingVictoryGameState(wildlingsAttack)).firstStart();
     }
 }

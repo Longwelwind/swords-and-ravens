@@ -8,7 +8,7 @@ import {footman, knight} from "../../../game-data-structure/unitTypes";
 import Region from "../../../game-data-structure/Region";
 import {ClientMessage} from "../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../messages/ServerMessage";
-import WildlingsAttackGameState from "../WildlingAttackGameState";
+import WildlingsAttackGameState from "../WildlingsAttackGameState";
 import IngameGameState from "../../../IngameGameState";
 
 export default class CrowKillersWildlingVictoryGameState extends WildlingCardEffectInTurnOrderGameState<SelectUnitsGameState<CrowKillersWildlingVictoryGameState>> {
@@ -97,8 +97,8 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
         }
     }
 
-    static deserializeFromServer(wildlingAttack: WildlingsAttackGameState, data: SerializedCrowKillersWildlingVictoryGameState): CrowKillersWildlingVictoryGameState {
-        const crowKillers = new CrowKillersWildlingVictoryGameState(wildlingAttack);
+    static deserializeFromServer(wildlingsAttack: WildlingsAttackGameState, data: SerializedCrowKillersWildlingVictoryGameState): CrowKillersWildlingVictoryGameState {
+        const crowKillers = new CrowKillersWildlingVictoryGameState(wildlingsAttack);
 
         crowKillers.childGameState = crowKillers.deserializeChildGameState(data.childGameState);
 
