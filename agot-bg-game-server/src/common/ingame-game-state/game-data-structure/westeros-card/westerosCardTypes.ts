@@ -33,7 +33,7 @@ export const webOfLies = new WebOfLiesWesterosCardType("web-of-lies", "Web of Li
 export const stormOfSwords = new StormOfSwordsWesterosCardType("storm-of-swords", "Storm of Swords", "Defense Orders cannot be played during this Planning Phase.", 2);
 export const rainsOfAutumn = new RainsOfAutumnWesterosCardType("rains-of-autumn", "Rains of Autumn", "March +1 Orders cannot be played this Planning Phase", 2);
 export const putToTheSword = new PutToTheSwordWesterosCardType("put-to-the-sword", "Put to the Sword", "The holder of the Valyrian Steel Blade chooses one of the following conditions for this Planning Phase: a) Defense Orders cannot be played b) March +1 Orders cannot be played, or c) no restrictions.");
-export const wildlingsAttack = new WildlingsAttackWesterosCardType("wildlings-attack", "Wildlings Attack", "The wildlings attack Westeros.LongAh, ça c'étaot");
+export const wildlingsAttack = new WildlingsAttackWesterosCardType("wildlings-attack", "Wildlings Attack", "The wildlings attack Westeros.");
 
 export const westerosCardTypes = new BetterMap<string, WesterosCardType>([
     [lastDaysOfSummer.id, lastDaysOfSummer],
