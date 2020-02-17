@@ -64,12 +64,15 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
             if (choice == 0) {
                 this.step = PreemptiveRaidStep.DESTROYING_UNITS;
 
-                // Lowest bidder must select two of his units.
-                this.setChildGameState(new SelectUnitsGameState(this)).firstStart(
-                    this.parentGameState.lowestBidder,
-                    this.game.world.getUnitsOfHouse(this.parentGameState.lowestBidder),
-                    2
-                );
+                const units = this.game.world.getUnitsOfHouse(this.parentGameState.lowestBidder);
+
+                const destroyCount = Math.min(2, units.length);
+
+                if (units.length > 0) {
+                    this.setChildGameState(new SelectUnitsGameState(this)).firstStart(this.parentGameState.lowestBidder, units, destroyCount);
+                } else {
+                    this.parentGameState.onWildlingCardExecuteEnd();
+                }
             } else if (choice == 1) {
                 const highestInfluenceTracks = this.highestInfluenceTracks;
 
