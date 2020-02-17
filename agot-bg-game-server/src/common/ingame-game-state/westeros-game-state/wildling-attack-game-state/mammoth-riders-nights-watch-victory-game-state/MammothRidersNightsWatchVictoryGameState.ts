@@ -1,5 +1,5 @@
 import GameState from "../../../../GameState";
-import WildlingAttackGameState from "../WildlingAttackGameState";
+import WildlingsAttackGameState from "../WildlingAttackGameState";
 import Player from "../../../Player";
 import {ClientMessage} from "../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../messages/ServerMessage";
@@ -11,7 +11,7 @@ import HouseCard, {HouseCardState} from "../../../game-data-structure/house-card
 import IngameGameState from "../../../IngameGameState";
 
 export default class MammothRidersNightsWatchVictoryGameState extends GameState<
-    WildlingAttackGameState,
+    WildlingsAttackGameState,
     SimpleChoiceGameState | SelectHouseCardGameState<MammothRidersNightsWatchVictoryGameState>
 > {
     get game(): Game {
@@ -85,7 +85,7 @@ export default class MammothRidersNightsWatchVictoryGameState extends GameState<
         }
     }
 
-    static deserializeFromServer(parent: WildlingAttackGameState, data: SerializedMammothRidersNightsWatchVictoryGameState): MammothRidersNightsWatchVictoryGameState {
+    static deserializeFromServer(parent: WildlingsAttackGameState, data: SerializedMammothRidersNightsWatchVictoryGameState): MammothRidersNightsWatchVictoryGameState {
         const mammothRiders = new MammothRidersNightsWatchVictoryGameState(parent);
 
         mammothRiders.childGameState = mammothRiders.deserializeChildGameState(data.childGameState);

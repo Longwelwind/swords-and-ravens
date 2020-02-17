@@ -1,11 +1,11 @@
 import WildlingCardType from "./WildlingCardType";
-import WildlingAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
+import WildlingsAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
 import {HouseCardState} from "../house-card/HouseCard";
 import MassingOnTheMilkwaterWildlingVictoryGameState
     from "../../westeros-game-state/wildling-attack-game-state/massing-on-the-milkwater-wildling-victory-game-state/MassingOnTheMilkwaterWildlingVictoryGameState";
 
 export default class MassingOnTheMilkwater extends WildlingCardType {
-    executeNightsWatchWon(wildlingAttack: WildlingAttackGameState): void {
+    executeNightsWatchWon(wildlingAttack: WildlingsAttackGameState): void {
         const highestBidder = wildlingAttack.highestBidder;
 
         const usedHouseCards = highestBidder.houseCards.values.filter(hc => hc.state == HouseCardState.USED);
@@ -28,7 +28,7 @@ export default class MassingOnTheMilkwater extends WildlingCardType {
         wildlingAttack.onWildlingCardExecuteEnd();
     }
 
-    executeWildlingWon(wildlingAttack: WildlingAttackGameState): void {
+    executeWildlingWon(wildlingAttack: WildlingsAttackGameState): void {
         wildlingAttack.ingame.log({
             type: "massing-on-the-milkwater-wildling-victory",
             lowestBidder: wildlingAttack.lowestBidder.id

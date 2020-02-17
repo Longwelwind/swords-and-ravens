@@ -28,8 +28,8 @@ import TheHordeDescendsWildlingVictoryGameState, {SerializedTheHordeDescendsWild
 import TheHordeDescendsNightsWatchVictoryGameState, {SerializedTheHordeDescendsNightsWatchVictoryGameState} from "./the-horde-descends-nights-watch-victory-game-state/TheHordeDescendsNightsWatchVictoryGameState";
 import IngameGameState from "../../IngameGameState";
 
-export default class WildlingAttackGameState extends GameState<WesterosGameState,
-    BiddingGameState<WildlingAttackGameState> | SimpleChoiceGameState | PreemptiveRaidWildlingVictoryGameState
+export default class WildlingsAttackGameState extends GameState<WesterosGameState,
+    BiddingGameState<WildlingsAttackGameState> | SimpleChoiceGameState | PreemptiveRaidWildlingVictoryGameState
     | CrowKillersWildlingVictoryGameState | CrowKillersNightsWatchVictoryGameState
     | RattleshirtsRaidersWildlingVictoryGameState | MassingOnTheMilkwaterWildlingVictoryGameState
     | AKingBeyondTheWallWildlingVictoryGameState | AKingBeyondTheWallNightsWatchVictoryGameState
@@ -232,12 +232,12 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
             wildlingStrength: this.game.wildlingStrength
         });
 
-        this.westerosGameState.onWildlingAttackGameStateEnd();
+        this.westerosGameState.onWildlingsAttackGameStateEnd();
     }
 
-    serializeToClient(admin: boolean, player: Player | null): SerializedWildlingAttackGameState {
+    serializeToClient(admin: boolean, player: Player | null): SerializedWildlingsAttackGameState {
         return {
-            type: "wildling-attack",
+            type: "wildlings-attack",
             wildlingStrength: this.wildlingStrength,
             childGameState: this.childGameState.serializeToClient(admin, player),
             participatingHouses: this.participatingHouses.map(h => h.id),
@@ -251,8 +251,8 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
         };
     }
 
-    static deserializeFromServer(westerosGameState: WesterosGameState, data: SerializedWildlingAttackGameState): WildlingAttackGameState {
-        const wildlingAttackGameState = new WildlingAttackGameState(westerosGameState);
+    static deserializeFromServer(westerosGameState: WesterosGameState, data: SerializedWildlingsAttackGameState): WildlingsAttackGameState {
+        const wildlingAttackGameState = new WildlingsAttackGameState(westerosGameState);
 
         wildlingAttackGameState.wildlingStrength = data.wildlingStrength;
         wildlingAttackGameState.participatingHouses = data.participatingHouses.map(hid => westerosGameState.game.houses.get(hid));
@@ -268,7 +268,7 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
         return wildlingAttackGameState;
     }
 
-    deserializeChildGameState(data: SerializedWildlingAttackGameState["childGameState"]): WildlingAttackGameState["childGameState"] {
+    deserializeChildGameState(data: SerializedWildlingsAttackGameState["childGameState"]): WildlingsAttackGameState["childGameState"] {
         switch(data.type) {
             case "bidding":
                 return BiddingGameState.deserializeFromServer(this, data);
@@ -300,8 +300,8 @@ export default class WildlingAttackGameState extends GameState<WesterosGameState
     }
 }
 
-export interface SerializedWildlingAttackGameState {
-    type: "wildling-attack";
+export interface SerializedWildlingsAttackGameState {
+    type: "wildlings-attack";
     wildlingStrength: number;
     participatingHouses: string[];
     childGameState: SerializedBiddingGameState | SerializedSimpleChoiceGameState | SerializedPreemptiveRaidWildlingVictoryGameState

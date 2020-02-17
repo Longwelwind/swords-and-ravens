@@ -412,7 +412,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </ul>
                 </>;
 
-            case "wildling-strength-trigger-wildling-attack":
+            case "wildling-strength-trigger-wildlings-attack":
                 return <>
                     <strong>Wildling strength</strong> reached <strong>{data.wildlingStrength}</strong>, triggering a <strong>Wildling attack</strong>
                 </>;
@@ -669,7 +669,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     kill {joinReactNodes(units.map(([region, units]) => <>{joinReactNodes(units.map((u, i) => <strong key={i}>{u.name}</strong>), ", ")} in <strong>{region.name}</strong></>), " and ")}.
                 </>;
 
-            case "preemptive-raid-wildling-attack":
+            case "preemptive-raid-wildlings-attack":
                 house = this.game.houses.get(data.house);
 
                 return <>

@@ -1,5 +1,5 @@
 import GameState from "../../../../GameState";
-import WildlingAttackGameState from "../WildlingAttackGameState";
+import WildlingsAttackGameState from "../WildlingAttackGameState";
 import Player from "../../../Player";
 import {ClientMessage} from "../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../messages/ServerMessage";
@@ -9,7 +9,7 @@ import _ from "lodash";
 import IngameGameState from "../../../IngameGameState";
 
 export default class AKingBeyondTheWallNightsWatchVictoryGameState extends GameState<
-    WildlingAttackGameState, SimpleChoiceGameState
+    WildlingsAttackGameState, SimpleChoiceGameState
 > {
     get game(): Game {
         return this.parentGameState.game;
@@ -62,7 +62,7 @@ export default class AKingBeyondTheWallNightsWatchVictoryGameState extends GameS
         }
     }
 
-    static deserializeFromServer(parent: WildlingAttackGameState, data: SerializedAKingBeyondTheWallNightsWatchVictoryGameState): AKingBeyondTheWallNightsWatchVictoryGameState {
+    static deserializeFromServer(parent: WildlingsAttackGameState, data: SerializedAKingBeyondTheWallNightsWatchVictoryGameState): AKingBeyondTheWallNightsWatchVictoryGameState {
         const aKingBeyondTheWall = new AKingBeyondTheWallNightsWatchVictoryGameState(parent);
 
         aKingBeyondTheWall.childGameState = aKingBeyondTheWall.deserializeChildGameState(data.childGameState);

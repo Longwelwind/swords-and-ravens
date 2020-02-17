@@ -4,7 +4,7 @@ import BiddingGameState
 import SimpleChoiceGameState from "../../src/common/ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
 import SelectUnitsGameState from "../../src/common/ingame-game-state/select-units-game-state/SelectUnitsGameState";
 import PlanningGameState from "../../src/common/ingame-game-state/planning-game-state/PlanningGameState";
-import WildlingAttackGameState
+import WildlingsAttackGameState
     from "../../src/common/ingame-game-state/westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
 import * as _ from "lodash";
 import BetterMap from "../../src/utils/BetterMap";
@@ -63,14 +63,14 @@ describe("preemptive raid wildling card", () => {
 
             // A full turn will pass with nothing happening.
             // At the beginning of the next turn, a wildling attack should occur
-            return globalContext.expectGameState<BiddingGameState<WildlingAttackGameState>>(BiddingGameState);
+            return globalContext.expectGameState<BiddingGameState<WildlingsAttackGameState>>(BiddingGameState);
         }).execute(globalContext => {
             globalContext.lannister.as((_, bidding) => bidding.bid(4));
             globalContext.baratheon.as((_, bidding) => bidding.bid(3));
             globalContext.greyjoy.as((_, bidding) => bidding.bid(3));
             globalContext.stark.as((_, bidding) => bidding.bid(5));
 
-            return globalContext.expectGameState<BiddingGameState<WildlingAttackGameState>>(BiddingGameState);
+            return globalContext.expectGameState<BiddingGameState<WildlingsAttackGameState>>(BiddingGameState);
         }).execute(globalContext => {
             globalContext.forEach((context, bidding) => {
                 expect(bidding.parentGameState.wildlingStrength).toBe(6);

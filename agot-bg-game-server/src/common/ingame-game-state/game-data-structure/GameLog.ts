@@ -9,7 +9,7 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | RavenHolderWildlingCardPutBottom | RavenHolderWildlingCardPutTop | RaidDone | DarkWingsDarkWordsChoice
     | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
-    | ActionPhaseBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingAttack | MarchOrderRemoved
+    | ActionPhaseBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingsAttack | MarchOrderRemoved
     | StarredConsolidatePowerForPowerTokens | ArmiesReconciled | EnemyPortTaken | ShipsDestroyedByEmptyCastle
     | TyrionLannisterHouseCardReplaced | TyrionLannisterChoiceMade
     | ArianneMartellPreventMovement | LorasTyrellAttackOrderMoved | TywinLannisterPowerTokensGained
@@ -18,7 +18,7 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | MaceTyrellNoFootmanAvailable | MaceTyrellCasualtiesPrevented | MaceTyrellFootmanKilled
     | CerseiLannisterNoOrderAvailable | CerseiLannisterOrderRemoved | RobbStarkRetreatRegionOverriden
     | RetreatRegionChosen | RetreatCasualtiesSuffered | SilenceAtTheWallExecuted
-    | PreemptiveRaidChoiceDone | PreemptiveRaidTrackReduced | PreemptiveRaidUnitsKilled | PreemptiveRaidWildlingAttack
+    | PreemptiveRaidChoiceDone | PreemptiveRaidTrackReduced | PreemptiveRaidUnitsKilled | PreemptiveRaidWildlingsAttack
     | MassingOnTheMilkwaterHouseCardsBack | MassingOnTheMilkwaterWildlingVictory
     | MassingOnTheMilkwaterHouseCardsRemoved
     | AKingBeyondTheWallHighestTopTrack | AKingBeyondTheWallHouseReduceTrack | AKingBeyondTheWallLowestReduceTracks
@@ -197,8 +197,8 @@ interface PlanningPhaseBegan {
     type: "planning-phase-began";
 }
 
-interface WildlingStrengthTriggerWildlingAttack {
-    type: "wildling-strength-trigger-wildling-attack";
+interface WildlingStrengthTriggerWildlingsAttack {
+    type: "wildling-strength-trigger-wildlings-attack";
     wildlingStrength: number;
 }
 
@@ -377,8 +377,8 @@ interface PreemptiveRaidTrackReduced {
     trackI: number;
 }
 
-interface PreemptiveRaidWildlingAttack {
-    type: "preemptive-raid-wildling-attack";
+interface PreemptiveRaidWildlingsAttack {
+    type: "preemptive-raid-wildlings-attack";
     house: string;
     wildlingStrength: number;
 }

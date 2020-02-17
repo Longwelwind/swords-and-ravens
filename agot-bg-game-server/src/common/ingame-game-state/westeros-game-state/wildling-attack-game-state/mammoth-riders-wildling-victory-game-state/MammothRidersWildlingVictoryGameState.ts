@@ -6,7 +6,7 @@ import Unit from "../../../game-data-structure/Unit";
 import Region from "../../../game-data-structure/Region";
 import {ClientMessage} from "../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../messages/ServerMessage";
-import WildlingAttackGameState from "../WildlingAttackGameState";
+import WildlingsAttackGameState from "../WildlingAttackGameState";
 import IngameGameState from "../../../IngameGameState";
 
 export default class MammothRidersWildlingVictoryGameState extends WildlingCardEffectInTurnOrderGameState<SelectUnitsGameState<MammothRidersWildlingVictoryGameState>> {
@@ -67,7 +67,7 @@ export default class MammothRidersWildlingVictoryGameState extends WildlingCardE
         }
     }
 
-    static deserializeFromServer(wildlingAttack: WildlingAttackGameState, data: SerializedMammothRidersWildlingVictoryGameState): MammothRidersWildlingVictoryGameState {
+    static deserializeFromServer(wildlingAttack: WildlingsAttackGameState, data: SerializedMammothRidersWildlingVictoryGameState): MammothRidersWildlingVictoryGameState {
         const mammothRiders = new MammothRidersWildlingVictoryGameState(wildlingAttack);
 
         mammothRiders.childGameState = mammothRiders.deserializeChildGameState(data.childGameState);

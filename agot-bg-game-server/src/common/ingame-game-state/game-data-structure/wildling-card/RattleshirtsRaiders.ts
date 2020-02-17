@@ -1,11 +1,11 @@
 import WildlingCardType from "./WildlingCardType";
-import WildlingAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
+import WildlingsAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
 import _ from "lodash";
 import RattleshirtsRaidersWildlingVictoryGameState
     from "../../westeros-game-state/wildling-attack-game-state/rattleshirts-raiders-wildling-victory-game-state/RattleshirtsRaidersWildlingVictoryGameState";
 
 export default class RattleshirtsRaiders extends WildlingCardType {
-    executeNightsWatchWon(wildlingAttack: WildlingAttackGameState): void {
+    executeNightsWatchWon(wildlingAttack: WildlingsAttackGameState): void {
         wildlingAttack.game.changeSupply(wildlingAttack.highestBidder, 1);
 
         wildlingAttack.entireGame.broadcastToClients({
@@ -22,7 +22,7 @@ export default class RattleshirtsRaiders extends WildlingCardType {
         wildlingAttack.onWildlingCardExecuteEnd();
     }
 
-    executeWildlingWon(wildlingAttack: WildlingAttackGameState): void {
+    executeWildlingWon(wildlingAttack: WildlingsAttackGameState): void {
         wildlingAttack.setChildGameState(new RattleshirtsRaidersWildlingVictoryGameState(wildlingAttack))
             .firstStart();
     }

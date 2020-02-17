@@ -1,5 +1,5 @@
 import GameState from "../../../GameState";
-import WildlingAttackGameState from "./WildlingAttackGameState";
+import WildlingsAttackGameState from "./WildlingAttackGameState";
 import Game from "../../game-data-structure/Game";
 import House from "../../game-data-structure/House";
 
@@ -15,7 +15,7 @@ import House from "../../game-data-structure/House";
  * These two methods must make sure that, at some point, `onExecuteFinish` is called
  * so that the execution of the card can proceed.
  */
-export default abstract class WildlingCardEffectInTurnOrderGameState<C extends GameState<any, any>> extends GameState<WildlingAttackGameState, C> {
+export default abstract class WildlingCardEffectInTurnOrderGameState<C extends GameState<any, any>> extends GameState<WildlingsAttackGameState, C> {
     get game(): Game {
         return this.parentGameState.game;
     }

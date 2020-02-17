@@ -2,7 +2,7 @@ import {setupAtPlanningGameState} from "../utils/setupGames";
 import BiddingGameState from "../../src/common/ingame-game-state/westeros-game-state/bidding-game-state/BiddingGameState";
 import PlanningGameState from "../../src/common/ingame-game-state/planning-game-state/PlanningGameState";
 import SimpleChoiceGameState from "../../src/common/ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
-import WildlingAttackGameState
+import WildlingsAttackGameState
     from "../../src/common/ingame-game-state/westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
 
 describe("wildling attack game state", () => {
@@ -12,7 +12,7 @@ describe("wildling attack game state", () => {
         }).execute(globalContext => {
             globalContext.forEachClients((_, planning) => planning.ready());
 
-            return globalContext.expectGameState<BiddingGameState<WildlingAttackGameState>>(BiddingGameState);
+            return globalContext.expectGameState<BiddingGameState<WildlingsAttackGameState>>(BiddingGameState);
         }).execute(globalContext => {
             globalContext.forEach((context) => {
                 expect(context.game.wildlingStrength).toBe(12);
@@ -35,7 +35,7 @@ describe("wildling attack game state", () => {
         }).execute(globalContext => {
             globalContext.forEachClients((_, planning) => planning.ready());
 
-            return globalContext.expectGameState<BiddingGameState<WildlingAttackGameState>>(BiddingGameState);
+            return globalContext.expectGameState<BiddingGameState<WildlingsAttackGameState>>(BiddingGameState);
         }).execute(globalContext => {
             globalContext.forEach((context, _) => expect(context.game.wildlingStrength).toBe(12));
 
@@ -58,7 +58,7 @@ describe("wildling attack game state", () => {
         }).execute(globalContext => {
             globalContext.forEachClients((_, planning) => planning.ready());
 
-            return globalContext.expectGameState<BiddingGameState<WildlingAttackGameState>>(BiddingGameState);
+            return globalContext.expectGameState<BiddingGameState<WildlingsAttackGameState>>(BiddingGameState);
         }).execute(globalContext => {
             globalContext.forEach((context, bidding) => {
                 expect(context.game.wildlingStrength).toBe(12);

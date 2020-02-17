@@ -1,6 +1,6 @@
 import {observer} from "mobx-react";
 import {Component, default as React, ReactNode} from "react";
-import WildlingAttackGameState
+import WildlingsAttackGameState
     from "../../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
 import BiddingGameState from "../../../common/ingame-game-state/westeros-game-state/bidding-game-state/BiddingGameState";
 import BiddingComponent from "../BiddingComponent";
@@ -46,7 +46,7 @@ import ListGroupItem from "react-bootstrap/ListGroupItem";
 import WildlingCardComponent from "../utils/WildlingCardComponent";
 
 @observer
-export default class WildlingAttackComponent extends Component<GameStateComponentProps<WildlingAttackGameState>> {
+export default class WildlingsAttackComponent extends Component<GameStateComponentProps<WildlingsAttackGameState>> {
     render(): ReactNode {
         const wildlingCardType = this.props.gameState.wildlingCard ? this.props.gameState.wildlingCard.type : null;
         return (
@@ -67,7 +67,7 @@ export default class WildlingAttackComponent extends Component<GameStateComponen
                                 All houses bid Power tokens to overcome the Wildling attack!
                             </Col>
                         )}
-                        {renderChildGameState<WildlingAttackGameState>(this.props, [
+                        {renderChildGameState<WildlingsAttackGameState>(this.props, [
                             [SimpleChoiceGameState, SimpleChoiceComponent],
                             [BiddingGameState, BiddingComponent],
                             [PreemptiveRaidWildlingVictoryGameState, PreemptiveRaidWildlingVictoryComponent],

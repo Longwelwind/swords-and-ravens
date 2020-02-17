@@ -8,7 +8,7 @@ import getById from "../../../utils/getById";
 import Player from "../Player";
 import EntireGame from "../../EntireGame";
 import * as _ from "lodash";
-import WildlingAttackGameState, {SerializedWildlingAttackGameState} from "./wildling-attack-game-state/WildlingAttackGameState";
+import WildlingsAttackGameState, {SerializedWildlingsAttackGameState} from "./wildling-attack-game-state/WildlingAttackGameState";
 import {ClientMessage} from "../../../messages/ClientMessage";
 import {ServerMessage} from "../../../messages/ServerMessage";
 import ReconcileArmiesGameState, {SerializedReconcileArmiesGameState} from "./reconcile-armies-game-state/ReconcileArmiesGameState";
@@ -21,7 +21,7 @@ import AThroneOfBladesGameState, {SerializedAThroneOfBladesGameState} from "./th
 import DarkWingsDarkWordsGameState, {SerializedDarkWingsDarkWordsGameState} from "./dark-wings-dark-words-game-state/DarkWingsDarkWordsGameState";
 
 export default class WesterosGameState extends GameState<IngameGameState,
-    WildlingAttackGameState | ReconcileArmiesGameState<WesterosGameState> | MusteringGameState | ClashOfKingsGameState
+    WildlingsAttackGameState | ReconcileArmiesGameState<WesterosGameState> | MusteringGameState | ClashOfKingsGameState
     | PutToTheSwordGameState | AThroneOfBladesGameState | DarkWingsDarkWordsGameState
 > {
     revealedCards: WesterosCard[];
@@ -110,11 +110,11 @@ export default class WesterosGameState extends GameState<IngameGameState,
             if (this.game.wildlingStrength == MAX_WILDLING_STRENGTH) {
                 // Trigger a wildling attack
                 this.ingame.log({
-                    type: "wildling-strength-trigger-wildling-attack",
+                    type: "wildling-strength-trigger-wildlings-attack",
                     wildlingStrength: this.game.wildlingStrength
                 });
 
-                this.triggerWildlingAttack();
+                this.triggerWildlingsAttack();
                 return;
             }
         }
@@ -123,11 +123,11 @@ export default class WesterosGameState extends GameState<IngameGameState,
     }
 
 
-    triggerWildlingAttack(): void {
-        this.setChildGameState(new WildlingAttackGameState(this)).firstStart(this.game.wildlingStrength, this.game.houses.values);
+    triggerWildlingsAttack(): void {
+        this.setChildGameState(new WildlingsAttackGameState(this)).firstStart(this.game.wildlingStrength, this.game.houses.values);
     }
 
-    onWildlingAttackGameStateEnd(): void {
+    onWildlingsAttackGameStateEnd(): void {
         this.executeNextCard();
     }
 
@@ -183,8 +183,8 @@ export default class WesterosGameState extends GameState<IngameGameState,
 
     deserializeChildGameState(data: SerializedWesterosGameState["childGameState"]): WesterosGameState["childGameState"]
     {
-        if (data.type == "wildling-attack") {
-            return WildlingAttackGameState.deserializeFromServer(this, data);
+        if (data.type == "wildlings-attack") {
+            return WildlingsAttackGameState.deserializeFromServer(this, data);
         } else if (data.type == "reconcile-armies") {
             return ReconcileArmiesGameState.deserializeFromServer(this, data);
         } else if (data.type == "mustering") {
@@ -208,7 +208,7 @@ export interface SerializedWesterosGameState {
     revealedCardIds: number[];
     currentCardI: number;
     planningRestrictions: string[];
-    childGameState: SerializedWildlingAttackGameState
+    childGameState: SerializedWildlingsAttackGameState
         | SerializedReconcileArmiesGameState | SerializedMusteringGameState | SerializedClashOfKingsGameState
         | SerializedPutToTheSwordGameState | SerializedAThroneOfBladesGameState | SerializedDarkWingsDarkWordsGameState;
 }

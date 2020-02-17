@@ -1,4 +1,4 @@
-import WildlingAttackGameState from "../WildlingAttackGameState";
+import WildlingsAttackGameState from "../WildlingAttackGameState";
 import GameState from "../../../../GameState";
 import {ServerMessage} from "../../../../../messages/ServerMessage";
 import Player from "../../../Player";
@@ -18,7 +18,7 @@ enum PreemptiveRaidStep {
     REDUCING_INFLUENCE_TRACKS
 }
 
-export default class PreemptiveRaidWildlingVictoryGameState extends GameState<WildlingAttackGameState, SimpleChoiceGameState | SelectUnitsGameState<PreemptiveRaidWildlingVictoryGameState>> {
+export default class PreemptiveRaidWildlingVictoryGameState extends GameState<WildlingsAttackGameState, SimpleChoiceGameState | SelectUnitsGameState<PreemptiveRaidWildlingVictoryGameState>> {
     step: PreemptiveRaidStep = PreemptiveRaidStep.CHOOSING;
 
     get game(): Game {
@@ -158,7 +158,7 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
         };
     }
 
-    static deserializeFromServer(wildlingAttack: WildlingAttackGameState, data: SerializedPreemptiveRaidWildlingVictoryGameState): PreemptiveRaidWildlingVictoryGameState {
+    static deserializeFromServer(wildlingAttack: WildlingsAttackGameState, data: SerializedPreemptiveRaidWildlingVictoryGameState): PreemptiveRaidWildlingVictoryGameState {
         const preemptiveRaidWildlingVictory = new PreemptiveRaidWildlingVictoryGameState(wildlingAttack);
 
         preemptiveRaidWildlingVictory.childGameState = preemptiveRaidWildlingVictory.deserializeChildGameState(data.childGameState);

@@ -1,4 +1,4 @@
-import WildlingAttackGameState from "../WildlingAttackGameState";
+import WildlingsAttackGameState from "../WildlingAttackGameState";
 import GameState from "../../../../GameState";
 import ReconcileArmiesGameState, {SerializedReconcileArmiesGameState} from "../../reconcile-armies-game-state/ReconcileArmiesGameState";
 import Player from "../../../Player";
@@ -9,14 +9,14 @@ import _ from "lodash";
 import IngameGameState from "../../../IngameGameState";
 
 export default class RattleshirtsRaidersWildlingVictoryGameState extends GameState<
-    WildlingAttackGameState,
+    WildlingsAttackGameState,
     ReconcileArmiesGameState<RattleshirtsRaidersWildlingVictoryGameState>
 > {
     get game(): Game {
         return this.parentGameState.game;
     }
 
-    get wildlingAttack(): WildlingAttackGameState {
+    get wildlingAttack(): WildlingsAttackGameState {
         return this.parentGameState;
     }
 
@@ -64,7 +64,7 @@ export default class RattleshirtsRaidersWildlingVictoryGameState extends GameSta
         };
     }
 
-    static deserializeFromServer(wildlingAttack: WildlingAttackGameState, data: SerializedRattleshirtsRaidersWildlingVictoryGameState): RattleshirtsRaidersWildlingVictoryGameState {
+    static deserializeFromServer(wildlingAttack: WildlingsAttackGameState, data: SerializedRattleshirtsRaidersWildlingVictoryGameState): RattleshirtsRaidersWildlingVictoryGameState {
         const rattleshirtsRaidersWildlingVictory = new RattleshirtsRaidersWildlingVictoryGameState(wildlingAttack);
 
         rattleshirtsRaidersWildlingVictory.childGameState = rattleshirtsRaidersWildlingVictory.deserializeChildGameState(data.childGameState);

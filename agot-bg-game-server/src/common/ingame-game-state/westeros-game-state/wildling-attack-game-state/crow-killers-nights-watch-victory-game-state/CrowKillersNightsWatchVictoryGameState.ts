@@ -1,5 +1,5 @@
 import GameState from "../../../../GameState";
-import WildlingAttackGameState from "../WildlingAttackGameState";
+import WildlingsAttackGameState from "../WildlingAttackGameState";
 import SelectUnitsGameState, {SerializedSelectUnitsGameState} from "../../../select-units-game-state/SelectUnitsGameState";
 import Player from "../../../Player";
 import {ClientMessage} from "../../../../../messages/ClientMessage";
@@ -12,7 +12,7 @@ import Game from "../../../game-data-structure/Game";
 import _ from "lodash";
 import IngameGameState from "../../../IngameGameState";
 
-export default class CrowKillersNightsWatchVictoryGameState extends GameState<WildlingAttackGameState, SelectUnitsGameState<CrowKillersNightsWatchVictoryGameState>> {
+export default class CrowKillersNightsWatchVictoryGameState extends GameState<WildlingsAttackGameState, SelectUnitsGameState<CrowKillersNightsWatchVictoryGameState>> {
 
     get game(): Game {
         return this.parentGameState.game;
@@ -100,7 +100,7 @@ export default class CrowKillersNightsWatchVictoryGameState extends GameState<Wi
         }
     }
 
-    static deserializeFromServer(parent: WildlingAttackGameState, data: SerializedCrowKillersNightsWatchVictoryGameState): CrowKillersNightsWatchVictoryGameState {
+    static deserializeFromServer(parent: WildlingsAttackGameState, data: SerializedCrowKillersNightsWatchVictoryGameState): CrowKillersNightsWatchVictoryGameState {
         const crowKillersNightsWatchVictory = new CrowKillersNightsWatchVictoryGameState(parent);
 
         crowKillersNightsWatchVictory.childGameState = crowKillersNightsWatchVictory.deserializeChildGameState(data.childGameState);

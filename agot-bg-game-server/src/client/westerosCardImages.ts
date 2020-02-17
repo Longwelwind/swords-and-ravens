@@ -29,7 +29,7 @@ const westerosCardImages = new BetterMap([
     ["supply", supply],
     ["a-throne-of-blades", throneOfBlades],
     ["web-of-lies", webOfLies],
-    ["wildling-attack", wildlingAttackIII],
+    ["wildlings-attack", wildlingAttackIII],
     ["winter-is-coming", winterIsComing]
 ]);
 

@@ -1,9 +1,9 @@
 import WildlingCardType from "./WildlingCardType";
-import WildlingAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
+import WildlingsAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
 import House from "../House";
 
 export default class SkinchangerScout extends WildlingCardType {
-    executeNightsWatchWon(wildlingAttack: WildlingAttackGameState): void {
+    executeNightsWatchWon(wildlingAttack: WildlingsAttackGameState): void {
         if (wildlingAttack.biddingResults == null) {
             throw new Error();
         }
@@ -28,7 +28,7 @@ export default class SkinchangerScout extends WildlingCardType {
         wildlingAttack.onWildlingCardExecuteEnd();
     }
 
-    executeWildlingWon(wildlingAttack: WildlingAttackGameState): void {
+    executeWildlingWon(wildlingAttack: WildlingsAttackGameState): void {
         const lowestBidder = wildlingAttack.lowestBidder;
         const powerTokensToLose = [wildlingAttack.lowestBidder]
             .concat(wildlingAttack.participatingHouses.filter(h => h != lowestBidder))
