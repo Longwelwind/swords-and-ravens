@@ -54,7 +54,7 @@ describe("preemptive raid wildling card", () => {
         });
     });
 
-    it("on a night's watch victory, triggers a new wildling attack of strength 6 without the highest bidder", () => {
+    it("on a night's watch victory, triggers a new wildlings attack of strength 6 without the highest bidder", () => {
         setupAtPlanningGameState({
             wildlingDeck: [{type: "preemptive-raid"}],
             wildlingStrength: 10
@@ -62,7 +62,7 @@ describe("preemptive raid wildling card", () => {
             globalContext.forEachClients((_, planning) => planning.ready());
 
             // A full turn will pass with nothing happening.
-            // At the beginning of the next turn, a wildling attack should occur
+            // At the beginning of the next turn, a wildlings attack should occur
             return globalContext.expectGameState<BiddingGameState<WildlingsAttackGameState>>(BiddingGameState);
         }).execute(globalContext => {
             globalContext.lannister.as((_, bidding) => bidding.bid(4));

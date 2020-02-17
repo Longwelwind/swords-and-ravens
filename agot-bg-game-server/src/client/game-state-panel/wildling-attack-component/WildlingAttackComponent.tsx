@@ -64,7 +64,7 @@ export default class WildlingsAttackComponent extends Component<GameStateCompone
                     <Row>
                         {this.props.gameState.childGameState instanceof BiddingGameState && (
                             <Col xs={12}>
-                                All houses bid Power tokens to overcome the Wildling attack!
+                                All houses bid Power tokens to overcome the Wildlings attack!
                             </Col>
                         )}
                         {renderChildGameState<WildlingsAttackGameState>(this.props, [
