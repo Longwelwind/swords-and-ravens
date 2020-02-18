@@ -159,6 +159,7 @@ export default class IngameGameState extends GameState<
 
                 dataUnits.forEach(dataUnit => {
                     const unit = Unit.deserializeFromServer(this.game, dataUnit);
+                    unit.region = region;
 
                     region.units.set(unit.id, unit);
                 });
