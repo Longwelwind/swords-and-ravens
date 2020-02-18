@@ -1,18 +1,18 @@
-import setupAtWildlingAttackGameState from "../utils/setupAtWildlingAttackGameState";
+import setupAtwildlingsAttackGameState from "../utils/setupAtWildlingsAttackGameState";
 import SelectUnitsGameState from "../../src/common/ingame-game-state/select-units-game-state/SelectUnitsGameState";
 import CrowKillersWildlingVictoryGameState
-    from "../../src/common/ingame-game-state/westeros-game-state/wildling-attack-game-state/crow-killers-wildling-victory-game-state/CrowKillersWildlingVictoryGameState";
+    from "../../src/common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/crow-killers-wildling-victory-game-state/CrowKillersWildlingVictoryGameState";
 import {footman, knight} from "../../src/common/ingame-game-state/game-data-structure/unitTypes";
 import Unit from "../../src/common/ingame-game-state/game-data-structure/Unit";
 import Region from "../../src/common/ingame-game-state/game-data-structure/Region";
 import BetterMap from "../../src/utils/BetterMap";
 import PlanningGameState from "../../src/common/ingame-game-state/planning-game-state/PlanningGameState";
 import CrowKillersNightsWatchVictoryGameState
-    from "../../src/common/ingame-game-state/westeros-game-state/wildling-attack-game-state/crow-killers-nights-watch-victory-game-state/CrowKillersNightsWatchVictoryGameState";
+    from "../../src/common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/crow-killers-nights-watch-victory-game-state/CrowKillersNightsWatchVictoryGameState";
 
 describe("crow killers wildling card", () => {
     it("forces knights to be transformed into footmen on a wildling victory", () => {
-        setupAtWildlingAttackGameState({
+        setupAtwildlingsAttackGameState({
             wildlingDeck: [{type: "crow-killers"}],
             wildlingStrength: 10,
             units: {
@@ -92,7 +92,7 @@ describe("crow killers wildling card", () => {
     });
 
     it("allows footmen to be transformed into knights on a night's watch victory", () => {
-        setupAtWildlingAttackGameState({
+        setupAtwildlingsAttackGameState({
             wildlingDeck: [{type: "crow-killers"}],
             wildlingStrength: 10,
             units: {

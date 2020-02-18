@@ -12,7 +12,7 @@ import stormOfSwords from "../../public/images/westeros-cards/StormOfSwords.png"
 import supply from "../../public/images/westeros-cards/Supply.png";
 import throneOfBlades from "../../public/images/westeros-cards/ThoneOfBlades.png";
 import webOfLies from "../../public/images/westeros-cards/WebOfLies.png";
-import wildlingAttackIII from "../../public/images/westeros-cards/WildingsAttackIII.png";
+import wildlingsAttackIII from "../../public/images/westeros-cards/WildlingsAttackIII.png";
 import winterIsComing from "../../public/images/westeros-cards/WinterIsComing.png";
 
 const westerosCardImages = new BetterMap([
@@ -29,7 +29,7 @@ const westerosCardImages = new BetterMap([
     ["supply", supply],
     ["a-throne-of-blades", throneOfBlades],
     ["web-of-lies", webOfLies],
-    ["wildling-attack", wildlingAttackIII],
+    ["wildlings-attack", wildlingsAttackIII],
     ["winter-is-coming", winterIsComing]
 ]);
 

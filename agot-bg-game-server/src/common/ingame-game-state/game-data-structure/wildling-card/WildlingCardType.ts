@@ -1,4 +1,4 @@
-import WildlingAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
+import WildlingsAttackGameState from "../../westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
 
 export default abstract class WildlingCardType {
     id: string;
@@ -15,6 +15,6 @@ export default abstract class WildlingCardType {
         this.nightsWatchDescription = nightsWatchDescription;
     }
 
-    abstract executeWildlingWon(wildlingAttack: WildlingAttackGameState): void;
-    abstract executeNightsWatchWon(wildlingAttack: WildlingAttackGameState): void;
+    abstract executeWildlingWon(wildlingsAttack: WildlingsAttackGameState): void;
+    abstract executeNightsWatchWon(wildlingsAttack: WildlingsAttackGameState): void;
 }

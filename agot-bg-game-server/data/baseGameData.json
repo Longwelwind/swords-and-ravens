@@ -253,7 +253,8 @@
         "type": "feast-for-crows"
       },
       {
-        "type": "last-days-of-summer"
+        "type": "wildlings-attack",
+        "quantity": 3
       }
     ]
   ],

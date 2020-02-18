@@ -1,22 +1,22 @@
-import WildlingAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
+import WildlingsAttackGameState from "../../westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
 import WildlingCardType from "./WildlingCardType";
 
 export default class SilenceAtTheWall extends WildlingCardType {
-    executeNightsWatchWon(wildlingAttackGameState: WildlingAttackGameState): void {
+    executeNightsWatchWon(wildlingsAttackGameState: WildlingsAttackGameState): void {
         // Nothing happens
-        wildlingAttackGameState.ingame.log({
+        wildlingsAttackGameState.ingame.log({
             type: "silence-at-the-wall-executed"
         });
 
-        wildlingAttackGameState.onWildlingCardExecuteEnd();
+        wildlingsAttackGameState.onWildlingCardExecuteEnd();
     }
 
-    executeWildlingWon(wildlingAttackGameState: WildlingAttackGameState): void {
+    executeWildlingWon(wildlingsAttackGameState: WildlingsAttackGameState): void {
         // Nothing happens
-        wildlingAttackGameState.ingame.log({
+        wildlingsAttackGameState.ingame.log({
             type: "silence-at-the-wall-executed"
         });
 
-        wildlingAttackGameState.onWildlingCardExecuteEnd();
+        wildlingsAttackGameState.onWildlingCardExecuteEnd();
     }
 }

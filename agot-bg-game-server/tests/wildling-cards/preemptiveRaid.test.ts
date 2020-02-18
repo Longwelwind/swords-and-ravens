@@ -4,15 +4,15 @@ import BiddingGameState
 import SimpleChoiceGameState from "../../src/common/ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
 import SelectUnitsGameState from "../../src/common/ingame-game-state/select-units-game-state/SelectUnitsGameState";
 import PlanningGameState from "../../src/common/ingame-game-state/planning-game-state/PlanningGameState";
-import WildlingAttackGameState
-    from "../../src/common/ingame-game-state/westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
+import WildlingsAttackGameState
+    from "../../src/common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
 import * as _ from "lodash";
 import BetterMap from "../../src/utils/BetterMap";
-import setupAtWildlingAttackGameState from "../utils/setupAtWildlingAttackGameState";
+import setupAtwildlingsAttackGameState from "../utils/setupAtWildlingsAttackGameState";
 
 describe("preemptive raid wildling card", () => {
     it("on a wildling victory, allows 2 units to be destroyed anywhere", () => {
-        setupAtWildlingAttackGameState({
+        setupAtwildlingsAttackGameState({
             wildlingDeck: [{type: "preemptive-raid"}],
             wildlingStrength: 10,
             units: {
@@ -54,7 +54,7 @@ describe("preemptive raid wildling card", () => {
         });
     });
 
-    it("on a night's watch victory, triggers a new wildling attack of strength 6 without the highest bidder", () => {
+    it("on a night's watch victory, triggers a new wildlings attack of strength 6 without the highest bidder", () => {
         setupAtPlanningGameState({
             wildlingDeck: [{type: "preemptive-raid"}],
             wildlingStrength: 10
@@ -62,15 +62,15 @@ describe("preemptive raid wildling card", () => {
             globalContext.forEachClients((_, planning) => planning.ready());
 
             // A full turn will pass with nothing happening.
-            // At the beginning of the next turn, a wildling attack should occur
-            return globalContext.expectGameState<BiddingGameState<WildlingAttackGameState>>(BiddingGameState);
+            // At the beginning of the next turn, a wildlings attack should occur
+            return globalContext.expectGameState<BiddingGameState<WildlingsAttackGameState>>(BiddingGameState);
         }).execute(globalContext => {
             globalContext.lannister.as((_, bidding) => bidding.bid(4));
             globalContext.baratheon.as((_, bidding) => bidding.bid(3));
             globalContext.greyjoy.as((_, bidding) => bidding.bid(3));
             globalContext.stark.as((_, bidding) => bidding.bid(5));
 
-            return globalContext.expectGameState<BiddingGameState<WildlingAttackGameState>>(BiddingGameState);
+            return globalContext.expectGameState<BiddingGameState<WildlingsAttackGameState>>(BiddingGameState);
         }).execute(globalContext => {
             globalContext.forEach((context, bidding) => {
                 expect(bidding.parentGameState.wildlingStrength).toBe(6);

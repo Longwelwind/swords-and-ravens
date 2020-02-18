@@ -1,10 +1,10 @@
 import {observer} from "mobx-react";
 import {Component} from "react";
 import WesterosGameState from "../../common/ingame-game-state/westeros-game-state/WesterosGameState";
-import WildlingAttackGameState
-    from "../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
+import WildlingsAttackGameState
+    from "../../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
 import * as React from "react";
-import WildlingAttackComponent from "./wildling-attack-component/WildlingAttackComponent";
+import WildlingsAttackComponent from "./wildlings-attack-component/WildlingsAttackComponent";
 import ReconcileArmiesGameState
     from "../../common/ingame-game-state/westeros-game-state/reconcile-armies-game-state/ReconcileArmiesGameState";
 import ReconcileArmiesComponent from "./ReconcileArmiesComponent";
@@ -67,7 +67,7 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
                         </Row>
                     </ListGroupItem>
                 ) : renderChildGameState(this.props, [
-                    [WildlingAttackGameState, WildlingAttackComponent],
+                    [WildlingsAttackGameState, WildlingsAttackComponent],
                     [ReconcileArmiesGameState, ReconcileArmiesComponent],
                     [ClashOfKingsGameState, ClashOfKingsComponent],
                     [MusteringGameState, MusteringComponent]

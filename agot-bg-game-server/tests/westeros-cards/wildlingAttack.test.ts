@@ -2,17 +2,17 @@ import {setupAtPlanningGameState} from "../utils/setupGames";
 import BiddingGameState from "../../src/common/ingame-game-state/westeros-game-state/bidding-game-state/BiddingGameState";
 import PlanningGameState from "../../src/common/ingame-game-state/planning-game-state/PlanningGameState";
 import SimpleChoiceGameState from "../../src/common/ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
-import WildlingAttackGameState
-    from "../../src/common/ingame-game-state/westeros-game-state/wildling-attack-game-state/WildlingAttackGameState";
+import WildlingsAttackGameState
+    from "../../src/common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
 
-describe("wildling attack game state", () => {
-    it("handles correctly a simple wildling attack where the night's watch wins", () => {
+describe("wildlings attack game state", () => {
+    it("handles correctly a simple wildlings attack where the night's watch wins", () => {
         setupAtPlanningGameState({
             wildlingStrength: 10
         }).execute(globalContext => {
             globalContext.forEachClients((_, planning) => planning.ready());
 
-            return globalContext.expectGameState<BiddingGameState<WildlingAttackGameState>>(BiddingGameState);
+            return globalContext.expectGameState<BiddingGameState<WildlingsAttackGameState>>(BiddingGameState);
         }).execute(globalContext => {
             globalContext.forEach((context) => {
                 expect(context.game.wildlingStrength).toBe(12);
@@ -29,13 +29,13 @@ describe("wildling attack game state", () => {
         });
     });
 
-    it("handles correctly a simple wildling attack where the wildling wins", () => {
+    it("handles correctly a simple wildlings attack where the wildling wins", () => {
         setupAtPlanningGameState({
             wildlingStrength: 8
         }).execute(globalContext => {
             globalContext.forEachClients((_, planning) => planning.ready());
 
-            return globalContext.expectGameState<BiddingGameState<WildlingAttackGameState>>(BiddingGameState);
+            return globalContext.expectGameState<BiddingGameState<WildlingsAttackGameState>>(BiddingGameState);
         }).execute(globalContext => {
             globalContext.forEach((context, _) => expect(context.game.wildlingStrength).toBe(12));
 
@@ -51,14 +51,14 @@ describe("wildling attack game state", () => {
         });
     });
 
-    it("handles correctly a wildling attack where the wildling wins and there is a tie", () => {
+    it("handles correctly a wildlings attack where the wildling wins and there is a tie", () => {
         setupAtPlanningGameState({
             wildlingStrength: 8,
             ironThroneTrack: ["greyjoy", "stark", "baratheon", "lannister"]
         }).execute(globalContext => {
             globalContext.forEachClients((_, planning) => planning.ready());
 
-            return globalContext.expectGameState<BiddingGameState<WildlingAttackGameState>>(BiddingGameState);
+            return globalContext.expectGameState<BiddingGameState<WildlingsAttackGameState>>(BiddingGameState);
         }).execute(globalContext => {
             globalContext.forEach((context, bidding) => {
                 expect(context.game.wildlingStrength).toBe(12);
