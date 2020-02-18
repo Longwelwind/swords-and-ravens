@@ -1,9 +1,9 @@
 import WildlingCardType from "./WildlingCardType";
-import WildlingsAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingsAttackGameState";
+import WildlingsAttackGameState from "../../westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
 import CrowKillersWildlingVictoryGameState
-    from "../../westeros-game-state/wildling-attack-game-state/crow-killers-wildling-victory-game-state/CrowKillersWildlingVictoryGameState";
+    from "../../westeros-game-state/wildlings-attack-game-state/crow-killers-wildling-victory-game-state/CrowKillersWildlingVictoryGameState";
 import CrowKillersNightsWatchVictoryGameState
-    from "../../westeros-game-state/wildling-attack-game-state/crow-killers-nights-watch-victory-game-state/CrowKillersNightsWatchVictoryGameState";
+    from "../../westeros-game-state/wildlings-attack-game-state/crow-killers-nights-watch-victory-game-state/CrowKillersNightsWatchVictoryGameState";
 
 export default class CrowKillers extends WildlingCardType {
     executeNightsWatchWon(wildlingsAttack: WildlingsAttackGameState): void {

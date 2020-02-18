@@ -2,7 +2,7 @@ import {observer} from "mobx-react";
 import {Component} from "react";
 import WesterosGameState from "../../common/ingame-game-state/westeros-game-state/WesterosGameState";
 import WildlingsAttackGameState
-    from "../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/WildlingsAttackGameState";
+    from "../../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
 import * as React from "react";
 import WildlingsAttackComponent from "./wildling-attack-component/WildlingsAttackComponent";
 import ReconcileArmiesGameState

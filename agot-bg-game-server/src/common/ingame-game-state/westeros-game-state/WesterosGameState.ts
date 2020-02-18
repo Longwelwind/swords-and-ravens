@@ -8,7 +8,7 @@ import getById from "../../../utils/getById";
 import Player from "../Player";
 import EntireGame from "../../EntireGame";
 import * as _ from "lodash";
-import WildlingsAttackGameState, {SerializedWildlingsAttackGameState} from "./wildling-attack-game-state/WildlingsAttackGameState";
+import WildlingsAttackGameState, {SerializedWildlingsAttackGameState} from "./wildlings-attack-game-state/WildlingsAttackGameState";
 import {ClientMessage} from "../../../messages/ClientMessage";
 import {ServerMessage} from "../../../messages/ServerMessage";
 import ReconcileArmiesGameState, {SerializedReconcileArmiesGameState} from "./reconcile-armies-game-state/ReconcileArmiesGameState";

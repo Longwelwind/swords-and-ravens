@@ -1,5 +1,5 @@
 import WildlingCardType from "./WildlingCardType";
-import WildlingsAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingsAttackGameState";
+import WildlingsAttackGameState from "../../westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
 import House from "../House";
 
 export default class SkinchangerScout extends WildlingCardType {

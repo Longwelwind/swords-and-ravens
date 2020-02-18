@@ -5,7 +5,7 @@ import renderChildGameState from "../../utils/renderChildGameState";
 import SelectUnitsGameState from "../../../common/ingame-game-state/select-units-game-state/SelectUnitsGameState";
 import SelectUnitsComponent from "../SelectUnitsComponent";
 import TheHordeDescendsWildlingVictoryGameState
-    from "../../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/the-horde-descends-wildling-victory-game-state/TheHordeDescendsWildlingVictoryGameState";
+    from "../../../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/the-horde-descends-wildling-victory-game-state/TheHordeDescendsWildlingVictoryGameState";
 
 @observer
 export default class TheHordeDescendsWildlingVictoryComponent extends Component<GameStateComponentProps<TheHordeDescendsWildlingVictoryGameState>> {

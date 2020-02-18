@@ -1,4 +1,4 @@
-import WildlingsAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingsAttackGameState";
+import WildlingsAttackGameState from "../../westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
 
 export default abstract class WildlingCardType {
     id: string;

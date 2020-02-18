@@ -1,6 +1,6 @@
 import GlobalContext from "./GlobalContext";
 import WildlingsAttackGameState
-    from "../../src/common/ingame-game-state/westeros-game-state/wildling-attack-game-state/WildlingsAttackGameState";
+    from "../../src/common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
 import {setupAtPlanningGameState, SetupOptions} from "./setupGames";
 import BiddingGameState
     from "../../src/common/ingame-game-state/westeros-game-state/bidding-game-state/BiddingGameState";

@@ -1,4 +1,4 @@
-import WildlingsAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingsAttackGameState";
+import WildlingsAttackGameState from "../../westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
 import WildlingCardType from "./WildlingCardType";
 
 export default class SilenceAtTheWall extends WildlingCardType {

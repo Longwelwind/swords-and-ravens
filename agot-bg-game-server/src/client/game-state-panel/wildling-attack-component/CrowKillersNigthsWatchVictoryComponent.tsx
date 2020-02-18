@@ -5,7 +5,7 @@ import renderChildGameState from "../../utils/renderChildGameState";
 import SelectUnitsGameState from "../../../common/ingame-game-state/select-units-game-state/SelectUnitsGameState";
 import SelectUnitsComponent from "../SelectUnitsComponent";
 import CrowKillersNightsWatchVictoryGameState
-    from "../../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/crow-killers-nights-watch-victory-game-state/CrowKillersNightsWatchVictoryGameState";
+    from "../../../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/crow-killers-nights-watch-victory-game-state/CrowKillersNightsWatchVictoryGameState";
 import Col from "react-bootstrap/Col";
 
 @observer

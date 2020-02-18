@@ -4,7 +4,7 @@ import GameStateComponentProps from "../GameStateComponentProps";
 import renderChildGameState from "../../utils/renderChildGameState";
 import React from "react";
 import MammothRidersNightsWatchVictoryGameState
-    from "../../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/mammoth-riders-nights-watch-victory-game-state/MammothRidersNightsWatchVictoryGameState";
+    from "../../../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/mammoth-riders-nights-watch-victory-game-state/MammothRidersNightsWatchVictoryGameState";
 import SimpleChoiceGameState from "../../../common/ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
 import SimpleChoiceComponent from "../SimpleChoiceComponent";
 import SelectHouseCardGameState

@@ -1,9 +1,9 @@
 import WildlingCardType from "./WildlingCardType";
-import WildlingsAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingsAttackGameState";
+import WildlingsAttackGameState from "../../westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
 import House from "../House";
 import * as _ from "lodash";
 import PreemptiveRaidWildlingVictoryGameState
-    from "../../westeros-game-state/wildling-attack-game-state/preemptive-raid-wildling-victory-game-state/PreemptiveRaidWildlingVictoryGameState";
+    from "../../westeros-game-state/wildlings-attack-game-state/preemptive-raid-wildling-victory-game-state/PreemptiveRaidWildlingVictoryGameState";
 
 export default class PreemptiveRaidWildlingCardType extends WildlingCardType {
     executeNightsWatchWon(wildlingsAttack: WildlingsAttackGameState): void {

@@ -5,7 +5,7 @@ import SimpleChoiceGameState from "../../src/common/ingame-game-state/simple-cho
 import SelectUnitsGameState from "../../src/common/ingame-game-state/select-units-game-state/SelectUnitsGameState";
 import PlanningGameState from "../../src/common/ingame-game-state/planning-game-state/PlanningGameState";
 import WildlingsAttackGameState
-    from "../../src/common/ingame-game-state/westeros-game-state/wildling-attack-game-state/WildlingsAttackGameState";
+    from "../../src/common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
 import * as _ from "lodash";
 import BetterMap from "../../src/utils/BetterMap";
 import setupAtwildlingsAttackGameState from "../utils/setupAtWildlingsAttackGameState";

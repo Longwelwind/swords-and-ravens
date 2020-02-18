@@ -3,7 +3,7 @@ import BiddingGameState from "../../src/common/ingame-game-state/westeros-game-s
 import PlanningGameState from "../../src/common/ingame-game-state/planning-game-state/PlanningGameState";
 import SimpleChoiceGameState from "../../src/common/ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
 import WildlingsAttackGameState
-    from "../../src/common/ingame-game-state/westeros-game-state/wildling-attack-game-state/WildlingsAttackGameState";
+    from "../../src/common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
 
 describe("wildlings attack game state", () => {
     it("handles correctly a simple wildlings attack where the night's watch wins", () => {

@@ -6,7 +6,7 @@ import SelectUnitsGameState from "../../../common/ingame-game-state/select-units
 import SelectUnitsComponent from "../SelectUnitsComponent";
 import React from "react";
 import MammothRidersWildlingVictoryGameState
-    from "../../../common/ingame-game-state/westeros-game-state/wildling-attack-game-state/mammoth-riders-wildling-victory-game-state/MammothRidersWildlingVictoryGameState";
+    from "../../../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/mammoth-riders-wildling-victory-game-state/MammothRidersWildlingVictoryGameState";
 
 @observer
 export default class MammothRidersWildlingVictoryComponent extends Component<GameStateComponentProps<MammothRidersWildlingVictoryGameState>> {

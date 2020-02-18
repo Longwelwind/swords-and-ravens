@@ -1,8 +1,8 @@
 import WildlingCardType from "./WildlingCardType";
-import WildlingsAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingsAttackGameState";
+import WildlingsAttackGameState from "../../westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
 import _ from "lodash";
 import RattleshirtsRaidersWildlingVictoryGameState
-    from "../../westeros-game-state/wildling-attack-game-state/rattleshirts-raiders-wildling-victory-game-state/RattleshirtsRaidersWildlingVictoryGameState";
+    from "../../westeros-game-state/wildlings-attack-game-state/rattleshirts-raiders-wildling-victory-game-state/RattleshirtsRaidersWildlingVictoryGameState";
 
 export default class RattleshirtsRaiders extends WildlingCardType {
     executeNightsWatchWon(wildlingsAttack: WildlingsAttackGameState): void {

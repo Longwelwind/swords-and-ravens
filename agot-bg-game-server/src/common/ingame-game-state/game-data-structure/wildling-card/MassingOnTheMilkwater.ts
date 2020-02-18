@@ -1,8 +1,8 @@
 import WildlingCardType from "./WildlingCardType";
-import WildlingsAttackGameState from "../../westeros-game-state/wildling-attack-game-state/WildlingsAttackGameState";
+import WildlingsAttackGameState from "../../westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
 import {HouseCardState} from "../house-card/HouseCard";
 import MassingOnTheMilkwaterWildlingVictoryGameState
-    from "../../westeros-game-state/wildling-attack-game-state/massing-on-the-milkwater-wildling-victory-game-state/MassingOnTheMilkwaterWildlingVictoryGameState";
+    from "../../westeros-game-state/wildlings-attack-game-state/massing-on-the-milkwater-wildling-victory-game-state/MassingOnTheMilkwaterWildlingVictoryGameState";
 
 export default class MassingOnTheMilkwater extends WildlingCardType {
     executeNightsWatchWon(wildlingsAttack: WildlingsAttackGameState): void {
