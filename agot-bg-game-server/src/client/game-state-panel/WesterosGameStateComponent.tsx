@@ -4,7 +4,7 @@ import WesterosGameState from "../../common/ingame-game-state/westeros-game-stat
 import WildlingsAttackGameState
     from "../../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
 import * as React from "react";
-import WildlingsAttackComponent from "./wildling-attack-component/WildlingsAttackComponent";
+import WildlingsAttackComponent from "./wildlings-attack-component/WildlingsAttackComponent";
 import ReconcileArmiesGameState
     from "../../common/ingame-game-state/westeros-game-state/reconcile-armies-game-state/ReconcileArmiesGameState";
 import ReconcileArmiesComponent from "./ReconcileArmiesComponent";
