@@ -86,3 +86,40 @@ You can now run the game server and the website by launching, in 2 two different
 * In `agot-bg-game-server/`, execute `yarn run run-server`.
 * In `agot-bg-website/`, execute `python3 manage.py runserver`.
 
+
+## How to deploy
+
+The easiest way to host the game is to use `dokku`. The easiest way is to provision an instance on DigitalOcean with dokku pre-installed. You will also need a domain name (e.g. swordsandravens.net). This domain name, as well as the subdomain name `play.<domain_name>` must point to  the provisioend `dokku` instance. On this `dokku` instance, make sure that:
+
+* The plugins `dokku-redis` and `dokku-postgres` are instaled.
+
+To deploy the app on this `dokku` instance:
+
+* Clone the repository
+* Create 2 remote that points to your `dokku` instance:
+  * `git remote add dokku-website dokku@<domain_name>:<domain_name>`
+  * `git remote add dokku-game-server dokku@<domain_name>:play`
+* Create the `dokku` apps on the instance:
+  * `ssh dokku@<domain_name> apps:create <domain_name>`
+  * `ssh dokku@<domain_name> apps:create play`
+* Create the databases and link them to the appropriate app:
+  * `ssh dokku@<domain_name> postgres:create <domain_name>`
+  * `ssh dokku@<domain_name> postgres:link <domain_name> <domain_name>`
+  * `ssh dokku@<domain_name> redis:create <domain_name>`
+  * `ssh dokku@<domain_name> redis:link <domain_name> <domain_name>`
+* Configure the website:
+  * `ssh dokku@<domain_name> docker-options:add <domain_name> build '--file website.Dockerfile'`
+  * `ssh dokku@<domain_name> SECRET_KEY=None SENTRY_DSN=None EMAIL_HOST_USER=None EMAIL_HOST_PASSWORD=None SOCIAL_AUTH_DISCORD_KEY=None SOCIAL_AUTH_DISCORD_OAUTH2_KEY=None SOCIAL_AUTH_DISCORD_OAUTH2_SECRET=None SOCIAL_AUTH_DISCORD_SECRET=None SOCIAL_AUTH_GOOGLE_OAUTH2_KEY=None SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=None`
+  * **Note:** For a staging/testing environment, setting a correct value for any of those variables is not necessary.
+* Push the code of the website to deploy:
+  * `git push dokku-website`
+  * It should launch successfuly.
+* Initialize database and create first user
+  * `ssh dokku@<domain_name> run <domain_name> python manage.py migrate`
+  * `ssh dokku@<domain_name> run <domain_name> python manage.py createsuperuser`
+* Configure the game server. The credentials of the user you have created previously must be used (`<username>` and `<password>`):
+  * `ssh dokku@<domain_name> docker-options:add play build '--file game_server.Dockerfile'`
+  * `ssh dokku@play MASTER_API_BASE_URL=<domain_name> MASTER_API_ENABLED=True MASTER_API_USERNAME=<username> MASTER_API_PASSWORD=<password>`
+* Push the code of the game server to deploy:
+  * `git push dokku-game-server`
+  * It should launch successfuly.
