@@ -6,11 +6,7 @@ import {ClientMessage} from "../messages/ClientMessage";
 import User, {SerializedUser} from "../server/User";
 import {observable} from "mobx";
 import * as _ from "lodash";
-import GameLogManager, {SerializedGameLogManager} from "./ingame-game-state/game-data-structure/GameLogManager";
 import BetterMap from "../utils/BetterMap";
-import Game from "./ingame-game-state/game-data-structure/Game";
-import House from "./ingame-game-state/game-data-structure/House";
-import {GameLogData} from "./ingame-game-state/game-data-structure/GameLog";
 import GameEndedGameState from "./ingame-game-state/game-ended-game-state/GameEndedGameState";
 
 export default class EntireGame extends GameState<null, LobbyGameState | IngameGameState> {
@@ -37,13 +33,13 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         this.setChildGameState(new LobbyGameState(this)).firstStart();
     }
 
-    proceedToIngameGameState(futurePlayers: BetterMap<string, User>) {
+    proceedToIngameGameState(futurePlayers: BetterMap<string, User>): void {
         this.setChildGameState(new IngameGameState(this)).beginGame(futurePlayers);
 
         this.checkGameStateChanged();
     }
 
-    checkGameStateChanged() {
+    checkGameStateChanged(): void {
         const {level, gameState} = this.getFirstGameStateToBeRetransmitted();
 
         if (gameState) {
@@ -116,7 +112,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         this.checkGameStateChanged();
     }
 
-    onServerMessage(message: ServerMessage) {
+    onServerMessage(message: ServerMessage): void {
         if (message.type == "game-state-change") {
             const {level, serializedGameState} = message;
 
@@ -136,21 +132,21 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         }
     }
 
-    broadcastToClients(message: ServerMessage) {
+    broadcastToClients(message: ServerMessage): void {
         this.sendMessageToClients(this.users.values, message);
     }
 
-    sendMessageToServer(message: ClientMessage) {
+    sendMessageToServer(message: ClientMessage): void {
         this.onSendClientMessage(message);
     }
 
-    broadcastCustomToClients(craftMessage: (u: User) => ServerMessage) {
+    broadcastCustomToClients(craftMessage: (u: User) => ServerMessage): void {
         this.users.values.forEach(u => {
             this.sendMessageToClients([u], craftMessage(u));
         });
     }
 
-    sendMessageToClients(users: User[], message: ServerMessage) {
+    sendMessageToClients(users: User[], message: ServerMessage): void {
         this.onSendServerMessage(users, message);
     }
 
@@ -224,7 +220,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         return entireGame;
     }
 
-    deserializeChildGameState(data: SerializedEntireGame["childGameState"]) {
+    deserializeChildGameState(data: SerializedEntireGame["childGameState"]): IngameGameState | LobbyGameState {
         if (data.type == "lobby") {
             return LobbyGameState.deserializeFromServer(this, data);
         } else if (data.type == "ingame") {
