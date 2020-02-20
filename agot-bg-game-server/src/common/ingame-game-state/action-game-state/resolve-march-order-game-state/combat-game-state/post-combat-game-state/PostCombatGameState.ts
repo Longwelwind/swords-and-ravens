@@ -103,6 +103,14 @@ export default class PostCombatGameState extends GameState<
     }
 
     onChooseCasualtiesGameStateEnd(region: Region, selectedCasualties: Unit[]): void {
+        this.combat.ingameGameState.log(
+            {
+                type: "killed-after-combat",
+                house: this.loser.name,
+                killed: selectedCasualties.map(u => u.type.name)
+            }
+        );
+
         // Remove the selected casualties
         selectedCasualties.forEach(u => region.units.delete(u.id));
         // Remove them from the house combat datas
@@ -148,6 +156,15 @@ export default class PostCombatGameState extends GameState<
         const immediatelyKilledLoserUnits = loserArmy.filter(u => u.wounded || !u.type.canRetreat);
 
         if (immediatelyKilledLoserUnits.length > 0) {
+            this.combat.ingameGameState.log(
+                {
+                    type: "immediatly-killed-after-combat",
+                    house: this.loser.name,
+                    killedBecauseWounded: immediatelyKilledLoserUnits.filter(u => u.wounded).map(u => u.type.name),
+                    killedBecauseCantRetreat: immediatelyKilledLoserUnits.filter(u => !u.type.canRetreat).map(u => u.type.name)
+                }
+            );
+
             immediatelyKilledLoserUnits.forEach(u => locationLoserArmy.units.delete(u.id));
             this.loserCombatData.army = _.difference(this.loserCombatData.army, immediatelyKilledLoserUnits);
 
@@ -164,6 +181,8 @@ export default class PostCombatGameState extends GameState<
                 region: locationLoserArmy.id,
                 army: this.loserCombatData.army.map(u => u.id)
             });
+
+            this.entireGame
         }
 
         const loserArmyLeft = _.difference(loserArmy, immediatelyKilledLoserUnits);
@@ -229,7 +248,7 @@ export default class PostCombatGameState extends GameState<
         this.setChildGameState(new AfterCombatHouseCardAbilitiesGameState(this)).firstStart();
     }
 
-    removeOrderFromRegion(region: Region) {
+    removeOrderFromRegion(region: Region): void {
         // Always check if there is an order to be removed as e.g. Arianne or Loras might lead to an orphaned order
         if (this.combat.actionGameState.ordersOnBoard.has(region)) {
             this.combat.actionGameState.ordersOnBoard.delete(region);
