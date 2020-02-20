@@ -167,7 +167,7 @@ function setup4PlayersGameIngame(
 
     let lastWesterosCardId = -1;
     const createWesterosDeck = (deck: {type: string}[]) => {
-        return deck.map(c => ({id: ++lastWesterosCardId, typeId: c.type}))
+        return deck.map(c => ({id: ++lastWesterosCardId, typeId: c.type, discarded: false}))
     };
 
     let lastWildlingCardId = -1;

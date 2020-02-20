@@ -63,7 +63,6 @@ interface MarchResolved {
 interface WesterosCardExecuted {
     type: "westeros-card-executed";
     westerosCardType: string;
-    cardI: number;
 }
 
 interface WesterosCardDrawn {
@@ -161,6 +160,7 @@ interface AThroneOfBladesChoice {
 interface WinterIsComing {
     type: "winter-is-coming";
     drawnCardType: string;
+    deckIndex: number;
 }
 
 interface WesterosPhaseBegan {
