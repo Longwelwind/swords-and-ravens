@@ -113,7 +113,7 @@ export default class Game {
         return numberStructuresPerHouse.some(n => n >= this.structuresCountNeededToWin);
     }
 
-    getPotentialWinner(): House {
+    getPotentialWinners(): House[] {
         const victoryConditions = [
             (h: House) => -this.getTotalHeldStructures(h),
             (h: House) => -this.world.regions.values.filter(r => r.getController() == h).filter(r => r.type == land),
@@ -121,7 +121,11 @@ export default class Game {
             (h: House) => this.ironThroneTrack.indexOf(h)
         ];
 
-        return _.sortBy(this.houses.values, victoryConditions)[0];
+        return _.sortBy(this.houses.values, victoryConditions);
+    }
+
+    getPotentialWinner(): House {
+        return this.getPotentialWinners()[0];
     }
 
     getCountUnitsOfType(house: House, unitType: UnitType): number {
@@ -264,7 +268,7 @@ export default class Game {
         }
 
         // Special port supply rule: Ports can only contain a maximum of 3 units
-        for (var p of addedUnits.keys.filter(r => r.type == port)) {
+        for (const p of addedUnits.keys.filter(r => r.type == port)) {
             // Filter for units of house as it is possible that the port still contains enemy ships
             // which will be removed after TakeControlOfEnemyPortGameState
             if(p.units.values.filter(u => u.allegiance == house).length + addedUnits.get(p).length > 3) {

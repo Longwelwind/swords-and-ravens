@@ -65,7 +65,7 @@ interface IngameComponentProps {
 @observer
 export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
-    @observable currentOpenedTab: string = "chat";
+    @observable currentOpenedTab = "chat";
 
     get game(): Game {
         return this.props.gameState.game;
@@ -145,7 +145,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                     </>
                                                                 ) : (
                                                                     <>
-                                                                        <b>Kings's Court Track</b><br />
+                                                                        <b>Kings&apos;s Court Track</b><br />
                                                                         At the end of the Planning Phase, the holder of the Raven may choose
                                                                         to either change one of his placed order, or to see the top card of the
                                                                         wildling deck and decide whether to leave it at the top or to
@@ -240,7 +240,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         <Col>
                             <Card>
                                 <ListGroup variant="flush">
-                                    {this.props.gameState.players.values.map(p => (
+                                    {this.props.gameState.sortedByLeadingPlayers.map(p => (
                                         <ListGroupItem key={p.user.id}>
                                             <Row className="align-items-center">
                                                 <Col xs="auto" className="pr-0">
@@ -253,7 +253,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 <Col>
                                                     <b style={{"color": p.house.color}}>{p.house.name}</b>
                                                     {" "}
-                                                    <a href={`/user/${p.user.id}`} target="_blank">
+                                                    <a href={`/user/${p.user.id}`} target="_blank" rel="noopener noreferrer">
                                                         <small>{p.user.name}</small>
                                                     </a>
                                                 </Col>
