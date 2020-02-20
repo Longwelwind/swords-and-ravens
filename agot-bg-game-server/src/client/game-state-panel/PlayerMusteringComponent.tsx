@@ -13,11 +13,8 @@ import {Button} from "react-bootstrap";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import Order from "../../common/ingame-game-state/game-data-structure/Order";
 import ConsolidatePowerOrderType
     from "../../common/ingame-game-state/game-data-structure/order-types/ConsolidatePowerOrderType";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
 import classNames from "classnames";
 import {OrderOnMapProperties, RegionOnMapProperties} from "../MapControls";
 import ResolveConsolidatePowerGameState
@@ -40,7 +37,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
             <>
                 <Col xs={12}>
                     {this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER ? (
-                        <>House {this.house.name} can use one of its starred consolidate power to muster units</>
+                        <>House {this.house.name} can resolve one of its Consolidate Power Orders</>
                     ) : this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD ? (
                         <>Players can muster units in their controlled castles and fortresses</>
                     ) : this.props.gameState.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD && (
@@ -68,7 +65,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                         {!(this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER && this.musterings.size > 0) && (
                             <Col xs={12}>
                                 {this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER ? (
-                                    <>Click on a starred consolidate power to resolve it.</>
+                                    <>Click on a Consolidate Power Order to resolve it.</>
                                 ) : this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD ? (
                                     <>Click on a region to initiate a recruitement from there.</>
                                 ) : this.props.gameState.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD && (
@@ -78,22 +75,26 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                         )}
                         {this.selectedRegion && (
                             <>
-                                <Col xs={12}>
-                                    From {this.selectedRegion.name}, you can ({this.props.gameState.getPointsLeft(this.selectedRegion, this.musterings)} points left):
-                                </Col>
-                                <Col xs={12}>
-                                    <Row>
-                                        {this.props.gameState.getValidMusteringRules(this.selectedRegion, this.musterings).map(({region, rules}) => (
-                                            rules.map((r, i) => (
-                                                <Col xs="auto" key={region.id + "-" + i}>
-                                                    <Button onClick={() => this.addMustering(r)}>
-                                                        [{r.cost}] {r.from ? "Upgrade to " : "Recruit "} a {r.to.name} in {region.name}
-                                                    </Button>
-                                                </Col>
-                                            ))
-                                        ))}
-                                    </Row>
-                                </Col>
+                                {this.selectedRegion.hasStructure && (
+                                    <>
+                                        <Col xs={12}>
+                                            From {this.selectedRegion.name}, you can ({this.props.gameState.getPointsLeft(this.selectedRegion, this.musterings)} mustering points left):
+                                        </Col>
+                                        <Col xs={12}>
+                                            <Row>
+                                                {this.props.gameState.getValidMusteringRules(this.selectedRegion, this.musterings).map(({region, rules}) => (
+                                                    rules.map((r, i) => (
+                                                        <Col xs="auto" key={region.id + "-" + i}>
+                                                            <Button onClick={() => this.addMustering(r)}>
+                                                                [{r.cost}] {r.from ? "Upgrade to " : "Recruit "} a {r.to.name} in {region.name}
+                                                            </Button>
+                                                        </Col>
+                                                    ))
+                                                ))}
+                                            </Row>
+                                        </Col>
+                                    </>
+                                )}
                             </>
                         )}
                         <Col xs={12}>
@@ -101,29 +102,21 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                                 <Col xs="auto">
                                     <Button disabled={!this.canSubmit()} onClick={() => this.submit()}>Submit</Button>
                                 </Col>
-                                {this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER && (
-                                    <Col xs="auto" className={classNames({"invisible": this.selectedRegion == null})}>
-                                        <OverlayTrigger
-                                            overlay={
-                                                <Tooltip id="starred-consolidate-power">
-                                                    Resolve this Starred Consolidate Power as a normal Consolidate
-                                                    Power to gain Power tokens.
-                                                </Tooltip>
-                                            }
-                                        >
-                                            <Button
+                                {this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER && this.selectedRegion &&
+                                    this.props.gameState.isConsolidatePowerOrderPresent(this.selectedRegion) &&
+                                    (<Col xs="auto" className={classNames({"invisible": this.selectedRegion == null})}>
+                                        <Button
                                                 onClick={() => this.submitForPT()}
                                                 disabled={this.selectedRegion == null || (this.musterings.size > 0 && this.musterings.entries[0][1].length > 0)}
                                             >
-                                                Get {this.selectedRegion ? this.props.gameState.getPotentialGainedPowerTokens(this.selectedRegion) : 0} power tokens
-                                            </Button>
-                                        </OverlayTrigger>
-                                    </Col>
-                                )}
+                                                {this.getPowerTokenButtonText()}
+                                        </Button>
+                                    </Col>)
+                                }
                                 <Col xs="auto">
                                     <Button
                                         variant="danger"
-                                        disabled={this.musterings.size == 0}
+                                        disabled={this.props.gameState.type != PlayerMusteringType.STARRED_CONSOLIDATE_POWER && this.musterings.size == 0}
                                         onClick={() => this.reset()}
                                     >
                                         Reset
@@ -146,7 +139,8 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
             case PlayerMusteringType.MUSTERING_WESTEROS_CARD:
                 return true;
             case PlayerMusteringType.STARRED_CONSOLIDATE_POWER:
-                return this.selectedRegion != null || this.musterings.size > 0;
+                // submit button should only be active on castle areas
+                return this.selectedRegion != null && this.selectedRegion.hasStructure && this.musterings.size > 0;
             case PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD:
                 return true;
         }
@@ -180,6 +174,11 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         }
 
         this.props.gameState.muster(this.musterings);
+    }
+
+    private getPowerTokenButtonText(): string {
+        const powerTokenCount = this.selectedRegion ? this.props.gameState.resolveConsolidatePowerGameState.getPotentialGainedPowerTokens(this.selectedRegion, this.house) : 0;
+        return `Get ${powerTokenCount} Power token${powerTokenCount > 1 ? "s" : ""}`;
     }
 
     modifyRegionsOnMap(): [Region, Partial<RegionOnMapProperties>][] {
@@ -250,14 +249,22 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
     }
 
 
-    private onRegionClick(region: Region) {
+    private onRegionClick(region: Region): void {
         if (region.getController() == this.props.gameState.house) {
-            if (region.castleLevel == 0) {
-                return;
+            if(region.castleLevel > 0) {
+                this.selectedRegion = region;
+                if(this.musterings.has(region)) {
+                    this.musterings.delete(region);
+                }
             }
 
-            this.selectedRegion = region;
-            this.musterings.set(this.selectedRegion, []);
+            if(this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
+                this.musterings.forEach((m, r) => this.musterings.delete(r));
+                this.selectedRegion = this.props.gameState.isConsolidatePowerOrderPresent(region) ? region : null;
+                if(this.selectedRegion) {
+                    this.musterings.set(this.selectedRegion, []);
+                }
+            }
         }
     }
 
@@ -265,7 +272,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         if (this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
             if (this.selectedRegion == null) {
                 if (this.props.gameClient.doesControlHouse(r.getController())) {
-                    this.selectedRegion = r;
+                    this.onRegionClick(r);
                 }
             }
         }
@@ -286,5 +293,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         this.props.gameState.muster(new BetterMap([
             [this.selectedRegion, []]
         ]));
+
+        this.reset();
     }
 }

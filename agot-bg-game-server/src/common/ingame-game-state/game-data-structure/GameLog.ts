@@ -10,7 +10,7 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
     | ActionPhaseBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingsAttack | MarchOrderRemoved
-    | StarredConsolidatePowerForPowerTokens | ArmiesReconciled | EnemyPortTaken | ShipsDestroyedByEmptyCastle
+    | ConsolidatePowerOrderResolved | ArmiesReconciled | EnemyPortTaken | ShipsDestroyedByEmptyCastle
     | TyrionLannisterHouseCardReplaced | TyrionLannisterChoiceMade
     | ArianneMartellPreventMovement | LorasTyrellAttackOrderMoved | TywinLannisterPowerTokensGained
     | RooseBoltonHouseCardsReturned | QueenOfThornsOrderRemoved | QueenOfThornsNoOrderAvailable
@@ -208,10 +208,11 @@ interface MarchOrderRemoved {
     region: string;
 }
 
-interface StarredConsolidatePowerForPowerTokens {
-    type: "starred-consolidate-power-for-power-tokens";
+interface ConsolidatePowerOrderResolved {
+    type: "consolidate-power-order-resolved";
     house: string;
     region: string;
+    starred: boolean;
     powerTokenCount: number;
 }
 
