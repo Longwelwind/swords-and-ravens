@@ -53,6 +53,14 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         return this.parentGameState.entireGame;
     }
 
+    get resolveConsolidatePowerGameState(): ResolveConsolidatePowerGameState {
+        if(this.type != PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
+            throw new Error("ResolveConsolidatePowerGameState requested but type != STARRED_CONSOLIDATE_POWER");
+        }
+
+        return this.parentGameState as ResolveConsolidatePowerGameState;
+    }
+
     firstStart(house: House, type: PlayerMusteringType): void {
         this.house = house;
         this.type = type;
@@ -118,7 +126,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                     }
 
                     const order = this.parentGameState.actionGameState.ordersOnBoard.get(originatingRegion);
-                    if (!(order.type instanceof ConsolidatePowerOrderType) || !order.type.starred) {
+                    if (!(order.type instanceof ConsolidatePowerOrderType)) {
                         return;
                     }
                 }
@@ -161,24 +169,8 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                     const startingRegion = entry[0];
                     if (entry[1].length == 0) {
                         // The CP was resolved to get Power tokens
-                        const gainedPowerTokens = this.getPotentialGainedPowerTokens(startingRegion);
-
-                        this.house.changePowerTokens(gainedPowerTokens);
-
-                        this.entireGame.broadcastToClients({
-                            type: "change-power-token",
-                            houseId: this.house.id,
-                            powerTokenCount: this.house.powerTokens
-                        });
-
-                        this.parentGameState.ingame.log({
-                            type: "starred-consolidate-power-for-power-tokens",
-                            house: this.house.id,
-                            region: startingRegion.id,
-                            powerTokenCount: gainedPowerTokens
-                        });
-
-                        this.parentGameState.onPlayerMusteringEnd(this.house, [startingRegion]);
+                        this.resolveConsolidatePowerGameState.resolveConsolidatePowerOrderForPt(startingRegion, this.house);
+                        this.resolveConsolidatePowerGameState.onPlayerMusteringEnd(this.house, [startingRegion]);
                         return;
                     }
                 }
@@ -221,14 +213,18 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         });
     }
 
-    getPotentialGainedPowerTokens(region: Region): number {
+    isConsolidatePowerOrderPresent(region: Region): boolean {
         if (this.type != PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
-            throw new Error();
+            throw new Error("isConsolidatePowerOrderPresent() called but type != STARRED_CONSOLIDATE_POWER");
         }
 
-        return 1 + region.crownIcons;
-    }
+        const order = this.resolveConsolidatePowerGameState.actionGameState.ordersOnBoard.tryGet(region, null);
+        if(!order) {
+            return false;
+        }
 
+        return order.type instanceof ConsolidatePowerOrderType;
+    }
 
     getWaitedUsers(): User[] {
         return [this.parentGameState.ingame.getControllerOfHouse(this.house).user];

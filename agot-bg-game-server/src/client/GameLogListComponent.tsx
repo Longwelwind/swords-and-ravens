@@ -426,14 +426,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>
                 </>;
 
-            case "starred-consolidate-power-for-power-tokens":
+            case "consolidate-power-order-resolved":
                 house = this.game.houses.get(data.house);
                 region = this.world.regions.get(data.region);
                 const countPowerToken = data.powerTokenCount;
 
                 return <>
-                    <strong>{house.name}</strong> resolved a Starred Consolidate Power Order token
-                    in <strong>{region.name}</strong> to gain <strong>{countPowerToken}</strong> Power token{countPowerToken > 0 && "s"}.
+                    <strong>{house.name}</strong> resolved a {data.starred && "Starred "}Consolidate Power Order
+                    in <strong>{region.name}</strong> to gain <strong>{countPowerToken}</strong> Power token{countPowerToken > 1 && "s"}.
                 </>;
 
             case "armies-reconciled":

@@ -34,67 +34,86 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
     }
 
     firstStart(): void {
-        // Resolve all the normal consolidate power and give the power tokens for each house
-        const gains = new BetterMap<House, number>(this.game.houses.values.map(h => ([h, 0])));
-        this.actionGameState.ordersOnBoard.entries.forEach(([region, order]) => {
-            const house = region.getController();
+        this.resolveNormalConsolidatePowerOrders();
 
-            // Should never happen. If there was an order here, then there were at least
-            // one unit, and therefore the region should have a controller.
-            if (!house) {
+        // Starred resolve consolidate power must still be resolved
+        this.proceedNextResolve(null);
+    }
+
+    resolveNormalConsolidatePowerOrders() {
+        // If a house has no starred consolidate power order the normal consolidate power orders can be processed automatically
+        // Resolve the normal consolidate power and give the power tokens for each house
+        const consolidatePowerOrders = this.actionGameState.ordersOnBoard.entries.filter(([region, order]) => order.type instanceof ConsolidatePowerOrderType);
+
+        this.actionGameState.game.getTurnOrder().forEach(house => {
+            const ordersOfHouse = consolidatePowerOrders.filter(([region, order]) => region.getController() == house);
+
+            if(ordersOfHouse.length == 0) {
                 return;
             }
 
-            if (!(order.type instanceof ConsolidatePowerOrderType)) {
-                return;
-            }
+            const starredOrders = ordersOfHouse.filter(([region, order]) => order.type.starred);
 
-            if (order.type.starred) {
-                return;
-            }
+            // If all consolidate power orders are not starred
+            // or the starred consolidate power order is placed on a non castle region
+            // this phase can be processed automatically
+            if(starredOrders.length == 0 || starredOrders.every(([region, order]) => !region.hasStructure)) {
+                ordersOfHouse.forEach(([region, order]) => {
+                    // Remember if the current order was a starred one for the game log
+                    this.resolveConsolidatePowerOrderForPt(region, house);
 
-            // This order can be processed automatically
-            // Remove it
-            this.actionGameState.ordersOnBoard.delete(region);
-            this.entireGame.broadcastToClients({
-                type: "action-phase-change-order",
-                region: region.id,
-                order: null
-            });
-
-            if (region.type == sea) {
-                // A consolidate power on sea grants nothing.
-                // Do nothing.
-            } else if (region.type == port) {
-                // A single power token is granted if the adjacent sea is unoccupied
-                // or if it belongs to the same house than the port
-                const adjacentSea = this.game.world.getAdjacentSeaOfPort(region);
-                const adjacentSeaController = adjacentSea.getController();
-                if (adjacentSeaController == null || adjacentSeaController == house) {
-                    gains.set(house, gains.get(house) + 1);
-                }
-            } else if (region.type == land) {
-                const gain = 1 + region.crownIcons;
-                gains.set(house, gains.get(house) + gain);
+                    // Remove the consolidate power order from board
+                    this.actionGameState.ordersOnBoard.delete(region);
+                    this.entireGame.broadcastToClients({
+                        type: "action-phase-change-order",
+                        region: region.id,
+                        order: null
+                    });
+                });
             }
         });
+    }
 
-        gains.forEach((gain, house) => {
-            if (gain == 0) {
-                return;
+    getPotentialGainedPowerTokens(region: Region, house: House): number {
+        if (region.type == sea) {
+            // A consolidate power on sea grants nothing.
+            // Do nothing.
+        } else if (region.type == port) {
+            // A single power token is granted if the adjacent sea is unoccupied
+            // or if it belongs to the same house than the port
+            const adjacentSea = this.game.world.getAdjacentSeaOfPort(region);
+            const adjacentSeaController = adjacentSea.getController();
+            if (adjacentSeaController == null || adjacentSeaController == house) {
+                return 1;
             }
+        } else if (region.type == land) {
+            return 1 + region.crownIcons;
+        }
 
-            house.changePowerTokens(gain);
+        return 0;
+    }
+
+    resolveConsolidatePowerOrderForPt(region: Region, house: House) {
+        const gaines: number = this.getPotentialGainedPowerTokens(region, house);
+
+        if(gaines > 0) {
+            // Broadcast new Power token count
+            house.changePowerTokens(gaines);
 
             this.entireGame.broadcastToClients({
                 type: "change-power-token",
                 houseId: house.id,
                 powerTokenCount: house.powerTokens
             });
-        });
 
-        // Starred resolve consolidate power must still be resolved
-        this.proceedNextResolve(null);
+            this.ingame.log({
+                type: "consolidate-power-order-resolved",
+                house: house.id,
+                region: region.id,
+                starred: this.actionGameState.ordersOnBoard.get(region).type.starred,
+                powerTokenCount: gaines
+            });
+        }
     }
 
     proceedNextResolve(lastHouseToResolve: House | null): void {
@@ -111,17 +130,19 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
     onPlayerMusteringEnd(house: House, regions: Region[]): void {
         const region = regions[0];
 
-        // Remove Consolidate Power token
         if (!region) {
             throw new Error();
         }
 
+        // Remove Consolidate Power token
         this.actionGameState.ordersOnBoard.delete(region);
         this.entireGame.broadcastToClients({
             type: "action-phase-change-order",
             region: region.id,
             order: null
         });
+
+        this.resolveNormalConsolidatePowerOrders();
 
         this.proceedNextResolve(house);
     }
