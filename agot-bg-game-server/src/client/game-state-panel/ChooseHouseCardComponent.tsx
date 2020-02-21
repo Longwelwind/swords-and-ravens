@@ -8,9 +8,13 @@ import GameStateComponentProps from "./GameStateComponentProps";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
+import HouseCardComponent from "./utils/HouseCardComponent";
+import { observable } from "mobx";
 
 @observer
 export default class ChooseHouseCardComponent extends Component<GameStateComponentProps<ChooseHouseCardGameState>> {
+    @observable selectedHouseCard: HouseCard | null;
+    
     render(): JSX.Element {
         return (
             <>
@@ -22,9 +26,12 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
                         <Row className="justify-content-center">
                             {this.getChoosableHouseCards().map(hc => (
                                 <Col xs="auto" key={hc.id}>
-                                    <Button onClick={() => this.chooseHouseCard(hc)} key={hc.id}>
-                                        {hc.name}
-                                    </Button>
+                                    <HouseCardComponent
+                                        houseCard={hc}
+                                        size="small"
+                                        selected={this.selectedHouseCard == hc}
+                                        onClick={() => this.selectedHouseCard != hc ? this.selectedHouseCard = hc : this.selectedHouseCard = null}
+                                    />
                                 </Col>
                             ))}
                         </Row>
@@ -34,12 +41,23 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
                         </div>
                     )}
                 </Col>
+                {this.shouldChooseHouseCard() && (
+                    <Col xs="auto">
+                        <Button onClick={() => this.chooseHouseCard()} disabled={this.selectedHouseCard == null}>
+                            Confirm
+                        </Button>
+                    </Col>
+                )}
             </>
         );
     }
 
-    chooseHouseCard(houseCard: HouseCard): void {
-        this.props.gameState.chooseHouseCard(houseCard);
+    chooseHouseCard(): void {
+        if(!this.selectedHouseCard) {
+            return;
+        }
+
+        this.props.gameState.chooseHouseCard(this.selectedHouseCard);
     }
 
     shouldChooseHouseCard(): boolean {
@@ -51,6 +69,6 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
             return [];
         }
 
-        return this.props.gameState.getChoosableCards(this.props.gameClient.authenticatedPlayer.house);
+        return this.props.gameState.getChoosableCards(this.props.gameClient.authenticatedPlayer.house).sort((a, b) => a.combatStrength - b.combatStrength);
     }
 }

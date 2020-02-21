@@ -34,7 +34,7 @@ export default class SelectHouseCardComponent extends Component<GameStateCompone
                                         <Col xs="auto" key={hc.id}>
                                             <HouseCardComponent
                                                 houseCard={hc}
-                                                size="tiny"
+                                                size="small"
                                                 selected={this.selectedHouseCard == hc}
                                                 onClick={() => this.selectedHouseCard != hc ? this.selectedHouseCard = hc : this.selectedHouseCard = null}
                                             />
