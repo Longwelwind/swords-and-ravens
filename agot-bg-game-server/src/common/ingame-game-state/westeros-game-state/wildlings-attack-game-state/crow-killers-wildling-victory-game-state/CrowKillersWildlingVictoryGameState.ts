@@ -42,6 +42,12 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
 
             this.setChildGameState(new SelectUnitsGameState(this)).firstStart(house, selectableKnights, count);
         } else {
+            this.ingame.log({
+                type: "crow-killers-knights-replaced",
+                house: house.id,
+                units: []
+            });
+
             this.proceedNextHouse(house);
         }
     }

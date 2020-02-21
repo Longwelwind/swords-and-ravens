@@ -35,6 +35,12 @@ export default class CrowKillersNightsWatchVictoryGameState extends GameState<Wi
         count = Math.min(count, availableKnights);
 
         if (count == 0) {
+            this.ingame.log({
+                type: "crow-killers-footman-upgraded",
+                house: house.id,
+                units: []
+            });
+
             this.parentGameState.onWildlingCardExecuteEnd();
             return;
         }
