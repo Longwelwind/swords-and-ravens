@@ -182,7 +182,7 @@ export default class GlobalServer {
         // Load it
         const entireGame = gameData.serializedGame
             ? EntireGame.deserializeFromServer(gameData.serializedGame as SerializedEntireGame)
-            : await this.createGame(gameData.id, gameData.ownerId);
+            : await this.createGame(gameData.id, gameData.ownerId, gameData.name);
 
         // Bind listeners
         entireGame.onSendClientMessage = _ => {
@@ -198,11 +198,11 @@ export default class GlobalServer {
         return entireGame;
     }
 
-    async createGame(id: string, ownedId: string): Promise<EntireGame> {
+    async createGame(id: string, ownedId: string, name: string): Promise<EntireGame> {
         // Create a public chat room ID
         const publicChatRoomId = await this.websiteClient.createPublicChatRoom(`Chat for game ${id}`);
 
-        const entireGame = new EntireGame(id, ownedId);
+        const entireGame = new EntireGame(id, ownedId, name);
         entireGame.publicChatRoomId = publicChatRoomId;
         entireGame.firstStart();
 

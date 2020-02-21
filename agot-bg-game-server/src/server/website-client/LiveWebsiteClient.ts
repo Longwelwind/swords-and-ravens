@@ -32,6 +32,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
 
             return {
                 id: response.id,
+                name: response.name,
                 ownerId: response.owner,
                 serializedGame: response.serialized_game,
                 version: response.version
