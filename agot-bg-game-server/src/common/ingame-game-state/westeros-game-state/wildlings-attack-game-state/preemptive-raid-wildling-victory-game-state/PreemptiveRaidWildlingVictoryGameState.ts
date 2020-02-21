@@ -54,13 +54,13 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
     }
 
     onSimpleChoiceGameStateEnd(choice: number): void {
-        this.ingame.log({
-            type: "preemptive-raid-choice-done",
-            house: this.parentGameState.lowestBidder.id,
-            choice: choice
-        });
-
         if (this.step == PreemptiveRaidStep.CHOOSING) {
+            this.ingame.log({
+                type: "preemptive-raid-choice-done",
+                house: this.parentGameState.lowestBidder.id,
+                choice: choice
+            });
+
             if (choice == 0) {
                 this.step = PreemptiveRaidStep.DESTROYING_UNITS;
 
