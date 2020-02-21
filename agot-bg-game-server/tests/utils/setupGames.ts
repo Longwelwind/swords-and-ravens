@@ -17,6 +17,7 @@ import {
 function setup4PlayersGame(serializedEntireGameChildGameState: SerializedEntireGame["childGameState"]): GlobalContext<any> {
     const serializedEntireGame: SerializedEntireGame = {
         id: "1",
+        name: "Test game",
         ownerUserId: "1",
         publicChatRoomId: "1",
         privateChatRoomIds: [],

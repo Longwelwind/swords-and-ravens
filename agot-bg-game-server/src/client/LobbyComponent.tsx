@@ -12,6 +12,7 @@ import ListGroupItem from "react-bootstrap/ListGroupItem";
 import houseInfluenceImages from "./houseInfluenceImages";
 import classNames = require("classnames");
 import ChatComponent from "./chat-client/ChatComponent";
+import GameSettingsComponent from "./GameSettingsComponent";
 
 interface LobbyComponentProps {
     gameClient: GameClient;
@@ -77,13 +78,24 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                     <Col>
                         <Card>
                             <Card.Body>
-                                <Button
-                                    block
-                                    onClick={() => this.props.gameState.start()}
-                                    disabled={!this.props.gameState.canStartGame() || !this.props.gameClient.isOwner()}
-                                >
-                                    Start
-                                </Button>
+                                <Row>
+                                    <Col>
+                                        <GameSettingsComponent
+                                            gameClient={this.props.gameClient}
+                                            entireGame={this.props.gameState.entireGame} />
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col>
+                                        <Button
+                                            block
+                                            onClick={() => this.props.gameState.start()}
+                                            disabled={!this.props.gameState.canStartGame() || !this.props.gameClient.isOwner()}
+                                        >
+                                            Start
+                                        </Button>
+                                    </Col>
+                                </Row>
                             </Card.Body>
                         </Card>
                     </Col>

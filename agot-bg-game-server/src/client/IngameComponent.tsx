@@ -42,7 +42,6 @@ import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes
 import unitImages from "./unitImages";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
 import GameEndedComponent from "./game-state-panel/GameEndedComponent";
-import SettingsRowComponent from "./SettingsRowComponent";
 import Nav from "react-bootstrap/Nav";
 import Tab from "react-bootstrap/Tab";
 import ChatComponent from "./chat-client/ChatComponent";
@@ -56,6 +55,8 @@ import classNames = require("classnames");
 import {Channel} from "./chat-client/ChatClient";
 // @ts-ignore
 import ScrollToBottom from "react-scroll-to-bottom";
+import Form from "react-bootstrap/FormGroup";
+import GameSettingsComponent from "./GameSettingsComponent";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -80,6 +81,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         return (
             <>
+                <Col xs={12}>
+                    <h3 style={{marginLeft: "1rem"}}>
+                        {this.props.gameState.entireGame.name} <Badge variant="primary" className={classNames({'invisible': !this.props.gameState.entireGame.gameSettings.pbem})}>PBEM</Badge>
+                    </h3>
+                </Col>
                 <Col xs={12} lg={3}>
                     <Row className="stackable">
                         <Col>
@@ -318,16 +324,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </ListGroup>
                             </Card>
                         </Col>
-                        <Col xs={12}>
-                            {this.props.gameClient.authenticatedUser && (
-                                <Row className="stackable">
-                                    <SettingsRowComponent
-                                        gameClient={this.props.gameClient}
-                                        authenticatedUser={this.props.gameClient.authenticatedUser}
-                                    />
-                                </Row>
-                            )}
-                        </Col>
                     </Row>
                 </Col>
                 <Col xs="auto">
@@ -387,6 +383,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     Chat
                                                 </Nav.Link>
                                             </Nav.Item>
+                                            {this.props.gameClient.isOwner() && (
+                                                <Nav.Item>
+                                                    <Nav.Link eventKey="settings">
+                                                        Settings
+                                                    </Nav.Link>
+                                                </Nav.Item>
+                                            )}
                                             {this.getPrivateChatRooms().map(({user, roomId}) => (
                                                 <Nav.Item key={roomId}>
                                                     <Nav.Link eventKey={roomId}
@@ -432,6 +435,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                    currentlyViewed={this.currentOpenedTab == roomId}/>
                                                 </Tab.Pane>
                                             ))}
+                                            {this.props.gameClient.isOwner() && (
+                                                <Tab.Pane eventKey="settings">
+                                                    <GameSettingsComponent gameClient={this.props.gameClient} 
+                                                                        entireGame={this.props.gameState.entireGame} />
+                                                </Tab.Pane>
+                                            )}
                                         </Tab.Content>
                                     </Card.Body>
                                 </Tab.Container>

@@ -10,6 +10,7 @@ export default class LocalWebsiteClient implements WebsiteClient {
 
         return {
             id: gameId,
+            name: "Local Test Game",
             ownerId: "1",
             serializedGame: null,
             version: null

@@ -14,7 +14,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
     @observable users = new BetterMap<string, User>();
     ownerUserId: string;
+    name: string;
 
+    @observable gameSettings: GameSettings = {pbem: false};
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -23,10 +25,11 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     // A pair of user is sorted alphabetically by their id when used as a key.
     @observable privateChatRoomsIds: BetterMap<User, BetterMap<User, string>> = new BetterMap();
 
-    constructor(id: string, ownerId: string) {
+    constructor(id: string, ownerId: string, name: string) {
         super(null);
         this.id = id;
         this.ownerUserId = ownerId;
+        this.name = name;
     }
 
     firstStart(): void {
@@ -71,10 +74,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 gameState = gameState.childGameState;
             }
 
-            // Get which users' turn it is
-            const users = this.leafState.getWaitedUsers().filter(u => u.settings.pbemMode);
-            if (this.onWaitedUsers) {
-                this.onWaitedUsers(users);
+            // If the game is PBEM, send a notification to all waited users
+            if (this.gameSettings.pbem && this.onWaitedUsers) {
+                this.onWaitedUsers(this.leafState.getWaitedUsers());
             }
         }
     }
@@ -104,6 +106,17 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 user: user.id,
                 settings: user.settings
             })
+        } else if (message.type == "change-game-settings") {
+            if (this.ownerUserId != user.id) {
+                return;
+            }
+
+            this.gameSettings = message.settings;
+
+            this.broadcastToClients({
+                type: "game-settings-changed",
+                settings: message.settings
+            });
         } else {
             this.childGameState.onClientMessage(user, message);
         }
@@ -127,6 +140,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             const user = this.users.get(message.user);
 
             user.settings = message.settings;
+        } else if (message.type == "game-settings-changed") {
+            this.gameSettings = message.settings;
         } else {
             this.childGameState.onServerMessage(message);
         }
@@ -194,9 +209,17 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         return players;
     }
 
+    updateGameSettings(settings: GameSettings): void {
+        this.sendMessageToServer({
+            type: "change-game-settings",
+            settings
+        });
+    }
+
     serializeToClient(user: User | null): SerializedEntireGame {
         return {
             id: this.id,
+            name: this.name,
             users: this.users.values.map(u => u.serializeToClient()),
             ownerUserId: this.ownerUserId,
             publicChatRoomId: this.publicChatRoomId,
@@ -206,7 +229,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     static deserializeFromServer(data: SerializedEntireGame): EntireGame {
-        const entireGame = new EntireGame(data.id, data.ownerUserId);
+        const entireGame = new EntireGame(data.id, data.ownerUserId, data.name);
 
         entireGame.users = new BetterMap<string, User>(data.users.map((ur: any) => [ur.id, User.deserializeFromServer(entireGame, ur)]));
         entireGame.ownerUserId = data.ownerUserId;
@@ -233,9 +256,14 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
 export interface SerializedEntireGame {
     id: string;
+    name: string;
     users: SerializedUser[];
     ownerUserId: string;
     childGameState: SerializedLobbyGameState | SerializedIngameGameState;
     publicChatRoomId: string;
     privateChatRoomIds: [string, [string, string][]][];
+}
+
+export interface GameSettings {
+    pbem: boolean;
 }

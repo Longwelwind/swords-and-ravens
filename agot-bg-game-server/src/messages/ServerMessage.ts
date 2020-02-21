@@ -14,7 +14,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | BidDone | GameStateChange | SupplyAdjusted
     | ChangeControlPowerToken | ChangePowerToken | ChangeWildlingStrength | AddGameLog | RevealWildlingCard
     | RemoveUnits | AddUnits | ChangeTracker | ActionPhaseChangeOrder | ChangeStateHouseCard
-    | SettingsChanged | ChangeValyrianSteelBladeUse | BiddingNextTrack | NewPrivateChatRoom;
+    | SettingsChanged | ChangeValyrianSteelBladeUse | BiddingNextTrack | NewPrivateChatRoom | GameSettingsChanged;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -217,4 +217,9 @@ interface NewPrivateChatRoom {
     type: "new-private-chat-room";
     users: string[];
     roomId: string;
+}
+
+interface GameSettingsChanged {
+    type: "game-settings-changed";
+    settings: any;
 }

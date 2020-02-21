@@ -2,6 +2,7 @@ import User from "../User";
 
 export interface StoredGameData {
     id: string;
+    name: string;
     ownerId: string;
     serializedGame: object | null;
     version: string | null;
