@@ -36,6 +36,10 @@ export default class IngameGameState extends GameState<
         return this.game.world;
     }
 
+    get sortedByLeadingPlayers(): Player[] {
+        return this.game.getPotentialWinners().map(h => this.getControllerOfHouse(h));
+    }
+
     constructor(entireGame: EntireGame) {
         super(entireGame);
     }
@@ -55,7 +59,7 @@ export default class IngameGameState extends GameState<
         this.beginNewTurn();
     }
 
-    onWesterosGameStateFinish(planningRestrictions: PlanningRestriction[]) {
+    onWesterosGameStateFinish(planningRestrictions: PlanningRestriction[]): void {
         this.proceedPlanningGameState(planningRestrictions);
     }
 
