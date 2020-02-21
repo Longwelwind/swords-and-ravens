@@ -41,8 +41,8 @@ export default class CrowKillersNightsWatchVictoryGameState extends GameState<Wi
 
         this.setChildGameState(new SelectUnitsGameState(this)).firstStart(
             this.parentGameState.highestBidder,
-            this.getAllFootmen(),
-            2
+            availableFootmen,
+            count
         );
     }
 
