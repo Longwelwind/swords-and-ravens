@@ -20,6 +20,7 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
         // Replace all of his knights by footmen
         const knightsToTransform = this.game.world
             .getControlledRegions(house)
+            .filter(r => r.units.values.some(u => u.type == knight))
             .map(r => [r, r.units.values.filter(u => u.type == knight)] as [Region, Unit[]]);
 
         knightsToTransform.forEach(([region, knights]) => this.transformIntoFootman(house, region, knights));
