@@ -133,6 +133,7 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
 
         this.westerosGameState.ingame.log({
             type: "wildling-bidding",
+            wildlingStrength: this.westerosGameState.game.wildlingStrength,
             results: results.map(([bid, houses]) => [bid, houses.map(h => h.id)]),
             nightsWatchVictory: this.nightsWatchWon
         });
