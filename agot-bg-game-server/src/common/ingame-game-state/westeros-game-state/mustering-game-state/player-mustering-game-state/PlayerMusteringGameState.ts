@@ -18,6 +18,7 @@ import {ServerMessage} from "../../../../../messages/ServerMessage";
 import RegionKind from "../../../game-data-structure/RegionKind";
 import IngameGameState from "../../../IngameGameState";
 import User from "../../../../../server/User";
+import Order from "../../../game-data-structure/Order";
 
 type MusteringRule = (Mustering & {cost: number});
 
@@ -66,7 +67,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         this.type = type;
     }
 
-    onServerMessage(message: ServerMessage): void {
+    onServerMessage(_: ServerMessage): void {
 
     }
 
@@ -120,13 +121,12 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                         return;
                     }
 
-                    const ordersOnBoard = this.parentGameState.actionGameState.ordersOnBoard;
-                    if (!ordersOnBoard.has(originatingRegion)) {
+                    const order = this.getConsolidatePowerOrder(originatingRegion);
+                    if(!order) {
                         return;
                     }
 
-                    const order = this.parentGameState.actionGameState.ordersOnBoard.get(originatingRegion);
-                    if (!(order.type instanceof ConsolidatePowerOrderType)) {
+                    if (musterings.entries[0][1].length > 0 && !order.type.starred) {
                         return;
                     }
                 }
@@ -213,17 +213,39 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         });
     }
 
-    isConsolidatePowerOrderPresent(region: Region): boolean {
+    private getConsolidatePowerOrder(region: Region): Order | null {
         if (this.type != PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
             throw new Error("isConsolidatePowerOrderPresent() called but type != STARRED_CONSOLIDATE_POWER");
         }
 
         const order = this.resolveConsolidatePowerGameState.actionGameState.ordersOnBoard.tryGet(region, null);
         if(!order) {
-            return false;
+            return null;
         }
 
-        return order.type instanceof ConsolidatePowerOrderType;
+        if(order.type instanceof ConsolidatePowerOrderType) {
+            return order;
+        }
+
+        return null;
+    }
+
+    hasConsolidatePowerOrder(region: Region): boolean {
+        if(this.getConsolidatePowerOrder(region)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    hasStarredConsolidatePowerOrder(region: Region): boolean {
+        const order = this.getConsolidatePowerOrder(region);
+
+        if (order) {
+            return order.type.starred;
+        }
+
+        return false;
     }
 
     getWaitedUsers(): User[] {
@@ -319,7 +341,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
     getAddedUnitsOfMustering(musterings: BetterMap<Region, Mustering[]>): BetterMap<Region, UnitType[]> {
         const addedUnits = new BetterMap<Region, UnitType[]>();
 
-        musterings.entries.forEach(([originatingRegion, recruitements]) =>
+        musterings.entries.forEach(([_, recruitements]) =>
             recruitements.forEach(({region, from, to}) => {
                 if (from != null) {
                     return;
@@ -332,7 +354,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         return addedUnits;
     }
 
-    getPointsLeft(region: Region, musterings: BetterMap<Region, Mustering[]>) {
+    getPointsLeft(region: Region, musterings: BetterMap<Region, Mustering[]>): number {
         return region.castleLevel - this.getUsedPoints(musterings.tryGet(region, []));
     }
 
@@ -381,7 +403,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         return _.difference(region.units.values, recruitments.map(({from}) => from).filter(f => f) as Unit[]);
     }
 
-    serializeToClient(admin: boolean, player: Player | null): SerializedPlayerMusteringGameState {
+    serializeToClient(_: boolean, __: Player | null): SerializedPlayerMusteringGameState {
         return {
             type: "player-mustering",
             house: this.house.id,
