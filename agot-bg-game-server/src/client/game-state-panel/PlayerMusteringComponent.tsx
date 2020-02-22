@@ -71,7 +71,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                         )}
                         {this.selectedRegion && (
                             <>
-                                {this.selectedRegion.hasStructure && (
+                                {this.selectedRegion.hasStructure && this.checkStarredConsolidatePower(this.selectedRegion) && (
                                     <>
                                         <Col xs={12}>
                                             From {this.selectedRegion.name}, you can ({this.props.gameState.getPointsLeft(this.selectedRegion, this.musterings)} mustering points left):
@@ -95,11 +95,12 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                         )}
                         <Col xs={12}>
                             <Row className="justify-content-center">
-                                <Col xs="auto">
+                                {(!this.selectedRegion || this.checkStarredConsolidatePower(this.selectedRegion)) && (
+                                 <Col xs="auto">
                                     <Button disabled={!this.canSubmit()} onClick={() => this.submit()}>Submit</Button>
-                                </Col>
+                                </Col>)}
                                 {this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER && this.selectedRegion &&
-                                    this.props.gameState.isConsolidatePowerOrderPresent(this.selectedRegion) &&
+                                    this.props.gameState.hasConsolidatePowerOrder(this.selectedRegion) &&
                                     (<Col xs="auto" className={classNames({"invisible": this.selectedRegion == null})}>
                                         <Button
                                                 onClick={() => this.submitForPT()}
@@ -112,7 +113,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                                 <Col xs="auto">
                                     <Button
                                         variant="danger"
-                                        disabled={this.musterings.size == 0 || this.musterings.entries[0][1].length == 0}
+                                        disabled={this.musterings.size == 0}
                                         onClick={() => this.reset()}
                                     >
                                         Reset
@@ -173,6 +174,14 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         this.props.gameState.muster(this.musterings);
     }
 
+    private checkStarredConsolidatePower(region: Region): boolean {
+        if(this.props.gameState.type != PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
+            return true;
+        }
+
+        return this.props.gameState.hasStarredConsolidatePowerOrder(region);
+    }
+
     private getPowerTokenButtonText(): string {
         const powerTokenCount = this.selectedRegion ? this.props.gameState.resolveConsolidatePowerGameState.getPotentialGainedPowerTokens(this.selectedRegion, this.house) : 0;
         return `Get ${powerTokenCount} Power token${powerTokenCount > 1 ? "s" : ""}`;
@@ -212,7 +221,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
             if (this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
                 if (this.selectedRegion == null) {
-                    return this.props.gameState.game.world.getControlledRegions(this.props.gameState.house).filter(r => this.props.gameState.isConsolidatePowerOrderPresent(r))
+                    return this.props.gameState.game.world.getControlledRegions(this.props.gameState.house).filter(r => this.props.gameState.hasConsolidatePowerOrder(r))
                     .map(r => [
                         r,
                         {
@@ -243,13 +252,13 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
             return;
         }
 
-        if(region.castleLevel > 0) {
-            this.selectedRegion = region;
-        } else if (this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
-            this.selectedRegion = this.props.gameState.isConsolidatePowerOrderPresent(region) ? region : null;
+        if (this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
+            this.selectedRegion = this.props.gameState.hasConsolidatePowerOrder(region) ? region : null;
             if(this.selectedRegion) {
                 this.musterings.set(this.selectedRegion, []);
             }
+        } else if(region.castleLevel > 0) {
+            this.selectedRegion = region;
         }
     }
 
