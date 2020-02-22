@@ -95,6 +95,7 @@ interface WildlingCardRevealed {
 
 interface WildlingBidding {
     type: "wildling-bidding";
+    wildlingStrength: number;
     results: [number, string[]][];
     nightsWatchVictory: boolean;
 }

@@ -177,8 +177,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <>
-                        Wildling bidding results:
-                        <table>
+                        Wildling bidding results for wildling strength <strong>{data.wildlingStrength}</strong>:
+                        <table cellPadding="5">
                             {results.map(([bid, houses]) => houses.map(h => (
                                 <tr key={h.id}>
                                     <td>{h.name}</td>
@@ -189,7 +189,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         {data.nightsWatchVictory ? (
                             <>The <strong>Night&apos;s Watch</strong> won!</>
                         ) : (
-                            <>The <strong>Wildling</strong> won!</>
+                            <>The <strong>Wildlings</strong> won!</>
                         )}
                     </>
                 );
