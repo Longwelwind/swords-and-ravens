@@ -769,7 +769,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
 
                 return <>
-                    <strong>Crow Killers</strong>: <strong>{house.name}</strong> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><strong>{unitTypes.length}</strong> Knights in <strong>{region.name}</strong></>), ", ")} by Footmen.
+                    {units.length > 0 
+                    ? (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><strong>{unitTypes.length}</strong> Knights in <strong>{region.name}</strong></>), ", ")} by Footmen.</>)
+                    : (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> had no Knights to replace by Footmen.</>)}
                 </>;
 
             case "crow-killers-footman-upgraded":
@@ -777,7 +779,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
 
                 return <>
-                    <strong>Crow Killers</strong>: <strong>{house.name}</strong> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><strong>{unitTypes.length}</strong> Footmen in <strong>{region.name}</strong></>), ", ")} by Knights.
+                    {units.length > 0 
+                    ? (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><strong>{unitTypes.length}</strong> Footmen in <strong>{region.name}</strong></>), ", ")} by Knights.</>) 
+                    : (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> was not able to replace any Footman by Knights.</>)}
                 </>;
 
             case "skinchanger-scout-nights-watch-victory":
