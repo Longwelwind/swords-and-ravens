@@ -223,6 +223,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             users: this.users.values.map(u => u.serializeToClient()),
             ownerUserId: this.ownerUserId,
             publicChatRoomId: this.publicChatRoomId,
+            gameSettings: this.gameSettings,
             privateChatRoomIds: this.privateChatRoomsIds.map((u1, v) => [u1.id, v.map((u2, rid) => [u2.id, rid])]),
             childGameState: this.childGameState.serializeToClient(user)
         };
@@ -235,6 +236,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         entireGame.ownerUserId = data.ownerUserId;
         entireGame.childGameState = entireGame.deserializeChildGameState(data.childGameState);
         entireGame.publicChatRoomId = data.publicChatRoomId;
+        entireGame.gameSettings = data.gameSettings;
         entireGame.privateChatRoomsIds = new BetterMap(data.privateChatRoomIds.map(([uid1, bm]) => [
             entireGame.users.get(uid1),
             new BetterMap(bm.map(([uid2, roomId]) => [entireGame.users.get(uid2), roomId]))
@@ -262,6 +264,7 @@ export interface SerializedEntireGame {
     childGameState: SerializedLobbyGameState | SerializedIngameGameState;
     publicChatRoomId: string;
     privateChatRoomIds: [string, [string, string][]][];
+    gameSettings: GameSettings;
 }
 
 export interface GameSettings {
