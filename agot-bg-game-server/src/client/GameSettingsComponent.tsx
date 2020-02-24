@@ -24,9 +24,11 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
     render(): ReactNode {
         return (
             <FormCheck
+                id="pbem-setting"
                 type="checkbox"
                 label="PBEM"
                 disabled={!this.canChangeGameSettings}
+                checked={this.gameSettings.pbem}
                 onChange={() => this.changeGameSettings(() => this.gameSettings.pbem = !this.gameSettings.pbem)}
             />
         );
