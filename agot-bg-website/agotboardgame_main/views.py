@@ -29,8 +29,11 @@ def games(request):
         games = sorted(games, key=lambda row: [IN_LOBBY, ONGOING].index(row.state))
 
         for game in games:
-            player_in_game = game.players.filter(user=request.user).first()
-            game.player_in_game = player_in_game
+            if request.user.is_authenticated:
+                player_in_game = game.players.filter(user=request.user).first()
+                game.player_in_game = player_in_game
+            else:
+                game.player_in_game = None
 
         public_room_id = Room.objects.get(name='public').id
 
