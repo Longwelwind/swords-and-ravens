@@ -51,7 +51,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                             <Col xs="auto" className="mx-1">
                                 <strong>{m.user.name}</strong>
                             </Col>
-                            <Col xs="auto" style={{overflowWrap: "break-word"}}>
+                            <Col style={{overflowWrap: "anywhere"}}>
                                 {m.text}
                             </Col>
                         </Row>
