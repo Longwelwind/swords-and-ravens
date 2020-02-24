@@ -20,6 +20,7 @@ function setup4PlayersGame(serializedEntireGameChildGameState: SerializedEntireG
         name: "Test game",
         ownerUserId: "1",
         publicChatRoomId: "1",
+        gameSettings: {pbem: false},
         privateChatRoomIds: [],
         users: [
             {
