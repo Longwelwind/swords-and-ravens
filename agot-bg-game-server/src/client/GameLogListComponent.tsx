@@ -840,7 +840,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         ))}
                     </ul>
                 </>;
+            case "immediatly-killed-after-combat":
+                return <>
+                    {data.killedBecauseCantRetreat.length > 0 && (<><strong>{data.house}</strong> suffered battle casualties because this units can&apos;t retreat: {data.killedBecauseCantRetreat.join(", ")}.</>)}
+                    {data.killedBecauseWounded.length > 0 && (<><strong>{data.house}</strong> suffered battle casualties because this units were wounded: {data.killedBecauseWounded.join(", ")}.</>)}
+                </>;
 
+            case "killed-after-combat":
+                return <>
+                    <strong>{data.house}</strong> suffered battle casualties and chose this units to be killed: {data.killed.join(", ")}.
+                </>;
         }
     }
 }
