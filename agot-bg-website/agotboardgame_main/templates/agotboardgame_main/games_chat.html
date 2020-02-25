@@ -85,11 +85,13 @@
                                    id="chat-message"
                                    placeholder="Message"
                                    value=${this.state.input}
+                                   disabled=${isAuthenticated}
                                    onInput=${e => this.setState({input: e.target.value})}/>
                         </div>
                         <div class="col-auto">
                             <button type="submit"
                                     class="btn btn-primary"
+                                    disabled=${isAuthenticated}
                                     onClick=${e => this.sendMessage(e)}>
                                 Send
                             </button>
