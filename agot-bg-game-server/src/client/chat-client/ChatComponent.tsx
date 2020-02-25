@@ -42,7 +42,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
             <div className="d-flex flex-column h-100">
                 {/* Setting a fixed height seems to be the only solution to make ScrollToBottom work */}
                 <ScrollToBottom className="mb-3 chat-scroll-to-bottom">
-                    {this.channel.messages.slice().reverse().map(m => (
+                    {this.channel.messages.map(m => (
                         <Row noGutters={true} className="flex-nowrap">
                             <Col xs="auto" style={{width: "38px"}} className="text-center">
                                 <small
