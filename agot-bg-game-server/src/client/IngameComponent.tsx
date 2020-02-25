@@ -437,7 +437,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             ))}
                                             {this.props.gameClient.isOwner() && (
                                                 <Tab.Pane eventKey="settings">
-                                                    <GameSettingsComponent gameClient={this.props.gameClient} 
+                                                    <GameSettingsComponent gameClient={this.props.gameClient}
                                                                         entireGame={this.props.gameState.entireGame} />
                                                 </Tab.Pane>
                                             )}

@@ -14,7 +14,7 @@ import { observable } from "mobx";
 @observer
 export default class ChooseHouseCardComponent extends Component<GameStateComponentProps<ChooseHouseCardGameState>> {
     @observable selectedHouseCard: HouseCard | null;
-    
+
     render(): JSX.Element {
         return (
             <>
