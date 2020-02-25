@@ -114,9 +114,9 @@ export default class Game {
     }
 
     getPotentialWinners(): House[] {
-        const victoryConditions = [
+        const victoryConditions: ((h: House) => number)[] = [
             (h: House) => -this.getTotalHeldStructures(h),
-            (h: House) => -this.world.regions.values.filter(r => r.getController() == h).filter(r => r.type == land),
+            (h: House) => -this.world.regions.values.filter(r => r.getController() == h).filter(r => r.type == land).length,
             (h: House) => -h.supplyLevel,
             (h: House) => this.ironThroneTrack.indexOf(h)
         ];

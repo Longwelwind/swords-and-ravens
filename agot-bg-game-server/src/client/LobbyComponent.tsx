@@ -23,7 +23,7 @@ interface LobbyComponentProps {
 export default class LobbyComponent extends Component<LobbyComponentProps> {
     render(): ReactNode {
         return (
-            <Col xs={3}>
+            <Col xs={12} sm={10} md={8} lg={6} xl={3}>
                 <Row>
                     <Col>
                         <Card>
