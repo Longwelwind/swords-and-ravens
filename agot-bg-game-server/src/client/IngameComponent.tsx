@@ -481,11 +481,18 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     getPrivateChatRooms(): {user: User; roomId: string}[] {
-        return _.flatMap(this.props.gameState.entireGame.privateChatRoomsIds.map((u1, bm) => bm.map((u2, roomId) => {
-            const otherUser = this.props.gameClient.authenticatedUser == u1 ? u2 : u1;
+        const authenticatedUser = this.props.gameClient.authenticatedUser;
 
-            return {user: otherUser, roomId};
-        })));
+        return _.flatMap(this.props.gameState.entireGame.privateChatRoomsIds
+            .map((u1, bm) => bm.entries
+                // Only get the private chat rooms that contains the authenticated player
+                .filter(([u2, _]) => u1 == authenticatedUser || u2 == authenticatedUser)
+                .map(([u2, roomId]) => {
+                    const otherUser = authenticatedUser == u1 ? u2 : u1;
+
+                    return {user: otherUser, roomId};
+                })
+        ));
     }
 
     getPrivateChatRoomForPlayer(u: User): Channel {
