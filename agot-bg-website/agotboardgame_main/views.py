@@ -1,12 +1,17 @@
+from datetime import datetime
+
+from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import select_template
+from django.views.decorators.http import require_POST
 
 from agotboardgame_main.models import Game, ONGOING, IN_LOBBY, User
 from chat.models import Room
+from agotboardgame_main.forms import UpdateUsernameForm
 
 
 def index(request):
@@ -83,6 +88,38 @@ def play(request, game_id, user_id=None):
     template = select_template(["agotboardgame_main/play.html", "agotboardgame_main/play_fake.html"])
 
     return HttpResponse(template.render({"auth_data": auth_data}, request))
+
+
+@login_required
+def settings(request):
+    # Initialize all forms used in the settings page
+    update_username_form = UpdateUsernameForm(instance=request.user)
+
+    # Possibly treat a form if a POST request was sent
+    if request.method == "POST":
+        form_type = request.POST.get('form_type')
+
+        if form_type == 'update_username':
+            # request.user can't be used because is_valid will modify the instance in-place,
+            # leading to inconsistent values being shown in the UI when "render" is called.
+            current_user = User.objects.get(pk=request.user.id)
+
+            # Check if user can update their username
+            if not current_user.can_update_username:
+                return HttpResponseRedirect('/settings/')
+
+            update_username_form = UpdateUsernameForm(request.POST, instance=current_user)
+
+            if update_username_form.is_valid():
+                update_username_form.save(commit=False)
+                current_user.last_username_update_time = datetime.now()
+                current_user.save()
+
+                messages.success(request, "Username successfuly changed!")
+
+                return HttpResponseRedirect('/settings/')
+
+    return render(request, "agotboardgame_main/settings.html", {"update_username_form": update_username_form})
 
 
 def user_profile(request, user_id):
