@@ -84,6 +84,7 @@
                                    class="form-control"
                                    id="chat-message"
                                    placeholder="Message"
+                                   maxlength="200"
                                    value=${this.state.input}
                                    disabled=${!isAuthenticated}
                                    onInput=${e => this.setState({input: e.target.value})}/>
