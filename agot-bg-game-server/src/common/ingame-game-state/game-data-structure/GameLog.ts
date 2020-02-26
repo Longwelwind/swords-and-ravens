@@ -26,7 +26,8 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | CrowKillersFootmanUpgraded | CrowKillersKnightsReplaced
     | SkinchangerScoutNightsWatchVictory | SkinchangerScoutWildlingVictory
     | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory
-    | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered;
+    | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered
+    | SupplyAdjusted;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -494,4 +495,9 @@ interface BattleCasualtiesSuffered {
     type: "killed-after-combat";
     house: string;
     killed: string[];
+}
+
+interface SupplyAdjusted {
+    type: "supply-adjusted";
+    supplies: [string, number][];
 }

@@ -850,6 +850,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <>
                     <strong>{data.house}</strong> suffered battle casualties and chose this units to be killed: {data.killed.join(", ")}.
                 </>;
+
+            case "supply-adjusted":
+                const supplies: [House, number][] = data.supplies.map(([hid, supply]) => [this.game.houses.get(hid), supply]);
+
+                return (
+                <>
+                    Supply levels have been adjusted:
+                    <table cellPadding="5">
+                        {supplies.map(([house, supply]) => (
+                            <tr key={house.id}>
+                                <td>{house.name}</td>
+                                <td>{supply}</td>
+                            </tr>))}
+                    </table>
+                </>);
         }
     }
 }

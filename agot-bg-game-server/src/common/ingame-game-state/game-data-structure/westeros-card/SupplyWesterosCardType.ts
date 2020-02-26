@@ -9,6 +9,11 @@ export default class SupplyWesterosCardType extends WesterosCardType {
             h.supplyLevel = westeros.game.getControlledSupplyIcons(h);
         });
 
+        westeros.ingame.log({
+            type: "supply-adjusted",
+            supplies: westeros.game.houses.values.map(h => [h.id, h.supplyLevel])
+        });
+
         westeros.entireGame.broadcastToClients({
             type: "supply-adjusted",
             supplies: westeros.game.houses.values.map(h => [h.id, h.supplyLevel])
