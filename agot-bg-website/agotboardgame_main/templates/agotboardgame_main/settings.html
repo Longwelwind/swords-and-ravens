@@ -1,0 +1,39 @@
+{% extends "./base.html" %}
+
+{% block title %}
+Settings -
+{% endblock %}
+
+{% load bootstrap4 %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-lg-10 mb-4">
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Change username</h4>
+                    <p>
+                        <strong>Warning:</strong> Your username can only be changed once
+                    </p>
+                    {% if user.can_update_username %}
+                        <form action="/settings/" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="form_type" value="update_username"/>
+                            {% bootstrap_form update_username_form %}
+                            {% buttons %}
+                                <button type="submit" class="btn btn-primary">Change</button>
+                            {% endbuttons %}
+                        </form>
+                    {% else %}
+                        <p>You can't change your username again</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

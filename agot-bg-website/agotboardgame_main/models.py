@@ -3,8 +3,10 @@ import uuid
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import JSONField
+from django.core.validators import RegexValidator, MinLengthValidator
 from django.db import models
 from django.utils.crypto import get_random_string
+from django.utils.translation import gettext_lazy as _
 
 IN_LOBBY = "IN_LOBBY"
 CLOSED = "CLOSED"
@@ -17,8 +19,24 @@ def generate_game_token():
 
 
 class User(AbstractUser):
+    username_validator = RegexValidator(regex=r'^[\w.-]+\Z')
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    username = models.CharField(
+        _('username'),
+        max_length=18,
+        unique=True,
+        help_text=_('Between 3 and 18 characters. Letters, digits and ./-/_ only.'),
+        validators=[MinLengthValidator(3), username_validator],
+        error_messages={
+            'unique': _("A user with that username already exists."),
+        },
+    )
     game_token = models.TextField(default=generate_game_token)
+    last_username_update_time = models.DateTimeField(default=None, null=True, blank=True)
+
+    def can_update_username(self):
+        return self.last_username_update_time is None
 
 
 class Game(models.Model):
