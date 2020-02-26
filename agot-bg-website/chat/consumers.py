@@ -73,6 +73,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 logger.warning(f'A user tried to send an empty message to room "{self.room.id}"')
                 return
 
+            if len(text) > 200:
+                logger.warning(f'A user tried to send a too long message to room ({self.room.id}')
+                return
+
             if not user.is_authenticated:
                 logger.warning(f'An unauthenticated user tried to send the message "${text}" to room "{self.room.id}"')
                 return
