@@ -193,6 +193,5 @@ dmypy.json
 
 # End of https://www.gitignore.io/api/python,django
 
-.idea/
 agotboardgame_main/templates/agotboardgame_main/play.html
 .env
