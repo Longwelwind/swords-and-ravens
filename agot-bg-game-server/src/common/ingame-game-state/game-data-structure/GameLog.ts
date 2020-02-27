@@ -40,11 +40,6 @@ interface SupportDeclared {
     supported: string | null;
 }
 
-interface HouseCardChosen {
-    type: "house-card-chosen";
-    houseCards: [string, string][];
-}
-
 interface Attack {
     type: "attack";
     attacker: string;
@@ -169,6 +164,7 @@ interface WesterosPhaseBegan {
     type: "westeros-phase-began";
 }
 
+// This is obsolete but need to be kept for now to be backwards compatible
 interface CombatHouseCardChosen {
     type: "combat-house-card-chosen";
     houseCards: [string, string][];

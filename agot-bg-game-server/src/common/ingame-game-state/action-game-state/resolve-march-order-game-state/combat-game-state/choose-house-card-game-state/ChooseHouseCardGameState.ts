@@ -63,20 +63,6 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
             if (this.houseCards.size == 2) {
                 this.houseCards.forEach((houseCard, house) => this.combatGameState.houseCombatDatas.get(house).houseCard = houseCard);
 
-                // "this.combatGameState.attackingHouseCombatData.houseCard" and
-                // "this.combatGameState.defendingHouseCombatData.houseCard" will always be non-null
-                // since they have just been set before, thus the two "ts-ignore". They could be later set to null
-                // because of Tyrion Lannister, for example.
-                this.ingameGameState.log({
-                    type: "combat-house-card-chosen",
-                    houseCards: [
-                        // @ts-ignore
-                        [this.combatGameState.attacker.id, this.combatGameState.attackingHouseCombatData.houseCard.id],
-                        // @ts-ignore
-                        [this.combatGameState.defender.id, this.combatGameState.defendingHouseCombatData.houseCard.id]
-                    ]
-                });
-
                 this.entireGame.broadcastToClients({
                     type: "change-combat-house-card",
                     // Same here, the houseCards will always be non-null

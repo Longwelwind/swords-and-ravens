@@ -374,19 +374,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <><strong>{house.name}</strong> used the <strong>Valyrian Sword</strong>.</>;
 
             case "combat-house-card-chosen":
-                const houseCards = data.houseCards.map(([hid, hcid]) => {
-                    const house = this.game.houses.get(hid);
-                    return [house, house.houseCards.get(hcid)];
-                });
-
-                return <>
-                    <p>House cards were chosen:</p>
-                    <ul>
-                        {houseCards.map(([h, hc]) => (
-                            <li key={h.id}><strong>{h.name}</strong> chose <strong>{hc.name}</strong></li>
-                        ))}
-                    </ul>
-                </>;
+                // Obsolete as GameInfoComponent shows this now
+                // Kept to be backwards compatible
+                return <></>;
 
             case "clash-of-kings-final-ordering":
                 const finalOrder = data.finalOrder.map(hid => this.game.houses.get(hid));
