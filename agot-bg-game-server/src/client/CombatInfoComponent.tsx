@@ -21,6 +21,7 @@ interface HouseCombatData {
 
 interface CombatInfoComponentProps {
     housesCombatData: HouseCombatData[];
+    showTitle: boolean;
 }
 
 @observer
@@ -38,6 +39,11 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
     render(): ReactNode {
         return (
             <>
+                {this.props.showTitle && (
+                    <div style={{display: 'flex', justifyContent: 'center'}}>
+                        <h5>Battle for <strong>{this.defender.region.name}</strong></h5>
+                    </div>
+                )}
                 <div style={{display: "grid", gridGap: "5px", gridTemplateColumns: "auto 1fr auto 1fr auto", justifyItems: "center", alignItems: "center"}} className="text-center">
                     <div style={{gridRow: "1", gridColumn: "1 / span 2"}}>
                         <strong>{this.attacker.house.name}</strong><br/>

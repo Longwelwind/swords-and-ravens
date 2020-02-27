@@ -154,7 +154,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <>
                         <p>Combat result</p>
-                        <CombatInfoComponent housesCombatData={houseCombatDatas}/>
+                        <CombatInfoComponent housesCombatData={houseCombatDatas} showTitle={false}/>
                         <p><strong>{winner.name}</strong> won the fight!</p>
                     </>
                 );

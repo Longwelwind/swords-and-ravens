@@ -15,7 +15,6 @@ import UseValyrianSteelBladeComponent from "./UseValyrianSteelBladeComponent";
 import House from "../../common/ingame-game-state/game-data-structure/House";
 import GameStateComponentProps from "./GameStateComponentProps";
 import renderChildGameState from "../utils/renderChildGameState";
-import Table from "react-bootstrap/Table";
 import PostCombatGameState
     from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState";
 import PostCombatComponent from "./PostCombatComponent";
@@ -74,7 +73,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                                     valyrianSteelBlade: this.combatGameState.getValyrianBladeBonus(this.defender),
                                     total: this.combatGameState.getTotalCombatStrength(this.defender),
                                 }
-                            ]}
+                            ]} showTitle={true}
                         />
                     )}
                 </Col>
