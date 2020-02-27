@@ -17,10 +17,11 @@ Settings -
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Change username</h4>
-                    <p>
-                        <strong>Warning:</strong> Your username can only be changed once
-                    </p>
                     {% if user.can_update_username %}
+                        <p>
+                            <strong>Warning:</strong> Your username can only be changed once. Your username will only be
+                            changed for new games.
+                        </p>
                         <form action="/settings/" method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="form_type" value="update_username"/>
