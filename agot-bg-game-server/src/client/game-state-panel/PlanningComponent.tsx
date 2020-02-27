@@ -14,6 +14,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import OrderGridComponent from "./utils/OrderGridComponent";
 import {OrderOnMapProperties, RegionOnMapProperties} from "../MapControls";
+import PartialRecursive from "../../utils/PartialRecursive";
 
 @observer
 export default class PlanningComponent extends Component<GameStateComponentProps<PlanningGameState>> {
@@ -88,7 +89,7 @@ export default class PlanningComponent extends Component<GameStateComponentProps
         _.pull(this.props.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
     }
 
-    modifyRegionsOnMap(): [Region, Partial<RegionOnMapProperties>][] {
+    modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
         if (this.props.gameClient.authenticatedPlayer) {
             if (this.selectedOrder != null) {
                 return this.props.gameState.getPossibleRegionsForOrders(this.props.gameClient.authenticatedPlayer.house).map(r => ([
@@ -104,7 +105,7 @@ export default class PlanningComponent extends Component<GameStateComponentProps
         return [];
     }
 
-    modifyOrdersOnMap(): [Region, Partial<OrderOnMapProperties>][] {
+    modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
         if (this.props.gameClient.authenticatedPlayer) {
             return this.props.gameState.getPossibleRegionsForOrders(this.props.gameClient.authenticatedPlayer.house).map(r => ([
                 r,

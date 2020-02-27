@@ -9,6 +9,7 @@ import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import SelectRegionGameState from "../../common/ingame-game-state/select-region-game-state/SelectRegionGameState";
 import {RegionOnMapProperties} from "../MapControls";
+import PartialRecursive from "../../utils/PartialRecursive";
 
 @observer
 export default class SelectRegionComponent extends Component<GameStateComponentProps<SelectRegionGameState<any>>> {
@@ -39,7 +40,7 @@ export default class SelectRegionComponent extends Component<GameStateComponentP
         );
     }
 
-    modifyRegionsOnMap(): [Region, Partial<RegionOnMapProperties>][] {
+    modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
             if (this.selectedRegion == null) {
                 return this.props.gameState.regions.map(r => ([

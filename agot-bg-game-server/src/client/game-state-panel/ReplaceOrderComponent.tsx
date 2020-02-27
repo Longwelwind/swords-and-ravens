@@ -14,6 +14,7 @@ import Col from "react-bootstrap/Col";
 import OrderGridComponent from "./utils/OrderGridComponent";
 import orders from "../../common/ingame-game-state/game-data-structure/orders";
 import {OrderOnMapProperties} from "../MapControls";
+import PartialRecursive from "../../utils/PartialRecursive";
 
 @observer
 export default class ReplaceOrderComponent extends Component<GameStateComponentProps<ReplaceOrderGameState>> {
@@ -88,12 +89,12 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
         }
     }
 
-    modifyOrdersOnMap(): [Region, Partial<OrderOnMapProperties>][] {
+    modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.props.gameState.ravenHolder)) {
             return this.props.gameState.ingameGameState.game.world.getControlledRegions(this.props.gameState.ravenHolder).map(r => [
                 r,
                 {
-                    highlight: this.selectedRegion == null || this.selectedOrder == null || (this.selectedRegion == r) ? {active: true} : null,
+                    highlight: {active: this.selectedRegion == null || this.selectedOrder == null || (this.selectedRegion == r)},
                     onClick: () => this.onOrderClick(r)
                 }
             ])

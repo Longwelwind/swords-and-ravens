@@ -14,6 +14,7 @@ import House from "../../common/ingame-game-state/game-data-structure/House";
 import {observable} from "mobx";
 import Row from "react-bootstrap/Row";
 import {UnitOnMapProperties} from "../MapControls";
+import PartialRecursive from "../../utils/PartialRecursive";
 
 @observer
 export default class PlayerReconcileArmiesComponent extends Component<GameStateComponentProps<PlayerReconcileArmiesGameState>> {
@@ -83,12 +84,12 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
         this.unitsToRemove = new BetterMap();
     }
 
-    modifyUnitsOnMap(): [Unit, Partial<UnitOnMapProperties>][] {
+    modifyUnitsOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.house)) {
             return this.props.gameState.game.world.getUnitsOfHouse(this.house).map(u => [
                 u,
                 {
-                    highlight: !_.flatMap(this.unitsToRemove.map((_, us) => us)).includes(u) ? {active: true} : null,
+                    highlight: {active: !_.flatMap(this.unitsToRemove.map((_, us) => us)).includes(u)},
                     onClick: () => this.onUnitClick(u)
                 }
             ]);

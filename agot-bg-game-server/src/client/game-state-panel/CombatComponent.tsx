@@ -28,9 +28,15 @@ import CancelHouseCardAbilitiesGameState
 import CancelHouseCardAbilitiesComponent from "./house-card-abilities/CancelHouseCardAbilitiesComponent";
 import Col from "react-bootstrap/Col";
 import CombatInfoComponent from "../CombatInfoComponent";
+import Region from "../../common/ingame-game-state/game-data-structure/Region";
+import { RegionOnMapProperties } from "../MapControls";
+import PartialRecursive from "../../utils/PartialRecursive";
+import _ from "lodash";
 
 @observer
 export default class CombatComponent extends Component<GameStateComponentProps<CombatGameState>> {
+    modifyRegionsOnMapCallback: any;
+
     get combatGameState(): CombatGameState {
         return this.props.gameState;
     }
@@ -88,5 +94,21 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                 ])}
             </>
         );
+    }
+
+    modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
+        // Highlight the embattled are in yellow
+        return [[
+            this.props.gameState.defendingRegion,
+            {highlight: {active: true, color: "yellow"}}
+        ]];
+    }
+
+    componentDidMount(): void {
+        this.props.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
+    }
+
+    componentWillUnmount(): void {
+        _.pull(this.props.mapControls.modifyRegionsOnMap, this.modifyRegionsOnMapCallback);
     }
 }
