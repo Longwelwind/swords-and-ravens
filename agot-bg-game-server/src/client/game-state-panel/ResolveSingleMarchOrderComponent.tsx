@@ -17,6 +17,8 @@ import Col from "react-bootstrap/Col";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import {OrderOnMapProperties, RegionOnMapProperties, UnitOnMapProperties} from "../MapControls";
+import PartialRecursive from "../../utils/PartialRecursive";
+
 
 @observer
 export default class ResolveSingleMarchOrderComponent extends Component<GameStateComponentProps<ResolveSingleMarchOrderGameState>> {
@@ -183,7 +185,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         this.reset();
     }
 
-    modifyOrdersOnMap(): [Region, Partial<OrderOnMapProperties>][] {
+    modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
             if (this.selectedMarchOrderRegion == null) {
                 return this.props.gameState.getRegionsWithMarchOrder().map(r => [
@@ -196,7 +198,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         return [];
     }
 
-    modifyUnitsOnMap(): [Unit, Partial<UnitOnMapProperties>][] {
+    modifyUnitsOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
             if (this.selectedMarchOrderRegion != null) {
                 return this.selectedMarchOrderRegion.units.values.filter(u => this.isUnitAvailable(u)).map(u => [
@@ -209,7 +211,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         return [];
     }
 
-    modifyRegionsOnMap(): [Region, Partial<RegionOnMapProperties>][] {
+    modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
         if (this.selectedMarchOrderRegion != null && this.selectedUnits.length > 0) {
             return this.props.gameState.getValidTargetRegions(this.selectedMarchOrderRegion, this.plannedMoves.entries, this.selectedUnits).map(r => [
                 r,

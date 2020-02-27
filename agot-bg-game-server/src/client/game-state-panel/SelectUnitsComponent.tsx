@@ -12,6 +12,7 @@ import BetterMap from "../../utils/BetterMap";
 import {observable} from "mobx";
 import {observer} from "mobx-react";
 import {UnitOnMapProperties} from "../MapControls";
+import PartialRecursive from "../../utils/PartialRecursive";
 
 @observer
 export default class SelectUnitsComponent extends Component<GameStateComponentProps<SelectUnitsGameState<any>>> {
@@ -62,11 +63,11 @@ export default class SelectUnitsComponent extends Component<GameStateComponentPr
         return _.difference(this.props.gameState.possibleUnits, _.flatMap(this.selectedUnits.map((_r, us) => us)));
     }
 
-    modifyUnitOnMap(): [Unit, Partial<UnitOnMapProperties>][] {
+    modifyUnitOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {
         return this.getSelectableUnits().map(u => [
             u,
             {highlight: {active: true}, onClick: () => this.onUnitClick(u.region, u)}
-        ] as [Unit, Partial<UnitOnMapProperties>]);
+        ] as [Unit, PartialRecursive<UnitOnMapProperties>]);
     }
 
     onUnitClick(region: Region, unit: Unit): void {

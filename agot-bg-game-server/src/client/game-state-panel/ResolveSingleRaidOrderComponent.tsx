@@ -13,6 +13,7 @@ import Order from "../../common/ingame-game-state/game-data-structure/Order";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import {OrderOnMapProperties} from "../MapControls";
+import PartialRecursive from "../../utils/PartialRecursive";
 
 @observer
 export default class ResolveSingleRaidOrderComponent extends Component<GameStateComponentProps<ResolveSingleRaidOrderGameState>> {
@@ -95,7 +96,7 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
         }
     }
 
-    modifyOrdersOnMap(): [Region, Partial<OrderOnMapProperties>][] {
+    modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
             if (this.selectedOrderRegion == null || this.orderInOrderRegion == null) {
                 // Highlight the Raid orders of the house

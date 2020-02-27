@@ -6,7 +6,7 @@ import Border from "../common/ingame-game-state/game-data-structure/Border";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
 import Unit from "../common/ingame-game-state/game-data-structure/Unit";
 import PlanningGameState from "../common/ingame-game-state/planning-game-state/PlanningGameState";
-import MapControls, {OrderOnMapProperties, RegionOnMapProperties} from "./MapControls";
+import MapControls, {OrderOnMapProperties, RegionOnMapProperties, UnitOnMapProperties} from "./MapControls";
 import {observer} from "mobx-react";
 import ActionGameState from "../common/ingame-game-state/action-game-state/ActionGameState";
 import Order from "../common/ingame-game-state/game-data-structure/Order";
@@ -21,6 +21,8 @@ import {OverlayTrigger, Tooltip} from "react-bootstrap";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import BetterMap from "../utils/BetterMap";
 import _ from "lodash";
+import PartialRecursive from "../utils/PartialRecursive";
+
 
 interface MapComponentProps {
     gameClient: GameClient;
@@ -30,6 +32,7 @@ interface MapComponentProps {
 
 @observer
 export default class MapComponent extends Component<MapComponentProps> {
+    
     render(): ReactNode {
         return (
             <div className="map"
@@ -74,17 +77,18 @@ export default class MapComponent extends Component<MapComponentProps> {
         const propertiesForRegions = this.getModifiedPropertiesForEntities<Region, RegionOnMapProperties>(
             this.props.ingameGameState.world.regions.values,
             this.props.mapControls.modifyRegionsOnMap,
-            {highlight: null, onClick: null}
+            {highlight: {active: false, color: "white"}, onClick: null}
         );
 
         return propertiesForRegions.entries.map(([region, properties]) => {
+
             return <polygon key={region.id}
                             points={this.getRegionPath(region)}
-                            fill="white"
+                            fill={properties.highlight.color}
                             fillRule="evenodd"
                             className={classNames(
                                 "region-area",
-                                properties.highlight != null ? {
+                                properties.highlight.active ? {
                                     "clickable": true,
                                     // Whatever the strength of the highlight defined, show the same
                                     // highlightness
@@ -96,10 +100,10 @@ export default class MapComponent extends Component<MapComponentProps> {
     }
 
     renderUnits(): ReactNode {
-        const propertiesForUnits = this.getModifiedPropertiesForEntities(
+        const propertiesForUnits = this.getModifiedPropertiesForEntities<Unit, UnitOnMapProperties>(
             _.flatMap(this.props.ingameGameState.world.regions.values.map(r => r.units.values)),
             this.props.mapControls.modifyUnitsOnMap,
-            {highlight: null, onClick: null}
+            {highlight: {active: false, color: "white"}, onClick: null}
         );
 
         return this.props.ingameGameState.world.regions.values.map(r => (
@@ -115,9 +119,9 @@ export default class MapComponent extends Component<MapComponentProps> {
                                 onClick={property.onClick ? property.onClick : undefined}
                                 className={classNames(
                                     "unit-icon hover-weak-outline",
-                                    property.highlight ? {
-                                        "medium-outline hover-strong-outline": true
-                                    } : {}
+                                    {
+                                        "medium-outline hover-strong-outline": property.highlight.active
+                                    }
                                 )}
                                 style={{
                                     backgroundImage: `url(${unitImages.get(u.allegiance.id).get(u.type.id)})`,
@@ -132,7 +136,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         const propertiesForOrders = this.getModifiedPropertiesForEntities<Region, OrderOnMapProperties>(
             _.flatMap(this.props.ingameGameState.world.regions.values),
             this.props.mapControls.modifyOrdersOnMap,
-            {highlight: null, onClick: null}
+            {highlight: {active: false, color: "white"}, onClick: null}
         );
 
         return propertiesForOrders.map((region, properties) => {
@@ -177,7 +181,7 @@ export default class MapComponent extends Component<MapComponentProps> {
      * @param modifyPropertiesFunctions
      * @param defaultProperties
      */
-    getModifiedPropertiesForEntities<Entity, Property>(entities: Entity[], modifyPropertiesFunctions: (() => [Entity, Partial<Property>][])[], defaultProperties: Property): BetterMap<Entity, Property> {
+    getModifiedPropertiesForEntities<Entity, Property>(entities: Entity[], modifyPropertiesFunctions: (() => [Entity, PartialRecursive<Property>][])[], defaultProperties: Property): BetterMap<Entity, Property> {
         // Create a Map of properties for all regions that will be shown
         const propertiesForEntities = new BetterMap<Entity, Property>();
         entities.forEach(entity => {
@@ -199,9 +203,9 @@ export default class MapComponent extends Component<MapComponentProps> {
         return (
             <div className={classNames(
                     "order-container", "hover-weak-outline",
-                    properties.highlight ? {
+                    {
                         "medium-outline hover-strong-outline clickable": properties.highlight.active
-                    } : null
+                    }
                 )}
                  style={{left: region.orderSlot.x, top: region.orderSlot.y}}
                  onClick={properties.onClick ? properties.onClick : undefined}

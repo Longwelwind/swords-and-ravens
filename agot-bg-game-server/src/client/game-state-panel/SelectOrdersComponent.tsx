@@ -11,6 +11,7 @@ import {observable} from "mobx";
 import Order from "../../common/ingame-game-state/game-data-structure/Order";
 import _ from "lodash";
 import {OrderOnMapProperties} from "../MapControls";
+import PartialRecursive from "../../utils/PartialRecursive";
 
 @observer
 export default class SelectOrdersComponent extends Component<GameStateComponentProps<SelectOrdersGameState<ParentGameState>>> {
@@ -61,7 +62,7 @@ export default class SelectOrdersComponent extends Component<GameStateComponentP
         }
     }
 
-    modifyOrdersOnMap(): [Region, Partial<OrderOnMapProperties>][] {
+    modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
             if (this.selectedRegions.length < this.props.gameState.count) {
                 return this.props.gameState.possibleRegions.map(r => [

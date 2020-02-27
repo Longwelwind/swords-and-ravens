@@ -15,6 +15,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import classNames from "classnames";
 import {OrderOnMapProperties, RegionOnMapProperties} from "../MapControls";
+import PartialRecursive from "../../utils/PartialRecursive";
 
 @observer
 export default class PlayerMusteringComponent extends Component<GameStateComponentProps<PlayerMusteringGameState>> {
@@ -187,7 +188,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         return `Get ${powerTokenCount} Power token${powerTokenCount > 1 ? "s" : ""}`;
     }
 
-    modifyRegionsOnMap(): [Region, Partial<RegionOnMapProperties>][] {
+    modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
             if (this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD) {
                 return this.props.gameState.game.world.regions.values
@@ -217,7 +218,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         return [];
     }
 
-    modifyOrdersOnMap(): [Region, Partial<OrderOnMapProperties>][] {
+    modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
             if (this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
                 if (this.selectedRegion == null) {
