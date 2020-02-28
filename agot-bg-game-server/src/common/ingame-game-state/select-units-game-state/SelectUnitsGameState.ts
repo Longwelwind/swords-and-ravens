@@ -21,15 +21,17 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
     house: House;
     possibleUnits: Unit[];
     count: number;
+    canBeSkipped: boolean;
 
     get game(): Game {
         return this.parentGameState.game;
     }
 
-    firstStart(house: House, possibleUnits: Unit[], count: number): void {
+    firstStart(house: House, possibleUnits: Unit[], count: number, canBeSkipped = false): void {
         this.house = house;
         this.possibleUnits = possibleUnits;
         this.count = count;
+        this.canBeSkipped = canBeSkipped;
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -45,12 +47,7 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
                 return [region, units];
             });
 
-            // Check if the user has selected a correct amount of units.
-            // There might not be enough units to select, so compute the number of available
-            // units to check.
-            const countSelectedUnits = _.sum(units.map(([_region, units]) => units.length));
-
-            if (countSelectedUnits != Math.min(this.count, this.possibleUnits.length)) {
+            if (!this.selectedCountMatchesExpectedCount(units)) {
                 return;
             }
 
@@ -59,6 +56,20 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
             }
 
             this.parentGameState.onSelectUnitsEnd(this.house, units);
+        }
+    }
+
+    selectedCountMatchesExpectedCount(selectedUnits: [Region, Unit[]][]): boolean {
+        // Check if the user has selected a correct amount of units.
+        // There might not be enough units to select, so compute the number of available
+        // units to check.
+        const selectedUnitsCount = _.sum(selectedUnits.map(([_region, units]) => units.length));
+        const possibleSelectCount = Math.min(this.count, this.possibleUnits.length);
+
+        if (this.canBeSkipped) {
+            return selectedUnitsCount <= possibleSelectCount;
+        } else {
+            return selectedUnitsCount == possibleSelectCount;
         }
     }
 
@@ -84,7 +95,8 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
             type: "select-units",
             house: this.house.id,
             possibleUnits: this.possibleUnits.map(u => u.id),
-            count: this.count
+            count: this.count,
+            canBeSkipped: this.canBeSkipped
         };
     }
 
@@ -94,6 +106,7 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
         selectUnits.house = parent.game.houses.get(data.house);
         selectUnits.possibleUnits = data.possibleUnits.map(uid => parent.game.world.getUnitById(uid));
         selectUnits.count = data.count;
+        selectUnits.canBeSkipped = data.canBeSkipped;
 
         return selectUnits;
     }
@@ -104,4 +117,5 @@ export interface SerializedSelectUnitsGameState {
     house: string;
     possibleUnits: number[];
     count: number;
+    canBeSkipped: boolean;
 }
