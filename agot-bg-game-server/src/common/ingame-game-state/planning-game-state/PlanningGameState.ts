@@ -24,6 +24,7 @@ export default class PlanningGameState extends GameState<IngameGameState> {
     // it thus represents a face-down order (this player can't see it).
     @observable placedOrders: BetterMap<Region, Order | null> = new BetterMap<Region, Order | null>();
     @observable readyPlayers: Player[] = [];
+    bypassCanReady: boolean;
 
     get ingameGameState(): IngameGameState {
         return this.parentGameState;
@@ -103,6 +104,10 @@ export default class PlanningGameState extends GameState<IngameGameState> {
                 return;
             }
 
+            if (!this.canReady(player.house).status) {
+                return;
+            }
+
             this.readyPlayers.push(player);
 
             // Check if all player are ready to go the action entireGame state
@@ -135,15 +140,41 @@ export default class PlanningGameState extends GameState<IngameGameState> {
             type: "planning",
             planningRestrictions: this.planningRestrictions.map(pr => pr.id),
             placedOrders: placedOrders,
-            readyPlayers: this.readyPlayers.map(p => p.user.id)
+            readyPlayers: this.readyPlayers.map(p => p.user.id),
+            bypassCanReady: this.bypassCanReady
         };
+    }
+
+    /*
+     * Common
+     */
+    
+    canReady(house: House): {status: boolean; reason: string} {
+        if(this.bypassCanReady) {
+            return {status: true, reason: "can-ready-bypassed"};
+        }
+
+        const possibleRegions = this.getPossibleRegionsForOrders(house);
+
+        if (possibleRegions.every(r => this.placedOrders.has(r)))
+        {
+            // All possible regions have orders
+            return {status: true, reason: "all-regions-filled"};
+        }
+
+        // It is possible that a house controls more areas than it has available orders
+        if (this.getAvailableOrders(house).length == 0) {
+            return {status: true, reason: "all-available-orders-used"};
+        }
+
+        return {status: false, reason: "not-all-regions-filled"};
     }
 
     /**
      * Client
      */
 
-    assignOrder(region: Region, order: Order | null) {
+    assignOrder(region: Region, order: Order | null): void {
         this.entireGame.sendMessageToServer({
             type: "place-order",
             regionId: region.id,
@@ -151,13 +182,13 @@ export default class PlanningGameState extends GameState<IngameGameState> {
         });
     }
 
-    ready() {
+    ready(): void {
         this.entireGame.sendMessageToServer({
             type: "ready"
         });
     }
 
-    onServerMessage(message: ServerMessage) {
+    onServerMessage(message: ServerMessage): void {
         if (message.type == "order-placed") {
             const region = this.world.regions.get(message.region);
             const order = message.order ? orders.get(message.order) : null;
@@ -204,13 +235,8 @@ export default class PlanningGameState extends GameState<IngameGameState> {
         return this.planningRestrictions.some(restriction => restriction.restriction(order.type));
     }
 
-    isReady(player: Player) {
+    isReady(player: Player): boolean {
         return this.readyPlayers.includes(player);
-    }
-
-    areOrdersAssignedToAllPossibleRegions(house: House): boolean {
-        const possibleRegions = this.getPossibleRegionsForOrders(house);
-        return possibleRegions.every(r => this.placedOrders.has(r));
     }
 
     static deserializeFromServer(ingameGameState: IngameGameState, data: SerializedPlanningGameState): PlanningGameState {
@@ -226,6 +252,7 @@ export default class PlanningGameState extends GameState<IngameGameState> {
             )
         );
         planningGameState.readyPlayers = data.readyPlayers.map(userId => ingameGameState.players.get(ingameGameState.entireGame.users.get(userId)));
+        planningGameState.bypassCanReady = data.bypassCanReady;
 
         return planningGameState;
     }
@@ -236,4 +263,5 @@ export interface SerializedPlanningGameState {
     planningRestrictions: string[];
     placedOrders: [string, number | null][];
     readyPlayers: string[];
+    bypassCanReady: boolean;
 }

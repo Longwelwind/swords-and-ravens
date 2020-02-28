@@ -292,7 +292,8 @@ export function setupAtPlanningGameState(
         type: "planning",
         placedOrders: [],
         readyPlayers: [],
-        planningRestrictions: []
+        planningRestrictions: [],
+        bypassCanReady: true
     }, userSetupOptions).expectGameState<PlanningGameState>(PlanningGameState);
 }
 
