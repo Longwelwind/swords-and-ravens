@@ -4,26 +4,9 @@ on:
   pull_request:
 
 jobs:
-  game-server-test:
-    name: Game Server Test
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - uses: actions/setup-node@v1
-      with:
-        node-version: "10.16"
-    - name: Install dependencies
-      run: |
-        cd agot-bg-game-server
-        yarn install
-    - name: Run tests
-      run: |
-        cd agot-bg-game-server
-        yarn run test
   game-server-build:
     name: Game Server Build
     runs-on: ubuntu-latest
-    needs: [game-server-test]
     steps:
     - uses: actions/checkout@v1
     - name: Build game-server Docker image
