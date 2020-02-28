@@ -54,7 +54,8 @@ export default class PostCombatGameState extends GameState<
     }
 
     firstStart(): void {
-        const attackerTotalStrength = this.combat.getTotalCombatStrength(this.attacker);
+        // Final combat strength can't be negative but only attacker is able to generate a negative final combat strength
+        const attackerTotalStrength = Math.max(this.combat.getTotalCombatStrength(this.attacker), 0);
         const defenderTotalStrength = this.combat.getTotalCombatStrength(this.defender);
 
         this.winner = attackerTotalStrength > defenderTotalStrength
@@ -80,7 +81,7 @@ export default class PostCombatGameState extends GameState<
                     houseCard: houseCard ? houseCard.id : null,
                     houseCardStrength: this.combat.getHouseCardCombatStrength(h),
                     valyrianSteelBlade: this.combat.getValyrianBladeBonus(h),
-                    total: this.combat.getTotalCombatStrength(h)
+                    total: Math.max(this.combat.getTotalCombatStrength(h), 0)
                 }
             })
         });
@@ -181,8 +182,6 @@ export default class PostCombatGameState extends GameState<
                 region: locationLoserArmy.id,
                 army: this.loserCombatData.army.map(u => u.id)
             });
-
-            this.entireGame
         }
 
         const loserArmyLeft = _.difference(loserArmy, immediatelyKilledLoserUnits);
