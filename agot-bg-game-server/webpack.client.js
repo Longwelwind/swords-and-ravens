@@ -25,8 +25,16 @@ module.exports = (env, argv) => {
                     use:['style-loader','css-loader', 'sass-loader']
                 },
                 {
-                    test: /\.(jpg|png|gif|svg)$/,
-                    use: 'file-loader',
+                    test: /\.(jpe?g|png|gif|svg)$/,
+                    use: [
+                        'file-loader',
+                        {
+                            loader: "image-webpack-loader",
+                            options: {
+                                disabled: true
+                            }
+                        }
+                    ],
                 },
             ]
         },

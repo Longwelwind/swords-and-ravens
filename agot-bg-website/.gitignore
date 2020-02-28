@@ -195,3 +195,4 @@ dmypy.json
 
 agotboardgame_main/templates/agotboardgame_main/play.html
 .env
+static_game/
