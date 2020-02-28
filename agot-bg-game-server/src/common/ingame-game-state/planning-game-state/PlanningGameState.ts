@@ -24,7 +24,6 @@ export default class PlanningGameState extends GameState<IngameGameState> {
     // it thus represents a face-down order (this player can't see it).
     @observable placedOrders: BetterMap<Region, Order | null> = new BetterMap<Region, Order | null>();
     @observable readyPlayers: Player[] = [];
-    bypassCanReady: boolean;
 
     get ingameGameState(): IngameGameState {
         return this.parentGameState;
@@ -140,8 +139,7 @@ export default class PlanningGameState extends GameState<IngameGameState> {
             type: "planning",
             planningRestrictions: this.planningRestrictions.map(pr => pr.id),
             placedOrders: placedOrders,
-            readyPlayers: this.readyPlayers.map(p => p.user.id),
-            bypassCanReady: this.bypassCanReady
+            readyPlayers: this.readyPlayers.map(p => p.user.id)
         };
     }
 
@@ -150,10 +148,6 @@ export default class PlanningGameState extends GameState<IngameGameState> {
      */
     
     canReady(house: House): {status: boolean; reason: string} {
-        if(this.bypassCanReady) {
-            return {status: true, reason: "can-ready-bypassed"};
-        }
-
         const possibleRegions = this.getPossibleRegionsForOrders(house);
 
         if (possibleRegions.every(r => this.placedOrders.has(r)))
@@ -252,7 +246,6 @@ export default class PlanningGameState extends GameState<IngameGameState> {
             )
         );
         planningGameState.readyPlayers = data.readyPlayers.map(userId => ingameGameState.players.get(ingameGameState.entireGame.users.get(userId)));
-        planningGameState.bypassCanReady = data.bypassCanReady;
 
         return planningGameState;
     }
@@ -263,5 +256,4 @@ export interface SerializedPlanningGameState {
     planningRestrictions: string[];
     placedOrders: [string, number | null][];
     readyPlayers: string[];
-    bypassCanReady: boolean;
 }
