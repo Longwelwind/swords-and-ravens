@@ -45,7 +45,8 @@ export default class PlanningComponent extends Component<GameStateComponentProps
                                 <Row className="justify-content-center">
                                     <Col xs="auto">
                                         <Button
-                                            disabled={this.props.gameState.isReady(this.props.gameClient.authenticatedPlayer)}
+                                            disabled={this.props.gameState.isReady(this.props.gameClient.authenticatedPlayer)
+                                                || !this.props.gameState.canReady(this.props.gameClient.authenticatedPlayer.house).status}
                                             onClick={() => this.onReadyClick()}
                                         >
                                             Ready
@@ -141,13 +142,6 @@ export default class PlanningComponent extends Component<GameStateComponentProps
     }
 
     onReadyClick(): void {
-        if (this.props.gameClient.authenticatedPlayer
-            && !this.props.gameState.areOrdersAssignedToAllPossibleRegions(this.props.gameClient.authenticatedPlayer.house)) {
-            if (!confirm('You haven\'t assigned an Order token to all of your areas. Continue anyway?')) {
-                return;
-            }
-        }
-
         this.props.gameState.ready();
     }
 }
