@@ -13,6 +13,10 @@ import houseInfluenceImages from "./houseInfluenceImages";
 import classNames = require("classnames");
 import ChatComponent from "./chat-client/ChatComponent";
 import GameSettingsComponent from "./GameSettingsComponent";
+import User from "../server/User";
+import ConditionalWrap from "./utils/ConditionalWrap";
+import { OverlayTrigger } from "react-bootstrap";
+import Tooltip from "react-bootstrap/Tooltip";
 
 interface LobbyComponentProps {
     gameClient: GameClient;
@@ -22,6 +26,8 @@ interface LobbyComponentProps {
 @observer
 export default class LobbyComponent extends Component<LobbyComponentProps> {
     render(): ReactNode {
+        const {success: canStartGame, reason: canStartGameReason} = this.props.gameState.canStartGame(this.props.gameClient.authenticatedUser as User);
+
         return (
             <Col xs={12} sm={10} md={8} lg={6} xl={3}>
                 <Row>
@@ -87,13 +93,32 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                 </Row>
                                 <Row>
                                     <Col>
-                                        <Button
-                                            block
-                                            onClick={() => this.props.gameState.start()}
-                                            disabled={!this.props.gameState.canStartGame() || !this.props.gameClient.isOwner()}
+                                        <ConditionalWrap
+                                            condition={!canStartGame}
+                                            wrap={children =>
+                                                <OverlayTrigger
+                                                    overlay={
+                                                        <Tooltip id="start-game">
+                                                            {canStartGameReason == "not-owner" ?
+                                                                "Only the owner of the game can start it"
+                                                            : canStartGameReason == "not-enough-players" ?
+                                                                "There must be at least 2 players to start a game"
+                                                            : null}
+                                                        </Tooltip>
+                                                    }
+                                                >
+                                                    {children}
+                                                </OverlayTrigger>
+                                            }
                                         >
-                                            Start
-                                        </Button>
+                                            <Button
+                                                block
+                                                onClick={() => this.props.gameState.start()}
+                                                disabled={!canStartGame}
+                                            >
+                                                Start
+                                            </Button>
+                                        </ConditionalWrap>
                                     </Col>
                                 </Row>
                             </Card.Body>
