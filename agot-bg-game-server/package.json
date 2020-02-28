@@ -64,7 +64,6 @@
     "build-client": "webpack --config webpack.client.js --mode=production",
     "run-server": "ts-node src/server/server.ts",
     "generate-json-schemas": "typescript-json-schema --strict-null-checks src/messages/ClientMessage.ts ClientMessage -o src/server/ClientMessage.json --include src/messages/*.ts",
-    "test": "jest",
     "lint": "eslint . --ext .ts,.tsx"
   }
 }
