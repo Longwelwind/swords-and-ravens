@@ -146,8 +146,8 @@ export default class PlanningGameState extends GameState<IngameGameState> {
     /*
      * Common
      */
-    
-    canReady(house: House): {status: boolean; reason: string} {
+
+     canReady(house: House): {status: boolean; reason: string} {
         const possibleRegions = this.getPossibleRegionsForOrders(house);
 
         if (possibleRegions.every(r => this.placedOrders.has(r)))

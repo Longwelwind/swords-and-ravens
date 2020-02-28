@@ -32,7 +32,6 @@ interface MapComponentProps {
 
 @observer
 export default class MapComponent extends Component<MapComponentProps> {
-    
     render(): ReactNode {
         return (
             <div className="map"
