@@ -6,6 +6,7 @@ import {ServerMessage} from "../../messages/ServerMessage";
 import {observable} from "mobx";
 import BetterMap from "../../utils/BetterMap";
 import baseGameData from "../../../data/baseGameData.json";
+import House from "../ingame-game-state/game-data-structure/House";
 
 export default class LobbyGameState extends GameState<EntireGame> {
     availableHouses: BetterMap<string, LobbyHouse>;
@@ -32,7 +33,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 return;
             }
 
-            if (!this.canStartGame()) {
+            if (!this.canStartGame(user).success) {
                 return;
             }
 
@@ -61,8 +62,16 @@ export default class LobbyGameState extends GameState<EntireGame> {
         }
     }
 
-    canStartGame(): boolean {
-        return this.players.size >= 1;
+    canStartGame(user: User): {success: boolean; reason: string} {
+        if (!this.entireGame.isOwner(user)) {
+            return {success: false, reason: "not-owner"};
+        }
+
+        if (this.players.size < 2) {
+            return {success: false, reason: "not-enough-players"};
+        }
+
+        return {success: true, reason: "ok"};
     }
 
     onServerMessage(message: ServerMessage): void {
