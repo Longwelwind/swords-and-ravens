@@ -10,6 +10,7 @@ import Game from "../../../../../../game-data-structure/Game";
 import HouseCard, {HouseCardState} from "../../../../../../game-data-structure/house-card/HouseCard";
 import IngameGameState from "../../../../../../IngameGameState";
 import SimpleChoiceGameState, { SerializedSimpleChoiceGameState } from "../../../../../../simple-choice-game-state/SimpleChoiceGameState";
+import { patchface } from "../../../../../../game-data-structure/house-card/houseCardAbilities";
 
 export default class PatchfaceAbilityGameState extends GameState<
     AfterCombatHouseCardAbilitiesGameState["childGameState"],
@@ -44,6 +45,11 @@ export default class PatchfaceAbilityGameState extends GameState<
 
             this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(house, choosableHouseCards);
         } else {
+            this.ingame.log({
+                type: "house-card-ability-not-used",
+                house: house.id,
+                houseCard: patchface.id
+            });
             this.parentGameState.onHouseCardResolutionFinish(house);
         }
     }
@@ -55,9 +61,17 @@ export default class PatchfaceAbilityGameState extends GameState<
 
         houseCard.state = HouseCardState.USED;
 
+        const affectedHouse = this.game.houses.values.find(h => h.houseCards.values.includes(houseCard)) as House;
+        this.ingame.log({
+            type: "patchface-used",
+            house: house.id,
+            affectedHouse: affectedHouse.id,
+            houseCard: houseCard.id
+        });
+
         this.combat().entireGame.broadcastToClients({
             type: "change-state-house-card",
-            houseId: (this.game.houses.values.find(h => h.houseCards.values.includes(houseCard)) as House).id,
+            houseId: affectedHouse.id,
             cardIds: [houseCard.id],
             state: HouseCardState.USED
         });
