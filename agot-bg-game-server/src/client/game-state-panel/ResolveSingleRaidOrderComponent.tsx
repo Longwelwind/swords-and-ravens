@@ -105,7 +105,7 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
                 ])
             } else {
                 // Highlight the possible raidable orders from the select Raid order
-                return this.props.gameState.getRaidableRegions(this.selectedOrderRegion, this.orderInOrderRegion).map(r => [
+                return this.props.gameState.getRaidableRegions(this.selectedOrderRegion).map(r => [
                     r,
                     {highlight: {active: true}, onClick: () => this.onOrderClick(r)}
                 ])
