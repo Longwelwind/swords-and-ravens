@@ -191,7 +191,9 @@ export default class MapComponent extends Component<MapComponentProps> {
             const modifiedPropertiesForEntities = modifyPropertiesFunction();
 
             modifiedPropertiesForEntities.forEach(([entity, modifiedProperties]) => {
-                propertiesForEntities.set(entity, _.merge(propertiesForEntities.get(entity), modifiedProperties));
+                if (propertiesForEntities.has(entity)) {
+                    propertiesForEntities.set(entity, _.merge(propertiesForEntities.get(entity), modifiedProperties));
+                }
             });
         });
 
