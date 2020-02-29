@@ -48,7 +48,7 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
             this.parentGameState.parentGameState.onHouseCardResolutionFinish();
         } else {
             this.setChildGameState(new SelectUnitsGameState(this))
-                .firstStart(house, upgradableFootmen, 1);
+                .firstStart(house, upgradableFootmen, 1, true);
         }
     }
 
