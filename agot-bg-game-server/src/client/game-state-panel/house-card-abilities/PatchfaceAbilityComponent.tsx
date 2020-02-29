@@ -9,6 +9,8 @@ import PatchfaceAbilityGameState
 import SelectHouseCardGameState
     from "../../../common/ingame-game-state/select-house-card-game-state/SelectHouseCardGameState";
 import SelectHouseCardComponent from "../SelectHouseCardComponent";
+import SimpleChoiceGameState from "../../../common/ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
+import SimpleChoiceComponent from "../SimpleChoiceComponent";
 
 @observer
 export default class PatchfaceAbilityComponent extends Component<GameStateComponentProps<PatchfaceAbilityGameState>> {
@@ -19,6 +21,7 @@ export default class PatchfaceAbilityComponent extends Component<GameStateCompon
                     <b>Patchface: </b> Baratheon must choose one house card of the opponent to discard.
                 </Col>
                 {renderChildGameState(this.props, [
+                    [SimpleChoiceGameState, SimpleChoiceComponent],
                     [SelectHouseCardGameState, SelectHouseCardComponent]
                 ])}
             </>
