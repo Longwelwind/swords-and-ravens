@@ -305,6 +305,7 @@ export default class Game {
             ironThroneTrack: this.ironThroneTrack.map(h => h.id),
             fiefdomsTrack: this.fiefdomsTrack.map(h => h.id),
             kingsCourtTrack: this.kingsCourtTrack.map(h => h.id),
+            valyrianSteelBladeUsed: this.valyrianSteelBladeUsed,
             // To send the westeros decks to a simple player and not reveal the order of the cards,
             // send a shuffled version of it. This allows the player to still see the composition of the deck
             // without seeing the order of the cards
@@ -335,6 +336,7 @@ export default class Game {
         game.westerosDecks = data.westerosDecks.map(wd => wd.map(wc => WesterosCard.deserializeFromServer(wc)));
         game.wildlingStrength = data.wildlingStrength;
         game.supplyRestrictions = data.supplyRestrictions;
+        game.valyrianSteelBladeUsed = data.valyrianSteelBladeUsed;
         game.wildlingDeck = data.wildlingDeck.map(c => WildlingCard.deserializeFromServer(c));
         game.starredOrderRestrictions = data.starredOrderRestrictions;
         game.skipRavenPhase = data.skipRavenPhase;
@@ -356,6 +358,7 @@ export interface SerializedGame {
     westerosDecks: SerializedWesterosCard[][];
     starredOrderRestrictions: number[];
     wildlingStrength: number;
+    valyrianSteelBladeUsed: boolean;
     wildlingDeck: SerializedWildlingCard[];
     supplyRestrictions: number[][];
     skipRavenPhase: boolean;
