@@ -1,4 +1,4 @@
-export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | ResolveMarchOrder | DeclareSupport
+export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | Unready | ResolveMarchOrder | DeclareSupport
     | UseValyrianSteelBlade | ChooseHouseCard | ChooseCasualties | ChooseRavenAction
     | ChooseTopWildlingCardAction | ReplaceOrder | SkipReplaceOrder | ResolveRaid | Bid | ChooseChoice
     | DecideBiggest | ReconcileArmies | Muster | ResolveTies | SelectUnits | LaunchGame | ChooseHouse
@@ -35,6 +35,10 @@ interface ChooseHouse {
 
 interface Ready {
     type: "ready";
+}
+
+interface Unready {
+    type: "unready";
 }
 
 interface LaunchGame {

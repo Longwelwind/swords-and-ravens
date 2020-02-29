@@ -41,23 +41,31 @@ export default class PlanningComponent extends Component<GameStateComponentProps
                             </Col>
                         )}
                         <Col xs={12}>
-                            {this.props.gameClient.authenticatedPlayer && !this.props.gameState.readyPlayers.includes(this.props.gameClient.authenticatedPlayer) ? (
+                            {this.props.gameClient.authenticatedPlayer && (
                                 <Row className="justify-content-center">
                                     <Col xs="auto">
                                         <Button
-                                            disabled={this.props.gameState.isReady(this.props.gameClient.authenticatedPlayer)
-                                                || !this.props.gameState.canReady(this.props.gameClient.authenticatedPlayer.house).status}
+                                            disabled={!this.props.gameState.canReady(this.props.gameClient.authenticatedPlayer).status}
                                             onClick={() => this.onReadyClick()}
                                         >
                                             Ready
                                         </Button>
                                     </Col>
+                                    <Col xs="auto">
+                                        <Button
+                                            disabled={!this.props.gameState.canUnready(this.props.gameClient.authenticatedPlayer).status}
+                                            onClick={() => this.onUnreadyClick()}
+                                        >
+                                            Unready
+                                        </Button>
+                                    </Col>
                                 </Row>
-                            ) : (
-                                <div className="text-center">
+                            )}
+                            <Row>
+                                <div className="text-center" style={{marginTop: 10}}>
                                     Waiting for {this.props.gameState.getNotReadyPlayers().map(p => p.house.name).join(', ')}...
                                 </div>
-                            )}
+                            </Row>
                         </Col>
                     </Row>
                 </ListGroupItem>
@@ -143,5 +151,9 @@ export default class PlanningComponent extends Component<GameStateComponentProps
 
     onReadyClick(): void {
         this.props.gameState.ready();
+    }
+
+    onUnreadyClick(): void {
+        this.props.gameState.unready();
     }
 }
