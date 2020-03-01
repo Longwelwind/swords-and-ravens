@@ -468,6 +468,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         {houseCard.name}</strong> from house <strong>{affectedHouse.name}</strong>.
                 </>;
 
+            case "doran-used":
+                house = this.game.houses.get(data.house);
+                affectedHouse = this.game.houses.get(data.affectedHouse);
+                const influenceTrack = this.game.getNameInfluenceTrack(data.influenceTrack);
+
+                return <>
+                    <strong>Doran Martell</strong>: <strong>{house.name}</strong> decided to move <strong>
+                        {affectedHouse.name}</strong> to the bottom of the <strong>{influenceTrack}</strong> track.
+                </>;
+
             case "tyrion-lannister-choice-made":
                 house = this.game.houses.get(data.house);
                 affectedHouse = this.game.houses.get(data.affectedHouse);
