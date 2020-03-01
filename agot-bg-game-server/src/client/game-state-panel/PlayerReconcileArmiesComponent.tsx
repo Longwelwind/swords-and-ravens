@@ -15,6 +15,7 @@ import {observable} from "mobx";
 import Row from "react-bootstrap/Row";
 import {UnitOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
+import { ListGroupItem } from "react-bootstrap";
 
 @observer
 export default class PlayerReconcileArmiesComponent extends Component<GameStateComponentProps<PlayerReconcileArmiesGameState>> {
@@ -28,30 +29,34 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
 
     render(): ReactNode {
         return (
-            <>
-                <Col xs={12} className="text-center">
-                    <strong>{this.props.gameState.house.name}</strong> must reconcile their armies according to their supply limits.
-                </Col>
-                {this.props.gameClient.doesControlHouse(this.house) ? (
-                    <>
-                        <Col xs={12}>
-                            {this.unitsToRemove.entries.map(([region, units]) => (
-                                <div key={region.id}>{region.name}: {units.map(u => u.type.name).join(", ")}</div>
-                            ))}
-                            <Row className="justify-content-center">
-                                <Col xs="auto">
-                                    <Button disabled={!this.props.gameState.isEnoughToReconcile(this.unitsToRemove)} onClick={() => this.confirm()}>Confirm</Button>
-                                </Col>
-                                <Col xs="auto">
-                                    <Button disabled={this.unitsToRemove.size == 0} onClick={() => this.reset()}>Reset</Button>
-                                </Col>
-                            </Row>
-                        </Col>
-                    </>
-                ) : (
-                    <Col xs={12} className="text-center">Waiting for {this.house.name}...</Col>
-                )}
-            </>
+            <ListGroupItem>
+                <Row>
+                    <Col xs={12} className="text-center">
+                        <strong>{this.props.gameState.house.name}</strong> must reconcile their armies according to their supply limits.
+                    </Col>
+                    {this.props.gameClient.doesControlHouse(this.house) ? (
+                        <>
+                            <Col xs={12}>
+                                {this.unitsToRemove.entries.map(([region, units]) => (
+                                    <Row key={region.id} className="justify-content-center" style={{paddingBottom: 10}}>
+                                        <div>{region.name}: {units.map(u => u.type.name).join(", ")}</div>
+                                    </Row>
+                                ))}
+                                <Row className="justify-content-center">
+                                    <Col xs="auto">
+                                        <Button disabled={!this.props.gameState.isEnoughToReconcile(this.unitsToRemove)} onClick={() => this.confirm()}>Confirm</Button>
+                                    </Col>
+                                    <Col xs="auto">
+                                        <Button disabled={this.unitsToRemove.size == 0} onClick={() => this.reset()}>Reset</Button>
+                                    </Col>
+                                </Row>
+                            </Col>
+                        </>
+                    ) : (
+                            <Col xs={12} className="text-center">Waiting for {this.house.name}...</Col>
+                        )}
+                </Row>
+            </ListGroupItem>
         );
     }
 
