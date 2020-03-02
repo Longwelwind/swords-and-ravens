@@ -343,7 +343,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const drawnCardType = westerosCardTypes.get(data.drawnCardType);
 
                 return <>
-                    <strong>Winter is coming:</strong> the Westeros deck {data.deckIndex + 1} was shuffled and the new Westeros card drawn
+                    <strong>Winter is coming</strong>: The Westeros deck {data.deckIndex + 1} was shuffled and the new Westeros card drawn
                     is <strong>{drawnCardType.name}</strong>.
                 </>;
 
