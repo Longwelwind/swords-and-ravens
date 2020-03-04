@@ -16,22 +16,22 @@ import RainsOfAutumnWesterosCardType from "./RainsOfAutumnWesterosCardType";
 import BetterMap from "../../../../utils/BetterMap";
 import WildlingsAttackWesterosCardType from "./WildlingsAttackWesterosCardType";
 
-export const lastDaysOfSummer = new LastDaysOfSummerWesterosCardType("last-days-of-summer", "Last Days of Summer", "Nothing happens", 2);
-export const winterIsComing = new WinterIsComingWesterosCardType("winter-is-coming", "Winter is Coming", "Immediately shuffle this deck. Then Draw and resolve a new card.");
+export const lastDaysOfSummer = new LastDaysOfSummerWesterosCardType("last-days-of-summer", "Last Days of Summer", "Nothing happens.", 2);
+export const winterIsComing = new WinterIsComingWesterosCardType("winter-is-coming", "Winter is Coming", "Immediately shuffle this deck. Then draw and resolve a new card.");
 
 export const supply = new SupplyWesterosCardType("supply", "Supply", "Adjust Supply track. Reconcile armies.");
-export const gameOfThrones = new GameOfThronesWesterosCardType("game-of-thrones", "Game of Thrones", "Each house gains power tokens for each controlled crown icons and ports");
-export const mustering = new MusteringWesterosCardType("mustering", "Mustering", "Recruit new units in strongholds and castles");
+export const gameOfThrones = new GameOfThronesWesterosCardType("game-of-thrones", "Game of Thrones", "Each house gains power tokens for each controlled crown icons and ports.");
+export const mustering = new MusteringWesterosCardType("mustering", "Mustering", "Recruit new units in strongholds and castles.");
 export const aThroneOfBlades = new AThroneOfBladesWesterosCardType("a-throne-of-blades", "A Throne of Blades", "The holder of the Iron Throne token chooses whether a) everyone updates their Supply then reconciles armies b) everyone muster units, or c) this card has no effect.", 2);
 
 export const clashOfKings = new ClashOfKingsWesterosCardType("clash-of-kings", "Clash of Kings", "Bid on the three Influence tracks.");
-export const darkWingsDarkWords = new DarkWingDarkWordsWesterosCardType("dark-wings-dark-words", "Dark Wings, Dark Words", "The holder of the Messenger Raven token chooses whether &) everyone bids on the  three Influence tracks b) everyone collects one Power token for every power icon present in areas they control, or c) this card has no effect", 2);
+export const darkWingsDarkWords = new DarkWingDarkWordsWesterosCardType("dark-wings-dark-words", "Dark Wings, Dark Words", "The holder of the Messenger Raven token chooses whether a) everyone bids on the  three Influence tracks b) everyone collects one Power token for every power icon present in areas they control, or c) this card has no effect.", 2);
 
-export const feastForCrows = new FeastForCrowsWesterosCardType("feast-for-crows", "Feast for Crows", "Consolidate Power Orders cannot be played during this Planning Phase", 2);
-export const seaOfStorms = new SeaOfStormsWesterosCardType("sea-of-storms", "Sea of Storms", "Raid Orders cannot be played during this Planning Phase", 2);
+export const feastForCrows = new FeastForCrowsWesterosCardType("feast-for-crows", "Feast for Crows", "Consolidate Power Orders cannot be played during this Planning Phase.", 2);
+export const seaOfStorms = new SeaOfStormsWesterosCardType("sea-of-storms", "Sea of Storms", "Raid Orders cannot be played during this Planning Phase.", 2);
 export const webOfLies = new WebOfLiesWesterosCardType("web-of-lies", "Web of Lies", "Support Orders cannot be played during this Planning Phase.", 2);
 export const stormOfSwords = new StormOfSwordsWesterosCardType("storm-of-swords", "Storm of Swords", "Defense Orders cannot be played during this Planning Phase.", 2);
-export const rainsOfAutumn = new RainsOfAutumnWesterosCardType("rains-of-autumn", "Rains of Autumn", "March +1 Orders cannot be played this Planning Phase", 2);
+export const rainsOfAutumn = new RainsOfAutumnWesterosCardType("rains-of-autumn", "Rains of Autumn", "March +1 Orders cannot be played this Planning Phase.", 2);
 export const putToTheSword = new PutToTheSwordWesterosCardType("put-to-the-sword", "Put to the Sword", "The holder of the Valyrian Steel Blade chooses one of the following conditions for this Planning Phase: a) Defense Orders cannot be played b) March +1 Orders cannot be played, or c) no restrictions.");
 export const wildlingsAttack = new WildlingsAttackWesterosCardType("wildlings-attack", "Wildlings Attack", "The wildlings attack Westeros.");
 
