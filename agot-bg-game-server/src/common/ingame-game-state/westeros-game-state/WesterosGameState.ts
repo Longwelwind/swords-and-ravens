@@ -163,7 +163,8 @@ export default class WesterosGameState extends GameState<IngameGameState,
     executeCard(card: WesterosCard): void {
         this.ingame.log({
             type: "westeros-card-executed",
-            westerosCardType: card.type.id
+            westerosCardType: card.type.id,
+            westerosDeckI: this.currentCardI
         });
 
         card.type.execute(this);

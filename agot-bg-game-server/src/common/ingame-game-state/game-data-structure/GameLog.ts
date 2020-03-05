@@ -65,6 +65,7 @@ interface MarchResolved {
 interface WesterosCardExecuted {
     type: "westeros-card-executed";
     westerosCardType: string;
+    westerosDeckI: number;
 }
 
 interface WesterosCardDrawn {
