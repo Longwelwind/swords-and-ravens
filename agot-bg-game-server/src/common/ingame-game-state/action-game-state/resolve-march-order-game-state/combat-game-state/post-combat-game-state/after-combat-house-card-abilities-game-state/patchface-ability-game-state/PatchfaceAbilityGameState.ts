@@ -3,17 +3,17 @@ import AfterCombatHouseCardAbilitiesGameState from "../AfterCombatHouseCardAbili
 import Player from "../../../../../../Player";
 import {ClientMessage} from "../../../../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../../../../messages/ServerMessage";
-import SelectUnitsGameState from "../../../../../../select-units-game-state/SelectUnitsGameState";
 import SelectHouseCardGameState, {SerializedSelectHouseCardGameState} from "../../../../../../select-house-card-game-state/SelectHouseCardGameState";
 import House from "../../../../../../game-data-structure/House";
 import CombatGameState from "../../../CombatGameState";
 import Game from "../../../../../../game-data-structure/Game";
 import HouseCard, {HouseCardState} from "../../../../../../game-data-structure/house-card/HouseCard";
 import IngameGameState from "../../../../../../IngameGameState";
+import SimpleChoiceGameState, { SerializedSimpleChoiceGameState } from "../../../../../../simple-choice-game-state/SimpleChoiceGameState";
 
 export default class PatchfaceAbilityGameState extends GameState<
     AfterCombatHouseCardAbilitiesGameState["childGameState"],
-    SelectHouseCardGameState<PatchfaceAbilityGameState>
+    SimpleChoiceGameState | SelectHouseCardGameState<PatchfaceAbilityGameState>
 > {
     get game(): Game {
         return this.combat().game;
@@ -27,12 +27,25 @@ export default class PatchfaceAbilityGameState extends GameState<
         return this.parentGameState.combatGameState;
     }
 
-    firstStart(house: House) {
-        const enemy = this.combat().getEnemy(house);
+    firstStart(house: House): void {
+        this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
+            house,
+            "",
+            ["Activate", "Ignore"]
+        );
+    }
 
-        const choosableHouseCards = enemy.houseCards.values.filter(hc => hc.state == HouseCardState.AVAILABLE);
+    onSimpleChoiceGameStateEnd(choice: number): void {
+        const house = this.childGameState.house;
+        if (choice == 0) {
+            const enemy = this.combat().getEnemy(house);
 
-        this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(house, choosableHouseCards);
+            const choosableHouseCards = enemy.houseCards.values.filter(hc => hc.state == HouseCardState.AVAILABLE);
+
+            this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(house, choosableHouseCards);
+        } else {
+            this.parentGameState.onHouseCardResolutionFinish(house);
+        }
     }
 
     onSelectHouseCardFinish(house: House, houseCard: HouseCard | null): void {
@@ -75,12 +88,17 @@ export default class PatchfaceAbilityGameState extends GameState<
         return patchfaceAbilityGameState;
     }
 
-    deserializeChildGameState(data: SerializedPatchfaceAbilityGameState["childGameState"]): SelectHouseCardGameState<PatchfaceAbilityGameState> {
-        return SelectHouseCardGameState.deserializeFromServer(this, data);
+    deserializeChildGameState(data: SerializedPatchfaceAbilityGameState["childGameState"]): SelectHouseCardGameState<PatchfaceAbilityGameState> | SimpleChoiceGameState {
+        switch (data.type) {
+            case "simple-choice":
+                return SimpleChoiceGameState.deserializeFromServer(this, data);
+            case "select-house-card":
+                return SelectHouseCardGameState.deserializeFromServer(this, data);
+        }
     }
 }
 
 export interface SerializedPatchfaceAbilityGameState {
     type: "patchface-ability";
-    childGameState: SerializedSelectHouseCardGameState;
+    childGameState: SerializedSimpleChoiceGameState | SerializedSelectHouseCardGameState;
 }
