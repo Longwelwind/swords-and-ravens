@@ -9,7 +9,7 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | RavenHolderWildlingCardPutBottom | RavenHolderWildlingCardPutTop | RavenHolderReplaceOrder | RaidDone | DarkWingsDarkWordsChoice
     | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
-    | ActionPhaseBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingsAttack | MarchOrderRemoved
+    | ActionPhaseBegan | ActionPhaseResolveRaidBegan | ActionPhaseResolveMarchBegan | ActionPhaseResolveConsolidatePowerBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingsAttack | MarchOrderRemoved
     | ConsolidatePowerOrderResolved | ArmiesReconciled | EnemyPortTaken | ShipsDestroyedByEmptyCastle
     | HouseCardAbilityNotUsed | PatchfaceUsed | DoranUsed
     | TyrionLannisterHouseCardReplaced | TyrionLannisterChoiceMade
@@ -207,6 +207,18 @@ interface ClashOfKingsFinalOrdering {
 
 interface ActionPhaseBegan {
     type: "action-phase-began";
+}
+
+interface ActionPhaseResolveRaidBegan {
+    type: "action-phase-resolve-raid-began";
+}
+
+interface ActionPhaseResolveMarchBegan {
+    type: "action-phase-resolve-march-began";
+}
+
+interface ActionPhaseResolveConsolidatePowerBegan {
+    type: "action-phase-resolve-consolidate-power-began";
 }
 
 interface PlanningPhaseBegan {

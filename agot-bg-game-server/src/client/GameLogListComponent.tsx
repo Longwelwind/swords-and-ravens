@@ -376,21 +376,42 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "westeros-phase-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h6><strong>Westeros Phase</strong></h6>
+                        <h5><strong>Westeros Phase</strong></h5>
                     </Col>
                 </Row>;
 
             case "planning-phase-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h6><strong>Planning Phase</strong></h6>
+                        <h5><strong>Planning Phase</strong></h5>
                     </Col>
                 </Row>;
 
             case "action-phase-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h6><strong>Action Phase</strong></h6>
+                        <h5><strong>Action Phase</strong></h5>
+                    </Col>
+                </Row>;
+
+            case "action-phase-resolve-raid-began":
+                return <Row className="justify-content-center">
+                    <Col xs="auto">
+                        <h6><strong>Resolve Raid Orders</strong></h6>
+                    </Col>
+                </Row>;
+
+            case "action-phase-resolve-march-began":
+                return <Row className="justify-content-center">
+                    <Col xs="auto">
+                        <h6><strong>Resolve March Orders</strong></h6>
+                    </Col>
+                </Row>;
+
+            case "action-phase-resolve-consolidate-power-began":
+                return <Row className="justify-content-center">
+                    <Col xs="auto">
+                        <h6><strong>Resolve Consolidate Power Orders</strong></h6>
                     </Col>
                 </Row>;
 

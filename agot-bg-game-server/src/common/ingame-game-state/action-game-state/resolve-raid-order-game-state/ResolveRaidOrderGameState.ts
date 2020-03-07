@@ -32,6 +32,10 @@ export default class ResolveRaidOrderGameState extends GameState<ActionGameState
     }
 
     firstStart(): void {
+        this.ingameGameState.log({
+            type: "action-phase-resolve-raid-began"
+        });
+
         this.proceedNextResolveSingleRaidOrder(null);
     }
 

@@ -43,6 +43,10 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
     firstStart(): void {
         this.currentTurnOrderIndex = -1;
 
+	    this.ingameGameState.log({
+            type: "action-phase-resolve-march-began"
+        });
+
         this.proceedNextResolveSingleMarchOrder();
     }
 
