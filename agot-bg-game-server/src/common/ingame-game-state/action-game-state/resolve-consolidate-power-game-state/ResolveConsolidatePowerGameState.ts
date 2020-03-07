@@ -6,7 +6,6 @@ import {ServerMessage} from "../../../../messages/ServerMessage";
 import Game from "../../game-data-structure/Game";
 import ConsolidatePowerOrderType from "../../game-data-structure/order-types/ConsolidatePowerOrderType";
 import House from "../../game-data-structure/House";
-import BetterMap from "../../../../utils/BetterMap";
 import EntireGame from "../../../EntireGame";
 import {land, port, sea} from "../../game-data-structure/regionTypes";
 import PlayerMusteringGameState, {
@@ -40,26 +39,25 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
         this.proceedNextResolve(null);
     }
 
-    resolveNormalConsolidatePowerOrders() {
+    resolveNormalConsolidatePowerOrders(): void {
         // If a house has no starred consolidate power order the normal consolidate power orders can be processed automatically
         // Resolve the normal consolidate power and give the power tokens for each house
-        const consolidatePowerOrders = this.actionGameState.ordersOnBoard.entries.filter(([region, order]) => order.type instanceof ConsolidatePowerOrderType);
+        const consolidatePowerOrders = this.actionGameState.ordersOnBoard.entries.filter(([_, order]) => order.type instanceof ConsolidatePowerOrderType);
 
         this.actionGameState.game.getTurnOrder().forEach(house => {
-            const ordersOfHouse = consolidatePowerOrders.filter(([region, order]) => region.getController() == house);
+            const ordersOfHouse = consolidatePowerOrders.filter(([region, _]) => region.getController() == house);
 
             if(ordersOfHouse.length == 0) {
                 return;
             }
 
-            const starredOrders = ordersOfHouse.filter(([region, order]) => order.type.starred);
+            const starredOrders = ordersOfHouse.filter(([_, order]) => order.type.starred);
 
             // If all consolidate power orders are not starred
             // or the starred consolidate power order is placed on a non castle region
             // this phase can be processed automatically
-            if(starredOrders.length == 0 || starredOrders.every(([region, order]) => !region.hasStructure)) {
-                ordersOfHouse.forEach(([region, order]) => {
-                    // Remember if the current order was a starred one for the game log
+            if(starredOrders.length == 0 || starredOrders.every(([region, _]) => !region.hasStructure)) {
+                ordersOfHouse.forEach(([region, _]) => {
                     this.resolveConsolidatePowerOrderForPt(region, house);
 
                     // Remove the consolidate power order from board
@@ -93,7 +91,7 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
         return 0;
     }
 
-    resolveConsolidatePowerOrderForPt(region: Region, house: House) {
+    resolveConsolidatePowerOrderForPt(region: Region, house: House): void {
         const gaines: number = this.getPotentialGainedPowerTokens(region, house);
 
         if(gaines > 0) {
