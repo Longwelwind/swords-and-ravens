@@ -92,26 +92,26 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
     }
 
     resolveConsolidatePowerOrderForPt(region: Region, house: House): void {
-        const gaines: number = this.getPotentialGainedPowerTokens(region, house);
+        const gains: number = this.getPotentialGainedPowerTokens(region, house);
 
-        if(gaines > 0) {
+        if(gains > 0) {
             // Broadcast new Power token count
-            house.changePowerTokens(gaines);
+            house.changePowerTokens(gains);
 
             this.entireGame.broadcastToClients({
                 type: "change-power-token",
                 houseId: house.id,
                 powerTokenCount: house.powerTokens
             });
-
-            this.ingame.log({
-                type: "consolidate-power-order-resolved",
-                house: house.id,
-                region: region.id,
-                starred: this.actionGameState.ordersOnBoard.get(region).type.starred,
-                powerTokenCount: gaines
-            });
         }
+
+        this.ingame.log({
+            type: "consolidate-power-order-resolved",
+            house: house.id,
+            region: region.id,
+            starred: this.actionGameState.ordersOnBoard.get(region).type.starred,
+            powerTokenCount: gains
+        });
     }
 
     proceedNextResolve(lastHouseToResolve: House | null): void {
