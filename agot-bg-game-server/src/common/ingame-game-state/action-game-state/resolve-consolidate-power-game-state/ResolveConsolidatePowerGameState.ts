@@ -4,9 +4,7 @@ import {ClientMessage} from "../../../../messages/ClientMessage";
 import Player from "../../Player";
 import {ServerMessage} from "../../../../messages/ServerMessage";
 import Game from "../../game-data-structure/Game";
-import ConsolidatePowerOrderType from "../../game-data-structure/order-types/ConsolidatePowerOrderType";
 import House from "../../game-data-structure/House";
-import BetterMap from "../../../../utils/BetterMap";
 import EntireGame from "../../../EntireGame";
 import {land, port, sea} from "../../game-data-structure/regionTypes";
 import PlayerMusteringGameState, {
@@ -34,44 +32,7 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
     }
 
     firstStart(): void {
-        this.resolveNormalConsolidatePowerOrders();
-
-        // Starred resolve consolidate power must still be resolved
         this.proceedNextResolve(null);
-    }
-
-    resolveNormalConsolidatePowerOrders() {
-        // If a house has no starred consolidate power order the normal consolidate power orders can be processed automatically
-        // Resolve the normal consolidate power and give the power tokens for each house
-        const consolidatePowerOrders = this.actionGameState.ordersOnBoard.entries.filter(([region, order]) => order.type instanceof ConsolidatePowerOrderType);
-
-        this.actionGameState.game.getTurnOrder().forEach(house => {
-            const ordersOfHouse = consolidatePowerOrders.filter(([region, order]) => region.getController() == house);
-
-            if(ordersOfHouse.length == 0) {
-                return;
-            }
-
-            const starredOrders = ordersOfHouse.filter(([region, order]) => order.type.starred);
-
-            // If all consolidate power orders are not starred
-            // or the starred consolidate power order is placed on a non castle region
-            // this phase can be processed automatically
-            if(starredOrders.length == 0 || starredOrders.every(([region, order]) => !region.hasStructure)) {
-                ordersOfHouse.forEach(([region, order]) => {
-                    // Remember if the current order was a starred one for the game log
-                    this.resolveConsolidatePowerOrderForPt(region, house);
-
-                    // Remove the consolidate power order from board
-                    this.actionGameState.ordersOnBoard.delete(region);
-                    this.entireGame.broadcastToClients({
-                        type: "action-phase-change-order",
-                        region: region.id,
-                        order: null
-                    });
-                });
-            }
-        });
     }
 
     getPotentialGainedPowerTokens(region: Region, house: House): number {
@@ -93,27 +54,26 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
         return 0;
     }
 
-    resolveConsolidatePowerOrderForPt(region: Region, house: House) {
-        const gaines: number = this.getPotentialGainedPowerTokens(region, house);
+    resolveConsolidatePowerOrderForPt(region: Region, house: House): void {
+        const gains: number = this.getPotentialGainedPowerTokens(region, house);
 
-        if(gaines > 0) {
-            // Broadcast new Power token count
-            house.changePowerTokens(gaines);
+        if(gains > 0) {
+            house.changePowerTokens(gains);
 
             this.entireGame.broadcastToClients({
                 type: "change-power-token",
                 houseId: house.id,
                 powerTokenCount: house.powerTokens
             });
-
-            this.ingame.log({
-                type: "consolidate-power-order-resolved",
-                house: house.id,
-                region: region.id,
-                starred: this.actionGameState.ordersOnBoard.get(region).type.starred,
-                powerTokenCount: gaines
-            });
         }
+
+        this.ingame.log({
+            type: "consolidate-power-order-resolved",
+            house: house.id,
+            region: region.id,
+            starred: this.actionGameState.ordersOnBoard.get(region).type.starred,
+            powerTokenCount: gains
+        });
     }
 
     proceedNextResolve(lastHouseToResolve: House | null): void {
@@ -124,7 +84,30 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
             return;
         }
 
-        this.setChildGameState(new PlayerMusteringGameState(this)).firstStart(nextToResolve, PlayerMusteringType.STARRED_CONSOLIDATE_POWER);
+        // Before asking the player to resolve a Consolidate Power token,
+        // check if they only have non-starred Consolidate Power tokens, or
+        // if the starred ones are present on regions with no structure.
+        // In that case, fast-track the process and simply resolve one of those.
+        const consolidatePowerOrders = this.actionGameState.getRegionsWithConsolidatePowerOrderOfHouse(nextToResolve);
+        if (consolidatePowerOrders.every(([r, o]) => !o.type.starred || (o.type.starred && !r.hasStructure))) {
+            // Take one of the CP order and resolve it
+            const [region] = consolidatePowerOrders[0];
+
+            this.resolveConsolidatePowerOrderForPt(region, nextToResolve);
+
+            // Remove the order from the board
+            this.actionGameState.ordersOnBoard.delete(region);
+            this.entireGame.broadcastToClients({
+                type: "action-phase-change-order",
+                region: region.id,
+                order: null
+            });
+
+            // Proceed to the next house
+            this.proceedNextResolve(nextToResolve);
+        } else {
+            this.setChildGameState(new PlayerMusteringGameState(this)).firstStart(nextToResolve, PlayerMusteringType.STARRED_CONSOLIDATE_POWER);
+        }
     }
 
     onPlayerMusteringEnd(house: House, regions: Region[]): void {
@@ -142,17 +125,15 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
             order: null
         });
 
-        this.resolveNormalConsolidatePowerOrders();
-
         this.proceedNextResolve(house);
     }
 
     getNextHouseToResolveOrder(lastHouseToResolve: House | null): House | null {
         let currentHouseToCheck = lastHouseToResolve ? this.game.getNextInTurnOrder(lastHouseToResolve) : this.game.getTurnOrder()[0];
 
-        // Check each house in order to find one that has a starred consolidate power
+        // Check each house in order to find one that has a consolidate power
         for (let i = 0;i < this.game.houses.size;i++) {
-            const regions = this.actionGameState.getRegionsWithStarredConsolidatePowerOrderOfHouse(currentHouseToCheck);
+            const regions = this.actionGameState.getRegionsWithConsolidatePowerOrderOfHouse(currentHouseToCheck);
             if (regions.length > 0) {
                 return currentHouseToCheck;
             }
