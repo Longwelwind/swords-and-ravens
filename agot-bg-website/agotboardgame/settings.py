@@ -40,6 +40,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'whitenoise.runserver_nostatic',
     'agotboardgame_main.apps.AgotboardgameMainConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -174,6 +175,8 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+WHITENOISE_IMMUTABLE_FILE_TEST = r'^.+\.[0-9a-f]{20,32}\..+$'
 
 # Rest Framework
 

@@ -7,7 +7,7 @@ module.exports = (env, argv) => {
     return {
         output: {
             path: __dirname + "/dist/",
-            filename: "bundle.[hash].js",
+            filename: "bundle.[contenthash].js",
             publicPath: "/static/"
         },
         entry: "./src/client/client.tsx",
@@ -27,7 +27,12 @@ module.exports = (env, argv) => {
                 {
                     test: /\.(jpe?g|png|gif|svg)$/,
                     use: [
-                        'file-loader',
+                        {
+                            loader: 'file-loader',
+                            options: {
+                                name: "[name].[contenthash].[ext]"
+                            }
+                        },
                         {
                             loader: "image-webpack-loader",
                             options: {
