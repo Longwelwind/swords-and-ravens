@@ -27,13 +27,20 @@ export default class DoranMartellAbilityGameState extends GameState<
     }
 
     onSimpleChoiceGameStateEnd(choice: number): void {
-        let enemy = this.combatGameState.getEnemy(this.childGameState.house);
+        const enemy = this.combatGameState.getEnemy(this.childGameState.house);
 
         // Put the enemy at the end of the influence track
-        let influenceTrack = this.game.getInfluenceTrackByI(choice);
-        let newInfluenceTrack = _.without(influenceTrack, enemy);
+        const influenceTrack = this.game.getInfluenceTrackByI(choice);
+        const newInfluenceTrack = _.without(influenceTrack, enemy);
         newInfluenceTrack.push(enemy);
         this.game.setInfluenceTrack(choice, newInfluenceTrack);
+
+        this.ingame.log({
+            type: "doran-used",
+            house: this.childGameState.house.id,
+            affectedHouse: enemy.id,
+            influenceTrack: choice
+        });
 
         this.parentGameState.entireGame.broadcastToClients({
             type: "change-tracker",
@@ -44,7 +51,7 @@ export default class DoranMartellAbilityGameState extends GameState<
         this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);
     }
 
-    firstStart(house: House) {
+    firstStart(house: House): void {
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
             house,
             "",

@@ -11,6 +11,7 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
     | ActionPhaseBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingsAttack | MarchOrderRemoved
     | ConsolidatePowerOrderResolved | ArmiesReconciled | EnemyPortTaken | ShipsDestroyedByEmptyCastle
+    | HouseCardAbilityNotUsed | PatchfaceUsed | DoranUsed
     | TyrionLannisterHouseCardReplaced | TyrionLannisterChoiceMade
     | ArianneMartellPreventMovement | LorasTyrellAttackOrderMoved | TywinLannisterPowerTokensGained
     | RooseBoltonHouseCardsReturned | QueenOfThornsOrderRemoved | QueenOfThornsNoOrderAvailable
@@ -222,6 +223,26 @@ interface ArmiesReconciled {
     type: "armies-reconciled";
     house: string;
     armies: [string, string[]][];
+}
+
+interface HouseCardAbilityNotUsed {
+    type: "house-card-ability-not-used";
+    house: string;
+    houseCard: string;
+}
+
+interface PatchfaceUsed {
+    type: "patchface-used";
+    house: string;
+    affectedHouse: string;
+    houseCard: string;
+}
+
+interface DoranUsed {
+    type: "doran-used";
+    house: string;
+    affectedHouse: string;
+    influenceTrack: number;
 }
 
 interface TyrionLannisterChoiceMade {

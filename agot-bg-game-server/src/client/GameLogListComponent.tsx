@@ -451,9 +451,36 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </ul>
                 </>;
 
-            case "tyrion-lannister-choice-made":
+            case "house-card-ability-not-used":
+                house = this.game.houses.get(data.house);
+                let houseCard = this.game.getHouseCardById(data.houseCard);
+
+                return <>
+                    <strong>{house.name}</strong> did not use <strong>{houseCard.name}&apos;s</strong> ability.
+                </>;
+
+            case "patchface-used":
                 house = this.game.houses.get(data.house);
                 let affectedHouse = this.game.houses.get(data.affectedHouse);
+                houseCard = this.game.getHouseCardById(data.houseCard);
+                return <>
+                    <strong>Patchface</strong>: <strong>{house.name}</strong> decided to discard <strong>
+                        {houseCard.name}</strong> from house <strong>{affectedHouse.name}</strong>.
+                </>;
+
+            case "doran-used":
+                house = this.game.houses.get(data.house);
+                affectedHouse = this.game.houses.get(data.affectedHouse);
+                const influenceTrack = this.game.getNameInfluenceTrack(data.influenceTrack);
+
+                return <>
+                    <strong>Doran Martell</strong>: <strong>{house.name}</strong> decided to move <strong>
+                        {affectedHouse.name}</strong> to the bottom of the <strong>{influenceTrack}</strong> track.
+                </>;
+
+            case "tyrion-lannister-choice-made":
+                house = this.game.houses.get(data.house);
+                affectedHouse = this.game.houses.get(data.affectedHouse);
                 const chooseToReplace = data.chooseToReplace;
 
                 return <>
@@ -740,7 +767,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
             case "mammoth-riders-return-card":
                 house = this.game.houses.get(data.house);
-                const houseCard = house.houseCards.get(data.houseCard);
+                houseCard = house.houseCards.get(data.houseCard);
 
                 return <>
                     <strong>Mammoth Riders</strong>: <strong>{house.name}</strong> chose to
