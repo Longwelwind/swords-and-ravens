@@ -216,6 +216,19 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         });
     }
 
+    getPrivateChatRoomsOf(user: User): {user: User; roomId: string}[] {
+        return _.flatMap(this.privateChatRoomsIds
+            .map((u1, bm) => bm.entries
+                // Only get the private chat rooms that contains the authenticated player
+                .filter(([u2, _]) => u1 == user || u2 == user)
+                .map(([u2, roomId]) => {
+                    const otherUser = user == u1 ? u2 : u1;
+
+                    return {user: otherUser, roomId};
+                })
+        ));
+    }
+
     serializeToClient(user: User | null): SerializedEntireGame {
         return {
             id: this.id,
