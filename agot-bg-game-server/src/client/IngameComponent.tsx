@@ -55,7 +55,6 @@ import classNames = require("classnames");
 import {Channel} from "./chat-client/ChatClient";
 // @ts-ignore
 import ScrollToBottom from "react-scroll-to-bottom";
-import Form from "react-bootstrap/FormGroup";
 import GameSettingsComponent from "./GameSettingsComponent";
 
 interface IngameComponentProps {

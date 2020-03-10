@@ -3,7 +3,6 @@ import classNames from "classnames";
 import React from "react";
 import {observer} from "mobx-react";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import {Placement} from "react-bootstrap/Overlay";
 import WesterosCardType from "../../../common/ingame-game-state/game-data-structure/westeros-card/WesterosCardType";
 import westerosCardImages from "../../westerosCardImages";
 

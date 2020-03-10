@@ -78,13 +78,13 @@ export default class ReplaceOrderGameState extends GameState<UseRavenGameState> 
 
     getAvailableOrders(replacedOrder: Order): Order[] {
         const placedOrders = new BetterMap(
-            this.actionGameState.getOrdersOfHouse(this.ravenHolder).filter(([r, o]) => replacedOrder != o)
+            this.actionGameState.getOrdersOfHouse(this.ravenHolder).filter(([_r, o]) => replacedOrder != o)
         );
 
         return this.ingameGameState.game.getAvailableOrders(placedOrders, this.ravenHolder);
     }
 
-    replaceOrder(region: Region, order: Order) {
+    replaceOrder(region: Region, order: Order): void {
         this.entireGame.sendMessageToServer({
             type: "replace-order",
             regionId: region.id,
@@ -92,13 +92,13 @@ export default class ReplaceOrderGameState extends GameState<UseRavenGameState> 
         });
     }
 
-    skip() {
+    skip(): void {
         this.entireGame.sendMessageToServer({
             type: "skip-replace-order"
         });
     }
 
-    onServerMessage(message: ServerMessage) {
+    onServerMessage(message: ServerMessage): void {
         if (message.type == "raven-order-replaced") {
             const region = this.ingameGameState.game.world.regions.get(message.regionId);
             const order = orders.get(message.orderId);
@@ -111,13 +111,13 @@ export default class ReplaceOrderGameState extends GameState<UseRavenGameState> 
         return "Replace order";
     }
 
-    serializeToClient(admin: boolean, player: Player | null): SerializedReplaceOrderGameState {
+    serializeToClient(_admin: boolean, _player: Player | null): SerializedReplaceOrderGameState {
         return {
             type: "replace-order"
         };
     }
 
-    static deserializeFromServer(useRavenGameState: UseRavenGameState, data: SerializedReplaceOrderGameState): ReplaceOrderGameState {
+    static deserializeFromServer(useRavenGameState: UseRavenGameState, _data: SerializedReplaceOrderGameState): ReplaceOrderGameState {
         return new ReplaceOrderGameState(useRavenGameState);
     }
 }

@@ -37,11 +37,11 @@ export default class UseRavenGameState extends GameState<ActionGameState, Choose
         return this.actionGameState.entireGame;
     }
 
-    firstStart() {
+    firstStart(): void {
         this.setChildGameState(new ChooseRavenActionGameState(this));
     }
 
-    onChooseRavenActionGameStateEnd(ravenAction: RavenAction) {
+    onChooseRavenActionGameStateEnd(ravenAction: RavenAction): void {
         if (ravenAction == RavenAction.REPLACE_ORDER) {
             this.setChildGameState(new ReplaceOrderGameState(this));
         } else if (ravenAction == RavenAction.SEE_TOP_WILDLING_CARD) {
@@ -51,19 +51,19 @@ export default class UseRavenGameState extends GameState<ActionGameState, Choose
         }
     }
 
-    onReplaceOrderGameStateEnd() {
+    onReplaceOrderGameStateEnd(): void {
         this.actionGameState.onUseRavenGameStateEnd();
     }
 
-    onSeeTopWildlingCardGameStateEnd() {
+    onSeeTopWildlingCardGameStateEnd(): void {
         this.actionGameState.onUseRavenGameStateEnd();
     }
 
-    onPlayerMessage(player: Player, message: ClientMessage) {
+    onPlayerMessage(player: Player, message: ClientMessage): void {
         this.childGameState.onPlayerMessage(player, message);
     }
 
-    onServerMessage(message: ServerMessage) {
+    onServerMessage(message: ServerMessage): void {
         this.childGameState.onServerMessage(message);
     }
 

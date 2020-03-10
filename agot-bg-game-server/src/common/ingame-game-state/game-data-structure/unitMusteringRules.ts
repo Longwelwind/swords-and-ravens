@@ -1,6 +1,5 @@
 import UnitType from "./UnitType";
 import {footman, knight, ship, siegeEngine} from "./unitTypes";
-import Unit from "./Unit";
 
 export type UnitMusteringRule = {from: UnitType | null; to: UnitType; cost: number};
 

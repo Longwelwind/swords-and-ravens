@@ -1,5 +1,5 @@
 import {observer} from "mobx-react";
-import {Component} from "react";
+import {Component, ReactNode} from "react";
 import React from "react";
 import ChooseRavenActionGameState
     from "../../common/ingame-game-state/action-game-state/use-raven-game-state/choose-raven-action-game-state/ChooseRavenActionGameState";
@@ -11,7 +11,7 @@ import {RavenAction} from "../../messages/ClientMessage";
 
 @observer
 export default class ChooseRavenActionComponent extends Component<GameStateComponentProps<ChooseRavenActionGameState>> {
-    render() {
+    render(): ReactNode {
         return (
             <>
                 <Col xs={12} className="text-center">
@@ -41,7 +41,7 @@ export default class ChooseRavenActionComponent extends Component<GameStateCompo
         );
     }
 
-    private choose(action: RavenAction) {
+    private choose(action: RavenAction): void {
         this.props.gameState.chooseRavenAction(action);
     }
 }

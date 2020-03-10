@@ -1,4 +1,4 @@
-import {Component} from "react";
+import {Component, ReactNode} from "react";
 import ActionGameState from "../../common/ingame-game-state/action-game-state/ActionGameState";
 import ResolveMarchOrderGameState
     from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/ResolveMarchOrderGameState";
@@ -20,7 +20,7 @@ import Row from "react-bootstrap/Row";
 
 @observer
 export default class ActionComponent extends Component<GameStateComponentProps<ActionGameState>> {
-    render() {
+    render(): ReactNode {
         return (
             <>
                 <ListGroupItem>

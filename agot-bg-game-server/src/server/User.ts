@@ -18,7 +18,7 @@ export default class User {
         this.entireGame = game;
     }
 
-    send(message: ServerMessage) {
+    send(message: ServerMessage): void {
         this.entireGame.sendMessageToClients([this], message);
     }
 

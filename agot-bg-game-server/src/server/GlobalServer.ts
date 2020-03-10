@@ -34,7 +34,7 @@ export default class GlobalServer {
         this.clientMessageValidator = new Ajv({allErrors: true}).compile(schema);
     }
 
-    async start() {
+    async start(): Promise<void> {
         this.server.on("connection", (client: WebSocket) => {
             console.log("Connection");
             client.on("message", (data: WebSocket.Data) => {
@@ -46,7 +46,7 @@ export default class GlobalServer {
         });
     }
 
-    onSendServerMessage(users: User[], message: ServerMessage) {
+    onSendServerMessage(users: User[], message: ServerMessage): void {
         const data = JSON.stringify(message);
 
         users.forEach(user => {
@@ -56,7 +56,7 @@ export default class GlobalServer {
         })
     }
 
-    async onMessage(client: WebSocket, data: string) {
+    async onMessage(client: WebSocket, data: string): Promise<void> {
         let message: ClientMessage | null = null;
         try {
             message = JSON.parse(data) as ClientMessage;
@@ -158,7 +158,7 @@ export default class GlobalServer {
         }
     }
 
-    saveGame(entireGame: EntireGame) {
+    saveGame(entireGame: EntireGame): void {
         const state = entireGame.getStateOfGame();
         const viewOfGame = entireGame.getViewOfGame();
         const players = entireGame.getPlayersInGame();
@@ -213,7 +213,7 @@ export default class GlobalServer {
         this.websiteClient.notifyUsers(game.id, users.map(u => u.id));
     }
 
-    onClose(client: WebSocket) {
+    onClose(client: WebSocket): void {
         console.log("Connection closed.");
 
         if (this.clientToUser.has(client)) {

@@ -33,7 +33,7 @@ export default class SimpleChoiceGameState extends GameState<ParentGameState> {
         }
     }
 
-    onPlayerMessage(player: Player, message: ClientMessage) {
+    onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "choose-choice") {
             if (this.house != player.house) {
                 return;
@@ -57,11 +57,11 @@ export default class SimpleChoiceGameState extends GameState<ParentGameState> {
         return "Choice";
     }
 
-    onServerMessage(message: ServerMessage) {
+    onServerMessage(_message: ServerMessage): void {
 
     }
 
-    choose(choice: number) {
+    choose(choice: number): void {
         this.entireGame.sendMessageToServer({
             type: "choose-choice",
             choice: choice

@@ -1,5 +1,5 @@
 import {observer} from "mobx-react";
-import {Component} from "react";
+import {Component, ReactNode} from "react";
 import WesterosGameState from "../../common/ingame-game-state/westeros-game-state/WesterosGameState";
 import WildlingsAttackGameState
     from "../../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
@@ -30,7 +30,7 @@ import WesterosCardComponent from "./utils/WesterosCardComponent";
 
 @observer
 export default class WesterosGameStateComponent extends Component<GameStateComponentProps<WesterosGameState>> {
-    render() {
+    render(): ReactNode {
         return (
             <>
                 {this.props.gameState.currentCard && (

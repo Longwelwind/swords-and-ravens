@@ -25,7 +25,7 @@ export default class LocalWebsiteClient implements WebsiteClient {
         };
     }
 
-    async saveGame(gameId: string, serializedGame: any, viewOfGame: any, players: {userId: string; data: object}[], state: string, version: string): Promise<void> {
+    async saveGame(_gameId: string, _serializedGame: any, _viewOfGame: any, _players: {userId: string; data: object}[], _state: string, _version: string): Promise<void> {
         // Do nothing
     }
 
@@ -37,7 +37,7 @@ export default class LocalWebsiteClient implements WebsiteClient {
         return `chat-${name}`;
     }
 
-    async createPrivateChatRoom(users: User[], name: string): Promise<string> {
+    async createPrivateChatRoom(users: User[], _name: string): Promise<string> {
         return `private-chat-between-${users.map(u => u.name).join("-")}`;
     }
 }

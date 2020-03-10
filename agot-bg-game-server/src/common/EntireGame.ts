@@ -67,6 +67,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             });
 
             // Mark everything as transmitted
+            // eslint-disable-next-line @typescript-eslint/no-this-alias
             let gameState: GameState<any, any> | null = this;
             while (gameState != null) {
                 gameState.needsToBeTransmittedToClient = false;

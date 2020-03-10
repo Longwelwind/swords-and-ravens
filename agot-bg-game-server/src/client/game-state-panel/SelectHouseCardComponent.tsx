@@ -1,14 +1,9 @@
 import {Component, ReactNode} from "react";
 import GameStateComponentProps from "./GameStateComponentProps";
-import SelectUnitsGameState from "../../common/ingame-game-state/select-units-game-state/SelectUnitsGameState";
-import Region from "../../common/ingame-game-state/game-data-structure/Region";
-import Unit from "../../common/ingame-game-state/game-data-structure/Unit";
-import _ from "lodash";
 import * as React from "react";
 import {Row} from "react-bootstrap";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
-import BetterMap from "../../utils/BetterMap";
 import {observable} from "mobx";
 import {observer} from "mobx-react";
 import SelectHouseCardGameState

@@ -31,11 +31,11 @@ export default class ReconcileArmiesGameState<P extends ParentGameState> extends
         this.childGameState.onPlayerMessage(player, message);
     }
 
-    onServerMessage(message: ServerMessage) {
+    onServerMessage(message: ServerMessage): void {
         this.childGameState.onServerMessage(message);
     }
 
-    proceedReconcileArmies(lastReconciled: House | null) {
+    proceedReconcileArmies(lastReconciled: House | null): void {
         if (lastReconciled == this.game.ironThroneTrack[this.game.ironThroneTrack.length - 1]) {
             this.parentGameState.onReconcileArmiesGameStateEnd();
             return;
@@ -51,7 +51,7 @@ export default class ReconcileArmiesGameState<P extends ParentGameState> extends
         }
     }
 
-    onPlayerReconcileArmiesGameStateEnd(house: House) {
+    onPlayerReconcileArmiesGameStateEnd(house: House): void {
         this.proceedReconcileArmies(house);
     }
 

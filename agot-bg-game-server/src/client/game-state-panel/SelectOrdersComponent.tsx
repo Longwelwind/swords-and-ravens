@@ -8,7 +8,6 @@ import {Row} from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
 import {observable} from "mobx";
-import Order from "../../common/ingame-game-state/game-data-structure/Order";
 import _ from "lodash";
 import {OrderOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";

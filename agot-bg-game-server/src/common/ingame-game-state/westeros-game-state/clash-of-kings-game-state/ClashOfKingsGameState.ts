@@ -20,11 +20,11 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
         return this.parentGameState.ingame;
     }
 
-    firstStart() {
+    firstStart(): void {
         this.proceedNextTrack();
     }
 
-    proceedNextTrack() {
+    proceedNextTrack(): void {
         this.currentTrackI++;
 
         this.entireGame.broadcastToClients({
@@ -35,11 +35,11 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
         this.setChildGameState(new BiddingGameState(this)).firstStart(this.game.houses.values);
     }
 
-    onPlayerMessage(player: Player, message: ClientMessage) {
+    onPlayerMessage(player: Player, message: ClientMessage): void {
         this.childGameState.onPlayerMessage(player, message);
     }
 
-    onServerMessage(message: ServerMessage) {
+    onServerMessage(message: ServerMessage): void {
         if(message.type == "bidding-next-track") {
             this.currentTrackI = message.nextTrack
         } else {

@@ -1,5 +1,4 @@
 import {observable} from "mobx";
-import EntireGame from "../../EntireGame";
 import GameLog, {GameLogData} from "./GameLog";
 import IngameGameState from "../IngameGameState";
 

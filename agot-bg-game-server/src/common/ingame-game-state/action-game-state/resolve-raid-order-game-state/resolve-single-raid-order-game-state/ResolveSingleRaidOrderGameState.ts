@@ -41,11 +41,11 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
         return this.game.world;
     }
 
-    firstStart(house: House) {
+    firstStart(house: House): void {
         this.house = house;
     }
 
-    onPlayerMessage(player: Player, message: ClientMessage) {
+    onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "resolve-raid") {
             if (player.house != this.house) {
                 return;

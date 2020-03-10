@@ -13,7 +13,7 @@ import Row from "react-bootstrap/Row";
 
 @observer
 export default class MusteringComponent extends Component<GameStateComponentProps<MusteringGameState>> {
-    render() {
+    render(): React.ReactNode {
         return (
             <ListGroupItem>
                 <Row>

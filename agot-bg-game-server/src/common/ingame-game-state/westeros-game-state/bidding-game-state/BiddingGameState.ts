@@ -25,7 +25,7 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
         return this.parentGameState.game;
     }
 
-    onPlayerMessage(player: Player, message: ClientMessage) {
+    onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "bid") {
             if (!this.participatingHouses.includes(player.house)) {
                 return;
@@ -70,14 +70,14 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
         }
     }
 
-    onServerMessage(message: ServerMessage) {
+    onServerMessage(message: ServerMessage): void {
         if (message.type == "bid-done") {
             const house = this.game.houses.get(message.houseId);
             this.bids.set(house, -1);
         }
     }
 
-    bid(powerTokens: number) {
+    bid(powerTokens: number): void {
         this.entireGame.sendMessageToServer({
             type: "bid",
             powerTokens: powerTokens
@@ -100,7 +100,7 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
         return "Bidding phase";
     }
 
-    firstStart(participatingHouses: House[] = []) {
+    firstStart(participatingHouses: House[] = []): void {
         this.participatingHouses = participatingHouses;
     }
 

@@ -1,7 +1,7 @@
 import {observer} from "mobx-react";
 import UseValyrianSteelBladeGameState
     from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/use-valyrian-steel-blade-game-state/UseValyrianSteelBladeGameState";
-import {Component} from "react";
+import {Component, ReactNode} from "react";
 import React from "react";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Button from "react-bootstrap/Button";
@@ -10,7 +10,7 @@ import Col from "react-bootstrap/Col";
 
 @observer
 export default class UseValyrianSteelBladeComponent extends Component<GameStateComponentProps<UseValyrianSteelBladeGameState>> {
-    render() {
+    render(): ReactNode {
         return (
             <>
                 <Col xs={12}>
@@ -23,7 +23,7 @@ export default class UseValyrianSteelBladeComponent extends Component<GameStateC
                                 <Button onClick={() => this.choose(true)}>Use it</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button onClick={() => this.choose(false)}>Don't use it</Button>
+                                <Button onClick={() => this.choose(false)}>Don&apos;t use it</Button>
                             </Col>
                         </Row>
                     ) : (
@@ -36,7 +36,7 @@ export default class UseValyrianSteelBladeComponent extends Component<GameStateC
         );
     }
 
-    choose(use: boolean) {
+    choose(use: boolean): void {
         this.props.gameState.choose(use);
     }
 }

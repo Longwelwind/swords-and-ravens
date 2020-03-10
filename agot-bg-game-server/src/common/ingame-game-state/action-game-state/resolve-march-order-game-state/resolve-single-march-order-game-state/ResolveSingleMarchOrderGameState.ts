@@ -189,7 +189,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
         }
     }
 
-    private destroyPossibleShipsInAdjacentPortIfNecessary(startingRegion: Region, movesThatTriggerAttack: [Region, Unit[]][]) {
+    private destroyPossibleShipsInAdjacentPortIfNecessary(startingRegion: Region, movesThatTriggerAttack: [Region, Unit[]][]): void {
         // Check if user left a simple castle empty
         // If so, destroy all existing ships in possible adjacent port
         // This has to be done now as user would keep control of the ships in case he initiates a battle but loses it

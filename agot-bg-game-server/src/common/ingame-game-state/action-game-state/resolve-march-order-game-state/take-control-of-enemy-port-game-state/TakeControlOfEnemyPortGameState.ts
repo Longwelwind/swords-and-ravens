@@ -57,7 +57,7 @@ export default class TakeControlOfEnemyPortGameState extends GameState<ResolveMa
             }
 
             const addedUnits = new BetterMap<Region, UnitType[]>();
-            addedUnits.set(port, Array.from({length: i}, (v, k) => ship));
+            addedUnits.set(port, Array.from({length: i}, () => ship));
 
             if (!this.game.hasTooMuchArmies(newController, addedUnits)) {
                 choices.push(i.toString());
@@ -67,14 +67,14 @@ export default class TakeControlOfEnemyPortGameState extends GameState<ResolveMa
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(newController, "", choices);
     }
 
-    onSimpleChoiceGameStateEnd(choice: number) {
+    onSimpleChoiceGameStateEnd(choice: number): void {
         // Remove ships from old controller
         const oldController = this.port.units.values[0].allegiance;
         this.parentGameState.destroyAllShipsInPort(this.port);
 
         if(choice > 0) {
             // Add ships for new controller
-            let shipsToAdd: Unit[] = [];
+            const shipsToAdd: Unit[] = [];
             for(let i=0;i<choice;i++) {
                 shipsToAdd.push(this.game.createUnit(this.port, ship, this.newController));
             }

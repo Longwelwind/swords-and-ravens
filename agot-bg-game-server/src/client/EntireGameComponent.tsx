@@ -1,5 +1,5 @@
 import {observer} from "mobx-react";
-import {Component, default as React} from "react";
+import {Component, default as React, ReactNode} from "react";
 import EntireGame from "../common/EntireGame";
 import GameClient from "./GameClient";
 import LobbyGameState from "../common/lobby-game-state/LobbyGameState";
@@ -14,7 +14,7 @@ interface EntireGameComponentProps {
 
 @observer
 export default class EntireGameComponent extends Component<EntireGameComponentProps> {
-    render() {
+    render(): ReactNode {
         return (
             this.props.entireGame.childGameState instanceof LobbyGameState ? (
                 <LobbyComponent gameClient={this.props.gameClient} gameState={this.props.entireGame.childGameState}/>
