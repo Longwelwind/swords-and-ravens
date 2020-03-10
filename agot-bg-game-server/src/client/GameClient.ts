@@ -149,10 +149,7 @@ export default class GameClient {
             this.chatClient.addChannel(this.entireGame.publicChatRoomId);
 
             // Connect to the private chat rooms
-            this.entireGame.privateChatRoomsIds
-                .map((_, betterMap) => betterMap.map((_, roomId) => roomId)
-                    .forEach(roomId => this.chatClient.addChannel(roomId))
-                );
+            this.entireGame.getPrivateChatRoomsOf(this.authenticatedUser).forEach(({roomId}) => this.chatClient.addChannel(roomId));
 
             this.connectionState = ConnectionState.SYNCED;
         } else if (message.type == "new-private-chat-room") {
