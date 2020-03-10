@@ -9,13 +9,13 @@ export default function renderChildGameState<E extends GameState<any, any>>(
     possibleChild: [any, any][],
     ref: (c: Component) => void = () => {}
 ): ReactNode {
-    const childEntry = possibleChild.find(([GameStateClass, ComponentClass]) => props.gameState.childGameState instanceof GameStateClass);
+    const childEntry = possibleChild.find(([GameStateClass, _ComponentClass]) => props.gameState.childGameState instanceof GameStateClass);
 
     if (!childEntry) {
         throw new Error(`Couldn't find childGameState of type ${props.gameState.childGameState.constructor.name}`);
     }
 
-    const [GameStateClass, ComponentClass] = childEntry;
+    const [, ComponentClass] = childEntry;
 
     return <ComponentClass
         gameClient={props.gameClient}

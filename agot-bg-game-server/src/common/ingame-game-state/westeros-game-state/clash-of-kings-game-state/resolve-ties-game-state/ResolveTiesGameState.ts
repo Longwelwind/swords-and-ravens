@@ -25,11 +25,11 @@ export default class ResolveTiesGameState extends GameState<ClashOfKingsGameStat
         return this.parentGameState.game.ironThroneHolder;
     }
 
-    firstStart(bidResults: [number, House[]][]) {
+    firstStart(bidResults: [number, House[]][]): void {
         this.bidResults = bidResults;
     }
 
-    onPlayerMessage(player: Player, message: ClientMessage) {
+    onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "resolve-ties") {
             if (player.house != this.decider) {
                 return;
@@ -58,7 +58,7 @@ export default class ResolveTiesGameState extends GameState<ClashOfKingsGameStat
             // Create the final order of the track
             let tieProgression = -1;
             const finalOrdering = _.flatten(
-                this.bidResults.map(([bid, houses]) => {
+                this.bidResults.map(([_bid, houses]) => {
                     if (houses.length == 1) {
                         return houses;
                     } else {
@@ -73,11 +73,11 @@ export default class ResolveTiesGameState extends GameState<ClashOfKingsGameStat
         }
     }
 
-    onServerMessage(message: ServerMessage) {
+    onServerMessage(_message: ServerMessage): void {
 
     }
 
-    resolveTies(resolvedTies: House[][]) {
+    resolveTies(resolvedTies: House[][]): void {
         this.entireGame.sendMessageToServer({
             type: "resolve-ties",
             resolvedTies: resolvedTies.map(houses => houses.map(h => h.id))
@@ -90,7 +90,7 @@ export default class ResolveTiesGameState extends GameState<ClashOfKingsGameStat
 
     getTiesToResolve(): {trackerPlace: number; houses: House[]}[] {
         return this.bidResults
-            .map(([bid, houses], i) => {
+            .map(([_bid, houses], i) => {
                 // The goal is to go from:
                 // [
                 //   [12, [lannister, stark]],
@@ -106,15 +106,15 @@ export default class ResolveTiesGameState extends GameState<ClashOfKingsGameStat
                 //   {trackerPlace: 5, houses: [greyjoy]},
                 // ]
                 return ({
-                    trackerPlace: _.sum(this.bidResults.slice(0, i).map(([bid, houses]) => houses.length)),
+                    trackerPlace: _.sum(this.bidResults.slice(0, i).map(([_bid, houses]) => houses.length)),
                     houses: houses
                 });
             })
-            .filter(({trackerPlace, houses}) => houses.length > 1);
+            .filter(({houses}) => houses.length > 1);
     }
 
     getBidOfHouse(house: House): number {
-        const index = this.bidResults.findIndex(([bid, houses], i) => houses.includes(house));
+        const index = this.bidResults.findIndex(([_bid, houses]) => houses.includes(house));
         if(index > -1) {
             return this.bidResults[index][0];
         }
@@ -122,14 +122,14 @@ export default class ResolveTiesGameState extends GameState<ClashOfKingsGameStat
         return -1;
     }
 
-    serializeToClient(admin: boolean, player: Player | null): SerializedResolveTiesGameState {
+    serializeToClient(_admin: boolean, _player: Player | null): SerializedResolveTiesGameState {
         return {
             type: "resolve-ties",
             bidResults: this.bidResults.map(([bid, houses]) => ([bid, houses.map(h => h.id)]))
         };
     }
 
-    static deserializeFromServer(clashOfKings: ClashOfKingsGameState, data: SerializedResolveTiesGameState) {
+    static deserializeFromServer(clashOfKings: ClashOfKingsGameState, data: SerializedResolveTiesGameState): ResolveTiesGameState {
         const resolveTies = new ResolveTiesGameState(clashOfKings);
 
         resolveTies.bidResults = data.bidResults.map(([bid, houseIds]) => ([bid, houseIds.map((hid => clashOfKings.game.houses.get(hid)))]));

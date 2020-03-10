@@ -74,6 +74,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
                 name,
                 public: true,
                 users: [],
+                // eslint-disable-next-line @typescript-eslint/camelcase
                 max_retrieve_count: null
             }
         });
@@ -84,9 +85,11 @@ export default class LiveWebsiteClient implements WebsiteClient {
     async saveGame(gameId: string, serializedGame: any, viewOfGame: any, players: {userId: string; data: object}[], state: string, version: string): Promise<void> {
         await this.request.patch(`${this.masterApiBaseUrl}/game/${gameId}`, {
             body: {
+                // eslint-disable-next-line @typescript-eslint/camelcase
                 serialized_game: serializedGame,
                 state,
                 version,
+                // eslint-disable-next-line @typescript-eslint/camelcase
                 view_of_game: viewOfGame,
                 players: players.map(p => ({user: p.userId, data: p.data})),
             }
@@ -106,6 +109,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
                 name,
                 public: false,
                 users: users.map(u => ({user: u.id})),
+                // eslint-disable-next-line @typescript-eslint/camelcase
                 max_retrieve_count: null
             }
         });

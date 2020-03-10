@@ -9,10 +9,11 @@ import {ClientMessage} from "../../../../messages/ClientMessage";
 import Player from "../../Player";
 import {ServerMessage} from "../../../../messages/ServerMessage";
 import IngameGameState from "../../IngameGameState";
+import Game from "../../game-data-structure/Game";
 
 export default class MusteringGameState extends GameState<WesterosGameState, PlayerMusteringGameState> {
 
-    get game() {
+    get game(): Game {
         return this.parentGameState.game;
     }
 
@@ -20,23 +21,23 @@ export default class MusteringGameState extends GameState<WesterosGameState, Pla
         return this.parentGameState.ingame;
     }
 
-    firstStart() {
+    firstStart(): void {
         this.proceedNextHouse();
     }
 
-    onPlayerMusteringEnd(house: House) {
+    onPlayerMusteringEnd(house: House): void {
         this.proceedNextHouse(house);
     }
 
-    onPlayerMessage(player: Player, message: ClientMessage ) {
+    onPlayerMessage(player: Player, message: ClientMessage): void {
         this.childGameState.onPlayerMessage(player, message);
     }
 
-    onServerMessage(message: ServerMessage) {
+    onServerMessage(_message: ServerMessage): void {
 
     }
 
-    proceedNextHouse(house: House | null = null) {
+    proceedNextHouse(house: House | null = null): void {
         if (this.game.ironThroneTrack[this.game.ironThroneTrack.length - 1] == house) {
             this.parentGameState.onMusteringGameStateEnd();
             return;
@@ -56,7 +57,7 @@ export default class MusteringGameState extends GameState<WesterosGameState, Pla
         );
     }
 
-    canMuster(house: House) {
+    canMuster(house: House): boolean {
         return this.game.world.getControlledRegions(house).some(r => r.castleLevel > 0);
     }
 

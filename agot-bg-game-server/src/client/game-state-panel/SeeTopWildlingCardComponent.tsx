@@ -1,10 +1,9 @@
 import {observer} from "mobx-react";
-import {Component} from "react";
+import {Component, ReactNode} from "react";
 import SeeTopWildlingCardGameState
     from "../../common/ingame-game-state/action-game-state/use-raven-game-state/see-top-wildling-card-game-state/SeeTopWildlingCardGameState";
 import React from "react";
 import GameStateComponentProps from "./GameStateComponentProps";
-import wildlingCardImages from "../wildlingCardImages";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
@@ -13,7 +12,7 @@ import WildlingCardComponent from "./utils/WildlingCardComponent";
 
 @observer
 export default class SeeTopWildlingCardComponent extends Component<GameStateComponentProps<SeeTopWildlingCardGameState>> {
-    render() {
+    render(): ReactNode {
         return (
             <>
                 <Col xs={12}>
@@ -50,7 +49,7 @@ export default class SeeTopWildlingCardComponent extends Component<GameStateComp
         );
     }
 
-    choose(action: SeeTopWildlingCardAction) {
+    choose(action: SeeTopWildlingCardAction): void {
         this.props.gameState.choose(action);
     }
 }

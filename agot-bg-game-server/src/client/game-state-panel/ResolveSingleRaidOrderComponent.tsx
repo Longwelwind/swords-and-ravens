@@ -1,5 +1,5 @@
 import {observer} from "mobx-react";
-import {Component} from "react";
+import {Component, ReactNode} from "react";
 import ResolveSingleRaidOrderGameState
     from "../../common/ingame-game-state/action-game-state/resolve-raid-order-game-state/resolve-single-raid-order-game-state/ResolveSingleRaidOrderGameState";
 import GameStateComponentProps from "./GameStateComponentProps";
@@ -9,7 +9,6 @@ import Region from "../../common/ingame-game-state/game-data-structure/Region";
 import Button from "react-bootstrap/Button";
 import * as _ from "lodash";
 import RaidOrderType from "../../common/ingame-game-state/game-data-structure/order-types/RaidOrderType";
-import Order from "../../common/ingame-game-state/game-data-structure/Order";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import {OrderOnMapProperties} from "../MapControls";
@@ -23,7 +22,7 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
 
     modifyOrdersOnMapCallback: any;
 
-    render() {
+    render(): ReactNode {
         return (
             <>
                 <Col xs={12} className="text-center">

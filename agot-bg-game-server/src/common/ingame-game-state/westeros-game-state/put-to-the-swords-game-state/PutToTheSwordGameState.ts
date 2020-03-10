@@ -17,7 +17,7 @@ export default class PutToTheSwordGameState extends GameState<WesterosGameState,
         return this.parentGameState.ingame;
     }
 
-    firstStart() {
+    firstStart(): void {
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
             this.game.valyrianSteelBladeHolder,
             "The holder of the Valyrian Blade Steel can choose between No March +1 orders, no Defense orders or none",
@@ -25,7 +25,7 @@ export default class PutToTheSwordGameState extends GameState<WesterosGameState,
         );
     }
 
-    onSimpleChoiceGameStateEnd(choice: number) {
+    onSimpleChoiceGameStateEnd(choice: number): void {
         this.parentGameState.ingame.log({
             type: "put-to-the-sword-choice",
             house: this.childGameState.house.id,
@@ -41,11 +41,11 @@ export default class PutToTheSwordGameState extends GameState<WesterosGameState,
         }
     }
 
-    onPlayerMessage(player: Player, message: ClientMessage) {
+    onPlayerMessage(player: Player, message: ClientMessage): void {
         this.childGameState.onPlayerMessage(player, message);
     }
 
-    onServerMessage(message: ServerMessage) {
+    onServerMessage(message: ServerMessage): void {
         this.childGameState.onServerMessage(message);
     }
 

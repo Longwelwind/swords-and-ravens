@@ -1,6 +1,5 @@
 import WildlingCardType from "./WildlingCardType";
 import WildlingsAttackGameState from "../../westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
-import _ from "lodash";
 import RattleshirtsRaidersWildlingVictoryGameState
     from "../../westeros-game-state/wildlings-attack-game-state/rattleshirts-raiders-wildling-victory-game-state/RattleshirtsRaidersWildlingVictoryGameState";
 

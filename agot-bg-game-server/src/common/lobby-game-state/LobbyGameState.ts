@@ -6,7 +6,6 @@ import {ServerMessage} from "../../messages/ServerMessage";
 import {observable} from "mobx";
 import BetterMap from "../../utils/BetterMap";
 import baseGameData from "../../../data/baseGameData.json";
-import House from "../ingame-game-state/game-data-structure/House";
 
 export default class LobbyGameState extends GameState<EntireGame> {
     availableHouses: BetterMap<string, LobbyHouse>;
@@ -104,7 +103,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
         return "Lobby";
     }
 
-    serializeToClient(user: User | null): SerializedLobbyGameState {
+    serializeToClient(_user: User | null): SerializedLobbyGameState {
         return {
             type: "lobby",
             availableHouses: this.availableHouses.values,

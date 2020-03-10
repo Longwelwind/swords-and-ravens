@@ -8,7 +8,7 @@ export default class MarchOrderType extends OrderType {
         this.attackModifier = attackModifier;
     }
 
-    toString() {
+    toString(): string {
         return "M" + (this.attackModifier > 0 ? "+" + this.attackModifier : this.attackModifier < 0 ? this.attackModifier : "");
     }
 }

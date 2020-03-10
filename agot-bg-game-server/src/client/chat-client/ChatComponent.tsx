@@ -43,7 +43,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                 {/* Setting a fixed height seems to be the only solution to make ScrollToBottom work */}
                 <ScrollToBottom className="mb-3 chat-scroll-to-bottom">
                     {this.channel.messages.map(m => (
-                        <Row noGutters={true} className="flex-nowrap">
+                        <Row noGutters={true} className="flex-nowrap" key={m.id}>
                             <Col xs="auto" style={{width: "38px"}} className="text-center">
                                 <small
                                     className="text-muted">{('0' + m.createdAt.getHours()).slice(-2)}:{('0' + m.createdAt.getMinutes()).slice(-2)}</small>

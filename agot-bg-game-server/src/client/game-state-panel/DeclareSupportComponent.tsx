@@ -1,7 +1,7 @@
 import {observer} from "mobx-react";
 import DeclareSupportGameState
     from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/declare-support-game-state/DeclareSupportGameState";
-import {Component} from "react";
+import {Component, ReactNode} from "react";
 import React from "react";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Button from "react-bootstrap/Button";
@@ -14,7 +14,7 @@ import ConditionalWrap from "../utils/ConditionalWrap";
 
 @observer
 export default class DeclareSupportComponent extends Component<GameStateComponentProps<DeclareSupportGameState>> {
-    render() {
+    render(): ReactNode {
         return (
             <>
                 <Col xs={12}>
@@ -31,7 +31,7 @@ export default class DeclareSupportComponent extends Component<GameStateComponen
                                             <OverlayTrigger
                                                 overlay={
                                                     <Tooltip id="support-choice-restricted">
-                                                        You can't support the enemy in a combat you are involved.
+                                                        You can&apos;t support the enemy in a combat you are involved.
                                                     </Tooltip>
                                                 }
                                             >
@@ -68,7 +68,7 @@ export default class DeclareSupportComponent extends Component<GameStateComponen
         return this.props.gameState.isRestrictedToHimself() ? supportedHouse == this.props.gameState.house : true;
     }
 
-    choose(house: House | null) {
+    choose(house: House | null): void {
         this.props.gameState.choose(house);
     }
 }

@@ -52,15 +52,15 @@ export default class BetterMap<K, V> {
         return this.entries.map(([key, value]) => ([mapKey(key), mapValue(value, key)]));
     }
 
-    forEach(f: (v: V, k: K, map: Map<K, V>) => void) {
+    forEach(f: (v: V, k: K, map: Map<K, V>) => void): void {
         this._map.forEach(f);
     }
 
-    set(key: K, value: V) {
+    set(key: K, value: V): void {
         this._map.set(key, value);
     }
 
-    replace(key: K, value: V) {
+    replace(key: K, value: V): void {
         if (!this._map.has(key)) {
             throw new Error("Map doesn't have key \"" + key + "\"");
         }
@@ -68,7 +68,7 @@ export default class BetterMap<K, V> {
         this._map.set(key, value);
     }
 
-    delete(key: K) {
+    delete(key: K): void {
         if (!this._map.has(key)) {
             throw new Error("Map doesn't have key \"" + key + "\"");
         }

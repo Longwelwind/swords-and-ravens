@@ -27,11 +27,11 @@ export default class PlayerReconcileArmiesGameState extends GameState<ReconcileA
         return this.parentGameState.entireGame;
     }
 
-    firstStart(house: House) {
+    firstStart(house: House): void {
         this.house = house;
     }
 
-    onPlayerMessage(player: Player, message: ClientMessage) {
+    onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "reconcile-armies") {
             if (this.house != player.house) {
                 return;
@@ -68,18 +68,18 @@ export default class PlayerReconcileArmiesGameState extends GameState<ReconcileA
         }
     }
 
-    onServerMessage(message: ServerMessage) {
+    onServerMessage(_message: ServerMessage): void {
 
     }
 
-    reconcileArmies(removedUnits: BetterMap<Region, Unit[]>) {
+    reconcileArmies(removedUnits: BetterMap<Region, Unit[]>): void {
         this.entireGame.sendMessageToServer({
             type: "reconcile-armies",
             unitsToRemove: removedUnits.entries.map(([region, units]) => [region.id, units.map(u => u.id)])
         });
     }
 
-    isEnoughToReconcile(removedUnits: BetterMap<Region, Unit[]>) {
+    isEnoughToReconcile(removedUnits: BetterMap<Region, Unit[]>): boolean {
         return !this.game.hasTooMuchArmies(this.house, new BetterMap<Region, UnitType[]>(), removedUnits);
     }
 

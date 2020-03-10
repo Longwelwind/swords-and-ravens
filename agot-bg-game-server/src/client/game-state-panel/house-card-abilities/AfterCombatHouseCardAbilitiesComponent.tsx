@@ -1,13 +1,9 @@
 import {observer} from "mobx-react";
 import {Component, ReactNode} from "react";
-import AfterWinnerDeterminationGameState
-    from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/AfterWinnerDeterminationGameState";
 import GameStateComponentProps from "../GameStateComponentProps";
 import renderChildGameState from "../../utils/renderChildGameState";
 import PatchfaceAbilityGameState
     from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-combat-house-card-abilities-game-state/patchface-ability-game-state/PatchfaceAbilityGameState";
-import PatchfaceHouseCardAbility
-    from "../../../common/ingame-game-state/game-data-structure/house-card/PatchfaceHouseCardAbility";
 import AfterCombatHouseCardAbilitiesGameState
     from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-combat-house-card-abilities-game-state/AfterCombatHouseCardAbilitiesGameState";
 import PatchfaceAbilityComponent from "./PatchfaceAbilityComponent";

@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Component} from "react";
+import {Component, ReactNode} from "react";
 import {observer} from "mobx-react";
 import GameClient, {ConnectionState} from "./GameClient";
 import Container from "react-bootstrap/Container";
@@ -14,7 +14,7 @@ interface AppProps {
 
 @observer
 export default class App extends Component<AppProps> {
-    render() {
+    render(): ReactNode {
         return (
             <Container fluid style={{marginTop: "1rem", marginBottom: "4.5rem"}}>
                 <Row className="justify-content-center">

@@ -101,7 +101,7 @@ export default class GameState<ParentGameState extends AnyGameState, ChildGameSt
         }
     }
 
-    deserializeChildGameState(data: any): ChildGameState {
+    deserializeChildGameState(_data: any): ChildGameState {
         throw new Error(`"deserializeChildGameState" is not defined for class "${this.constructor.name}"`);
     }
 }

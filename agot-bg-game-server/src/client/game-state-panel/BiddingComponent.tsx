@@ -1,6 +1,6 @@
 import {observer} from "mobx-react";
 import BiddingGameState, {BiddingGameStateParent} from "../../common/ingame-game-state/westeros-game-state/bidding-game-state/BiddingGameState";
-import {Component} from "react";
+import {Component, ReactNode} from "react";
 import * as React from "react";
 import {observable} from "mobx";
 import GameStateComponentProps from "./GameStateComponentProps";
@@ -12,7 +12,7 @@ import Col from "react-bootstrap/Col";
 export default class BiddingComponent<ParentGameState extends BiddingGameStateParent> extends Component<GameStateComponentProps<BiddingGameState<ParentGameState>>> {
     @observable powerTokensToBid = 0;
 
-    render() {
+    render(): ReactNode {
         return (
             <>
                 {this.props.gameClient.authenticatedPlayer
@@ -51,7 +51,7 @@ export default class BiddingComponent<ParentGameState extends BiddingGameStatePa
         );
     }
 
-    bid(powerTokens: number) {
+    bid(powerTokens: number): void {
         this.props.gameState.bid(powerTokens);
         // Reset Power Tokens for next bidding.
         this.powerTokensToBid = 0;

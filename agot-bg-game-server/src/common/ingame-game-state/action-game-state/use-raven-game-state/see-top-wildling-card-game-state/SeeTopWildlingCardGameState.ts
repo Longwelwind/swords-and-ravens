@@ -29,11 +29,11 @@ export default class SeeTopWildlingCardGameState extends GameState<UseRavenGameS
         return this.useRavenGameState.ravenHolder;
     }
 
-    firstStart() {
+    firstStart(): void {
         this.topWildlingCard = this.useRavenGameState.game.wildlingDeck[0];
     }
 
-    onPlayerMessage(player: Player, message: ClientMessage) {
+    onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "choose-top-wildling-card-action") {
             if (this.ravenHolder != player.house) {
                 return;
@@ -59,14 +59,14 @@ export default class SeeTopWildlingCardGameState extends GameState<UseRavenGameS
         }
     }
 
-    choose(action: SeeTopWildlingCardAction) {
+    choose(action: SeeTopWildlingCardAction): void {
         this.entireGame.sendMessageToServer({
             type: "choose-top-wildling-card-action",
             action: action
         });
     }
 
-    onServerMessage(message: ServerMessage) {
+    onServerMessage(_message: ServerMessage): void {
 
     }
 

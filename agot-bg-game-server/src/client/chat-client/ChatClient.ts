@@ -28,7 +28,7 @@ interface MessageData {
 export class Channel {
     id: string;
     websocket: WebSocket;
-    @observable connected: boolean = false;
+    @observable connected = false;
     @observable messages: {id: string; user: User; text: string; createdAt: Date}[] = [];
     @observable lastViewedMessageId: string;
     onMessage: (() => void) | null;

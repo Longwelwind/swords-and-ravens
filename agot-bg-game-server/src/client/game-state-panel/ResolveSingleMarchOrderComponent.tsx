@@ -6,10 +6,8 @@ import {observable} from "mobx";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
 import Unit from "../../common/ingame-game-state/game-data-structure/Unit";
 import * as _ from "lodash";
-import Order from "../../common/ingame-game-state/game-data-structure/Order";
 import {observer} from "mobx-react";
 import {Button, Form} from "react-bootstrap";
-import MarchOrderType from "../../common/ingame-game-state/game-data-structure/order-types/MarchOrderType";
 import BetterMap from "../../utils/BetterMap";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Row from "react-bootstrap/Row";
@@ -54,7 +52,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                             <Col xs={12} className="text-center">
                                 {this.plannedMoves.entries.map(([region, units]) => (
                                     <div key={region.id}>
-                                        {units.map(u => u.type.name).join(", ")} => {region.name}
+                                        {units.map(u => u.type.name).join(", ")} =&gt; {region.name}
                                     </div>
                                 ))}
                             </Col>

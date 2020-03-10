@@ -64,7 +64,7 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         this.proceedNextResolveSingleMarchOrder(house);
     }
 
-    onTakeControlOfEnemyPortFinish(lastHouseThatResolvedMarchOrder: House) {
+    onTakeControlOfEnemyPortFinish(lastHouseThatResolvedMarchOrder: House): void {
         // Check if an other march order can be resolved
         this.onResolveSingleMarchOrderGameStateFinish(lastHouseThatResolvedMarchOrder);
     }
@@ -123,7 +123,7 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         return null;
     }
 
-    moveUnits(from: Region, units: Unit[], to: Region) {
+    moveUnits(from: Region, units: Unit[], to: Region): void {
         const controllerToRegion = to.getController();
 
         if (controllerToRegion != units[0].allegiance) {
@@ -162,7 +162,7 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         });
     }
 
-    private removePossibleOrdersInPort(portRegion: Region) {
+    private removePossibleOrdersInPort(portRegion: Region): void {
         if(portRegion.type != port) {
             throw new Error("This method is intended to only be used for removing orders of destroyed or taken ships")
         }
@@ -177,7 +177,7 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         }
     }
 
-    private isTakeControlOfEnemyPortGameStateRequired(): {port: Region, newController: House} | null {
+    private isTakeControlOfEnemyPortGameStateRequired(): {port: Region; newController: House} | null {
         // Find ports with enemy ships
         const portsWithEnemyShips = this.world.regions.values.filter(r => r.type == port
             && r.units.size > 0
@@ -204,11 +204,11 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         throw new Error("adjacentCastleController should never be null");
     }
 
-    onPlayerMessage(player: Player, message: ClientMessage) {
+    onPlayerMessage(player: Player, message: ClientMessage): void {
         this.childGameState.onPlayerMessage(player, message);
     }
 
-    onServerMessage(message: ServerMessage) {
+    onServerMessage(message: ServerMessage): void {
         this.childGameState.onServerMessage(message);
     }
 

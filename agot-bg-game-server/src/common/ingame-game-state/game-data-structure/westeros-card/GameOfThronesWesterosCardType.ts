@@ -5,7 +5,7 @@ import * as _ from "lodash";
 import {port} from "../regionTypes";
 
 export default class GameOfThronesWesterosCardType extends WesterosCardType {
-    execute(westeros: WesterosGameState) {
+    execute(westeros: WesterosGameState): void {
         const world = westeros.world;
 
         // Make each player wins a power tokens for each region with crown icons,
@@ -22,7 +22,7 @@ export default class GameOfThronesWesterosCardType extends WesterosCardType {
                         || world.getAdjacentSeaOfPort(r).getController() == house
                     ).length
             ])
-        ).filter(([house, gain]) => gain > 0);
+        ).filter(([_house, gain]) => gain > 0);
 
         gains.forEach(([house, gain]) => {
             house.changePowerTokens(gain);

@@ -83,7 +83,7 @@ export default class ResolveRetreatGameState extends GameState<
         }
     }
 
-    private destroyAllUnits(region: Region, affectedHouse: House) {
+    private destroyAllUnits(region: Region, affectedHouse: House): void {
         const unitIdsToKill = region.units.values.map(u => u.id);
         const unitTypesToKill = region.units.values.map(u => u.type.name);
         unitIdsToKill.forEach(uid => region.units.delete(uid));

@@ -2,6 +2,11 @@ module.exports = {
     parser: '@typescript-eslint/parser',
     plugins: ['@typescript-eslint'],
     extends: ['plugin:@typescript-eslint/recommended', "plugin:react/recommended"],
+    settings: {
+        react: {
+            version: "detect"
+        }
+    },
     rules: {
         "@typescript-eslint/no-unused-vars": [
             "error",
@@ -18,7 +23,13 @@ module.exports = {
         ],
         "@typescript-eslint/no-explicit-any": [
             "off",
-        ]
+        ],
+        "@typescript-eslint/no-empty-function": [
+            "off",
+        ],
+        "@typescript-eslint/ban-ts-ignore": [
+            "off",
+        ],
     }
 };
 

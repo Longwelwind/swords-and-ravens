@@ -20,11 +20,11 @@ export default class ChooseRavenActionGameState extends GameState<UseRavenGameSt
         return this.useRavenGameState.ravenHolder;
     }
 
-    firstStart() {
+    firstStart(): void {
 
     }
 
-    chooseRavenAction(action: RavenAction) {
+    chooseRavenAction(action: RavenAction): void {
         this.entireGame.sendMessageToServer({
             type: "choose-raven-action",
             action: action
@@ -35,7 +35,7 @@ export default class ChooseRavenActionGameState extends GameState<UseRavenGameSt
         return [this.parentGameState.ingameGameState.getControllerOfHouse(this.ravenHolder).user];
     }
 
-    onPlayerMessage(player: Player, message: ClientMessage) {
+    onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "choose-raven-action") {
             if (player.house != this.ravenHolder) {
                 return;
@@ -47,20 +47,20 @@ export default class ChooseRavenActionGameState extends GameState<UseRavenGameSt
         }
     }
 
-    onServerMessage(message: ServerMessage) {
+    onServerMessage(_message: ServerMessage): void {
     }
 
     getPhaseName(): string {
         return "Choose raven action";
     }
 
-    serializeToClient(admin: boolean, player: Player | null): SerializedChooseRavenActionGameState {
+    serializeToClient(_admin: boolean, _player: Player | null): SerializedChooseRavenActionGameState {
         return {
             type: "choose-raven-action"
         }
     }
 
-    static deserializeFromServer(useRavenGameState: UseRavenGameState, data: SerializedChooseRavenActionGameState): ChooseRavenActionGameState {
+    static deserializeFromServer(useRavenGameState: UseRavenGameState, _data: SerializedChooseRavenActionGameState): ChooseRavenActionGameState {
         return new ChooseRavenActionGameState(useRavenGameState);
     }
 }

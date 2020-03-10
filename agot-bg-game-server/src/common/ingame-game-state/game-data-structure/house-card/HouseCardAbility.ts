@@ -10,7 +10,6 @@ import AfterCombatHouseCardAbilitiesGameState
     from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-combat-house-card-abilities-game-state/AfterCombatHouseCardAbilitiesGameState";
 import CancelHouseCardAbilitiesGameState
     from "../../action-game-state/resolve-march-order-game-state/combat-game-state/cancel-house-card-abilities-game-state/CancelHouseCardAbilitiesGameState";
-import Order from "../Order";
 import DefenseOrderType from "../order-types/DefenseOrderType";
 import PostCombatGameState
     from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState";

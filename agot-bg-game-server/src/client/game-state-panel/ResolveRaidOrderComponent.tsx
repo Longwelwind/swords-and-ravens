@@ -1,5 +1,5 @@
 import {observer} from "mobx-react";
-import {Component} from "react";
+import {Component, ReactNode} from "react";
 import GameStateComponentProps from "./GameStateComponentProps";
 import ResolveRaidOrderGameState
     from "../../common/ingame-game-state/action-game-state/resolve-raid-order-game-state/ResolveRaidOrderGameState";
@@ -10,7 +10,7 @@ import ResolveSingleRaidOrderComponent from "./ResolveSingleRaidOrderComponent";
 
 @observer
 export default class ResolveRaidOrderComponent extends Component<GameStateComponentProps<ResolveRaidOrderGameState>> {
-    render() {
+    render(): ReactNode {
         return renderChildGameState(this.props, [[ResolveSingleRaidOrderGameState, ResolveSingleRaidOrderComponent]]);
     }
 }

@@ -2,6 +2,12 @@ import HouseCardAbility from "./HouseCardAbility";
 import houseCardAbilities from "./houseCardAbilities";
 import {observable} from "mobx";
 
+export enum HouseCardState {
+    AVAILABLE,
+    USED,
+    DISCARDED
+}
+
 export default class HouseCard {
     id: string;
     name: string;
@@ -56,10 +62,4 @@ export interface SerializedHouseCard {
     towerIcons: number;
     abilityId: string | null;
     state: HouseCardState;
-}
-
-export enum HouseCardState {
-    AVAILABLE,
-    USED,
-    DISCARDED
 }

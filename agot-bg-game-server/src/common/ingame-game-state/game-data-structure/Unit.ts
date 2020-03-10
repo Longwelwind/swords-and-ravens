@@ -38,7 +38,7 @@ export default class Unit {
         }
     }
 
-    static deserializeFromServer(game: Game, data: SerializedUnit) {
+    static deserializeFromServer(game: Game, data: SerializedUnit): Unit {
         const type = unitTypes.get(data.type);
         const allegiance = game.houses.get(data.allegiance);
 

@@ -57,7 +57,7 @@ export default class GameClient {
         this.authData = authData;
     }
 
-    start() {
+    start(): void {
         const websocketHost = location.hostname == "localhost"
             ? "ws://localhost:5000"
             : "wss://play." + location.hostname;
@@ -112,7 +112,7 @@ export default class GameClient {
         return this.entireGame.isOwner(this.authenticatedUser);
     }
 
-    onOpen() {
+    onOpen(): void {
         // Authenticate
         this.send({
             type: "authenticate",
@@ -122,7 +122,7 @@ export default class GameClient {
         this.connectionState = ConnectionState.AUTHENTICATING;
     }
 
-    onMessage(data: string) {
+    onMessage(data: string): void {
         let message: ServerMessage | null = null;
 
         try {
@@ -180,15 +180,15 @@ export default class GameClient {
         }
     }
 
-    onError() {
+    onError(): void {
         this.connectionState = ConnectionState.CLOSED;
     }
 
-    onClose() {
+    onClose(): void {
         this.connectionState = ConnectionState.CLOSED;
     }
 
-    send(message: ClientMessage) {
+    send(message: ClientMessage): void {
         console.debug("Sending:");
         console.debug(message);
         const data = JSON.stringify(message);
@@ -196,7 +196,7 @@ export default class GameClient {
         this.socket.send(data);
     }
 
-    isAuthenticatedUser(user: User) {
+    isAuthenticatedUser(user: User): boolean {
         return this.authenticatedUser == user;
     }
 }
