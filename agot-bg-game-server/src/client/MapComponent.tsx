@@ -39,7 +39,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                 <div style={{position: "relative"}}>
                     {this.props.ingameGameState.world.regions.values.map(r => (
                         <div key={r.id}>
-                            {r.garrison > 0 && (
+                            {r.garrison > 0 && r.garrison != 1000 && (
                                 <div
                                     className="garrison-token hover-weak-outline"
                                     style={{
@@ -81,18 +81,20 @@ export default class MapComponent extends Component<MapComponentProps> {
 
         return propertiesForRegions.entries.map(([region, properties]) => {
 
+            const blocked = region.garrison == 1000;
+
             return <polygon key={region.id}
                             points={this.getRegionPath(region)}
-                            fill={properties.highlight.color}
+                            fill={blocked ? "black" : properties.highlight.color}
                             fillRule="evenodd"
                             className={classNames(
-                                "region-area",
-                                properties.highlight.active ? {
+                                blocked ? "blocked-region" : "region-area",
+                                properties.highlight.active && {
                                     "clickable": true,
                                     // Whatever the strength of the highlight defined, show the same
                                     // highlightness
                                     "highlighted-region-area": true
-                                } : {}
+                                }
                             )}
                             onClick={properties.onClick != null ? properties.onClick : undefined}/>;
         });

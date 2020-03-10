@@ -8,7 +8,7 @@ import BetterMap from "../../utils/BetterMap";
 import baseGameData from "../../../data/baseGameData.json";
 
 export default class LobbyGameState extends GameState<EntireGame> {
-    availableHouses: BetterMap<string, LobbyHouse>;
+    lobbyHouses: BetterMap<string, LobbyHouse>;
     @observable players = new BetterMap<LobbyHouse, User>();
 
     get entireGame(): EntireGame {
@@ -17,13 +17,37 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
     firstStart(): void {
         // Load the available houses for this game
-        this.availableHouses = this.getAvailableHouses();
+        this.lobbyHouses = this.getLobbyHouses();
     }
 
-    getAvailableHouses(): BetterMap<string, LobbyHouse> {
+    getLobbyHouses(): BetterMap<string, LobbyHouse> {
         return new BetterMap(
-            Object.entries(baseGameData.houses).map(([hid, h]) => [hid, {id: hid, name: h.name, color: h.color}])
+            Object.entries(baseGameData.houses)
+                .map(([hid, h]) => [hid, {id: hid, name: h.name, color: h.color}])
         );
+    }
+
+    getAvailableHouses(): LobbyHouse[] {
+        return this.lobbyHouses.values.filter(h => this.entireGame.gameSetup.houses.includes(h.id));
+    }
+
+    onGameSettingsChange(): void {
+        // Remove all chosen houses that are not available with the new settings
+        const availableHouses = this.getAvailableHouses();
+        let dirty = false;
+        this.players.forEach((user, house) => {
+            if (!availableHouses.includes(house)) {
+                dirty = true;
+                this.players.delete(house);
+            }
+        });
+
+        if (dirty) {
+            this.entireGame.broadcastToClients({
+                type: "house-chosen",
+                players: this.players.entries.map(([house, user]) => [house.id, user.id])
+            });
+        }
     }
 
     onClientMessage(user: User, message: ClientMessage): void {
@@ -38,7 +62,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
             this.entireGame.proceedToIngameGameState(new BetterMap(this.players.map((h, u) => ([h.id, u]))));
         } else if (message.type == "choose-house") {
-            const house = message.house ? this.availableHouses.get(message.house) : null;
+            const house = message.house ? this.lobbyHouses.get(message.house) : null;
 
             // Check if the house is available
             if (house && this.players.has(house)) {
@@ -66,7 +90,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
             return {success: false, reason: "not-owner"};
         }
 
-        if (this.players.size < 2) {
+        if (this.players.size < this.getAvailableHouses().length) {
             return {success: false, reason: "not-enough-players"};
         }
 
@@ -76,7 +100,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
     onServerMessage(message: ServerMessage): void {
         if (message.type == "house-chosen") {
             this.players = new BetterMap(message.players.map(([hid, uid]) => [
-                this.availableHouses.get(hid),
+                this.lobbyHouses.get(hid),
                 this.entireGame.users.get(uid)
             ]));
         }
@@ -106,7 +130,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
     serializeToClient(_user: User | null): SerializedLobbyGameState {
         return {
             type: "lobby",
-            availableHouses: this.availableHouses.values,
+            lobbyHouses: this.lobbyHouses.values,
             players: this.players.entries.map(([h, u]) => [h.id, u.id])
         };
     }
@@ -114,8 +138,8 @@ export default class LobbyGameState extends GameState<EntireGame> {
     static deserializeFromServer(entireGame: EntireGame, data: SerializedLobbyGameState): LobbyGameState {
         const lobbyGameState = new LobbyGameState(entireGame);
 
-        lobbyGameState.availableHouses = new BetterMap(data.availableHouses.map(h => [h.id, h]));
-        lobbyGameState.players = new BetterMap(data["players"].map(([hid, uid]) => [lobbyGameState.availableHouses.get(hid), entireGame.users.get(uid)]));
+        lobbyGameState.lobbyHouses = new BetterMap(data.lobbyHouses.map(h => [h.id, h]));
+        lobbyGameState.players = new BetterMap(data["players"].map(([hid, uid]) => [lobbyGameState.lobbyHouses.get(hid), entireGame.users.get(uid)]));
 
         return lobbyGameState;
     }
@@ -124,7 +148,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
 export interface SerializedLobbyGameState {
     type: "lobby";
     players: [string, string][];
-    availableHouses: LobbyHouse[];
+    lobbyHouses: LobbyHouse[];
 }
 
 export interface LobbyHouse {

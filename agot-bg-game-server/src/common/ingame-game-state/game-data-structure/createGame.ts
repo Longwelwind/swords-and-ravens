@@ -16,6 +16,7 @@ import wildlingCardTypes from "./wildling-card/wildlingCardTypes";
 import BetterMap from "../../../utils/BetterMap";
 import * as _ from "lodash";
 import houseCardAbilities from "./house-card/houseCardAbilities";
+import EntireGame from "../../EntireGame";
 
 interface TiledSquareObject {
     name: string;
@@ -71,7 +72,21 @@ interface HouseCardData {
     ability?: string;
 }
 
-export default function createGame(housesToCreate: string[]): Game {
+export interface GameSetup {
+    houses: string[];
+    blockedRegions?: string[];
+    removedUnits?: string[];
+}
+
+export default function createGame(entireGame: EntireGame, housesToCreate: string[]): Game {
+    // Based on the number of players, find the corresponding setup
+    if (!baseGameData.setups.hasOwnProperty(housesToCreate.length.toString())) {
+        throw new Error();
+    }
+
+    // @ts-ignore
+    const gameSetup = entireGame.gameSetup;
+
     const game = new Game();
 
     game.houses = new BetterMap(Object.entries(baseGameData.houses)
@@ -216,11 +231,13 @@ export default function createGame(housesToCreate: string[]): Game {
         const orderSlot = regionIdToOrderSlots.get(id);
         const powerTokenSlot = regionIdToPowerTokenSlots.get(id);
 
+        const blocked = gameSetup.blockedRegions ? gameSetup.blockedRegions.includes(id) : false;
+
         return [
             id,
             new Region(
                 id, regionData.name, {x, y}, regionTypes.get(type), unitSlot, orderSlot, powerTokenSlot, crownIcons,
-                supplyIcons, castleLevel, garrison, superControlPowerToken
+                supplyIcons, castleLevel, blocked ? 1000 : garrison, superControlPowerToken
             )
         ];
     }));
@@ -271,6 +288,11 @@ export default function createGame(housesToCreate: string[]): Game {
             const house = game.houses.get(unitData.house);
             const unitType = unitTypes.get(unitData.unitType);
             const quantity = unitData.quantity;
+
+            // Check if the game setup removed units off this region
+            if (gameSetup.removedUnits && gameSetup.removedUnits.includes(region.id)) {
+                return;
+            }
 
             for (let i = 0;i < quantity;i++) {
                 const unit = game.createUnit(region, unitType, house);

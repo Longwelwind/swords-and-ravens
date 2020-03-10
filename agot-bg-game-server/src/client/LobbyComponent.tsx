@@ -34,8 +34,8 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                     <Col>
                         <Card>
                             <ListGroup variant="flush">
-                                {this.props.gameState.availableHouses.values.map(h => (
-                                    <ListGroupItem key={h.id}>
+                                {this.props.gameState.lobbyHouses.values.map(h => (
+                                    <ListGroupItem key={h.id} style={{opacity: this.isHouseAvailable(h) ? 1 : 0.3}}>
                                         <Row className="align-items-center">
                                             <Col xs="auto">
                                                 <div className="influence-icon"
@@ -52,14 +52,16 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                                     </i>
                                                 </div>
                                             </Col>
-                                            {!this.props.gameState.players.has(h) ? (
-                                                <Col xs="auto">
-                                                    <Button onClick={() => this.choose(h)}>Choose</Button>
-                                                </Col>
-                                            ) : this.props.gameState.players.get(h) == this.props.gameClient.authenticatedUser && (
-                                                <Col xs="auto">
-                                                    <Button variant="danger" onClick={() => this.leave()}>Leave</Button>
-                                                </Col>
+                                            {this.isHouseAvailable(h) && (
+                                                !this.props.gameState.players.has(h) ? (
+                                                    <Col xs="auto">
+                                                        <Button onClick={() => this.choose(h)}>Choose</Button>
+                                                    </Col>
+                                                ) : this.props.gameState.players.get(h) == this.props.gameClient.authenticatedUser && (
+                                                    <Col xs="auto">
+                                                        <Button variant="danger" onClick={() => this.leave()}>Leave</Button>
+                                                    </Col>
+                                                )
                                             )}
                                         </Row>
                                     </ListGroupItem>
@@ -102,7 +104,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                                             {canStartGameReason == "not-owner" ?
                                                                 "Only the owner of the game can start it"
                                                             : canStartGameReason == "not-enough-players" ?
-                                                                "There must be at least 2 players to start a game"
+                                                                "Not all houses have been taken"
                                                             : null}
                                                         </Tooltip>
                                                     }
@@ -127,6 +129,10 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                 </Row>
             </Col>
         );
+    }
+
+    isHouseAvailable(house: LobbyHouse): boolean {
+        return this.props.gameState.getAvailableHouses().includes(house);
     }
 
     choose(house: LobbyHouse): void {

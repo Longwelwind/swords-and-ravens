@@ -6,6 +6,35 @@
     "fiefdoms": ["greyjoy", "tyrell", "martell", "stark", "baratheon", "lannister"],
     "kingsCourt": ["lannister", "stark", "martell", "baratheon", "tyrell", "greyjoy"]
   },
+  "setups": {
+    "3": {
+      "houses": ["stark", "lannister", "baratheon"],
+      "blockedRegions": [
+        "pyke", "port-of-pyke", "highgarden", "oldtown", "port-of-oldtown", "sunspear",
+        "port-of-sunspear", "salt-shore", "yronwood", "starfall", "three-towers",
+        "dornish-marches", "princes-pass", "the-boneway", "storms-end", "port-of-storms-end"
+      ],
+      "removedUnits": ["port-of-lannisport"]
+    },
+    "4": {
+      "houses": ["stark", "greyjoy", "lannister", "baratheon"],
+      "blockedRegions": [
+        "highgarden", "oldtown", "port-of-oldtown", "sunspear", "port-of-sunspear", "salt-shore",
+        "yronwood", "starfall", "three-towers", "dornish-marches", "princes-pass", "the-boneway",
+        "storms-end", "port-of-storms-end"
+      ]
+    },
+    "5": {
+      "houses": ["stark", "greyjoy", "lannister", "baratheon", "tyrell"],
+      "blockedRegions": [
+        "sunspear", "port-of-sunspear", "salt-shore", "yronwood", "starfall", "three-towers",
+        "princes-pass", "the-boneway", "storms-end", "port-of-storms-end"
+      ]
+    },
+    "6": {
+      "houses": ["stark", "greyjoy", "lannister", "baratheon", "tyrell", "martell"]
+    }
+  },
   "units": {
     "winterfell": [
       {

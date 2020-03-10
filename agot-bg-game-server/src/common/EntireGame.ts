@@ -3,11 +3,13 @@ import LobbyGameState, {SerializedLobbyGameState} from "./lobby-game-state/Lobby
 import IngameGameState, {SerializedIngameGameState} from "./ingame-game-state/IngameGameState";
 import {ServerMessage} from "../messages/ServerMessage";
 import {ClientMessage} from "../messages/ClientMessage";
+import * as baseGameData from "../../data/baseGameData.json";
 import User, {SerializedUser} from "../server/User";
 import {observable} from "mobx";
 import * as _ from "lodash";
 import BetterMap from "../utils/BetterMap";
 import GameEndedGameState from "./ingame-game-state/game-ended-game-state/GameEndedGameState";
+import { GameSetup } from "./ingame-game-state/game-data-structure/createGame";
 
 export default class EntireGame extends GameState<null, LobbyGameState | IngameGameState> {
     id: string;
@@ -16,7 +18,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     ownerUserId: string;
     name: string;
 
-    @observable gameSettings: GameSettings = {pbem: false};
+    @observable gameSettings: GameSettings = {pbem: false, playerCount: 6};
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -30,6 +32,11 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         this.id = id;
         this.ownerUserId = ownerId;
         this.name = name;
+    }
+
+    get gameSetup(): GameSetup {
+        // @ts-ignore
+        return baseGameData.setups[this.gameSettings.playerCount.toString()];
     }
 
     firstStart(): void {
@@ -113,6 +120,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             }
 
             this.gameSettings = message.settings;
+
+            if (this.childGameState instanceof LobbyGameState) {
+                this.childGameState.onGameSettingsChange();
+            }
 
             this.broadcastToClients({
                 type: "game-settings-changed",
@@ -282,5 +293,6 @@ export interface SerializedEntireGame {
 }
 
 export interface GameSettings {
+    playerCount: number;
     pbem: boolean;
 }
