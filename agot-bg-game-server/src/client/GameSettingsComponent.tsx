@@ -5,6 +5,9 @@ import FormCheck from "react-bootstrap/FormCheck";
 import GameClient from "./GameClient";
 import { GameSettings } from "../common/EntireGame";
 import EntireGame from "../common/EntireGame";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import LobbyGameState from "../common/lobby-game-state/LobbyGameState";
 
 interface GameSettingsComponentProps {
     gameClient: GameClient;
@@ -23,14 +26,36 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
 
     render(): ReactNode {
         return (
-            <FormCheck
-                id="pbem-setting"
-                type="checkbox"
-                label="PBEM"
-                disabled={!this.canChangeGameSettings}
-                checked={this.gameSettings.pbem}
-                onChange={() => this.changeGameSettings(() => this.gameSettings.pbem = !this.gameSettings.pbem)}
-            />
+            <>
+                {this.props.entireGame.childGameState instanceof LobbyGameState && (
+                    <Row>
+                        <Col xs="auto">
+                            <input
+                                type="range"
+                                className="custom-range"
+                                min={3}
+                                max={6}
+                                value={this.gameSettings.playerCount}
+                                onChange={e => this.changeGameSettings(() => this.gameSettings.playerCount = parseInt(e.target.value))}
+                                disabled={!this.canChangeGameSettings}
+                            />
+                        </Col>
+                        <Col xs="auto">
+                            <div style={{marginLeft: "10px"}}>
+                                {this.gameSettings.playerCount} players
+                            </div>
+                        </Col>
+                    </Row>
+                )}
+                <FormCheck
+                    id="pbem-setting"
+                    type="checkbox"
+                    label="PBEM"
+                    disabled={!this.canChangeGameSettings}
+                    checked={this.gameSettings.pbem}
+                    onChange={() => this.changeGameSettings(() => this.gameSettings.pbem = !this.gameSettings.pbem)}
+                />
+            </>
         );
     }
 

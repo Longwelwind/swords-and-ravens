@@ -266,6 +266,10 @@ $strong-outline: rgba($outline-color, 0.8);
   opacity: 0.1;
 }
 
+.blocked-region {
+  opacity: 0.5;
+}
+
 .highlighted-region-area {
   opacity: 0.3;
 }
