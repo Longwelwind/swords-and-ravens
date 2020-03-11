@@ -45,7 +45,10 @@ Games -
                                         {{ game.name }}
                                     </td>
                                     <td class="align-middle text-center">
-                                        {{ game.players.count }}/6
+                                        {{ game.players.count }}
+                                        {% if game.state == "IN_LOBBY" %}
+                                            /{{ game.view_of_game.maxPlayerCount }}
+                                        {% endif %}
                                     </td>
                                     <td class="text-right">
                                         <a
