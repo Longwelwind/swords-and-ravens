@@ -11,12 +11,29 @@ import Col from "react-bootstrap/Col";
 @observer
 export default class BiddingComponent<ParentGameState extends BiddingGameStateParent> extends Component<GameStateComponentProps<BiddingGameState<ParentGameState>>> {
     @observable powerTokensToBid = 0;
+    @observable dirty: boolean;
+
+    constructor(props: GameStateComponentProps<BiddingGameState<ParentGameState>>) {
+        super(props);
+
+        const authenticatedPlayer = this.props.gameClient.authenticatedPlayer;
+
+        this.powerTokensToBid = authenticatedPlayer
+            ? this.props.gameState.hasBid(authenticatedPlayer.house)
+                ? this.props.gameState.bids.get(authenticatedPlayer.house)
+                : 0
+            : 0;
+        this.dirty = authenticatedPlayer
+            ? this.props.gameState.hasBid(authenticatedPlayer.house)
+                ? false
+                : true
+            :  false;
+    }
 
     render(): ReactNode {
         return (
             <>
-                {this.props.gameClient.authenticatedPlayer
-                    && this.props.gameState.canBid(this.props.gameClient.authenticatedPlayer.house) ? (
+                {this.props.gameClient.authenticatedPlayer && (
                     <>
                         <Col xs={12}>
                             <Row className="justify-content-center">
@@ -27,8 +44,8 @@ export default class BiddingComponent<ParentGameState extends BiddingGameStatePa
                                         min={0}
                                         max={this.props.gameClient.authenticatedPlayer.house.powerTokens}
                                         value={this.powerTokensToBid}
-                                        onChange={e => this.powerTokensToBid = parseInt(e.target.value)}
-                                        disabled={this.props.gameClient.authenticatedPlayer.house.powerTokens==0}
+                                        onChange={e => this.changePowerTokensToBid(parseInt(e.target.value))}
+                                        disabled={!this.dirty && this.props.gameClient.authenticatedPlayer.house.powerTokens==0}
                                     />
                                 </Col>
                                 <Col xs="auto">
@@ -39,21 +56,29 @@ export default class BiddingComponent<ParentGameState extends BiddingGameStatePa
                             </Row>
                         </Col>
                         <Col xs={12} className="text-center">
-                            <Button onClick={() => this.bid(this.powerTokensToBid)}>Confirm</Button>
+                            <Button
+                                onClick={() => this.bid(this.powerTokensToBid)}
+                                disabled={!this.dirty}
+                            >
+                                Confirm
+                            </Button>
                         </Col>
                     </>
-                ) : (
-                    <Col xs={12} className="text-center">
-                        Waiting for {this.props.gameState.getHousesLeftToBid().map(h => h.name).join(", ")}
-                    </Col>
                 )}
+                <Col xs={12} className="text-center">
+                    Waiting for {this.props.gameState.getHousesLeftToBid().map(h => h.name).join(", ")}
+                </Col>
             </>
         );
     }
 
+    changePowerTokensToBid(count: number): void {
+        this.powerTokensToBid = count;
+        this.dirty = true;
+    }
+
     bid(powerTokens: number): void {
         this.props.gameState.bid(powerTokens);
-        // Reset Power Tokens for next bidding.
-        this.powerTokensToBid = 0;
+        this.dirty = false;
     }
 }

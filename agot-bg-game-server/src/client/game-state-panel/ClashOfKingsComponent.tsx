@@ -1,7 +1,7 @@
 import {observer} from "mobx-react";
 import ClashOfKingsGameState
     from "../../common/ingame-game-state/westeros-game-state/clash-of-kings-game-state/ClashOfKingsGameState";
-import {Component, ReactNode} from "react";
+import {Component, ReactNode, Fragment} from "react";
 import BiddingGameState from "../../common/ingame-game-state/westeros-game-state/bidding-game-state/BiddingGameState";
 import BiddingComponent from "./BiddingComponent";
 import ResolveTiesGameState
@@ -24,10 +24,12 @@ export default class ClashOfKingsComponent extends Component<GameStateComponentP
                         Houses bid for the <strong>
                         {this.props.gameState.game.getNameInfluenceTrack(this.props.gameState.currentTrackI)}</strong> track.
                     </Col>
-                    {renderChildGameState(this.props, [
-                        [BiddingGameState, BiddingComponent],
-                        [ResolveTiesGameState, ResolveTiesComponent]
-                    ])}
+                    <Fragment key={this.props.gameState.currentTrackI}>
+                        {renderChildGameState(this.props, [
+                            [BiddingGameState, BiddingComponent],
+                            [ResolveTiesGameState, ResolveTiesComponent]
+                        ])}
+                    </Fragment>
                 </Row>
             </ListGroupItem>
         </>;

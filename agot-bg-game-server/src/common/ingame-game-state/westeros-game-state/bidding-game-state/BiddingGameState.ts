@@ -84,12 +84,12 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
         });
     }
 
-    getWaitedUsers(): User[] {
-        return this.getHousesLeftToBid().map(h => this.parentGameState.ingame.getControllerOfHouse(h).user);
+    hasBid(house: House): boolean {
+        return this.bids.has(house);
     }
 
-    canBid(house: House): boolean {
-        return this.participatingHouses.includes(house) && !this.bids.has(house);
+    getWaitedUsers(): User[] {
+        return this.getHousesLeftToBid().map(h => this.parentGameState.ingame.getControllerOfHouse(h).user);
     }
 
     getHousesLeftToBid(): House[] {
