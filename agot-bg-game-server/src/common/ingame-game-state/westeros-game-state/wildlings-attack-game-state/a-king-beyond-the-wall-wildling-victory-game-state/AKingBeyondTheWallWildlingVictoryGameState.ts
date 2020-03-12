@@ -57,7 +57,7 @@ export default class AKingBeyondTheWallWildlingVictoryGameState extends Wildling
         this.ingame.log({
             type: "a-king-beyond-the-wall-house-reduce-track",
             house: house.id,
-            trackI: choice
+            trackI: choice + 1
         });
 
         this.proceedNextHouse(house);
