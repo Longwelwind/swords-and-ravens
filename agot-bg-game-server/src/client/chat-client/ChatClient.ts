@@ -1,6 +1,5 @@
 import BetterMap from "../../utils/BetterMap";
 import {observable} from "mobx";
-import User from "../../server/User";
 import GameClient from "../GameClient";
 import _ from "lodash";
 
@@ -29,7 +28,7 @@ export class Channel {
     id: string;
     websocket: WebSocket;
     @observable connected = false;
-    @observable messages: {id: string; user: User; text: string; createdAt: Date}[] = [];
+    @observable messages: {id: string; user: {id: string; name: string}; text: string; createdAt: Date}[] = [];
     @observable lastViewedMessageId: string;
     onMessage: (() => void) | null;
 

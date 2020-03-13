@@ -1,6 +1,5 @@
 import {observer} from "mobx-react";
 import {Component, ReactNode} from "react";
-import GameClient from "../GameClient";
 import Row from "react-bootstrap/Row";
 import Button from "react-bootstrap/Button";
 import React from "react";
@@ -13,8 +12,6 @@ import EntireGame from "../../common/EntireGame";
 import ScrollToBottom from "react-scroll-to-bottom";
 
 interface ChatComponentProps {
-    gameClient: GameClient;
-    entireGame: EntireGame;
     roomId: string;
     /**
      * This property indicates whether this component can be viewed by the user.

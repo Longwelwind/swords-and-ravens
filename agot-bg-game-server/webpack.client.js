@@ -7,10 +7,13 @@ module.exports = (env, argv) => {
     return {
         output: {
             path: __dirname + "/dist/",
-            filename: "bundle.[contenthash].js",
+            filename: "[name].[contenthash].js",
             publicPath: "/static/"
         },
-        entry: "./src/client/client.tsx",
+        entry: {
+            main: "./src/client/client.tsx",
+            chatClient: "./src/client/chat-client/ChatComponent.tsx"
+        },
         target: "web",
         devtool: "inline-source-map",
         module: {
