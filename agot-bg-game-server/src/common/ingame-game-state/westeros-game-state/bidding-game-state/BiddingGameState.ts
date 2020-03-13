@@ -39,35 +39,39 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
                 houseId: player.house.id
             });
 
-            if (this.getHousesLeftToBid().length == 0) {
-                // All players had bid
-
-                // Remove the power tokens
-                this.bids.entries.forEach(([house, bid]) => {
-                    house.powerTokens -= bid;
-
-                    this.entireGame.broadcastToClients({
-                        type: "change-power-token",
-                        houseId: house.id,
-                        powerTokenCount: house.powerTokens
-                    });
-                });
-
-                // Create a convenient array containing the results
-                const housesPerBid = new BetterMap<number, House[]>();
-                this.bids.forEach((bid, house) => {
-                    if (housesPerBid.has(bid)) {
-                        housesPerBid.get(bid).push(house);
-                    } else {
-                        housesPerBid.set(bid, [house]);
-                    }
-                });
-
-                const results = _.sortBy(housesPerBid.entries, ([bid, _]) => -bid);
-
-                this.parentGameState.onBiddingGameStateEnd(results);
-            }
+            this.checkAndProceedEndOfBidding();
         }
+    }
+
+    checkAndProceedEndOfBidding(): void {
+        if (this.getHousesLeftToBid().length > 0) {
+            return;
+        }
+
+        // Remove the power tokens
+        this.bids.entries.forEach(([house, bid]) => {
+            house.powerTokens -= bid;
+
+            this.entireGame.broadcastToClients({
+                type: "change-power-token",
+                houseId: house.id,
+                powerTokenCount: house.powerTokens
+            });
+        });
+
+        // Create a convenient array containing the results
+        const housesPerBid = new BetterMap<number, House[]>();
+        this.bids.forEach((bid, house) => {
+            if (housesPerBid.has(bid)) {
+                housesPerBid.get(bid).push(house);
+            } else {
+                housesPerBid.set(bid, [house]);
+            }
+        });
+
+        const results = _.sortBy(housesPerBid.entries, ([bid, _]) => -bid);
+
+        this.parentGameState.onBiddingGameStateEnd(results);
     }
 
     onServerMessage(message: ServerMessage): void {
@@ -102,6 +106,16 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
 
     firstStart(participatingHouses: House[] = []): void {
         this.participatingHouses = participatingHouses;
+
+        // Already make the bidding for houses that have 0 power tokens
+        this.participatingHouses.forEach(h => {
+            if (h.powerTokens == 0) {
+                this.bids.set(h, 0);
+            }
+        });
+
+        // All houses might have been fast-tracked, check if the bidding is over
+        this.checkAndProceedEndOfBidding();
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedBiddingGameState {
