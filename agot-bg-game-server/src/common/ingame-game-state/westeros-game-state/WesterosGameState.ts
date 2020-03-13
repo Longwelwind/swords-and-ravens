@@ -19,7 +19,6 @@ import planningRestrictions from "../game-data-structure/westeros-card/planning-
 import PutToTheSwordGameState, {SerializedPutToTheSwordGameState} from "./put-to-the-swords-game-state/PutToTheSwordGameState";
 import AThroneOfBladesGameState, {SerializedAThroneOfBladesGameState} from "./thrones-of-blades-game-state/AThroneOfBladesGameState";
 import DarkWingsDarkWordsGameState, {SerializedDarkWingsDarkWordsGameState} from "./dark-wings-dark-words-game-state/DarkWingsDarkWordsGameState";
-import WinterIsComingWesterosCardType from "../game-data-structure/westeros-card/WinterIsComingWesterosCardType";
 
 export default class WesterosGameState extends GameState<IngameGameState,
     WildlingsAttackGameState | ReconcileArmiesGameState<WesterosGameState> | MusteringGameState | ClashOfKingsGameState
@@ -92,19 +91,9 @@ export default class WesterosGameState extends GameState<IngameGameState,
             return card;
         });
 
-        // Execute winter is coming now
-        let winterIsComingPresent = true;
-        while(winterIsComingPresent) {
-            winterIsComingPresent = false;
-            for (let i=0; i<this.revealedCards.length; i++) {
-                const card = this.revealedCards[i];
-                if(card.type instanceof WinterIsComingWesterosCardType) {
-                    winterIsComingPresent = true;
-                    this.currentCardI = i;
-                    this.executeCard(card);
-                    break;
-                }
-            }
+        // Execute all immediately effects
+        for(let i=0; i<this.game.westerosDecks.length; i++) {
+            this.revealedCards[i].type.executeImmediately(this, i);
         }
 
         this.currentCardI = -1;

@@ -14,4 +14,8 @@ export default abstract class WesterosCardType {
     }
 
     abstract execute(westerosGameState: WesterosGameState): void;
+
+    executeImmediately(_westerosGameState: WesterosGameState, _currentDeckI: number): void {
+        return;
+    }
 }
