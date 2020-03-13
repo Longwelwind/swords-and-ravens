@@ -79,8 +79,8 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
                 }
 
                 if (orderTarget.type instanceof ConsolidatePowerOrderType) {
-                    this.house.changePowerTokens(-2);
-                    raidedHouse.changePowerTokens(2);
+                    this.house.changePowerTokens(1);
+                    raidedHouse.changePowerTokens(-1);
 
                     this.entireGame.broadcastToClients({
                         type: "change-power-token",
