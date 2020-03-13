@@ -2,44 +2,18 @@
 
 {% load static %}
 
-{% block content %}
+{% block content %} 
 <div class="row justify-content-center">
-    <div class="col col-sm-12 mb-3">
-        <div class="card">
-            <div class="card-body">
-                <h3 class="card-title">Welcome to Swords and Ravens!</h3>
-                <p>
-                    <strong>Swords and Ravens</strong> is a platform to play the board game "A Game of Thrones:
-                    Board Game - Second Edition", edited by Fantasy Flight Games, online with players around the world!
-                </p>
-                <p>
-                    The game is currently in open beta test in order to iron the features of the base game. Plans are
-                    to implement the gameplay of the extensions (especially <strong>Mother of Dragons</strong>).
-                </p>
-                <p>
-                    Feedbacks, bug reports and other remarks can also be posted on
-                    the <a href="https://discord.gg/wWgCdvM">Discord</a>!
-                </p>
-                <a>
-                    The source code can be found
-                    on <a href="https://github.com/Longwelwind/swords-and-ravens">the Github of the project</a>.
-                </p>
+    <div class="col col-sm-12 col-lg-10">
+        {% for post in posts %}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">{{ post.title }}</h3>
+                    <h6 class="card-subtitle mb-3 text-muted">{{ post.created_at | date:"d F Y" }}</h6>
+                    {{ post.content | safe }}
+                </div>
             </div>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col col-sm-12 col-md-5">
-        <div class="card">
-            <div class="card-body">
-                <h3 class="card-title">What to test</h3>
-                <p>
-                    The implementation of the <strong>rules</strong> of the game is the priority. Feel free to play as
-                    you want, but don't hesitate to check if the game reacts correctly to <strong>edge cases</strong> (special
-                    combinations of house cards, for example).
-                </p>
-            </div>
-        </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

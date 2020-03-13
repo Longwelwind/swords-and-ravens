@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -15,7 +15,30 @@ from agotboardgame_main.forms import UpdateUsernameForm
 
 
 def index(request):
-    return render(request, "agotboardgame_main/index.html")
+    posts = [
+        {
+            "title": "Welcome to Swords and Ravens!",
+            "content": """
+                <p>
+                    <strong>Swords and Ravens</strong> is a platform to play the board game "A Game of Thrones:
+                    Board Game - Second Edition", edited by Fantasy Flight Games, online with players around the world!
+                </p>
+                <p>
+                    At the moment, this website only features the base game. Extensions (with
+                    <strong>Mother of Dragons</strong>) are currently planned to be implemented.
+                </p>
+                <p>
+                    Feedbacks, bug reports and other remarks can also be posted on
+                    the <a href="https://discord.gg/wWgCdvM">Discord</a>!
+                    The source code can be found
+                    on <a href="https://github.com/Longwelwind/swords-and-ravens">the Github of the project</a>.
+                </p>
+            """,
+            "created_at": date(day=14, month=3, year=2020)
+        }
+    ]
+
+    return render(request, "agotboardgame_main/index.html", {"posts": posts})
 
 
 def login(request):
