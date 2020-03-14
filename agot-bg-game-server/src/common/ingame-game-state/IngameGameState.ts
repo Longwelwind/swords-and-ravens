@@ -75,11 +75,11 @@ export default class IngameGameState extends GameState<
         this.setChildGameState(new PlanningGameState(this)).firstStart(planningRestrictions);
     }
 
-    proceedToActionGameState(placedOrders: BetterMap<Region, Order>): void {
+    proceedToActionGameState(placedOrders: BetterMap<Region, Order>, planningRestrictions: PlanningRestriction[]): void {
         // this.placedOrders is of type Map<Region, Order | null> but ActionGameState.firstStart
         // accepts Map<Region, Order>. Server-side, there should never be null values in the map,
         // so it can be converted safely.
-        this.setChildGameState(new ActionGameState(this)).firstStart(placedOrders);
+        this.setChildGameState(new ActionGameState(this)).firstStart(placedOrders, planningRestrictions);
     }
 
     beginNewTurn(): void {

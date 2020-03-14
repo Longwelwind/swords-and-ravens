@@ -13,6 +13,7 @@ import WildlingCard, {SerializedWildlingCard} from "./wildling-card/WildlingCard
 import BetterMap from "../../../utils/BetterMap";
 import HouseCard from "./house-card/HouseCard";
 import {land, port} from "./regionTypes";
+import PlanningRestriction from "./westeros-card/planning-restriction/PlanningRestriction";
 
 export const MAX_WILDLING_STRENGTH = 12;
 
@@ -59,7 +60,7 @@ export default class Game {
         return track[0];
     }
 
-    getAvailableOrders(allPlacedOrders: BetterMap<Region, Order | null>, house: House): Order[] {
+    getAvailableOrders(allPlacedOrders: BetterMap<Region, Order | null>, house: House, planningRestrictions: PlanningRestriction[]): Order[] {
         const placedOrders = allPlacedOrders.entries
             .filter(([region, _order]) => region.getController() == house)
             .map(([_region, order]) => order as Order);
@@ -68,6 +69,9 @@ export default class Game {
             orders.values,
             placedOrders
         );
+
+        // Remove restricted orders
+        leftOrders = leftOrders.filter(order => planningRestrictions.every(restriction => !restriction.restriction(order.type)));
 
         // Remove starred orders if the house used more than allowed
         const starredOrderLeft = this.getAllowedCoundOfStarredOrders(house) - placedOrders.filter(o => o && o.type.starred).length;

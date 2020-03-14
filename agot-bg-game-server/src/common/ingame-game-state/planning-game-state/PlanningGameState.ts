@@ -111,7 +111,7 @@ export default class PlanningGameState extends GameState<IngameGameState> {
 
             // Check if all player are ready to go the action entireGame state
             if (this.readyPlayers.length == this.ingameGameState.players.values.length) {
-                this.ingameGameState.proceedToActionGameState(this.placedOrders as BetterMap<Region, Order>);
+                this.ingameGameState.proceedToActionGameState(this.placedOrders as BetterMap<Region, Order>, this.planningRestrictions);
             } else {
                 this.entireGame.broadcastToClients({
                     type: "player-ready",
@@ -221,8 +221,7 @@ export default class PlanningGameState extends GameState<IngameGameState> {
     }
 
     getAvailableOrders(house: House): Order[] {
-        return this.ingameGameState.game.getAvailableOrders(this.placedOrders, house)
-            .filter(o => !this.isOrderRestricted(o));
+        return this.ingameGameState.game.getAvailableOrders(this.placedOrders, house, this.planningRestrictions);
     }
 
     isOrderRestricted(order: Order): boolean {
