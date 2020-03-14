@@ -81,7 +81,7 @@ export default class ReplaceOrderGameState extends GameState<UseRavenGameState> 
             this.actionGameState.getOrdersOfHouse(this.ravenHolder).filter(([_r, o]) => replacedOrder != o)
         );
 
-        return this.ingameGameState.game.getAvailableOrders(placedOrders, this.ravenHolder);
+        return this.ingameGameState.game.getAvailableOrders(placedOrders, this.ravenHolder, this.actionGameState.planningRestrictions);
     }
 
     replaceOrder(region: Region, order: Order): void {

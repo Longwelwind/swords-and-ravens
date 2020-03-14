@@ -21,8 +21,11 @@ import ConsolidatePowerOrderType from "../game-data-structure/order-types/Consol
 import SupportOrderType from "../game-data-structure/order-types/SupportOrderType";
 import * as _ from "lodash";
 import {port, sea, land} from "../game-data-structure/regionTypes";
+import PlanningRestriction from "../game-data-structure/westeros-card/planning-restriction/PlanningRestriction";
+import planningRestrictions from "../game-data-structure/westeros-card/planning-restriction/planningRestrictions";
 
 export default class ActionGameState extends GameState<IngameGameState, UseRavenGameState | ResolveRaidOrderGameState | ResolveMarchOrderGameState | ResolveConsolidatePowerGameState> {
+    planningRestrictions: PlanningRestriction[];
     @observable ordersOnBoard: BetterMap<Region, Order>;
 
     get ingameGameState(): IngameGameState {
@@ -41,7 +44,8 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
         super(ingameGameState);
     }
 
-    firstStart(ordersOnBoard: BetterMap<Region, Order>): void {
+    firstStart(ordersOnBoard: BetterMap<Region, Order>, planningRestrictions: PlanningRestriction[]): void {
+        this.planningRestrictions = planningRestrictions;
         this.ordersOnBoard = ordersOnBoard;
 
         this.ingameGameState.log({
@@ -141,6 +145,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
         return {
             type: "action",
             ordersOnBoard: this.ordersOnBoard.mapOver(r => r.id, o => o.id),
+            planningRestrictions: this.planningRestrictions.map(r => r.id),
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -153,6 +158,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
                 [ingameGameState.world.regions.get(regionId), orders.get(orderId)]
             ))
         );
+        actionGameState.planningRestrictions = data.planningRestrictions ? data.planningRestrictions.map(id => planningRestrictions.get(id)) : [];
         actionGameState.childGameState = actionGameState.deserializeChildGameState(data.childGameState);
 
         return actionGameState;
@@ -175,6 +181,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
 
 export interface SerializedActionGameState {
     type: "action";
+    planningRestrictions: string[];
     ordersOnBoard: [string, number][];
     childGameState: SerializedUseRavenGameState | SerializedResolveMarchOrderGameState | SerializedResolveRaidOrderGameState
         | SerializedResolveConsolidatePowerGameState;
