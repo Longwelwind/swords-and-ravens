@@ -195,8 +195,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             ? this.childGameState.game.turn
             : -1;
         const maxPlayerCount = this.gameSettings.playerCount;
+        const settings = this.gameSettings;
 
-        return {turn, maxPlayerCount};
+        return {turn, maxPlayerCount, settings};
     }
 
     getPlayersInGame(): {userId: string; data: object}[] {
