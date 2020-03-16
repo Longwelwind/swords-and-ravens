@@ -1,10 +1,13 @@
 import uuid
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group
 from django.contrib.postgres.fields import JSONField
 from django.core.validators import RegexValidator, MinLengthValidator
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils.crypto import get_random_string
 from django.utils.translation import gettext_lazy as _
 
@@ -38,6 +41,13 @@ class User(AbstractUser):
 
     def can_update_username(self):
         return self.last_username_update_time is None
+
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if settings.DEFAULT_GROUP and created:
+        group = Group.objects.get(name=settings.DEFAULT_GROUP)
+        group.user_set.add(instance)
 
 
 class Game(models.Model):

@@ -36,6 +36,7 @@ SECRET_KEY = env('SECRET_KEY')
 
 ALLOWED_HOSTS = ["*"]
 
+DEFAULT_GROUP = "Member"
 
 # Application definition
 
