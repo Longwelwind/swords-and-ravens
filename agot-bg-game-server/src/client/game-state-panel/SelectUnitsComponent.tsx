@@ -64,10 +64,14 @@ export default class SelectUnitsComponent extends Component<GameStateComponentPr
     }
 
     modifyUnitOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {
-        return this.getSelectableUnits().map(u => [
-            u,
-            {highlight: {active: true}, onClick: () => this.onUnitClick(u.region, u)}
-        ] as [Unit, PartialRecursive<UnitOnMapProperties>]);
+        if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
+            return this.getSelectableUnits().map(u => [
+                u,
+                {highlight: {active: true}, onClick: () => this.onUnitClick(u.region, u)}
+            ] as [Unit, PartialRecursive<UnitOnMapProperties>]);
+        }
+
+        return [];
     }
 
     onUnitClick(region: Region, unit: Unit): void {
