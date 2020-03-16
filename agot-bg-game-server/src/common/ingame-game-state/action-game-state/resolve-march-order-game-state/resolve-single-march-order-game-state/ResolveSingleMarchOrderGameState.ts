@@ -200,35 +200,47 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             return;
         }
 
-        // Check if all units left the starting region.
-        if(!(movesThatTriggerAttack.length == 0 && startingRegion.getController() != this.house)) {
+        if (startingRegion.controlPowerToken == this.house) {
+            // Starting region is controlled by a Power Token and no ships need to be destroyed
+            return;
+        }
+
+        // Check if there is a port with ships adjacent to the starting region
+        const portOfStartingRegion = this.game.world.getAdjacentPortOfCastle(startingRegion);
+        if (!portOfStartingRegion || portOfStartingRegion.units.size == 0) {
+            return;
+        }
+
+        // Now let's check if user still controls the starting region
+
+        // In case there are no pending combats we simply can use getController()
+        if(movesThatTriggerAttack.length == 0 && startingRegion.getController() == this.house) {
             return;
         }
 
         // In case of a pending combat it's a bit more complicated
         // as the attacking units are still present in the starting region
         // and thus getController() can't be used. We have to check if all units
-        // marched to combat in that case.
-        if (!(_.flatMap(movesThatTriggerAttack.map(([_, units]) => units)).length == startingRegion.units.size)) {
+        // marched to combat. As all non combat moves have already been executed we check
+        // if original units count is equal to attacking units count.
+        if (_.flatMap(movesThatTriggerAttack.map(([_, units]) => units)).length != startingRegion.units.size) {
             return;
         }
 
-        const portOfStartingRegion = this.game.world.getAdjacentPortOfCastle(startingRegion);
-        if (portOfStartingRegion && portOfStartingRegion.units.size > 0) {
-            // Starting region has a port with ships in it, so destroy them
-            const destroyedShipCount = this.parentGameState.destroyAllShipsInPort(portOfStartingRegion);
+        // User really left a castle with ships empty. The ships must be destroyed.
+        const destroyedShipCount = this.parentGameState.destroyAllShipsInPort(portOfStartingRegion);
 
-            this.parentGameState.ingameGameState.log({
-                type: "ships-destroyed-by-empty-castle",
-                castle: startingRegion.name,
-                house: this.house.name,
-                port: portOfStartingRegion.name,
-                shipCount: destroyedShipCount
-            });
-        }
+        this.parentGameState.ingameGameState.log({
+            type: "ships-destroyed-by-empty-castle",
+            castle: startingRegion.name,
+            house: this.house.name,
+            port: portOfStartingRegion.name,
+            shipCount: destroyedShipCount
+        });
     }
 
     onServerMessage(_message: ServerMessage): void {
+        return;
     }
 
     areValidMoves(startingRegion: Region, moves: [Region, Unit[]][]): boolean {
