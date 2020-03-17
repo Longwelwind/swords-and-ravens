@@ -80,11 +80,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         return (
             <>
-                <Col xs={12}>
-                    <h3 style={{marginLeft: "1rem"}}>
-                        {this.props.gameState.entireGame.name} <Badge variant="primary" className={classNames({'invisible': !this.props.gameState.entireGame.gameSettings.pbem})}>PBEM</Badge>
-                    </h3>
-                </Col>
                 <Col xs={12} lg={3}>
                     <Row className="stackable">
                         <Col>

@@ -17,6 +17,8 @@ import User from "../server/User";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import { OverlayTrigger } from "react-bootstrap";
 import Tooltip from "react-bootstrap/Tooltip";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {faTimes} from "@fortawesome/free-solid-svg-icons/faTimes";
 
 interface LobbyComponentProps {
     gameClient: GameClient;
@@ -27,6 +29,7 @@ interface LobbyComponentProps {
 export default class LobbyComponent extends Component<LobbyComponentProps> {
     render(): ReactNode {
         const {success: canStartGame, reason: canStartGameReason} = this.props.gameState.canStartGame(this.props.gameClient.authenticatedUser as User);
+        const {success: canCancelGame, reason: canCancelGameReason} = this.props.gameState.canCancel(this.props.gameClient.authenticatedUser as User);
 
         return (
             <Col xs={12} sm={10} md={8} lg={6} xl={3}>
@@ -122,6 +125,32 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                             </Button>
                                         </ConditionalWrap>
                                     </Col>
+                                    <Col xs="auto">
+                                    <ConditionalWrap
+                                            condition={!canCancelGame}
+                                            wrap={children =>
+                                                <OverlayTrigger
+                                                    overlay={
+                                                        <Tooltip id="start-game">
+                                                            {canCancelGameReason == "not-owner" ?
+                                                                "Only the owner of the game can cancel it"
+                                                            : null}
+                                                        </Tooltip>
+                                                    }
+                                                >
+                                                    {children}
+                                                </OverlayTrigger>
+                                            }
+                                        >
+                                            <Button
+                                                variant="danger"
+                                                onClick={() => this.cancel()}
+                                                disabled={!canCancelGame}
+                                            >
+                                                <FontAwesomeIcon icon={faTimes} />
+                                            </Button>
+                                        </ConditionalWrap>
+                                    </Col>
                                 </Row>
                             </Card.Body>
                         </Card>
@@ -137,6 +166,12 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
 
     choose(house: LobbyHouse): void {
         this.props.gameState.chooseHouse(house);
+    }
+
+    cancel(): void {
+        if (confirm("Are you sure you want to cancel the game?")) {
+            this.props.gameState.cancel();
+        }
     }
 
     leave(): void {

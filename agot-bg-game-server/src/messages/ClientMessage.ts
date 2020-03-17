@@ -2,7 +2,8 @@ export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | ResolveMa
     | UseValyrianSteelBlade | ChooseHouseCard | ChooseCasualties | ChooseRavenAction
     | ChooseTopWildlingCardAction | ReplaceOrder | SkipReplaceOrder | ResolveRaid | Bid | ChooseChoice
     | DecideBiggest | ReconcileArmies | Muster | ResolveTies | SelectUnits | LaunchGame | ChooseHouse
-    | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings | CreatePrivateChatRoom | ChangeGameSettings;
+    | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings | CreatePrivateChatRoom | ChangeGameSettings
+    | CancelGame;
 
 interface Ping {
     type: "ping";
@@ -21,6 +22,10 @@ interface PlaceOrder {
     type: "place-order";
     orderId: number | null;
     regionId: string;
+}
+
+interface CancelGame {
+    type: "cancel-game";
 }
 
 interface ChooseHouse {

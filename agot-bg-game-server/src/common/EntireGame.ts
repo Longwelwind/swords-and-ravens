@@ -10,8 +10,9 @@ import * as _ from "lodash";
 import BetterMap from "../utils/BetterMap";
 import GameEndedGameState from "./ingame-game-state/game-ended-game-state/GameEndedGameState";
 import { GameSetup } from "./ingame-game-state/game-data-structure/createGame";
+import CancelledGameState, { SerializedCancelledGameState } from "./cancelled-game-state/CancelledGameState";
 
-export default class EntireGame extends GameState<null, LobbyGameState | IngameGameState> {
+export default class EntireGame extends GameState<null, LobbyGameState | IngameGameState | CancelledGameState> {
     id: string;
 
     @observable users = new BetterMap<string, User>();
@@ -180,12 +181,14 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     getStateOfGame(): string {
         if (this.childGameState instanceof LobbyGameState) {
             return "IN_LOBBY";
-        } else {
+        } else if (this.childGameState instanceof IngameGameState) {
             const ingame = this.childGameState;
             if (ingame.childGameState instanceof GameEndedGameState) {
                 return "FINISHED";
             }
             return "ONGOING";
+        } else {
+            return "CANCELLED";
         }
     }
 
@@ -272,11 +275,13 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         return entireGame;
     }
 
-    deserializeChildGameState(data: SerializedEntireGame["childGameState"]): IngameGameState | LobbyGameState {
+    deserializeChildGameState(data: SerializedEntireGame["childGameState"]): this["childGameState"] {
         if (data.type == "lobby") {
             return LobbyGameState.deserializeFromServer(this, data);
         } else if (data.type == "ingame") {
             return IngameGameState.deserializeFromServer(this, data);
+        } else if (data.type == "cancelled") {
+            return CancelledGameState.deserializeFromServer(this, data);
         } else {
             throw new Error();
         }
@@ -288,7 +293,7 @@ export interface SerializedEntireGame {
     name: string;
     users: SerializedUser[];
     ownerUserId: string;
-    childGameState: SerializedLobbyGameState | SerializedIngameGameState;
+    childGameState: SerializedLobbyGameState | SerializedIngameGameState | SerializedCancelledGameState;
     publicChatRoomId: string;
     privateChatRoomIds: [string, [string, string][]][];
     gameSettings: GameSettings;
