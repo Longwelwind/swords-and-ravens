@@ -16,8 +16,12 @@ interface GameSettingsComponentProps {
 
 @observer
 export default class GameSettingsComponent extends Component<GameSettingsComponentProps> {
+    get entireGame(): EntireGame {
+        return this.props.entireGame;
+    }
+
     get gameSettings(): GameSettings {
-        return this.props.entireGame.gameSettings;
+        return this.entireGame.gameSettings;
     }
 
     get canChangeGameSettings(): boolean {
@@ -28,24 +32,26 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
         return (
             <>
                 {this.props.entireGame.childGameState instanceof LobbyGameState && (
-                    <Row>
-                        <Col xs="auto">
-                            <input
-                                type="range"
-                                className="custom-range"
-                                min={3}
-                                max={6}
-                                value={this.gameSettings.playerCount}
-                                onChange={e => this.changeGameSettings(() => this.gameSettings.playerCount = parseInt(e.target.value))}
-                                disabled={!this.canChangeGameSettings}
-                            />
-                        </Col>
-                        <Col xs="auto">
-                            <div style={{marginLeft: "10px"}}>
-                                {this.gameSettings.playerCount} players
-                            </div>
-                        </Col>
-                    </Row>
+                    <>
+                        <Row>
+                            <Col xs="auto">
+                                <select id="setups" name="setups"
+                                    value={this.gameSettings.setupId}
+                                    onChange={e => this.onSetupChange(e.target.value)}>
+                                    {this.createSetupItems()}
+                                </select>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <select id="player-count" name="playerCount"
+                                    value={this.gameSettings.playerCount}
+                                    onChange={e => this.onPlayerCountChange(e.target.value)}>
+                                    {this.createPlayerCountItems()}
+                                </select>
+                            </Col>
+                        </Row>
+                    </>
                 )}
                 <FormCheck
                     id="pbem-setting"
@@ -59,13 +65,53 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
         );
     }
 
+    createSetupItems(): ReactNode {
+        const items: JSX.Element[] = [];
+
+        this.entireGame.allGameSetups.forEach(([setupId, setupData]) => {
+            items.push(<option key={setupId} value={setupId}>{setupData.name}</option>);
+        });
+
+        return items;
+    }
+
+    createPlayerCountItems(): ReactNode {
+        const items: JSX.Element[] = [];
+
+        const playerSetups = this.entireGame.getGameSetupContainer(this.gameSettings.setupId).playerSetups;
+
+        playerSetups.forEach(gameSetup => {
+            items.push(<option key={gameSetup.playerCount} value={gameSetup.playerCount}>{gameSetup.playerCount}</option>);
+        });
+
+        return items;
+    }
+
+    onSetupChange(newVal: string): void {
+        this.gameSettings.setupId = newVal;
+
+        // On setup change set player count to it's default value which should be the highest value (last element)
+        const container = this.entireGame.getGameSetupContainer(newVal);
+        const playerCounts = container.playerSetups.map(playerSetup => playerSetup.playerCount);
+        const defaultPlayerCount = playerCounts[playerCounts.length - 1];
+        this.gameSettings.playerCount = defaultPlayerCount;
+
+        this.changeGameSettings();
+    }
+
+    onPlayerCountChange(newVal: string): void {
+        this.gameSettings.playerCount = parseInt(newVal);
+
+        this.changeGameSettings();
+    }
+
     /**
      * Helper function to modify gameSettings and update the game settings.
      * @param action Function that modifies gameSettings
      */
-    changeGameSettings(action: () => void): void {
+    changeGameSettings(action: () => void = () => {}): void {
         action();
 
-        this.props.entireGame.updateGameSettings(this.props.entireGame.gameSettings);
+        this.props.entireGame.updateGameSettings(this.gameSettings);
     }
 }
