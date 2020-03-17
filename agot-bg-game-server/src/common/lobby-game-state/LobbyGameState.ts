@@ -6,6 +6,7 @@ import {ServerMessage} from "../../messages/ServerMessage";
 import {observable} from "mobx";
 import BetterMap from "../../utils/BetterMap";
 import baseGameData from "../../../data/baseGameData.json";
+import CancelledGameState from "../cancelled-game-state/CancelledGameState";
 
 export default class LobbyGameState extends GameState<EntireGame> {
     lobbyHouses: BetterMap<string, LobbyHouse>;
@@ -61,6 +62,12 @@ export default class LobbyGameState extends GameState<EntireGame> {
             }
 
             this.entireGame.proceedToIngameGameState(new BetterMap(this.players.map((h, u) => ([h.id, u]))));
+        } else if (message.type == "cancel-game") {
+            if (!this.entireGame.isOwner(user)) {
+                return;
+            }
+
+            this.entireGame.setChildGameState(new CancelledGameState(this.entireGame)).firstStart();
         } else if (message.type == "choose-house") {
             const house = message.house ? this.lobbyHouses.get(message.house) : null;
 
@@ -97,6 +104,14 @@ export default class LobbyGameState extends GameState<EntireGame> {
         return {success: true, reason: "ok"};
     }
 
+    canCancel(user: User):  {success: boolean; reason: string} {
+        if (!this.entireGame.isOwner(user)) {
+            return {success: false, reason: "not-owner"};
+        }
+
+        return {success: true, reason: "ok"};
+    }
+
     onServerMessage(message: ServerMessage): void {
         if (message.type == "house-chosen") {
             this.players = new BetterMap(message.players.map(([hid, uid]) => [
@@ -116,6 +131,12 @@ export default class LobbyGameState extends GameState<EntireGame> {
     start(): void {
         this.entireGame.sendMessageToServer({
             type: "launch-game"
+        });
+    }
+
+    cancel(): void {
+        this.entireGame.sendMessageToServer({
+            type: "cancel-game"
         });
     }
 

@@ -15,6 +15,7 @@ IN_LOBBY = "IN_LOBBY"
 CLOSED = "CLOSED"
 ONGOING = "ONGOING"
 FINISHED = "FINISHED"
+CANCELLED = "CANCELLED"
 
 
 def generate_game_token():
