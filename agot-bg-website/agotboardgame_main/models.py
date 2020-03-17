@@ -50,11 +50,23 @@ def create_user_profile(sender, instance, created, **kwargs):
         group.user_set.add(instance)
 
 
+def generate_default_view_of_game():
+    # Before the game is loaded on the game server, the view of game will be empty, which will create weird
+    # display on the Games page. A default value is created here, which will be replaced by the game server
+    # when the game is loaded there.
+    return {
+        "maxPlayerCount": 6,
+        "settings": {
+            "pbem": False
+        }
+    }
+
+
 class Game(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=200)
     owner = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    view_of_game = JSONField(null=True, default=None, blank=True)
+    view_of_game = JSONField(null=True, default=generate_default_view_of_game, blank=True)
     serialized_game = JSONField(null=True, default=None, blank=True)
     version = models.TextField(null=True, default=None, blank=True)
     state = models.TextField(default=IN_LOBBY)
