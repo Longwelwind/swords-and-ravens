@@ -6,7 +6,7 @@ export default class SupplyWesterosCardType extends WesterosCardType {
     execute(westeros: WesterosGameState): void {
         // Refresh the supply level of all houses
         westeros.game.houses.values.forEach(h =>  {
-            h.supplyLevel = westeros.game.getControlledSupplyIcons(h);
+            h.supplyLevel = Math.min(westeros.game.supplyRestrictions.length - 1, westeros.game.getControlledSupplyIcons(h));
         });
 
         westeros.ingame.log({
