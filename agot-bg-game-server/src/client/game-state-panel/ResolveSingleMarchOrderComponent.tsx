@@ -199,7 +199,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     modifyUnitsOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
             if (this.selectedMarchOrderRegion != null) {
-                return this.selectedMarchOrderRegion.units.values.filter(u => this.isUnitAvailable(u)).map(u => [
+                return this.props.gameState.getValidMarchUnits(this.selectedMarchOrderRegion).filter(u => this.isUnitAvailable(u)).map(u => [
                     u,
                     {highlight: {active: true}, onClick: () => this.onUnitClick(this.selectedMarchOrderRegion as Region, u)}
                 ]);
