@@ -244,9 +244,20 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
     }
 
     areValidMoves(startingRegion: Region, moves: [Region, Unit[]][]): boolean {
+        const movingUnits = _.flatMap(moves.map(([_, u]) => u));
+        const validUnits = this.getValidMarchUnits(startingRegion);
+
+        if (!movingUnits.every(u => validUnits.includes(u))) {
+            return false;
+        }
+
         return moves.every(
             ([regionToward, army], i) => this.getValidTargetRegions(startingRegion, moves.slice(0, i), army).includes(regionToward)
         );
+    }
+
+    getValidMarchUnits(startingRegion: Region): Unit[] {
+        return startingRegion.units.values.filter(u => !u.wounded);
     }
 
     getWaitedUsers(): User[] {
