@@ -771,7 +771,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <strong>Mammoth Riders</strong>: <strong>{house.name}</strong> chose to
-                    discard <strong>{houseCard.name}</strong>.
+                    regain <strong>{houseCard.name}</strong>.
                 </>;
 
             case "the-horde-descends-highest-muster":
