@@ -75,7 +75,21 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
         // Even tough they should be only one unit in "selectedUnit",
         // the following code is generic for all units in it.house
         selectedUnit.forEach(([region, footmenToRemove]) => {
-            footmenToRemove.forEach(u => region.units.delete(u.id));
+            footmenToRemove.forEach(u => {
+                region.units.delete(u.id);
+
+                const houseCombatData = this.combatGameState.houseCombatDatas.get(house);
+                if (houseCombatData.region == region) {
+                    houseCombatData.army = _.without(houseCombatData.army, ...footmenToRemove);
+
+                    this.entireGame.broadcastToClients({
+                        type: "combat-change-army",
+                        house: house.id,
+                        region: region.id,
+                        army: this.combatGameState.houseCombatDatas.get(house).army.map(u => u.id)
+                    });
+                }
+            });
 
             this.entireGame.broadcastToClients({
                 type: "remove-units",
