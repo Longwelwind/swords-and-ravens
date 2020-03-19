@@ -124,6 +124,8 @@ export default class GlobalServer {
 
             const entireGame = user.entireGame;
 
+            console.log(`Message received for game ${entireGame.id}`);
+
             // Chat related messages are handled by GlobalServer because they must use the website client
             if (message.type == "create-private-chat-room") {
                 const otherUser = user.entireGame.users.get(message.otherUser);
