@@ -157,7 +157,7 @@ export default class CombatGameState extends GameState<
     }
 
     getCombatStrengthOfUnit(houseSide: House, unit: Unit, support: boolean): number {
-        const attackingAStructure = this.isAttackingAStructure(unit.allegiance);
+        const attackingAStructure = support ? this.isSupportingAttackAgainstAStructure(unit.allegiance) : this.isAttackingAStructure(unit.allegiance);
 
         return this.getOrderResolutionHouseCard().reduce((s, h) => {
             const houseCard = this.houseCombatDatas.get(h).houseCard;
@@ -229,7 +229,17 @@ export default class CombatGameState extends GameState<
 
     isAttackingAStructure(house: House): boolean {
         if (house == this.attacker) {
-            return this.defendingRegion.castleLevel > 0;
+            return this.defendingRegion.hasStructure;
+        }
+
+        return false;
+    }
+
+    isSupportingAttackAgainstAStructure(supporter: House): boolean {
+        const supportedHouse = this.supporters.tryGet(supporter, null);
+
+        if (supportedHouse == this.attacker) {
+            return this.defendingRegion.hasStructure;
         }
 
         return false;
