@@ -159,7 +159,6 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </>
                 );
             case "wildling-card-revealed":
-                console.log(this.game.wildlingDeck);
                 const wildlingCard = this.game.wildlingDeck.find(wc => wc.id == data.wildlingCard) as WildlingCard;
 
                 return (
