@@ -71,6 +71,8 @@ class Game(models.Model):
     serialized_game = JSONField(null=True, default=None, blank=True)
     version = models.TextField(null=True, default=None, blank=True)
     state = models.TextField(default=IN_LOBBY)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def is_in_game(self, user):
         return user in self.players.all()
