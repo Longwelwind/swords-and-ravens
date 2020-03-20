@@ -187,21 +187,35 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
             return null;
         }
 
-        const adjacentCastleController = this.world.getAdjacentLandOfPort(portsWithEnemyShips[0]).getController();
-        if(adjacentCastleController) {
+        const portRegion = portsWithEnemyShips[0];
+        const adjacentCastle = this.world.getAdjacentLandOfPort(portRegion);
+        const adjacentCastleController = adjacentCastle.getController();
+
+        if (adjacentCastleController) {
             // A castle with ships in port has been conquered
-            this.removePossibleOrdersInPort(portsWithEnemyShips[0]);
+            this.removePossibleOrdersInPort(portRegion);
 
             // return TakeControlOfEnemyPortGameState required
             return {
-                port: portsWithEnemyShips[0],
+                port: portRegion,
                 newController: adjacentCastleController
             }
         }
-        // An else path can be omitted here as immediately destroyed ships by empty castle
-        // has been handled by resolve single march order game state already
 
-        throw new Error("adjacentCastleController should never be null");
+        // When we reach this line the only way right now a orphaned ship can exist in a port
+        // is Martell playing Arianne in a non-capital city. So the ships have to be destroyed
+        const houseThatLostShips = portRegion.units.values[0].allegiance;
+
+        const destroyedShipCount = this.destroyAllShipsInPort(portRegion);
+        this.ingameGameState.log({
+            type: "ships-destroyed-by-empty-castle",
+            castle: adjacentCastle.name,
+            house: houseThatLostShips.name,
+            port: portRegion.name,
+            shipCount: destroyedShipCount
+        });
+
+        return null;
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
