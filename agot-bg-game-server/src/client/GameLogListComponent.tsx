@@ -649,7 +649,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
             case "ships-destroyed-by-empty-castle":
                 return <>
-                    <><strong>{data.house}</strong> lost {data.shipCount} ship{data.shipCount>1?"s":""} in <strong>{data.port}</strong> because of leaving <strong>{data.castle}</strong> empty.</>
+                    <><strong>{data.house}</strong> lost {data.shipCount} ship{data.shipCount>1?"s":""} in <strong>{data.port}</strong> because <strong>{data.castle}</strong> is empty now.</>
                 </>;
 
             case "silence-at-the-wall-executed":
