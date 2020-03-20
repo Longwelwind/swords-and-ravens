@@ -317,9 +317,11 @@ export default class Game {
                 ? this.westerosDecks.map(wd => wd.map(wc => wc.serializeToClient()))
                 : this.westerosDecks.map(wd => shuffle([...wd]).map(wc => wc.serializeToClient())),
             // Same for the wildling deck
+            wildlingDeck: admin
+                ? this.wildlingDeck.map(c => c.serializeToClient())
+                : shuffle([...this.wildlingDeck]).map(c => c.serializeToClient()),
             wildlingStrength: this.wildlingStrength,
             supplyRestrictions: this.supplyRestrictions,
-            wildlingDeck: this.wildlingDeck.map(c => c.serializeToClient()),
             starredOrderRestrictions: this.starredOrderRestrictions,
             skipRavenPhase: this.skipRavenPhase,
             structuresCountNeededToWin: this.structuresCountNeededToWin,
