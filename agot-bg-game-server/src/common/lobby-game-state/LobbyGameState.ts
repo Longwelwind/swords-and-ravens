@@ -29,7 +29,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
     }
 
     getAvailableHouses(): LobbyHouse[] {
-        return this.lobbyHouses.values.filter(h => this.entireGame.gameSetup.houses.includes(h.id));
+        return this.lobbyHouses.values.filter(h => this.entireGame.getSelectedGameSetup().houses.includes(h.id));
     }
 
     onGameSettingsChange(): void {

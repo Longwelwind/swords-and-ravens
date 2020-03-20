@@ -72,20 +72,20 @@ interface HouseCardData {
     ability?: string;
 }
 
+export interface GameSetupContainer {
+    name: string;
+    playerSetups: GameSetup[];
+}
+
 export interface GameSetup {
+    playerCount: number;
     houses: string[];
     blockedRegions?: string[];
     removedUnits?: string[];
 }
 
 export default function createGame(entireGame: EntireGame, housesToCreate: string[]): Game {
-    // Based on the number of players, find the corresponding setup
-    if (!baseGameData.setups.hasOwnProperty(housesToCreate.length.toString())) {
-        throw new Error();
-    }
-
-    // @ts-ignore
-    const gameSetup = entireGame.gameSetup;
+    const gameSetup = entireGame.getSelectedGameSetup();
 
     const game = new Game();
 

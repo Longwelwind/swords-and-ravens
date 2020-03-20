@@ -9,17 +9,18 @@ import {observable} from "mobx";
 import * as _ from "lodash";
 import BetterMap from "../utils/BetterMap";
 import GameEndedGameState from "./ingame-game-state/game-ended-game-state/GameEndedGameState";
-import { GameSetup } from "./ingame-game-state/game-data-structure/createGame";
+import { GameSetup, GameSetupContainer } from "./ingame-game-state/game-data-structure/createGame";
 import CancelledGameState, { SerializedCancelledGameState } from "./cancelled-game-state/CancelledGameState";
 
 export default class EntireGame extends GameState<null, LobbyGameState | IngameGameState | CancelledGameState> {
     id: string;
+    allGameSetups = Object.entries(baseGameData.setups);
 
     @observable users = new BetterMap<string, User>();
     ownerUserId: string;
     name: string;
 
-    @observable gameSettings: GameSettings = {pbem: false, playerCount: 6};
+    @observable gameSettings: GameSettings = {pbem: false, setupId: "base-game", playerCount: 6};
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -33,11 +34,6 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         this.id = id;
         this.ownerUserId = ownerId;
         this.name = name;
-    }
-
-    get gameSetup(): GameSetup {
-        // @ts-ignore
-        return baseGameData.setups[this.gameSettings.playerCount.toString()];
     }
 
     firstStart(): void {
@@ -246,6 +242,34 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         ));
     }
 
+    getGameSetupContainer(setupId: string): GameSetupContainer {
+        const container = this.allGameSetups.find(([sid, _]) => sid == setupId);
+
+        if (!container) {
+            throw new Error("Invalid setupId");
+        }
+
+        return container[1];
+    }
+
+    getGameSetupByIdAndPlayerCount(setupId: string, playerCount: number): GameSetup {
+        const container = this.getGameSetupContainer(setupId);
+
+        const playerSetups = container.playerSetups;
+
+        const gameSetup = playerSetups.find(gameSetup => playerCount == gameSetup.playerCount);
+
+        if (!gameSetup) {
+            throw new Error(`Invalid playerCount ${playerCount} for setupId ${setupId}`);
+        }
+
+        return gameSetup;
+    }
+
+    getSelectedGameSetup(): GameSetup {
+        return this.getGameSetupByIdAndPlayerCount(this.gameSettings.setupId, this.gameSettings.playerCount);
+    }
+
     serializeToClient(user: User | null): SerializedEntireGame {
         return {
             id: this.id,
@@ -300,6 +324,7 @@ export interface SerializedEntireGame {
 }
 
 export interface GameSettings {
-    playerCount: number;
     pbem: boolean;
+    setupId: string;
+    playerCount: number;
 }
