@@ -31,7 +31,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                 ingame.gameLogManager.logs
                     .filter((log: any) => log.data.type == "westeros-card-executed")
                     .forEach((log: any) => {
-                        log.westerosDeckI = mappings.get(log.westerosCardType)
+                        log.westerosDeckI = mappings.get(log.data.westerosCardType)
                     });
             }
 
