@@ -37,6 +37,8 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             // Migration for #336
             serializedGame.gameSettings.setupId = "base-game";
+
+            return serializedGame;
         }
     }
 ];
