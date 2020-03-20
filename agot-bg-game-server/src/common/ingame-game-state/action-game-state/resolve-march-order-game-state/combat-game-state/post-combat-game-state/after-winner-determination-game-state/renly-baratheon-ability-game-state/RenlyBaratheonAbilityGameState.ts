@@ -12,6 +12,7 @@ import {footman, knight} from "../../../../../../game-data-structure/unitTypes";
 import _ from "lodash";
 import Region from "../../../../../../game-data-structure/Region";
 import IngameGameState from "../../../../../../IngameGameState";
+import { renlyBaratheon } from "../../../../../../game-data-structure/house-card/houseCardAbilities";
 
 export default class RenlyBaratheonAbilityGameState extends GameState<
     AfterWinnerDeterminationGameState["childGameState"],
@@ -73,7 +74,16 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
     onSelectUnitsEnd(house: House, selectedUnit: [Region, Unit[]][]): void {
         // Upgrade the footmen to a knight
         // Even tough they should be only one unit in "selectedUnit",
-        // the following code is generic for all units in it.house
+        // the following code is generic for all units in it.
+
+        if (_.flatMap(selectedUnit.map(([_, u]) => u)).length == 0) {
+            this.ingame.log({
+                type: "house-card-ability-not-used",
+                house: house.id,
+                houseCard: renlyBaratheon.id
+            });
+        }
+
         selectedUnit.forEach(([region, footmenToRemove]) => {
             footmenToRemove.forEach(u => {
                 region.units.delete(u.id);

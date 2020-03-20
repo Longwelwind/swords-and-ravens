@@ -8,7 +8,8 @@ export default class WinterIsComingWesterosCardType extends WesterosCardType {
     executeImmediately(westerosGameState: WesterosGameState, currentDeckI: number): void {
         westerosGameState.ingame.log({
             type: "westeros-card-executed",
-            westerosCardType: winterIsComing.id
+            westerosCardType: winterIsComing.id,
+            westerosDeckI: currentDeckI
         });
 
         const deck = westerosGameState.game.westerosDecks[currentDeckI];

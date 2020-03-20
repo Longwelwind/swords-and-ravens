@@ -66,6 +66,14 @@ export default class ReplaceOrderGameState extends GameState<UseRavenGameState> 
                 orderId: order.id
             });
 
+            this.ingameGameState.log({
+                type: "raven-holder-replace-order",
+                ravenHolder: this.ravenHolder.id,
+                region: region.id,
+                originalOrder: replacedOrder.id,
+                newOrder: order.id
+            });
+
             this.useRavenGameState.onReplaceOrderGameStateEnd();
         } else if (message.type == "skip-replace-order") {
             this.useRavenGameState.onReplaceOrderGameStateEnd();

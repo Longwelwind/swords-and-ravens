@@ -10,6 +10,7 @@ import {ServerMessage} from "../../../../../../../messages/ServerMessage";
 import SelectHouseCardGameState, {SerializedSelectHouseCardGameState} from "../../../../../select-house-card-game-state/SelectHouseCardGameState";
 import HouseCard, {HouseCardState} from "../../../../../game-data-structure/house-card/HouseCard";
 import IngameGameState from "../../../../../IngameGameState";
+import { aeronDamphair } from "../../../../../game-data-structure/house-card/houseCardAbilities";
 
 export default class AeronDamphairAbilityGameState extends GameState<
     ImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"],
@@ -50,6 +51,12 @@ export default class AeronDamphairAbilityGameState extends GameState<
 
             this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(house, possibleHouseCards);
         } else {
+            this.ingame.log({
+                type: "house-card-ability-not-used",
+                house: house.id,
+                houseCard: aeronDamphair.id
+            });
+
             this.parentGameState.onHouseCardResolutionFinish(house);
         }
     }

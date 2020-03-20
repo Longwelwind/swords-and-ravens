@@ -4,13 +4,14 @@ import User from "./User";
 import * as WebSocket from "ws";
 import EntireGame, {SerializedEntireGame} from "../common/EntireGame";
 import {ServerMessage} from "../messages/ServerMessage";
-import WebsiteClient from "./website-client/WebsiteClient";
+import WebsiteClient, { StoredGameData } from "./website-client/WebsiteClient";
 import LocalWebsiteClient from "./website-client/LocalWebsiteClient";
 import LiveWebsiteClient from "./website-client/LiveWebsiteClient";
 import BetterMap from "../utils/BetterMap";
 import schema from "./ClientMessage.json";
 import Ajv, {ValidateFunction} from "ajv";
 import _ from "lodash";
+import serializedGameMigrations from "./serializedGameMigrations";
 
 export default class GlobalServer {
     server: Server;
@@ -19,6 +20,16 @@ export default class GlobalServer {
     loadedGames = new BetterMap<string, EntireGame>();
     clientToUser: Map<WebSocket, User> = new Map<WebSocket, User>();
     clientMessageValidator: ValidateFunction;
+
+    get latestSerializedGameVersion(): string {
+        const lastMigration = _.last(serializedGameMigrations);
+
+        if (!lastMigration) {
+            throw new Error();
+        }
+
+        return lastMigration.version;
+    }
 
     constructor(server: Server) {
         this.server = server;
@@ -165,8 +176,11 @@ export default class GlobalServer {
         const viewOfGame = entireGame.getViewOfGame();
         const players = entireGame.getPlayersInGame();
         const serializedGame = entireGame.serializeToClient(null);
+        // Assume that all game always follow the latest serializedGame version,
+        // since they have been migrated when loaded.
+        const version = this.latestSerializedGameVersion;
 
-        this.websiteClient.saveGame(entireGame.id, serializedGame, viewOfGame, players, state, "1.0.0");
+        this.websiteClient.saveGame(entireGame.id, serializedGame, viewOfGame, players, state, version);
     }
 
     async getEntireGame(gameId: string): Promise<EntireGame | null> {
@@ -183,7 +197,7 @@ export default class GlobalServer {
 
         // Load it
         const entireGame = gameData.serializedGame
-            ? EntireGame.deserializeFromServer(gameData.serializedGame as SerializedEntireGame)
+            ? this.deserializeStoredGame(gameData)
             : await this.createGame(gameData.id, gameData.ownerId, gameData.name);
 
         // Bind listeners
@@ -198,6 +212,28 @@ export default class GlobalServer {
         this.loadedGames.set(gameId, entireGame);
 
         return entireGame;
+    }
+
+    deserializeStoredGame(gameData: StoredGameData): EntireGame {
+        // Check if the serialized game needs to be migrated
+        if (gameData.version != this.latestSerializedGameVersion) {
+            gameData.serializedGame = this.migrateSerializedGame(gameData.serializedGame, gameData.version as string);
+        }
+
+        return EntireGame.deserializeFromServer(gameData.serializedGame as SerializedEntireGame);
+    }
+
+    migrateSerializedGame(serializedGame: any, version: string): any {
+        const migrationI = serializedGameMigrations.findIndex(m => m.version == version);
+
+        const migrationsToApply = serializedGameMigrations.slice(migrationI + 1);
+
+        const migratedSerializedGame = migrationsToApply.reduce(
+            (serializedGame, migration) => migration.migrate(serializedGame),
+            serializedGame
+        );
+
+        return migratedSerializedGame;
     }
 
     async createGame(id: string, ownedId: string, name: string): Promise<EntireGame> {

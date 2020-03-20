@@ -6,7 +6,7 @@ export default interface GameLog {
 export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | WesterosCardExecuted | WesterosCardDrawn | CombatResult | WildlingCardRevealed | WildlingBidding
     | HighestBidderChosen | LowestBidderChosen | PlayerMustered | WinnerDeclared
-    | RavenHolderWildlingCardPutBottom | RavenHolderWildlingCardPutTop | RaidDone | DarkWingsDarkWordsChoice
+    | RavenHolderWildlingCardPutBottom | RavenHolderWildlingCardPutTop | RavenHolderReplaceOrder | RaidDone | DarkWingsDarkWordsChoice
     | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
     | ActionPhaseBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingsAttack | MarchOrderRemoved
@@ -65,6 +65,7 @@ interface MarchResolved {
 interface WesterosCardExecuted {
     type: "westeros-card-executed";
     westerosCardType: string;
+    westerosDeckI: number;
 }
 
 interface WesterosCardDrawn {
@@ -131,6 +132,14 @@ interface RavenHolderWildlingCardPutBottom {
 interface RavenHolderWildlingCardPutTop {
     type: "raven-holder-wildling-card-put-top";
     ravenHolder: string;
+}
+
+interface RavenHolderReplaceOrder {
+    type: "raven-holder-replace-order";
+    ravenHolder: string;
+    region: string;
+    originalOrder: number;
+    newOrder: number;
 }
 
 interface RaidDone {

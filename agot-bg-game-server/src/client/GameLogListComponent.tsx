@@ -112,7 +112,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <>
                         <Row className="justify-content-center">
                             <Col xs="auto">
-                                <WesterosCardComponent cardType={westerosCardType} size="small" tooltip={true}/>
+                                <WesterosCardComponent cardType={westerosCardType} size="small" tooltip={true} westerosDeckI={data.westerosDeckI}/>
                             </Col>
                         </Row>
                     </>
@@ -129,7 +129,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         <Row className="justify-content-around">
                             {drawnWesterosCardTypes.map((wct, i) => (
                                 <Col xs="auto" key={i}>
-                                    <WesterosCardComponent cardType={wct} size="small" tooltip={true} />
+                                    <WesterosCardComponent cardType={wct} size="small" tooltip={true} westerosDeckI={i} />
                                 </Col>
                             ))}
                         </Row>
@@ -264,6 +264,20 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <p>
                         <strong>{house.name}</strong>, holder of the Raven token, chose to see the card at the top
                         of the wildling card deck and to leave it at the top of the deck.
+                    </p>
+                );
+
+            case "raven-holder-replace-order":
+                house = this.game.houses.get(data.ravenHolder);
+                const orderRegion = this.world.regions.get(data.region);
+                const originalOrder = orders.get(data.originalOrder);
+                const newOrder = orders.get(data.newOrder);
+
+                return (
+                    <p>
+                        <strong>{house.name}</strong>, holder of the Raven token, chose to replace
+                        a <strong>{originalOrder.type.name} Order</strong> by a <strong>{newOrder.type.name} Order
+                        </strong> in <strong>{orderRegion.name}</strong>.
                     </p>
                 );
 
