@@ -11,6 +11,7 @@ import {ServerMessage} from "../../../../../../../../messages/ServerMessage";
 import Region from "../../../../../../game-data-structure/Region";
 import ActionGameState from "../../../../../ActionGameState";
 import IngameGameState from "../../../../../../IngameGameState";
+import { cerseiLannister } from "../../../../../../game-data-structure/house-card/houseCardAbilities";
 
 export default class CerseiLannisterAbilityGameState extends GameState<
     AfterWinnerDeterminationGameState["childGameState"],
@@ -58,6 +59,11 @@ export default class CerseiLannisterAbilityGameState extends GameState<
 
             this.setChildGameState(new SelectOrdersGameState(this)).firstStart(house, availableRegions, 1);
         } else {
+            this.ingame.log({
+                type: "house-card-ability-not-used",
+                house: house.id,
+                houseCard: cerseiLannister.id
+            });
             this.parentGameState.onHouseCardResolutionFinish(house);
         }
     }
