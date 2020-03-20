@@ -37,7 +37,7 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
                     <ListGroupItem>
                         <Row className="justify-content-center">
                             <Col xs="auto">
-                                <WesterosCardComponent cardType={this.props.gameState.currentCard.type}/>
+                                <WesterosCardComponent cardType={this.props.gameState.currentCard.type} westerosDeckI={this.props.gameState.currentCardI}/>
                             </Col>
                         </Row>
                     </ListGroupItem>

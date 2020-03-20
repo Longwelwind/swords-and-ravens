@@ -112,7 +112,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <>
                         <Row className="justify-content-center">
                             <Col xs="auto">
-                                <WesterosCardComponent cardType={westerosCardType} size="small" tooltip={true}/>
+                                <WesterosCardComponent cardType={westerosCardType} size="small" tooltip={true} westerosDeckI={data.westerosDeckI}/>
                             </Col>
                         </Row>
                     </>
@@ -129,7 +129,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         <Row className="justify-content-around">
                             {drawnWesterosCardTypes.map((wct, i) => (
                                 <Col xs="auto" key={i}>
-                                    <WesterosCardComponent cardType={wct} size="small" tooltip={true} />
+                                    <WesterosCardComponent cardType={wct} size="small" tooltip={true} westerosDeckI={i} />
                                 </Col>
                             ))}
                         </Row>

@@ -8,6 +8,7 @@ import westerosCardImages from "../../westerosCardImages";
 
 interface WesterosCardProps {
     cardType: WesterosCardType;
+    westerosDeckI: number;
     size?: "small" | "medium";
     tooltip?: boolean;
 }
@@ -21,7 +22,7 @@ export default class WesterosCardComponent extends Component<WesterosCardProps> 
                     this.props.tooltip ? <div
                         className="horizontal-game-card"
                         style={{
-                            backgroundImage: this.props.cardType ? `url(${westerosCardImages.get(this.props.cardType.id)})` : undefined
+                            backgroundImage: this.props.cardType ? `url(${westerosCardImages.get(this.props.westerosDeckI).get(this.props.cardType.id)})` : undefined
                         }}
                     /> : <div/>
                 }
@@ -32,7 +33,7 @@ export default class WesterosCardComponent extends Component<WesterosCardProps> 
                 <div
                     className={classNames("horizontal-game-card hover-weak-outline", this.props.size)}
                     style={{
-                        backgroundImage: this.props.cardType ? `url(${westerosCardImages.get(this.props.cardType.id)})` : undefined
+                        backgroundImage: this.props.cardType ? `url(${westerosCardImages.get(this.props.westerosDeckI).get(this.props.cardType.id)})` : undefined
                     }}
                 />
             </OverlayTrigger>
