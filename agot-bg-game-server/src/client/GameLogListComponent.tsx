@@ -267,6 +267,20 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>
                 );
 
+            case "raven-holder-replace-order":
+                house = this.game.houses.get(data.ravenHolder);
+                const orderRegion = this.world.regions.get(data.region);
+                const originalOrder = orders.get(data.originalOrder);
+                const newOrder = orders.get(data.newOrder);
+
+                return (
+                    <p>
+                        <strong>{house.name}</strong>, holder of the Raven token, chose to replace
+                        a <strong>{originalOrder.type.name} Order</strong> by a <strong>{newOrder.type.name} Order
+                        </strong> in <strong>{orderRegion.name}</strong>.
+                    </p>
+                );
+
             case "raid-done":
                 const raider = this.game.houses.get(data.raider);
                 const raiderRegion = this.world.regions.get(data.raiderRegion);
