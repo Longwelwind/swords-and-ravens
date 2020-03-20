@@ -1,5 +1,6 @@
 from datetime import datetime, date
 
+from django import template
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -54,7 +55,7 @@ def games(request):
         games = Game.objects.filter(Q(state=IN_LOBBY) | Q(state=ONGOING))
         # It seems to be hard to ask Postgres to order the list correctly.
         # It is done in Python
-        games = sorted(games, key=lambda row: [IN_LOBBY, ONGOING].index(row.state))
+        games = sorted(games, key=lambda game: ([IN_LOBBY, ONGOING].index(game.state), -datetime.timestamp(game.updated_at)))
 
         for game in games:
             if request.user.is_authenticated:
@@ -63,10 +64,14 @@ def games(request):
             else:
                 game.player_in_game = None
 
+        # Create the list of "My games"
+        my_games = [game for game in games if game.player_in_game]
+
         public_room_id = Room.objects.get(name='public').id
 
         return render(request, "agotboardgame_main/games.html", {
             "games": games,
+            "my_games": my_games,
             'public_room_id': public_room_id
         })
     elif request.method == "POST":
@@ -83,7 +88,7 @@ def games(request):
         if len(name) < 4 or 24 < len(name):
             return HttpResponseRedirect("/games")
 
-        return HttpResponseRedirect("/games")
+        return HttpResponseRedirect(f"/play/{game.id}")
 
 
 @login_required

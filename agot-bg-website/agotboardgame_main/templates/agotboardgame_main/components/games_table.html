@@ -1,0 +1,68 @@
+<table class="table table-hover table-sm">
+    <thead>
+        <tr>
+            <th style="width: 75px"></th>
+            <th>
+                Name
+            </th>
+            <th style="width: 1px">
+                Players
+            </th>
+            <th style="width: 120px"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for game in games %}
+            <tr>
+                <td class="align-middle text-center">
+                    {% if game.state == "IN_LOBBY" %}
+                        <span class="badge badge-pill badge-success">Open</span>
+                    {% elif game.state == "ONGOING" %}
+                        <span class="badge badge-pill badge-warning">Ongoing</span>
+                    {% endif %}
+                </td>
+                <td class="align-middle">
+                    {% if game.view_of_game.settings.pbem %}
+                        <span class="badge badge-pill badge-info">PBEM</span>
+                    {% else %}
+                        <span class="badge badge-pill badge-info">Live</span>
+                    {% endif %}
+                    {% if game.player_in_game %}
+                        {% if game.player_in_game.data.waited_for %}
+                            <span class="badge badge-pill badge-danger">YOUR TURN</span>
+                        {% else %}
+                            <span class="badge badge-pill badge-info">Playing</span>
+                        {% endif %}
+                    {% endif %}
+
+                    {{ game.name }}
+                </td>
+                <td class="align-middle text-center">
+                    {{ game.players.count }}{% if game.state == "IN_LOBBY" %}/{{ game.view_of_game.maxPlayerCount }}{% endif %}
+                </td>
+                <td class="text-right">
+                    <a
+                        target="_blank"
+                        href="/play/{{ game.id }}"
+                        class="btn btn-primary btn-sm {% if not user.is_authenticated %}disabled{% endif %}"
+                        {% if not user.is_authenticated %}
+                            title="You must be logged in to join or observe a game"
+                        {% endif %}
+                    >
+                        {% if not game.player_in_game %}
+                            Join
+                        {% else %}
+                            Rejoin
+                        {% endif %}
+                    </a>
+                </td>
+            </tr>
+        {% empty %}
+        <tr>
+            <td class="text-center align-middle" style="height: 50px" colspan="4">
+                There are no open or ongoing games
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
