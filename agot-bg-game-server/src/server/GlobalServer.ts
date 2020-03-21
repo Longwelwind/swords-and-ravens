@@ -62,7 +62,13 @@ export default class GlobalServer {
 
         users.forEach(user => {
             user.connectedClients.forEach(connectedClient => {
-                connectedClient.send(data);
+                // It may happen that a connected is actually disconnected because,
+                // disconnection happened after the beginning of the processing of
+                // this function and thus the client was not removed properly off
+                // the list.
+                if (connectedClient.readyState == WebSocket.OPEN) {
+                    connectedClient.send(data);
+                }
             });
         })
     }
