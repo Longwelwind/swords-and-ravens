@@ -76,6 +76,23 @@ export default class PatchfaceAbilityGameState extends GameState<
             state: HouseCardState.USED
         });
 
+        // If this was the last card of the house, all cards
+        // except the discarded one are returned.
+        if (affectedHouse.houseCards.values.every(hc => hc.state == HouseCardState.USED)) {
+            const returnedHouseCards = affectedHouse.houseCards.values.filter(hc => hc != houseCard);
+
+            returnedHouseCards.forEach(hc => {
+                hc.state = HouseCardState.AVAILABLE;
+            });
+
+            this.combat().entireGame.broadcastToClients({
+                type: "change-state-house-card",
+                houseId: affectedHouse.id,
+                cardIds: returnedHouseCards.map(hc => hc.id),
+                state: HouseCardState.AVAILABLE
+            });
+        }
+
         this.parentGameState.onHouseCardResolutionFinish(house);
     }
 
