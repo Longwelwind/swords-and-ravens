@@ -525,7 +525,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <strong>Roose Bolton</strong>: <strong>{house.name}</strong> took back all discarded House
-                    cards ({returnedHouseCards.map(hc => hc).join(", ")}).
+                    cards ({joinReactNodes(returnedHouseCards.map(hc => <strong key={hc.id}>{hc.name}</strong>), ", ")}).
                 </>;
 
             case "loras-tyrell-attack-order-moved":
