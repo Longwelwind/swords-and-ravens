@@ -43,7 +43,7 @@
           "houses": ["stark", "greyjoy", "lannister", "baratheon", "tyrell"],
           "blockedRegions": [
             "sunspear", "port-of-sunspear", "salt-shore", "yronwood", "starfall",
-            "princes-pass", "the-boneway", "storms-end", "port-of-storms-end"
+            "storms-end", "port-of-storms-end"
           ]
         }
       ]
