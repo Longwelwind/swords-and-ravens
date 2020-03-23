@@ -50,6 +50,24 @@ def register(request):
     return render(request, "agotboardgame_main/register.html")
 
 
+def about(request):
+    tasks = [
+        {"name": "Base Game Second Edition", "done": True, "children": [
+            {"name": "Tides of Battle"}
+        ]},
+        {"name": "A Feast for Crows"},
+        {"name": "A Dance with Dragons"},
+        {"name": "Mother of Dragons", "children": [
+            {"name": "Vassals", "next": True},
+            {"name": "House Arryn"},
+            {"name": "Iron Bank"},
+            {"name": "Essos and House Targaryen"}
+        ]}
+    ]
+
+    return render(request, "agotboardgame_main/about.html", {"tasks": tasks})
+
+
 def games(request):
     if request.method == "GET":
         games = Game.objects.filter(Q(state=IN_LOBBY) | Q(state=ONGOING))

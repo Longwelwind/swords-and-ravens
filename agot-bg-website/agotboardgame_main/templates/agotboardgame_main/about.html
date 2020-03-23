@@ -1,0 +1,65 @@
+{% extends "./base.html" %}
+
+{% load static %}
+{% load tasks_list %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col col-sm-12 col-lg-10">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3 class="card-title">What is Swords and Ravens?</h3>
+                <p>
+                    <b>Swords and Ravens</b> is a online adaptation of the excellent board game
+                    <b>A Game of Thrones: The Board Game (Second Edition)</b> edited
+                    by <a href="https://www.fantasyflightgames.com/en/index/" target="_blank">Fantasy Flight Games</a>.
+                    You can play with players from around the world either in live or via email, for free.
+                </p>
+                <p>
+                    It is developed mainly by
+                    <a href="https://longwelwind.net/" target="_blank">Longwelwind</a>, with the considerable help of:
+                    <ul>
+                        <li><a href="https://www.facebook.com/gereon.doppelsieben" target="_blank">Gereon</a> for his contribution to the codebase.</li>
+                        <li><a href="" target="_blank">Tex</a> for hosting communication about the game on the AGOT:BG Discord.</li>
+                        <li>
+                            OrangePeanut, Marco Martell, DerSeynmaster, obmit, DemonInside, Jason77, Master
+                            Falcao and others for play-testing the game during the open beta-test.
+                        </li>
+                    </ul>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col col-sm-12 col-lg-5">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3 class="card-title">What's implemented?</h3>
+                <p>
+                    Swords and Ravens is under active development. What is currently implemented:
+                </p>
+                {% tasks_list tasks %}
+                <p>
+                    Aside from game features, meta-game features such as ranked games, player reports or statistics
+                    should come in the following months!
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col col-sm-12 col-lg-5">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3 class="card-title">How to contribute?</h3>
+                <p>
+                    Swords and Ravens is fully open-source and the source code is available on
+                    <a href="https://github.com/Longwelwind/swords-and-ravens" target="_blank">GitHub</a>.
+                    Contributions, bug reports or feedback are welcome!
+                </p>
+                <p>
+                    A <a href="https://discord.gg/66VvR5" target="_blank">Discord</a> server is also available for
+                    discussions about the platform.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

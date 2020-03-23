@@ -5,6 +5,7 @@ from agotboardgame_main import views
 
 urlpatterns = [
     path('', views.index),
+    path('about/', views.about),
     path('login/', views.login),
     path('logout/', views.logout_view),
     path('register/', views.register),
