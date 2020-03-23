@@ -34,6 +34,10 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
         this.count = count;
         this.canBeSkipped = canBeSkipped;
 
+        if (possibleUnits.length == 0) {
+            throw new Error("SelectUnitsGameState called with possibleUnits.length == 0!")
+        }
+
         if (count > possibleUnits.length) {
             throw new Error("User has to select more units than possible and therefore SelectUnitsGameState will never end!");
         }
