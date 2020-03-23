@@ -13,7 +13,7 @@ import _ from "lodash";
 import User from "../../../../../../server/User";
 
 export default class ChooseHouseCardGameState extends GameState<CombatGameState> {
-    // A null value for a key can be present client-side, it indicates
+    // A null value for a value can be present client-side, it indicates
     // that a house card was chosen but it may not be shown to the player.
     @observable houseCards = new BetterMap<House, HouseCard | null>();
 
@@ -30,7 +30,11 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
     }
 
     firstStart(): void {
+        // In case users just have one house card it can be selected automatically
+        this.tryAutomaticallyChooseLastHouseCard(this.combatGameState.attacker);
+        this.tryAutomaticallyChooseLastHouseCard(this.combatGameState.defender);
 
+        this.checkAndProceedEndOfChooseHouseCardGameState();
     }
 
     onServerMessage(message: ServerMessage): void {
@@ -60,32 +64,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                 houseId: player.house.id
             });
 
-            if (this.houseCards.size == 2) {
-                this.houseCards.forEach((houseCard, house) => this.combatGameState.houseCombatDatas.get(house).houseCard = houseCard);
-
-                // "this.combatGameState.attackingHouseCombatData.houseCard" and
-                // "this.combatGameState.defendingHouseCombatData.houseCard" will always be non-null
-                // since they have just been set before, thus the two "ts-ignore". They could be later set to null
-                // because of Tyrion Lannister, for example.
-                this.ingameGameState.log({
-                    type: "combat-house-card-chosen",
-                    houseCards: [
-                        // @ts-ignore
-                        [this.combatGameState.attacker.id, this.combatGameState.attackingHouseCombatData.houseCard.id],
-                        // @ts-ignore
-                        [this.combatGameState.defender.id, this.combatGameState.defendingHouseCombatData.houseCard.id]
-                    ]
-                });
-
-                this.entireGame.broadcastToClients({
-                    type: "change-combat-house-card",
-                    // Same here, the houseCards will always be non-null
-                    // @ts-ignore
-                    houseCardIds: this.combatGameState.houseCombatDatas.map((h, hcd) => [h.id, hcd.houseCard.id])
-                });
-
-                this.combatGameState.onChooseHouseCardGameStateEnd();
-            }
+            this.checkAndProceedEndOfChooseHouseCardGameState();
         }
     }
 
@@ -117,6 +96,42 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
             type: "choose-house-card",
             houseCards: this.houseCards.map((h, hc) => [h.id, hc ? hc.id : null])
         };
+    }
+
+    private checkAndProceedEndOfChooseHouseCardGameState(): void {
+        if (this.houseCards.size == 2) {
+            this.houseCards.forEach((houseCard, house) => this.combatGameState.houseCombatDatas.get(house).houseCard = houseCard);
+
+            // "this.combatGameState.attackingHouseCombatData.houseCard" and
+            // "this.combatGameState.defendingHouseCombatData.houseCard" will always be non-null
+            // since they have just been set before, thus the two "ts-ignore". They could be later set to null
+            // because of Tyrion Lannister, for example.
+            this.ingameGameState.log({
+                type: "combat-house-card-chosen",
+                houseCards: [
+                    // @ts-ignore
+                    [this.combatGameState.attacker.id, this.combatGameState.attackingHouseCombatData.houseCard.id],
+                    // @ts-ignore
+                    [this.combatGameState.defender.id, this.combatGameState.defendingHouseCombatData.houseCard.id]
+                ]
+            });
+
+            this.entireGame.broadcastToClients({
+                type: "change-combat-house-card",
+                // Same here, the houseCards will always be non-null
+                // @ts-ignore
+                houseCardIds: this.combatGameState.houseCombatDatas.map((h, hcd) => [h.id, hcd.houseCard.id])
+            });
+
+            this.combatGameState.onChooseHouseCardGameStateEnd();
+        }
+    }
+
+    private tryAutomaticallyChooseLastHouseCard(house: House): void {
+        const choosableCards = this.getChoosableCards(house);
+        if (choosableCards.length == 1) {
+            this.houseCards.set(house, choosableCards[0]);
+        }
     }
 
     static deserializeFromServer(combatGameState: CombatGameState, data: SerializedChooseHouseCardGameState): ChooseHouseCardGameState {
