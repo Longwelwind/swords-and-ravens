@@ -28,6 +28,15 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
     }
 
     firstStart(house: House, possibleUnits: Unit[], count: number, canBeSkipped = false): void {
+        if (count > possibleUnits.length) {
+            throw new Error("User has to select more units than possible and therefore SelectUnitsGameState will never end!");
+        }
+
+        if (!canBeSkipped && possibleUnits.length == count) {
+            this.parentGameState.onSelectUnitsEnd(house, this.convertPossibleUnitsForOnSelectUnitsEnd(possibleUnits));
+            return;
+        }
+
         this.house = house;
         this.possibleUnits = possibleUnits;
         this.count = count;
@@ -88,6 +97,23 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
 
     canPickUnit(u: Unit): boolean {
         return this.possibleUnits.includes(u);
+    }
+
+    private convertPossibleUnitsForOnSelectUnitsEnd(units: Unit[]): [Region, Unit[]][] {
+        const unitsMap = new BetterMap<Region, Unit[]>();
+
+        units.forEach(u => {
+            const r = u.region;
+            const tmp = unitsMap.tryGet(r, null);
+            if (tmp) {
+                tmp.push(u);
+                unitsMap.set(r, tmp);
+            } else {
+                unitsMap.set(r, Array.of(u));
+            }
+        });
+
+        return unitsMap.entries;
     }
 
     serializeToClient(_admin: boolean, _player: Player | null): SerializedSelectUnitsGameState {
