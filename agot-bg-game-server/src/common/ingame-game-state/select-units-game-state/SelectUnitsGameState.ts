@@ -10,6 +10,7 @@ import * as _ from "lodash";
 import BetterMap from "../../../utils/BetterMap";
 import IngameGameState from "../IngameGameState";
 import User from "../../../server/User";
+import groupBy from "../../../utils/groupBy";
 
 interface SelectUnitsParentGameState extends GameState<any, any> {
     game: Game;
@@ -32,6 +33,15 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
         this.possibleUnits = possibleUnits;
         this.count = count;
         this.canBeSkipped = canBeSkipped;
+
+        if (count > possibleUnits.length) {
+            throw new Error("User has to select more units than possible and therefore SelectUnitsGameState will never end!");
+        }
+
+        if (!canBeSkipped && possibleUnits.length == count) {
+            this.parentGameState.onSelectUnitsEnd(house, groupBy(possibleUnits, u => u.region).entries);
+            return;
+        }
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
