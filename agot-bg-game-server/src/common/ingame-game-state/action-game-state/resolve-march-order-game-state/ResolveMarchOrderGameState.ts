@@ -89,8 +89,18 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
 
         this.removePossibleOrdersInPort(portRegion);
 
+        const house = portRegion.units.size > 0 ? portRegion.units.values[0].allegiance : null;
         const shipsToDestroy = portRegion.units.map((id, _unit) => id);
         shipsToDestroy.forEach(id => portRegion.units.delete(id));
+
+        if (house) {
+            this.entireGame.broadcastToClients({
+                type: "combat-change-army",
+                region: portRegion.id,
+                house: house.id,
+                army: []
+            });
+        }
 
         this.entireGame.broadcastToClients({
             type: "remove-units",
