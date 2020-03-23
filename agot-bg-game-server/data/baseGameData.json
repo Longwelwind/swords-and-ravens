@@ -72,7 +72,10 @@
           "houses": ["lannister", "stark", "greyjoy", "tyrell", "martell"],
           "blockedRegions": [
             "dragonstone", "port-of-dragonstone"
-          ]
+          ],
+          "tracks": {
+            "ironThrone": ["stark", "lannister", "martell", "greyjoy", "tyrell"]
+          }
         }
       ]
     },
