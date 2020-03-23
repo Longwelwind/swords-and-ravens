@@ -23,6 +23,15 @@ export default class SelectHouseCardGameState<P extends ParentGameState> extends
     firstStart(house: House, houseCards: HouseCard[]): void {
         this.house = house;
         this.houseCards = houseCards;
+
+        if (houseCards.length == 0) {
+            throw new Error("SelectHouseCardGameState called with houseCards.length == 0!");
+        }
+
+        // Automatically resolve this state in case there is just one house card to select
+        if (houseCards.length == 1) {
+            this.parentGameState.onSelectHouseCardFinish(house, houseCards[0]);
+        }
     }
 
     select(houseCard: HouseCard): void {
