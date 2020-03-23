@@ -1,0 +1,14 @@
+{% load tasks_list %}
+
+<ul style="list-style-type: none; padding-left: 25px;">
+    {% for task in tasks %}
+        <li>
+            <input type="checkbox" disabled {% if "done" in task %}checked{% endif %} />
+            {{ task.name }}
+            {% if "next" in task %}<span class="badge badge-pill badge-info">Next</span>{% endif %}
+            {% if "children" in task %}
+                {% tasks_list task.children %}
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
