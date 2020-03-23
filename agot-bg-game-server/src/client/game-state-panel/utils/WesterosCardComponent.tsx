@@ -11,6 +11,7 @@ interface WesterosCardProps {
     westerosDeckI: number;
     size?: "small" | "medium";
     tooltip?: boolean;
+    classNames?: string;
 }
 
 @observer
@@ -31,7 +32,7 @@ export default class WesterosCardComponent extends Component<WesterosCardProps> 
                 placement="auto"
             >
                 <div
-                    className={classNames("horizontal-game-card hover-weak-outline", this.props.size)}
+                    className={classNames("horizontal-game-card hover-weak-outline", this.props.size, this.props.classNames)}
                     style={{
                         backgroundImage: this.props.cardType ? `url(${westerosCardImages.get(this.props.westerosDeckI).get(this.props.cardType.id)})` : undefined
                     }}
