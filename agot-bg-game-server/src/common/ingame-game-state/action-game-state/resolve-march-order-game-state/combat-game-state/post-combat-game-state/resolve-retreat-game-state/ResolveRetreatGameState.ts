@@ -89,6 +89,13 @@ export default class ResolveRetreatGameState extends GameState<
         unitIdsToKill.forEach(uid => region.units.delete(uid));
 
         this.entireGame.broadcastToClients({
+            type: "combat-change-army",
+            region: region.id,
+            house: affectedHouse.id,
+            army: []
+        });
+
+        this.entireGame.broadcastToClients({
             type: "remove-units",
             regionId: region.id,
             unitIds: unitIdsToKill
