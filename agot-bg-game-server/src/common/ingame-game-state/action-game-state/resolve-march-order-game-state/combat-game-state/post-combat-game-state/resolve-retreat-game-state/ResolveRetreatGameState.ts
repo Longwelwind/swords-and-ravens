@@ -180,6 +180,7 @@ export default class ResolveRetreatGameState extends GameState<
             // Retreat those unit to this location
             armyLeft.forEach(u => this.postCombat.loserCombatData.region.units.delete(u.id));
             armyLeft.forEach(u => this.retreatRegion.units.set(u.id, u));
+            armyLeft.forEach(u => u.region = this.retreatRegion);
 
             this.entireGame.broadcastToClients({
                 type: "move-units",
