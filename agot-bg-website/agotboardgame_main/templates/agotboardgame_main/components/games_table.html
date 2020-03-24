@@ -55,6 +55,12 @@
                             Rejoin
                         {% endif %}
                     </a>
+                    {% if perms.agotboardgame_main.cancel_game %}
+                        <form action="/game/{{ game.id }}/cancel" method="POST" class="d-inline">
+                            {% csrf_token %}
+                            <button class="btn btn-danger btn-sm">X</button>
+                        </form>
+                    {% endif %}
                 </td>
             </tr>
         {% empty %}
