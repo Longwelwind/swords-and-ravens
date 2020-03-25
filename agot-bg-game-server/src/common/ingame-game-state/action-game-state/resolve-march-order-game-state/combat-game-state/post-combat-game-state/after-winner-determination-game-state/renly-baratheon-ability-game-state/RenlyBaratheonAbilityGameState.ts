@@ -84,12 +84,15 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
             });
         }
 
+        const houseCombatData = this.combatGameState.houseCombatDatas.get(house);
+
         selectedUnit.forEach(([region, footmenToRemove]) => {
             footmenToRemove.forEach(u => {
                 region.units.delete(u.id);
 
-                const houseCombatData = this.combatGameState.houseCombatDatas.get(house);
                 if (houseCombatData.region == region) {
+                    // In case the footman was party of the army, 
+                    // remove it from the army.
                     houseCombatData.army = _.without(houseCombatData.army, ...footmenToRemove);
 
                     this.entireGame.broadcastToClients({
@@ -109,7 +112,11 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
 
             // Replace them by footman
             const knightsToAdd = footmenToRemove.map(_ => this.game.createUnit(region, knight, house));
-            this.combatGameState.houseCombatDatas.get(house).army.push(...knightsToAdd);
+            if (houseCombatData.region == region) {
+                // If the new knight is part of the attacking army,
+                // it will now be part of the army
+                houseCombatData.army.push(...knightsToAdd);
+            }
 
             knightsToAdd.forEach(u => region.units.set(u.id, u));
 
