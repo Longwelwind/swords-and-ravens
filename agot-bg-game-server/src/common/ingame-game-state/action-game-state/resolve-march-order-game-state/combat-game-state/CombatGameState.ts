@@ -336,7 +336,13 @@ export default class CombatGameState extends GameState<
     getNextHouseToDeclareSupport(): House | null {
         const possibleSupportingHouses = this.getPossibleSupportingHouses();
 
-        for (const house of this.game.getTurnOrder()) {
+        // Create an array of houses with attacker and defender on top followed by all other houses in turn order
+        // to speed up DeclareSupportGameState in PBEM games
+        const allHouses = this.game.getTurnOrder().filter(h => h != this.attacker && h != this.defender);
+        allHouses.unshift(this.defender); 
+        allHouses.unshift(this.attacker);
+
+        for (const house of allHouses) {
             if (possibleSupportingHouses.includes(house) && !this.supporters.has(house)) {
                 // This house may support this combat, but has not yet declared his support yet
                 return house;
