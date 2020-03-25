@@ -109,6 +109,7 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
 
             // Replace them by footman
             const knightsToAdd = footmenToRemove.map(_ => this.game.createUnit(region, knight, house));
+            this.combatGameState.houseCombatDatas.get(house).army.push(...knightsToAdd);
 
             knightsToAdd.forEach(u => region.units.set(u.id, u));
 
