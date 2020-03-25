@@ -82,7 +82,8 @@ class Game(models.Model):
 
     class Meta:
         permissions = [
-            ("can_play_as_another_player", "Can impersonate an other player in a game")
+            ("can_play_as_another_player", "Can impersonate an other player in a game"),
+            ("cancel_game", "Can cancel a game")
         ]
 
 

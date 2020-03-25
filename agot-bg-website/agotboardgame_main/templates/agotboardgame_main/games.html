@@ -13,7 +13,7 @@ Games -
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Your Games</h4>
-                    {% games_table my_games user %}
+                    {% games_table my_games user perms %}
                 </div>
             </div>
         </div>
@@ -23,7 +23,7 @@ Games -
                 <div class="card-body">
                     <h4 class="card-title">Games</h4>
                     <div style="height: 440px; overflow-y: auto">
-                        {% games_table games user %}
+                        {% games_table games user perms %}
                     </div>
                 </div>
             </div>

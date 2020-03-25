@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, date
 
 from django import template
@@ -10,9 +11,12 @@ from django.shortcuts import render, get_object_or_404
 from django.template.loader import select_template
 from django.views.decorators.http import require_POST
 
-from agotboardgame_main.models import Game, ONGOING, IN_LOBBY, User
+from agotboardgame_main.models import Game, ONGOING, IN_LOBBY, User, CANCELLED
 from chat.models import Room
 from agotboardgame_main.forms import UpdateUsernameForm
+
+
+logger = logging.getLogger(__name__)
 
 
 def index(request):
@@ -107,6 +111,20 @@ def games(request):
             return HttpResponseRedirect("/games")
 
         return HttpResponseRedirect(f"/play/{game.id}")
+
+
+def cancel_game(request, game_id):
+    if not request.user.has_perm("agotboardgame_main.cancel_game"):
+        return HttpResponseRedirect("/")
+
+    game = get_object_or_404(Game, id=game_id)
+
+    game.state = CANCELLED
+    game.save()
+
+    logger.info(f"{request.user.username} ({request.user.id}) cancelled game {game.name} ({game.id})")
+
+    return HttpResponseRedirect("/games")
 
 
 @login_required
