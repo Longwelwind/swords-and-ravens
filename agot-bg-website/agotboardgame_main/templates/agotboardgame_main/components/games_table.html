@@ -56,7 +56,7 @@
                         {% endif %}
                     </a>
                     {% if perms.agotboardgame_main.cancel_game %}
-                        <form action="/game/{{ game.id }}/cancel" method="POST" class="d-inline">
+                        <form action="/game/{{ game.id }}/cancel" method="POST" class="d-inline" onsubmit="return confirm('Do you really want to cancel this game?');">
                             {% csrf_token %}
                             <button class="btn btn-danger btn-sm">X</button>
                         </form>
