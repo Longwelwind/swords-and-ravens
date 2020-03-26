@@ -64,7 +64,7 @@
   "scripts": {
     "run-client": "webpack-dev-server --config webpack.client.js --mode=development",
     "build-client": "webpack --config webpack.client.js --mode=production",
-    "run-server": "ts-node src/server/server.ts",
+    "run-server": "ts-node -T src/server/server.ts",
     "generate-json-schemas": "typescript-json-schema --strict-null-checks src/messages/ClientMessage.ts ClientMessage -o src/server/ClientMessage.json --include src/messages/*.ts",
     "lint": "eslint . --ext .ts,.tsx"
   }
