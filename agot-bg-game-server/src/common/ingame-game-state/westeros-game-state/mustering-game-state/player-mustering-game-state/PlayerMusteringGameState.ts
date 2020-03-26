@@ -281,7 +281,9 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 .filter(r => r.type.kind == RegionKind.SEA)
             )
             // Can't recruit in a enemy-controled territory
-            .filter(r => r.getController() == null || r.getController() == this.house);
+            .filter(r => r.getController() == null || r.getController() == this.house)
+            // Can't recruit into a blocked region, e.g. an adjacent blocked sea
+            .filter(r => r.garrison > 0 ? r.getController() == this.house : true);
 
         const pointsLeft = this.getPointsLeft(originatingRegion, musterings);
 
