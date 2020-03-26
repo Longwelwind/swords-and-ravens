@@ -1,0 +1,64 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+    - master
+
+env:
+  GITHUB_PACKAGES_GAME_SERVER_DOCKER_IMAGE: docker.pkg.github.com/longwelwind/swords-and-ravens/game_server:${{ github.sha }}
+  GITHUB_PACKAGES_WEBSITE_DOCKER_IMAGE: docker.pkg.github.com/longwelwind/swords-and-ravens/website:${{ github.sha }}
+  DOKKU_GAME_SERVER_DOCKER_IMAGE: dokku/play:${{ github.sha }}
+  DOKKU_WEBSITE_DOCKER_IMAGE: dokku/swordsandravens.net:${{ github.sha }}
+  DOKKU_HOST: root@swordsandravens.net
+
+jobs:
+  game-server-docker-build:
+    name: Game Server Docker Image Build
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v1
+    - name: Login to GitHub Packages
+      run: docker login docker.pkg.github.com -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+    - name: Build game-server Docker image
+      run: docker build -f ./game_server.Dockerfile -t $GITHUB_PACKAGES_GAME_SERVER_DOCKER_IMAGE .
+    - name: Upload Docker image to GitHub Packages
+      run: docker push $GITHUB_PACKAGES_GAME_SERVER_DOCKER_IMAGE
+  website-docker-build:
+    name: Website Docker Image Build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Login to GitHub Packages
+      run: docker login docker.pkg.github.com -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+    - name: Build game-server Docker image
+      run: docker build -f ./website.Dockerfile -t $GITHUB_PACKAGES_WEBSITE_DOCKER_IMAGE .
+    - name: Upload Docker image to GitHub Packages
+      run: docker push $GITHUB_PACKAGES_WEBSITE_DOCKER_IMAGE
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-18.04
+    needs: [game-server-docker-build, website-docker-build]
+    env:
+      SSH_KEY: ${{ secrets.CI_DEPLOY_SSH_KEY }}
+    steps:
+    - name: Login to GitHub Packages
+      run: docker login docker.pkg.github.com -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+    - name: Setup SSH Key
+      run: mkdir -p ~/.ssh && echo "$SSH_KEY" > ~/.ssh/id_rsa && chmod 400 ~/.ssh/id_rsa
+    - name: Pulling Game Server Docker Image
+      run: docker pull $GITHUB_PACKAGES_GAME_SERVER_DOCKER_IMAGE
+    - name: Pulling Website Docker Image
+      run: docker pull $GITHUB_PACKAGES_WEBSITE_DOCKER_IMAGE
+    - name: Tagging Game Server Docker Image
+      run: docker tag $GITHUB_PACKAGES_GAME_SERVER_DOCKER_IMAGE $DOKKU_GAME_SERVER_DOCKER_IMAGE
+    - name: Tagging Website Docker Image
+      run: docker tag $GITHUB_PACKAGES_WEBSITE_DOCKER_IMAGE $DOKKU_WEBSITE_DOCKER_IMAGE
+    - name: Upload Game Server Docker Image to Dokku
+      run: docker save $DOKKU_GAME_SERVER_DOCKER_IMAGE | bzip2 | ssh -o StrictHostKeyChecking=no $DOKKU_HOST "bunzip2 | docker load"
+    - name: Upload Website Docker Image to Dokku
+      run: docker save $DOKKU_WEBSITE_DOCKER_IMAGE | bzip2 | ssh -o StrictHostKeyChecking=no $DOKKU_HOST "bunzip2 | docker load"
+    - name: Deploy Game Server
+      run: ssh -o StrictHostKeyChecking=no $DOKKU_HOST "dokku tags:deploy play ${{ github.sha }}"
+    - name: Deploy Website
+      run: ssh -o StrictHostKeyChecking=no $DOKKU_HOST "dokku tags:deploy swordsandravens.net ${{ github.sha }}"
