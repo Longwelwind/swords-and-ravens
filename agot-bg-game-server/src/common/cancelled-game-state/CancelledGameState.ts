@@ -9,7 +9,6 @@ export default class CancelledGameState extends GameState<EntireGame> {
     }
 
     onClientMessage(_user: User, _message: ClientMessage): void {
-        
     }
 
     onServerMessage(_: ServerMessage): void {

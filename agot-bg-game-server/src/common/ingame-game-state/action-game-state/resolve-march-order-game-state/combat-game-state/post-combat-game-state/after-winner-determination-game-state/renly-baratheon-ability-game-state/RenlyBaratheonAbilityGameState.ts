@@ -91,7 +91,7 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
                 region.units.delete(u.id);
 
                 if (houseCombatData.region == region) {
-                    // In case the footman was party of the army, 
+                    // In case the footman was party of the army,
                     // remove it from the army.
                     houseCombatData.army = _.without(houseCombatData.army, ...footmenToRemove);
 

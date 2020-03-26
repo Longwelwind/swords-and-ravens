@@ -14,7 +14,7 @@ export default class RenlyBaratheonHouseCardAbility extends HouseCardAbility {
                 .firstStart(house);
             return;
         }
-        
+
         afterWinnerDetermination.onHouseCardResolutionFinish();
     }
 }
