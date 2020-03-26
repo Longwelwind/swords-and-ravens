@@ -11,6 +11,7 @@ import SelectUnitsGameState, {SerializedSelectUnitsGameState} from "../../../../
 import House from "../../../../../game-data-structure/House";
 import Game from "../../../../../game-data-structure/Game";
 import PostCombatGameState from "../PostCombatGameState";
+import groupBy from "../../../../../../../utils/groupBy";
 
 export default class ChooseCasualtiesGameState extends GameState<PostCombatGameState, SelectUnitsGameState<ChooseCasualtiesGameState>> {
 
@@ -34,8 +35,22 @@ export default class ChooseCasualtiesGameState extends GameState<PostCombatGameS
         return this.ingame.game;
     }
 
-    firstStart(house: House, possibleCasualties: Unit[], casualties: number): void {
-        this.setChildGameState(new SelectUnitsGameState(this)).firstStart(house, possibleCasualties, casualties);
+    firstStart(house: House, possibleCasualties: Unit[], casualtiesCount: number): void {
+        if (possibleCasualties.length == 0) {
+            throw new Error("ChooseCasualtiesGameState called with possibleCasualties.length == 0!")
+        }
+
+        if (casualtiesCount > possibleCasualties.length) {
+            throw new Error("User has to select more casualties than possible and therefore ChooseCasualtiesGameState will never end!");
+        }
+
+        if (possibleCasualties.every(u => u.type == possibleCasualties[0].type)) {
+            // In case all units have the same type process casualties automatically
+            this.onSelectUnitsEnd(house, groupBy(possibleCasualties.slice(0, casualtiesCount), u => u.region).entries);
+        } else {
+            // Otherwise let the user decide which units to sacrifice
+            this.setChildGameState(new SelectUnitsGameState(this)).firstStart(house, possibleCasualties, casualtiesCount);
+        }
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedChooseCasualtiesGameState {

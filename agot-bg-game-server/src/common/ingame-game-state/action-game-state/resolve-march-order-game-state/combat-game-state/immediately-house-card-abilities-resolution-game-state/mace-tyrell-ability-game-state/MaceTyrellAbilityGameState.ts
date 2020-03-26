@@ -12,6 +12,7 @@ import Region from "../../../../../game-data-structure/Region";
 import Unit from "../../../../../game-data-structure/Unit";
 import {footman} from "../../../../../game-data-structure/unitTypes";
 import IngameGameState from "../../../../../IngameGameState";
+import groupBy from "../../../../../../../utils/groupBy";
 
 export default class MaceTyrellAbilityGameState extends GameState<
     ImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"],
@@ -48,11 +49,18 @@ export default class MaceTyrellAbilityGameState extends GameState<
 
             this.parentGameState.onHouseCardResolutionFinish(house);
         } else {
-            this.setChildGameState(new SelectUnitsGameState(this)).firstStart(
-                house,
-                availableFootmen,
-                1
-            );
+            if (availableFootmen.every(fm => !fm.wounded) || availableFootmen.every(fm => fm.wounded)) {
+                // Automatically kill one of the footmen if all are wounded or all are not wounded
+                const selectedFootman = Array.of(availableFootmen[0]);
+                this.onSelectUnitsEnd(house, groupBy(selectedFootman, u => u.region).entries);
+            } else {
+                // In case there are non-wounded and wounded footmen let the user decide which one to kill
+                this.setChildGameState(new SelectUnitsGameState(this)).firstStart(
+                    house,
+                    availableFootmen,
+                    1
+                );
+            }
         }
     }
 
@@ -67,7 +75,6 @@ export default class MaceTyrellAbilityGameState extends GameState<
 
             units.forEach(unit => {
                 region.units.delete(unit.id);
-
             });
 
             this.entireGame.broadcastToClients({
