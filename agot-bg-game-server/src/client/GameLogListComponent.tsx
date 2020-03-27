@@ -83,7 +83,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <>
                         <b>{attacker.name}</b> attacked <b>{attacked ? attacked.name : "a neutral force"}</b> from <b>{attackingRegion.name}</b> to <b>
-                        {attackedRegion.name}</b> with {joinReactNodes(army.map(ut => ut.name), ', ')}.
+                        {attackedRegion.name}</b> with <>{joinReactNodes(army.map((ut, i) => <strong key={i}>{ut.name}</strong>), ', ')}</>.
                     </>
                 );
 
