@@ -13,6 +13,7 @@ import BetterMap from "../../../../../utils/BetterMap";
 import UnitType from "../../../game-data-structure/UnitType";
 import Unit from "../../../game-data-structure/Unit";
 import ResolveMarchOrderGameState from "../ResolveMarchOrderGameState";
+import { destroyAllShipsInPort } from "../../../port-helper/PortHelper";
 
 export default class TakeControlOfEnemyPortGameState extends GameState<ResolveMarchOrderGameState, SimpleChoiceGameState> {
     port: Region;
@@ -70,7 +71,7 @@ export default class TakeControlOfEnemyPortGameState extends GameState<ResolveMa
     onSimpleChoiceGameStateEnd(choice: number): void {
         // Remove ships from old controller
         const oldController = this.port.units.values[0].allegiance;
-        this.parentGameState.destroyAllShipsInPort(this.port);
+        destroyAllShipsInPort(this.port, this.entireGame, this.parentGameState.actionGameState);
 
         if(choice > 0) {
             // Add ships for new controller
