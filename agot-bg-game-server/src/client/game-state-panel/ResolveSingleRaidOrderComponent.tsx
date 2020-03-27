@@ -67,6 +67,8 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
         if (this.selectedOrderRegion) {
             this.props.gameState.resolveRaid(this.selectedOrderRegion, this.selectedTargetRegion);
         }
+
+        this.reset();
     }
 
     reset(): void {
