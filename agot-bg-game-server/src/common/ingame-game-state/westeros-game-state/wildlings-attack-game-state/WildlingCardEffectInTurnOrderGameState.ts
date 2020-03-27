@@ -2,6 +2,7 @@ import GameState from "../../../GameState";
 import WildlingsAttackGameState from "./WildlingsAttackGameState";
 import Game from "../../game-data-structure/Game";
 import House from "../../game-data-structure/House";
+import { findOrphanedShipsAndDestroyThem } from "../../port-helper/PortHelper";
 
 /**
  * A lot of Wildling Cards have the same logic where the lowest bidder
@@ -29,6 +30,10 @@ export default abstract class WildlingCardEffectInTurnOrderGameState<C extends G
     }
 
     proceedNextHouse(previousHouse: House | null): void {
+        // Some wildlings effects may cause units to be killed.
+        // Therefore an orphaned ship may be present here. Try to find it and destroy it in that case
+        findOrphanedShipsAndDestroyThem(this.game.world, this.parentGameState.ingame, null);
+
         if (previousHouse == null) {
             this.executeForLowestBidder(this.parentGameState.lowestBidder);
             return;
