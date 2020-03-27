@@ -43,6 +43,15 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
 
     firstStart(house: House): void {
         this.house = house;
+
+        // Check if all raid orders can not be trivially resolved
+        const regionsWithRaidOrders = this.getRegionWithRaidOrders();
+        if (regionsWithRaidOrders.every(r => this.getRaidableRegions(r, this.actionGameState.ordersOnBoard.get(r).type as RaidOrderType).length == 0)) {
+            // If yes, fast-track the game by resolving one
+            const regionToResolve = regionsWithRaidOrders[0];
+
+            this.resolveRaidOrder(regionToResolve, null);
+        }
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -62,73 +71,77 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
                 return;
             }
 
-            const orderType = this.actionGameState.ordersOnBoard.get(orderRegion).type as RaidOrderType;
+            this.resolveRaidOrder(orderRegion, targetRegion);
+        }
+    }
 
-            if (targetRegion) {
-                const orderTarget = this.actionGameState.ordersOnBoard.get(targetRegion);
+    resolveRaidOrder(orderRegion: Region, targetRegion: Region | null): void {
+        const orderType = this.actionGameState.ordersOnBoard.get(orderRegion).type as RaidOrderType;
 
-                if (!this.getRaidableRegions(orderRegion, orderType).includes(targetRegion)) {
-                    return;
-                }
+        if (targetRegion) {
+            const orderTarget = this.actionGameState.ordersOnBoard.get(targetRegion);
 
-                // If the raided order is a consolidate power, transfer some power tokens
-                const raidedHouse = targetRegion.getController();
-                if (raidedHouse == null) {
-                    // This should normally never happens as a region that has an order always have a controller
-                    throw new Error();
-                }
+            if (!this.getRaidableRegions(orderRegion, orderType).includes(targetRegion)) {
+                return;
+            }
 
-                if (orderTarget.type instanceof ConsolidatePowerOrderType) {
-                    this.house.changePowerTokens(1);
-                    raidedHouse.changePowerTokens(-1);
+            // If the raided order is a consolidate power, transfer some power tokens
+            const raidedHouse = targetRegion.getController();
+            if (raidedHouse == null) {
+                // This should normally never happens as a region that has an order always have a controller
+                throw new Error();
+            }
 
-                    this.entireGame.broadcastToClients({
-                        type: "change-power-token",
-                        houseId: this.house.id,
-                        powerTokenCount: this.house.powerTokens
-                    });
-                    this.entireGame.broadcastToClients({
-                        type: "change-power-token",
-                        houseId: raidedHouse.id,
-                        powerTokenCount: raidedHouse.powerTokens
-                    });
-                }
+            if (orderTarget.type instanceof ConsolidatePowerOrderType) {
+                this.house.changePowerTokens(1);
+                raidedHouse.changePowerTokens(-1);
 
-                this.actionGameState.ordersOnBoard.delete(targetRegion);
                 this.entireGame.broadcastToClients({
-                    type: "action-phase-change-order",
-                    region: targetRegion.id,
-                    order: null
+                    type: "change-power-token",
+                    houseId: this.house.id,
+                    powerTokenCount: this.house.powerTokens
                 });
-
-                this.ingameGameState.log({
-                    type: "raid-done",
-                    raider: player.house.id,
-                    raidee: raidedHouse.id,
-                    raiderRegion: orderRegion.id,
-                    raidedRegion: targetRegion.id,
-                    orderRaided: orderTarget.id
-                });
-            } else {
-                this.ingameGameState.log({
-                    type: "raid-done",
-                    raider: player.house.id,
-                    raiderRegion: orderRegion.id,
-                    raidedRegion: null,
-                    raidee: null,
-                    orderRaided: null
+                this.entireGame.broadcastToClients({
+                    type: "change-power-token",
+                    houseId: raidedHouse.id,
+                    powerTokenCount: raidedHouse.powerTokens
                 });
             }
 
-            this.actionGameState.ordersOnBoard.delete(orderRegion);
+            this.actionGameState.ordersOnBoard.delete(targetRegion);
             this.entireGame.broadcastToClients({
                 type: "action-phase-change-order",
-                region: orderRegion.id,
+                region: targetRegion.id,
                 order: null
             });
 
-            this.resolveRaidOrderGameState.onResolveSingleRaidOrderGameStateEnd(this.house);
+            this.ingameGameState.log({
+                type: "raid-done",
+                raider: this.house.id,
+                raidee: raidedHouse.id,
+                raiderRegion: orderRegion.id,
+                raidedRegion: targetRegion.id,
+                orderRaided: orderTarget.id
+            });
+        } else {
+            this.ingameGameState.log({
+                type: "raid-done",
+                raider: this.house.id,
+                raiderRegion: orderRegion.id,
+                raidedRegion: null,
+                raidee: null,
+                orderRaided: null
+            });
         }
+
+        this.actionGameState.ordersOnBoard.delete(orderRegion);
+        this.entireGame.broadcastToClients({
+            type: "action-phase-change-order",
+            region: orderRegion.id,
+            order: null
+        });
+
+        this.resolveRaidOrderGameState.onResolveSingleRaidOrderGameStateEnd(this.house);
     }
 
     getWaitedUsers(): User[] {
