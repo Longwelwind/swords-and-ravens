@@ -84,21 +84,24 @@ export default class ResolveRetreatGameState extends GameState<
     }
 
     private destroyAllUnits(region: Region, affectedHouse: House): void {
-        const unitIdsToKill = region.units.values.map(u => u.id);
-        const unitTypesToKill = region.units.values.map(u => u.type.name);
-        unitIdsToKill.forEach(uid => region.units.delete(uid));
+        const unitsToKill = region.units.values;
+        unitsToKill.forEach(u => region.units.delete(u.id));
+
+        // Remove the units off the army
+        const houseCombatData = this.combat.houseCombatDatas.get(affectedHouse);
+        houseCombatData.army = _.difference(houseCombatData.army, unitsToKill);
 
         this.entireGame.broadcastToClients({
             type: "combat-change-army",
             region: region.id,
             house: affectedHouse.id,
-            army: []
+            army: houseCombatData.army.map(u => u.id)
         });
 
         this.entireGame.broadcastToClients({
             type: "remove-units",
             regionId: region.id,
-            unitIds: unitIdsToKill
+            unitIds: unitsToKill.map(u => u.id)
         });
 
         this.ingame.log({
@@ -111,7 +114,7 @@ export default class ResolveRetreatGameState extends GameState<
         this.ingame.log({
             type: "retreat-casualties-suffered",
             house: affectedHouse.name,
-            units: unitTypesToKill
+            units: region.units.values.map(u => u.type.name)
         });
     }
 
