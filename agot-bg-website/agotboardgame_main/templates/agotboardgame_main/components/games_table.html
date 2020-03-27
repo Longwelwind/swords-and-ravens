@@ -12,8 +12,25 @@
         </tr>
     </thead>
     <tbody>
-        {% for game in games %}
-            <tr>
+        {% for game in games %} 
+            <tr
+                {% if game.state == "ONGOING" %}
+                data-toggle="popover"
+                data-html="true"
+                data-title="<div class='popover-title'>{{ game.name }}</div>"
+                data-boundary="window"
+                data-content="
+                    <p>
+                        Turn: <b>{{ game.view_of_game.turn }}</b>
+                    </p>
+                    <div class='text-small text-muted'>
+                        Last active on {{ game.updated_at|date:'d F Y \a\t H:i' }}
+                    </div>
+                "
+                data-placement="right"
+                data-trigger="hover"
+                {% endif %}
+            >
                 <td class="align-middle text-center">
                     {% if game.state == "IN_LOBBY" %}
                         <span class="badge badge-pill badge-success">Open</span>
