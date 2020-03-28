@@ -123,11 +123,16 @@ export default class GlobalServer {
             this.clientToUser.set(client, user);
             user.connectedClients.push(client);
 
-            client.send(JSON.stringify({
-                type: "authenticate-response",
-                userId: user.id,
-                game: entireGame.serializeToClient(user)
-            }));
+            // The client might have disconnected between the execution of this thread,
+            // and the sending of the response, thus why the state of the socket needs to
+            // be checked here.
+            if (client.readyState == WebSocket.OPEN) {
+                client.send(JSON.stringify({
+                    type: "authenticate-response",
+                    userId: user.id,
+                    game: entireGame.serializeToClient(user)
+                }));
+            }
         } else if (message.type == "ping") {
             // The client may send ping to keep the connection alive.
             // Do nothing.
