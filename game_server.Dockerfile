@@ -3,7 +3,8 @@ FROM node:10.16
 WORKDIR /app
 
 COPY ./agot-bg-game-server/package.json .
-RUN yarn install
+COPY ./agot-bg-game-server/yarn.lock .
+RUN yarn install --frozen-lockfile
 
 COPY ./agot-bg-game-server/ .
 
