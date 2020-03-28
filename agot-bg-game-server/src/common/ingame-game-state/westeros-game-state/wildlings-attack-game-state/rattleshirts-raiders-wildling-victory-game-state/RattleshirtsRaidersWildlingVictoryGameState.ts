@@ -25,7 +25,7 @@ export default class RattleshirtsRaidersWildlingVictoryGameState extends GameSta
     }
 
     firstStart(): void {
-        [this.wildlingsAttack.lowestBidder].concat(_.without(this.wildlingsAttack.game.houses.values, this.wildlingsAttack.lowestBidder)).forEach((house, i) => {
+        [this.wildlingsAttack.lowestBidder].concat(_.without(this.wildlingsAttack.participatingHouses, this.wildlingsAttack.lowestBidder)).forEach((house, i) => {
             const delta = i == 0 ? 2 : 1;
 
             this.wildlingsAttack.game.changeSupply(house, -delta);

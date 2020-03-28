@@ -114,7 +114,7 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
         this.wildlingCard = this.game.wildlingDeck.shift() as WildlingCard;
         this.game.wildlingDeck.push(this.wildlingCard);
 
-        this.setChildGameState(new BiddingGameState(this)).firstStart(this.game.houses.values);
+        this.setChildGameState(new BiddingGameState(this)).firstStart(this.participatingHouses);
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
