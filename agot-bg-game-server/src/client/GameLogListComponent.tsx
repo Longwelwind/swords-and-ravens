@@ -861,8 +861,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const newSupply = data.newSupply.map(([hid, supply]) => [this.game.houses.get(hid), supply] as [House, number]);
 
                 return <>
-                    <strong>Rattleshirt&apos;s Raiders</strong>: <strong>{lowestBidder.name}</strong> lost 3 levels of supply,
-                    all other houses lost 2 levels of supply.
+                    <strong>Rattleshirt&apos;s Raiders</strong>: <strong>{lowestBidder.name}</strong> lost 2 levels of supply,
+                    all other houses lost 1 levels of supply.
                     <ul>
                         {newSupply.map(([house, supply]) => (
                             <li key={house.id}><strong>{house.name}</strong> is now at <strong>{supply}</strong>.</li>
