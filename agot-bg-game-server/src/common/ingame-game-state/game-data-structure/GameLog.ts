@@ -28,7 +28,7 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | SkinchangerScoutNightsWatchVictory | SkinchangerScoutWildlingVictory
     | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory
     | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered
-    | SupplyAdjusted | PlayerReplaced;
+    | SupplyAdjusted | PlayerReplaced | VassalsClaimed;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -560,4 +560,10 @@ interface PlayerReplaced {
     oldUser: string;
     newUser: string;
     house: string;
+}
+
+interface VassalsClaimed {
+    type: "vassals-claimed";
+    house: string;
+    vassals: string[];
 }

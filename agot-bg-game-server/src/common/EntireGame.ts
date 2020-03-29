@@ -20,7 +20,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     ownerUserId: string;
     name: string;
 
-    @observable gameSettings: GameSettings = {pbem: false, setupId: "base-game", playerCount: 6, randomHouses: false};
+    @observable gameSettings: GameSettings = {pbem: false, setupId: "base-game", playerCount: 6, randomHouses: false, vassals: false};
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -42,8 +42,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         this.setChildGameState(new LobbyGameState(this)).firstStart();
     }
 
-    proceedToIngameGameState(futurePlayers: BetterMap<string, User>): void {
-        this.setChildGameState(new IngameGameState(this)).beginGame(futurePlayers);
+    proceedToIngameGameState(housesToCreate: string[], futurePlayers: BetterMap<string, User>): void {
+        this.setChildGameState(new IngameGameState(this)).beginGame(housesToCreate, futurePlayers);
 
         this.checkGameStateChanged();
     }
@@ -359,4 +359,5 @@ export interface GameSettings {
     setupId: string;
     playerCount: number;
     randomHouses: boolean;
+    vassals: boolean;
 }

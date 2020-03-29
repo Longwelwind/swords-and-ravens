@@ -71,7 +71,10 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 }
             }
 
-            this.entireGame.proceedToIngameGameState(new BetterMap(this.players.map((h, u) => ([h.id, u]))));
+            this.entireGame.proceedToIngameGameState(
+                this.getAvailableHouses().map(h => h.id),
+                new BetterMap(this.players.map((h, u) => ([h.id, u])))
+            );
         } else if (message.type == "kick-player") {
             const kickedUser = this.entireGame.users.get(message.user);
 
@@ -120,8 +123,11 @@ export default class LobbyGameState extends GameState<EntireGame> {
             return {success: false, reason: "not-owner"};
         }
 
-        if (this.players.size < this.entireGame.getSelectedGameSetup().playerCount) {
-            return {success: false, reason: "not-enough-players"};
+        // If Vassals are toggled, not all houses need to be taken
+        if (!this.entireGame.gameSettings.vassals) {
+            if (this.players.size < this.entireGame.getSelectedGameSetup().playerCount) {
+                return {success: false, reason: "not-enough-players"};
+            }
         }
 
         return {success: true, reason: "ok"};

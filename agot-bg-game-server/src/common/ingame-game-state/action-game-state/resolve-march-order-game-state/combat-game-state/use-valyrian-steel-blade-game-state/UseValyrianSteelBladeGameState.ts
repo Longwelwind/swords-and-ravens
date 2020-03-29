@@ -34,7 +34,7 @@ export default class UseValyrianSteelBladeGameState extends GameState<CombatGame
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "use-valyrian-steel-blade") {
-            if (player.house != this.house) {
+            if (this.ingame.getControllerOfHouse(this.house) != player) {
                 return;
             }
 

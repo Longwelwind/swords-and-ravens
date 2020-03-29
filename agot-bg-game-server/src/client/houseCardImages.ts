@@ -41,6 +41,13 @@ import theonImage from "../../public/images/house-cards/Theon.png";
 import tyrionImage from "../../public/images/house-cards/Tyrion.png";
 import tywinImage from "../../public/images/house-cards/Tywin.png";
 import victorianImage from "../../public/images/house-cards/Victorian.png";
+import varysImage from "../../public/images/house-cards/Varys.png";
+import syrioImage from "../../public/images/house-cards/SyrioForel.png";
+import jaqenImage from "../../public/images/house-cards/JaqenHGar.png";
+import janosImage from "../../public/images/house-cards/JanosSlynt.png";
+import jonConningtonImage from "../../public/images/house-cards/JonConnington.png";
+import bericImage from "../../public/images/house-cards/BericDondarrion.png";
+import bronnImage from "../../public/images/house-cards/Bronn.png";
 
 
 const houseCardImages = new BetterMap([
@@ -86,7 +93,14 @@ const houseCardImages = new BetterMap([
     ["theon-greyjoy", theonImage],
     ["tyrion-lannister", tyrionImage],
     ["tywin-lannister", tywinImage],
-    ["victarion-greyjoy", victorianImage]
+    ["victarion-greyjoy", victorianImage],
+    ["varys", varysImage],
+    ["syrio-forel", syrioImage],
+    ["jaqen-h-ghar", jaqenImage],
+    ["janos-slynt", janosImage],
+    ["jon-connington", jonConningtonImage],
+    ["beric-dondarrion", bericImage],
+    ["bronn", bronnImage],
 ]);
 
 export default houseCardImages;

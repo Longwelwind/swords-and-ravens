@@ -151,11 +151,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "combat-result":
                 const houseCombatDatas = data.stats.map(stat => {
                     const house = this.game.houses.get(stat.house);
+                    const houseCard = stat.houseCard != null ? this.props.ingameGameState.getAssociatedHouseCards(house).get(stat.houseCard) : null;
+
                     return {
                         ...stat,
                         house,
                         region: this.world.regions.get(stat.region),
-                        houseCard: stat.houseCard != null ? house.houseCards.get(stat.houseCard) : null,
+                        houseCard: houseCard,
                         armyUnits: stat.armyUnits.map(ut => unitTypes.get(ut))
                     };
                 });
@@ -430,7 +432,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "combat-house-card-chosen":
                 const houseCards = data.houseCards.map(([hid, hcid]) => {
                     const house = this.game.houses.get(hid);
-                    return [house, house.houseCards.get(hcid)];
+                    const houseCard = this.props.ingameGameState.getAssociatedHouseCards(house).get(hcid);
+                    return [house, houseCard];
                 });
 
                 return <>
@@ -972,6 +975,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                             </tr>))}
                     </table>
                 </>);
+                
             case "player-replaced":
                 const oldUser = this.props.ingameGameState.entireGame.users.get(data.oldUser);
                 const newUser = this.props.ingameGameState.entireGame.users.get(data.newUser);
@@ -982,6 +986,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         <b>{oldUser.name}</b> (<b>{house.name}</b>) was replaced by <b>{newUser.name}</b>.
                     </>
                 );
+
+            case "vassals-claimed":
+                const vassals = data.vassals.map(hid => this.game.houses.get(hid));
+                house = this.game.houses.get(data.house);
+
+                return <>
+                    <b>{house.name}</b> claimed {joinReactNodes(vassals.map(v => <b key={v.id}>{v.name}</b>), ", ")} as
+                    vassal{vassals.length > 0 && "s"}.
+                </>;
         }
     }
 }

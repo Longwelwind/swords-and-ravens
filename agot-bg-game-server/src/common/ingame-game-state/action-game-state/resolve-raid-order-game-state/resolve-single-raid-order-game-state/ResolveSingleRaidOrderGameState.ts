@@ -56,7 +56,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "resolve-raid") {
-            if (player.house != this.house) {
+            if (this.ingameGameState.getControllerOfHouse(this.house) != player) {
                 return;
             }
 

@@ -24,6 +24,7 @@ import PartialRecursive from "../utils/PartialRecursive";
 import joinReactNodes from "./utils/joinReactNodes";
 import StaticBorder from "../common/ingame-game-state/game-data-structure/static-data-structure/StaticBorder";
 import { land } from "../common/ingame-game-state/game-data-structure/regionTypes";
+import PlaceOrdersGameState from "../common/ingame-game-state/planning-game-state/place-orders-game-state/PlaceOrdersGameState";
 
 interface MapComponentProps {
     gameClient: GameClient;
@@ -201,8 +202,8 @@ export default class MapComponent extends Component<MapComponentProps> {
 
         return propertiesForOrders.map((region, properties) => {
 
-            if (this.props.ingameGameState.childGameState instanceof PlanningGameState) {
-                const planningGameState = this.props.ingameGameState.childGameState;
+            if (this.props.ingameGameState.childGameState instanceof PlanningGameState && this.props.ingameGameState.childGameState.childGameState instanceof PlaceOrdersGameState) {
+                const planningGameState = this.props.ingameGameState.childGameState.childGameState;
                 const orderPresent = planningGameState.placedOrders.has(region);
                 const order = orderPresent ? planningGameState.placedOrders.get(region) : null;
 

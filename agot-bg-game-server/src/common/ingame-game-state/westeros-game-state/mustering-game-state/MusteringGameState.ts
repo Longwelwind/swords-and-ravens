@@ -43,7 +43,7 @@ export default class MusteringGameState extends GameState<WesterosGameState, Pla
             return;
         }
 
-        const nextHouse = this.game.getNextInTurnOrder(house);
+        const nextHouse = this.ingame.getNextInTurnOrder(house);
 
         // Check if this can muster something
         if (!this.canMuster(nextHouse)) {

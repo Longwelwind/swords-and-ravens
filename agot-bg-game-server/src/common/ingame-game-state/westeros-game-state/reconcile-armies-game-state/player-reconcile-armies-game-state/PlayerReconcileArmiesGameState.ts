@@ -33,7 +33,7 @@ export default class PlayerReconcileArmiesGameState extends GameState<ReconcileA
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "reconcile-armies") {
-            if (this.house != player.house) {
+            if (this.parentGameState.ingame.getControllerOfHouse(this.house) != player) {
                 return;
             }
 

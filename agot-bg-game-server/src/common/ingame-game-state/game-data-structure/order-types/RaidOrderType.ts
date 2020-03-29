@@ -6,10 +6,6 @@ import Order from "../Order";
 import SupportOrderType from "./SupportOrderType";
 
 export default class RaidOrderType extends OrderType {
-    toString(): string {
-        return "R";
-    }
-
     getRaidableOrderTypes(): any[] {
         return _.concat(
             [RaidOrderType, ConsolidatePowerOrderType, SupportOrderType],

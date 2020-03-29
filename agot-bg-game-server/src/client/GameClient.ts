@@ -87,7 +87,18 @@ export default class GameClient {
         }
     }
 
+    /**
+     * Returns whether the given house is controlled by the authenticated player,
+     * either because it is the directy controled house, or because it's one of its vassals.
+     * @param house 
+     */
     doesControlHouse(house: House | null): boolean {
+        if (this.entireGame == null || !(this.entireGame.childGameState instanceof IngameGameState)) {
+            throw new Error();
+        }
+        
+        const ingame = this.entireGame.childGameState;
+
         if (house == null) {
             return false;
         }
@@ -95,7 +106,7 @@ export default class GameClient {
         const player = this.authenticatedPlayer;
 
         if (player) {
-            return player.house == house;
+            return ingame.getControllerOfHouse(house) == player;
         } else {
             return false;
         }

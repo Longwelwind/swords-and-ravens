@@ -25,6 +25,7 @@ import Vote, { SerializedVote, VoteState } from "./vote-system/Vote";
 import VoteType, { CancelGame, ReplacePlayer } from "./vote-system/VoteType";
 import { v4 } from "uuid";
 import CancelledGameState, { SerializedCancelledGameState } from "../cancelled-game-state/CancelledGameState";
+import HouseCard from "./game-data-structure/house-card/HouseCard";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -53,8 +54,8 @@ export default class IngameGameState extends GameState<
         super(entireGame);
     }
 
-    beginGame(futurePlayers: BetterMap<string, User>): void {
-        this.game = createGame(this.entireGame, futurePlayers.keys);
+    beginGame(housesToCreate: string[], futurePlayers: BetterMap<string, User>): void {
+        this.game = createGame(this, housesToCreate);
         this.players = new BetterMap(futurePlayers.map((house, user) => [user, new Player(user, this.game.houses.get(house))]));
 
         this.beginNewTurn();
@@ -182,13 +183,51 @@ export default class IngameGameState extends GameState<
     }
 
     getControllerOfHouse(house: House): Player {
-        const player = this.players.values.find(p => p.house == house);
+        if (this.isVassalHouse(house)) {
+            const suzerainHouse = this.game.vassalRelations.get(house);
 
-        if (player == null) {
-            throw new Error(`Couldn't find a player controlling house "${house.id}"`);
+            if (suzerainHouse == null) {
+                throw new Error();
+            }
+
+            return this.getControllerOfHouse(suzerainHouse);
+        } else {
+            const player = this.players.values.find(p => p.house == house);
+
+            if (player == null) {
+                throw new Error();
+            }
+
+            return player;
+        }
+    }
+
+    getNextInTurnOrder(house: House | null, except: House | null = null): House {
+        const turnOrder = this.game.getTurnOrder();
+
+        if (house == null) {
+            return turnOrder[0];
         }
 
-        return player;
+        const i = turnOrder.indexOf(house);
+
+        const nextHouse = turnOrder[(i + 1) % turnOrder.length];
+
+        if (nextHouse == except) {
+            return this.getNextInTurnOrder(nextHouse);
+        }
+
+        return nextHouse;
+    }
+
+    getNextNonVassalInTurnOrder(house: House | null): House {
+        house = this.getNextInTurnOrder(house);
+
+        if (!this.isVassalHouse(house)) {
+            return house;
+        } else {
+            return this.getNextNonVassalInTurnOrder(house);
+        }
     }
 
     changePowerTokens(house: House, delta: number): number {
@@ -309,6 +348,7 @@ export default class IngameGameState extends GameState<
             this.game.turn++;
             this.game.valyrianSteelBladeUsed = false;
             this.world.regions.forEach(r => r.units.forEach(u => u.wounded = false));
+            this.game.vassalRelations = new BetterMap();
         } else if (message.type == "add-game-log") {
             this.gameLogManager.logs.push({data: message.data, time: new Date(message.time * 1000)});
         } else if (message.type == "change-tracker") {
@@ -406,11 +446,51 @@ export default class IngameGameState extends GameState<
         return {result: true, reason: ""};
     }
 
+    getAssociatedHouseCards(house: House): BetterMap<string, HouseCard> {
+        if (!this.isVassalHouse(house)) {
+            return house.houseCards;
+        } else {
+            return this.game.vassalHouseCards;
+        }
+    }
+
     launchReplacePlayerVote(player: Player): void {
         this.entireGame.sendMessageToServer({
             type: "launch-replace-player-vote",
             player: player.user.id
         });
+    }
+    
+    getVassalHouses(): House[] {
+        return this.game.houses.values.filter(h => this.isVassalHouse(h));
+    }
+    
+    getNonVassalHouses(): House[] {
+        return this.game.houses.values.filter(h => !this.isVassalHouse(h));
+    }
+
+    isVassalControlledByPlayer(vassal: House, player: Player): boolean {
+        if (!this.isVassalHouse(vassal)) {
+            throw new Error();
+        }
+
+        return this.game.vassalRelations.tryGet(vassal, null) == player.house;
+    }
+
+    getVassalsControlledByPlayer(player: Player): House[] {
+        return this.getVassalHouses().filter(h => this.isVassalControlledByPlayer(h, player));
+    }
+
+    getNonClaimedVassalHouses(): House[] {
+        return this.getVassalHouses().filter(v => !this.game.vassalRelations.has(v));
+    }
+
+    isVassalHouse(house: House): boolean {
+        return !this.players.values.map(p => p.house).includes(house);
+    }
+
+    getTurnOrderWithoutVassals(): House[] {
+        return this.game.getTurnOrder().filter(h => !this.isVassalHouse(h));
     }
 
     updateNote(note: string): void {
@@ -444,7 +524,7 @@ export default class IngameGameState extends GameState<
     static deserializeFromServer(entireGame: EntireGame, data: SerializedIngameGameState): IngameGameState {
         const ingameGameState = new IngameGameState(entireGame);
 
-        ingameGameState.game = Game.deserializeFromServer(data.game);
+        ingameGameState.game = Game.deserializeFromServer(ingameGameState, data.game);
         ingameGameState.players = new BetterMap(
             data.players.map(p => [entireGame.users.get(p.userId), Player.deserializeFromServer(ingameGameState, p)])
         );

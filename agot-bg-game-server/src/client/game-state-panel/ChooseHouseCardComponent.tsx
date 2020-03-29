@@ -95,6 +95,8 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
             return [];
         }
 
-        return this.props.gameState.getChoosableCards(this.props.gameClient.authenticatedPlayer.house).sort((a, b) => a.combatStrength - b.combatStrength);
+        const commandedHouse = this.props.gameState.combatGameState.getCommandedHouseInCombat(this.props.gameClient.authenticatedPlayer.house);
+
+        return this.props.gameState.getChoosableCards(commandedHouse).sort((a, b) => a.combatStrength - b.combatStrength);
     }
 }

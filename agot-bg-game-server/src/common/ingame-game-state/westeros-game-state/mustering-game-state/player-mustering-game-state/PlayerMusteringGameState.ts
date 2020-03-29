@@ -87,7 +87,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "muster") {
-            if (player.house != this.house) {
+            if (this.parentGameState.ingame.getControllerOfHouse(this.house) != player) {
                 return;
             }
 

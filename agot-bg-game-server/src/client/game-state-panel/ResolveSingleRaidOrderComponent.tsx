@@ -28,7 +28,7 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
                 <Col xs={12} className="text-center">
                     House <b>{this.props.gameState.house.name}</b> must resolve one of its Raid Orders.
                 </Col>
-                {this.props.gameClient.authenticatedPlayer && this.props.gameState.house == this.props.gameClient.authenticatedPlayer.house ? (
+                {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
                     this.selectedOrderRegion == null ? (
                         <Col xs={12} className="text-center">
                             Select a Raid Order token to resolve it.

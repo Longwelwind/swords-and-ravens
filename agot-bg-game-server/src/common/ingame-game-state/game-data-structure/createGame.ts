@@ -12,8 +12,8 @@ import wildlingCardTypes from "./wildling-card/wildlingCardTypes";
 import BetterMap from "../../../utils/BetterMap";
 import * as _ from "lodash";
 import houseCardAbilities from "./house-card/houseCardAbilities";
-import EntireGame from "../../EntireGame";
 import staticWorld from "./static-data-structure/globalStaticWorld";
+import IngameGameState from "../IngameGameState";
 
 const MAX_POWER_TOKENS = 20;
 
@@ -38,10 +38,23 @@ export interface GameSetup {
     tracks?: { ironThrone?: string[]; fiefdoms?: string[]; kingsCourt?: string[] };
 }
 
-export default function createGame(entireGame: EntireGame, housesToCreate: string[]): Game {
-    const gameSetup = entireGame.getSelectedGameSetup();
+function createHouseCard(houseCardId: string, houseCardData: HouseCardData): HouseCard {
+    const houseCard = new HouseCard(
+        houseCardId,
+        houseCardData.name,
+        houseCardData.combatStrength ? houseCardData.combatStrength : 0,
+        houseCardData.swordIcons ? houseCardData.swordIcons : 0,
+        houseCardData.towerIcons ? houseCardData.towerIcons : 0,
+        houseCardData.ability ? houseCardAbilities.get(houseCardData.ability) : null
+    );
 
-    const game = new Game();
+    return houseCard;
+}
+
+export default function createGame(ingame: IngameGameState, housesToCreate: string[]): Game {
+    const gameSetup = ingame.entireGame.getSelectedGameSetup();
+
+    const game = new Game(ingame);
 
     game.houses = new BetterMap(Object.entries(baseGameData.houses)
         .filter(([hid, _]) => housesToCreate.includes(hid))
@@ -142,6 +155,11 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
 
         return _.shuffle(cards);
     });
+
+    // Load vassal house cards
+    game.vassalHouseCards = new BetterMap(Object.entries(baseGameData.vassalHouseCards).map(([houseCardId, houseCardData]) => {
+        return [houseCardId, createHouseCard(houseCardId, houseCardData)];
+    }));
 
     // Load Wildling deck
     let lastId = 0;

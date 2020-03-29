@@ -109,7 +109,9 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
 
     firstStart(wildlingStrength: number, participatingHouses: House[] = []): void {
         this.wildlingStrength = wildlingStrength;
-        this.participatingHouses = participatingHouses;
+
+        // Filter out Vassal houses, who never participates in wildling attacks
+        this.participatingHouses = participatingHouses.filter(h => !this.ingame.isVassalHouse(h));
 
         this.setChildGameState(new BiddingGameState(this)).firstStart(this.participatingHouses);
     }

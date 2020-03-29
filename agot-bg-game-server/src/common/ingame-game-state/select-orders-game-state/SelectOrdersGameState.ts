@@ -40,6 +40,10 @@ export default class SelectOrdersGameState<P extends ParentGameState> extends Ga
         if (message.type == "select-orders") {
             const regions = message.regions.map(rid => this.game.world.regions.get(rid));
 
+            if (this.parentGameState.ingame.getControllerOfHouse(this.house) != player) {
+                return;
+            }
+
             if (regions.length != this.count) {
                 return;
             }

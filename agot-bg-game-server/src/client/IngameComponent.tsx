@@ -23,7 +23,6 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faStar} from "@fortawesome/free-solid-svg-icons/faStar";
 import {faStickyNote} from "@fortawesome/free-solid-svg-icons/faStickyNote";
 import Tooltip from "react-bootstrap/Tooltip";
-import castleImage from "../../public/images/icons/castle.svg";
 import stoneThroneImage from "../../public/images/icons/stone-throne.svg";
 import cancelImage from "../../public/images/icons/cancel.svg";
 import ravenImage from "../../public/images/icons/raven.svg";
@@ -34,20 +33,14 @@ import chatBubble from "../../public/images/icons/chat-bubble.svg";
 import speaker from "../../public/images/icons/speaker.svg";
 import speakerOff from "../../public/images/icons/speaker-off.svg";
 import House from "../common/ingame-game-state/game-data-structure/House";
-import housePowerTokensImages from "./housePowerTokensImages";
 import marked from "marked";
 import GameLogListComponent from "./GameLogListComponent";
-import HouseCardComponent from "./game-state-panel/utils/HouseCardComponent";
 import Game from "../common/ingame-game-state/game-data-structure/Game";
-import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
-import unitImages from "./unitImages";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
 import GameEndedComponent from "./game-state-panel/GameEndedComponent";
 import Nav from "react-bootstrap/Nav";
 import Tab from "react-bootstrap/Tab";
 import ChatComponent from "./chat-client/ChatComponent";
-import {HouseCardState} from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
-import HouseCardBackComponent from "./game-state-panel/utils/HouseCardBackComponent";
 import InfluenceIconComponent from "./game-state-panel/utils/InfluenceIconComponent";
 import SupplyTrackComponent from "./game-state-panel/utils/SupplyTrackComponent";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -59,12 +52,12 @@ import {Channel, Message} from "./chat-client/ChatClient";
 // @ts-ignore
 import ScrollToBottom from "react-scroll-to-bottom";
 import GameSettingsComponent from "./GameSettingsComponent";
-import UserLabel from "./UserLabel";
 import VoteComponent from "./VoteComponent";
 import IngameCancelledComponent from "./game-state-panel/IngameCancelledComponent";
 import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
 import joinReactNodes from "./utils/joinReactNodes";
 import NoteComponent from "./NoteComponent";
+import HouseRowComponent from "./HouseRowComponent";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -218,94 +211,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         <Col>
                             <Card>
                                 <ListGroup variant="flush">
-                                    {this.props.gameState.sortedByLeadingPlayers.map(p => (
-                                        <ListGroupItem key={p.user.id}>
-                                            <Row className="align-items-center">
-                                                <Col xs="auto" className="pr-0">
-                                                    <FontAwesomeIcon
-                                                        className={classNames({"invisible": !this.props.gameClient.isAuthenticatedUser(p.user)})}
-                                                        style={{color: p.house.color}}
-                                                        icon={faStar}
-                                                    />
-                                                </Col>
-                                                <Col>
-                                                    <b style={{"color": p.house.color}}>{p.house.name}</b>
-                                                    {" "}
-                                                    <UserLabel
-                                                        user={p.user}
-                                                        gameState={this.props.gameState}
-                                                        gameClient={this.props.gameClient}
-                                                    />
-                                                </Col>
-                                                <Col xs="auto">
-                                                    <Row className="justify-content-center align-items-center" style={{width: 110}}>
-                                                        {unitTypes.values.map(type => (
-                                                            <Col xs={6} key={type.id}>
-                                                                <Row className="justify-content-center no-gutters align-items-center">
-                                                                    <Col xs="auto">
-                                                                        {this.game.getAvailableUnitsOfType(p.house, type)}
-                                                                    </Col>
-                                                                    <Col xs="auto" style={{marginLeft: 4}}>
-                                                                        <div className="unit-icon small hover-weak-outline"
-                                                                             style={{
-                                                                                 backgroundImage: `url(${unitImages.get(p.house.id).get(type.id)})`,
-                                                                             }}
-                                                                        />
-                                                                    </Col>
-                                                                </Row>
-                                                            </Col>
-                                                        ))}
-                                                    </Row>
-                                                </Col>
-                                                <OverlayTrigger
-                                                    overlay={this.renderTotalLandRegionsTooltip(p.house)}
-                                                    delay={{ show: 250, hide: 100 }}
-                                                    placement="auto"
-                                                >
-                                                    <Col xs="auto" className="d-flex align-items-center">
-                                                        <div style={{ fontSize: "18px" }}>{this.game.getTotalHeldStructures(p.house)}</div>
-                                                        <img
-                                                            src={castleImage} width={32} className="hover-weak-outline"
-                                                            style={{ marginLeft: "10px" }}
-                                                        />
-                                                    </Col>
-                                                </OverlayTrigger>
-                                                <Col xs="auto" className="d-flex align-items-center">
-                                                    <div style={{fontSize: "18px"}}>{p.house.powerTokens}</div>
-                                                    <OverlayTrigger
-                                                        overlay={this.renderPowerTooltip(p.house)}
-                                                        delay={{show: 750, hide: 100}}
-                                                        placement="auto"
-                                                    >
-                                                        <div
-                                                            className="house-power-token hover-weak-outline"
-                                                            style={{
-                                                                backgroundImage: `url(${housePowerTokensImages.get(p.house.id)})`,
-                                                                marginLeft: "10px"
-                                                            }}
-                                                        />
-                                                    </OverlayTrigger>
-                                                </Col>
-                                            </Row>
-                                            <Row className="justify-content-center">
-                                                {_.sortBy(p.house.houseCards.values, hc => hc.combatStrength).map(hc => (
-                                                    <Col xs="auto" key={hc.id}>
-                                                        {hc.state == HouseCardState.AVAILABLE ? (
-                                                            <HouseCardComponent
-                                                                houseCard={hc}
-                                                                size="tiny"
-                                                            />
-                                                        ) : (
-                                                            <HouseCardBackComponent
-                                                                house={p.house}
-                                                                houseCard={hc}
-                                                                size="tiny"
-                                                            />
-                                                        )}
-                                                    </Col>
-                                                ))}
-                                            </Row>
-                                        </ListGroupItem>
+                                    {this.game.houses.values.map(h => (
+                                        <HouseRowComponent
+                                            key={h.id}
+                                            gameClient={this.props.gameClient}
+                                            ingame={this.props.gameState}
+                                            house={h}
+                                        />
                                     ))}
                                     <ListGroupItem className="text-center font-italic">
                                         <small>
@@ -518,25 +430,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     get publicChatRoom(): Channel {
         return this.props.gameClient.chatClient.channels.get(this.props.gameState.entireGame.publicChatRoomId);
-    }
-
-    private renderTotalLandRegionsTooltip(house: House): ReactNode {
-        return <Tooltip id={house.id + "-total-land-regions"}>
-            <h5>Total Land Areas</h5><br/><h4 style={{textAlign: "center"}}><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
-        </Tooltip>;
-    }
-
-    private renderPowerTooltip(house: House): ReactNode {
-        const availablePower =  house.powerTokens;
-        const powerTokensOnBoard = this.game.countPowerTokensOnBoard(house);
-        const powerInPool = this.game.maxPowerTokens - availablePower - powerTokensOnBoard;
-
-        return <Tooltip id={house.id + "-power-tooltip"}>
-            <b>{house.name}</b><br/>
-            <small>Available: </small><b>{availablePower}</b><br/>
-            <small>On the board: </small><b>{powerTokensOnBoard}</b><br/>
-            <small>Power Pool: </small><b>{powerInPool}</b>
-        </Tooltip>;
     }
 
     private renderRemainingWesterosCards(): ReactNode {

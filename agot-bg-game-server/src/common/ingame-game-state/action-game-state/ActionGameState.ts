@@ -22,6 +22,7 @@ import SupportOrderType from "../game-data-structure/order-types/SupportOrderTyp
 import {port, sea, land} from "../game-data-structure/regionTypes";
 import PlanningRestriction from "../game-data-structure/westeros-card/planning-restriction/PlanningRestriction";
 import planningRestrictions from "../game-data-structure/westeros-card/planning-restriction/planningRestrictions";
+import RaidSupportOrderType from "../game-data-structure/order-types/RaidSupportOrderType";
 
 export default class ActionGameState extends GameState<IngameGameState, UseRavenGameState | ResolveRaidOrderGameState | ResolveMarchOrderGameState | ResolveConsolidatePowerGameState> {
     planningRestrictions: PlanningRestriction[];
@@ -101,7 +102,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
     getRegionsWithRaidOrderOfHouse(house: House): Region[] {
         return this.ordersOnBoard.entries
             .filter(([region, _order]) => region.getController() == house)
-            .filter(([_region, order]) => order.type instanceof RaidOrderType)
+            .filter(([_region, order]) => order.type instanceof RaidOrderType || order.type instanceof RaidSupportOrderType)
             .map(([region, _order]) => region);
     }
 
@@ -125,7 +126,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
     getPossibleSupportingRegions(attackedRegion: Region): {region: Region; support: SupportOrderType}[] {
         return this.game.world.getNeighbouringRegions(attackedRegion)
             .filter(r => this.ordersOnBoard.has(r))
-            .filter(r => this.ordersOnBoard.get(r).type instanceof SupportOrderType)
+            .filter(r => this.ordersOnBoard.get(r).type instanceof SupportOrderType || this.ordersOnBoard.get(r).type instanceof RaidSupportOrderType)
             // A port can't support the adjacent land region
             .filter(r => !(r.type == port && this.game.world.getAdjacentLandOfPort(r) == attackedRegion))
             // A sea battle can't be supported by land units

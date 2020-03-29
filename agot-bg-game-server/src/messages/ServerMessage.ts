@@ -10,7 +10,7 @@ import { SerializedVote } from "../common/ingame-game-state/vote-system/Vote";
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady | PlayerUnready
     | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | NewTurn | RemovePlacedOrder
-    | MoveUnits | CombatChangeArmy
+    | MoveUnits | CombatChangeArmy | VassalsClaimed
     | UnitsWounded | ChangeCombatHouseCard | BeginSeeTopWildlingCard
     | RavenOrderReplaced | RevealTopWildlingCard | HideTopWildlingCard | ProceedWesterosCard | ChangeGarrison
     | BidDone | GameStateChange | SupplyAdjusted
@@ -275,4 +275,10 @@ interface PlayerReplaced {
     type: "player-replaced";
     oldUser: string;
     newUser: string;
+}
+
+interface VassalsClaimed {
+    type: "vassals-claimed";
+    vassals: string[];
+    house: string;
 }

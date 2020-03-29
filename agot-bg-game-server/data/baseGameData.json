@@ -278,6 +278,36 @@
     [3, 2, 1, 0],
     [3, 3, 2, 1, 0, 0, 0, 3]
   ],
+  "vassalHouseCards": {
+    "bronn": {
+      "name": "Bronn",
+      "combatStrength": 4
+    },
+    "beric-dondarrion": {
+      "name": "Beric Dondarrion",
+      "combatStrength": 3
+    },
+    "jon-connington": {
+      "name": "Jon Connington",
+      "combatStrength": 2
+    },
+    "janos-slynt": {
+      "name": "Janos Slynt",
+      "combatStrength": 2
+    },
+    "jaqen-h-ghar": {
+      "name": "Jaqen H'Ghar",
+      "combatStrength": 1
+    },
+    "syrio-forel": {
+      "name": "Syrio Forel",
+      "combatStrength": 1
+    },
+    "varys": {
+      "name": "Varys",
+      "combatStrength": 0
+    }
+  },
   "supplyRestrictions": [
     [2, 2],
     [3, 2],

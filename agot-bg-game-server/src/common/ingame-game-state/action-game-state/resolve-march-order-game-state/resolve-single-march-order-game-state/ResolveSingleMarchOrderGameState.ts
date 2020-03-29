@@ -18,6 +18,7 @@ import User from "../../../../../server/User";
 import MarchOrderType from "../../../game-data-structure/order-types/MarchOrderType";
 import { port } from "../../../game-data-structure/regionTypes";
 import { destroyAllShipsInPort } from "../../../../ingame-game-state/port-helper/PortHelper";
+import IngameGameState from "../../../IngameGameState";
 
 export default class ResolveSingleMarchOrderGameState extends GameState<ResolveMarchOrderGameState> {
     @observable house: House;
@@ -28,6 +29,10 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
 
     get entireGame(): EntireGame {
         return this.resolveMarchOrderGameState.entireGame;
+    }
+
+    get ingame(): IngameGameState {
+        return this.actionGameState.parentGameState;
     }
 
     get actionGameState(): ActionGameState {
@@ -56,7 +61,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "resolve-march-order") {
-            if (player.house != this.house) {
+            if (this.ingame.getControllerOfHouse(this.house) != player) {
                 console.warn("Not correct house");
                 return;
             }

@@ -67,7 +67,7 @@ export default class ResolveRaidOrderGameState extends GameState<ActionGameState
     }
 
     getNextHouseToResolveRaidOrder(lastHouseToResolve: House | null): House | null {
-        let currentHouseToCheck = lastHouseToResolve ? this.game.getNextInTurnOrder(lastHouseToResolve) : this.game.getTurnOrder()[0];
+        let currentHouseToCheck = lastHouseToResolve ? this.ingameGameState.getNextInTurnOrder(lastHouseToResolve) : this.game.getTurnOrder()[0];
 
         // Check each house in order to find one that has an available March order.
         // Check at most once for each house
@@ -77,7 +77,7 @@ export default class ResolveRaidOrderGameState extends GameState<ActionGameState
                 return currentHouseToCheck;
             }
 
-            currentHouseToCheck = this.game.getNextInTurnOrder(currentHouseToCheck);
+            currentHouseToCheck = this.ingameGameState.getNextInTurnOrder(currentHouseToCheck);
         }
 
         // If no house has any raid order available, return null

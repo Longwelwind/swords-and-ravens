@@ -126,7 +126,7 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
     }
 
     getNextHouseToResolveOrder(lastHouseToResolve: House | null): House | null {
-        let currentHouseToCheck = lastHouseToResolve ? this.game.getNextInTurnOrder(lastHouseToResolve) : this.game.getTurnOrder()[0];
+        let currentHouseToCheck = lastHouseToResolve ? this.ingame.getNextInTurnOrder(lastHouseToResolve) : this.game.getTurnOrder()[0];
 
         // Check each house in order to find one that has a consolidate power
         for (let i = 0;i < this.game.houses.size;i++) {
@@ -135,7 +135,7 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
                 return currentHouseToCheck;
             }
 
-            currentHouseToCheck = this.game.getNextInTurnOrder(currentHouseToCheck);
+            currentHouseToCheck = this.ingame.getNextInTurnOrder(currentHouseToCheck);
         }
 
         // If no house has any CP* order available, return null
