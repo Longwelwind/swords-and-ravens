@@ -15,6 +15,7 @@ import Game from "../../../../../game-data-structure/Game";
 import IngameGameState from "../../../../../IngameGameState";
 import BetterMap from "../../../../../../../utils/BetterMap";
 import _ from "lodash";
+import groupBy from "../../../../../../../utils/groupBy";
 
 export default class ResolveRetreatGameState extends GameState<
     PostCombatGameState,
@@ -131,10 +132,16 @@ export default class ResolveRetreatGameState extends GameState<
         })
 
         // Check if this retreat region require casualties
-        const casualties = this.getCasualtiesOfRetreatRegion(retreatRegion);
-        if (casualties > 0) {
-            // The loser must sacrifice some of their units
-            this.setChildGameState(new SelectUnitsGameState(this)).firstStart(this.postCombat.loser, army, casualties);
+        const casualtiesCount = this.getCasualtiesOfRetreatRegion(retreatRegion);
+        if (casualtiesCount > 0) {
+            if (army.every(u => u.type == army[0].type)) {
+                // In case all units have the same type automatically process the casualties
+                this.onSelectUnitsEnd(this.postCombat.loser, groupBy(army.slice(0, casualtiesCount), u => u.region).entries);
+            } else {
+                // Otherwise let the loser decide which unit to sacrifice
+                this.setChildGameState(new SelectUnitsGameState(this)).firstStart(this.postCombat.loser, army, casualtiesCount);
+            }
+
             return;
         }
 
@@ -271,6 +278,20 @@ export default class ResolveRetreatGameState extends GameState<
     }
 
     getCasualtiesOfRetreatRegion(retreatRegion: Region): number {
+        // If retreatRegion is attackingRegion the attacker lost the battle
+        // and retreats back from where he came from. In that case we don't need
+        // to calculate casualties as retreating back to attackingRegion will always be
+        // supply compliant at that point (if it is blocked for retreat 
+        // has been checked earlier).
+        // Furthermore we have to do this extra processing for the time being
+        // because the attacking units are still present in attackingRegion
+        // and therefore hasTooMuchArmies with addedUnits overload will double 
+        // the army size for the attackingRegion which could result
+        // in an invalid supply violation.
+        if (retreatRegion == this.postCombat.combat.attackingRegion) {
+            return 0;
+        }
+
         // To find the number of casualties that a specific retreat region will inflict,
         // simulate a movement of an increasing number of units and find at which number of units
         // the user has too much armies for their supplies.

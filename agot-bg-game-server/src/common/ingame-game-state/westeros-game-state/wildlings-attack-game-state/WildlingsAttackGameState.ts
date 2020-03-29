@@ -27,6 +27,7 @@ import MammothRidersNightsWatchVictoryGameState, {SerializedMammothRidersNightsW
 import TheHordeDescendsWildlingVictoryGameState, {SerializedTheHordeDescendsWildlingVictoryGameState} from "./the-horde-descends-wildling-victory-game-state/TheHordeDescendsWildlingVictoryGameState";
 import TheHordeDescendsNightsWatchVictoryGameState, {SerializedTheHordeDescendsNightsWatchVictoryGameState} from "./the-horde-descends-nights-watch-victory-game-state/TheHordeDescendsNightsWatchVictoryGameState";
 import IngameGameState from "../../IngameGameState";
+import { silenceAtTheWall } from "../../game-data-structure/wildling-card/wildlingCardTypes";
 
 export default class WildlingsAttackGameState extends GameState<WesterosGameState,
     BiddingGameState<WildlingsAttackGameState> | SimpleChoiceGameState | PreemptiveRaidWildlingVictoryGameState
@@ -113,7 +114,7 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
         this.wildlingCard = this.game.wildlingDeck.shift() as WildlingCard;
         this.game.wildlingDeck.push(this.wildlingCard);
 
-        this.setChildGameState(new BiddingGameState(this)).firstStart(this.game.houses.values);
+        this.setChildGameState(new BiddingGameState(this)).firstStart(this.participatingHouses);
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -152,7 +153,8 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
         if (this.nightsWatchWon) {
             // Wildlings attack has been rebuffed
             // Check if there a single highest bidder or if there needs to be a decision from the iron throne holder
-            if (this.highestBidders.length > 1) {
+            // (Automatically resolve highest bidder for Silence At The Wall)
+            if (this.wildlingCard.type != silenceAtTheWall && this.highestBidders.length > 1) {
                 this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
                     this.game.ironThroneHolder,
                     "The holder of the Iron Throne must choose between the highest bidders",
@@ -165,7 +167,8 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
         } else {
             // Wildlings attack was successful
             // Check if there a single lowest bidder or if there needs to be a decision from the iron throne holder
-            if (this.lowestBidders.length > 1) {
+            // (Automatically resolve lowest bidder for Silence At The Wall)
+            if (this.wildlingCard.type != silenceAtTheWall && this.lowestBidders.length > 1) {
                 this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
                     this.game.ironThroneHolder,
                     "The holder of the Iron Throne must choose between the lowest bidders",

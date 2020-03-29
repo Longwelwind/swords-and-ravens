@@ -22,6 +22,16 @@ export default class SimpleChoiceGameState extends GameState<ParentGameState> {
         this.description = description;
         this.house = house;
         this.choices = choices;
+
+        if (choices.length == 0) {
+            throw new Error("SimpleChoiceGameState called with choices.length == 0!");
+        }
+
+        if (choices.length == 1) {
+            // In case there is just one possible choice, e.g. when you can't convert a ship
+            // but just delete it in TakeControlOfEnemyPortGameState, automatically resolve this choice.
+            this.parentGameState.onSimpleChoiceGameStateEnd(0);
+        }
     }
 
     serializeToClient(_admin: boolean, _player: Player | null): SerializedSimpleChoiceGameState {

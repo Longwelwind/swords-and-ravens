@@ -43,7 +43,7 @@
           "houses": ["stark", "greyjoy", "lannister", "baratheon", "tyrell"],
           "blockedRegions": [
             "sunspear", "port-of-sunspear", "salt-shore", "yronwood", "starfall",
-            "princes-pass", "the-boneway", "storms-end", "port-of-storms-end"
+            "storms-end", "port-of-storms-end"
           ]
         }
       ]
@@ -59,7 +59,8 @@
             "greywater-watch", "moat-cailin", "the-twins", "the-fingers", "the-eyrie",
             "the-stony-shore", "winterfell", "port-of-winterfell", "white-harbor", "port-of-white-harbor",
             "widows-watch", "castle-black", "karhold", "the-shivering-sea", "pyke", "port-of-pyke"
-          ]
+          ],
+          "removedUnits": ["port-of-lannisport"]
         }
       ]
     },
@@ -71,7 +72,10 @@
           "houses": ["lannister", "stark", "greyjoy", "tyrell", "martell"],
           "blockedRegions": [
             "dragonstone", "port-of-dragonstone"
-          ]
+          ],
+          "tracks": {
+            "ironThrone": ["stark", "lannister", "martell", "greyjoy", "tyrell"]
+          }
         }
       ]
     },

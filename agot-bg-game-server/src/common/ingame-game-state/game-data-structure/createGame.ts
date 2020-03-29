@@ -82,6 +82,7 @@ export interface GameSetup {
     houses: string[];
     blockedRegions?: string[];
     removedUnits?: string[];
+    tracks?: { ironThrone?: string[]; fiefdoms?: string[]; kingsCourt?: string[] };
 }
 
 export default function createGame(entireGame: EntireGame, housesToCreate: string[]): Game {
@@ -126,9 +127,23 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
     game.supplyRestrictions = baseGameData.supplyRestrictions;
 
     // Load tracks starting positions
-    game.ironThroneTrack = baseGameData.tracks.ironThrone.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
-    game.fiefdomsTrack = baseGameData.tracks.fiefdoms.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
-    game.kingsCourtTrack = baseGameData.tracks.kingsCourt.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
+    if (gameSetup.tracks && gameSetup.tracks.ironThrone) {
+        game.ironThroneTrack = gameSetup.tracks.ironThrone.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
+    } else {
+        game.ironThroneTrack = baseGameData.tracks.ironThrone.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
+    }
+
+    if (gameSetup.tracks && gameSetup.tracks.fiefdoms) {
+        game.fiefdomsTrack = gameSetup.tracks.fiefdoms.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
+    } else {
+        game.fiefdomsTrack = baseGameData.tracks.fiefdoms.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
+    }
+
+    if (gameSetup.tracks && gameSetup.tracks.kingsCourt) {
+        game.kingsCourtTrack = gameSetup.tracks.kingsCourt.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
+    } else {
+        game.kingsCourtTrack = baseGameData.tracks.kingsCourt.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
+    }
 
     if (game.ironThroneTrack.length != game.houses.size) {
         throw new Error("Size of ironThrone track is not equal to the number of houses");

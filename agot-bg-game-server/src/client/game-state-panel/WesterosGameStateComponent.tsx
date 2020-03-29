@@ -26,6 +26,7 @@ import GameStateComponentProps from "./GameStateComponentProps";
 import renderChildGameState from "../utils/renderChildGameState";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
+import classNames = require("classnames");
 import WesterosCardComponent from "./utils/WesterosCardComponent";
 
 @observer
@@ -35,10 +36,18 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
             <>
                 {this.props.gameState.currentCard && (
                     <ListGroupItem>
-                        <Row className="justify-content-center">
-                            <Col xs="auto">
-                                <WesterosCardComponent cardType={this.props.gameState.currentCard.type} westerosDeckI={this.props.gameState.currentCardI}/>
-                            </Col>
+                        <Row className="justify-content-around">
+                            {this.props.gameState.revealedCards.map((wc, i) => (
+                                <Col xs="auto" key={i}>
+                                    <WesterosCardComponent
+                                        cardType={wc.type}
+                                        westerosDeckI={i}
+                                        size={"small"}
+                                        tooltip={true}
+                                        classNames={classNames({"medium-outline": this.props.gameState.currentCardI == i})}
+                                    />
+                                </Col>
+                            ))}
                         </Row>
                     </ListGroupItem>
                 )}

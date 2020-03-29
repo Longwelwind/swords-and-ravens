@@ -15,6 +15,7 @@ import Game from "../../game-data-structure/Game";
 import Order from "../../game-data-structure/Order";
 import { port } from "../../game-data-structure/regionTypes";
 import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameState } from "./take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
+import { findOrphanedShipsAndDestroyThem } from "../../port-helper/PortHelper";
 
 export default class ResolveMarchOrderGameState extends GameState<ActionGameState, ResolveSingleMarchOrderGameState | CombatGameState | TakeControlOfEnemyPortGameState> {
     constructor(actionGameState: ActionGameState) {
@@ -48,6 +49,8 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
     onResolveSingleMarchOrderGameStateFinish(house: House): void {
         // Last march is completely handled
         // Now is the time to ...
+        //   ... destroy orphaned ships (e.g. caused by Arianne)
+        findOrphanedShipsAndDestroyThem(this.world, this.ingameGameState, this.actionGameState);
         //   ... check if ships can be converted
         const analyzePortResult = this.isTakeControlOfEnemyPortGameStateRequired();
         if(analyzePortResult) {
@@ -80,35 +83,6 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         }
 
         this.setChildGameState(new ResolveSingleMarchOrderGameState(this)).firstStart(houseToResolve);
-    }
-
-    destroyAllShipsInPort(portRegion: Region): number {
-        if(portRegion.type != port) {
-            throw new Error("This method is intended to only be used for destroying ships in ports")
-        }
-
-        this.removePossibleOrdersInPort(portRegion);
-
-        const house = portRegion.units.size > 0 ? portRegion.units.values[0].allegiance : null;
-        const shipsToDestroy = portRegion.units.map((id, _unit) => id);
-        shipsToDestroy.forEach(id => portRegion.units.delete(id));
-
-        if (house) {
-            this.entireGame.broadcastToClients({
-                type: "combat-change-army",
-                region: portRegion.id,
-                house: house.id,
-                army: []
-            });
-        }
-
-        this.entireGame.broadcastToClients({
-            type: "remove-units",
-            regionId: portRegion.id,
-            unitIds: shipsToDestroy
-        });
-
-        return shipsToDestroy.length;
     }
 
     proceedToCombat(attackerComingFrom: Region, combatRegion: Region, attacker: House, defender: House, army: Unit[], order: Order): void {
@@ -172,28 +146,13 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         });
     }
 
-    private removePossibleOrdersInPort(portRegion: Region): void {
-        if(portRegion.type != port) {
-            throw new Error("This method is intended to only be used for removing orders of destroyed or taken ships")
-        }
-
-        if (this.actionGameState.ordersOnBoard.has(portRegion)) {
-            this.actionGameState.ordersOnBoard.delete(portRegion);
-            this.entireGame.broadcastToClients({
-                type: "action-phase-change-order",
-                region: portRegion.id,
-                order: null
-            });
-        }
-    }
-
-    private isTakeControlOfEnemyPortGameStateRequired(): {port: Region; newController: House} | null {
+    private isTakeControlOfEnemyPortGameStateRequired(): { port: Region; newController: House } | null {
         // Find ports with enemy ships
         const portsWithEnemyShips = this.world.regions.values.filter(r => r.type == port
             && r.units.size > 0
             && r.getController() != this.world.getAdjacentLandOfPort(r).getController());
 
-            if(portsWithEnemyShips.length == 0) {
+        if (portsWithEnemyShips.length == 0) {
             return null;
         }
 
@@ -202,9 +161,6 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         const adjacentCastleController = adjacentCastle.getController();
 
         if (adjacentCastleController) {
-            // A castle with ships in port has been conquered
-            this.removePossibleOrdersInPort(portRegion);
-
             // return TakeControlOfEnemyPortGameState required
             return {
                 port: portRegion,
@@ -212,20 +168,9 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
             }
         }
 
-        // When we reach this line the only way right now a orphaned ship can exist in a port
+        // We should never reach this line because we removed orphaned ships earlier.
         // is Martell playing Arianne in a non-capital city. So the ships have to be destroyed
-        const houseThatLostShips = portRegion.units.values[0].allegiance;
-
-        const destroyedShipCount = this.destroyAllShipsInPort(portRegion);
-        this.ingameGameState.log({
-            type: "ships-destroyed-by-empty-castle",
-            castle: adjacentCastle.name,
-            house: houseThatLostShips.name,
-            port: portRegion.name,
-            shipCount: destroyedShipCount
-        });
-
-        return null;
+        throw new Error(`$Port with id '{portRegion.id}' contains orphaned ships which should have been removed before!`);
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {

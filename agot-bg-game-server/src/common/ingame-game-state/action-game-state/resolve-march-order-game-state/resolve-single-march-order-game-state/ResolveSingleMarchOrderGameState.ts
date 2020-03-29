@@ -17,6 +17,7 @@ import RegionKind from "../../../game-data-structure/RegionKind";
 import User from "../../../../../server/User";
 import MarchOrderType from "../../../game-data-structure/order-types/MarchOrderType";
 import { port } from "../../../game-data-structure/regionTypes";
+import { destroyAllShipsInPort } from "../../../../ingame-game-state/port-helper/PortHelper";
 
 export default class ResolveSingleMarchOrderGameState extends GameState<ResolveMarchOrderGameState> {
     @observable house: House;
@@ -121,6 +122,17 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                 });
             }
 
+            // It may be possible, that a user left a castle with ships in port empty.
+            // If so, the ships in the port have to be destroyed.
+            // It would be nice to use findOrphanedShipsAndDestroyThem here.
+            // But for time being we have to reimplement this a bit different
+            // as the units which will march to combat stay in the startingRegion until the combat is resolved.
+            // Therefore getController() calls inside findOrphanedShipsAndDestroyThem() will prevent
+            // us from finding orphaned ships.
+            // On the other hand destroying the ships after the march has been fully resolved is too late
+            // as a possible attacker may have retreated to the starting region
+            // which would prevent the destruction of the ships.
+            // So there is no other way as checking this situations explicity now:
             this.destroyPossibleShipsInAdjacentPortIfNecessary(startingRegion, movesThatTriggerAttack);
 
             // If there was a move that trigger a fight, do special processing
@@ -229,7 +241,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
         }
 
         // User really left a castle with ships empty. The ships must be destroyed.
-        const destroyedShipCount = this.parentGameState.destroyAllShipsInPort(portOfStartingRegion);
+        const destroyedShipCount = destroyAllShipsInPort(portOfStartingRegion, this.entireGame, this.parentGameState.actionGameState);
 
         this.parentGameState.ingameGameState.log({
             type: "ships-destroyed-by-empty-castle",
