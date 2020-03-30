@@ -234,11 +234,8 @@ export default class PostCombatGameState extends GameState<
             // It might be that this movement can be prevented by house cards (e.g. Arianne Martell)
             if (!this.isAttackingArmyMovementPrevented()) {
                 this.combat.resolveMarchOrderGameState.moveUnits(this.combat.attackingRegion, this.combat.attackingArmy, this.combat.defendingRegion);
-            } else {
-                // Defender had to retreat
-                // Therefore possible orders in defending region need to be removed
-                this.removeOrderFromRegion(this.combat.defendingRegion);
             }
+            this.removeOrderFromRegion(this.combat.defendingRegion);
         }
 
         // Remove the order from attacking region
