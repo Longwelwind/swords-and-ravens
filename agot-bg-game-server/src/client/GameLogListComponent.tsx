@@ -650,8 +650,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
             case "retreat-casualties-suffered":
                 return <>
-                    <p><strong>{data.house}</strong> suffered casualties from the retreat:</p>
-                    <p>{data.units.join(", ")}</p>
+                    <p><strong>{data.house}</strong> suffered casualties from the retreat: <>{joinReactNodes(data.units.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</p>
                 </>
 
             case "enemy-port-taken":
@@ -882,13 +881,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 </>;
             case "immediatly-killed-after-combat":
                 return <>
-                    {data.killedBecauseCantRetreat.length > 0 && (<><strong>{data.house}</strong> suffered battle casualties because this units can&apos;t retreat: {data.killedBecauseCantRetreat.join(", ")}.</>)}
-                    {data.killedBecauseWounded.length > 0 && (<><strong>{data.house}</strong> suffered battle casualties because this units were wounded: {data.killedBecauseWounded.join(", ")}.</>)}
+                    {data.killedBecauseCantRetreat.length > 0 && (<><strong>{data.house}</strong> suffered battle casualties because this units can&apos;t retreat: <>{joinReactNodes(data.killedBecauseCantRetreat.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</>)}
+                    {data.killedBecauseWounded.length > 0 && (<><strong>{data.house}</strong> suffered battle casualties because this units were wounded: <>{joinReactNodes(data.killedBecauseWounded.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</>)}
                 </>;
 
             case "killed-after-combat":
                 return <>
-                    <strong>{data.house}</strong> suffered battle casualties and chose this units to be killed: {data.killed.join(", ")}.
+                    <strong>{data.house}</strong> suffered battle casualties and chose this units to be killed: <>{joinReactNodes(data.killed.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.
                 </>;
 
             case "supply-adjusted":
