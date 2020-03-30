@@ -19,7 +19,6 @@ import Game from "../game-data-structure/Game";
 import ResolveConsolidatePowerGameState, {SerializedResolveConsolidatePowerGameState} from "./resolve-consolidate-power-game-state/ResolveConsolidatePowerGameState";
 import ConsolidatePowerOrderType from "../game-data-structure/order-types/ConsolidatePowerOrderType";
 import SupportOrderType from "../game-data-structure/order-types/SupportOrderType";
-import * as _ from "lodash";
 import {port, sea, land} from "../game-data-structure/regionTypes";
 import PlanningRestriction from "../game-data-structure/westeros-card/planning-restriction/PlanningRestriction";
 import planningRestrictions from "../game-data-structure/westeros-card/planning-restriction/planningRestrictions";
@@ -132,13 +131,6 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
             // A sea battle can't be supported by land units
             .filter(r => !(attackedRegion.type == sea && r.type == land))
             .map(region => ({region, support: this.ordersOnBoard.get(region).type as SupportOrderType}));
-    }
-
-    getSupportCombatStrength(supportingHouse: House, attackedRegion: Region): number {
-        return this.getPossibleSupportingRegions(attackedRegion)
-            .filter(({region}) => region.getController() == supportingHouse)
-            .map(({region, support}) => this.game.getCombatStrengthOfArmy(region.units.values, attackedRegion.hasStructure) + support.supportModifier)
-            .reduce(_.add, 0);
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedActionGameState {
