@@ -276,7 +276,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <p>
                         <strong>{house.name}</strong>, holder of the Raven token, chose to replace
-                        a <strong>{originalOrder.type.name} Order</strong> by a <strong>{newOrder.type.name} Order
+                        a <strong>{originalOrder.type.name} Order</strong> with a <strong>{newOrder.type.name} Order
                         </strong> in <strong>{orderRegion.name}</strong>.
                     </p>
                 );
@@ -809,8 +809,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     {units.length > 0
-                    ? (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><strong>{unitTypes.length}</strong> Knights in <strong>{region.name}</strong></>), ", ")} by Footmen.</>)
-                    : (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> had no Knights to replace by Footmen.</>)}
+                    ? (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><strong>{unitTypes.length}</strong> Knights in <strong>{region.name}</strong></>), ", ")} with Footmen.</>)
+                    : (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> had no Knights to replace with Footmen.</>)}
                 </>;
 
             case "crow-killers-footman-upgraded":
@@ -819,8 +819,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     {units.length > 0
-                    ? (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><strong>{unitTypes.length}</strong> Footmen in <strong>{region.name}</strong></>), ", ")} by Knights.</>)
-                    : (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> was not able to replace any Footman by Knights.</>)}
+                    ? (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><strong>{unitTypes.length}</strong> Footmen in <strong>{region.name}</strong></>), ", ")} with Knights.</>)
+                    : (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> was not able to replace any Footman with Knights.</>)}
                 </>;
 
             case "skinchanger-scout-nights-watch-victory":
