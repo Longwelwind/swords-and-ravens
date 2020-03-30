@@ -151,8 +151,6 @@ export default class PostCombatGameState extends GameState<
             ? this.combat.getHouseCardTowerIcons(this.attacker)
             : this.combat.getHouseCardTowerIcons(this.defender);
 
-        const loserCasualtiesCount = Math.max(0, winnerSwordIcons - loserTowerIcons);
-
         // All units of the loser army that can't retreat or are wounded are immediately killed
         const immediatelyKilledLoserUnits = loserArmy.filter(u => u.wounded || !u.type.canRetreat);
 
@@ -185,6 +183,8 @@ export default class PostCombatGameState extends GameState<
         }
 
         const loserArmyLeft = _.difference(loserArmy, immediatelyKilledLoserUnits);
+        const maxLoserCasualtiesCount = Math.max(0, winnerSwordIcons - loserTowerIcons);
+        const loserCasualtiesCount = Math.min(maxLoserCasualtiesCount, loserArmyLeft.length);
 
         if (loserCasualtiesCount > 0) {
             // Check if casualties are prevented this combat
