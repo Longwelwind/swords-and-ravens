@@ -4,3 +4,16 @@
     white-space: nowrap;
     overflow: hidden;
 }
+
+
+.badge .house-icon {
+    margin-top: -2px;
+    margin-right: 2px;
+    display: inline-block;
+    height: 0px;
+}
+
+.badge .house-icon img {
+    height: 19px;
+    width: 19px;
+}

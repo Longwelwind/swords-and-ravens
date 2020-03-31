@@ -1,3 +1,5 @@
+{% load house_icon %}
+
 <table class="table table-hover table-sm">
     <thead>
         <tr>
@@ -46,9 +48,13 @@
                     {% endif %}
                     {% if game.player_in_game %}
                         {% if game.player_in_game.data.waited_for %}
-                            <span class="badge badge-pill badge-danger">YOUR TURN</span>
+                            <span class="badge badge-pill badge-danger">
+                                {% house_icon game.player_in_game.data.house %} YOUR TURN
+                            </span>
                         {% else %}
-                            <span class="badge badge-pill badge-info">Playing</span>
+                            <span class="badge badge-pill badge-info">
+                                {% house_icon game.player_in_game.data.house %} Playing
+                            </span>
                         {% endif %}
                     {% endif %}
 
