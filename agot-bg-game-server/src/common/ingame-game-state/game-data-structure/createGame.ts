@@ -116,7 +116,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
                     .map(([unitTypeId, limit]) => [unitTypes.get(unitTypeId), limit])
             );
 
-            const house = new House(hid, houseData.name, houseData.color, houseCards, unitLimits, 5, houseData.supplyLevel);
+            const house = new House(hid, houseData.name, houseData.color, houseCards, unitLimits, 5, houseData.supplyLevel, game);
 
             return [hid, house];
         })

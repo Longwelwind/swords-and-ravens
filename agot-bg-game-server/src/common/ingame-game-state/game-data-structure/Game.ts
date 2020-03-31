@@ -303,7 +303,7 @@ export default class Game {
     serializeToClient(admin: boolean): SerializedGame {
         return {
             lastUnitId: this.lastUnitId,
-            houses: this.houses.values.map(h => h.serializeToClient()),
+            houses: this.houses.values.map(h => h.serializeToClient(admin)),
             world: this.world.serializeToClient(),
             turn: this.turn,
             ironThroneTrack: this.ironThroneTrack.map(h => h.id),
