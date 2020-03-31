@@ -20,6 +20,8 @@ import GameLogManager, {SerializedGameLogManager} from "./game-data-structure/Ga
 import {GameLogData} from "./game-data-structure/GameLog";
 import GameEndedGameState, {SerializedGameEndedGameState} from "./game-ended-game-state/GameEndedGameState";
 
+const MAX_POWER_TOKENS = 20;
+
 export default class IngameGameState extends GameState<
     EntireGame,
     WesterosGameState | PlanningGameState | ActionGameState | GameEndedGameState
@@ -125,6 +127,24 @@ export default class IngameGameState extends GameState<
         }
 
         return player;
+    }
+
+    changePowerTokens(house: House, delta: number): number {
+        const originalValue = house.powerTokens;
+
+        const powerTokensOnBoardCount = this.game.countPowerTokensOnBoard(house);
+        const maxPowerTokenCount = MAX_POWER_TOKENS - powerTokensOnBoardCount;
+
+        house.powerTokens += delta;
+        house.powerTokens = Math.max(0, Math.min(house.powerTokens, maxPowerTokenCount));
+
+        this.entireGame.broadcastToClients({
+            type: "change-power-token",
+            houseId: house.id,
+            powerTokenCount: house.powerTokens
+        });
+
+        return originalValue - house.powerTokens;
     }
 
     checkVictoryConditions(): boolean {

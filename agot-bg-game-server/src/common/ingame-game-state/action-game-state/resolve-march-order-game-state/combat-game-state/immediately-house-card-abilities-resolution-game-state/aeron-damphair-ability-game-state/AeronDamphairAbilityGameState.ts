@@ -91,13 +91,7 @@ export default class AeronDamphairAbilityGameState extends GameState<
         });
 
         // Remove 2 power tokens
-        house.changePowerTokens(-2);
-
-        this.entireGame.broadcastToClients({
-            type: "change-power-token",
-            houseId: house.id,
-            powerTokenCount: house.powerTokens
-        });
+        this.ingame.changePowerTokens(house, -2);
 
         this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);
     }

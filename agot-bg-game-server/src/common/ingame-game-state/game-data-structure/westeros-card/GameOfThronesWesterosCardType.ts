@@ -25,13 +25,7 @@ export default class GameOfThronesWesterosCardType extends WesterosCardType {
         ).filter(([_house, gain]) => gain > 0);
 
         gains.forEach(([house, gain]) => {
-            house.changePowerTokens(gain);
-
-            westeros.entireGame.broadcastToClients({
-                type: "change-power-token",
-                houseId: house.id,
-                powerTokenCount: house.powerTokens
-            });
+            westeros.ingame.changePowerTokens(house, gain);
         });
 
         westeros.ingame.log({
