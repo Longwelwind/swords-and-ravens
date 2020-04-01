@@ -4,8 +4,6 @@ import BetterMap from "../../../utils/BetterMap";
 import UnitType from "./UnitType";
 import unitTypes from "./unitTypes";
 
-const MAX_POWER_TOKENS = 20;
-
 export default class House {
     id: string;
     name: string;
@@ -23,15 +21,6 @@ export default class House {
         this.unitLimits = unitLimits;
         this.powerTokens = powerTokens;
         this.supplyLevel = supplyLevel;
-    }
-
-    changePowerTokens(delta: number): number {
-        const originalValue = this.powerTokens;
-
-        this.powerTokens += delta;
-        this.powerTokens = Math.max(0, Math.min(this.powerTokens, MAX_POWER_TOKENS));
-
-        return this.powerTokens - originalValue;
     }
 
     serializeToClient(): SerializedHouse {

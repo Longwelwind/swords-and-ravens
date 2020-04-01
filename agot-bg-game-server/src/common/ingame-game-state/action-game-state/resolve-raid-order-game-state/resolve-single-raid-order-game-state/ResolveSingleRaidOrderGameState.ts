@@ -93,19 +93,8 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
             }
 
             if (orderTarget.type instanceof ConsolidatePowerOrderType) {
-                this.house.changePowerTokens(1);
-                raidedHouse.changePowerTokens(-1);
-
-                this.entireGame.broadcastToClients({
-                    type: "change-power-token",
-                    houseId: this.house.id,
-                    powerTokenCount: this.house.powerTokens
-                });
-                this.entireGame.broadcastToClients({
-                    type: "change-power-token",
-                    houseId: raidedHouse.id,
-                    powerTokenCount: raidedHouse.powerTokens
-                });
+                this.ingameGameState.changePowerTokens(this.house, 1);
+                this.ingameGameState.changePowerTokens(raidedHouse, -1);
             }
 
             this.actionGameState.ordersOnBoard.delete(targetRegion);
