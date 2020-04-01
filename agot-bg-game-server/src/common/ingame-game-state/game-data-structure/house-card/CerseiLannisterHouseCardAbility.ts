@@ -15,6 +15,7 @@ export default class CerseiLannisterHouseCardAbility extends HouseCardAbility {
                 .firstStart(house);
             return;
         }
-        afterWinnerDetermination.onHouseCardResolutionFinish();
+
+        afterWinnerDetermination.childGameState.onHouseCardResolutionFinish(house);
     }
 }
