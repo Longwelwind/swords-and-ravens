@@ -6,7 +6,7 @@
 
 
 {% block content %}
-<h3>{{ viewed_user.username }}</h3>
+<h3 class="mb-4">{% if group_name %}<span class="badge badge badge-{{ group_color }}">{{ group_name }}</span>{% endif %} {{ viewed_user.username }}</h3>
 <div class="row">
     <div class="col-lg-6">
         <div class="card">

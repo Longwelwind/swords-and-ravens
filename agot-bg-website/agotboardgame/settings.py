@@ -224,3 +224,10 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+# Group badges in user profile
+
+GROUP_COLORS = {
+    "Admin": "danger",
+    "High Member": "info"
+}
