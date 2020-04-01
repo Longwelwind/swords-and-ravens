@@ -16,6 +16,6 @@ export default class TywinLannisterHouseCardAbility extends HouseCardAbility {
             });
         }
 
-        afterWinnerDetermination.onHouseCardResolutionFinish();
+        afterWinnerDetermination.childGameState.onHouseCardResolutionFinish(house);
     }
 }
