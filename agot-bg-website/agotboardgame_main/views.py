@@ -11,6 +11,7 @@ from django.shortcuts import render, get_object_or_404
 from django.template.loader import select_template
 from django.views.decorators.http import require_POST
 
+from agotboardgame.settings import GROUP_COLORS
 from agotboardgame_main.models import Game, ONGOING, IN_LOBBY, User, CANCELLED
 from chat.models import Room
 from agotboardgame_main.forms import UpdateUsernameForm
@@ -189,7 +190,15 @@ def settings(request):
 def user_profile(request, user_id):
     user = get_object_or_404(User, id=user_id)
 
-    return render(request, "agotboardgame_main/user_profile.html", {"viewed_user": user})
+    group_name = None
+    group_color = None
+    for possible_group_name, possible_group_color in GROUP_COLORS.items():
+        if user.is_in_group(possible_group_name):
+            group_name = possible_group_name
+            group_color = possible_group_color
+            break
+
+    return render(request, "agotboardgame_main/user_profile.html", {"viewed_user": user, "group_name": group_name, "group_color": group_color})
 
 
 def logout_view(request):
