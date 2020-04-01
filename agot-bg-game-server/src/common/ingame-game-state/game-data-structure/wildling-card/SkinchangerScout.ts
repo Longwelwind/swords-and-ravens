@@ -11,13 +11,7 @@ export default class SkinchangerScout extends WildlingCardType {
         const amount = wildlingsAttack.biddingResults[0][0];
         const house = wildlingsAttack.highestBidder;
 
-        house.changePowerTokens(amount);
-
-        wildlingsAttack.entireGame.broadcastToClients({
-            type: "change-power-token",
-            houseId: house.id,
-            powerTokenCount: house.powerTokens
-        });
+        wildlingsAttack.ingame.changePowerTokens(house, amount);
 
         wildlingsAttack.ingame.log({
             type: "skinchanger-scout-nights-watch-victory",
@@ -35,13 +29,7 @@ export default class SkinchangerScout extends WildlingCardType {
             .map((h, i) => [h, i == 0 ? -h.powerTokens : -2] as [House, number]);
 
         powerTokensToLose.forEach(([house, powerTokens]) => {
-            house.changePowerTokens(powerTokens);
-
-            wildlingsAttack.entireGame.broadcastToClients({
-                type: "change-power-token",
-                houseId: house.id,
-                powerTokenCount: house.powerTokens
-            });
+            wildlingsAttack.ingame.changePowerTokens(house, powerTokens);
         });
 
         wildlingsAttack.ingame.log({
