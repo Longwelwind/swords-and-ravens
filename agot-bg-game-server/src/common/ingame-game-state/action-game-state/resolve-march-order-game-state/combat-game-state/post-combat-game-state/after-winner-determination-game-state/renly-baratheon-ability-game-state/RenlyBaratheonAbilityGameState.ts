@@ -110,8 +110,14 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
                 unitIds: footmenToRemove.map(k => k.id)
             });
 
-            // Replace them by footman
-            const knightsToAdd = footmenToRemove.map(_ => this.game.createUnit(region, knight, house));
+            // Replace them by knight
+            const knightsToAdd = footmenToRemove.map(footman => {
+                const newKnight = this.game.createUnit(region, knight, house);
+                newKnight.wounded = footman.wounded;
+
+                return newKnight
+            });
+
             if (houseCombatData.region == region) {
                 // If the new knight is part of the attacking army,
                 // it will now be part of the army
