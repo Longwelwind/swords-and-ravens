@@ -149,23 +149,25 @@ export default class Game {
         return unit;
     }
 
-    transformUnits(region: Region, units: Unit[], targetType: UnitType, entireGame: EntireGame): Unit[] {
-        units.forEach(u => u.region.units.delete(u.id));
+    transformSingle(unit: Unit, targetType: UnitType): Unit {
+        unit.region.units.delete(unit.id);
 
+        const newUnit = this.createUnit(unit.region, targetType, unit.allegiance);
+        newUnit.region.units.set(newUnit.id, newUnit);
+
+        newUnit.wounded = unit.wounded;
+
+        return newUnit
+    }
+
+    transformUnits(region: Region, units: Unit[], targetType: UnitType, entireGame: EntireGame): Unit[] {
         entireGame.broadcastToClients({
             type: "remove-units",
             regionId: region.id,
             unitIds: units.map(u => u.id)
         });
 
-        const transformed = units.map(u => {
-            const t = this.createUnit(u.region, targetType, u.allegiance);
-            t.region.units.set(t.id, t);
-
-            t.wounded = u.wounded;
-
-            return t;
-        });
+        const transformed = units.map(u => this.transformSingle(u, targetType));
 
         entireGame.broadcastToClients({
             type: "add-units",
