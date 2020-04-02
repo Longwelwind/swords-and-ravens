@@ -62,7 +62,7 @@ export default class CrowKillersNightsWatchVictoryGameState extends GameState<Wi
 
     onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][]): void {
         selectedUnits.forEach(([region, footmen]) => {
-            this.transformIntoKnight(house, region, footmen);
+            this.game.transformUnits(region, footmen, knight, this.entireGame);
         });
 
         this.ingame.log({
@@ -72,26 +72,6 @@ export default class CrowKillersNightsWatchVictoryGameState extends GameState<Wi
         });
 
         this.parentGameState.onWildlingCardExecuteEnd();
-    }
-
-    transformIntoKnight(house: House, region: Region, footmenToRemove: Unit[]): void {
-        footmenToRemove.forEach(u => region.units.delete(u.id));
-
-        this.entireGame.broadcastToClients({
-            type: "remove-units",
-            regionId: region.id,
-            unitIds: footmenToRemove.map(k => k.id)
-        });
-
-        // Replace them by footman
-        const knightsToAdd = footmenToRemove.map(_ => this.game.createUnit(region, knight, house));
-
-        knightsToAdd.forEach(u => region.units.set(u.id, u));
-
-        this.entireGame.broadcastToClients({
-            type: "add-units",
-            units: [[region.id, knightsToAdd.map(u => u.serializeToClient())]]
-        });
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
