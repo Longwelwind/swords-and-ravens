@@ -144,21 +144,22 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
             // Remove units that will be used to upgrade, and add mustered units
             musterings.entries.forEach(([_, recruitements]) => {
                 recruitements.forEach(({from, to, region}) => {
+                    let unit: Unit;
                     if (from) {
                         if (!totalRemovedUnits.has(region)) {
                             totalRemovedUnits.set(region, []);
                         }
-
-                        region.units.delete(from.id);
                         totalRemovedUnits.get(region).push(from);
+
+                        unit = this.game.transformSingle(from, to);
+                    } else {
+                        unit = this.game.createUnit(region, to, this.house);
+                        region.units.set(unit.id, unit);
                     }
 
                     if (!totalAddedUnits.has(region)) {
                         totalAddedUnits.set(region, []);
                     }
-
-                    const unit = this.game.createUnit(region, to, this.house);
-                    region.units.set(unit.id, unit);
                     totalAddedUnits.get(region).push(unit);
                 });
             });
