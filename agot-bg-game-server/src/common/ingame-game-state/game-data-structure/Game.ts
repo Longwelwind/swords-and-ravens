@@ -14,6 +14,7 @@ import BetterMap from "../../../utils/BetterMap";
 import HouseCard from "./house-card/HouseCard";
 import {land, port} from "./regionTypes";
 import PlanningRestriction from "./westeros-card/planning-restriction/PlanningRestriction";
+import EntireGame from "../../EntireGame";
 
 export const MAX_WILDLING_STRENGTH = 12;
 
@@ -146,6 +147,32 @@ export default class Game {
         unit.region = region;
 
         return unit;
+    }
+
+    transformUnits(region: Region, units: Unit[], targetType: UnitType, entireGame: EntireGame): Unit[] {
+        units.forEach(u => u.region.units.delete(u.id));
+
+        entireGame.broadcastToClients({
+            type: "remove-units",
+            regionId: region.id,
+            unitIds: units.map(u => u.id)
+        });
+
+        const transformed = units.map(u => {
+            const t = this.createUnit(u.region, targetType, u.allegiance);
+            t.region.units.set(t.id, t);
+
+            t.wounded = u.wounded;
+
+            return t;
+        });
+
+        entireGame.broadcastToClients({
+            type: "add-units",
+            units: [[region.id, transformed.map(u => u.serializeToClient())]]
+        });
+
+        return transformed;
     }
 
     getControlledSupplyIcons(house: House): number {
