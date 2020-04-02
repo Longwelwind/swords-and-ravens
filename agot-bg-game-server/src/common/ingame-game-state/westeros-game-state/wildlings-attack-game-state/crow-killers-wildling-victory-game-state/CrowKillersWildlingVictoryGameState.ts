@@ -23,15 +23,7 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
             .filter(r => r.units.values.some(u => u.type == knight))
             .map(r => [r, r.units.values.filter(u => u.type == knight)] as [Region, Unit[]]);
 
-        knightsToTransform.forEach(([region, knights]) => this.transformIntoFootman(house, region, knights));
-
-        this.ingame.log({
-            type: "crow-killers-knights-replaced",
-            house: house.id,
-            units: knightsToTransform.map(([region, knights]) => [region.id, knights.map(k => k.type.id)])
-        });
-
-        this.proceedNextHouse(house);
+        this.transformSelection(house, knightsToTransform);
     }
 
     executeForEveryoneElse(house: House): void {
@@ -52,26 +44,6 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
         }
     }
 
-    transformIntoFootman(house: House, region: Region, knightsToRemove: Unit[]): void {
-        knightsToRemove.forEach(u => region.units.delete(u.id));
-
-        this.entireGame.broadcastToClients({
-            type: "remove-units",
-            regionId: region.id,
-            unitIds: knightsToRemove.map(k => k.id)
-        });
-
-        // Replace them by footman
-        const footmenToAdd = knightsToRemove.map(_ => this.game.createUnit(region, footman, house));
-
-        footmenToAdd.forEach(u => region.units.set(u.id, u));
-
-        this.entireGame.broadcastToClients({
-            type: "add-units",
-            units: [[region.id, footmenToAdd.map(u => u.serializeToClient())]]
-        });
-    }
-
     onPlayerMessage(player: Player, message: ClientMessage): void {
         this.childGameState.onPlayerMessage(player, message);
     }
@@ -79,9 +51,16 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
     onServerMessage(_message: ServerMessage): void { }
 
     onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][]): void {
-        selectedUnits.forEach(([region, knights]) => {
-            this.transformIntoFootman(house, region, knights);
-        });
+        this.transformSelection(house, selectedUnits);
+    }
+
+    getSelectableKnights(house: House): Unit[] {
+        return _.flatMap(this.game.world.getControlledRegions(house).map(r => r.units.values))
+            .filter(u => u.type == knight);
+    }
+
+    transformSelection(house: House, selectedUnits: [Region, Unit[]][]): void {
+        selectedUnits.forEach(([region, knights]) => this.game.transformUnits(region, knights, footman, this.entireGame));
 
         this.ingame.log({
             type: "crow-killers-knights-replaced",
@@ -90,11 +69,6 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
         });
 
         this.proceedNextHouse(house);
-    }
-
-    getSelectableKnights(house: House): Unit[] {
-        return _.flatMap(this.game.world.getControlledRegions(house).map(r => r.units.values))
-            .filter(u => u.type == knight);
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedCrowKillersWildlingVictoryGameState {
