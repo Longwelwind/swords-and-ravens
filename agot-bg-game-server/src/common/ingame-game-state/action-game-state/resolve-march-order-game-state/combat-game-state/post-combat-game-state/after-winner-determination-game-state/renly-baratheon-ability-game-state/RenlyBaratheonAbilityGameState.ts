@@ -87,26 +87,24 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
         const houseCombatData = this.combatGameState.houseCombatDatas.get(house);
 
         selectedUnit.forEach(([region, footmenToRemove]) => {
+            // Replace them by knight
+            const knightsToAdd = this.game.transformUnits(region, footmenToRemove, knight, this.entireGame);
+
             if (houseCombatData.region == region) {
                 // In case the footman was party of the army,
                 // remove it from the army.
                 houseCombatData.army = _.without(houseCombatData.army, ...footmenToRemove);
 
+                // If the new knight is part of the attacking army,
+                // it will now be part of the army
+                houseCombatData.army.push(...knightsToAdd);
+
                 this.entireGame.broadcastToClients({
                     type: "combat-change-army",
                     house: house.id,
                     region: region.id,
-                    army: this.combatGameState.houseCombatDatas.get(house).army.map(u => u.id)
+                    army: houseCombatData.army.map(u => u.id)
                 });
-            }
-
-            // Replace them by knight
-            const knightsToAdd = this.game.transformUnits(region, footmenToRemove, knight, this.entireGame);
-
-            if (houseCombatData.region == region) {
-                // If the new knight is part of the attacking army,
-                // it will now be part of the army
-                houseCombatData.army.push(...knightsToAdd);
             }
 
             this.ingame.log({
