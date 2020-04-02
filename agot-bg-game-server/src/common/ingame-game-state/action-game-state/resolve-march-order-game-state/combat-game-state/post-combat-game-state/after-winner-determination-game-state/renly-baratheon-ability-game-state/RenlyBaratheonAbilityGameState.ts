@@ -87,36 +87,21 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
         const houseCombatData = this.combatGameState.houseCombatDatas.get(house);
 
         selectedUnit.forEach(([region, footmenToRemove]) => {
-            footmenToRemove.forEach(u => {
-                region.units.delete(u.id);
+            if (houseCombatData.region == region) {
+                // In case the footman was party of the army,
+                // remove it from the army.
+                houseCombatData.army = _.without(houseCombatData.army, ...footmenToRemove);
 
-                if (houseCombatData.region == region) {
-                    // In case the footman was party of the army, 
-                    // remove it from the army.
-                    houseCombatData.army = _.without(houseCombatData.army, ...footmenToRemove);
-
-                    this.entireGame.broadcastToClients({
-                        type: "combat-change-army",
-                        house: house.id,
-                        region: region.id,
-                        army: this.combatGameState.houseCombatDatas.get(house).army.map(u => u.id)
-                    });
-                }
-            });
-
-            this.entireGame.broadcastToClients({
-                type: "remove-units",
-                regionId: region.id,
-                unitIds: footmenToRemove.map(k => k.id)
-            });
+                this.entireGame.broadcastToClients({
+                    type: "combat-change-army",
+                    house: house.id,
+                    region: region.id,
+                    army: this.combatGameState.houseCombatDatas.get(house).army.map(u => u.id)
+                });
+            }
 
             // Replace them by knight
-            const knightsToAdd = footmenToRemove.map(footman => {
-                const newKnight = this.game.createUnit(region, knight, house);
-                newKnight.wounded = footman.wounded;
-
-                return newKnight
-            });
+            const knightsToAdd = this.game.transformUnits(region, footmenToRemove, knight, this.entireGame);
 
             if (houseCombatData.region == region) {
                 // If the new knight is part of the attacking army,
@@ -124,17 +109,10 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
                 houseCombatData.army.push(...knightsToAdd);
             }
 
-            knightsToAdd.forEach(u => region.units.set(u.id, u));
-
             this.ingame.log({
                 type: "renly-baratheon-footman-upgraded-to-knight",
                 house: house.id,
                 region: region.id
-            });
-
-            this.entireGame.broadcastToClients({
-                type: "add-units",
-                units: [[region.id, knightsToAdd.map(u => u.serializeToClient())]]
             });
         });
 
