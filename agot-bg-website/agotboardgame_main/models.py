@@ -39,6 +39,7 @@ class User(AbstractUser):
     game_token = models.TextField(default=generate_game_token)
     last_username_update_time = models.DateTimeField(default=None, null=True, blank=True)
     last_activity = models.DateTimeField(auto_now_add=True, blank=True)
+    email_notification_active = models.BooleanField(default=True)
 
     def is_in_group(self, group_name):
         return self.groups.filter(name=group_name).exists()

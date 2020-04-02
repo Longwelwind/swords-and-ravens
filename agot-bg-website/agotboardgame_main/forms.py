@@ -7,3 +7,12 @@ class UpdateUsernameForm(ModelForm):
     class Meta:
         model = User
         fields = ["username"]
+
+
+class UpdateSettingsForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ["email_notification_active"]
+        labels = {
+            "email_notification_active": "PBEM Notifications"
+        }
