@@ -8,6 +8,7 @@ import EntireGame from "../common/EntireGame";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import LobbyGameState from "../common/lobby-game-state/LobbyGameState";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 interface GameSettingsComponentProps {
     gameClient: GameClient;
@@ -56,7 +57,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <FormCheck
                     id="pbem-setting"
                     type="checkbox"
-                    label="PBEM"
+                    label={
+                        <OverlayTrigger overlay={
+                            <Tooltip id="pbem-tooltip">
+                                <b>P</b>lay <b>B</b>y <b>E</b>-<b>M</b>ail<br/>
+                                Players receive an e-mail when it is their turn.
+                                Those games are typically played over days or weeks.
+                            </Tooltip>}>
+                                <label>PBEM</label>
+                        </OverlayTrigger>}
                     disabled={!this.canChangeGameSettings}
                     checked={this.gameSettings.pbem}
                     onChange={() => this.changeGameSettings(() => this.gameSettings.pbem = !this.gameSettings.pbem)}
