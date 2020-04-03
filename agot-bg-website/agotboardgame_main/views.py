@@ -14,8 +14,7 @@ from django.views.decorators.http import require_POST
 from agotboardgame.settings import GROUP_COLORS
 from agotboardgame_main.models import Game, ONGOING, IN_LOBBY, User, CANCELLED
 from chat.models import Room
-from agotboardgame_main.forms import UpdateUsernameForm
-
+from agotboardgame_main.forms import UpdateUsernameForm, UpdateSettingsForm
 
 logger = logging.getLogger(__name__)
 
@@ -159,6 +158,7 @@ def play(request, game_id, user_id=None):
 def settings(request):
     # Initialize all forms used in the settings page
     update_username_form = UpdateUsernameForm(instance=request.user)
+    update_settings_form = UpdateSettingsForm(instance=request.user)
 
     # Possibly treat a form if a POST request was sent
     if request.method == "POST":
@@ -183,8 +183,17 @@ def settings(request):
                 messages.success(request, "Username successfuly changed!")
 
                 return HttpResponseRedirect('/settings/')
+        elif form_type == 'update_settings':
+            update_settings_form = UpdateSettingsForm(request.POST, instance=request.user)
 
-    return render(request, "agotboardgame_main/settings.html", {"update_username_form": update_username_form})
+            if update_settings_form.is_valid():
+                update_settings_form.save()
+
+                messages.success(request, "Settings changed!")
+
+                return HttpResponseRedirect('/settings/')
+
+    return render(request, "agotboardgame_main/settings.html", {"update_username_form": update_username_form, "update_settings_form": update_settings_form})
 
 
 def user_profile(request, user_id):

@@ -36,5 +36,20 @@ Settings -
                 </div>
             </div>
         </div>
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Settings</h4>
+                    <form action="/settings/" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="form_type" value="update_settings"/>
+                        {% bootstrap_form update_settings_form %}
+                        {% buttons %}
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        {% endbuttons %}
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}
