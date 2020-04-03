@@ -23,7 +23,6 @@ import BetterMap from "../utils/BetterMap";
 import _ from "lodash";
 import PartialRecursive from "../utils/PartialRecursive";
 
-
 interface MapComponentProps {
     gameClient: GameClient;
     ingameGameState: IngameGameState;
@@ -83,21 +82,78 @@ export default class MapComponent extends Component<MapComponentProps> {
 
             const blocked = region.garrison == 1000;
 
-            return <polygon key={region.id}
-                            points={this.getRegionPath(region)}
-                            fill={blocked ? "black" : properties.highlight.color}
-                            fillRule="evenodd"
-                            className={classNames(
-                                blocked ? "blocked-region" : "region-area",
-                                properties.highlight.active && {
-                                    "clickable": true,
-                                    // Whatever the strength of the highlight defined, show the same
-                                    // highlightness
-                                    "highlighted-region-area": true
-                                }
-                            )}
-                            onClick={properties.onClick != null ? properties.onClick : undefined}/>;
+            return <ConditionalWrap key={region.id} condition={!blocked}
+                        wrap={child =>
+                            <OverlayTrigger
+                                overlay={this.renderRegionTooltip(region)}
+                                delay={{ show: 750, hide: 100 }}>
+                                {child}
+                            </OverlayTrigger>}>
+                            <polygon
+                                points={this.getRegionPath(region)}
+                                fill={blocked ? "black" : properties.highlight.color}
+                                fillRule="evenodd"
+                                className={classNames(
+                                    blocked ? "blocked-region" : "region-area",
+                                    properties.highlight.active && {
+                                        "clickable": true,
+                                        // Whatever the strength of the highlight defined, show the same
+                                        // highlightness
+                                        "highlighted-region-area": true
+                                    }
+                                )}
+                                onClick={properties.onClick != null ? properties.onClick : undefined} />
+            </ConditionalWrap>;
         });
+    }
+
+    private renderRegionTooltip(region: Region): ReactNode {
+        const controller =  region.getController();
+
+        return <Tooltip id="region-details">
+            <table cellPadding="5">
+                <tbody>
+                    <tr>
+                        <td>Name</td>
+                        <td>{region.name}</td>
+                    </tr>
+                    <tr>
+                        <td>Controller</td>
+                        <td>{controller ? controller.name : "None"}</td>
+                    </tr>
+                    {region.superControlPowerToken &&
+                        <tr>
+                            <td>Capital Owner</td>
+                            <td>{region.superControlPowerToken.name}</td>
+                        </tr>}
+                    {(region.superControlPowerToken || region.garrison > 0) &&
+                        <tr>
+                            <td>Garrison</td>
+                            <td>{region.garrison}</td>
+                        </tr>}
+                    {region.hasStructure &&
+                        <tr>
+                            <td>Muster points</td>
+                            <td>{region.castleLevel}</td>
+                        </tr>}
+                    {region.supplyIcons > 0 &&
+                        <tr>
+                            <td>Barrels</td>
+                            <td>{region.supplyIcons}</td>
+                        </tr>}
+                    {region.crownIcons > 0 &&
+                        <tr>
+                            <td>Crowns</td>
+                            <td>{region.crownIcons}</td>
+                        </tr>}
+                    {region.units.size > 0 &&
+                        <tr>
+                            <td>Army</td>
+                            <td>{region.units.entries.map(([_id, unit]) => unit.type.name).join(", ")}</td>
+                        </tr>}
+                </tbody>
+            </table>
+        </Tooltip>;
     }
 
     renderUnits(): ReactNode {
