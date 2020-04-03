@@ -22,6 +22,8 @@ import SupportOrderType from "../game-data-structure/order-types/SupportOrderTyp
 import {port, sea, land} from "../game-data-structure/regionTypes";
 import PlanningRestriction from "../game-data-structure/westeros-card/planning-restriction/PlanningRestriction";
 import planningRestrictions from "../game-data-structure/westeros-card/planning-restriction/planningRestrictions";
+import { RegionState, TracksState } from "../game-data-structure/GameLog";
+import { HouseCardState } from "../game-data-structure/house-card/HouseCard";
 
 export default class ActionGameState extends GameState<IngameGameState, UseRavenGameState | ResolveRaidOrderGameState | ResolveMarchOrderGameState | ResolveConsolidatePowerGameState> {
     planningRestrictions: PlanningRestriction[];
@@ -51,11 +53,51 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
             type: "action-phase-began"
         });
 
+        this.ingameGameState.log({
+            type: "game-board-state",
+            regions: this.createRegionsState(ordersOnBoard),
+            tracks: this.createTracksState(),
+            houseCards: this.createHouseCardsState()
+        });
+
         if (!this.game.skipRavenPhase) {
             this.setChildGameState(new UseRavenGameState(this)).firstStart();
         } else {
             this.onUseRavenGameStateEnd();
         }
+    }
+
+    private createRegionsState(ordersOnBoard: BetterMap<Region, Order>): RegionState[] {
+        const result = new BetterMap<Region, {controller: House | null; order: Order | null}>();
+        const allRegions = this.ingameGameState.world.regions.entries.map(([_id, region]) => region);
+
+        allRegions.forEach(r => {
+            result.set(r, {controller: r.getController(), order: ordersOnBoard.tryGet(r, null)});
+        });
+
+        return result.entries.map(([region, data]) => [region.id,
+            {
+                controllerId: data.controller ? data.controller.id : null,
+                unitTypeIds: region.units.entries.map(([_uid, unit]) => unit.type.id),
+                orderId: data.order ? data.order.id : null,
+                garrison: region.garrison,
+                controlPowerToken: region.controlPowerToken ? region.controlPowerToken.id : null
+            }]);
+    }
+
+    private createTracksState(): TracksState {
+        return {
+            ironThrone: this.game.ironThroneTrack.map(h => h.id),
+            fiefdoms: this.game.fiefdomsTrack.map(h => h.id),
+            kingsCourt: this.game.kingsCourtTrack.map(h => h.id),
+            supply: this.game.houses.entries.map(([hid, h]) => [hid, h.supplyLevel])
+        };
+    }
+
+    private createHouseCardsState(): [string, [string, boolean][]][] {
+        return this.game.houses.entries.map(([hid, h]) =>
+            [hid, h.houseCards.entries.map(([hcid, hc]) => [hcid, hc.state == HouseCardState.USED || hc.state == HouseCardState.DISCARDED])]
+        );
     }
 
     onResolveMarchOrderGameStateFinish(): void {

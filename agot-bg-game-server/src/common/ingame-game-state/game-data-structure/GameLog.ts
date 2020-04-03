@@ -28,7 +28,31 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | SkinchangerScoutNightsWatchVictory | SkinchangerScoutWildlingVictory
     | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory
     | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered
-    | SupplyAdjusted | PlayerReplaced;
+    | SupplyAdjusted | PlayerReplaced | GameBoardState;
+
+export type RegionState = [string, {
+    controllerId: string | null;
+    unitTypeIds: string[];
+    orderId: number | null;
+    garrison: number;
+    controlPowerToken: string | null;
+}];
+
+export type TracksState = {
+    ironThrone: string[];
+    fiefdoms: string[];
+    kingsCourt: string[];
+    supply: [string, number][];
+};
+
+interface GameBoardState {
+    type: "game-board-state";
+    regions: RegionState[];
+    tracks: TracksState;
+    // Outer key is the house id, outer value is a house cards map
+    // Inner house cards map key is houseCardId, value is USED
+    houseCards: [string, [string, boolean][]][];
+}
 
 interface TurnBegin {
     type: "turn-begin";

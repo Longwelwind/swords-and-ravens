@@ -1000,6 +1000,45 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         <b>{oldUser.name}</b> (<b>{house.name}</b>) was replaced by <b>{newUser.name}</b>.
                     </>
                 );
+
+            case "game-board-state":
+                // Log the complete board state to console for now
+                console.log(JSON.stringify(data, null, 1));
+
+                const allRegions =
+                    data.regions.map(([rid, {controllerId, unitTypeIds, orderId, garrison}]) =>
+                        [this.world.regions.get(rid), {
+                            controller: controllerId ? this.game.houses.get(controllerId) : null,
+                            units: unitTypeIds.map(utid => unitTypes.get(utid)),
+                            order: orderId ? orders.get(orderId) : null,
+                            garrison: garrison
+                        }] as [Region, {controller: House; units: UnitType[]; order: Order | null; garrison: number}]);
+
+                // In the game log only show orders for now
+                const regionsWithUnits = allRegions
+                                                .filter(([_r, regionData]) => regionData.units.length > 0)
+                                                .sort(([_r, regionData]) => this.game.getTurnOrder().findIndex(h => h == regionData.controller));
+                return (
+                <>
+                    <p>All orders have been revealed:<br/></p>
+                    <table style={{border: "1px solid white", padding: 5}}>
+                        <tbody>
+                            <tr>
+                                <th style={{border: "1px solid white", padding: 5}}>Region</th>
+                                <th style={{border: "1px solid white", padding: 5}}>Controller</th>
+                                <th style={{border: "1px solid white", padding: 5}}>Units</th>
+                                <th style={{border: "1px solid white", padding: 5}}>Order</th>
+                            </tr>
+                            {regionsWithUnits.map(([region, regionData]) =>
+                                <tr key={region.id}>
+                                    <td style={{border: "1px solid white", padding: 5}}>{region.name}</td>
+                                    <td style={{border: "1px solid white", padding: 5}}>{regionData.controller.name}</td>
+                                    <td style={{border: "1px solid white", padding: 5}}>{regionData.units.map(ut => ut.name).join(", ")}</td>
+                                    <td style={{border: "1px solid white", padding: 5}}>{regionData.order ? regionData.order.type.name : ""}</td>
+                                </tr>)}
+                        </tbody>
+                    </table>
+                </>);
         }
     }
 }
