@@ -62,6 +62,10 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         return this.parentGameState as ResolveConsolidatePowerGameState;
     }
 
+    get ingame(): IngameGameState {
+        return this.parentGameState.ingame;
+    }
+
     firstStart(house: House, type: PlayerMusteringType): void {
         this.house = house;
         this.type = type;
@@ -151,7 +155,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                         }
                         totalRemovedUnits.get(region).push(from);
 
-                        unit = this.game.transformSingle(from, to);
+                        unit = this.ingame.transformSingle(from, to);
                     } else {
                         unit = this.game.createUnit(region, to, this.house);
                         region.units.set(unit.id, unit);

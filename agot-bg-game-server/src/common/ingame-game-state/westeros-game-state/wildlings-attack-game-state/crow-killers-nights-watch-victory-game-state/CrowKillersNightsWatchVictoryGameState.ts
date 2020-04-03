@@ -62,7 +62,7 @@ export default class CrowKillersNightsWatchVictoryGameState extends GameState<Wi
 
     onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][]): void {
         selectedUnits.forEach(([region, footmen]) => {
-            this.game.transformUnits(region, footmen, knight, this.entireGame);
+            this.ingame.transformUnits(region, footmen, knight);
         });
 
         this.ingame.log({

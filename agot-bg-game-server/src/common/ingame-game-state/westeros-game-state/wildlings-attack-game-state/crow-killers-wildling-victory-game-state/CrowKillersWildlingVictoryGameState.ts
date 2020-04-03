@@ -60,7 +60,7 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
     }
 
     transformSelection(house: House, selectedUnits: [Region, Unit[]][]): void {
-        selectedUnits.forEach(([region, knights]) => this.game.transformUnits(region, knights, footman, this.entireGame));
+        selectedUnits.forEach(([region, knights]) => this.ingame.transformUnits(region, knights, footman));
 
         this.ingame.log({
             type: "crow-killers-knights-replaced",

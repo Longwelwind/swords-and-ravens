@@ -149,34 +149,6 @@ export default class Game {
         return unit;
     }
 
-    transformSingle(unit: Unit, targetType: UnitType): Unit {
-        unit.region.units.delete(unit.id);
-
-        const newUnit = this.createUnit(unit.region, targetType, unit.allegiance);
-        newUnit.region.units.set(newUnit.id, newUnit);
-
-        newUnit.wounded = unit.wounded;
-
-        return newUnit
-    }
-
-    transformUnits(region: Region, units: Unit[], targetType: UnitType, entireGame: EntireGame): Unit[] {
-        entireGame.broadcastToClients({
-            type: "remove-units",
-            regionId: region.id,
-            unitIds: units.map(u => u.id)
-        });
-
-        const transformed = units.map(u => this.transformSingle(u, targetType));
-
-        entireGame.broadcastToClients({
-            type: "add-units",
-            units: [[region.id, transformed.map(u => u.serializeToClient())]]
-        });
-
-        return transformed;
-    }
-
     getControlledSupplyIcons(house: House): number {
         return _.sum(
             this.world.regions.values

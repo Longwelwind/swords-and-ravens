@@ -88,7 +88,7 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
 
         selectedUnit.forEach(([region, footmenToRemove]) => {
             // Replace them by knight
-            const knightsToAdd = this.game.transformUnits(region, footmenToRemove, knight, this.entireGame);
+            const knightsToAdd = this.ingame.transformUnits(region, footmenToRemove, knight);
 
             if (houseCombatData.region == region) {
                 // In case the footman was party of the army,

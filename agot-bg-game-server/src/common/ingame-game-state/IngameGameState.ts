@@ -19,6 +19,7 @@ import PlanningRestriction from "./game-data-structure/westeros-card/planning-re
 import GameLogManager, {SerializedGameLogManager} from "./game-data-structure/GameLogManager";
 import {GameLogData} from "./game-data-structure/GameLog";
 import GameEndedGameState, {SerializedGameEndedGameState} from "./game-ended-game-state/GameEndedGameState";
+import UnitType from "./game-data-structure/UnitType";
 
 const MAX_POWER_TOKENS = 20;
 
@@ -145,6 +146,34 @@ export default class IngameGameState extends GameState<
         });
 
         return originalValue - house.powerTokens;
+    }
+
+    transformSingle(unit: Unit, targetType: UnitType): Unit {
+        unit.region.units.delete(unit.id);
+
+        const newUnit = this.game.createUnit(unit.region, targetType, unit.allegiance);
+        newUnit.region.units.set(newUnit.id, newUnit);
+
+        newUnit.wounded = unit.wounded;
+
+        return newUnit
+    }
+
+    transformUnits(region: Region, units: Unit[], targetType: UnitType): Unit[] {
+        this.entireGame.broadcastToClients({
+            type: "remove-units",
+            regionId: region.id,
+            unitIds: units.map(u => u.id)
+        });
+
+        const transformed = units.map(u => this.transformSingle(u, targetType));
+
+        this.entireGame.broadcastToClients({
+            type: "add-units",
+            units: [[region.id, transformed.map(u => u.serializeToClient())]]
+        });
+
+        return transformed;
     }
 
     checkVictoryConditions(): boolean {
