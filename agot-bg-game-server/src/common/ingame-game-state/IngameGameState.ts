@@ -148,17 +148,6 @@ export default class IngameGameState extends GameState<
         return originalValue - house.powerTokens;
     }
 
-    transformSingle(unit: Unit, targetType: UnitType): Unit {
-        unit.region.units.delete(unit.id);
-
-        const newUnit = this.game.createUnit(unit.region, targetType, unit.allegiance);
-        newUnit.region.units.set(newUnit.id, newUnit);
-
-        newUnit.wounded = unit.wounded;
-
-        return newUnit
-    }
-
     transformUnits(region: Region, units: Unit[], targetType: UnitType): Unit[] {
         this.entireGame.broadcastToClients({
             type: "remove-units",
@@ -166,7 +155,16 @@ export default class IngameGameState extends GameState<
             unitIds: units.map(u => u.id)
         });
 
-        const transformed = units.map(u => this.transformSingle(u, targetType));
+        const transformed = units.map(unit => {
+            unit.region.units.delete(unit.id);
+
+            const newUnit = this.game.createUnit(unit.region, targetType, unit.allegiance);
+            newUnit.region.units.set(newUnit.id, newUnit);
+
+            newUnit.wounded = unit.wounded;
+
+            return newUnit;
+        });
 
         this.entireGame.broadcastToClients({
             type: "add-units",

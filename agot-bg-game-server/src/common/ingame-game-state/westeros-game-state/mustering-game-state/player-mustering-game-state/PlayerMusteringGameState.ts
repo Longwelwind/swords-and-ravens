@@ -142,29 +142,20 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 }
             }
 
-            const totalRemovedUnits = new BetterMap<Region, Unit[]>();
-            const totalAddedUnits = new BetterMap<Region, Unit[]>();
-
             // Remove units that will be used to upgrade, and add mustered units
             musterings.entries.forEach(([_, recruitements]) => {
                 recruitements.forEach(({from, to, region}) => {
-                    let unit: Unit;
                     if (from) {
-                        if (!totalRemovedUnits.has(region)) {
-                            totalRemovedUnits.set(region, []);
-                        }
-                        totalRemovedUnits.get(region).push(from);
-
-                        unit = this.ingame.transformSingle(from, to);
+                        this.ingame.transformUnits(region, [from], to);
                     } else {
-                        unit = this.game.createUnit(region, to, this.house);
-                        region.units.set(unit.id, unit);
-                    }
+                        const unit = this.game.createUnit(region, to, this.house);
 
-                    if (!totalAddedUnits.has(region)) {
-                        totalAddedUnits.set(region, []);
+                        region.units.set(unit.id, unit);
+                        this.entireGame.broadcastToClients({
+                            type: "add-units",
+                            units: [[region.id, [unit.serializeToClient()]]]
+                        })
                     }
-                    totalAddedUnits.get(region).push(unit);
                 });
             });
 
@@ -180,19 +171,6 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                     }
                 }
             }
-
-            totalRemovedUnits.forEach((units, region) => {
-                this.entireGame.broadcastToClients({
-                    type: "remove-units",
-                    regionId: region.id,
-                    unitIds: units.map(u => u.id)
-                });
-            });
-
-            this.entireGame.broadcastToClients({
-                type: "add-units",
-                units: totalAddedUnits.entries.map(([region, units]) => ([region.id, units.map(u => u.serializeToClient())]))
-            });
 
             if (_.sum(musterings.map((_, r) => r.length)) > 0) {
                 this.parentGameState.ingame.log({
