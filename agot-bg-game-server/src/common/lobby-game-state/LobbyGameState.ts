@@ -97,7 +97,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
             return {success: false, reason: "not-owner"};
         }
 
-        if (this.players.size < this.getAvailableHouses().length) {
+        if (this.players.size < this.entireGame.getSelectedGameSetup().playerCount) {
             return {success: false, reason: "not-enough-players"};
         }
 

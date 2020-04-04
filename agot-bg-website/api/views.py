@@ -39,6 +39,9 @@ def notify(request, game_id):
     game = Game.objects.get(id=game_id)
     users = [User.objects.get(id=user_id) for user_id in user_ids]
 
+    # Filter users who turned off email
+    users = [user for user in users if user.email_notification_active]
+
     mails = [
         (
             f'{game.name} -  It\'s your turn!',

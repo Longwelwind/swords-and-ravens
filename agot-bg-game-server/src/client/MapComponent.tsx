@@ -22,7 +22,7 @@ import ConditionalWrap from "./utils/ConditionalWrap";
 import BetterMap from "../utils/BetterMap";
 import _ from "lodash";
 import PartialRecursive from "../utils/PartialRecursive";
-
+import joinReactNodes from "./utils/joinReactNodes";
 
 interface MapComponentProps {
     gameClient: GameClient;
@@ -83,21 +83,53 @@ export default class MapComponent extends Component<MapComponentProps> {
 
             const blocked = region.garrison == 1000;
 
-            return <polygon key={region.id}
-                            points={this.getRegionPath(region)}
-                            fill={blocked ? "black" : properties.highlight.color}
-                            fillRule="evenodd"
-                            className={classNames(
-                                blocked ? "blocked-region" : "region-area",
-                                properties.highlight.active && {
-                                    "clickable": true,
-                                    // Whatever the strength of the highlight defined, show the same
-                                    // highlightness
-                                    "highlighted-region-area": true
-                                }
-                            )}
-                            onClick={properties.onClick != null ? properties.onClick : undefined}/>;
+            return <ConditionalWrap key={region.id} condition={!blocked}
+                        wrap={child =>
+                            <OverlayTrigger
+                                overlay={this.renderRegionTooltip(region)}
+                                delay={{ show: 750, hide: 100 }}
+                                placement="auto">
+                                {child}
+                            </OverlayTrigger>}>
+                            <polygon
+                                points={this.getRegionPath(region)}
+                                fill={blocked ? "black" : properties.highlight.color}
+                                fillRule="evenodd"
+                                className={classNames(
+                                    blocked ? "blocked-region" : "region-area",
+                                    properties.highlight.active && {
+                                        "clickable": true,
+                                        // Whatever the strength of the highlight defined, show the same
+                                        // highlightness
+                                        "highlighted-region-area": true
+                                    }
+                                )}
+                                onClick={properties.onClick != null ? properties.onClick : undefined} />
+            </ConditionalWrap>;
         });
+    }
+
+    private renderRegionTooltip(region: Region): ReactNode {
+        const controller =  region.getController();
+
+        return <Tooltip id="region-details">
+            <b>{region.name}</b> {controller && (<small>of <b>{controller.name}</b></small>)} {region.castleLevel > 0 && (<small> ({region.castleLevel == 1 ? "Castle" : "Stronghold"})</small>)}
+            {region.superControlPowerToken ? (
+                <small><br/>Capital of {region.superControlPowerToken.name} {region.garrison > 0 && <>(Garrison of <b>{region.garrison}</b>)</>}</small>
+            ) : (
+                region.garrison > 0 && (<small><br />Neutral force of <b>{region.garrison}</b></small>)
+            )}
+            {(region.supplyIcons > 0 || region.crownIcons) > 0 && (
+                <>
+                    <br />{region.supplyIcons > 0 && <><b>{region.supplyIcons}</b> Barrels</>}
+                    {(region.supplyIcons > 0 && region.crownIcons > 0) && " - "}
+                    {region.crownIcons > 0 && <><b>{region.crownIcons}</b> Crowns</>}
+                </>
+            )}
+            {region.units.size > 0 && (
+                <><br/>{joinReactNodes(region.units.values.map(u => u.wounded ? <s key={u.id}>{u.type.name}</s> : <b key={u.id}>{u.type.name}</b>), ", ")}</>
+            )}
+        </Tooltip>;
     }
 
     renderUnits(): ReactNode {

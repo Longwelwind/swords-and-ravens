@@ -91,6 +91,15 @@
           "removedUnits": ["port-of-lannisport"]
         }
       ]
+    },
+    "learn-the-game": {
+      "name": "Learn the Game (2 players)",
+      "playerSetups": [
+        {
+          "playerCount": 2,
+          "houses": ["stark", "greyjoy", "lannister", "baratheon", "tyrell", "martell"]
+        }
+      ]
     }
   },
   "units": {
