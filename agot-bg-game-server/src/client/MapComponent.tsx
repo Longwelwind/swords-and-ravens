@@ -22,6 +22,7 @@ import ConditionalWrap from "./utils/ConditionalWrap";
 import BetterMap from "../utils/BetterMap";
 import _ from "lodash";
 import PartialRecursive from "../utils/PartialRecursive";
+import joinReactNodes from "./utils/joinReactNodes";
 
 interface MapComponentProps {
     gameClient: GameClient;
@@ -86,7 +87,8 @@ export default class MapComponent extends Component<MapComponentProps> {
                         wrap={child =>
                             <OverlayTrigger
                                 overlay={this.renderRegionTooltip(region)}
-                                delay={{ show: 750, hide: 100 }}>
+                                delay={{ show: 750, hide: 100 }}
+                                placement="auto">
                                 {child}
                             </OverlayTrigger>}>
                             <polygon
@@ -111,48 +113,22 @@ export default class MapComponent extends Component<MapComponentProps> {
         const controller =  region.getController();
 
         return <Tooltip id="region-details">
-            <table cellPadding="5">
-                <tbody>
-                    <tr>
-                        <td>Name</td>
-                        <td>{region.name}</td>
-                    </tr>
-                    <tr>
-                        <td>Controller</td>
-                        <td>{controller ? controller.name : "None"}</td>
-                    </tr>
-                    {region.superControlPowerToken &&
-                        <tr>
-                            <td>Capital Owner</td>
-                            <td>{region.superControlPowerToken.name}</td>
-                        </tr>}
-                    {(region.superControlPowerToken || region.garrison > 0) &&
-                        <tr>
-                            <td>Garrison</td>
-                            <td>{region.garrison}</td>
-                        </tr>}
-                    {region.hasStructure &&
-                        <tr>
-                            <td>Muster points</td>
-                            <td>{region.castleLevel}</td>
-                        </tr>}
-                    {region.supplyIcons > 0 &&
-                        <tr>
-                            <td>Barrels</td>
-                            <td>{region.supplyIcons}</td>
-                        </tr>}
-                    {region.crownIcons > 0 &&
-                        <tr>
-                            <td>Crowns</td>
-                            <td>{region.crownIcons}</td>
-                        </tr>}
-                    {region.units.size > 0 &&
-                        <tr>
-                            <td>Army</td>
-                            <td>{region.units.entries.map(([_id, unit]) => unit.type.name).join(", ")}</td>
-                        </tr>}
-                </tbody>
-            </table>
+            <b>{region.name}</b> {controller && (<small>of <b>{controller.name}</b></small>)} {region.castleLevel > 0 && (<small> ({region.castleLevel == 1 ? "Castle" : "Stronghold"})</small>)}
+            {region.superControlPowerToken ? (
+                <small><br/>Capital of {region.superControlPowerToken.name} {region.garrison > 0 && <>(Garrison of <b>{region.garrison}</b>)</>}</small>
+            ) : (
+                region.garrison > 0 && (<small><br />Neutral force of <b>{region.garrison}</b></small>)
+            )}
+            {(region.supplyIcons > 0 || region.crownIcons) > 0 && (
+                <>
+                    <br />{region.supplyIcons > 0 && <><b>{region.supplyIcons}</b> Barrels</>}
+                    {(region.supplyIcons > 0 && region.crownIcons > 0) && " - "}
+                    {region.crownIcons > 0 && <><b>{region.crownIcons}</b> Crowns</>}
+                </>
+            )}
+            {region.units.size > 0 && (
+                <><br/>{joinReactNodes(region.units.values.map(u => u.wounded ? <s key={u.id}>{u.type.name}</s> : <b key={u.id}>{u.type.name}</b>), ", ")}</>
+            )}
         </Tooltip>;
     }
 
