@@ -292,7 +292,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             // Filter out destinations that are already used
             .filter(r => !moves.map(([r, _a]) => r).includes(r))
             // Check that this new move doesn't trigger another attack
-            .filter(r => !attackMoveAlreadyPresent || this.doesMoveTriggerAttack(r))
+            .filter(r => attackMoveAlreadyPresent ? !this.doesMoveTriggerAttack(r) : true)
             // Check that if the destination a port, the adjacent land area must
             // be controlled by the resolver
             .filter(r => r.type == port ? this.world.getAdjacentLandOfPort(r).getController() == this.house : true)
