@@ -14,6 +14,7 @@ import BetterMap from "../../../utils/BetterMap";
 import HouseCard from "./house-card/HouseCard";
 import {land, port} from "./regionTypes";
 import PlanningRestriction from "./westeros-card/planning-restriction/PlanningRestriction";
+import EntireGame from "../../EntireGame";
 
 export const MAX_WILDLING_STRENGTH = 12;
 
@@ -281,6 +282,10 @@ export default class Game {
         }
 
         return false;
+    }
+
+    countPowerTokensOnBoard(house: House): number {
+        return this.world.regions.values.filter(r => r.controlPowerToken == house).length;
     }
 
     getAllowedCoundOfStarredOrders(house: House): number {

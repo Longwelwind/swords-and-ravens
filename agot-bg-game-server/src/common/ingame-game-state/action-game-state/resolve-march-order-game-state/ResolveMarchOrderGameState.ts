@@ -49,6 +49,9 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
     onResolveSingleMarchOrderGameStateFinish(house: House): void {
         // Last march is completely handled
         // Now is the time to ...
+        //   ... remove orphaned orders (e.g. caused by Mace Tyrell or Ilyn Payne)
+        this.findOrphanedOrdersAndRemoveThem();
+
         //   ... destroy orphaned ships (e.g. caused by Arianne)
         findOrphanedShipsAndDestroyThem(this.world, this.ingameGameState, this.actionGameState);
         //   ... check if ships can be converted
@@ -65,6 +68,20 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
 
         //   ... check if an other march order can be resolved
         this.proceedNextResolveSingleMarchOrder(house);
+    }
+
+    findOrphanedOrdersAndRemoveThem(): void {
+        const orphanedOrders = this.actionGameState.ordersOnBoard.entries.filter(([region, _]) => region.units.size == 0);
+
+        orphanedOrders.forEach(([region, _]) => {
+            // todo: Add a game log for this event
+            this.actionGameState.ordersOnBoard.delete(region);
+            this.actionGameState.entireGame.broadcastToClients({
+                type: "action-phase-change-order",
+                region: region.id,
+                order: null
+            });
+        });
     }
 
     onTakeControlOfEnemyPortFinish(lastHouseThatResolvedMarchOrder: House): void {

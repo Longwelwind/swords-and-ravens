@@ -151,8 +151,6 @@ export default class PostCombatGameState extends GameState<
             ? this.combat.getHouseCardTowerIcons(this.attacker)
             : this.combat.getHouseCardTowerIcons(this.defender);
 
-        const loserCasualtiesCount = Math.max(0, winnerSwordIcons - loserTowerIcons);
-
         // All units of the loser army that can't retreat or are wounded are immediately killed
         const immediatelyKilledLoserUnits = loserArmy.filter(u => u.wounded || !u.type.canRetreat);
 
@@ -185,6 +183,8 @@ export default class PostCombatGameState extends GameState<
         }
 
         const loserArmyLeft = _.difference(loserArmy, immediatelyKilledLoserUnits);
+        const maxLoserCasualtiesCount = Math.max(0, winnerSwordIcons - loserTowerIcons);
+        const loserCasualtiesCount = Math.min(maxLoserCasualtiesCount, loserArmyLeft.length);
 
         if (loserCasualtiesCount > 0) {
             // Check if casualties are prevented this combat
@@ -229,16 +229,16 @@ export default class PostCombatGameState extends GameState<
     }
 
     proceedEndOfCombat(): void {
-        // If the attacker won, move his units to the attacked region
         if (this.winner == this.attacker) {
-            // It might be that this movement can be prevented by house cards (e.g. Arianne Martell)
-            if (!this.isAttackingArmyMovementPrevented()) {
-                this.combat.resolveMarchOrderGameState.moveUnits(this.combat.attackingRegion, this.combat.attackingArmy, this.combat.defendingRegion);
-            } else {
-                // Defender had to retreat
-                // Therefore possible orders in defending region need to be removed
-                this.removeOrderFromRegion(this.combat.defendingRegion);
+            // Check if the attacker still has an army. All attacking units might have
+            // been killed during the combat.
+            if (this.combat.attackingArmy.length > 0) {
+                // It might be that this movement can be prevented by house cards (e.g. Arianne Martell)
+                if (!this.isAttackingArmyMovementPrevented()) {
+                    this.combat.resolveMarchOrderGameState.moveUnits(this.combat.attackingRegion, this.combat.attackingArmy, this.combat.defendingRegion);
+                }
             }
+            this.removeOrderFromRegion(this.combat.defendingRegion);
         }
 
         // Remove the order from attacking region

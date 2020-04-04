@@ -58,13 +58,7 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
         const gains: number = this.getPotentialGainedPowerTokens(region, house);
 
         if(gains > 0) {
-            house.changePowerTokens(gains);
-
-            this.entireGame.broadcastToClients({
-                type: "change-power-token",
-                houseId: house.id,
-                powerTokenCount: house.powerTokens
-            });
+            this.ingame.changePowerTokens(house, gains);
         }
 
         this.ingame.log({

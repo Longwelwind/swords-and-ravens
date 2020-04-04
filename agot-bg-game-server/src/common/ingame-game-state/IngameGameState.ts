@@ -19,6 +19,9 @@ import PlanningRestriction from "./game-data-structure/westeros-card/planning-re
 import GameLogManager, {SerializedGameLogManager} from "./game-data-structure/GameLogManager";
 import {GameLogData} from "./game-data-structure/GameLog";
 import GameEndedGameState, {SerializedGameEndedGameState} from "./game-ended-game-state/GameEndedGameState";
+import UnitType from "./game-data-structure/UnitType";
+
+const MAX_POWER_TOKENS = 20;
 
 export default class IngameGameState extends GameState<
     EntireGame,
@@ -125,6 +128,50 @@ export default class IngameGameState extends GameState<
         }
 
         return player;
+    }
+
+    changePowerTokens(house: House, delta: number): number {
+        const originalValue = house.powerTokens;
+
+        const powerTokensOnBoardCount = this.game.countPowerTokensOnBoard(house);
+        const maxPowerTokenCount = MAX_POWER_TOKENS - powerTokensOnBoardCount;
+
+        house.powerTokens += delta;
+        house.powerTokens = Math.max(0, Math.min(house.powerTokens, maxPowerTokenCount));
+
+        this.entireGame.broadcastToClients({
+            type: "change-power-token",
+            houseId: house.id,
+            powerTokenCount: house.powerTokens
+        });
+
+        return originalValue - house.powerTokens;
+    }
+
+    transformUnits(region: Region, units: Unit[], targetType: UnitType): Unit[] {
+        this.entireGame.broadcastToClients({
+            type: "remove-units",
+            regionId: region.id,
+            unitIds: units.map(u => u.id)
+        });
+
+        const transformed = units.map(unit => {
+            unit.region.units.delete(unit.id);
+
+            const newUnit = this.game.createUnit(unit.region, targetType, unit.allegiance);
+            newUnit.region.units.set(newUnit.id, newUnit);
+
+            newUnit.wounded = unit.wounded;
+
+            return newUnit;
+        });
+
+        this.entireGame.broadcastToClients({
+            type: "add-units",
+            units: [[region.id, transformed.map(u => u.serializeToClient())]]
+        });
+
+        return transformed;
     }
 
     checkVictoryConditions(): boolean {
