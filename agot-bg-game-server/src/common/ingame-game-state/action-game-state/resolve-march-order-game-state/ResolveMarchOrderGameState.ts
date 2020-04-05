@@ -203,12 +203,14 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
     serializeToClient(admin: boolean, player: Player | null): SerializedResolveMarchOrderGameState {
         return {
             type: "resolve-march-order",
-            childGameState: this.childGameState.serializeToClient(admin, player)
+            childGameState: this.childGameState.serializeToClient(admin, player),
+            currentTurnOrderIndex: this.currentTurnOrderIndex
         };
     }
 
     static deserializeFromServer(actionGameState: ActionGameState, data: SerializedResolveMarchOrderGameState): ResolveMarchOrderGameState {
         const resolveMarchOrderGameState = new ResolveMarchOrderGameState(actionGameState);
+        resolveMarchOrderGameState.currentTurnOrderIndex = data.currentTurnOrderIndex;
 
         resolveMarchOrderGameState.childGameState = resolveMarchOrderGameState.deserializeChildGameState(data.childGameState);
 
@@ -231,4 +233,5 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
 export interface SerializedResolveMarchOrderGameState {
     type: "resolve-march-order";
     childGameState: SerializedResolveSingleMarchOrderGameState | SerializedCombatGameState | SerializedTakeControlOfEnemyPortGameState;
+    currentTurnOrderIndex: number;
 }
