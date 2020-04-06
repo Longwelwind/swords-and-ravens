@@ -97,9 +97,6 @@ export default class PostCombatGameState extends GameState<
             });
         }
 
-        // Put the house cards as used
-        this.combat.houseCombatDatas.forEach(({houseCard}, house) => this.markHouseAsUsed(house, houseCard));
-
         this.setChildGameState(new AfterWinnerDeterminationGameState(this)).firstStart();
     }
 
@@ -243,6 +240,9 @@ export default class PostCombatGameState extends GameState<
 
         // Remove the order from attacking region
         this.removeOrderFromRegion(this.combat.attackingRegion);
+
+        // Put the house cards as used
+        this.combat.houseCombatDatas.forEach(({houseCard}, house) => this.markHouseAsUsed(house, houseCard));
 
         this.setChildGameState(new AfterCombatHouseCardAbilitiesGameState(this)).firstStart();
     }
