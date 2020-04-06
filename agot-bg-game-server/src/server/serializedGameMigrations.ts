@@ -40,6 +40,23 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "3",
+        migrate: (serializedGame: any) => {
+            // Migration for #506
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                ingame.gameLogManager.logs
+                    .filter((log: any) => log.data.type == "combat-result")
+                    .forEach((log: any) => {
+                        log.data.stats.forEach((s: any) => s.armyUnits = []);
+                    });
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

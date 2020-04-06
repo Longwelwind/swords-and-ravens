@@ -75,6 +75,7 @@ export default class PostCombatGameState extends GameState<
                     house: h.id,
                     region: this.combat.houseCombatDatas.get(h).region.id,
                     army: this.combat.getBaseCombatStrength(h),
+                    armyUnits: this.combat.houseCombatDatas.get(h).army.map(u => u.type.id),
                     orderBonus: this.combat.getOrderBonus(h),
                     support: this.combat.getSupportStrengthForSide(h),
                     garrison: this.combat.getGarrisonCombatStrength(h),
