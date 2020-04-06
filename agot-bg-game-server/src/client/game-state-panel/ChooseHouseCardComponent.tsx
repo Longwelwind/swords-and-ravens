@@ -14,6 +14,25 @@ import { observable } from "mobx";
 @observer
 export default class ChooseHouseCardComponent extends Component<GameStateComponentProps<ChooseHouseCardGameState>> {
     @observable selectedHouseCard: HouseCard | null;
+    @observable dirty: boolean;
+
+    get chosenHouseCard(): HouseCard | null {
+        return this.props.gameClient.authenticatedPlayer
+            ? this.props.gameState.houseCards.tryGet(this.props.gameClient.authenticatedPlayer.house, null)
+            : null;
+    }
+
+    constructor(props: GameStateComponentProps<ChooseHouseCardGameState>) {
+        super(props);
+
+        const authenticatedPlayer = this.props.gameClient.authenticatedPlayer;
+
+        this.selectedHouseCard = this.chosenHouseCard;
+
+        this.dirty = authenticatedPlayer
+            ? !this.props.gameState.houseCards.has(authenticatedPlayer.house)
+            :  false;
+    }
 
     render(): JSX.Element {
         return (
@@ -22,32 +41,34 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
                     The attacker and the defender must choose a House Card
                 </Col>
                 <Col xs={12}>
-                    {this.shouldChooseHouseCard() ? (
-                        <Row className="justify-content-center">
-                            {this.getChoosableHouseCards().map(hc => (
-                                <Col xs="auto" key={hc.id}>
-                                    <HouseCardComponent
-                                        houseCard={hc}
-                                        size="small"
-                                        selected={this.selectedHouseCard == hc}
-                                        onClick={() => this.selectedHouseCard != hc ? this.selectedHouseCard = hc : this.selectedHouseCard = null}
-                                    />
-                                </Col>
-                            ))}
-                        </Row>
-                    ) : (
-                        <div>
-                            Waiting for {this.props.gameState.getWaitingForHouses().map(h => h.name).join(" and ")} to choose their House Cards...
-                        </div>
-                    )}
+                    <Row className="justify-content-center">
+                        {this.getChoosableHouseCards().map(hc => (
+                            <Col xs="auto" key={hc.id}>
+                                <HouseCardComponent
+                                    houseCard={hc}
+                                    size="small"
+                                    selected={this.selectedHouseCard == hc}
+                                    onClick={() => {
+                                        if (hc != this.selectedHouseCard) {
+                                            this.selectedHouseCard = hc;
+                                            this.dirty = this.selectedHouseCard != this.chosenHouseCard;
+                                        }
+                                    }}
+                                />
+                            </Col>
+                        ))}
+                    </Row>
                 </Col>
-                {this.shouldChooseHouseCard() && (
-                    <Col xs="auto">
-                        <Button onClick={() => this.chooseHouseCard()} disabled={this.selectedHouseCard == null}>
+                <Col xs={12}>
+                        <Button onClick={() => this.chooseHouseCard()} disabled={!this.dirty}>
                             Confirm
                         </Button>
-                    </Col>
-                )}
+                </Col>
+                <Col xs={12}>
+                    <div>
+                        Waiting for {this.props.gameState.getWaitingForHouses().map(h => h.name).join(" and ")} to choose their House Cards...
+                    </div>
+                </Col>
             </>
         );
     }
@@ -58,10 +79,7 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
         }
 
         this.props.gameState.chooseHouseCard(this.selectedHouseCard);
-    }
-
-    shouldChooseHouseCard(): boolean {
-        return this.props.gameState.getWaitingForHouses().some(h => this.props.gameClient.doesControlHouse(h));
+        this.dirty = false;
     }
 
     getChoosableHouseCards(): HouseCard[] {
