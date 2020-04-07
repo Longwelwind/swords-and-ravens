@@ -146,6 +146,7 @@ interface ProceedWesterosCard {
 interface BidDone {
     type: "bid-done";
     houseId: string;
+    value: number;
 }
 
 interface GameStateChange {

@@ -34,9 +34,17 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
             const bid = Math.max(0, Math.min(message.powerTokens, player.house.powerTokens));
             this.bids.set(player.house, bid);
 
-            this.entireGame.broadcastToClients({
+            const otherHouses = _.difference(this.game.houses.values, [player.house]);
+            this.entireGame.sendMessageToClients(otherHouses.map(h => this.parentGameState.ingame.getControllerOfHouse(h).user), {
                 type: "bid-done",
-                houseId: player.house.id
+                houseId: player.house.id,
+                value: -1
+            });
+
+            this.entireGame.sendMessageToClients([player.user], {
+                type: "bid-done",
+                houseId: player.house.id,
+                value: bid
             });
 
             this.checkAndProceedEndOfBidding();
@@ -77,7 +85,7 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
     onServerMessage(message: ServerMessage): void {
         if (message.type == "bid-done") {
             const house = this.game.houses.get(message.houseId);
-            this.bids.set(house, -1);
+            this.bids.set(house, message.value);
         }
     }
 
