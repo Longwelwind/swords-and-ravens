@@ -88,6 +88,24 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                     });
             }
 
+            // Migration for #501
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                ingame.gameLogManager.logs
+                    .filter((log: any) => log.data.type == "retreat-region-chosen" && log.data.regionTo == null)
+                    .forEach((log: any) => {
+                        // Convert to a retreat-failed message
+                        log.data.type = "retreat-failed";
+
+                        log.data.region = log.data.regionFrom;
+                        delete log.data.regionFrom;
+
+                        // Assume the common case for a failed retreat
+                        log.data.isAttacker = false;
+                    });
+            }
+
             return serializedGame;
         }
     }

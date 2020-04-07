@@ -651,13 +651,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
             case "retreat-region-chosen":
                 return <>
-                {data.regionTo ?
-                    <>
                         <strong>{data.house}</strong> retreats from <strong>
                         {data.regionFrom}</strong> to <strong>{data.regionTo}</strong>.
-                    </> :
-                    <><strong>{data.house}</strong> was not able to retreat from <strong>{data.regionFrom}</strong>.</>}
                 </>;
+
+            case "retreat-failed":
+                return <>{
+                    data.isAttacker ?
+                        <><strong>{data.house}</strong> was not able to retreat to <strong>{data.region}</strong>.</>   :
+                        <><strong>{data.house}</strong> was not able to retreat from <strong>{data.region}</strong>.</>
+                }</>;
 
             case "retreat-casualties-suffered":
                 return <>
