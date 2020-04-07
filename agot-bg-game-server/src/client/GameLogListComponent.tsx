@@ -662,7 +662,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "retreat-casualties-suffered":
                 return <>
                     <p><strong>{data.house}</strong> suffered casualties from the retreat: <>{joinReactNodes(data.units.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</p>
-                </>
+                </>;
 
             case "enemy-port-taken":
                 return <>

@@ -115,7 +115,7 @@ export default class ResolveRetreatGameState extends GameState<
         this.ingame.log({
             type: "retreat-casualties-suffered",
             house: affectedHouse.name,
-            units: region.units.values.map(u => u.type.name)
+            units: unitsToKill.map(u => u.type.name)
         });
     }
 
@@ -129,7 +129,7 @@ export default class ResolveRetreatGameState extends GameState<
             house: this.postCombat.loser.name,
             regionFrom: this.combat.defendingRegion.name,
             regionTo: retreatRegion.name
-        })
+        });
 
         // Check if this retreat region require casualties
         const casualtiesCount = this.getCasualtiesOfRetreatRegion(retreatRegion);
