@@ -81,6 +81,7 @@ interface CombatResult {
         house: string;
         region: string;
         army: number;
+        armyUnits: string[];
         orderBonus: number;
         support: number;
         garrison: number;
