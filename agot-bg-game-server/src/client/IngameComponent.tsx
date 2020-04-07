@@ -32,6 +32,8 @@ import diamondHiltImage from "../../public/images/icons/diamond-hilt.svg";
 import hourglassImage from "../../public/images/icons/hourglass.svg";
 import mammothImage from "../../public/images/icons/mammoth.svg";
 import chatBubble from "../../public/images/icons/chat-bubble.svg";
+import speaker from "../../public/images/icons/speaker.svg";
+import speakerOff from "../../public/images/icons/speaker-off.svg";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import housePowerTokensImages from "./housePowerTokensImages";
 import marked from "marked";
@@ -195,7 +197,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                             </Badge>
                                                             </div>
                                                             <div className="d-flex">
-                                                                <div style={{width: "18px", marginRight: "10px", marginTop: "10px"}}>
+                                                                <div style={{width: "18px", marginRight: "6px", marginTop: "10px"}}>
                                                                     {this.getHousesAtSupplyLevel(i).map(h => (
                                                                         <OverlayTrigger
                                                                             key={h.id}
@@ -236,7 +238,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             </Card>
                         </Col>
                     </Row>
-                    <Row>
+                    <Row className="stackable">
                         <Col>
                             <Card>
                                 <ListGroup variant="flush">
@@ -319,6 +321,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             </Card>
                         </Col>
                     </Row>
+                    <Row>
+                        <Col xs="auto">
+                            <button className="btn btn-outline-light btn-sm" onClick={() => this.props.gameClient.muted = !this.props.gameClient.muted}>
+                                <img src={this.props.gameClient.muted ? speakerOff : speaker} width={32}/>
+                            </button>
+                        </Col>
+                    </Row>
                 </Col>
                 <Col xs="auto">
                     <div>
@@ -332,7 +341,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 <Col xs={12} lg={3}>
                     <Row className="stackable">
                         <Col>
-                            <Card>
+                            <Card border={this.props.gameClient.isOwnTurn() ? "warning" : undefined}>
                                 <ListGroup variant="flush">
                                     {phases.some(phase => this.props.gameState.childGameState instanceof phase.gameState) && (
                                         <ListGroupItem>
