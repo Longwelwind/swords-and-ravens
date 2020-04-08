@@ -64,7 +64,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                 Players receive an e-mail when it is their turn.
                                 Those games are typically played over days or weeks.
                             </Tooltip>}>
-                                <label>PBEM</label>
+                                <label htmlFor="pbem-setting">PBEM</label>
                         </OverlayTrigger>}
                     disabled={!this.canChangeGameSettings}
                     checked={this.gameSettings.pbem}
