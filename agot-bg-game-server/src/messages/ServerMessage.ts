@@ -63,6 +63,7 @@ interface SupportDeclared {
 interface HouseCardChosen {
     type: "house-card-chosen";
     houseId: string;
+    houseCardId: string | null;
 }
 
 interface ChangeCombatHouseCard {

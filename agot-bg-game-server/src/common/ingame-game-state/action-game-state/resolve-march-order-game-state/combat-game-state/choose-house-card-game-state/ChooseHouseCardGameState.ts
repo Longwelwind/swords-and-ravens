@@ -40,8 +40,9 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
     onServerMessage(message: ServerMessage): void {
         if (message.type == "house-card-chosen") {
             const house = this.combatGameState.game.houses.get(message.houseId);
-
-            this.houseCards.set(house, null);
+            this.houseCards.set(house, message.houseCardId
+                ? this.combatGameState.game.getHouseCardById(message.houseCardId)
+                : null);
         }
     }
 
@@ -59,9 +60,17 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
             this.houseCards.set(player.house, houseCard);
 
-            this.entireGame.broadcastToClients({
+            const otherHouses = _.difference(this.parentGameState.game.houses.values, [player.house]);
+            this.entireGame.sendMessageToClients(otherHouses.map(h => this.combatGameState.ingameGameState.getControllerOfHouse(h).user), {
                 type: "house-card-chosen",
-                houseId: player.house.id
+                houseId: player.house.id,
+                houseCardId: null
+            });
+
+            this.entireGame.sendMessageToClients([player.user], {
+                type: "house-card-chosen",
+                houseId: player.house.id,
+                houseCardId: houseCard.id
             });
 
             this.checkAndProceedEndOfChooseHouseCardGameState();
