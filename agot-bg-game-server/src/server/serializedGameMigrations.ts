@@ -44,6 +44,39 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
     {
         version: "3",
         migrate: (serializedGame: any) => {
+          // Migration for #499
+          if (serializedGame.childGameState.type == "ingame") {
+              const serializedIngameGameState = serializedGame.childGameState;
+              if (serializedIngameGameState.childGameState.type == "action") {
+                  const serializedActionGameState = serializedIngameGameState.childGameState;
+                  if (serializedActionGameState.childGameState.type == "resolve-march-order") {
+                      const serializedResolveMarchOrderGameState = serializedActionGameState.childGameState;
+
+                      let lastSelectedId: any;
+
+                      const serializedChildGameState = serializedResolveMarchOrderGameState.childGameState;
+                      switch (serializedChildGameState.type) {
+                          case "resolve-single-march":
+                              lastSelectedId = serializedChildGameState.houseId;
+                              break;
+                          case "combat":
+                              lastSelectedId = serializedChildGameState.attackerId;
+                              break;
+                          case "take-control-of-enemy-port":
+                              lastSelectedId = serializedChildGameState.lastHouseThatResolvedMarchOrderId;
+                              break;
+                          default:
+                              throw new Error("Invalid childGameState type")
+                      }
+
+                      // This will get the index of the last player that resolved a march order on the current turn order.
+                      // It might result in the pre-fix behavior if the Doran Martell was used as one of the cards in the child game state.
+                      serializedResolveMarchOrderGameState.currentTurnOrderIndex = serializedIngameGameState.game.ironThroneTrack.indexOf(lastSelectedId);
+                  }
+              }
+          }
+
+
             // Migration for #506
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
