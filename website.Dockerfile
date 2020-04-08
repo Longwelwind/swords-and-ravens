@@ -1,4 +1,4 @@
-FROM node:10.16 AS build-client
+FROM node:10.16-slim AS build-client
 # Build the client of the game
 WORKDIR /app
 
@@ -11,7 +11,7 @@ COPY ./agot-bg-game-server/ .
 RUN yarn run generate-json-schemas
 RUN yarn run build-client
 
-FROM python:3.6
+FROM python:3.6-slim
 
 WORKDIR /app
 
@@ -39,6 +39,6 @@ RUN SECRET_KEY=not_used \
     EMAIL_HOST_USER=not_used \
     EMAIL_HOST_PASSWORD=not_used \
     REDIS_URL=not_used \
-    python manage.py collectstatic
+    python manage.py collectstatic -l
 
 RUN mkdir /django_metrics
