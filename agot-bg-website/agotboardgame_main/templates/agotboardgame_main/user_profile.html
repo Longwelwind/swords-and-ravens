@@ -4,6 +4,7 @@
 {{ viewed_user.username }} -
 {% endblock %}
 
+{% load humanize %}
 
 {% block content %}
 <h3 class="mb-4">{% if group_name %}<span class="badge badge badge-{{ group_color }}">{{ group_name }}</span>{% endif %} {{ viewed_user.username }}</h3>
@@ -11,7 +12,7 @@
     <div class="col-lg-6">
         <div class="card">
             <div class="card-body">
-                <strong>Last activity:</strong> {{ viewed_user.last_activity|date:"d F Y" }} at {{ viewed_user.last_activity|date:"H:i" }}
+                <strong>Last activity </strong> {{ viewed_user.last_activity|naturaltime}}
             </div>
         </div>
     </div>

@@ -1,4 +1,5 @@
 {% load house_icon %}
+{% load humanize %}
 
 <table class="table table-hover table-sm">
     <thead>
@@ -26,7 +27,7 @@
                         Turn: <b>{{ game.view_of_game.turn }}</b>
                     </p>
                     <div class='text-small text-muted'>
-                        Last active on {{ game.updated_at|date:'d F Y \a\t H:i' }}
+                        Last active {{ game.updated_at|naturaltime }}
                     </div>
                 "
                 data-placement="right"
