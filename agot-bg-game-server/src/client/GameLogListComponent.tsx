@@ -294,15 +294,23 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 // Those 3 variables will always be all null or all non-null
                 if (raidee && raidedRegion && orderRaided) {
                     return (
-                        <p>
-                            <strong>{raider.name}</strong> raided <strong>{raidee.name}</strong>&apos;s <strong>{orderRaided.type.name}
-                            </strong> in <strong>{raidedRegion.name}</strong> from <strong>{raiderRegion.name}</strong>
-                        </p>
+                        <>
+                            <p>
+                                <strong>{raider.name}</strong> raided <strong>{raidee.name}</strong>&apos;s <strong>{orderRaided.type.name}
+                                </strong> in <strong>{raidedRegion.name}</strong> from <strong>{raiderRegion.name}</strong>.
+                            </p>
+                            {data.raiderGainedPowerToken &&
+                                <p><strong>{raider.name}</strong> gained {data.raiderGainedPowerToken ? "a" : "no"} Power Token
+                                    from this raid.</p>}
+                            {data.raidedHouseLostPowerToken != null
+                                && <p><strong>{raidee.name}</strong> lost {data.raidedHouseLostPowerToken ? "a" : "no"} Power Token
+                                    from this raid.</p>}
+                        </>
                     );
                 } else {
                     return (
                         <p>
-                            <strong>{raider.name}</strong> raided nothing from <strong>{raiderRegion.name}</strong>
+                            <strong>{raider.name}</strong> raided nothing from <strong>{raiderRegion.name}</strong>.
                         </p>
                     );
                 }
