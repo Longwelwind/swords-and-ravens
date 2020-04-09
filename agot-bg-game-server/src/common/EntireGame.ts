@@ -28,6 +28,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     // Keys are the two users participating in the private chat.
     // A pair of user is sorted alphabetically by their id when used as a key.
     @observable privateChatRoomsIds: BetterMap<User, BetterMap<User, string>> = new BetterMap();
+    // Client-side callback fired whenever the current GameState changes.
+    onClientGameStateChange: (() => void) | null;
 
     constructor(id: string, ownerId: string, name: string) {
         super(null);
@@ -141,6 +143,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             // Get the GameState for whose the childGameState must change
             const parentGameState = this.getGameStateNthLevelDown(level - 1);
             parentGameState.childGameState = parentGameState.deserializeChildGameState(serializedGameState);
+
+            if (this.onClientGameStateChange) {
+                this.onClientGameStateChange();
+            }
         } else if (message.type == "new-user") {
             const user = User.deserializeFromServer(this, message.user);
 
