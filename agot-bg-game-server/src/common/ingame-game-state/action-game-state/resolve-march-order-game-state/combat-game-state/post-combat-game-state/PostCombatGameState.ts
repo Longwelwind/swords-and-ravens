@@ -187,10 +187,12 @@ export default class PostCombatGameState extends GameState<
                     // is not needed. The army left can be exterminated.
                     this.onChooseCasualtiesGameStateEnd(locationLoserArmy, loserArmyLeft);
                 }
+                
+                return;
             }
-        } else {
-            this.proceedHouseCardHandling();
         }
+
+        this.proceedHouseCardHandling();
     }
 
     proceedHouseCardHandling(): void {
