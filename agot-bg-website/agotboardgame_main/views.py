@@ -55,7 +55,7 @@ def register(request):
 
 
 def about(request):
-    tasks = [
+    game_tasks = [
         {"name": "Base Game Second Edition", "done": True, "children": [
             {"name": "Tides of Battle"}
         ]},
@@ -69,7 +69,15 @@ def about(request):
         ]}
     ]
 
-    return render(request, "agotboardgame_main/about.html", {"tasks": tasks})
+    meta_tasks = [
+        {"name": "Ranked games"},
+        {"name": "Game Statistics (win rates, ...)"},
+        {"name": "Player Statistic (kicked rate, ...)"},
+        {"name": "Player Reports & moderation tools"},
+        {"name": "Replays"}
+    ]
+
+    return render(request, "agotboardgame_main/about.html", {"game_tasks": game_tasks, "meta_tasks": meta_tasks})
 
 
 def games(request):
