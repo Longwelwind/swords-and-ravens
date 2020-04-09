@@ -151,6 +151,8 @@ interface RaidDone {
     raiderRegion: string;
     raidedRegion: string | null;
     orderRaided: number | null;
+    raiderGainedPowerToken: boolean | null;
+    raidedHouseLostPowerToken: boolean | null;
 }
 
 interface DarkWingsDarkWordsChoice {
