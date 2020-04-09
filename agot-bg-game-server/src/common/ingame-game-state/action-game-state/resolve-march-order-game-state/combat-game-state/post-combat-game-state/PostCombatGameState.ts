@@ -86,21 +86,7 @@ export default class PostCombatGameState extends GameState<
             })
         });
 
-        // If there was a defeated garrison, remove it
-        if (this.loser == this.combat.defender && this.combat.defendingRegion.garrison > 0) {
-            this.combat.defendingRegion.garrison = 0;
-
-            this.entireGame.broadcastToClients({
-                type: "change-garrison",
-                region: this.combat.defendingRegion.id,
-                newGarrison: 0
-            });
-        }
-
-        // Put the house cards as used
-        this.combat.houseCombatDatas.forEach(({houseCard}, house) => this.markHouseAsUsed(house, houseCard));
-
-        this.setChildGameState(new AfterWinnerDeterminationGameState(this)).firstStart();
+        this.proceedCasualties();
     }
 
     onChooseCasualtiesGameStateEnd(region: Region, selectedCasualties: Unit[]): void {
@@ -131,15 +117,20 @@ export default class PostCombatGameState extends GameState<
             unitIds: selectedCasualties.map(u => u.id)
         });
 
-        if (this.loser == this.defender) {
-            this.proceedRetreat();
-            return;
-        }
-
-        this.proceedEndOfCombat();
+        this.proceedHouseCardHandling();
     }
 
-    onAfterWinnerDeterminationFinish(): void {
+    proceedCasualties(): void {
+        // If there was a defeated garrison, remove it
+        if (this.loser == this.combat.defender && this.combat.defendingRegion.garrison > 0) {
+            this.combat.defendingRegion.garrison = 0;
+
+            this.entireGame.broadcastToClients({
+                type: "change-garrison",
+                region: this.combat.defendingRegion.id,
+                newGarrison: 0
+            });
+        }
 
         const locationLoserArmy = this.attacker == this.loser ? this.combat.attackingRegion : this.combat.defendingRegion;
         const loserArmy = this.attacker == this.loser ? this.combat.attackingArmy : this.combat.defendingArmy;
@@ -196,11 +187,25 @@ export default class PostCombatGameState extends GameState<
                     // is not needed. The army left can be exterminated.
                     this.onChooseCasualtiesGameStateEnd(locationLoserArmy, loserArmyLeft);
                 }
-
-                return;
             }
+        } else {
+            this.proceedHouseCardHandling();
         }
+    }
 
+    proceedHouseCardHandling(): void {
+        // Put the house cards as used
+        this.combat.houseCombatDatas.forEach(({houseCard}, house) => this.markHouseAsUsed(house, houseCard));
+
+        this.proceedAfterWinnerDetermination();
+    }
+
+    proceedAfterWinnerDetermination(): void {
+        // Do abilities
+        this.setChildGameState(new AfterWinnerDeterminationGameState(this)).firstStart();
+    }
+
+    onAfterWinnerDeterminationFinish(): void {
         this.proceedRetreat();
     }
 
