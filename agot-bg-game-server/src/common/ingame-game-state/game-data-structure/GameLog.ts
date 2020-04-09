@@ -60,6 +60,7 @@ interface MarchResolved {
     house: string;
     startingRegion: string;
     moves: [string, string[]][];
+    leftPowerToken: boolean | null;
 }
 
 interface WesterosCardExecuted {

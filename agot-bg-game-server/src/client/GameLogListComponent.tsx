@@ -94,14 +94,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <>
-                        <b>{house.name}</b> marched from <b>{startingRegion.name}</b>:
+                        <b>{house.name}</b> marched from <b>{startingRegion.name}</b>{
+                            data.leftPowerToken != null && <> and left {data.leftPowerToken ? "a" : "no"} Power Token</>}{moves.length > 0 ? ":" : "."}
+                        {moves.length > 0 &&
                         <ul>
                             {moves.map(([region, unitTypes]) => (
                                 <li key={region.id}>
                                     {joinReactNodes(unitTypes.map((ut, i) => <b key={i}>{ut.name}</b>), ", ")} to <b>{region.name}</b>
                                 </li>
                             ))}
-                        </ul>
+                        </ul>}
                     </>
                 );
 
