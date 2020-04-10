@@ -36,14 +36,14 @@
             >
                 <td class="align-middle text-center">
                     {% if game.state == "IN_LOBBY" %}
-                        <span class="badge badge-pill badge-success">Open</span>
+                        <span class="badge badge-success">Open</span>
                     {% elif game.state == "ONGOING" %}
-                        <span class="badge badge-pill badge-warning">Ongoing</span>
+                        <span class="badge badge-warning">Ongoing</span>
                     {% endif %}
                 </td>
                 <td class="align-middle">
                     {% if game.view_of_game.settings.pbem %}
-                        <span class="badge badge-pill badge-info"
+                        <span class="badge badge-info"
                               data-toggle="tooltip"
                               data-html="true"
                               title="
@@ -55,17 +55,17 @@
                             PBEM
                         </span>
                     {% else %}
-                        <span class="badge badge-pill badge-info" data-toggle="tooltip">
+                        <span class="badge badge-info" data-toggle="tooltip">
                             Live
                         </span>
                     {% endif %}
                     {% if game.player_in_game %}
                         {% if game.player_in_game.data.waited_for %}
-                            <span class="badge badge-pill badge-danger">
+                            <span class="badge badge-danger">
                                 {% house_icon game.player_in_game.data.house %} YOUR TURN
                             </span>
                         {% else %}
-                            <span class="badge badge-pill badge-info">
+                            <span class="badge badge-info">
                                 {% house_icon game.player_in_game.data.house %} Playing
                             </span>
                         {% endif %}

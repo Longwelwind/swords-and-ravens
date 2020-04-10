@@ -7,13 +7,14 @@
 
 
 .badge .house-icon {
-    margin-top: -2px;
+    margin-top: -3.5px;
+    margin-bottom: 2px;
     margin-right: 2px;
     display: inline-block;
     height: 0px;
 }
 
 .badge .house-icon img {
-    height: 19px;
-    width: 19px;
+    height: 18px;
+    width: 18px;
 }
