@@ -33,7 +33,7 @@ export default class BiddingComponent<ParentGameState extends BiddingGameStatePa
     render(): ReactNode {
         return (
             <>
-                {this.props.gameClient.authenticatedPlayer && (
+                {this.props.gameClient.authenticatedPlayer && this.props.gameState.participatingHouses.includes(this.props.gameClient.authenticatedPlayer.house) && (
                     <>
                         <Col xs={12}>
                             <Row className="justify-content-center">

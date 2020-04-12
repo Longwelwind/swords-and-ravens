@@ -100,10 +100,17 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         return "Choose a general";
     }
 
-    serializeToClient(_admin: boolean, _player: Player | null): SerializedChooseHouseCardGameState {
+    serializeToClient(admin: boolean, player: Player | null): SerializedChooseHouseCardGameState {
         return {
             type: "choose-house-card",
-            houseCards: this.houseCards.map((h, hc) => [h.id, hc ? hc.id : null])
+            houseCards: this.houseCards.map((h, hc) => {
+                // If a player requested the serialized version, only give his own house card.
+                if ((admin || (player && h == player.house)) && hc) {
+                    return [h.id, hc.id];
+                } else {
+                    return [h.id, null];
+                }
+            })
         };
     }
 

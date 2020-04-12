@@ -80,7 +80,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             }
 
             // Check that at most one move triggers a fight
-            const movesThatTriggerAttack = moves.filter(([region, _army]) => this.doesMoveTriggerAttack(region));
+            const movesThatTriggerAttack = this.getMovesThatTriggerAttack(moves);
             // This has been checked earlier in "this.areValidMoves" but it's never bad
             // to check twice
             if (movesThatTriggerAttack.length > 1) {
@@ -294,13 +294,14 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
      */
     getValidTargetRegions(startingRegion: Region, moves: [Region, Unit[]][], movingArmy: Unit[]): Region[] {
         const movesThatTriggerAttack = this.getMovesThatTriggerAttack(moves);
+        const movesThatDontTriggerAttack = _.difference(moves, movesThatTriggerAttack);
         const attackMoveAlreadyPresent = movesThatTriggerAttack.length > 0;
 
         return this.world.getReachableRegions(startingRegion, this.house, movingArmy)
             // Filter out destinations that are already used
             .filter(r => !moves.map(([r, _a]) => r).includes(r))
             // Check that this new move doesn't trigger another attack
-            .filter(r => !attackMoveAlreadyPresent || this.doesMoveTriggerAttack(r))
+            .filter(r => attackMoveAlreadyPresent ? !this.doesMoveTriggerAttack(r) : true)
             // Check that if the destination a port, the adjacent land area must
             // be controlled by the resolver
             .filter(r => r.type == port ? this.world.getAdjacentLandOfPort(r).getController() == this.house : true)
@@ -310,7 +311,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             // to overcome the neutral force
             .filter(r => {
                 if (r.getController() == null && r.garrison > 0) {
-                    return this.hasEnoughToAttackNeutralForce(startingRegion, movingArmy, r);
+                    return this.hasEnoughToAttackNeutralForce(startingRegion, movingArmy, r, movesThatDontTriggerAttack);
                 }
 
                 return true;
@@ -342,16 +343,38 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
         return this.actionGameState.getRegionsWithMarchOrderOfHouse(this.house);
     }
 
-    hasEnoughToAttackNeutralForce(startingRegion: Region, army: Unit[], targetRegion: Region): boolean {
+    hasEnoughToAttackNeutralForce(startingRegion: Region, army: Unit[], targetRegion: Region, movesThatDontTriggerAttack: [Region, Unit[]][]): boolean {
         const marchOrder = this.actionGameState.ordersOnBoard.get(startingRegion);
 
         if (!(marchOrder.type instanceof MarchOrderType)) {
             throw new Error();
         }
 
-        return this.game.getCombatStrengthOfArmy(army, targetRegion.hasStructure)
-            + this.actionGameState.getSupportCombatStrength(this.house, targetRegion)
+        return this.getCombatStrengthOfArmyAgainstNeutralForce(army, targetRegion.hasStructure)
+            + this.getSupportCombatStrengthAgainstNeutralForce(this.house, targetRegion, movesThatDontTriggerAttack)
             + marchOrder.type.attackModifier >= targetRegion.garrison;
+    }
+
+    private getCombatStrengthOfArmyAgainstNeutralForce(army: Unit[], attackingAStructure: boolean, additionalSupportingUnits: Unit[] | null = null): number {
+        let strength = army
+            .filter(u => !u.wounded)
+            .map(u => u.getCombatStrength(attackingAStructure))
+            .reduce(_.add, 0);
+
+        if (additionalSupportingUnits) {
+            // Additional supporting units can't be wounded so we don't need that filter here
+            strength += additionalSupportingUnits.map(u => u.getCombatStrength(attackingAStructure)).reduce(_.add, 0);
+        }
+
+        return strength;
+    }
+
+    private getSupportCombatStrengthAgainstNeutralForce(supportingHouse: House, attackedRegion: Region, movesThatDontTriggerAttack: [Region, Unit[]][]): number {
+        const movesThatDontTriggerAttackMap = new BetterMap(movesThatDontTriggerAttack);
+        return this.actionGameState.getPossibleSupportingRegions(attackedRegion)
+            .filter(({region}) => region.getController() == supportingHouse)
+            .map(({region, support}) => this.getCombatStrengthOfArmyAgainstNeutralForce(region.units.values, attackedRegion.hasStructure, movesThatDontTriggerAttackMap.tryGet(region, null)) + support.supportModifier)
+            .reduce(_.add, 0);
     }
 
     sendMoves(startingRegion: Region, moves: BetterMap<Region, Unit[]>, leavePowerToken: boolean): void {

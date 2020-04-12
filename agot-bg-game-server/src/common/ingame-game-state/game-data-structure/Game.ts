@@ -298,13 +298,6 @@ export default class Game {
         return this.starredOrderRestrictions[place];
     }
 
-    getCombatStrengthOfArmy(army: Unit[], attackingAStructure: boolean): number {
-        return army
-            .filter(u => !u.wounded)
-            .map(u => u.getCombatStrength(attackingAStructure))
-            .reduce(_.add, 0);
-    }
-
     serializeToClient(admin: boolean): SerializedGame {
         return {
             lastUnitId: this.lastUnitId,
