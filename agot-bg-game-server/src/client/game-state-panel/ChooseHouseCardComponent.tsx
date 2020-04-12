@@ -40,30 +40,34 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
                 <Col xs={12}>
                     The attacker and the defender must choose a House Card
                 </Col>
-                <Col xs={12}>
-                    <Row className="justify-content-center">
-                        {this.getChoosableHouseCards().map(hc => (
-                            <Col xs="auto" key={hc.id}>
-                                <HouseCardComponent
-                                    houseCard={hc}
-                                    size="small"
-                                    selected={this.selectedHouseCard == hc}
-                                    onClick={() => {
-                                        if (hc != this.selectedHouseCard) {
-                                            this.selectedHouseCard = hc;
-                                            this.dirty = this.selectedHouseCard != this.chosenHouseCard;
-                                        }
-                                    }}
-                                />
-                            </Col>
-                        ))}
-                    </Row>
-                </Col>
-                <Col xs={12}>
-                        <Button onClick={() => this.chooseHouseCard()} disabled={!this.dirty}>
-                            Confirm
-                        </Button>
-                </Col>
+                {this.shouldChooseHouseCard() && (
+                    <>
+                        <Col xs={12}>
+                            <Row className="justify-content-center">
+                                {this.getChoosableHouseCards().map(hc => (
+                                    <Col xs="auto" key={hc.id}>
+                                        <HouseCardComponent
+                                            houseCard={hc}
+                                            size="small"
+                                            selected={this.selectedHouseCard == hc}
+                                            onClick={() => {
+                                                if (hc != this.selectedHouseCard) {
+                                                    this.selectedHouseCard = hc;
+                                                    this.dirty = this.selectedHouseCard != this.chosenHouseCard;
+                                                }
+                                            }}
+                                        />
+                                    </Col>
+                                ))}
+                            </Row>
+                        </Col>
+                        <Col xs={12}>
+                                <Button onClick={() => this.chooseHouseCard()} disabled={!this.dirty}>
+                                    Confirm
+                                </Button>
+                        </Col>
+                    </>
+                )}
                 <Col xs={12}>
                     <div>
                         Waiting for {this.props.gameState.getWaitingForHouses().map(h => h.name).join(" and ")} to choose their House Cards...
@@ -71,6 +75,10 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
                 </Col>
             </>
         );
+    }
+
+    shouldChooseHouseCard(): boolean {
+        return this.props.gameState.combatGameState.houseCombatDatas.keys.some(h => this.props.gameClient.doesControlHouse(h));
     }
 
     chooseHouseCard(): void {
