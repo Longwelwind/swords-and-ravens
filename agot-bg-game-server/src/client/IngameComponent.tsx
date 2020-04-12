@@ -288,13 +288,19 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 </Col>
                                                 <Col xs="auto" className="d-flex align-items-center">
                                                     <div style={{fontSize: "18px"}}>{p.house.powerTokens}</div>
-                                                    <div
-                                                        className="house-power-token hover-weak-outline"
-                                                        style={{
-                                                            backgroundImage: `url(${housePowerTokensImages.get(p.house.id)})`,
-                                                            marginLeft: "10px"
-                                                        }}
-                                                    />
+                                                    <OverlayTrigger
+                                                        overlay={this.renderPowerTooltip(p.house)}
+                                                        delay={{show: 750, hide: 100}}
+                                                        placement="auto"
+                                                    >
+                                                        <div
+                                                            className="house-power-token hover-weak-outline"
+                                                            style={{
+                                                                backgroundImage: `url(${housePowerTokensImages.get(p.house.id)})`,
+                                                                marginLeft: "10px"
+                                                            }}
+                                                        />
+                                                    </OverlayTrigger>
                                                 </Col>
                                             </Row>
                                             <Row className="justify-content-center">
@@ -465,6 +471,19 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     get publicChatRoom(): Channel {
         return this.props.gameClient.chatClient.channels.get(this.props.gameState.entireGame.publicChatRoomId);
+    }
+
+    private renderPowerTooltip(house: House): ReactNode {
+        const availablePower =  house.powerTokens;
+        const powerTokensOnBoard = this.game.countPowerTokensOnBoard(house);
+        const powerInPool = this.game.maxPowerTokens - availablePower - powerTokensOnBoard;
+
+        return <Tooltip id={house.id + "-power-tooltip"}>
+            <b>{house.name}</b><br/>
+            <small>Available: </small><b>{availablePower}</b><br/>
+            <small>On the board: </small><b>{powerTokensOnBoard}</b><br/>
+            <small>Power Pool: </small><b>{powerInPool}</b>
+        </Tooltip>;
     }
 
     onNewPrivateChatRoomClick(p: Player): void {

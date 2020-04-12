@@ -18,6 +18,8 @@ import * as _ from "lodash";
 import houseCardAbilities from "./house-card/houseCardAbilities";
 import EntireGame from "../../EntireGame";
 
+const MAX_POWER_TOKENS = 20;
+
 interface TiledSquareObject {
     name: string;
     x: number;
@@ -125,6 +127,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
     game.maxTurns = baseGameData.maxTurns;
     game.structuresCountNeededToWin = baseGameData.structuresCountNeededToWin;
     game.supplyRestrictions = baseGameData.supplyRestrictions;
+    game.maxPowerTokens = MAX_POWER_TOKENS;
 
     // Load tracks starting positions
     if (gameSetup.tracks && gameSetup.tracks.ironThrone) {
