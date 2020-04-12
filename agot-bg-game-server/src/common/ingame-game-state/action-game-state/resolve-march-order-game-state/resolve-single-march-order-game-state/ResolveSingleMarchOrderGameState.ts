@@ -91,7 +91,10 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             const movesThatDontTriggerAttack = _.difference(moves, movesThatTriggerAttack);
 
             // Check if the player was capable of placing a power token
-            if (message.leavePowerToken && this.canLeavePowerToken(startingRegion, new BetterMap(moves)).success) {
+            let leftPowerToken: boolean | null = null;
+            const canLeavePowerToken = this.canLeavePowerToken(startingRegion, new BetterMap(moves)).success;
+
+            if (message.leavePowerToken && canLeavePowerToken) {
                 startingRegion.controlPowerToken = this.house;
                 this.house.powerTokens -= 1;
 
@@ -106,6 +109,12 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                     regionId: startingRegion.id,
                     houseId: this.house.id
                 });
+
+                leftPowerToken = true;
+            }
+
+            if (canLeavePowerToken && !message.leavePowerToken) {
+                leftPowerToken = false;
             }
 
             // Execute the moves that don't trigger a fight
@@ -113,14 +122,13 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                 this.resolveMarchOrderGameState.moveUnits(startingRegion, units, region);
             });
 
-            if (movesThatDontTriggerAttack.length > 0) {
-                this.actionGameState.ingameGameState.log({
-                    type: "march-resolved",
-                    house: this.house.id,
-                    startingRegion: startingRegion.id,
-                    moves: movesThatDontTriggerAttack.map(([r, us]) => [r.id, us.map(u => u.type.id)])
-                });
-            }
+            this.actionGameState.ingameGameState.log({
+                type: "march-resolved",
+                house: this.house.id,
+                startingRegion: startingRegion.id,
+                moves: movesThatDontTriggerAttack.map(([r, us]) => [r.id, us.map(u => u.type.id)]),
+                leftPowerToken: leftPowerToken
+            });
 
             // It may be possible, that a user left a castle with ships in port empty.
             // If so, the ships in the port have to be destroyed.

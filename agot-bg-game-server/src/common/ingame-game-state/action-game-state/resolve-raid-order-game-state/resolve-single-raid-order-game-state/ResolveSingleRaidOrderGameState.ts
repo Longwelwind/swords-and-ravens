@@ -92,9 +92,12 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
                 throw new Error();
             }
 
+            let raiderGainedPowerToken: boolean | null = null;
+            let raidedHouseLostPowerToken: boolean | null = null;
+
             if (orderTarget.type instanceof ConsolidatePowerOrderType) {
-                this.ingameGameState.changePowerTokens(this.house, 1);
-                this.ingameGameState.changePowerTokens(raidedHouse, -1);
+                raiderGainedPowerToken = this.ingameGameState.changePowerTokens(this.house, 1) != 0;
+                raidedHouseLostPowerToken = this.ingameGameState.changePowerTokens(raidedHouse, -1) != 0;
             }
 
             this.actionGameState.ordersOnBoard.delete(targetRegion);
@@ -110,7 +113,9 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
                 raidee: raidedHouse.id,
                 raiderRegion: orderRegion.id,
                 raidedRegion: targetRegion.id,
-                orderRaided: orderTarget.id
+                orderRaided: orderTarget.id,
+                raiderGainedPowerToken: raiderGainedPowerToken,
+                raidedHouseLostPowerToken: raidedHouseLostPowerToken
             });
         } else {
             this.ingameGameState.log({
@@ -119,7 +124,9 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
                 raiderRegion: orderRegion.id,
                 raidedRegion: null,
                 raidee: null,
-                orderRaided: null
+                orderRaided: null,
+                raiderGainedPowerToken: null,
+                raidedHouseLostPowerToken: null
             });
         }
 

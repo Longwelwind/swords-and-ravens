@@ -40,6 +40,74 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "3",
+        migrate: (serializedGame: any) => {
+          // Migration for #499
+          if (serializedGame.childGameState.type == "ingame") {
+              const serializedIngameGameState = serializedGame.childGameState;
+              if (serializedIngameGameState.childGameState.type == "action") {
+                  const serializedActionGameState = serializedIngameGameState.childGameState;
+                  if (serializedActionGameState.childGameState.type == "resolve-march-order") {
+                      const serializedResolveMarchOrderGameState = serializedActionGameState.childGameState;
+
+                      let lastSelectedId: any;
+
+                      const serializedChildGameState = serializedResolveMarchOrderGameState.childGameState;
+                      switch (serializedChildGameState.type) {
+                          case "resolve-single-march":
+                              lastSelectedId = serializedChildGameState.houseId;
+                              break;
+                          case "combat":
+                              lastSelectedId = serializedChildGameState.attackerId;
+                              break;
+                          case "take-control-of-enemy-port":
+                              lastSelectedId = serializedChildGameState.lastHouseThatResolvedMarchOrderId;
+                              break;
+                          default:
+                              throw new Error("Invalid childGameState type")
+                      }
+
+                      // This will get the index of the last player that resolved a march order on the current turn order.
+                      // It might result in the pre-fix behavior if the Doran Martell was used as one of the cards in the child game state.
+                      serializedResolveMarchOrderGameState.currentTurnOrderIndex = serializedIngameGameState.game.ironThroneTrack.indexOf(lastSelectedId);
+                  }
+              }
+          }
+
+
+            // Migration for #506
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                ingame.gameLogManager.logs
+                    .filter((log: any) => log.data.type == "combat-result")
+                    .forEach((log: any) => {
+                        log.data.stats.forEach((s: any) => s.armyUnits = []);
+                    });
+            }
+
+            // Migration for #501
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                ingame.gameLogManager.logs
+                    .filter((log: any) => log.data.type == "retreat-region-chosen" && log.data.regionTo == null)
+                    .forEach((log: any) => {
+                        // Convert to a retreat-failed message
+                        log.data.type = "retreat-failed";
+
+                        log.data.region = log.data.regionFrom;
+                        delete log.data.regionFrom;
+
+                        // Assume the common case for a failed retreat
+                        log.data.isAttacker = false;
+                    });
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

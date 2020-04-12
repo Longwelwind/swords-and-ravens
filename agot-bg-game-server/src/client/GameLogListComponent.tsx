@@ -94,14 +94,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <>
-                        <b>{house.name}</b> marched from <b>{startingRegion.name}</b>:
+                        <b>{house.name}</b> marched from <b>{startingRegion.name}</b>{
+                            data.leftPowerToken != null && <> and left {data.leftPowerToken ? "a" : "no"} Power Token</>}{moves.length > 0 ? ":" : "."}
+                        {moves.length > 0 &&
                         <ul>
                             {moves.map(([region, unitTypes]) => (
                                 <li key={region.id}>
                                     {joinReactNodes(unitTypes.map((ut, i) => <b key={i}>{ut.name}</b>), ", ")} to <b>{region.name}</b>
                                 </li>
                             ))}
-                        </ul>
+                        </ul>}
                     </>
                 );
 
@@ -147,6 +149,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         house,
                         region: this.world.regions.get(stat.region),
                         houseCard: stat.houseCard != null ? house.houseCards.get(stat.houseCard) : null,
+                        armyUnits: stat.armyUnits.map(ut => unitTypes.get(ut))
                     };
                 });
                 const winner = this.game.houses.get(data.winner);
@@ -291,15 +294,23 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 // Those 3 variables will always be all null or all non-null
                 if (raidee && raidedRegion && orderRaided) {
                     return (
-                        <p>
-                            <strong>{raider.name}</strong> raided <strong>{raidee.name}</strong>&apos;s <strong>{orderRaided.type.name}
-                            </strong> in <strong>{raidedRegion.name}</strong> from <strong>{raiderRegion.name}</strong>
-                        </p>
+                        <>
+                            <p>
+                                <strong>{raider.name}</strong> raided <strong>{raidee.name}</strong>&apos;s <strong>{orderRaided.type.name}
+                                </strong> in <strong>{raidedRegion.name}</strong> from <strong>{raiderRegion.name}</strong>.
+                            </p>
+                            {data.raiderGainedPowerToken &&
+                                <p><strong>{raider.name}</strong> gained {data.raiderGainedPowerToken ? "a" : "no"} Power Token
+                                    from this raid.</p>}
+                            {data.raidedHouseLostPowerToken != null
+                                && <p><strong>{raidee.name}</strong> lost {data.raidedHouseLostPowerToken ? "a" : "no"} Power Token
+                                    from this raid.</p>}
+                        </>
                     );
                 } else {
                     return (
                         <p>
-                            <strong>{raider.name}</strong> raided nothing from <strong>{raiderRegion.name}</strong>
+                            <strong>{raider.name}</strong> raided nothing from <strong>{raiderRegion.name}</strong>.
                         </p>
                     );
                 }
@@ -640,18 +651,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
             case "retreat-region-chosen":
                 return <>
-                {data.regionTo ?
-                    <>
                         <strong>{data.house}</strong> retreats from <strong>
                         {data.regionFrom}</strong> to <strong>{data.regionTo}</strong>.
-                    </> :
-                    <><strong>{data.house}</strong> was not able to retreat from <strong>{data.regionFrom}</strong>.</>}
                 </>;
+
+            case "retreat-failed":
+                return <>{
+                    data.isAttacker ?
+                        <><strong>{data.house}</strong> was not able to retreat to <strong>{data.region}</strong>.</>   :
+                        <><strong>{data.house}</strong> was not able to retreat from <strong>{data.region}</strong>.</>
+                }</>;
 
             case "retreat-casualties-suffered":
                 return <>
                     <p><strong>{data.house}</strong> suffered casualties from the retreat: <>{joinReactNodes(data.units.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</p>
-                </>
+                </>;
 
             case "enemy-port-taken":
                 return <>

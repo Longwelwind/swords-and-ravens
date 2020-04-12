@@ -18,9 +18,7 @@ import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameSt
 import { findOrphanedShipsAndDestroyThem } from "../../port-helper/PortHelper";
 
 export default class ResolveMarchOrderGameState extends GameState<ActionGameState, ResolveSingleMarchOrderGameState | CombatGameState | TakeControlOfEnemyPortGameState> {
-    constructor(actionGameState: ActionGameState) {
-        super(actionGameState);
-    }
+    public currentTurnOrderIndex: number;
 
     get actionGameState(): ActionGameState {
         return this.parentGameState;
@@ -43,6 +41,8 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
     }
 
     firstStart(): void {
+        this.currentTurnOrderIndex = -1;
+
         this.proceedNextResolveSingleMarchOrder();
     }
 
@@ -67,7 +67,7 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         }
 
         //   ... check if an other march order can be resolved
-        this.proceedNextResolveSingleMarchOrder(house);
+        this.proceedNextResolveSingleMarchOrder();
     }
 
     findOrphanedOrdersAndRemoveThem(): void {
@@ -89,8 +89,8 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         this.onResolveSingleMarchOrderGameStateFinish(lastHouseThatResolvedMarchOrder);
     }
 
-    proceedNextResolveSingleMarchOrder(lastHouseToResolve: House | null = null): void {
-        const houseToResolve = this.getNextHouseToResolveMarchOrder(lastHouseToResolve);
+    proceedNextResolveSingleMarchOrder(): void {
+        const houseToResolve = this.getNextHouseToResolveMarchOrder();
 
         if (houseToResolve == null) {
             // All march orders have been executed
@@ -106,18 +106,20 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         this.setChildGameState(new CombatGameState(this)).firstStart(attackerComingFrom, combatRegion, attacker, defender, army, order);
     }
 
-    getNextHouseToResolveMarchOrder(lastHouseToResolve: House | null): House | null {
-        let currentHouseToCheck = lastHouseToResolve ? this.game.getNextInTurnOrder(lastHouseToResolve) : this.game.getTurnOrder()[0];
+    getNextHouseToResolveMarchOrder(): House | null {
+        const turnOrder = this.game.getTurnOrder();
+        const numberOfPlayers = turnOrder.length;
 
         // Check each house in order to find one that has an available March order.
         // Check at most once for each house
-        for (let i = 0;i < this.game.houses.size;i++) {
+        for (let i = 0;i < numberOfPlayers;i++) {
+            this.currentTurnOrderIndex = (this.currentTurnOrderIndex + 1) % numberOfPlayers;
+            const currentHouseToCheck = turnOrder[this.currentTurnOrderIndex];
+
             const regions = this.actionGameState.getRegionsWithMarchOrderOfHouse(currentHouseToCheck);
             if (regions.length > 0) {
                 return currentHouseToCheck;
             }
-
-            currentHouseToCheck = this.game.getNextInTurnOrder(currentHouseToCheck);
         }
 
         // If no house has any march order available, return null
@@ -201,12 +203,14 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
     serializeToClient(admin: boolean, player: Player | null): SerializedResolveMarchOrderGameState {
         return {
             type: "resolve-march-order",
-            childGameState: this.childGameState.serializeToClient(admin, player)
+            childGameState: this.childGameState.serializeToClient(admin, player),
+            currentTurnOrderIndex: this.currentTurnOrderIndex
         };
     }
 
     static deserializeFromServer(actionGameState: ActionGameState, data: SerializedResolveMarchOrderGameState): ResolveMarchOrderGameState {
         const resolveMarchOrderGameState = new ResolveMarchOrderGameState(actionGameState);
+        resolveMarchOrderGameState.currentTurnOrderIndex = data.currentTurnOrderIndex;
 
         resolveMarchOrderGameState.childGameState = resolveMarchOrderGameState.deserializeChildGameState(data.childGameState);
 
@@ -229,4 +233,5 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
 export interface SerializedResolveMarchOrderGameState {
     type: "resolve-march-order";
     childGameState: SerializedResolveSingleMarchOrderGameState | SerializedCombatGameState | SerializedTakeControlOfEnemyPortGameState;
+    currentTurnOrderIndex: number;
 }

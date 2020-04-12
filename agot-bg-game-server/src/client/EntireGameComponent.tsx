@@ -11,6 +11,10 @@ import CancelledGameState from "../common/cancelled-game-state/CancelledGameStat
 import Col from "react-bootstrap/Col";
 import Badge from "react-bootstrap/Badge";
 import classNames from "classnames";
+import notificationSound from "../../public/sounds/notification.ogg";
+import faviconNormal from "../../public/images/favicon.ico";
+import faviconAlert from "../../public/images/favicon-alert.ico";
+import {Helmet} from "react-helmet";
 
 interface EntireGameComponentProps {
     entireGame: EntireGame;
@@ -21,6 +25,9 @@ interface EntireGameComponentProps {
 export default class EntireGameComponent extends Component<EntireGameComponentProps> {
     render(): ReactNode {
         return <>
+            <Helmet>
+                <link rel="icon" href={this.props.gameClient.isOwnTurn() ? faviconAlert : faviconNormal} sizes="16x16" />
+            </Helmet>
             <Col xs={12}>
                     <h3 style={{marginLeft: "1rem"}}>
                         {this.props.entireGame.name} <Badge variant="primary" className={classNames({'invisible': !this.props.entireGame.gameSettings.pbem})}>PBEM</Badge>
@@ -36,5 +43,20 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 )
             }
         </>;
+    }
+
+    componentDidMount(): void {
+        this.props.entireGame.onClientGameStateChange = () => this.onClientGameStateChange();
+    }
+
+    onClientGameStateChange(): void {
+        if (this.props.gameClient.isOwnTurn() && !this.props.gameClient.muted) {
+            const audio = new Audio(notificationSound);
+            audio.play();
+        }
+    }
+
+    componentWillUnmount(): void {
+        this.props.entireGame.onClientGameStateChange = null;
     }
 }

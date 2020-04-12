@@ -18,7 +18,7 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | RenlyBaratheonNoFootmanAvailable | RenlyBaratheonNoKnightAvailable | RenlyBaratheonFootmanUpgradedToKnight
     | MaceTyrellNoFootmanAvailable | MaceTyrellCasualtiesPrevented | MaceTyrellFootmanKilled
     | CerseiLannisterNoOrderAvailable | CerseiLannisterOrderRemoved | RobbStarkRetreatRegionOverriden
-    | RetreatRegionChosen | RetreatCasualtiesSuffered | SilenceAtTheWallExecuted
+    | RetreatRegionChosen | RetreatCasualtiesSuffered | RetreatFailed | SilenceAtTheWallExecuted
     | PreemptiveRaidChoiceDone | PreemptiveRaidTrackReduced | PreemptiveRaidUnitsKilled | PreemptiveRaidWildlingsAttack
     | MassingOnTheMilkwaterHouseCardsBack | MassingOnTheMilkwaterWildlingVictory
     | MassingOnTheMilkwaterHouseCardsRemoved
@@ -60,6 +60,7 @@ interface MarchResolved {
     house: string;
     startingRegion: string;
     moves: [string, string[]][];
+    leftPowerToken: boolean | null;
 }
 
 interface WesterosCardExecuted {
@@ -81,6 +82,7 @@ interface CombatResult {
         house: string;
         region: string;
         army: number;
+        armyUnits: string[];
         orderBonus: number;
         support: number;
         garrison: number;
@@ -149,6 +151,8 @@ interface RaidDone {
     raiderRegion: string;
     raidedRegion: string | null;
     orderRaided: number | null;
+    raiderGainedPowerToken: boolean | null;
+    raidedHouseLostPowerToken: boolean | null;
 }
 
 interface DarkWingsDarkWordsChoice {
@@ -362,7 +366,14 @@ interface RetreatRegionChosen {
     type: "retreat-region-chosen";
     house: string;
     regionFrom: string;
-    regionTo: string | null;
+    regionTo: string;
+}
+
+interface RetreatFailed {
+    type: "retreat-failed";
+    house: string;
+    isAttacker: boolean;
+    region: string;
 }
 
 interface RetreatCasualtiesSuffered {

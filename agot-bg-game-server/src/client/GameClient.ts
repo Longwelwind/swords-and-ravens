@@ -32,6 +32,7 @@ export default class GameClient {
     @observable authenticated = false;
     @observable authenticatedUser: User | null = null
     chatClient: ChatClient = new ChatClient(this);
+    @observable muted = false;
 
     authData: AuthData;
 
@@ -178,6 +179,14 @@ export default class GameClient {
 
             this.entireGame.onServerMessage(message);
         }
+    }
+
+    isOwnTurn(): boolean {
+        if (!this.entireGame || !this.authenticatedUser) {
+            throw new Error();
+        }
+
+        return this.entireGame.getWaitedUsers().includes(this.authenticatedUser);
     }
 
     onError(): void {
