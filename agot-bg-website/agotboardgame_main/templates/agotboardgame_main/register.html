@@ -8,6 +8,9 @@ Register -
 {% block content %}
 <div style="max-width: 360px; margin: 0 auto;margin-top: 80px">
     <h3>Register</h3>
+    <div class="alert alert-warning" role="alert">
+        By registering, you agree that you own a licensed version of the board game.
+    </div>
     <a href="{% url 'social:begin' 'google-oauth2' %}?next=/" class="btn btn-social btn-google btn-block">
         <span class="fab fa-google"></span> Register with Google
     </a>
