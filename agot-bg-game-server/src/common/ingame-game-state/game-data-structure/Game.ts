@@ -14,7 +14,6 @@ import BetterMap from "../../../utils/BetterMap";
 import HouseCard from "./house-card/HouseCard";
 import {land, port} from "./regionTypes";
 import PlanningRestriction from "./westeros-card/planning-restriction/PlanningRestriction";
-import EntireGame from "../../EntireGame";
 
 export const MAX_WILDLING_STRENGTH = 12;
 
@@ -36,6 +35,7 @@ export default class Game {
     skipRavenPhase: boolean;
     structuresCountNeededToWin: number;
     maxTurns: number;
+    maxPowerTokens: number;
 
     get ironThroneHolder(): House {
         return this.getTokenHolder(this.ironThroneTrack);
@@ -323,7 +323,8 @@ export default class Game {
             starredOrderRestrictions: this.starredOrderRestrictions,
             skipRavenPhase: this.skipRavenPhase,
             structuresCountNeededToWin: this.structuresCountNeededToWin,
-            maxTurns: this.maxTurns
+            maxTurns: this.maxTurns,
+            maxPowerTokens: this.maxPowerTokens
         };
     }
 
@@ -346,6 +347,7 @@ export default class Game {
         game.skipRavenPhase = data.skipRavenPhase;
         game.structuresCountNeededToWin = data.structuresCountNeededToWin;
         game.maxTurns = data.maxTurns;
+        game.maxPowerTokens = data.maxPowerTokens;
 
         return game;
     }
@@ -368,4 +370,5 @@ export interface SerializedGame {
     skipRavenPhase: boolean;
     structuresCountNeededToWin: number;
     maxTurns: number;
+    maxPowerTokens: number;
 }

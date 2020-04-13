@@ -108,6 +108,16 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "4",
+        migrate: (serializedGame: any) => {
+            // Migration for #532
+            if (serializedGame.childGameState.type == "ingame") {
+                // Set max power tokens to the default max of 20
+                serializedGame.childGameState.game.maxPowerTokens = 20;
+            }
+        }
     }
 ];
 
