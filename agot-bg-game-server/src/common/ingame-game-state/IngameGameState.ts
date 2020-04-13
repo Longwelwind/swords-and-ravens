@@ -145,7 +145,7 @@ export default class IngameGameState extends GameState<
             powerTokenCount: house.powerTokens
         });
 
-        return originalValue - house.powerTokens;
+        return house.powerTokens - originalValue;
     }
 
     transformUnits(region: Region, units: Unit[], targetType: UnitType): Unit[] {
