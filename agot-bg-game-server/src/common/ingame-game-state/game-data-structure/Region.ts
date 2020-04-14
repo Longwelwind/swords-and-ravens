@@ -1,52 +1,74 @@
 import RegionType from "./RegionType";
 import Unit, {SerializedUnit} from "./Unit";
-import Point from "../../../utils/Point";
 import House from "./House";
 import {observable} from "mobx";
 import Game from "./Game";
-import regionTypes from "./regionTypes";
 import BetterMap from "../../../utils/BetterMap";
+import StaticRegion from "./static-data-structure/StaticRegion";
+import staticWorld from "./static-data-structure/globalStaticWorld";
+import Point from "../../../utils/Point";
 
 export default class Region {
-    id: string;
-    name: string;
-    type: RegionType;
-    @observable units: BetterMap<number, Unit>;
-    crownIcons: number;
-    supplyIcons: number;
-    castleLevel: number;
-    garrison: number;
-    superControlPowerToken: House | null;
-    controlPowerToken: House | null;
+    game: Game;
 
-    // Display attributes
-    nameSlot: Point;
-    unitSlot: Point;
-    orderSlot: Point;
-    powerTokenSlot: Point;
+    id: string;
+    @observable units: BetterMap<number, Unit>;
+    garrison: number;
+    @observable controlPowerToken: House | null;
+
+    get staticRegion(): StaticRegion {
+        return staticWorld.staticRegions.get(this.id);
+    }
 
     get hasStructure(): boolean {
-        return this.castleLevel > 0;
+        return this.staticRegion.hasStructure;
+    }
+
+    get superControlPowerToken(): House | null {
+        return this.staticRegion.superControlPowerToken
+            ? this.game.houses.tryGet(this.staticRegion.superControlPowerToken, null)
+            : null;
+    }
+
+    get name(): string {
+        return this.staticRegion.name;
+    }
+
+    get castleLevel(): number {
+        return this.staticRegion.castleLevel;
+    }
+
+    get crownIcons(): number {
+        return this.staticRegion.crownIcons;
+    }
+
+    get type(): RegionType {
+        return this.staticRegion.type;
+    }
+
+    get supplyIcons(): number {
+        return this.staticRegion.supplyIcons;
+    }
+
+    get unitSlot(): Point {
+        return this.staticRegion.unitSlot;
+    }
+
+    get orderSlot(): Point {
+        return this.staticRegion.orderSlot;
+    }
+
+    get powerTokenSlot(): Point {
+        return this.staticRegion.powerTokenSlot;
     }
 
     constructor(
-        id: string, name: string, nameSlot: Point, type: RegionType,
-        unitSlot: Point, orderSlot: Point, powerTokenSlot: Point, crownIcons: number, supplyIcons: number, castleLevel: number, garrison: number,
-        superControlPowerToken: House | null, controlPowerToken: House | null = null, units: BetterMap<number, Unit> = new BetterMap<number, Unit>()
+        game: Game, id: string, garrison: number, controlPowerToken: House | null = null, units: BetterMap<number, Unit> = new BetterMap<number, Unit>()
     ) {
+        this.game = game;
         this.id = id;
-        this.nameSlot = nameSlot;
-        this.name = name;
-        this.type = type;
-        this.unitSlot = unitSlot;
         this.units = units;
-        this.orderSlot = orderSlot;
-        this.powerTokenSlot = powerTokenSlot;
-        this.castleLevel = castleLevel;
-        this.crownIcons = crownIcons;
-        this.supplyIcons = supplyIcons;
         this.garrison = garrison;
-        this.superControlPowerToken = superControlPowerToken;
         this.controlPowerToken = controlPowerToken;
     }
 
@@ -76,18 +98,8 @@ export default class Region {
     serializeToClient(): SerializedRegion {
         return {
             id: this.id,
-            name: this.name,
-            nameSlot: this.nameSlot,
-            type: this.type.id,
-            unitSlot: this.unitSlot,
-            orderSlot: this.orderSlot,
-            powerTokenSlot: this.powerTokenSlot,
-            castleLevel: this.castleLevel,
             units: this.units.values.map(u => u.serializeToClient()),
-            crownIcons: this.crownIcons,
-            supplyIcons: this.supplyIcons,
             garrison: this.garrison,
-            superControlPowerToken: this.superControlPowerToken ? this.superControlPowerToken.id : null,
             controlPowerToken: this.controlPowerToken ? this.controlPowerToken.id : null
         }
     }
@@ -96,9 +108,7 @@ export default class Region {
         const units = new BetterMap<number, Unit>(data.units.map(u => [u.id, Unit.deserializeFromServer(game, u)]));
 
         const region = new Region(
-            data.id, data.name, data.nameSlot, regionTypes.get(data.type),
-            data.unitSlot, data.orderSlot, data.powerTokenSlot, data.crownIcons, data.supplyIcons, data.castleLevel, data.garrison,
-            data.superControlPowerToken ? game.houses.get(data.superControlPowerToken) : null,
+            game, data.id, data.garrison,
             data.controlPowerToken ? game.houses.get(data.controlPowerToken) : null,
             units
         );
@@ -111,17 +121,7 @@ export default class Region {
 
 export interface SerializedRegion {
     id: string;
-    name: string;
-    nameSlot: Point;
-    unitSlot: Point;
-    orderSlot: Point;
-    powerTokenSlot: Point;
-    type: string;
     units: SerializedUnit[];
-    castleLevel: number;
-    crownIcons: number;
-    supplyIcons: number;
     garrison: number;
-    superControlPowerToken: string | null;
     controlPowerToken: string | null;
 }

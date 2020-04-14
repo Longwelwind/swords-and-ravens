@@ -1,5 +1,4 @@
 import Region, {SerializedRegion} from "./Region";
-import Border, {SerializedBorder} from "./Border";
 import Point, {distanceSquared} from "../../../utils/Point";
 import Unit from "./Unit";
 import House from "./House";
@@ -7,18 +6,27 @@ import Game from "./Game";
 import BetterMap from "../../../utils/BetterMap";
 import {land, port, sea} from "./regionTypes";
 import * as _ from "lodash";
+import StaticBorder from "./static-data-structure/StaticBorder";
+import staticWorld from "./static-data-structure/globalStaticWorld";
+import StaticRegion from "./static-data-structure/StaticRegion";
 
 export default class World {
     regions: BetterMap<string, Region>;
-    borders: Border[];
 
-    constructor(regions: BetterMap<string, Region>, borders: Border[]) {
-        this.regions = regions;
-        this.borders = borders;
+    get borders(): StaticBorder[] {
+        return staticWorld.staticBorders;
     }
 
-    getBorders(region: Region): Border[] {
-        return this.borders.filter(b => b.isPart(region));
+    constructor(regions: BetterMap<string, Region>) {
+        this.regions = regions;
+    }
+
+    getRegion(staticRegion: StaticRegion): Region {
+        return this.regions.get(staticRegion.id);
+    }
+
+    getBorders(region: Region): StaticBorder[] {
+        return this.borders.filter(b => b.isPart(region.staticRegion));
     }
 
     getContinuousBorder(region: Region): Point[] {
@@ -38,9 +46,9 @@ export default class World {
         return continuousPoints;
     }
 
-    private getClosestNextBorder(start: Point, borders: Border[]): {border: Border; reverse: boolean} {
+    private getClosestNextBorder(start: Point, borders: StaticBorder[]): {border: StaticBorder; reverse: boolean} {
         let minDistanceSquared = Number.MAX_VALUE;
-        let border: Border | null = null;
+        let border: StaticBorder | null = null;
         let reverse = false;
 
         borders.forEach(b => {
@@ -74,9 +82,10 @@ export default class World {
         // this is why _.uniq is used.
         return _.uniq(
             this.borders
-                .filter(b => b.isPart(region))
+                .filter(b => b.isPart(region.staticRegion))
                 .filter(b => b.to != null)
-                .map(b => b.getNeighbour(region) as Region)
+                .map(b => b.getNeighbour(region.staticRegion) as StaticRegion)
+                .map(sr => this.getRegion(sr))
         );
     }
 
@@ -185,19 +194,16 @@ export default class World {
     serializeToClient(): SerializedWorld {
         return {
             regions: this.regions.values.map(r => r.serializeToClient()),
-            borders: this.borders.map(b => b.serializeToClient())
         };
     }
 
     static deserializeFromServer(game: Game, data: SerializedWorld): World {
         const regions = new BetterMap(data.regions.map(r => [r.id, Region.deserializeFromServer(game, r)]));
-        const borders = data.borders.map(b => Border.deserializeFromServer(regions, b));
 
-        return new World(regions, borders);
+        return new World(regions);
     }
 }
 
 export interface SerializedWorld {
     regions: SerializedRegion[];
-    borders: SerializedBorder[];
 }
