@@ -1,18 +1,18 @@
 import logging
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 from django import template
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import select_template
 from django.views.decorators.http import require_POST
 
 from agotboardgame.settings import GROUP_COLORS
-from agotboardgame_main.models import Game, ONGOING, IN_LOBBY, User, CANCELLED
+from agotboardgame_main.models import Game, ONGOING, IN_LOBBY, User, CANCELLED, PlayerInGame
 from chat.models import Room
 from agotboardgame_main.forms import UpdateUsernameForm, UpdateSettingsForm
 
@@ -43,7 +43,14 @@ def index(request):
         }
     ]
 
-    return render(request, "agotboardgame_main/index.html", {"posts": posts})
+    # Retrieves some stats to show on the front page
+    active_games_count = Game.objects.filter(updated_at__gt=datetime.now() - timedelta(days=2)).count()
+
+    return render(
+        request,
+        "agotboardgame_main/index.html",
+        {"posts": posts, "active_games_count": active_games_count}
+    )
 
 
 def login(request):
