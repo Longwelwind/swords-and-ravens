@@ -148,6 +148,22 @@ export default class MapComponent extends Component<MapComponentProps> {
                 {r.units.values.map(u => {
                     const property = propertiesForUnits.get(u);
 
+                    let opacity: number;
+                    // css transform
+                    let transform: string;
+
+                    if (!u.wounded) {
+                        opacity = 1;
+                        transform = ``;
+                    } else if (u.type.name == "Ship") {
+                        opacity = 0.5;
+                        transform = ``;
+                    } else {
+                        opacity = 0.7;
+                        transform = `rotate(90deg)`;
+                    }
+
+
                     return <div key={u.id}
                                 onClick={property.onClick ? property.onClick : undefined}
                                 className={classNames(
@@ -158,7 +174,8 @@ export default class MapComponent extends Component<MapComponentProps> {
                                 )}
                                 style={{
                                     backgroundImage: `url(${unitImages.get(u.allegiance.id).get(u.type.id)})`,
-                                    opacity: u.wounded ? 0.5 : 1
+                                    opacity: opacity,
+                                    transform: transform
                                 }}/>;
                 })}
             </div>
