@@ -1,11 +1,7 @@
 import * as baseGameData from "../../../../data/baseGameData.json";
 import HouseCard from "./house-card/HouseCard";
 import House from "./House";
-import * as westerosData from "../../../../data/westeros.json";
-import Point from "../../../utils/Point";
 import Region from "./Region";
-import regionTypes from "./regionTypes";
-import Border from "./Border";
 import World from "./World";
 import WesterosCard from "./westeros-card/WesterosCard";
 import {westerosCardTypes} from "./westeros-card/westerosCardTypes";
@@ -17,54 +13,7 @@ import BetterMap from "../../../utils/BetterMap";
 import * as _ from "lodash";
 import houseCardAbilities from "./house-card/houseCardAbilities";
 import EntireGame from "../../EntireGame";
-
-const MAX_POWER_TOKENS = 20;
-
-interface TiledSquareObject {
-    name: string;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    properties: TiledProperty[];
-
-}
-
-interface TiledPolygonObject {
-    name: string;
-    polygon: {x: number; y: number}[];
-    x: number;
-    y: number;
-    properties: TiledProperty[];
-}
-
-interface TiledProperty {
-    name: string;
-    value: any;
-    type: string;
-}
-
-function hasTiledProperty(properties: TiledProperty[], name: string): boolean {
-    return properties.find(p => p.name == name) != null;
-}
-
-function getTiledProperty<E = string>(properties: TiledProperty[], name: string): E {
-    const property = properties.find(p => p.name == name);
-    if (!property) {
-        throw new Error("No property with name " + name + " found");
-    }
-
-    return property.value as E;
-}
-
-function tryGetTiledProperty<E = string>(properties: TiledProperty[], name: string, defaultValue: E): E {
-    const property = properties.find(p => p.name == name);
-    if (!property) {
-        return defaultValue;
-    }
-
-    return property.value as E;
-}
+import staticWorld from "./static-data-structure/globalStaticWorld";
 
 interface HouseCardData {
     name: string;
@@ -159,119 +108,20 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
     }
 
     // Loading Tiled map
-    const regionsLayer = westerosData.layers.find(l => l.name == "Regions");
-    if (!regionsLayer) {
-        throw new Error("No layer named Regions in map file");
-    }
-
-    const bordersLayer = westerosData.layers.find(l => l.name == "Borders");
-    if (!bordersLayer) {
-        throw new Error("No layer named Borders in map file");
-    }
-
-    const unitSlotsLayer = westerosData.layers.find(l => l.name == "Unit Slots");
-    if (!unitSlotsLayer) {
-        throw new Error("No layer named Unit Slots in map file");
-    }
-
-    const orderSlotsLayer = westerosData.layers.find(l => l.name == "Order Slots");
-    if (!orderSlotsLayer) {
-        throw new Error("No layer named Order Slots in map file");
-    }
-
-    const powerTokenSlotsLayer = westerosData.layers.find(l => l.name == "Power Token Slots");
-    if (!powerTokenSlotsLayer) {
-        throw new Error("No layer named Power Token Slots in map file");
-    }
-
-    const regionIdToUnitSlots = new BetterMap<string, Point>();
-    (unitSlotsLayer.objects as TiledSquareObject[]).forEach(o => {
-        const regionId = getTiledProperty(o.properties, "region");
-
-        if (regionIdToUnitSlots.has(regionId)) {
-            throw new Error("Two unit slots share the same regionId: " + regionId);
-        }
-
-        regionIdToUnitSlots.set(regionId, {
-            x: o.x + o.width / 2,
-            y: o.y + o.height / 2
-        });
-    });
-
-    const regionIdToOrderSlots = new BetterMap<string, Point>();
-    (orderSlotsLayer.objects as TiledSquareObject[]).forEach(o => {
-        const regionId = getTiledProperty(o.properties, "region");
-
-        if (regionIdToOrderSlots.has(regionId)) {
-            throw new Error("Two order slots share the same regionId: " + regionId);
-        }
-
-        regionIdToOrderSlots.set(regionId, {
-            x: o.x + o.width / 2,
-            y: o.y + o.height / 2
-        });
-    });
-
-    const regionIdToPowerTokenSlots = new BetterMap<string, Point>();
-    (powerTokenSlotsLayer.objects as TiledSquareObject[]).forEach(o => {
-        const regionId = getTiledProperty(o.properties, "region");
-
-        if (regionIdToPowerTokenSlots.has(regionId)) {
-            throw new Error("Two power token slots share the same regionId: " + regionId);
-        }
-
-        regionIdToPowerTokenSlots.set(regionId, {
-            x: o.x + o.width / 2,
-            y: o.y + o.height / 2
-        });
-    });
-
-    const regions = new BetterMap<string, Region>((regionsLayer.objects as TiledSquareObject[]).map(regionData => {
-        const x = regionData.x + regionData.width / 2;
-        const y = regionData.y + regionData.height / 2;
-        const id = getTiledProperty(regionData.properties, "id");
-        const type = getTiledProperty(regionData.properties, "type");
-        const crownIcons = tryGetTiledProperty<number>(regionData.properties, "crownIcons", 0);
-        const supplyIcons = tryGetTiledProperty<number>(regionData.properties, "supplyIcons", 0);
-        const castleLevel = tryGetTiledProperty<number>(regionData.properties, "castleLevel", 0);
-        const garrison = tryGetTiledProperty<number>(regionData.properties, "garrison", 0);
-        const superControlPowerTokenHouseId = tryGetTiledProperty<string | null>(regionData.properties, "superController", null);
-
-        const superControlPowerToken = superControlPowerTokenHouseId && housesToCreate.includes(superControlPowerTokenHouseId)
-            ? game.houses.get(superControlPowerTokenHouseId)
-            : null;
-
-        if (!regionIdToUnitSlots.has(id)) {
-            throw new Error("No unit slots for region id: " + id);
-        }
-
-        const unitSlot = regionIdToUnitSlots.get(id);
-        const orderSlot = regionIdToOrderSlots.get(id);
-        const powerTokenSlot = regionIdToPowerTokenSlots.get(id);
-
-        const blocked = gameSetup.blockedRegions ? gameSetup.blockedRegions.includes(id) : false;
+    const regions = new BetterMap(staticWorld.staticRegions.values.map(staticRegion => {
+        const blocked = gameSetup.blockedRegions ? gameSetup.blockedRegions.includes(staticRegion.id) : false;
 
         return [
-            id,
+            staticRegion.id,
             new Region(
-                id, regionData.name, {x, y}, regionTypes.get(type), unitSlot, orderSlot, powerTokenSlot, crownIcons,
-                supplyIcons, castleLevel, blocked ? 1000 : garrison, superControlPowerToken
+                game,
+                staticRegion.id,
+                blocked ? 1000 : staticRegion.startingGarrison
             )
         ];
     }));
 
-    const borders = (bordersLayer.objects as TiledPolygonObject[]).map(borderData => {
-        const from = regions.get(getTiledProperty(borderData.properties, "from"));
-        const to = hasTiledProperty(borderData.properties, "to")
-            ? regions.get(getTiledProperty(borderData.properties, "to"))
-            : null;
-
-        const polygon = borderData.polygon.map(pos => ({x: pos.x + borderData.x, y: pos.y + borderData.y}));
-
-        return new Border(from, to, polygon);
-    });
-
-    game.world = new World(regions, borders);
+    game.world = new World(regions);
 
     // Load Westeros Cards
     game.westerosDecks = baseGameData.westerosCards.map(westerosDeckData => {

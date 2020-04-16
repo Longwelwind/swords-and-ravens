@@ -2,7 +2,6 @@ import {Component, ReactNode} from "react";
 import GameClient from "./GameClient";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import * as React from "react";
-import Border from "../common/ingame-game-state/game-data-structure/Border";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
 import Unit from "../common/ingame-game-state/game-data-structure/Unit";
 import PlanningGameState from "../common/ingame-game-state/planning-game-state/PlanningGameState";
@@ -23,6 +22,7 @@ import BetterMap from "../utils/BetterMap";
 import _ from "lodash";
 import PartialRecursive from "../utils/PartialRecursive";
 import joinReactNodes from "./utils/joinReactNodes";
+import StaticBorder from "../common/ingame-game-state/game-data-structure/static-data-structure/StaticBorder";
 
 interface MapComponentProps {
     gameClient: GameClient;
@@ -148,6 +148,22 @@ export default class MapComponent extends Component<MapComponentProps> {
                 {r.units.values.map(u => {
                     const property = propertiesForUnits.get(u);
 
+                    let opacity: number;
+                    // css transform
+                    let transform: string;
+
+                    if (!u.wounded) {
+                        opacity = 1;
+                        transform = ``;
+                    } else if (u.type.name == "Ship") {
+                        opacity = 0.5;
+                        transform = ``;
+                    } else {
+                        opacity = 0.7;
+                        transform = `rotate(90deg)`;
+                    }
+
+
                     return <div key={u.id}
                                 onClick={property.onClick ? property.onClick : undefined}
                                 className={classNames(
@@ -158,7 +174,8 @@ export default class MapComponent extends Component<MapComponentProps> {
                                 )}
                                 style={{
                                     backgroundImage: `url(${unitImages.get(u.allegiance.id).get(u.type.id)})`,
-                                    opacity: u.wounded ? 0.5 : 1
+                                    opacity: opacity,
+                                    transform: transform
                                 }}/>;
                 })}
             </div>
@@ -261,7 +278,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         );
     }
 
-    getBorderPathD(border: Border): string {
+    getBorderPathD(border: StaticBorder): string {
         return border.polygon.map(p => p.x + "," + p.y).join(" ");
     }
 
