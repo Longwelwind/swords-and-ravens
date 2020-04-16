@@ -1,5 +1,6 @@
 import BetterMap from "../utils/BetterMap";
 import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
+import staticWorld from "../common/ingame-game-state/game-data-structure/static-data-structure/globalStaticWorld";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
     {
@@ -125,6 +126,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
                 const unitTypeNameToIdMappings = new BetterMap(unitTypes.entries.map(([utid, ut]) => [ut.name, utid]));
                 const houseNameToIdMappings = new BetterMap(ingame.game.houses.map((h: any) => [h.name, h.id]));
+                const regionNameToIdMappings = new BetterMap(staticWorld.staticRegions.entries.map(([rid, r]) => [r.name, rid]));
 
                 ingame.gameLogManager.logs
                     .filter((log: any) => log.data.type == "immediatly-killed-after-combat")
@@ -144,6 +146,17 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         const houseName = log.data.house;
                         log.data.house = houseNameToIdMappings.get(houseName);
                         log.data.killed = killedNames.map(name => unitTypeNameToIdMappings.get(name));
+                    });
+
+                ingame.gameLogManager.logs
+                    .filter((log: any) => log.data.type == "ships-destroyed-by-empty-castle")
+                    .forEach((log: any) => {
+                        const houseName = log.data.house;
+                        const portName = log.data.port;
+                        const castleName = log.data.castle;
+                        log.data.house = houseNameToIdMappings.get(houseName);
+                        log.data.port = regionNameToIdMappings.get(portName);
+                        log.data.castle = regionNameToIdMappings.get(castleName);
                     });
             }
         }

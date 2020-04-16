@@ -674,11 +674,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         : <><strong>{data.newController}</strong> has destroyed all <strong>{data.oldController}</strong> ships in <strong></strong>{data.port}.</>}
                 </>;
 
-            case "ships-destroyed-by-empty-castle":
+            case "ships-destroyed-by-empty-castle": {
+                const house = this.game.houses.get(data.house);
+                const port = this.game.world.regions.get(data.port);
+                const castle = this.game.world.regions.get(data.castle);
                 return <>
-                    <><strong>{data.house}</strong> lost {data.shipCount} ship{data.shipCount>1?"s":""} in <strong>{data.port}</strong> because <strong>{data.castle}</strong> is empty now.</>
+                    <><strong>{house.name}</strong> lost {data.shipCount} ship{data.shipCount>1?"s":""} in <strong>{port.name}</strong> because <strong>{castle.name}</strong> is empty now.</>
                 </>;
-
+            }
             case "silence-at-the-wall-executed":
                 return <><strong>Silence at the Wall</strong>: Nothing happened.</>;
 

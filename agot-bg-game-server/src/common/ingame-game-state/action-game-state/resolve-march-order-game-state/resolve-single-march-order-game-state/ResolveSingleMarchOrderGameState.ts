@@ -253,9 +253,9 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
 
         this.parentGameState.ingameGameState.log({
             type: "ships-destroyed-by-empty-castle",
-            castle: startingRegion.name,
-            house: this.house.name,
-            port: portOfStartingRegion.name,
+            castle: startingRegion.id,
+            house: this.house.id,
+            port: portOfStartingRegion.id,
             shipCount: destroyedShipCount
         });
     }
