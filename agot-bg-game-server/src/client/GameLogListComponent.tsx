@@ -893,12 +893,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         ))}
                     </ul>
                 </>;
-            case "immediatly-killed-after-combat":
+            case "immediatly-killed-after-combat": {
+                const house = this.game.houses.get(data.house);
+                const killedBecauseWounded = data.killedBecauseWounded.map(utid => unitTypes.get(utid).name);
+                const killedBecauseCantRetreat = data.killedBecauseCantRetreat.map(utid => unitTypes.get(utid).name);
                 return <>
-                    {data.killedBecauseWounded.length > 0 && (<><strong>{data.house}</strong> suffered battle casualties because this units were wounded: <>{joinReactNodes(data.killedBecauseWounded.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</>)}
-                    {data.killedBecauseCantRetreat.length > 0 && (<><strong>{data.house}</strong> suffered battle casualties because this units can&apos;t retreat: <>{joinReactNodes(data.killedBecauseCantRetreat.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</>)}
+                    {killedBecauseWounded.length > 0 && (<><strong>{house.name}</strong> suffered battle casualties because this units were wounded: <>{joinReactNodes(killedBecauseWounded.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</>)}
+                    {killedBecauseCantRetreat.length > 0 && (<><strong>{house.name}</strong> suffered battle casualties because this units can&apos;t retreat: <>{joinReactNodes(killedBecauseCantRetreat.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</>)}
                 </>;
-
+            }
             case "killed-after-combat":
                 return <>
                     <strong>{data.house}</strong> suffered battle casualties and chose this units to be killed: <>{joinReactNodes(data.killed.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.

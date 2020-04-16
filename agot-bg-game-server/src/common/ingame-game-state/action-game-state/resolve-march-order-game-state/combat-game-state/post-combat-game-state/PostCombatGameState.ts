@@ -150,9 +150,9 @@ export default class PostCombatGameState extends GameState<
             this.combat.ingameGameState.log(
                 {
                     type: "immediatly-killed-after-combat",
-                    house: this.loser.name,
-                    killedBecauseWounded: immediatelyKilledLoserUnits.filter(u => u.wounded).map(u => u.type.name),
-                    killedBecauseCantRetreat: immediatelyKilledLoserUnits.filter(u => !u.type.canRetreat).map(u => u.type.name)
+                    house: this.loser.id,
+                    killedBecauseWounded: immediatelyKilledLoserUnits.filter(u => u.wounded).map(u => u.type.id),
+                    killedBecauseCantRetreat: immediatelyKilledLoserUnits.filter(u => !u.type.canRetreat).map(u => u.type.id)
                 }
             );
 
@@ -188,7 +188,6 @@ export default class PostCombatGameState extends GameState<
                     // is not needed. The army left can be exterminated.
                     this.onChooseCasualtiesGameStateEnd(locationLoserArmy, loserArmyLeft);
                 }
-                
                 return;
             }
         }

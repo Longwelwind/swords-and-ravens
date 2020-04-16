@@ -1,4 +1,5 @@
 import BetterMap from "../utils/BetterMap";
+import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
     {
@@ -116,6 +117,25 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             if (serializedGame.childGameState.type == "ingame") {
                 // Set max power tokens to the default max of 20
                 serializedGame.childGameState.game.maxPowerTokens = 20;
+            }
+
+            // Migration for #550
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                const unitTypeNameToIdMappings = new BetterMap(unitTypes.entries.map(([utid, ut]) => [ut.name, utid]));
+                const houseNameToIdMappings = new BetterMap(ingame.game.houses.map((h: any) => [h.name, h.id]));
+
+                ingame.gameLogManager.logs
+                    .filter((log: any) => log.data.type == "immediatly-killed-after-combat")
+                    .forEach((log: any) => {
+                        const woundedNames: string[] = log.data.killedBecauseWounded;
+                        const cannotRetreatNames: string[] = log.data.killedBecauseCantRetreat;
+                        const houseName = log.data.house;
+                        log.data.house = houseNameToIdMappings.get(houseName);
+                        log.data.killedBecauseWounded = woundedNames.map(name => unitTypeNameToIdMappings.get(name));
+                        log.data.killedBecauseCantRetreat = cannotRetreatNames.map(name => unitTypeNameToIdMappings.get(name));
+                    });
             }
         }
     }
