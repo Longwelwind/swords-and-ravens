@@ -229,7 +229,7 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
         if (this.nightsWatchWon) {
             this.game.wildlingStrength = 0;
         } else {
-            this.game.wildlingStrength = Math.max(0, this.game.wildlingStrength - 2);
+            this.game.wildlingStrength = Math.max(0, this.game.wildlingStrength - 4);
         }
         this.entireGame.broadcastToClients({
             type: "change-wildling-strength",
