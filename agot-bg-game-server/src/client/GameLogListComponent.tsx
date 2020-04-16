@@ -902,11 +902,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     {killedBecauseCantRetreat.length > 0 && (<><strong>{house.name}</strong> suffered battle casualties because this units can&apos;t retreat: <>{joinReactNodes(killedBecauseCantRetreat.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</>)}
                 </>;
             }
-            case "killed-after-combat":
+            case "killed-after-combat": {
+                const house = this.game.houses.get(data.house);
+                const killed = data.killed.map(utid => unitTypes.get(utid).name);
                 return <>
-                    <strong>{data.house}</strong> suffered battle casualties and chose this units to be killed: <>{joinReactNodes(data.killed.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.
+                    <strong>{house.name}</strong> suffered battle casualties and chose this units to be killed: <>{joinReactNodes(killed.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.
                 </>;
-
+            }
             case "supply-adjusted":
                 const supplies: [House, number][] = data.supplies.map(([hid, supply]) => [this.game.houses.get(hid), supply]);
 

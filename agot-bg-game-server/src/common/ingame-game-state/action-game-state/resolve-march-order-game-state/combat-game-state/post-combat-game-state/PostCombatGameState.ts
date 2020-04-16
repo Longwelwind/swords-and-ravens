@@ -94,8 +94,8 @@ export default class PostCombatGameState extends GameState<
         this.combat.ingameGameState.log(
             {
                 type: "killed-after-combat",
-                house: this.loser.name,
-                killed: selectedCasualties.map(u => u.type.name)
+                house: this.loser.id,
+                killed: selectedCasualties.map(u => u.type.id)
             }
         );
 

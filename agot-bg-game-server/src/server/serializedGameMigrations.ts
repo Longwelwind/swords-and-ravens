@@ -136,6 +136,15 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         log.data.killedBecauseWounded = woundedNames.map(name => unitTypeNameToIdMappings.get(name));
                         log.data.killedBecauseCantRetreat = cannotRetreatNames.map(name => unitTypeNameToIdMappings.get(name));
                     });
+
+                ingame.gameLogManager.logs
+                    .filter((log: any) => log.data.type == "killed-after-combat")
+                    .forEach((log: any) => {
+                        const killedNames: string[] = log.data.killed;
+                        const houseName = log.data.house;
+                        log.data.house = houseNameToIdMappings.get(houseName);
+                        log.data.killed = killedNames.map(name => unitTypeNameToIdMappings.get(name));
+                    });
             }
         }
     }
