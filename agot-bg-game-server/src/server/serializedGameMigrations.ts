@@ -158,6 +158,17 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         log.data.port = regionNameToIdMappings.get(portName);
                         log.data.castle = regionNameToIdMappings.get(castleName);
                     });
+
+                ingame.gameLogManager.logs
+                    .filter((log: any) => log.data.type == "enemy-port-taken")
+                    .forEach((log: any) => {
+                        const oldControllerName = log.data.oldController;
+                        const newControllerName = log.data.newController;
+                        const portName = log.data.port;
+                        log.data.oldController = houseNameToIdMappings.get(oldControllerName);
+                        log.data.newController = houseNameToIdMappings.get(newControllerName);
+                        log.data.port = regionNameToIdMappings.get(portName);
+                    });
             }
         }
     }

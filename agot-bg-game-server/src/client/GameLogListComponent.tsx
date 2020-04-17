@@ -667,13 +667,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <p><strong>{data.house}</strong> suffered casualties from the retreat: <>{joinReactNodes(data.units.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</p>
                 </>;
 
-            case "enemy-port-taken":
+            case "enemy-port-taken": {
+                const newController = this.game.houses.get(data.newController);
+                const oldController = this.game.houses.get(data.oldController);
+                const port = this.world.regions.get(data.oldController);
                 return <>
                     {data.shipCount > 0
-                        ? <><strong>{data.newController}</strong> has converted {data.shipCount} ship{data.shipCount == 1 ? "" : "s"} from <strong>{data.oldController}</strong> in <strong></strong>{data.port}.</>
-                        : <><strong>{data.newController}</strong> has destroyed all <strong>{data.oldController}</strong> ships in <strong></strong>{data.port}.</>}
+                        ? <><strong>{newController.name}</strong> has converted {data.shipCount} ship{data.shipCount == 1 ? "" : "s"} from <strong>{oldController.name}</strong> in <strong></strong>{port.name}.</>
+                        : <><strong>{newController.name}</strong> has destroyed all <strong>{oldController.name}</strong> ships in <strong></strong>{port.name}.</>}
                 </>;
-
+            }
             case "ships-destroyed-by-empty-castle": {
                 const house = this.game.houses.get(data.house);
                 const port = this.game.world.regions.get(data.port);
