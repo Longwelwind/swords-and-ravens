@@ -658,13 +658,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         {regionFrom.name}</strong> to <strong>{regionTo.name}</strong>.
                 </>;
             }
-            case "retreat-failed":
+            case "retreat-failed": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
+
                 return <>{
                     data.isAttacker ?
-                        <><strong>{data.house}</strong> was not able to retreat to <strong>{data.region}</strong>.</>   :
-                        <><strong>{data.house}</strong> was not able to retreat from <strong>{data.region}</strong>.</>
+                        <><strong>{house.name}</strong> was not able to retreat to <strong>{region.name}</strong>.</>   :
+                        <><strong>{house.name}</strong> was not able to retreat from <strong>{region.name}</strong>.</>
                 }</>;
-
+            }
             case "retreat-casualties-suffered": {
                 const house = this.game.houses.get(data.house);
                 const units = data.units.map(ut => unitTypes.get(ut).name);

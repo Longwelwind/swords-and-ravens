@@ -189,6 +189,15 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         log.data.house = houseNameToIdMappings.get(houseName);
                         log.data.units = unitNames.map(name => unitTypeNameToIdMappings.get(name));
                     });
+
+                ingame.gameLogManager.logs
+                    .filter((log: any) => log.data.type == "retreat-failed")
+                    .forEach((log: any) => {
+                        const houseName = log.data.house;
+                        const regionName = log.data.region;
+                        log.data.house = houseNameToIdMappings.get(houseName);
+                        log.data.region = regionNameToIdMappings.get(regionName);
+                    });
             }
         }
     }

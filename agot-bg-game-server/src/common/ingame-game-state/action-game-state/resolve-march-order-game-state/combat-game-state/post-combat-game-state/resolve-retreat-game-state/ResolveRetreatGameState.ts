@@ -107,9 +107,9 @@ export default class ResolveRetreatGameState extends GameState<
 
         this.ingame.log({
             type: "retreat-failed",
-            house: affectedHouse.name,
+            house: affectedHouse.id,
             isAttacker: affectedHouse == this.combat.attacker,
-            region: region.name
+            region: region.id
         });
 
         this.ingame.log({
