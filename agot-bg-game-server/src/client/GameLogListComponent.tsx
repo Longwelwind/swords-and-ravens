@@ -665,11 +665,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         <><strong>{data.house}</strong> was not able to retreat from <strong>{data.region}</strong>.</>
                 }</>;
 
-            case "retreat-casualties-suffered":
+            case "retreat-casualties-suffered": {
+                const house = this.game.houses.get(data.house);
+                const units = data.units.map(ut => unitTypes.get(ut).name);
                 return <>
-                    <p><strong>{data.house}</strong> suffered casualties from the retreat: <>{joinReactNodes(data.units.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</p>
+                    <p><strong>{house.name}</strong> suffered casualties from the retreat: <>{joinReactNodes(units.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</p>
                 </>;
-
+            }
             case "enemy-port-taken": {
                 const newController = this.game.houses.get(data.newController);
                 const oldController = this.game.houses.get(data.oldController);

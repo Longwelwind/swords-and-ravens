@@ -114,8 +114,8 @@ export default class ResolveRetreatGameState extends GameState<
 
         this.ingame.log({
             type: "retreat-casualties-suffered",
-            house: affectedHouse.name,
-            units: unitsToKill.map(u => u.type.name)
+            house: affectedHouse.id,
+            units: unitsToKill.map(u => u.type.id)
         });
     }
 
@@ -170,8 +170,8 @@ export default class ResolveRetreatGameState extends GameState<
 
             this.ingame.log({
                 type: "retreat-casualties-suffered",
-                house: this.postCombat.loser.name,
-                units: units.map(u => u.type.name)
+                house: this.postCombat.loser.id,
+                units: units.map(u => u.type.id)
             });
         });
 
