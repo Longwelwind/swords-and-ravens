@@ -649,12 +649,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     retreating army of <strong>{affectedHouse.name}</strong>.
                 </>;
 
-            case "retreat-region-chosen":
+            case "retreat-region-chosen": {
+                const house = this.game.houses.get(data.house);
+                const regionFrom = this.game.world.regions.get(data.regionFrom);
+                const regionTo = this.game.world.regions.get(data.regionTo);
                 return <>
-                        <strong>{data.house}</strong> retreats from <strong>
-                        {data.regionFrom}</strong> to <strong>{data.regionTo}</strong>.
+                        <strong>{house.name}</strong> retreats from <strong>
+                        {regionFrom.name}</strong> to <strong>{regionTo.name}</strong>.
                 </>;
-
+            }
             case "retreat-failed":
                 return <>{
                     data.isAttacker ?

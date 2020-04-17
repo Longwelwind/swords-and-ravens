@@ -169,6 +169,17 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         log.data.newController = houseNameToIdMappings.get(newControllerName);
                         log.data.port = regionNameToIdMappings.get(portName);
                     });
+
+                ingame.gameLogManager.logs
+                    .filter((log: any) => log.data.type == "retreat-region-chosen")
+                    .forEach((log: any) => {
+                        const houseName = log.data.house;
+                        const regionFromName = log.data.regionFrom;
+                        const regionToName = log.data.regionTo;
+                        log.data.house = houseNameToIdMappings.get(houseName);
+                        log.data.regionFrom = regionNameToIdMappings.get(regionFromName);
+                        log.data.regionTo = regionNameToIdMappings.get(regionToName);
+                    });
             }
         }
     }

@@ -126,9 +126,9 @@ export default class ResolveRetreatGameState extends GameState<
 
         this.ingame.log({
             type: "retreat-region-chosen",
-            house: this.postCombat.loser.name,
-            regionFrom: this.combat.defendingRegion.name,
-            regionTo: retreatRegion.name
+            house: this.postCombat.loser.id,
+            regionFrom: this.combat.defendingRegion.id,
+            regionTo: retreatRegion.id
         });
 
         // Check if this retreat region require casualties
@@ -281,11 +281,11 @@ export default class ResolveRetreatGameState extends GameState<
         // If retreatRegion is attackingRegion the attacker lost the battle
         // and retreats back from where he came from. In that case we don't need
         // to calculate casualties as retreating back to attackingRegion will always be
-        // supply compliant at that point (if it is blocked for retreat 
+        // supply compliant at that point (if it is blocked for retreat
         // has been checked earlier).
         // Furthermore we have to do this extra processing for the time being
         // because the attacking units are still present in attackingRegion
-        // and therefore hasTooMuchArmies with addedUnits overload will double 
+        // and therefore hasTooMuchArmies with addedUnits overload will double
         // the army size for the attackingRegion which could result
         // in an invalid supply violation.
         if (retreatRegion == this.postCombat.combat.attackingRegion) {
