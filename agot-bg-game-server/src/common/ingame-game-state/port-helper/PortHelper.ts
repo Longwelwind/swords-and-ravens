@@ -63,9 +63,9 @@ export function findOrphanedShipsAndDestroyThem(world: World, ingameGameState: I
         const destroyedShipCount = destroyAllShipsInPort(portRegion, ingameGameState.entireGame, actionGameState);
         ingameGameState.log({
             type: "ships-destroyed-by-empty-castle",
-            castle: world.getAdjacentLandOfPort(portRegion).name,
-            house: houseThatLostShips.name,
-            port: portRegion.name,
+            castle: world.getAdjacentLandOfPort(portRegion).id,
+            house: houseThatLostShips.id,
+            port: portRegion.id,
             shipCount: destroyedShipCount
         });
     })

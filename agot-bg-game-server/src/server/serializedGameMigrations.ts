@@ -1,4 +1,6 @@
 import BetterMap from "../utils/BetterMap";
+import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
+import staticWorld from "../common/ingame-game-state/game-data-structure/static-data-structure/globalStaticWorld";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
     {
@@ -116,6 +118,86 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             if (serializedGame.childGameState.type == "ingame") {
                 // Set max power tokens to the default max of 20
                 serializedGame.childGameState.game.maxPowerTokens = 20;
+            }
+
+            // Migration for #550
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                const unitTypeNameToIdMappings = new BetterMap(unitTypes.entries.map(([utid, ut]) => [ut.name, utid]));
+                const houseNameToIdMappings = new BetterMap(ingame.game.houses.map((h: any) => [h.name, h.id]));
+                const regionNameToIdMappings = new BetterMap(staticWorld.staticRegions.entries.map(([rid, r]) => [r.name, rid]));
+
+                ingame.gameLogManager.logs
+                    .filter((log: any) => log.data.type == "immediatly-killed-after-combat")
+                    .forEach((log: any) => {
+                        const woundedNames: string[] = log.data.killedBecauseWounded;
+                        const cannotRetreatNames: string[] = log.data.killedBecauseCantRetreat;
+                        const houseName = log.data.house;
+                        log.data.house = houseNameToIdMappings.get(houseName);
+                        log.data.killedBecauseWounded = woundedNames.map(name => unitTypeNameToIdMappings.get(name));
+                        log.data.killedBecauseCantRetreat = cannotRetreatNames.map(name => unitTypeNameToIdMappings.get(name));
+                    });
+
+                ingame.gameLogManager.logs
+                    .filter((log: any) => log.data.type == "killed-after-combat")
+                    .forEach((log: any) => {
+                        const killedNames: string[] = log.data.killed;
+                        const houseName = log.data.house;
+                        log.data.house = houseNameToIdMappings.get(houseName);
+                        log.data.killed = killedNames.map(name => unitTypeNameToIdMappings.get(name));
+                    });
+
+                ingame.gameLogManager.logs
+                    .filter((log: any) => log.data.type == "ships-destroyed-by-empty-castle")
+                    .forEach((log: any) => {
+                        const houseName = log.data.house;
+                        const portName = log.data.port;
+                        const castleName = log.data.castle;
+                        log.data.house = houseNameToIdMappings.get(houseName);
+                        log.data.port = regionNameToIdMappings.get(portName);
+                        log.data.castle = regionNameToIdMappings.get(castleName);
+                    });
+
+                ingame.gameLogManager.logs
+                    .filter((log: any) => log.data.type == "enemy-port-taken")
+                    .forEach((log: any) => {
+                        const oldControllerName = log.data.oldController;
+                        const newControllerName = log.data.newController;
+                        const portName = log.data.port;
+                        log.data.oldController = houseNameToIdMappings.get(oldControllerName);
+                        log.data.newController = houseNameToIdMappings.get(newControllerName);
+                        log.data.port = regionNameToIdMappings.get(portName);
+                    });
+
+                ingame.gameLogManager.logs
+                    .filter((log: any) => log.data.type == "retreat-region-chosen")
+                    .forEach((log: any) => {
+                        const houseName = log.data.house;
+                        const regionFromName = log.data.regionFrom;
+                        const regionToName = log.data.regionTo;
+                        log.data.house = houseNameToIdMappings.get(houseName);
+                        log.data.regionFrom = regionNameToIdMappings.get(regionFromName);
+                        log.data.regionTo = regionNameToIdMappings.get(regionToName);
+                    });
+
+                ingame.gameLogManager.logs
+                    .filter((log: any) => log.data.type == "retreat-casualties-suffered")
+                    .forEach((log: any) => {
+                        const houseName = log.data.house;
+                        const unitNames: string[] = log.data.units;
+                        log.data.house = houseNameToIdMappings.get(houseName);
+                        log.data.units = unitNames.map(name => unitTypeNameToIdMappings.get(name));
+                    });
+
+                ingame.gameLogManager.logs
+                    .filter((log: any) => log.data.type == "retreat-failed")
+                    .forEach((log: any) => {
+                        const houseName = log.data.house;
+                        const regionName = log.data.region;
+                        log.data.house = houseNameToIdMappings.get(houseName);
+                        log.data.region = regionNameToIdMappings.get(regionName);
+                    });
             }
         }
     }

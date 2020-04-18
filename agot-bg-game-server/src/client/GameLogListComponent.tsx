@@ -649,36 +649,50 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     retreating army of <strong>{affectedHouse.name}</strong>.
                 </>;
 
-            case "retreat-region-chosen":
+            case "retreat-region-chosen": {
+                const house = this.game.houses.get(data.house);
+                const regionFrom = this.game.world.regions.get(data.regionFrom);
+                const regionTo = this.game.world.regions.get(data.regionTo);
                 return <>
-                        <strong>{data.house}</strong> retreats from <strong>
-                        {data.regionFrom}</strong> to <strong>{data.regionTo}</strong>.
+                        <strong>{house.name}</strong> retreats from <strong>
+                        {regionFrom.name}</strong> to <strong>{regionTo.name}</strong>.
                 </>;
+            }
+            case "retreat-failed": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
 
-            case "retreat-failed":
                 return <>{
                     data.isAttacker ?
-                        <><strong>{data.house}</strong> was not able to retreat to <strong>{data.region}</strong>.</>   :
-                        <><strong>{data.house}</strong> was not able to retreat from <strong>{data.region}</strong>.</>
+                        <><strong>{house.name}</strong> was not able to retreat to <strong>{region.name}</strong>.</>   :
+                        <><strong>{house.name}</strong> was not able to retreat from <strong>{region.name}</strong>.</>
                 }</>;
-
-            case "retreat-casualties-suffered":
+            }
+            case "retreat-casualties-suffered": {
+                const house = this.game.houses.get(data.house);
+                const units = data.units.map(ut => unitTypes.get(ut).name);
                 return <>
-                    <p><strong>{data.house}</strong> suffered casualties from the retreat: <>{joinReactNodes(data.units.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</p>
+                    <p><strong>{house.name}</strong> suffered casualties from the retreat: <>{joinReactNodes(units.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</p>
                 </>;
-
-            case "enemy-port-taken":
+            }
+            case "enemy-port-taken": {
+                const newController = this.game.houses.get(data.newController);
+                const oldController = this.game.houses.get(data.oldController);
+                const port = this.world.regions.get(data.oldController);
                 return <>
                     {data.shipCount > 0
-                        ? <><strong>{data.newController}</strong> has converted {data.shipCount} ship{data.shipCount == 1 ? "" : "s"} from <strong>{data.oldController}</strong> in <strong></strong>{data.port}.</>
-                        : <><strong>{data.newController}</strong> has destroyed all <strong>{data.oldController}</strong> ships in <strong></strong>{data.port}.</>}
+                        ? <><strong>{newController.name}</strong> has converted {data.shipCount} ship{data.shipCount == 1 ? "" : "s"} from <strong>{oldController.name}</strong> in <strong></strong>{port.name}.</>
+                        : <><strong>{newController.name}</strong> has destroyed all <strong>{oldController.name}</strong> ships in <strong></strong>{port.name}.</>}
                 </>;
-
-            case "ships-destroyed-by-empty-castle":
+            }
+            case "ships-destroyed-by-empty-castle": {
+                const house = this.game.houses.get(data.house);
+                const port = this.game.world.regions.get(data.port);
+                const castle = this.game.world.regions.get(data.castle);
                 return <>
-                    <><strong>{data.house}</strong> lost {data.shipCount} ship{data.shipCount>1?"s":""} in <strong>{data.port}</strong> because <strong>{data.castle}</strong> is empty now.</>
+                    <><strong>{house.name}</strong> lost {data.shipCount} ship{data.shipCount>1?"s":""} in <strong>{port.name}</strong> because <strong>{castle.name}</strong> is empty now.</>
                 </>;
-
+            }
             case "silence-at-the-wall-executed":
                 return <><strong>Silence at the Wall</strong>: Nothing happened.</>;
 
@@ -893,17 +907,22 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         ))}
                     </ul>
                 </>;
-            case "immediatly-killed-after-combat":
+            case "immediatly-killed-after-combat": {
+                const house = this.game.houses.get(data.house);
+                const killedBecauseWounded = data.killedBecauseWounded.map(utid => unitTypes.get(utid).name);
+                const killedBecauseCantRetreat = data.killedBecauseCantRetreat.map(utid => unitTypes.get(utid).name);
                 return <>
-                    {data.killedBecauseCantRetreat.length > 0 && (<><strong>{data.house}</strong> suffered battle casualties because this units can&apos;t retreat: <>{joinReactNodes(data.killedBecauseCantRetreat.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</>)}
-                    {data.killedBecauseWounded.length > 0 && (<><strong>{data.house}</strong> suffered battle casualties because this units were wounded: <>{joinReactNodes(data.killedBecauseWounded.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</>)}
+                    {killedBecauseWounded.length > 0 && (<><strong>{house.name}</strong> suffered battle casualties because this units were wounded: <>{joinReactNodes(killedBecauseWounded.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</>)}
+                    {killedBecauseCantRetreat.length > 0 && (<><strong>{house.name}</strong> suffered battle casualties because this units can&apos;t retreat: <>{joinReactNodes(killedBecauseCantRetreat.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</>)}
                 </>;
-
-            case "killed-after-combat":
+            }
+            case "killed-after-combat": {
+                const house = this.game.houses.get(data.house);
+                const killed = data.killed.map(utid => unitTypes.get(utid).name);
                 return <>
-                    <strong>{data.house}</strong> suffered battle casualties and chose this units to be killed: <>{joinReactNodes(data.killed.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.
+                    <strong>{house.name}</strong> suffered battle casualties and chose this units to be killed: <>{joinReactNodes(killed.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.
                 </>;
-
+            }
             case "supply-adjusted":
                 const supplies: [House, number][] = data.supplies.map(([hid, supply]) => [this.game.houses.get(hid), supply]);
 
