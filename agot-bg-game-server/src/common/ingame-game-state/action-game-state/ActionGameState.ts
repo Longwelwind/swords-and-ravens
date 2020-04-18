@@ -98,11 +98,15 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
             .filter(([region, _order]) => region.getController() == house);
     }
 
-    getRegionsWithRaidOrderOfHouse(house: House): Region[] {
+    getAllRegionsWithRaidOrder(): Region[] {
         return this.ordersOnBoard.entries
-            .filter(([region, _order]) => region.getController() == house)
             .filter(([_region, order]) => order.type instanceof RaidOrderType)
             .map(([region, _order]) => region);
+    }
+
+    getRegionsWithRaidOrderOfHouse(house: House): Region[] {
+        return this.getAllRegionsWithRaidOrder()
+            .filter((region) => region.getController() == house);
     }
 
     getRegionsWithMarchOrderOfHouse(house: House): Region[] {

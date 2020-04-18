@@ -46,7 +46,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
 
         // Check if all raid orders can not be trivially resolved
         const regionsWithRaidOrders = this.getRegionWithRaidOrders();
-        if (regionsWithRaidOrders.every(r => this.getRaidableRegions(r, this.actionGameState.ordersOnBoard.get(r).type as RaidOrderType).length == 0)) {
+        if (this.canBeFastTracked()) {
             // If yes, fast-track the game by resolving one
             const regionToResolve = regionsWithRaidOrders[0];
 
@@ -144,6 +144,38 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
         return [this.ingameGameState.getControllerOfHouse(this.house).user];
     }
 
+    canBeFastTracked(): boolean {
+        const allRegionsWithRaidOrders = this.actionGameState.getAllRegionsWithRaidOrder();
+
+        // All raids can remove only other raids
+        const onlyRaidsCanBeRemoved = allRegionsWithRaidOrders.every((region) => {
+            const order = this.actionGameState.ordersOnBoard.get(region);
+
+            // This shouldn't happen
+            if (!(order.type instanceof RaidOrderType)) {
+                throw Error("non-raid order passed the filter!");
+            }
+
+            const raidableRegions = this.getRaidableRegions(region, order.type);
+
+            return raidableRegions.every((r) => this.actionGameState.ordersOnBoard.get(r).type instanceof RaidOrderType)
+        });
+
+        // All raids of active House can't remove anything
+        const houseRaidsAreTrivial = allRegionsWithRaidOrders.filter(r => r.getController() == this.house).every(region => {
+           const order = this.actionGameState.ordersOnBoard.get(region) ;
+
+           // This shouldn't happen
+            if (!(order.type instanceof RaidOrderType)) {
+                throw Error("non-raid order passed the filter!");
+            }
+
+            return this.getRaidableRegions(region, order.type).length == 0;
+        });
+
+        return onlyRaidsCanBeRemoved || houseRaidsAreTrivial;
+    }
+
     getRegionWithRaidOrders(): Region[] {
         return this.actionGameState.getRegionsWithRaidOrderOfHouse(this.house);
     }
@@ -154,7 +186,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
 
     getRaidableRegions(orderRegion: Region, raid: RaidOrderType): Region[] {
         return this.world.getNeighbouringRegions(orderRegion)
-            .filter(r => r.getController() != this.house)
+            .filter(r => r.getController() != orderRegion.getController())
             .filter(r => this.actionGameState.ordersOnBoard.has(r))
             .filter(r => raid.isValidRaidableOrder(this.actionGameState.ordersOnBoard.get(r)))
             .filter(r => r.type.kind == orderRegion.type.kind || orderRegion.type.canAdditionalyRaid == r.type.kind);
