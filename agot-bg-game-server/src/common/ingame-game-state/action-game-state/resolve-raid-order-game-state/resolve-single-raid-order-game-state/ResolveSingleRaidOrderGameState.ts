@@ -46,7 +46,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
 
         // Check if all raid orders can not be trivially resolved
         const regionsWithRaidOrders = this.getRegionWithRaidOrders();
-        if (regionsWithRaidOrders.every(r => this.getRaidableRegions(r, this.actionGameState.ordersOnBoard.get(r).type as RaidOrderType).length == 0)) {
+        if (regionsWithRaidOrders.every(r => this.parentGameState.getRaidableRegions(r, this.actionGameState.ordersOnBoard.get(r).type as RaidOrderType).length == 0)) {
             // If yes, fast-track the game by resolving one
             const regionToResolve = regionsWithRaidOrders[0];
 
@@ -81,7 +81,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
         if (targetRegion) {
             const orderTarget = this.actionGameState.ordersOnBoard.get(targetRegion);
 
-            if (!this.getRaidableRegions(orderRegion, orderType).includes(targetRegion)) {
+            if (!this.parentGameState.getRaidableRegions(orderRegion, orderType).includes(targetRegion)) {
                 return;
             }
 
@@ -150,14 +150,6 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
 
     onServerMessage(_message: ServerMessage): void {
 
-    }
-
-    getRaidableRegions(orderRegion: Region, raid: RaidOrderType): Region[] {
-        return this.world.getNeighbouringRegions(orderRegion)
-            .filter(r => r.getController() != this.house)
-            .filter(r => this.actionGameState.ordersOnBoard.has(r))
-            .filter(r => raid.isValidRaidableOrder(this.actionGameState.ordersOnBoard.get(r)))
-            .filter(r => r.type.kind == orderRegion.type.kind || orderRegion.type.canAdditionalyRaid == r.type.kind);
     }
 
     resolveRaid(orderRegion: Region, targetRegion: Region | null): void {

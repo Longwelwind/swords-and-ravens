@@ -315,6 +315,33 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     );
                 }
 
+            case "raid-resolution-fast-track":
+                const removedOrders = data.removedOrders;
+
+                return (<>
+                    <p>Raid Orders could only remove other Raid Orders, skipping to March Resolution.</p>
+                    {
+                        removedOrders.map(([houseId, removedOrders]) => {
+                            const house = this.game.houses.get(houseId);
+
+                            return (<>
+                                <p><strong>{house.name}</strong> removed:</p>
+                                <ul>
+                                    {
+                                        removedOrders.map(([regionId, starred]) =>
+                                        {
+                                            const region = this.game.world.regions.get(regionId);
+
+                                            return <li key={regionId}><strong>{starred ? "Special " : ""}Raid</strong> Order at <strong>{region.name}</strong></li>;
+                                        })
+                                    }
+                                </ul>
+                            </>);
+                        })
+                    }
+                    </>);
+
+
             case "a-throne-of-blades-choice":
                 house = this.game.houses.get(data.house);
 

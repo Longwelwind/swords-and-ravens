@@ -6,8 +6,8 @@ export default interface GameLog {
 export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | WesterosCardExecuted | WesterosCardDrawn | CombatResult | WildlingCardRevealed | WildlingBidding
     | HighestBidderChosen | LowestBidderChosen | PlayerMustered | WinnerDeclared
-    | RavenHolderWildlingCardPutBottom | RavenHolderWildlingCardPutTop | RavenHolderReplaceOrder | RaidDone | DarkWingsDarkWordsChoice
-    | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan
+    | RavenHolderWildlingCardPutBottom | RavenHolderWildlingCardPutTop | RavenHolderReplaceOrder | RaidDone | RaidResolutionFastTrack
+    | DarkWingsDarkWordsChoice | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
     | ActionPhaseBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingsAttack | MarchOrderRemoved
     | ConsolidatePowerOrderResolved | ArmiesReconciled | EnemyPortTaken | ShipsDestroyedByEmptyCastle
@@ -153,6 +153,12 @@ interface RaidDone {
     orderRaided: number | null;
     raiderGainedPowerToken: boolean | null;
     raidedHouseLostPowerToken: boolean | null;
+}
+
+interface RaidResolutionFastTrack {
+    type: "raid-resolution-fast-track";
+    // House id: (region id, starred)[]
+    removedOrders: [string, [string, boolean][]][];
 }
 
 interface DarkWingsDarkWordsChoice {

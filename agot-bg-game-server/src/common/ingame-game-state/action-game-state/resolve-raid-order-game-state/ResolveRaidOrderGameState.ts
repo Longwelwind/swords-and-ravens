@@ -9,6 +9,9 @@ import House from "../../game-data-structure/House";
 import Player from "../../Player";
 import {ClientMessage} from "../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../messages/ServerMessage";
+import Region from "../../game-data-structure/Region";
+import RaidOrderType from "../../game-data-structure/order-types/RaidOrderType";
+import groupBy from "../../../../utils/groupBy";
 
 export default class ResolveRaidOrderGameState extends GameState<ActionGameState, ResolveSingleRaidOrderGameState> {
     get actionGameState(): ActionGameState {
@@ -50,6 +53,12 @@ export default class ResolveRaidOrderGameState extends GameState<ActionGameState
     }
 
     proceedNextResolveSingleRaidOrder(lastHouseToResolve: House | null = null): void {
+        if (this.canBeFastTracked()) {
+            this.fastTrackResolution();
+
+            return;
+        }
+
         const houseToResolve = this.getNextHouseToResolveRaidOrder(lastHouseToResolve);
 
         if (houseToResolve == null) {
@@ -60,6 +69,37 @@ export default class ResolveRaidOrderGameState extends GameState<ActionGameState
         }
 
         this.setChildGameState(new ResolveSingleRaidOrderGameState(this)).firstStart(houseToResolve);
+    }
+
+    fastTrackResolution(): void {
+        const allRaidRegions = this.actionGameState.getAllRegionsWithRaidOrder();
+
+        this.ingameGameState.log({
+            type: "raid-resolution-fast-track",
+            removedOrders: groupBy(allRaidRegions, (region) => {
+                const controller = region.getController();
+
+                // This should never happen
+                if (controller == null) {
+                    throw Error("Region controller is null")
+                }
+
+                return controller.id;
+            })
+                .mapOver(k => k, regions => regions.map(r => [r.id, this.actionGameState.ordersOnBoard.get(r).type.starred]))
+        });
+
+        allRaidRegions.forEach((region) => {
+            this.actionGameState.ordersOnBoard.delete(region);
+            this.entireGame.broadcastToClients({
+                type: "action-phase-change-order",
+                region: region.id,
+                order: null
+            })
+        });
+
+        this.actionGameState.onResolveRaidOrderGameStateFinish();
+        return;
     }
 
     getNextHouseToResolveRaidOrder(lastHouseToResolve: House | null): House | null {
@@ -78,6 +118,32 @@ export default class ResolveRaidOrderGameState extends GameState<ActionGameState
 
         // If no house has any raid order available, return null
         return null;
+    }
+
+    canBeFastTracked(): boolean {
+        const allRegionsWithRaids = this.actionGameState.getAllRegionsWithRaidOrder();
+
+        // Fast-track when all raid orders can remove only other raid orders
+        return allRegionsWithRaids.every((region) => {
+            const order = this.actionGameState.ordersOnBoard.get(region);
+
+            // This shouldn't happen
+            if (!(order.type instanceof RaidOrderType)) {
+                throw Error("non-raid order passed the filter!");
+            }
+
+            const raidableRegions = this.getRaidableRegions(region, order.type);
+
+            return raidableRegions.every((r) => this.actionGameState.ordersOnBoard.get(r).type instanceof RaidOrderType)
+        })
+    }
+
+    getRaidableRegions(orderRegion: Region, raid: RaidOrderType): Region[] {
+        return this.world.getNeighbouringRegions(orderRegion)
+            .filter(r => r.getController() != orderRegion.getController())
+            .filter(r => this.actionGameState.ordersOnBoard.has(r))
+            .filter(r => raid.isValidRaidableOrder(this.actionGameState.ordersOnBoard.get(r)))
+            .filter(r => r.type.kind == orderRegion.type.kind || orderRegion.type.canAdditionalyRaid == r.type.kind);
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedResolveRaidOrderGameState {
