@@ -15,6 +15,8 @@ import houseCardAbilities from "./house-card/houseCardAbilities";
 import EntireGame from "../../EntireGame";
 import staticWorld from "./static-data-structure/globalStaticWorld";
 
+const MAX_POWER_TOKENS = 20;
+
 interface HouseCardData {
     name: string;
     combatStrength?: number;
