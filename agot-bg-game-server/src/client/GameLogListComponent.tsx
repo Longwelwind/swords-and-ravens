@@ -136,7 +136,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                             ))}
                         </Row>
                         {data.addedWildlingStrength > 0 && (
-                            <p>Wildling strength increased by {data.addedWildlingStrength}</p>
+                            <p>Wildling Threat increased by {data.addedWildlingStrength}</p>
                         )}
                     </>
                 );
@@ -179,7 +179,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <>
-                        Wildling bidding results for wildling strength <strong>{data.wildlingStrength}</strong>:
+                        Wildling bidding results for Wildling Threat <strong>{data.wildlingStrength}</strong>:
                         <table cellPadding="5">
                             {results.map(([bid, houses]) => houses.map(h => (
                                 <tr key={h.id}>
@@ -247,7 +247,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
             case "winner-declared":
                 return (
-                    <>Game ended</>
+                    <>Game ended.</>
                 );
 
             case "raven-holder-wildling-card-put-bottom":
@@ -255,8 +255,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <p>
-                        <strong>{house.name}</strong>, holder of the Raven token, chose to see the card at the top
-                        of the wildling card deck and to move it at the bottom of the deck.
+                        <strong>{house.name}</strong>, holder of the Messenger Raven token, chose to see the card at the top
+                        of the Wildling card deck and to move it at the bottom of the deck.
                     </p>
                 );
 
@@ -265,8 +265,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <p>
-                        <strong>{house.name}</strong>, holder of the Raven token, chose to see the card at the top
-                        of the wildling card deck and to leave it at the top of the deck.
+                        <strong>{house.name}</strong>, holder of the Messenger Raven token, chose to see the card at the top
+                        of the Wildling card deck and to leave it at the top of the deck.
                     </p>
                 );
 
@@ -278,7 +278,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <p>
-                        <strong>{house.name}</strong>, holder of the Raven token, chose to replace
+                        <strong>{house.name}</strong>, holder of the Messenger Raven token, chose to replace
                         a <strong>{originalOrder.type.name} Order</strong> with a <strong>{newOrder.type.name} Order
                         </strong> in <strong>{orderRegion.name}</strong>.
                     </p>
@@ -296,7 +296,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     return (
                         <>
                             <p>
-                                <strong>{raider.name}</strong> raided <strong>{raidee.name}</strong>&apos;s <strong>{orderRaided.type.name}
+                                <strong>{raider.name}</strong> raided <strong>{raidee.name}</strong>&apos;s <strong>{orderRaided.type.name} Order
                                 </strong> in <strong>{raidedRegion.name}</strong> from <strong>{raiderRegion.name}</strong>.
                             </p>
                             {data.raiderGainedPowerToken &&
@@ -336,7 +336,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <p>
-                        <strong>{house.name}</strong>, holder of the Raven token, chose to
+                        <strong>{house.name}</strong>, holder of the Messenger Raven token, chose to
                         {data.choice == 0 ? (
                             <> trigger a Clash of Kings.</>
                         ) : data.choice == 1 ? (
@@ -354,11 +354,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <p>
                         <strong>{house.name}</strong>, holder of the Valyrian Steel Blade token, chose to
                         {data.choice == 0 ? (
-                            <> forbid <strong>March +1</strong> orders from being played during this Planning phase.</>
+                            <> forbid <strong>March +1</strong> Orders from being played during this Planning Phase.</>
                         ) : data.choice == 1 ? (
-                            <> forbid <strong>Defense</strong> orders from being played during this Planning phase.</>
+                            <> forbid <strong>Defense</strong> Orders from being played during this Planning Phase.</>
                         ) : (
-                            <> trigger nothing.</>
+                            <> forbid nothing.</>
                         )}
                     </p>
                 );
@@ -367,7 +367,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const drawnCardType = westerosCardTypes.get(data.drawnCardType);
 
                 return <>
-                    <strong>Winter is coming</strong>: The Westeros deck {data.deckIndex + 1} was shuffled and the new Westeros card drawn
+                    <strong>Winter is Coming</strong>: The Westeros deck {data.deckIndex + 1} was shuffled and the new Westeros card drawn
                     is <strong>{drawnCardType.name}</strong>.
                 </>;
 
@@ -395,7 +395,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "combat-valyrian-sword-used":
                 house = this.game.houses.get(data.house);
 
-                return <><strong>{house.name}</strong> used the <strong>Valyrian Sword</strong>.</>;
+                return <><strong>{house.name}</strong> used the <strong>Valyrian Steel Blade</strong>.</>;
 
             case "combat-house-card-chosen":
                 const houseCards = data.houseCards.map(([hid, hcid]) => {
@@ -438,15 +438,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
             case "wildling-strength-trigger-wildlings-attack":
                 return <>
-                    <strong>Wildling strength</strong> reached <strong>{data.wildlingStrength}</strong>, triggering a <strong>Wildlings attack</strong>
+                    <strong>Wildling Threat</strong> reached <strong>{data.wildlingStrength}</strong>, triggering a <strong>Wildling Attack</strong>
                 </>;
+
             case "march-order-removed":
                 house = this.game.houses.get(data.house);
                 let region = this.game.world.regions.get(data.region);
 
                 return <>
                     <p>
-                        <strong>{house.name}</strong> removed his march order in <strong>{region.name}</strong>.
+                        <strong>{house.name}</strong> removed their March Order in <strong>{region.name}</strong>.
                     </p>
                 </>;
 
@@ -456,7 +457,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const countPowerToken = data.powerTokenCount;
 
                 return <>
-                    <strong>{house.name}</strong> resolved a {data.starred && "Starred "}Consolidate Power Order
+                    <strong>{house.name}</strong> resolved a {data.starred && "Special "}Consolidate Power Order
                     in <strong>{region.name}</strong> to gain <strong>{countPowerToken}</strong> Power token{countPowerToken > 1 && "s"}.
                 </>;
 
@@ -544,7 +545,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const embattledRegion = this.world.regions.get(data.region);
 
                 return <>
-                    <strong>Loras Tyrell</strong>: The <strong>{order.type.name}</strong> order was moved
+                    <strong>Loras Tyrell</strong>: The <strong>{order.type.name}</strong> Order was moved
                     to <strong>{embattledRegion.name}</strong>.
                 </>;
 
@@ -553,7 +554,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 affectedHouse = this.game.houses.get(data.affectedHouse);
 
                 return <>
-                    <strong>Queen of Thorns</strong>: <strong>{affectedHouse.name}</strong> had no adjacent order tokens.
+                    <strong>Queen of Thorns</strong>: <strong>{affectedHouse.name}</strong> had no adjacent Order tokens.
                 </>;
 
             case "queen-of-thorns-order-removed":
@@ -564,7 +565,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <strong>Queen of Thorns</strong>: <strong>{house.name}</strong> removed
-                    a <strong>{removedOrder.type.name}</strong> of <strong>{affectedHouse.name}</strong> in <strong>{region.name}</strong>.
+                    a <strong>{removedOrder.type.name}</strong> Order of <strong>{affectedHouse.name}</strong> in <strong>{region.name}</strong>.
                 </>;
 
             case "tywin-lannister-power-tokens-gained":
@@ -580,7 +581,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 house = this.game.houses.get(data.house);
 
                 return <>
-                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> had no available knight to upgrade
+                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> had no available Knight to upgrade
                     to.
                 </>;
 
@@ -588,7 +589,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 house = this.game.houses.get(data.house);
 
                 return <>
-                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> had no available footman to upgrade.
+                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> had no available Footman to upgrade.
                 </>;
 
             case "renly-baratheon-footman-upgraded-to-knight":
@@ -596,7 +597,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 region = this.world.regions.get(data.region);
 
                 return <>
-                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> upgraded a footman to a knight in
+                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> upgraded a Footman to a Knight in
                     <strong>{region.name}</strong>.
                 </>;
 
@@ -611,7 +612,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 house = this.game.houses.get(data.house);
 
                 return <>
-                    <strong>Mace Tyrell</strong>: No enemy footman were available to be killed.
+                    <strong>Mace Tyrell</strong>: No enemy Footman was available to be killed.
                 </>;
 
             case "mace-tyrell-footman-killed":
@@ -619,13 +620,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 region = this.world.regions.get(data.region);
 
                 return <>
-                    <strong>Mace Tyrell</strong>: <strong>{house.name}</strong> killed an enemy footman
+                    <strong>Mace Tyrell</strong>: <strong>{house.name}</strong> killed an enemy Footman
                     in <strong>{region.name}</strong>.
                 </>;
 
             case "cersei-lannister-no-order-available":
                 return <>
-                    <strong>Cersei Lannister</strong>: There were no order to be removed.
+                    <strong>Cersei Lannister</strong>: There were no Order tokens to be removed.
                 </>;
 
             case "cersei-lannister-order-removed":
@@ -636,7 +637,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <strong>Cersei Lannister</strong>: <strong>{house.name}</strong> removed
-                    a <strong>{removedOrder.type.name}</strong> order
+                    a <strong>{removedOrder.type.name}</strong> Order
                     of <strong>{affectedHouse.name}</strong> in <strong>{region.name}</strong>.
                 </>;
 
@@ -681,8 +682,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const port = this.world.regions.get(data.oldController);
                 return <>
                     {data.shipCount > 0
-                        ? <><strong>{newController.name}</strong> has converted {data.shipCount} ship{data.shipCount == 1 ? "" : "s"} from <strong>{oldController.name}</strong> in <strong></strong>{port.name}.</>
-                        : <><strong>{newController.name}</strong> has destroyed all <strong>{oldController.name}</strong> ships in <strong></strong>{port.name}.</>}
+                        ? <><strong>{newController.name}</strong> has converted {data.shipCount} Ship{data.shipCount == 1 ? "" : "s"} from <strong>{oldController.name}</strong> in <strong>{port.name}</strong>.</>
+                        : <><strong>{newController.name}</strong> has destroyed all <strong>{oldController.name}</strong> Ships in <strong>{port.name}</strong>.</>}
                 </>;
             }
             case "ships-destroyed-by-empty-castle": {
@@ -690,7 +691,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const port = this.game.world.regions.get(data.port);
                 const castle = this.game.world.regions.get(data.castle);
                 return <>
-                    <><strong>{house.name}</strong> lost {data.shipCount} ship{data.shipCount>1?"s":""} in <strong>{port.name}</strong> because <strong>{castle.name}</strong> is empty now.</>
+                    <><strong>{house.name}</strong> lost {data.shipCount} Ship{data.shipCount>1?"s":""} in <strong>{port.name}</strong> because <strong>{castle.name}</strong> is empty now.</>
                 </>;
             }
             case "silence-at-the-wall-executed":
@@ -912,15 +913,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const killedBecauseWounded = data.killedBecauseWounded.map(utid => unitTypes.get(utid).name);
                 const killedBecauseCantRetreat = data.killedBecauseCantRetreat.map(utid => unitTypes.get(utid).name);
                 return <>
-                    {killedBecauseWounded.length > 0 && (<><strong>{house.name}</strong> suffered battle casualties because this units were wounded: <>{joinReactNodes(killedBecauseWounded.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</>)}
-                    {killedBecauseCantRetreat.length > 0 && (<><strong>{house.name}</strong> suffered battle casualties because this units can&apos;t retreat: <>{joinReactNodes(killedBecauseCantRetreat.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</>)}
+                    {killedBecauseWounded.length > 0 && (<><strong>{house.name}</strong> suffered battle casualties because these units were wounded: <>{joinReactNodes(killedBecauseWounded.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</>)}
+                    {killedBecauseCantRetreat.length > 0 && (<><strong>{house.name}</strong> suffered battle casualties because these units can&apos;t retreat: <>{joinReactNodes(killedBecauseCantRetreat.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</>)}
                 </>;
             }
             case "killed-after-combat": {
                 const house = this.game.houses.get(data.house);
                 const killed = data.killed.map(utid => unitTypes.get(utid).name);
                 return <>
-                    <strong>{house.name}</strong> suffered battle casualties and chose this units to be killed: <>{joinReactNodes(killed.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.
+                    <strong>{house.name}</strong> suffered battle casualties and chose these units to be killed: <>{joinReactNodes(killed.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.
                 </>;
             }
             case "supply-adjusted":
