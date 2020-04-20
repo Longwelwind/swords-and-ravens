@@ -20,7 +20,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     ownerUserId: string;
     name: string;
 
-    @observable gameSettings: GameSettings = {pbem: false, setupId: "base-game", playerCount: 6};
+    @observable gameSettings: GameSettings = {pbem: false, setupId: "base-game", playerCount: 6, tidesOfBattle: false};
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -333,4 +333,5 @@ export interface GameSettings {
     pbem: boolean;
     setupId: string;
     playerCount: number;
+    tidesOfBattle: boolean;
 }
