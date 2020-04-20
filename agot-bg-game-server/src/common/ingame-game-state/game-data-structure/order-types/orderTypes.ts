@@ -17,10 +17,10 @@ export const support = new SupportOrderType("support", "Support", false);
 export const supportPlusOne = new SupportOrderType("support-plus-one", "Support +1", true, 1);
 
 export const consolidatePower = new ConsolidatePowerOrderType("consolidate-power", "Consolidate Power", false);
-export const specialConsolidatePower = new ConsolidatePowerOrderType("special-consolidate-power", "Starred Consolidate Power", true);
+export const specialConsolidatePower = new ConsolidatePowerOrderType("special-consolidate-power", "Special Consolidate Power", true);
 
 export const raid = new RaidOrderType("raid", "Raid", false);
-export const specialRaid = new RaidOrderType("special-raid", "Starred Raid", true);
+export const specialRaid = new RaidOrderType("special-raid", "Special Raid", true);
 
 const orderTypes = new BetterMap<string, OrderType>([
     [marchMinusOne.id, marchMinusOne],
