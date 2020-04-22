@@ -61,10 +61,6 @@ export default class UseValyrianSteelBladeGameState extends GameState<CombatGame
         return [this.ingame.getControllerOfHouse(this.house).user];
     }
 
-    getPhaseName(): string {
-        return "Use Valyrian Steel Blade";
-    }
-
     choose(use: boolean): void {
         this.entireGame.sendMessageToServer({
             type: "use-valyrian-steel-blade",

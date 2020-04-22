@@ -403,10 +403,6 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
         };
     }
 
-    getPhaseName(): string {
-        return "Resolve a March Order";
-    }
-
     canLeavePowerToken(startingRegion: Region, moves: BetterMap<Region, Unit[]>): {success: boolean; reason: string} {
         if (startingRegion.superControlPowerToken == this.house) {
             return {success: false, reason: "already-capital"};
