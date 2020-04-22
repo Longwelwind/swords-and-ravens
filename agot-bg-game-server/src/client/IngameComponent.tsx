@@ -23,8 +23,6 @@ import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faStar} from "@fortawesome/free-solid-svg-icons/faStar";
 import Tooltip from "react-bootstrap/Tooltip";
-import Badge from "react-bootstrap/Badge";
-import barrelImage from "../../public/images/icons/barrel.svg";
 import castleImage from "../../public/images/icons/castle.svg";
 import stoneThroneImage from "../../public/images/icons/stone-throne.svg";
 import ravenImage from "../../public/images/icons/raven.svg";
@@ -50,6 +48,7 @@ import ChatComponent from "./chat-client/ChatComponent";
 import {HouseCardState} from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import HouseCardBackComponent from "./game-state-panel/utils/HouseCardBackComponent";
 import InfluenceIconComponent from "./game-state-panel/utils/InfluenceIconComponent";
+import SupplyTrackComponent from "./game-state-panel/utils/SupplyTrackComponent";
 import Dropdown from "react-bootstrap/Dropdown";
 import User from "../server/User";
 import Player from "../common/ingame-game-state/Player";
@@ -184,56 +183,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         </ListGroupItem>
                                     ))}
                                     <ListGroupItem>
-                                        <Row>
-                                            <Col xs="auto">
-                                                <img width="32px" src={barrelImage} alt="Supply"/>
-                                            </Col>
-                                            <Col>
-                                                <Row className="justify-content-center">
-                                                    {this.game.supplyRestrictions.map((allowedArmies, i) => (
-                                                        <Col xs="auto" key={i} className="d-flex flex-column align-items-center">
-                                                            <div>
-                                                            <Badge variant="secondary" style={{fontSize: "14px"}}>
-                                                                {i}
-                                                            </Badge>
-                                                            </div>
-                                                            <div className="d-flex">
-                                                                <div style={{width: "18px", marginRight: "6px", marginTop: "10px"}}>
-                                                                    {this.getHousesAtSupplyLevel(i).map(h => (
-                                                                        <OverlayTrigger
-                                                                            key={h.id}
-                                                                            overlay={
-                                                                                <Tooltip id={`supply-house-${h.id}`}>
-                                                                                    {h.name}
-                                                                                </Tooltip>
-                                                                            }
-                                                                            placement="right">
-                                                                            <div
-                                                                                key={h.id}
-                                                                                className="supply-icon hover-weak-outline"
-                                                                                style={{
-                                                                                    backgroundImage: `url(${houseInfluenceImages.get(h.id)})`,
-                                                                                    marginTop: "-5px"
-                                                                                }}
-                                                                            >
-
-                                                                            </div>
-                                                                        </OverlayTrigger>
-                                                                    ))}
-                                                                </div>
-                                                                <div>
-                                                                    {allowedArmies.map((size, i) => (
-                                                                        <div style={{marginBottom: "-6px"}} key={i}>
-                                                                            {size}
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            </div>
-                                                        </Col>
-                                                    ))}
-                                                </Row>
-                                            </Col>
-                                        </Row>
+                                        <SupplyTrackComponent
+                                            supplyRestrictions={this.game.supplyRestrictions}
+                                            houses={this.game.houses}
+                                        />
                                     </ListGroupItem>
                                 </ListGroup>
                             </Card>
@@ -496,10 +449,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     getOtherPlayers(): Player[] {
         return this.props.gameState.players.values.filter(p => p.user != this.props.gameClient.authenticatedUser);
-    }
-
-    getHousesAtSupplyLevel(supplyLevel: number): House[] {
-        return this.game.houses.values.filter(h => h.supplyLevel == supplyLevel);
     }
 
     compileGameLog(gameLog: string): string {
