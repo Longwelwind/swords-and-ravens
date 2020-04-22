@@ -144,10 +144,6 @@ export default class LobbyGameState extends GameState<EntireGame> {
         return [];
     }
 
-    getPhaseName(): string {
-        return "Lobby";
-    }
-
     serializeToClient(_user: User | null): SerializedLobbyGameState {
         return {
             type: "lobby",

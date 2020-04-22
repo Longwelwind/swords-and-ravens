@@ -63,10 +63,6 @@ export default class SimpleChoiceGameState extends GameState<ParentGameState> {
         return [this.parentGameState.ingame.getControllerOfHouse(this.house).user];
     }
 
-    getPhaseName(): string {
-        return "Choice";
-    }
-
     onServerMessage(_message: ServerMessage): void {
 
     }

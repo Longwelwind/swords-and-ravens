@@ -201,10 +201,6 @@ export default class PlanningGameState extends GameState<IngameGameState> {
         }
     }
 
-    getPhaseName(): string {
-        return "Planning";
-    }
-
     /**
      * Queries
      */

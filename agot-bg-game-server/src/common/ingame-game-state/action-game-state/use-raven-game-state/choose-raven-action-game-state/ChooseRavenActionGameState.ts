@@ -50,10 +50,6 @@ export default class ChooseRavenActionGameState extends GameState<UseRavenGameSt
     onServerMessage(_message: ServerMessage): void {
     }
 
-    getPhaseName(): string {
-        return "Choose raven action";
-    }
-
     serializeToClient(_admin: boolean, _player: Player | null): SerializedChooseRavenActionGameState {
         return {
             type: "choose-raven-action"

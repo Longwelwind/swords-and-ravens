@@ -96,10 +96,6 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         });
     }
 
-    getPhaseName(): string {
-        return "Choose a general";
-    }
-
     serializeToClient(admin: boolean, player: Player | null): SerializedChooseHouseCardGameState {
         return {
             type: "choose-house-card",

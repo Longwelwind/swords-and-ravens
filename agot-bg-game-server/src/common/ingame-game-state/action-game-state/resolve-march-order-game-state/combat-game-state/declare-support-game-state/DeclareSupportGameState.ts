@@ -32,10 +32,6 @@ export default class DeclareSupportGameState extends GameState<CombatGameState> 
         this.house = house;
     }
 
-    getPhaseName(): string {
-        return "Declare support";
-    }
-
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "declare-support") {
             if (player.house != this.house) {
