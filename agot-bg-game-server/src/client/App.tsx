@@ -16,7 +16,7 @@ interface AppProps {
 export default class App extends Component<AppProps> {
     render(): ReactNode {
         return (
-            <Container fluid style={{marginTop: "1rem", marginBottom: "4.5rem"}}>
+            <Container fluid style={{marginTop: "1rem", marginBottom: "4.5rem", maxWidth: "1920px"}}>
                 <Row className="justify-content-center">
                     {this.props.gameClient.connectionState == ConnectionState.INITIALIZING ? (
                         <Col xs={3}>
