@@ -679,7 +679,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "enemy-port-taken": {
                 const newController = this.game.houses.get(data.newController);
                 const oldController = this.game.houses.get(data.oldController);
-                const port = this.world.regions.get(data.oldController);
+                const port = this.world.regions.get(data.port);
                 return <>
                     {data.shipCount > 0
                         ? <><strong>{newController.name}</strong> has converted {data.shipCount} Ship{data.shipCount == 1 ? "" : "s"} from <strong>{oldController.name}</strong> in <strong>{port.name}</strong>.</>
