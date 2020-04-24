@@ -199,6 +199,8 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         log.data.region = regionNameToIdMappings.get(regionName);
                     });
             }
+
+            return serializedGame;
         }
     }
 ];
