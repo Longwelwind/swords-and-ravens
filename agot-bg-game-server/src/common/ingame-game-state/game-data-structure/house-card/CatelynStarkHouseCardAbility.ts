@@ -5,7 +5,11 @@ import HouseCard from "./HouseCard";
 import House from "../House";
 
 export default class CatelynStarkHouseCardAbility extends HouseCardAbility {
-    modifyDefenseOrderBonus(_combat: CombatGameState, _house: House, _houseCard: HouseCard, defenseOrderType: DefenseOrderType, _currentBonus: number): number {
-        return defenseOrderType.defenseModifier;
+    modifyDefenseOrderBonus(_combat: CombatGameState, _house: House, _houseCard: HouseCard, houseSide: House, defenseOrderType: DefenseOrderType, _currentBonus: number): number {
+        if (_house == houseSide) {
+            return defenseOrderType.defenseModifier;
+        }
+
+        return 0;
     }
 }
