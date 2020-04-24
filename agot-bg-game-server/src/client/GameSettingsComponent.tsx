@@ -38,6 +38,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             <Col xs="auto">
                                 <select id="setups" name="setups"
                                     value={this.gameSettings.setupId}
+                                    disabled={!this.canChangeGameSettings}
                                     onChange={e => this.onSetupChange(e.target.value)}>
                                     {this.createSetupItems()}
                                 </select>
@@ -47,6 +48,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             <Col xs="auto">
                                 <select id="player-count" name="playerCount"
                                     value={this.gameSettings.playerCount}
+                                    disabled={!this.canChangeGameSettings}
                                     onChange={e => this.onPlayerCountChange(e.target.value)}>
                                     {this.createPlayerCountItems()}
                                 </select>

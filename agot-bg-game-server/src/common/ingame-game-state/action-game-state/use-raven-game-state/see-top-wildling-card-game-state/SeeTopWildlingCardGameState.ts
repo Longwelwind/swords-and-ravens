@@ -74,10 +74,6 @@ export default class SeeTopWildlingCardGameState extends GameState<UseRavenGameS
         return [this.parentGameState.ingameGameState.getControllerOfHouse(this.ravenHolder).user];
     }
 
-    getPhaseName(): string {
-        return "See top wildling card";
-    }
-
     serializeToClient(admin: boolean, player: Player | null): SerializedSeeTopWildlingCardGameState {
         return {
             type: "see-top-wildling-card",

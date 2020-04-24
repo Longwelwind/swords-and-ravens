@@ -74,10 +74,6 @@ export default class ChooseCasualtiesGameState extends GameState<PostCombatGameS
 
     }
 
-    getPhaseName(): string {
-        return "Choose casualties";
-    }
-
     static deserializeFromServer(postCombatGameState: PostCombatGameState, data: SerializedChooseCasualtiesGameState): ChooseCasualtiesGameState {
         const chooseCasualtiesGameState = new ChooseCasualtiesGameState(postCombatGameState);
 

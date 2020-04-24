@@ -253,9 +253,9 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
 
         this.parentGameState.ingameGameState.log({
             type: "ships-destroyed-by-empty-castle",
-            castle: startingRegion.name,
-            house: this.house.name,
-            port: portOfStartingRegion.name,
+            castle: startingRegion.id,
+            house: this.house.id,
+            port: portOfStartingRegion.id,
             shipCount: destroyedShipCount
         });
     }
@@ -401,10 +401,6 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             type: "resolve-single-march",
             houseId: this.house.id
         };
-    }
-
-    getPhaseName(): string {
-        return "Resolve a March Order";
     }
 
     canLeavePowerToken(startingRegion: Region, moves: BetterMap<Region, Unit[]>): {success: boolean; reason: string} {

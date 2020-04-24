@@ -21,8 +21,6 @@ import {GameLogData} from "./game-data-structure/GameLog";
 import GameEndedGameState, {SerializedGameEndedGameState} from "./game-ended-game-state/GameEndedGameState";
 import UnitType from "./game-data-structure/UnitType";
 
-const MAX_POWER_TOKENS = 20;
-
 export default class IngameGameState extends GameState<
     EntireGame,
     WesterosGameState | PlanningGameState | ActionGameState | GameEndedGameState
@@ -134,7 +132,7 @@ export default class IngameGameState extends GameState<
         const originalValue = house.powerTokens;
 
         const powerTokensOnBoardCount = this.game.countPowerTokensOnBoard(house);
-        const maxPowerTokenCount = MAX_POWER_TOKENS - powerTokensOnBoardCount;
+        const maxPowerTokenCount = this.game.maxPowerTokens - powerTokensOnBoardCount;
 
         house.powerTokens += delta;
         house.powerTokens = Math.max(0, Math.min(house.powerTokens, maxPowerTokenCount));
