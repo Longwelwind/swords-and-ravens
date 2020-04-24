@@ -24,7 +24,7 @@ There a multiple ways to run the code, depending on what components on what you 
 Requires `NodeJS` and `yarn`. Install the dependencies and initialize the environment variables by executing:
 
 ```bash
-cp agot-bg-game-server/
+cd agot-bg-game-server/
 yarn install
 yarn run generate-json-schemas
 cp .env.dev.local .env

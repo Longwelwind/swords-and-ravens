@@ -49,6 +49,7 @@ import Tab from "react-bootstrap/Tab";
 import ChatComponent from "./chat-client/ChatComponent";
 import {HouseCardState} from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import HouseCardBackComponent from "./game-state-panel/utils/HouseCardBackComponent";
+import InfluenceIconComponent from "./game-state-panel/utils/InfluenceIconComponent";
 import Dropdown from "react-bootstrap/Dropdown";
 import User from "../server/User";
 import Player from "../common/ingame-game-state/Player";
@@ -163,9 +164,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 </Col>
                                                 {tracker.map((h, i) => (
                                                     <Col xs="auto" key={h.id}>
-                                                        <div className="influence-icon hover-weak-outline"
-                                                             style={{backgroundImage: `url(${houseInfluenceImages.get(h.id)})`}}>
-                                                        </div>
+                                                        <InfluenceIconComponent
+                                                            house={h}
+                                                        />
                                                         <div className="tracker-star-container">
                                                             {stars && i < this.game.starredOrderRestrictions.length && (
                                                                 _.range(0, this.game.starredOrderRestrictions[i]).map(i => (

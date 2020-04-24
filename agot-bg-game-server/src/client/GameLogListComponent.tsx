@@ -605,7 +605,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 house = this.game.houses.get(data.house);
 
                 return <>
-                    <strong>Mace Tyrell</strong>: Casualties were prevented by <strong>Robb Stark</strong>.
+                    <strong>Mace Tyrell</strong>: Casualties were prevented by <strong>The Blackfish</strong>.
                 </>;
 
             case "mace-tyrell-no-footman-available":
