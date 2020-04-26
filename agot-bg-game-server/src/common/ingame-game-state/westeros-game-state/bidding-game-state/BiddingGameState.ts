@@ -100,10 +100,6 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
         return _.difference(this.participatingHouses, this.bids.keys);
     }
 
-    getPhaseName(): string {
-        return "Bidding phase";
-    }
-
     firstStart(participatingHouses: House[] = []): void {
         this.participatingHouses = participatingHouses;
 

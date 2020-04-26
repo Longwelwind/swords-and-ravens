@@ -55,7 +55,7 @@ export default class HouseCardAbility {
         return 0;
     }
 
-    modifyDefenseOrderBonus(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _defenseOrderType: DefenseOrderType, _currentBonus: number): number {
+    modifyDefenseOrderBonus(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _houseSide: House, _defenseOrderType: DefenseOrderType, _currentBonus: number): number {
         return 0;
     }
 

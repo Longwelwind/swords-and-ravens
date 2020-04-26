@@ -189,7 +189,7 @@ export default class CombatGameState extends GameState<
             if (order.type instanceof DefenseOrderType) {
                 return this.computeModifiedStat(
                     order.type.defenseModifier,
-                    (h, hc, hca, cv) => hca.modifyDefenseOrderBonus(this, h, hc, order.type as DefenseOrderType, cv)
+                    (h, hc, hca, cv) => hca.modifyDefenseOrderBonus(this, h, hc, house, order.type as DefenseOrderType, cv)
                 );
             }
         }

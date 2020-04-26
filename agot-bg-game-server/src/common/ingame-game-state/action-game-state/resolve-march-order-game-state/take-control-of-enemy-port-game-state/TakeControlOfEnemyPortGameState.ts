@@ -89,10 +89,10 @@ export default class TakeControlOfEnemyPortGameState extends GameState<ResolveMa
 
             this.ingame.log({
                 type: "enemy-port-taken",
-                oldController: oldController.name,
-                newController: this.newController.name,
+                oldController: oldController.id,
+                newController: this.newController.id,
                 shipCount: shipsToAdd.length,
-                port: this.port.name
+                port: this.port.id
             });
         }
 

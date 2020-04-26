@@ -49,14 +49,6 @@ export default class GameState<ParentGameState extends AnyGameState, ChildGameSt
                 : false;
     }
 
-    getPhaseName(): string {
-        if (this.childGameState) {
-            return this.childGameState.getPhaseName();
-        } else {
-            throw new Error("getPhaseName should be overriden for leaf ingame state");
-        }
-    }
-
     getWaitedUsers(): User[] {
         if (this.childGameState) {
             return this.childGameState.getWaitedUsers();

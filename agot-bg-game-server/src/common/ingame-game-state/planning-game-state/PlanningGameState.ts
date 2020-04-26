@@ -51,10 +51,13 @@ export default class PlanningGameState extends GameState<IngameGameState> {
         });
 
         this.planningRestrictions = planningRestrictions;
-    }
 
-    isOrderAvailable(house: House, order: Order): boolean {
-        return this.getAvailableOrders(house).includes(order);
+        // Automatically set ready for houses which don't have units left
+        this.game.houses.forEach(h => {
+            if (this.getPossibleRegionsForOrders(h).length == 0) {
+                this.setReady(this.ingameGameState.getControllerOfHouse(h));
+            }
+        });
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -99,30 +102,30 @@ export default class PlanningGameState extends GameState<IngameGameState> {
                 })
             }
         } else if (message.type == "ready") {
-            if (this.readyPlayers.includes(player)) {
-                return;
-            }
-
-            if (!this.canReady(player.house).status) {
-                return;
-            }
-
-            this.readyPlayers.push(player);
-
-            // Check if all player are ready to go the action entireGame state
-            if (this.readyPlayers.length == this.ingameGameState.players.values.length) {
-                this.ingameGameState.proceedToActionGameState(this.placedOrders as BetterMap<Region, Order>, this.planningRestrictions);
-            } else {
-                this.entireGame.broadcastToClients({
-                    type: "player-ready",
-                    userId: player.user.id
-                });
-            }
+            this.setReady(player);
         }
     }
 
-    getPossibleRegionsForOrders(house: House): Region[] {
-        return this.game.world.getControlledRegions(house).filter(r => r.units.size > 0);
+    private setReady(player: Player): void {
+        if (this.readyPlayers.includes(player)) {
+            return;
+        }
+
+        if (!this.canReady(player.house).status) {
+            return;
+        }
+
+        this.readyPlayers.push(player);
+
+        // Check if all player are ready to go the action entireGame state
+        if (this.readyPlayers.length == this.ingameGameState.players.values.length) {
+            this.ingameGameState.proceedToActionGameState(this.placedOrders as BetterMap<Region, Order>, this.planningRestrictions);
+        } else {
+            this.entireGame.broadcastToClients({
+                type: "player-ready",
+                userId: player.user.id
+            });
+        }
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedPlanningGameState {
@@ -147,7 +150,15 @@ export default class PlanningGameState extends GameState<IngameGameState> {
      * Common
      */
 
-     canReady(house: House): {status: boolean; reason: string} {
+    getPossibleRegionsForOrders(house: House): Region[] {
+        return this.game.world.getControlledRegions(house).filter(r => r.units.size > 0);
+    }
+
+    isOrderAvailable(house: House, order: Order): boolean {
+        return this.getAvailableOrders(house).includes(order);
+    }
+
+    canReady(house: House): {status: boolean; reason: string} {
         const possibleRegions = this.getPossibleRegionsForOrders(house);
 
         if (possibleRegions.every(r => this.placedOrders.has(r)))
@@ -199,10 +210,6 @@ export default class PlanningGameState extends GameState<IngameGameState> {
 
             this.readyPlayers.push(player);
         }
-    }
-
-    getPhaseName(): string {
-        return "Planning";
     }
 
     /**

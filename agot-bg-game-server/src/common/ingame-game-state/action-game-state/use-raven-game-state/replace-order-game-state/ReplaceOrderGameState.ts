@@ -115,10 +115,6 @@ export default class ReplaceOrderGameState extends GameState<UseRavenGameState> 
         }
     }
 
-    getPhaseName(): string {
-        return "Replace order";
-    }
-
     serializeToClient(_admin: boolean, _player: Player | null): SerializedReplaceOrderGameState {
         return {
             type: "replace-order"

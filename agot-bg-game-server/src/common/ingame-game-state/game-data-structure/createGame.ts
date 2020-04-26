@@ -15,6 +15,8 @@ import houseCardAbilities from "./house-card/houseCardAbilities";
 import EntireGame from "../../EntireGame";
 import staticWorld from "./static-data-structure/globalStaticWorld";
 
+const MAX_POWER_TOKENS = 20;
+
 interface HouseCardData {
     name: string;
     combatStrength?: number;
@@ -76,6 +78,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
     game.maxTurns = baseGameData.maxTurns;
     game.structuresCountNeededToWin = baseGameData.structuresCountNeededToWin;
     game.supplyRestrictions = baseGameData.supplyRestrictions;
+    game.maxPowerTokens = MAX_POWER_TOKENS;
 
     // Load tracks starting positions
     if (gameSetup.tracks && gameSetup.tracks.ironThrone) {
