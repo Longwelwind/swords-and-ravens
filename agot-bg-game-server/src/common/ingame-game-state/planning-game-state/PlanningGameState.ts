@@ -73,6 +73,9 @@ export default class PlanningGameState extends GameState<IngameGameState> {
                 return;
             }
 
+            // When a player placed or removed an order he is unready
+            this.setUnready(player);
+
             if (order) {
                 this.placedOrders.set(region, order);
             } else {
@@ -103,14 +106,12 @@ export default class PlanningGameState extends GameState<IngameGameState> {
             }
         } else if (message.type == "ready") {
             this.setReady(player);
+        } else if (message.type == "unready") {
+            this.setUnready(player);
         }
     }
 
     private setReady(player: Player): void {
-        if (this.readyPlayers.includes(player)) {
-            return;
-        }
-
         if (!this.canReady(player.house).status) {
             return;
         }
@@ -126,6 +127,19 @@ export default class PlanningGameState extends GameState<IngameGameState> {
                 userId: player.user.id
             });
         }
+    }
+
+    setUnready(player: Player): void {
+        if (!this.canUnready(player).status) {
+            return;
+        }
+
+        this.readyPlayers.splice(this.readyPlayers.indexOf(player), 1);
+
+        this.entireGame.broadcastToClients({
+            type: "player-unready",
+            userId: player.user.id
+        });
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedPlanningGameState {
@@ -159,6 +173,10 @@ export default class PlanningGameState extends GameState<IngameGameState> {
     }
 
     canReady(house: House): {status: boolean; reason: string} {
+        if (this.isReady(this.ingameGameState.getControllerOfHouse(house))) {
+            return {status: false, reason: "already-ready"};
+        }
+
         const possibleRegions = this.getPossibleRegionsForOrders(house);
 
         if (possibleRegions.every(r => this.placedOrders.has(r)))
@@ -173,6 +191,14 @@ export default class PlanningGameState extends GameState<IngameGameState> {
         }
 
         return {status: false, reason: "not-all-regions-filled"};
+    }
+
+    canUnready(player: Player): {status: boolean; reason: string} {
+        if (!this.isReady(player)) {
+            return {status: false, reason: "not-ready"};
+        }
+
+        return {status: true, reason: "player-can-unready"};
     }
 
     /**
@@ -193,6 +219,12 @@ export default class PlanningGameState extends GameState<IngameGameState> {
         });
     }
 
+    unready(): void {
+        this.entireGame.sendMessageToServer({
+            type: "unready"
+        });
+    }
+
     onServerMessage(message: ServerMessage): void {
         if (message.type == "order-placed") {
             const region = this.world.regions.get(message.region);
@@ -209,6 +241,10 @@ export default class PlanningGameState extends GameState<IngameGameState> {
             const player = this.ingameGameState.players.get(this.entireGame.users.get(message.userId));
 
             this.readyPlayers.push(player);
+        } else if (message.type == "player-unready") {
+            const player = this.ingameGameState.players.get(this.entireGame.users.get(message.userId));
+
+            this.readyPlayers.splice(this.readyPlayers.indexOf(player), 1);
         }
     }
 
