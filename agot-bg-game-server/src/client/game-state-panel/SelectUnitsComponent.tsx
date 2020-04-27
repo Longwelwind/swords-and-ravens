@@ -52,6 +52,12 @@ export default class SelectUnitsComponent extends Component<GameStateComponentPr
     }
 
     confirm(): void {
+        if (this.selectedUnits.size == 0) {
+            if (!window.confirm("You haven't selected any unit yet. Continue anyway?")) {
+                return;
+            }
+        }
+
         this.props.gameState.selectUnits(this.selectedUnits);
     }
 
