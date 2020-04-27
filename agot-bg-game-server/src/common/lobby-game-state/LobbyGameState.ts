@@ -7,6 +7,7 @@ import {observable} from "mobx";
 import BetterMap from "../../utils/BetterMap";
 import baseGameData from "../../../data/baseGameData.json";
 import CancelledGameState from "../cancelled-game-state/CancelledGameState";
+import Player from "../ingame-game-state/Player";
 
 export default class LobbyGameState extends GameState<EntireGame> {
     lobbyHouses: BetterMap<string, LobbyHouse>;
@@ -62,6 +63,14 @@ export default class LobbyGameState extends GameState<EntireGame> {
             }
 
             this.entireGame.proceedToIngameGameState(new BetterMap(this.players.map((h, u) => ([h.id, u]))));
+        } else if (message.type == "kick-player") {
+            const kickedUser = this.entireGame.users.get(message.user);
+
+            if (!this.entireGame.isOwner(user)) {
+                return;
+            }
+
+            this.setUserForLobbyHouse(null, kickedUser);
         } else if (message.type == "cancel-game") {
             if (!this.entireGame.isOwner(user)) {
                 return;
@@ -76,20 +85,25 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 return;
             }
 
-            this.players.forEach((houseUser, house) => {
-                if (user == houseUser) {
-                    this.players.delete(house);
-                }
-            });
-            if (house) {
-                this.players.set(house, user);
-            }
-
-            this.entireGame.broadcastToClients({
-                type: "house-chosen",
-                players: this.players.entries.map(([house, user]) => [house.id, user.id])
-            });
+            this.setUserForLobbyHouse(house, user);
         }
+    }
+
+    setUserForLobbyHouse(house: LobbyHouse | null, user: User): void {
+        this.players.forEach((houseUser, house) => {
+            if (user == houseUser) {
+                this.players.delete(house);
+            }
+        });
+
+        if (house) {
+            this.players.set(house, user);
+        }
+
+        this.entireGame.broadcastToClients({
+            type: "house-chosen",
+            players: this.players.entries.map(([house, user]) => [house.id, user.id])
+        });
     }
 
     canStartGame(user: User): {success: boolean; reason: string} {
@@ -137,6 +151,13 @@ export default class LobbyGameState extends GameState<EntireGame> {
     cancel(): void {
         this.entireGame.sendMessageToServer({
             type: "cancel-game"
+        });
+    }
+
+    kick(user: User): void {
+        this.entireGame.sendMessageToServer({
+            type: "kick-player",
+            user: user.id
         });
     }
 
