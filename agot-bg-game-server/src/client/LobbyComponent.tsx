@@ -27,9 +27,13 @@ interface LobbyComponentProps {
 
 @observer
 export default class LobbyComponent extends Component<LobbyComponentProps> {
+    get authenticatedUser(): User {
+        return this.props.gameClient.authenticatedUser as User;
+    }
+
     render(): ReactNode {
-        const {success: canStartGame, reason: canStartGameReason} = this.props.gameState.canStartGame(this.props.gameClient.authenticatedUser as User);
-        const {success: canCancelGame, reason: canCancelGameReason} = this.props.gameState.canCancel(this.props.gameClient.authenticatedUser as User);
+        const {success: canStartGame, reason: canStartGameReason} = this.props.gameState.canStartGame(this.authenticatedUser);
+        const {success: canCancelGame, reason: canCancelGameReason} = this.props.gameState.canCancel(this.authenticatedUser);
 
         return (
             <Col xs={12} sm={10} md={8} lg={6} xl={3}>
@@ -60,10 +64,16 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                                     <Col xs="auto">
                                                         <Button onClick={() => this.choose(h)}>Choose</Button>
                                                     </Col>
-                                                ) : this.props.gameState.players.get(h) == this.props.gameClient.authenticatedUser && (
+                                                ) : this.props.gameState.players.get(h) == this.authenticatedUser ? (
                                                     <Col xs="auto">
                                                         <Button variant="danger" onClick={() => this.leave()}>Leave</Button>
                                                     </Col>
+                                                ) : (
+                                                    this.props.gameState.entireGame.isOwner(this.authenticatedUser) && (
+                                                        <Col xs="auto">
+                                                            <Button variant="danger" onClick={() => this.kick(h)}>Kick</Button>
+                                                        </Col>
+                                                    )
                                                 )
                                             )}
                                         </Row>
@@ -166,6 +176,10 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
 
     choose(house: LobbyHouse): void {
         this.props.gameState.chooseHouse(house);
+    }
+
+    kick(house: LobbyHouse): void {
+        this.props.gameState.kick(this.props.gameState.players.get(house));
     }
 
     cancel(): void {

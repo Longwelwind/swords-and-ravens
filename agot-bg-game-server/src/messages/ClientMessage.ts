@@ -1,5 +1,5 @@
 export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | Unready | ResolveMarchOrder | DeclareSupport
-    | UseValyrianSteelBlade | ChooseHouseCard | ChooseCasualties | ChooseRavenAction
+    | UseValyrianSteelBlade | ChooseHouseCard | ChooseCasualties | ChooseRavenAction | KickPlayer
     | ChooseTopWildlingCardAction | ReplaceOrder | SkipReplaceOrder | ResolveRaid | Bid | ChooseChoice
     | DecideBiggest | ReconcileArmies | Muster | ResolveTies | SelectUnits | LaunchGame | ChooseHouse
     | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings | CreatePrivateChatRoom | ChangeGameSettings
@@ -181,4 +181,9 @@ interface ChangeGameSettings {
 interface CreatePrivateChatRoom {
     type: "create-private-chat-room";
     otherUser: string;
+}
+
+interface KickPlayer {
+    type: "kick-player";
+    user: string;
 }
