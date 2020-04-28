@@ -298,6 +298,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>
                 );
 
+            case "raven-not-used":{
+                const house = this.game.houses.get(data.ravenHolder);
+
+                return <p><strong>{house.name}</strong> did not use the Messenger Raven token.</p>;
+            }
+
             case "raid-done":
                 const raider = this.game.houses.get(data.raider);
                 const raiderRegion = this.world.regions.get(data.raiderRegion);

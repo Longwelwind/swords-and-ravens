@@ -79,6 +79,15 @@ export default class ReplaceOrderGameState extends GameState<UseRavenGameState> 
 
             this.useRavenGameState.onReplaceOrderGameStateEnd();
         } else if (message.type == "skip-replace-order") {
+            if (player.house != this.ravenHolder) {
+                return;
+            }
+
+            this.ingameGameState.log({
+                type: "raven-not-used",
+                ravenHolder: this.ravenHolder.id
+            })
+
             this.useRavenGameState.onReplaceOrderGameStateEnd();
         }
     }
