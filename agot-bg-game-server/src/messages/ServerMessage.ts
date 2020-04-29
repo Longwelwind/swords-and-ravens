@@ -5,6 +5,7 @@ import {SerializedUser} from "../server/User";
 import {HouseCardState} from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import {GameLogData} from "../common/ingame-game-state/game-data-structure/GameLog";
 import {UserSettings} from "./ClientMessage";
+import { SerializedWesterosCard } from "../common/ingame-game-state/game-data-structure/westeros-card/WesterosCard";
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady | PlayerUnready
     | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | NewTurn | RemovePlacedOrder
@@ -14,7 +15,8 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | BidDone | GameStateChange | SupplyAdjusted
     | ChangeControlPowerToken | ChangePowerToken | ChangeWildlingStrength | AddGameLog | RevealWildlingCard
     | RemoveUnits | AddUnits | ChangeTracker | ActionPhaseChangeOrder | ChangeStateHouseCard
-    | SettingsChanged | ChangeValyrianSteelBladeUse | BiddingNextTrack | NewPrivateChatRoom | GameSettingsChanged;
+    | SettingsChanged | ChangeValyrianSteelBladeUse | BiddingNextTrack | NewPrivateChatRoom | GameSettingsChanged
+    | UpdateWesterosDecks;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -228,4 +230,9 @@ interface NewPrivateChatRoom {
 interface GameSettingsChanged {
     type: "game-settings-changed";
     settings: any;
+}
+
+interface UpdateWesterosDecks {
+    type: "update-westeros-decks";
+    westerosDecks: SerializedWesterosCard[][];
 }

@@ -20,6 +20,7 @@ import GameLogManager, {SerializedGameLogManager} from "./game-data-structure/Ga
 import {GameLogData} from "./game-data-structure/GameLog";
 import GameEndedGameState, {SerializedGameEndedGameState} from "./game-ended-game-state/GameEndedGameState";
 import UnitType from "./game-data-structure/UnitType";
+import WesterosCard from "./game-data-structure/westeros-card/WesterosCard";
 
 export default class IngameGameState extends GameState<
     EntireGame,
@@ -258,10 +259,12 @@ export default class IngameGameState extends GameState<
             } else if (message.trackerI == 2) {
                 this.game.kingsCourtTrack = newOrder;
             }
-        } else
-        if (message.type == "change-valyrian-steel-blade-use") {
+        } else if (message.type == "change-valyrian-steel-blade-use") {
             this.game.valyrianSteelBladeUsed = message.used;
-        } else {
+        } else if (message.type == "update-westeros-decks") {
+            this.game.westerosDecks = message.westerosDecks.map(wd => wd.map(wc => WesterosCard.deserializeFromServer(wc)));
+        }
+        else {
             this.childGameState.onServerMessage(message);
         }
     }
