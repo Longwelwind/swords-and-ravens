@@ -19,7 +19,8 @@ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
 env = environ.Env(
-    DEBUG=(bool, False)
+    DEBUG=(bool, False),
+    VANILLA_IGNORED_USERS_WHEN_MIGRATING=(list, [])
 )
 environ.Env.read_env(".env")
 
@@ -232,3 +233,10 @@ GROUP_COLORS = {
     "Admin": "danger",
     "High Member": "info"
 }
+
+# Vanilla Forum
+
+VANILLA_FORUM_API_KEY = env('VANILLA_FORUM_API_KEY', default=None)
+VANILLA_FORUM_DEFAULT_ROLE_ID = env('VANILLA_FORUM_DEFAULT_ROLE_ID', default=0)
+VANILLA_FORUM_HOST = env('VANILLA_FORUM_HOST', default=None)
+VANILLA_IGNORED_USERS_WHEN_MIGRATING = env('VANILLA_IGNORED_USERS_WHEN_MIGRATING')
