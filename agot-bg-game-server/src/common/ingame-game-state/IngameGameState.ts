@@ -190,6 +190,14 @@ export default class IngameGameState extends GameState<
         }
     }
 
+    logWesterosDecks(): void {
+        const decks = this.game.westerosDecks.map(deck => (
+            deck.filter(wc => !wc.discarded).map(wc => wc.type.name).sort()
+        ));
+
+        console.log(`Remaining Westeros cards:\n${JSON.stringify(decks, null, 2)}`);
+    }
+
     onServerMessage(message: ServerMessage): void {
         if (message.type == "supply-adjusted") {
             const supplies: [House, number][] = message.supplies.map(([houseId, supply]) => [this.game.houses.get(houseId), supply]);
@@ -297,6 +305,7 @@ export default class IngameGameState extends GameState<
         ingameGameState.gameLogManager = GameLogManager.deserializeFromServer(ingameGameState, data.gameLogManager);
         ingameGameState.childGameState = ingameGameState.deserializeChildGameState(data.childGameState);
 
+        ingameGameState.logWesterosDecks();
         return ingameGameState;
     }
 
