@@ -17,7 +17,6 @@ import PlanningGameState from "../common/ingame-game-state/planning-game-state/P
 import PlanningComponent from "./game-state-panel/PlanningComponent";
 import ActionGameState from "../common/ingame-game-state/action-game-state/ActionGameState";
 import ActionComponent from "./game-state-panel/ActionComponent";
-import houseInfluenceImages from "./houseInfluenceImages";
 import * as _ from "lodash";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -305,20 +304,26 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 <ListGroup variant="flush">
                                     {phases.some(phase => this.props.gameState.childGameState instanceof phase.gameState) && (
                                         <ListGroupItem>
-                                            <Row className="justify-content-between">
-                                                {phases.map((phase, i) => (
-                                                    <Col xs="auto" key={i}>
-                                                        {this.props.gameState.childGameState instanceof phase.gameState ? (
-                                                            <strong className="weak-outline">{phase.name} phase</strong>
-                                                        ) : (
-                                                            <span className="text-muted">
-                                                            {phase.name} phase
-                                                        </span>
-                                                        )}
-
-                                                    </Col>
-                                                ))}
-                                            </Row>
+                                            <OverlayTrigger
+                                                overlay={this.renderRemainingWesterosCards()}
+                                                delay={{ show: 250, hide: 100 }}
+                                                placement="auto"
+                                                container={this}
+                                            >
+                                                <Row className="justify-content-between">
+                                                    {phases.map((phase, i) => (
+                                                        <Col xs="auto" key={i}>
+                                                            {this.props.gameState.childGameState instanceof phase.gameState ? (
+                                                                <strong className="weak-outline">{phase.name} phase</strong>
+                                                            ) : (
+                                                                    <span className="text-muted">
+                                                                        {phase.name} phase
+                                                                    </span>
+                                                                )}
+                                                        </Col>
+                                                    ))}
+                                                </Row>
+                                            </OverlayTrigger>
                                         </ListGroupItem>
                                     )}
                                     {renderChildGameState(
@@ -437,6 +442,31 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             <small>Available: </small><b>{availablePower}</b><br/>
             <small>On the board: </small><b>{powerTokensOnBoard}</b><br/>
             <small>Power Pool: </small><b>{powerInPool}</b>
+        </Tooltip>;
+    }
+
+    private renderRemainingWesterosCards(): ReactNode {
+        const remainingCards = this.game.remainingWesterosCardTypes;
+
+        return <Tooltip id="remaining-westeros-cards" className="westeros-tooltip">
+            <h5 style={{textAlign: "center"}}>Remaining Westeros Cards</h5>
+            <table cellPadding="5">
+                <thead>
+                    <tr>
+                        {remainingCards.map((_, i) =>
+                            <th key={"westeros-deck-" + i + "-header"} style={{textAlign: "center"}}>Deck {i + 1}</th>)}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        {remainingCards.map((rc, i) =>
+                            <td key={"westeros-deck-" + i + "-data"}>
+                                {rc.entries.map(([wc, count], j) => <div key={"westeros-deck-" + i + "-" + j + "-data"}><small>{wc.name}</small> ({count})</div>)}
+                            </td>
+                        )}
+                    </tr>
+                </tbody>
+            </table>
         </Tooltip>;
     }
 

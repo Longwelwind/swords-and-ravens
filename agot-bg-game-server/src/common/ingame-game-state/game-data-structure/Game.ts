@@ -14,6 +14,7 @@ import BetterMap from "../../../utils/BetterMap";
 import HouseCard from "./house-card/HouseCard";
 import {land, port} from "./regionTypes";
 import PlanningRestriction from "./westeros-card/planning-restriction/PlanningRestriction";
+import WesterosCardType from "./westeros-card/WesterosCardType";
 
 export const MAX_WILDLING_STRENGTH = 12;
 
@@ -55,6 +56,26 @@ export default class Game {
             this.fiefdomsTrack,
             this.kingsCourtTrack
         ];
+    }
+
+    get remainingWesterosCardTypes(): BetterMap<WesterosCardType, number>[] {
+        const result: BetterMap<WesterosCardType, number>[] = [];
+
+        this.westerosDecks.forEach(wd => {
+            const map = new BetterMap<WesterosCardType, number>();
+            wd.sort((a, b) => a.type.name.localeCompare(b.type.name)).forEach(wc => {
+                if (wc.discarded) {
+                    return;
+                }
+                if (!map.has(wc.type)) {
+                    map.set(wc.type, 0);
+                }
+                map.set(wc.type, map.get(wc.type) + 1);
+            });
+            result.push(map);
+        });
+
+        return result;
     }
 
     getTokenHolder(track: House[]): House {
