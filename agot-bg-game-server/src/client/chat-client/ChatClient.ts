@@ -94,6 +94,9 @@ export default class ChatClient {
         if (!channel.connected) {
             return;
         }
+        if (text == null || text.match(/^\s*$/)){
+            return;
+        }
         console.log('Message sent');
         channel.websocket.send(JSON.stringify({type: 'chat_message', text}));
     }
