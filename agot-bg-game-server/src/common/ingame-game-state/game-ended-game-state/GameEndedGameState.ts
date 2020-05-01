@@ -9,6 +9,10 @@ import User from "../../../server/User";
 export default class GameEndedGameState extends GameState<IngameGameState> {
     winner: House;
 
+    get ingame(): IngameGameState {
+        return this.parentGameState;
+    }
+
     firstStart(winner: House): void {
         this.winner = winner;
     }
@@ -21,7 +25,7 @@ export default class GameEndedGameState extends GameState<IngameGameState> {
     }
 
     getWaitedUsers(): User[] {
-        return [];
+        return this.ingame.players.keys;
     }
 
     serializeToClient(_admin: boolean, _player: Player | null): SerializedGameEndedGameState{
