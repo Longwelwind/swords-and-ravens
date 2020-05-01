@@ -40,7 +40,8 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
                 <Col>
                     <Row className="justify-content-center">
                         {this.props.supplyRestrictions.map((allowedArmies, i) => (
-                            <Col xs="auto" key={i} className="d-flex flex-column align-items-center">
+                            <Col xs="auto" key={i} className="d-flex flex-column align-items-center"
+                                style={{ border-right: "1px lightgray solid" }}>
                                 <div>
                                     <OverlayTrigger
                                         overlay={
