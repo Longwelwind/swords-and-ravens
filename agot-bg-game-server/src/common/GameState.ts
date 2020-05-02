@@ -1,6 +1,5 @@
 import {observable} from "mobx";
 import EntireGame from "./EntireGame";
-import User from "../server/User";
 
 type AnyGameState = GameState<any, any> | null;
 
@@ -49,7 +48,7 @@ export default class GameState<ParentGameState extends AnyGameState, ChildGameSt
                 : false;
     }
 
-    getWaitedUsers(): User[] {
+    getWaitedUsers(): string[] {
         if (this.childGameState) {
             return this.childGameState.getWaitedUsers();
         } else {

@@ -1,5 +1,3 @@
-import {ServerMessage} from "../messages/ServerMessage";
-import * as WebSocket from "ws";
 import EntireGame from "../common/EntireGame";
 import {UserSettings} from "../messages/ClientMessage";
 import {observable} from "mobx";
@@ -8,25 +6,11 @@ export default class User {
     id: string;
     name: string;
     @observable settings: UserSettings;
-    entireGame: EntireGame;
     connectedClients: WebSocket[] = [];
 
-    constructor(id: string, name: string, game: EntireGame, settings: UserSettings = {pbemMode: false}) {
+    constructor(id: string, name: string) {
         this.id = id;
         this.name = name;
-        this.settings = settings;
-        this.entireGame = game;
-    }
-
-    send(message: ServerMessage): void {
-        this.entireGame.sendMessageToClients([this], message);
-    }
-
-    syncSettings(): void {
-        this.entireGame.sendMessageToServer({
-            type: "change-settings",
-            settings: this.settings
-        });
     }
 
     serializeToClient(): SerializedUser {
@@ -37,8 +21,8 @@ export default class User {
         }
     }
 
-    static deserializeFromServer(game: EntireGame, data: SerializedUser): User {
-        return new User(data.id, data.name, game, data.settings);
+    static deserializeFromServer(data: SerializedUser): User {
+        return new User(data.id, data.name);
     }
 }
 

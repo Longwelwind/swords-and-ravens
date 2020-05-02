@@ -16,26 +16,38 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     id: string;
     allGameSetups = Object.entries(baseGameData.setups);
 
-    @observable users = new BetterMap<string, User>();
     ownerUserId: string;
     name: string;
 
     @observable gameSettings: GameSettings = {pbem: false, setupId: "base-game", playerCount: 6};
     onSendClientMessage: (message: ClientMessage) => void;
-    onSendServerMessage: (users: User[], message: ServerMessage) => void;
-    onWaitedUsers: (users: User[]) => void;
+    onSendServerMessage: (users: string[], message: ServerMessage) => void;
+    onWaitedUsers: (users: string[]) => void;
     publicChatRoomId: string;
+    users: string[] = [];
     // Keys are the two users participating in the private chat.
     // A pair of user is sorted alphabetically by their id when used as a key.
-    @observable privateChatRoomsIds: BetterMap<User, BetterMap<User, string>> = new BetterMap();
+    @observable privateChatRoomsIds: BetterMap<string, BetterMap<string, string>> = new BetterMap();
     // Client-side callback fired whenever the current GameState changes.
     onClientGameStateChange: (() => void) | null;
 
-    constructor(id: string, ownerId: string, name: string) {
+    /**
+     * `getUser` is a function provided by the instantiator of the EntireGame that provides
+     * a way to get a User from a user id. It is coded that way so that anytime the game
+     * needs information about the user server-side, it gets a fresh copy of it from the 
+     * website. This allows usernames, for example, to be updated if a user changes their name
+     * through the website.
+     * 
+     * This also means that User objects are ephemeral, and should not be stored or serialized.
+     */
+    getUser: (id: string) => Promise<User>;
+
+    constructor(id: string, ownerId: string, name: string, getUser: (id: string) => Promise<User>) {
         super(null);
         this.id = id;
         this.ownerUserId = ownerId;
         this.name = name;
+        this.getUser = getUser;
     }
 
     firstStart(): void {
@@ -92,9 +104,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         return user.id == this.ownerUserId;
     }
 
-    addUser(userId: string, userName: string): User {
-        const user = new User(userId, userName, this);
-        this.users.set(user.id, user);
+    addUser(user: User): User {
+        this.users.push(user.id);
 
         this.broadcastToClients({
             type: "new-user",
@@ -235,7 +246,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         });
     }
 
-    getPrivateChatRoomsOf(user: User): {user: User; roomId: string}[] {
+    getPrivateChatRoomsOf(user: string): {user: string; roomId: string}[] {
         return _.flatMap(this.privateChatRoomsIds
             .map((u1, bm) => bm.entries
                 // Only get the private chat rooms that contains the authenticated player
@@ -280,26 +291,24 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         return {
             id: this.id,
             name: this.name,
-            users: this.users.values.map(u => u.serializeToClient()),
             ownerUserId: this.ownerUserId,
             publicChatRoomId: this.publicChatRoomId,
             gameSettings: this.gameSettings,
-            privateChatRoomIds: this.privateChatRoomsIds.map((u1, v) => [u1.id, v.map((u2, rid) => [u2.id, rid])]),
+            privateChatRoomIds: this.privateChatRoomsIds.map((u1, v) => [u1, v.map((u2, rid) => [u2, rid])]),
             childGameState: this.childGameState.serializeToClient(user)
         };
     }
 
-    static deserializeFromServer(data: SerializedEntireGame): EntireGame {
-        const entireGame = new EntireGame(data.id, data.ownerUserId, data.name);
+    static deserializeFromServer(data: SerializedEntireGame, getUser: (string: string) => User): EntireGame {
+        const entireGame = new EntireGame(data.id, data.ownerUserId, data.name, getUser);
 
-        entireGame.users = new BetterMap<string, User>(data.users.map((ur: any) => [ur.id, User.deserializeFromServer(entireGame, ur)]));
         entireGame.ownerUserId = data.ownerUserId;
         entireGame.childGameState = entireGame.deserializeChildGameState(data.childGameState);
         entireGame.publicChatRoomId = data.publicChatRoomId;
         entireGame.gameSettings = data.gameSettings;
         entireGame.privateChatRoomsIds = new BetterMap(data.privateChatRoomIds.map(([uid1, bm]) => [
-            entireGame.users.get(uid1),
-            new BetterMap(bm.map(([uid2, roomId]) => [entireGame.users.get(uid2), roomId]))
+            uid1,
+            new BetterMap(bm)
         ]));
 
         return entireGame;
@@ -321,7 +330,6 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 export interface SerializedEntireGame {
     id: string;
     name: string;
-    users: SerializedUser[];
     ownerUserId: string;
     childGameState: SerializedLobbyGameState | SerializedIngameGameState | SerializedCancelledGameState;
     publicChatRoomId: string;

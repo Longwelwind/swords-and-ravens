@@ -12,13 +12,14 @@ import schema from "./ClientMessage.json";
 import Ajv, {ValidateFunction} from "ajv";
 import _ from "lodash";
 import serializedGameMigrations from "./serializedGameMigrations";
+import AuthenticatedClient from "./AuthenticatedClient";
 
 export default class GlobalServer {
     server: Server;
 
     websiteClient: WebsiteClient;
     loadedGames = new BetterMap<string, EntireGame>();
-    clientToUser: Map<WebSocket, User> = new Map<WebSocket, User>();
+    clientToUser = new Map<WebSocket, AuthenticatedClient>();
     clientMessageValidator: ValidateFunction;
 
     get latestSerializedGameVersion(): string {
@@ -73,6 +74,16 @@ export default class GlobalServer {
         })
     }
 
+    async getUser(userId: string): Promise<User | null> {
+        const userData = await this.websiteClient.getUser(userId);
+
+        if (userData) {
+            return new User(userData.id, userData.name);
+        } else {
+            return null;
+        }
+    }
+
     async onMessage(client: WebSocket, data: string): Promise<void> {
         let message: ClientMessage | null = null;
         try {
@@ -116,11 +127,15 @@ export default class GlobalServer {
             }
 
             // Check if the game already contains this user
-            const user = entireGame.users.has(userData.id)
+            if (!entireGame.users.includes(userData.id)) {
+                entireGame.addUser(userData);
+            }
+            const user = await this.getUser(userData.id);
                 ? entireGame.users.get(userData.id)
                 : entireGame.addUser(userData.id, userData.name);
 
             this.clientToUser.set(client, user);
+            this.clientToEntireGame.set(client, entireGame);
             user.connectedClients.push(client);
 
             // The client might have disconnected between the execution of this thread,
