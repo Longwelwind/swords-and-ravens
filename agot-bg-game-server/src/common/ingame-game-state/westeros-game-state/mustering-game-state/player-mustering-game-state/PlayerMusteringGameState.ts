@@ -69,6 +69,16 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
     firstStart(house: House, type: PlayerMusteringType): void {
         this.house = house;
         this.type = type;
+
+        if (this.game.world.getControlledRegions(house).filter(r => r.hasStructure).length == 0) {
+            this.parentGameState.ingame.log({
+                type: "player-mustered",
+                house: house.id,
+                musterings: []
+            });
+
+            this.parentGameState.onPlayerMusteringEnd(house, []);
+        }
     }
 
     onServerMessage(_: ServerMessage): void {
