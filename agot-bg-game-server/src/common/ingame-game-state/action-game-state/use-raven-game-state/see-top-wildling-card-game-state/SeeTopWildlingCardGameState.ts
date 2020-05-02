@@ -40,6 +40,9 @@ export default class SeeTopWildlingCardGameState extends GameState<UseRavenGameS
             }
 
             if (message.action == SeeTopWildlingCardAction.PUT_AT_BOTTOM) {
+                this.ingameGameState.game.houses.forEach(h => h.knowsNextWildlingCard = false);
+                this.entireGame.broadcastToClients({type: "hide-top-wildling-card"});
+
                 const removedCard = this.useRavenGameState.game.wildlingDeck.shift() as WildlingCard;
 
                 this.useRavenGameState.game.wildlingDeck.push(removedCard);
@@ -49,6 +52,16 @@ export default class SeeTopWildlingCardGameState extends GameState<UseRavenGameS
                     ravenHolder: this.ravenHolder.id
                 });
             } else {
+                const wildlingCard = this.ingameGameState.game.wildlingDeck[0] as WildlingCard;
+                this.ravenHolder.knowsNextWildlingCard = true;
+
+                const ravenUser = this.ingameGameState.players.entries.filter(entry => entry[1].house == this.ravenHolder)[0][0];
+                ravenUser.send({
+                    type: "reveal-top-wildling-card",
+                    cardId: wildlingCard.id,
+                    houseId: this.ravenHolder.id
+                });
+
                 this.ingameGameState.log({
                     type: "raven-holder-wildling-card-put-top",
                     ravenHolder: this.ravenHolder.id

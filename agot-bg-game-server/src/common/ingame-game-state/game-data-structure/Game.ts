@@ -29,6 +29,8 @@ export default class Game {
     @observable valyrianSteelBladeUsed = false;
     @observable kingsCourtTrack: House[];
     @observable wildlingStrength = 2;
+    // number in clients where house.knowsNextWilldingCard is true, otherwise null.
+    @observable clientNextWildlingCardId: number | null;
     wildlingDeck: WildlingCard[];
     supplyRestrictions: number[][];
     starredOrderRestrictions: number[];
@@ -319,7 +321,7 @@ export default class Game {
         return this.starredOrderRestrictions[place];
     }
 
-    serializeToClient(admin: boolean): SerializedGame {
+    serializeToClient(admin: boolean, knowsNextWildlingCard: boolean): SerializedGame {
         return {
             lastUnitId: this.lastUnitId,
             houses: this.houses.values.map(h => h.serializeToClient()),
@@ -345,7 +347,8 @@ export default class Game {
             skipRavenPhase: this.skipRavenPhase,
             structuresCountNeededToWin: this.structuresCountNeededToWin,
             maxTurns: this.maxTurns,
-            maxPowerTokens: this.maxPowerTokens
+            maxPowerTokens: this.maxPowerTokens,
+            clientNextWidllingCardId: (admin || knowsNextWildlingCard) ? this.wildlingDeck[0].id : null
         };
     }
 
@@ -369,6 +372,7 @@ export default class Game {
         game.structuresCountNeededToWin = data.structuresCountNeededToWin;
         game.maxTurns = data.maxTurns;
         game.maxPowerTokens = data.maxPowerTokens;
+        game.clientNextWildlingCardId = data.clientNextWidllingCardId;
 
         return game;
     }
@@ -392,4 +396,5 @@ export interface SerializedGame {
     structuresCountNeededToWin: number;
     maxTurns: number;
     maxPowerTokens: number;
+    clientNextWidllingCardId: number | null;
 }

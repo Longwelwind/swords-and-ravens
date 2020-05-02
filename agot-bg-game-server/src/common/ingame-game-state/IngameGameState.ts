@@ -263,8 +263,13 @@ export default class IngameGameState extends GameState<
             this.game.valyrianSteelBladeUsed = message.used;
         } else if (message.type == "update-westeros-decks") {
             this.game.westerosDecks = message.westerosDecks.map(wd => wd.map(wc => WesterosCard.deserializeFromServer(wc)));
-        }
-        else {
+        } else if (message.type == "hide-top-wildling-card") {
+            this.game.houses.forEach(h => h.knowsNextWildlingCard = false);
+            this.game.clientNextWildlingCardId = null;
+        } else if (message.type == "reveal-top-wildling-card") {
+            this.game.houses.get(message.houseId).knowsNextWildlingCard = true;
+            this.game.clientNextWildlingCardId = message.cardId;
+        } else {
             this.childGameState.onServerMessage(message);
         }
     }
@@ -284,7 +289,7 @@ export default class IngameGameState extends GameState<
         return {
             type: "ingame",
             players: this.players.values.map(p => p.serializeToClient()),
-            game: this.game.serializeToClient(admin),
+            game: this.game.serializeToClient(admin, player != null && player.house.knowsNextWildlingCard),
             gameLogManager: this.gameLogManager.serializeToClient(),
             childGameState: this.childGameState.serializeToClient(admin, player),
         };

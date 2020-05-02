@@ -202,6 +202,21 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "5",
+        migrate: (serializedGame: any) => {
+            // Migration for #245
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                const game = ingame.game;
+
+                game.houses.forEach((h: any) => h.knowsNextWildlingCard = false);
+                game.clientNextWidllingCardId = null;
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

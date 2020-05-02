@@ -16,7 +16,7 @@ export default class SeeTopWildlingCardComponent extends Component<GameStateComp
         return (
             <>
                 <Col xs={12}>
-                    The holder of the Raven sees the card at the top of the Wildling deck
+                    The holder of the Messenger Raven sees the card at the top of the Wildling deck
                     and may choose to either leave it at the top, or put it at the bottom
                     of the deck.
                 </Col>
