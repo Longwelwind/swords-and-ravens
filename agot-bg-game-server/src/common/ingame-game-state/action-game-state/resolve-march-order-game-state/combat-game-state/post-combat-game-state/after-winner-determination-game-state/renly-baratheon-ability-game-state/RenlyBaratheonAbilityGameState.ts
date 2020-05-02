@@ -1,4 +1,4 @@
-import GameState from "../../../../../../../GameState";
+    import GameState from "../../../../../../../GameState";
 import AfterWinnerDeterminationGameState from "../AfterWinnerDeterminationGameState";
 import SelectUnitsGameState, {SerializedSelectUnitsGameState} from "../../../../../../select-units-game-state/SelectUnitsGameState";
 import Game from "../../../../../../game-data-structure/Game";
@@ -66,9 +66,9 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
                 .filter(region => region.getController() == house)
             : [];
 
-        const regions = [this.combatGameState.houseCombatDatas.get(house).region].concat(supportingRegions);
-
-        return _.flatMap(regions, region => region.units.values.filter(u => u.type == footman));
+        const supportingFootman = _.flatMap(regions, region => supportingRegions.units.values.filter(u => u.type == footman));
+        const fightingFootman = _.flatMap(regions, region => this.combatGameState.houseCombatDatas.get(house).army.filter(u => u.type == footman));
+        return supportingFootman.concat(fightingFootman);
     }
 
     onSelectUnitsEnd(house: House, selectedUnit: [Region, Unit[]][]): void {
