@@ -11,8 +11,6 @@ from django.dispatch import receiver
 from django.utils.crypto import get_random_string
 from django.utils.translation import gettext_lazy as _
 
-from agotboardgame_main.vanilla_forum_integration import create_vanilla_forum_user_for_django_user
-
 IN_LOBBY = "IN_LOBBY"
 CLOSED = "CLOSED"
 ONGOING = "ONGOING"
@@ -61,7 +59,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=get_user_model())
 def create_account_vanilla_forum(sender, instance, created, **kwargs):
     if settings.VANILLA_FORUM_API_KEY and created:
-        create_vanilla_forum_user_for_django_user(instance)
+        pass
 
 
 def generate_default_view_of_game():

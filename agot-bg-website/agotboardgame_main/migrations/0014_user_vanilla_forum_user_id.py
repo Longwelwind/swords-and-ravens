@@ -3,14 +3,15 @@ from django.conf import settings
 from django.db import migrations, models
 
 from agotboardgame_main.models import User
-from agotboardgame_main.vanilla_forum_integration import create_vanilla_forum_user_for_django_user
 
 
 def forward(apps, schema_editor):
     # Create a Vanilla forum account for all registered user
     for user in User.objects.all():
         if str(user.id) not in settings.VANILLA_IGNORED_USERS_WHEN_MIGRATING and user.vanilla_forum_user_id == 0:
-            create_vanilla_forum_user_for_django_user(user)
+            # The function was removed since the Vanilla forum integration was
+            # not kept.
+            pass
 
 
 def reverse(apps, schema_editor):
