@@ -23,16 +23,18 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
     possibleUnits: Unit[];
     count: number;
     canBeSkipped: boolean;
+    selectedUnitsMustBeOfSameRegion: boolean;
 
     get game(): Game {
         return this.parentGameState.game;
     }
 
-    firstStart(house: House, possibleUnits: Unit[], count: number, canBeSkipped = false): void {
+    firstStart(house: House, possibleUnits: Unit[], count: number, canBeSkipped = false, unitsMustBeOfSameRegion = false): void {
         this.house = house;
         this.possibleUnits = possibleUnits;
         this.count = count;
         this.canBeSkipped = canBeSkipped;
+        this.selectedUnitsMustBeOfSameRegion = unitsMustBeOfSameRegion;
 
         if (possibleUnits.length == 0) {
             throw new Error("SelectUnitsGameState called with possibleUnits.length == 0!")
@@ -42,9 +44,20 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
             throw new Error("User has to select more units than possible and therefore SelectUnitsGameState will never end!");
         }
 
-        if (!canBeSkipped && possibleUnits.length == count) {
-            this.parentGameState.onSelectUnitsEnd(house, groupBy(possibleUnits, u => u.region).entries);
-            return;
+        if (!canBeSkipped) {
+            // If possible units count equals to select units count this state can be fast-tracked
+            if (possibleUnits.length == count) {
+                this.parentGameState.onSelectUnitsEnd(house, groupBy(possibleUnits, u => u.region).entries);
+            } else {
+                const region = possibleUnits[0].region;
+                const type = possibleUnits[0].type;
+    
+                // If all units are of same type and of same region this state can be fast-tracked
+                if (possibleUnits.every(u => u.region == region && u.type == type)) {
+                    const selectedUnits = possibleUnits.slice(possibleUnits.length - count);
+                    this.parentGameState.onSelectUnitsEnd(house, groupBy(selectedUnits, u => u.region).entries);
+                }
+            }
         }
     }
 
@@ -67,6 +80,14 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
 
             if (!units.every(([_r, u]) => u.every(u => this.canPickUnit(u)))) {
                 return;
+            }
+
+            if (this.selectedUnitsMustBeOfSameRegion) {
+                const region = units[0][0];
+
+                if (!units.every(([r, _u]) => region == r)) {
+                    return;
+                }
             }
 
             this.parentGameState.onSelectUnitsEnd(this.house, units);
@@ -110,7 +131,8 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
             house: this.house.id,
             possibleUnits: this.possibleUnits.map(u => u.id),
             count: this.count,
-            canBeSkipped: this.canBeSkipped
+            canBeSkipped: this.canBeSkipped,
+            selectedUnitsMustBeOfSameRegion: this.selectedUnitsMustBeOfSameRegion
         };
     }
 
@@ -121,6 +143,7 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
         selectUnits.possibleUnits = data.possibleUnits.map(uid => parent.game.world.getUnitById(uid));
         selectUnits.count = data.count;
         selectUnits.canBeSkipped = data.canBeSkipped;
+        selectUnits.selectedUnitsMustBeOfSameRegion = data.selectedUnitsMustBeOfSameRegion;
 
         return selectUnits;
     }
@@ -132,4 +155,5 @@ export interface SerializedSelectUnitsGameState {
     possibleUnits: number[];
     count: number;
     canBeSkipped: boolean;
+    selectedUnitsMustBeOfSameRegion: boolean;
 }

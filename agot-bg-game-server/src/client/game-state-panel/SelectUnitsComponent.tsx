@@ -66,7 +66,15 @@ export default class SelectUnitsComponent extends Component<GameStateComponentPr
             return [];
         }
 
-        return _.difference(this.props.gameState.possibleUnits, _.flatMap(this.selectedUnits.map((_r, us) => us)));
+        let result = _.difference(this.props.gameState.possibleUnits, _.flatMap(this.selectedUnits.map((_r, us) => us)));
+
+        if (this.props.gameState.selectedUnitsMustBeOfSameRegion && this.selectedUnits.size > 0) {
+            const selectedRegion = this.selectedUnits.entries[0][0];
+
+            result = result.filter(u => u.region == selectedRegion);
+        }
+
+        return result;
     }
 
     modifyUnitOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {

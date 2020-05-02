@@ -28,11 +28,11 @@ export default class TheHordeDescendsWildlingVictoryGameState extends WildlingCa
 
     executeForLowestBidder(house: House): void {
         const strongholdUnits = _.flatMap(
-            this.game.getUnitsOfHouse(house).filter(([region, _]) => region.hasStructure).map(([_, units]) => units)
+            this.game.getUnitsOfHouse(house).filter(([region, _]) => region.hasStructure && region.units.size >=2).map(([_, units]) => units)
         );
 
         if (strongholdUnits.length >= 2) {
-            this.setChildGameState(new SelectUnitsGameState(this)).firstStart(house, strongholdUnits, 2);
+            this.setChildGameState(new SelectUnitsGameState(this)).firstStart(house, strongholdUnits, 2, false, true);
         } else {
             const units = this.game.world.getUnitsOfHouse(house);
 
