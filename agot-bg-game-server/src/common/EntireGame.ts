@@ -157,6 +157,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             user.settings = message.settings;
         } else if (message.type == "game-settings-changed") {
             this.gameSettings = message.settings;
+        } else if (message.type == "update-connection-status") {
+            const user = this.users.get(message.user);
+            user.connected = message.status;
         } else {
             this.childGameState.onServerMessage(message);
         }

@@ -19,6 +19,7 @@ import { OverlayTrigger } from "react-bootstrap";
 import Tooltip from "react-bootstrap/Tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faTimes} from "@fortawesome/free-solid-svg-icons/faTimes";
+import UserLabel from "./UserLabel";
 
 interface LobbyComponentProps {
     gameClient: GameClient;
@@ -54,9 +55,9 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                                     <b>{h.name}</b>
                                                 </div>
                                                 <div className={classNames({"invisible": !this.props.gameState.players.has(h)})}>
-                                                    <i>
-                                                        {this.props.gameState.players.has(h) ? this.props.gameState.players.get(h).name : "XXX"}
-                                                    </i>
+                                                    {this.props.gameState.players.has(h) ? (
+                                                        <UserLabel user={this.props.gameState.players.get(h)} />
+                                                    ) : <div className="small">XXX</div>}
                                                 </div>
                                             </Col>
                                             {this.isHouseAvailable(h) && (

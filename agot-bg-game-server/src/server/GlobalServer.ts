@@ -133,6 +133,9 @@ export default class GlobalServer {
                     game: entireGame.serializeToClient(user)
                 }));
             }
+
+            // Update the connection status for all other users
+            user.updateConnectionStatus();
         } else if (message.type == "ping") {
             // The client may send ping to keep the connection alive.
             // Do nothing.
@@ -220,6 +223,9 @@ export default class GlobalServer {
         };
         entireGame.onWaitedUsers = (users) => this.onWaitedUsers(entireGame, users);
 
+        // Set the connection status of all users to false
+        entireGame.users.values.forEach(u => u.connected = false);
+
         this.loadedGames.set(gameId, entireGame);
 
         return entireGame;
@@ -269,6 +275,8 @@ export default class GlobalServer {
             const user = this.clientToUser.get(client) as User;
             user.connectedClients.splice(user.connectedClients.indexOf(client), 1);
             this.clientToUser.delete(client);
+
+            user.updateConnectionStatus();
         }
     }
 }
