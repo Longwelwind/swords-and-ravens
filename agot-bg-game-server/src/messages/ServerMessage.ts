@@ -16,7 +16,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | ChangeControlPowerToken | ChangePowerToken | ChangeWildlingStrength | AddGameLog | RevealWildlingCard
     | RemoveUnits | AddUnits | ChangeTracker | ActionPhaseChangeOrder | ChangeStateHouseCard
     | SettingsChanged | ChangeValyrianSteelBladeUse | BiddingNextTrack | NewPrivateChatRoom | GameSettingsChanged
-    | UpdateWesterosDecks;
+    | UpdateWesterosDecks | UpdateConnectionStatus;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -235,4 +235,10 @@ interface GameSettingsChanged {
 interface UpdateWesterosDecks {
     type: "update-westeros-decks";
     westerosDecks: SerializedWesterosCard[][];
+}
+
+interface UpdateConnectionStatus {
+    type: "update-connection-status";
+    user: string;
+    status: boolean;
 }

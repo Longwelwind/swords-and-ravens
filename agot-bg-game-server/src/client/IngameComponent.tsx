@@ -57,6 +57,7 @@ import {Channel} from "./chat-client/ChatClient";
 // @ts-ignore
 import ScrollToBottom from "react-scroll-to-bottom";
 import GameSettingsComponent from "./GameSettingsComponent";
+import UserLabel from "./UserLabel";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -208,9 +209,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 <Col>
                                                     <b style={{"color": p.house.color}}>{p.house.name}</b>
                                                     {" "}
-                                                    <a href={`/user/${p.user.id}`} target="_blank" rel="noopener noreferrer">
-                                                        <small>{p.user.name}</small>
-                                                    </a>
+                                                    <UserLabel user={p.user} />
                                                 </Col>
                                                 <Col xs="auto">
                                                     <Row className="justify-content-center align-items-center" style={{width: 110}}>
