@@ -258,7 +258,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <p>
                         <strong>{house.name}</strong>, holder of the Messenger Raven token, chose to see the card at the top
-                        of the Wildling card deck and to move it at the bottom of the deck.
+                        of the Wildling deck and to move it at the bottom of the deck.
                     </p>
                 );
 
@@ -268,7 +268,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <p>
                         <strong>{house.name}</strong>, holder of the Messenger Raven token, chose to see the card at the top
-                        of the Wildling card deck and to leave it at the top of the deck.
+                        of the Wildling deck and to leave it at the top of the deck.
                     </p>
                 );
 
