@@ -830,8 +830,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
 
                 return <>
-                    <strong>The Horde Descends</strong>: <strong>{house.name}</strong> chose to
-                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <strong key={i}>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), ", ")}.
+                    <strong>The Horde Descends</strong>: <strong>{house.name}</strong>{units.length > 0 ? (<> chose to
+                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <strong key={i}>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), ", ")}.</>)
+                    : <> had no units to destroy.</>}
                 </>;
 
             case "crow-killers-knights-replaced":
