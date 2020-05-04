@@ -199,7 +199,7 @@ export default class PostCombatGameState extends GameState<
         // Put the house cards as used
         this.combat.houseCombatDatas.forEach(({houseCard}, house) => this.markHouseAsUsed(house, houseCard));
 
-        this.proceedAfterWinnerDetermination();
+        this.proceedRetreat();
     }
 
     proceedAfterWinnerDetermination(): void {
@@ -208,7 +208,7 @@ export default class PostCombatGameState extends GameState<
     }
 
     onAfterWinnerDeterminationFinish(): void {
-        this.proceedRetreat();
+        this.setChildGameState(new AfterCombatHouseCardAbilitiesGameState(this)).firstStart();
     }
 
     proceedRetreat(): void {
@@ -251,7 +251,7 @@ export default class PostCombatGameState extends GameState<
         // Remove the order from attacking region
         this.removeOrderFromRegion(this.combat.attackingRegion);
 
-        this.setChildGameState(new AfterCombatHouseCardAbilitiesGameState(this)).firstStart();
+        this.proceedAfterWinnerDetermination();
     }
 
     removeOrderFromRegion(region: Region): void {
