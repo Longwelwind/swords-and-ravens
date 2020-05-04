@@ -72,6 +72,12 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
                 if (units.length > 0) {
                     this.setChildGameState(new SelectUnitsGameState(this)).firstStart(this.parentGameState.lowestBidder, units, destroyCount);
                 } else {
+                    this.ingame.log({
+                        type: "preemptive-raid-units-killed",
+                        house: this.parentGameState.lowestBidder.id,
+                        units: []
+                    });
+
                     this.parentGameState.onWildlingCardExecuteEnd();
                 }
             } else if (choice == 1) {

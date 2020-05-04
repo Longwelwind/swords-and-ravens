@@ -735,8 +735,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 let units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))] as [Region, UnitType[]]);
 
                 return <>
-                    <strong>{house.name}</strong> chose to
-                    kill {joinReactNodes(units.map(([region, units]) => <>{joinReactNodes(units.map((u, i) => <strong key={i}>{u.name}</strong>), ", ")} in <strong>{region.name}</strong></>), " and ")}.
+                    <strong>{house.name}</strong>{units.length > 0 ? (<> chose to
+                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <strong key={i}>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), " and ")}.</>)
+                    : <> had no units to destroy.</>}
                 </>;
 
             case "preemptive-raid-wildlings-attack":
