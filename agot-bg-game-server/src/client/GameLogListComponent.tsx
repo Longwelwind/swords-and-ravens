@@ -216,7 +216,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
             case "player-mustered":
                 house = this.game.houses.get(data.house);
-                    const musterings = _.flatMap(data.musterings.map(([_, musterements]: [string, {region: string; from: string | null; to: string}[]]) =>
+                const musterings = _.flatMap(data.musterings.map(([_, musterements]: [string, {region: string; from: string | null; to: string}[]]) =>
                     musterements.map(({region, from, to}) => ({
                         region: this.game.world.regions.get(region),
                         from: from ? unitTypes.get(from) : null,
@@ -227,8 +227,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <>
                         <p>
-                            <strong>{house.name}</strong> mustered:
+                            <strong>{house.name}</strong> mustered{musterings.length > 0 ? ":" : " nothing."}
                         </p>
+                        {musterings.length > 0 && (
                         <ul>
                             {musterings.map(({region, from, to}, i) => (
                                 <li key={i}>
@@ -242,6 +243,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                                 </li>
                             ))}
                         </ul>
+                        )}
                     </>
                 );
 
