@@ -1,5 +1,6 @@
 import RegionType from "../RegionType";
 import Point from "../../../../utils/Point";
+import UnitSlot from "../../../../utils/unitSlot";
 
 export default class StaticRegion {
     id: string;
@@ -13,13 +14,13 @@ export default class StaticRegion {
 
     // Display attributes
     nameSlot: Point;
-    unitSlot: Point;
+    unitSlot: UnitSlot;
     orderSlot: Point;
     powerTokenSlot: Point;
 
     constructor(
         id: string, name: string, nameSlot: Point, type: RegionType,
-        unitSlot: Point, orderSlot: Point, powerTokenSlot: Point, crownIcons: number, supplyIcons: number, castleLevel: number, startingGarrison: number,
+        unitSlot: UnitSlot, orderSlot: Point, powerTokenSlot: Point, crownIcons: number, supplyIcons: number, castleLevel: number, startingGarrison: number,
         superControlPowerToken: string | null
     ) {
         this.id = id;

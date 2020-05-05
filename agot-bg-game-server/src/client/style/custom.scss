@@ -46,6 +46,7 @@ $grid-gutter-width: 1rem;
 .map .units-container {
   position: absolute;
   display: flex;
+  justify-content: center;
   // This allows the units to be center on the position-absolute reference points
   transform: translate(-50%, -50%);
 }
