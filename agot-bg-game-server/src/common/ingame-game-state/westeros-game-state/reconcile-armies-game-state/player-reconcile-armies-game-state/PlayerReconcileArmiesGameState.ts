@@ -11,6 +11,8 @@ import BetterMap from "../../../../../utils/BetterMap";
 import EntireGame from "../../../../EntireGame";
 import UnitType from "../../../game-data-structure/UnitType";
 import User from "../../../../../server/User";
+import { getUniqueCombinations } from "../../../../../utils/getUniqueCombinations";
+import _ from "lodash";
 
 export default class PlayerReconcileArmiesGameState extends GameState<ReconcileArmiesGameState<any>> {
     house: House;
@@ -48,6 +50,11 @@ export default class PlayerReconcileArmiesGameState extends GameState<ReconcileA
                 return;
             }
 
+            if (this.isTooMuchReconciled(removedUnits).status) {
+                // The player has removed too much armies
+                return;
+            }
+
             removedUnits.forEach((units, region) => {
                 units.forEach(u => region.units.delete(u.id));
 
@@ -69,7 +76,12 @@ export default class PlayerReconcileArmiesGameState extends GameState<ReconcileA
     }
 
     onServerMessage(_message: ServerMessage): void {
+        return;
+    }
 
+    getPossibleUnitsToBeRemoved(house: House): Unit[] {
+        const regionsWithArmies = this.game.world.getControlledRegions(house).filter(r => r.units.size > 1);
+        return _.flatMap(regionsWithArmies, r => r.units.values);
     }
 
     reconcileArmies(removedUnits: BetterMap<Region, Unit[]>): void {
@@ -77,6 +89,42 @@ export default class PlayerReconcileArmiesGameState extends GameState<ReconcileA
             type: "reconcile-armies",
             unitsToRemove: removedUnits.entries.map(([region, units]) => [region.id, units.map(u => u.id)])
         });
+    }
+
+    isTooMuchReconciled(removedUnits: BetterMap<Region, Unit[]>): {status: boolean; reason: string} {
+        if (removedUnits.size == 0) {
+            return {status: false, reason: "nothing-removed"};
+        }
+
+        // Check if a single unit has been removed
+        if (removedUnits.keys.some(r => r.units.size <= 1)) {
+            return {status: true, reason: "single-unit-removed"};
+        }
+
+        // Check if user removed all units from a region
+        if (removedUnits.entries.some(([region, units]) => region.units.size == units.length)) {
+            return {status: true, reason: "removed-all-units-from-region"};
+        }
+
+        // Check incremental if a part of removedUnits would also be a valid reconcilement
+        const combinations = getUniqueCombinations<Region>(Array.of(removedUnits.keys));
+        for(const regions of combinations) {
+            if(regions.length == removedUnits.size) {
+                // The original combination of removedUnits must be skipped
+                continue;
+            }
+
+            const newRemovedUnits = new BetterMap<Region, Unit[]>();
+            regions.forEach(r => {
+                newRemovedUnits.set(r, removedUnits.get(r));
+            });
+
+            if (this.isEnoughToReconcile(newRemovedUnits)) {
+                return {status: true, reason: "too-much-armies-removed"};
+            }
+        };
+
+        return { status: false, reason: "valid-reconcilement"};
     }
 
     isEnoughToReconcile(removedUnits: BetterMap<Region, Unit[]>): boolean {

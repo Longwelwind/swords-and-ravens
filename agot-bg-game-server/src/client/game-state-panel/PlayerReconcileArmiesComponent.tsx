@@ -44,7 +44,8 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
                                 ))}
                                 <Row className="justify-content-center">
                                     <Col xs="auto">
-                                        <Button disabled={!this.props.gameState.isEnoughToReconcile(this.unitsToRemove)} onClick={() => this.confirm()}>Confirm</Button>
+                                        <Button disabled={!this.props.gameState.isEnoughToReconcile(this.unitsToRemove)
+                                            || this.props.gameState.isTooMuchReconciled(this.unitsToRemove).status} onClick={() => this.confirm()}>Confirm</Button>
                                     </Col>
                                     <Col xs="auto">
                                         <Button disabled={this.unitsToRemove.size == 0} onClick={() => this.reset()}>Reset</Button>
@@ -91,7 +92,7 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
 
     modifyUnitsOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.house)) {
-            return this.props.gameState.game.world.getUnitsOfHouse(this.house).map(u => [
+            return this.props.gameState.getPossibleUnitsToBeRemoved(this.house).map(u => [
                 u,
                 {
                     highlight: {active: !_.flatMap(this.unitsToRemove.map((_, us) => us)).includes(u)},
