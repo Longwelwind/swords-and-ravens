@@ -66,9 +66,10 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
                 .filter(region => region.getController() == house)
             : [];
 
-        const regions = [this.combatGameState.houseCombatDatas.get(house).region].concat(supportingRegions);
+        const upgradableFootmen = _.flatMap(supportingRegions, r => r.units.values).filter(u => u.type == footman);
+        upgradableFootmen.push(...this.combatGameState.houseCombatDatas.get(house).army.filter(u => u.type == footman));
 
-        return _.flatMap(regions, region => region.units.values.filter(u => u.type == footman));
+        return upgradableFootmen;
     }
 
     onSelectUnitsEnd(house: House, selectedUnit: [Region, Unit[]][]): void {
