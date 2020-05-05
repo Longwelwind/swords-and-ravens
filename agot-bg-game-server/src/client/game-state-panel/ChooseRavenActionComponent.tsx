@@ -25,7 +25,7 @@ export default class ChooseRavenActionComponent extends Component<GameStateCompo
                                 <Button onClick={() => this.choose(RavenAction.REPLACE_ORDER)}>Replace an Order Token</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button onClick={() => this.choose(RavenAction.SEE_TOP_WILDLING_CARD)}>Look at the Top Wilding Card</Button>
+                                <Button onClick={() => this.choose(RavenAction.SEE_TOP_WILDLING_CARD)}>Look at the Top Wildling Card</Button>
                             </Col>
                             <Col xs="auto">
                                 <Button onClick={() => this.choose(RavenAction.NONE)}>Skip</Button>
