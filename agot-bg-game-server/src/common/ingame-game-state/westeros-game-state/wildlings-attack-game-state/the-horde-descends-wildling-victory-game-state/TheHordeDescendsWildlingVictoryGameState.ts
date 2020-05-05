@@ -39,6 +39,12 @@ export default class TheHordeDescendsWildlingVictoryGameState extends WildlingCa
             const count = Math.min(2, units.length);
 
             if (count == 0) {
+                this.ingame.log({
+                    type: "the-horde-descends-units-killed",
+                    house: house.id,
+                    units: []
+                });
+
                 this.proceedNextHouse(house);
                 return;
             }
@@ -51,6 +57,12 @@ export default class TheHordeDescendsWildlingVictoryGameState extends WildlingCa
         const units = this.game.world.getUnitsOfHouse(house);
 
         if (units.length == 0) {
+            this.ingame.log({
+                type: "the-horde-descends-units-killed",
+                house: house.id,
+                units: []
+            });
+
             this.proceedNextHouse(house);
             return;
         }

@@ -16,16 +16,16 @@ export default class ChooseRavenActionComponent extends Component<GameStateCompo
             <>
                 <Col xs={12} className="text-center">
                     The holder of the Raven token may now choose to replace an order or to see the top
-                    card of the wildling deck
+                    card of the Wildling deck
                 </Col>
                 {this.props.gameClient.doesControlHouse(this.props.gameState.ravenHolder) ? (
                     <Col xs={12}>
                         <Row className="justify-content-center">
                             <Col xs="auto">
-                                <Button onClick={() => this.choose(RavenAction.REPLACE_ORDER)}>Replace an order</Button>
+                                <Button onClick={() => this.choose(RavenAction.REPLACE_ORDER)}>Replace an Order Token</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button onClick={() => this.choose(RavenAction.SEE_TOP_WILDLING_CARD)}>See wildling deck</Button>
+                                <Button onClick={() => this.choose(RavenAction.SEE_TOP_WILDLING_CARD)}>Look at the Top Wilding Card</Button>
                             </Col>
                             <Col xs="auto">
                                 <Button onClick={() => this.choose(RavenAction.NONE)}>Skip</Button>

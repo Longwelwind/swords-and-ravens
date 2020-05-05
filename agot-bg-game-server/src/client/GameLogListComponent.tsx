@@ -216,7 +216,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
             case "player-mustered":
                 house = this.game.houses.get(data.house);
-                    const musterings = _.flatMap(data.musterings.map(([_, musterements]: [string, {region: string; from: string | null; to: string}[]]) =>
+                const musterings = _.flatMap(data.musterings.map(([_, musterements]: [string, {region: string; from: string | null; to: string}[]]) =>
                     musterements.map(({region, from, to}) => ({
                         region: this.game.world.regions.get(region),
                         from: from ? unitTypes.get(from) : null,
@@ -227,8 +227,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <>
                         <p>
-                            <strong>{house.name}</strong> mustered:
+                            <strong>{house.name}</strong> mustered{musterings.length > 0 ? ":" : " nothing."}
                         </p>
+                        {musterings.length > 0 && (
                         <ul>
                             {musterings.map(({region, from, to}, i) => (
                                 <li key={i}>
@@ -242,6 +243,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                                 </li>
                             ))}
                         </ul>
+                        )}
                     </>
                 );
 
@@ -256,7 +258,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <p>
                         <strong>{house.name}</strong>, holder of the Messenger Raven token, chose to see the card at the top
-                        of the Wildling card deck and to move it at the bottom of the deck.
+                        of the Wildling deck and to move it at the bottom of the deck.
                     </p>
                 );
 
@@ -266,7 +268,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <p>
                         <strong>{house.name}</strong>, holder of the Messenger Raven token, chose to see the card at the top
-                        of the Wildling card deck and to leave it at the top of the deck.
+                        of the Wildling deck and to leave it at the top of the deck.
                     </p>
                 );
 
@@ -581,8 +583,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 house = this.game.houses.get(data.house);
 
                 return <>
-                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> had no available Knight to upgrade
-                    to.
+                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> had no available Knight to upgrade to.
                 </>;
 
             case "renly-baratheon-no-footman-available":
@@ -597,8 +598,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 region = this.world.regions.get(data.region);
 
                 return <>
-                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> upgraded a Footman to a Knight in
-                    <strong>{region.name}</strong>.
+                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> upgraded a Footman to a Knight
+                    in <strong>{region.name}</strong>.
                 </>;
 
             case "mace-tyrell-casualties-prevented":
@@ -733,8 +734,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 let units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))] as [Region, UnitType[]]);
 
                 return <>
-                    <strong>{house.name}</strong> chose to
-                    kill {joinReactNodes(units.map(([region, units]) => <>{joinReactNodes(units.map((u, i) => <strong key={i}>{u.name}</strong>), ", ")} in <strong>{region.name}</strong></>), " and ")}.
+                    <strong>{house.name}</strong>{units.length > 0 ? (<> chose to
+                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <strong key={i}>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), " and ")}.</>)
+                    : <> had no units to destroy.</>}
                 </>;
 
             case "preemptive-raid-wildlings-attack":
@@ -802,8 +804,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
 
                 return <>
-                    <strong>Mammoth Riders</strong>: <strong>{house.name}</strong> chose to
-                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <strong key={i}>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), ", ")}.
+                    <strong>Mammoth Riders</strong>: <strong>{house.name}</strong>{units.length > 0 ? (<> chose to
+                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <strong key={i}>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), ", ")}.</>)
+                    : <> had no units to destroy.</>}
                 </>;
 
             case "mammoth-riders-return-card":
@@ -828,8 +831,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
 
                 return <>
-                    <strong>The Horde Descends</strong>: <strong>{house.name}</strong> chose to
-                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <strong key={i}>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), ", ")}.
+                    <strong>The Horde Descends</strong>: <strong>{house.name}</strong>{units.length > 0 ? (<> chose to
+                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <strong key={i}>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), ", ")}.</>)
+                    : <> had no units to destroy.</>}
                 </>;
 
             case "crow-killers-knights-replaced":

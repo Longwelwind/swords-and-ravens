@@ -30,6 +30,12 @@ export default class MammothRidersWildlingVictoryGameState extends WildlingCardE
         if (units.length > 0) {
             this.setChildGameState(new SelectUnitsGameState(this)).firstStart(house, units, count);
         } else {
+            this.ingame.log({
+                type: "mammoth-riders-destroy-units",
+                house: house.id,
+                units: []
+            });
+
             this.proceedNextHouse(house);
         }
     }
