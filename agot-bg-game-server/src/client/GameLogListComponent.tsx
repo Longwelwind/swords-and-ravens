@@ -583,8 +583,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 house = this.game.houses.get(data.house);
 
                 return <>
-                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> had no available Knight to upgrade
-                    to.
+                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> had no available Knight to upgrade to.
                 </>;
 
             case "renly-baratheon-no-footman-available":
@@ -599,8 +598,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 region = this.world.regions.get(data.region);
 
                 return <>
-                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> upgraded a Footman to a Knight in
-                    <strong>{region.name}</strong>.
+                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> upgraded a Footman to a Knight
+                    in <strong>{region.name}</strong>.
                 </>;
 
             case "mace-tyrell-casualties-prevented":
