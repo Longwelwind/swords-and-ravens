@@ -54,24 +54,46 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                 </select>
                             </Col>
                         </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="random-houses-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="random-houses-tooltip">
+                                                Houses will be randomized before the game starts when this option is selected.
+                                            </Tooltip>}>
+                                            <label htmlFor="random-houses-setting">Randomize houses</label>
+                                        </OverlayTrigger>}
+                                    disabled={!this.canChangeGameSettings}
+                                    checked={this.gameSettings.randomHouses}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.randomHouses = !this.gameSettings.randomHouses)}
+                                />
+                            </Col>
+                        </Row>
                     </>
                 )}
-                <FormCheck
-                    id="pbem-setting"
-                    type="checkbox"
-                    label={
-                        <OverlayTrigger overlay={
-                            <Tooltip id="pbem-tooltip">
-                                <b>P</b>lay <b>B</b>y <b>E</b>-<b>M</b>ail<br/>
-                                Players receive an e-mail when it is their turn.
-                                Those games are typically played over days or weeks.
-                            </Tooltip>}>
-                                <label htmlFor="pbem-setting">PBEM</label>
-                        </OverlayTrigger>}
-                    disabled={!this.canChangeGameSettings}
-                    checked={this.gameSettings.pbem}
-                    onChange={() => this.changeGameSettings(() => this.gameSettings.pbem = !this.gameSettings.pbem)}
-                />
+                <Row>
+                    <Col xs="auto">
+                        <FormCheck
+                            id="pbem-setting"
+                            type="checkbox"
+                            label={
+                                <OverlayTrigger overlay={
+                                    <Tooltip id="pbem-tooltip">
+                                        <b>P</b>lay <b>B</b>y <b>E</b>-<b>M</b>ail<br />
+                                        Players receive an e-mail when it is their turn.
+                                        Those games are typically played over days or weeks.
+                                    </Tooltip>}>
+                                    <label htmlFor="pbem-setting">PBEM</label>
+                                </OverlayTrigger>}
+                            disabled={!this.canChangeGameSettings}
+                            checked={this.gameSettings.pbem}
+                            onChange={() => this.changeGameSettings(() => this.gameSettings.pbem = !this.gameSettings.pbem)}
+                        />
+                    </Col>
+                </Row>
             </>
         );
     }

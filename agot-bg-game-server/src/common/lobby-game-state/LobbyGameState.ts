@@ -7,7 +7,7 @@ import {observable} from "mobx";
 import BetterMap from "../../utils/BetterMap";
 import baseGameData from "../../../data/baseGameData.json";
 import CancelledGameState from "../cancelled-game-state/CancelledGameState";
-import Player from "../ingame-game-state/Player";
+import shuffle from "../../utils/shuffle";
 
 export default class LobbyGameState extends GameState<EntireGame> {
     lobbyHouses: BetterMap<string, LobbyHouse>;
@@ -60,6 +60,15 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
             if (!this.canStartGame(user).success) {
                 return;
+            }
+
+            if (this.entireGame.gameSettings.randomHouses) {
+                const shuffled = shuffle(this.players.entries);
+
+                const lobbyHouses = this.players.keys;
+                for (let i = 0; i < shuffled.length; i++) {
+                    this.players.set(lobbyHouses[i], shuffled[i][1]);
+                }
             }
 
             this.entireGame.proceedToIngameGameState(new BetterMap(this.players.map((h, u) => ([h.id, u]))));
