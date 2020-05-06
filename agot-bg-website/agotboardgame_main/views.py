@@ -82,17 +82,15 @@ def about(request):
 
 def games(request):
     if request.method == "GET":
-        games = Game.objects.filter(Q(state=IN_LOBBY) | Q(state=ONGOING))
+        # Preload the games with the players in them
+        games = Game.objects.prefetch_related('players').filter(Q(state=IN_LOBBY) | Q(state=ONGOING))
         # It seems to be hard to ask Postgres to order the list correctly.
         # It is done in Python
         games = sorted(games, key=lambda game: ([IN_LOBBY, ONGOING].index(game.state), -datetime.timestamp(game.updated_at)))
 
         for game in games:
             if request.user.is_authenticated:
-                player_in_game = game.players.filter(user=request.user).first()
-                game.player_in_game = player_in_game
-            else:
-                game.player_in_game = None
+                game.player_in_game = next((player for player in game.players.all() if player.user == request.user), None)
 
         # Create the list of "My games"
         my_games = [game for game in games if game.player_in_game]

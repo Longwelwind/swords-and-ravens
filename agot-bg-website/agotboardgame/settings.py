@@ -58,7 +58,10 @@ INSTALLED_APPS = [
     'chat',
 ]
 
-MIDDLEWARE = [
+if DEBUG:
+    INSTALLED_APPS += ['debug_toolbar']
+
+MIDDLEWARE = (['debug_toolbar.middleware.DebugToolbarMiddleware'] if DEBUG else []) + [
     'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -240,3 +243,13 @@ VANILLA_FORUM_API_KEY = env('VANILLA_FORUM_API_KEY', default=None)
 VANILLA_FORUM_DEFAULT_ROLE_ID = env('VANILLA_FORUM_DEFAULT_ROLE_ID', default=0)
 VANILLA_FORUM_HOST = env('VANILLA_FORUM_HOST', default=None)
 VANILLA_IGNORED_USERS_WHEN_MIGRATING = env('VANILLA_IGNORED_USERS_WHEN_MIGRATING')
+
+
+# Debug Toolbar
+def show_toolbar(request):
+    return DEBUG
+
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': show_toolbar
+}
