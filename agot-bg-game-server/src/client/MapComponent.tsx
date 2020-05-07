@@ -23,6 +23,7 @@ import _ from "lodash";
 import PartialRecursive from "../utils/PartialRecursive";
 import joinReactNodes from "./utils/joinReactNodes";
 import StaticBorder from "../common/ingame-game-state/game-data-structure/static-data-structure/StaticBorder";
+import { land } from "../common/ingame-game-state/game-data-structure/regionTypes";
 
 interface MapComponentProps {
     gameClient: GameClient;
@@ -44,7 +45,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                                     className="garrison-token hover-weak-outline"
                                     style={{
                                         backgroundImage: `url(${garrisonTokens.get(r.id)})`,
-                                        left: r.unitSlot.x, top: r.unitSlot.y
+                                        left: r.unitSlot.point.x, top: r.unitSlot.point.y
                                     }}
                                 >
                                 </div>
@@ -143,7 +144,7 @@ export default class MapComponent extends Component<MapComponentProps> {
             <div
                 key={r.id}
                 className="units-container"
-                style={{left: r.unitSlot.x, top: r.unitSlot.y}}
+                style={{left: r.unitSlot.point.x, top: r.unitSlot.point.y, width: r.unitSlot.width, flexWrap: r.type == land ? "wrap-reverse" : "wrap"}}
             >
                 {r.units.values.map(u => {
                     const property = propertiesForUnits.get(u);
@@ -154,10 +155,10 @@ export default class MapComponent extends Component<MapComponentProps> {
 
                     if (!u.wounded) {
                         opacity = 1;
-                        transform = ``;
+                        transform = `none`;
                     } else if (u.type.name == "Ship") {
                         opacity = 0.5;
-                        transform = ``;
+                        transform = `none`;
                     } else {
                         opacity = 0.7;
                         transform = `rotate(90deg)`;

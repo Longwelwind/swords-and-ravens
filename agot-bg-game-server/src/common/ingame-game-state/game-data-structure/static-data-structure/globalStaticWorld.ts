@@ -5,6 +5,7 @@ import StaticBorder from "./StaticBorder";
 import StaticWorld from "./StaticWorld";
 import StaticRegion from "./StaticRegion";
 import regionTypes from "../regionTypes";
+import UnitSlot from "../../../../utils/unitSlot";
 
 interface TiledSquareObject {
     name: string;
@@ -78,7 +79,7 @@ if (!powerTokenSlotsLayer) {
     throw new Error("No layer named Power Token Slots in map file");
 }
 
-const regionIdToUnitSlots = new BetterMap<string, Point>();
+const regionIdToUnitSlots = new BetterMap<string, UnitSlot>();
 (unitSlotsLayer.objects as TiledSquareObject[]).forEach(o => {
     const regionId = getTiledProperty(o.properties, "region");
 
@@ -87,8 +88,11 @@ const regionIdToUnitSlots = new BetterMap<string, Point>();
     }
 
     regionIdToUnitSlots.set(regionId, {
-        x: o.x + o.width / 2,
-        y: o.y + o.height / 2
+        point: {
+            x: o.x + o.width / 2,
+            y: o.y + o.height / 2
+        },
+        width: o.width
     });
 });
 
