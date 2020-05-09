@@ -139,6 +139,10 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
             nightsWatchVictory: this.nightsWatchWon
         });
 
+        // hide wildling card
+        this.game.houses.forEach(h => h.knowsNextWildlingCard = false);
+        this.entireGame.broadcastToClients({type: "hide-top-wildling-card"});
+
         // Reveal the wildling card to the players
         this.entireGame.broadcastToClients({
             type: "reveal-wildling-card",

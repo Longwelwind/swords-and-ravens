@@ -80,6 +80,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             {name: "Action", gameState: ActionGameState, component: ActionComponent}
         ];
 
+        const knowsWildlingCard = this.props.gameClient.authenticatedPlayer != null &&
+            this.props.gameClient.authenticatedPlayer.house.knowsNextWildlingCard;
+        const nextWildlingCard = this.game.wildlingDeck.filter(c => c.id == this.game.clientNextWildlingCardId)[0];
+
         return (
             <>
                 <Col xs={12} lg={3}>
@@ -105,14 +109,21 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             <Col xs="auto">
                                                 <OverlayTrigger overlay={
                                                         <Tooltip id="wildling-threat">
-                                                            <b>Wildling Threat</b>
+                                                            <b>Wildling Threat</b>{ knowsWildlingCard && nextWildlingCard ?
+                                                            <><br/><br/><strong><u>{nextWildlingCard.type.name}</u></strong><br/>
+                                                            <strong>Lowest Bidder:</strong> {nextWildlingCard.type.wildlingVictoryLowestBidderDescription}<br/>
+                                                            <strong>Everyone Else:</strong> {nextWildlingCard.type.wildlingVictoryEverybodyElseDescription}<br/><br/>
+                                                            <strong>Highest Bidder:</strong> {nextWildlingCard.type.nightsWatchDescription}
+                                                            </>
+                                                            : <></>
+                                                            }
                                                         </Tooltip>
                                                     }
                                                     placement="bottom"
                                                 >
                                                     <div>
                                                         {this.game.wildlingStrength}
-                                                        <img src={mammothImage} width={32} style={{marginLeft: "5px"}}/>
+                                                        <img src={mammothImage} width={32} style={{marginLeft: "5px"}} className={knowsWildlingCard ? "wildling-highlight" : ""}/>
                                                     </div>
                                                 </OverlayTrigger>
                                             </Col>

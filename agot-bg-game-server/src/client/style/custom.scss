@@ -254,6 +254,11 @@ $strong-outline: rgba($outline-color, 0.8);
   transition: all 0.12s linear;
 }
 
+$wildling-outline: rgba(#f8ff00, 0.5);
+.wildling-highlight {
+  filter: drop-shadow(1px 1px 3px $wildling-outline) drop-shadow(-1px -1px 3px $wildling-outline);
+}
+
 .clickable {
   cursor: pointer;
 }

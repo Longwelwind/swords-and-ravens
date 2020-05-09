@@ -11,7 +11,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | NewTurn | RemovePlacedOrder
     | MoveUnits | CombatChangeArmy
     | UnitsWounded | ChangeCombatHouseCard | BeginSeeTopWildlingCard
-    | RavenOrderReplaced | ProceedWesterosCard | ChangeGarrison
+    | RavenOrderReplaced | RevealTopWildlingCard | HideTopWildlingCard | ProceedWesterosCard | ChangeGarrison
     | BidDone | GameStateChange | SupplyAdjusted
     | ChangeControlPowerToken | ChangePowerToken | ChangeWildlingStrength | AddGameLog | RevealWildlingCard
     | RemoveUnits | AddUnits | ChangeTracker | ActionPhaseChangeOrder | ChangeStateHouseCard
@@ -120,6 +120,16 @@ interface RavenOrderReplaced {
     type: "raven-order-replaced";
     regionId: string;
     orderId: number;
+}
+
+interface RevealTopWildlingCard {
+    type: "reveal-top-wildling-card";
+    cardId: number;
+    houseId: string;
+}
+
+interface HideTopWildlingCard {
+    type: "hide-top-wildling-card";
 }
 
 interface ProceedWesterosCard {

@@ -8,6 +8,7 @@ export default class House {
     id: string;
     name: string;
     color: string;
+    knowsNextWildlingCard: boolean;
     houseCards: BetterMap<string, HouseCard>;
     unitLimits: BetterMap<UnitType, number>;
     @observable powerTokens: number;
@@ -17,6 +18,7 @@ export default class House {
         this.id = id;
         this.name = name;
         this.color = color;
+        this.knowsNextWildlingCard = false;
         this.houseCards = houseCards;
         this.unitLimits = unitLimits;
         this.powerTokens = powerTokens;
@@ -28,6 +30,7 @@ export default class House {
             id: this.id,
             name: this.name,
             color: this.color,
+            knowsNextWildlingCard: this.knowsNextWildlingCard,
             houseCards: this.houseCards.entries.map(([houseCardId, houseCard]) => [houseCardId, houseCard.serializeToClient()]),
             unitLimits: this.unitLimits.map((unitType, limit) => [unitType.id, limit]),
             powerTokens: this.powerTokens,
@@ -36,7 +39,7 @@ export default class House {
     }
 
     static deserializeFromServer(data: SerializedHouse): House {
-        return new House(
+        const house = new House(
             data.id,
             data.name,
             data.color,
@@ -49,6 +52,9 @@ export default class House {
             data.powerTokens,
             data.supplyLevel
         );
+
+        house.knowsNextWildlingCard = data.knowsNextWildlingCard;
+        return house;
     }
 }
 
@@ -56,6 +62,7 @@ export interface SerializedHouse {
     id: string;
     name: string;
     color: string;
+    knowsNextWildlingCard: boolean;
     houseCards: [string, SerializedHouseCard][];
     unitLimits: [string, number][];
     powerTokens: number;
