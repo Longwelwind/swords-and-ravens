@@ -89,6 +89,7 @@ def games(request):
         games = sorted(games, key=lambda game: ([IN_LOBBY, ONGOING].index(game.state), -datetime.timestamp(game.updated_at)))
 
         for game in games:
+            game.player_in_game = None
             if request.user.is_authenticated:
                 game.player_in_game = next((player for player in game.players.all() if player.user == request.user), None)
 
