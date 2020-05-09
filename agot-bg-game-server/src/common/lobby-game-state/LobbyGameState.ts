@@ -90,7 +90,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
             const house = message.house ? this.lobbyHouses.get(message.house) : null;
 
             // Check if the house is available
-            if (house && this.players.has(house)) {
+            if (house && (this.players.has(house) || !this.getAvailableHouses().includes(house))) {
                 return;
             }
 
