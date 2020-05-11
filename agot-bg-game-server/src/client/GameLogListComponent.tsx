@@ -770,7 +770,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const houseCardsUsed = data.houseCardsUsed.map(hcid => house.houseCards.get(hcid));
 
                 return <>
-                    <strong>{house.name}</strong> discarded {joinReactNodes(houseCardsUsed.map(hc => <strong key={hc.id}>{hc.name}</strong>), ", ")}.
+                    {houseCardsUsed.length > 0
+                        ? <><strong>{house.name}</strong> discarded {joinReactNodes(houseCardsUsed.map(hc => <strong key={hc.id}>{hc.name}</strong>), ", ")}.</>
+                        : <><strong>{house.name}</strong> did not discard his last available house card.</>}
                 </>;
 
             case "a-king-beyond-the-wall-highest-top-track":
