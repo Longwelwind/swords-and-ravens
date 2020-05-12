@@ -6,6 +6,7 @@ import {HouseCardState} from "../common/ingame-game-state/game-data-structure/ho
 import {GameLogData} from "../common/ingame-game-state/game-data-structure/GameLog";
 import {UserSettings} from "./ClientMessage";
 import { SerializedWesterosCard } from "../common/ingame-game-state/game-data-structure/westeros-card/WesterosCard";
+import { SerializedVote } from "../common/ingame-game-state/vote-system/Vote";
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady | PlayerUnready
     | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | NewTurn | RemovePlacedOrder
@@ -16,7 +17,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | ChangeControlPowerToken | ChangePowerToken | ChangeWildlingStrength | AddGameLog | RevealWildlingCard
     | RemoveUnits | AddUnits | ChangeTracker | ActionPhaseChangeOrder | ChangeStateHouseCard
     | SettingsChanged | ChangeValyrianSteelBladeUse | BiddingNextTrack | NewPrivateChatRoom | GameSettingsChanged
-    | UpdateWesterosDecks | UpdateConnectionStatus;
+    | UpdateWesterosDecks | UpdateConnectionStatus | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -251,4 +252,27 @@ interface UpdateConnectionStatus {
     type: "update-connection-status";
     user: string;
     status: boolean;
+}
+
+interface VoteStarted {
+    type: "vote-started";
+    vote: SerializedVote;
+}
+
+interface VoteCancelled {
+    type: "vote-cancelled";
+    vote: string;
+}
+
+interface VoteDone {
+    type: "vote-done";
+    vote: string;
+    voter: string;
+    choice: boolean;
+}
+
+interface PlayerReplaced {
+    type: "player-replaced";
+    oldUser: string;
+    newUser: string;
 }

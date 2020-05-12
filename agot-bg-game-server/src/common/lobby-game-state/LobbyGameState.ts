@@ -174,7 +174,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
         return [];
     }
 
-    serializeToClient(_user: User | null): SerializedLobbyGameState {
+    serializeToClient(_admin: boolean, _user: User | null): SerializedLobbyGameState {
         return {
             type: "lobby",
             lobbyHouses: this.lobbyHouses.values,

@@ -280,6 +280,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     serializeToClient(user: User | null): SerializedEntireGame {
+        const admin = user == null;
+        
         return {
             id: this.id,
             name: this.name,
@@ -288,7 +290,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             publicChatRoomId: this.publicChatRoomId,
             gameSettings: this.gameSettings,
             privateChatRoomIds: this.privateChatRoomsIds.map((u1, v) => [u1.id, v.map((u2, rid) => [u2.id, rid])]),
-            childGameState: this.childGameState.serializeToClient(user)
+            childGameState: this.childGameState.serializeToClient(admin, user)
         };
     }
 

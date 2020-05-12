@@ -21,14 +21,19 @@ import {GameLogData} from "./game-data-structure/GameLog";
 import GameEndedGameState, {SerializedGameEndedGameState} from "./game-ended-game-state/GameEndedGameState";
 import UnitType from "./game-data-structure/UnitType";
 import WesterosCard from "./game-data-structure/westeros-card/WesterosCard";
+import Vote, { SerializedVote, VoteState } from "./vote-system/Vote";
+import VoteType, { CancelGame, ReplacePlayer } from "./vote-system/VoteType";
+import { v4 } from "uuid";
+import CancelledGameState, { SerializedCancelledGameState } from "../cancelled-game-state/CancelledGameState";
 
 export default class IngameGameState extends GameState<
     EntireGame,
-    WesterosGameState | PlanningGameState | ActionGameState | GameEndedGameState
+    WesterosGameState | PlanningGameState | ActionGameState | CancelledGameState | GameEndedGameState
 > {
     players: BetterMap<User, Player> = new BetterMap<User, Player>();
     game: Game;
     gameLogManager: GameLogManager = new GameLogManager(this);
+    votes: BetterMap<string, Vote> = new BetterMap();
 
     get entireGame(): EntireGame {
         return this.parentGameState;
@@ -112,18 +117,71 @@ export default class IngameGameState extends GameState<
     }
 
     onClientMessage(user: User, message: ClientMessage): void {
-        if (this.players.has(user)) {
+        if (message.type == "cancel-vote") {
+            const vote = this.votes.get(message.vote);
+
+            vote.cancelVote();
+        } else if (message.type == "launch-replace-player-vote") {
+            const player = this.players.get(this.entireGame.users.get(message.player));
+
+            if (!this.canLaunchReplacePlayerVote(user, player).result) {
+                return;
+            }
+
+            this.createVote(user, new ReplacePlayer(user, player.user, player.house));
+        } else if (this.players.has(user)) {
             const player = this.players.get(user);
 
-            this.childGameState.onPlayerMessage(player, message);
+            this.onPlayerMessage(player, message);
         }
+    }
+
+    onPlayerMessage(player: Player, message: ClientMessage): void {
+        if (message.type == "vote") {
+            const vote = this.votes.get(message.vote);
+
+            if (vote.state != VoteState.ONGOING) {
+                return;
+            }
+
+            vote.votes.set(player.house, message.choice);
+
+            this.entireGame.broadcastToClients({
+                type: "vote-done",
+                vote: vote.id,
+                voter: player.house.id,
+                choice: message.choice
+            });
+
+            vote.checkVoteFinished();
+        } else if (message.type == "launch-cancel-game-vote") {
+            this.createVote(
+                player.user,
+                new CancelGame()
+            );
+        } else {
+            this.childGameState.onPlayerMessage(player, message);
+        } 
+    }
+
+    createVote(initiator: User, type: VoteType): Vote {
+        const vote = new Vote(this, v4(), initiator, type);
+
+        this.votes.set(vote.id, vote);
+
+        this.entireGame.broadcastToClients({
+            type: "vote-started",
+            vote: vote.serializeToClient()
+        });
+
+        return vote;
     }
 
     getControllerOfHouse(house: House): Player {
         const player = this.players.values.find(p => p.house == house);
 
         if (player == null) {
-            throw new Error();
+            throw new Error(`Couldn't find a player controlling house "${house.id}"`);
         }
 
         return player;
@@ -269,17 +327,89 @@ export default class IngameGameState extends GameState<
         } else if (message.type == "reveal-top-wildling-card") {
             this.game.houses.get(message.houseId).knowsNextWildlingCard = true;
             this.game.clientNextWildlingCardId = message.cardId;
+        } else if (message.type == "vote-started") {
+            const vote = Vote.deserializeFromServer(this, message.vote);
+            
+            this.votes.set(vote.id, vote);
+        } else if (message.type == "vote-cancelled") {
+            const vote = this.votes.get(message.vote);
+            
+            vote.cancelled = true;
+        } else if (message.type == "vote-done") {
+            const vote = this.votes.get(message.vote);
+            const voter = this.game.houses.get(message.voter);
+
+            vote.votes.set(voter, message.choice);
+        } else if (message.type == "player-replaced") {
+            const oldPlayer = this.players.get(this.entireGame.users.get(message.oldUser));
+            const newUser = this.entireGame.users.get(message.newUser);
+
+            const newPlayer = new Player(newUser, oldPlayer.house);
+
+            this.players.set(newUser, newPlayer);
+            this.players.delete(oldPlayer.user);
         } else {
             this.childGameState.onServerMessage(message);
         }
     }
 
-    serializeToClient(user: User | null): SerializedIngameGameState {
+    launchCancelGameVote(): void {
+        this.entireGame.sendMessageToServer({
+            type: "launch-cancel-game-vote"
+        });
+    }
+
+    canLaunchCancelGameVote(): {result: boolean; reason: string} {  
+        const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof CancelGame);
+
+        if (existingVotes.length > 0) {
+            return {result: false, reason: "already-existing"};
+        }
+
+        if (this.childGameState instanceof CancelledGameState) {
+            return {result: false, reason: "already-cancelled"};
+        }
+
+        if (this.childGameState instanceof GameEndedGameState) {
+            return {result: false, reason: "already-ended"};
+        }
+
+        return {result: true, reason: ""};
+    }
+
+    canLaunchReplacePlayerVote(fromUser: User, _forPlayer: Player): {result: boolean; reason: string} {
+        if (this.players.keys.includes(fromUser)) {
+            return {result: false, reason: "already-playing"};
+        }
+
+        const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof ReplacePlayer);
+        if (existingVotes.length > 0) {
+            return {result: false, reason: "ongoing-vote"};
+        }
+
+        if (this.childGameState instanceof CancelledGameState) {
+            return {result: false, reason: "game-cancelled"};
+        }
+
+        if (this.childGameState instanceof GameEndedGameState) {
+            return {result: false, reason: "game-ended"};
+        }
+
+        return {result: true, reason: ""};
+    }
+
+    launchReplacePlayerVote(player: Player): void {
+        this.entireGame.sendMessageToServer({
+            type: "launch-replace-player-vote",
+            player: player.user.id
+        });
+    }
+
+    serializeToClient(admin: boolean, user: User | null): SerializedIngameGameState {
         // If user == null, then the game state needs to be serialized
         // in an "admin" version (i.e. containing all data).
         // Otherwise, provide a serialized version that hides data
         // based on which user is requesting the data.
-        const admin = user == null;
         const player: Player | null = user
             ? (this.players.has(user)
                 ? this.players.get(user)
@@ -291,6 +421,7 @@ export default class IngameGameState extends GameState<
             players: this.players.values.map(p => p.serializeToClient()),
             game: this.game.serializeToClient(admin, player != null && player.house.knowsNextWildlingCard),
             gameLogManager: this.gameLogManager.serializeToClient(),
+            votes: this.votes.values.map(v => v.serializeToClient()),
             childGameState: this.childGameState.serializeToClient(admin, player),
         };
     }
@@ -302,6 +433,7 @@ export default class IngameGameState extends GameState<
         ingameGameState.players = new BetterMap(
             data.players.map(p => [entireGame.users.get(p.userId), Player.deserializeFromServer(ingameGameState, p)])
         );
+        ingameGameState.votes = new BetterMap(data.votes.map(sv => [sv.id, Vote.deserializeFromServer(ingameGameState, sv)]));
         ingameGameState.gameLogManager = GameLogManager.deserializeFromServer(ingameGameState, data.gameLogManager);
         ingameGameState.childGameState = ingameGameState.deserializeChildGameState(data.childGameState);
 
@@ -318,6 +450,8 @@ export default class IngameGameState extends GameState<
                 return ActionGameState.deserializeFromServer(this, data);
             case "game-ended":
                 return GameEndedGameState.deserializeFromServer(this, data);
+            case "cancelled":
+                return CancelledGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -326,7 +460,8 @@ export interface SerializedIngameGameState {
     type: "ingame";
     players: SerializedPlayer[];
     game: SerializedGame;
+    votes: SerializedVote[];
     gameLogManager: SerializedGameLogManager;
     childGameState: SerializedPlanningGameState | SerializedActionGameState | SerializedWesterosGameState
-        | SerializedGameEndedGameState;
+        | SerializedGameEndedGameState | SerializedCancelledGameState;
 }

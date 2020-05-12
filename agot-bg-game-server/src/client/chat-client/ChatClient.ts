@@ -6,9 +6,9 @@ import _ from "lodash";
 
 const CHAT_SERVER_URL = process.env.CHAT_SERVER_URL || `${window.location.protocol == 'http:' ? 'ws' : 'wss'}://${window.location.host}`;
 
-type ChatServerMessage = Message | MessagesRetrieved;
+type ChatServerMessage = NewMessage | MessagesRetrieved;
 
-interface Message extends MessageData{
+interface NewMessage extends MessageData {
     type: 'chat_message';
 }
 
@@ -25,11 +25,18 @@ interface MessageData {
     created_at: string;
 }
 
+export interface Message {
+    id: string;
+    user: User;
+    text: string;
+    createdAt: Date;
+}
+
 export class Channel {
     id: string;
     websocket: WebSocket;
     @observable connected = false;
-    @observable messages: {id: string; user: User; text: string; createdAt: Date}[] = [];
+    @observable messages: Message[] = [];
     @observable lastViewedMessageId: string;
     onMessage: (() => void) | null;
 

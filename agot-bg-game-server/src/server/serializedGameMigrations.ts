@@ -217,6 +217,28 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "6",
+        migrate: (serializedGame: any) => {
+            // Migration for #635
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                // Add an empty list of votes in ingame
+                ingame.votes = [];
+
+                // Planning phase was changed to store houses and not players
+                if (ingame.childGameState.type == "planning") {
+                    const planning = ingame.childGameState;
+
+                    const playersToHouse = new BetterMap(ingame.players.map((serializedPlayer: any) => [serializedPlayer.userId, serializedPlayer.houseId]));
+
+                    planning.readyHouses = planning.readyPlayers.map((playerId: string) => playersToHouse.get(playerId));
+                }
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

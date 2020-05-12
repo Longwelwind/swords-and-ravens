@@ -56,7 +56,11 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                                 </div>
                                                 <div className={classNames({"invisible": !this.props.gameState.players.has(h)})}>
                                                     {this.props.gameState.players.has(h) ? (
-                                                        <UserLabel user={this.props.gameState.players.get(h)} />
+                                                        <UserLabel
+                                                            gameClient={this.props.gameClient}
+                                                            gameState={this.props.gameState}
+                                                            user={this.props.gameState.players.get(h)}
+                                                        />
                                                     ) : <div className="small">XXX</div>}
                                                 </div>
                                             </Col>
