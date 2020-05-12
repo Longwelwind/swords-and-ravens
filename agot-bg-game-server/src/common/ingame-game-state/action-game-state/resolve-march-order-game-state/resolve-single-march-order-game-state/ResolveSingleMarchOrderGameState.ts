@@ -305,8 +305,8 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             // Check that if the destination a port, the adjacent land area must
             // be controlled by the resolver
             .filter(r => r.type == port ? this.world.getAdjacentLandOfPort(r).getController() == this.house : true)
-            // Check that the moves doesn't exceed supply
-            .filter(r => !this.doesMoveExceedSupply(startingRegion, new BetterMap(moves.concat([[r, movingArmy]]))))
+            // Check that the non-combat moves doesn't exceed supply limits
+            .filter(r => !this.doesMoveExceedSupply(startingRegion, new BetterMap(movesThatDontTriggerAttack.concat([[r, movingArmy]]))))
             // If the move is an attack on a neutral force, then there must be sufficient combat strength
             // to overcome the neutral force
             .filter(r => {
