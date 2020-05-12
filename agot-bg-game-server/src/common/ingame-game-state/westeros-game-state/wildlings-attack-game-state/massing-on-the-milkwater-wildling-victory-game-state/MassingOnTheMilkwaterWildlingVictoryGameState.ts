@@ -28,6 +28,13 @@ export default class MassingOnTheMilkwaterWildlingVictoryGameState extends Wildl
 
         const cardsToDiscard = availableHouseCards.filter(hc => hc.combatStrength == highestStrength);
 
+        // If all the house cards have the same strength, i.e. cardsToDiscard == availableHouseCards
+        // Remove none of them
+        if (availableHouseCards.length == cardsToDiscard.length) {
+            this.proceedNextHouse(house);
+            return;
+        }
+
         cardsToDiscard.forEach(hc => hc.state = HouseCardState.USED);
 
         this.parentGameState.entireGame.broadcastToClients({
