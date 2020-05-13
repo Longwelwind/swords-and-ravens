@@ -20,6 +20,12 @@ export default class MassingOnTheMilkwaterWildlingVictoryGameState extends Wildl
         const availableHouseCards = house.houseCards.values.filter(hc => hc.state == HouseCardState.AVAILABLE);
 
         if (availableHouseCards.length < 2) {
+            this.ingame.log({
+                type: "massing-on-the-milkwater-house-cards-removed",
+                house: house.id,
+                houseCardsUsed: []
+            });
+
             this.proceedNextHouse(house);
             return;
         }
@@ -31,6 +37,12 @@ export default class MassingOnTheMilkwaterWildlingVictoryGameState extends Wildl
         // If all the house cards have the same strength, i.e. cardsToDiscard == availableHouseCards
         // Remove none of them
         if (availableHouseCards.length == cardsToDiscard.length) {
+            this.ingame.log({
+                type: "massing-on-the-milkwater-house-cards-removed",
+                house: house.id,
+                houseCardsUsed: []
+            });
+
             this.proceedNextHouse(house);
             return;
         }
@@ -57,6 +69,12 @@ export default class MassingOnTheMilkwaterWildlingVictoryGameState extends Wildl
         const availableHouseCards = house.houseCards.values.filter(hc => hc.state == HouseCardState.AVAILABLE);
 
         if (availableHouseCards.length < 2) {
+            this.ingame.log({
+                type: "massing-on-the-milkwater-house-cards-removed",
+                house: house.id,
+                houseCardsUsed: []
+            });
+
             this.proceedNextHouse(house);
             return;
         }
