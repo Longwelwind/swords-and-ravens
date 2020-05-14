@@ -683,8 +683,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const port = this.world.regions.get(data.port);
                 return <>
                     {data.shipCount > 0
-                        ? <><strong>{newController.name}</strong> has converted {data.shipCount} Ship{data.shipCount == 1 ? "" : "s"} from <strong>{oldController.name}</strong> in <strong>{port.name}</strong>.</>
-                        : <><strong>{newController.name}</strong> has destroyed all <strong>{oldController.name}</strong> Ships in <strong>{port.name}</strong>.</>}
+                        ? <><strong>{newController.name}</strong> converted {data.shipCount} ship{data.shipCount == 1 ? "" : "s"} from <strong>{oldController.name}</strong> in <strong>{port.name}</strong>.</>
+                        : <><strong>{newController.name}</strong> destroyed all <strong>{oldController.name}</strong> ships in <strong>{port.name}</strong>.</>}
                 </>;
             }
             case "ships-destroyed-by-empty-castle": {
