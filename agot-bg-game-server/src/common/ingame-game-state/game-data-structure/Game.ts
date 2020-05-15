@@ -144,12 +144,16 @@ export default class Game {
     getPotentialWinners(): House[] {
         const victoryConditions: ((h: House) => number)[] = [
             (h: House) => -this.getTotalHeldStructures(h),
-            (h: House) => -this.world.regions.values.filter(r => r.getController() == h).filter(r => r.type == land).length,
+            (h: House) => -this.getTotalControlledLandRegions(h),
             (h: House) => -h.supplyLevel,
             (h: House) => this.ironThroneTrack.indexOf(h)
         ];
 
         return _.sortBy(this.houses.values, victoryConditions);
+    }
+
+    getTotalControlledLandRegions(h: House): number {
+        return this.world.regions.values.filter(r => r.getController() == h).filter(r => r.type == land).length;
     }
 
     getPotentialWinner(): House {
