@@ -86,15 +86,15 @@ export default class TakeControlOfEnemyPortGameState extends GameState<ResolveMa
                 type: "add-units",
                 units: [[this.port.id, shipsToAdd.map(ship => ship.serializeToClient())]]
             });
-
-            this.ingame.log({
-                type: "enemy-port-taken",
-                oldController: oldController.id,
-                newController: this.newController.id,
-                shipCount: shipsToAdd.length,
-                port: this.port.id
-            });
         }
+
+        this.ingame.log({
+            type: "enemy-port-taken",
+            oldController: oldController.id,
+            newController: this.newController.id,
+            shipCount: choice,
+            port: this.port.id
+        });
 
         this.parentGameState.onTakeControlOfEnemyPortFinish(this.lastHouseThatResolvedMarchOrder);
     }
