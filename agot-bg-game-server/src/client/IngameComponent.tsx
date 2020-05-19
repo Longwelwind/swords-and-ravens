@@ -24,6 +24,7 @@ import {faStar} from "@fortawesome/free-solid-svg-icons/faStar";
 import Tooltip from "react-bootstrap/Tooltip";
 import castleImage from "../../public/images/icons/castle.svg";
 import stoneThroneImage from "../../public/images/icons/stone-throne.svg";
+import cancelImage from "../../public/images/icons/cancel.svg";
 import ravenImage from "../../public/images/icons/raven.svg";
 import diamondHiltImage from "../../public/images/icons/diamond-hilt.svg";
 import hourglassImage from "../../public/images/icons/hourglass.svg";
@@ -53,11 +54,14 @@ import User from "../server/User";
 import Player from "../common/ingame-game-state/Player";
 import {observable} from "mobx";
 import classNames = require("classnames");
-import {Channel} from "./chat-client/ChatClient";
+import {Channel, Message} from "./chat-client/ChatClient";
 // @ts-ignore
 import ScrollToBottom from "react-scroll-to-bottom";
 import GameSettingsComponent from "./GameSettingsComponent";
 import UserLabel from "./UserLabel";
+import VoteComponent from "./VoteComponent";
+import IngameCancelledComponent from "./game-state-panel/IngameCancelledComponent";
+import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -83,6 +87,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const knowsWildlingCard = this.props.gameClient.authenticatedPlayer != null &&
             this.props.gameClient.authenticatedPlayer.house.knowsNextWildlingCard;
         const nextWildlingCard = this.game.wildlingDeck.filter(c => c.id == this.game.clientNextWildlingCardId)[0];
+
+        const {result: canLaunchCancelGameVote, reason: canLaunchCancelGameVoteReason} = this.props.gameState.canLaunchCancelGameVote();
 
         return (
             <>
@@ -220,7 +226,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 <Col>
                                                     <b style={{"color": p.house.color}}>{p.house.name}</b>
                                                     {" "}
-                                                    <UserLabel user={p.user} />
+                                                    <UserLabel
+                                                        user={p.user}
+                                                        gameState={this.props.gameState}
+                                                        gameClient={this.props.gameClient}
+                                                    />
                                                 </Col>
                                                 <Col xs="auto">
                                                     <Row className="justify-content-center align-items-center" style={{width: 110}}>
@@ -302,6 +312,33 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 <img src={this.props.gameClient.muted ? speakerOff : speaker} width={32}/>
                             </button>
                         </Col>
+                        {this.props.gameState.players.has(this.props.gameClient.authenticatedUser as User) && (
+                            <Col xs="auto">
+                                <OverlayTrigger
+                                    overlay={
+                                        <Tooltip id="cancel-game-vote-tooltip">
+                                            {canLaunchCancelGameVote ? (
+                                                "Launch a vote to cancel the game"
+                                            ) : canLaunchCancelGameVoteReason == "already-existing" ? (
+                                                "A vote to cancel the game is already ongoing"
+                                            ) : canLaunchCancelGameVoteReason == "already-cancelled" ? (
+                                                "Game has already been cancelled"
+                                            ) : canLaunchCancelGameVoteReason == "already-ended" && (
+                                                "Game has already ended"
+                                            )}
+                                        </Tooltip>
+                                    }
+                                >
+                                    <button
+                                        className="btn btn-outline-light btn-sm"
+                                        onClick={() => this.props.gameState.launchCancelGameVote()}
+                                        disabled={!canLaunchCancelGameVote}
+                                    >
+                                        <img src={cancelImage} width={32}/>
+                                    </button>
+                                </OverlayTrigger>
+                            </Col>
+                        )}
                     </Row>
                 </Col>
                 <Col xs="auto">
@@ -316,7 +353,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 <Col xs={12} lg={3}>
                     <Row className="stackable">
                         <Col>
-                            <Card border={this.props.gameClient.isOwnTurn() ? "warning" : undefined}>
+                            <Card border={this.props.gameClient.isOwnTurn() ? "warning" : undefined} bg={this.props.gameState.childGameState instanceof CancelledGameState ? "danger" : undefined}>
                                 <ListGroup variant="flush">
                                     {phases.some(phase => this.props.gameState.childGameState instanceof phase.gameState) && (
                                         <ListGroupItem>
@@ -346,7 +383,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         {mapControls: this.mapControls, ...this.props},
                                         _.concat(
                                             phases.map(phase => [phase.gameState, phase.component] as [any, typeof Component]),
-                                            [[GameEndedGameState, GameEndedComponent]]
+                                            [[GameEndedGameState, GameEndedComponent]],
+                                            [[CancelledGameState, IngameCancelledComponent]],
                                         )
                                     )}
                                 </ListGroup>
@@ -404,7 +442,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 <ChatComponent gameClient={this.props.gameClient}
                                                                entireGame={this.props.gameState.entireGame}
                                                                roomId={this.props.gameState.entireGame.publicChatRoomId}
-                                                               currentlyViewed={this.currentOpenedTab == "chat"}/>
+                                                               currentlyViewed={this.currentOpenedTab == "chat"}
+                                                               injectBetweenMessages={(p, n) => this.injectBetweenMessages(p, n)}/>
                                             </Tab.Pane>
                                             <Tab.Pane eventKey="game-logs" className="h-100">
                                                 <ScrollToBottom className="h-100" scrollViewClassName="overflow-x-hidden">
@@ -524,5 +563,15 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     compileGameLog(gameLog: string): string {
         return marked(gameLog);
+    }
+
+    injectBetweenMessages(previous: Message | null, next: Message | null): ReactNode {
+        // Take the necessary votes to render, based on the `createdAt` times of
+        // `previous` and `next`.
+        const votesToRender = this.props.gameState.votes.values.filter(v => (previous != null ? previous.createdAt < v.createdAt : true) && (next ? v.createdAt < next.createdAt : true));
+        console.log(votesToRender);
+        return _.sortBy(votesToRender, v => v.createdAt).map(v => (
+            <VoteComponent key={v.id} vote={v} gameClient={this.props.gameClient} ingame={this.props.gameState} />
+        ));
     }
 }

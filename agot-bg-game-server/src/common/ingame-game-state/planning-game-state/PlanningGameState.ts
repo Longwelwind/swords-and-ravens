@@ -9,7 +9,6 @@ import orders from "../game-data-structure/orders";
 import {ServerMessage} from "../../../messages/ServerMessage";
 import EntireGame from "../../EntireGame";
 import {observable} from "mobx";
-import * as _ from "lodash";
 import BetterMap from "../../../utils/BetterMap";
 import Game from "../game-data-structure/Game";
 import PlanningRestriction from "../game-data-structure/westeros-card/planning-restriction/PlanningRestriction";
@@ -23,7 +22,7 @@ export default class PlanningGameState extends GameState<IngameGameState> {
     // Client-side, the client can receive a null value if it is the order of an other player,
     // it thus represents a face-down order (this player can't see it).
     @observable placedOrders: BetterMap<Region, Order | null> = new BetterMap<Region, Order | null>();
-    @observable readyPlayers: Player[] = [];
+    @observable readyHouses: House[] = [];
 
     get ingameGameState(): IngameGameState {
         return this.parentGameState;
@@ -116,10 +115,10 @@ export default class PlanningGameState extends GameState<IngameGameState> {
             return;
         }
 
-        this.readyPlayers.push(player);
+        this.readyHouses.push(player.house);
 
         // Check if all player are ready to go the action entireGame state
-        if (this.readyPlayers.length == this.ingameGameState.players.values.length) {
+        if (this.readyHouses.length == this.ingameGameState.players.values.length) {
             this.ingameGameState.proceedToActionGameState(this.placedOrders as BetterMap<Region, Order>, this.planningRestrictions);
         } else {
             this.entireGame.broadcastToClients({
@@ -134,7 +133,7 @@ export default class PlanningGameState extends GameState<IngameGameState> {
             return;
         }
 
-        this.readyPlayers.splice(this.readyPlayers.indexOf(player), 1);
+        this.readyHouses.splice(this.readyHouses.indexOf(player.house), 1);
 
         this.entireGame.broadcastToClients({
             type: "player-unready",
@@ -156,7 +155,7 @@ export default class PlanningGameState extends GameState<IngameGameState> {
             type: "planning",
             planningRestrictions: this.planningRestrictions.map(pr => pr.id),
             placedOrders: placedOrders,
-            readyPlayers: this.readyPlayers.map(p => p.user.id)
+            readyHouses: this.readyHouses.map(h => h.id)
         };
     }
 
@@ -240,11 +239,11 @@ export default class PlanningGameState extends GameState<IngameGameState> {
         } else if (message.type == "player-ready") {
             const player = this.ingameGameState.players.get(this.entireGame.users.get(message.userId));
 
-            this.readyPlayers.push(player);
+            this.readyHouses.push(player.house);
         } else if (message.type == "player-unready") {
             const player = this.ingameGameState.players.get(this.entireGame.users.get(message.userId));
 
-            this.readyPlayers.splice(this.readyPlayers.indexOf(player), 1);
+            this.readyHouses.splice(this.readyHouses.indexOf(player.house), 1);
         }
     }
 
@@ -253,10 +252,7 @@ export default class PlanningGameState extends GameState<IngameGameState> {
      */
 
     getNotReadyPlayers(): Player[] {
-        return _.difference(
-            this.ingameGameState.players.values,
-            this.readyPlayers
-        );
+        return this.ingameGameState.players.values.filter(p => !this.readyHouses.includes(p.house));
     }
 
     getWaitedUsers(): User[] {
@@ -272,7 +268,7 @@ export default class PlanningGameState extends GameState<IngameGameState> {
     }
 
     isReady(player: Player): boolean {
-        return this.readyPlayers.includes(player);
+        return this.readyHouses.includes(player.house);
     }
 
     static deserializeFromServer(ingameGameState: IngameGameState, data: SerializedPlanningGameState): PlanningGameState {
@@ -287,7 +283,7 @@ export default class PlanningGameState extends GameState<IngameGameState> {
                 ]
             )
         );
-        planningGameState.readyPlayers = data.readyPlayers.map(userId => ingameGameState.players.get(ingameGameState.entireGame.users.get(userId)));
+        planningGameState.readyHouses = data.readyHouses.map(hid => ingameGameState.game.houses.get(hid));
 
         return planningGameState;
     }
@@ -297,5 +293,5 @@ export interface SerializedPlanningGameState {
     type: "planning";
     planningRestrictions: string[];
     placedOrders: [string, number | null][];
-    readyPlayers: string[];
+    readyHouses: string[];
 }
