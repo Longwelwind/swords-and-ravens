@@ -242,13 +242,19 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                         ))}
                                                     </Row>
                                                 </Col>
-                                                <Col xs="auto" className="d-flex align-items-center">
-                                                    <div style={{fontSize: "18px"}}>{this.game.getTotalHeldStructures(p.house)}</div>
-                                                    <img
-                                                        src={castleImage} width={32} className="hover-weak-outline"
-                                                        style={{marginLeft: "10px"}}
-                                                    />
-                                                </Col>
+                                                <OverlayTrigger
+                                                    overlay={this.renderTotalLandRegionsTooltip(p.house)}
+                                                    delay={{ show: 250, hide: 100 }}
+                                                    placement="auto"
+                                                >
+                                                    <Col xs="auto" className="d-flex align-items-center">
+                                                        <div style={{ fontSize: "18px" }}>{this.game.getTotalHeldStructures(p.house)}</div>
+                                                        <img
+                                                            src={castleImage} width={32} className="hover-weak-outline"
+                                                            style={{ marginLeft: "10px" }}
+                                                        />
+                                                    </Col>
+                                                </OverlayTrigger>
                                                 <Col xs="auto" className="d-flex align-items-center">
                                                     <div style={{fontSize: "18px"}}>{p.house.powerTokens}</div>
                                                     <OverlayTrigger
@@ -440,6 +446,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     get publicChatRoom(): Channel {
         return this.props.gameClient.chatClient.channels.get(this.props.gameState.entireGame.publicChatRoomId);
+    }
+
+    private renderTotalLandRegionsTooltip(house: House): ReactNode {
+        return <Tooltip id={house.id + "-total-land-regions"}>
+            <h5>Total Land Areas</h5><br/><h4 style={{textAlign: "center"}}><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
+        </Tooltip>;
     }
 
     private renderPowerTooltip(house: House): ReactNode {
