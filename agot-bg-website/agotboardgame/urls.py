@@ -24,10 +24,5 @@ urlpatterns = [
     url('', include('social_django.urls', namespace='social')),
     path('api/', include('api.urls')),
     path('admin/', admin.site.urls),
+    path('__debug__/', include(debug_toolbar.urls)),
 ]
-
-
-if settings.DEBUG:
-    urlpatterns += [
-        path('__debug__/', include(debug_toolbar.urls))
-    ]
