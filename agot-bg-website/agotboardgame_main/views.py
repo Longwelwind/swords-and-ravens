@@ -22,6 +22,44 @@ logger = logging.getLogger(__name__)
 def index(request):
     posts = [
         {
+            "title": "Swords and Ravens after 2 months: some numbers and what's to come!",
+            "content": """
+            <p>
+                <b>Swords and Ravens</b> launched 2 months ago, and a lot of things have happened since then.
+                1416 users registered and more than 500 games have been played to completion!
+            </p>
+
+            <p>
+                The game also evolved a lot since launch: variants for games with less than 6 players have
+                appeared, a forum has been added to discuss everything about the game, a lot of UI improvements
+                were made and a ton of bugs have been squashed. Around 800 commits were made on the codebase,
+                available on <a href="https://github.com/Longwelwind/swords-and-ravens">GitHub</a>, some of
+                them done by <a href="https://github.com/Longwelwind/swords-and-ravens/graphs/contributors">external
+                contributors</a>. All the changes done can be found
+                in <a href="https://community.swordsandravens.net/viewtopic.php?f=4&t=7">the changelog</a>.
+            </p>
+
+            <p>
+                The <a href="https://community.swordsandravens.net">forum</a> has been launched, to discuss
+                everything related to the game and the development of Swords and Ravens, don't hesitate to check
+                it out!
+            </p>
+
+            <p>
+                It's not over, obviously. The Vassals mechanic, which appeared in the MoD extension, is
+                progressing and will be playable in the coming months. Multiple other meta-game features such
+                as abuse reports, player statistics and localization are also planned, and should be available
+                once I find the time to work on them. 😛
+            </p>
+
+            <p>
+                Thanks to all the players who made this possible, and I hope S&R will allow many more games to
+                be played!
+            </p>
+        """,
+            "created_at": date(day=20, month=5, year=2020)
+        },
+        {
             "title": "Welcome to Swords and Ravens!",
             "content": """
                 <p>
