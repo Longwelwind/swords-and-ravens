@@ -56,12 +56,10 @@ INSTALLED_APPS = [
     'django_prometheus',
     'channels',
     'chat',
+    'debug_toolbar'
 ]
 
-if DEBUG:
-    INSTALLED_APPS += ['debug_toolbar']
-
-MIDDLEWARE = (['debug_toolbar.middleware.DebugToolbarMiddleware'] if DEBUG else []) + [
+MIDDLEWARE = [
     'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -69,6 +67,7 @@ MIDDLEWARE = (['debug_toolbar.middleware.DebugToolbarMiddleware'] if DEBUG else 
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_prometheus.middleware.PrometheusAfterMiddleware',
@@ -247,7 +246,7 @@ VANILLA_IGNORED_USERS_WHEN_MIGRATING = env('VANILLA_IGNORED_USERS_WHEN_MIGRATING
 
 # Debug Toolbar
 def show_toolbar(request):
-    return DEBUG
+    return request.user.is_superuser
 
 
 DEBUG_TOOLBAR_CONFIG = {
