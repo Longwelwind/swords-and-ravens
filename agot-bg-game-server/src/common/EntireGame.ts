@@ -190,6 +190,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             const ingame = this.childGameState;
             if (ingame.childGameState instanceof GameEndedGameState) {
                 return "FINISHED";
+            } else if (ingame.childGameState instanceof CancelledGameState) {
+                return "CANCELLED";
             }
             return "ONGOING";
         } else {
