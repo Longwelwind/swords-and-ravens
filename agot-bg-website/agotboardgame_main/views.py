@@ -158,15 +158,14 @@ def games(request):
 
                 # This is a query inside a loop, not super good for performance,
                 # but since this only applies to games of the player, it should not impact performance that much.
-                print(important_chat_rooms)
                 unseen_private_messages = UserInRoom.objects.filter(
                     Q(room__messages__created_at__gt=F("last_viewed_message__created_at"))
                     | Q(last_viewed_message__isnull=True),
                     user=game.player_in_game.user,
-                    room__in=important_chat_rooms
+                    room__in=important_chat_rooms,
+                    room__messages__isnull=False
                 ).exists()
 
-                print(unseen_private_messages)
                 game.unseen_private_messages = unseen_private_messages
             else:
                 game.unseen_private_messages = False
