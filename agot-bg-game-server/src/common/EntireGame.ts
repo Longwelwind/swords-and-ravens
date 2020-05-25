@@ -221,9 +221,20 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             const waitedForUsers = this.childGameState.getWaitedUsers();
 
             this.childGameState.players.forEach((player, user) => {
+                // "Important chat rooms" are chat rooms where unseen messages will display
+                // a badge next to the game in the website.
+                // In this case, it's all private rooms with this player in it. The next line
+                // fetches the list of private chat rooms, the website will take care of
+                // showing the badge or not, based on whether there are unseen messages.
+                const importantChatRooms = this.getPrivateChatRoomsOf(user);
+
                 players.push({
                     userId: user.id,
-                    data: {"house": player.house.id, "waited_for": waitedForUsers.includes(user)}
+                    data: {
+                        "house": player.house.id,
+                        "waited_for": waitedForUsers.includes(user),
+                        "important_chat_rooms": importantChatRooms.map(cr => cr.roomId)
+                    }
                 });
             });
         }
