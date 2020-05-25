@@ -25,4 +25,4 @@ class Message(models.Model):
 class UserInRoom(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     room = models.ForeignKey(Room, related_name='users', on_delete=models.CASCADE)
-    last_viewed_message = models.ForeignKey(Message, on_delete=models.CASCADE, null=True)
+    last_viewed_message = models.ForeignKey(Message, on_delete=models.CASCADE, null=True, blank=True)

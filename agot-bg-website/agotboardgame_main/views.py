@@ -5,7 +5,7 @@ from django import template
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Count, Prefetch
+from django.db.models import Q, Count, Prefetch, F
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import select_template
@@ -13,7 +13,7 @@ from django.views.decorators.http import require_POST
 
 from agotboardgame.settings import GROUP_COLORS
 from agotboardgame_main.models import Game, ONGOING, IN_LOBBY, User, CANCELLED, PlayerInGame
-from chat.models import Room
+from chat.models import Room, UserInRoom
 from agotboardgame_main.forms import UpdateUsernameForm, UpdateSettingsForm
 
 logger = logging.getLogger(__name__)
@@ -141,14 +141,35 @@ def games(request):
         # It is done in Python
         games = sorted(games, key=lambda game: ([IN_LOBBY, ONGOING].index(game.state), -datetime.timestamp(game.updated_at)))
 
-        # "game.player_in_game" contains a list of one or zero element, depending on whether the authenticated
-        # player is in the game.
-        # Transform that into a single field that can be None.
         for game in games:
+            # "game.player_in_game" contains a list of one or zero element, depending on whether the authenticated
+            # player is in the game.
+            # Transform that into a single field that can be None.
             if request.user.is_authenticated:
                 game.player_in_game = game.player_in_game[0] if len(game.player_in_game) > 0 else None
             else:
                 game.player_in_game = None
+
+            # Check whether there is an unseen message in
+            if game.player_in_game and "important_chat_rooms" in game.player_in_game.data:
+                # `important_chat_rooms` will contain a list of room ids that must trigger a warning
+                # if there are unseen messages.
+                important_chat_rooms = game.player_in_game.data["important_chat_rooms"]
+
+                # This is a query inside a loop, not super good for performance,
+                # but since this only applies to games of the player, it should not impact performance that much.
+                print(important_chat_rooms)
+                unseen_private_messages = UserInRoom.objects.filter(
+                    Q(room__messages__created_at__gt=F("last_viewed_message__created_at"))
+                    | Q(last_viewed_message__isnull=True),
+                    user=game.player_in_game.user,
+                    room__in=important_chat_rooms
+                ).exists()
+
+                print(unseen_private_messages)
+                game.unseen_private_messages = unseen_private_messages
+            else:
+                game.unseen_private_messages = False
 
         # Create the list of "My games"
         my_games = [game for game in games if game.player_in_game]
