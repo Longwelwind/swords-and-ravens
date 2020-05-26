@@ -32,6 +32,10 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
         return this.props.gameClient.authenticatedUser as User;
     }
 
+    get randomHouses(): boolean {
+        return this.props.gameState.entireGame.gameSettings.randomHouses;
+    }
+
     render(): ReactNode {
         const {success: canStartGame, reason: canStartGameReason} = this.props.gameState.canStartGame(this.authenticatedUser);
         const {success: canCancelGame, reason: canCancelGameReason} = this.props.gameState.canCancel(this.authenticatedUser);
@@ -42,17 +46,17 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                     <Col>
                         <Card>
                             <ListGroup variant="flush">
-                                {this.props.gameState.lobbyHouses.values.map(h => (
+                                {this.props.gameState.lobbyHouses.values.map((h, i) => (
                                     <ListGroupItem key={h.id} style={{opacity: this.isHouseAvailable(h) ? 1 : 0.3}}>
                                         <Row className="align-items-center">
-                                            <Col xs="auto">
+                                            {!this.randomHouses && <Col xs="auto">
                                                 <div className="influence-icon"
                                                      style={{backgroundImage: `url(${houseInfluenceImages.get(h.id)})`}}>
                                                 </div>
-                                            </Col>
+                                            </Col>}
                                             <Col>
                                                 <div>
-                                                    <b>{h.name}</b>
+                                                    <b>{this.randomHouses ? "Seat " + (i + 1): h.name}</b>
                                                 </div>
                                                 <div className={classNames({"invisible": !this.props.gameState.players.has(h)})}>
                                                     {this.props.gameState.players.has(h) ? (
