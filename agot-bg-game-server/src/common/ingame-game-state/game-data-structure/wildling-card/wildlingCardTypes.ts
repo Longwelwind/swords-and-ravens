@@ -12,21 +12,23 @@ import SkinchangerScout from "./SkinchangerScout";
 
 export const silenceAtTheWall = new SilenceAtTheWall(
     "silence-at-the-wall", "Silence at the Wall",
-    "Nothing happens",
-    "Nothing happens",
-    "Nothing happens"
+    "Nothing happens.",
+    "Nothing happens.",
+    "Nothing happens."
 );
 export const preemptiveRaid = new PreemptiveRaidWildlingCardType(
     "preemptive-raid", "Preemptive Raid",
-    "Chooses one of the following",
-    "Nothing happens",
-    ""
+    "Chooses one of the following: A) Destroys 2 of their units anywhere."
+        + " B) Is reduced 2 positions on their highest Influence track.",
+    "Nothing happens.",
+    "The wildlings immediately attack again with a strength of 6. You do not participate in the bidding"
+        + " against this attack (nor do you receive any rewards or penalties)."
 );
 export const crowKillers = new CrowKillers(
     "crow-killers", "Crow Killers",
-    "Replaces all of his Knights with available Footmen. Any knight unable to be replaced is destroyed.",
-    "Replaces 2 of their Knights with available Footmen. Any knight unable to be replaced is destroyed.",
-    "May immediately replace up to 2 of his Footmen, anywhere, with available Knights."
+    "Replaces all of their Knights with available Footmen. Any Knight unable to be replaced is destroyed.",
+    "Replaces 2 of their Knights with available Footmen. Any Knight unable to be replaced is destroyed.",
+    "May immediately replace up to 2 of their Footmen, anywhere, with available Knights."
 );
 export const rattleshirtsRaiders = new RattleshirtsRaiders(
     "rattleshirts-raiders", "Rattleshirt's Raiders",
@@ -36,30 +38,30 @@ export const rattleshirtsRaiders = new RattleshirtsRaiders(
 );
 export const massingOnTheMilkwater = new MassingOnTheMilkwater(
     "massing-on-the-milkwater", "Massing on the Milkwater",
-    "If they have more than one House card in his hand, he discards all cards with"
-    + " the highest combat strength",
-    "If they have have more than one House card in their hand, they must choose and "
+    "If they have more than one House card in their hand, they discard all cards with"
+    + " the highest combat strength.",
+    "If they have more than one House card in their hand, they must choose and"
     + " discard one of those cards.",
-    "Returns his entire House card discard into his hand."
+    "Returns their entire House card discard pile into their hand."
 );
 export const aKingBeyondTheWall = new AKingBeyondTheWall(
     "a-king-beyond-the-wall", "A King Beyond the Wall",
-    "Moves their tokens to the lowest position of every Influence track",
+    "Moves their tokens to the lowest position of every Influence track.",
     "In turn order, each player chooses either the Fiefdoms or King's Court Influence"
     + " track and moves their token to the lowest position of that track.",
-    "Moves their token to the top of one Influence track of his choice then takes the appropriate"
+    "Moves their token to the top of one Influence track of their choice, then take the appropriate"
     + " Dominance token."
 );
 export const mammothRiders = new MammothRiders(
     "mammoth-riders", "Mammoth Riders",
     "Destroys 3 of their units anywhere.",
     "Destroys 2 of their units anywhere.",
-    "May retrieve 1 House card of their choice from their House card discard pile."
+    "May retrieve 1 House card of their choice from his House card discard pile."
 );
 export const theHordeDescends = new TheHordeDescends(
     "the-horde-descends", "The Horde Descends",
-    "Destroy 2 of their units at one of his Castles or Strongholds. If unable,"
-    + " they destroys 2 of his units anywhere.",
+    "Destroys 2 of their units at one of his Castles or Strongholds. If unable,"
+    + " they destroys 2 of their units anywhere.",
     "Destroys 1 of their units anywhere.",
     "May muster forces (following normal mustering rules) in any one Castle or Stronghold area"
     + " they controls."
