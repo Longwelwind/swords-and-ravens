@@ -239,7 +239,7 @@ $strong-outline: rgba($outline-color, 1);
 .medium-outline {
 	filter: drop-shadow(6px 6px 6px $medium-outline) drop-shadow(-6px -6px 6px $medium-outline);
   }
-   
+
 .hover-medium-outline:hover {
 filter: drop-shadow(6px 6px 6px $medium-outline) drop-shadow(-6px -6px 6px $medium-outline);
 transition: all 0.12s linear;
@@ -253,7 +253,6 @@ filter: drop-shadow(6px 6px 6px $strong-outline) drop-shadow(-6px -6px 6px $stro
 filter: drop-shadow(6px 6px 6px $strong-outline) drop-shadow(-6px -6px 6px $strong-outline);
 transition: all 0.12s linear;
 }
-  
 
 $wildling-outline: rgba(#f8ff00, 0.5);
 .wildling-highlight {

@@ -51,7 +51,7 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
             } else {
                 const region = possibleUnits[0].region;
                 const type = possibleUnits[0].type;
-    
+
                 // If all units are of same type and of same region this state can be fast-tracked
                 if (possibleUnits.every(u => u.region == region && u.type == type)) {
                     const selectedUnits = possibleUnits.slice(possibleUnits.length - count);

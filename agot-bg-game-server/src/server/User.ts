@@ -36,7 +36,7 @@ export default class User {
 
         if (newConnected != this.connected) {
             this.connected = newConnected;
-    
+
             this.entireGame.broadcastToClients({
                 type: "update-connection-status",
                 user: this.id,

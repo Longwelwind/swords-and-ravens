@@ -294,7 +294,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
     serializeToClient(user: User | null): SerializedEntireGame {
         const admin = user == null;
-        
+
         return {
             id: this.id,
             name: this.name,

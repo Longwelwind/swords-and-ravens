@@ -72,7 +72,7 @@ export default class UserLabel extends Component<UserLabelProps> {
                 {/* Add a button to replace a place */}
                 <ConditionalWrap
                     condition={!canLaunchReplacePlayerVote}
-                    wrap={children => 
+                    wrap={children =>
                         <OverlayTrigger
                             overlay={
                                 <Tooltip id="replace-player-tooltip">

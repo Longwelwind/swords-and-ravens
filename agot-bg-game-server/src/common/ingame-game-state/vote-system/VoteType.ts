@@ -41,7 +41,7 @@ export class CancelGame extends VoteType {
             type: "cancel-game"
         };
     }
-    
+
     static deserializeFromServer(_ingame: IngameGameState, _data: SerializedCancelGame): CancelGame {
         return new CancelGame();
     }
@@ -97,7 +97,7 @@ export class ReplacePlayer extends VoteType {
             forHouse: this.forHouse.id
         };
     }
-    
+
     static deserializeFromServer(ingame: IngameGameState, data: SerializedReplacePlayer): ReplacePlayer {
         const replacer = ingame.entireGame.users.get(data.replacer);
         const replaced = ingame.entireGame.users.get(data.replaced);
