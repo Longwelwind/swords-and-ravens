@@ -684,13 +684,18 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         this.height = (this.user && this.user.settings.mapScrollbar) ? window.innerHeight : null;
     }
 
+    onNewPrivateChatRoomCreated(roomId: string): void {
+        this.currentOpenedTab = roomId;
+    }
+
     componentDidMount(): void {
+        this.props.gameState.entireGame.onNewPrivateChatRoomCreated = (roomId: string) => this.onNewPrivateChatRoomCreated(roomId);
         this.adjustMapHeight();
         window.addEventListener('resize', () => this.adjustMapHeight());
-
     }
 
     componentWillUnmount(): void {
+        this.props.gameState.entireGame.onNewPrivateChatRoomCreated = null;
         window.removeEventListener('resize', () => this.adjustMapHeight());
     }
 }
