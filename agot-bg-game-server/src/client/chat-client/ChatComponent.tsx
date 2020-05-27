@@ -48,7 +48,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
 
     render(): ReactNode {
         const messages = this.channel.messages;
-        
+
         return (
             <div className="d-flex flex-column h-100">
                 {/* Setting a fixed height seems to be the only solution to make ScrollToBottom work */}

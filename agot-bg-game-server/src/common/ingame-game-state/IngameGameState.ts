@@ -161,7 +161,7 @@ export default class IngameGameState extends GameState<
             );
         } else {
             this.childGameState.onPlayerMessage(player, message);
-        } 
+        }
     }
 
     createVote(initiator: User, type: VoteType): Vote {
@@ -329,11 +329,9 @@ export default class IngameGameState extends GameState<
             this.game.clientNextWildlingCardId = message.cardId;
         } else if (message.type == "vote-started") {
             const vote = Vote.deserializeFromServer(this, message.vote);
-            
             this.votes.set(vote.id, vote);
         } else if (message.type == "vote-cancelled") {
             const vote = this.votes.get(message.vote);
-            
             vote.cancelled = true;
         } else if (message.type == "vote-done") {
             const vote = this.votes.get(message.vote);
@@ -359,7 +357,7 @@ export default class IngameGameState extends GameState<
         });
     }
 
-    canLaunchCancelGameVote(): {result: boolean; reason: string} {  
+    canLaunchCancelGameVote(): {result: boolean; reason: string} {
         const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof CancelGame);
 
         if (existingVotes.length > 0) {

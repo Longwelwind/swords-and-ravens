@@ -35,7 +35,6 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
         this.ingame.log({
             type: "action-phase-resolve-consolidate-power-began"
         });
-        
         this.proceedNextResolve(null);
     }
 

@@ -11,15 +11,12 @@ export default class CancelledGameState extends GameState<EntireGame | IngameGam
     }
 
     onClientMessage(_user: User, _message: ClientMessage): void {
-        
     }
 
     onPlayerMessage(_player: Player, _message: ClientMessage): void {
-        
     }
 
     onServerMessage(_: ServerMessage): void {
-
     }
 
     getWaitedUsers(): User[] {
