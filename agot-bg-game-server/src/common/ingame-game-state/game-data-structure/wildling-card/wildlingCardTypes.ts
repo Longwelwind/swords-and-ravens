@@ -34,7 +34,7 @@ export const rattleshirtsRaiders = new RattleshirtsRaiders(
     "rattleshirts-raiders", "Rattleshirt's Raiders",
     "Is reduced 2 positions on the Supply track (to no lower than 0).",
     "Is reduced 1 position on the Supply track (to no lower than 0).",
-    "is increased 1 position on the Supply track (to no higher than 6)."
+    "Is increased 1 position on the Supply track (to no higher than 6)."
 );
 export const massingOnTheMilkwater = new MassingOnTheMilkwater(
     "massing-on-the-milkwater", "Massing on the Milkwater",
