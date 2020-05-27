@@ -10,7 +10,7 @@ import LobbyGameState from "../common/lobby-game-state/LobbyGameState";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCaretDown} from "@fortawesome/free-solid-svg-icons/faCaretDown";
-import { Dropdown, Overlay } from "react-bootstrap";
+import { Dropdown } from "react-bootstrap";
 import Player from "../common/ingame-game-state/Player";
 import ConditionalWrap from "./utils/ConditionalWrap";
 
@@ -105,9 +105,11 @@ export default class UserLabel extends Component<UserLabelProps> {
 
     onLaunchReplacePlayerVoteClick(): void {
         if (!(this.props.gameState instanceof IngameGameState)) {
-            throw new Error("`player` called when the game was not in IngameGameState");
+            throw new Error("`launchReplacePlayerVote` called when the game was not in IngameGameState");
         }
 
-        this.props.gameState.launchReplacePlayerVote(this.player);
+        if (window.confirm(`Do you want to launch a vote to replace ${this.player.user.name} who controls house ${this.player.house.name}?`)) {
+            this.props.gameState.launchReplacePlayerVote(this.player);
+        }
     }
 }
