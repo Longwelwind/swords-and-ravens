@@ -352,9 +352,11 @@ export default class IngameGameState extends GameState<
     }
 
     launchCancelGameVote(): void {
-        this.entireGame.sendMessageToServer({
-            type: "launch-cancel-game-vote"
-        });
+        if (window.confirm('Do you want to launch a vote to cancel the game?')) {
+            this.entireGame.sendMessageToServer({
+                type: "launch-cancel-game-vote"
+            });
+        }
     }
 
     canLaunchCancelGameVote(): {result: boolean; reason: string} {
