@@ -5,8 +5,7 @@ import {observable} from "mobx";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
 import * as _ from "lodash";
 import GameStateComponentProps from "./GameStateComponentProps";
-import Button from "react-bootstrap/Button";
-import Col from "react-bootstrap/Col";
+import { Row, Col, Button } from "react-bootstrap";
 import SelectRegionGameState from "../../common/ingame-game-state/select-region-game-state/SelectRegionGameState";
 import {RegionOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
@@ -28,9 +27,18 @@ export default class SelectRegionComponent extends Component<GameStateComponentP
                                     Selected region: {this.selectedRegion.name}
                                 </p>
                             )}
-                            <Button onClick={() => this.confirm()} disabled={this.selectedRegion == null}>
-                                Confirm
-                            </Button>
+                            <Row className="justify-content-center">
+                                <Col xs="auto">
+                                    <Button onClick={() => this.confirm()} disabled={this.selectedRegion == null}>
+                                        Confirm
+                                    </Button>
+                                </Col>
+                                <Col xs="auto">
+                                    <Button onClick={() => this.reset()} disabled={this.selectedRegion == null}>
+                                        Reset
+                                    </Button>
+                                </Col>
+                            </Row>
                         </>
                     ) : (
                         <div className="text-center">Waiting for {this.props.gameState.house.name}...</div>
@@ -66,9 +74,13 @@ export default class SelectRegionComponent extends Component<GameStateComponentP
         _.pull(this.props.mapControls.modifyRegionsOnMap, this.modifyRegionsOnMapCallback);
     }
 
+    private reset(): void {
+        this.selectedRegion = null;
+    }
+
     private onRegionClick(r: Region): void {
         if (this.selectedRegion == r) {
-            this.selectedRegion = null;
+            this.reset();
         } else {
             this.selectedRegion = r;
         }
@@ -80,6 +92,6 @@ export default class SelectRegionComponent extends Component<GameStateComponentP
         }
 
         this.props.gameState.select(this.selectedRegion);
-        this.selectedRegion = null;
+        this.reset();
     }
 }
