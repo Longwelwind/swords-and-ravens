@@ -489,7 +489,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     private renderTotalLandRegionsTooltip(house: House): ReactNode {
         return <Tooltip id={house.id + "-total-land-regions"}>
-            <h5>Total Land Areas</h5><br/><h4 style={{textAlign: "center"}}><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
+            <h5>Castles and Strongholds</h5><br/><h4 style={{textAlign: "center"}}><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
         </Tooltip>;
     }
 
