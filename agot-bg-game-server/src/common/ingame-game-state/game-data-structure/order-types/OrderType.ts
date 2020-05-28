@@ -10,4 +10,6 @@ export default abstract class OrderType {
     }
 
     abstract toString(): string;
+
+    abstract tooltipText(): string;
 }

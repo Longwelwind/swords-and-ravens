@@ -1,6 +1,8 @@
 import React, {Component} from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
 import orderImages from "../../orderImages";
 import classNames = require("classnames");
 import Order from "../../../common/ingame-game-state/game-data-structure/Order";
@@ -20,18 +22,26 @@ export default class OrderGridComponent extends Component<OrderGridProps> {
                     <Row style={{width: "180px"}} className="no-gutters justify-content-center">
                         {this.props.orders.map(o => (
                             <Col xs="auto" className="p-1" key={o.id}>
-                                <div className={classNames(
-                                        "order-icon",
-                                        {"clickable": this.isOrderAvailable(o) && this.props.selectedOrder != o},
-                                        {"hover-weak-outline": this.isOrderAvailable(o) && this.props.selectedOrder != o},
-                                        {"strong-outline": this.props.selectedOrder == o})
+                                <OverlayTrigger overlay={
+                                        <Tooltip id="order-icon-tooltip">
+                                            {o.type.tooltipText()}
+                                        </Tooltip>
                                     }
-                                     style={{
-                                         backgroundImage: `url(${orderImages.get(o.type.id)})`,
-                                         opacity: this.props.availableOrders.includes(o) ? 1 : 0.1
-                                     }}
-                                     onClick={() => this.onOrderClick(o)}
-                                     key={o.id}/>
+                                    placement="bottom"
+                                >
+                                    <div className={classNames(
+                                            "order-icon",
+                                            {"clickable": this.isOrderAvailable(o) && this.props.selectedOrder != o},
+                                            {"hover-weak-outline": this.isOrderAvailable(o) && this.props.selectedOrder != o},
+                                            {"strong-outline": this.props.selectedOrder == o})
+                                        }
+                                         style={{
+                                             backgroundImage: `url(${orderImages.get(o.type.id)})`,
+                                             opacity: this.props.availableOrders.includes(o) ? 1 : 0.1
+                                         }}
+                                         onClick={() => this.onOrderClick(o)}
+                                         key={o.id}/>
+                                </OverlayTrigger>
                             </Col>
                         ))}
                     </Row>
