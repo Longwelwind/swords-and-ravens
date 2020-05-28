@@ -39,6 +39,7 @@ import GameLogListComponent from "./GameLogListComponent";
 import HouseCardComponent from "./game-state-panel/utils/HouseCardComponent";
 import Game from "../common/ingame-game-state/game-data-structure/Game";
 import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
+import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
 import unitImages from "./unitImages";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
 import GameEndedComponent from "./game-state-panel/GameEndedComponent";
@@ -241,11 +242,20 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                         {this.game.getAvailableUnitsOfType(p.house, type)}
                                                                     </Col>
                                                                     <Col xs="auto" style={{marginLeft: 4}}>
-                                                                        <div className="unit-icon small hover-weak-outline"
-                                                                             style={{
-                                                                                 backgroundImage: `url(${unitImages.get(p.house.id).get(type.id)})`,
-                                                                             }}
-                                                                        />
+                                                                        <OverlayTrigger overlay={
+                                                                                <Tooltip id="">
+                                                                                    <b>{type.name}</b><br />
+                                                                                    {this.tooltipForUnitType(type)}
+                                                                                </Tooltip>
+                                                                            }
+                                                                            placement="bottom"
+                                                                        >
+                                                                            <div className="unit-icon small hover-weak-outline"
+                                                                                 style={{
+                                                                                     backgroundImage: `url(${unitImages.get(p.house.id).get(type.id)})`,
+                                                                                 }}
+                                                                            />
+                                                                        </OverlayTrigger>
                                                                     </Col>
                                                                 </Row>
                                                             </Col>
@@ -529,6 +539,19 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 </tbody>
             </table>
         </Tooltip>;
+    }
+
+    tooltipForUnitType(unitType: UnitType): string {
+        if (unitType.id == "footman") {
+            return "Adds 1 Combat Strength in battle. Costs 1 point of mustering.";
+        } else if (unitType.id === "knight") {
+            return "Adds 2 Combat Strength in battle. Costs 2 points of mustering (or 1 point if upgraded from a Footman).";
+        } else if (unitType.id === "siege-engine") {
+            return "Adds 4 Combat Strength when attacking (or supporting an attack against) an area containing a Castle or Stronghold, otherwise it adds 0. Siege Engines may not retreat when losing combat; it is destroyed instead. Costs 2 points of mustering (or 1 point if upgraded from a Footman).";
+        } else if (unitType.id === "ship") {
+            return "Adds 1 Combat Strength in battle. Costs 1 point of mustering.";
+        }
+        return "";
     }
 
     onNewPrivateChatRoomClick(p: Player): void {
