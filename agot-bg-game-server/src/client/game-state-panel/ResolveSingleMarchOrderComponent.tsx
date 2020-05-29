@@ -30,7 +30,6 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     modifyOrdersOnMapCallback: any;
 
     render(): ReactNode {
-
         return (
             <>
                 <Col xs={12} className="text-center">

@@ -1,7 +1,6 @@
-import {Component, ReactNode} from "react";
+import {Component, ReactNode, ReactElement} from "react";
 import PlanningGameState from "../../common/ingame-game-state/planning-game-state/PlanningGameState";
 import orders from "../../common/ingame-game-state/game-data-structure/orders";
-import {observable} from "mobx";
 import {observer} from "mobx-react";
 import Order from "../../common/ingame-game-state/game-data-structure/Order";
 import React from "react";
@@ -15,12 +14,17 @@ import Col from "react-bootstrap/Col";
 import OrderGridComponent from "./utils/OrderGridComponent";
 import {OrderOnMapProperties, RegionOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
+import Player from "../../common/ingame-game-state/Player";
+import { OverlayTrigger, Overlay, Popover } from "react-bootstrap";
+import { observable } from "mobx";
+import BetterMap from "../../utils/BetterMap";
 
 @observer
 export default class PlanningComponent extends Component<GameStateComponentProps<PlanningGameState>> {
-    @observable selectedOrder: Order | null;
     modifyRegionsOnMapCallback: any;
     modifyOrdersOnMapCallback: any;
+
+    @observable overlayTriggers = new BetterMap<Region, OverlayTrigger>();
 
     render(): ReactNode {
         return (
@@ -30,16 +34,6 @@ export default class PlanningComponent extends Component<GameStateComponentProps
                         <Col xs={12}>
                             Assign an order to each region in which one of your unit is present.
                         </Col>
-                        {this.props.gameClient.authenticatedPlayer && (
-                            <Col xs={12}>
-                                <OrderGridComponent orders={orders.values}
-                                                    selectedOrder={this.selectedOrder}
-                                                    availableOrders={
-                                                        this.props.gameState.getAvailableOrders(this.props.gameClient.authenticatedPlayer.house)
-                                                    }
-                                                    onOrderClick={o => this.selectOrder(o)}/>
-                            </Col>
-                        )}
                         <Col xs={12}>
                             {this.props.gameClient.authenticatedPlayer && (
                                 <Row className="justify-content-center">
@@ -73,14 +67,6 @@ export default class PlanningComponent extends Component<GameStateComponentProps
         );
     }
 
-    selectOrder(order: Order): void {
-        if (this.selectedOrder == order) {
-            this.selectedOrder = null;
-        } else {
-            this.selectedOrder = order;
-        }
-    }
-
     isOrderAvailable(order: Order): boolean {
         if (!this.props.gameClient.authenticatedPlayer) {
             return false;
@@ -100,15 +86,38 @@ export default class PlanningComponent extends Component<GameStateComponentProps
 
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
         if (this.props.gameClient.authenticatedPlayer) {
-            if (this.selectedOrder != null) {
-                return this.props.gameState.getPossibleRegionsForOrders(this.props.gameClient.authenticatedPlayer.house).map(r => ([
-                    r,
-                    {
-                        highlight: {active: true},
-                        onClick: () => this.onRegionClick(r)
-                    }
-                ]));
-            }
+            return this.props.gameState.getPossibleRegionsForOrders(this.props.gameClient.authenticatedPlayer.house).map(r => ([
+                r,
+                {
+                    // Highlight areas with no order
+                    highlight: {active: !this.props.gameState.placedOrders.has(r)},
+                    wrap: (child: ReactElement) => (
+                        <OverlayTrigger
+                            placement="auto"
+                            trigger="click"
+                            ref={(ref: OverlayTrigger) => {this.overlayTriggers.set(r, ref)}}
+                            rootClose
+                            overlay={
+                                <Popover id={"region" + r.id}>
+                                    <p className="text-strong text-center">{r.name}</p>
+                                    <OrderGridComponent orders={orders.values}
+                                        selectedOrder={null}
+                                        availableOrders={
+                                            this.props.gameState.getAvailableOrders((this.props.gameClient.authenticatedPlayer as Player).house)
+                                        }
+                                        onOrderClick={o => {
+                                            this.props.gameState.assignOrder(r, o);
+                                            // @ts-ignore `hide` is not a public method of OverlayTrigger, but it does the job
+                                            this.overlayTriggers.get(r).hide();
+                                    }}/>
+                                </Popover>
+                            }
+                        >
+                            {child}
+                        </OverlayTrigger>
+                    )
+                }
+            ]));
         }
 
         return [];
@@ -119,6 +128,7 @@ export default class PlanningComponent extends Component<GameStateComponentProps
             return this.props.gameState.getPossibleRegionsForOrders(this.props.gameClient.authenticatedPlayer.house).map(r => ([
                 r,
                 {
+                    highlight: {active: true},
                     onClick: () => this.onOrderClick(r)
                 }
             ]));
@@ -127,26 +137,12 @@ export default class PlanningComponent extends Component<GameStateComponentProps
         return [];
     }
 
-    onRegionClick(region: Region): void {
-        if (!this.props.gameClient.authenticatedPlayer) {
-            return;
-        }
-
-        this.props.gameState.assignOrder(region, this.selectedOrder);
-        this.selectedOrder = null;
-    }
-
     onOrderClick(region: Region): void {
         if (!this.props.gameClient.authenticatedPlayer) {
             return;
         }
 
-        if (this.selectedOrder != null) {
-            this.props.gameState.assignOrder(region, this.selectedOrder);
-            this.selectedOrder = null;
-        } else {
-            this.props.gameState.assignOrder(region, null);
-        }
+        this.props.gameState.assignOrder(region, null);
     }
 
     onReadyClick(): void {
