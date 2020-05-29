@@ -214,9 +214,16 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         const players: {userId: string; data: object}[] = [];
         if (this.childGameState instanceof LobbyGameState) {
             this.childGameState.players.forEach((user, house) => {
+                // If the game is in "randomize house" mode, don't specify any houses in the PlayerInGame data
+                const playerData: {[key: string]: any} = {};
+
+                if (!this.gameSettings.randomHouses) {
+                    playerData["house"] = house.id;
+                }
+
                 players.push({
                     userId: user.id,
-                    data: {"house": house.id}
+                    data: playerData
                 });
             });
         } else if (this.childGameState instanceof IngameGameState) {
