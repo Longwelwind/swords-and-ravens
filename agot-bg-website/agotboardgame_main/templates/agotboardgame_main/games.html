@@ -21,7 +21,27 @@ Games -
         <div class="col-lg-10 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Games</h4>
+                    <h4 class="card-title">
+                        Games
+                        <span
+                            id="westerosi-time"
+                            class="float-right badge badge-secondary"
+                            data-toggle="tooltip"
+                            data-html="true"
+                            title="<b>Westerosi time</b> ...<small>basically, UTC</small>"
+                        >
+
+                        </span>
+                        <script type="text/javascript">
+                            let element = document.getElementById("westerosi-time");
+                            function update() {
+                                let time = new Date();
+                                element.innerHTML = time.getUTCHours().toString().padStart(2, "0") + ":" + time.getUTCMinutes().toString().padStart(2, "0");
+                            }
+                            update();
+                            setInterval(update, 1000);
+                        </script>
+                    </h4>
                     <div style="height: 440px; overflow-y: auto">
                         {% games_table games user perms %}
                     </div>
