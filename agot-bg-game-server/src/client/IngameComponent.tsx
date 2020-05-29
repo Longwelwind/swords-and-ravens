@@ -62,6 +62,7 @@ import UserLabel from "./UserLabel";
 import VoteComponent from "./VoteComponent";
 import IngameCancelledComponent from "./game-state-panel/IngameCancelledComponent";
 import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
+import joinReactNodes from "./utils/joinReactNodes";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -89,6 +90,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const nextWildlingCard = this.game.wildlingDeck.filter(c => c.id == this.game.clientNextWildlingCardId)[0];
 
         const {result: canLaunchCancelGameVote, reason: canLaunchCancelGameVoteReason} = this.props.gameState.canLaunchCancelGameVote();
+
+        const connectedSpectators = this.getConnectedSpectators();
 
         return (
             <>
@@ -302,6 +305,15 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             </Row>
                                         </ListGroupItem>
                                     ))}
+                                    <ListGroupItem className="text-center font-italic">
+                                        <small>
+                                        {connectedSpectators.length > 0 ? (
+                                            <>Spectators: {joinReactNodes(this.getConnectedSpectators().map(u => <strong key={u.id}>{u.name}</strong>), ", ")}</>
+                                        ) : (
+                                            <>No spectators</>
+                                        )}
+                                        </small>
+                                    </ListGroupItem>
                                 </ListGroup>
                             </Card>
                         </Col>
@@ -529,6 +541,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 </tbody>
             </table>
         </Tooltip>;
+    }
+
+    getConnectedSpectators(): User[] {
+        return this.props.gameState.getSpectators().filter(u => u.connected);
     }
 
     onNewPrivateChatRoomClick(p: Player): void {

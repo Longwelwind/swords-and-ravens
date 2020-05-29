@@ -351,6 +351,10 @@ export default class IngameGameState extends GameState<
         }
     }
 
+    getSpectators(): User[] {
+        return this.entireGame.users.values.filter(u => !this.players.keys.includes(u));
+    }
+
     launchCancelGameVote(): void {
         if (window.confirm('Do you want to launch a vote to cancel the game?')) {
             this.entireGame.sendMessageToServer({
