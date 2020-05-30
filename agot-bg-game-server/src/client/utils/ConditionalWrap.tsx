@@ -7,6 +7,6 @@ interface ConditionalWrapProps {
     children: ReactElement;
 }
 
-const ConditionalWrap = ({condition, wrap, children}: ConditionalWrapProps): ReactElement => condition ? wrap(children) : <>{children}</>;
+const ConditionalWrap = ({condition, wrap, children}: ConditionalWrapProps): ReactElement => condition ? wrap(children) : children;
 
 export default ConditionalWrap;

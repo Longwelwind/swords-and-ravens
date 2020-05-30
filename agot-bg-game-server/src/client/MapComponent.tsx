@@ -16,7 +16,7 @@ import unitImages from "./unitImages";
 import classNames = require("classnames");
 import housePowerTokensImages from "./housePowerTokensImages";
 import garrisonTokens from "./garrisonTokens";
-import {OverlayTrigger, Tooltip} from "react-bootstrap";
+import {OverlayTrigger, Tooltip, Popover} from "react-bootstrap";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import BetterMap from "../utils/BetterMap";
 import _ from "lodash";
@@ -33,6 +33,8 @@ interface MapComponentProps {
 
 @observer
 export default class MapComponent extends Component<MapComponentProps> {
+    refOverlayTriggerRegion: OverlayTrigger;
+
     render(): ReactNode {
         return (
             <div className="map"
@@ -77,36 +79,43 @@ export default class MapComponent extends Component<MapComponentProps> {
         const propertiesForRegions = this.getModifiedPropertiesForEntities<Region, RegionOnMapProperties>(
             this.props.ingameGameState.world.regions.values,
             this.props.mapControls.modifyRegionsOnMap,
-            {highlight: {active: false, color: "white"}, onClick: null}
+            {highlight: {active: false, color: "white"}, onClick: null, wrap: null}
         );
 
         return propertiesForRegions.entries.map(([region, properties]) => {
-
             const blocked = region.garrison == 1000;
+            const wrap = properties.wrap;
 
-            return <ConditionalWrap key={region.id} condition={!blocked}
-                        wrap={child =>
-                            <OverlayTrigger
-                                overlay={this.renderRegionTooltip(region)}
-                                delay={{ show: 750, hide: 100 }}
-                                placement="auto">
-                                {child}
-                            </OverlayTrigger>}>
-                            <polygon
-                                points={this.getRegionPath(region)}
-                                fill={blocked ? "black" : properties.highlight.color}
-                                fillRule="evenodd"
-                                className={classNames(
-                                    blocked ? "blocked-region" : "region-area",
-                                    properties.highlight.active && {
-                                        "clickable": true,
-                                        // Whatever the strength of the highlight defined, show the same
-                                        // highlightness
-                                        "highlighted-region-area": true
-                                    }
-                                )}
-                                onClick={properties.onClick != null ? properties.onClick : undefined} />
-            </ConditionalWrap>;
+            return (
+                <ConditionalWrap condition={!blocked}
+                    key={region.id}
+                    wrap={wrap ? wrap : child =>
+                        <OverlayTrigger
+                            overlay={this.renderRegionTooltip(region)}
+                            delay={{ show: 750, hide: 100 }}
+                            placement="auto"
+                            rootClose
+                        >
+                            {child}
+                        </OverlayTrigger>
+                    }
+                >
+                    <polygon
+                        points={this.getRegionPath(region)}
+                        fill={blocked ? "black" : properties.highlight.color}
+                        fillRule="evenodd"
+                        className={classNames(
+                            blocked ? "blocked-region" : "region-area",
+                            properties.highlight.active && {
+                                "clickable": true,
+                                // Whatever the strength of the highlight defined, show the same
+                                // highlightness
+                                "highlighted-region-area": true
+                            }
+                        )}
+                        onClick={properties.onClick != null ? properties.onClick : undefined} />
+                </ConditionalWrap>
+            );
         });
     }
 
