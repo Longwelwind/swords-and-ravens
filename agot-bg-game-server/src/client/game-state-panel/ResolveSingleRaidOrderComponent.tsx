@@ -26,12 +26,12 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
         return (
             <>
                 <Col xs={12} className="text-center">
-                    {this.props.gameState.house.name} must resolve one of its raid orders.
+                    House <b>{this.props.gameState.house.name}</b> must resolve one of its Raid Orders.
                 </Col>
                 {this.props.gameClient.authenticatedPlayer && this.props.gameState.house == this.props.gameClient.authenticatedPlayer.house ? (
                     this.selectedOrderRegion == null ? (
                         <Col xs={12} className="text-center">
-                            Select a raid order token to resolve it
+                            Select a Raid Order token to resolve it.
                         </Col>
                     ) : (
                         <>
@@ -66,7 +66,7 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
     confirm(): void {
         if (this.selectedOrderRegion) {
             if (!this.selectedTargetRegion) {
-                if (!window.confirm('Do you want to remove your Raid order?')) {
+                if (!window.confirm('Do you want to remove your Raid Order?')) {
                     return;
                 }
             }

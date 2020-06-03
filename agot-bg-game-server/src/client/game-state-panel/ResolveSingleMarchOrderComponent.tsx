@@ -33,18 +33,18 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         return (
             <>
                 <Col xs={12} className="text-center">
-                    <strong>{this.props.gameState.house.name}</strong> must resolve one of
-                    its march orders.
+                    House <b>{this.props.gameState.house.name}</b> must resolve one of
+                    its March Orders.
                 </Col>
                 {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
                     <>
                         <Col xs={12} className="text-center">
                             {this.selectedMarchOrderRegion == null ? (
-                                "Click on one of your march order"
+                                "Click on one of your March Orders."
                             ) : this.selectedUnits.length == 0 ? (
-                                "Click on a subset of the troops in the marching region"
+                                "Click on a subset of the troops in the marching region."
                             ) : (
-                                "Click on a neighbouring region, or click on other units of the marching region"
+                                "Click on a neighbouring region, or click on other units of the marching region."
                             )}
                         </Col>
                         {this.plannedMoves.size > 0 && (
@@ -81,7 +81,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                     </>
                 ) : (
                     <Col xs={12} className="text-center">
-                        Waiting for {this.props.gameState.house.name} to resolve one of its march order...
+                        Waiting for {this.props.gameState.house.name}...
                     </Col>
                 )}
             </>
@@ -168,7 +168,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         }
 
         if(this.plannedMoves.size == 0) {
-            if(!confirm("Do you want to remove your march order?")) {
+            if(!confirm("Do you want to remove your March Order?")) {
                 return;
             }
         }

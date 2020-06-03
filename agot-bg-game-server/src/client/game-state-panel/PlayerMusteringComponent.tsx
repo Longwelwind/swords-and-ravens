@@ -34,11 +34,11 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
             <>
                 <Col xs={12}>
                     {this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER ? (
-                        <>House {this.house.name} can resolve one of its Consolidate Power Orders</>
+                        <>House <b>{this.house.name}</b> must resolve one of its Consolidate Power Orders.</>
                     ) : this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD ? (
-                        <>Players can muster units in their controlled castles and fortresses</>
+                        <>Players can muster units in their controlled castles and fortresses.</>
                     ) : this.props.gameState.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD && (
-                        <></>
+                        <>House <b>{this.house.name}</b> can muster units in one of their controlled castles or fortresses.</>
                     )}
                 </Col>
                 {this.props.gameClient.doesControlHouse(this.house) ? (
@@ -61,13 +61,9 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                         )}
                         {!(this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER && this.musterings.size > 0) && (
                             <Col xs={12}>
-                                {this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER ? (
-                                    <>Click on a Consolidate Power Order to resolve it.</>
-                                ) : this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD ? (
-                                    <>Click on a region to initiate a recruitement from there.</>
-                                ) : this.props.gameState.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD && (
-                                    <>...</>
-                                )}
+                                {this.props.gameState.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER ?
+                                    <>Click on a Consolidate Power Order token to resolve it.</>
+                                  : <>Click on a region to initiate a recruitment from there.</>}
                             </Col>
                         )}
                         {this.selectedRegion && (
