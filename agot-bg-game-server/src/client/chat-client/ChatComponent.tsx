@@ -11,6 +11,7 @@ import ChatClient, {Channel, Message} from "./ChatClient";
 import EntireGame from "../../common/EntireGame";
 // @ts-ignore
 import ScrollToBottom from "react-scroll-to-bottom";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 interface ChatComponentProps {
     gameClient: GameClient;
@@ -69,8 +70,14 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                             )}
                             <Row noGutters={true} className="flex-nowrap" key={m.id}>
                                 <Col xs="auto" style={{width: "38px"}} className="text-center">
-                                    <small
-                                        className="text-muted">{('0' + m.createdAt.getHours()).slice(-2)}:{('0' + m.createdAt.getMinutes()).slice(-2)}</small>
+                                    <OverlayTrigger
+                                        placement="auto"
+                                        overlay={<Tooltip id={"message-date-" + m.id}>{m.createdAt.toLocaleString()}</Tooltip>}
+                                    >
+                                        <small className="text-muted">
+                                            {('0' + m.createdAt.getHours()).slice(-2)}:{('0' + m.createdAt.getMinutes()).slice(-2)}
+                                        </small>
+                                    </OverlayTrigger>
                                 </Col>
                                 <Col xs="auto" className="mx-1">
                                     <strong>{m.user.name}</strong>
