@@ -3,6 +3,11 @@ $grid-gutter-width: 1rem;
 @import './theme/_variables';
 @import '../../../node_modules/bootstrap/scss/bootstrap';
 
+strong 
+{ 
+  font-weight: bold; 
+}
+
 .row {
   margin-top: -0.5rem;
   margin-bottom: -0.5rem;
