@@ -433,7 +433,7 @@ export default class IngameGameState extends GameState<
 
         return {
             type: "ingame",
-            players: this.players.values.map(p => p.serializeToClient()),
+            players: this.players.values.map(p => p.serializeToClient(admin, player)),
             game: this.game.serializeToClient(admin, player != null && player.house.knowsNextWildlingCard),
             gameLogManager: this.gameLogManager.serializeToClient(),
             votes: this.votes.values.map(v => v.serializeToClient()),

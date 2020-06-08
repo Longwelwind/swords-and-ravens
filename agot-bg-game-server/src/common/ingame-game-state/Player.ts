@@ -13,11 +13,11 @@ export default class Player {
         this.house = house;
     }
 
-    serializeToClient(): SerializedPlayer {
+    serializeToClient(admin: boolean, player: Player | null): SerializedPlayer {
         return {
             userId: this.user.id,
             houseId: this.house.id,
-            note: this.note
+            note: admin ? this.note : player == this ? this.note : ""
         };
     }
 
