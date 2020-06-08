@@ -73,6 +73,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                     <OverlayTrigger
                                         placement="auto"
                                         overlay={<Tooltip id={"message-date-" + m.id}>{m.createdAt.toLocaleString()}</Tooltip>}
+                                        popperConfig={{modifiers: {preventOverflow: {boundariesElement: "viewport"}}}}
                                     >
                                         <small className="text-muted">
                                             {('0' + m.createdAt.getHours()).slice(-2)}:{('0' + m.createdAt.getMinutes()).slice(-2)}
