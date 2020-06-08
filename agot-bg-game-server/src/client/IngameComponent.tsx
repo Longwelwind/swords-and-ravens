@@ -21,6 +21,7 @@ import * as _ from "lodash";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faStar} from "@fortawesome/free-solid-svg-icons/faStar";
+import {faStickyNote} from "@fortawesome/free-solid-svg-icons/faStickyNote";
 import Tooltip from "react-bootstrap/Tooltip";
 import castleImage from "../../public/images/icons/castle.svg";
 import stoneThroneImage from "../../public/images/icons/stone-throne.svg";
@@ -63,6 +64,7 @@ import VoteComponent from "./VoteComponent";
 import IngameCancelledComponent from "./game-state-panel/IngameCancelledComponent";
 import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
 import joinReactNodes from "./utils/joinReactNodes";
+import NoteComponent from "./NoteComponent";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -417,6 +419,18 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     Chat
                                                 </Nav.Link>
                                             </Nav.Item>
+                                            <Nav.Item>
+                                                <Nav.Link eventKey="note" className={classNames({"new-event": this.publicChatRoom.areThereNewMessage})}>
+                                                    <OverlayTrigger
+                                                        overlay={<Tooltip id="note">Personal note</Tooltip>}
+                                                        placement="auto"
+                                                    >
+                                                    <FontAwesomeIcon
+                                                        style={{color: "white"}}
+                                                        icon={faStickyNote}/>
+                                                    </OverlayTrigger>
+                                                </Nav.Link>
+                                            </Nav.Item>
                                             {this.props.gameClient.isOwner() && (
                                                 <Nav.Item>
                                                     <Nav.Link eventKey="settings">
@@ -461,6 +475,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 <ScrollToBottom className="h-100" scrollViewClassName="overflow-x-hidden">
                                                     <GameLogListComponent ingameGameState={this.props.gameState} />
                                                 </ScrollToBottom>
+                                            </Tab.Pane>
+                                            <Tab.Pane eventKey="note" className="h-100">
+                                                <NoteComponent gameClient={this.props.gameClient} ingame={this.props.gameState} />
                                             </Tab.Pane>
                                             {this.getPrivateChatRooms().map(({roomId}) => (
                                                 <Tab.Pane eventKey={roomId} key={roomId} className="h-100">
