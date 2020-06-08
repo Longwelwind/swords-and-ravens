@@ -419,18 +419,20 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     Chat
                                                 </Nav.Link>
                                             </Nav.Item>
-                                            <Nav.Item>
-                                                <Nav.Link eventKey="note" className={classNames({"new-event": this.publicChatRoom.areThereNewMessage})}>
-                                                    <OverlayTrigger
-                                                        overlay={<Tooltip id="note">Personal note</Tooltip>}
-                                                        placement="auto"
-                                                    >
-                                                    <FontAwesomeIcon
-                                                        style={{color: "white"}}
-                                                        icon={faStickyNote}/>
-                                                    </OverlayTrigger>
-                                                </Nav.Link>
-                                            </Nav.Item>
+                                            {this.props.gameClient.authenticatedPlayer && (
+                                                <Nav.Item>
+                                                    <Nav.Link eventKey="note" className={classNames({"new-event": this.publicChatRoom.areThereNewMessage})}>
+                                                        <OverlayTrigger
+                                                            overlay={<Tooltip id="note">Personal note</Tooltip>}
+                                                            placement="auto"
+                                                        >
+                                                        <FontAwesomeIcon
+                                                            style={{color: "white"}}
+                                                            icon={faStickyNote}/>
+                                                        </OverlayTrigger>
+                                                    </Nav.Link>
+                                                </Nav.Item>
+                                            )}
                                             {this.props.gameClient.isOwner() && (
                                                 <Nav.Item>
                                                     <Nav.Link eventKey="settings">
@@ -476,9 +478,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     <GameLogListComponent ingameGameState={this.props.gameState} />
                                                 </ScrollToBottom>
                                             </Tab.Pane>
-                                            <Tab.Pane eventKey="note" className="h-100">
-                                                <NoteComponent gameClient={this.props.gameClient} ingame={this.props.gameState} />
-                                            </Tab.Pane>
+                                            {this.props.gameClient.authenticatedPlayer && (
+                                                <Tab.Pane eventKey="note" className="h-100">
+                                                    <NoteComponent gameClient={this.props.gameClient} ingame={this.props.gameState} />
+                                                </Tab.Pane>
+                                            )}
                                             {this.getPrivateChatRooms().map(({roomId}) => (
                                                 <Tab.Pane eventKey={roomId} key={roomId} className="h-100">
                                                     <ChatComponent gameClient={this.props.gameClient}
