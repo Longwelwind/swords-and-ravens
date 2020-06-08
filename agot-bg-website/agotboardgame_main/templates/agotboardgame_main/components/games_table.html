@@ -17,22 +17,24 @@
     <tbody>
         {% for game in games %}
             <tr
-                {% if game.state == "ONGOING" %}
                 data-toggle="popover"
                 data-html="true"
                 data-title="<div class='popover-title'>{{ game.name }}</div>"
                 data-boundary="window"
                 data-content="
-                    <p>
-                        Turn: <b>{{ game.view_of_game.turn }}</b>
-                    </p>
-                    <div class='text-small text-muted'>
-                        Last active {{ game.updated_at|naturaltime }}
-                    </div>
+                    {% if game.state == "ONGOING" %}
+                        <p>
+                            Turn: <b>{{ game.view_of_game.turn }}</b>
+                        </p>
+                        <div class='text-small text-muted'>
+                            Last active {{ game.updated_at|naturaltime }}
+                        </div>
+                    {% else %}
+                        <div><b>Owner: </b>{{ game.owner.username }}</div>
+                    {% endif %}
                 "
                 data-placement="right"
                 data-trigger="hover"
-                {% endif %}
             >
                 <td class="align-middle text-center">
                     {% if game.state == "IN_LOBBY" %}
