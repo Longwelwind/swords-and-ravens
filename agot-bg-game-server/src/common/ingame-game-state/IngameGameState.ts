@@ -26,6 +26,8 @@ import VoteType, { CancelGame, ReplacePlayer } from "./vote-system/VoteType";
 import { v4 } from "uuid";
 import CancelledGameState, { SerializedCancelledGameState } from "../cancelled-game-state/CancelledGameState";
 
+export const NOTE_MAX_LENGTH = 5000;
+
 export default class IngameGameState extends GameState<
     EntireGame,
     WesterosGameState | PlanningGameState | ActionGameState | CancelledGameState | GameEndedGameState
@@ -159,6 +161,8 @@ export default class IngameGameState extends GameState<
                 player.user,
                 new CancelGame()
             );
+        } else if (message.type == "update-note") {
+            player.note = message.note.substring(0, NOTE_MAX_LENGTH);
         } else {
             this.childGameState.onPlayerMessage(player, message);
         }
@@ -406,6 +410,13 @@ export default class IngameGameState extends GameState<
         this.entireGame.sendMessageToServer({
             type: "launch-replace-player-vote",
             player: player.user.id
+        });
+    }
+
+    updateNote(note: string): void {
+        this.entireGame.sendMessageToServer({
+            type: "update-note",
+            note: note
         });
     }
 
