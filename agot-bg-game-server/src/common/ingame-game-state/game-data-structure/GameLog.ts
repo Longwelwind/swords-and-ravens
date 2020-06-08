@@ -24,7 +24,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | MassingOnTheMilkwaterHouseCardsRemoved
     | AKingBeyondTheWallHighestTopTrack | AKingBeyondTheWallHouseReduceTrack | AKingBeyondTheWallLowestReduceTracks
     | MammothRidersDestroyUnits | MammothRidersReturnCard | TheHordeDescendsHighestMuster | TheHordeDescendsUnitsKilled
-    | CrowKillersFootmanUpgraded | CrowKillersKnightsReplaced
+    | CrowKillersFootmanUpgraded | CrowKillersKnightsReplaced | CrowKillersKnightsKilled
     | SkinchangerScoutNightsWatchVictory | SkinchangerScoutWildlingVictory
     | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory
     | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered
@@ -503,6 +503,12 @@ interface TheHordeDescendsUnitsKilled {
 
 interface CrowKillersKnightsReplaced {
     type: "crow-killers-knights-replaced";
+    house: string;
+    units: [string, string[]][];
+}
+
+interface CrowKillersKnightsKilled {
+    type: "crow-killers-knights-killed";
     house: string;
     units: [string, string[]][];
 }
