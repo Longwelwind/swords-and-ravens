@@ -29,9 +29,8 @@
                         <div class='text-small text-muted'>
                             Last active {{ game.updated_at|naturaltime }}
                         </div>
-                    {% else %}
-                        <div><b>Owner: </b>{{ game.owner.username }}</div>
                     {% endif %}
+                    <div><b>Owner: </b>{{ game.owner.username }}</div>
                 "
                 data-placement="right"
                 data-trigger="hover"
