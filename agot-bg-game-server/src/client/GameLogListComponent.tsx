@@ -19,6 +19,7 @@ import _ from "lodash";
 import joinReactNodes from "./utils/joinReactNodes";
 import orders from "../common/ingame-game-state/game-data-structure/orders";
 import CombatInfoComponent from "./CombatInfoComponent";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -38,10 +39,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         return this.props.ingameGameState.gameLogManager.logs.map((l, i) => (
             <Row key={i}>
                 <Col xs="auto" className="text-muted">
-                    <small>
-                        {l.time.getHours().toString().padStart(2, "0")}
-                        :{l.time.getMinutes().toString().padStart(2, "0")}
-                    </small>
+                    <OverlayTrigger
+                        placement="auto"
+                        overlay={<Tooltip id={"log-date-" + l.time.getUTCMilliseconds()}>{l.time.toLocaleString()}</Tooltip>}
+                        popperConfig={{ modifiers: { preventOverflow: { boundariesElement: "viewport" } } }}
+                    >
+                        <small>
+                            {l.time.getHours().toString().padStart(2, "0")}
+                            :{l.time.getMinutes().toString().padStart(2, "0")}
+                        </small>
+                    </OverlayTrigger>
                 </Col>
                 <Col>
                     <div className="game-log-content">
