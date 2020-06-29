@@ -17,13 +17,14 @@ import Tooltip from "react-bootstrap/Tooltip";
 import {OrderOnMapProperties, RegionOnMapProperties, UnitOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
 
-
 @observer
 export default class ResolveSingleMarchOrderComponent extends Component<GameStateComponentProps<ResolveSingleMarchOrderGameState>> {
     @observable selectedMarchOrderRegion: Region | null;
     @observable selectedUnits: Unit[] = [];
     @observable plannedMoves = new BetterMap<Region, Unit[]>();
-    @observable leavePowerToken = false;
+    @observable leavePowerToken: boolean | undefined = undefined;
+    canLeavePowerToken = false;
+    canLeavePowerTokenReason = "";
 
     modifyRegionsOnMapCallback: any;
     modifyUnitsOnMapCallback: any;
@@ -62,7 +63,10 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                 <Col xs={12}>
                                     <Row className="justify-content-center">
                                         <Col xs="auto">
-                                            <Button onClick={() => this.confirm()}>
+                                            <Button
+                                                onClick={() => this.confirm()}
+                                                disabled={this.leavePowerToken == undefined}
+                                            >
                                                 Confirm
                                             </Button>
                                         </Col>
@@ -88,38 +92,75 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         );
     }
 
-    renderLeavePowerToken(startingRegion: Region): ReactNode | null {
-        const {success, reason} = this.props.gameState.canLeavePowerToken(
-            startingRegion,
-            this.plannedMoves
-        );
+    componentWillMount(): any {
+        this.componentWillUpdate();
+    }
 
+    componentWillUpdate(): any {
+        const {success, reason} = this.selectedMarchOrderRegion
+            ? this.props.gameState.canLeavePowerToken(this.selectedMarchOrderRegion, this.plannedMoves)
+            : {success: false, reason: "no-all-units-go"}
+
+        if (this.canLeavePowerToken != success) {
+            // Set undefined here to actively force a user decision when a move was done which changed canLeavePowerToken
+            this.leavePowerToken = undefined;
+        }
+
+        this.canLeavePowerToken = success;
+        this.canLeavePowerTokenReason = reason;
+
+        if (!this.canLeavePowerToken) {
+            this.leavePowerToken = false;
+        }
+    }
+
+    renderLeavePowerToken(startingRegion: Region): ReactNode | null {
         return (
             <Col xs={12} className="text-center">
                 <OverlayTrigger overlay={
                     <Tooltip id={"leave-power-token"}>
-                        {reason == "already-capital" ? (
+                        {this.canLeavePowerTokenReason == "already-capital" ? (
                             <>Your capital is always controlled by your house, thus not requiring a Power
                                 token to be left when leaving the area to keep control of it.</>
-                        ) : reason == "already-power-token" ? (
+                        ) : this.canLeavePowerTokenReason == "already-power-token" ? (
                             <>A Power token is already present.</>
-                        ) : reason == "no-power-token-available" ? (
+                        ) : this.canLeavePowerTokenReason == "no-power-token-available" ? (
                             "You don't have any available Power token."
-                        ) : reason == "not-a-land" ? (
+                        ) : this.canLeavePowerTokenReason == "not-a-land" ? (
                             "Power tokens can only be left on land areas."
-                        ) : reason == "no-all-units-go" ? (
+                        ) : this.canLeavePowerTokenReason == "no-all-units-go" ? (
                             "All units must leave the area in order to leave a Power token."
                         ) : "Leaving a Power token in an area maintain the control your house has on it, even"
                             + " if all units your units leave the area."}
                     </Tooltip>
                 }>
-                    <Form.Check
-                        id="chk-leave-pt"
-                        label="Leave a Power Token"
-                        checked={this.leavePowerToken}
-                        onChange={() => this.leavePowerToken = !this.leavePowerToken}
-                        disabled={!success}
-                    />
+                    <Form>
+                        <fieldset>
+                            <Form.Group as={Col}>
+                                <Form.Label>
+                                    Do you want to leave a Power token in <b>{startingRegion.name}</b> to keep control?
+                                </Form.Label>
+                                <Form.Check
+                                    id="chk-leave-pt"
+                                    name="leave-pt-radios"
+                                    inline
+                                    type="radio"
+                                    label="Yes"
+                                    checked={this.leavePowerToken}
+                                    onChange={() => {this.leavePowerToken = true;}}
+                                    disabled={!this.canLeavePowerToken}/>
+                                <Form.Check
+                                    id="chk-dont-leave-pt"
+                                    name="leave-pt-radios"
+                                    inline
+                                    type="radio"
+                                    label="No"
+                                    checked={this.leavePowerToken == false}
+                                    onChange={() => {this.leavePowerToken = false;}}
+                                    disabled={!this.canLeavePowerToken}/>
+                            </Form.Group>
+                        </fieldset>
+                    </Form>
                 </OverlayTrigger>
             </Col>
         );
@@ -159,10 +200,14 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         this.selectedMarchOrderRegion = null;
         this.selectedUnits = [];
         this.plannedMoves = new BetterMap<Region, Unit[]>();
-        this.leavePowerToken = false;
+        this.leavePowerToken = undefined;
     }
 
     confirm(): void {
+        if (this.leavePowerToken == undefined) {
+            return;
+        }
+
         if (!this.selectedMarchOrderRegion) {
             return;
         }
