@@ -421,11 +421,15 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
         }
 
         // The player can place a power token if all units go out
-        if (_.sum(moves.values.map(us => us.length)) < startingRegion.units.size) {
+        if (!this.haveAllUnitsLeft(startingRegion, moves)) {
             return {success: false, reason: "no-all-units-go"}
         }
 
         return {success: true, reason: "ok"};
+    }
+
+    haveAllUnitsLeft(startingRegion: Region, moves: BetterMap<Region, Unit[]>): boolean {
+        return _.sum(moves.values.map(us => us.length)) == startingRegion.units.size;
     }
 
     static deserializeFromServer(resolveMarchOrderGameState: ResolveMarchOrderGameState, data: SerializedResolveSingleMarchOrderGameState): ResolveSingleMarchOrderGameState {

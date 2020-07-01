@@ -31,6 +31,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     modifyOrdersOnMapCallback: any;
 
     render(): ReactNode {
+        const allUnitsLeft = this.selectedMarchOrderRegion ? this.props.gameState.haveAllUnitsLeft(this.selectedMarchOrderRegion, this.plannedMoves) : false;
         return (
             <>
                 <Col xs={12} className="text-center">
@@ -42,11 +43,11 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                         <Col xs={12} className="text-center">
                             {this.selectedMarchOrderRegion == null ? (
                                 "Click on one of your March Orders."
-                            ) : this.selectedUnits.length == 0 ? (
-                                "Click on a subset of the troops in the marching region."
-                            ) : (
-                                "Click on a neighbouring region, or click on other units of the marching region."
-                            )}
+                            ) : this.selectedUnits.length == 0 && !allUnitsLeft ? (
+                                <>Click on a subset of the troops in <b>{this.selectedMarchOrderRegion.name}</b>.</>
+                            ) : !allUnitsLeft ? (
+                                <>Click on a neighbouring region, or click on other units in <b>{this.selectedMarchOrderRegion.name}</b>.</>
+                            ) : (<></>)}
                         </Col>
                         {this.plannedMoves.size > 0 && (
                             <Col xs={12} className="text-center">
@@ -115,7 +116,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     }
 
     renderLeavePowerToken(startingRegion: Region): ReactNode | null {
-        return (
+        return this.plannedMoves.size > 0 && (
             <Col xs={12} className="text-center">
                 <OverlayTrigger overlay={
                     <Tooltip id={"leave-power-token"}>
