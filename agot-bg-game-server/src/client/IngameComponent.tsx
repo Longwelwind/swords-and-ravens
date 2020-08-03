@@ -281,7 +281,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     <div style={{fontSize: "18px"}}>{p.house.powerTokens}</div>
                                                     <OverlayTrigger
                                                         overlay={this.renderPowerTooltip(p.house)}
-                                                        delay={{show: 750, hide: 100}}
+                                                        delay={{show: 250, hide: 100}}
                                                         placement="auto"
                                                     >
                                                         <div

@@ -283,7 +283,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                  key={"region-" + region.id}
             >
                 <OverlayTrigger overlay={this.renderOrderTooltip(order, region)}
-                    delay={{show: 750, hide: 250}}>
+                    delay={{show: 750, hide: 100}}>
                     <div className="order-icon" style={{backgroundImage: `url(${backgroundUrl})`}}/>
                 </OverlayTrigger>
             </div>
