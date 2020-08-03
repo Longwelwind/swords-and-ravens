@@ -25,7 +25,7 @@ export default class SelectOrdersComponent extends Component<GameStateComponentP
                 <Col xs={12}>
                     {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
                         <>
-                            {this.selectedRegions.length > 0 && 
+                            {this.selectedRegions.length > 0 &&
                             <Row className="justify-content-center">
                                 <p>Selected region{this.selectedRegions.length > 1 && "s"}: {joinReactNodes(this.selectedRegions.map(r => <b key={r.id}>{r.name}</b>), ', ')}</p>
                             </Row>}
