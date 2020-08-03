@@ -16,7 +16,7 @@ import unitImages from "./unitImages";
 import classNames = require("classnames");
 import housePowerTokensImages from "./housePowerTokensImages";
 import garrisonTokens from "./garrisonTokens";
-import {OverlayTrigger, Tooltip, Popover} from "react-bootstrap";
+import {OverlayTrigger, Tooltip} from "react-bootstrap";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import BetterMap from "../utils/BetterMap";
 import _ from "lodash";
@@ -220,7 +220,7 @@ export default class MapComponent extends Component<MapComponentProps> {
 
                     if (!controller) {
                         // Should never happen. If there's an order, there's a controller.
-                        throw new Error();
+                        throw new Error("Should never happen. If there's an order, there's a controller.");
                     }
 
                     const backgroundUrl = order ? orderImages.get(order.type.id) : houseOrderImages.get(controller.id);
@@ -270,7 +270,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         return propertiesForEntities;
     }
 
-    renderOrder(region: Region, order: Order | null, backgroundUrl: string, properties: OrderOnMapProperties, isActionGameState: boolean): ReactNode {
+    renderOrder(region: Region, order: Order | null, backgroundUrl: string, properties: OrderOnMapProperties, _isActionGameState: boolean): ReactNode {
         return (
             <div className={classNames(
                     "order-container", "hover-weak-outline",
@@ -282,19 +282,20 @@ export default class MapComponent extends Component<MapComponentProps> {
                  onClick={properties.onClick ? properties.onClick : undefined}
                  key={"region-" + region.id}
             >
-                <ConditionalWrap condition={isActionGameState}
-                                 wrap={child =>
-                                     <OverlayTrigger overlay={
-                                         <Tooltip id={"order-owner"}>
-                                             {this.getController(region)}
-                                         </Tooltip>
-                                     } delay={{show: 750, hide: 250}}>
-                                         {child}
-                                     </OverlayTrigger>}>
+                <OverlayTrigger overlay={this.renderOrderTooltip(order, region)}
+                    delay={{show: 750, hide: 250}}>
                     <div className="order-icon" style={{backgroundImage: `url(${backgroundUrl})`}}/>
-                </ConditionalWrap>
+                </OverlayTrigger>
             </div>
         );
+    }
+
+    private renderOrderTooltip(order: Order | null, region: Region): ReactNode {
+        const regionController = region.getController();
+
+        return <Tooltip id={"order-info"}>
+            <b>{order ? order.type.name : "Order token"}</b>{regionController != null && <small> of <b>{regionController.name}</b></small>}
+        </Tooltip>;
     }
 
     getBorderPathD(border: StaticBorder): string {
@@ -311,10 +312,5 @@ export default class MapComponent extends Component<MapComponentProps> {
         const points = this.props.ingameGameState.world.getContinuousBorder(region);
 
         return points.map(p => p.x + "," + p.y).join(" ");
-    }
-
-    getController(region: Region): string | null {
-        const controller = region.getController();
-        return (controller ? controller.name : null);
     }
 }
