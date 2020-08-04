@@ -131,9 +131,9 @@ export default class MapComponent extends Component<MapComponentProps> {
             )}
             {(region.supplyIcons > 0 || region.crownIcons) > 0 && (
                 <>
-                    <br />{region.supplyIcons > 0 && <><b>{region.supplyIcons}</b> Barrels</>}
+                    <br />{region.supplyIcons > 0 && <><b>{region.supplyIcons}</b> Barrel{region.supplyIcons > 1 && "s"}</>}
                     {(region.supplyIcons > 0 && region.crownIcons > 0) && " - "}
-                    {region.crownIcons > 0 && <><b>{region.crownIcons}</b> Crowns</>}
+                    {region.crownIcons > 0 && <><b>{region.crownIcons}</b> Crown{region.crownIcons > 1 && "s"}</>}
                 </>
             )}
             {region.units.size > 0 && (
