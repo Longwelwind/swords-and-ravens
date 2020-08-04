@@ -17,4 +17,12 @@ export default abstract class WildlingCardType {
 
     abstract executeWildlingWon(wildlingsAttack: WildlingsAttackGameState): void;
     abstract executeNightsWatchWon(wildlingsAttack: WildlingsAttackGameState): void;
+
+    lowestBidderChoiceCanBeSkipped(_wildlingsAttack: WildlingsAttackGameState): boolean {
+        return false;
+    }
+
+    highestBidderChoiceCanBeSkipped(_wildlingsAttack: WildlingsAttackGameState): boolean {
+        return false;
+    }
 }
