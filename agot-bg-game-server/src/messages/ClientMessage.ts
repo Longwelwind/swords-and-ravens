@@ -1,5 +1,5 @@
 export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | Unready | ResolveMarchOrder | DeclareSupport
-    | UseValyrianSteelBlade | ChooseHouseCard | ChooseCasualties | ChooseRavenAction | KickPlayer
+    | RefuseSupport | UseValyrianSteelBlade | ChooseHouseCard | ChooseCasualties | ChooseRavenAction | KickPlayer
     | ChooseTopWildlingCardAction | ReplaceOrder | SkipReplaceOrder | ResolveRaid | Bid | ChooseChoice
     | DecideBiggest | ReconcileArmies | Muster | ResolveTies | SelectUnits | LaunchGame | ChooseHouse
     | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings | CreatePrivateChatRoom | ChangeGameSettings
@@ -55,6 +55,10 @@ interface ResolveMarchOrder {
 interface DeclareSupport {
     type: "declare-support";
     supportedHouseId: string | null;
+}
+
+interface RefuseSupport {
+    type: "refuse-support";
 }
 
 interface UseValyrianSteelBlade {

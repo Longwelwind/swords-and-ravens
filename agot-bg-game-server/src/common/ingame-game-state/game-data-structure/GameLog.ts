@@ -3,7 +3,7 @@ export default interface GameLog {
     data: GameLogData;
 }
 
-export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
+export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack | MarchResolved
     | WesterosCardExecuted | WesterosCardDrawn | CombatResult | WildlingCardRevealed | WildlingBidding
     | HighestBidderChosen | LowestBidderChosen | PlayerMustered | WinnerDeclared
     | RavenHolderWildlingCardPutBottom | RavenHolderWildlingCardPutTop | RavenHolderReplaceOrder | RaidDone | DarkWingsDarkWordsChoice
@@ -39,6 +39,11 @@ interface SupportDeclared {
     type: "support-declared";
     supporter: string;
     supported: string | null;
+}
+
+interface SupportRefused {
+    type: "support-refused";
+    house: string;
 }
 
 interface HouseCardChosen {

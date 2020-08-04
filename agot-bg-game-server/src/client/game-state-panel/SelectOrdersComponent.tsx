@@ -11,6 +11,7 @@ import {observable} from "mobx";
 import _ from "lodash";
 import {OrderOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
+import joinReactNodes from "../utils/joinReactNodes";
 
 @observer
 export default class SelectOrdersComponent extends Component<GameStateComponentProps<SelectOrdersGameState<ParentGameState>>> {
@@ -23,18 +24,24 @@ export default class SelectOrdersComponent extends Component<GameStateComponentP
             <>
                 <Col xs={12}>
                     {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
-                        <Row className="justify-content-center">
-                            <Col xs="auto">
-                                <Button onClick={() => this.reset()} variant="danger" disabled={this.selectedRegions.length == 0}>
-                                    Reset
-                                </Button>
-                            </Col>
-                            <Col xs="auto">
-                                <Button onClick={() => this.confirm()} disabled={this.selectedRegions.length != this.props.gameState.count}>
-                                    Confirm
-                                </Button>
-                            </Col>
-                        </Row>
+                        <>
+                            {this.selectedRegions.length > 0 &&
+                            <Row className="justify-content-center">
+                                <p>Selected region{this.selectedRegions.length > 1 && "s"}: {joinReactNodes(this.selectedRegions.map(r => <b key={r.id}>{r.name}</b>), ', ')}</p>
+                            </Row>}
+                            <Row className="justify-content-center">
+                                <Col xs="auto">
+                                    <Button onClick={() => this.confirm()} disabled={this.selectedRegions.length != this.props.gameState.count}>
+                                        Confirm
+                                    </Button>
+                                </Col>
+                                <Col xs="auto">
+                                    <Button onClick={() => this.reset()} variant="danger" disabled={this.selectedRegions.length == 0}>
+                                        Reset
+                                    </Button>
+                                </Col>
+                            </Row>
+                        </>
                     ) : (
                         <div className="text-center">
                             Waiting for {this.props.gameState.house.name}...

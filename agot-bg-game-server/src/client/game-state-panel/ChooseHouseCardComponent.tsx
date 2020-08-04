@@ -13,13 +13,20 @@ import { observable } from "mobx";
 
 @observer
 export default class ChooseHouseCardComponent extends Component<GameStateComponentProps<ChooseHouseCardGameState>> {
-    @observable selectedHouseCard: HouseCard | null;
     @observable dirty: boolean;
 
     get chosenHouseCard(): HouseCard | null {
         return this.props.gameClient.authenticatedPlayer
             ? this.props.gameState.houseCards.tryGet(this.props.gameClient.authenticatedPlayer.house, null)
             : null;
+    }
+
+    get selectedHouseCard(): HouseCard | null {
+        return this.props.gameState.selectedHouseCard;
+    }
+
+    set selectedHouseCard(value: HouseCard | null) {
+        this.props.gameState.selectedHouseCard = value;
     }
 
     constructor(props: GameStateComponentProps<ChooseHouseCardGameState>) {
@@ -62,9 +69,24 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
                             </Row>
                         </Col>
                         <Col xs={12}>
-                                <Button onClick={() => this.chooseHouseCard()} disabled={!this.dirty}>
-                                    Confirm
-                                </Button>
+                            <Row className="justify-content-center">
+                                <Col xs="auto">
+                                    <Button onClick={() => this.chooseHouseCard()} disabled={!this.dirty || this.selectedHouseCard == null}>
+                                        Confirm
+                                    </Button>
+                                </Col>
+                                {this.props.gameClient.authenticatedPlayer &&
+                                <Col xs="auto">
+                                    <Button onClick={() => {
+                                            if (window.confirm("Are you sure you want to refuse all the support you have received?")) {
+                                                this.props.gameState.refuseSupport();
+                                            }
+                                        }}
+                                        disabled={!this.props.gameState.canRefuseSupport(this.props.gameClient.authenticatedPlayer.house)}>
+                                        Refuse received support
+                                    </Button>
+                                </Col>}
+                            </Row>
                         </Col>
                     </>
                 )}

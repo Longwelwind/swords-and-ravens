@@ -9,7 +9,7 @@ import { SerializedWesterosCard } from "../common/ingame-game-state/game-data-st
 import { SerializedVote } from "../common/ingame-game-state/vote-system/Vote";
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady | PlayerUnready
-    | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | NewTurn | RemovePlacedOrder
+    | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | SupportRefused | NewTurn | RemovePlacedOrder
     | MoveUnits | CombatChangeArmy | VassalsClaimed
     | UnitsWounded | ChangeCombatHouseCard | BeginSeeTopWildlingCard
     | RavenOrderReplaced | RevealTopWildlingCard | HideTopWildlingCard | ProceedWesterosCard | ChangeGarrison
@@ -66,6 +66,11 @@ interface SupportDeclared {
     type: "support-declared";
     houseId: string;
     supportedHouseId: string | null;
+}
+
+interface SupportRefused {
+    type: "support-refused";
+    houseId: string;
 }
 
 interface HouseCardChosen {

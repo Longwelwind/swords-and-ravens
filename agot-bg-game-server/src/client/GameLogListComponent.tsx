@@ -79,6 +79,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     return <><b>{supporter.name}</b> supported no-one.</>;
                 }
 
+            case "support-refused": {
+                const house = this.game.houses.get(data.house);
+                return <>House <b>{house.name}</b> chose to refuse all the support they received.</>;
+            }
+
             case "attack":
                 const attacker = this.game.houses.get(data.attacker);
                 // A "null" for "attacked" means it was an attack against a neutral force
