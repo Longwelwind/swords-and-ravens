@@ -262,6 +262,11 @@ export default class ResolveRetreatGameState extends GameState<
                 }
             }
         }
+
+        if (possibleRetreatRegions.length == 0) {
+            return [];
+        }
+
         // No need for else path here.
         // If defender lost the battle he or the final chooser
         // has to choose a retreat region from possible retreat regions
@@ -271,7 +276,12 @@ export default class ResolveRetreatGameState extends GameState<
             possibleRetreatRegions.map(r => [r, this.getCasualtiesOfRetreatRegion(r)] as [Region, number]);
 
         // Get lowest casualty value
-        const lowestCasualty = _.min(_.flatMap(casualtiesPerRegion.map(([_, c]) => c)));
+        const lowestCasualty = _.min(casualtiesPerRegion.map(([_, c]) => c));
+
+        if (lowestCasualty == loserArmy.length) {
+            // If lowest casualty equals to the unit count of the whole army there is no valid retreat region
+            return [];
+        }
 
         // Filter regions for lowest casualty value
         return casualtiesPerRegion.filter(([_, c]) => c == lowestCasualty).map(([r, _]) => r);
