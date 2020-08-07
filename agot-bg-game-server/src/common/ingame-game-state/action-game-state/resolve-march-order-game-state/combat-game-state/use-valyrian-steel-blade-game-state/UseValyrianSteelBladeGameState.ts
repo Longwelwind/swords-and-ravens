@@ -30,6 +30,26 @@ export default class UseValyrianSteelBladeGameState extends GameState<CombatGame
 
     firstStart(house: House): void {
         this.house = house;
+
+        // Check if we can fast-track this state by checking that no involved house card forces the VSB decision
+        // and that VSB holders current battle strength is one less than his opponent
+        const forcedByHouseCard = this.combatGameState.houseCombatDatas.values.some(hcd => hcd.houseCard != null
+             && hcd.houseCard.ability != null
+             && hcd.houseCard.ability.forcesValyrianSteelBladeDecision(this.combatGameState, house));
+
+        if (forcedByHouseCard) {
+            return;
+        }
+
+        const vsbBattleStrength = this.combatGameState.getTotalCombatStrength(house);
+        const opponent = this.combatGameState.houseCombatDatas.keys.filter(h => h != house)[0];
+        const opponentsBattleStrength = this.combatGameState.getTotalCombatStrength(opponent);
+
+        if (opponentsBattleStrength - vsbBattleStrength != 1) {
+            // Using VSB would make no sense as battle is already won or VSB doesn't help to win it.
+            // So we end this state with VSB not used
+            this.combatGameState.onUseValyrianSteelBladeGameStateEnd();
+        }
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {

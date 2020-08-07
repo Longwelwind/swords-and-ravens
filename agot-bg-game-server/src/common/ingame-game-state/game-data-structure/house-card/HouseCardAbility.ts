@@ -70,4 +70,8 @@ export default class HouseCardAbility {
     overrideRetreatLocationChooser(_postCombat: PostCombatGameState, _house: House, _houseCard: HouseCard, _retreater: House): House | null {
         return null;
     }
+
+    forcesValyrianSteelBladeDecision(_combat: CombatGameState, _valyrianSteelBladeHolder: House): boolean {
+        return false;
+    }
 }
