@@ -134,6 +134,12 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     }
 
     renderLeavePowerToken(startingRegion: Region): ReactNode | null {
+        const portRegion = startingRegion.game.world.getAdjacentPortOfCastle(startingRegion);
+        const hasShipsInPort = portRegion == null ? false : portRegion.units.size > 0;
+        const unitOwner = startingRegion.units.values[0].allegiance.id;
+        const superTokenOwner = startingRegion.staticRegion.superControlPowerToken;
+        const capitalizedSuperTokenOwner = superTokenOwner == null ? "" : superTokenOwner.charAt(0).toUpperCase() + superTokenOwner.slice(1)   
+
         return this.plannedMoves.size > 0 && (
             <Col xs={12} className="text-center">
                 <OverlayTrigger overlay={
@@ -157,32 +163,38 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                 }>
                     <Form>
                         <fieldset>
-                            <Form.Group>
-                                <Col xs={12} className="mb-0 pb-0">
-                                    <Form.Label>
-                                        Do you want to leave a Power token in <b>{startingRegion.name}</b> to keep control?
-                                    </Form.Label>
-                                </Col>
-                                <Col xs={12} className="mt-0 pt-0">
-                                    <Form.Check
-                                        id="chk-leave-pt"
-                                        name="leave-pt-radios"
-                                        inline
-                                        type="radio"
-                                        label="Yes"
-                                        checked={this.leavePowerToken}
-                                        onChange={() => {this.leavePowerToken = true;}}
-                                        disabled={!this.canLeavePowerToken || this.isVassalHouse}/>
-                                    <Form.Check
-                                        id="chk-dont-leave-pt"
-                                        name="leave-pt-radios"
-                                        inline
-                                        type="radio"
-                                        label="No"
-                                        checked={this.leavePowerToken == false}
-                                        onChange={() => {this.leavePowerToken = false;}}
-                                        disabled={!this.canLeavePowerToken || this.isVassalHouse}/>
-                                </Col>
+                            <Form.Group as={Col}>
+                                <Form.Label>
+                                    Do you want to leave a Power token in <b>{startingRegion.name}</b> to keep control?
+                                    {this.canLeavePowerToken || this.canLeavePowerTokenReason == "no-power-token-available" ?
+                                        superTokenOwner == null && portRegion != null && hasShipsInPort ? (
+                                            <> If you do not leave a token, the ships in <b>{ portRegion.name }</b> will be destroyed.</>
+                                        ) : superTokenOwner != null && superTokenOwner != unitOwner && portRegion != null && hasShipsInPort ? (
+                                            <> If you do not leave a token, <b>{ capitalizedSuperTokenOwner }</b> will regain control of <b>{ startingRegion.name }</b> and capture your ships in <b>{ portRegion.name }</b>.</>
+                                        ) : superTokenOwner != null && superTokenOwner != unitOwner && portRegion != null && !hasShipsInPort ? (
+                                            <> If you do not leave a token, <b>{ capitalizedSuperTokenOwner }</b> will regain control of <b>{ startingRegion.name }</b>.</>
+                                        ) : ""
+                                    : ""
+                                    }
+                                </Form.Label>
+                                <Form.Check
+                                    id="chk-leave-pt"
+                                    name="leave-pt-radios"
+                                    inline
+                                    type="radio"
+                                    label="Yes"
+                                    checked={this.leavePowerToken}
+                                    onChange={() => {this.leavePowerToken = true;}}
+                                    disabled={!this.canLeavePowerToken}/>
+                                <Form.Check
+                                    id="chk-dont-leave-pt"
+                                    name="leave-pt-radios"
+                                    inline
+                                    type="radio"
+                                    label="No"
+                                    checked={this.leavePowerToken == false}
+                                    onChange={() => {this.leavePowerToken = false;}}
+                                    disabled={!this.canLeavePowerToken}/>
                             </Form.Group>
                         </fieldset>
                     </Form>
