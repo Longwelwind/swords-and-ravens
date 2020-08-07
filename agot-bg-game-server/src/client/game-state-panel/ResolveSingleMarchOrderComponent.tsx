@@ -148,11 +148,11 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                     Do you want to leave a Power token in <b>{startingRegion.name}</b> to keep control?
                                     {this.canLeavePowerToken || this.canLeavePowerTokenReason == "no-power-token-available" ?
                                         superTokenOwner == null && portRegion != null && hasShipsInPort ? (
-                                            <> If you do not leave a power token, the ships in <b>{ portRegion.name }</b> will be destroyed.</>
+                                            <> If you do not leave a token, the ships in <b>{ portRegion.name }</b> will be destroyed.</>
                                         ) : superTokenOwner != null && superTokenOwner != unitOwner && portRegion != null && hasShipsInPort ? (
-                                            <> If you do not leave a power token, <b>{ capitalizedSuperTokenOwner }</b> will regain control of <b>{ startingRegion.name }</b> and capture your ships in <b>{ portRegion.name }</b>.</>
+                                            <> If you do not leave a token, <b>{ capitalizedSuperTokenOwner }</b> will regain control of <b>{ startingRegion.name }</b> and capture your ships in <b>{ portRegion.name }</b>.</>
                                         ) : superTokenOwner != null && superTokenOwner != unitOwner && portRegion != null && !hasShipsInPort ? (
-                                            <> If you do not leave a power token, <b>{ capitalizedSuperTokenOwner }</b> will regain control of <b>{ startingRegion.name }</b>.</>
+                                            <> If you do not leave a token, <b>{ capitalizedSuperTokenOwner }</b> will regain control of <b>{ startingRegion.name }</b>.</>
                                         ) : ""
                                     : ""
                                     }
