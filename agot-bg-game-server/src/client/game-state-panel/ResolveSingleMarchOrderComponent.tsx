@@ -116,6 +116,12 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     }
 
     renderLeavePowerToken(startingRegion: Region): ReactNode | null {
+        const portRegion = startingRegion.game.world.getAdjacentPortOfCastle(startingRegion);
+        const hasShipsInPort = portRegion == null ? false : portRegion.units.size > 0;
+        const unitOwner = startingRegion.units.values[0].allegiance.id;
+        const superTokenOwner = startingRegion.staticRegion.superControlPowerToken;
+        const capitalizedSuperTokenOwner = superTokenOwner == null ? "" : superTokenOwner.charAt(0).toUpperCase() + superTokenOwner.slice(1)   
+
         return this.plannedMoves.size > 0 && (
             <Col xs={12} className="text-center">
                 <OverlayTrigger overlay={
@@ -131,7 +137,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                             "Power tokens can only be left on land areas."
                         ) : this.canLeavePowerTokenReason == "no-all-units-go" ? (
                             "All units must leave the area in order to leave a Power token."
-                        ) : "Leaving a Power token in an area maintain the control your house has on it, even"
+                        ) : "Leaving a Power token in an area maintains the control your house has on it, even"
                             + " if all units your units leave the area."}
                     </Tooltip>
                 }>
@@ -140,6 +146,16 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                             <Form.Group as={Col}>
                                 <Form.Label>
                                     Do you want to leave a Power token in <b>{startingRegion.name}</b> to keep control?
+                                    {this.canLeavePowerToken || this.canLeavePowerTokenReason == "no-power-token-available" ?
+                                        superTokenOwner == null && portRegion != null && hasShipsInPort ? (
+                                            <> If you do not leave a power token, the ships in <b>{ portRegion.name }</b> will be destroyed.</>
+                                        ) : superTokenOwner != null && superTokenOwner != unitOwner && portRegion != null && hasShipsInPort ? (
+                                            <> If you do not leave a power token, <b>{ capitalizedSuperTokenOwner }</b> will regain control of <b>{ startingRegion.name }</b> and capture your ships in <b>{ portRegion.name }</b>.</>
+                                        ) : superTokenOwner != null && superTokenOwner != unitOwner && portRegion != null && !hasShipsInPort ? (
+                                            <> If you do not leave a power token, <b>{ capitalizedSuperTokenOwner }</b> will regain control of <b>{ startingRegion.name }</b>.</>
+                                        ) : ""
+                                    : ""
+                                    }
                                 </Form.Label>
                                 <Form.Check
                                     id="chk-leave-pt"
