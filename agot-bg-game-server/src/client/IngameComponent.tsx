@@ -357,7 +357,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </Row>
                 </Col>
                 <Col xs="auto">
-                    <div style={{height: this.height - 90, overflowY: "scroll", maxHeight: 1378}}>
+                    <div style={{height: this.height - 90, overflowY: "scroll", maxHeight: 1378, minHeight: 460}}>
                         <MapComponent
                             gameClient={this.props.gameClient}
                             ingameGameState={this.props.gameState}
