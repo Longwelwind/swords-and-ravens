@@ -149,8 +149,9 @@ export default class MapComponent extends Component<MapComponentProps> {
             {highlight: {active: false, color: "white"}, onClick: null}
         );
 
-        return this.props.ingameGameState.world.regions.values.map(r => (
-            <div
+        return this.props.ingameGameState.world.regions.values.map(r => {
+            const controller = r.getController();
+            return <div
                 key={r.id}
                 className="units-container"
                 style={{left: r.unitSlot.point.x, top: r.unitSlot.point.y, width: r.unitSlot.width, flexWrap: r.type == land ? "wrap-reverse" : "wrap"}}
@@ -173,9 +174,15 @@ export default class MapComponent extends Component<MapComponentProps> {
                         transform = `rotate(90deg)`;
                     }
 
-
-                    return <div key={u.id}
-                                onClick={property.onClick ? property.onClick : undefined}
+                return <OverlayTrigger
+                            key={"unit-overlay-" + u.id}
+                            delay={{ show: 750, hide: 100 }}
+                            placement="auto"
+                            overlay={<Tooltip id={"unit-tooltip-" + u.id}>
+                                <b>{u.type.name}</b>{controller != null && <small> of <b>{controller.name}</b></small>}
+                            </Tooltip>}
+                        >
+                            <div onClick={property.onClick ? property.onClick : undefined}
                                 className={classNames(
                                     "unit-icon hover-weak-outline",
                                     {
@@ -186,10 +193,12 @@ export default class MapComponent extends Component<MapComponentProps> {
                                     backgroundImage: `url(${unitImages.get(u.allegiance.id).get(u.type.id)})`,
                                     opacity: opacity,
                                     transform: transform
-                                }}/>;
+                                }}
+                            />
+                        </OverlayTrigger>
                 })}
             </div>
-        ));
+        });
     }
 
     renderOrders(): ReactNode {
