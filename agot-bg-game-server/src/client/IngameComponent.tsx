@@ -65,6 +65,7 @@ import IngameCancelledComponent from "./game-state-panel/IngameCancelledComponen
 import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
 import joinReactNodes from "./utils/joinReactNodes";
 import NoteComponent from "./NoteComponent";
+import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -247,11 +248,16 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                         {this.game.getAvailableUnitsOfType(p.house, type)}
                                                                     </Col>
                                                                     <Col xs="auto" style={{marginLeft: 4}}>
-                                                                        <div className="unit-icon small hover-weak-outline"
-                                                                             style={{
-                                                                                 backgroundImage: `url(${unitImages.get(p.house.id).get(type.id)})`,
-                                                                             }}
-                                                                        />
+                                                                        <OverlayTrigger
+                                                                            overlay={this.renderUnitTypeTooltip(type)}
+                                                                            delay={{ show: 250, hide: 100 }}
+                                                                            placement="auto">
+                                                                            <div className="unit-icon small hover-weak-outline"
+                                                                                    style={{
+                                                                                        backgroundImage: `url(${unitImages.get(p.house.id).get(type.id)})`,
+                                                                                    }}
+                                                                            />
+                                                                        </OverlayTrigger>
                                                                     </Col>
                                                                 </Row>
                                                             </Col>
@@ -275,7 +281,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     <div style={{fontSize: "18px"}}>{p.house.powerTokens}</div>
                                                     <OverlayTrigger
                                                         overlay={this.renderPowerTooltip(p.house)}
-                                                        delay={{show: 750, hide: 100}}
+                                                        delay={{show: 250, hide: 100}}
                                                         placement="auto"
                                                     >
                                                         <div
@@ -519,6 +525,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     get publicChatRoom(): Channel {
         return this.props.gameClient.chatClient.channels.get(this.props.gameState.entireGame.publicChatRoomId);
+    }
+
+    private renderUnitTypeTooltip(unitType: UnitType): ReactNode {
+        return <Tooltip id={unitType.id + "-tooltip"}>
+            <b>{unitType.name}</b><br/>
+            <small>{unitType.description}</small>
+        </Tooltip>;
     }
 
     private renderTotalLandRegionsTooltip(house: House): ReactNode {

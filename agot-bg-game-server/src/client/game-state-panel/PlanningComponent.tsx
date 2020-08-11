@@ -15,7 +15,7 @@ import OrderGridComponent from "./utils/OrderGridComponent";
 import {OrderOnMapProperties, RegionOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
 import Player from "../../common/ingame-game-state/Player";
-import { OverlayTrigger, Overlay, Popover } from "react-bootstrap";
+import { OverlayTrigger, Popover } from "react-bootstrap";
 import { observable } from "mobx";
 import BetterMap from "../../utils/BetterMap";
 
@@ -109,7 +109,8 @@ export default class PlanningComponent extends Component<GameStateComponentProps
                                             this.props.gameState.assignOrder(r, o);
                                             // @ts-ignore `hide` is not a public method of OverlayTrigger, but it does the job
                                             this.overlayTriggers.get(r).hide();
-                                    }}/>
+                                        }}
+                                    />
                                 </Popover>
                             }
                         >
