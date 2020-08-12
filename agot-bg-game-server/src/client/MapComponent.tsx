@@ -187,6 +187,9 @@ export default class MapComponent extends Component<MapComponentProps> {
                                     "unit-icon hover-weak-outline",
                                     {
                                         "medium-outline hover-strong-outline": property.highlight.active
+                                    },
+                                    {
+                                        "attacking-army-highlight": property.highlight.color == "red"
                                     }
                                 )}
                                 style={{
