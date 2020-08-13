@@ -19,6 +19,7 @@ import castleImage from "../../public/images/icons/castle.svg";
 import battleGearImage from "../../public/images/icons/battle-gear.svg";
 import Player from "../common/ingame-game-state/Player";
 import UserLabel from "./UserLabel";
+import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
 
 
 interface HouseRowComponentProps {
@@ -103,12 +104,17 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                         <Col xs="auto">
                                             {this.game.getAvailableUnitsOfType(this.house, type)}
                                         </Col>
-                                        <Col xs="auto" style={{marginLeft: 4}}>
-                                            <div className="unit-icon small hover-weak-outline"
-                                                style={{
-                                                    backgroundImage: `url(${unitImages.get(this.house.id).get(type.id)})`,
-                                                }}
-                                            />
+                                        <Col xs="auto" style={{ marginLeft: 4 }}>
+                                            <OverlayTrigger
+                                                overlay={this.renderUnitTypeTooltip(type)}
+                                                delay={{ show: 250, hide: 100 }}
+                                                placement="auto">
+                                                <div className="unit-icon small hover-weak-outline"
+                                                    style={{
+                                                        backgroundImage: `url(${unitImages.get(p.house.id).get(type.id)})`,
+                                                    }}
+                                                />
+                                            </OverlayTrigger>
                                         </Col>
                                     </Row>
                                 </Col>
@@ -132,7 +138,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         <div style={{fontSize: "18px"}}>{this.house.powerTokens}</div>
                         <OverlayTrigger
                             overlay={this.renderPowerTooltip(this.house)}
-                            delay={{show: 750, hide: 100}}
+                            delay={{show: 250, hide: 100}}
                             placement="auto"
                         >
                             <div
@@ -165,6 +171,13 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                 </Row>
             </ListGroupItem>
         </>;
+    }
+
+    private renderUnitTypeTooltip(unitType: UnitType): ReactNode {
+        return <Tooltip id={unitType.id + "-tooltip"}>
+            <b>{unitType.name}</b><br/>
+            <small>{unitType.description}</small>
+        </Tooltip>;
     }
 
     private renderTotalLandRegionsTooltip(house: House): ReactNode {

@@ -31,6 +31,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     // Client-side callback fired whenever the current GameState changes.
     onClientGameStateChange: (() => void) | null;
 
+    get owner(): User | null {
+        return this.users.tryGet(this.ownerUserId, null);
+    }
+
     constructor(id: string, ownerId: string, name: string) {
         super(null);
         this.id = id;

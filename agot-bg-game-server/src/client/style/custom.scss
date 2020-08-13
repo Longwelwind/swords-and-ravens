@@ -259,6 +259,15 @@ filter: drop-shadow(6px 6px 6px $strong-outline) drop-shadow(-6px -6px 6px $stro
 transition: all 0.12s linear;
 }
 
+$attacking-army-outline: rgba(red, 1.0);
+.attacking-army-highlight {
+  filter: drop-shadow(4px 4px 4px $attacking-army-outline) drop-shadow(-4px -4px 4px $attacking-army-outline);
+}
+
+.attacking-army-highlight:hover {
+  filter: drop-shadow(4px 4px 4px $attacking-army-outline) drop-shadow(-4px -4px 4px $attacking-army-outline);
+}
+
 $wildling-outline: rgba(#f8ff00, 0.5);
 .wildling-highlight {
   filter: drop-shadow(1px 1px 3px $wildling-outline) drop-shadow(-1px -1px 3px $wildling-outline);

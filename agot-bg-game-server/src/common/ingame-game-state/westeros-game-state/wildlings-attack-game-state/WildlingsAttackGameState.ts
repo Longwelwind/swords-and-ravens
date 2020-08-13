@@ -27,7 +27,6 @@ import MammothRidersNightsWatchVictoryGameState, {SerializedMammothRidersNightsW
 import TheHordeDescendsWildlingVictoryGameState, {SerializedTheHordeDescendsWildlingVictoryGameState} from "./the-horde-descends-wildling-victory-game-state/TheHordeDescendsWildlingVictoryGameState";
 import TheHordeDescendsNightsWatchVictoryGameState, {SerializedTheHordeDescendsNightsWatchVictoryGameState} from "./the-horde-descends-nights-watch-victory-game-state/TheHordeDescendsNightsWatchVictoryGameState";
 import IngameGameState from "../../IngameGameState";
-import { silenceAtTheWall } from "../../game-data-structure/wildling-card/wildlingCardTypes";
 
 export default class WildlingsAttackGameState extends GameState<WesterosGameState,
     BiddingGameState<WildlingsAttackGameState> | SimpleChoiceGameState | PreemptiveRaidWildlingVictoryGameState

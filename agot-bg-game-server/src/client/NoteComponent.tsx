@@ -17,7 +17,7 @@ export default class NoteComponent extends Component<NoteComponentProps> {
         return (
             <>
                 <FormControl
-                    maxlength={NOTE_MAX_LENGTH}
+                    maxLength={NOTE_MAX_LENGTH}
                     as="textarea"
                     value={(this.props.gameClient.authenticatedPlayer as Player).note}
                     onChange={(e: any) => this.onNoteChange(e.target.value)}

@@ -147,6 +147,11 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 this.lobbyHouses.get(hid),
                 this.entireGame.users.get(uid)
             ]));
+
+            if (this.entireGame.onClientGameStateChange) {
+                // Fake a game state change to play a sound also in case lobby is full
+                this.entireGame.onClientGameStateChange();
+            }
         }
     }
 
@@ -177,7 +182,12 @@ export default class LobbyGameState extends GameState<EntireGame> {
     }
 
     getWaitedUsers(): User[] {
-        return [];
+        const owner = this.entireGame.owner;
+        if (!owner || !this.canStartGame(owner).success) {
+            return [];
+        }
+
+        return [owner];
     }
 
     serializeToClient(_admin: boolean, _user: User | null): SerializedLobbyGameState {

@@ -53,6 +53,9 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     {this.createPlayerCountItems()}
                                 </select>
                             </Col>
+                            <Col xs="auto">
+                                <>Players</>
+                            </Col>
                         </Row>
                         <Row>
                             <Col xs="auto">

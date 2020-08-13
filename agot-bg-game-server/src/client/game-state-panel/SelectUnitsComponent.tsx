@@ -59,6 +59,7 @@ export default class SelectUnitsComponent extends Component<GameStateComponentPr
         }
 
         this.props.gameState.selectUnits(this.selectedUnits);
+        this.selectedUnits = new BetterMap();
     }
 
     getSelectableUnits(): Unit[] {

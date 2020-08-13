@@ -68,6 +68,7 @@ interface IngameComponentProps {
 export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
     @observable currentOpenedTab = "chat";
+    @observable height: number;
 
     get game(): Game {
         return this.props.gameState.game;
@@ -268,7 +269,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </Row>
                 </Col>
                 <Col xs="auto">
-                    <div>
+                    <div style={{height: this.height - 90, overflowY: "scroll", maxHeight: 1378, minHeight: 460}}>
                         <MapComponent
                             gameClient={this.props.gameClient}
                             ingameGameState={this.props.gameState}
@@ -504,4 +505,17 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             <VoteComponent key={v.id} vote={v} gameClient={this.props.gameClient} ingame={this.props.gameState} />
         ));
     }
+
+    componentDidMount(): void {
+        this.height = window.innerHeight;
+        window.addEventListener('resize', this.handleResize);
+    }
+
+    componentWillUnmount(): void {
+        window.removeEventListener('resize', this.handleResize);
+    }
+
+    handleResize = () => {
+        this.height = window.innerHeight;
+    };
 }
