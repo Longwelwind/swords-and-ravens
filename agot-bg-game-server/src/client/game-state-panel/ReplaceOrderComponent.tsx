@@ -27,15 +27,16 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
         return (
             <>
                 <Col xs={12}>
-                    The holder of the Raven token may now choose to replace one of its order.
+                    The holder of the Raven token may now choose to replace one of its Order tokens or to look at the top
+                    card of the Wildling deck.
                 </Col>
                 {this.props.gameClient.doesControlHouse(this.props.gameState.ravenHolder) ? (
                     <>
                         {this.selectedRegion == null ? (
-                            <Col xs={12}>Click on the order you want to replace on the map</Col>
+                            <Col xs={12}>Click on the order you want to replace on the map.</Col>
                         ) : (
                             <Col xs={12}>
-                                Choose which order to place on {this.selectedRegion.name}:
+                                Choose which order to place on <strong>{this.selectedRegion.name}</strong> or reset your selection by clicking it on the map again.<br/><br/>
                                 <OrderGridComponent orders={orders.values}
                                                     selectedOrder={this.selectedOrder}
                                                     availableOrders={this.props.gameState.getAvailableOrders(this.props.gameState.actionGameState.ordersOnBoard.get(this.selectedRegion))}
@@ -44,13 +45,14 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
                         )}
                         <Col xs={12}>
                             <Row className="justify-content-center">
-                                {this.selectedOrder != null && this.selectedRegion != null && (
-                                    <Col xs="auto">
-                                        <Button onClick={() => this.replaceOrder()}>Confirm</Button>
-                                    </Col>
-                                )}
                                 <Col xs="auto">
-                                    <Button onClick={() => this.skip()}>Skip</Button>
+                                    <Button onClick={() => this.replaceOrder()} disabled={this.selectedOrder == null || this.selectedRegion == null}>Confirm Order Token replacement</Button>
+                                </Col>
+                                <Col xs="auto">
+                                    <Button onClick={() => this.seeTopWildlingCardInstead()} disabled={this.selectedRegion != null || this.selectedOrder != null}>Look at the Top Wildling Card instead</Button>
+                                </Col>
+                                <Col xs="auto">
+                                    <Button onClick={() => this.skip()}>Skip Raven Phase</Button>
                                 </Col>
                             </Row>
                         </Col>
@@ -87,6 +89,10 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
         if (this.selectedRegion && this.selectedOrder) {
             this.props.gameState.replaceOrder(this.selectedRegion, this.selectedOrder);
         }
+    }
+
+    seeTopWildlingCardInstead(): void {
+        this.props.gameState.seeTopWildlingCardInstead();
     }
 
     modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {

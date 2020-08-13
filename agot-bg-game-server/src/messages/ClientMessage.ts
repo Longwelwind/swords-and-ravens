@@ -1,5 +1,5 @@
 export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | Unready | ResolveMarchOrder | DeclareSupport
-    | RefuseSupport | UseValyrianSteelBlade | ChooseHouseCard | ChooseCasualties | ChooseRavenAction | KickPlayer
+    | RefuseSupport | UseValyrianSteelBlade | ChooseHouseCard | ChooseCasualties | ChooseSeeTopWildlingCard | KickPlayer
     | ChooseTopWildlingCardAction | ReplaceOrder | SkipReplaceOrder | ResolveRaid | Bid | ChooseChoice
     | DecideBiggest | ReconcileArmies | Muster | ResolveTies | SelectUnits | LaunchGame | ChooseHouse
     | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings | CreatePrivateChatRoom | ChangeGameSettings
@@ -76,15 +76,8 @@ interface ChooseCasualties {
     chosenCasualties: number[];
 }
 
-interface ChooseRavenAction {
-    type: "choose-raven-action";
-    action: RavenAction;
-}
-
-export enum RavenAction {
-    REPLACE_ORDER,
-    SEE_TOP_WILDLING_CARD,
-    NONE
+interface ChooseSeeTopWildlingCard {
+    type: "choose-see-top-wildling-card";
 }
 
 interface ChooseTopWildlingCardAction {

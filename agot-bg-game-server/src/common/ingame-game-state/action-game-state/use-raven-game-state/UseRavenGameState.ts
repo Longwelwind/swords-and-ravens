@@ -1,6 +1,5 @@
 import GameState from "../../../GameState";
 import ActionGameState from "../ActionGameState";
-import ChooseRavenActionGameState, {SerializedChooseRavenActionGameState} from "./choose-raven-action-game-state/ChooseRavenActionGameState";
 import ReplaceOrderGameState, {SerializedReplaceOrderGameState} from "./replace-order-game-state/ReplaceOrderGameState";
 import SeeTopWildlingCardGameState, {SerializedSeeTopWildlingCardGameState} from "./see-top-wildling-card-game-state/SeeTopWildlingCardGameState";
 import IngameGameState from "../../IngameGameState";
@@ -8,11 +7,11 @@ import World from "../../game-data-structure/World";
 import Game from "../../game-data-structure/Game";
 import House from "../../game-data-structure/House";
 import Player from "../../Player";
-import {ClientMessage, RavenAction} from "../../../../messages/ClientMessage";
+import {ClientMessage} from "../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../messages/ServerMessage";
 import EntireGame from "../../../EntireGame";
 
-export default class UseRavenGameState extends GameState<ActionGameState, ChooseRavenActionGameState | ReplaceOrderGameState | SeeTopWildlingCardGameState> {
+export default class UseRavenGameState extends GameState<ActionGameState, ReplaceOrderGameState | SeeTopWildlingCardGameState> {
     get actionGameState(): ActionGameState {
         return this.parentGameState;
     }
@@ -38,17 +37,7 @@ export default class UseRavenGameState extends GameState<ActionGameState, Choose
     }
 
     firstStart(): void {
-        this.setChildGameState(new ChooseRavenActionGameState(this));
-    }
-
-    onChooseRavenActionGameStateEnd(ravenAction: RavenAction): void {
-        if (ravenAction == RavenAction.REPLACE_ORDER) {
-            this.setChildGameState(new ReplaceOrderGameState(this));
-        } else if (ravenAction == RavenAction.SEE_TOP_WILDLING_CARD) {
-            this.setChildGameState(new SeeTopWildlingCardGameState(this)).firstStart();
-        } else {
-            this.actionGameState.onUseRavenGameStateEnd();
-        }
+        this.setChildGameState(new ReplaceOrderGameState(this)).firstStart();
     }
 
     onReplaceOrderGameStateEnd(): void {
@@ -60,7 +49,13 @@ export default class UseRavenGameState extends GameState<ActionGameState, Choose
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
-        this.childGameState.onPlayerMessage(player, message);
+        if (message.type == "choose-see-top-wildling-card") {
+            if (player.house == this.ravenHolder) {
+                this.setChildGameState(new SeeTopWildlingCardGameState(this)).firstStart();
+            }
+        } else {
+            this.childGameState.onPlayerMessage(player, message);
+        }
     }
 
     onServerMessage(message: ServerMessage): void {
@@ -82,10 +77,8 @@ export default class UseRavenGameState extends GameState<ActionGameState, Choose
         return useRavenGameState;
     }
 
-    deserializeChildGameState(data: SerializedUseRavenGameState["childGameState"]): ChooseRavenActionGameState | ReplaceOrderGameState | SeeTopWildlingCardGameState {
-        if (data.type == "choose-raven-action") {
-            return ChooseRavenActionGameState.deserializeFromServer(this, data);
-        } else if (data.type == "replace-order") {
+    deserializeChildGameState(data: SerializedUseRavenGameState["childGameState"]): ReplaceOrderGameState | SeeTopWildlingCardGameState {
+        if (data.type == "replace-order") {
             return ReplaceOrderGameState.deserializeFromServer(this, data);
         } else if (data.type == "see-top-wildling-card") {
             return SeeTopWildlingCardGameState.deserializeFromServer(this, data);
@@ -97,5 +90,5 @@ export default class UseRavenGameState extends GameState<ActionGameState, Choose
 
 export interface SerializedUseRavenGameState {
     type: "use-raven";
-    childGameState: SerializedChooseRavenActionGameState | SerializedReplaceOrderGameState | SerializedSeeTopWildlingCardGameState;
+    childGameState: SerializedReplaceOrderGameState | SerializedSeeTopWildlingCardGameState;
 }
