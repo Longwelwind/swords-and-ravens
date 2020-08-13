@@ -7,6 +7,7 @@ import {GameLogData} from "../common/ingame-game-state/game-data-structure/GameL
 import {UserSettings} from "./ClientMessage";
 import { SerializedWesterosCard } from "../common/ingame-game-state/game-data-structure/westeros-card/WesterosCard";
 import { SerializedVote } from "../common/ingame-game-state/vote-system/Vote";
+import { CrowKillersStep } from "../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/crow-killers-wildling-victory-game-state/CrowKillersWildlingVictoryGameState";
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady | PlayerUnready
     | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | SupportRefused | NewTurn | RemovePlacedOrder
@@ -17,7 +18,8 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | ChangeControlPowerToken | ChangePowerToken | ChangeWildlingStrength | AddGameLog | RevealWildlingCard
     | RemoveUnits | AddUnits | ChangeTracker | ActionPhaseChangeOrder | ChangeStateHouseCard
     | SettingsChanged | ChangeValyrianSteelBladeUse | BiddingNextTrack | NewPrivateChatRoom | GameSettingsChanged
-    | UpdateWesterosDecks | UpdateConnectionStatus | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced;
+    | UpdateWesterosDecks | UpdateConnectionStatus | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced
+    | CrowKillersStepChanged;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -281,4 +283,9 @@ interface PlayerReplaced {
     type: "player-replaced";
     oldUser: string;
     newUser: string;
+}
+
+interface CrowKillersStepChanged {
+    type: "crow-killers-step-changed";
+    newStep: CrowKillersStep;
 }
