@@ -249,7 +249,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             // Check if game is currently in "CrowKillersWildlingsVictoryGameState"
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
-                
+
                 if (ingame.childGameState && ingame.childGameState.type == "westeros") {
                     const westeros = ingame.childGameState;
 
@@ -261,6 +261,27 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
                             // We assume no game is in the potential buggy state where we would have to apply KILLING_KNIGHTS
                             crowKillersWildlingVictory.step = CrowKillersStep.DEGRADING_KNIGHTS;
+                        }
+                    }
+                }
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "8",
+        migrate: (serializedGame: any) => {
+            // Migration for #590
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                if (ingame.childGameState && ingame.childGameState.type == "action") {
+                    const action = ingame.childGameState;
+                    if (action.childGameState && action.childGameState.type == "use-raven") {
+                        const useRaven = action.childGameState;
+                        if (useRaven.childGameState && useRaven.childGameState.type == "choose-raven-action") {
+                            // If game is currently in "choose-raven-action" replace it with new first child state "replace-order"
+                            useRaven.childGameState.type = "replace-order"
                         }
                     }
                 }

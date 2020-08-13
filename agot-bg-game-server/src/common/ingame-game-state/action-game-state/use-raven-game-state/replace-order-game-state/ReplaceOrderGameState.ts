@@ -34,6 +34,9 @@ export default class ReplaceOrderGameState extends GameState<UseRavenGameState> 
         return this.useRavenGameState.ravenHolder;
     }
 
+    firstStart(): void {
+    }
+
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "replace-order") {
             if (player.house != this.ravenHolder) {
@@ -76,6 +79,15 @@ export default class ReplaceOrderGameState extends GameState<UseRavenGameState> 
 
             this.useRavenGameState.onReplaceOrderGameStateEnd();
         } else if (message.type == "skip-replace-order") {
+            if (player.house != this.ravenHolder) {
+                return;
+            }
+
+            this.ingameGameState.log({
+                type: "raven-not-used",
+                ravenHolder: this.ravenHolder.id
+            })
+
             this.useRavenGameState.onReplaceOrderGameStateEnd();
         }
     }
@@ -104,6 +116,12 @@ export default class ReplaceOrderGameState extends GameState<UseRavenGameState> 
         this.entireGame.sendMessageToServer({
             type: "skip-replace-order"
         });
+    }
+
+    seeTopWildlingCardInstead(): void {
+        this.entireGame.sendMessageToServer({
+            type: "choose-see-top-wildling-card"
+        })
     }
 
     onServerMessage(message: ServerMessage): void {

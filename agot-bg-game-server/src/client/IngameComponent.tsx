@@ -173,7 +173,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                     <>
                                                                         <b>Kings&apos;s Court Track</b><br />
                                                                         At the end of the Planning Phase, the holder of the Raven may choose
-                                                                        to either change one of his placed order, or to see the top card of the
+                                                                        to either change one of his placed order, or to look at the top card of the
                                                                         Wildling deck and decide whether to leave it at the top or to
                                                                         place it at the bottom of the deck.
                                                                     </>

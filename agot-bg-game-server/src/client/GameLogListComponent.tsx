@@ -269,8 +269,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <p>
-                        <strong>{house.name}</strong>, holder of the Messenger Raven token, chose to see the card at the top
-                        of the Wildling deck and to move it at the bottom of the deck.
+                        <strong>{house.name}</strong>, holder of the Messenger Raven token, chose to look at the top
+                        card of the Wildling deck and to move it at the bottom of the deck.
                     </p>
                 );
 
@@ -279,8 +279,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <p>
-                        <strong>{house.name}</strong>, holder of the Messenger Raven token, chose to see the card at the top
-                        of the Wildling deck and to leave it at the top of the deck.
+                        <strong>{house.name}</strong>, holder of the Messenger Raven token, chose to look at the top
+                        card of the Wildling deck and to leave it at the top of the deck.
                     </p>
                 );
 
@@ -297,6 +297,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         </strong> in <strong>{orderRegion.name}</strong>.
                     </p>
                 );
+
+            case "raven-not-used":{
+                const house = this.game.houses.get(data.ravenHolder);
+
+                return <p><strong>{house.name}</strong> did not use the Messenger Raven token.</p>;
+            }
 
             case "raid-done":
                 const raider = this.game.houses.get(data.raider);
