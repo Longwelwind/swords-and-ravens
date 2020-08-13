@@ -123,7 +123,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
             || this.props.gameState.childGameState instanceof ChooseHouseCardGameState
             || this.props.gameState.childGameState instanceof UseValyrianSteelBladeGameState
             // But we can highlight the attacking army for non combatants during the whole combat phase
-            || (authenticatedPlayer && !this.props.gameState.houseCombatDatas.keys.includes(authenticatedPlayer.house))) {
+            || (authenticatedPlayer == null || !this.props.gameState.houseCombatDatas.keys.includes(authenticatedPlayer.house))) {
             return this.props.gameState.attackingArmy.map(u => ([u, {highlight: {active: false, color: "red"}}]));
         }
         return [];
