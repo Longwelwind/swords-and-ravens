@@ -99,7 +99,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         return (
             <>
-                <Col xs={{span: "auto", order: "3"}} xl={{span: "auto", order: "1"}}>
+                <Col xs={12} lg={3}>
                     <Row className="stackable">
                         <Col>
                             <Card>
@@ -362,7 +362,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         )}
                     </Row>
                 </Col>
-                <Col xs={{span: "11", order: "2"}} xl={{span: "auto", order: "2"}}>
+                <Col xs="auto">
                     <div style={{height: this.height - 90, overflowY: "scroll", maxHeight: 1378, minHeight: 460}}>
                         <MapComponent
                             gameClient={this.props.gameClient}
@@ -371,8 +371,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         />
                     </div>
                 </Col>
-                <Col xs={{span: "auto", order: "1"}} xl={{span: "auto", order: "3"}}>
-                    <div style={{width: 460}}>
+                <Col xs={12} lg={3}>
                     <Row className="stackable">
                         <Col>
                             <Card border={this.props.gameClient.isOwnTurn() ? "warning" : undefined} bg={this.props.gameState.childGameState instanceof CancelledGameState ? "danger" : undefined}>
@@ -511,7 +510,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             </Card>
                         </Col>
                     </Row>
-                    </div>
                 </Col>
             </>
         );
