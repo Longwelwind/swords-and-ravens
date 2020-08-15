@@ -44,6 +44,7 @@ import TheHordeDescendsNightsWatchVictoryGameState
 import TheHordeDescendsNightsWatchVictoryComponent from "./TheHordeDescendsNightsWatchVictoryComponent";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import WildlingCardComponent from "../utils/WildlingCardComponent";
+import joinReactNodes from "../../../client/utils/joinReactNodes";
 
 @observer
 export default class WildlingsAttackComponent extends Component<GameStateComponentProps<WildlingsAttackGameState>> {
@@ -64,7 +65,7 @@ export default class WildlingsAttackComponent extends Component<GameStateCompone
                     <Row>
                         {this.props.gameState.childGameState instanceof BiddingGameState && (
                             <Col xs={12}>
-                                All houses bid Power tokens to overcome the Wildlings attack!
+                                <strong>All houses</strong>{this.props.gameState.excludedHouses.length >0 && (<> except {joinReactNodes(this.props.gameState.excludedHouses.map(h => <strong key={h.id}>{h.name}</strong>), ", ")}</>)} bid Power tokens to overcome the Wildlings attack!
                             </Col>
                         )}
                         {renderChildGameState<WildlingsAttackGameState>(this.props, [

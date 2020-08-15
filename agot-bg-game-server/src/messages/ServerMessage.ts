@@ -14,10 +14,10 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | MoveUnits | CombatChangeArmy | VassalsClaimed
     | UnitsWounded | ChangeCombatHouseCard | BeginSeeTopWildlingCard
     | RavenOrderReplaced | RevealTopWildlingCard | HideTopWildlingCard | ProceedWesterosCard | ChangeGarrison
-    | BidDone | GameStateChange | SupplyAdjusted
+    | BiddingBegin | BidDone | BiddingNextTrack | GameStateChange | SupplyAdjusted
     | ChangeControlPowerToken | ChangePowerToken | ChangeWildlingStrength | AddGameLog | RevealWildlingCard
     | RemoveUnits | AddUnits | ChangeTracker | ActionPhaseChangeOrder | ChangeStateHouseCard
-    | SettingsChanged | ChangeValyrianSteelBladeUse | BiddingNextTrack | NewPrivateChatRoom | GameSettingsChanged
+    | SettingsChanged | ChangeValyrianSteelBladeUse |  NewPrivateChatRoom | GameSettingsChanged
     | UpdateWesterosDecks | UpdateConnectionStatus | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced
     | CrowKillersStepChanged;
 
@@ -143,6 +143,10 @@ interface HideTopWildlingCard {
 interface ProceedWesterosCard {
     type: "proceed-westeros-card";
     currentCardI: number;
+}
+
+interface BiddingBegin {
+    type: "bidding-begin";
 }
 
 interface BidDone {

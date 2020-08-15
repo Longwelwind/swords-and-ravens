@@ -27,6 +27,7 @@ import MammothRidersNightsWatchVictoryGameState, {SerializedMammothRidersNightsW
 import TheHordeDescendsWildlingVictoryGameState, {SerializedTheHordeDescendsWildlingVictoryGameState} from "./the-horde-descends-wildling-victory-game-state/TheHordeDescendsWildlingVictoryGameState";
 import TheHordeDescendsNightsWatchVictoryGameState, {SerializedTheHordeDescendsNightsWatchVictoryGameState} from "./the-horde-descends-nights-watch-victory-game-state/TheHordeDescendsNightsWatchVictoryGameState";
 import IngameGameState from "../../IngameGameState";
+import { observable } from "mobx";
 
 export default class WildlingsAttackGameState extends GameState<WesterosGameState,
     BiddingGameState<WildlingsAttackGameState> | SimpleChoiceGameState | PreemptiveRaidWildlingVictoryGameState
@@ -36,7 +37,8 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
     | MammothRidersWildlingVictoryGameState | MammothRidersNightsWatchVictoryGameState
     | TheHordeDescendsWildlingVictoryGameState | TheHordeDescendsNightsWatchVictoryGameState
 > {
-    participatingHouses: House[];
+    @observable  participatingHouses: House[];
+    
     // This field is null before the bidding phase is over,
     // as the wildling card will be drawn after the bidding phase is over.
     wildlingCard: WildlingCard | null;
@@ -44,6 +46,10 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
     _highestBidder: House | null;
     _lowestBidder: House | null;
     biddingResults: [number, House[]][] | null;
+
+    get excludedHouses(): House[] {
+        return _.difference(this.game.houses.values, this.participatingHouses);
+    }
 
     get totalBid(): number {
         if (this.biddingResults == null) {
