@@ -342,9 +342,11 @@ hr {
   padding: 0.5rem 0.5rem !important;
 }
 
-
-.nav-link.new-event {
-  text-decoration: underline;
+div.new-event {
+  border: solid;
+  border-color: #F39C12;
+  border-radius: 5px;
+  border-width: 1px;
 }
 
 .chat-scroll-to-bottom {
