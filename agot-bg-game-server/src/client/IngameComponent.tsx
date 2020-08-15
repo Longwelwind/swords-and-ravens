@@ -427,13 +427,15 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 <Nav.Link eventKey="game-logs">Game Logs</Nav.Link>
                                             </Nav.Item>
                                             <Nav.Item>
-                                                <Nav.Link eventKey="chat" className={classNames({"new-event": this.publicChatRoom.areThereNewMessage})}>
-                                                    Chat
-                                                </Nav.Link>
+                                                <div className={classNames({"new-event": this.publicChatRoom.areThereNewMessage})}>
+                                                    <Nav.Link eventKey="chat">
+                                                        Chat
+                                                    </Nav.Link>
+                                                </div>
                                             </Nav.Item>
                                             {this.props.gameClient.authenticatedPlayer && (
                                                 <Nav.Item>
-                                                    <Nav.Link eventKey="note" className={classNames({"new-event": this.publicChatRoom.areThereNewMessage})}>
+                                                    <Nav.Link eventKey="note">
                                                         <OverlayTrigger
                                                             overlay={<Tooltip id="note">Personal note</Tooltip>}
                                                             placement="auto"
@@ -454,10 +456,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             )}
                                             {this.getPrivateChatRooms().map(({user, roomId}) => (
                                                 <Nav.Item key={roomId}>
-                                                    <Nav.Link eventKey={roomId}
-                                                              className={classNames({"new-event": this.getPrivateChatRoomForPlayer(user).areThereNewMessage})}>
-                                                        {user.name}
-                                                    </Nav.Link>
+                                                    <div className={classNames({"new-event": this.getPrivateChatRoomForPlayer(user).areThereNewMessage})}>
+                                                        <Nav.Link eventKey={roomId}>
+                                                            {user.name}
+                                                        </Nav.Link>
+                                                    </div>
                                                 </Nav.Item>
                                             ))}
                                             <Nav.Item>
