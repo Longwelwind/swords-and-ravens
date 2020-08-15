@@ -1,4 +1,11 @@
 $grid-gutter-width: 1rem;
+$grid-breakpoints: (
+        xs: 0,
+        sm: 576px,
+        md: 768px,
+        lg: 992px,
+        xl: 1565px,
+);
 
 @import './theme/_variables';
 @import '../../../node_modules/bootstrap/scss/bootstrap';
@@ -335,9 +342,11 @@ hr {
   padding: 0.5rem 0.5rem !important;
 }
 
-
-.nav-link.new-event {
-  text-decoration: underline;
+div.new-event {
+  border: solid;
+  border-color: #F39C12;
+  border-radius: 5px;
+  border-width: 1px;
 }
 
 .chat-scroll-to-bottom {

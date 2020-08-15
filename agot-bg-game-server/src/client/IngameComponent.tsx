@@ -58,6 +58,7 @@ import CancelledGameState from "../common/cancelled-game-state/CancelledGameStat
 import joinReactNodes from "./utils/joinReactNodes";
 import NoteComponent from "./NoteComponent";
 import HouseRowComponent from "./HouseRowComponent";
+import UserSettingsComponent from "./UserSettingsComponent";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -68,10 +69,14 @@ interface IngameComponentProps {
 export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
     @observable currentOpenedTab = "chat";
-    @observable height: number;
+    @observable height: number | null = null;
 
     get game(): Game {
         return this.props.gameState.game;
+    }
+
+    get user(): User | null {
+        return this.props.gameClient.authenticatedUser ? this.props.gameClient.authenticatedUser : null;
     }
 
     render(): ReactNode {
@@ -91,7 +96,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         return (
             <>
-                <Col xs={12} lg={3}>
+                <Col xs={{span: "auto", order: "3"}}  xl={{span: "auto", order: "1"}}>
                     <Row className="stackable">
                         <Col>
                             <Card>
@@ -268,8 +273,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         )}
                     </Row>
                 </Col>
-                <Col xs="auto">
-                    <div style={{height: this.height - 90, overflowY: "scroll", maxHeight: 1378, minHeight: 460}}>
+                <Col xs={{span: "auto", order: "2"}} xl={{span: "auto", order: "2"}}>
+                    <div style={{height: this.height != null ? this.height - 90 : "auto", overflowY: this.height != null ? "scroll" : "visible", maxHeight: 1378, minHeight: 460}}>
                         <MapComponent
                             gameClient={this.props.gameClient}
                             ingameGameState={this.props.gameState}
@@ -277,7 +282,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         />
                     </div>
                 </Col>
-                <Col xs={12} lg={3}>
+                <Col xs={{span: "8", order: "1"}} xl={{span: 3, order: "3"}}>
                     <Row className="stackable">
                         <Col>
                             <Card border={this.props.gameClient.isOwnTurn() ? "warning" : undefined} bg={this.props.gameState.childGameState instanceof CancelledGameState ? "danger" : undefined}>
@@ -328,13 +333,15 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 <Nav.Link eventKey="game-logs">Game Logs</Nav.Link>
                                             </Nav.Item>
                                             <Nav.Item>
-                                                <Nav.Link eventKey="chat" className={classNames({"new-event": this.publicChatRoom.areThereNewMessage})}>
-                                                    Chat
-                                                </Nav.Link>
+                                                <div className={classNames({"new-event": this.publicChatRoom.areThereNewMessage})}>
+                                                    <Nav.Link eventKey="chat">
+                                                        Chat
+                                                    </Nav.Link>
+                                                </div>
                                             </Nav.Item>
                                             {this.props.gameClient.authenticatedPlayer && (
                                                 <Nav.Item>
-                                                    <Nav.Link eventKey="note" className={classNames({"new-event": this.publicChatRoom.areThereNewMessage})}>
+                                                    <Nav.Link eventKey="note">
                                                         <OverlayTrigger
                                                             overlay={<Tooltip id="note">Personal note</Tooltip>}
                                                             placement="auto"
@@ -355,10 +362,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             )}
                                             {this.getPrivateChatRooms().map(({user, roomId}) => (
                                                 <Nav.Item key={roomId}>
-                                                    <Nav.Link eventKey={roomId}
-                                                              className={classNames({"new-event": this.getPrivateChatRoomForPlayer(user).areThereNewMessage})}>
-                                                        {user.name}
-                                                    </Nav.Link>
+                                                    <div className={classNames({"new-event": this.getPrivateChatRoomForPlayer(user).areThereNewMessage})}>
+                                                        <Nav.Link eventKey={roomId}>
+                                                            {user.name}
+                                                        </Nav.Link>
+                                                    </div>
                                                 </Nav.Item>
                                             ))}
                                             <Nav.Item>
@@ -408,6 +416,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 <Tab.Pane eventKey="settings">
                                                     <GameSettingsComponent gameClient={this.props.gameClient}
                                                                         entireGame={this.props.gameState.entireGame} />
+                                                    <UserSettingsComponent user={this.props.gameClient.authenticatedUser}
+                                                                            entireGame={this.props.gameState.entireGame}
+                                                                            parent={this} />
                                                 </Tab.Pane>
                                             )}
                                         </Tab.Content>
@@ -506,16 +517,17 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         ));
     }
 
+    adjustMapHeight(): void {
+        this.height = (this.user && this.user.settings.mapScrollbar) ? window.innerHeight : null;
+    }
+
     componentDidMount(): void {
-        this.height = window.innerHeight;
-        window.addEventListener('resize', this.handleResize);
+        this.adjustMapHeight();
+        window.addEventListener('resize', () => this.adjustMapHeight());
+
     }
 
     componentWillUnmount(): void {
-        window.removeEventListener('resize', this.handleResize);
+        window.removeEventListener('resize', () => this.adjustMapHeight());
     }
-
-    handleResize = () => {
-        this.height = window.innerHeight;
-    };
 }
