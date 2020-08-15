@@ -111,7 +111,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                                 placement="auto">
                                                 <div className="unit-icon small hover-weak-outline"
                                                     style={{
-                                                        backgroundImage: `url(${unitImages.get(p.house.id).get(type.id)})`,
+                                                        backgroundImage: `url(${unitImages.get(this.house.id).get(type.id)})`,
                                                     }}
                                                 />
                                             </OverlayTrigger>
