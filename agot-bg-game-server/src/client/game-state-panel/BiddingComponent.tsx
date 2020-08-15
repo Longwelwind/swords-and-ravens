@@ -2,7 +2,6 @@ import {observer} from "mobx-react";
 import BiddingGameState, {BiddingGameStateParent} from "../../common/ingame-game-state/westeros-game-state/bidding-game-state/BiddingGameState";
 import {Component, ReactNode} from "react";
 import * as React from "react";
-import {observable} from "mobx";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
@@ -11,14 +10,16 @@ import Player from "../../common/ingame-game-state/Player";
 
 @observer
 export default class BiddingComponent<ParentGameState extends BiddingGameStateParent> extends Component<GameStateComponentProps<BiddingGameState<ParentGameState>>> {
-    @observable powerTokensToBid = 0;
-
     get gameState(): BiddingGameState<ParentGameState> {
         return this.props.gameState;
     }
 
     get authenticatedPlayer(): Player | null {
         return this.props.gameClient.authenticatedPlayer;
+    }
+
+    get powerTokensToBid(): number {
+        return this.gameState.powerTokensToBid;
     }
 
     get biddenPowerTokens(): number {
@@ -34,7 +35,7 @@ export default class BiddingComponent<ParentGameState extends BiddingGameStatePa
     constructor(props: GameStateComponentProps<BiddingGameState<ParentGameState>>) {
         super(props);
 
-        this.powerTokensToBid = Math.max(this.biddenPowerTokens, 0);
+        this.gameState.powerTokensToBid = Math.max(this.biddenPowerTokens, 0);
     }
 
     render(): ReactNode {
@@ -51,7 +52,9 @@ export default class BiddingComponent<ParentGameState extends BiddingGameStatePa
                                         min={0}
                                         max={this.authenticatedPlayer.house.powerTokens}
                                         value={this.powerTokensToBid}
-                                        onChange={e => this.changePowerTokensToBid(parseInt(e.target.value))}
+                                        onChange={e => {
+                                            this.gameState.powerTokensToBid = parseInt(e.target.value);
+                                        }}
                                         disabled={this.authenticatedPlayer.house.powerTokens==0}
                                     />
                                 </Col>
@@ -77,10 +80,6 @@ export default class BiddingComponent<ParentGameState extends BiddingGameStatePa
                 </Col>
             </>
         );
-    }
-
-    changePowerTokensToBid(count: number): void {
-        this.powerTokensToBid = count;
     }
 
     bid(powerTokens: number): void {

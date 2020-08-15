@@ -20,6 +20,7 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
     participatingHouses: House[];
     // Client-side, this structure will only contain -1 as value.
     @observable bids: BetterMap<House, number> = new BetterMap<House, number>();
+    @observable powerTokensToBid = 0;
 
     get game(): Game {
         return this.parentGameState.game;
@@ -51,9 +52,9 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
         }
     }
 
-    checkAndProceedEndOfBidding(): void {
+    checkAndProceedEndOfBidding(): boolean {
         if (this.getHousesLeftToBid().length > 0) {
-            return;
+            return false;
         }
 
         // Remove the power tokens
@@ -80,12 +81,16 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
         const results = _.sortBy(housesPerBid.entries, ([bid, _]) => -bid);
 
         this.parentGameState.onBiddingGameStateEnd(results);
+        return true;
     }
 
     onServerMessage(message: ServerMessage): void {
         if (message.type == "bid-done") {
             const house = this.game.houses.get(message.houseId);
             this.bids.set(house, message.value);
+        } else if(message.type == "bidding-begin") {
+            this.bids = new BetterMap();
+            this.powerTokensToBid = 0;
         }
     }
 
@@ -119,7 +124,11 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
         });
 
         // All houses might have been fast-tracked, check if the bidding is over
-        this.checkAndProceedEndOfBidding();
+        if (! this.checkAndProceedEndOfBidding()) {
+            this.entireGame.broadcastToClients({
+                type: "bidding-begin"
+            })
+        }
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedBiddingGameState {
