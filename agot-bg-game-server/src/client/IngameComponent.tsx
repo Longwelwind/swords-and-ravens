@@ -66,6 +66,7 @@ import CancelledGameState from "../common/cancelled-game-state/CancelledGameStat
 import joinReactNodes from "./utils/joinReactNodes";
 import NoteComponent from "./NoteComponent";
 import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
+import UserSettingsComponent from "./UserSettingsComponent";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -76,10 +77,14 @@ interface IngameComponentProps {
 export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
     @observable currentOpenedTab = "chat";
-    @observable height: number;
+    @observable height: number | null = null;
 
     get game(): Game {
         return this.props.gameState.game;
+    }
+
+    get user(): User | null {
+        return this.props.gameClient.authenticatedUser ? this.props.gameClient.authenticatedUser : null;
     }
 
     render(): ReactNode {
@@ -363,7 +368,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </Row>
                 </Col>
                 <Col xs="auto">
-                    <div style={{height: this.height - 90, overflowY: "scroll", maxHeight: 1378, minHeight: 460}}>
+                    <div style={{height: this.height != null ? this.height - 90 : "auto", overflowY: this.height != null ? "scroll" : "visible", maxHeight: 1378, minHeight: 460}}>
                         <MapComponent
                             gameClient={this.props.gameClient}
                             ingameGameState={this.props.gameState}
@@ -502,6 +507,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 <Tab.Pane eventKey="settings">
                                                     <GameSettingsComponent gameClient={this.props.gameClient}
                                                                         entireGame={this.props.gameState.entireGame} />
+                                                    <UserSettingsComponent user={this.props.gameClient.authenticatedUser}
+                                                                            entireGame={this.props.gameState.entireGame}
+                                                                            parent={this} />
                                                 </Tab.Pane>
                                             )}
                                         </Tab.Content>
@@ -626,16 +634,17 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         ));
     }
 
+    adjustMapHeight(): void {
+        this.height = (this.user && this.user.settings.mapScrollbar) ? window.innerHeight : null;
+    }
+
     componentDidMount(): void {
-        this.height = window.innerHeight;
-        window.addEventListener('resize', this.handleResize);
+        this.adjustMapHeight();
+        window.addEventListener('resize', () => this.adjustMapHeight());
+
     }
 
     componentWillUnmount(): void {
-        window.removeEventListener('resize', this.handleResize);
+        window.removeEventListener('resize', () => this.adjustMapHeight());
     }
-
-    handleResize = () => {
-        this.height = window.innerHeight;
-    };
 }
