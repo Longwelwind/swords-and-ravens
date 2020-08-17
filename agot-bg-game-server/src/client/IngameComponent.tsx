@@ -454,13 +454,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     </Nav.Link>
                                                 </Nav.Item>
                                             )}
-                                            {this.props.gameClient.isOwner() && (
-                                                <Nav.Item>
-                                                    <Nav.Link eventKey="settings">
-                                                        Settings
-                                                    </Nav.Link>
-                                                </Nav.Item>
-                                            )}
+                                            <Nav.Item>
+                                                <Nav.Link eventKey="settings">
+                                                    Settings
+                                                </Nav.Link>
+                                            </Nav.Item>
                                             {this.getPrivateChatRooms().map(({user, roomId}) => (
                                                 <Nav.Item key={roomId}>
                                                     <div className={classNames({"new-event": this.getPrivateChatRoomForPlayer(user).areThereNewMessage})}>
@@ -500,6 +498,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     <GameLogListComponent ingameGameState={this.props.gameState} />
                                                 </ScrollToBottom>
                                             </Tab.Pane>
+                                            <Tab.Pane eventKey="settings">
+                                                <GameSettingsComponent gameClient={this.props.gameClient}
+                                                                    entireGame={this.props.gameState.entireGame} />
+                                                <UserSettingsComponent user={this.props.gameClient.authenticatedUser}
+                                                                        entireGame={this.props.gameState.entireGame}
+                                                                        parent={this} />
+                                            </Tab.Pane>
                                             {this.props.gameClient.authenticatedPlayer && (
                                                 <Tab.Pane eventKey="note" className="h-100">
                                                     <NoteComponent gameClient={this.props.gameClient} ingame={this.props.gameState} />
@@ -513,15 +518,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                    currentlyViewed={this.currentOpenedTab == roomId}/>
                                                 </Tab.Pane>
                                             ))}
-                                            {this.props.gameClient.isOwner() && (
-                                                <Tab.Pane eventKey="settings">
-                                                    <GameSettingsComponent gameClient={this.props.gameClient}
-                                                                        entireGame={this.props.gameState.entireGame} />
-                                                    <UserSettingsComponent user={this.props.gameClient.authenticatedUser}
-                                                                            entireGame={this.props.gameState.entireGame}
-                                                                            parent={this} />
-                                                </Tab.Pane>
-                                            )}
                                         </Tab.Content>
                                     </Card.Body>
                                 </Tab.Container>

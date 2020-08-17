@@ -33,8 +33,8 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                                     label={
                                         <OverlayTrigger overlay={
                                             <Tooltip id="map-scrollbar-tooltip">
-                                                Enables a fixed game map with a scrollbar which also auto resizes the owning window.
-                                        </Tooltip>}>
+                                                Enables a fixed game map with a scrollbar. The map height then resizes with the actual window height.
+                                            </Tooltip>}>
                                             <label htmlFor="map-scrollbar-setting">Map scrollbar</label>
                                         </OverlayTrigger>}
                                     checked={this.mapScrollbar}
