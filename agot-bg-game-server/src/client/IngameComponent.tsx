@@ -76,7 +76,7 @@ interface IngameComponentProps {
 @observer
 export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
-    @observable currentOpenedTab = "chat";
+    @observable currentOpenedTab = (this.user && this.user.settings.lastOpenedTab) ? this.user.settings.lastOpenedTab : "chat";
     @observable height: number | null = null;
 
     get game(): Game {
@@ -420,7 +420,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     <Row>
                         <Col>
                             <Card>
-                                <Tab.Container activeKey={this.currentOpenedTab} onSelect={k => this.currentOpenedTab = k}>
+                                <Tab.Container activeKey={this.currentOpenedTab}
+                                    onSelect={k => {
+                                        this.currentOpenedTab = k;
+                                        if (this.user) {
+                                            this.user.settings.lastOpenedTab = k;
+                                            this.user.syncSettings();
+                                        }
+                                    }}>
                                     <Card.Header>
                                         <Nav variant="tabs">
                                             <Nav.Item>
