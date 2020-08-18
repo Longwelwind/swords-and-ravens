@@ -386,8 +386,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             <OverlayTrigger
                                                 overlay={this.renderRemainingWesterosCards()}
                                                 delay={{ show: 250, hide: 100 }}
-                                                placement="auto"
-                                                container={this}
+                                                placement="bottom"
+                                                popperConfig={{modifiers: {preventOverflow: {boundariesElement: "viewport"}}}}
                                             >
                                                 <Row className="justify-content-between">
                                                     {phases.map((phase, i) => (
