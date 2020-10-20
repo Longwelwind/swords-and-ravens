@@ -363,4 +363,5 @@ export interface GameSettings {
     setupId: string;
     playerCount: number;
     randomHouses: boolean;
+    revealedWD: boolean;
 }
