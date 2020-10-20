@@ -79,6 +79,16 @@ export default class Game {
 
         return result;
     }
+    
+    get nextWesterosCardNames(): string[][] {
+        const result: string[][] = [];
+
+        this.westerosDecks.forEach(wd => {
+            result.push(wd.slice(0, 3).map((card) => card.type.name));
+        });
+
+        return result;
+    }
 
     getTokenHolder(track: House[]): House {
         return track[0];
