@@ -65,7 +65,7 @@ export default class Game {
 
         this.westerosDecks.forEach(wd => {
             const map = new BetterMap<WesterosCardType, number>();
-            wd.sort((a, b) => a.type.name.localeCompare(b.type.name)).forEach(wc => {
+            wd.concat().sort((a, b) => a.type.name.localeCompare(b.type.name)).forEach(wc => {
                 if (wc.discarded) {
                     return;
                 }
