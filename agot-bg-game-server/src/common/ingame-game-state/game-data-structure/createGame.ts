@@ -4,7 +4,7 @@ import House from "./House";
 import Region from "./Region";
 import World from "./World";
 import WesterosCard from "./westeros-card/WesterosCard";
-import {westerosCardTypes} from "./westeros-card/westerosCardTypes";
+import { westerosCardTypes } from "./westeros-card/westerosCardTypes";
 import unitTypes from "./unitTypes";
 import Game from "./Game";
 import WildlingCard from "./wildling-card/WildlingCard";
@@ -51,7 +51,7 @@ function createHouseCard(houseCardId: string, houseCardData: HouseCardData): Hou
     return houseCard;
 }
 
-export default function createGame(ingame: IngameGameState, housesToCreate: string[]): Game {
+export default function createGame(ingame: IngameGameState, housesToCreate: string[], playerHouses: string[]): Game {
     const gameSetup = ingame.entireGame.getSelectedGameSetup();
 
     const game = new Game(ingame);
@@ -63,7 +63,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
                 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
                 // @ts-ignore The conversion provokes n error in the CI
                 // Don't ask me why.
-                Object.entries(houseData.houseCards as {[key: string]: HouseCardData})
+                Object.entries(houseData.houseCards as { [key: string]: HouseCardData })
                     .map(([houseCardId, houseCardData]) => {
                         const houseCard = new HouseCard(
                             houseCardId,
@@ -78,7 +78,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
                     })
             );
             const unitLimits = new BetterMap(
-                Object.entries(houseData.unitLimits as {[key: string]: number})
+                Object.entries(houseData.unitLimits as { [key: string]: number })
                     .map(([unitTypeId, limit]) => [unitTypes.get(unitTypeId), limit])
             );
 
@@ -146,7 +146,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         westerosDeckData.forEach(westerosCardData => {
             const westerosCardType = westerosCardTypes.get(westerosCardData.type);
             const quantity = westerosCardData.quantity ? westerosCardData.quantity : 1;
-            for (let i = 0;i < quantity;i++) {
+            for (let i = 0; i < quantity; i++) {
                 const id = ++lastId;
 
                 cards.push(new WesterosCard(id, westerosCardType));
@@ -175,14 +175,14 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             const region = game.world.regions.get(regionId);
             const house = game.houses.get(unitData.house);
             const unitType = unitTypes.get(unitData.unitType);
-            const quantity = unitData.quantity;
+            const quantity = playerHouses.includes(house.id) ? unitData.quantity : unitData.quantityVassal;
 
             // Check if the game setup removed units off this region
             if (gameSetup.removedUnits && gameSetup.removedUnits.includes(region.id)) {
                 return;
             }
 
-            for (let i = 0;i < quantity;i++) {
+            for (let i = 0; i < quantity; i++) {
                 const unit = game.createUnit(region, unitType, house);
 
                 region.units.set(unit.id, unit);
