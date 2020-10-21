@@ -1,30 +1,30 @@
 import GameState from "../../GameState";
 import IngameGameState from "../IngameGameState";
 import WesterosCard from "../game-data-structure/westeros-card/WesterosCard";
-import Game, {MAX_WILDLING_STRENGTH} from "../game-data-structure/Game";
+import Game, { MAX_WILDLING_STRENGTH } from "../game-data-structure/Game";
 import World from "../game-data-structure/World";
-import {observable} from "mobx";
+import { observable } from "mobx";
 import getById from "../../../utils/getById";
 import Player from "../Player";
 import EntireGame from "../../EntireGame";
 import * as _ from "lodash";
-import WildlingsAttackGameState, {SerializedWildlingsAttackGameState} from "./wildlings-attack-game-state/WildlingsAttackGameState";
-import {ClientMessage} from "../../../messages/ClientMessage";
-import {ServerMessage} from "../../../messages/ServerMessage";
-import ReconcileArmiesGameState, {SerializedReconcileArmiesGameState} from "./reconcile-armies-game-state/ReconcileArmiesGameState";
-import MusteringGameState, {SerializedMusteringGameState} from "./mustering-game-state/MusteringGameState";
-import ClashOfKingsGameState, {SerializedClashOfKingsGameState} from "./clash-of-kings-game-state/ClashOfKingsGameState";
+import WildlingsAttackGameState, { SerializedWildlingsAttackGameState } from "./wildlings-attack-game-state/WildlingsAttackGameState";
+import { ClientMessage } from "../../../messages/ClientMessage";
+import { ServerMessage } from "../../../messages/ServerMessage";
+import ReconcileArmiesGameState, { SerializedReconcileArmiesGameState } from "./reconcile-armies-game-state/ReconcileArmiesGameState";
+import MusteringGameState, { SerializedMusteringGameState } from "./mustering-game-state/MusteringGameState";
+import ClashOfKingsGameState, { SerializedClashOfKingsGameState } from "./clash-of-kings-game-state/ClashOfKingsGameState";
 import PlanningRestriction from "../game-data-structure/westeros-card/planning-restriction/PlanningRestriction";
 import planningRestrictions from "../game-data-structure/westeros-card/planning-restriction/planningRestrictions";
-import PutToTheSwordGameState, {SerializedPutToTheSwordGameState} from "./put-to-the-swords-game-state/PutToTheSwordGameState";
-import AThroneOfBladesGameState, {SerializedAThroneOfBladesGameState} from "./thrones-of-blades-game-state/AThroneOfBladesGameState";
-import DarkWingsDarkWordsGameState, {SerializedDarkWingsDarkWordsGameState} from "./dark-wings-dark-words-game-state/DarkWingsDarkWordsGameState";
+import PutToTheSwordGameState, { SerializedPutToTheSwordGameState } from "./put-to-the-swords-game-state/PutToTheSwordGameState";
+import AThroneOfBladesGameState, { SerializedAThroneOfBladesGameState } from "./thrones-of-blades-game-state/AThroneOfBladesGameState";
+import DarkWingsDarkWordsGameState, { SerializedDarkWingsDarkWordsGameState } from "./dark-wings-dark-words-game-state/DarkWingsDarkWordsGameState";
 import shuffle from "../../../utils/shuffle";
 
 export default class WesterosGameState extends GameState<IngameGameState,
     WildlingsAttackGameState | ReconcileArmiesGameState<WesterosGameState> | MusteringGameState | ClashOfKingsGameState
     | PutToTheSwordGameState | AThroneOfBladesGameState | DarkWingsDarkWordsGameState
-> {
+    > {
     revealedCards: WesterosCard[];
     @observable currentCardI = -1;
     /**
@@ -93,13 +93,15 @@ export default class WesterosGameState extends GameState<IngameGameState,
         });
 
         // Execute all immediately effects
-        for(let i=0; i<this.game.westerosDecks.length; i++) {
+        for (let i = 0; i < this.game.westerosDecks.length; i++) {
             this.revealedCards[i].type.executeImmediately(this, i);
         }
 
+        const revealedWCs = this.entireGame.gameSettings.westerosMode ? 3 : 0;
+
         this.entireGame.broadcastToClients({
             type: "update-westeros-decks",
-            westerosDecks: this.game.westerosDecks.map(wd => shuffle([...wd]).map(wc => wc.serializeToClient()))
+            westerosDecks: this.game.westerosDecks.map(wd => wd.slice(0, revealedWCs).concat(shuffle(wd.slice(revealedWCs))).map(wc => wc.serializeToClient()))
         });
 
         this.currentCardI = -1;
@@ -195,8 +197,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
         return westerosGameState;
     }
 
-    deserializeChildGameState(data: SerializedWesterosGameState["childGameState"]): WesterosGameState["childGameState"]
-    {
+    deserializeChildGameState(data: SerializedWesterosGameState["childGameState"]): WesterosGameState["childGameState"] {
         if (data.type == "wildlings-attack") {
             return WildlingsAttackGameState.deserializeFromServer(this, data);
         } else if (data.type == "reconcile-armies") {
@@ -211,7 +212,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
             return AThroneOfBladesGameState.deserializeFromServer(this, data);
         } else if (data.type == "dark-wings-dark-words") {
             return DarkWingsDarkWordsGameState.deserializeFromServer(this, data);
-        } else  {
+        } else {
             throw new Error();
         }
     }
@@ -223,6 +224,6 @@ export interface SerializedWesterosGameState {
     currentCardI: number;
     planningRestrictions: string[];
     childGameState: SerializedWildlingsAttackGameState
-        | SerializedReconcileArmiesGameState | SerializedMusteringGameState | SerializedClashOfKingsGameState
-        | SerializedPutToTheSwordGameState | SerializedAThroneOfBladesGameState | SerializedDarkWingsDarkWordsGameState;
+    | SerializedReconcileArmiesGameState | SerializedMusteringGameState | SerializedClashOfKingsGameState
+    | SerializedPutToTheSwordGameState | SerializedAThroneOfBladesGameState | SerializedDarkWingsDarkWordsGameState;
 }
