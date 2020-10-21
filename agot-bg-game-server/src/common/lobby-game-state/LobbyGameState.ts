@@ -1,9 +1,9 @@
 import EntireGame from "../EntireGame";
 import GameState from "../GameState";
 import User from "../../server/User";
-import {ClientMessage} from "../../messages/ClientMessage";
-import {ServerMessage} from "../../messages/ServerMessage";
-import {observable} from "mobx";
+import { ClientMessage } from "../../messages/ClientMessage";
+import { ServerMessage } from "../../messages/ServerMessage";
+import { observable } from "mobx";
 import BetterMap from "../../utils/BetterMap";
 import baseGameData from "../../../data/baseGameData.json";
 import CancelledGameState from "../cancelled-game-state/CancelledGameState";
@@ -25,7 +25,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
     getLobbyHouses(): BetterMap<string, LobbyHouse> {
         return new BetterMap(
             Object.entries(baseGameData.houses)
-                .map(([hid, h]) => [hid, {id: hid, name: h.name, color: h.color}])
+                .map(([hid, h]) => [hid, { id: hid, name: h.name, color: h.color }])
         );
     }
 
@@ -118,27 +118,27 @@ export default class LobbyGameState extends GameState<EntireGame> {
         });
     }
 
-    canStartGame(user: User): {success: boolean; reason: string} {
+    canStartGame(user: User): { success: boolean; reason: string } {
         if (!this.entireGame.isOwner(user)) {
-            return {success: false, reason: "not-owner"};
+            return { success: false, reason: "not-owner" };
         }
 
         // If Vassals are toggled, not all houses need to be taken
         if (!this.entireGame.gameSettings.vassals) {
             if (this.players.size < this.entireGame.getSelectedGameSetup().playerCount) {
-                return {success: false, reason: "not-enough-players"};
+                return { success: false, reason: "not-enough-players" };
             }
         }
 
-        return {success: true, reason: "ok"};
+        return { success: true, reason: "ok" };
     }
 
-    canCancel(user: User):  {success: boolean; reason: string} {
+    canCancel(user: User): { success: boolean; reason: string } {
         if (!this.entireGame.isOwner(user)) {
-            return {success: false, reason: "not-owner"};
+            return { success: false, reason: "not-owner" };
         }
 
-        return {success: true, reason: "ok"};
+        return { success: true, reason: "ok" };
     }
 
     onServerMessage(message: ServerMessage): void {
