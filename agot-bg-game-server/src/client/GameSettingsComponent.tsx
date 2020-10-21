@@ -75,6 +75,24 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                 />
                             </Col>
                         </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="random-houses-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="random-houses-tooltip">
+                                                Players may look at the next 3 Westeros cards from each deck at any given moment of the game.
+                                            </Tooltip>}>
+                                            <label htmlFor="random-houses-setting">Enable CoK Westeros Mode</label>
+                                        </OverlayTrigger>}
+                                    disabled={!this.canChangeGameSettings}
+                                    checked={this.gameSettings.westerosMode}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.westerosMode = !this.gameSettings.westerosMode)}
+                                />
+                            </Col>
+                        </Row>
                     </>
                 )}
                 <Row>
@@ -145,7 +163,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
      * Helper function to modify gameSettings and update the game settings.
      * @param action Function that modifies gameSettings
      */
-    changeGameSettings(action: () => void = () => {}): void {
+    changeGameSettings(action: () => void = () => { }): void {
         action();
 
         this.props.entireGame.updateGameSettings(this.gameSettings);

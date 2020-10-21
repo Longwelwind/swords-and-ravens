@@ -1,11 +1,11 @@
-import GameState, {SerializedGameState} from "./GameState";
-import LobbyGameState, {SerializedLobbyGameState} from "./lobby-game-state/LobbyGameState";
-import IngameGameState, {SerializedIngameGameState} from "./ingame-game-state/IngameGameState";
-import {ServerMessage} from "../messages/ServerMessage";
-import {ClientMessage} from "../messages/ClientMessage";
+import GameState, { SerializedGameState } from "./GameState";
+import LobbyGameState, { SerializedLobbyGameState } from "./lobby-game-state/LobbyGameState";
+import IngameGameState, { SerializedIngameGameState } from "./ingame-game-state/IngameGameState";
+import { ServerMessage } from "../messages/ServerMessage";
+import { ClientMessage } from "../messages/ClientMessage";
 import * as baseGameData from "../../data/baseGameData.json";
-import User, {SerializedUser} from "../server/User";
-import {observable} from "mobx";
+import User, { SerializedUser } from "../server/User";
+import { observable } from "mobx";
 import * as _ from "lodash";
 import BetterMap from "../utils/BetterMap";
 import GameEndedGameState from "./ingame-game-state/game-ended-game-state/GameEndedGameState";
@@ -20,7 +20,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     ownerUserId: string;
     name: string;
 
-    @observable gameSettings: GameSettings = {pbem: false, setupId: "base-game", playerCount: 6, randomHouses: false, revealedWD: false};
+    @observable gameSettings: GameSettings = { pbem: false, setupId: "base-game", playerCount: 6, randomHouses: false, westerosMode: false };
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -53,7 +53,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     checkGameStateChanged(): void {
-        const {level, gameState} = this.getFirstGameStateToBeRetransmitted();
+        const { level, gameState } = this.getFirstGameStateToBeRetransmitted();
 
         if (gameState) {
             // The GameState tree has been changed, broadcast a message to transmit to them
@@ -142,7 +142,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
     onServerMessage(message: ServerMessage): void {
         if (message.type == "game-state-change") {
-            const {level, serializedGameState} = message;
+            const { level, serializedGameState } = message;
 
             // Get the GameState for whose the childGameState must change
             const parentGameState = this.getGameStateNthLevelDown(level - 1);
@@ -159,7 +159,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             const user = this.users.get(message.user);
 
             user.settings = message.settings;
-        } else if (message.type == "game-settings-changed") {
+        } else if (message.type == "game-settings-changed") {
             this.gameSettings = message.settings;
         } else if (message.type == "update-connection-status") {
             const user = this.users.get(message.user);
@@ -211,15 +211,15 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         const maxPlayerCount = this.gameSettings.playerCount;
         const settings = this.gameSettings;
 
-        return {turn, maxPlayerCount, settings};
+        return { turn, maxPlayerCount, settings };
     }
 
-    getPlayersInGame(): {userId: string; data: object}[] {
-        const players: {userId: string; data: object}[] = [];
+    getPlayersInGame(): { userId: string; data: object }[] {
+        const players: { userId: string; data: object }[] = [];
         if (this.childGameState instanceof LobbyGameState) {
             this.childGameState.players.forEach((user, house) => {
                 // If the game is in "randomize house" mode, don't specify any houses in the PlayerInGame data
-                const playerData: {[key: string]: any} = {};
+                const playerData: { [key: string]: any } = {};
 
                 if (!this.gameSettings.randomHouses) {
                     playerData["house"] = house.id;
@@ -262,7 +262,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         });
     }
 
-    getPrivateChatRoomsOf(user: User): {user: User; roomId: string}[] {
+    getPrivateChatRoomsOf(user: User): { user: User; roomId: string }[] {
         return _.flatMap(this.privateChatRoomsIds
             .map((u1, bm) => bm.entries
                 // Only get the private chat rooms that contains the authenticated player
@@ -270,9 +270,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 .map(([u2, roomId]) => {
                     const otherUser = user == u1 ? u2 : u1;
 
-                    return {user: otherUser, roomId};
+                    return { user: otherUser, roomId };
                 })
-        ));
+            ));
     }
 
     getGameSetupContainer(setupId: string): GameSetupContainer {
@@ -363,5 +363,5 @@ export interface GameSettings {
     setupId: string;
     playerCount: number;
     randomHouses: boolean;
-    revealedWD: boolean;
+    westerosMode: boolean;
 }
