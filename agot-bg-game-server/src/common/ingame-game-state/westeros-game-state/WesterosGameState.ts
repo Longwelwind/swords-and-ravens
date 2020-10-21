@@ -97,7 +97,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
             this.revealedCards[i].type.executeImmediately(this, i);
         }
 
-        const revealedWCs = this.entireGame.gameSettings.westerosMode ? 3 : 0;
+        const revealedWCs = this.game.revealedWesterosCards;
 
         this.entireGame.broadcastToClients({
             type: "update-westeros-decks",

@@ -577,7 +577,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const nextCards = this.game.nextWesterosCardNames;
 
         return < Tooltip id="remaining-westeros-cards" className="westeros-tooltip" >
-            {this.gameSettings.westerosMode && (
+            {this.gameSettings.cokWesterosPhase && (
                 <>
                     <Row className='mt-0'>
                         <Col>

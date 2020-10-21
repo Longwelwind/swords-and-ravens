@@ -88,8 +88,8 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                             <label htmlFor="random-houses-setting">Enable CoK Westeros Mode</label>
                                         </OverlayTrigger>}
                                     disabled={!this.canChangeGameSettings}
-                                    checked={this.gameSettings.westerosMode}
-                                    onChange={() => this.changeGameSettings(() => this.gameSettings.westerosMode = !this.gameSettings.westerosMode)}
+                                    checked={this.gameSettings.cokWesterosPhase}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.cokWesterosPhase = !this.gameSettings.cokWesterosPhase)}
                                 />
                             </Col>
                         </Row>
