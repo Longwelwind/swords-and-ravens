@@ -85,7 +85,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                             <Tooltip id="random-houses-tooltip">
                                                 Players may look at the next 3 Westeros cards from each deck at any given moment of the game.
                                             </Tooltip>}>
-                                            <label htmlFor="random-houses-setting">Enable CoK Westeros Mode</label>
+                                            <label htmlFor="random-houses-setting">Enable CoK Westeros Phase Variant</label>
                                         </OverlayTrigger>}
                                     disabled={!this.canChangeGameSettings}
                                     checked={this.gameSettings.cokWesterosPhase}
