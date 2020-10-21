@@ -1,21 +1,22 @@
 import GameState from "../../../../../../GameState";
 import CombatGameState from "../../CombatGameState";
-import HouseCardResolutionGameState, {SerializedHouseCardResolutionGameState} from "../../house-card-resolution-game-state/HouseCardResolutionGameState";
+import HouseCardResolutionGameState, { SerializedHouseCardResolutionGameState } from "../../house-card-resolution-game-state/HouseCardResolutionGameState";
 import Game from "../../../../../game-data-structure/Game";
 import HouseCard from "../../../../../game-data-structure/house-card/HouseCard";
 import House from "../../../../../game-data-structure/House";
 import Player from "../../../../../Player";
-import {ServerMessage} from "../../../../../../../messages/ServerMessage";
-import {ClientMessage} from "../../../../../../../messages/ClientMessage";
+import { ServerMessage } from "../../../../../../../messages/ServerMessage";
+import { ClientMessage } from "../../../../../../../messages/ClientMessage";
 import RenlyBaratheonAbilityGameState, { SerializedRenlyBaratheonAbilityGameState } from "./renly-baratheon-ability-game-state/RenlyBaratheonAbilityGameState";
 import PostCombatGameState from "../PostCombatGameState";
-import CerseiLannisterAbilityGameState, {SerializedCerseiLannisterAbilityGameState} from "./cersei-lannister-ability-game-state/CerseiLannisterAbilityGameState";
+import CerseiLannisterAbilityGameState, { SerializedCerseiLannisterAbilityGameState } from "./cersei-lannister-ability-game-state/CerseiLannisterAbilityGameState";
+import BericDondarrionAbilityGameState, { SerializedBericDondarrionAbilityGameState } from "./beric-dondarrion-ability-game-state/BericDondarrionAbilityGameState";
 
 export default class AfterWinnerDeterminationGameState extends GameState<
     PostCombatGameState,
     HouseCardResolutionGameState<
         AfterWinnerDeterminationGameState,
-        RenlyBaratheonAbilityGameState | CerseiLannisterAbilityGameState
+        RenlyBaratheonAbilityGameState | CerseiLannisterAbilityGameState | BericDondarrionAbilityGameState
     >>
 {
     get postCombatGameState(): PostCombatGameState {
@@ -80,6 +81,8 @@ export default class AfterWinnerDeterminationGameState extends GameState<
         switch (data.type) {
             case "renly-baratheon-ability":
                 return RenlyBaratheonAbilityGameState.deserializeFromServer(houseCardResolution, data);
+            case "beric-dondarrion-ability":
+                return BericDondarrionAbilityGameState.deserializeFromServer(houseCardResolution, data);
             case "cersei-lannister-ability":
                 return CerseiLannisterAbilityGameState.deserializeFromServer(houseCardResolution, data);
         }
@@ -89,6 +92,6 @@ export default class AfterWinnerDeterminationGameState extends GameState<
 export interface SerializedAfterWinnerDeterminationGameState {
     type: "after-winner-determination";
     childGameState: SerializedHouseCardResolutionGameState<
-        SerializedRenlyBaratheonAbilityGameState | SerializedCerseiLannisterAbilityGameState
+        SerializedRenlyBaratheonAbilityGameState | SerializedCerseiLannisterAbilityGameState | SerializedBericDondarrionAbilityGameState
     >;
 }

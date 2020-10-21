@@ -1,15 +1,15 @@
-import {Server} from "ws";
-import {ClientMessage} from "../messages/ClientMessage";
+import { Server } from "ws";
+import { ClientMessage } from "../messages/ClientMessage";
 import User from "./User";
 import * as WebSocket from "ws";
-import EntireGame, {SerializedEntireGame} from "../common/EntireGame";
-import {ServerMessage} from "../messages/ServerMessage";
+import EntireGame, { SerializedEntireGame } from "../common/EntireGame";
+import { ServerMessage } from "../messages/ServerMessage";
 import WebsiteClient, { StoredGameData } from "./website-client/WebsiteClient";
 import LocalWebsiteClient from "./website-client/LocalWebsiteClient";
 import LiveWebsiteClient from "./website-client/LiveWebsiteClient";
 import BetterMap from "../utils/BetterMap";
 import schema from "./ClientMessage.json";
-import Ajv, {ValidateFunction} from "ajv";
+import Ajv, { ValidateFunction } from "ajv";
 import _ from "lodash";
 import serializedGameMigrations from "./serializedGameMigrations";
 
@@ -42,7 +42,7 @@ export default class GlobalServer {
             this.websiteClient = new LocalWebsiteClient();
         }
 
-        this.clientMessageValidator = new Ajv({allErrors: true}).compile(schema);
+        this.clientMessageValidator = new Ajv({ allErrors: true }).compile(schema);
     }
 
     async start(): Promise<void> {
@@ -74,6 +74,7 @@ export default class GlobalServer {
     }
 
     async onMessage(client: WebSocket, data: string): Promise<void> {
+        console.log(data); // TESTE
         let message: ClientMessage | null = null;
         try {
             message = JSON.parse(data) as ClientMessage;
@@ -82,6 +83,7 @@ export default class GlobalServer {
             return;
         }
 
+        console.log(message); // TESTE
         // Validate the JSON
         if (!this.clientMessageValidator(message)) {
             console.warn(`Unvalid schema of JSON message: ${data}, ${this.clientMessageValidator.errors}`);
@@ -91,7 +93,7 @@ export default class GlobalServer {
 
 
         if (message.type == "authenticate") {
-            const {userId, gameId, authToken} = message.authData;
+            const { userId, gameId, authToken } = message.authData;
 
             // Check that the user exists
             const userData = await this.websiteClient.getUser(userId);
