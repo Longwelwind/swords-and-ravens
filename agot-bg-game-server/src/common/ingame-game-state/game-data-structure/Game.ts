@@ -1,18 +1,18 @@
-import House, {SerializedHouse} from "./House";
-import World, {SerializedWorld} from "./World";
+import House, { SerializedHouse } from "./House";
+import World, { SerializedWorld } from "./World";
 import Region from "./Region";
 import UnitType from "./UnitType";
 import Unit from "./Unit";
 import Order from "./Order";
 import orders from "./orders";
 import * as _ from "lodash";
-import {observable} from "mobx";
-import WesterosCard, {SerializedWesterosCard} from "./westeros-card/WesterosCard";
+import { observable } from "mobx";
+import WesterosCard, { SerializedWesterosCard } from "./westeros-card/WesterosCard";
 import shuffle from "../../../utils/shuffle";
-import WildlingCard, {SerializedWildlingCard} from "./wildling-card/WildlingCard";
+import WildlingCard, { SerializedWildlingCard } from "./wildling-card/WildlingCard";
 import BetterMap from "../../../utils/BetterMap";
 import HouseCard from "./house-card/HouseCard";
-import {land, port} from "./regionTypes";
+import { land, port } from "./regionTypes";
 import PlanningRestriction from "./westeros-card/planning-restriction/PlanningRestriction";
 import WesterosCardType from "./westeros-card/WesterosCardType";
 
@@ -39,6 +39,7 @@ export default class Game {
     structuresCountNeededToWin: number;
     maxTurns: number;
     maxPowerTokens: number;
+    revealedWesterosCards = 0;
 
     get ironThroneHolder(): House {
         return this.getTokenHolder(this.ironThroneTrack);
@@ -65,7 +66,7 @@ export default class Game {
 
         this.westerosDecks.forEach(wd => {
             const map = new BetterMap<WesterosCardType, number>();
-            wd.concat().sort((a, b) => a.type.name.localeCompare(b.type.name)).forEach(wc => {
+            wd.slice(this.revealedWesterosCards).sort((a, b) => a.type.name.localeCompare(b.type.name)).forEach(wc => {
                 if (wc.discarded) {
                     return;
                 }
@@ -79,12 +80,12 @@ export default class Game {
 
         return result;
     }
-    
+
     get nextWesterosCardNames(): string[][] {
         const result: string[][] = [];
 
         this.westerosDecks.forEach(wd => {
-            result.push(wd.slice(0, 3).map((card) => card.type.name));
+            result.push(wd.slice(0, this.revealedWesterosCards).map((card) => card.type.name));
         });
 
         return result;
@@ -303,7 +304,7 @@ export default class Game {
             return true;
         }
 
-        for (let i = 0;i < armySizes.length;i++) {
+        for (let i = 0; i < armySizes.length; i++) {
             if (armySizes[i] > allowedArmySizes[i]) {
                 return true;
             }
@@ -313,7 +314,7 @@ export default class Game {
         for (const p of addedUnits.keys.filter(r => r.type == port)) {
             // Filter for units of house as it is possible that the port still contains enemy ships
             // which will be removed after TakeControlOfEnemyPortGameState
-            if(p.units.values.filter(u => u.allegiance == house).length + addedUnits.get(p).length > 3) {
+            if (p.units.values.filter(u => u.allegiance == house).length + addedUnits.get(p).length > 3) {
                 return true;
             }
         }
@@ -350,7 +351,9 @@ export default class Game {
             // without seeing the order of the cards
             westerosDecks: admin
                 ? this.westerosDecks.map(wd => wd.map(wc => wc.serializeToClient()))
-                : this.westerosDecks.map(wd => shuffle([...wd]).map(wc => wc.serializeToClient())),
+                : this.westerosDecks.map(wd => wd.slice(0, this.revealedWesterosCards)
+                    .concat(shuffle(wd.slice(this.revealedWesterosCards)))
+                    .map(wc => wc.serializeToClient())),
             // Same for the wildling deck
             wildlingDeck: admin
                 ? this.wildlingDeck.map(c => c.serializeToClient())
@@ -362,6 +365,7 @@ export default class Game {
             structuresCountNeededToWin: this.structuresCountNeededToWin,
             maxTurns: this.maxTurns,
             maxPowerTokens: this.maxPowerTokens,
+            revealedWesterosCards: this.revealedWesterosCards,
             clientNextWidllingCardId: (admin || knowsNextWildlingCard) ? this.wildlingDeck[0].id : null
         };
     }
@@ -386,6 +390,7 @@ export default class Game {
         game.structuresCountNeededToWin = data.structuresCountNeededToWin;
         game.maxTurns = data.maxTurns;
         game.maxPowerTokens = data.maxPowerTokens;
+        game.revealedWesterosCards = data.revealedWesterosCards;
         game.clientNextWildlingCardId = data.clientNextWidllingCardId;
 
         return game;
@@ -410,5 +415,6 @@ export interface SerializedGame {
     structuresCountNeededToWin: number;
     maxTurns: number;
     maxPowerTokens: number;
+    revealedWesterosCards: number;
     clientNextWidllingCardId: number | null;
 }

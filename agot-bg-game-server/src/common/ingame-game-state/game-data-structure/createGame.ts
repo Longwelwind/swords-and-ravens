@@ -4,7 +4,7 @@ import House from "./House";
 import Region from "./Region";
 import World from "./World";
 import WesterosCard from "./westeros-card/WesterosCard";
-import {westerosCardTypes} from "./westeros-card/westerosCardTypes";
+import { westerosCardTypes } from "./westeros-card/westerosCardTypes";
 import unitTypes from "./unitTypes";
 import Game from "./Game";
 import WildlingCard from "./wildling-card/WildlingCard";
@@ -50,7 +50,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
                 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
                 // @ts-ignore The conversion provokes n error in the CI
                 // Don't ask me why.
-                Object.entries(houseData.houseCards as {[key: string]: HouseCardData})
+                Object.entries(houseData.houseCards as { [key: string]: HouseCardData })
                     .map(([houseCardId, houseCardData]) => {
                         const houseCard = new HouseCard(
                             houseCardId,
@@ -65,7 +65,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
                     })
             );
             const unitLimits = new BetterMap(
-                Object.entries(houseData.unitLimits as {[key: string]: number})
+                Object.entries(houseData.unitLimits as { [key: string]: number })
                     .map(([unitTypeId, limit]) => [unitTypes.get(unitTypeId), limit])
             );
 
@@ -79,6 +79,8 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
     game.structuresCountNeededToWin = baseGameData.structuresCountNeededToWin;
     game.supplyRestrictions = baseGameData.supplyRestrictions;
     game.maxPowerTokens = MAX_POWER_TOKENS;
+
+    game.revealedWesterosCards = entireGame.gameSettings.cokWesterosPhase ? 3 : 0;
 
     // Load tracks starting positions
     if (gameSetup.tracks && gameSetup.tracks.ironThrone) {
@@ -133,7 +135,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
         westerosDeckData.forEach(westerosCardData => {
             const westerosCardType = westerosCardTypes.get(westerosCardData.type);
             const quantity = westerosCardData.quantity ? westerosCardData.quantity : 1;
-            for (let i = 0;i < quantity;i++) {
+            for (let i = 0; i < quantity; i++) {
                 const id = ++lastId;
 
                 cards.push(new WesterosCard(id, westerosCardType));
@@ -164,7 +166,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
                 return;
             }
 
-            for (let i = 0;i < quantity;i++) {
+            for (let i = 0; i < quantity; i++) {
                 const unit = game.createUnit(region, unitType, house);
 
                 region.units.set(unit.id, unit);
