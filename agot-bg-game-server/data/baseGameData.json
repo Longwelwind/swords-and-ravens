@@ -578,8 +578,7 @@
     },
     "beric-dondarrion": {
       "name": "Beric Dondarrion",
-      "combatStrength": 3,
-      "ability": "beric-dondarrion"
+      "combatStrength": 3
     },
     "jon-connington": {
       "name": "Jon Connington",
@@ -587,9 +586,7 @@
     },
     "janos-slynt": {
       "name": "Janos Slynt",
-      "combatStrength": 2,
-      "swordIcons": 2,
-      "towerIcons": 1
+      "combatStrength": 2
     },
     "jaqen-h-ghar": {
       "name": "Jaqen H'Ghar",
@@ -597,13 +594,11 @@
     },
     "syrio-forel": {
       "name": "Syrio Forel",
-      "combatStrength": 1,
-      "ability": "syrio-forel"
+      "combatStrength": 1
     },
     "varys": {
       "name": "Varys",
-      "combatStrength": 0,
-      "ability": "varys"
+      "combatStrength": 0
     }
   },
   "supplyRestrictions": [

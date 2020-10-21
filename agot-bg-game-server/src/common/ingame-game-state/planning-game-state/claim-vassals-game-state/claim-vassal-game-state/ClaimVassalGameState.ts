@@ -25,7 +25,6 @@ export default class ClaimVassalGameState extends GameState<ClaimVassalsGameStat
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "claim-vassal") {
-            console.log(message); // TESTE
             if (player.house != this.house) {
                 return;
             }
@@ -35,7 +34,7 @@ export default class ClaimVassalGameState extends GameState<ClaimVassalsGameStat
             if (claimedVassals.length > this.count) {
                 return;
             }
-
+            
             if (claimedVassals.every(v => !this.getClaimableVassals().includes(v))) {
                 return;
             }
@@ -76,7 +75,7 @@ export default class ClaimVassalGameState extends GameState<ClaimVassalsGameStat
 
         claimVassal.house = claimVassals.game.houses.get(data.house);
         claimVassal.count = data.count;
-
+        
         return claimVassal;
     }
 }

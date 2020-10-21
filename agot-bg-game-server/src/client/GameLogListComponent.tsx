@@ -1,17 +1,17 @@
-import { Component, ReactNode } from "react";
+import {Component, ReactNode} from "react";
 import React from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
-import { GameLogData } from "../common/ingame-game-state/game-data-structure/GameLog";
+import {GameLogData} from "../common/ingame-game-state/game-data-structure/GameLog";
 import Game from "../common/ingame-game-state/game-data-structure/Game";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
 import World from "../common/ingame-game-state/game-data-structure/World";
 import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
-import { westerosCardTypes } from "../common/ingame-game-state/game-data-structure/westeros-card/westerosCardTypes";
-import { observer } from "mobx-react";
+import {westerosCardTypes} from "../common/ingame-game-state/game-data-structure/westeros-card/westerosCardTypes";
+import {observer} from "mobx-react";
 import WildlingCardComponent from "./game-state-panel/utils/WildlingCardComponent";
 import WildlingCard from "../common/ingame-game-state/game-data-structure/wildling-card/WildlingCard";
 import WesterosCardComponent from "./game-state-panel/utils/WesterosCardComponent";
@@ -63,11 +63,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         switch (data.type) {
             case "turn-begin":
                 return <Row className="justify-content-center">
-                    <Col xs={true}><hr /></Col>
+                    <Col xs={true}><hr/></Col>
                     <Col xs="auto">
                         <h4>Turn <b>{data.turn}</b></h4>
                     </Col>
-                    <Col xs={true}><hr /></Col>
+                    <Col xs={true}><hr/></Col>
                 </Row>;
 
             case "support-declared":
@@ -90,7 +90,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <>
                         <b>{attacker.name}</b> attacked <b>{attacked ? attacked.name : "a neutral force"}</b> from <b>{attackingRegion.name}</b> to <b>
-                            {attackedRegion.name}</b> with <>{joinReactNodes(army.map((ut, i) => <strong key={i}>{ut.name}</strong>), ', ')}</>.
+                        {attackedRegion.name}</b> with <>{joinReactNodes(army.map((ut, i) => <strong key={i}>{ut.name}</strong>), ', ')}</>.
                     </>
                 );
 
@@ -104,13 +104,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         <b>{house.name}</b> marched from <b>{startingRegion.name}</b>{
                             data.leftPowerToken != null && <> and left {data.leftPowerToken ? "a" : "no"} Power Token</>}{moves.length > 0 ? ":" : "."}
                         {moves.length > 0 &&
-                            <ul>
-                                {moves.map(([region, unitTypes]) => (
-                                    <li key={region.id}>
-                                        {joinReactNodes(unitTypes.map((ut, i) => <b key={i}>{ut.name}</b>), ", ")} to <b>{region.name}</b>
-                                    </li>
-                                ))}
-                            </ul>}
+                        <ul>
+                            {moves.map(([region, unitTypes]) => (
+                                <li key={region.id}>
+                                    {joinReactNodes(unitTypes.map((ut, i) => <b key={i}>{ut.name}</b>), ", ")} to <b>{region.name}</b>
+                                </li>
+                            ))}
+                        </ul>}
                     </>
                 );
 
@@ -121,7 +121,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <>
                         <Row className="justify-content-center">
                             <Col xs="auto">
-                                <WesterosCardComponent cardType={westerosCardType} size="small" tooltip={true} westerosDeckI={data.westerosDeckI} />
+                                <WesterosCardComponent cardType={westerosCardType} size="small" tooltip={true} westerosDeckI={data.westerosDeckI}/>
                             </Col>
                         </Row>
                     </>
@@ -166,7 +166,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <>
                         <p>Combat result</p>
-                        <CombatInfoComponent housesCombatData={houseCombatDatas} />
+                        <CombatInfoComponent housesCombatData={houseCombatDatas}/>
                         <p><strong>{winner.name}</strong> won the fight!</p>
                     </>
                 );
@@ -178,7 +178,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         Wildling card revealed:
                         <Row className="justify-content-center">
                             <Col xs="auto">
-                                <WildlingCardComponent cardType={wildlingCard.type} size="small" tooltip={true} placement="auto" />
+                                <WildlingCardComponent cardType={wildlingCard.type} size="small" tooltip={true} placement="auto"/>
                             </Col>
                         </Row>
                     </>
@@ -200,8 +200,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         {data.nightsWatchVictory ? (
                             <>The <strong>Night&apos;s Watch</strong> won!</>
                         ) : (
-                                <>The <strong>Wildlings</strong> won!</>
-                            )}
+                            <>The <strong>Wildlings</strong> won!</>
+                        )}
                     </>
                 );
 
@@ -225,8 +225,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
             case "player-mustered":
                 house = this.game.houses.get(data.house);
-                const musterings = _.flatMap(data.musterings.map(([_, musterements]: [string, { region: string; from: string | null; to: string }[]]) =>
-                    musterements.map(({ region, from, to }) => ({
+                const musterings = _.flatMap(data.musterings.map(([_, musterements]: [string, {region: string; from: string | null; to: string}[]]) =>
+                    musterements.map(({region, from, to}) => ({
                         region: this.game.world.regions.get(region),
                         from: from ? unitTypes.get(from) : null,
                         to: unitTypes.get(to)
@@ -239,19 +239,19 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                             <strong>{house.name}</strong> mustered{musterings.length > 0 ? ":" : " nothing."}
                         </p>
                         {musterings.length > 0 && (
-                            <ul>
-                                {musterings.map(({ region, from, to }, i) => (
-                                    <li key={i}>
-                                        {from ? (
-                                            <>
-                                                A <strong>{to.name}</strong> from a <strong>{from.name}</strong> in <strong>{region.name}</strong>
-                                            </>
-                                        ) : (
-                                                <>A <strong>{to.name}</strong> in <strong>{region.name}</strong></>
-                                            )}
-                                    </li>
-                                ))}
-                            </ul>
+                        <ul>
+                            {musterings.map(({region, from, to}, i) => (
+                                <li key={i}>
+                                    {from ? (
+                                        <>
+                                            A <strong>{to.name}</strong> from a <strong>{from.name}</strong> in <strong>{region.name}</strong>
+                                        </>
+                                    ) : (
+                                        <>A <strong>{to.name}</strong> in <strong>{region.name}</strong></>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
                         )}
                     </>
                 );
@@ -337,8 +337,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         ) : data.choice == 1 ? (
                             <> trigger a Supply.</>
                         ) : (
-                                    <> trigger nothing.</>
-                                )}
+                            <> trigger nothing.</>
+                        )}
                     </p>
                 );
 
@@ -353,8 +353,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         ) : data.choice == 1 ? (
                             <> trigger a Game of Thrones.</>
                         ) : (
-                                    <> trigger nothing.</>
-                                )}
+                            <> trigger nothing.</>
+                        )}
                     </p>
                 );
 
@@ -369,8 +369,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         ) : data.choice == 1 ? (
                             <> forbid <strong>Defense</strong> Orders from being played during this Planning Phase.</>
                         ) : (
-                                    <> forbid nothing.</>
-                                )}
+                            <> forbid nothing.</>
+                        )}
                     </p>
                 );
 
@@ -451,7 +451,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <>
                     <p>
                         Final order for {this.game.getNameInfluenceTrack(data.trackerI)}: {
-                            joinReactNodes(finalOrder.map(h => <strong key={h.id}>{h.name}</strong>), ", ")}
+                        joinReactNodes(finalOrder.map(h => <strong key={h.id}>{h.name}</strong>), ", ")}
                     </p>
                 </>;
 
@@ -553,8 +553,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return newHouseCard ? (
                     <><strong>{affectedHouse.name}</strong> chose <strong>{newHouseCard.name}.</strong></>
                 ) : (
-                        <><strong>{affectedHouse.name}</strong> had no other available House card</>
-                    );
+                    <><strong>{affectedHouse.name}</strong> had no other available House card</>
+                );
 
             case "arianne-martell-prevent-movement":
                 const enemyHouse = this.game.houses.get(data.enemyHouse);
@@ -687,7 +687,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const regionFrom = this.game.world.regions.get(data.regionFrom);
                 const regionTo = this.game.world.regions.get(data.regionTo);
                 return <>
-                    <strong>{house.name}</strong> retreats from <strong>
+                        <strong>{house.name}</strong> retreats from <strong>
                         {regionFrom.name}</strong> to <strong>{regionTo.name}</strong>.
                 </>;
             }
@@ -697,7 +697,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>{
                     data.isAttacker ?
-                        <><strong>{house.name}</strong> was not able to retreat to <strong>{region.name}</strong>.</> :
+                        <><strong>{house.name}</strong> was not able to retreat to <strong>{region.name}</strong>.</>   :
                         <><strong>{house.name}</strong> was not able to retreat from <strong>{region.name}</strong>.</>
                 }</>;
             }
@@ -723,7 +723,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const port = this.game.world.regions.get(data.port);
                 const castle = this.game.world.regions.get(data.castle);
                 return <>
-                    <><strong>{house.name}</strong> lost {data.shipCount} Ship{data.shipCount > 1 ? "s" : ""} in <strong>{port.name}</strong> because <strong>{castle.name}</strong> is empty now.</>
+                    <><strong>{house.name}</strong> lost {data.shipCount} Ship{data.shipCount>1?"s":""} in <strong>{port.name}</strong> because <strong>{castle.name}</strong> is empty now.</>
                 </>;
             }
             case "silence-at-the-wall-executed":
@@ -767,7 +767,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <>
                     <strong>{house.name}</strong>{units.length > 0 ? (<> chose to
                     destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <strong key={i}>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), " and ")}.</>)
-                        : <> had no units to destroy.</>}
+                    : <> had no units to destroy.</>}
                 </>;
 
             case "preemptive-raid-wildlings-attack":
@@ -839,7 +839,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <>
                     <strong>Mammoth Riders</strong>: <strong>{house.name}</strong>{units.length > 0 ? (<> chose to
                     destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <strong key={i}>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), ", ")}.</>)
-                        : <> had no units to destroy.</>}
+                    : <> had no units to destroy.</>}
                 </>;
 
             case "mammoth-riders-return-card":
@@ -866,7 +866,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <>
                     <strong>The Horde Descends</strong>: <strong>{house.name}</strong>{units.length > 0 ? (<> chose to
                     destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <strong key={i}>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), ", ")}.</>)
-                        : <> had no units to destroy.</>}
+                    : <> had no units to destroy.</>}
                 </>;
 
             case "crow-killers-knights-replaced":
@@ -875,8 +875,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     {units.length > 0
-                        ? (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><strong>{unitTypes.length}</strong> Knights in <strong>{region.name}</strong></>), ", ")} with Footmen.</>)
-                        : (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> had no Knights to replace with Footmen.</>)}
+                    ? (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><strong>{unitTypes.length}</strong> Knights in <strong>{region.name}</strong></>), ", ")} with Footmen.</>)
+                    : (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> had no Knights to replace with Footmen.</>)}
                 </>;
 
             case "crow-killers-footman-upgraded":
@@ -885,8 +885,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     {units.length > 0
-                        ? (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><strong>{unitTypes.length}</strong> Footmen in <strong>{region.name}</strong></>), ", ")} with Knights.</>)
-                        : (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> was not able to replace any Footman with Knights.</>)}
+                    ? (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><strong>{unitTypes.length}</strong> Footmen in <strong>{region.name}</strong></>), ", ")} with Knights.</>)
+                    : (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> was not able to replace any Footman with Knights.</>)}
                 </>;
 
             case "skinchanger-scout-nights-watch-victory":
@@ -965,17 +965,17 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const supplies: [House, number][] = data.supplies.map(([hid, supply]) => [this.game.houses.get(hid), supply]);
 
                 return (
-                    <>
-                        Supply levels have been adjusted:
-                        <table cellPadding="5">
-                            {supplies.map(([house, supply]) => (
-                                <tr key={house.id}>
-                                    <td>{house.name}</td>
-                                    <td>{supply}</td>
-                                </tr>))}
-                        </table>
-                    </>);
-
+                <>
+                    Supply levels have been adjusted:
+                    <table cellPadding="5">
+                        {supplies.map(([house, supply]) => (
+                            <tr key={house.id}>
+                                <td>{house.name}</td>
+                                <td>{supply}</td>
+                            </tr>))}
+                    </table>
+                </>);
+                
             case "player-replaced":
                 const oldUser = this.props.ingameGameState.entireGame.users.get(data.oldUser);
                 const newUser = this.props.ingameGameState.entireGame.users.get(data.newUser);
@@ -994,14 +994,6 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <>
                     <b>{house.name}</b> claimed {joinReactNodes(vassals.map(v => <b key={v.id}>{v.name}</b>), ", ")} as
                     vassal{vassals.length > 0 && "s"}.
-                </>;
-
-            case "varys-used":
-                house = this.game.houses.get(data.house);
-
-                return <>
-                    <strong>Varys</strong>: <strong>{house.name}</strong> was moved to the top
-                    of the <strong>{this.game.getNameInfluenceTrack(1)}</strong> track.
                 </>;
         }
     }

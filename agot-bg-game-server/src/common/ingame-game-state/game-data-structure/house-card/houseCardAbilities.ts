@@ -24,13 +24,6 @@ import MaceTyrellHouseCardAbility from "./MaceTyrellHouseCardAbility";
 import CerseiLannisterHouseCardAbility from "./CerseiLannisterHouseCardAbility";
 import TheBlackfishHouseCardAbility from "./TheBlackfishHouseCardAbility";
 import RobbStarkHouseCardAbility from "./RobbStarkHouseCardAbility";
-import VarysHouseCardAbility from "./VarysHouseCardAbility";
-// import JaqenHGharHouseCardAbility from "./JaqenHGharHouseCardAbility";
-import SyrioForelHouseCardAbility from "./SyrioForelHouseCardAbility";
-// import JonConningtonHouseCardAbility from "./JonConningtonHouseCardAbility";
-import BericDondarrionHouseCardAbility from "./BericDondarrionHouseCardAbility";
-// import BronnHouseCardAbility from "./BronnHouseCardAbility";
-
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -70,7 +63,7 @@ export const queenOfThorns = new QueenOfThornsHouseCardAbility(
 export const victarionGreyjoy = new VictarionGreyjoyHouseCardAbility(
     "victarion-greyjoy",
     "If you are attacking, all of you participating Ships (including"
-    + " supporting Greyjoy Ships) add +2 to combat strength instead of +1."
+     + " supporting Greyjoy Ships) add +2 to combat strength instead of +1."
 );
 export const balonGreyjoy = new BalonGreyjoyHouseCardAbility(
     "balon-greyjoy",
@@ -148,34 +141,6 @@ export const robbStark = new RobbStarkHouseCardAbility(
     "If you win this combat, you may choose the area to which your opponent's retreats."
     + " You must choose a legal area where your opponent loses the fewest units."
 );
-export const varys = new VarysHouseCardAbility(
-    "varys",
-    "After combat, move this Vassal to the top of the fiefdoms track, shifting all other houses down."
-);
-// export const jaqenHGhar = new JaqenHGharHouseCardAbility(
-//     "jaqen-h-ghar",
-//     "Cancel your opponents chosen house card and return it to their hand."
-//     + " Then, randomly choose a house card from their hand to reveal as their chosen house card."
-// );
-export const syrioForel = new SyrioForelHouseCardAbility(
-    "syrio-forel",
-    "If this vassal is defending, the combat strength of all non-vassal footman is reduced to 0."
-);
-// export const jonConnington = new JonConningtonHouseCardAbility(
-//     "jon-connington",
-//     "If this vassal loses this combat, after combat, you may muster 1 of this vassal's knights"
-//     + " in either the area it retreated to or it's home area (if able)."
-// );
-export const bericDondarrion = new BericDondarrionHouseCardAbility(
-    "beric-dondarrion",
-    "If you win the combat, after casualties are taken,"
-    + " you must destroy 1 of this vassal's units in the embattled area."
-);
-// export const bronn = new BronnHouseCardAbility(
-//     "bronn",
-//     "After you reveal house cards, your opponent may choose to discard 2 of"
-//     + " their available power tokens to reduce this card's combat strength to 0."
-// );
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -202,12 +167,6 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [cerseiLannister.id, cerseiLannister],
     [theBlackfish.id, theBlackfish],
     [robbStark.id, robbStark],
-    [varys.id, varys],
-    // [jaqenHGhar.id, jaqenHGhar],
-    [syrioForel.id, syrioForel],
-    // [jonConnington.id, jonConnington],
-    [bericDondarrion.id, bericDondarrion],
-    // [bronn.id, bronn],
 ]);
 
 export default houseCardAbilities;

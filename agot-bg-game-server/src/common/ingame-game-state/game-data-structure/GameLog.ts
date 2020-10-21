@@ -19,16 +19,16 @@ export type GameLogData = TurnBegin | SupportDeclared | Attack | MarchResolved
     | MaceTyrellNoFootmanAvailable | MaceTyrellCasualtiesPrevented | MaceTyrellFootmanKilled
     | CerseiLannisterNoOrderAvailable | CerseiLannisterOrderRemoved | RobbStarkRetreatRegionOverriden
     | RetreatRegionChosen | RetreatCasualtiesSuffered | RetreatFailed | SilenceAtTheWallExecuted
-    | PreemptiveRaidChoiceDone | PreemptiveRaidTrackReduced | PreemptiveRaidUnitsKilled | PreemptiveRaidWildlingsAttack
+    | PreemptiveRaidChoiceDone | PreemptiveRaidTrackReduced | PreemptiveRaidUnitsKilled | PreemptiveRaidWildlingsAttack
     | MassingOnTheMilkwaterHouseCardsBack | MassingOnTheMilkwaterWildlingVictory
     | MassingOnTheMilkwaterHouseCardsRemoved
-    | AKingBeyondTheWallHighestTopTrack | AKingBeyondTheWallHouseReduceTrack | AKingBeyondTheWallLowestReduceTracks
+    | AKingBeyondTheWallHighestTopTrack | AKingBeyondTheWallHouseReduceTrack | AKingBeyondTheWallLowestReduceTracks
     | MammothRidersDestroyUnits | MammothRidersReturnCard | TheHordeDescendsHighestMuster | TheHordeDescendsUnitsKilled
     | CrowKillersFootmanUpgraded | CrowKillersKnightsReplaced
     | SkinchangerScoutNightsWatchVictory | SkinchangerScoutWildlingVictory
     | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory
     | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered
-    | SupplyAdjusted | PlayerReplaced | VassalsClaimed | VarysUsed;
+    | SupplyAdjusted | PlayerReplaced | VassalsClaimed;
 
 interface TurnBegin {
     type: "turn-begin";
@@ -118,7 +118,7 @@ interface LowestBidderChosen {
 interface PlayerMustered {
     type: "player-mustered";
     house: string;
-    musterings: [string, { from: string | null; to: string; region: string }[]][];
+    musterings: [string, {from: string | null; to: string; region: string}[]][];
 }
 
 interface WinnerDeclared {
@@ -566,9 +566,4 @@ interface VassalsClaimed {
     type: "vassals-claimed";
     house: string;
     vassals: string[];
-}
-
-interface VarysUsed {
-    type: "varys-used";
-    house: string;
 }
