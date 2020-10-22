@@ -304,7 +304,7 @@ export default class Game {
             return true;
         }
 
-        for (let i = 0; i < armySizes.length; i++) {
+        for (let i = 0;i < armySizes.length;i++) {
             if (armySizes[i] > allowedArmySizes[i]) {
                 return true;
             }
@@ -314,7 +314,7 @@ export default class Game {
         for (const p of addedUnits.keys.filter(r => r.type == port)) {
             // Filter for units of house as it is possible that the port still contains enemy ships
             // which will be removed after TakeControlOfEnemyPortGameState
-            if (p.units.values.filter(u => u.allegiance == house).length + addedUnits.get(p).length > 3) {
+            if(p.units.values.filter(u => u.allegiance == house).length + addedUnits.get(p).length > 3) {
                 return true;
             }
         }

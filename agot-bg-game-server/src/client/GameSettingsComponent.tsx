@@ -163,7 +163,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
      * Helper function to modify gameSettings and update the game settings.
      * @param action Function that modifies gameSettings
      */
-    changeGameSettings(action: () => void = () => { }): void {
+    changeGameSettings(action: () => void = () => {}): void {
         action();
 
         this.props.entireGame.updateGameSettings(this.gameSettings);

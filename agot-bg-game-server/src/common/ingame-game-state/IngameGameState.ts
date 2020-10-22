@@ -21,17 +21,17 @@ import {GameLogData} from "./game-data-structure/GameLog";
 import GameEndedGameState, {SerializedGameEndedGameState} from "./game-ended-game-state/GameEndedGameState";
 import UnitType from "./game-data-structure/UnitType";
 import WesterosCard from "./game-data-structure/westeros-card/WesterosCard";
-import Vote, {SerializedVote, VoteState} from "./vote-system/Vote";
-import VoteType, {CancelGame, ReplacePlayer} from "./vote-system/VoteType";
-import {v4} from "uuid";
-import CancelledGameState, {SerializedCancelledGameState} from "../cancelled-game-state/CancelledGameState";
+import Vote, { SerializedVote, VoteState } from "./vote-system/Vote";
+import VoteType, { CancelGame, ReplacePlayer } from "./vote-system/VoteType";
+import { v4 } from "uuid";
+import CancelledGameState, { SerializedCancelledGameState } from "../cancelled-game-state/CancelledGameState";
 
 export const NOTE_MAX_LENGTH = 5000;
 
 export default class IngameGameState extends GameState<
     EntireGame,
     WesterosGameState | PlanningGameState | ActionGameState | CancelledGameState | GameEndedGameState
-    > {
+> {
     players: BetterMap<User, Player> = new BetterMap<User, Player>();
     game: Game;
     gameLogManager: GameLogManager = new GameLogManager(this);
@@ -478,5 +478,5 @@ export interface SerializedIngameGameState {
     votes: SerializedVote[];
     gameLogManager: SerializedGameLogManager;
     childGameState: SerializedPlanningGameState | SerializedActionGameState | SerializedWesterosGameState
-    | SerializedGameEndedGameState | SerializedCancelledGameState;
+        | SerializedGameEndedGameState | SerializedCancelledGameState;
 }

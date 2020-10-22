@@ -35,7 +35,7 @@ export interface GameSetup {
     houses: string[];
     blockedRegions?: string[];
     removedUnits?: string[];
-    tracks?: {ironThrone?: string[]; fiefdoms?: string[]; kingsCourt?: string[]};
+    tracks?: { ironThrone?: string[]; fiefdoms?: string[]; kingsCourt?: string[] };
 }
 
 export default function createGame(entireGame: EntireGame, housesToCreate: string[]): Game {
@@ -135,7 +135,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
         westerosDeckData.forEach(westerosCardData => {
             const westerosCardType = westerosCardTypes.get(westerosCardData.type);
             const quantity = westerosCardData.quantity ? westerosCardData.quantity : 1;
-            for (let i = 0; i < quantity; i++) {
+            for (let i = 0;i < quantity;i++) {
                 const id = ++lastId;
 
                 cards.push(new WesterosCard(id, westerosCardType));
@@ -166,7 +166,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
                 return;
             }
 
-            for (let i = 0; i < quantity; i++) {
+            for (let i = 0;i < quantity;i++) {
                 const unit = game.createUnit(region, unitType, house);
 
                 region.units.set(unit.id, unit);

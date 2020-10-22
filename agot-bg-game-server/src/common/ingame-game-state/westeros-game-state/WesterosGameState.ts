@@ -24,7 +24,7 @@ import shuffle from "../../../utils/shuffle";
 export default class WesterosGameState extends GameState<IngameGameState,
     WildlingsAttackGameState | ReconcileArmiesGameState<WesterosGameState> | MusteringGameState | ClashOfKingsGameState
     | PutToTheSwordGameState | AThroneOfBladesGameState | DarkWingsDarkWordsGameState
-    > {
+> {
     revealedCards: WesterosCard[];
     @observable currentCardI = -1;
     /**
@@ -93,7 +93,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
         });
 
         // Execute all immediately effects
-        for (let i = 0; i < this.game.westerosDecks.length; i++) {
+        for(let i=0; i<this.game.westerosDecks.length; i++) {
             this.revealedCards[i].type.executeImmediately(this, i);
         }
 
@@ -197,7 +197,8 @@ export default class WesterosGameState extends GameState<IngameGameState,
         return westerosGameState;
     }
 
-    deserializeChildGameState(data: SerializedWesterosGameState["childGameState"]): WesterosGameState["childGameState"] {
+    deserializeChildGameState(data: SerializedWesterosGameState["childGameState"]): WesterosGameState["childGameState"] 
+    {
         if (data.type == "wildlings-attack") {
             return WildlingsAttackGameState.deserializeFromServer(this, data);
         } else if (data.type == "reconcile-armies") {
@@ -212,7 +213,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
             return AThroneOfBladesGameState.deserializeFromServer(this, data);
         } else if (data.type == "dark-wings-dark-words") {
             return DarkWingsDarkWordsGameState.deserializeFromServer(this, data);
-        } else {
+        } else  {
             throw new Error();
         }
     }
@@ -224,6 +225,6 @@ export interface SerializedWesterosGameState {
     currentCardI: number;
     planningRestrictions: string[];
     childGameState: SerializedWildlingsAttackGameState
-    | SerializedReconcileArmiesGameState | SerializedMusteringGameState | SerializedClashOfKingsGameState
-    | SerializedPutToTheSwordGameState | SerializedAThroneOfBladesGameState | SerializedDarkWingsDarkWordsGameState;
+        | SerializedReconcileArmiesGameState | SerializedMusteringGameState | SerializedClashOfKingsGameState
+        | SerializedPutToTheSwordGameState | SerializedAThroneOfBladesGameState | SerializedDarkWingsDarkWordsGameState;
 }

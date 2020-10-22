@@ -9,8 +9,8 @@ import {observable} from "mobx";
 import * as _ from "lodash";
 import BetterMap from "../utils/BetterMap";
 import GameEndedGameState from "./ingame-game-state/game-ended-game-state/GameEndedGameState";
-import {GameSetup, GameSetupContainer} from "./ingame-game-state/game-data-structure/createGame";
-import CancelledGameState, {SerializedCancelledGameState} from "./cancelled-game-state/CancelledGameState";
+import { GameSetup, GameSetupContainer } from "./ingame-game-state/game-data-structure/createGame";
+import CancelledGameState, { SerializedCancelledGameState } from "./cancelled-game-state/CancelledGameState";
 
 export default class EntireGame extends GameState<null, LobbyGameState | IngameGameState | CancelledGameState> {
     id: string;
@@ -159,7 +159,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             const user = this.users.get(message.user);
 
             user.settings = message.settings;
-        } else if (message.type == "game-settings-changed") {
+        } else if (message.type == "game-settings-changed"){
             this.gameSettings = message.settings;
         } else if (message.type == "update-connection-status") {
             const user = this.users.get(message.user);
@@ -272,7 +272,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
                     return {user: otherUser, roomId};
                 })
-            ));
+        ));
     }
 
     getGameSetupContainer(setupId: string): GameSetupContainer {

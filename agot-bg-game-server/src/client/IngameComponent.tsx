@@ -109,7 +109,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         return (
             <>
-                <Col xs={{span: "auto", order: "3"}} xl={{span: "auto", order: "1"}}>
+                <Col xs={{span: "auto", order: "3"}}  xl={{span: "auto", order: "1"}}>
                     <Row className="stackable">
                         <Col>
                             <Card>
@@ -118,35 +118,35 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         <Row className="justify-content-between" style={{fontSize: "24px"}}>
                                             <Col xs="auto">
                                                 <OverlayTrigger overlay={
-                                                    <Tooltip id="turn">
-                                                        <b>Turn</b>
-                                                    </Tooltip>
+                                                        <Tooltip id="turn">
+                                                            <b>Turn</b>
+                                                        </Tooltip>
                                                 }
                                                     placement="bottom">
                                                     <div>
-                                                        <img src={hourglassImage} style={{marginRight: "5px"}} width={32} />
+                                                        <img src={hourglassImage} style={{marginRight: "5px"}} width={32}/>
                                                         {this.game.turn}
                                                     </div>
                                                 </OverlayTrigger>
                                             </Col>
                                             <Col xs="auto">
                                                 <OverlayTrigger overlay={
-                                                    <Tooltip id="wildling-threat">
-                                                        <b>Wildling Threat</b>{knowsWildlingCard && nextWildlingCard ?
-                                                            <><br /><br /><strong><u>{nextWildlingCard.type.name}</u></strong><br />
-                                                                <strong>Lowest Bidder:</strong> {nextWildlingCard.type.wildlingVictoryLowestBidderDescription}<br />
-                                                                <strong>Everyone Else:</strong> {nextWildlingCard.type.wildlingVictoryEverybodyElseDescription}<br /><br />
-                                                                <strong>Highest Bidder:</strong> {nextWildlingCard.type.nightsWatchDescription}
+                                                        <Tooltip id="wildling-threat">
+                                                            <b>Wildling Threat</b>{ knowsWildlingCard && nextWildlingCard ?
+                                                            <><br/><br/><strong><u>{nextWildlingCard.type.name}</u></strong><br/>
+                                                            <strong>Lowest Bidder:</strong> {nextWildlingCard.type.wildlingVictoryLowestBidderDescription}<br/>
+                                                            <strong>Everyone Else:</strong> {nextWildlingCard.type.wildlingVictoryEverybodyElseDescription}<br/><br/>
+                                                            <strong>Highest Bidder:</strong> {nextWildlingCard.type.nightsWatchDescription}
                                                             </>
                                                             : <></>
-                                                        }
-                                                    </Tooltip>
-                                                }
+                                                            }
+                                                        </Tooltip>
+                                                    }
                                                     placement="bottom"
                                                 >
                                                     <div>
                                                         {this.game.wildlingStrength}
-                                                        <img src={mammothImage} width={32} style={{marginLeft: "5px"}} className={knowsWildlingCard ? "wildling-highlight" : ""} />
+                                                        <img src={mammothImage} width={32} style={{marginLeft: "5px"}} className={knowsWildlingCard ? "wildling-highlight" : ""}/>
                                                     </div>
                                                 </OverlayTrigger>
                                             </Col>
@@ -161,38 +161,38 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                             <Tooltip id={`tooltip-tracker-${i}`}>
                                                                 {i == 0 ? (
                                                                     <>
-                                                                        <b>Iron Throne Track</b><br />
+                                                                        <b>Iron Throne Track</b><br/>
                                                                         All ties (except military ones) are decided by the holder
-                                                                        of the Iron Throne.<br />
+                                                                        of the Iron Throne.<br/>
                                                                         Turn order is decided by this tracker.
                                                                     </>
                                                                 ) : i == 1 ? (
                                                                     <>
-                                                                        <b>Fiefdoms Track</b><br />
+                                                                        <b>Fiefdoms Track</b><br/>
                                                                         Once per turn, the holder of Valyrian Steel Blade can use the blade
-                                                                        to increase by one the combat strength of his army in a combat.<br />
+                                                                        to increase by one the combat strength of his army in a combat.<br/>
                                                                         In case of a tie in a combat, the winner is the house which is
-                                                                        the highest in this tracker.<br /><br />
+                                                                        the highest in this tracker.<br/><br/>
                                                                         {this.props.gameState.game.valyrianSteelBladeUsed ? (
                                                                             <>The Valyrian Steel Blade has been used this turn</>
                                                                         ) : (
-                                                                                <>The Valyrian Steel Blade is available</>
-                                                                            )}
+                                                                            <>The Valyrian Steel Blade is available</>
+                                                                        )}
                                                                     </>
                                                                 ) : (
-                                                                            <>
-                                                                                <b>Kings&apos;s Court Track</b><br />
+                                                                    <>
+                                                                        <b>Kings&apos;s Court Track</b><br/>
                                                                         At the end of the Planning Phase, the holder of the Raven may choose
                                                                         to either change one of his placed order, or to look at the top card of the
                                                                         Wildling deck and decide whether to leave it at the top or to
                                                                         place it at the bottom of the deck.
                                                                     </>
-                                                                        )}
+                                                                )}
                                                             </Tooltip>
                                                         }
                                                         placement="right"
                                                     >
-                                                        <img src={i == 0 ? stoneThroneImage : i == 1 ? diamondHiltImage : ravenImage} width={32} />
+                                                        <img src={i == 0 ? stoneThroneImage : i == 1 ? diamondHiltImage : ravenImage} width={32}/>
                                                     </OverlayTrigger>
                                                 </Col>
                                                 {tracker.map((h, i) => (
@@ -206,7 +206,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                     <div key={i}>
                                                                         <FontAwesomeIcon
                                                                             style={{color: "#ffc107", fontSize: "9px"}}
-                                                                            icon={faStar} />
+                                                                            icon={faStar}/>
                                                                     </div>
                                                                 ))
                                                             )}
@@ -340,7 +340,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     <Row>
                         <Col xs="auto">
                             <button className="btn btn-outline-light btn-sm" onClick={() => this.props.gameClient.muted = !this.props.gameClient.muted}>
-                                <img src={this.props.gameClient.muted ? speakerOff : speaker} width={32} />
+                                <img src={this.props.gameClient.muted ? speakerOff : speaker} width={32}/>
                             </button>
                         </Col>
                         {this.props.gameState.players.has(this.props.gameClient.authenticatedUser as User) && (
@@ -365,7 +365,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         onClick={() => this.props.gameState.launchCancelGameVote()}
                                         disabled={!canLaunchCancelGameVote}
                                     >
-                                        <img src={cancelImage} width={32} />
+                                        <img src={cancelImage} width={32}/>
                                     </button>
                                 </OverlayTrigger>
                             </Col>
@@ -454,7 +454,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                         >
                                                             <FontAwesomeIcon
                                                                 style={{color: "white"}}
-                                                                icon={faStickyNote} />
+                                                                icon={faStickyNote}/>
                                                         </OverlayTrigger>
                                                     </Nav.Link>
                                                 </Nav.Item>
@@ -476,7 +476,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             <Nav.Item>
                                                 <Dropdown>
                                                     <Dropdown.Toggle id="private-chat-room-dropdown" variant="link">
-                                                        <img src={chatBubble} width={16} />
+                                                        <img src={chatBubble} width={16}/>
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
                                                         {this.getOtherPlayers().map(p => (
@@ -496,23 +496,23 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     entireGame={this.props.gameState.entireGame}
                                                     roomId={this.props.gameState.entireGame.publicChatRoomId}
                                                     currentlyViewed={this.currentOpenedTab == "chat"}
-                                                    injectBetweenMessages={(p, n) => this.injectBetweenMessages(p, n)} />
+                                                    injectBetweenMessages={(p, n) => this.injectBetweenMessages(p, n)}/>
                                             </Tab.Pane>
                                             <Tab.Pane eventKey="game-logs" className="h-100">
                                                 <ScrollToBottom className="h-100" scrollViewClassName="overflow-x-hidden">
-                                                    <GameLogListComponent ingameGameState={this.props.gameState} />
+                                                    <GameLogListComponent ingameGameState={this.props.gameState}/>
                                                 </ScrollToBottom>
                                             </Tab.Pane>
                                             <Tab.Pane eventKey="settings">
                                                 <GameSettingsComponent gameClient={this.props.gameClient}
-                                                    entireGame={this.props.gameState.entireGame} />
+                                                    entireGame={this.props.gameState.entireGame}/>
                                                 <UserSettingsComponent user={this.props.gameClient.authenticatedUser}
                                                     entireGame={this.props.gameState.entireGame}
-                                                    parent={this} />
+                                                    parent={this}/>
                                             </Tab.Pane>
                                             {this.props.gameClient.authenticatedPlayer && (
                                                 <Tab.Pane eventKey="note" className="h-100">
-                                                    <NoteComponent gameClient={this.props.gameClient} ingame={this.props.gameState} />
+                                                    <NoteComponent gameClient={this.props.gameClient} ingame={this.props.gameState}/>
                                                 </Tab.Pane>
                                             )}
                                             {this.getPrivateChatRooms().map(({roomId}) => (
@@ -520,7 +520,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     <ChatComponent gameClient={this.props.gameClient}
                                                         entireGame={this.props.gameState.entireGame}
                                                         roomId={roomId}
-                                                        currentlyViewed={this.currentOpenedTab == roomId} />
+                                                        currentlyViewed={this.currentOpenedTab == roomId}/>
                                                 </Tab.Pane>
                                             ))}
                                         </Tab.Content>
@@ -548,14 +548,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     private renderUnitTypeTooltip(unitType: UnitType): ReactNode {
         return <Tooltip id={unitType.id + "-tooltip"}>
-            <b>{unitType.name}</b><br />
+            <b>{unitType.name}</b><br/>
             <small>{unitType.description}</small>
         </Tooltip>;
     }
 
     private renderTotalLandRegionsTooltip(house: House): ReactNode {
         return <Tooltip id={house.id + "-total-land-regions"}>
-            <h5>Total Land Areas</h5><br /><h4 style={{textAlign: "center"}}><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
+            <h5>Total Land Areas</h5><br/><h4 style={{textAlign: "center"}}><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
         </Tooltip>;
     }
 
@@ -565,9 +565,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const powerInPool = this.game.maxPowerTokens - availablePower - powerTokensOnBoard;
 
         return <Tooltip id={house.id + "-power-tooltip"}>
-            <b>{house.name}</b><br />
-            <small>Available: </small><b>{availablePower}</b><br />
-            <small>On the board: </small><b>{powerTokensOnBoard}</b><br />
+            <b>{house.name}</b><br/>
+            <small>Available: </small><b>{availablePower}</b><br/>
+            <small>On the board: </small><b>{powerTokensOnBoard}</b><br/>
             <small>Power Pool: </small><b>{powerInPool}</b>
         </Tooltip>;
     }
@@ -660,7 +660,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const votesToRender = this.props.gameState.votes.values.filter(v => (previous != null ? previous.createdAt < v.createdAt : true) && (next ? v.createdAt < next.createdAt : true));
         console.log(votesToRender);
         return _.sortBy(votesToRender, v => v.createdAt).map(v => (
-            <VoteComponent key={v.id} vote={v} gameClient={this.props.gameClient} ingame={this.props.gameState} />
+            <VoteComponent key={v.id} vote={v} gameClient={this.props.gameClient} ingame={this.props.gameState}/>
         ));
     }
 
