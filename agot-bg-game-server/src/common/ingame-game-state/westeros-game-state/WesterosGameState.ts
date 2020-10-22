@@ -197,7 +197,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
         return westerosGameState;
     }
 
-    deserializeChildGameState(data: SerializedWesterosGameState["childGameState"]): WesterosGameState["childGameState"] 
+    deserializeChildGameState(data: SerializedWesterosGameState["childGameState"]): WesterosGameState["childGameState"]
     {
         if (data.type == "wildlings-attack") {
             return WildlingsAttackGameState.deserializeFromServer(this, data);

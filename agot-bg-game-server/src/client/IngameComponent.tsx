@@ -260,7 +260,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                     <Col xs="auto" style={{marginLeft: 4}}>
                                                                         <OverlayTrigger
                                                                             overlay={this.renderUnitTypeTooltip(type)}
-                                                                            delay={{ show: 250, hide: 100 }}
+                                                                            delay={{show: 250, hide: 100}}
                                                                             placement="auto">
                                                                             <div className="unit-icon small hover-weak-outline"
                                                                                     style={{
@@ -280,10 +280,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     placement="auto"
                                                 >
                                                     <Col xs="auto" className="d-flex align-items-center">
-                                                        <div style={{fontSize: "18px"}}>{this.game.getTotalHeldStructures(p.house)}</div>
+                                                        <div style={{ fontSize: "18px" }}>{this.game.getTotalHeldStructures(p.house)}</div>
                                                         <img
                                                             src={castleImage} width={32} className="hover-weak-outline"
-                                                            style={{marginLeft: "10px"}}
+                                                            style={{ marginLeft: "10px" }}
                                                         />
                                                     </Col>
                                                 </OverlayTrigger>
@@ -493,10 +493,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         <Tab.Content className="h-100">
                                             <Tab.Pane eventKey="chat" className="h-100">
                                                 <ChatComponent gameClient={this.props.gameClient}
-                                                            entireGame={this.props.gameState.entireGame}
-                                                            roomId={this.props.gameState.entireGame.publicChatRoomId}
-                                                            currentlyViewed={this.currentOpenedTab == "chat"}
-                                                            injectBetweenMessages={(p, n) => this.injectBetweenMessages(p, n)}/>
+                                                               entireGame={this.props.gameState.entireGame}
+                                                               roomId={this.props.gameState.entireGame.publicChatRoomId}
+                                                               currentlyViewed={this.currentOpenedTab == "chat"}
+                                                               injectBetweenMessages={(p, n) => this.injectBetweenMessages(p, n)}/>
                                             </Tab.Pane>
                                             <Tab.Pane eventKey="game-logs" className="h-100">
                                                 <ScrollToBottom className="h-100" scrollViewClassName="overflow-x-hidden">
@@ -508,7 +508,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                     entireGame={this.props.gameState.entireGame} />
                                                 <UserSettingsComponent user={this.props.gameClient.authenticatedUser}
                                                                         entireGame={this.props.gameState.entireGame}
-                                                                        parent={this}/>
+                                                                        parent={this} />
                                             </Tab.Pane>
                                             {this.props.gameClient.authenticatedPlayer && (
                                                 <Tab.Pane eventKey="note" className="h-100">
@@ -576,7 +576,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const remainingCards = this.game.remainingWesterosCardTypes;
         const nextCards = this.game.nextWesterosCardNames;
 
-        return < Tooltip id="remaining-westeros-cards" className="westeros-tooltip" >
+        return <Tooltip id="remaining-westeros-cards" className="westeros-tooltip">
             {this.gameSettings.cokWesterosPhase && (
                 <>
                     <Row className='mt-0'>
@@ -613,7 +613,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </Col>
                 )}
             </Row>
-        </Tooltip >;
+        </Tooltip>;
     }
 
     getConnectedSpectators(): User[] {
