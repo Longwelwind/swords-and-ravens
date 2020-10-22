@@ -80,6 +80,8 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
     game.supplyRestrictions = baseGameData.supplyRestrictions;
     game.maxPowerTokens = MAX_POWER_TOKENS;
 
+    game.revealedWesterosCards = entireGame.gameSettings.cokWesterosPhase ? 3 : 0;
+
     // Load tracks starting positions
     if (gameSetup.tracks && gameSetup.tracks.ironThrone) {
         game.ironThroneTrack = gameSetup.tracks.ironThrone.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));

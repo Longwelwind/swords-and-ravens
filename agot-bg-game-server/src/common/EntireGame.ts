@@ -20,7 +20,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     ownerUserId: string;
     name: string;
 
-    @observable gameSettings: GameSettings = {pbem: false, setupId: "base-game", playerCount: 6, randomHouses: false};
+    @observable gameSettings: GameSettings = {pbem: false, setupId: "base-game", playerCount: 6, randomHouses: false, cokWesterosPhase: false};
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -159,7 +159,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             const user = this.users.get(message.user);
 
             user.settings = message.settings;
-        } else if (message.type == "game-settings-changed") {
+        } else if (message.type == "game-settings-changed") {
             this.gameSettings = message.settings;
         } else if (message.type == "update-connection-status") {
             const user = this.users.get(message.user);
@@ -363,4 +363,5 @@ export interface GameSettings {
     setupId: string;
     playerCount: number;
     randomHouses: boolean;
+    cokWesterosPhase: boolean;
 }
