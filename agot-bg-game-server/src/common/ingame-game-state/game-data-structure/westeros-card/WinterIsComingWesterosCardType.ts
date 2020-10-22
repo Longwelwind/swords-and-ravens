@@ -12,16 +12,17 @@ export default class WinterIsComingWesterosCardType extends WesterosCardType {
             westerosDeckI: currentDeckI
         });
 
-        const deck = westerosGameState.game.westerosDecks[currentDeckI];
+        let deck = westerosGameState.game.westerosDecks[currentDeckI];
+        const dontShuffle = westerosGameState.game.revealedWesterosCards - 1;
 
         // Reset discarded state
         deck.forEach(card => { card.discarded = false; });
 
         // Shuffle the deck
-        shuffle(deck);
-
+        deck = deck.slice(0, dontShuffle).concat(shuffle(deck.slice(dontShuffle)));
+        
         // Draw a new card from this deck ...
-        const newDrawnCard = deck.shift() as WesterosCard;
+        const newDrawnCard = deck.splice(dontShuffle, 1)[0] as WesterosCard;
 
         // ... and burry it at the bottom of the deck
         deck.push(newDrawnCard);

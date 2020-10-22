@@ -75,6 +75,24 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                 />
                             </Col>
                         </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="cok-westeros-phase-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="cok-westeros-phase-tooltip">
+                                                Players may look at the next 3 Westeros cards from each deck at any given moment of the game.
+                                            </Tooltip>}>
+                                            <label htmlFor="cok-westeros-phase-setting">Enable CoK Westeros Phase Variant</label>
+                                        </OverlayTrigger>}
+                                    disabled={!this.canChangeGameSettings}
+                                    checked={this.gameSettings.cokWesterosPhase}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.cokWesterosPhase = !this.gameSettings.cokWesterosPhase)}
+                                />
+                            </Col>
+                        </Row>
                     </>
                 )}
                 <Row>

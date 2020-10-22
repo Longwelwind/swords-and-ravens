@@ -67,6 +67,7 @@ import joinReactNodes from "./utils/joinReactNodes";
 import NoteComponent from "./NoteComponent";
 import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
 import UserSettingsComponent from "./UserSettingsComponent";
+import { GameSettings } from '../common/EntireGame';
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -81,6 +82,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     get game(): Game {
         return this.props.gameState.game;
+    }
+
+    get gameSettings(): GameSettings {
+        return this.props.gameState.entireGame.gameSettings;
     }
 
     get user(): User | null {
@@ -569,26 +574,44 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     private renderRemainingWesterosCards(): ReactNode {
         const remainingCards = this.game.remainingWesterosCardTypes;
-
+        const nextCards = this.game.nextWesterosCardNames;
+        
         return <Tooltip id="remaining-westeros-cards" className="westeros-tooltip">
-            <h5 style={{textAlign: "center"}}>Remaining Westeros Cards</h5>
-            <table cellPadding="5">
-                <thead>
-                    <tr>
-                        {remainingCards.map((_, i) =>
-                            <th key={"westeros-deck-" + i + "-header"} style={{textAlign: "center"}}>Deck {i + 1}</th>)}
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        {remainingCards.map((rc, i) =>
-                            <td key={"westeros-deck-" + i + "-data"}>
-                                {rc.entries.map(([wc, count], j) => <div key={"westeros-deck-" + i + "-" + j + "-data"}><small>{wc.name}</small> ({count})</div>)}
-                            </td>
-                        )}
-                    </tr>
-                </tbody>
-            </table>
+            {this.gameSettings.cokWesterosPhase && (
+                <>
+                    <Row className='mt-0'>
+                        <Col>
+                            <h5 className='text-center'>Next Westeros Cards</h5>
+                        </Col>
+                    </Row>
+                    <Row>
+                        {nextCards.map((_, i) =>
+                            <Col key={"westeros-deck-" + i + "-header"} className='text-center'>Deck {i + 1}</Col>)}
+                    </Row>
+                    <Row>
+                        {nextCards.map((wd, i) =>
+                            <Col key={"westeros-deck-" + i + "-data"}>
+                                {wd.map((wc, j) => <div key={"westeros-deck-" + i + "-" + j + "-data"}><small>{wc}</small></div>)}
+                            </Col>)}
+                    </Row>
+                </>
+            )}
+            <Row className='mt-0'>
+                <Col>
+                    <h5 className='text-center'>Remaining Westeros Cards</h5>
+                </Col>
+            </Row>
+            <Row>
+                {remainingCards.map((_, i) =>
+                    <Col key={"westeros-deck-" + i + "-header"} style={{ textAlign: "center" }}>Deck {i + 1}</Col>)}
+            </Row>
+            <Row>
+                {remainingCards.map((rc, i) =>
+                    <Col key={"westeros-deck-" + i + "-data"}>
+                        {rc.entries.map(([wc, count], j) => <div key={"westeros-deck-" + i + "-" + j + "-data"}><small>{wc.name}</small> ({count})</div>)}
+                    </Col>
+                )}
+            </Row>
         </Tooltip>;
     }
 
