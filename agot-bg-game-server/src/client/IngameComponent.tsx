@@ -260,7 +260,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                     <Col xs="auto" style={{marginLeft: 4}}>
                                                                         <OverlayTrigger
                                                                             overlay={this.renderUnitTypeTooltip(type)}
-                                                                            delay={{show: 250, hide: 100}}
+                                                                            delay={{ show: 250, hide: 100 }}
                                                                             placement="auto">
                                                                             <div className="unit-icon small hover-weak-outline"
                                                                                     style={{
@@ -291,7 +291,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     <div style={{fontSize: "18px"}}>{p.house.powerTokens}</div>
                                                     <OverlayTrigger
                                                         overlay={this.renderPowerTooltip(p.house)}
-                                                        delay={{ show: 250, hide: 100 }}
+                                                        delay={{show: 250, hide: 100}}
                                                         placement="auto"
                                                     >
                                                         <div
