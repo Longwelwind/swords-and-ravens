@@ -1,24 +1,24 @@
 import GameState from "../../GameState";
 import IngameGameState from "../IngameGameState";
 import WesterosCard from "../game-data-structure/westeros-card/WesterosCard";
-import Game, { MAX_WILDLING_STRENGTH } from "../game-data-structure/Game";
+import Game, {MAX_WILDLING_STRENGTH} from "../game-data-structure/Game";
 import World from "../game-data-structure/World";
-import { observable } from "mobx";
+import {observable} from "mobx";
 import getById from "../../../utils/getById";
 import Player from "../Player";
 import EntireGame from "../../EntireGame";
 import * as _ from "lodash";
-import WildlingsAttackGameState, { SerializedWildlingsAttackGameState } from "./wildlings-attack-game-state/WildlingsAttackGameState";
-import { ClientMessage } from "../../../messages/ClientMessage";
-import { ServerMessage } from "../../../messages/ServerMessage";
-import ReconcileArmiesGameState, { SerializedReconcileArmiesGameState } from "./reconcile-armies-game-state/ReconcileArmiesGameState";
-import MusteringGameState, { SerializedMusteringGameState } from "./mustering-game-state/MusteringGameState";
-import ClashOfKingsGameState, { SerializedClashOfKingsGameState } from "./clash-of-kings-game-state/ClashOfKingsGameState";
+import WildlingsAttackGameState, {SerializedWildlingsAttackGameState} from "./wildlings-attack-game-state/WildlingsAttackGameState";
+import {ClientMessage} from "../../../messages/ClientMessage";
+import {ServerMessage} from "../../../messages/ServerMessage";
+import ReconcileArmiesGameState, {SerializedReconcileArmiesGameState} from "./reconcile-armies-game-state/ReconcileArmiesGameState";
+import MusteringGameState, {SerializedMusteringGameState} from "./mustering-game-state/MusteringGameState";
+import ClashOfKingsGameState, {SerializedClashOfKingsGameState} from "./clash-of-kings-game-state/ClashOfKingsGameState";
 import PlanningRestriction from "../game-data-structure/westeros-card/planning-restriction/PlanningRestriction";
 import planningRestrictions from "../game-data-structure/westeros-card/planning-restriction/planningRestrictions";
-import PutToTheSwordGameState, { SerializedPutToTheSwordGameState } from "./put-to-the-swords-game-state/PutToTheSwordGameState";
-import AThroneOfBladesGameState, { SerializedAThroneOfBladesGameState } from "./thrones-of-blades-game-state/AThroneOfBladesGameState";
-import DarkWingsDarkWordsGameState, { SerializedDarkWingsDarkWordsGameState } from "./dark-wings-dark-words-game-state/DarkWingsDarkWordsGameState";
+import PutToTheSwordGameState, {SerializedPutToTheSwordGameState} from "./put-to-the-swords-game-state/PutToTheSwordGameState";
+import AThroneOfBladesGameState, {SerializedAThroneOfBladesGameState} from "./thrones-of-blades-game-state/AThroneOfBladesGameState";
+import DarkWingsDarkWordsGameState, {SerializedDarkWingsDarkWordsGameState} from "./dark-wings-dark-words-game-state/DarkWingsDarkWordsGameState";
 import shuffle from "../../../utils/shuffle";
 
 export default class WesterosGameState extends GameState<IngameGameState,

@@ -1,18 +1,18 @@
-import House, { SerializedHouse } from "./House";
-import World, { SerializedWorld } from "./World";
+import House, {SerializedHouse} from "./House";
+import World, {SerializedWorld} from "./World";
 import Region from "./Region";
 import UnitType from "./UnitType";
 import Unit from "./Unit";
 import Order from "./Order";
 import orders from "./orders";
 import * as _ from "lodash";
-import { observable } from "mobx";
-import WesterosCard, { SerializedWesterosCard } from "./westeros-card/WesterosCard";
+import {observable} from "mobx";
+import WesterosCard, {SerializedWesterosCard} from "./westeros-card/WesterosCard";
 import shuffle from "../../../utils/shuffle";
-import WildlingCard, { SerializedWildlingCard } from "./wildling-card/WildlingCard";
+import WildlingCard, {SerializedWildlingCard} from "./wildling-card/WildlingCard";
 import BetterMap from "../../../utils/BetterMap";
 import HouseCard from "./house-card/HouseCard";
-import { land, port } from "./regionTypes";
+import {land, port} from "./regionTypes";
 import PlanningRestriction from "./westeros-card/planning-restriction/PlanningRestriction";
 import WesterosCardType from "./westeros-card/WesterosCardType";
 

@@ -1,30 +1,30 @@
 import EntireGame from "../EntireGame";
 import GameState from "../GameState";
-import { ClientMessage } from "../../messages/ClientMessage";
-import { ServerMessage } from "../../messages/ServerMessage";
+import {ClientMessage} from "../../messages/ClientMessage";
+import {ServerMessage} from "../../messages/ServerMessage";
 import User from "../../server/User";
 import World from "./game-data-structure/World";
-import Player, { SerializedPlayer } from "./Player";
+import Player, {SerializedPlayer} from "./Player";
 import Region from "./game-data-structure/Region";
-import PlanningGameState, { SerializedPlanningGameState } from "./planning-game-state/PlanningGameState";
-import ActionGameState, { SerializedActionGameState } from "./action-game-state/ActionGameState";
+import PlanningGameState, {SerializedPlanningGameState} from "./planning-game-state/PlanningGameState";
+import ActionGameState, {SerializedActionGameState} from "./action-game-state/ActionGameState";
 import Order from "./game-data-structure/Order";
-import Game, { SerializedGame } from "./game-data-structure/Game";
-import WesterosGameState, { SerializedWesterosGameState } from "./westeros-game-state/WesterosGameState";
+import Game, {SerializedGame} from "./game-data-structure/Game";
+import WesterosGameState, {SerializedWesterosGameState} from "./westeros-game-state/WesterosGameState";
 import createGame from "./game-data-structure/createGame";
 import BetterMap from "../../utils/BetterMap";
 import House from "./game-data-structure/House";
 import Unit from "./game-data-structure/Unit";
 import PlanningRestriction from "./game-data-structure/westeros-card/planning-restriction/PlanningRestriction";
-import GameLogManager, { SerializedGameLogManager } from "./game-data-structure/GameLogManager";
-import { GameLogData } from "./game-data-structure/GameLog";
-import GameEndedGameState, { SerializedGameEndedGameState } from "./game-ended-game-state/GameEndedGameState";
+import GameLogManager, {SerializedGameLogManager} from "./game-data-structure/GameLogManager";
+import {GameLogData} from "./game-data-structure/GameLog";
+import GameEndedGameState, {SerializedGameEndedGameState} from "./game-ended-game-state/GameEndedGameState";
 import UnitType from "./game-data-structure/UnitType";
 import WesterosCard from "./game-data-structure/westeros-card/WesterosCard";
-import Vote, { SerializedVote, VoteState } from "./vote-system/Vote";
-import VoteType, { CancelGame, ReplacePlayer } from "./vote-system/VoteType";
-import { v4 } from "uuid";
-import CancelledGameState, { SerializedCancelledGameState } from "../cancelled-game-state/CancelledGameState";
+import Vote, {SerializedVote, VoteState} from "./vote-system/Vote";
+import VoteType, {CancelGame, ReplacePlayer} from "./vote-system/VoteType";
+import {v4} from "uuid";
+import CancelledGameState, {SerializedCancelledGameState} from "../cancelled-game-state/CancelledGameState";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -99,7 +99,7 @@ export default class IngameGameState extends GameState<
         }
 
         this.game.turn++;
-        this.log({ type: "turn-begin", turn: this.game.turn });
+        this.log({type: "turn-begin", turn: this.game.turn});
 
         this.game.valyrianSteelBladeUsed = false;
 
@@ -310,7 +310,7 @@ export default class IngameGameState extends GameState<
             this.game.valyrianSteelBladeUsed = false;
             this.world.regions.forEach(r => r.units.forEach(u => u.wounded = false));
         } else if (message.type == "add-game-log") {
-            this.gameLogManager.logs.push({ data: message.data, time: new Date(message.time * 1000) });
+            this.gameLogManager.logs.push({data: message.data, time: new Date(message.time * 1000)});
         } else if (message.type == "change-tracker") {
             const newOrder = message.tracker.map(hid => this.game.houses.get(hid));
 
@@ -367,43 +367,43 @@ export default class IngameGameState extends GameState<
         }
     }
 
-    canLaunchCancelGameVote(): { result: boolean; reason: string } {
+    canLaunchCancelGameVote(): {result: boolean; reason: string} {
         const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof CancelGame);
 
         if (existingVotes.length > 0) {
-            return { result: false, reason: "already-existing" };
+            return {result: false, reason: "already-existing"};
         }
 
         if (this.childGameState instanceof CancelledGameState) {
-            return { result: false, reason: "already-cancelled" };
+            return {result: false, reason: "already-cancelled"};
         }
 
         if (this.childGameState instanceof GameEndedGameState) {
-            return { result: false, reason: "already-ended" };
+            return {result: false, reason: "already-ended"};
         }
 
-        return { result: true, reason: "" };
+        return {result: true, reason: ""};
     }
 
-    canLaunchReplacePlayerVote(fromUser: User, _forPlayer: Player): { result: boolean; reason: string } {
+    canLaunchReplacePlayerVote(fromUser: User, _forPlayer: Player): {result: boolean; reason: string} {
         if (this.players.keys.includes(fromUser)) {
-            return { result: false, reason: "already-playing" };
+            return {result: false, reason: "already-playing"};
         }
 
         const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof ReplacePlayer);
         if (existingVotes.length > 0) {
-            return { result: false, reason: "ongoing-vote" };
+            return {result: false, reason: "ongoing-vote"};
         }
 
         if (this.childGameState instanceof CancelledGameState) {
-            return { result: false, reason: "game-cancelled" };
+            return {result: false, reason: "game-cancelled"};
         }
 
         if (this.childGameState instanceof GameEndedGameState) {
-            return { result: false, reason: "game-ended" };
+            return {result: false, reason: "game-ended"};
         }
 
-        return { result: true, reason: "" };
+        return {result: true, reason: ""};
     }
 
     launchReplacePlayerVote(player: Player): void {

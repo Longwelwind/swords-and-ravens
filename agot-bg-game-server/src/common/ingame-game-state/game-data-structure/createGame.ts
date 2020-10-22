@@ -4,7 +4,7 @@ import House from "./House";
 import Region from "./Region";
 import World from "./World";
 import WesterosCard from "./westeros-card/WesterosCard";
-import { westerosCardTypes } from "./westeros-card/westerosCardTypes";
+import {westerosCardTypes} from "./westeros-card/westerosCardTypes";
 import unitTypes from "./unitTypes";
 import Game from "./Game";
 import WildlingCard from "./wildling-card/WildlingCard";
@@ -35,7 +35,7 @@ export interface GameSetup {
     houses: string[];
     blockedRegions?: string[];
     removedUnits?: string[];
-    tracks?: { ironThrone?: string[]; fiefdoms?: string[]; kingsCourt?: string[] };
+    tracks?: {ironThrone?: string[]; fiefdoms?: string[]; kingsCourt?: string[]};
 }
 
 export default function createGame(entireGame: EntireGame, housesToCreate: string[]): Game {
@@ -50,7 +50,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
                 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
                 // @ts-ignore The conversion provokes n error in the CI
                 // Don't ask me why.
-                Object.entries(houseData.houseCards as { [key: string]: HouseCardData })
+                Object.entries(houseData.houseCards as {[key: string]: HouseCardData})
                     .map(([houseCardId, houseCardData]) => {
                         const houseCard = new HouseCard(
                             houseCardId,
@@ -65,7 +65,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
                     })
             );
             const unitLimits = new BetterMap(
-                Object.entries(houseData.unitLimits as { [key: string]: number })
+                Object.entries(houseData.unitLimits as {[key: string]: number})
                     .map(([unitTypeId, limit]) => [unitTypes.get(unitTypeId), limit])
             );
 
