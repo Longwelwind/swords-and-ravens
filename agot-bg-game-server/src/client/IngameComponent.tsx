@@ -121,7 +121,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                         <Tooltip id="turn">
                                                             <b>Turn</b>
                                                         </Tooltip>
-                                                }
+                                                    }
                                                     placement="bottom">
                                                     <div>
                                                         <img src={hourglassImage} style={{marginRight: "5px"}} width={32}/>
@@ -161,16 +161,16 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                             <Tooltip id={`tooltip-tracker-${i}`}>
                                                                 {i == 0 ? (
                                                                     <>
-                                                                        <b>Iron Throne Track</b><br/>
+                                                                        <b>Iron Throne Track</b><br />
                                                                         All ties (except military ones) are decided by the holder
-                                                                        of the Iron Throne.<br/>
+                                                                        of the Iron Throne.<br />
                                                                         Turn order is decided by this tracker.
                                                                     </>
                                                                 ) : i == 1 ? (
                                                                     <>
-                                                                        <b>Fiefdoms Track</b><br/>
+                                                                        <b>Fiefdoms Track</b><br />
                                                                         Once per turn, the holder of Valyrian Steel Blade can use the blade
-                                                                        to increase by one the combat strength of his army in a combat.<br/>
+                                                                        to increase by one the combat strength of his army in a combat.<br />
                                                                         In case of a tie in a combat, the winner is the house which is
                                                                         the highest in this tracker.<br/><br/>
                                                                         {this.props.gameState.game.valyrianSteelBladeUsed ? (
@@ -181,7 +181,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                     </>
                                                                 ) : (
                                                                     <>
-                                                                        <b>Kings&apos;s Court Track</b><br/>
+                                                                        <b>Kings&apos;s Court Track</b><br />
                                                                         At the end of the Planning Phase, the holder of the Raven may choose
                                                                         to either change one of his placed order, or to look at the top card of the
                                                                         Wildling deck and decide whether to leave it at the top or to
@@ -260,12 +260,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                     <Col xs="auto" style={{marginLeft: 4}}>
                                                                         <OverlayTrigger
                                                                             overlay={this.renderUnitTypeTooltip(type)}
-                                                                            delay={{show: 250, hide: 100}}
+                                                                            delay={{ show: 250, hide: 100 }}
                                                                             placement="auto">
                                                                             <div className="unit-icon small hover-weak-outline"
-                                                                                style={{
-                                                                                    backgroundImage: `url(${unitImages.get(p.house.id).get(type.id)})`,
-                                                                                }}
+                                                                                    style={{
+                                                                                        backgroundImage: `url(${unitImages.get(p.house.id).get(type.id)})`,
+                                                                                    }}
                                                                             />
                                                                         </OverlayTrigger>
                                                                     </Col>
@@ -276,7 +276,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 </Col>
                                                 <OverlayTrigger
                                                     overlay={this.renderTotalLandRegionsTooltip(p.house)}
-                                                    delay={{show: 250, hide: 100}}
+                                                    delay={{ show: 250, hide: 100 }}
                                                     placement="auto"
                                                 >
                                                     <Col xs="auto" className="d-flex align-items-center">
@@ -291,7 +291,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     <div style={{fontSize: "18px"}}>{p.house.powerTokens}</div>
                                                     <OverlayTrigger
                                                         overlay={this.renderPowerTooltip(p.house)}
-                                                        delay={{show: 250, hide: 100}}
+                                                        delay={{ show: 250, hide: 100 }}
                                                         placement="auto"
                                                     >
                                                         <div
@@ -313,12 +313,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                 size="tiny"
                                                             />
                                                         ) : (
-                                                                <HouseCardBackComponent
-                                                                    house={p.house}
-                                                                    houseCard={hc}
-                                                                    size="tiny"
-                                                                />
-                                                            )}
+                                                            <HouseCardBackComponent
+                                                                house={p.house}
+                                                                houseCard={hc}
+                                                                size="tiny"
+                                                            />
+                                                        )}
                                                     </Col>
                                                 ))}
                                             </Row>
@@ -326,11 +326,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     ))}
                                     <ListGroupItem className="text-center font-italic">
                                         <small>
-                                            {connectedSpectators.length > 0 ? (
-                                                <>Spectators: {joinReactNodes(this.getConnectedSpectators().map(u => <strong key={u.id}>{u.name}</strong>), ", ")}</>
-                                            ) : (
-                                                    <>No spectators</>
-                                                )}
+                                        {connectedSpectators.length > 0 ? (
+                                            <>Spectators: {joinReactNodes(this.getConnectedSpectators().map(u => <strong key={u.id}>{u.name}</strong>), ", ")}</>
+                                        ) : (
+                                            <>No spectators</>
+                                        )}
                                         </small>
                                     </ListGroupItem>
                                 </ListGroup>
@@ -390,7 +390,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         <ListGroupItem>
                                             <OverlayTrigger
                                                 overlay={this.renderRemainingWesterosCards()}
-                                                delay={{show: 250, hide: 100}}
+                                                delay={{ show: 250, hide: 100 }}
                                                 placement="bottom"
                                                 popperConfig={{modifiers: {preventOverflow: {boundariesElement: "viewport"}}}}
                                             >
@@ -452,9 +452,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                             overlay={<Tooltip id="note">Personal note</Tooltip>}
                                                             placement="auto"
                                                         >
-                                                            <FontAwesomeIcon
-                                                                style={{color: "white"}}
-                                                                icon={faStickyNote}/>
+                                                        <FontAwesomeIcon
+                                                            style={{color: "white"}}
+                                                            icon={faStickyNote}/>
                                                         </OverlayTrigger>
                                                     </Nav.Link>
                                                 </Nav.Item>
@@ -476,7 +476,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             <Nav.Item>
                                                 <Dropdown>
                                                     <Dropdown.Toggle id="private-chat-room-dropdown" variant="link">
-                                                        <img src={chatBubble} width={16}/>
+                                                        <img src={chatBubble} width={16} />
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
                                                         {this.getOtherPlayers().map(p => (
@@ -493,34 +493,34 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         <Tab.Content className="h-100">
                                             <Tab.Pane eventKey="chat" className="h-100">
                                                 <ChatComponent gameClient={this.props.gameClient}
-                                                    entireGame={this.props.gameState.entireGame}
-                                                    roomId={this.props.gameState.entireGame.publicChatRoomId}
-                                                    currentlyViewed={this.currentOpenedTab == "chat"}
-                                                    injectBetweenMessages={(p, n) => this.injectBetweenMessages(p, n)}/>
+                                                            entireGame={this.props.gameState.entireGame}
+                                                            roomId={this.props.gameState.entireGame.publicChatRoomId}
+                                                            currentlyViewed={this.currentOpenedTab == "chat"}
+                                                            injectBetweenMessages={(p, n) => this.injectBetweenMessages(p, n)}/>
                                             </Tab.Pane>
                                             <Tab.Pane eventKey="game-logs" className="h-100">
                                                 <ScrollToBottom className="h-100" scrollViewClassName="overflow-x-hidden">
-                                                    <GameLogListComponent ingameGameState={this.props.gameState}/>
+                                                    <GameLogListComponent ingameGameState={this.props.gameState} />
                                                 </ScrollToBottom>
                                             </Tab.Pane>
                                             <Tab.Pane eventKey="settings">
                                                 <GameSettingsComponent gameClient={this.props.gameClient}
-                                                    entireGame={this.props.gameState.entireGame}/>
+                                                                    entireGame={this.props.gameState.entireGame} />
                                                 <UserSettingsComponent user={this.props.gameClient.authenticatedUser}
-                                                    entireGame={this.props.gameState.entireGame}
-                                                    parent={this}/>
+                                                                        entireGame={this.props.gameState.entireGame}
+                                                                        parent={this}/>
                                             </Tab.Pane>
                                             {this.props.gameClient.authenticatedPlayer && (
                                                 <Tab.Pane eventKey="note" className="h-100">
-                                                    <NoteComponent gameClient={this.props.gameClient} ingame={this.props.gameState}/>
+                                                    <NoteComponent gameClient={this.props.gameClient} ingame={this.props.gameState} />
                                                 </Tab.Pane>
                                             )}
                                             {this.getPrivateChatRooms().map(({roomId}) => (
                                                 <Tab.Pane eventKey={roomId} key={roomId} className="h-100">
                                                     <ChatComponent gameClient={this.props.gameClient}
-                                                        entireGame={this.props.gameState.entireGame}
-                                                        roomId={roomId}
-                                                        currentlyViewed={this.currentOpenedTab == roomId}/>
+                                                                   entireGame={this.props.gameState.entireGame}
+                                                                   roomId={roomId}
+                                                                   currentlyViewed={this.currentOpenedTab == roomId}/>
                                                 </Tab.Pane>
                                             ))}
                                         </Tab.Content>
@@ -560,7 +560,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     private renderPowerTooltip(house: House): ReactNode {
-        const availablePower = house.powerTokens;
+        const availablePower =  house.powerTokens;
         const powerTokensOnBoard = this.game.countPowerTokensOnBoard(house);
         const powerInPool = this.game.maxPowerTokens - availablePower - powerTokensOnBoard;
 
@@ -660,7 +660,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const votesToRender = this.props.gameState.votes.values.filter(v => (previous != null ? previous.createdAt < v.createdAt : true) && (next ? v.createdAt < next.createdAt : true));
         console.log(votesToRender);
         return _.sortBy(votesToRender, v => v.createdAt).map(v => (
-            <VoteComponent key={v.id} vote={v} gameClient={this.props.gameClient} ingame={this.props.gameState}/>
+            <VoteComponent key={v.id} vote={v} gameClient={this.props.gameClient} ingame={this.props.gameState} />
         ));
     }
 
