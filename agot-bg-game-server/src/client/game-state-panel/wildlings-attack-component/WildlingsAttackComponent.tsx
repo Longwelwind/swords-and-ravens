@@ -65,10 +65,10 @@ export default class WildlingsAttackComponent extends Component<GameStateCompone
                     <Row>
                         {this.props.gameState.childGameState instanceof BiddingGameState && (
                             <Col xs={12}>
-                                <strong>All houses</strong>{this.props.gameState.excludedHouses.length >0 && 
+                                <b>All houses</b>{this.props.gameState.excludedHouses.length >0 && 
                                 (<> except {joinReactNodes(this.props.gameState.excludedHouses.map(h => 
-                                <strong key={h.id}>{h.name}</strong>), ", ")}</>)} bid Power tokens to overcome the 
-                                Wildlings attacking with <strong>{this.props.gameState.game.wildlingStrength} strength</strong>!
+                                <b key={h.id}>{h.name}</b>), ", ")}</>)} bid Power tokens to overcome the 
+                                Wildlings which are attacking with a strength of <b>{this.props.gameState.game.wildlingStrength}</b>!
                             </Col>
                         )}
                         {renderChildGameState<WildlingsAttackGameState>(this.props, [
