@@ -3,7 +3,7 @@
   "maxTurns": 10,
   "tracks": {
     "ironThrone": ["baratheon", "lannister", "stark", "martell", "greyjoy", "tyrell"],
-    "fiefdoms": ["greyjoy", "tyrell", "martell", "stark", "baratheon", "lannister"],
+    "fiefdoms": ["lannister", "greyjoy", "tyrell", "martell", "stark", "baratheon"],
     "kingsCourt": ["lannister", "stark", "martell", "baratheon", "tyrell", "greyjoy"]
   },
   "setups": {
@@ -110,6 +110,11 @@
         "quantity": 1
       },
       {
+        "unitType": "ship",
+        "house": "stark",
+        "quantity": 1
+      },
+      {
         "unitType": "knight",
         "house": "stark",
         "quantity": 1
@@ -171,7 +176,7 @@
       {
         "unitType": "knight",
         "house": "lannister",
-        "quantity": 1
+        "quantity": 5
       }
     ],
     "port-of-lannisport": [
