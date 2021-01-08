@@ -36,6 +36,17 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     <>
                         <Row>
                             <Col xs="auto">
+                                <select id="game-edition" name="game-edition"
+                                    value={this.gameSettings.gameEdition}
+                                    disabled={!this.canChangeGameSettings}
+                                    onChange={ e => this.onEditionChange(e.target.value) }>
+                                    { this.createEditionItems() }
+                                </select>
+                            </Col>
+                        </Row>
+
+                        <Row>
+                            <Col xs="auto">
                                 <select id="setups" name="setups"
                                     value={this.gameSettings.setupId}
                                     disabled={!this.canChangeGameSettings}
@@ -101,10 +112,24 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
         );
     }
 
+    createEditionItems(): ReactNode {
+        const items: JSX.Element[] = [];
+
+        this.entireGame.allGameEditionSetups.forEach(([editionId, editionSetups]) => {
+            console.log('Putting edition item: ' + editionId)
+            items.push(<option key={editionId} value={editionId}>{editionId}</option>);
+        })
+
+        return items;
+    }
+
     createSetupItems(): ReactNode {
         const items: JSX.Element[] = [];
 
-        this.entireGame.allGameSetups.forEach(([setupId, setupData]) => {
+        const gameSetups = Object.entries(this.entireGame.getGameEditionSetups(this.gameSettings.gameEdition));
+
+        gameSetups.forEach(([setupId, setupData]) => {
+        // this.entireGame.allGameSetups.forEach(([setupId, setupData]) => {
             items.push(<option key={setupId} value={setupId}>{setupData.name}</option>);
         });
 
@@ -121,6 +146,18 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
         });
 
         return items;
+    }
+
+    onEditionChange(newVal: string): void {
+        this.gameSettings.gameEdition = newVal;
+
+        const editionSetups = this.entireGame.getGameEditionSetups(newVal);
+        const setupId = Object.keys(editionSetups)[0];
+        this.gameSettings.setupId = setupId;
+
+        console.log(setupId);
+
+        this.changeGameSettings();
     }
 
     onSetupChange(newVal: string): void {

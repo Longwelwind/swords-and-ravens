@@ -4,6 +4,7 @@ import IngameGameState, {SerializedIngameGameState} from "./ingame-game-state/In
 import {ServerMessage} from "../messages/ServerMessage";
 import {ClientMessage} from "../messages/ClientMessage";
 import * as baseGameData from "../../data/baseGameData.json";
+import * as aDanceWithDragonsData from "../../data/aDanceWithDragonsData.json"
 import User, {SerializedUser} from "../server/User";
 import {observable} from "mobx";
 import * as _ from "lodash";
@@ -15,12 +16,13 @@ import CancelledGameState, { SerializedCancelledGameState } from "./cancelled-ga
 export default class EntireGame extends GameState<null, LobbyGameState | IngameGameState | CancelledGameState> {
     id: string;
     allGameSetups = Object.entries(baseGameData.setups);
+    allGameEditionSetups = Object.entries({"base-edition": baseGameData.setups, "a-dance-with-dragons": aDanceWithDragonsData.setups});
 
     @observable users = new BetterMap<string, User>();
     ownerUserId: string;
     name: string;
 
-    @observable gameSettings: GameSettings = {pbem: false, setupId: "base-game", playerCount: 6, randomHouses: false};
+    @observable gameSettings: GameSettings = {pbem: false, setupId: "base-game", playerCount: 6, randomHouses: false, gameEdition: "base-edition"};
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -275,14 +277,27 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         ));
     }
 
-    getGameSetupContainer(setupId: string): GameSetupContainer {
-        const container = this.allGameSetups.find(([sid, _]) => sid == setupId);
+    getGameEditionSetups(editionId: string): { [id: string]: GameSetupContainer; } {
+        const editionSetups = this.allGameEditionSetups.find(([eid, _]) => eid == editionId);
 
-        if (!container) {
-            throw new Error("Invalid setupId");
+        if (!editionSetups) {
+            throw new Error("Invalid editionId");
         }
 
-        return container[1];
+        return editionSetups[1];
+    }
+
+    getGameSetupContainer(setupId: string): GameSetupContainer {
+        const editionSetups = this.getGameEditionSetups(this.gameSettings.gameEdition);
+        const setupContainer = Object.entries(editionSetups).find(([sid, _]) => sid == setupId);
+
+        if (!setupContainer) {
+            throw new Error("Invalid setupId: " + setupId);
+        }
+
+        console.error('setup container' + setupContainer[0])
+
+        return setupContainer[1];
     }
 
     getGameSetupByIdAndPlayerCount(setupId: string, playerCount: number): GameSetup {
@@ -363,4 +378,5 @@ export interface GameSettings {
     setupId: string;
     playerCount: number;
     randomHouses: boolean;
+    gameEdition: string;
 }
