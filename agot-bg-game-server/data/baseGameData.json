@@ -509,25 +509,25 @@
           "combatStrength": 2,
           "ability": "ser-davos-seaworth"
         },
-        "brienne-of-tarth": {
-          "name": "Brienne of Tarth",
+        "bastard-of-nightsong": {
+          "name": "Bastard of Nightsong",
           "combatStrength": 2,
+          "towerIcons": 1
+        },
+        "ser-davos-seaworth-adwd": {
+          "name": "Ser Davos Seaworth",
+          "combatStrength": 1,
           "swordIcons": 1,
           "towerIcons": 1
         },
-        "salladhor-saan": {
-          "name": "Salladhor Saan",
-          "combatStrength": 1,
-          "ability": "salladhor-saan"
-        },
-        "melisandre": {
-          "name": "Melisandre",
+        "axel-florent": {
+          "name": "Ser Axel Florent",
           "combatStrength": 1,
           "swordIcons": 1
         },
-        "patchface": {
-          "name": "Patchface",
-          "ability": "patchface"
+        "mance-rayder": {
+          "name": "Mance Rayder",
+          "ability": "mance-rayder"
         }
       },
       "supplyLevel": 2
@@ -611,19 +611,20 @@
           "combatStrength": 2,
           "swordIcons": 1
         },
-        "arianne-martell": {
-          "name": "Arianne Martell",
+        "ser-gerris-drinkwater": {
+          "name": "Ser Gerris Drinkwater",
           "combatStrength": 1,
-          "ability": "arianne-martell"
+          "ability": "ser-gerris-drinkwater"
         },
-        "nymeria-sand": {
+        "quentyn-martell": {
+          "name": "Quentyn Martell",
+          "combatStrength": 1,
+          "ability": "quentyn-martell"
+        },
+        "nymeria-sand-adwd": {
           "name": "Nymeria Sand",
-          "combatStrength": 1,
-          "ability": "nymeria-sand"
-        },
-        "doran-martell": {
-          "name": "Doran Martell",
-          "ability": "doran-martell"
+          "swordIcons": 1,
+          "towerIcons": 1
         }
       },
       "supplyLevel": 2

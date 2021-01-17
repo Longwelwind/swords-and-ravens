@@ -42,6 +42,15 @@ import tyrionImage from "../../public/images/house-cards/Tyrion.png";
 import tywinImage from "../../public/images/house-cards/Tywin.png";
 import victorianImage from "../../public/images/house-cards/Victorian.png";
 
+// A Dance with Dragons House Cards
+import manceImage from "../../public/images/house-cards/Mance.png";
+import axelImage from "../../public/images/house-cards/Axel.png"
+import quentynImage from "../../public/images/house-cards/Quentyn.png"
+import davosADWDImage from "../../public/images/house-cards/davosADWD.png"
+import nymeriaADWDImage from "../../public/images/house-cards/nymeriaADWD.png"
+import GerrisImage from "../../public/images/house-cards/Gerris.png"
+import BastardImage from "../../public/images/house-cards/Bastard.png"
+
 
 const houseCardImages = new BetterMap([
     ["queen-of-thorns", queenImage],
@@ -86,7 +95,15 @@ const houseCardImages = new BetterMap([
     ["theon-greyjoy", theonImage],
     ["tyrion-lannister", tyrionImage],
     ["tywin-lannister", tywinImage],
-    ["victarion-greyjoy", victorianImage]
+    ["victarion-greyjoy", victorianImage],
+    // A Dance with Dragons House Cards
+    ["mance-rayder", manceImage],
+    ["axel-florent", axelImage],
+    ["quentyn-martell", quentynImage],
+    ["ser-davos-seaworth-adwd", davosADWDImage],
+    ["nymeria-sand-adwd", nymeriaADWDImage],
+    ["ser-gerris-drinkwater", GerrisImage],
+    ["bastard-of-nightsong", BastardImage]
 ]);
 
 export default houseCardImages;

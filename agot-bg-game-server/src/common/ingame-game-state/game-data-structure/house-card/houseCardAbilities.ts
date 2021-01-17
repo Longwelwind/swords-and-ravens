@@ -25,6 +25,10 @@ import CerseiLannisterHouseCardAbility from "./CerseiLannisterHouseCardAbility";
 import TheBlackfishHouseCardAbility from "./TheBlackfishHouseCardAbility";
 import RobbStarkHouseCardAbility from "./RobbStarkHouseCardAbility";
 
+// A Dance with Dragons House cards
+import ManceRayderHouseCardAbility from "./ManceRayderHouseCardAbility";
+import QuentynMartellHouseCardAbility from "./QuentynMartellHouseCardAbility";
+
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
     "If you are defending an area that contains either a Stronghold or a Castle,"
@@ -142,6 +146,18 @@ export const robbStark = new RobbStarkHouseCardAbility(
     + " You must choose a legal area where your opponent loses the fewest units."
 );
 
+// A Dance with Dragons House Cards
+export const manceRayder = new ManceRayderHouseCardAbility(
+    "mance-rayder",
+    "Your final combat strength is equal to the current position of the Wilding"
+    + " Threat token."
+);
+
+export const quentynMartell = new QuentynMartellHouseCardAbility(
+    "quentyn-martell",
+    "For each House card in your discard pile, this card gains +1 combat strength."
+)
+
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
     [serDavosSeaworth.id, serDavosSeaworth],
@@ -167,6 +183,9 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [cerseiLannister.id, cerseiLannister],
     [theBlackfish.id, theBlackfish],
     [robbStark.id, robbStark],
+    // A Dance with Dragons House Cards
+    [manceRayder.id, manceRayder],
+    [quentynMartell.id, quentynMartell],
 ]);
 
 export default houseCardAbilities;
