@@ -26,8 +26,15 @@ import TheBlackfishHouseCardAbility from "./TheBlackfishHouseCardAbility";
 import RobbStarkHouseCardAbility from "./RobbStarkHouseCardAbility";
 
 // A Dance with Dragons House cards
+// Baratheon
 import ManceRayderHouseCardAbility from "./ManceRayderHouseCardAbility";
+import MelisandreAdwdHouseCardAbility from "./MelisandreAdwdHouseCardAbility";
+import JonSnowAdwdHouseCardAbility from "./JonSnowAdwdHouseCardAbility";
+import StannisBaratheonAdwdHouseCardAbility from "./StannisBaratheonAdwdHouseCardAbility";
+// Martell
 import QuentynMartellHouseCardAbility from "./QuentynMartellHouseCardAbility";
+import DoranMartellAdwdHouseCardAbility from "./DoranMartellAdwdHouseCardAbility";
+import GerrisDrinkwaterHouseCardAbility from "./GerrisDrinkwaterHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -147,16 +154,37 @@ export const robbStark = new RobbStarkHouseCardAbility(
 );
 
 // A Dance with Dragons House Cards
+// Baratheon
 export const manceRayder = new ManceRayderHouseCardAbility(
     "mance-rayder",
     "Your final combat strength is equal to the current position of the Wilding"
     + " Threat token."
 );
-
+export const jonSnowAdwd = new JonSnowAdwdHouseCardAbility(
+    "jon-snow-adwd",
+    "Needs fixing"
+);
+export const melisandreAdwd = new MelisandreAdwdHouseCardAbility(
+    "melisandre-adwd",
+    "Needs fixing"
+);
+export const stannisBaratheonAdwd = new StannisBaratheonAdwdHouseCardAbility(
+    "stannis-baratheon-adwd",
+    "Needs fixing"
+);
+// Martell
 export const quentynMartell = new QuentynMartellHouseCardAbility(
     "quentyn-martell",
     "For each House card in your discard pile, this card gains +1 combat strength."
-)
+);
+export const gerrisDrinkwater = new GerrisDrinkwaterHouseCardAbility(
+    "ser-gerris-drinkwater",
+    "Needs fixing"
+);
+export const doranMartellAdwd = new DoranMartellAdwdHouseCardAbility(
+    "doran-martell-adwd",
+    "Needs fixing"
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -186,6 +214,11 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     // A Dance with Dragons House Cards
     [manceRayder.id, manceRayder],
     [quentynMartell.id, quentynMartell],
+    [doranMartellAdwd.id, doranMartellAdwd],
+    [gerrisDrinkwater.id, gerrisDrinkwater],
+    [stannisBaratheonAdwd.id, stannisBaratheonAdwd],
+    [melisandreAdwd.id, melisandreAdwd],
+    [jonSnowAdwd.id, jonSnowAdwd]
 ]);
 
 export default houseCardAbilities;

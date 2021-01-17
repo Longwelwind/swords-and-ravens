@@ -494,20 +494,15 @@
         "siege-engine": 2
       },
       "houseCards": {
-        "stannis-baratheon": {
+        "stannis-baratheon-adwd": {
           "name": "Stannis Baratheon",
           "combatStrength": 4,
-          "ability": "stannis-baratheon"
+          "ability": "stannis-baratheon-adwd"
         },
-        "renly-baratheon": {
-          "name": "Renly Baratheon",
+        "jon-snow-adwd": {
+          "name": "Jon Snow",
           "combatStrength": 3,
-          "ability": "renly-baratheon"
-        },
-        "ser-davos-seaworth": {
-          "name": "Ser Davos Seaworth",
-          "combatStrength": 2,
-          "ability": "ser-davos-seaworth"
+          "ability": "jon-snow-adwd"
         },
         "bastard-of-nightsong": {
           "name": "Bastard of Nightsong",
@@ -521,9 +516,13 @@
           "towerIcons": 1
         },
         "axel-florent": {
-          "name": "Ser Axel Florent",
+          "name": "Ser Axell Florent",
           "combatStrength": 1,
           "swordIcons": 1
+        },
+        "melisandre-adwd": {
+          "name": "Melsisandre",
+          "ability": "melisandre-adwd"
         },
         "mance-rayder": {
           "name": "Mance Rayder",
@@ -590,26 +589,10 @@
         "siege-engine": 2
       },
       "houseCards": {
-        "the-red-viper": {
-          "name": "The Red Viper",
-          "combatStrength": 4,
-          "swordIcons": 2,
-          "towerIcons": 1
-        },
-        "areo-hotah": {
-          "name": "Areo Hotah",
-          "combatStrength": 3,
-          "towerIcons": 1
-        },
-        "darkstar": {
-          "name": "Darkstar",
+        "bastard-of-godsgrace-adwd": {
+          "name": "Bastard of Godsgrace",
           "combatStrength": 2,
-          "swordIcons": 1
-        },
-        "obara-sand": {
-          "name": "Obara Sand",
-          "combatStrength": 2,
-          "swordIcons": 1
+          "towerIcons": 1
         },
         "ser-gerris-drinkwater": {
           "name": "Ser Gerris Drinkwater",
@@ -620,6 +603,21 @@
           "name": "Quentyn Martell",
           "combatStrength": 1,
           "ability": "quentyn-martell"
+        },
+        "areo-hotah-adwd": {
+          "name": "Areo Hotah",
+          "combatStrength": 3,
+          "towerIcons": 2
+        },
+        "big-man-adwd": {
+          "name": "Big Man",
+          "combatStrength": 2,
+          "swordIcons": 1
+        },
+        "doran-martell-adwd": {
+          "name": "Doran Martell",
+          "combatStrength": 4,
+          "ability": "doran-martell-adwd"
         },
         "nymeria-sand-adwd": {
           "name": "Nymeria Sand",

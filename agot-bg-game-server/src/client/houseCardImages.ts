@@ -1,5 +1,5 @@
 import BetterMap from "../utils/BetterMap";
-import aeronImage from "../../public/images/house-cards/Aeron.png";
+import aeronImage, { big } from "../../public/images/house-cards/Aeron.png";
 import alesterImage from "../../public/images/house-cards/Alester.png";
 import aeroImage from "../../public/images/house-cards/Areo.png";
 import arianneImage from "../../public/images/house-cards/Arianne.png";
@@ -43,14 +43,22 @@ import tywinImage from "../../public/images/house-cards/Tywin.png";
 import victorianImage from "../../public/images/house-cards/Victorian.png";
 
 // A Dance with Dragons House Cards
-import manceImage from "../../public/images/house-cards/Mance.png";
-import axelImage from "../../public/images/house-cards/Axel.png"
-import quentynImage from "../../public/images/house-cards/Quentyn.png"
-import davosADWDImage from "../../public/images/house-cards/DavosADWD.png"
-import nymeriaADWDImage from "../../public/images/house-cards/NymeriaADWD.png"
-import GerrisImage from "../../public/images/house-cards/Gerris.png"
-import BastardImage from "../../public/images/house-cards/Bastard.png"
-
+// Baratheon
+import manceImage from "../../public/images/house-cards/ManceRayderADWD.png";
+import axelImage from "../../public/images/house-cards/SerAxellFlorentADWD.png"
+import davosADWDImage from "../../public/images/house-cards/SerDavosSeaworthADWD.png"
+import bastardNightImage from "../../public/images/house-cards/BastardOfNightsongADWD.png"
+import stannisADWDImage from "../../public/images/house-cards/StannisBaratheonADWD.png"
+import melisandreADWDImage from "../../public/images/house-cards/MelisandreADWD.png"
+import jonSnowADWDImage from "../../public/images/house-cards/JonSnowADWD.png"
+// Martell
+import quentynImage from "../../public/images/house-cards/QuentynMartellADWD.png"
+import nymeriaADWDImage from "../../public/images/house-cards/NymeriaSandADWD.png"
+import gerrisImage from "../../public/images/house-cards/SerGerrisDrinkwaterADWD.png"
+import doranADWDImage from "../../public/images/house-cards/DoranMartellADWD.png"
+import bastardGodImage from "../../public/images/house-cards/BastardOfGodsgraceADWD.png"
+import bigMenImage from "../../public/images/house-cards/BigManADWD.png"
+import areoADWDImage from "../../public/images/house-cards/AreoHotahADWD.png"
 
 const houseCardImages = new BetterMap([
     ["queen-of-thorns", queenImage],
@@ -97,13 +105,22 @@ const houseCardImages = new BetterMap([
     ["tywin-lannister", tywinImage],
     ["victarion-greyjoy", victorianImage],
     // A Dance with Dragons House Cards
+    // Baratheon
     ["mance-rayder", manceImage],
     ["axel-florent", axelImage],
-    ["quentyn-martell", quentynImage],
     ["ser-davos-seaworth-adwd", davosADWDImage],
-    ["nymeria-sand-adwd", nymeriaADWDImage],
-    ["ser-gerris-drinkwater", GerrisImage],
-    ["bastard-of-nightsong", BastardImage]
+    ["bastard-of-nightsong", bastardNightImage],
+    ["jon-snow-adwd", jonSnowADWDImage],
+    ["stannis-baratheon-adwd", stannisADWDImage],
+    ["melisandre-adwd", melisandreADWDImage],
+    // Martell
+    ["ser-gerris-drinkwater", gerrisImage],
+    ["nymeria-sand-adwd", nymeriaADWDImage], 
+    ["quentyn-martell", quentynImage],
+    ["doran-martell-adwd", doranADWDImage],
+    ["big-man-adwd", bigMenImage],
+    ["areo-hotah-adwd", areoADWDImage],
+    ["bastard-of-godsgrace-adwd", bastardGodImage]
 ]);
 
 export default houseCardImages;
