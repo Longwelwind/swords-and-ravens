@@ -46,8 +46,8 @@ import victorianImage from "../../public/images/house-cards/Victorian.png";
 import manceImage from "../../public/images/house-cards/Mance.png";
 import axelImage from "../../public/images/house-cards/Axel.png"
 import quentynImage from "../../public/images/house-cards/Quentyn.png"
-import davosADWDImage from "../../public/images/house-cards/davosADWD.png"
-import nymeriaADWDImage from "../../public/images/house-cards/nymeriaADWD.png"
+import davosADWDImage from "../../public/images/house-cards/DavosADWD.png"
+import nymeriaADWDImage from "../../public/images/house-cards/NymeriaADWD.png"
 import GerrisImage from "../../public/images/house-cards/Gerris.png"
 import BastardImage from "../../public/images/house-cards/Bastard.png"
 
