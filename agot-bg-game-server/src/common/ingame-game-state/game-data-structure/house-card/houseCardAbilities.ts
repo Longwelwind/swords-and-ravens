@@ -48,6 +48,10 @@ import AeronDamphairAdwdHouseCardAbility from "./AeronDamphairAdwdHouseCardAbili
 import SerIlynPayneAdwdHouseCardAbility from "./SerIlynPayneAdwdHouseCardAbility";
 import SerAddamMarbrandAdwdHouseCardAbility from "./SerAddamMarbrandAdwdHouseCardAbility";
 import QyburnAdwdHouseCardAbility from "./QyburnAdwdHouseCardAbility";
+// Tyrell
+import PaxterRedwyneAdwdHouseCardAbility from "./PaxterRedwyneAdwdHouseCardAbility";
+import MargaeryTyrellAdwdHouseCardAbility from "./MargaeryTyrellAdwdHouseCardAbility";
+import QueenOfThornsAdwdHouseCardAbility from "./QueenOfThornsAdwdHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -231,7 +235,7 @@ export const aeronDamphairAdwd = new AeronDamphairAdwdHouseCardAbility(
 // Lannister
 export const serIlynPayneAdwd = new SerIlynPayneAdwdHouseCardAbility(
     "ser-ilyn-payne-adwd",
-    "For each House card in your discard pile, this card gains +1 combat strength."
+    "Needs fixing"
 );
 export const serAddamAdwd = new SerAddamMarbrandAdwdHouseCardAbility(
     "ser-addam-marbrand-adwd",
@@ -239,6 +243,19 @@ export const serAddamAdwd = new SerAddamMarbrandAdwdHouseCardAbility(
 );
 export const qyburnAdwd = new QyburnAdwdHouseCardAbility(
     "qyburn-adwd",
+    "Needs fixing"
+);
+// Tyrell
+export const paxterRedwyneAdwd = new PaxterRedwyneAdwdHouseCardAbility(
+    "paxter-redwyne-adwd",
+    "Needs fixing"
+);
+export const queenOfThornsAdwd = new QueenOfThornsAdwdHouseCardAbility(
+    "queen-of-thorns-adwd",
+    "Needs fixing"
+);
+export const margaeryTyrellAdwd = new MargaeryTyrellAdwdHouseCardAbility(
+    "margaery-tyrell-adwd",
     "Needs fixing"
 );
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
@@ -283,7 +300,10 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [aeronDamphairAdwd.id, aeronDamphairAdwd],
     [serIlynPayneAdwd.id,serIlynPayneAdwd],
     [serAddamAdwd.id,serAddamAdwd],
-    [qyburnAdwd.id, qyburnAdwd]
+    [qyburnAdwd.id, qyburnAdwd],
+    [paxterRedwyneAdwd.id, paxterRedwyneAdwd],
+    [queenOfThornsAdwd.id, queenOfThornsAdwd],
+    [margaeryTyrellAdwd.id, margaeryTyrellAdwd]
 
 
 ]);

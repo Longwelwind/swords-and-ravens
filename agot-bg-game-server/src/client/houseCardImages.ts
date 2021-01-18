@@ -83,6 +83,14 @@ import lannister4Image from "../../public/images/house-cards/DavenLannisterADWD.
 import lannister5Image from "../../public/images/house-cards/SerAddamMarbrandADWD.png"
 import lannister6Image from "../../public/images/house-cards/CerseiLannisterADWD.png"
 import lannister7Image from "../../public/images/house-cards/QyburnADWD.png"
+// Tyrell
+import tyrell1Image from "../../public/images/house-cards/MaceTyrellADWD.png"
+import tyrell2Image from "../../public/images/house-cards/RandyllTarlyADWD.png"
+import tyrell3Image from "../../public/images/house-cards/WillasTyrellADWD.png"
+import tyrell4Image from "../../public/images/house-cards/SerJonFossowayADWD.png"
+import tyrell5Image from "../../public/images/house-cards/PaxterRedwyneADWD.png"
+import tyrell6Image from "../../public/images/house-cards/QueenOfThornsADWD.png"
+import tyrell7Image from "../../public/images/house-cards/MargaeryTyrellADWD.png"
 
 const houseCardImages = new BetterMap([
     ["queen-of-thorns", queenImage],
@@ -168,7 +176,15 @@ const houseCardImages = new BetterMap([
     ["daven-lannister-adwd",lannister4Image],
     ["ser-addam-marbrand-adwd",lannister5Image],
     ["cersei-lannister-adwd",lannister6Image],
-    ["qyburn-adwd",lannister7Image]
+    ["qyburn-adwd",lannister7Image],
+    // Tyrell
+    ["mace-tyrell-adwd",tyrell1Image],
+    ["randyll-tarly-adwd",tyrell2Image],
+    ["willas-tyrell-adwd",tyrell3Image],
+    ["ser-jon-fossoway-adwd",tyrell4Image],
+    ["paxter-redwyne-adwd",tyrell5Image],
+    ["queen-of-thorns-adwd",tyrell6Image],
+    ["margaery-tyrell-adwd",tyrell7Image],
 ]);
 
 export default houseCardImages;

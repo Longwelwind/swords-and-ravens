@@ -637,39 +637,40 @@
         "siege-engine": 2
       },
       "houseCards": {
-        "mace-tyrell": {
+        "mace-tyrell-adwd": {
           "name": "Mace Tyrell",
           "combatStrength": 4,
-          "ability": "mace-tyrell"
+          "towerIcons": 1,
+          "swordIcons": 1
         },
-        "ser-loras-tyrell": {
-          "name": "Ser Loras Tyrell",
-          "combatStrength": 3,
-          "ability": "ser-loras-tyrell"
-        },
-        "randyll-tarly": {
+        "randyll-tarly-adwd": {
           "name": "Randyll Tarly",
+          "combatStrength": 3,
+          "swordIcons": 2
+        },
+        "willas-tyrell-adwd": {
+          "name": "Willas Tyrell",
+          "combatStrength": 2,
+          "towerIcons": 1
+        },
+        "ser-jon-fossoway-adwd": {
+          "name": "Ser Jon Fossoway",
           "combatStrength": 2,
           "swordIcons": 1
         },
-        "ser-garlan-tyrell": {
-          "name": "Ser Garlan Tyrell",
-          "combatStrength": 2,
-          "swordIcons": 2
-        },
-        "margaery-tyrell": {
-          "name": "Margaery Tyrell",
+        "paxter-redwyne-adwd": {
+          "name": "Paxter Redwyne",
           "combatStrength": 1,
-          "towerIcons": 1
+          "ability": "paxter-redwyne-adwd"         
         },
-        "alester-florent": {
-          "name": "Alester Florent",
-          "combatStrength": 1,
-          "towerIcons": 1
-        },
-        "queen-of-thorns": {
+        "queen-of-thorns-adwd": {
           "name": "Queen of Thorns",
-          "ability": "queen-of-thorns"
+          "combatStrength": 1,
+          "ability": "queen-of-thorns-adwd"        
+        },
+        "margaery-tyrell-adwd": {
+          "name": "Margaery Tyrell",
+          "ability": "margaery-tyrell-adwd"
         }
       },
       "supplyLevel": 2
