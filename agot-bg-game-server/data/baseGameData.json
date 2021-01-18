@@ -447,39 +447,39 @@
         "siege-engine": 2
       },
       "houseCards": {
-        "eddard-stark": {
-          "name": "Eddard Stark",
-          "combatStrength": 4,
-          "swordIcons": 2
-        },
-        "robb-stark": {
-          "name": "Robb Stark",
-          "combatStrength": 3,
-          "ability": "robb-stark"
-        },
-        "roose-bolton": {
-          "name": "Roose Bolton",
-          "combatStrength": 2,
-          "ability": "roose-bolton"
-        },
-        "greatjon-umber": {
-          "name": "Greatjon Umber",
+        "black-walder-adwd": {
+          "name": "Black Walder",
           "combatStrength": 2,
           "swordIcons": 1
         },
-        "ser-rodrick-cassel": {
-          "name": "Ser Rodrick Cassel",
-          "combatStrength": 1,
-          "towerIcons": 2
+        "roose-bolton-adwd": {
+          "name": "Roose Bolton",
+          "combatStrength": 4,
+          "swordIcons": 1
         },
-        "the-blackfish": {
-          "name": "The Blackfish",
+        "damon-dance-for-me-adwd": {
+          "name": "Damon Dance-For-Me",
           "combatStrength": 1,
-          "ability": "the-blackfish"
+          "swordIcons": 1
         },
-        "catelyn-stark": {
-          "name": "Catelyn Stark",
-          "ability": "catelyn-stark"
+        "steelshanks-walton-adwd": {
+          "name": "Steelshanks Walton",
+          "combatStrength": 2,
+          "towerIcons": 1
+        },
+        "ramsay-bolton-adwd": {
+          "name": "Ramsay Bolton",
+          "combatStrength": 3,
+          "ability": "ramsay-bolton-adwd"
+        },
+        "reek-adwd": {
+          "name": "Reek",
+          "combatStrength": 0,
+          "ability": "reek-adwd"
+        },
+        "walder-frey-adwd": {
+          "name": "Walder Frey",
+          "ability": "walder-frey-adwd"
         }
       },
       "supplyLevel": 1

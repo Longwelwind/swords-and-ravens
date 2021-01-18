@@ -59,6 +59,15 @@ import doranADWDImage from "../../public/images/house-cards/DoranMartellADWD.png
 import bastardGodImage from "../../public/images/house-cards/BastardOfGodsgraceADWD.png"
 import bigMenImage from "../../public/images/house-cards/BigManADWD.png"
 import areoADWDImage from "../../public/images/house-cards/AreoHotahADWD.png"
+// Stark
+import bwalderImage from "../../public/images/house-cards/BlackWalderADWD.png"
+import rooseBaltonAdwdImage from "../../public/images/house-cards/RooseBoltonADWD.png"
+import dancerImage from "../../public/images/house-cards/DamonDanceForMeADWD.png"
+import steelshanksImage from "../../public/images/house-cards/SteelshanksWaltonADWD.png"
+import ramsayBaltonAdwdImage from "../../public/images/house-cards/RamsayBoltonADWD.png"
+import reekAdwdImage from "../../public/images/house-cards/ReekADWD.png"
+import walderFreyImage from "../../public/images/house-cards/WalderFreyADWD.png"
+
 
 const houseCardImages = new BetterMap([
     ["queen-of-thorns", queenImage],
@@ -120,7 +129,15 @@ const houseCardImages = new BetterMap([
     ["doran-martell-adwd", doranADWDImage],
     ["big-man-adwd", bigMenImage],
     ["areo-hotah-adwd", areoADWDImage],
-    ["bastard-of-godsgrace-adwd", bastardGodImage]
+    ["bastard-of-godsgrace-adwd", bastardGodImage],
+    // Stark
+    ["black-walder-adwd", bwalderImage],
+    ["roose-bolton-adwd", rooseBaltonAdwdImage],
+    ["damon-dance-for-me-adwd", dancerImage],
+    ["steelshanks-walton-adwd", steelshanksImage],
+    ["ramsay-bolton-adwd", ramsayBaltonAdwdImage],
+    ["reek-adwd", reekAdwdImage],
+    ["walder-frey-adwd", walderFreyImage]
 ]);
 
 export default houseCardImages;

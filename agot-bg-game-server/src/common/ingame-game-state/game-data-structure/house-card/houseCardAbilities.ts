@@ -35,6 +35,10 @@ import StannisBaratheonAdwdHouseCardAbility from "./StannisBaratheonAdwdHouseCar
 import QuentynMartellHouseCardAbility from "./QuentynMartellHouseCardAbility";
 import DoranMartellAdwdHouseCardAbility from "./DoranMartellAdwdHouseCardAbility";
 import GerrisDrinkwaterHouseCardAbility from "./GerrisDrinkwaterHouseCardAbility";
+// Stark
+import ReekAdwdHouseCardAbility from "./ReekAdwdHouseCardAbility";
+import WalderFreyAdwdHouseCardAbility from "./WalderFreyAdwdHouseCardAbility";
+import RamsayBoltonAdwdHouseCardAbility from "./RamsayBoltonAdwdHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -185,6 +189,19 @@ export const doranMartellAdwd = new DoranMartellAdwdHouseCardAbility(
     "doran-martell-adwd",
     "Needs fixing"
 );
+// Stark
+export const reekAdwd = new ReekAdwdHouseCardAbility(
+    "reek-adwd",
+    "Needs fixing"
+);
+export const walderFreyAdwd = new WalderFreyAdwdHouseCardAbility(
+    "walder-frey-adwd",
+    "Needs fixing"
+);
+export const ramsayBoltonAdwd = new RamsayBoltonAdwdHouseCardAbility(
+    "ramsay-bolton-adwd",
+    "Needs fixing"
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -218,7 +235,10 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [gerrisDrinkwater.id, gerrisDrinkwater],
     [stannisBaratheonAdwd.id, stannisBaratheonAdwd],
     [melisandreAdwd.id, melisandreAdwd],
-    [jonSnowAdwd.id, jonSnowAdwd]
+    [jonSnowAdwd.id, jonSnowAdwd],
+    [reekAdwd.id, reekAdwd],
+    [walderFreyAdwd.id, walderFreyAdwd],
+    [ramsayBoltonAdwd.id, ramsayBoltonAdwd]
 ]);
 
 export default houseCardAbilities;
