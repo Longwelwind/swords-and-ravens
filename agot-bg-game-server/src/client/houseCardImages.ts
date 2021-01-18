@@ -75,6 +75,14 @@ import eEyeImage from "../../public/images/house-cards/EuronCrowsEyeADWD.png"
 import serHarlawImage from "../../public/images/house-cards/SerHarrasHarlawADWD.png"
 import vGreyjoyAdwdImage from "../../public/images/house-cards/VictarionGreyjoy.png"
 import quarlMaidImage from "../../public/images/house-cards/QuarlTheMaidADWD.png"
+// Lannister
+import lannister1Image from "../../public/images/house-cards/SerJaimeLannisterADWD.png"
+import lannister2Image from "../../public/images/house-cards/SerKevanLannisterADWD.png"
+import lannister3Image from "../../public/images/house-cards/SerIlynPayneADWD.png"
+import lannister4Image from "../../public/images/house-cards/DavenLannisterADWD.png"
+import lannister5Image from "../../public/images/house-cards/SerAddamMarbrandADWD.png"
+import lannister6Image from "../../public/images/house-cards/CerseiLannisterADWD.png"
+import lannister7Image from "../../public/images/house-cards/QyburnADWD.png"
 
 const houseCardImages = new BetterMap([
     ["queen-of-thorns", queenImage],
@@ -153,6 +161,14 @@ const houseCardImages = new BetterMap([
     ["ser-harras-harlaw-adwd", serHarlawImage],
     ["victarion-greyjoy-adwd", vGreyjoyAdwdImage],
     ["quarl-the-maid-adwd", quarlMaidImage],
+    // Lannister
+    ["ser-jaime-lannister-adwd",lannister1Image],
+    ["ser-kevan-lannister-adwd",lannister2Image],
+    ["ser-ilyn-payne-adwd",lannister3Image],
+    ["daven-lannister-adwd",lannister4Image],
+    ["ser-addam-marbrand-adwd",lannister5Image],
+    ["cersei-lannister-adwd",lannister6Image],
+    ["qyburn-adwd",lannister7Image]
 ]);
 
 export default houseCardImages;

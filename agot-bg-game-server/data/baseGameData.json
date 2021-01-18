@@ -400,39 +400,40 @@
         "siege-engine": 2
       },
       "houseCards": {
-        "tywin-lannister": {
-          "name": "Tywin Lannister",
-          "combatStrength": 4,
-          "ability": "tywin-lannister"
-        },
-        "ser-gregor-clegane": {
-          "name": "Ser Gregor Clegane",
-          "combatStrength": 3,
-          "swordIcons": 3
-        },
-        "ser-jaime-lannister": {
+        "ser-jaime-lannister-adwd": {
           "name": "Ser Jaime Lannister",
+          "combatStrength": 4,
+          "swordIcons": 1,
+          "towerIcons": 1
+        },
+        "ser-kevan-lannister-adwd": {
+          "name": "Ser Kevan Lannister",
+          "combatStrength": 3,
+          "towerIcons": 1
+        },
+        "ser-ilyn-payne-adwd": {
+          "name": "Ser Ilyn Payne",
+          "combatStrength": 2,
+          "ability": "ser-ilyn-payne-adwd"
+        },
+        "daven-lannister-adwd": {
+          "name": "Daven Lannister",
           "combatStrength": 2,
           "swordIcons": 1
         },
-        "the-hound": {
-          "name": "The hound",
-          "combatStrength": 2,
-          "towerIcons": 2
-        },
-        "ser-kevan-lannister": {
-          "name": "Ser Kevan Lannister",
+        "ser-addam-marbrand-adwd": {
+          "name": "Ser Addam Marbrand",
           "combatStrength": 1,
-          "ability": "ser-kevan-lannister"
+          "ability": "ser-addam-marbrand-adwd"
         },
-        "tyrion-lannister": {
-          "name": "Tyrion Lannister",
-          "combatStrength": 1,
-          "ability": "tyrion-lannister"
-        },
-        "cersei-lannister": {
+        "cersei-lannister-adwd": {
           "name": "Cersei Lannister",
-          "ability": "cersei-lannister"
+          "combatStrength": 1,
+          "towerIcons": 1
+        },
+        "qyburn-adwd": {
+          "name": "Qyburn",
+          "ability": "qyburn-adwd"
         }
       },
       "supplyLevel": 2

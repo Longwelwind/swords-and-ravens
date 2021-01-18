@@ -44,6 +44,10 @@ import EuronCrowsEyeAdwdHouseCardAbility from "./EuronCrowsEyeAdwdHouseCardAbili
 import RodrikTheReaderAdwdHouseCardAbility from "./RodrikTheReaderAdwdHouseCardAbility";
 import QuarlTheMaidAdwdHouseCardAbility from "./QuarlTheMaidAdwdHouseCardAbility";
 import AeronDamphairAdwdHouseCardAbility from "./AeronDamphairAdwdHouseCardAbility";
+// Lannister
+import SerIlynPayneAdwdHouseCardAbility from "./SerIlynPayneAdwdHouseCardAbility";
+import SerAddamMarbrandAdwdHouseCardAbility from "./SerAddamMarbrandAdwdHouseCardAbility";
+import QyburnAdwdHouseCardAbility from "./QyburnAdwdHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -224,7 +228,19 @@ export const aeronDamphairAdwd = new AeronDamphairAdwdHouseCardAbility(
     "aeron-damphair-adwd",
     "Needs fixing"
 );
-
+// Lannister
+export const serIlynPayneAdwd = new SerIlynPayneAdwdHouseCardAbility(
+    "ser-ilyn-payne-adwd",
+    "For each House card in your discard pile, this card gains +1 combat strength."
+);
+export const serAddamAdwd = new SerAddamMarbrandAdwdHouseCardAbility(
+    "ser-addam-marbrand-adwd",
+    "Needs fixing"
+);
+export const qyburnAdwd = new QyburnAdwdHouseCardAbility(
+    "qyburn-adwd",
+    "Needs fixing"
+);
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
     [serDavosSeaworth.id, serDavosSeaworth],
@@ -264,7 +280,11 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [euronCrowsEyeAdwd.id, euronCrowsEyeAdwd],
     [rodrikTheReaderAdwd.id, rodrikTheReaderAdwd],
     [quarlTheMaidAdwd.id, quarlTheMaidAdwd],
-    [aeronDamphairAdwd.id, aeronDamphairAdwd]
+    [aeronDamphairAdwd.id, aeronDamphairAdwd],
+    [serIlynPayneAdwd.id,serIlynPayneAdwd],
+    [serAddamAdwd.id,serAddamAdwd],
+    [qyburnAdwd.id, qyburnAdwd]
+
 
 ]);
 
