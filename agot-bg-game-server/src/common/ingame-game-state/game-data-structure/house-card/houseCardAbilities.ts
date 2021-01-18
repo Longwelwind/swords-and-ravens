@@ -39,6 +39,11 @@ import GerrisDrinkwaterHouseCardAbility from "./GerrisDrinkwaterHouseCardAbility
 import ReekAdwdHouseCardAbility from "./ReekAdwdHouseCardAbility";
 import WalderFreyAdwdHouseCardAbility from "./WalderFreyAdwdHouseCardAbility";
 import RamsayBoltonAdwdHouseCardAbility from "./RamsayBoltonAdwdHouseCardAbility";
+// Greyjoy
+import EuronCrowsEyeAdwdHouseCardAbility from "./EuronCrowsEyeAdwdHouseCardAbility";
+import RodrikTheReaderAdwdHouseCardAbility from "./RodrikTheReaderAdwdHouseCardAbility";
+import QuarlTheMaidAdwdHouseCardAbility from "./QuarlTheMaidAdwdHouseCardAbility";
+import AeronDamphairAdwdHouseCardAbility from "./AeronDamphairAdwdHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -202,6 +207,23 @@ export const ramsayBoltonAdwd = new RamsayBoltonAdwdHouseCardAbility(
     "ramsay-bolton-adwd",
     "Needs fixing"
 );
+//Greyjoy
+export const euronCrowsEyeAdwd = new EuronCrowsEyeAdwdHouseCardAbility(
+    "euron-crows-eye-adwd",
+    "Needs fixing"
+);
+export const rodrikTheReaderAdwd = new RodrikTheReaderAdwdHouseCardAbility(
+    "rodrik-the-reader-adwd",
+    "Needs fixing"
+);
+export const quarlTheMaidAdwd = new QuarlTheMaidAdwdHouseCardAbility(
+    "quarl-the-maid-adwd",
+    "Needs fixing"
+);
+export const aeronDamphairAdwd = new AeronDamphairAdwdHouseCardAbility(
+    "aeron-damphair-adwd",
+    "Needs fixing"
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -238,7 +260,12 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [jonSnowAdwd.id, jonSnowAdwd],
     [reekAdwd.id, reekAdwd],
     [walderFreyAdwd.id, walderFreyAdwd],
-    [ramsayBoltonAdwd.id, ramsayBoltonAdwd]
+    [ramsayBoltonAdwd.id, ramsayBoltonAdwd],
+    [euronCrowsEyeAdwd.id, euronCrowsEyeAdwd],
+    [rodrikTheReaderAdwd.id, rodrikTheReaderAdwd],
+    [quarlTheMaidAdwd.id, quarlTheMaidAdwd],
+    [aeronDamphairAdwd.id, aeronDamphairAdwd]
+
 ]);
 
 export default houseCardAbilities;

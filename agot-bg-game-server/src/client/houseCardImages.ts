@@ -67,7 +67,14 @@ import steelshanksImage from "../../public/images/house-cards/SteelshanksWaltonA
 import ramsayBaltonAdwdImage from "../../public/images/house-cards/RamsayBoltonADWD.png"
 import reekAdwdImage from "../../public/images/house-cards/ReekADWD.png"
 import walderFreyImage from "../../public/images/house-cards/WalderFreyADWD.png"
-
+// Greyjoy
+import aGreyjoyImage from "../../public/images/house-cards/AshaGreyjoyADWD.png"
+import rodrikReaderAdwdImage from "../../public/images/house-cards/RodrikTheReaderADWD.png"
+import aDamphairAdwdImage from "../../public/images/house-cards/AeronDamphairADWD.png"
+import eEyeImage from "../../public/images/house-cards/EuronCrowsEyeADWD.png"
+import serHarlawImage from "../../public/images/house-cards/SerHarrasHarlawADWD.png"
+import vGreyjoyAdwdImage from "../../public/images/house-cards/VictarionGreyjoy.png"
+import quarlMaidImage from "../../public/images/house-cards/QuarlTheMaidADWD.png"
 
 const houseCardImages = new BetterMap([
     ["queen-of-thorns", queenImage],
@@ -137,7 +144,15 @@ const houseCardImages = new BetterMap([
     ["steelshanks-walton-adwd", steelshanksImage],
     ["ramsay-bolton-adwd", ramsayBaltonAdwdImage],
     ["reek-adwd", reekAdwdImage],
-    ["walder-frey-adwd", walderFreyImage]
+    ["walder-frey-adwd", walderFreyImage],
+    // Greyjoy
+    ["asha-greyjoy-adwd", aGreyjoyImage],
+    ["rodrik-the-reader-adwd", rodrikReaderAdwdImage],
+    ["aeron-damphair-adwd", aDamphairAdwdImage],
+    ["euron-crows-eye-adwd", eEyeImage],
+    ["ser-harras-harlaw-adwd", serHarlawImage],
+    ["victarion-greyjoy-adwd", vGreyjoyAdwdImage],
+    ["quarl-the-maid-adwd", quarlMaidImage],
 ]);
 
 export default houseCardImages;

@@ -541,40 +541,39 @@
         "siege-engine": 2
       },
       "houseCards": {
-        "euron-crows-eye": {
+        "euron-crows-eye-adwd": {
           "name": "Euron Crow's Eye",
           "combatStrength": 4,
-          "swordIcons": 1
+          "ability": "euron-crows-eye-adwd"
         },
-        "victarion-greyjoy": {
+        "victarion-greyjoy-adwd": {
           "name": "Victarion Greyjoy",
           "combatStrength": 3,
-          "ability": "victarion-greyjoy"
+          "swordIcons": 2
         },
-        "balon-greyjoy": {
-          "name": "Balon Greyjoy",
+        "rodrik-the-reader-adwd": {
+          "name": "Rodrik the Reader",
           "combatStrength": 2,
-          "ability": "balon-greyjoy"
+          "ability": "rodrik-the-reader-adwd"
         },
-        "theon-greyjoy": {
-          "name": "Theon Greyjoy",
+        "asha-greyjoy-adwd": {
+          "name": "Asha Greyjoy",
           "combatStrength": 2,
-          "ability": "theon-greyjoy"
-        },
-        "dagmar-cleftjaw": {
-          "name": "Dagmar Cleftjaw",
-          "combatStrength": 1,
-          "swordIcons": 1,
           "towerIcons": 1
         },
-        "asha-greyjoy": {
-          "name": "Asha Greyjoy",
+        "quarl-the-maid-adwd": {
+          "name": "Quarl the Maid",
           "combatStrength": 1,
-          "ability": "asha-greyjoy"
+          "ability": "quarl-the-maid-adwd"
         },
-        "aeron-damphair": {
+        "ser-harras-harlaw-adwd": {
+          "name": "Ser Harras Harlaw",
+          "combatStrength": 1,
+          "swordIcons": 1
+        },
+        "aeron-damphair-adwd": {
           "name": "Aeron Damphair",
-          "ability": "aeron-damphair"
+          "ability": "aeron-damphair-adwd"
         }
       },
       "supplyLevel": 2
