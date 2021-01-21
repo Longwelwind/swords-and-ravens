@@ -5,7 +5,7 @@ import CombatGameState from "../../action-game-state/resolve-march-order-game-st
 
 export default class RamsayBoltonAdwdHouseCardAbility extends HouseCardAbility {
 
-    modifyCombatStrength(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _affectedHouseCard: HouseCard): number {
+    modifyHouseCardCombatStrength(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _affectedHouseCard: HouseCard): number {
         var discardedCards = 0;
 
         _house.houseCards.forEach((card, _) =>{

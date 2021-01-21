@@ -5,7 +5,7 @@ import CombatGameState from "../../action-game-state/resolve-march-order-game-st
 
 export default class StannisBaratheonHouseCardAbility extends HouseCardAbility {
 
-    modifyCombatStrength(combat: CombatGameState, house: House, houseCard: HouseCard, affectedHouseCard: HouseCard): number {
+    modifyHouseCardCombatStrength(combat: CombatGameState, house: House, houseCard: HouseCard, affectedHouseCard: HouseCard): number {
         return combat.game.isAheadInTrack(combat.game.ironThroneTrack, combat.getEnemy(house), house) && houseCard == affectedHouseCard
             ? 1
             : 0;

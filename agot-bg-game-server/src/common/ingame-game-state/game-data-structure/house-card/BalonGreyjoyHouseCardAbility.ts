@@ -5,7 +5,7 @@ import CombatGameState from "../../action-game-state/resolve-march-order-game-st
 
 export default class BalonGreyjoyHouseCardAbility extends HouseCardAbility {
 
-    modifyCombatStrength(_combat: CombatGameState, _house: House, houseCard: HouseCard, affectedHouseCard: HouseCard): number {
+    modifyHouseCardCombatStrength(_combat: CombatGameState, _house: House, houseCard: HouseCard, affectedHouseCard: HouseCard): number {
         return houseCard != affectedHouseCard ? -affectedHouseCard.combatStrength : 0;
     }
 }

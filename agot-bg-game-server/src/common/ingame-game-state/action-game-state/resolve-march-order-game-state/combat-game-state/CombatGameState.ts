@@ -401,7 +401,7 @@ export default class CombatGameState extends GameState<
         return this.getStatOfHouseCard(
             house,
             hc => hc.combatStrength,
-            (h, hc, a, ahc) => a.modifyCombatStrength(this, h, hc, ahc)
+            (h, hc, a, ahc) => a.modifyHouseCardCombatStrength(this, h, hc, ahc)
         );
     }
 
@@ -473,13 +473,17 @@ export default class CombatGameState extends GameState<
     }
 
     getTotalCombatStrength(house: House): number {
-        return this.getBaseCombatStrength(house)
+        const totalCombatStrength = this.getBaseCombatStrength(house)
             + this.getOrderBonus(house)
             + this.getSupportStrengthForSide(house)
             + this.getValyrianBladeBonus(house)
             + this.getHouseCardCombatStrength(house)
             + this.getGarrisonCombatStrength(house);
-    }
+
+        return this.computeModifiedStat(totalCombatStrength, 
+                    (h, hc, hca, cv) => hca.modifyTotalCombatStrength(this, h, hc, house, cv)
+                    );    
+                } 
 
     getEnemy(house: House): House {
         return house == this.attacker ? this.defender : this.attacker;

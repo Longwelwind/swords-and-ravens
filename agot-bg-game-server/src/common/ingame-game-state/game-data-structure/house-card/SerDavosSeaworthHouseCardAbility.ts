@@ -8,7 +8,7 @@ export default class SerDavosSeaworthHouseCardAbility extends HouseCardAbility {
         return this.doesTrigger(_houseCard, _affectedHouseCard, _house) ? 1 : 0;
     }
 
-    modifyCombatStrength(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _affectedHouseCard: HouseCard): number {
+    modifyHouseCardCombatStrength(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _affectedHouseCard: HouseCard): number {
         return this.doesTrigger(_houseCard, _affectedHouseCard, _house) ? 1 : 0;
     }
 
