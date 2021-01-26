@@ -60,18 +60,36 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         <Row>
                             <Col xs="auto">
                                 <FormCheck
-                                    id="random-houses-setting"
+                                    id="westeros-phase-variant-setting"
                                     type="checkbox"
                                     label={
                                         <OverlayTrigger overlay={
                                             <Tooltip id="random-houses-tooltip">
                                                 Houses will be randomized before the game starts when this option is selected.
                                             </Tooltip>}>
-                                            <label htmlFor="random-houses-setting">Randomize houses</label>
+                                            <label htmlFor="westeros-phase-variant-setting">Randomize houses</label>
                                         </OverlayTrigger>}
                                     disabled={!this.canChangeGameSettings}
                                     checked={this.gameSettings.randomHouses}
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.randomHouses = !this.gameSettings.randomHouses)}
+                                />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="random-houses-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="random-houses-tooltip">
+                                                Players may look at the next 3 Westeros cards from each deck at any given moment of the game.
+                                            </Tooltip>}>
+                                            <label htmlFor="random-houses-setting">Enable CoK Westeros Phase Variant</label>
+                                        </OverlayTrigger>}
+                                    disabled={!this.canChangeGameSettings}
+                                    checked={this.gameSettings.cokWesterosPhase}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.cokWesterosPhase = !this.gameSettings.cokWesterosPhase)}
                                 />
                             </Col>
                         </Row>
