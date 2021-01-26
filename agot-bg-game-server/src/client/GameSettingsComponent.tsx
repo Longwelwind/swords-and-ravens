@@ -60,14 +60,14 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         <Row>
                             <Col xs="auto">
                                 <FormCheck
-                                    id="westeros-phase-variant-setting"
+                                    id="random-houses-setting"
                                     type="checkbox"
                                     label={
                                         <OverlayTrigger overlay={
                                             <Tooltip id="random-houses-tooltip">
                                                 Houses will be randomized before the game starts when this option is selected.
                                             </Tooltip>}>
-                                            <label htmlFor="westeros-phase-variant-setting">Randomize houses</label>
+                                            <label htmlFor="random-houses-setting">Randomize houses</label>
                                         </OverlayTrigger>}
                                     disabled={!this.canChangeGameSettings}
                                     checked={this.gameSettings.randomHouses}
@@ -78,14 +78,14 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         <Row>
                             <Col xs="auto">
                                 <FormCheck
-                                    id="random-houses-setting"
+                                    id="westeros-phase-variant-setting"
                                     type="checkbox"
                                     label={
                                         <OverlayTrigger overlay={
-                                            <Tooltip id="random-houses-tooltip">
-                                                Players may look at the next 3 Westeros cards from each deck at any given moment of the game.
+                                            <Tooltip id="westeros-phase-variant-tooltip">
+                                                Players may look at the next 3 Westeros cards from each deck at any time.
                                             </Tooltip>}>
-                                            <label htmlFor="random-houses-setting">Enable CoK Westeros Phase Variant</label>
+                                            <label htmlFor="westeros-phase-variant-setting">CoK Westeros Phase Variant</label>
                                         </OverlayTrigger>}
                                     disabled={!this.canChangeGameSettings}
                                     checked={this.gameSettings.cokWesterosPhase}
