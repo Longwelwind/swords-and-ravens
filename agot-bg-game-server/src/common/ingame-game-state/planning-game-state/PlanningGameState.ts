@@ -90,12 +90,11 @@ export default class PlanningGameState extends GameState<IngameGameState> {
                     region: region.id
                 });
 
-                this.ingameGameState.players.values.filter(p => p != player).forEach(p => {
-                    p.user.send({
-                        type: "order-placed",
-                        region: region.id,
-                        order: null
-                    });
+                // Send order-placed message to all clients including spectators
+                this.entireGame.sendMessageToClients(this.entireGame.users.values.filter(usr => usr != player.user), {
+                    type: "order-placed",
+                    region: region.id,
+                    order: null
                 });
             } else {
                 this.entireGame.broadcastToClients({
