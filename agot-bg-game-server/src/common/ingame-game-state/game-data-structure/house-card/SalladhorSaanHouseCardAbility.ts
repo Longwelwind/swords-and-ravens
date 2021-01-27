@@ -8,9 +8,13 @@ import {ship} from "../unitTypes";
 export default class SalladhorSaanHouseCardAbility extends HouseCardAbility {
 
     modifyUnitCombatStrength(combat: CombatGameState, house: House, _houseCard: HouseCard, _houseSide: House, affectedUnit: Unit, _support: boolean, currentStrength: number): number {
-        // Check that the owner of this card is indeed not being supported,
-        // i.e. that no house supports the owner of the card.
-        if (combat.supporters.entries.some(([_supportingHouse, supportedHouse]) => supportedHouse == house)) {
+        // Check that the owner of this card is being supported,
+        // i.e. the final support value for the owner of the card must be greater than 0.
+
+        // As a possible support order may have been removed by an opponents immediately ability house card
+        // we have to use getSupportStrengthForSide instead of the supporters map 
+        // as getSupportStrengthForSide will respect getPossibleSupportingRegions
+        if (combat.getSupportStrengthForSide(house) > 0) {
             // Check that it is a non-owned ship
             if (affectedUnit.type == ship && affectedUnit.allegiance != house) {
                 return -currentStrength;
