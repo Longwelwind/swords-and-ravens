@@ -575,7 +575,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     private renderRemainingWesterosCards(): ReactNode {
         const remainingCards = this.game.remainingWesterosCardTypes;
         const nextCards = this.game.nextWesterosCardTypes;
-        
+
         return <Tooltip id="remaining-westeros-cards" className="westeros-tooltip">
             {this.gameSettings.cokWesterosPhase && (
                 <>
