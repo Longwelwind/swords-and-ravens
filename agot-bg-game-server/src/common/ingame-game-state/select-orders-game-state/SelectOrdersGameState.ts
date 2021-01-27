@@ -34,6 +34,12 @@ export default class SelectOrdersGameState<P extends ParentGameState> extends Ga
         this.house = house;
         this.possibleRegions = possibleRegions;
         this.count = count;
+
+        // If possible regions count equals to the amount of orders to select
+        // we can fast-track this state
+        if (possibleRegions.length == count) {
+            this.parentGameState.onSelectOrdersFinish(possibleRegions);
+        }
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
