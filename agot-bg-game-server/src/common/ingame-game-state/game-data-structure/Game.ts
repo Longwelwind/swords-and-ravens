@@ -39,6 +39,7 @@ export default class Game {
     structuresCountNeededToWin: number;
     maxTurns: number;
     maxPowerTokens: number;
+    revealedWesterosCards = 0;
 
     get ironThroneHolder(): House {
         return this.getTokenHolder(this.ironThroneTrack);
@@ -65,7 +66,7 @@ export default class Game {
 
         this.westerosDecks.forEach(wd => {
             const map = new BetterMap<WesterosCardType, number>();
-            wd.sort((a, b) => a.type.name.localeCompare(b.type.name)).forEach(wc => {
+            wd.slice(this.revealedWesterosCards).sort((a, b) => a.type.name.localeCompare(b.type.name)).forEach(wc => {
                 if (wc.discarded) {
                     return;
                 }
@@ -75,6 +76,16 @@ export default class Game {
                 map.set(wc.type, map.get(wc.type) + 1);
             });
             result.push(map);
+        });
+
+        return result;
+    }
+
+    get nextWesterosCardTypes(): WesterosCardType[][] {
+        const result: WesterosCardType[][] = [];
+
+        this.westerosDecks.forEach(wd => {
+            result.push(wd.slice(0, this.revealedWesterosCards).map((card) => card.type));
         });
 
         return result;
@@ -340,7 +351,9 @@ export default class Game {
             // without seeing the order of the cards
             westerosDecks: admin
                 ? this.westerosDecks.map(wd => wd.map(wc => wc.serializeToClient()))
-                : this.westerosDecks.map(wd => shuffle([...wd]).map(wc => wc.serializeToClient())),
+                : this.westerosDecks.map(wd => wd.slice(0, this.revealedWesterosCards)
+                    .concat(shuffle(wd.slice(this.revealedWesterosCards)))
+                    .map(wc => wc.serializeToClient())),
             // Same for the wildling deck
             wildlingDeck: admin
                 ? this.wildlingDeck.map(c => c.serializeToClient())
@@ -352,6 +365,7 @@ export default class Game {
             structuresCountNeededToWin: this.structuresCountNeededToWin,
             maxTurns: this.maxTurns,
             maxPowerTokens: this.maxPowerTokens,
+            revealedWesterosCards: this.revealedWesterosCards,
             clientNextWidllingCardId: (admin || knowsNextWildlingCard) ? this.wildlingDeck[0].id : null
         };
     }
@@ -376,6 +390,7 @@ export default class Game {
         game.structuresCountNeededToWin = data.structuresCountNeededToWin;
         game.maxTurns = data.maxTurns;
         game.maxPowerTokens = data.maxPowerTokens;
+        game.revealedWesterosCards = data.revealedWesterosCards;
         game.clientNextWildlingCardId = data.clientNextWidllingCardId;
 
         return game;
@@ -400,5 +415,6 @@ export interface SerializedGame {
     structuresCountNeededToWin: number;
     maxTurns: number;
     maxPowerTokens: number;
+    revealedWesterosCards: number;
     clientNextWidllingCardId: number | null;
 }
