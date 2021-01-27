@@ -13,9 +13,6 @@ export default class AshaGreyjoyHouseCardAbilities extends HouseCardAbility {
     }
 
     private doesTrigger(combat: CombatGameState, house: House, houseCard: HouseCard, affectedHouseCard: HouseCard): boolean {
-        // As a possible support order may have been removed by an opponents immediately ability house card
-        // we have to use getSupportStrengthForSide instead of the supporters map 
-        // as getSupportStrengthForSide will respect getPossibleSupportingRegions
-        return houseCard == affectedHouseCard && combat.getSupportStrengthForSide(house) == 0;
+        return houseCard == affectedHouseCard && !combat.isHouseSupported(house);
     }
 }
