@@ -59,6 +59,7 @@ import joinReactNodes from "./utils/joinReactNodes";
 import NoteComponent from "./NoteComponent";
 import HouseRowComponent from "./HouseRowComponent";
 import UserSettingsComponent from "./UserSettingsComponent";
+import { GameSettings } from '../common/EntireGame';
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -68,11 +69,15 @@ interface IngameComponentProps {
 @observer
 export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
-    @observable currentOpenedTab = "chat";
+    @observable currentOpenedTab = (this.user && this.user.settings.lastOpenedTab) ? this.user.settings.lastOpenedTab : "chat";
     @observable height: number | null = null;
 
     get game(): Game {
         return this.props.gameState.game;
+    }
+
+    get gameSettings(): GameSettings {
+        return this.props.gameState.entireGame.gameSettings;
     }
 
     get user(): User | null {
@@ -292,8 +297,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             <OverlayTrigger
                                                 overlay={this.renderRemainingWesterosCards()}
                                                 delay={{ show: 250, hide: 100 }}
-                                                placement="auto"
-                                                container={this}
+                                                placement="bottom"
+                                                popperConfig={{modifiers: {preventOverflow: {boundariesElement: "viewport"}}}}
                                             >
                                                 <Row className="justify-content-between">
                                                     {phases.map((phase, i) => (
@@ -326,7 +331,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     <Row>
                         <Col>
                             <Card>
-                                <Tab.Container activeKey={this.currentOpenedTab} onSelect={k => this.currentOpenedTab = k}>
+                                <Tab.Container activeKey={this.currentOpenedTab}
+                                    onSelect={k => {
+                                        this.currentOpenedTab = k;
+                                        if (this.user) {
+                                            this.user.settings.lastOpenedTab = k;
+                                            this.user.syncSettings();
+                                        }
+                                    }}>
                                     <Card.Header>
                                         <Nav variant="tabs">
                                             <Nav.Item>
@@ -353,13 +365,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     </Nav.Link>
                                                 </Nav.Item>
                                             )}
-                                            {this.props.gameClient.isOwner() && (
-                                                <Nav.Item>
-                                                    <Nav.Link eventKey="settings">
-                                                        Settings
-                                                    </Nav.Link>
-                                                </Nav.Item>
-                                            )}
+                                            <Nav.Item>
+                                                <Nav.Link eventKey="settings">
+                                                    Settings
+                                                </Nav.Link>
+                                            </Nav.Item>
                                             {this.getPrivateChatRooms().map(({user, roomId}) => (
                                                 <Nav.Item key={roomId}>
                                                     <div className={classNames({"new-event": this.getPrivateChatRoomForPlayer(user).areThereNewMessage})}>
@@ -399,6 +409,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     <GameLogListComponent ingameGameState={this.props.gameState} />
                                                 </ScrollToBottom>
                                             </Tab.Pane>
+                                            <Tab.Pane eventKey="settings">
+                                                <GameSettingsComponent gameClient={this.props.gameClient}
+                                                                    entireGame={this.props.gameState.entireGame} />
+                                                <UserSettingsComponent user={this.props.gameClient.authenticatedUser}
+                                                                        entireGame={this.props.gameState.entireGame}
+                                                                        parent={this} />
+                                            </Tab.Pane>
                                             {this.props.gameClient.authenticatedPlayer && (
                                                 <Tab.Pane eventKey="note" className="h-100">
                                                     <NoteComponent gameClient={this.props.gameClient} ingame={this.props.gameState} />
@@ -412,15 +429,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                    currentlyViewed={this.currentOpenedTab == roomId}/>
                                                 </Tab.Pane>
                                             ))}
-                                            {this.props.gameClient.isOwner() && (
-                                                <Tab.Pane eventKey="settings">
-                                                    <GameSettingsComponent gameClient={this.props.gameClient}
-                                                                        entireGame={this.props.gameState.entireGame} />
-                                                    <UserSettingsComponent user={this.props.gameClient.authenticatedUser}
-                                                                            entireGame={this.props.gameState.entireGame}
-                                                                            parent={this} />
-                                                </Tab.Pane>
-                                            )}
                                         </Tab.Content>
                                     </Card.Body>
                                 </Tab.Container>
@@ -446,26 +454,44 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     private renderRemainingWesterosCards(): ReactNode {
         const remainingCards = this.game.remainingWesterosCardTypes;
+        const nextCards = this.game.nextWesterosCardTypes;
 
         return <Tooltip id="remaining-westeros-cards" className="westeros-tooltip">
-            <h5 style={{textAlign: "center"}}>Remaining Westeros Cards</h5>
-            <table cellPadding="5">
-                <thead>
-                    <tr>
-                        {remainingCards.map((_, i) =>
-                            <th key={"westeros-deck-" + i + "-header"} style={{textAlign: "center"}}>Deck {i + 1}</th>)}
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        {remainingCards.map((rc, i) =>
-                            <td key={"westeros-deck-" + i + "-data"}>
-                                {rc.entries.map(([wc, count], j) => <div key={"westeros-deck-" + i + "-" + j + "-data"}><small>{wc.name}</small> ({count})</div>)}
-                            </td>
-                        )}
-                    </tr>
-                </tbody>
-            </table>
+            {this.gameSettings.cokWesterosPhase && (
+                <>
+                    <Row className='mt-0'>
+                        <Col>
+                            <h5 className='text-center'>Next Westeros Cards</h5>
+                        </Col>
+                    </Row>
+                    <Row>
+                        {nextCards.map((_, i) =>
+                            <Col key={"westeros-deck-" + i + "-header"} className='text-center'>Deck {i + 1}</Col>)}
+                    </Row>
+                    <Row>
+                        {nextCards.map((wd, i) =>
+                            <Col key={"westeros-deck-" + i + "-data"}>
+                                {wd.map((wc, j) => <div key={"westeros-deck-" + i + "-" + j + "-data"}><small>{wc.name}</small></div>)}
+                            </Col>)}
+                    </Row>
+                </>
+            )}
+            <Row className='mt-0'>
+                <Col>
+                    <h5 className='text-center'>Remaining Westeros Cards</h5>
+                </Col>
+            </Row>
+            <Row>
+                {remainingCards.map((_, i) =>
+                    <Col key={"westeros-deck-" + i + "-header"} style={{ textAlign: "center" }}>Deck {i + 1}</Col>)}
+            </Row>
+            <Row>
+                {remainingCards.map((rc, i) =>
+                    <Col key={"westeros-deck-" + i + "-data"}>
+                        {rc.entries.map(([wc, count], j) => <div key={"westeros-deck-" + i + "-" + j + "-data"}><small>{wc.name}</small> ({count})</div>)}
+                    </Col>
+                )}
+            </Row>
         </Tooltip>;
     }
 

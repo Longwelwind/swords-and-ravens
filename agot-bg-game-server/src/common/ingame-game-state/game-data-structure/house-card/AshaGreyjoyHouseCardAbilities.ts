@@ -13,6 +13,6 @@ export default class AshaGreyjoyHouseCardAbilities extends HouseCardAbility {
     }
 
     private doesTrigger(combat: CombatGameState, house: House, houseCard: HouseCard, affectedHouseCard: HouseCard): boolean {
-        return houseCard == affectedHouseCard && combat.supporters.entries.every(([_supporter, supportee]) => supportee != house);
+        return houseCard == affectedHouseCard && !combat.isHouseSupported(house);
     }
 }

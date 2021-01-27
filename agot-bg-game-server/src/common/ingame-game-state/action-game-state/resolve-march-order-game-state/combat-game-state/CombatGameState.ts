@@ -280,6 +280,15 @@ export default class CombatGameState extends GameState<
             .reduce(_.add, 0);
     }
 
+    isHouseSupported(house: House): boolean {
+        const supportsForHouse = this.supporters.entries.filter(([_supporter, supportedHouse]) => supportedHouse == house);
+
+        // Check if the initial support order of the supporter is still present, it may have been removed by e.g. Queen of Thorns
+        return supportsForHouse.some(([supporter, _supportedHouse]) => {
+            return this.getPossibleSupportingRegions().some(({region}) => region.getController() == supporter);
+        });
+    }
+
     getValyrianBladeBonus(house: House): number {
         return house == this.valyrianSteelBladeUser ? 1 : 0;
     }

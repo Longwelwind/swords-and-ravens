@@ -38,7 +38,7 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
     | TheHordeDescendsWildlingVictoryGameState | TheHordeDescendsNightsWatchVictoryGameState
 > {
     @observable  participatingHouses: House[];
-    
+
     // This field is null before the bidding phase is over,
     // as the wildling card will be drawn after the bidding phase is over.
     wildlingCard: WildlingCard | null;

@@ -289,6 +289,18 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "9",
+        migrate: (serializedGame: any) => {
+            // Migration for #750
+            if (serializedGame.childGameState.type == "ingame") {
+                const serializedIngameGameState = serializedGame.childGameState;
+                serializedIngameGameState.game.revealedWesterosCards = 0;
+            }
+
+            return serializedGame;
+        }
     }
 ];
 
