@@ -28,7 +28,19 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | SkinchangerScoutNightsWatchVictory | SkinchangerScoutWildlingVictory
     | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory
     | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered
-    | SupplyAdjusted | PlayerReplaced | UserHouseAssignments;
+    | SupplyAdjusted | PlayerReplaced | UserHouseAssignments | PlayerAction;
+
+export enum PlayerActionType {
+    ORDERS_PLACED,
+    BID_MADE,
+    HOUSE_CARD_CHOSEN
+}
+
+interface PlayerAction {
+    type: "player-action";
+    house: string;
+    action: PlayerActionType;
+}
 
 interface UserHouseAssignments {
     type: "user-house-assignments";

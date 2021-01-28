@@ -9,6 +9,7 @@ import {observable} from "mobx";
 import BetterMap from "../../../../utils/BetterMap";
 import User from "../../../../server/User";
 import IngameGameState from "../../IngameGameState";
+import { PlayerActionType } from "../../game-data-structure/GameLog";
 
 export interface BiddingGameStateParent extends GameState<any, any> {
     game: Game;
@@ -24,6 +25,10 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
 
     get game(): Game {
         return this.parentGameState.game;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.ingame;
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -46,6 +51,12 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
                 type: "bid-done",
                 houseId: player.house.id,
                 value: bid
+            });
+
+            this.ingame.log({
+                type: "player-action",
+                house: player.house.id,
+                action: PlayerActionType.BID_MADE
             });
 
             this.checkAndProceedEndOfBidding();
@@ -120,6 +131,11 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
         this.participatingHouses.forEach(h => {
             if (h.powerTokens == 0) {
                 this.bids.set(h, 0);
+                this.ingame.log({
+                    type: "player-action",
+                    house: h.id,
+                    action: PlayerActionType.BID_MADE
+                })
             }
         });
 

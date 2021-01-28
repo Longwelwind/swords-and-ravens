@@ -3,7 +3,7 @@ import React from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
-import {GameLogData} from "../common/ingame-game-state/game-data-structure/GameLog";
+import {GameLogData, PlayerActionType} from "../common/ingame-game-state/game-data-structure/GameLog";
 import Game from "../common/ingame-game-state/game-data-structure/Game";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
@@ -62,6 +62,27 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
     renderGameLogData(data: GameLogData): ReactNode {
         switch (data.type) {
+            case "player-action": {
+                const house = this.game.houses.get(data.house);
+                let text: string;
+
+                switch(data.action) {
+                    case PlayerActionType.ORDERS_PLACED:
+                        text = "placed their orders.";
+                        break;
+                    case PlayerActionType.BID_MADE:
+                        text = "made their bid.";
+                        break;
+                    case PlayerActionType.HOUSE_CARD_CHOSEN:
+                        text = "has chosen their house card.";
+                        break;
+                    default:
+                        throw "Invalid PlayerActionType received.";
+                }
+                return <>
+                    <p>House <b>{house.name}</b> {text}</p>
+                </>;
+            }
             case "user-house-assignments":
                 const assignments = data.assignments.map(([houseId, userId]) =>
                     [this.game.houses.get(houseId), this.props.ingameGameState.entireGame.users.get(userId)]) as [House, User][];
