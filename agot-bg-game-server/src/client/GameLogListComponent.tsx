@@ -3,7 +3,7 @@ import React from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
-import {GameLogData} from "../common/ingame-game-state/game-data-structure/GameLog";
+import {GameLogData, PlayerActionType} from "../common/ingame-game-state/game-data-structure/GameLog";
 import Game from "../common/ingame-game-state/game-data-structure/Game";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
@@ -20,6 +20,7 @@ import joinReactNodes from "./utils/joinReactNodes";
 import orders from "../common/ingame-game-state/game-data-structure/orders";
 import CombatInfoComponent from "./CombatInfoComponent";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import User from "../server/User";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -61,6 +62,36 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
     renderGameLogData(data: GameLogData): ReactNode {
         switch (data.type) {
+            case "player-action": {
+                const house = this.game.houses.get(data.house);
+                let text: string;
+
+                switch(data.action) {
+                    case PlayerActionType.ORDERS_PLACED:
+                        text = "placed their orders.";
+                        break;
+                    case PlayerActionType.BID_MADE:
+                        text = "made their bid.";
+                        break;
+                    case PlayerActionType.HOUSE_CARD_CHOSEN:
+                        text = "has chosen their house card.";
+                        break;
+                    default:
+                        throw "Invalid PlayerActionType received.";
+                }
+                return <>
+                    <p>House <b>{house.name}</b> {text}</p>
+                </>;
+            }
+            case "user-house-assignments":
+                const assignments = data.assignments.map(([houseId, userId]) =>
+                    [this.game.houses.get(houseId), this.props.ingameGameState.entireGame.users.get(userId)]) as [House, User][];
+                return <>
+                    <div className="text-center"><h5>The fight for the Iron Throne has begun!</h5></div>
+                    {assignments.map(([house, user]) =>
+                        <p  key={house.id + "-" + user.id}>House <b>{house.name}</b> is controlled by <b>{user.name}</b>.</p>
+                    )}
+                </>;
             case "turn-begin":
                 return <Row className="justify-content-center">
                     <Col xs={true}><hr/></Col>
@@ -228,33 +259,44 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
             case "player-mustered": {
                 const house = this.game.houses.get(data.house);
-                const musterings = _.flatMap(data.musterings.map(([_, musterements]: [string, {region: string; from: string | null; to: string}[]]) =>
-                    musterements.map(({region, from, to}) => ({
+                const musterings = data.musterings.map(([originatingRegion, recruitments]) =>
+                    [this.game.world.regions.get(originatingRegion), recruitments.map(({region, from, to}) => ({
                         region: this.game.world.regions.get(region),
                         from: from ? unitTypes.get(from) : null,
                         to: unitTypes.get(to)
-                    }))
-                ));
+                    }))] as [Region, {region: Region; from: UnitType | null; to: UnitType}[]]
+                );
 
                 return (
                     <>
-                        <p>
-                            <b>{house.name}</b> mustered{musterings.length > 0 ? ":" : " nothing."}
-                        </p>
+                        {musterings.length == 0 && (
+                            <p>
+                                <strong>{house.name}</strong> mustered nothing.
+                            </p>
+                        )}
                         {musterings.length > 0 && (
-                        <ul>
-                            {musterings.map(({region, from, to}, i) => (
-                                <li key={i}>
-                                    {from ? (
-                                        <>
-                                            A <b>{to.name}</b> from a <b>{from.name}</b> in <b>{region.name}</b>
-                                        </>
-                                    ) : (
-                                        <>A <b>{to.name}</b> in <b>{region.name}</b></>
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
+                            <>
+                                {musterings.map(([originatingRegion, recruitments]) => (
+                                    <>
+                                        <p>
+                                            <b>{house.name}</b> mustered in <b>{originatingRegion.name}</b>:
+                                        </p>
+                                        <ul>
+                                            {recruitments.map(({ region, from, to }, i) => (
+                                                <li key={"recruitment-" + region.id + "-" + i}>
+                                                    {from ? (
+                                                        <>
+                                                            A <strong>{to.name}</strong> from a <strong>{from.name}</strong> to <strong>{region.name}</strong>.
+                                                        </>
+                                                    ) : (
+                                                            <>A <strong>{to.name}</strong> to <strong>{region.name}</strong>.</>
+                                                        )}
+                                                </li>
+                                            ))}
+                                         </ul>
+                                    </>)
+                                )}
+                            </>
                         )}
                     </>
                 );

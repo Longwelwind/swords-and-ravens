@@ -70,7 +70,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         this.house = house;
         this.type = type;
 
-        if (this.game.world.getControlledRegions(house).filter(r => r.hasStructure).length == 0) {
+        if (!this.canMuster(house)) {
             this.parentGameState.ingame.log({
                 type: "player-mustered",
                 house: house.id,
@@ -79,6 +79,10 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
 
             this.parentGameState.onPlayerMusteringEnd(house, []);
         }
+    }
+
+    canMuster(house: House): boolean {
+        return this.game.world.getControlledRegions(house).some(r => r.hasStructure);
     }
 
     onServerMessage(_: ServerMessage): void {

@@ -15,6 +15,7 @@ import PlanningRestriction from "../game-data-structure/westeros-card/planning-r
 import planningRestrictions from "../game-data-structure/westeros-card/planning-restriction/planningRestrictions";
 import House from "../game-data-structure/House";
 import User from "../../../server/User";
+import { PlayerActionType } from "../game-data-structure/GameLog";
 
 export default class PlanningGameState extends GameState<IngameGameState> {
     planningRestrictions: PlanningRestriction[];
@@ -115,6 +116,12 @@ export default class PlanningGameState extends GameState<IngameGameState> {
         }
 
         this.readyHouses.push(player.house);
+
+        this.ingameGameState.log({
+            type: "player-action",
+            house: player.house.id,
+            action: PlayerActionType.ORDERS_PLACED
+        })
 
         // Check if all player are ready to go the action entireGame state
         if (this.readyHouses.length == this.ingameGameState.players.values.length) {

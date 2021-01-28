@@ -45,20 +45,10 @@ export default class MusteringGameState extends GameState<WesterosGameState, Pla
 
         const nextHouse = this.game.getNextInTurnOrder(house);
 
-        // Check if this can muster something
-        if (!this.canMuster(nextHouse)) {
-            this.onPlayerMusteringEnd(nextHouse);
-            return;
-        }
-
         this.setChildGameState(new PlayerMusteringGameState(this)).firstStart(
             nextHouse,
             PlayerMusteringType.MUSTERING_WESTEROS_CARD
         );
-    }
-
-    canMuster(house: House): boolean {
-        return this.game.world.getControlledRegions(house).some(r => r.castleLevel > 0);
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedMusteringGameState {
