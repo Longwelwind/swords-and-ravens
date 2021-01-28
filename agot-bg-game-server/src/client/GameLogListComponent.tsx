@@ -20,6 +20,7 @@ import joinReactNodes from "./utils/joinReactNodes";
 import orders from "../common/ingame-game-state/game-data-structure/orders";
 import CombatInfoComponent from "./CombatInfoComponent";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import User from "../server/User";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -61,6 +62,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
     renderGameLogData(data: GameLogData): ReactNode {
         switch (data.type) {
+            case "user-house-assignments":
+                const assignments = data.assignments.map(([houseId, userId]) =>
+                    [this.game.houses.get(houseId), this.props.ingameGameState.entireGame.users.get(userId)]) as [House, User][];
+                return <>
+                    <div className="text-center"><h5>The fight for the Iron Throne has begun!</h5></div>
+                    {assignments.map(([house, user]) =>
+                        <p  key={house.id + "-" + user.id}>House <b>{house.name}</b> is controlled by <b>{user.name}</b>.</p>
+                    )}
+                </>;
             case "turn-begin":
                 return <Row className="justify-content-center">
                     <Col xs={true}><hr/></Col>

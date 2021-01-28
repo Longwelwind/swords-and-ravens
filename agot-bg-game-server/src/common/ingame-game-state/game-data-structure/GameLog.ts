@@ -28,7 +28,12 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | SkinchangerScoutNightsWatchVictory | SkinchangerScoutWildlingVictory
     | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory
     | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered
-    | SupplyAdjusted | PlayerReplaced;
+    | SupplyAdjusted | PlayerReplaced | UserHouseAssignments;
+
+interface UserHouseAssignments {
+    type: "user-house-assignments";
+    assignments: [string, string][];
+}
 
 interface TurnBegin {
     type: "turn-begin";
