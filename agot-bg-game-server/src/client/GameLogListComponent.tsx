@@ -228,33 +228,44 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
             case "player-mustered": {
                 const house = this.game.houses.get(data.house);
-                const musterings = _.flatMap(data.musterings.map(([_, musterements]: [string, {region: string; from: string | null; to: string}[]]) =>
-                    musterements.map(({region, from, to}) => ({
+                const musterings = data.musterings.map(([originatingRegion, recruitments]) =>
+                    [this.game.world.regions.get(originatingRegion), recruitments.map(({region, from, to}) => ({
                         region: this.game.world.regions.get(region),
                         from: from ? unitTypes.get(from) : null,
                         to: unitTypes.get(to)
-                    }))
-                ));
+                    }))] as [Region, {region: Region; from: UnitType | null; to: UnitType}[]]
+                );
 
                 return (
                     <>
-                        <p>
-                            <b>{house.name}</b> mustered{musterings.length > 0 ? ":" : " nothing."}
-                        </p>
+                        {musterings.length == 0 && (
+                            <p>
+                                <strong>{house.name}</strong> mustered nothing.
+                            </p>
+                        )}
                         {musterings.length > 0 && (
-                        <ul>
-                            {musterings.map(({region, from, to}, i) => (
-                                <li key={i}>
-                                    {from ? (
-                                        <>
-                                            A <b>{to.name}</b> from a <b>{from.name}</b> in <b>{region.name}</b>
-                                        </>
-                                    ) : (
-                                        <>A <b>{to.name}</b> in <b>{region.name}</b></>
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
+                            <>
+                                {musterings.map(([originatingRegion, recruitments]) => (
+                                    <>
+                                        <p>
+                                            <b>{house.name}</b> mustered in <b>{originatingRegion.name}</b>:
+                                        </p>
+                                        <ul>
+                                            {recruitments.map(({ region, from, to }, i) => (
+                                                <li key={"recruitment-" + region.id + "-" + i}>
+                                                    {from ? (
+                                                        <>
+                                                            A <strong>{to.name}</strong> from a <strong>{from.name}</strong> to <strong>{region.name}</strong>.
+                                                        </>
+                                                    ) : (
+                                                            <>A <strong>{to.name}</strong> to <strong>{region.name}</strong>.</>
+                                                        )}
+                                                </li>
+                                            ))}
+                                         </ul>
+                                    </>)
+                                )}
+                            </>
                         )}
                     </>
                 );
