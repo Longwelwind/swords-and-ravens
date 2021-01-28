@@ -99,8 +99,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </>
                 );
 
-            case "march-resolved":
-                let house = this.game.houses.get(data.house);
+            case "march-resolved": {
+                const house = this.game.houses.get(data.house);
                 const startingRegion = this.world.regions.get(data.startingRegion);
                 const moves: [Region, UnitType[]][] = data.moves.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
 
@@ -118,7 +118,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         </ul>}
                     </>
                 );
-
+            }
             case "westeros-card-executed":
                 const westerosCardType = westerosCardTypes.get(data.westerosCardType);
 
@@ -208,15 +208,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </>
                 );
 
-            case "lowest-bidder-chosen":
-                let lowestBidder = this.game.houses.get(data.lowestBidder);
+            case "lowest-bidder-chosen": {
+                const lowestBidder = this.game.houses.get(data.lowestBidder);
 
                 return (
                     <>
                         <b>{lowestBidder.name}</b> was chosen as the lowest bidder.
                     </>
                 );
-
+            }
             case "highest-bidder-chosen":
                 const highestBidder = this.game.houses.get(data.highestBidder);
 
@@ -226,8 +226,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </>
                 );
 
-            case "player-mustered":
-                house = this.game.houses.get(data.house);
+            case "player-mustered": {
+                const house = this.game.houses.get(data.house);
                 const musterings = _.flatMap(data.musterings.map(([_, musterements]: [string, {region: string; from: string | null; to: string}[]]) =>
                     musterements.map(({region, from, to}) => ({
                         region: this.game.world.regions.get(region),
@@ -258,14 +258,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         )}
                     </>
                 );
-
+            }
             case "winner-declared":
                 return (
                     <>Game ended.</>
                 );
 
-            case "raven-holder-wildling-card-put-bottom":
-                house = this.game.houses.get(data.ravenHolder);
+            case "raven-holder-wildling-card-put-bottom": {
+                const house = this.game.houses.get(data.ravenHolder);
 
                 return (
                     <p>
@@ -273,9 +273,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         card of the Wildling deck and to move it at the bottom of the deck.
                     </p>
                 );
-
-            case "raven-holder-wildling-card-put-top":
-                house = this.game.houses.get(data.ravenHolder);
+            }
+            case "raven-holder-wildling-card-put-top": {
+                const house = this.game.houses.get(data.ravenHolder);
 
                 return (
                     <p>
@@ -283,9 +283,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         card of the Wildling deck and to leave it at the top of the deck.
                     </p>
                 );
-
-            case "raven-holder-replace-order":
-                house = this.game.houses.get(data.ravenHolder);
+            }
+            case "raven-holder-replace-order": {
+                const house = this.game.houses.get(data.ravenHolder);
                 const orderRegion = this.world.regions.get(data.region);
                 const originalOrder = orders.get(data.originalOrder);
                 const newOrder = orders.get(data.newOrder);
@@ -297,7 +297,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         </b> in <b>{orderRegion.name}</b>.
                     </p>
                 );
-
+            }
             case "raven-not-used":{
                 const house = this.game.houses.get(data.ravenHolder);
 
@@ -335,8 +335,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     );
                 }
 
-            case "a-throne-of-blades-choice":
-                house = this.game.houses.get(data.house);
+            case "a-throne-of-blades-choice": {
+                const house = this.game.houses.get(data.house);
 
                 return (
                     <p>
@@ -350,9 +350,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         )}
                     </p>
                 );
-
-            case "dark-wings-dark-words-choice":
-                house = this.game.houses.get(data.house);
+            }
+            case "dark-wings-dark-words-choice": {
+                const house = this.game.houses.get(data.house);
 
                 return (
                     <p>
@@ -366,9 +366,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         )}
                     </p>
                 );
-
-            case "put-to-the-sword-choice":
-                house = this.game.houses.get(data.house);
+            }
+            case "put-to-the-sword-choice": {
+                const house = this.game.houses.get(data.house);
 
                 return (
                     <p>
@@ -382,7 +382,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         )}
                     </p>
                 );
-
+            }
             case "winter-is-coming":
                 const drawnCardType = westerosCardTypes.get(data.drawnCardType);
 
@@ -433,11 +433,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </Col>
                 </Row>;
 
-            case "combat-valyrian-sword-used":
-                house = this.game.houses.get(data.house);
+            case "combat-valyrian-sword-used": {
+                const house = this.game.houses.get(data.house);
 
                 return <><b>{house.name}</b> used the <b>Valyrian Steel Blade</b>.</>;
-
+            }
             case "combat-house-card-chosen":
                 const houseCards = data.houseCards.map(([hid, hcid]) => {
                     const house = this.game.houses.get(hid);
@@ -482,28 +482,28 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Wildling Threat</b> reached <b>{data.wildlingStrength}</b>, triggering a <b>Wildling Attack</b>
                 </>;
 
-            case "march-order-removed":
-                house = this.game.houses.get(data.house);
-                let region = this.game.world.regions.get(data.region);
+            case "march-order-removed": {
+                const house = this.game.houses.get(data.house);
+                const region = this.game.world.regions.get(data.region);
 
                 return <>
                     <p>
                         <b>{house.name}</b> removed their March Order in <b>{region.name}</b>.
                     </p>
                 </>;
-
-            case "consolidate-power-order-resolved":
-                house = this.game.houses.get(data.house);
-                region = this.world.regions.get(data.region);
+            }
+            case "consolidate-power-order-resolved": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
                 const countPowerToken = data.powerTokenCount;
 
                 return <>
                     <b>{house.name}</b> resolved a {data.starred && "Special "}Consolidate Power Order
                     in <b>{region.name}</b> to gain <b>{countPowerToken}</b> Power token{countPowerToken > 1 && "s"}.
                 </>;
-
-            case "armies-reconciled":
-                house = this.game.houses.get(data.house);
+            }
+            case "armies-reconciled": {
+                const house = this.game.houses.get(data.house);
                 const armies = data.armies.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))] as [Region, UnitType[]]);
 
                 return <>
@@ -516,46 +516,46 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         ))}
                     </ul>
                 </>;
-
-            case "house-card-ability-not-used":
-                house = this.game.houses.get(data.house);
-                let houseCard = this.game.getHouseCardById(data.houseCard);
+            }
+            case "house-card-ability-not-used": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = this.game.getHouseCardById(data.houseCard);
 
                 return <>
                     <b>{house.name}</b> did not use <b>{houseCard.name}&apos;s</b> ability.
                 </>;
-
-            case "patchface-used":
-                house = this.game.houses.get(data.house);
-                let affectedHouse = this.game.houses.get(data.affectedHouse);
-                houseCard = this.game.getHouseCardById(data.houseCard);
+            }
+            case "patchface-used": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+                const houseCard = this.game.getHouseCardById(data.houseCard);
                 return <>
                     <b>Patchface</b>: <b>{house.name}</b> decided to discard <b>
                         {houseCard.name}</b> from house <b>{affectedHouse.name}</b>.
                 </>;
-
-            case "doran-used":
-                house = this.game.houses.get(data.house);
-                affectedHouse = this.game.houses.get(data.affectedHouse);
+            }
+            case "doran-used": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
                 const influenceTrack = this.game.getNameInfluenceTrack(data.influenceTrack);
 
                 return <>
                     <b>Doran Martell</b>: <b>{house.name}</b> decided to move <b>
                         {affectedHouse.name}</b> to the bottom of the <b>{influenceTrack}</b> track.
                 </>;
-
-            case "tyrion-lannister-choice-made":
-                house = this.game.houses.get(data.house);
-                affectedHouse = this.game.houses.get(data.affectedHouse);
+            }
+            case "tyrion-lannister-choice-made": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
                 const chooseToReplace = data.chooseToReplace;
 
                 return <>
                     <b>Tyrion Lannister</b>: <b>{house.name}</b> {!chooseToReplace && "didn't "}force{chooseToReplace && "d"} <b>
                         {affectedHouse.name}</b> to choose a new House card.
                 </>;
-
-            case "tyrion-lannister-house-card-replaced":
-                affectedHouse = this.game.houses.get(data.affectedHouse);
+            }
+            case "tyrion-lannister-house-card-replaced": {
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
                 const newHouseCard = data.newHouseCard ? affectedHouse.houseCards.get(data.newHouseCard) : null;
 
                 return newHouseCard ? (
@@ -563,7 +563,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 ) : (
                     <><b>{affectedHouse.name}</b> had no other available House card</>
                 );
-
+            }
             case "arianne-martell-prevent-movement":
                 const enemyHouse = this.game.houses.get(data.enemyHouse);
 
@@ -572,15 +572,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     army to the embattled area.
                 </>;
 
-            case "roose-bolton-house-cards-returned":
-                house = this.game.houses.get(data.house);
+            case "roose-bolton-house-cards-returned": {
+                const house = this.game.houses.get(data.house);
                 const returnedHouseCards = data.houseCards.map(hcid => house.houseCards.get(hcid));
 
                 return <>
                     <b>Roose Bolton</b>: <b>{house.name}</b> took back all discarded House
                     cards ({joinReactNodes(returnedHouseCards.map(hc => <b key={hc.id}>{hc.name}</b>), ", ")}).
                 </>;
-
+            }
             case "loras-tyrell-attack-order-moved":
                 const order = orders.get(data.order);
                 const embattledRegion = this.world.regions.get(data.region);
@@ -590,106 +590,101 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     to <b>{embattledRegion.name}</b>.
                 </>;
 
-            case "queen-of-thorns-no-order-available":
-                house = this.game.houses.get(data.house);
-                affectedHouse = this.game.houses.get(data.affectedHouse);
+            case "queen-of-thorns-no-order-available": {
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
 
                 return <>
                     <b>Queen of Thorns</b>: <b>{affectedHouse.name}</b> had no adjacent Order tokens.
                 </>;
-
-            case "queen-of-thorns-order-removed":
-                house = this.game.houses.get(data.house);
-                affectedHouse = this.game.houses.get(data.affectedHouse);
-                region = this.world.regions.get(data.region);
-                let removedOrder = orders.get(data.orderRemoved);
+            }
+            case "queen-of-thorns-order-removed": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+                const region = this.world.regions.get(data.region);
+                const removedOrder = orders.get(data.orderRemoved);
 
                 return <>
                     <b>Queen of Thorns</b>: <b>{house.name}</b> removed
                     a <b>{removedOrder.type.name}</b> Order of <b>{affectedHouse.name}</b> in <b>{region.name}</b>.
                 </>;
-
-            case "tywin-lannister-power-tokens-gained":
-                house = this.game.houses.get(data.house);
+            }
+            case "tywin-lannister-power-tokens-gained": {
+                const house = this.game.houses.get(data.house);
                 const powerTokensGained = data.powerTokensGained;
 
                 return <>
                     <b>Tywin Lannister</b>: <b>{house.name}</b> gained {powerTokensGained} Power
                     tokens.
                 </>;
-
-            case "renly-baratheon-no-knight-available":
-                house = this.game.houses.get(data.house);
+            }
+            case "renly-baratheon-no-knight-available": {
+                const house = this.game.houses.get(data.house);
 
                 return <>
                     <b>Renly Baratheon</b>: <b>{house.name}</b> had no available Knight to upgrade to.
                 </>;
-
-            case "renly-baratheon-no-footman-available":
-                house = this.game.houses.get(data.house);
+            }
+            case "renly-baratheon-no-footman-available": {
+                const house = this.game.houses.get(data.house);
 
                 return <>
                     <b>Renly Baratheon</b>: <b>{house.name}</b> had no available Footman to upgrade.
                 </>;
-
-            case "renly-baratheon-footman-upgraded-to-knight":
-                house = this.game.houses.get(data.house);
-                region = this.world.regions.get(data.region);
+            }
+            case "renly-baratheon-footman-upgraded-to-knight": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
 
                 return <>
                     <b>Renly Baratheon</b>: <b>{house.name}</b> upgraded a Footman to a Knight
                     in <b>{region.name}</b>.
                 </>;
-
-            case "mace-tyrell-casualties-prevented":
-                house = this.game.houses.get(data.house);
-
+            }
+            case "mace-tyrell-casualties-prevented": {
                 return <>
                     <b>Mace Tyrell</b>: Casualties were prevented by <b>The Blackfish</b>.
                 </>;
-
+            }
             case "mace-tyrell-no-footman-available":
-                house = this.game.houses.get(data.house);
-
                 return <>
                     <b>Mace Tyrell</b>: No enemy Footman was available to be killed.
                 </>;
 
-            case "mace-tyrell-footman-killed":
-                house = this.game.houses.get(data.house);
-                region = this.world.regions.get(data.region);
+            case "mace-tyrell-footman-killed": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
 
                 return <>
                     <b>Mace Tyrell</b>: <b>{house.name}</b> killed an enemy Footman
                     in <b>{region.name}</b>.
                 </>;
-
+            }
             case "cersei-lannister-no-order-available":
                 return <>
                     <b>Cersei Lannister</b>: There were no Order tokens to be removed.
                 </>;
 
-            case "cersei-lannister-order-removed":
-                house = this.game.houses.get(data.house);
-                affectedHouse = this.game.houses.get(data.affectedHouse);
-                region = this.world.regions.get(data.region);
-                removedOrder = orders.get(data.order);
+            case "cersei-lannister-order-removed": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+                const region = this.world.regions.get(data.region);
+                const removedOrder = orders.get(data.order);
 
                 return <>
                     <b>Cersei Lannister</b>: <b>{house.name}</b> removed
                     a <b>{removedOrder.type.name}</b> Order
                     of <b>{affectedHouse.name}</b> in <b>{region.name}</b>.
                 </>;
-
-            case "robb-stark-retreat-location-overriden":
-                house = this.game.houses.get(data.house);
-                affectedHouse = this.game.houses.get(data.affectedHouse);
+            }
+            case "robb-stark-retreat-location-overriden": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
 
                 return <>
                     <b>Robb Stark</b>: <b>{house.name}</b> chose the retreat location of the
                     retreating army of <b>{affectedHouse.name}</b>.
                 </>;
-
+            }
             case "retreat-region-chosen": {
                 const house = this.game.houses.get(data.house);
                 const regionFrom = this.game.world.regions.get(data.regionFrom);
@@ -737,8 +732,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "silence-at-the-wall-executed":
                 return <><b>Silence at the Wall</b>: Nothing happened.</>;
 
-            case "preemptive-raid-choice-done":
-                house = this.game.houses.get(data.house);
+            case "preemptive-raid-choice-done": {
+                const house = this.game.houses.get(data.house);
 
                 if (data.choice == 0) {
                     return <>
@@ -751,11 +746,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         on their highest Influence track.
                     </>;
                 }
-
-            case "preemptive-raid-track-reduced":
+            }
+            case "preemptive-raid-track-reduced": {
                 const chooser = data.chooser ? this.game.houses.get(data.chooser) : null;
-                house = this.game.houses.get(data.house);
-                let trackName = this.game.getNameInfluenceTrack(data.trackI);
+                const house = this.game.houses.get(data.house);
+                const trackName = this.game.getNameInfluenceTrack(data.trackI);
 
                 if (chooser == null) {
                     return <>
@@ -767,45 +762,45 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         on the <b>{trackName}</b> track.
                     </>;
                 }
-
-            case "preemptive-raid-units-killed":
-                house = this.game.houses.get(data.house);
-                let units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))] as [Region, UnitType[]]);
+            }
+            case "preemptive-raid-units-killed": {
+                const house = this.game.houses.get(data.house);
+                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))] as [Region, UnitType[]]);
 
                 return <>
                     <b>{house.name}</b>{units.length > 0 ? (<> chose to
                     destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <b key={i}>{ut.name}</b>), ", ")} in <b>{region.name}</b></>), " and ")}.</>)
                     : <> had no units to destroy.</>}
                 </>;
-
-            case "preemptive-raid-wildlings-attack":
-                house = this.game.houses.get(data.house);
+            }
+            case "preemptive-raid-wildlings-attack": {
+                const house = this.game.houses.get(data.house);
 
                 return <>
                     <b>Preemptive Raid</b>: A new Wildlings Attack with
                     strength <b>{data.wildlingStrength}</b> was triggered
                     where <b>{house.name}</b> will not be participating.
                 </>;
-
-            case "massing-on-the-milkwater-house-cards-back":
-                house = this.game.houses.get(data.house);
+            }
+            case "massing-on-the-milkwater-house-cards-back": {
+                const house = this.game.houses.get(data.house);
                 const houseCardsReturned = data.houseCardsReturned.map(hcid => house.houseCards.get(hcid));
 
                 return <>
                     <b>Massing on the Milkwater</b>: <b>{house.name}</b> took
                     back {joinReactNodes(houseCardsReturned.map(hc => <b key={hc.id}>{hc.name}</b>), ", ")}
                 </>;
-
-            case "massing-on-the-milkwater-wildling-victory":
-                lowestBidder = this.game.houses.get(data.lowestBidder);
+            }
+            case "massing-on-the-milkwater-wildling-victory": {
+                const lowestBidder = this.game.houses.get(data.lowestBidder);
 
                 return <>
                     <b>Massing on the Milkwater</b>: <b>{lowestBidder.name}</b> discards all House
                     cards with the highest combat strength, all other houses must discard one House card.
                 </>;
-
-            case "massing-on-the-milkwater-house-cards-removed":
-                house = this.game.houses.get(data.house);
+            }
+            case "massing-on-the-milkwater-house-cards-removed": {
+                const house = this.game.houses.get(data.house);
                 const houseCardsUsed = data.houseCardsUsed.map(hcid => house.houseCards.get(hcid));
 
                 return <>
@@ -813,80 +808,80 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         ? <><b>{house.name}</b> discarded {joinReactNodes(houseCardsUsed.map(hc => <b key={hc.id}>{hc.name}</b>), ", ")}.</>
                         : <><b>{house.name}</b> did not discard a House card.</>}
                 </>;
-
-            case "a-king-beyond-the-wall-highest-top-track":
-                house = this.game.houses.get(data.house);
-                trackName = this.game.getNameInfluenceTrack(data.trackI);
+            }
+            case "a-king-beyond-the-wall-highest-top-track": {
+                const house = this.game.houses.get(data.house);
+                const trackName = this.game.getNameInfluenceTrack(data.trackI);
 
                 return <>
                     <b>A King Beyond the Wall</b>: <b>{house.name}</b> chose to move at the top
                     of the <b>{trackName}</b> track.
                 </>;
-
+            }
             case "a-king-beyond-the-wall-lowest-reduce-tracks":
-                lowestBidder = this.game.houses.get(data.lowestBidder);
+                const lowestBidder = this.game.houses.get(data.lowestBidder);
 
                 return <>
                     <b>A King Beyond the Wall</b>: <b>{lowestBidder.name}</b> was moved to the
                     bottom of all influence tracks.
                 </>;
 
-            case "a-king-beyond-the-wall-house-reduce-track":
-                house = this.game.houses.get(data.house);
-                trackName = this.game.getNameInfluenceTrack(data.trackI);
+            case "a-king-beyond-the-wall-house-reduce-track": {
+                const house = this.game.houses.get(data.house);
+                const trackName = this.game.getNameInfluenceTrack(data.trackI);
 
                 return <>
                     <b>A King Beyond the Wall</b>: <b>{house.name}</b> chose to move at the bottom
                     of the <b>{trackName}</b> influence track.
                 </>;
-
-            case "mammoth-riders-destroy-units":
-                house = this.game.houses.get(data.house);
-                units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
+            }
+            case "mammoth-riders-destroy-units": {
+                const house = this.game.houses.get(data.house);
+                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]) as [Region, UnitType[]][];
 
                 return <>
                     <b>Mammoth Riders</b>: <b>{house.name}</b>{units.length > 0 ? (<> chose to
                     destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <b key={i}>{ut.name}</b>), ", ")} in <b>{region.name}</b></>), ", ")}.</>)
                     : <> had no units to destroy.</>}
                 </>;
-
-            case "mammoth-riders-return-card":
-                house = this.game.houses.get(data.house);
-                houseCard = house.houseCards.get(data.houseCard);
+            }
+            case "mammoth-riders-return-card": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = house.houseCards.get(data.houseCard);
 
                 return <>
                     <b>Mammoth Riders</b>: <b>{house.name}</b> chose to
                     regain <b>{houseCard.name}</b>.
                 </>;
-
-            case "the-horde-descends-highest-muster":
-                house = this.game.houses.get(data.house);
+            }
+            case "the-horde-descends-highest-muster": {
+                const house = this.game.houses.get(data.house);
 
                 return <>
                     <b>The Horde Descends</b>: <b>{house.name}</b> may muster forces in any one
                     Castle or Stronghold they control.
                 </>;
-
-            case "the-horde-descends-units-killed":
-                house = this.game.houses.get(data.house);
-                units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
+            }
+            case "the-horde-descends-units-killed": {
+                const house = this.game.houses.get(data.house);
+                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]) as [Region, UnitType[]][];
 
                 return <>
                     <b>The Horde Descends</b>: <b>{house.name}</b>{units.length > 0 ? (<> chose to
                     destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <b key={i}>{ut.name}</b>), ", ")} in <b>{region.name}</b></>), ", ")}.</>)
                     : <> had no units to destroy.</>}
                 </>;
-
-            case "crow-killers-knights-replaced":
-                house = this.game.houses.get(data.house);
-                units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
+            }
+            case "crow-killers-knights-replaced": {
+                const house = this.game.houses.get(data.house);
+                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]) as [Region, UnitType[]][];
 
                 return <>
                     {units.length > 0
                     ? (<><b>Crow Killers</b>: <b>{house.name}</b> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><b>{unitTypes.length}</b> Knight{unitTypes.length > 1 && "s"} in <b>{region.name}</b></>), ", ")} with Footmen.</>)
                     : (<><b>Crow Killers</b>: <b>{house.name}</b> had no Knights to replace with Footmen.</>)}
                 </>;
-
+            }
             case "crow-killers-knights-killed": {
                 const house = this.game.houses.get(data.house);
                 const units: [Region, UnitType[]][] = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
@@ -894,26 +889,26 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <><b>Crow Killers</b>: <b>{house.name}</b> had to destroy {joinReactNodes(units.map(([region, unitTypes]) => <><b>{unitTypes.length}</b> Knight{unitTypes.length > 1 && "s"} in <b>{region.name}</b></>), ", ")}.</>;
             }
 
-            case "crow-killers-footman-upgraded":
-                house = this.game.houses.get(data.house);
-                units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
+            case "crow-killers-footman-upgraded": {
+                const house = this.game.houses.get(data.house);
+                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]) as [Region, UnitType[]][];
 
                 return <>
                     {units.length > 0
                     ? (<><b>Crow Killers</b>: <b>{house.name}</b> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><b>{unitTypes.length}</b> Footm{unitTypes.length == 1 ? "a" : "e"}n in <b>{region.name}</b></>), ", ")} with Knights.</>)
                     : (<><b>Crow Killers</b>: <b>{house.name}</b> was not able to replace any Footman with Knights.</>)}
                 </>;
-
-            case "skinchanger-scout-nights-watch-victory":
-                house = this.game.houses.get(data.house);
+            }
+            case "skinchanger-scout-nights-watch-victory": {
+                const house = this.game.houses.get(data.house);
 
                 return <>
                     <b>Skinchanger Scout</b>: <b>{house.name}</b> gets
                     back <b>{data.powerToken}</b> Power tokens.
                 </>;
-
-            case "skinchanger-scout-wildling-victory":
-                house = this.game.houses.get(data.house);
+            }
+            case "skinchanger-scout-wildling-victory": {
+                const house = this.game.houses.get(data.house);
                 const powerTokensLost = data.powerTokensLost.map(([hid, amount]) => [this.game.houses.get(hid), amount] as [House, number]);
 
                 return <>
@@ -927,17 +922,17 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         ))}
                     </ul>
                 </>;
-
+            }
             case "rattleshirts-raiders-nights-watch-victory":
-                house = this.game.houses.get(data.house);
+                const house = this.game.houses.get(data.house);
 
                 return <>
                     <b>Rattleshirt&apos;s Raiders</b>: <b>{house.name}</b> gained one level of supply,
                     and is now at <b>{data.newSupply}</b>.
                 </>;
 
-            case "rattleshirts-raiders-wildling-victory":
-                lowestBidder = this.game.houses.get(data.lowestBidder);
+            case "rattleshirts-raiders-wildling-victory": {
+                const lowestBidder = this.game.houses.get(data.lowestBidder);
                 const newSupply = data.newSupply.map(([hid, supply]) => [this.game.houses.get(hid), supply] as [House, number]);
 
                 return <>
@@ -949,7 +944,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         ))}
                     </ul>
                 </>;
-
+            }
             case "game-of-thrones-power-tokens-gained":
                 const gains = data.gains.map(([hid, gain]) => [this.game.houses.get(hid), gain] as [House, number]);
 
@@ -990,16 +985,17 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                             </tr>))}
                     </table>
                 </>);
-            case "player-replaced":
+            case "player-replaced": {
                 const oldUser = this.props.ingameGameState.entireGame.users.get(data.oldUser);
                 const newUser = this.props.ingameGameState.entireGame.users.get(data.newUser);
-                house = this.game.houses.get(data.house);
+                const house = this.game.houses.get(data.house);
 
                 return (
                     <>
                         <b>{oldUser.name}</b> (<b>{house.name}</b>) was replaced by <b>{newUser.name}</b>.
                     </>
                 );
+            }
         }
     }
 }
