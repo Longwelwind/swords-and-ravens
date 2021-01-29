@@ -53,7 +53,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
         return (
             <div className="d-flex flex-column h-100">
                 {/* Setting a fixed height seems to be the only solution to make ScrollToBottom work */}
-                <ScrollToBottom className="mb-3 chat-scroll-to-bottom" scrollViewClassName="overflow-x-hidden">
+                <ScrollToBottom className="mb-3 h-100 chat-scroll-to-bottom" scrollViewClassName="overflow-x-hidden">
                     {/* In case there's no messages yet, inject with no messages as arguments */}
                     {messages.length == 0 && (
                         <React.Fragment key={"injected-for-all"}>
