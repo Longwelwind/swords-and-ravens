@@ -344,9 +344,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </div>
                 </Col>
                 <Col xs={{span: "8", order: "1"}} xl={{span: 3, order: "3"}}>
-                    <Row> {/* We need this to make child column ordering work */}
+                    <Row className="mt-0"> {/* This row is necessary to make child column ordering work */}
                         <Col xs={{span: "12", order: "2"}} xl={{span: "12", order: "1"}}>
-                            <Row className="mt-0">
+                            <Row>
                                 <Col>
                                     <Card border={this.props.gameClient.isOwnTurn() ? "warning" : undefined} bg={this.props.gameState.childGameState instanceof CancelledGameState ? "danger" : undefined}>
                                         <ListGroup variant="flush">
@@ -386,35 +386,41 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     </Card>
                                 </Col>
                                 <Col xs="auto">
-                                    <OverlayTrigger overlay={
-                                            <Tooltip id="round">
-                                                <b>Round</b>
-                                            </Tooltip>
-                                        }
-                                        placement="auto">
-                                        <Col xs={12}>
-                                            <Row className="mb-1 justify-content-center"><img src={hourglassImage} width={28}/></Row>
-                                            <Row className="mb-2 justify-content-center" style={{fontSize: "22px"}}>{this.game.turn}</Row>
-                                        </Col>
-                                    </OverlayTrigger>
-                                    <OverlayTrigger overlay={
-                                            <Tooltip id="wildling-threat">
-                                                <b>Wildling Threat</b>{ knowsWildlingCard && nextWildlingCard ?
-                                                <><br/><br/><strong><u>{nextWildlingCard.type.name}</u></strong><br/>
-                                                <strong>Lowest Bidder:</strong> {nextWildlingCard.type.wildlingVictoryLowestBidderDescription}<br/>
-                                                <strong>Everyone Else:</strong> {nextWildlingCard.type.wildlingVictoryEverybodyElseDescription}<br/><br/>
-                                                <strong>Highest Bidder:</strong> {nextWildlingCard.type.nightsWatchDescription}
-                                                </>
-                                                : <></>
+                                    <Col style={{width: "28px", fontSize: "22px", textAlign: "center"}}>
+                                        <Row className="mb-3">
+                                            <OverlayTrigger overlay={
+                                                    <Tooltip id="round">
+                                                        <b>Round</b>
+                                                    </Tooltip>
                                                 }
-                                            </Tooltip>
-                                        }
-                                        placement="auto">
-                                        <Col xs={12}>
-                                            <Row className="mb-1 justify-content-center"><img src={mammothImage} width={28} className={knowsWildlingCard ? "wildling-highlight" : ""}/></Row>
-                                            <Row className="justify-content-center" style={{fontSize: "22px"}}>{this.game.wildlingStrength}</Row>
-                                        </Col>
-                                    </OverlayTrigger>
+                                                placement="auto">
+                                                <div>
+                                                    <img src={hourglassImage} width={28}/>
+                                                    {this.game.turn}
+                                                </div>
+                                            </OverlayTrigger>
+                                        </Row>
+                                        <Row>
+                                            <OverlayTrigger overlay={
+                                                    <Tooltip id="wildling-threat">
+                                                        <b>Wildling Threat</b>{ knowsWildlingCard && nextWildlingCard ?
+                                                        <><br/><br/><strong><u>{nextWildlingCard.type.name}</u></strong><br/>
+                                                        <strong>Lowest Bidder:</strong> {nextWildlingCard.type.wildlingVictoryLowestBidderDescription}<br/>
+                                                        <strong>Everyone Else:</strong> {nextWildlingCard.type.wildlingVictoryEverybodyElseDescription}<br/><br/>
+                                                        <strong>Highest Bidder:</strong> {nextWildlingCard.type.nightsWatchDescription}
+                                                        </>
+                                                        : <></>
+                                                        }
+                                                    </Tooltip>
+                                                }
+                                                placement="auto">
+                                                <div>
+                                                    <img src={mammothImage} width={28} className={knowsWildlingCard ? "wildling-highlight" : ""}/>
+                                                    {this.game.wildlingStrength}
+                                                </div>
+                                            </OverlayTrigger>
+                                        </Row>
+                                    </Col>
                                 </Col>
                             </Row>
                         </Col>
