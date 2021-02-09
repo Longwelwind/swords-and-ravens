@@ -57,7 +57,11 @@ export default class PostCombatGameState extends GameState<
         // Final combat strength can't be negative but only attacker is able to generate a negative final combat strength
         const attackerTotalStrength = Math.max(this.combat.getTotalCombatStrength(this.attacker), 0);
         const defenderTotalStrength = this.combat.getTotalCombatStrength(this.defender);
-
+        console.log("Final:")
+        console.log(attackerTotalStrength > defenderTotalStrength);
+        console.log(attackerTotalStrength);
+        console.log(defenderTotalStrength);
+        
         this.winner = attackerTotalStrength > defenderTotalStrength
             ? this.attacker
             : defenderTotalStrength > attackerTotalStrength

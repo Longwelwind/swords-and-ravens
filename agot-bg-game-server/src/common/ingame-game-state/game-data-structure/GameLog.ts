@@ -28,7 +28,8 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | SkinchangerScoutNightsWatchVictory | SkinchangerScoutWildlingVictory
     | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory
     | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered
-    | SupplyAdjusted | PlayerReplaced | UserHouseAssignments | PlayerAction;
+    | SupplyAdjusted | PlayerReplaced | UserHouseAssignments | PlayerAction | MelisandreUsed | JonSnowUsed
+    | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -290,11 +291,41 @@ interface PatchfaceUsed {
     houseCard: string;
 }
 
+interface MelisandreUsed {
+    type: "melisandre-used";
+    house: string;
+    houseCard: string;
+}
+
+interface MelisandreDwDUsed {
+    type: "melisandre-dwd-used";
+    house: string;
+    houseCard: string;
+}
+
+interface JonSnowUsed {
+    type: "jon-snow-used";
+    house: string;
+    wildlingsStrength: number;
+}
+
 interface DoranUsed {
     type: "doran-used";
     house: string;
     affectedHouse: string;
     influenceTrack: number;
+}
+
+interface QyburnUsed {
+    type: "qyburn-used";
+    house: string;
+    houseCard: string;
+}
+
+interface AeronDamhairUsed {
+    type: "aeron-damphair-used";
+    house: string;
+    tokens: number;
 }
 
 interface TyrionLannisterChoiceMade {
@@ -347,6 +378,12 @@ interface QueenOfThornsOrderRemoved {
 
 interface TywinLannisterPowerTokensGained {
     type: "tywin-lannister-power-tokens-gained";
+    house: string;
+    powerTokensGained: number;
+}
+
+interface QarlTheMaidPowerTokensGained {
+    type: "qarl-the-maid-tokens-gained";
     house: string;
     powerTokensGained: number;
 }

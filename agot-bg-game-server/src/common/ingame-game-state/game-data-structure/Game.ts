@@ -270,6 +270,16 @@ export default class Game {
         return houseCard;
     }
 
+    getWesterosCardById(id: number, deckId: number): WesterosCard {
+        const westerosCard = this.westerosDecks[deckId].find(wc => wc.id == id);
+
+        if (westerosCard == null) {
+            throw new Error();
+        }
+
+        return westerosCard;
+    }
+
     changeSupply(house: House, delta: number): void {
         const newSupply = Math.max(0, Math.min(house.supplyLevel + delta, this.supplyRestrictions.length - 1));
 
