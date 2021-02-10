@@ -170,6 +170,7 @@ interface ChangeSettings {
 export interface UserSettings {
     mapScrollbar: boolean;
     lastOpenedTab: string | null;
+    chatHouseNames: boolean;
 }
 
 interface ChangeGameSettings {

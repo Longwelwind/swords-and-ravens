@@ -469,7 +469,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 <Nav.Item key={roomId}>
                                                     <div className={classNames({"new-event": this.getPrivateChatRoomForPlayer(user).areThereNewMessage})}>
                                                         <Nav.Link eventKey={roomId}>
-                                                            {user.name}
+                                                            {this.getUserDisplayName(user)}
                                                         </Nav.Link>
                                                     </div>
                                                 </Nav.Item>
@@ -482,7 +482,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     <Dropdown.Menu>
                                                         {this.getOtherPlayers().map(p => (
                                                             <Dropdown.Item onClick={() => this.onNewPrivateChatRoomClick(p)} key={p.user.id}>
-                                                                {p.user.name}
+                                                                {this.getUserDisplayName(p.user)}
                                                             </Dropdown.Item>
                                                         ))}
                                                     </Dropdown.Menu>
@@ -497,7 +497,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                entireGame={this.props.gameState.entireGame}
                                                                roomId={this.props.gameState.entireGame.publicChatRoomId}
                                                                currentlyViewed={this.currentOpenedTab == "chat"}
-                                                               injectBetweenMessages={(p, n) => this.injectBetweenMessages(p, n)}/>
+                                                               injectBetweenMessages={(p, n) => this.injectBetweenMessages(p, n)}
+                                                               getUserDisplayName={u => this.getUserDisplayName(u)}/>
                                             </Tab.Pane>
                                             <Tab.Pane eventKey="game-logs" className="h-100">
                                                 <ScrollToBottom className="h-100" scrollViewClassName="overflow-x-hidden">
@@ -521,7 +522,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     <ChatComponent gameClient={this.props.gameClient}
                                                                    entireGame={this.props.gameState.entireGame}
                                                                    roomId={roomId}
-                                                                   currentlyViewed={this.currentOpenedTab == roomId}/>
+                                                                   currentlyViewed={this.currentOpenedTab == roomId}
+                                                                   getUserDisplayName={u => this.getUserDisplayName(u)}/>
                                                 </Tab.Pane>
                                             ))}
                                         </Tab.Content>
@@ -533,6 +535,20 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 </Col>
             </>
         );
+    }
+
+    getUserDisplayName(user: User): React.ReactNode {
+        const authenticatedUser = this.props.gameClient.authenticatedUser;
+        if (!authenticatedUser || !authenticatedUser.settings.chatHouseNames) {
+            return <>{user.name}</>;
+        }
+
+        const player = this.props.gameState.players.tryGet(user, null);
+        if (player) {
+            return <>{player.house.name}</>;
+        }
+
+        return <>{user.name}</>;
     }
 
     get tracks(): {name: string; tracker: House[]; stars: boolean}[] {
