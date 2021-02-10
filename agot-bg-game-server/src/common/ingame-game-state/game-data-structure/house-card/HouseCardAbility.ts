@@ -71,7 +71,16 @@ export default class HouseCardAbility {
         return null;
     }
 
+    finalCombatStrength(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _affectedHouseCard: HouseCard, strength: number) {
+        return strength;
+    }
+
+    modifySupportStrength(_combat: CombatGameState, _houseCard: HouseCard, _affectedHouseCard: HouseCard, _house: House, strength: number) {
+        return strength;
+    }
+
     forcesValyrianSteelBladeDecision(_combat: CombatGameState, _valyrianSteelBladeHolder: House): boolean {
         return false;
     }
+
 }

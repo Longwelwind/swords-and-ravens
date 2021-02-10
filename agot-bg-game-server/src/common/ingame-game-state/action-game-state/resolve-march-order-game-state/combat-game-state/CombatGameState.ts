@@ -241,7 +241,7 @@ export default class CombatGameState extends GameState<
     }
 
     getSupportStrengthForSide(supportedHouse: House): number {
-        return this.supporters.entries
+        return this.getHouseSupportStrength(supportedHouse, this.supporters.entries
             .filter(([_house, supHouse]) => supportedHouse == supHouse)
             .map(([house, _supHouse]) => {
                 // Compute the total strength that this supporting house is bringing
@@ -263,7 +263,7 @@ export default class CombatGameState extends GameState<
                     })
                     .reduce(_.add, 0);
             })
-            .reduce(_.add, 0);
+            .reduce(_.add, 0));
     }
 
     isHouseSupported(house: House): boolean {
@@ -414,6 +414,24 @@ export default class CombatGameState extends GameState<
         );
     }
 
+    getHouseSupportStrength(house: House, supportStrength: number): number {
+        const affectedHouseCard = this.houseCombatDatas.get(house).houseCard;
+
+        if (affectedHouseCard == null) {
+            return supportStrength;
+        }
+
+        return this.getOrderResolutionHouseCard().reduce((s, h) => {
+            const houseCard = this.houseCombatDatas.get(h).houseCard;
+
+            if (houseCard == null) {
+                return s;
+            }
+            let a = houseCard.ability ? houseCard.ability.modifySupportStrength(this, houseCard, affectedHouseCard, house, supportStrength) : s;
+            return a;
+        }, supportStrength);
+    }
+
     getHouseCardSwordIcons(house: House): number {
         return this.getStatOfHouseCard(
             house,
@@ -428,6 +446,24 @@ export default class CombatGameState extends GameState<
             hc => hc.towerIcons,
             (h, hc, a, ahc) => a.modifyTowerIcons(this, h, hc, ahc)
         );
+    }
+
+    getFinalCombatStrength(house: House, strength: number): number {
+        const affectedHouseCard = this.houseCombatDatas.get(house).houseCard;
+
+        if (affectedHouseCard == null) {
+            return strength;
+        }
+
+        return this.getOrderResolutionHouseCard().reduce((s, h) => {
+            const houseCard = this.houseCombatDatas.get(h).houseCard;
+
+            if (houseCard == null) {
+                return s;
+            }
+
+            return houseCard.ability ? houseCard.ability.finalCombatStrength(this, house, houseCard, affectedHouseCard, s) : s;
+        }, strength);
     }
 
     getStatOfHouseCard(
@@ -482,12 +518,17 @@ export default class CombatGameState extends GameState<
     }
 
     getTotalCombatStrength(house: House): number {
-        return this.getBaseCombatStrength(house)
-            + this.getOrderBonus(house)
-            + this.getSupportStrengthForSide(house)
-            + this.getValyrianBladeBonus(house)
-            + this.getHouseCardCombatStrength(house)
-            + this.getGarrisonCombatStrength(house);
+        let total = this.getBaseCombatStrength(house)
+        + this.getOrderBonus(house)
+        + this.getSupportStrengthForSide(house)
+        + this.getValyrianBladeBonus(house)
+        + this.getHouseCardCombatStrength(house)
+        + this.getGarrisonCombatStrength(house)
+        console.log(house.name);
+        let fin = this.getFinalCombatStrength(house, total);
+        console.log(fin);
+
+        return fin;
     }
 
     getEnemy(house: House): House {

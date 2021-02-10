@@ -46,11 +46,13 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
     game.houses = new BetterMap(Object.entries(baseGameData.houses)
         .filter(([hid, _]) => housesToCreate.includes(hid))
         .map(([hid, houseData]) => {
+            let cards = entireGame.gameSettings.classic_cards ? houseData.dwd_houseCards : houseData.classic_cards;
             const houseCards = new BetterMap<string, HouseCard>(
                 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
                 // @ts-ignore The conversion provokes n error in the CI
                 // Don't ask me why.
-                Object.entries(houseData.houseCards as {[key: string]: HouseCardData})
+                
+                Object.entries(cards as {[key: string]: HouseCardData})
                     .map(([houseCardId, houseCardData]) => {
                         const houseCard = new HouseCard(
                             houseCardId,

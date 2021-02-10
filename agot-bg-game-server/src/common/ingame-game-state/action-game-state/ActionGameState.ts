@@ -22,6 +22,8 @@ import SupportOrderType from "../game-data-structure/order-types/SupportOrderTyp
 import {port, sea, land} from "../game-data-structure/regionTypes";
 import PlanningRestriction from "../game-data-structure/westeros-card/planning-restriction/PlanningRestriction";
 import planningRestrictions from "../game-data-structure/westeros-card/planning-restriction/planningRestrictions";
+import Unit from "../game-data-structure/Unit";
+import {footman} from "../game-data-structure/unitTypes";
 
 export default class ActionGameState extends GameState<IngameGameState, UseRavenGameState | ResolveRaidOrderGameState | ResolveMarchOrderGameState | ResolveConsolidatePowerGameState> {
     planningRestrictions: PlanningRestriction[];
@@ -96,6 +98,21 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
     getOrdersOfHouse(house: House): [Region, Order][] {
         return this.ordersOnBoard.entries
             .filter(([region, _order]) => region.getController() == house);
+    }
+
+    getFootmenOfHouse(house: House): Unit[] {
+        let footmen: Unit[] = [];
+        this.ordersOnBoard.entries
+            .filter(([region, _order]) => region.getController() == house)
+            .map(([region, _order]) => region)
+            .forEach(region => {
+                region.units.forEach(unit => {
+                    if (unit.type == footman) {
+                        footmen.push(unit);
+                    }
+                })
+            })
+        return footmen;
     }
 
     getRegionsWithRaidOrderOfHouse(house: House): Region[] {

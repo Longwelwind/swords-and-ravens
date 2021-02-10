@@ -10,12 +10,16 @@ import {ClientMessage} from "../../../../../../../messages/ClientMessage";
 import RenlyBaratheonAbilityGameState, { SerializedRenlyBaratheonAbilityGameState } from "./renly-baratheon-ability-game-state/RenlyBaratheonAbilityGameState";
 import PostCombatGameState from "../PostCombatGameState";
 import CerseiLannisterAbilityGameState, {SerializedCerseiLannisterAbilityGameState} from "./cersei-lannister-ability-game-state/CerseiLannisterAbilityGameState";
-
+import JonSnowBaratheonAbilityGameState, {SerializedJonSnowBaratheonAbilityGameState} from "./jon-snow-baratheon-ability-game-state/JonSnowBaratheonAbilityGameState";
+import SerIlynPayneAbilityGameState, {SerializedSerIlynPayneAbilityGameState} from "./ser-ilyn-payne-ability-game-state/SerIlynPayneAbilityGameState";
+import SerGerrisDrinkwaterAbilityGameState, {SerializedSerGerrisDrinkwaterAbilityGameState} from "./ser-gerris-drinkwater-ability-game-state/SerGerrisDrinkwaterAbilityGameState";
+import ReekAbilityGameState, {SerializedReekAbilityGameState} from "./reek-ability-game-state/ReekAbilityGameState";
 export default class AfterWinnerDeterminationGameState extends GameState<
     PostCombatGameState,
     HouseCardResolutionGameState<
         AfterWinnerDeterminationGameState,
-        RenlyBaratheonAbilityGameState | CerseiLannisterAbilityGameState
+        RenlyBaratheonAbilityGameState | CerseiLannisterAbilityGameState | JonSnowBaratheonAbilityGameState 
+        | SerIlynPayneAbilityGameState | SerGerrisDrinkwaterAbilityGameState | ReekAbilityGameState
     >>
 {
     get postCombatGameState(): PostCombatGameState {
@@ -82,6 +86,14 @@ export default class AfterWinnerDeterminationGameState extends GameState<
                 return RenlyBaratheonAbilityGameState.deserializeFromServer(houseCardResolution, data);
             case "cersei-lannister-ability":
                 return CerseiLannisterAbilityGameState.deserializeFromServer(houseCardResolution, data);
+            case "jon-snow-baratheon-ability":
+                return JonSnowBaratheonAbilityGameState.deserializeFromServer(houseCardResolution, data);
+            case "ser-ilyn-payne-ability":
+                return SerIlynPayneAbilityGameState.deserializeFromServer(houseCardResolution, data);
+            case "ser-gerris-drinkwater-ability":
+                return SerGerrisDrinkwaterAbilityGameState.deserializeFromServer(houseCardResolution, data);                
+            case "reek-ability":
+                return ReekAbilityGameState.deserializeFromServer(houseCardResolution, data);                
         }
     }
 }
@@ -89,6 +101,8 @@ export default class AfterWinnerDeterminationGameState extends GameState<
 export interface SerializedAfterWinnerDeterminationGameState {
     type: "after-winner-determination";
     childGameState: SerializedHouseCardResolutionGameState<
-        SerializedRenlyBaratheonAbilityGameState | SerializedCerseiLannisterAbilityGameState
+        SerializedRenlyBaratheonAbilityGameState | SerializedCerseiLannisterAbilityGameState 
+        | SerializedJonSnowBaratheonAbilityGameState | SerializedSerIlynPayneAbilityGameState
+        | SerializedSerGerrisDrinkwaterAbilityGameState | SerializedReekAbilityGameState
     >;
 }
