@@ -46,6 +46,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     componentDidMount(): void {
+        document.title = this.props.entireGame.name;
         this.props.entireGame.onClientGameStateChange = () => this.onClientGameStateChange();
     }
 
