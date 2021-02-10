@@ -14,6 +14,7 @@ import Unit from "../../game-data-structure/Unit";
 import Game from "../../game-data-structure/Game";
 import Order from "../../game-data-structure/Order";
 import { port } from "../../game-data-structure/regionTypes";
+import HouseCard from "../../game-data-structure/house-card/HouseCard";
 import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameState } from "./take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
 import { findOrphanedShipsAndDestroyThem } from "../../port-helper/PortHelper";
 
@@ -55,6 +56,17 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         // Now is the time to ...
         //   ... remove orphaned orders (e.g. caused by Mace Tyrell or Ilyn Payne)
         this.findOrphanedOrdersAndRemoveThem();
+
+        // reset all card ability (due to queen of thorns)
+        let disabled_cards: HouseCard[] = [];
+        this.game.houses.forEach(h => {
+            let cards = h.houseCards.values.filter(hc => hc.disabled == true);
+            disabled_cards = disabled_cards.concat(cards);
+        });
+        disabled_cards.forEach(card => { 
+            card.ability = card.disabled_ability;
+            card.disabled = false;
+        });
 
         //   ... destroy orphaned ships (e.g. caused by Arianne)
         findOrphanedShipsAndDestroyThem(this.world, this.ingameGameState, this.actionGameState);

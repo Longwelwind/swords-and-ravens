@@ -15,6 +15,8 @@ export default class HouseCard {
     swordIcons: number;
     towerIcons: number;
     ability: HouseCardAbility | null;
+    disabled_ability: HouseCardAbility | null;
+    disabled: boolean | false;
     @observable state: HouseCardState = HouseCardState.AVAILABLE;
 
     constructor(id: string, name: string, combatStrength: number, swordIcons: number, towerIcons: number, ability: HouseCardAbility | null) {
@@ -24,6 +26,8 @@ export default class HouseCard {
         this.swordIcons = swordIcons;
         this.towerIcons = towerIcons;
         this.ability = ability;
+        this.disabled_ability = null;
+        this.disabled = false;
     }
 
     serializeToClient(): SerializedHouseCard {
