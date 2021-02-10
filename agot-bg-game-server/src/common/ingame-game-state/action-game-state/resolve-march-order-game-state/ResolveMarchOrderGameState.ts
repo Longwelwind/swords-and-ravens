@@ -58,13 +58,13 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         this.findOrphanedOrdersAndRemoveThem();
 
         // reset all card ability (due to queen of thorns)
-        let disabled_cards: HouseCard[] = [];
+        let disabledCards: HouseCard[] = [];
         this.game.houses.forEach(h => {
-            let cards = h.houseCards.values.filter(hc => hc.disabled == true);
-            disabled_cards = disabled_cards.concat(cards);
+            const cards = h.houseCards.values.filter(hc => hc.disabled == true);
+            disabledCards = disabledCards.concat(cards);
         });
-        disabled_cards.forEach(card => { 
-            card.ability = card.disabled_ability;
+        disabledCards.forEach(card => {
+            card.ability = card.disabledAbility;
             card.disabled = false;
         });
 

@@ -84,7 +84,7 @@ export default class AfterCombatHouseCardAbilitiesGameState extends GameState<
             case "melisandre-ability":
                 return MelisandreAbilityGameState.deserializeFromServer(houseCardResolution, data);
             case "rodrik-the-reader-ability":
-                return RodrikTheReaderAbilityGameState.deserializeFromServer(houseCardResolution, data);                
+                return RodrikTheReaderAbilityGameState.deserializeFromServer(houseCardResolution, data);
         }
     }
 }

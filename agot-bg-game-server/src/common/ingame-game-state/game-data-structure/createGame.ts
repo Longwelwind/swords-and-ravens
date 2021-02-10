@@ -84,7 +84,7 @@ function createHouses(housesToCreate: string[], housesData: {[key: string]: Hous
 
         return [hid, house];
     }));
-} 
+}
 
 function createUnits(housesToCreate: string[], game: Game, gameSetup: GameSetup, units: {[key: string]: UnitData[]}): void {
     Object.entries(units).forEach(([regionId, data]) => {
@@ -119,7 +119,6 @@ export default function createBaseGame(entireGame: EntireGame, housesToCreate: s
         } else {
             game.houses = createHouses(housesToCreate, baseGameData.houses);
         }
-        
     }
 
     game.maxTurns = baseGameData.maxTurns;
@@ -136,19 +135,19 @@ export default function createBaseGame(entireGame: EntireGame, housesToCreate: s
         } else {
             game.ironThroneTrack = baseGameData.tracks.ironThrone.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
         }
-    
+
         if (gameSetup.tracks && gameSetup.tracks.fiefdoms) {
             game.fiefdomsTrack = gameSetup.tracks.fiefdoms.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
         } else {
             game.fiefdomsTrack = baseGameData.tracks.fiefdoms.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
         }
-    
+
         if (gameSetup.tracks && gameSetup.tracks.kingsCourt) {
             game.kingsCourtTrack = gameSetup.tracks.kingsCourt.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
         } else {
             game.kingsCourtTrack = baseGameData.tracks.kingsCourt.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
         }
-    
+
         if (game.ironThroneTrack.length != game.houses.size) {
             throw new Error("Size of ironThrone track is not equal to the number of houses");
         }
@@ -218,7 +217,7 @@ export default function createBaseGame(entireGame: EntireGame, housesToCreate: s
 
 export function createAdwdGame(entireGame: EntireGame, housesToCreate: string[]): Game {
     const game = createBaseGame(entireGame, housesToCreate, false);
-    
+
     game.houses = createHouses(housesToCreate, adwdData.houses);
 
     createUnits(housesToCreate, game, entireGame.getSelectedGameSetup(), adwdData.units);

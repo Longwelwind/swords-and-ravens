@@ -175,7 +175,7 @@ const houseCardImages = new BetterMap([
     ["cersei-lannister-dwd", cerseiLannisterDwDImage],
     ["ser-jaime-lannister-dwd", serJaimeLannisterDwDImage],
     ["ser-kevan-lannister-dwd", serKevanLannisterDwDImage],
-    ["ser-daven-lannister", serDavenLannisterImage],    
+    ["ser-daven-lannister", serDavenLannisterImage],
 ]);
 
 

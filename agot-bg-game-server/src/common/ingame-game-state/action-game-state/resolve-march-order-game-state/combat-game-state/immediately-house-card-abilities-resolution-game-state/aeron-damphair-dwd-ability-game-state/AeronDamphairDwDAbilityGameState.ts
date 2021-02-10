@@ -7,11 +7,7 @@ import House from "../../../../../game-data-structure/House";
 import Player from "../../../../../Player";
 import {ClientMessage} from "../../../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../../../messages/ServerMessage";
-import SelectHouseCardGameState, {SerializedSelectHouseCardGameState} from "../../../../../select-house-card-game-state/SelectHouseCardGameState";
-import HouseCard, {HouseCardState} from "../../../../../game-data-structure/house-card/HouseCard";
 import IngameGameState from "../../../../../IngameGameState";
-import { aeronDamphairDwD } from "../../../../../game-data-structure/house-card/houseCardAbilities";
-
 
 
 export default class AeronDamphairDwDAbilityGameState extends GameState<
@@ -31,7 +27,7 @@ export default class AeronDamphairDwDAbilityGameState extends GameState<
 
     firstStart(house: House): void {
         const choices: string[] = ["0"];
-    
+
         for(let i = 1;i<=house.powerTokens;i++) {
             choices.push(i.toString());
         }
@@ -46,7 +42,7 @@ export default class AeronDamphairDwDAbilityGameState extends GameState<
     onSimpleChoiceGameStateEnd(choice: number): void {
         const house = this.childGameState.house;
         const houseCombatData = this.combatGameState.houseCombatDatas.get(house);
-        const aeronDamphairHouseCard = houseCombatData.houseCard;        
+        const aeronDamphairHouseCard = houseCombatData.houseCard;
 
         // This should normally never happen as there's no way for the houseCard of a house to
         // be null if this game state was triggered.

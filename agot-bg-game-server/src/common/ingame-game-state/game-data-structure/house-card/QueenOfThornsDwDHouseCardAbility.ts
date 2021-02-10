@@ -6,13 +6,12 @@ import CancelHouseCardAbilitiesGameState
 
 export default class QueenOfThornsDwDHouseCardAbility extends HouseCardAbility {
     cancel(cancelResolutionState: CancelHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {
-        let card = cancelResolutionState.combatGameState.houseCombatDatas.get(cancelResolutionState.combatGameState.getEnemy(house)).houseCard;
+        const card = cancelResolutionState.combatGameState.houseCombatDatas.get(cancelResolutionState.combatGameState.getEnemy(house)).houseCard;
         if (card) {
-            card.disabled_ability = card.ability;
+            card.disabledAbility = card.ability;
             card.disabled = true;
             card.ability = null;
         }
         cancelResolutionState.onHouseCardResolutionFinish();
     }
-    
 }

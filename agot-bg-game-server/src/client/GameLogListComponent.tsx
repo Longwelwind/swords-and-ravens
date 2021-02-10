@@ -591,15 +591,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <strong>Melisandre</strong>: <strong>{house.name}</strong> decided to return <strong>
                         {houseCard.name}</strong> card to hand.
                 </>;
-            }            
+            }
             case "jon-snow-used": {
                 const house = this.game.houses.get(data.house);
-                let wilddlingStatus: string = "increase";
+                let wilddlingStatus = "increase";
                 if (data.wildlingsStrength < 0) {
                     wilddlingStatus = "decrease";
                 }
                 return <>
-                    <strong>Jon Snow</strong>: <strong>{house.name}</strong> decided to  <strong> 
+                    <strong>Jon Snow</strong>: <strong>{house.name}</strong> decided to  <strong>
                         {wilddlingStatus} </strong> the Wildling track by one space.
                 </>;
             }
@@ -618,9 +618,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const houseCard = this.game.getHouseCardById(data.houseCard);
 
                 return <>
-                    <b>Qyburn</b>: Decided to use strength from <b>{houseCard.name}</b>
+                    <b>Qyburn</b>: <b>{house.name}</b> decided to use strength from <b>{houseCard.name}</b>
                 </>;
-            }            
+            }
             case "aeron-damphair-used": {
                 const house = this.game.houses.get(data.house);
                 const tokens = data.tokens;
@@ -629,7 +629,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Aeron Damphair</b>: <b>{house.name}</b> decided to increase
                         the combat strength of this card by <b>{tokens}</b>.
                 </>;
-            }            
+            }
             case "tyrion-lannister-choice-made": {
                 const house = this.game.houses.get(data.house);
                 const affectedHouse = this.game.houses.get(data.affectedHouse);

@@ -20,7 +20,7 @@ export default class AfterCombatHouseCardAbilitiesComponent extends Component<Ga
         return renderChildGameState({...this.props, gameState: this.props.gameState.childGameState}, [
             [PatchfaceAbilityGameState, PatchfaceAbilityComponent],
             [MelisandreAbilityGameState, MelisandreAbilityComponent],
-            [RodrikTheReaderAbilityGameState, RodrikTheReaderAbilityComponent]            
+            [RodrikTheReaderAbilityGameState, RodrikTheReaderAbilityComponent]
         ]);
     }
 }

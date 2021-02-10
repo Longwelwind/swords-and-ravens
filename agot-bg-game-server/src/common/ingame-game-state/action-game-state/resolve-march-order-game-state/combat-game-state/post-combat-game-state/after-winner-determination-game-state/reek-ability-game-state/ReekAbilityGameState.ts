@@ -47,13 +47,13 @@ export default class ReekAbilityGameState extends GameState<
     onSimpleChoiceGameStateEnd(choice: number): void {
         const house = this.childGameState.house;
         this.parentGameState.game.wildlingStrength += choice;
-        
+
         if (choice == 0) {
             this.ingame.log({
                 type: "house-card-ability-not-used",
                 house: house.id,
                 houseCard: reek.id
-            });            
+            });
         } else {
             const reek = house.houseCards.get("reek");
             reek.state = HouseCardState.AVAILABLE;
@@ -98,5 +98,5 @@ export default class ReekAbilityGameState extends GameState<
 
 export interface SerializedReekAbilityGameState {
     type: "reek-ability";
-    childGameState: SerializedSimpleChoiceGameState
+    childGameState: SerializedSimpleChoiceGameState;
 }

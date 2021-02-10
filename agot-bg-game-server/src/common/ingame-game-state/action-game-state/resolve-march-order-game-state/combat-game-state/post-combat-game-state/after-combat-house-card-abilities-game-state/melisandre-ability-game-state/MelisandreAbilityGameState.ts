@@ -77,7 +77,6 @@ export default class MelisandreAbilityGameState extends GameState<
             powerTokenCount: house.powerTokens
         });
 
-        
         this.parentGameState.onHouseCardResolutionFinish(house);
     }
 

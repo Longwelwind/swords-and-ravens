@@ -18,7 +18,7 @@ export default class AfterWinnerDeterminationGameState extends GameState<
     PostCombatGameState,
     HouseCardResolutionGameState<
         AfterWinnerDeterminationGameState,
-        RenlyBaratheonAbilityGameState | CerseiLannisterAbilityGameState | JonSnowBaratheonAbilityGameState 
+        RenlyBaratheonAbilityGameState | CerseiLannisterAbilityGameState | JonSnowBaratheonAbilityGameState
         | SerIlynPayneAbilityGameState | SerGerrisDrinkwaterAbilityGameState | ReekAbilityGameState
     >>
 {
@@ -91,9 +91,9 @@ export default class AfterWinnerDeterminationGameState extends GameState<
             case "ser-ilyn-payne-ability":
                 return SerIlynPayneAbilityGameState.deserializeFromServer(houseCardResolution, data);
             case "ser-gerris-drinkwater-ability":
-                return SerGerrisDrinkwaterAbilityGameState.deserializeFromServer(houseCardResolution, data);                
+                return SerGerrisDrinkwaterAbilityGameState.deserializeFromServer(houseCardResolution, data);
             case "reek-ability":
-                return ReekAbilityGameState.deserializeFromServer(houseCardResolution, data);                
+                return ReekAbilityGameState.deserializeFromServer(houseCardResolution, data);
         }
     }
 }
@@ -101,7 +101,7 @@ export default class AfterWinnerDeterminationGameState extends GameState<
 export interface SerializedAfterWinnerDeterminationGameState {
     type: "after-winner-determination";
     childGameState: SerializedHouseCardResolutionGameState<
-        SerializedRenlyBaratheonAbilityGameState | SerializedCerseiLannisterAbilityGameState 
+        SerializedRenlyBaratheonAbilityGameState | SerializedCerseiLannisterAbilityGameState
         | SerializedJonSnowBaratheonAbilityGameState | SerializedSerIlynPayneAbilityGameState
         | SerializedSerGerrisDrinkwaterAbilityGameState | SerializedReekAbilityGameState
     >;

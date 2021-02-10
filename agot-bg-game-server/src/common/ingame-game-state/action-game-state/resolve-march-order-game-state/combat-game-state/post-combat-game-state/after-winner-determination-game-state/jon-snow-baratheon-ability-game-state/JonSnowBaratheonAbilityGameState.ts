@@ -57,13 +57,13 @@ export default class JonSnowBaratheonAbilityGameState extends GameState<
     onSimpleChoiceGameStateEnd(choice: number): void {
         const house = this.childGameState.house;
         this.parentGameState.game.wildlingStrength += choice;
-        
+
         if (choice == 0) {
             this.ingame.log({
                 type: "house-card-ability-not-used",
                 house: house.id,
                 houseCard: jonSnow.id
-            });            
+            });
         } else {
             this.ingame.log({
                 type: "jon-snow-used",
@@ -110,5 +110,5 @@ export default class JonSnowBaratheonAbilityGameState extends GameState<
 
 export interface SerializedJonSnowBaratheonAbilityGameState {
     type: "jon-snow-baratheon-ability";
-    childGameState: SerializedSimpleChoiceGameState
+    childGameState: SerializedSimpleChoiceGameState;
 }
