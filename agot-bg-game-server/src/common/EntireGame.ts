@@ -31,6 +31,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     // Client-side callback fired whenever the current GameState changes.
     onClientGameStateChange: (() => void) | null;
 
+    get lobbyGameState(): LobbyGameState | null{
+        return this.childGameState instanceof LobbyGameState ? this.childGameState : null;
+    }
+
     get owner(): User | null {
         return this.users.tryGet(this.ownerUserId, null);
     }
@@ -93,6 +97,34 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     isOwner(user: User): boolean {
+        const owner = this.owner;
+        if (!owner) {
+            return this.isRealOwner(user);
+        }
+
+        // If owner is not seated every player becomes owner ...
+        if (this.lobbyGameState) {
+            if (this.lobbyGameState.players.values.includes(owner)) {
+                return this.isRealOwner(user);
+            } else {
+                // ... and can kick players, change settings, start the game, etc. in LobbyGameState
+                return this.lobbyGameState.players.values.includes(user);
+            }
+        }
+
+        if (this.childGameState instanceof IngameGameState) {
+            if (this.childGameState.players.keys.includes(owner)) {
+                return this.isRealOwner(user);
+            } else {
+                // ... and can toggle PBEM during game
+                return this.childGameState.players.keys.includes(user);
+            }
+        }
+
+        return this.isRealOwner(user);
+    }
+
+    isRealOwner(user: User): boolean {
         return user.id == this.ownerUserId;
     }
 
@@ -118,19 +150,25 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 settings: user.settings
             })
         } else if (message.type == "change-game-settings") {
-            if (this.ownerUserId != user.id) {
+            if (!this.isOwner(user)) {
                 return;
             }
 
-            this.gameSettings = message.settings;
+            let settings =  message.settings as GameSettings;
+            if (!settings || (this.lobbyGameState && this.lobbyGameState.players.size > settings.playerCount)) {
+                // A variant which contains less players than connected is not allowed
+                settings = this.gameSettings;
+            }
 
-            if (this.childGameState instanceof LobbyGameState) {
-                this.childGameState.onGameSettingsChange();
+            this.gameSettings = settings;
+
+            if (this.lobbyGameState) {
+                this.lobbyGameState.onGameSettingsChange();
             }
 
             this.broadcastToClients({
                 type: "game-settings-changed",
-                settings: message.settings
+                settings: settings
             });
         } else {
             this.childGameState.onClientMessage(user, message);

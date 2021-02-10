@@ -37,7 +37,7 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
 
         if (!this.enoughReconciled) {
             result = union(result, this.props.gameState.getAllArmyUnitsOfHouse(this.house));
-            
+
             // Remove the last unit from an area from selectable units
             for (const region of this.unitsToRemove.keys) {
                 const remainingUnits = _.difference(region.units.values, this.unitsToRemove.get(region));
