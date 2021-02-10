@@ -19,6 +19,7 @@ interface UserSettingsComponentProps {
 @observer
 export default class UserSettingsComponent extends Component<UserSettingsComponentProps> {
     @observable mapScrollbar = false;
+    @observable chatHouseNames = false;
 
     render(): ReactNode {
         return (
@@ -45,6 +46,26 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                                 />
                             </Col>
                         </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="chat-house-names-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="chat-house-names-tooltip">
+                                                Will show house names instead of user names in chat windows.
+                                            </Tooltip>}>
+                                            <label htmlFor="chat-house-names-setting">House names for chat</label>
+                                        </OverlayTrigger>}
+                                    checked={this.chatHouseNames}
+                                    onChange={() => {
+                                        this.chatHouseNames = !this.chatHouseNames;
+                                        this.changeUserSettings();
+                                    }}
+                                />
+                            </Col>
+                        </Row>
                     </>
                 )}
             </>
@@ -54,12 +75,14 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
     componentDidMount(): void {
         if (this.props.user) {
             this.mapScrollbar = this.props.user.settings.mapScrollbar;
+            this.chatHouseNames = this.props.user.settings.chatHouseNames;
         }
     }
 
     changeUserSettings(): void {
         if (this.props.user) {
             this.props.user.settings.mapScrollbar = this.mapScrollbar;
+            this.props.user.settings.chatHouseNames = this.chatHouseNames;
             this.props.user.syncSettings();
         }
 

@@ -12,6 +12,7 @@ import EntireGame from "../../common/EntireGame";
 // @ts-ignore
 import ScrollToBottom from "react-scroll-to-bottom";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import User from "../../server/User";
 
 interface ChatComponentProps {
     gameClient: GameClient;
@@ -22,6 +23,8 @@ interface ChatComponentProps {
      * managed externally to be put between messages. Used, for example, for in-game vote status.
      */
     injectBetweenMessages: (previousMessage: Message | null, nextMessage: Message | null) => ReactNode;
+
+    getUserDisplayName: (user: User) => ReactNode;
     /**
      * This property indicates whether this component can be viewed by the user.
      * If the component is inside a Tab component, it can hidden if an other Tab is opened.
@@ -36,7 +39,8 @@ export default class ChatComponent extends Component<ChatComponentProps> {
     @observable inputText = "";
 
     static defaultProps = {
-        injectBetweenMessages: () => <></>
+        injectBetweenMessages: () => <></>,
+        getUserDisplayName: (u: User) => <>{u.name}</>
     };
 
     get chatClient(): ChatClient {
@@ -81,7 +85,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                     </OverlayTrigger>
                                 </Col>
                                 <Col xs="auto" className="mx-1">
-                                    <strong>{m.user.name}</strong>
+                                    <strong>{this.props.getUserDisplayName(m.user)}</strong>
                                 </Col>
                                 <Col style={{overflowWrap: "anywhere"}}>
                                     {m.text}
