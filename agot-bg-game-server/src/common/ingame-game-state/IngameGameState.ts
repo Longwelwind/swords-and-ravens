@@ -11,7 +11,7 @@ import ActionGameState, {SerializedActionGameState} from "./action-game-state/Ac
 import Order from "./game-data-structure/Order";
 import Game, {SerializedGame} from "./game-data-structure/Game";
 import WesterosGameState, {SerializedWesterosGameState} from "./westeros-game-state/WesterosGameState";
-import createGame from "./game-data-structure/createGame";
+import createBaseGame, { createAdwdGame } from "./game-data-structure/createGame";
 import BetterMap from "../../utils/BetterMap";
 import House from "./game-data-structure/House";
 import Unit from "./game-data-structure/Unit";
@@ -54,7 +54,7 @@ export default class IngameGameState extends GameState<
     }
 
     beginGame(futurePlayers: BetterMap<string, User>): void {
-        this.game = createGame(this.entireGame, futurePlayers.keys);
+        this.game = this.entireGame.gameSettings.setupId == "a-dance-with-dragons" ? createAdwdGame(this.entireGame, futurePlayers.keys) : createBaseGame(this.entireGame, futurePlayers.keys);
         this.players = new BetterMap(futurePlayers.map((house, user) => [user, new Player(user, this.game.houses.get(house))]));
 
         this.log({

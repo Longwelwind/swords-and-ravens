@@ -96,18 +96,18 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         <Row>
                             <Col xs="auto">
                                 <FormCheck
-                                    id="dwd-houses-cards"
+                                    id="adwd-house-cards"
                                     type="checkbox"
                                     label={
                                         <OverlayTrigger overlay={
-                                            <Tooltip id="dwd-houses-cards">
+                                            <Tooltip id="adwd-house-cards-tooltip">
                                                 The house cards will come from the Dance with Dragons expansion.
                                             </Tooltip>}>
-                                            <label htmlFor="dwd-houses-cards">Use house cards from <i>Dance with Dragons</i> expansion</label>
+                                            <label htmlFor="adwd-house-cards">Use <i>A Dance with Dragons</i> house cards (BETA)</label>
                                         </OverlayTrigger>}
-                                    disabled={!this.canChangeGameSettings}
-                                    checked={this.gameSettings.classic_cards}
-                                    onChange={() => this.changeGameSettings(() => this.gameSettings.classic_cards = !this.gameSettings.classic_cards)}
+                                    disabled={!this.canChangeGameSettings || this.props.entireGame.gameSettings.setupId == "a-dance-with-dragons"}
+                                    checked={this.gameSettings.adwdHouseCards}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.adwdHouseCards = !this.gameSettings.adwdHouseCards)}
                                 />
                             </Col>
                         </Row>

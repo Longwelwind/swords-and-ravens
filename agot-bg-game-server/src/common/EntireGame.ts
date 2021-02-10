@@ -20,7 +20,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     ownerUserId: string;
     name: string;
 
-    @observable gameSettings: GameSettings = { pbem: false, setupId: "base-game", playerCount: 6, randomHouses: false, cokWesterosPhase: false, classic_cards: false};
+    @observable gameSettings: GameSettings = { pbem: false, setupId: "base-game", playerCount: 6, randomHouses: false, cokWesterosPhase: false, adwdHouseCards: false};
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -158,6 +158,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             if (!settings || (this.lobbyGameState && this.lobbyGameState.players.size > settings.playerCount)) {
                 // A variant which contains less players than connected is not allowed
                 settings = this.gameSettings;
+            }
+
+            if (settings.setupId == "a-dance-with-dragons") {
+                settings.adwdHouseCards = true;
             }
 
             this.gameSettings = settings;
@@ -401,6 +405,6 @@ export interface GameSettings {
     setupId: string;
     playerCount: number;
     randomHouses: boolean;
-    classic_cards: boolean;
+    adwdHouseCards: boolean;
     cokWesterosPhase: boolean;
 }
