@@ -7,9 +7,9 @@ import CancelHouseCardAbilitiesGameState
 export default class StannisBaratheonDwDHouseCardAbility extends HouseCardAbility {
 
     cancel(cancelResolutionState: CancelHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {
-        let actionGameState = cancelResolutionState.combatGameState.actionGameState;
-        let combatGameState = cancelResolutionState.combatGameState;
-        let game = cancelResolutionState.game
+        const actionGameState = cancelResolutionState.combatGameState.actionGameState;
+        const combatGameState = cancelResolutionState.combatGameState;
+        const game = cancelResolutionState.game
         if (cancelResolutionState.combatGameState.supporters.entries.every(([_supporter, supportee]) => supportee != house)) {
             const regions = game.world.getNeighbouringRegions(combatGameState.defendingRegion)
                                 .filter(r => actionGameState.ordersOnBoard.has(r))

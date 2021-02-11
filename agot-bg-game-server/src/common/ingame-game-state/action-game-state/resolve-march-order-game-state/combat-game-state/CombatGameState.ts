@@ -518,14 +518,12 @@ export default class CombatGameState extends GameState<
 
     getTotalCombatStrength(house: House): number {
         const total = this.getBaseCombatStrength(house)
-        + this.getOrderBonus(house)
-        + this.getSupportStrengthForSide(house)
-        + this.getValyrianBladeBonus(house)
-        + this.getHouseCardCombatStrength(house)
-        + this.getGarrisonCombatStrength(house)
-        const fin = this.getFinalCombatStrength(house, total);
-
-        return fin;
+            + this.getOrderBonus(house)
+            + this.getSupportStrengthForSide(house)
+            + this.getValyrianBladeBonus(house)
+            + this.getHouseCardCombatStrength(house)
+            + this.getGarrisonCombatStrength(house);
+        return this.getFinalCombatStrength(house, total);
     }
 
     getEnemy(house: House): House {

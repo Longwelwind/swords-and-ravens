@@ -3,7 +3,7 @@ import CombatGameState from "../../action-game-state/resolve-march-order-game-st
 import House from "../House";
 import HouseCard from "./HouseCard";
 import Unit from "../Unit";
-import {footman, knight} from "../unitTypes";
+import {knight} from "../unitTypes";
 
 export default class SerAddamMarbrandAbility extends HouseCardAbility {
     modifyUnitCombatStrength(combat: CombatGameState, house: House, _houseCard: HouseCard, _houseSide: House, affectedUnit: Unit, _support: boolean, _currentStrength: number): number {

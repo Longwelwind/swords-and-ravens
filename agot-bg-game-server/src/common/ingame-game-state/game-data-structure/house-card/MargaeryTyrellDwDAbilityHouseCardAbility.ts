@@ -4,7 +4,7 @@ import House from "../House";
 import CombatGameState from "../../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 
 export default class MargaeryTyrellDwDAbilityHouseCardAbility extends HouseCardAbility {
-    finalCombatStrength(combat: CombatGameState, house: House, houseCard: HouseCard, affectedHouseCard: HouseCard, strength: number) {
+    finalCombatStrength(combat: CombatGameState, house: House, houseCard: HouseCard, affectedHouseCard: HouseCard, strength: number): number {
         let defender: House;
         if (houseCard == affectedHouseCard) {
             defender = house;

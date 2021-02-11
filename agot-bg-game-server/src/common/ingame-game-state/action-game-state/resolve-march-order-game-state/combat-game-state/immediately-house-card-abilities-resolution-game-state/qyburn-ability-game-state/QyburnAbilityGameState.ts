@@ -31,7 +31,7 @@ export default class QyburnAbilityGameState extends GameState<
     firstStart(house: House): void {
         // If the house doesn't have 2 power tokens, or doesn't have other available
         // house cards, don't even ask him.
-        const availableHouseCards = this.getAvailableHouseCards(house);
+        const availableHouseCards = this.getAvailableHouseCards();
         if (house.powerTokens < 2 || availableHouseCards.length == 0) {
             this.parentGameState.onHouseCardResolutionFinish(house);
             return;
@@ -47,7 +47,7 @@ export default class QyburnAbilityGameState extends GameState<
     onSimpleChoiceGameStateEnd(choice: number): void {
         const house = this.childGameState.house;
         if (choice == 0) {
-            const possibleHouseCards = this.getAvailableHouseCards(house);
+            const possibleHouseCards = this.getAvailableHouseCards();
 
             this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(house, possibleHouseCards);
         } else {
@@ -95,12 +95,11 @@ export default class QyburnAbilityGameState extends GameState<
         this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);
     }
 
-    getAvailableHouseCards(house: House): HouseCard[] {
+    getAvailableHouseCards(): HouseCard[] {
         let availableHouseCards: HouseCard[] = [];
         this.game.houses.forEach(h => {
-                let cards = h.houseCards.values.filter(hc => hc.state == HouseCardState.USED);
+                const cards = h.houseCards.values.filter(hc => hc.state == HouseCardState.USED);
                 availableHouseCards = availableHouseCards.concat(cards);
-
             });
         return availableHouseCards;
     }

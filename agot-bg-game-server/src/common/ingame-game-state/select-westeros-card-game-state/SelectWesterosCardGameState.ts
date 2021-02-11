@@ -1,13 +1,12 @@
 import GameState from "../../GameState";
 import Game from "../game-data-structure/Game";
 import House from "../game-data-structure/House";
-import HouseCard from "../game-data-structure/house-card/HouseCard";
 import {ServerMessage} from "../../../messages/ServerMessage";
 import Player from "../Player";
 import {ClientMessage} from "../../../messages/ClientMessage";
 import IngameGameState from "../IngameGameState";
 import User from "../../../server/User";
-import WesterosCard, {SerializedWesterosCard} from "../game-data-structure/westeros-card/WesterosCard";
+import WesterosCard from "../game-data-structure/westeros-card/WesterosCard";
 
 interface ParentGameState extends GameState<any, any> {
     game: Game;
@@ -79,5 +78,5 @@ export default class SelectWesterosCardGameState<P extends ParentGameState> exte
 export interface SerializedSelectWesterosCardGameState {
     type: "select-westeros-card";
     house: string;
-    deckId: number,
+    deckId: number;
 }

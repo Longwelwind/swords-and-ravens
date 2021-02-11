@@ -1,18 +1,14 @@
 import GameState from "../../../../../../../GameState";
 import AfterWinnerDeterminationGameState from "../AfterWinnerDeterminationGameState";
 import SimpleChoiceGameState, {SerializedSimpleChoiceGameState} from "../../../../../../simple-choice-game-state/SimpleChoiceGameState";
-import SelectOrdersGameState, {SerializedSelectOrdersGameState} from "../../../../../../select-orders-game-state/SelectOrdersGameState";
 import Game from "../../../../../../game-data-structure/Game";
 import CombatGameState from "../../../CombatGameState";
 import House from "../../../../../../game-data-structure/House";
 import Player from "../../../../../../Player";
 import {ClientMessage} from "../../../../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../../../../messages/ServerMessage";
-import Region from "../../../../../../game-data-structure/Region";
 import ActionGameState from "../../../../../ActionGameState";
 import IngameGameState from "../../../../../../IngameGameState";
-import { cerseiLannister } from "../../../../../../game-data-structure/house-card/houseCardAbilities";
-import _ from "lodash";
 
 export default class SerGerrisDrinkwaterAbilityGameState extends GameState<
     AfterWinnerDeterminationGameState["childGameState"],
@@ -66,7 +62,7 @@ export default class SerGerrisDrinkwaterAbilityGameState extends GameState<
             this.parentGameState.onHouseCardResolutionFinish(house);
         } else {
             const influenceTrack = this.game.getInfluenceTrackByI(choice-1);
-            let position = influenceTrack.indexOf(house);
+            const position = influenceTrack.indexOf(house);
             influenceTrack.splice(position-1, 0, influenceTrack.splice(position, 1)[0]);
             this.parentGameState.onHouseCardResolutionFinish(house);
 
@@ -110,5 +106,5 @@ export default class SerGerrisDrinkwaterAbilityGameState extends GameState<
 
 export interface SerializedSerGerrisDrinkwaterAbilityGameState {
     type: "ser-gerris-drinkwater-ability";
-    childGameState: SerializedSimpleChoiceGameState
+    childGameState: SerializedSimpleChoiceGameState;
 }
