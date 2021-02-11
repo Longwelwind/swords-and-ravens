@@ -17,9 +17,6 @@ export default class RodrikTheReaderAbilityGameState extends GameState<
     AfterCombatHouseCardAbilitiesGameState["childGameState"],
     SimpleChoiceGameState | SelectWesterosCardGameState<RodrikTheReaderAbilityGameState>
 > {
-    westerosCards: WesterosCard[];
-    deckId: number;
-
     get game(): Game {
         return this.combat().game;
     }
@@ -51,9 +48,7 @@ export default class RodrikTheReaderAbilityGameState extends GameState<
             this.parentGameState.onHouseCardResolutionFinish(house);
         }
         else {
-            this.westerosCards = this.game.westerosDecks[choice-1];
-            this.deckId = choice - 1;
-            this.setChildGameState(new SelectWesterosCardGameState(this)).firstStart(house, this.westerosCards, this.deckId);
+            this.setChildGameState(new SelectWesterosCardGameState(this)).firstStart(house, this.game.westerosDecks[choice-1], choice-1);
         }
     }
 
@@ -62,10 +57,10 @@ export default class RodrikTheReaderAbilityGameState extends GameState<
             return;
         }
 
-        let westerosCards = this.game.westerosDecks[this.deckId].filter(wc => wc != westerosCard);
+        let westerosCards = this.game.westerosDecks[deckId].filter(wc => wc != westerosCard);
         westerosCards = shuffle([...westerosCards]);
         westerosCards.unshift(westerosCard);
-        this.game.westerosDecks[this.deckId] = westerosCards;
+        this.game.westerosDecks[deckId] = westerosCards;
         this.parentGameState.onHouseCardResolutionFinish(house);
     }
 
@@ -85,11 +80,11 @@ export default class RodrikTheReaderAbilityGameState extends GameState<
     }
 
     static deserializeFromServer(afterCombat: AfterCombatHouseCardAbilitiesGameState["childGameState"], data: SerializedRodrikTheReaderAbilityGameState): RodrikTheReaderAbilityGameState {
-        const melisandreAbilityGameState = new RodrikTheReaderAbilityGameState(afterCombat);
+        const rodrikTheReaderAbilityGameState = new RodrikTheReaderAbilityGameState(afterCombat);
 
-        melisandreAbilityGameState.childGameState = melisandreAbilityGameState.deserializeChildGameState(data.childGameState);
+        rodrikTheReaderAbilityGameState.childGameState = rodrikTheReaderAbilityGameState.deserializeChildGameState(data.childGameState);
 
-        return melisandreAbilityGameState;
+        return rodrikTheReaderAbilityGameState;
     }
 
     deserializeChildGameState(data: SerializedRodrikTheReaderAbilityGameState["childGameState"]): SelectWesterosCardGameState<RodrikTheReaderAbilityGameState> | SimpleChoiceGameState {

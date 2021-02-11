@@ -40,9 +40,17 @@ export default class SelectWesterosCardGameState<P extends ParentGameState> exte
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "select-westeros-card") {
+            if (player.house != this.house) {
+                return;
+            }
+
             const westerosCard = this.parentGameState.game.getWesterosCardById(message.westerosCardId, message.deckId);
 
-            if (player.house != this.house) {
+            if (!this.westerosCards.includes(westerosCard)) {
+                return;
+            }
+
+            if (this.deckId != message.deckId) {
                 return;
             }
 
