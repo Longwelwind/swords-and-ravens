@@ -101,17 +101,17 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
     }
 
     getFootmenOfHouse(house: House): Unit[] {
-        let footmen: Unit[] = [];
-        this.ordersOnBoard.entries
-            .filter(([region, _order]) => region.getController() == house)
-            .map(([region, _order]) => region)
+        const footmen: Unit[] = [];
+
+        this.game.world.regions.values
+            .filter(region => region.getController() == house)
             .forEach(region => {
                 region.units.forEach(unit => {
                     if (unit.type == footman) {
                         footmen.push(unit);
                     }
                 })
-            })
+            });
         return footmen;
     }
 

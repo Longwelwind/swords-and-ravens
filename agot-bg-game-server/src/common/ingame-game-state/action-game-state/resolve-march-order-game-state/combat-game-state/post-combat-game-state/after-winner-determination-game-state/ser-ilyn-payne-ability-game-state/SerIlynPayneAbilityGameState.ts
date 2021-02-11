@@ -1,7 +1,6 @@
 import GameState from "../../../../../../../GameState";
 import AfterWinnerDeterminationGameState from "../AfterWinnerDeterminationGameState";
 import SimpleChoiceGameState, {SerializedSimpleChoiceGameState} from "../../../../../../simple-choice-game-state/SimpleChoiceGameState";
-import SelectOrdersGameState, {SerializedSelectOrdersGameState} from "../../../../../../select-orders-game-state/SelectOrdersGameState";
 import Game from "../../../../../../game-data-structure/Game";
 import CombatGameState from "../../../CombatGameState";
 import House from "../../../../../../game-data-structure/House";
@@ -11,9 +10,7 @@ import {ServerMessage} from "../../../../../../../../messages/ServerMessage";
 import Region from "../../../../../../game-data-structure/Region";
 import ActionGameState from "../../../../../ActionGameState";
 import IngameGameState from "../../../../../../IngameGameState";
-import { serIlynPayne } from "../../../../../../game-data-structure/house-card/houseCardAbilities";
 import Unit from "../../../../../../game-data-structure/Unit";
-import {footman} from "../../../../../../game-data-structure/unitTypes";
 import _ from "lodash";
 import SelectUnitsGameState, {SerializedSelectUnitsGameState} from "../../../../../../select-units-game-state/SelectUnitsGameState";
 export default class SerIlynPayneAbilityGameState extends GameState<
@@ -85,7 +82,7 @@ export default class SerIlynPayneAbilityGameState extends GameState<
 
     onSimpleChoiceGameStateEnd(choice: number): void {
         if (choice == 0) {
-            let availableFootmen = this.actionGameState.getFootmenOfHouse(this.combatGameState.getEnemy(this.house));
+            const availableFootmen = this.actionGameState.getFootmenOfHouse(this.combatGameState.getEnemy(this.house));
             this.setChildGameState(new SelectUnitsGameState(this)).firstStart(
                 this.house,
                 availableFootmen,
