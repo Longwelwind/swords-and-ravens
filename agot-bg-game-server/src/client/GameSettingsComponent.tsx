@@ -140,7 +140,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
     createSetupItems(): ReactNode {
         const items: JSX.Element[] = [];
 
-        this.entireGame.allGameSetups.forEach(([setupId, setupData]) => {
+        this.entireGame.allGameSetups.forEach((setupData, setupId) => {
             items.push(<option key={setupId} value={setupId}>{setupData.name}</option>);
         });
 

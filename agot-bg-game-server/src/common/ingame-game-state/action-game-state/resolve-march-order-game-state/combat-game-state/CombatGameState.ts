@@ -427,8 +427,7 @@ export default class CombatGameState extends GameState<
             if (houseCard == null) {
                 return s;
             }
-            let a = houseCard.ability ? houseCard.ability.modifySupportStrength(this, houseCard, affectedHouseCard, house, supportStrength) : s;
-            return a;
+            return houseCard.ability ? houseCard.ability.modifySupportStrength(this, houseCard, affectedHouseCard, house, supportStrength) : s;
         }, supportStrength);
     }
 
@@ -518,15 +517,13 @@ export default class CombatGameState extends GameState<
     }
 
     getTotalCombatStrength(house: House): number {
-        let total = this.getBaseCombatStrength(house)
+        const total = this.getBaseCombatStrength(house)
         + this.getOrderBonus(house)
         + this.getSupportStrengthForSide(house)
         + this.getValyrianBladeBonus(house)
         + this.getHouseCardCombatStrength(house)
         + this.getGarrisonCombatStrength(house)
-        console.log(house.name);
-        let fin = this.getFinalCombatStrength(house, total);
-        console.log(fin);
+        const fin = this.getFinalCombatStrength(house, total);
 
         return fin;
     }
