@@ -127,7 +127,7 @@ export default class MapComponent extends Component<MapComponentProps> {
             {region.superControlPowerToken ? (
                 <small><br/>Capital of {region.superControlPowerToken.name} {region.garrison > 0 && <>(Garrison of <b>{region.garrison}</b>)</>}</small>
             ) : (
-                region.garrison > 0 && (<small><br />Neutral force of <b>{region.garrison}</b></small>)
+                region.garrison > 0 && (<small><br />{!region.getController() ? "Neutral force" : "Garrison"} of <b>{region.garrison}</b></small>)
             )}
             {(region.supplyIcons > 0 || region.crownIcons) > 0 && (
                 <>
