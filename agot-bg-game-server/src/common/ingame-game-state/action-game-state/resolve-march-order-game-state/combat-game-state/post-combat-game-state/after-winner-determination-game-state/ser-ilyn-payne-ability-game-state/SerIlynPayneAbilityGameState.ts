@@ -49,19 +49,21 @@ export default class SerIlynPayneAbilityGameState extends GameState<
         // There will only be one footman in "selectedUnit",
         // but the following code deals with the multiple units present.
         selectedUnits.forEach(([region, units]) => {
-            // Remove them from the regions as well as from the army of the opponent
+            // Remove them from the regions and if necessary from the army of the opponent as well
             const houseCombatData = this.combatGameState.houseCombatDatas.get(enemy);
-            houseCombatData.army = _.without(houseCombatData.army, ...units);
+            if (units.some(u => houseCombatData.army.includes(u))) {
+                houseCombatData.army = _.without(houseCombatData.army, ...units);
+
+                this.entireGame.broadcastToClients({
+                    type: "combat-change-army",
+                    region: region.id,
+                    house: enemy.id,
+                    army: houseCombatData.army.map(u => u.id)
+                });
+            }
 
             units.forEach(unit => {
                 region.units.delete(unit.id);
-            });
-
-            this.entireGame.broadcastToClients({
-                type: "combat-change-army",
-                region: region.id,
-                house: enemy.id,
-                army: houseCombatData.army.map(u => u.id)
             });
 
             this.entireGame.broadcastToClients({
@@ -71,7 +73,7 @@ export default class SerIlynPayneAbilityGameState extends GameState<
             });
 
             this.ingame.log({
-                type: "mace-tyrell-footman-killed",
+                type: "mace-tyrell-footman-killed", // todo
                 house: house.id,
                 region: region.id
             });
