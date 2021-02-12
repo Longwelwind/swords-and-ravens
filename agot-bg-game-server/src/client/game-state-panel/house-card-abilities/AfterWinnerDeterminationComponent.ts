@@ -31,7 +31,7 @@ export default class AfterWinnerDeterminationComponent extends Component<GameSta
             [JonSnowBaratheonAbilityGameState, JonSnowBaratheonAbilityComponent],
             [SerIlynPayneAbilityGameState, SerIlynPayneAbilityComponent],
             [SerGerrisDrinkwaterAbilityGameState, SerGerrisDrinkwaterAbilityComponent],
-            [ReekAbilityGameState, ReekAbilityComponent],
+            [ReekAbilityGameState, ReekAbilityComponent]
         ]);
     }
 }
