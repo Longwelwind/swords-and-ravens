@@ -41,6 +41,11 @@ export default class AeronDamphairDwDAbilityGameState extends GameState<
 
     onSimpleChoiceGameStateEnd(choice: number): void {
         const house = this.childGameState.house;
+
+        if (choice > house.powerTokens) {
+            return;
+        }
+
         const houseCombatData = this.combatGameState.houseCombatDatas.get(house);
         const aeronDamphairHouseCard = houseCombatData.houseCard;
 
@@ -52,14 +57,20 @@ export default class AeronDamphairDwDAbilityGameState extends GameState<
 
         aeronDamphairHouseCard.combatStrength += choice;
 
+        this.entireGame.broadcastToClients({
+            type: "manipulate-combat-house-card",
+            manipulatedHouseCards: [aeronDamphairHouseCard].map(hc => [hc.id, hc.serializeToClient()])
+        });
+
         this.ingame.changePowerTokens(house, -choice);
-        this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);
 
         this.ingame.log({
             type: "aeron-damphair-used",
             house: this.childGameState.house.id,
             tokens: choice,
         });
+
+        this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {

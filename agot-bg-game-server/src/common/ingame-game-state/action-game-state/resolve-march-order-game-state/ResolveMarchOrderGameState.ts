@@ -14,9 +14,9 @@ import Unit from "../../game-data-structure/Unit";
 import Game from "../../game-data-structure/Game";
 import Order from "../../game-data-structure/Order";
 import { port } from "../../game-data-structure/regionTypes";
-import HouseCard from "../../game-data-structure/house-card/HouseCard";
 import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameState } from "./take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
 import { findOrphanedShipsAndDestroyThem } from "../../port-helper/PortHelper";
+import _ from "lodash";
 
 export default class ResolveMarchOrderGameState extends GameState<ActionGameState, ResolveSingleMarchOrderGameState | CombatGameState | TakeControlOfEnemyPortGameState> {
     public currentTurnOrderIndex: number;
@@ -57,15 +57,30 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         //   ... remove orphaned orders (e.g. caused by Mace Tyrell or Ilyn Payne)
         this.findOrphanedOrdersAndRemoveThem();
 
-        // reset all card ability (due to queen of thorns)
-        let disabledCards: HouseCard[] = [];
-        this.game.houses.forEach(h => {
-            const cards = h.houseCards.values.filter(hc => hc.disabled == true);
-            disabledCards = disabledCards.concat(cards);
-        });
-        disabledCards.forEach(card => {
+        // Reset all card abilities (e.g. due to DWD Queen of Thorns)
+        const allHouseCards = _.flatMap(this.game.houses.values.map(h => h.houseCards.values));
+        const manipulatedHouseCards = allHouseCards.filter(hc => 
+               hc.disabled
+            || hc.combatStrength != hc.originalCombatStrength 
+            || hc.swordIcons != hc.originalSwordIcons 
+            || hc.originalTowerIcons != hc.originalTowerIcons);
+
+        manipulatedHouseCards.filter(hc => hc.disabled).forEach(card => {
             card.ability = card.disabledAbility;
             card.disabled = false;
+            card.disabledAbility = null;
+        });
+
+        // Reset DWD Aeron and Qyburn
+        manipulatedHouseCards.forEach(hc => {
+                hc.combatStrength = hc.originalCombatStrength;
+                hc.swordIcons = hc.originalSwordIcons;
+                hc.towerIcons = hc.originalTowerIcons;
+        });
+
+        this.entireGame.broadcastToClients({
+            type: "manipulate-combat-house-card",
+            manipulatedHouseCards: manipulatedHouseCards.map(hc => [hc.id, hc.serializeToClient()])
         });
 
         //   ... destroy orphaned ships (e.g. caused by Arianne)
@@ -213,7 +228,19 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
     }
 
     onServerMessage(message: ServerMessage): void {
-        this.childGameState.onServerMessage(message);
+        if (message.type == "manipulate-combat-house-card") {
+            const allHouseCards = _.flatMap(this.game.houses.values.map(h => h.houseCards.values));
+            message.manipulatedHouseCards.forEach(([hcid, shc]) => {
+                const found = allHouseCards.find(hc => hc.id == hcid);
+                if (found) {
+                    found.combatStrength = shc.combatStrength;
+                    found.swordIcons = shc.swordIcons;
+                    found.towerIcons = shc.towerIcons;
+                }
+            });
+        } else {
+            this.childGameState.onServerMessage(message);
+        }
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedResolveMarchOrderGameState {

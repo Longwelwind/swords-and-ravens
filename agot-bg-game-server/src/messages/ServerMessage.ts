@@ -2,7 +2,7 @@ import {SerializedSeeTopWildlingCardGameState} from "../common/ingame-game-state
 import {SerializedGameState} from "../common/GameState";
 import {SerializedUnit} from "../common/ingame-game-state/game-data-structure/Unit";
 import {SerializedUser} from "../server/User";
-import {HouseCardState} from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
+import {HouseCardState, SerializedHouseCard} from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import {GameLogData} from "../common/ingame-game-state/game-data-structure/GameLog";
 import {UserSettings} from "./ClientMessage";
 import { SerializedWesterosCard } from "../common/ingame-game-state/game-data-structure/westeros-card/WesterosCard";
@@ -19,7 +19,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | RemoveUnits | AddUnits | ChangeTracker | ActionPhaseChangeOrder | ChangeStateHouseCard
     | SettingsChanged | ChangeValyrianSteelBladeUse |  NewPrivateChatRoom | GameSettingsChanged
     | UpdateWesterosDecks | UpdateConnectionStatus | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced
-    | CrowKillersStepChanged;
+    | CrowKillersStepChanged | ManipulateCombatHouseCard;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -84,6 +84,11 @@ interface HouseCardChosen {
 interface ChangeCombatHouseCard {
     type: "change-combat-house-card";
     houseCardIds: [string, string | null][];
+}
+
+interface ManipulateCombatHouseCard {
+    type: "manipulate-combat-house-card";
+    manipulatedHouseCards: [string, SerializedHouseCard][];
 }
 
 interface CombatImmediatelyKilledUnits {

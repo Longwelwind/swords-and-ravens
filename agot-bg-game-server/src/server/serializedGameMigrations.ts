@@ -2,6 +2,7 @@ import BetterMap from "../utils/BetterMap";
 import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
 import staticWorld from "../common/ingame-game-state/game-data-structure/static-data-structure/globalStaticWorld";
 import { CrowKillersStep } from "../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/crow-killers-wildling-victory-game-state/CrowKillersWildlingVictoryGameState";
+import { SerializedHouse } from "../common/ingame-game-state/game-data-structure/House";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
     {
@@ -297,6 +298,29 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             if (serializedGame.childGameState.type == "ingame") {
                 const serializedIngameGameState = serializedGame.childGameState;
                 serializedIngameGameState.game.revealedWesterosCards = 0;
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "10",
+        migrate: (serializedGame: any) => {
+            // Migration for #785
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                const game = ingame.game;
+
+                game.houses.forEach((h: SerializedHouse) => {
+                    h.houseCards.forEach(([_hcid, shc]) => {
+                        shc.disabled = false;
+                        shc.disabledAbilityId = null;
+                        shc.originalCombatStrength = shc.combatStrength;
+                        shc.originalSwordIcons = shc.swordIcons;
+                        shc.originalTowerIcons = shc.towerIcons;
+                    });
+                });
+                game.clientNextWidllingCardId = null;
             }
 
             return serializedGame;

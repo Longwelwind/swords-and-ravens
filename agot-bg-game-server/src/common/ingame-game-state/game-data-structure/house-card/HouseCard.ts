@@ -14,17 +14,20 @@ export default class HouseCard {
     combatStrength: number;
     swordIcons: number;
     towerIcons: number;
+    originalCombatStrength: number;
+    originalSwordIcons: number;
+    originalTowerIcons: number;
     ability: HouseCardAbility | null;
     disabledAbility: HouseCardAbility | null;
-    disabled: boolean | false;
+    disabled: boolean;
     @observable state: HouseCardState = HouseCardState.AVAILABLE;
 
     constructor(id: string, name: string, combatStrength: number, swordIcons: number, towerIcons: number, ability: HouseCardAbility | null) {
         this.id = id;
         this.name = name;
-        this.combatStrength = combatStrength;
-        this.swordIcons = swordIcons;
-        this.towerIcons = towerIcons;
+        this.combatStrength = this.originalCombatStrength = combatStrength;
+        this.swordIcons = this.originalSwordIcons = swordIcons;
+        this.towerIcons = this.originalTowerIcons = towerIcons;
         this.ability = ability;
         this.disabledAbility = null;
         this.disabled = false;
@@ -38,7 +41,12 @@ export default class HouseCard {
             swordIcons: this.swordIcons,
             towerIcons: this.towerIcons,
             abilityId: this.ability ? this.ability.id : null,
-            state: this.state
+            disabledAbilityId: this.disabledAbility ? this.disabledAbility.id : null,
+            disabled: this.disabled,
+            state: this.state,
+            originalCombatStrength: this.originalCombatStrength,
+            originalSwordIcons: this.originalSwordIcons,
+            originalTowerIcons: this.originalTowerIcons
         };
     }
 
@@ -53,6 +61,11 @@ export default class HouseCard {
         );
 
         houseCard.state = data.state;
+        houseCard.originalCombatStrength = data.originalCombatStrength;
+        houseCard.originalSwordIcons = data.originalSwordIcons;
+        houseCard.originalTowerIcons = data.originalTowerIcons;
+        houseCard.disabledAbility = data.disabledAbilityId ? houseCardAbilities.get(data.disabledAbilityId) : null;
+        houseCard.disabled = data.disabled;
 
         return houseCard;
     }
@@ -65,5 +78,10 @@ export interface SerializedHouseCard {
     swordIcons: number;
     towerIcons: number;
     abilityId: string | null;
+    disabledAbilityId: string | null;
+    disabled: boolean | false;
     state: HouseCardState;
+    originalCombatStrength: number;
+    originalSwordIcons: number;
+    originalTowerIcons: number;
 }

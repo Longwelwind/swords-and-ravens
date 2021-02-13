@@ -11,7 +11,14 @@ export default class QueenOfThornsDwDHouseCardAbility extends HouseCardAbility {
             card.disabledAbility = card.ability;
             card.disabled = true;
             card.ability = null;
+
+            cancelResolutionState.entireGame.broadcastToClients({
+                type: "manipulate-combat-house-card",
+                manipulatedHouseCards: [card].map(c=> [c.id, c.serializeToClient()])
+            });
         }
+
+        
         cancelResolutionState.onHouseCardResolutionFinish();
     }
 }

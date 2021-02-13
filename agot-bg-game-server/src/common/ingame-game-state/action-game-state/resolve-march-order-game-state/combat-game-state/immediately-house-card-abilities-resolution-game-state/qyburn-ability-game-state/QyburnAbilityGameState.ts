@@ -62,8 +62,6 @@ export default class QyburnAbilityGameState extends GameState<
     }
 
     onSelectHouseCardFinish(house: House, houseCard: HouseCard): void {
-        // Discard Aeron Damphair, which should normally be the current house card
-        // of "house".
         const houseCombatData = this.combatGameState.houseCombatDatas.get(house);
         const qyburnHouseCard = houseCombatData.houseCard;
 
@@ -85,8 +83,8 @@ export default class QyburnAbilityGameState extends GameState<
         qyburnHouseCard.swordIcons = houseCard.swordIcons;
 
         this.entireGame.broadcastToClients({
-            type: "change-combat-house-card",
-            houseCardIds: [[house.id, houseCard.id]]
+            type: "manipulate-combat-house-card",
+            manipulatedHouseCards: [[qyburnHouseCard.id, qyburnHouseCard.serializeToClient()]]
         });
 
         // Remove 2 power tokens
