@@ -576,6 +576,33 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         {houseCard.name}</b> from house <b>{affectedHouse.name}</b>.
                 </>;
             }
+            case "melisandre-used": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = this.game.getHouseCardById(data.houseCard);
+                return <>
+                    <strong>Melisandre</strong>: <strong>{house.name}</strong> decided to discard <strong>
+                        {houseCard.name}</strong> from house.
+                </>;
+            }
+            case "melisandre-dwd-used": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = this.game.getHouseCardById(data.houseCard);
+                return <>
+                    <strong>Melisandre</strong>: <strong>{house.name}</strong> decided to return <strong>
+                        {houseCard.name}</strong> card to hand.
+                </>;
+            }
+            case "jon-snow-used": {
+                const house = this.game.houses.get(data.house);
+                let wilddlingStatus = "increase";
+                if (data.wildlingsStrength < 0) {
+                    wilddlingStatus = "decrease";
+                }
+                return <>
+                    <strong>Jon Snow</strong>: <strong>{house.name}</strong> decided to  <strong>
+                        {wilddlingStatus} </strong> the Wildling track by one space.
+                </>;
+            }
             case "doran-used": {
                 const house = this.game.houses.get(data.house);
                 const affectedHouse = this.game.houses.get(data.affectedHouse);
@@ -584,6 +611,23 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <>
                     <b>Doran Martell</b>: <b>{house.name}</b> decided to move <b>
                         {affectedHouse.name}</b> to the bottom of the <b>{influenceTrack}</b> track.
+                </>;
+            }
+            case "qyburn-used": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = this.game.getHouseCardById(data.houseCard);
+
+                return <>
+                    <b>Qyburn</b>: <b>{house.name}</b> decided to use strength from <b>{houseCard.name}</b>
+                </>;
+            }
+            case "aeron-damphair-used": {
+                const house = this.game.houses.get(data.house);
+                const tokens = data.tokens;
+
+                return <>
+                    <b>Aeron Damphair</b>: <b>{house.name}</b> decided to increase
+                        the combat strength of this card by <b>{tokens}</b>.
                 </>;
             }
             case "tyrion-lannister-choice-made": {
@@ -656,6 +700,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <b>Tywin Lannister</b>: <b>{house.name}</b> gained {powerTokensGained} Power
+                    tokens.
+                </>;
+            }
+            case "qarl-the-maid-tokens-gained": {
+                const house = this.game.houses.get(data.house);
+                const powerTokensGained = data.powerTokensGained;
+
+                return <>
+                    <b>Qarl the Maid</b>: <b>{house.name}</b> gained {powerTokensGained} Power
                     tokens.
                 </>;
             }

@@ -17,6 +17,24 @@ import staticWorld from "./static-data-structure/globalStaticWorld";
 
 const MAX_POWER_TOKENS = 20;
 
+interface HouseCardContainer {
+    houseCards: {[key: string]: HouseCardData};
+}
+
+interface HouseData {
+    name: string;
+    color: string;
+    unitLimits: {[key: string]: number};
+    houseCards: {[key: string]: HouseCardData};
+    supplyLevel: number;
+}
+
+interface UnitData {
+    unitType: string;
+    house: string;
+    quantity: number;
+}
+
 interface HouseCardData {
     name: string;
     combatStrength?: number;
@@ -36,21 +54,69 @@ export interface GameSetup {
     blockedRegions?: string[];
     removedUnits?: string[];
     tracks?: { ironThrone?: string[]; fiefdoms?: string[]; kingsCourt?: string[] };
+    houseCards?: {[key: string]: HouseCardContainer};
+    units?: {[key: string]: UnitData[]};
+    structuresCountNeededToWin?: number;
+    maxTurn?: number;
+    supplyLevels?: {[key: string]: number};
+    powerTokensOnBoard?: {[key: string]: string[]};
+    garrisons?: {[key: string]: number};
 }
 
 export default function createGame(entireGame: EntireGame, housesToCreate: string[]): Game {
     const gameSetup = entireGame.getSelectedGameSetup();
+    const gameSettings = entireGame.gameSettings;
 
     const game = new Game();
 
-    game.houses = new BetterMap(Object.entries(baseGameData.houses)
-        .filter(([hid, _]) => housesToCreate.includes(hid))
+    const baseGameHousesToCreate = new BetterMap(
+        Object.entries(baseGameData.houses as {[key: string]: HouseData})
+        .filter(([hid, _]) => housesToCreate.includes(hid)));
+
+    // Overwrite house cards
+    if (gameSetup.houseCards) {
+        const newHouseCards = new BetterMap(
+            Object.entries(gameSetup.houseCards)
+            .filter(([hid, _]) => housesToCreate.includes(hid)));
+
+        newHouseCards.keys.forEach(hid => {
+           const newHouseData = baseGameHousesToCreate.get(hid);
+           newHouseData.houseCards = newHouseCards.get(hid).houseCards;
+           baseGameHousesToCreate.set(hid, newHouseData);
+        });
+    } else if (gameSettings.adwdHouseCards) {
+        const adwdHouseCards = entireGame.allGameSetups.get("a-dance-with-dragons").playerSetups[0].houseCards as {[key: string]: HouseCardContainer};
+        const newHouseCards = new BetterMap(
+            Object.entries(adwdHouseCards)
+            .filter(([hid, _]) => housesToCreate.includes(hid)));
+
+        newHouseCards.keys.forEach(hid => {
+           const newHouseData = baseGameHousesToCreate.get(hid);
+           newHouseData.houseCards = newHouseCards.get(hid).houseCards;
+           baseGameHousesToCreate.set(hid, newHouseData);
+        });
+    }
+
+    // Overwrite supply levels
+    if (gameSetup.supplyLevels) {
+        Object.entries(gameSetup.supplyLevels)
+            .filter(([hid, _]) => housesToCreate.includes(hid))
+            .forEach(([hid, level]) => {
+                const newHouseData = baseGameHousesToCreate.get(hid);
+                newHouseData.supplyLevel = level;
+                baseGameHousesToCreate.set(hid, newHouseData);
+        });
+    }
+
+    game.houses = new BetterMap(
+        baseGameHousesToCreate.entries
         .map(([hid, houseData]) => {
             const houseCards = new BetterMap<string, HouseCard>(
                 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
                 // @ts-ignore The conversion provokes n error in the CI
                 // Don't ask me why.
-                Object.entries(houseData.houseCards as {[key: string]: HouseCardData})
+
+                Object.entries(houseData.houseCards)
                     .map(([houseCardId, houseCardData]) => {
                         const houseCard = new HouseCard(
                             houseCardId,
@@ -64,6 +130,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
                         return [houseCardId, houseCard];
                     })
             );
+
             const unitLimits = new BetterMap(
                 Object.entries(houseData.unitLimits as {[key: string]: number})
                     .map(([unitTypeId, limit]) => [unitTypes.get(unitTypeId), limit])
@@ -75,11 +142,11 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
         })
     );
 
-    game.maxTurns = baseGameData.maxTurns;
-    game.structuresCountNeededToWin = baseGameData.structuresCountNeededToWin;
+    game.maxTurns = gameSetup.maxTurn ? gameSetup.maxTurn : baseGameData.maxTurns;
+    game.structuresCountNeededToWin = gameSetup.structuresCountNeededToWin ? gameSetup.structuresCountNeededToWin : baseGameData.structuresCountNeededToWin;
     game.supplyRestrictions = baseGameData.supplyRestrictions;
     game.maxPowerTokens = MAX_POWER_TOKENS;
-    game.revealedWesterosCards = entireGame.gameSettings.cokWesterosPhase ? 3 : 0;
+    game.revealedWesterosCards = gameSettings.cokWesterosPhase ? 3 : 0;
 
     // Load tracks starting positions
     if (gameSetup.tracks && gameSetup.tracks.ironThrone) {
@@ -152,8 +219,10 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
     // Shuffle the deck
     game.wildlingDeck = _.shuffle(game.wildlingDeck);
 
+    const units = gameSetup.units ? gameSetup.units : baseGameData.units;
+
     // Initialize the starting positions
-    Object.entries(baseGameData.units).forEach(([regionId, data]) => {
+    Object.entries(units).forEach(([regionId, data]) => {
         data.filter(unitData => housesToCreate.includes(unitData.house)).forEach(unitData => {
             const region = game.world.regions.get(regionId);
             const house = game.houses.get(unitData.house);
@@ -176,7 +245,22 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
     game.starredOrderRestrictions = baseGameData.starredOrderRestrictions[baseGameData.starredOrderRestrictions.findIndex(
         restrictions => game.houses.size <= restrictions.length)];
 
-    game.skipRavenPhase = false;
+    game.skipRavenPhase = false; // todo: Remove unused var
+
+    // Apply map changes
+    if (gameSetup.powerTokensOnBoard) {
+        Object.entries(gameSetup.powerTokensOnBoard).forEach(([houseId, regions]) => {
+            const house = game.houses.get(houseId);
+            regions.forEach(r => game.world.getRegion(staticWorld.staticRegions.get(r)).controlPowerToken = house);
+        });
+    }
+
+    if (gameSetup.garrisons) {
+        Object.entries(gameSetup.garrisons).forEach(([regionId, garrison]) => {
+            game.world.getRegion(staticWorld.staticRegions.get(regionId)).garrison = garrison;
+            staticWorld.staticRegions.get(regionId).startingGarrison = garrison;
+        });
+    }
 
     return game;
 }

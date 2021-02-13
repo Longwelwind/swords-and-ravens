@@ -14,13 +14,13 @@ import CancelledGameState, { SerializedCancelledGameState } from "./cancelled-ga
 
 export default class EntireGame extends GameState<null, LobbyGameState | IngameGameState | CancelledGameState> {
     id: string;
-    allGameSetups = Object.entries(baseGameData.setups);
+    allGameSetups = new BetterMap(Object.entries(baseGameData.setups as {[key: string]: GameSetupContainer}));
 
     @observable users = new BetterMap<string, User>();
     ownerUserId: string;
     name: string;
 
-    @observable gameSettings: GameSettings = { pbem: false, setupId: "base-game", playerCount: 6, randomHouses: false, cokWesterosPhase: false };
+    @observable gameSettings: GameSettings = { pbem: false, setupId: "base-game", playerCount: 6, randomHouses: false, cokWesterosPhase: false, adwdHouseCards: false };
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -158,6 +158,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             if (!settings || (this.lobbyGameState && this.lobbyGameState.players.size > settings.playerCount)) {
                 // A variant which contains less players than connected is not allowed
                 settings = this.gameSettings;
+            }
+
+            if (settings.setupId == "a-dance-with-dragons") {
+                settings.adwdHouseCards = true;
             }
 
             this.gameSettings = settings;
@@ -314,13 +318,11 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     getGameSetupContainer(setupId: string): GameSetupContainer {
-        const container = this.allGameSetups.find(([sid, _]) => sid == setupId);
-
-        if (!container) {
+        if (!this.allGameSetups.has(setupId)) {
             throw new Error("Invalid setupId");
         }
 
-        return container[1];
+        return this.allGameSetups.get(setupId);
     }
 
     getGameSetupByIdAndPlayerCount(setupId: string, playerCount: number): GameSetup {
@@ -401,5 +403,6 @@ export interface GameSettings {
     setupId: string;
     playerCount: number;
     randomHouses: boolean;
+    adwdHouseCards: boolean;
     cokWesterosPhase: boolean;
 }

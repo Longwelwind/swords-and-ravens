@@ -93,6 +93,24 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                 />
                             </Col>
                         </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="adwd-house-cards"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="adwd-house-cards-tooltip">
+                                                The house cards will come from the Dance with Dragons expansion.
+                                            </Tooltip>}>
+                                            <label htmlFor="adwd-house-cards">Use <i>A Dance with Dragons</i> house cards (BETA)</label>
+                                        </OverlayTrigger>}
+                                    disabled={!this.canChangeGameSettings || this.props.entireGame.gameSettings.setupId == "a-dance-with-dragons"}
+                                    checked={this.gameSettings.adwdHouseCards}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.adwdHouseCards = !this.gameSettings.adwdHouseCards)}
+                                />
+                            </Col>
+                        </Row>
                     </>
                 )}
                 <Row>
@@ -122,7 +140,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
     createSetupItems(): ReactNode {
         const items: JSX.Element[] = [];
 
-        this.entireGame.allGameSetups.forEach(([setupId, setupData]) => {
+        this.entireGame.allGameSetups.forEach((setupData, setupId) => {
             items.push(<option key={setupId} value={setupId}>{setupData.name}</option>);
         });
 
