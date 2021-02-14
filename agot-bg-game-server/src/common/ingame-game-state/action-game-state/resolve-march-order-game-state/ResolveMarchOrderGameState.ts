@@ -219,7 +219,6 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         }
 
         // We should never reach this line because we removed orphaned ships earlier.
-        // is Martell playing Arianne in a non-capital city. So the ships have to be destroyed
         throw new Error(`$Port with id '{portRegion.id}' contains orphaned ships which should have been removed before!`);
     }
 
@@ -238,6 +237,10 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
                     found.towerIcons = shc.towerIcons;
                 }
             });
+            
+            if (this.childGameState instanceof CombatGameState) {
+                this.childGameState.rerender++;
+            }
         } else {
             this.childGameState.onServerMessage(message);
         }

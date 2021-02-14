@@ -73,7 +73,7 @@ export default class SerIlynPayneAbilityGameState extends GameState<
             });
 
             this.ingame.log({
-                type: "mace-tyrell-footman-killed", // todo
+                type: "ser-ilyn-payne-footman-killed",
                 house: house.id,
                 region: region.id
             });

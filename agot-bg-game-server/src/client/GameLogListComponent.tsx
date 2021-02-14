@@ -754,6 +754,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     in <b>{region.name}</b>.
                 </>;
             }
+            case "ser-ilyn-payne-footman-killed": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
+
+                return <>
+                    <b>Ser Ilyn Payne</b>: <b>{house.name}</b> killed an enemy Footman
+                    in <b>{region.name}</b>.
+                </>;
+            }
             case "cersei-lannister-no-order-available":
                 return <>
                     <b>Cersei Lannister</b>: There were no Order tokens to be removed.

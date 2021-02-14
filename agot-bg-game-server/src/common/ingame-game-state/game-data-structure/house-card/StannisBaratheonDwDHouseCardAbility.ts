@@ -1,38 +1,31 @@
 import HouseCardAbility from "./HouseCardAbility";
 import House from "../House";
 import HouseCard from "./HouseCard";
-import CancelHouseCardAbilitiesGameState
-    from "../../action-game-state/resolve-march-order-game-state/combat-game-state/cancel-house-card-abilities-game-state/CancelHouseCardAbilitiesGameState";
+import BeforeCombatHouseCardAbilitiesGameState from "../../action-game-state/resolve-march-order-game-state/combat-game-state/before-combat-house-card-abilities-game-state/BeforeCombatHouseCardAbilitiesGameState";
 
 export default class StannisBaratheonDwDHouseCardAbility extends HouseCardAbility {
 
-    cancel(cancelResolutionState: CancelHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {
-        const actionGameState = cancelResolutionState.combatGameState.actionGameState;
-        const combatGameState = cancelResolutionState.combatGameState;
-        const game = cancelResolutionState.game
-        if (cancelResolutionState.combatGameState.supporters.entries.every(([_supporter, supportee]) => supportee != house)) {
+    beforeCombatResolution(beforeCombatResolutionState: BeforeCombatHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {
+        const actionGameState = beforeCombatResolutionState.combatGameState.actionGameState;
+        const combatGameState = beforeCombatResolutionState.combatGameState;
+        const game = beforeCombatResolutionState.game
+        if (beforeCombatResolutionState.combatGameState.supporters.entries.every(([_supporter, supportee]) => supportee != house)) {
             const regions = game.world.getNeighbouringRegions(combatGameState.defendingRegion)
                                 .filter(r => actionGameState.ordersOnBoard.has(r))
                                 .map(r => ({r, o: actionGameState.ordersOnBoard.get(r)}))
                                 .filter(({o}) => o.type.id == 'support' || o.type.id == 'support-plus-one')
                                 .map(({r}) => r);
-            regions.forEach(r => cancelResolutionState.combatGameState.actionGameState.ordersOnBoard.delete(r));
+            regions.forEach(r => beforeCombatResolutionState.combatGameState.actionGameState.ordersOnBoard.delete(r));
             regions.forEach(r => {
-                cancelResolutionState.combatGameState.actionGameState.entireGame.broadcastToClients({
+                beforeCombatResolutionState.combatGameState.actionGameState.entireGame.broadcastToClients({
                     type: "action-phase-change-order",
                     region: r.id,
                     order: null
-                })
+                });
             });
-
-        } else {
-            // nic do usuniecia
-            // this.ingame.log({
-            //     type: "queen-of-thorns-no-order-available",
-            //     house: house.id,
-            //     affectedHouse: this.combatGameState.getEnemy(house).id
-            // });
         }
-        cancelResolutionState.onHouseCardResolutionFinish();
+
+        // Todo: Log which orders have been removed by Stannis
+        beforeCombatResolutionState.onHouseCardResolutionFinish();
     }
 }

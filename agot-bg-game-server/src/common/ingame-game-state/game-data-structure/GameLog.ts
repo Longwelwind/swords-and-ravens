@@ -29,7 +29,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory
     | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered
     | SupplyAdjusted | PlayerReplaced | UserHouseAssignments | PlayerAction | MelisandreUsed | JonSnowUsed
-    | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed;
+    | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed | SerIlynPayneFootmanKilled;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -416,6 +416,12 @@ interface MaceTyrellCasualtiesPrevented {
 
 interface MaceTyrellFootmanKilled {
     type: "mace-tyrell-footman-killed";
+    house: string;
+    region: string;
+}
+
+interface SerIlynPayneFootmanKilled {
+    type: "ser-ilyn-payne-footman-killed";
     house: string;
     region: string;
 }
