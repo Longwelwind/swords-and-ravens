@@ -237,6 +237,10 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
                     found.towerIcons = shc.towerIcons;
                 }
             });
+            
+            if (this.childGameState instanceof CombatGameState) {
+                this.childGameState.rerender++;
+            }
         } else {
             this.childGameState.onServerMessage(message);
         }

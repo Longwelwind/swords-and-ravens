@@ -53,6 +53,9 @@ export default class CombatGameState extends GameState<
     houseCombatDatas: BetterMap<House, HouseCombatData>;
     valyrianSteelBladeUser: House | null;
 
+    @observable
+    rerender = 0;
+
     // The key is the supporting house and the value is the supported house.
     // The value is always either attacker or defender or null if the supporter
     // decided to support no-one.

@@ -54,7 +54,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
         return (
             <>
                 <Col xs={12}>
-                    {!(this.props.gameState.childGameState instanceof PostCombatGameState) && (
+                    {!(this.props.gameState.childGameState instanceof PostCombatGameState) && this.props.gameState.rerender >= 0 && (
                         <>
                             <div style={{ display: 'flex', justifyContent: 'center' }}>
                                 <h5>Battle for <strong>{this.combatGameState.defendingRegion.name}</strong></h5>
