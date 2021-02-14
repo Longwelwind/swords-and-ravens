@@ -29,6 +29,7 @@ import orders from "../../../game-data-structure/orders";
 import CancelHouseCardAbilitiesGameState
     , {SerializedCancelHouseCardAbilitiesGameState} from "./cancel-house-card-abilities-game-state/CancelHouseCardAbilitiesGameState";
 import { observable } from "mobx";
+import BeforeCombatHouseCardAbilitiesGameState, { SerializedBeforeCombatHouseCardAbilitiesGameState } from "./before-combat-house-card-abilities-game-state/BeforeCombatHouseCardAbilitiesGameState";
 
 
 export interface HouseCombatData {
@@ -39,9 +40,9 @@ export interface HouseCombatData {
 
 export default class CombatGameState extends GameState<
     ResolveMarchOrderGameState,
-    DeclareSupportGameState | ChooseHouseCardGameState | UseValyrianSteelBladeGameState
-    | ImmediatelyHouseCardAbilitiesResolutionGameState | PostCombatGameState
-    | CancelHouseCardAbilitiesGameState
+    DeclareSupportGameState | ChooseHouseCardGameState | CancelHouseCardAbilitiesGameState
+    | ImmediatelyHouseCardAbilitiesResolutionGameState | BeforeCombatHouseCardAbilitiesGameState
+    | UseValyrianSteelBladeGameState | PostCombatGameState
 > {
     winner: House | null;
     loser: House | null;
@@ -300,6 +301,14 @@ export default class CombatGameState extends GameState<
     }
 
     onCancelHouseCardAbilitiesFinish(): void {
+        this.proceedBeforeCombatResolution();
+    }
+
+    proceedBeforeCombatResolution(): void {
+        this.setChildGameState(new BeforeCombatHouseCardAbilitiesGameState(this)).firstStart();
+    }
+
+    onBeforeCombatResolutionFinish(): void {
         this.proceedImmediatelyResolution();
     }
 
@@ -590,6 +599,8 @@ export default class CombatGameState extends GameState<
                 return ImmediatelyHouseCardAbilitiesResolutionGameState.deserializeFromServer(this, data);
             case "cancel-house-card-abilities":
                 return CancelHouseCardAbilitiesGameState.deserializeFromServer(this, data);
+            case "before-combat-house-card-abilities-resolution":
+                return BeforeCombatHouseCardAbilitiesGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -604,5 +615,6 @@ export interface SerializedCombatGameState {
     childGameState: SerializedDeclareSupportGameState | SerializedChooseHouseCardGameState
         | SerializedUseValyrianSteelBladeGameState | SerializedPostCombatGameState
         | SerializedImmediatelyHouseCardAbilitiesResolutionGameState
-        | SerializedCancelHouseCardAbilitiesGameState;
+        | SerializedCancelHouseCardAbilitiesGameState
+        | SerializedBeforeCombatHouseCardAbilitiesGameState;
 }

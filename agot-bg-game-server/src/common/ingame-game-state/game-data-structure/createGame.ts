@@ -250,7 +250,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
     // Apply map changes
     if (gameSetup.powerTokensOnBoard) {
         Object.entries(gameSetup.powerTokensOnBoard).forEach(([houseId, regions]) => {
-            const house = game.houses.get(houseId);
+            const house = game.houses.tryGet(houseId, null);
             regions.forEach(r => game.world.getRegion(staticWorld.staticRegions.get(r)).controlPowerToken = house);
         });
     }
