@@ -6,8 +6,7 @@ import React from "react";
 import Col from "react-bootstrap/Col";
 import SimpleChoiceGameState from "../../../common/ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
 import SimpleChoiceComponent from "../SimpleChoiceComponent";
-import AeronDamphairDwDAbilityGameState
-    from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/immediately-house-card-abilities-resolution-game-state/aeron-damphair-dwd-ability-game-state/AeronDamphairDwDAbilityGameState";
+import AeronDamphairDwDAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/before-combat-house-card-abilities-game-state/aeron-damphair-dwd-ability-game-state/AeronDamphairDwDAbilityGameState";
 
 @observer
 export default class AeronDamphairAbilityComponent extends Component<GameStateComponentProps<AeronDamphairDwDAbilityGameState>> {

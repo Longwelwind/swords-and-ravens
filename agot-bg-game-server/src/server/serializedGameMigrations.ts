@@ -325,6 +325,34 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "11",
+        migrate: (serializedGame: any) => {
+            // Migration for #TBD
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                if (ingame.childGameState && ingame.childGameState.type == "action") {
+                    const action = ingame.childGameState;
+                    if (action.childGameState && action.childGameState.type == "resolve-march-order") {
+                        const resolveMarchOrders = action.childGameState;
+                        if (resolveMarchOrders.childGameState && resolveMarchOrders.childGameState.type == "combat") {
+                            const combat = resolveMarchOrders.childGameState;
+                            if (combat.childGameState && combat.childGameState.type == "immediately-house-card-abilities-resolution") {
+                                const immediatelyHouseCardResolution = combat.childGameState;
+                                if (immediatelyHouseCardResolution.childGameState &&
+                                    (immediatelyHouseCardResolution.childGameState.type == "aeron-damphair-dwd-ability" || immediatelyHouseCardResolution.childGameState.type == "qyburn-ability")) {
+                                        // Aron and Qyburn are now BeforeCombat states => Convert combat.childGameState to BeforeCombat
+                                        combat.childGameState.type = "before-combat-house-card-abilities-resolution";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

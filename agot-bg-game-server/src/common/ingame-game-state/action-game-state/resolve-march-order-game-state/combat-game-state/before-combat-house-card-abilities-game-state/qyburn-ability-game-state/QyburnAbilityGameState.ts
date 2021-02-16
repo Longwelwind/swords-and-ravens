@@ -1,5 +1,4 @@
 import GameState from "../../../../../../GameState";
-import ImmediatelyHouseCardAbilitiesResolutionGameState from "../ImmediatelyHouseCardAbilitiesResolutionGameState";
 import SimpleChoiceGameState, {SerializedSimpleChoiceGameState} from "../../../../../simple-choice-game-state/SimpleChoiceGameState";
 import Game from "../../../../../game-data-structure/Game";
 import CombatGameState from "../../CombatGameState";
@@ -11,9 +10,10 @@ import SelectHouseCardGameState, {SerializedSelectHouseCardGameState} from "../.
 import HouseCard, {HouseCardState} from "../../../../../game-data-structure/house-card/HouseCard";
 import IngameGameState from "../../../../../IngameGameState";
 import { qyburn } from "../../../../../game-data-structure/house-card/houseCardAbilities";
+import BeforeCombatHouseCardAbilitiesGameState from "../BeforeCombatHouseCardAbilitiesGameState";
 
 export default class QyburnAbilityGameState extends GameState<
-    ImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"],
+BeforeCombatHouseCardAbilitiesGameState["childGameState"],
     SimpleChoiceGameState | SelectHouseCardGameState<QyburnAbilityGameState>
 > {
     get game(): Game {
@@ -33,6 +33,7 @@ export default class QyburnAbilityGameState extends GameState<
         // house cards, don't even ask him.
         const availableHouseCards = this.getAvailableHouseCards();
         if (house.powerTokens < 2 || availableHouseCards.length == 0) {
+            // Todo: Log reason for fast-tracking
             this.parentGameState.onHouseCardResolutionFinish(house);
             return;
         }
@@ -117,12 +118,12 @@ export default class QyburnAbilityGameState extends GameState<
         };
     }
 
-    static deserializeFromServer(houseCardResolution: ImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"], data: SerializedQyburnAbilityGameState): QyburnAbilityGameState {
-        const aeronDamphairAbilityGameState = new QyburnAbilityGameState(houseCardResolution);
+    static deserializeFromServer(houseCardResolution: BeforeCombatHouseCardAbilitiesGameState["childGameState"], data: SerializedQyburnAbilityGameState): QyburnAbilityGameState {
+        const qyburnAbilityGameState = new QyburnAbilityGameState(houseCardResolution);
 
-        aeronDamphairAbilityGameState.childGameState = aeronDamphairAbilityGameState.deserializeChildGameState(data.childGameState);
+        qyburnAbilityGameState.childGameState = qyburnAbilityGameState.deserializeChildGameState(data.childGameState);
 
-        return aeronDamphairAbilityGameState;
+        return qyburnAbilityGameState;
     }
 
     deserializeChildGameState(data: SerializedQyburnAbilityGameState["childGameState"]): QyburnAbilityGameState["childGameState"] {

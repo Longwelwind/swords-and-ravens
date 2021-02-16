@@ -59,10 +59,10 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
 
         // Reset all card abilities (e.g. due to DWD Queen of Thorns)
         const allHouseCards = _.flatMap(this.game.houses.values.map(h => h.houseCards.values));
-        const manipulatedHouseCards = allHouseCards.filter(hc => 
+        const manipulatedHouseCards = allHouseCards.filter(hc =>
                hc.disabled
-            || hc.combatStrength != hc.originalCombatStrength 
-            || hc.swordIcons != hc.originalSwordIcons 
+            || hc.combatStrength != hc.originalCombatStrength
+            || hc.swordIcons != hc.originalSwordIcons
             || hc.originalTowerIcons != hc.originalTowerIcons);
 
         manipulatedHouseCards.filter(hc => hc.disabled).forEach(card => {
@@ -237,7 +237,7 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
                     found.towerIcons = shc.towerIcons;
                 }
             });
-            
+
             if (this.childGameState instanceof CombatGameState) {
                 this.childGameState.rerender++;
             }

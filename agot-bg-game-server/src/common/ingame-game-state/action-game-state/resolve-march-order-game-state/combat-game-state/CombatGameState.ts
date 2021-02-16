@@ -310,9 +310,9 @@ export default class CombatGameState extends GameState<
     proceedImmediatelyResolution(): void {
         this.setChildGameState(new ImmediatelyHouseCardAbilitiesResolutionGameState(this)).firstStart();
     }
-    
+
     onImmediatelyResolutionFinish(): void {
-        this.proceedBeforeCombatResolution();        
+        this.proceedBeforeCombatResolution();
     }
 
     proceedBeforeCombatResolution(): void {

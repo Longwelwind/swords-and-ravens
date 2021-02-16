@@ -18,7 +18,6 @@ export default class QueenOfThornsDwDHouseCardAbility extends HouseCardAbility {
             });
         }
 
-        
         cancelResolutionState.onHouseCardResolutionFinish();
     }
 }
