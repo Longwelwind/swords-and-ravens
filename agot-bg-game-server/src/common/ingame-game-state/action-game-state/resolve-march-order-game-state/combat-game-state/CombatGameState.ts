@@ -304,7 +304,15 @@ export default class CombatGameState extends GameState<
     }
 
     onCancelHouseCardAbilitiesFinish(): void {
-        this.proceedBeforeCombatResolution();
+        this.proceedImmediatelyResolution();
+    }
+
+    proceedImmediatelyResolution(): void {
+        this.setChildGameState(new ImmediatelyHouseCardAbilitiesResolutionGameState(this)).firstStart();
+    }
+    
+    onImmediatelyResolutionFinish(): void {
+        this.proceedBeforeCombatResolution();        
     }
 
     proceedBeforeCombatResolution(): void {
@@ -312,14 +320,6 @@ export default class CombatGameState extends GameState<
     }
 
     onBeforeCombatResolutionFinish(): void {
-        this.proceedImmediatelyResolution();
-    }
-
-    proceedImmediatelyResolution(): void {
-        this.setChildGameState(new ImmediatelyHouseCardAbilitiesResolutionGameState(this)).firstStart();
-    }
-
-    onImmediatelyResolutionFinish(): void {
         // Check if the sword has not been used this round
         if (!this.game.valyrianSteelBladeUsed) {
             // Check if one of the two participants can use the sword
