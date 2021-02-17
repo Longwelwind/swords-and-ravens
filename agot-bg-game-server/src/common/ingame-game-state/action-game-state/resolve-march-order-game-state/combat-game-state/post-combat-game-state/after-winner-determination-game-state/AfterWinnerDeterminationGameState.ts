@@ -36,7 +36,8 @@ export default class AfterWinnerDeterminationGameState extends GameState<
 
     firstStart(): void {
         this.setChildGameState(
-            new HouseCardResolutionGameState<AfterWinnerDeterminationGameState, RenlyBaratheonAbilityGameState>(this)
+            new HouseCardResolutionGameState<AfterWinnerDeterminationGameState, RenlyBaratheonAbilityGameState | CerseiLannisterAbilityGameState | JonSnowBaratheonAbilityGameState
+            | SerIlynPayneAbilityGameState | SerGerrisDrinkwaterAbilityGameState | ReekAbilityGameState>(this)
         ).firstStart();
     }
 

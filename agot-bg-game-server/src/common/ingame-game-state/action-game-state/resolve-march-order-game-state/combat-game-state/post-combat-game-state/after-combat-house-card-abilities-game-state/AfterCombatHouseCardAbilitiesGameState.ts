@@ -33,7 +33,7 @@ export default class AfterCombatHouseCardAbilitiesGameState extends GameState<
 
     firstStart(): void {
         this.setChildGameState(
-            new HouseCardResolutionGameState<AfterCombatHouseCardAbilitiesGameState, PatchfaceAbilityGameState | MelisandreAbilityGameState>(this)
+            new HouseCardResolutionGameState<AfterCombatHouseCardAbilitiesGameState, PatchfaceAbilityGameState | MelisandreAbilityGameState | RodrikTheReaderAbilityGameState>(this)
         ).firstStart();
     }
 

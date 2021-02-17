@@ -31,7 +31,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
     }
 
     getAvailableHouses(): LobbyHouse[] {
-        return this.lobbyHouses.values.filter(h => this.entireGame.getSelectedGameSetup().houses.includes(h.id));
+        return this.lobbyHouses.values.filter(h => this.entireGame.selectedGameSetup.houses.includes(h.id));
     }
 
     onGameSettingsChange(): void {
@@ -48,7 +48,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
             }
         });
 
-        if (usersForReassignment.length > 0 && this.players.size < this.entireGame.getSelectedGameSetup().playerCount) {
+        if (usersForReassignment.length > 0 && this.players.size < this.entireGame.selectedGameSetup.playerCount) {
             const freeHouses = _.difference(availableHouses, this.players.keys);
 
             while (freeHouses.length > 0 && usersForReassignment.length > 0) {
@@ -132,7 +132,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
             return {success: false, reason: "not-owner"};
         }
 
-        if (this.players.size < this.entireGame.getSelectedGameSetup().playerCount) {
+        if (this.players.size < this.entireGame.selectedGameSetup.playerCount) {
             return {success: false, reason: "not-enough-players"};
         }
 

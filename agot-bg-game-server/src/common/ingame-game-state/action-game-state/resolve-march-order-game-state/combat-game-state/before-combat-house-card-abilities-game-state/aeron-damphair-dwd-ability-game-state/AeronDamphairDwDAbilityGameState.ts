@@ -1,5 +1,4 @@
 import GameState from "../../../../../../GameState";
-import ImmediatelyHouseCardAbilitiesResolutionGameState from "../ImmediatelyHouseCardAbilitiesResolutionGameState";
 import SimpleChoiceGameState, {SerializedSimpleChoiceGameState} from "../../../../../simple-choice-game-state/SimpleChoiceGameState";
 import Game from "../../../../../game-data-structure/Game";
 import CombatGameState from "../../CombatGameState";
@@ -8,10 +7,11 @@ import Player from "../../../../../Player";
 import {ClientMessage} from "../../../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../../../messages/ServerMessage";
 import IngameGameState from "../../../../../IngameGameState";
+import BeforeCombatHouseCardAbilitiesGameState from "../BeforeCombatHouseCardAbilitiesGameState";
 
 
 export default class AeronDamphairDwDAbilityGameState extends GameState<
-    ImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"], SimpleChoiceGameState
+    BeforeCombatHouseCardAbilitiesGameState["childGameState"], SimpleChoiceGameState
 > {
     get game(): Game {
         return this.parentGameState.game;
@@ -88,7 +88,7 @@ export default class AeronDamphairDwDAbilityGameState extends GameState<
         };
     }
 
-    static deserializeFromServer(houseCardResolution: ImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"], data: SerializedAeronDamphairDwDAbilityGameState): AeronDamphairDwDAbilityGameState {
+    static deserializeFromServer(houseCardResolution: BeforeCombatHouseCardAbilitiesGameState["childGameState"], data: SerializedAeronDamphairDwDAbilityGameState): AeronDamphairDwDAbilityGameState {
         const aeronDamphairDwDAbilityGameState = new AeronDamphairDwDAbilityGameState(houseCardResolution);
 
         aeronDamphairDwDAbilityGameState.childGameState = aeronDamphairDwDAbilityGameState.deserializeChildGameState(data.childGameState);

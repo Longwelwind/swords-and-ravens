@@ -32,7 +32,7 @@ import AeronDamphairDwDHouseCardAbility from "./AeronDamphairDwDHouseCardAbility
 import QarlTheMaidAbility from "./QarlTheMaidHouseCardAbility";
 import RodrikTheReaderAbility from "./RodrikTheReaderCardAbility";
 import EuronCrowsEyeDwDAbility from "./EuronCrowsEyeDwDCardAbility";
-import QyburnAbility from "./QyburnAbility";
+import QyburnHouseCardAbility from "./QyburnAbility";
 import SerAddamMarbrandAbility from "./SerAddamMarbrandAbility";
 import SerIlynPayneAbility from "./SerIlynPayneAbility";
 import QuentynMartellAbility from "./QuentynMartellAbility";
@@ -198,7 +198,7 @@ export const euronCrowsEyeDwd = new EuronCrowsEyeDwDAbility(
     "euron-crows-eye-dwd",
     "If your opponent has a higher position on the Fiefdoms Influence track than you, this card gains +1 combat strength."
 );
-export const qyburn = new QyburnAbility(
+export const qyburn = new QyburnHouseCardAbility(
     "qyburn",
     "You may discard two of your avaiable Power tokens to choose a House card in any players' discard pile."
     + " Qyburn gains the printed combat, strength and combat icons of that card, ignoring its text ability."

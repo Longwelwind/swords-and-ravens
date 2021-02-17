@@ -7,14 +7,14 @@ import HouseCard from "../../../../game-data-structure/house-card/HouseCard";
 import Player from "../../../../Player";
 import {ClientMessage} from "../../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../../messages/ServerMessage";
-import StannisBaratheonDwDAbilityGameState, { SerializedStannisBaratheonDwdAbilityGameState } from "./stannis-baratheon-dwd-ability-game-state/StannisBaratheonDwDAbilityGameState";
-import StannisBaratheonDwDHouseCardAbilityGameState from "./stannis-baratheon-dwd-ability-game-state/StannisBaratheonDwDAbilityGameState";
+import QyburnAbilityGameState, { SerializedQyburnAbilityGameState } from "./qyburn-ability-game-state/QyburnAbilityGameState";
+import AeronDamphairDwDAbilityGameState, { SerializedAeronDamphairDwDAbilityGameState } from "./aeron-damphair-dwd-ability-game-state/AeronDamphairDwDAbilityGameState";
 
 export default class BeforeCombatHouseCardAbilitiesGameState extends GameState<
     CombatGameState,
     HouseCardResolutionGameState<
     BeforeCombatHouseCardAbilitiesGameState,
-    StannisBaratheonDwDAbilityGameState
+    AeronDamphairDwDAbilityGameState | QyburnAbilityGameState
     >
 > {
     get combatGameState(): CombatGameState {
@@ -27,7 +27,7 @@ export default class BeforeCombatHouseCardAbilitiesGameState extends GameState<
 
     firstStart(): void {
         this.setChildGameState(
-            new HouseCardResolutionGameState<BeforeCombatHouseCardAbilitiesGameState, StannisBaratheonDwDAbilityGameState>(this)
+            new HouseCardResolutionGameState<BeforeCombatHouseCardAbilitiesGameState, AeronDamphairDwDAbilityGameState | QyburnAbilityGameState>(this)
         ).firstStart();
     }
 
@@ -64,8 +64,10 @@ export default class BeforeCombatHouseCardAbilitiesGameState extends GameState<
         data: SerializedBeforeCombatHouseCardAbilitiesGameState["childGameState"]["childGameState"]
     ): BeforeCombatHouseCardAbilitiesGameState["childGameState"]["childGameState"] {
         switch (data.type) {
-            case "stannis-baratheon-dwd-ability":
-                return StannisBaratheonDwDHouseCardAbilityGameState.deserializeFromServer(houseCardResolution, data);
+            case "aeron-damphair-dwd-ability":
+                return AeronDamphairDwDAbilityGameState.deserializeFromServer(houseCardResolution, data);
+            case "qyburn-ability":
+                return QyburnAbilityGameState.deserializeFromServer(houseCardResolution, data);
         }
     }
 
@@ -85,6 +87,6 @@ export default class BeforeCombatHouseCardAbilitiesGameState extends GameState<
 export interface SerializedBeforeCombatHouseCardAbilitiesGameState {
     type: "before-combat-house-card-abilities-resolution";
     childGameState: SerializedHouseCardResolutionGameState<
-    SerializedStannisBaratheonDwdAbilityGameState
+    SerializedAeronDamphairDwDAbilityGameState | SerializedQyburnAbilityGameState
     >;
 }

@@ -39,6 +39,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         return this.users.tryGet(this.ownerUserId, null);
     }
 
+    get selectedGameSetup(): GameSetup {
+        return this.getGameSetupByIdAndPlayerCount(this.gameSettings.setupId, this.gameSettings.playerCount);
+    }
+
     constructor(id: string, ownerId: string, name: string) {
         super(null);
         this.id = id;
@@ -337,10 +341,6 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         }
 
         return gameSetup;
-    }
-
-    getSelectedGameSetup(): GameSetup {
-        return this.getGameSetupByIdAndPlayerCount(this.gameSettings.setupId, this.gameSettings.playerCount);
     }
 
     serializeToClient(user: User | null): SerializedEntireGame {

@@ -5,7 +5,7 @@ import renderChildGameState from "../../utils/renderChildGameState";
 import React from "react";
 import Col from "react-bootstrap/Col";
 import QyburnAbilityGameState
-    from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/immediately-house-card-abilities-resolution-game-state/qyburn-ability-game-state/QyburnAbilityGameState";
+    from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/before-combat-house-card-abilities-game-state/qyburn-ability-game-state/QyburnAbilityGameState";
 import SelectHouseCardGameState
     from "../../../common/ingame-game-state/select-house-card-game-state/SelectHouseCardGameState";
 import SelectHouseCardComponent from "../SelectHouseCardComponent";
