@@ -64,7 +64,6 @@ export interface GameSetup {
 }
 
 export default function createGame(entireGame: EntireGame, housesToCreate: string[]): Game {
-    const gameSetup = entireGame.getSelectedGameSetup();
     const gameSettings = entireGame.gameSettings;
 
     const game = new Game();
@@ -74,9 +73,9 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
         .filter(([hid, _]) => housesToCreate.includes(hid)));
 
     // Overwrite house cards
-    if (gameSetup.houseCards) {
+    if (entireGame.selectedGameSetup.houseCards) {
         const newHouseCards = new BetterMap(
-            Object.entries(gameSetup.houseCards)
+            Object.entries(entireGame.selectedGameSetup.houseCards)
             .filter(([hid, _]) => housesToCreate.includes(hid)));
 
         newHouseCards.keys.forEach(hid => {
@@ -98,8 +97,8 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
     }
 
     // Overwrite supply levels
-    if (gameSetup.supplyLevels) {
-        Object.entries(gameSetup.supplyLevels)
+    if (entireGame.selectedGameSetup.supplyLevels) {
+        Object.entries(entireGame.selectedGameSetup.supplyLevels)
             .filter(([hid, _]) => housesToCreate.includes(hid))
             .forEach(([hid, level]) => {
                 const newHouseData = baseGameHousesToCreate.get(hid);
@@ -142,44 +141,34 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
         })
     );
 
-    game.maxTurns = gameSetup.maxTurn ? gameSetup.maxTurn : baseGameData.maxTurns;
-    game.structuresCountNeededToWin = gameSetup.structuresCountNeededToWin ? gameSetup.structuresCountNeededToWin : baseGameData.structuresCountNeededToWin;
+    game.maxTurns = entireGame.selectedGameSetup.maxTurn ? entireGame.selectedGameSetup.maxTurn : baseGameData.maxTurns;
+    game.structuresCountNeededToWin = entireGame.selectedGameSetup.structuresCountNeededToWin ? entireGame.selectedGameSetup.structuresCountNeededToWin : baseGameData.structuresCountNeededToWin;
     game.supplyRestrictions = baseGameData.supplyRestrictions;
     game.maxPowerTokens = MAX_POWER_TOKENS;
     game.revealedWesterosCards = gameSettings.cokWesterosPhase ? 3 : 0;
 
     // Load tracks starting positions
-    if (gameSetup.tracks && gameSetup.tracks.ironThrone) {
-        game.ironThroneTrack = gameSetup.tracks.ironThrone.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
+    if (entireGame.selectedGameSetup.tracks && entireGame.selectedGameSetup.tracks.ironThrone) {
+        game.ironThroneTrack = entireGame.selectedGameSetup.tracks.ironThrone.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     } else {
         game.ironThroneTrack = baseGameData.tracks.ironThrone.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     }
 
-    if (gameSetup.tracks && gameSetup.tracks.fiefdoms) {
-        game.fiefdomsTrack = gameSetup.tracks.fiefdoms.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
+    if (entireGame.selectedGameSetup.tracks && entireGame.selectedGameSetup.tracks.fiefdoms) {
+        game.fiefdomsTrack = entireGame.selectedGameSetup.tracks.fiefdoms.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     } else {
         game.fiefdomsTrack = baseGameData.tracks.fiefdoms.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     }
 
-    if (gameSetup.tracks && gameSetup.tracks.kingsCourt) {
-        game.kingsCourtTrack = gameSetup.tracks.kingsCourt.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
+    if (entireGame.selectedGameSetup.tracks && entireGame.selectedGameSetup.tracks.kingsCourt) {
+        game.kingsCourtTrack = entireGame.selectedGameSetup.tracks.kingsCourt.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     } else {
         game.kingsCourtTrack = baseGameData.tracks.kingsCourt.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     }
 
-    if (game.ironThroneTrack.length != game.houses.size) {
-        throw new Error("Size of ironThrone track is not equal to the number of houses");
-    }
-    if (game.fiefdomsTrack.length != game.houses.size) {
-        throw new Error("Size of fiefdoms track is not equal to the number of houses");
-    }
-    if (game.kingsCourtTrack.length != game.houses.size) {
-        throw new Error("Size of kingsCourt track is not equal to the number of houses");
-    }
-
     // Loading Tiled map
     const regions = new BetterMap(staticWorld.staticRegions.values.map(staticRegion => {
-        const blocked = gameSetup.blockedRegions ? gameSetup.blockedRegions.includes(staticRegion.id) : false;
+        const blocked = entireGame.selectedGameSetup.blockedRegions ? entireGame.selectedGameSetup.blockedRegions.includes(staticRegion.id) : false;
 
         return [
             staticRegion.id,
@@ -219,7 +208,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
     // Shuffle the deck
     game.wildlingDeck = _.shuffle(game.wildlingDeck);
 
-    const units = gameSetup.units ? gameSetup.units : baseGameData.units;
+    const units = entireGame.selectedGameSetup.units ? entireGame.selectedGameSetup.units : baseGameData.units;
 
     // Initialize the starting positions
     Object.entries(units).forEach(([regionId, data]) => {
@@ -230,7 +219,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
             const quantity = unitData.quantity;
 
             // Check if the game setup removed units off this region
-            if (gameSetup.removedUnits && gameSetup.removedUnits.includes(region.id)) {
+            if (entireGame.selectedGameSetup.removedUnits && entireGame.selectedGameSetup.removedUnits.includes(region.id)) {
                 return;
             }
 
@@ -248,17 +237,17 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
     game.skipRavenPhase = false; // todo: Remove unused var
 
     // Apply map changes
-    if (gameSetup.powerTokensOnBoard) {
-        Object.entries(gameSetup.powerTokensOnBoard).forEach(([houseId, regions]) => {
+    if (entireGame.selectedGameSetup.powerTokensOnBoard) {
+        Object.entries(entireGame.selectedGameSetup.powerTokensOnBoard).forEach(([houseId, regions]) => {
             const house = game.houses.tryGet(houseId, null);
             regions.forEach(r => game.world.getRegion(staticWorld.staticRegions.get(r)).controlPowerToken = house);
         });
     }
 
-    if (gameSetup.garrisons) {
-        Object.entries(gameSetup.garrisons).forEach(([regionId, garrison]) => {
-            game.world.getRegion(staticWorld.staticRegions.get(regionId)).garrison = garrison;
-            staticWorld.staticRegions.get(regionId).startingGarrison = garrison;
+    if (entireGame.selectedGameSetup.garrisons) {
+        Object.entries(entireGame.selectedGameSetup.garrisons).forEach(([regionId, garrison]) => {
+            const staticRegion = staticWorld.staticRegions.get(regionId);
+            game.world.getRegion(staticRegion).garrison = staticRegion.startingGarrison = garrison;
         });
     }
 
