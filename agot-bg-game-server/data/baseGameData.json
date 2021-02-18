@@ -355,7 +355,6 @@
               "asha-greyjoy-dwd": {
                 "name": "Asha Greyjoy",
                 "combatStrength": 2,
-                "ability": "balon-greyjoy",
                 "towerIcons": 2
               },
               "rodrik-the-reader": {
