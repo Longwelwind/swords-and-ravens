@@ -320,7 +320,6 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         shc.originalTowerIcons = shc.towerIcons;
                     });
                 });
-                game.clientNextWidllingCardId = null;
             }
 
             return serializedGame;
@@ -329,7 +328,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
     {
         version: "11",
         migrate: (serializedGame: any) => {
-            // Migration for #TBD
+            // Migration for #791
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
                 if (ingame.childGameState && ingame.childGameState.type == "action") {
@@ -349,6 +348,26 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         }
                     }
                 }
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "12",
+        migrate: (serializedGame: any) => {
+            // Migration for #TBD
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                const game = ingame.game;
+
+                game.houses.forEach((h: SerializedHouse) => {
+                    h.houseCards.forEach(([hcid, shc]) => {
+                        if (hcid == "asha-greyjoy-dwd") {
+                            shc.abilityId = null;
+                        }
+                    });
+                });
             }
 
             return serializedGame;
