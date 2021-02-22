@@ -10,6 +10,7 @@ import BetterMap from "../utils/BetterMap";
 import GameEndedGameState from "./ingame-game-state/game-ended-game-state/GameEndedGameState";
 import { GameSetup, getGameSetupContainer } from "./ingame-game-state/game-data-structure/createGame";
 import CancelledGameState, { SerializedCancelledGameState } from "./cancelled-game-state/CancelledGameState";
+import { VoteState } from "./ingame-game-state/vote-system/Vote";
 
 export default class EntireGame extends GameState<null, LobbyGameState | IngameGameState | CancelledGameState> {
     id: string;
@@ -286,9 +287,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 });
             });
         } else if (this.childGameState instanceof IngameGameState) {
-            const waitedForUsers = this.childGameState.getWaitedUsers();
+            const ingame = this.childGameState as IngameGameState;
+            const waitedForUsers = ingame.getWaitedUsers();
 
-            this.childGameState.players.forEach((player, user) => {
+            ingame.players.forEach((player, user) => {
                 // "Important chat rooms" are chat rooms where unseen messages will display
                 // a badge next to the game in the website.
                 // In this case, it's all private rooms with this player in it. The next line
@@ -301,7 +303,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                     data: {
                         "house": player.house.id,
                         "waited_for": waitedForUsers.includes(user),
-                        "important_chat_rooms": importantChatRooms.map(cr => cr.roomId)
+                        "important_chat_rooms": importantChatRooms.map(cr => cr.roomId),
+                        "is_winner": ingame.childGameState instanceof GameEndedGameState ? ingame.childGameState.winner == player.house : false,
+                        "needed_for_vote": ingame.votes.values.filter(vote => vote.state == VoteState.ONGOING).some(vote => !vote.votes.has(player.house))
                     }
                 });
             });
