@@ -14,8 +14,9 @@ import GameStateComponentProps from "./GameStateComponentProps";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import classNames from "classnames";
-import {OrderOnMapProperties, RegionOnMapProperties} from "../MapControls";
+import {OrderOnMapProperties, RegionOnMapProperties, UnitOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
+import Unit from "../../common/ingame-game-state/game-data-structure/Unit";
 
 @observer
 export default class PlayerMusteringComponent extends Component<GameStateComponentProps<PlayerMusteringGameState>> {
@@ -24,6 +25,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
 
     modifyRegionsOnMapCallback: any;
     modifyOrdersOnMapCallback: any;
+    modifyUnitsOnMapCallback: any;
 
     get house(): House {
         return this.props.gameState.house;
@@ -47,10 +49,10 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                             <Col xs={12}>
                                 {this.musterings.entries.map(([region, musterings]) => (
                                     <div key={region.id}>
-                                        From <strong>{region.name}</strong>:
+                                        From <b>{region.name}</b>:
                                         <ul>
                                             {musterings.map(({region, from, to}, i) => (
-                                                <li onClick={() => musterings.splice(i, 1)} key={i}>
+                                                <li onClick={() => this.removeMustering(musterings, i)} key={i}>
                                                     {from ? "Upgrading to " : "Recruiting "} a {to.name} in {region.name}
                                                 </li>
                                             ))}
@@ -68,10 +70,10 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                         )}
                         {this.selectedRegion && (
                             <>
-                                {this.selectedRegion.hasStructure && this.checkStarredConsolidatePower(this.selectedRegion) && (
+                                {this.selectedRegion.hasStructure && this.checkStarredConsolidatePower(this.selectedRegion) && this.props.gameState.getValidMusteringRulesForRegion(this.selectedRegion, this.musterings).length > 0 && (
                                     <>
                                         <Col xs={12}>
-                                            From {this.selectedRegion.name}, you can ({this.props.gameState.getPointsLeft(this.selectedRegion, this.musterings)} mustering points left):
+                                            From <b>{this.selectedRegion.name}</b>, you can ({this.props.gameState.getPointsLeft(this.selectedRegion, this.musterings)} mustering points left):
                                         </Col>
                                         <Col xs={12}>
                                             <Row>
@@ -128,6 +130,26 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         );
     }
 
+    private removeMustering(musterings: Mustering[], i: number): void {
+        const removedMustering = musterings.splice(i, 1)[0];
+        const region = removedMustering.region;
+
+        if (removedMustering.affectedUnit) {
+            if (removedMustering.from) {
+                removedMustering.affectedUnit.upgradedType = undefined;
+            } else {
+                region.newUnits = region.newUnits.filter(u => u != removedMustering.affectedUnit);
+            }
+        }
+
+        this.musterings.keys.forEach(r => {
+           const mustering = this.musterings.get(r);
+           if (mustering.length == 0) {
+               this.musterings.delete(r);
+           }
+        });
+    }
+
     canSubmit(): boolean {
         switch (this.props.gameState.type) {
             case PlayerMusteringType.MUSTERING_WESTEROS_CARD:
@@ -148,12 +170,15 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
 
         const musterings: Mustering[] = this.musterings.tryGet(this.selectedRegion, []);
 
-        musterings.push({
-            from: rule.from,
-            to: rule.to,
-            region: rule.region
-        });
+        if (rule.from) {
+            rule.affectedUnit = this.props.gameState.getUnitsLeftToUpgrade(this.musterings, rule.region)[0];
+            rule.affectedUnit.upgradedType = rule.to;
+        } else {
+            rule.affectedUnit = this.props.gameState.game.createUnit(rule.region, rule.to, this.props.gameState.house);
+            rule.region.newUnits.push(rule.affectedUnit);
+        }
 
+        musterings.push(rule);
         this.musterings.set(this.selectedRegion, musterings);
 
         if (this.props.gameState.getPointsLeft(this.selectedRegion, this.musterings) == 0) {
@@ -169,6 +194,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         }
 
         this.props.gameState.muster(this.musterings);
+        this.reset();
     }
 
     private checkStarredConsolidatePower(region: Region): boolean {
@@ -186,28 +212,16 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
 
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
-            if (this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD) {
+            if (this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD || this.props.gameState.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD) {
                 return this.props.gameState.game.world.regions.values
-                    .filter(r => r.getController() == this.props.gameState.house && r.castleLevel > 0)
+                    .filter(r => r.getController() == this.props.gameState.house && this.props.gameState.getValidMusteringRulesForRegion(r, this.musterings).length > 0)
                     .map(r => [
-                        r,
-                        {
-                            highlight: {active: true},
-                            onClick: () => this.onRegionClick(r)
-                        }
-                    ]);
-            } else if (this.props.gameState.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD) {
-                if (this.musterings.size == 0) {
-                    return this.props.gameState.game.world.regions.values
-                        .filter(r => r.getController() == this.props.gameState.house && r.castleLevel > 0)
-                        .map(r => [
                             r,
                             {
                                 highlight: {active: true},
                                 onClick: () => this.onRegionClick(r)
-                            }
-                        ]);
-                }
+                            }]
+                        );
             }
         }
 
@@ -233,9 +247,29 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         return [];
     }
 
+    modifyUnitsOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {
+        if (this.props.gameClient.doesControlHouse(this.house)) {
+            const allMusteredToRegions = _.uniq(_.flatMap(this.musterings.values).map(m => m.region));
+            const allMusteredUnitsOfHouse = _.flatMap(allMusteredToRegions.map(r => _.concat(r.newUnits, r.units.values.filter(u => u.upgradedType != undefined))));
+
+            return allMusteredUnitsOfHouse.map(u => [
+                u,
+                {
+                    highlight: { active: true, color: "yellow" },
+                    onClick: () => {
+                        this.onUnitClick(u);
+                    }
+                }
+            ]);
+        }
+
+        return [];
+    }
+
     componentDidMount(): void {
         this.props.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
         this.props.mapControls.modifyOrdersOnMap.push(this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap());
+        this.props.mapControls.modifyUnitsOnMap.push(this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap());
     }
 
     componentWillUnmount(): void {
@@ -269,7 +303,26 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         }
     }
 
+    onUnitClick(unit: Unit): void {
+        for (const musteredRegion of this.musterings.keys) {
+            const musterings = this.musterings.get(musteredRegion);
+
+            for (let i=0; i < musterings.length; i++) {
+                const mustering = musterings[i];
+                if (mustering.affectedUnit == unit) {
+                    this.removeMustering(musterings, i);
+                    return;
+                }
+            }
+        }
+    }
+
     reset(): void {
+        _.flatMap(this.musterings.values).forEach(r => {
+            r.region.newUnits = [];
+            r.region.units.values.forEach(u => u.upgradedType = undefined);
+        });
+
         this.selectedRegion = null;
         this.musterings = new BetterMap<Region, Mustering[]>();
     }

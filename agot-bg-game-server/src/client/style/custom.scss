@@ -275,6 +275,15 @@ $attacking-army-outline: rgba(red, 1.0);
   filter: drop-shadow(4px 4px 4px $attacking-army-outline) drop-shadow(-4px -4px 4px $attacking-army-outline);
 }
 
+$unit-highlight-outline-yellow: rgba(yellow, 1.0);
+.unit-highlight-yellow {
+  filter: drop-shadow(4px 4px 4px $unit-highlight-outline-yellow) drop-shadow(-4px -4px 4px $unit-highlight-outline-yellow);
+}
+
+.unit-highlight-yellow:hover {
+  filter: drop-shadow(4px 4px 4px $unit-highlight-outline-yellow) drop-shadow(-4px -4px 4px $unit-highlight-outline-yellow);
+}
+
 $wildling-outline: rgba(#f8ff00, 0.5);
 .wildling-highlight {
   filter: drop-shadow(1px 1px 3px $wildling-outline) drop-shadow(-1px -1px 3px $wildling-outline);

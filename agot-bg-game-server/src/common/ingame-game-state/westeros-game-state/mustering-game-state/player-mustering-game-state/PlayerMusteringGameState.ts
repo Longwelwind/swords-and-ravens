@@ -22,7 +22,7 @@ import Order from "../../../game-data-structure/Order";
 
 type MusteringRule = (Mustering & {cost: number});
 
-export type Mustering = {from: Unit | null; region: Region; to: UnitType};
+export type Mustering = {from: Unit | null; region: Region; to: UnitType, affectedUnit?: Unit};
 
 export enum PlayerMusteringType {
     MUSTERING_WESTEROS_CARD = 0,
@@ -335,6 +335,10 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         })
     }
 
+    getValidMusteringRulesForRegion(region: Region, musterings: BetterMap<Region, Mustering[]>): MusteringRule[] {
+        return _.flatMap(this.getValidMusteringRules(region, musterings).map(({rules}) => rules));
+    }
+
     getAddedUnitsOfMustering(musterings: BetterMap<Region, Mustering[]>): BetterMap<Region, UnitType[]> {
         const addedUnits = new BetterMap<Region, UnitType[]>();
 
@@ -361,7 +365,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         switch(this.type) {
             case PlayerMusteringType.MUSTERING_WESTEROS_CARD:
                 // Return true if there is any valid mustering rule for any controlled castle unused
-                return _.flatMap(controlledCastles.map(c => _.flatMap(this.getValidMusteringRules(c, musterings).map(({rules}) => rules)))).length > 0;
+                return _.flatMap(controlledCastles.map(c => this.getValidMusteringRulesForRegion(c, musterings))).length > 0;
             case PlayerMusteringType.STARRED_CONSOLIDATE_POWER:
                 const parentResolveConsolidatePowerGameState: ResolveConsolidatePowerGameState | null = this.parentGameState instanceof ResolveConsolidatePowerGameState ? this.parentGameState : null;
                 if(!parentResolveConsolidatePowerGameState) {
@@ -372,7 +376,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 const region = regions.length > 0 ? regions[0] : null;
                 if(region) {
                     // Return true if there is there are valid mustering rules left for the starred CP region
-                    return _.flatMap(this.getValidMusteringRules(region, musterings).map(({rules}) => rules)).length > 0;
+                    return this.getValidMusteringRulesForRegion(region, musterings).length > 0;
                 }
 
                 return false;
