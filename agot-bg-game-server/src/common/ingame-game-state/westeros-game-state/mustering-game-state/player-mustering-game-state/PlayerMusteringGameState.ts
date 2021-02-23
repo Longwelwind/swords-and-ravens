@@ -55,7 +55,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
     }
 
     get resolveConsolidatePowerGameState(): ResolveConsolidatePowerGameState {
-        if(this.type != PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
+        if(!this.isStarredConsolidatePowerMusteringType) {
             throw new Error("ResolveConsolidatePowerGameState requested but type != STARRED_CONSOLIDATE_POWER");
         }
 
@@ -64,6 +64,10 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
 
     get ingame(): IngameGameState {
         return this.parentGameState.ingame;
+    }
+
+    get isStarredConsolidatePowerMusteringType(): boolean {
+        return this.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER;
     }
 
     firstStart(house: House, type: PlayerMusteringType): void {
@@ -82,7 +86,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
     }
 
     canMuster(house: House): boolean {
-        return this.game.world.getControlledRegions(house).some(r => r.hasStructure);
+        return this.isStarredConsolidatePowerMusteringType || this.game.world.getControlledRegions(house).some(r => r.hasStructure);
     }
 
     onServerMessage(_: ServerMessage): void {
@@ -112,7 +116,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 })
             );
 
-            if (this.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER
+            if (this.isStarredConsolidatePowerMusteringType
                 || this.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD
             ) {
                 // If the mustering is from a starred consolidate power or "The hord descends",
@@ -132,7 +136,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                     return;
                 }
 
-                if (this.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
+                if (this.isStarredConsolidatePowerMusteringType) {
                     // If the mustering is from a starred consolidate power, then there
                     // must be a starred consolidate power in the region
                     if (!(this.parentGameState instanceof ResolveConsolidatePowerGameState)) {
@@ -173,7 +177,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 });
             });
 
-            if (this.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
+            if (this.isStarredConsolidatePowerMusteringType) {
                 if (musterings.size > 0) {
                     const entry = musterings.entries[0];
                     const startingRegion = entry[0];
@@ -208,8 +212,8 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         });
     }
 
-    private getConsolidatePowerOrder(region: Region): Order | null {
-        if (this.type != PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
+    getConsolidatePowerOrder(region: Region): Order | null {
+        if (!this.isStarredConsolidatePowerMusteringType) {
             throw new Error("isConsolidatePowerOrderPresent() called but type != STARRED_CONSOLIDATE_POWER");
         }
 
@@ -223,24 +227,6 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         }
 
         return null;
-    }
-
-    hasConsolidatePowerOrder(region: Region): boolean {
-        if(this.getConsolidatePowerOrder(region)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    hasStarredConsolidatePowerOrder(region: Region): boolean {
-        const order = this.getConsolidatePowerOrder(region);
-
-        if (order) {
-            return order.type.starred;
-        }
-
-        return false;
     }
 
     getWaitedUsers(): User[] {
@@ -356,15 +342,14 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
     }
 
     getPointsLeft(region: Region, musterings: BetterMap<Region, Mustering[]>): number {
-        return region.castleLevel - this.getUsedPoints(musterings.tryGet(region, []));
+        return region.castleLevel - this.getUsedPointsForRegion(region, musterings);
     }
 
     anyUsablePointsLeft(musterings: BetterMap<Region, Mustering[]>): boolean {
-        const controlledCastles = this.game.world.getControlledRegions(this.house).filter(r => r.castleLevel > 0);
-
         switch(this.type) {
             case PlayerMusteringType.MUSTERING_WESTEROS_CARD:
                 // Return true if there is any valid mustering rule for any controlled castle unused
+                const controlledCastles = this.game.world.getControlledRegions(this.house).filter(r => r.castleLevel > 0);
                 return _.flatMap(controlledCastles.map(c => this.getValidMusteringRulesForRegion(c, musterings))).length > 0;
             case PlayerMusteringType.STARRED_CONSOLIDATE_POWER:
                 const parentResolveConsolidatePowerGameState: ResolveConsolidatePowerGameState | null = this.parentGameState instanceof ResolveConsolidatePowerGameState ? this.parentGameState : null;
@@ -381,8 +366,18 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
 
                 return false;
             case PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD:
-                return false; // todo: Make this work for the wildling card also
+                if (musterings.size == 0) {
+                    // Return true if there is any valid mustering rule for any controlled castle unused
+                    const controlledCastles = this.game.world.getControlledRegions(this.house).filter(r => r.castleLevel > 0);
+                    return _.flatMap(controlledCastles.map(c => this.getValidMusteringRulesForRegion(c, musterings))).length > 0;
+                } else {
+                    return this.getValidMusteringRulesForRegion(musterings.keys[0], musterings).length > 0;
+                }
         }
+    }
+
+    getUsedPointsForRegion(region: Region, musterings: BetterMap<Region, Mustering[]>): number {
+        return this.getUsedPoints(musterings.tryGet(region, []));
     }
 
     getUsedPoints(musterings: Mustering[]): number {

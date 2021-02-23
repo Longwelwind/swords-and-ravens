@@ -194,6 +194,9 @@ export default class MapComponent extends Component<MapComponentProps> {
                                     {
                                         "unit-highlight-yellow": property.highlight.color == "yellow"
                                     },
+                                    {
+                                        "unit-highlight-green": property.highlight.color == "green"
+                                    },
                                 )}
                                 style={{
                                     backgroundImage: `url(${unitImages.get(u.allegiance.id).get(u.upgradedType ? u.upgradedType.id : u.type.id)})`,
