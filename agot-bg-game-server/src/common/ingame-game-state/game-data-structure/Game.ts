@@ -91,6 +91,11 @@ export default class Game {
         return result;
     }
 
+    updateWildlingStrength(value: number): number {
+        this.wildlingStrength = Math.max(0, Math.min(this.wildlingStrength + value, MAX_WILDLING_STRENGTH));
+        return this.wildlingStrength;
+    }
+
     getTokenHolder(track: House[]): House {
         return track[0];
     }

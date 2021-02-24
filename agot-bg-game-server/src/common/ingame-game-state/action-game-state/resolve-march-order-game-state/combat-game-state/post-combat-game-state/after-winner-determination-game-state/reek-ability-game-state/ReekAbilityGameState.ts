@@ -46,7 +46,6 @@ export default class ReekAbilityGameState extends GameState<
 
     onSimpleChoiceGameStateEnd(choice: number): void {
         const house = this.childGameState.house;
-        this.parentGameState.game.wildlingStrength += choice;
 
         if (choice == 0) {
             this.ingame.log({

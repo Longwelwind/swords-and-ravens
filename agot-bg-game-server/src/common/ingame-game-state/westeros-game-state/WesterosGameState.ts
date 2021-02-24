@@ -118,7 +118,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
 
 
         if (addedWildlingStrength > 0) {
-            this.game.wildlingStrength = Math.max(0, Math.min(this.game.wildlingStrength + addedWildlingStrength, MAX_WILDLING_STRENGTH));
+            this.game.updateWildlingStrength(addedWildlingStrength);
 
             this.entireGame.broadcastToClients({
                 type: "change-wildling-strength",

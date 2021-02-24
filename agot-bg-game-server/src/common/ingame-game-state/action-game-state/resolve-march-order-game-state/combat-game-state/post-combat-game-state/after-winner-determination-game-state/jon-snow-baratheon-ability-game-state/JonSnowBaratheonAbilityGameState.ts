@@ -15,8 +15,6 @@ export default class JonSnowBaratheonAbilityGameState extends GameState<
     AfterWinnerDeterminationGameState["childGameState"],
     SimpleChoiceGameState
 > {
-    wildingsTrackChange: number[] | null;
-
     get game(): Game {
         return this.parentGameState.game;
     }
@@ -35,15 +33,12 @@ export default class JonSnowBaratheonAbilityGameState extends GameState<
 
     firstStart(house: House): void {
         const choices: string[] = ["Ignore"];
-        this.wildingsTrackChange = [0];
         if (this.parentGameState.game.wildlingStrength >= 2) {
             choices.push("Decrease one space");
-            this.wildingsTrackChange.push(-2);
         }
 
         if (this.parentGameState.game.wildlingStrength <= 8) {
             choices.push("Increase one space");
-            this.wildingsTrackChange.push(2);
         }
         this.setChildGameState(new SimpleChoiceGameState(this))
             .firstStart(
@@ -56,7 +51,6 @@ export default class JonSnowBaratheonAbilityGameState extends GameState<
 
     onSimpleChoiceGameStateEnd(choice: number): void {
         const house = this.childGameState.house;
-        this.parentGameState.game.wildlingStrength += choice;
 
         if (choice == 0) {
             this.ingame.log({
@@ -65,10 +59,24 @@ export default class JonSnowBaratheonAbilityGameState extends GameState<
                 houseCard: jonSnow.id
             });
         } else {
+            const wildlingTrackChange = [0];
+
+            if (this.parentGameState.game.wildlingStrength >= 2) {
+                wildlingTrackChange.push(-2);
+            }
+
+            if (this.parentGameState.game.wildlingStrength <= 8) {
+                wildlingTrackChange.push(2);
+            }
+
+            const changeToApply = wildlingTrackChange[choice];
+
+            this.game.updateWildlingStrength(changeToApply);
+
             this.ingame.log({
                 type: "jon-snow-used",
                 house: house.id,
-                wildlingsStrength: choice,
+                wildlingsStrength: changeToApply,
             });
 
             this.entireGame.broadcastToClients({
@@ -77,6 +85,7 @@ export default class JonSnowBaratheonAbilityGameState extends GameState<
             });
 
         }
+
         this.parentGameState.onHouseCardResolutionFinish(house);
     }
 
