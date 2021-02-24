@@ -28,6 +28,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     // Keys are the two users participating in the private chat.
     // A pair of user is sorted alphabetically by their id when used as a key.
     @observable privateChatRoomsIds: BetterMap<User, BetterMap<User, string>> = new BetterMap();
+    // Client-side callback fired whenever a new private chat-window was created
+    onNewPrivateChatRoomCreated: ((roomId: string) => void) | null;
     // Client-side callback fired whenever the current GameState changes.
     onClientGameStateChange: (() => void) | null;
 
