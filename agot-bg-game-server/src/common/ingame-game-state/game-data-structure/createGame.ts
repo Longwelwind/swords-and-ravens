@@ -43,11 +43,6 @@ interface HouseCardData {
     ability?: string;
 }
 
-export interface GameSetupContainer {
-    name: string;
-    playerSetups: GameSetup[];
-}
-
 export interface GameSetup {
     playerCount: number;
     houses: string[];
@@ -63,6 +58,21 @@ export interface GameSetup {
     garrisons?: {[key: string]: number};
 }
 
+export interface GameSetupContainer {
+    name: string;
+    playerSetups: GameSetup[];
+}
+
+export const allGameSetups = new BetterMap(Object.entries(baseGameData.setups as {[key: string]: GameSetupContainer}));
+
+export function getGameSetupContainer(setupId: string): GameSetupContainer {
+    if (!allGameSetups.has(setupId)) {
+        throw new Error(`Invalid setupId ${setupId}. All setups: ${JSON.stringify(allGameSetups)}`);
+    }
+
+    return allGameSetups.get(setupId);
+}
+
 export default function createGame(entireGame: EntireGame, housesToCreate: string[]): Game {
     const gameSettings = entireGame.gameSettings;
 
@@ -73,7 +83,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
         .filter(([hid, _]) => housesToCreate.includes(hid)));
 
     // Overwrite house cards
-    if (entireGame.selectedGameSetup.houseCards) {
+    if (entireGame.selectedGameSetup.houseCards != undefined) {
         const newHouseCards = new BetterMap(
             Object.entries(entireGame.selectedGameSetup.houseCards)
             .filter(([hid, _]) => housesToCreate.includes(hid)));
@@ -84,7 +94,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
            baseGameHousesToCreate.set(hid, newHouseData);
         });
     } else if (gameSettings.adwdHouseCards) {
-        const adwdHouseCards = entireGame.allGameSetups.get("a-dance-with-dragons").playerSetups[0].houseCards as {[key: string]: HouseCardContainer};
+        const adwdHouseCards = allGameSetups.get("a-dance-with-dragons").playerSetups[0].houseCards as {[key: string]: HouseCardContainer};
         const newHouseCards = new BetterMap(
             Object.entries(adwdHouseCards)
             .filter(([hid, _]) => housesToCreate.includes(hid)));
@@ -97,7 +107,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
     }
 
     // Overwrite supply levels
-    if (entireGame.selectedGameSetup.supplyLevels) {
+    if (entireGame.selectedGameSetup.supplyLevels != undefined) {
         Object.entries(entireGame.selectedGameSetup.supplyLevels)
             .filter(([hid, _]) => housesToCreate.includes(hid))
             .forEach(([hid, level]) => {
@@ -141,26 +151,26 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
         })
     );
 
-    game.maxTurns = entireGame.selectedGameSetup.maxTurn ? entireGame.selectedGameSetup.maxTurn : baseGameData.maxTurns;
-    game.structuresCountNeededToWin = entireGame.selectedGameSetup.structuresCountNeededToWin ? entireGame.selectedGameSetup.structuresCountNeededToWin : baseGameData.structuresCountNeededToWin;
+    game.maxTurns = entireGame.selectedGameSetup.maxTurn != undefined ? entireGame.selectedGameSetup.maxTurn : baseGameData.maxTurns;
+    game.structuresCountNeededToWin = entireGame.selectedGameSetup.structuresCountNeededToWin != undefined ? entireGame.selectedGameSetup.structuresCountNeededToWin : baseGameData.structuresCountNeededToWin;
     game.supplyRestrictions = baseGameData.supplyRestrictions;
     game.maxPowerTokens = MAX_POWER_TOKENS;
     game.revealedWesterosCards = gameSettings.cokWesterosPhase ? 3 : 0;
 
     // Load tracks starting positions
-    if (entireGame.selectedGameSetup.tracks && entireGame.selectedGameSetup.tracks.ironThrone) {
+    if (entireGame.selectedGameSetup.tracks != undefined && entireGame.selectedGameSetup.tracks.ironThrone != undefined) {
         game.ironThroneTrack = entireGame.selectedGameSetup.tracks.ironThrone.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     } else {
         game.ironThroneTrack = baseGameData.tracks.ironThrone.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     }
 
-    if (entireGame.selectedGameSetup.tracks && entireGame.selectedGameSetup.tracks.fiefdoms) {
+    if (entireGame.selectedGameSetup.tracks != undefined && entireGame.selectedGameSetup.tracks.fiefdoms != undefined) {
         game.fiefdomsTrack = entireGame.selectedGameSetup.tracks.fiefdoms.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     } else {
         game.fiefdomsTrack = baseGameData.tracks.fiefdoms.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     }
 
-    if (entireGame.selectedGameSetup.tracks && entireGame.selectedGameSetup.tracks.kingsCourt) {
+    if (entireGame.selectedGameSetup.tracks != undefined && entireGame.selectedGameSetup.tracks.kingsCourt != undefined) {
         game.kingsCourtTrack = entireGame.selectedGameSetup.tracks.kingsCourt.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     } else {
         game.kingsCourtTrack = baseGameData.tracks.kingsCourt.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
@@ -208,7 +218,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
     // Shuffle the deck
     game.wildlingDeck = _.shuffle(game.wildlingDeck);
 
-    const units = entireGame.selectedGameSetup.units ? entireGame.selectedGameSetup.units : baseGameData.units;
+    const units = entireGame.selectedGameSetup.units != undefined ? entireGame.selectedGameSetup.units : baseGameData.units;
 
     // Initialize the starting positions
     Object.entries(units).forEach(([regionId, data]) => {
@@ -237,14 +247,14 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
     game.skipRavenPhase = false; // todo: Remove unused var
 
     // Apply map changes
-    if (entireGame.selectedGameSetup.powerTokensOnBoard) {
+    if (entireGame.selectedGameSetup.powerTokensOnBoard != undefined) {
         Object.entries(entireGame.selectedGameSetup.powerTokensOnBoard).forEach(([houseId, regions]) => {
             const house = game.houses.tryGet(houseId, null);
             regions.forEach(r => game.world.getRegion(staticWorld.staticRegions.get(r)).controlPowerToken = house);
         });
     }
 
-    if (entireGame.selectedGameSetup.garrisons) {
+    if (entireGame.selectedGameSetup.garrisons != undefined) {
         Object.entries(entireGame.selectedGameSetup.garrisons).forEach(([regionId, garrison]) => {
             const staticRegion = staticWorld.staticRegions.get(regionId);
             game.world.getRegion(staticRegion).garrison = staticRegion.startingGarrison = garrison;
