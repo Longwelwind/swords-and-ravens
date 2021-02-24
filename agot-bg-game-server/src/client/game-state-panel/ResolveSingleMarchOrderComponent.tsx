@@ -137,28 +137,32 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                 }>
                     <Form>
                         <fieldset>
-                            <Form.Group as={Col}>
-                                <Form.Label>
-                                    Do you want to leave a Power token in <b>{startingRegion.name}</b> to keep control?
-                                </Form.Label>
-                                <Form.Check
-                                    id="chk-leave-pt"
-                                    name="leave-pt-radios"
-                                    inline
-                                    type="radio"
-                                    label="Yes"
-                                    checked={this.leavePowerToken}
-                                    onChange={() => {this.leavePowerToken = true;}}
-                                    disabled={!this.canLeavePowerToken}/>
-                                <Form.Check
-                                    id="chk-dont-leave-pt"
-                                    name="leave-pt-radios"
-                                    inline
-                                    type="radio"
-                                    label="No"
-                                    checked={this.leavePowerToken == false}
-                                    onChange={() => {this.leavePowerToken = false;}}
-                                    disabled={!this.canLeavePowerToken}/>
+                            <Form.Group>
+                                <Col xs={12}>
+                                    <Form.Label>
+                                        Do you want to leave a Power token in <b>{startingRegion.name}</b> to keep control?
+                                    </Form.Label>
+                                </Col>
+                                <Col xs={12}>
+                                    <Form.Check
+                                        id="chk-leave-pt"
+                                        name="leave-pt-radios"
+                                        inline
+                                        type="radio"
+                                        label="Yes"
+                                        checked={this.leavePowerToken}
+                                        onChange={() => {this.leavePowerToken = true;}}
+                                        disabled={!this.canLeavePowerToken}/>
+                                    <Form.Check
+                                        id="chk-dont-leave-pt"
+                                        name="leave-pt-radios"
+                                        inline
+                                        type="radio"
+                                        label="No"
+                                        checked={this.leavePowerToken == false}
+                                        onChange={() => {this.leavePowerToken = false;}}
+                                        disabled={!this.canLeavePowerToken}/>
+                                </Col>
                             </Form.Group>
                         </fieldset>
                     </Form>
