@@ -356,7 +356,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
     {
         version: "12",
         migrate: (serializedGame: any) => {
-            // Migration for #TBD
+            // Migration for #795
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
                 const game = ingame.game;
@@ -368,6 +368,36 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         }
                     });
                 });
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "13",
+        migrate: (serializedGame: any) => {
+            // Migration for #TBD
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                if (ingame.childGameState && ingame.childGameState.type == "action") {
+                    const action = ingame.childGameState;
+                    if (action.childGameState && action.childGameState.type == "resolve-march-order") {
+                        const resolveMarchOrders = action.childGameState;
+                        if (resolveMarchOrders.childGameState && resolveMarchOrders.childGameState.type == "combat") {
+                            const combat = resolveMarchOrders.childGameState;
+                            if (combat.childGameState && combat.childGameState.type == "post-combat") {
+                                const postCombat = combat.childGameState;
+                                if (postCombat.childGameState && postCombat.childGameState.type == "after-combat-house-card-abilities") {
+                                    const afterCombatHouseCardAbilities = postCombat.childGameState;
+                                    if (afterCombatHouseCardAbilities.childGameState && afterCombatHouseCardAbilities.childGameState.type == "rodrik-the-reader-ability") {
+                                        // Rodrik is now a AfterWinner ability
+                                        postCombat.childGameState.type = "after-winner-determination";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             return serializedGame;
