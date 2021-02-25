@@ -38,7 +38,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
     render(): ReactNode {
         return this.props.ingameGameState.gameLogManager.logs.map((l, i) => (
-            <Row key={i}>
+            <Row key={`log_${i}`}>
                 <Col xs="auto" className="text-muted">
                     <OverlayTrigger
                         placement="auto"
@@ -89,7 +89,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <>
                     <div className="text-center"><h5>The fight for the Iron Throne has begun!</h5></div>
                     {assignments.map(([house, user]) =>
-                        <p  key={house.id + "-" + user.id}>House <b>{house.name}</b> is controlled by <b>{user.name}</b>.</p>
+                        <p  key={`${house.id}_${user.id}`}>House <b>{house.name}</b> is controlled by <b>{user.name}</b>.</p>
                     )}
                 </>;
             case "turn-begin":
@@ -126,7 +126,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <>
                         <b>{attacker.name}</b> attacked <b>{attacked ? attacked.name : "a neutral force"}</b> from <b>{attackingRegion.name}</b> to <b>
-                        {attackedRegion.name}</b> with <>{joinReactNodes(army.map((ut, i) => <b key={i}>{ut.name}</b>), ', ')}</>.
+                        {attackedRegion.name}</b> with <>{joinReactNodes(army.map((ut, i) => <b key={`attack_${ut.id}_${i}`}>{ut.name}</b>), ', ')}</>.
                     </>
                 );
 
@@ -143,7 +143,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         <ul>
                             {moves.map(([region, unitTypes]) => (
                                 <li key={region.id}>
-                                    {joinReactNodes(unitTypes.map((ut, i) => <b key={i}>{ut.name}</b>), ", ")} to <b>{region.name}</b>
+                                    {joinReactNodes(unitTypes.map((ut, i) => <b key={`march_${ut.id}_${i}`}>{ut.name}</b>), ", ")} to <b>{region.name}</b>
                                 </li>
                             ))}
                         </ul>}
@@ -173,7 +173,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         </p>
                         <Row className="justify-content-around">
                             {drawnWesterosCardTypes.map((wct, i) => (
-                                <Col xs="auto" key={i}>
+                                <Col xs="auto" key={`${wct.id}_${i}`}>
                                     <WesterosCardComponent cardType={wct} size="small" tooltip={true} westerosDeckI={i} />
                                 </Col>
                             ))}
@@ -224,12 +224,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <>
                         Wildling bidding results for Wildling Threat <b>{data.wildlingStrength}</b>:
                         <table cellPadding="5">
-                            {results.map(([bid, houses]) => houses.map(h => (
-                                <tr key={h.id}>
-                                    <td>{h.name}</td>
-                                    <td>{bid}</td>
-                                </tr>
-                            )))}
+                            <tbody>
+                                {results.map(([bid, houses]) => houses.map(h => (
+                                    <tr key={`bid_${h.id}`}>
+                                        <td>{h.name}</td>
+                                        <td>{bid}</td>
+                                    </tr>
+                                )))}
+                            </tbody>
                         </table>
                         {data.nightsWatchVictory ? (
                             <>The <b>Night&apos;s Watch</b> won!</>
@@ -277,24 +279,24 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         {musterings.length > 0 && (
                             <>
                                 {musterings.map(([originatingRegion, recruitments]) => (
-                                    <>
+                                    <div key={`$mustering_${originatingRegion.id}`}>
                                         <p>
-                                            <b>{house.name}</b> mustered in <b>{originatingRegion.name}</b>:
+                                            <b>{house.name}</b> mustered in <b>{originatingRegion.name}</b>
                                         </p>
                                         <ul>
                                             {recruitments.map(({ region, from, to }, i) => (
                                                 <li key={"recruitment-" + region.id + "-" + i}>
                                                     {from ? (
                                                         <>
-                                                            A <strong>{to.name}</strong> from a <strong>{from.name}</strong> to <strong>{region.name}</strong>.
+                                                            A <strong>{to.name}</strong> from a <strong>{from.name}</strong>{originatingRegion != region && (<> to <strong>{region.name}</strong></>)}
                                                         </>
                                                     ) : (
-                                                            <>A <strong>{to.name}</strong> to <strong>{region.name}</strong>.</>
+                                                            <>A <strong>{to.name}</strong>{originatingRegion != region && (<> to <strong>{region.name}</strong></>)}</>
                                                         )}
                                                 </li>
                                             ))}
                                          </ul>
-                                    </>)
+                                    </div>)
                                 )}
                             </>
                         )}
@@ -490,7 +492,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <p>House cards were chosen:</p>
                     <ul>
                         {houseCards.map(([h, hc]) => (
-                            <li key={h.id}><b>{h.name}</b> chose <b>{hc.name}</b></li>
+                            <li key={`housecard_${h.id}_${hc.id}`}><b>{h.name}</b> chose <b>{hc.name}</b></li>
                         ))}
                     </ul>
                 </>;
@@ -501,7 +503,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <>
                     <p>
                         Final order for {this.game.getNameInfluenceTrack(data.trackerI)}: {
-                        joinReactNodes(finalOrder.map(h => <b key={h.id}>{h.name}</b>), ", ")}
+                        joinReactNodes(finalOrder.map(h => <b key={`cok_final_${h.id}`}>{h.name}</b>), ", ")}
                     </p>
                 </>;
 
@@ -514,7 +516,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>
                     <ul>
                         {bids.map(([bid, house]) => (
-                            <li key={house.id}><b>{house.name}</b> bid <b>{bid}</b></li>
+                            <li key={`cok_bid_done_${house.id}`}><b>{house.name}</b> bid <b>{bid}</b></li>
                         ))}
                     </ul>
                 </>;
@@ -554,7 +556,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>
                     <ul>
                         {armies.map(([region, unitTypes]) => (
-                            <li key={region.id}>{region.name}: {unitTypes.map(ut => ut.name).join(", ")}</li>
+                            <li key={`reconciling_${region.id}`}>{region.name}: {joinReactNodes(unitTypes.map((ut, i) => <b key={`${region.id}_${ut.id}_${i}`}>{ut.name}</b>), ", ")}</li>
                         ))}
                     </ul>
                 </>;
@@ -664,7 +666,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <b>Roose Bolton</b>: <b>{house.name}</b> took back all discarded House
-                    cards ({joinReactNodes(returnedHouseCards.map(hc => <b key={hc.id}>{hc.name}</b>), ", ")}).
+                    cards ({joinReactNodes(returnedHouseCards.map(hc => <b key={`roose_${hc.id}`}>{hc.name}</b>), ", ")}).
                 </>;
             }
             case "loras-tyrell-attack-order-moved":
@@ -812,7 +814,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const units = data.units.map(ut => unitTypes.get(ut).name);
                 return <>
-                    <p><b>{house.name}</b> suffered casualties from the retreat: <>{joinReactNodes(units.map((unitType, i) => <b key={i}>{unitType}</b>), ', ')}</>.</p>
+                    <p><b>{house.name}</b> suffered casualties from the retreat: <>{joinReactNodes(units.map((unitType, i) => <b key={`retreat_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.</p>
                 </>;
             }
             case "enemy-port-taken": {
@@ -873,7 +875,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <b>{house.name}</b>{units.length > 0 ? (<> chose to
-                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <b key={i}>{ut.name}</b>), ", ")} in <b>{region.name}</b></>), " and ")}.</>)
+                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <b key={`preemptive_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></>), " and ")}.</>)
                     : <> had no units to destroy.</>}
                 </>;
             }
@@ -892,7 +894,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <b>Massing on the Milkwater</b>: <b>{house.name}</b> took
-                    back {joinReactNodes(houseCardsReturned.map(hc => <b key={hc.id}>{hc.name}</b>), ", ")}
+                    back {joinReactNodes(houseCardsReturned.map(hc => <b key={`massing-on-the-milkwater-cards-back_${hc.id}`}>{hc.name}</b>), ", ")}
                 </>;
             }
             case "massing-on-the-milkwater-wildling-victory": {
@@ -909,7 +911,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     {houseCardsUsed.length > 0
-                        ? <><b>{house.name}</b> discarded {joinReactNodes(houseCardsUsed.map(hc => <b key={hc.id}>{hc.name}</b>), ", ")}.</>
+                        ? <><b>{house.name}</b> discarded {joinReactNodes(houseCardsUsed.map(hc => <b key={`massing-on-the-milkwater-cards-removed_${hc.id}`}>{hc.name}</b>), ", ")}.</>
                         : <><b>{house.name}</b> did not discard a House card.</>}
                 </>;
             }
@@ -945,7 +947,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <b>Mammoth Riders</b>: <b>{house.name}</b>{units.length > 0 ? (<> chose to
-                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <b key={i}>{ut.name}</b>), ", ")} in <b>{region.name}</b></>), ", ")}.</>)
+                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <b key={`mammoth-riders_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></>), ", ")}.</>)
                     : <> had no units to destroy.</>}
                 </>;
             }
@@ -972,7 +974,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <b>The Horde Descends</b>: <b>{house.name}</b>{units.length > 0 ? (<> chose to
-                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <b key={i}>{ut.name}</b>), ", ")} in <b>{region.name}</b></>), ", ")}.</>)
+                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <b key={`the-horde-descends_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></>), ", ")}.</>)
                     : <> had no units to destroy.</>}
                 </>;
             }
@@ -982,7 +984,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     {units.length > 0
-                    ? (<><b>Crow Killers</b>: <b>{house.name}</b> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><b>{unitTypes.length}</b> Knight{unitTypes.length > 1 && "s"} in <b>{region.name}</b></>), ", ")} with Footmen.</>)
+                    ? (<><b>Crow Killers</b>: <b>{house.name}</b> replaced {joinReactNodes(units.map(([region, unitTypes], i) => <span key={`crow-killers-replace_${i}`}><b>{unitTypes.length}</b> Knight{unitTypes.length > 1 && "s"} in <b>{region.name}</b></span>), ", ")} with Footmen.</>)
                     : (<><b>Crow Killers</b>: <b>{house.name}</b> had no Knights to replace with Footmen.</>)}
                 </>;
             }
@@ -990,7 +992,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const units: [Region, UnitType[]][] = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
 
-                return <><b>Crow Killers</b>: <b>{house.name}</b> had to destroy {joinReactNodes(units.map(([region, unitTypes]) => <><b>{unitTypes.length}</b> Knight{unitTypes.length > 1 && "s"} in <b>{region.name}</b></>), ", ")}.</>;
+                return <><b>Crow Killers</b>: <b>{house.name}</b> had to destroy {joinReactNodes(units.map(([region, unitTypes], i) => <span key={`crow-killers-kill_${i}`}><b>{unitTypes.length}</b> Knight{unitTypes.length > 1 && "s"} in <b>{region.name}</b></span>), ", ")}.</>;
             }
 
             case "crow-killers-footman-upgraded": {
@@ -999,7 +1001,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     {units.length > 0
-                    ? (<><b>Crow Killers</b>: <b>{house.name}</b> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><b>{unitTypes.length}</b> Footm{unitTypes.length == 1 ? "a" : "e"}n in <b>{region.name}</b></>), ", ")} with Knights.</>)
+                    ? (<><b>Crow Killers</b>: <b>{house.name}</b> replaced {joinReactNodes(units.map(([region, unitTypes], i) => <span key={`crow-killers-upgrade_${i}`}><b>{unitTypes.length}</b> Footm{unitTypes.length == 1 ? "a" : "e"}n in <b>{region.name}</b></span>), ", ")} with Knights.</>)
                     : (<><b>Crow Killers</b>: <b>{house.name}</b> was not able to replace any Footman with Knights.</>)}
                 </>;
             }
@@ -1022,7 +1024,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>
                     <ul>
                         {powerTokensLost.map(([house, amount]) => (
-                            <li key={house.id}><b>{house.name}</b> lost <b>{amount}</b> Power tokens.</li>
+                            <li key={`skinchanger-scout_${house.id}`}><b>{house.name}</b> lost <b>{amount}</b> Power tokens.</li>
                         ))}
                     </ul>
                 </>;
@@ -1044,7 +1046,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     all other houses lost 1 levels of supply.
                     <ul>
                         {newSupply.map(([house, supply]) => (
-                            <li key={house.id}><b>{house.name}</b> is now at <b>{supply}</b>.</li>
+                            <li key={`rattleshirts-raiders_${house.id}`}><b>{house.name}</b> is now at <b>{supply}</b>.</li>
                         ))}
                     </ul>
                 </>;
@@ -1055,7 +1057,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <>
                     <ul>
                         {gains.map(([house, gain]) => (
-                            <li key={house.id}><b>{house.name}</b> gained <b>{gain}</b> Power tokens.</li>
+                            <li key={`got-${house.id}`}><b>{house.name}</b> gained <b>{gain}</b> Power tokens.</li>
                         ))}
                     </ul>
                 </>;
@@ -1064,15 +1066,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const killedBecauseWounded = data.killedBecauseWounded.map(utid => unitTypes.get(utid).name);
                 const killedBecauseCantRetreat = data.killedBecauseCantRetreat.map(utid => unitTypes.get(utid).name);
                 return <>
-                    {killedBecauseWounded.length > 0 && (<><b>{house.name}</b> suffered battle casualties because these units were wounded: <>{joinReactNodes(killedBecauseWounded.map((unitType, i) => <b key={i}>{unitType}</b>), ', ')}</>.</>)}
-                    {killedBecauseCantRetreat.length > 0 && (<><b>{house.name}</b> suffered battle casualties because these units can&apos;t retreat: <>{joinReactNodes(killedBecauseCantRetreat.map((unitType, i) => <b key={i}>{unitType}</b>), ', ')}</>.</>)}
+                    {killedBecauseWounded.length > 0 && (<><b>{house.name}</b> suffered battle casualties because these units were wounded: <>{joinReactNodes(killedBecauseWounded.map((unitType, i) => <b key={`wounded_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.</>)}
+                    {killedBecauseCantRetreat.length > 0 && (<><b>{house.name}</b> suffered battle casualties because these units can&apos;t retreat: <>{joinReactNodes(killedBecauseCantRetreat.map((unitType, i) => <b key={`cant-retreat_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.</>)}
                 </>;
             }
             case "killed-after-combat": {
                 const house = this.game.houses.get(data.house);
                 const killed = data.killed.map(utid => unitTypes.get(utid).name);
                 return <>
-                    <b>{house.name}</b> suffered battle casualties and chose these units to be killed: <>{joinReactNodes(killed.map((unitType, i) => <b key={i}>{unitType}</b>), ', ')}</>.
+                    <b>{house.name}</b> suffered battle casualties and chose these units to be killed: <>{joinReactNodes(killed.map((unitType, i) => <b key={`casualties_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.
                 </>;
             }
             case "supply-adjusted":
@@ -1082,11 +1084,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 <>
                     Supply levels have been adjusted:
                     <table cellPadding="5">
-                        {supplies.map(([house, supply]) => (
-                            <tr key={house.id}>
-                                <td>{house.name}</td>
-                                <td>{supply}</td>
-                            </tr>))}
+                        <tbody>
+                            {supplies.map(([house, supply]) => (
+                                <tr key={`supply_${house.id}`}>
+                                    <td>{house.name}</td>
+                                    <td>{supply}</td>
+                                </tr>))}
+                        </tbody>
                     </table>
                 </>);
             case "player-replaced": {
