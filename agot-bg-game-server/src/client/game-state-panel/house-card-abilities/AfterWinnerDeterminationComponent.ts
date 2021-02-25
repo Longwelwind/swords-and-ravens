@@ -22,6 +22,8 @@ import SerGerrisDrinkwaterAbilityComponent from "./SerGerrisDrinkwaterAbilityCom
 import ReekAbilityGameState
     from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/reek-ability-game-state/ReekAbilityGameState";
 import ReekAbilityComponent from "./ReekAbilityComponent";
+import RodrikTheReaderAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-combat-house-card-abilities-game-state/rodrik-the-reader-ability-game-state/RodrikTheReaderAbilityGameState";
+import RodrikTheReaderAbilityComponent from "./RodrikTheReaderAbilityComponent";
 @observer
 export default class AfterWinnerDeterminationComponent extends Component<GameStateComponentProps<AfterWinnerDeterminationGameState>> {
     render(): ReactNode {
@@ -31,7 +33,8 @@ export default class AfterWinnerDeterminationComponent extends Component<GameSta
             [JonSnowBaratheonAbilityGameState, JonSnowBaratheonAbilityComponent],
             [SerIlynPayneAbilityGameState, SerIlynPayneAbilityComponent],
             [SerGerrisDrinkwaterAbilityGameState, SerGerrisDrinkwaterAbilityComponent],
-            [ReekAbilityGameState, ReekAbilityComponent]
+            [ReekAbilityGameState, ReekAbilityComponent],
+            [RodrikTheReaderAbilityGameState, RodrikTheReaderAbilityComponent]
         ]);
     }
 }

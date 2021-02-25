@@ -90,6 +90,14 @@ export default class SerIlynPayneAbilityGameState extends GameState<
             });
         });
 
+        if (selectedUnits.length == 0) {
+            this.ingame.log({
+                type: "house-card-ability-not-used",
+                house: this.house.id,
+                houseCard: serIlynPayne.id
+            });
+        }
+
         this.parentGameState.onHouseCardResolutionFinish(house);
     }
 
@@ -98,7 +106,11 @@ export default class SerIlynPayneAbilityGameState extends GameState<
             const availableFootmen = this.actionGameState.getFootmenOfHouse(this.enemy);
 
             if (availableFootmen.length == 0) {
-                // Todo: Log
+                this.ingame.log({
+                    type: "house-card-ability-not-used",
+                    house: this.house.id,
+                    houseCard: serIlynPayne.id
+                });
                 this.parentGameState.onHouseCardResolutionFinish(this.house);
                 return;
             }
@@ -106,7 +118,8 @@ export default class SerIlynPayneAbilityGameState extends GameState<
             this.setChildGameState(new SelectUnitsGameState(this)).firstStart(
                 this.house,
                 availableFootmen,
-                1
+                1,
+                true
             );
         } else {
             this.ingame.log({

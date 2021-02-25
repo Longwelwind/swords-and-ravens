@@ -1,5 +1,4 @@
 import GameState from "../../../../../../../GameState";
-import AfterCombatHouseCardAbilitiesGameState from "../AfterCombatHouseCardAbilitiesGameState";
 import Player from "../../../../../../Player";
 import {ClientMessage} from "../../../../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../../../../messages/ServerMessage";
@@ -12,9 +11,10 @@ import IngameGameState from "../../../../../../IngameGameState";
 import SimpleChoiceGameState, { SerializedSimpleChoiceGameState } from "../../../../../../simple-choice-game-state/SimpleChoiceGameState";
 import { rodrikTheReader } from "../../../../../../game-data-structure/house-card/houseCardAbilities";
 import shuffle from "../../../../../../../../utils/shuffle";
+import AfterWinnerDeterminationGameState from "../../after-winner-determination-game-state/AfterWinnerDeterminationGameState";
 
 export default class RodrikTheReaderAbilityGameState extends GameState<
-    AfterCombatHouseCardAbilitiesGameState["childGameState"],
+    AfterWinnerDeterminationGameState["childGameState"],
     SimpleChoiceGameState | SelectWesterosCardGameState<RodrikTheReaderAbilityGameState>
 > {
     get game(): Game {
@@ -79,8 +79,8 @@ export default class RodrikTheReaderAbilityGameState extends GameState<
         };
     }
 
-    static deserializeFromServer(afterCombat: AfterCombatHouseCardAbilitiesGameState["childGameState"], data: SerializedRodrikTheReaderAbilityGameState): RodrikTheReaderAbilityGameState {
-        const rodrikTheReaderAbilityGameState = new RodrikTheReaderAbilityGameState(afterCombat);
+    static deserializeFromServer(afterWinner: AfterWinnerDeterminationGameState["childGameState"], data: SerializedRodrikTheReaderAbilityGameState): RodrikTheReaderAbilityGameState {
+        const rodrikTheReaderAbilityGameState = new RodrikTheReaderAbilityGameState(afterWinner);
 
         rodrikTheReaderAbilityGameState.childGameState = rodrikTheReaderAbilityGameState.deserializeChildGameState(data.childGameState);
 
