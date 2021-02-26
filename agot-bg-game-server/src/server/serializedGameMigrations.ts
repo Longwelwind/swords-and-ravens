@@ -376,7 +376,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
     {
         version: "13",
         migrate: (serializedGame: any) => {
-            // Migration for #TBD
+            // Migration for #808
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
                 if (ingame.childGameState && ingame.childGameState.type == "action") {
@@ -398,6 +398,40 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         }
                     }
                 }
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "14",
+        migrate: (serializedGame: any) => {
+            // Migration for #TBD
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                // Abilities need to have the same id as the house card itself to allow house-card-ability-not-used giving the ability id.
+                // In the game log getHouseCardById then returns the house card with the name. We could introduce a getHouseCardByAbilityId at some point.
+                // For now lets migrate Melisandre DWD.
+
+                // Fix melisandre => melisandre-dwd ability
+                const game = ingame.game;
+                game.houses.forEach((h: SerializedHouse) => {
+                    h.houseCards.forEach(([hcid, shc]) => {
+                        if (hcid == "melisandre-dwd") {
+                            shc.abilityId = "melisandre-dwd";
+                        }
+                    });
+                });
+
+                // Fix invalid game logs
+                ingame.gameLogManager.logs
+                .filter((log: any) => log.data.type == "house-card-ability-not-used")
+                .forEach((log: any) => {
+                    if (log.data.houseCard == "melisandre") {
+                        log.data.houseCard = "melisandre-dwd";
+                    }
+                });
             }
 
             return serializedGame;

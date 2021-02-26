@@ -10,7 +10,7 @@ import Game from "../../../../../../game-data-structure/Game";
 import HouseCard, {HouseCardState} from "../../../../../../game-data-structure/house-card/HouseCard";
 import IngameGameState from "../../../../../../IngameGameState";
 import SimpleChoiceGameState, { SerializedSimpleChoiceGameState } from "../../../../../../simple-choice-game-state/SimpleChoiceGameState";
-import { melisandre } from "../../../../../../game-data-structure/house-card/houseCardAbilities";
+import { melisandreDwd } from "../../../../../../game-data-structure/house-card/houseCardAbilities";
 
 export default class MelisandreAbilityGameState extends GameState<
     AfterCombatHouseCardAbilitiesGameState["childGameState"],
@@ -45,7 +45,7 @@ export default class MelisandreAbilityGameState extends GameState<
             this.ingame.log({
                 type: "house-card-ability-not-used",
                 house: house.id,
-                houseCard: melisandre.id
+                houseCard: melisandreDwd.id
             });
             this.parentGameState.onHouseCardResolutionFinish(house);
         }
