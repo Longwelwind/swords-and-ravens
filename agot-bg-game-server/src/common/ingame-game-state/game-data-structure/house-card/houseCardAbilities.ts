@@ -165,8 +165,8 @@ export const rayder = new RayderHouseCardAbility(
     "rayder",
     "Your final combat strength is equal to the current position of the Wildling Threat token."
 );
-export const melisandre = new MelisandreHouseCardAbility(
-    "melisandre",
+export const melisandreDwd = new MelisandreHouseCardAbility(
+    "melisandre-dwd",
     "After combat, you may return any House card in your discard pile (including this card)"
     + " to your hand by discarding a number of your available Power tokens equal to the printed combat strength of that card."
 );
@@ -281,7 +281,7 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theBlackfish.id, theBlackfish],
     [robbStark.id, robbStark],
     [rayder.id, rayder],
-    [melisandre.id, melisandre],
+    [melisandreDwd.id, melisandreDwd],
     [jonSnow.id, jonSnow],
     [stannisBaratheonDwD.id, stannisBaratheonDwD],
     [aeronDamphairDwD.id, aeronDamphairDwD],

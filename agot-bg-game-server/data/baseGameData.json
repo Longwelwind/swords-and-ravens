@@ -316,7 +316,7 @@
               "melisandre-dwd": {
                 "name": "Melisandre",
                 "combatStrength": 2,
-                "ability": "melisandre"
+                "ability": "melisandre-dwd"
               },
               "bastard-of-nightsong": {
                 "name": "Bastard of Nightsong",
