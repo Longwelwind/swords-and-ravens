@@ -33,6 +33,10 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         return this.props.gameState.isStarredConsolidatePowerMusteringType;
     }
 
+    get consolidatePowerOrderResolvedForGainingPowerToken(): boolean {
+        return this.isStarredConsolidatePowerMusteringType && this.musterings.size == 1 && this.musterings.values[0].length == 0;
+    }
+
     get doesControlCurrentHouse(): boolean {
         return this.props.gameClient.doesControlHouse(this.house);
     }
@@ -51,22 +55,29 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                 </Col>
                 {this.doesControlCurrentHouse ? (
                     <>
-                        {this.musterings.size > 0 && (
+                        {this.musterings.size > 0 &&
                             <Col xs={12}>
-                                {this.musterings.entries.map(([r, musterings]) => (
-                                    <div key={r.id}>
-                                        From <b>{r.name}</b>
-                                        <ul>
-                                            {musterings.map(({region, from, to}, i) => (
-                                                <li onClick={() => this.removeMustering(musterings, i)} key={i}>
-                                                    {from ? "Upgrading to " : "Recruiting "} a {to.name}{r != region && ("in " + region.name)}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                ))}
+                                <>
+                                    {this.consolidatePowerOrderResolvedForGainingPowerToken
+                                        && this.hasStarredConsolidatePowerOrder(this.musterings.keys[0])
+                                        && this.props.gameState.anyUsablePointsLeft(this.musterings) &&
+                                            <p>Click into <b>{this.musterings.keys[0].name}</b> to initiate a recruitment.</p>}
+                                    {this.musterings.values[0].length > 0 && <p>Your recruitments:</p>}
+                                    {this.musterings.entries.map(([r, musterings]) => (
+                                        <div key={`recruitments-${r.id}`}>
+                                            From <b>{r.name}</b>
+                                            <ul>
+                                                {musterings.map(({region, from, to}, i) => (
+                                                    <li onClick={() => this.removeMustering(musterings, i)} key={i}>
+                                                        {from ? "Upgrading to " : "Recruiting "} a {to.name}{r != region && ("in " + region.name)}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    ))}
+                                </>
                             </Col>
-                        )}
+                        }
                         {(this.musterings.size == 0 || (this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD && this.props.gameState.anyUsablePointsLeft(this.musterings))) && (
                             <Col xs={12}>
                                 {this.isStarredConsolidatePowerMusteringType ?
@@ -77,17 +88,15 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                         )}
                         <Col xs={12}>
                             <Row className="justify-content-center">
-                                {(!this.isStarredConsolidatePowerMusteringType || (this.musterings.size > 0 && this.musterings.values[0].length > 0)) && (
-                                 <Col xs="auto">
-                                    <Button disabled={!this.canSubmit()} onClick={() => this.submit()}>Submit</Button>
-                                </Col>)}
-                                {this.isStarredConsolidatePowerMusteringType &&
-                                    this.musterings.size == 1 && this.musterings.values[0].length == 0 &&
-                                    (<Col xs="auto">
+                                {this.showSubmit() ?
+                                    <Col xs="auto">
+                                        <Button disabled={!this.canSubmit()} onClick={() => this.submit()}>Submit</Button>
+                                    </Col> :
+                                    <Col xs="auto">
                                         <Button onClick={() => this.submitForPT()}>
-                                            {this.getPowerTokenButtonText()}
+                                            {this.getPowerTokenButtonText(this.props.gameState.resolveConsolidatePowerGameState.getPotentialGainedPowerTokens(this.musterings.keys[0], this.house))}
                                         </Button>
-                                    </Col>)
+                                    </Col>
                                 }
                                 <Col xs="auto">
                                     <Button
@@ -150,13 +159,17 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         this.removeEmptyMusterings();
     }
 
-    private removeEmptyMusterings() {
+    private removeEmptyMusterings(): void {
         this.musterings.keys.forEach(r => {
             const mustering = this.musterings.get(r);
             if (mustering.length == 0) {
                 this.musterings.delete(r);
             }
         });
+    }
+
+    private showSubmit(): boolean {
+        return !this.consolidatePowerOrderResolvedForGainingPowerToken;
     }
 
     private canSubmit(): boolean {
@@ -166,7 +179,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
             case PlayerMusteringType.STARRED_CONSOLIDATE_POWER:
                 // Submit button should only be active when user used the starred CP for mustering.
                 // If he can't use it for muster, he has to use it for gaining PTs
-                return this.musterings.size > 0 && this.musterings.entries[0][1].length > 0;
+                return this.musterings.size == 1 && this.musterings.values.length > 0;
             case PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD:
                 return this.musterings.size <= 1;
         }
@@ -208,8 +221,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         this.reset();
     }
 
-    private getPowerTokenButtonText(): string {
-        const powerTokenCount = this.musterings.size == 1 && this.musterings.values[0].length == 0 ? this.props.gameState.resolveConsolidatePowerGameState.getPotentialGainedPowerTokens(this.musterings.keys[0], this.house) : 0;
+    private getPowerTokenButtonText(powerTokenCount: number): string {
         return `Get ${powerTokenCount} Power token${powerTokenCount > 1 ? "s" : ""}`;
     }
 
@@ -351,8 +363,8 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
     submitForPT(): void {
         // Send a mustering with only one region, with no recruitements.
         // This acts as a consolidate power
-        if (this.musterings.size != 1 || this.musterings.values[0].length != 0) {
-            throw new Error("submitForPT was clicked but this.musterings contains unit recruitments");
+        if (!this.consolidatePowerOrderResolvedForGainingPowerToken) {
+            throw new Error("submitForPT was clicked but !this.consolidatePowerOrderResolvedForGainingPowerToken");
         }
 
         this.props.gameState.muster(this.musterings);
