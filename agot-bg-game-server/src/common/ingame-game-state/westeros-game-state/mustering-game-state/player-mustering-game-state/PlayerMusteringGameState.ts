@@ -22,7 +22,7 @@ import Order from "../../../game-data-structure/Order";
 
 type MusteringRule = (Mustering & {cost: number});
 
-export type Mustering = {from: Unit | null; region: Region; to: UnitType, affectedUnit?: Unit};
+export type Mustering = {from: Unit | null; region: Region; to: UnitType; affectedUnit?: Unit};
 
 export enum PlayerMusteringType {
     MUSTERING_WESTEROS_CARD = 0,
@@ -74,7 +74,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         this.house = house;
         this.type = type;
 
-        if (!this.canMuster(house)) {
+        if (!this.canMuster()) {
             this.parentGameState.ingame.log({
                 type: "player-mustered",
                 house: house.id,
@@ -85,8 +85,9 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         }
     }
 
-    canMuster(house: House): boolean {
-        return this.isStarredConsolidatePowerMusteringType || this.game.world.getControlledRegions(house).some(r => r.hasStructure);
+    canMuster(): boolean {
+        // canMuster is always true when isStarredConsolidatePowerMusteringType to allow resolving a CP* for Power tokens even when it can't be used for mustering
+        return this.isStarredConsolidatePowerMusteringType || this.anyUsablePointsLeft(new BetterMap());
     }
 
     onServerMessage(_: ServerMessage): void {
@@ -360,7 +361,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 const regions = parentResolveConsolidatePowerGameState.actionGameState.getRegionsWithStarredConsolidatePowerOrderOfHouse(this.house);
                 const region = regions.length > 0 ? regions[0] : null;
                 if(region) {
-                    // Return true if there is there are valid mustering rules left for the starred CP region
+                    // Return true if there are valid mustering rules left for the starred CP region
                     return this.getValidMusteringRulesForRegion(region, musterings).length > 0;
                 }
 
