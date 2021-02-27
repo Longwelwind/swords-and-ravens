@@ -18,9 +18,22 @@ import Player from "../../common/ingame-game-state/Player";
 import { OverlayTrigger, Popover } from "react-bootstrap";
 import { observable } from "mobx";
 import BetterMap from "../../utils/BetterMap";
+import WesterosCardComponent from "./utils/WesterosCardComponent";
+import PlanningRestriction from "../../common/ingame-game-state/game-data-structure/westeros-card/planning-restriction/PlanningRestriction";
+import { noMarchPlusOneOrder, noDefenseOrder, noSupportOrder, noRaidOrder, noConsolidatePowerOrder } from "../../common/ingame-game-state/game-data-structure/westeros-card/planning-restriction/planningRestrictions";
+import WesterosCardType from "../../common/ingame-game-state/game-data-structure/westeros-card/WesterosCardType";
+import { rainsOfAutumn, stormOfSwords, webOfLies, seaOfStorms, feastForCrows } from "../../common/ingame-game-state/game-data-structure/westeros-card/westerosCardTypes";
 
 @observer
 export default class PlanningComponent extends Component<GameStateComponentProps<PlanningGameState>> {
+    restrictionToWesterosCardTypeMap = new BetterMap<PlanningRestriction, {deckId: number; westerosCardType: WesterosCardType}>([
+        [noMarchPlusOneOrder, { deckId: 2, westerosCardType: rainsOfAutumn } ],
+        [noDefenseOrder, { deckId: 2, westerosCardType: stormOfSwords } ],
+        [noSupportOrder, { deckId: 2, westerosCardType: webOfLies } ],
+        [noRaidOrder, { deckId: 2, westerosCardType: seaOfStorms } ],
+        [noConsolidatePowerOrder, { deckId: 2, westerosCardType: feastForCrows} ]
+    ]);
+
     modifyRegionsOnMapCallback: any;
     modifyOrdersOnMapCallback: any;
 
@@ -31,6 +44,12 @@ export default class PlanningComponent extends Component<GameStateComponentProps
             <>
                 <ListGroupItem>
                     <Row>
+                        {this.props.gameState.planningRestrictions.map(pr => this.restrictionToWesterosCardTypeMap.tryGet(pr, null))
+                            .map(prWc => prWc != null ?
+                                <Col xs={12} key={`prwc_${prWc.westerosCardType.id}`} className="d-flex flex-column align-items-center">
+                                    <WesterosCardComponent cardType={prWc.westerosCardType} size="medium" tooltip={true} westerosDeckI={prWc.deckId}/>
+                                </Col> : <></>)
+                        }
                         <Col xs={12}>
                             Assign an order to each region in which one of your unit is present.
                         </Col>
