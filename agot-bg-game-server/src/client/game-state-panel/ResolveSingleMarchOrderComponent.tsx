@@ -49,18 +49,23 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                 <>Click on a neighbouring region, or click on other units in <b>{this.selectedMarchOrderRegion.name}</b>.</>
                             ) : (<></>)}
                         </Col>
-                        {this.plannedMoves.size > 0 && (
-                            <Col xs={12} className="text-center">
-                                {this.plannedMoves.entries.map(([region, units]) => (
-                                    <div key={region.id}>
-                                        {units.map(u => u.type.name).join(", ")} =&gt; {region.name}
-                                    </div>
-                                ))}
+                        {this.selectedMarchOrderRegion && this.plannedMoves.size > 0 && (
+                            <Col xs={12} className="mt-2">
+                                <div>
+                                    Planned moves from <b>{this.selectedMarchOrderRegion.name}</b>:
+                                    <ul>
+                                        {this.plannedMoves.entries.map(([region, units]) => (
+                                            <li key={`planned-move_${region.id}`}>
+                                                {units.map(u => u.type.name).join(", ")} =&gt; {region.name}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
                             </Col>
                         )}
                         {this.selectedMarchOrderRegion != null && (
                             <>
-                                {this.renderLeavePowerToken(this.selectedMarchOrderRegion)}
+                                {allUnitsLeft && this.renderLeavePowerToken(this.selectedMarchOrderRegion)}
                                 <Col xs={12}>
                                     <Row className="justify-content-center">
                                         <Col xs="auto">
@@ -138,12 +143,12 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                     <Form>
                         <fieldset>
                             <Form.Group>
-                                <Col xs={12}>
+                                <Col xs={12} className="mb-0 pb-0">
                                     <Form.Label>
                                         Do you want to leave a Power token in <b>{startingRegion.name}</b> to keep control?
                                     </Form.Label>
                                 </Col>
-                                <Col xs={12}>
+                                <Col xs={12} className="mt-0 pt-0">
                                     <Form.Check
                                         id="chk-leave-pt"
                                         name="leave-pt-radios"
@@ -194,6 +199,12 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
 
         this.plannedMoves.set(region, newGoingArmy);
 
+        // Make non combat moves directly visible by help of new/removedUnits to easily restore the original gameState by resetting new/removedUnits
+        if (this.selectedMarchOrderRegion && !this.props.gameState.doesMoveTriggerAttack(region)) {
+            region.newUnits = newGoingArmy;
+            this.selectedMarchOrderRegion.removedUnits = _.concat(this.selectedMarchOrderRegion.removedUnits, newGoingArmy);
+        }
+
         this.selectedUnits = [];
     }
 
@@ -202,6 +213,11 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     }
 
     reset(): void {
+        if (this.selectedMarchOrderRegion) {
+            this.selectedMarchOrderRegion.removedUnits = [];
+        }
+        this.plannedMoves.keys.forEach(r => r.newUnits = []);
+
         this.selectedMarchOrderRegion = null;
         this.selectedUnits = [];
         this.plannedMoves = new BetterMap<Region, Unit[]>();
@@ -247,22 +263,32 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
 
     modifyUnitsOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
-            if (this.selectedMarchOrderRegion != null) {
-                return this.props.gameState.getValidMarchUnits(this.selectedMarchOrderRegion).filter(u => this.isUnitAvailable(u)).map(u => [
-                    u,
-                    {highlight: {active: true}, onClick: () => this.onUnitClick(this.selectedMarchOrderRegion as Region, u)}
-                ]);
-            }
+            const marchableUnits = this.selectedMarchOrderRegion != null ? this.props.gameState.getValidMarchUnits(this.selectedMarchOrderRegion).filter(u => this.isUnitAvailable(u)) : [];
+            const attackingUnits = _.flatMap(this.plannedMoves.entries.filter(([r, _u]) => this.props.gameState.doesMoveTriggerAttack(r)).map(([_r, u]) => u));
+
+            return _.concat(marchableUnits, attackingUnits).map(u => [
+                u,
+                {
+                    highlight: { active: true, color: attackingUnits.includes(u) ? "red" : "white"},
+                    onClick: () => marchableUnits.includes(u) && !attackingUnits.includes(u) ? this.onUnitClick(this.selectedMarchOrderRegion as Region, u) : null
+                }
+            ]);
         }
 
         return [];
     }
 
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
-        if (this.selectedMarchOrderRegion != null && this.selectedUnits.length > 0) {
-            return this.props.gameState.getValidTargetRegions(this.selectedMarchOrderRegion, this.plannedMoves.entries, this.selectedUnits).map(r => [
+        if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
+            const targetRegions = this.selectedMarchOrderRegion != null && this.selectedUnits.length > 0 ? this.props.gameState.getValidTargetRegions(this.selectedMarchOrderRegion, this.plannedMoves.entries, this.selectedUnits) : [];
+            const combatRegions = this.plannedMoves.keys.filter(r => this.props.gameState.doesMoveTriggerAttack(r));
+
+            return _.concat(targetRegions, combatRegions).map(r => [
                 r,
-                {highlight: {active: true}, onClick: () => this.onRegionClick(r)}
+                {
+                    highlight: {active: true, color: combatRegions.includes(r) ? "yellow" : "white"},
+                    onClick: () => targetRegions.includes(r) ? this.onRegionClick(r) : null
+                }
             ]);
         }
 
