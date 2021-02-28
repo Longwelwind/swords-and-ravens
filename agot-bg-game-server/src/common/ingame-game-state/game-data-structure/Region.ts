@@ -20,6 +20,7 @@ export default class Region {
 
     // Client-side only to support live update of planned musterings
     @observable newUnits: Unit[];
+    @observable removedUnits: Unit[];
 
 
     get staticRegion(): StaticRegion {
@@ -69,7 +70,7 @@ export default class Region {
     }
 
     get allUnits(): Unit[] {
-        return _.concat(this.units.values, this.newUnits);
+        return _.difference(_.concat(this.units.values, this.newUnits), this.removedUnits);
     }
 
     constructor(
@@ -81,6 +82,7 @@ export default class Region {
         this.garrison = garrison;
         this.controlPowerToken = controlPowerToken;
         this.newUnits = [];
+        this.removedUnits = [];
     }
 
     getController(): House | null {
