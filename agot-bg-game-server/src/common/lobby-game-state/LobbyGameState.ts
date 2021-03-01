@@ -8,6 +8,7 @@ import BetterMap from "../../utils/BetterMap";
 import baseGameData from "../../../data/baseGameData.json";
 import CancelledGameState from "../cancelled-game-state/CancelledGameState";
 import shuffle from "../../utils/shuffle";
+import _ from "lodash";
 
 export default class LobbyGameState extends GameState<EntireGame> {
     lobbyHouses: BetterMap<string, LobbyHouse>;
@@ -30,19 +31,30 @@ export default class LobbyGameState extends GameState<EntireGame> {
     }
 
     getAvailableHouses(): LobbyHouse[] {
-        return this.lobbyHouses.values.filter(h => this.entireGame.getSelectedGameSetup().houses.includes(h.id));
+        return this.lobbyHouses.values.filter(h => this.entireGame.selectedGameSetup.houses.includes(h.id));
     }
 
     onGameSettingsChange(): void {
         // Remove all chosen houses that are not available with the new settings
         const availableHouses = this.getAvailableHouses();
+        const usersForReassignment: User[] = [];
+
         let dirty = false;
-        this.players.forEach((user, house) => {
+        this.players.keys.forEach(house => {
             if (!availableHouses.includes(house)) {
                 dirty = true;
+                usersForReassignment.push(this.players.get(house));
                 this.players.delete(house);
             }
         });
+
+        if (usersForReassignment.length > 0 && this.players.size < this.entireGame.selectedGameSetup.playerCount) {
+            const freeHouses = _.difference(availableHouses, this.players.keys);
+
+            while (freeHouses.length > 0 && usersForReassignment.length > 0) {
+                this.players.set(freeHouses.shift() as LobbyHouse, usersForReassignment.shift() as User);
+            }
+        }
 
         if (dirty) {
             this.entireGame.broadcastToClients({
@@ -78,7 +90,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
         } else if (message.type == "kick-player") {
             const kickedUser = this.entireGame.users.get(message.user);
 
-            if (!this.entireGame.isOwner(user)) {
+            if (!this.entireGame.isOwner(user) || kickedUser == user) {
                 return;
             }
 
@@ -125,16 +137,17 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
         // If Vassals are toggled, not all houses need to be taken
         if (!this.entireGame.gameSettings.vassals) {
-            if (this.players.size < this.entireGame.getSelectedGameSetup().playerCount) {
+            if (this.players.size < this.entireGame.selectedGameSetup.playerCount) {
                 return {success: false, reason: "not-enough-players"};
             }
         }
+        // Todo vassals: Add min playerCount
 
         return {success: true, reason: "ok"};
     }
 
     canCancel(user: User):  {success: boolean; reason: string} {
-        if (!this.entireGame.isOwner(user)) {
+        if (!this.entireGame.isRealOwner(user)) {
             return {success: false, reason: "not-owner"};
         }
 

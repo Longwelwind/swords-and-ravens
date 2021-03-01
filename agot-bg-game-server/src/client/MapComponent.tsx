@@ -128,7 +128,7 @@ export default class MapComponent extends Component<MapComponentProps> {
             {region.superControlPowerToken ? (
                 <small><br/>Capital of {region.superControlPowerToken.name} {region.garrison > 0 && <>(Garrison of <b>{region.garrison}</b>)</>}</small>
             ) : (
-                region.garrison > 0 && (<small><br />Neutral force of <b>{region.garrison}</b></small>)
+                region.garrison > 0 && (<small><br />{!region.getController() ? "Neutral force" : "Garrison"} of <b>{region.garrison}</b></small>)
             )}
             {(region.supplyIcons > 0 || region.crownIcons) > 0 && (
                 <>
@@ -145,7 +145,7 @@ export default class MapComponent extends Component<MapComponentProps> {
 
     renderUnits(): ReactNode {
         const propertiesForUnits = this.getModifiedPropertiesForEntities<Unit, UnitOnMapProperties>(
-            _.flatMap(this.props.ingameGameState.world.regions.values.map(r => r.units.values)),
+            _.flatMap(this.props.ingameGameState.world.regions.values.map(r => r.allUnits)),
             this.props.mapControls.modifyUnitsOnMap,
             {highlight: {active: false, color: "white"}, onClick: null}
         );
@@ -157,7 +157,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                 className="units-container"
                 style={{left: r.unitSlot.point.x, top: r.unitSlot.point.y, width: r.unitSlot.width, flexWrap: r.type == land ? "wrap-reverse" : "wrap"}}
             >
-                {r.units.values.map(u => {
+                {r.allUnits.map(u => {
                     const property = propertiesForUnits.get(u);
 
                     let opacity: number;
@@ -191,10 +191,16 @@ export default class MapComponent extends Component<MapComponentProps> {
                                     },
                                     {
                                         "attacking-army-highlight": property.highlight.color == "red"
-                                    }
+                                    },
+                                    {
+                                        "unit-highlight-yellow": property.highlight.color == "yellow"
+                                    },
+                                    {
+                                        "unit-highlight-green": property.highlight.color == "green"
+                                    },
                                 )}
                                 style={{
-                                    backgroundImage: `url(${unitImages.get(u.allegiance.id).get(u.type.id)})`,
+                                    backgroundImage: `url(${unitImages.get(u.allegiance.id).get(u.upgradedType ? u.upgradedType.id : u.type.id)})`,
                                     opacity: opacity,
                                     transform: transform
                                 }}

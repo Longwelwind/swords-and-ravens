@@ -14,6 +14,7 @@ import Game from "../../game-data-structure/Game";
 import House from "../../game-data-structure/House";
 import User from "../../../../server/User";
 import PlanningGameState from "../PlanningGameState";
+import { PlayerActionType } from "../../game-data-structure/GameLog";
 import _ from "lodash";
 
 export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
@@ -72,7 +73,13 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
 
         this.readyHouses.push(player.house);
 
-        // Check if all player are ready to go the action entireGame state
+        this.ingameGameState.log({
+            type: "player-action",
+            house: player.house.id,
+            action: PlayerActionType.ORDERS_PLACED
+        })
+
+        // Check if all players are ready
         if (this.readyHouses.length == this.ingameGameState.players.values.length) {
             this.planningGameState.onPlaceOrderFinish(this.forVassals, this.placedOrders as BetterMap<Region, Order>);
         } else {

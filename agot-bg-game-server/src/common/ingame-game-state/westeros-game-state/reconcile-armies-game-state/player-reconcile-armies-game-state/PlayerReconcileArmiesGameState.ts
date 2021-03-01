@@ -11,6 +11,7 @@ import BetterMap from "../../../../../utils/BetterMap";
 import EntireGame from "../../../../EntireGame";
 import UnitType from "../../../game-data-structure/UnitType";
 import User from "../../../../../server/User";
+import _ from "lodash";
 
 export default class PlayerReconcileArmiesGameState extends GameState<ReconcileArmiesGameState<any>> {
     house: House;
@@ -43,8 +44,18 @@ export default class PlayerReconcileArmiesGameState extends GameState<ReconcileA
                 return [region, units];
             }));
 
+            // Check that all removed units are from player
+            if (_.flatMap(removedUnits.values).some(u => u.allegiance != this.house)) {
+                return;
+            }
+
             if (!this.isEnoughToReconcile(removedUnits)) {
                 // The player has not given enough units to remove to match his supply
+                return;
+            }
+
+            if (this.isTooMuchReconciled(removedUnits)) {
+                // The player has removed too much armies
                 return;
             }
 
@@ -69,7 +80,11 @@ export default class PlayerReconcileArmiesGameState extends GameState<ReconcileA
     }
 
     onServerMessage(_message: ServerMessage): void {
+        return;
+    }
 
+    getAllArmyUnitsOfHouse(house: House): Unit[] {
+        return _.flatMap(this.game.world.getControlledRegions(house).filter(r => r.units.size > 1).map(r => r.units.values));
     }
 
     reconcileArmies(removedUnits: BetterMap<Region, Unit[]>): void {
@@ -77,6 +92,25 @@ export default class PlayerReconcileArmiesGameState extends GameState<ReconcileA
             type: "reconcile-armies",
             unitsToRemove: removedUnits.entries.map(([region, units]) => [region.id, units.map(u => u.id)])
         });
+    }
+
+    isTooMuchReconciled(removedUnits: BetterMap<Region, Unit[]>): boolean {
+        // Check incremental if a reconcilement with one unit less would be also sufficient
+        const allRemovedUnitIds = _.flatMap(removedUnits.values).map(u => u.id);
+        for (const uid of allRemovedUnitIds) {
+            const newRemovedUnits = new BetterMap(removedUnits.entries);
+            newRemovedUnits.keys.forEach(region => {
+                const newUnits = newRemovedUnits.get(region).filter(u => u.id != uid);
+                newRemovedUnits.set(region, newUnits);
+            });
+
+            if (this.isEnoughToReconcile(newRemovedUnits)) {
+                // This reconcilement would be also valid => isTooMuchReconciled is true
+                return true;
+            }
+        }
+
+        return false;
     }
 
     isEnoughToReconcile(removedUnits: BetterMap<Region, Unit[]>): boolean {

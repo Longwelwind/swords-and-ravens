@@ -28,7 +28,26 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | SkinchangerScoutNightsWatchVictory | SkinchangerScoutWildlingVictory
     | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory
     | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered
-    | SupplyAdjusted | PlayerReplaced | VassalsClaimed;
+    | SupplyAdjusted | PlayerReplaced | UserHouseAssignments | PlayerAction | MelisandreUsed | JonSnowUsed
+    | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed | SerIlynPayneFootmanKilled
+    | VassalsClaimed;
+
+export enum PlayerActionType {
+    ORDERS_PLACED,
+    BID_MADE,
+    HOUSE_CARD_CHOSEN
+}
+
+interface PlayerAction {
+    type: "player-action";
+    house: string;
+    action: PlayerActionType;
+}
+
+interface UserHouseAssignments {
+    type: "user-house-assignments";
+    assignments: [string, string][];
+}
 
 interface TurnBegin {
     type: "turn-begin";
@@ -273,11 +292,41 @@ interface PatchfaceUsed {
     houseCard: string;
 }
 
+interface MelisandreUsed {
+    type: "melisandre-used";
+    house: string;
+    houseCard: string;
+}
+
+interface MelisandreDwDUsed {
+    type: "melisandre-dwd-used";
+    house: string;
+    houseCard: string;
+}
+
+interface JonSnowUsed {
+    type: "jon-snow-used";
+    house: string;
+    wildlingsStrength: number;
+}
+
 interface DoranUsed {
     type: "doran-used";
     house: string;
     affectedHouse: string;
     influenceTrack: number;
+}
+
+interface QyburnUsed {
+    type: "qyburn-used";
+    house: string;
+    houseCard: string;
+}
+
+interface AeronDamhairUsed {
+    type: "aeron-damphair-used";
+    house: string;
+    tokens: number;
 }
 
 interface TyrionLannisterChoiceMade {
@@ -334,6 +383,12 @@ interface TywinLannisterPowerTokensGained {
     powerTokensGained: number;
 }
 
+interface QarlTheMaidPowerTokensGained {
+    type: "qarl-the-maid-tokens-gained";
+    house: string;
+    powerTokensGained: number;
+}
+
 interface RenlyBaratheonNoFootmanAvailable {
     type: "renly-baratheon-no-footman-available";
     house: string;
@@ -362,6 +417,12 @@ interface MaceTyrellCasualtiesPrevented {
 
 interface MaceTyrellFootmanKilled {
     type: "mace-tyrell-footman-killed";
+    house: string;
+    region: string;
+}
+
+interface SerIlynPayneFootmanKilled {
+    type: "ser-ilyn-payne-footman-killed";
     house: string;
     region: string;
 }

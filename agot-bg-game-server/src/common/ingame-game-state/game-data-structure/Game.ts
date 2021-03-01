@@ -107,6 +107,11 @@ export default class Game {
         return result;
     }
 
+    updateWildlingStrength(value: number): number {
+        this.wildlingStrength = Math.max(0, Math.min(this.wildlingStrength + value, MAX_WILDLING_STRENGTH));
+        return this.wildlingStrength;
+    }
+
     getTokenHolder(track: House[]): House {
         // A vassal can never be the bearer of a dominance token
         // Ignore them when finding the token holder
@@ -281,6 +286,16 @@ export default class Game {
         }
 
         return houseCard;
+    }
+
+    getWesterosCardById(id: number, deckId: number): WesterosCard {
+        const westerosCard = this.westerosDecks[deckId].find(wc => wc.id == id);
+
+        if (westerosCard == null) {
+            throw new Error();
+        }
+
+        return westerosCard;
     }
 
     changeSupply(house: House, delta: number): void {

@@ -25,9 +25,9 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
                         <Tooltip id="supply-track">
                             <b>Supply Track</b><br />
                             Each supply track column contains a list of numbers illustrating the
-                            maximum size and count of each player's armies. (An army is made up
+                            maximum size and count of each player&apos;s armies. (An army is made up
                             of two or more units within the same land or sea area.) The supply
-                            track is updated from game effects, such as the "Supply" Westeros
+                            track is updated from game effects, such as the &quotSupply&quot Westeros
                             card. The updated supply position is determined by the number of
                             Supply icons printed in areas that the player controls.
                         </Tooltip>

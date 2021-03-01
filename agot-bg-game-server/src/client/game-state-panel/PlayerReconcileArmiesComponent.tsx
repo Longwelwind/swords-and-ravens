@@ -16,6 +16,7 @@ import Row from "react-bootstrap/Row";
 import {UnitOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
 import { ListGroupItem } from "react-bootstrap";
+import { union } from "lodash";
 
 @observer
 export default class PlayerReconcileArmiesComponent extends Component<GameStateComponentProps<PlayerReconcileArmiesGameState>> {
@@ -27,7 +28,39 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
         return this.props.gameState.house;
     }
 
+    get selectedUnits(): Unit[] {
+        return _.flatMap(this.unitsToRemove.values);
+    }
+
+    get selectableUnits(): Unit[] {
+        let result = this.selectedUnits;
+
+        if (!this.enoughReconciled) {
+            result = union(result, this.props.gameState.getAllArmyUnitsOfHouse(this.house));
+
+            // Remove the last unit from an area from selectable units
+            for (const region of this.unitsToRemove.keys) {
+                const remainingUnits = _.difference(region.units.values, this.unitsToRemove.get(region));
+                if (remainingUnits.length == 1) {
+                    result = result.filter(u => u != remainingUnits[0]);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    get enoughReconciled(): boolean {
+        return this.props.gameState.isEnoughToReconcile(this.unitsToRemove);
+    }
+
+    get tooMuchReconciled(): boolean {
+        return this.props.gameState.isTooMuchReconciled(this.unitsToRemove);
+    }
+
     render(): ReactNode {
+        const tooMuch = this.tooMuchReconciled;
+        const notEnough = !this.enoughReconciled;
         return (
             <ListGroupItem>
                 <Row>
@@ -44,12 +77,13 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
                                 ))}
                                 <Row className="justify-content-center">
                                     <Col xs="auto">
-                                        <Button disabled={!this.props.gameState.isEnoughToReconcile(this.unitsToRemove)} onClick={() => this.confirm()}>Confirm</Button>
+                                        <Button disabled={notEnough || tooMuch} onClick={() => this.confirm()}>Confirm</Button>
                                     </Col>
                                     <Col xs="auto">
                                         <Button disabled={this.unitsToRemove.size == 0} onClick={() => this.reset()}>Reset</Button>
                                     </Col>
                                 </Row>
+                                {tooMuch && <Row className="mt-1 justify-content-center">You removed too much units!</Row>}
                             </Col>
                         </>
                     ) : (
@@ -91,11 +125,14 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
 
     modifyUnitsOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.house)) {
-            return this.props.gameState.game.world.getUnitsOfHouse(this.house).map(u => [
+            const selected = this.selectedUnits;
+            return this.selectableUnits.map(u => [
                 u,
                 {
-                    highlight: {active: !_.flatMap(this.unitsToRemove.map((_, us) => us)).includes(u)},
-                    onClick: () => this.onUnitClick(u)
+                    highlight: { active: true, color: selected.includes(u) ? "red" : "white" },
+                    onClick: () => {
+                        this.onUnitClick(u);
+                    }
                 }
             ]);
         }

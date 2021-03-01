@@ -13,6 +13,7 @@ import CancelHouseCardAbilitiesGameState
 import DefenseOrderType from "../order-types/DefenseOrderType";
 import PostCombatGameState
     from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState";
+import BeforeCombatHouseCardAbilitiesGameState from "../../action-game-state/resolve-march-order-game-state/combat-game-state/before-combat-house-card-abilities-game-state/BeforeCombatHouseCardAbilitiesGameState";
 
 export default class HouseCardAbility {
     id: string;
@@ -27,16 +28,20 @@ export default class HouseCardAbility {
         cancelResolutionState.childGameState.onHouseCardResolutionFinish(house);
     }
 
-    afterCombat(afterCombat: AfterCombatHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {
-        afterCombat.childGameState.onHouseCardResolutionFinish(house);
+    immediatelyResolution(immediatelyResolutionState: ImmediatelyHouseCardAbilitiesResolutionGameState, house: House, _houseCard: HouseCard): void {
+        immediatelyResolutionState.childGameState.onHouseCardResolutionFinish(house);
+    }
+
+    beforeCombatResolution(beforeCombat: BeforeCombatHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {
+        beforeCombat.childGameState.onHouseCardResolutionFinish(house);
     }
 
     afterWinnerDetermination(afterWinnerDetermination: AfterWinnerDeterminationGameState, house: House, _houseCard: HouseCard): void {
         afterWinnerDetermination.childGameState.onHouseCardResolutionFinish(house);
     }
 
-    immediatelyResolution(immediatelyResolutionState: ImmediatelyHouseCardAbilitiesResolutionGameState, house: House, _houseCard: HouseCard): void {
-        immediatelyResolutionState.childGameState.onHouseCardResolutionFinish(house);
+    afterCombat(afterCombat: AfterCombatHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {
+        afterCombat.childGameState.onHouseCardResolutionFinish(house);
     }
 
     modifyCombatStrength(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _affectedHouseCard: HouseCard): number {
@@ -71,7 +76,16 @@ export default class HouseCardAbility {
         return null;
     }
 
+    finalCombatStrength(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _affectedHouseCard: HouseCard, strength: number): number {
+        return strength;
+    }
+
+    modifySupportStrength(_combat: CombatGameState, _houseCard: HouseCard, _affectedHouseCard: HouseCard, _house: House, strength: number): number {
+        return strength;
+    }
+
     forcesValyrianSteelBladeDecision(_combat: CombatGameState, _valyrianSteelBladeHolder: House): boolean {
         return false;
     }
+
 }

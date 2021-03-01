@@ -3,7 +3,7 @@ import React from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
-import {GameLogData} from "../common/ingame-game-state/game-data-structure/GameLog";
+import {GameLogData, PlayerActionType} from "../common/ingame-game-state/game-data-structure/GameLog";
 import Game from "../common/ingame-game-state/game-data-structure/Game";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
@@ -20,6 +20,7 @@ import joinReactNodes from "./utils/joinReactNodes";
 import orders from "../common/ingame-game-state/game-data-structure/orders";
 import CombatInfoComponent from "./CombatInfoComponent";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import User from "../server/User";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -37,7 +38,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
     render(): ReactNode {
         return this.props.ingameGameState.gameLogManager.logs.map((l, i) => (
-            <Row key={i}>
+            <Row key={`log_${i}`}>
                 <Col xs="auto" className="text-muted">
                     <OverlayTrigger
                         placement="auto"
@@ -61,6 +62,36 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
     renderGameLogData(data: GameLogData): ReactNode {
         switch (data.type) {
+            case "player-action": {
+                const house = this.game.houses.get(data.house);
+                let text: string;
+
+                switch(data.action) {
+                    case PlayerActionType.ORDERS_PLACED:
+                        text = "placed their orders.";
+                        break;
+                    case PlayerActionType.BID_MADE:
+                        text = "made their bid.";
+                        break;
+                    case PlayerActionType.HOUSE_CARD_CHOSEN:
+                        text = "has chosen their house card.";
+                        break;
+                    default:
+                        throw "Invalid PlayerActionType received.";
+                }
+                return <>
+                    <p>House <b>{house.name}</b> {text}</p>
+                </>;
+            }
+            case "user-house-assignments":
+                const assignments = data.assignments.map(([houseId, userId]) =>
+                    [this.game.houses.get(houseId), this.props.ingameGameState.entireGame.users.get(userId)]) as [House, User][];
+                return <>
+                    <div className="text-center"><h5>The fight for the Iron Throne has begun!</h5></div>
+                    {assignments.map(([house, user]) =>
+                        <p  key={`${house.id}_${user.id}`}>House <b>{house.name}</b> is controlled by <b>{user.name}</b>.</p>
+                    )}
+                </>;
             case "turn-begin":
                 return <Row className="justify-content-center">
                     <Col xs={true}><hr/></Col>
@@ -95,12 +126,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <>
                         <b>{attacker.name}</b> attacked <b>{attacked ? attacked.name : "a neutral force"}</b> from <b>{attackingRegion.name}</b> to <b>
-                        {attackedRegion.name}</b> with <>{joinReactNodes(army.map((ut, i) => <strong key={i}>{ut.name}</strong>), ', ')}</>.
+                        {attackedRegion.name}</b> with <>{joinReactNodes(army.map((ut, i) => <b key={`attack_${ut.id}_${i}`}>{ut.name}</b>), ', ')}</>.
                     </>
                 );
 
-            case "march-resolved":
-                let house = this.game.houses.get(data.house);
+            case "march-resolved": {
+                const house = this.game.houses.get(data.house);
                 const startingRegion = this.world.regions.get(data.startingRegion);
                 const moves: [Region, UnitType[]][] = data.moves.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
 
@@ -112,13 +143,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         <ul>
                             {moves.map(([region, unitTypes]) => (
                                 <li key={region.id}>
-                                    {joinReactNodes(unitTypes.map((ut, i) => <b key={i}>{ut.name}</b>), ", ")} to <b>{region.name}</b>
+                                    {joinReactNodes(unitTypes.map((ut, i) => <b key={`march_${ut.id}_${i}`}>{ut.name}</b>), ", ")} to <b>{region.name}</b>
                                 </li>
                             ))}
                         </ul>}
                     </>
                 );
-
+            }
             case "westeros-card-executed":
                 const westerosCardType = westerosCardTypes.get(data.westerosCardType);
 
@@ -142,7 +173,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         </p>
                         <Row className="justify-content-around">
                             {drawnWesterosCardTypes.map((wct, i) => (
-                                <Col xs="auto" key={i}>
+                                <Col xs="auto" key={`${wct.id}_${i}`}>
                                     <WesterosCardComponent cardType={wct} size="small" tooltip={true} westerosDeckI={i} />
                                 </Col>
                             ))}
@@ -172,7 +203,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <>
                         <p>Combat result</p>
                         <CombatInfoComponent housesCombatData={houseCombatDatas}/>
-                        <p><strong>{winner.name}</strong> won the fight!</p>
+                        <p><b>{winner.name}</b> won the fight!</p>
                     </>
                 );
             case "wildling-card-revealed":
@@ -193,117 +224,130 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <>
-                        Wildling bidding results for Wildling Threat <strong>{data.wildlingStrength}</strong>:
+                        Wildling bidding results for Wildling Threat <b>{data.wildlingStrength}</b>:
                         <table cellPadding="5">
-                            {results.map(([bid, houses]) => houses.map(h => (
-                                <tr key={h.id}>
-                                    <td>{h.name}</td>
-                                    <td>{bid}</td>
-                                </tr>
-                            )))}
+                            <tbody>
+                                {results.map(([bid, houses]) => houses.map(h => (
+                                    <tr key={`bid_${h.id}`}>
+                                        <td>{h.name}</td>
+                                        <td>{bid}</td>
+                                    </tr>
+                                )))}
+                            </tbody>
                         </table>
                         {data.nightsWatchVictory ? (
-                            <>The <strong>Night&apos;s Watch</strong> won!</>
+                            <>The <b>Night&apos;s Watch</b> won!</>
                         ) : (
-                            <>The <strong>Wildlings</strong> won!</>
+                            <>The <b>Wildlings</b> won!</>
                         )}
                     </>
                 );
 
-            case "lowest-bidder-chosen":
-                let lowestBidder = this.game.houses.get(data.lowestBidder);
+            case "lowest-bidder-chosen": {
+                const lowestBidder = this.game.houses.get(data.lowestBidder);
 
                 return (
                     <>
-                        <strong>{lowestBidder.name}</strong> was chosen as the lowest bidder.
+                        <b>{lowestBidder.name}</b> was chosen as the lowest bidder.
                     </>
                 );
-
+            }
             case "highest-bidder-chosen":
                 const highestBidder = this.game.houses.get(data.highestBidder);
 
                 return (
                     <>
-                        <strong>{highestBidder.name}</strong> was chosen as the highest bidder.
+                        <b>{highestBidder.name}</b> was chosen as the highest bidder.
                     </>
                 );
 
-            case "player-mustered":
-                house = this.game.houses.get(data.house);
-                const musterings = _.flatMap(data.musterings.map(([_, musterements]: [string, {region: string; from: string | null; to: string}[]]) =>
-                    musterements.map(({region, from, to}) => ({
+            case "player-mustered": {
+                const house = this.game.houses.get(data.house);
+                const musterings = data.musterings.map(([originatingRegion, recruitments]) =>
+                    [this.game.world.regions.get(originatingRegion), recruitments.map(({region, from, to}) => ({
                         region: this.game.world.regions.get(region),
                         from: from ? unitTypes.get(from) : null,
                         to: unitTypes.get(to)
-                    }))
-                ));
+                    }))] as [Region, {region: Region; from: UnitType | null; to: UnitType}[]]
+                );
 
                 return (
                     <>
-                        <p>
-                            <strong>{house.name}</strong> mustered{musterings.length > 0 ? ":" : " nothing."}
-                        </p>
+                        {musterings.length == 0 && (
+                            <p>
+                                <strong>{house.name}</strong> mustered nothing.
+                            </p>
+                        )}
                         {musterings.length > 0 && (
-                        <ul>
-                            {musterings.map(({region, from, to}, i) => (
-                                <li key={i}>
-                                    {from ? (
-                                        <>
-                                            A <strong>{to.name}</strong> from a <strong>{from.name}</strong> in <strong>{region.name}</strong>
-                                        </>
-                                    ) : (
-                                        <>A <strong>{to.name}</strong> in <strong>{region.name}</strong></>
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
+                            <>
+                                {musterings.map(([originatingRegion, recruitments]) => (
+                                    <div key={`$mustering_${originatingRegion.id}`}>
+                                        <p>
+                                            <b>{house.name}</b> mustered in <b>{originatingRegion.name}</b>
+                                        </p>
+                                        <ul>
+                                            {recruitments.map(({ region, from, to }, i) => (
+                                                <li key={"recruitment-" + region.id + "-" + i}>
+                                                    {from ? (
+                                                        <>
+                                                            A <strong>{to.name}</strong> from a <strong>{from.name}</strong>{originatingRegion != region && (<> to <strong>{region.name}</strong></>)}
+                                                        </>
+                                                    ) : (
+                                                            <>A <strong>{to.name}</strong>{originatingRegion != region && (<> to <strong>{region.name}</strong></>)}</>
+                                                        )}
+                                                </li>
+                                            ))}
+                                         </ul>
+                                    </div>)
+                                )}
+                            </>
                         )}
                     </>
                 );
-
+            }
             case "winner-declared":
                 return (
                     <>Game ended.</>
                 );
 
-            case "raven-holder-wildling-card-put-bottom":
-                house = this.game.houses.get(data.ravenHolder);
+            case "raven-holder-wildling-card-put-bottom": {
+                const house = this.game.houses.get(data.ravenHolder);
 
                 return (
                     <p>
-                        <strong>{house.name}</strong>, holder of the Messenger Raven token, chose to look at the top
+                        <b>{house.name}</b>, holder of the Messenger Raven token, chose to look at the top
                         card of the Wildling deck and to move it at the bottom of the deck.
                     </p>
                 );
-
-            case "raven-holder-wildling-card-put-top":
-                house = this.game.houses.get(data.ravenHolder);
+            }
+            case "raven-holder-wildling-card-put-top": {
+                const house = this.game.houses.get(data.ravenHolder);
 
                 return (
                     <p>
-                        <strong>{house.name}</strong>, holder of the Messenger Raven token, chose to look at the top
+                        <b>{house.name}</b>, holder of the Messenger Raven token, chose to look at the top
                         card of the Wildling deck and to leave it at the top of the deck.
                     </p>
                 );
-
-            case "raven-holder-replace-order":
-                house = this.game.houses.get(data.ravenHolder);
+            }
+            case "raven-holder-replace-order": {
+                const house = this.game.houses.get(data.ravenHolder);
                 const orderRegion = this.world.regions.get(data.region);
                 const originalOrder = orders.get(data.originalOrder);
                 const newOrder = orders.get(data.newOrder);
 
                 return (
                     <p>
-                        <strong>{house.name}</strong>, holder of the Messenger Raven token, chose to replace
-                        a <strong>{originalOrder.type.name} Order</strong> with a <strong>{newOrder.type.name} Order
-                        </strong> in <strong>{orderRegion.name}</strong>.
+                        <b>{house.name}</b>, holder of the Messenger Raven token, chose to replace
+                        a <b>{originalOrder.type.name} Order</b> with a <b>{newOrder.type.name} Order
+                        </b> in <b>{orderRegion.name}</b>.
                     </p>
                 );
-
+            }
             case "raven-not-used":{
                 const house = this.game.houses.get(data.ravenHolder);
 
-                return <p><strong>{house.name}</strong> did not use the Messenger Raven token.</p>;
+                return <p><b>{house.name}</b> did not use the Messenger Raven token.</p>;
             }
 
             case "raid-done":
@@ -318,31 +362,31 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     return (
                         <>
                             <p>
-                                <strong>{raider.name}</strong> raided <strong>{raidee.name}</strong>&apos;s <strong>{orderRaided.type.name} Order
-                                </strong> in <strong>{raidedRegion.name}</strong> from <strong>{raiderRegion.name}</strong>.
+                                <b>{raider.name}</b> raided <b>{raidee.name}</b>&apos;s <b>{orderRaided.type.name} Order
+                                </b> in <b>{raidedRegion.name}</b> from <b>{raiderRegion.name}</b>.
                             </p>
                             {data.raiderGainedPowerToken &&
-                                <p><strong>{raider.name}</strong> gained {data.raiderGainedPowerToken ? "a" : "no"} Power Token
+                                <p><b>{raider.name}</b> gained {data.raiderGainedPowerToken ? "a" : "no"} Power Token
                                     from this raid.</p>}
                             {data.raidedHouseLostPowerToken != null
-                                && <p><strong>{raidee.name}</strong> lost {data.raidedHouseLostPowerToken ? "a" : "no"} Power Token
+                                && <p><b>{raidee.name}</b> lost {data.raidedHouseLostPowerToken ? "a" : "no"} Power Token
                                     from this raid.</p>}
                         </>
                     );
                 } else {
                     return (
                         <p>
-                            <strong>{raider.name}</strong> raided nothing from <strong>{raiderRegion.name}</strong>.
+                            <b>{raider.name}</b> raided nothing from <b>{raiderRegion.name}</b>.
                         </p>
                     );
                 }
 
-            case "a-throne-of-blades-choice":
-                house = this.game.houses.get(data.house);
+            case "a-throne-of-blades-choice": {
+                const house = this.game.houses.get(data.house);
 
                 return (
                     <p>
-                        <strong>{house.name}</strong>, holder of the Iron Throne token, chose to
+                        <b>{house.name}</b>, holder of the Iron Throne token, chose to
                         {data.choice == 0 ? (
                             <> trigger a Mustering.</>
                         ) : data.choice == 1 ? (
@@ -352,13 +396,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         )}
                     </p>
                 );
-
-            case "dark-wings-dark-words-choice":
-                house = this.game.houses.get(data.house);
+            }
+            case "dark-wings-dark-words-choice": {
+                const house = this.game.houses.get(data.house);
 
                 return (
                     <p>
-                        <strong>{house.name}</strong>, holder of the Messenger Raven token, chose to
+                        <b>{house.name}</b>, holder of the Messenger Raven token, chose to
                         {data.choice == 0 ? (
                             <> trigger a Clash of Kings.</>
                         ) : data.choice == 1 ? (
@@ -368,78 +412,78 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         )}
                     </p>
                 );
-
-            case "put-to-the-sword-choice":
-                house = this.game.houses.get(data.house);
+            }
+            case "put-to-the-sword-choice": {
+                const house = this.game.houses.get(data.house);
 
                 return (
                     <p>
-                        <strong>{house.name}</strong>, holder of the Valyrian Steel Blade token, chose to
+                        <b>{house.name}</b>, holder of the Valyrian Steel Blade token, chose to
                         {data.choice == 0 ? (
-                            <> forbid <strong>March +1</strong> Orders from being played during this Planning Phase.</>
+                            <> forbid <b>March +1</b> Orders from being played during this Planning Phase.</>
                         ) : data.choice == 1 ? (
-                            <> forbid <strong>Defense</strong> Orders from being played during this Planning Phase.</>
+                            <> forbid <b>Defense</b> Orders from being played during this Planning Phase.</>
                         ) : (
                             <> forbid nothing.</>
                         )}
                     </p>
                 );
-
+            }
             case "winter-is-coming":
                 const drawnCardType = westerosCardTypes.get(data.drawnCardType);
 
                 return <>
-                    <strong>Winter is Coming</strong>: The Westeros deck {data.deckIndex + 1} was shuffled and the new Westeros card drawn
-                    is <strong>{drawnCardType.name}</strong>.
+                    <b>Winter is Coming</b>: The Westeros deck {data.deckIndex + 1} was shuffled and the new Westeros card drawn
+                    is <b>{drawnCardType.name}</b>.
                 </>;
 
             case "westeros-phase-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h5><strong>Westeros Phase</strong></h5>
+                        <h5><b>Westeros Phase</b></h5>
                     </Col>
                 </Row>;
 
             case "planning-phase-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h5><strong>Planning Phase</strong></h5>
+                        <h5><b>Planning Phase</b></h5>
                     </Col>
                 </Row>;
 
             case "action-phase-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h5><strong>Action Phase</strong></h5>
+                        <h5><b>Action Phase</b></h5>
                     </Col>
                 </Row>;
 
             case "action-phase-resolve-raid-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h6><strong>Resolve Raid Orders</strong></h6>
+                        <h6><b>Resolve Raid Orders</b></h6>
                     </Col>
                 </Row>;
 
             case "action-phase-resolve-march-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h6><strong>Resolve March Orders</strong></h6>
+                        <h6><b>Resolve March Orders</b></h6>
                     </Col>
                 </Row>;
 
             case "action-phase-resolve-consolidate-power-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h6><strong>Resolve Consolidate Power Orders</strong></h6>
+                        <h6><b>Resolve Consolidate Power Orders</b></h6>
                     </Col>
                 </Row>;
 
-            case "combat-valyrian-sword-used":
-                house = this.game.houses.get(data.house);
+            case "combat-valyrian-sword-used": {
+                const house = this.game.houses.get(data.house);
 
-                return <><strong>{house.name}</strong> used the <strong>Valyrian Steel Blade</strong>.</>;
-
+                return <><b>{house.name}</b> used the <b>Valyrian Steel Blade</b>.</>;
+            }
             case "combat-house-card-chosen":
                 const houseCards = data.houseCards.map(([hid, hcid]) => {
                     const house = this.game.houses.get(hid);
@@ -451,7 +495,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <p>House cards were chosen:</p>
                     <ul>
                         {houseCards.map(([h, hc]) => (
-                            <li key={h.id}><strong>{h.name}</strong> chose <strong>{hc.name}</strong></li>
+                            <li key={`housecard_${h.id}_${hc.id}`}><b>{h.name}</b> chose <b>{hc.name}</b></li>
                         ))}
                     </ul>
                 </>;
@@ -462,7 +506,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <>
                     <p>
                         Final order for {this.game.getNameInfluenceTrack(data.trackerI)}: {
-                        joinReactNodes(finalOrder.map(h => <strong key={h.id}>{h.name}</strong>), ", ")}
+                        joinReactNodes(finalOrder.map(h => <b key={`cok_final_${h.id}`}>{h.name}</b>), ", ")}
                     </p>
                 </>;
 
@@ -475,231 +519,288 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>
                     <ul>
                         {bids.map(([bid, house]) => (
-                            <li key={house.id}><strong>{house.name}</strong> bid <strong>{bid}</strong></li>
+                            <li key={`cok_bid_done_${house.id}`}><b>{house.name}</b> bid <b>{bid}</b></li>
                         ))}
                     </ul>
                 </>;
 
             case "wildling-strength-trigger-wildlings-attack":
                 return <>
-                    <strong>Wildling Threat</strong> reached <strong>{data.wildlingStrength}</strong>, triggering a <strong>Wildling Attack</strong>
+                    <b>Wildling Threat</b> reached <b>{data.wildlingStrength}</b>, triggering a <b>Wildling Attack</b>
                 </>;
 
-            case "march-order-removed":
-                house = this.game.houses.get(data.house);
-                let region = this.game.world.regions.get(data.region);
+            case "march-order-removed": {
+                const house = this.game.houses.get(data.house);
+                const region = this.game.world.regions.get(data.region);
 
                 return <>
                     <p>
-                        <strong>{house.name}</strong> removed their March Order in <strong>{region.name}</strong>.
+                        <b>{house.name}</b> removed their March Order in <b>{region.name}</b>.
                     </p>
                 </>;
-
-            case "consolidate-power-order-resolved":
-                house = this.game.houses.get(data.house);
-                region = this.world.regions.get(data.region);
+            }
+            case "consolidate-power-order-resolved": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
                 const countPowerToken = data.powerTokenCount;
 
                 return <>
-                    <strong>{house.name}</strong> resolved a {data.starred && "Special "}Consolidate Power Order
-                    in <strong>{region.name}</strong> to gain <strong>{countPowerToken}</strong> Power token{countPowerToken > 1 && "s"}.
+                    <b>{house.name}</b> resolved a {data.starred && "Special "}Consolidate Power Order
+                    in <b>{region.name}</b> to gain <b>{countPowerToken}</b> Power token{countPowerToken > 1 && "s"}.
                 </>;
-
-            case "armies-reconciled":
-                house = this.game.houses.get(data.house);
+            }
+            case "armies-reconciled": {
+                const house = this.game.houses.get(data.house);
                 const armies = data.armies.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))] as [Region, UnitType[]]);
 
                 return <>
                     <p>
-                        <strong>{house.name}</strong> reconciled their armies by removing:
+                        <b>{house.name}</b> reconciled their armies by removing:
                     </p>
                     <ul>
                         {armies.map(([region, unitTypes]) => (
-                            <li key={region.id}>{region.name}: {unitTypes.map(ut => ut.name).join(", ")}</li>
+                            <li key={`reconciling_${region.id}`}>{region.name}: {joinReactNodes(unitTypes.map((ut, i) => <b key={`${region.id}_${ut.id}_${i}`}>{ut.name}</b>), ", ")}</li>
                         ))}
                     </ul>
                 </>;
-
-            case "house-card-ability-not-used":
-                house = this.game.houses.get(data.house);
-                let houseCard = this.game.getHouseCardById(data.houseCard);
+            }
+            case "house-card-ability-not-used": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = this.game.getHouseCardById(data.houseCard);
 
                 return <>
-                    <strong>{house.name}</strong> did not use <strong>{houseCard.name}&apos;s</strong> ability.
+                    <b>{house.name}</b> did not use <b>{houseCard.name}&apos;s</b> ability.
                 </>;
-
-            case "patchface-used":
-                house = this.game.houses.get(data.house);
-                let affectedHouse = this.game.houses.get(data.affectedHouse);
-                houseCard = this.game.getHouseCardById(data.houseCard);
+            }
+            case "patchface-used": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+                const houseCard = this.game.getHouseCardById(data.houseCard);
                 return <>
-                    <strong>Patchface</strong>: <strong>{house.name}</strong> decided to discard <strong>
-                        {houseCard.name}</strong> from house <strong>{affectedHouse.name}</strong>.
+                    <b>Patchface</b>: <b>{house.name}</b> decided to discard <b>
+                        {houseCard.name}</b> from house <b>{affectedHouse.name}</b>.
                 </>;
-
-            case "doran-used":
-                house = this.game.houses.get(data.house);
-                affectedHouse = this.game.houses.get(data.affectedHouse);
+            }
+            case "melisandre-used": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = this.game.getHouseCardById(data.houseCard);
+                return <>
+                    <strong>Melisandre</strong>: <strong>{house.name}</strong> decided to discard <strong>
+                        {houseCard.name}</strong> from house.
+                </>;
+            }
+            case "melisandre-dwd-used": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = this.game.getHouseCardById(data.houseCard);
+                return <>
+                    <strong>Melisandre</strong>: <strong>{house.name}</strong> decided to return <strong>
+                        {houseCard.name}</strong> card to hand.
+                </>;
+            }
+            case "jon-snow-used": {
+                const house = this.game.houses.get(data.house);
+                let wilddlingStatus = "increase";
+                if (data.wildlingsStrength < 0) {
+                    wilddlingStatus = "decrease";
+                }
+                return <>
+                    <strong>Jon Snow</strong>: <strong>{house.name}</strong> decided to  <strong>
+                        {wilddlingStatus} </strong> the Wildling track by one space.
+                </>;
+            }
+            case "doran-used": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
                 const influenceTrack = this.game.getNameInfluenceTrack(data.influenceTrack);
 
                 return <>
-                    <strong>Doran Martell</strong>: <strong>{house.name}</strong> decided to move <strong>
-                        {affectedHouse.name}</strong> to the bottom of the <strong>{influenceTrack}</strong> track.
+                    <b>Doran Martell</b>: <b>{house.name}</b> decided to move <b>
+                        {affectedHouse.name}</b> to the bottom of the <b>{influenceTrack}</b> track.
                 </>;
+            }
+            case "qyburn-used": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = this.game.getHouseCardById(data.houseCard);
 
-            case "tyrion-lannister-choice-made":
-                house = this.game.houses.get(data.house);
-                affectedHouse = this.game.houses.get(data.affectedHouse);
+                return <>
+                    <b>Qyburn</b>: <b>{house.name}</b> decided to use strength from <b>{houseCard.name}</b>
+                </>;
+            }
+            case "aeron-damphair-used": {
+                const house = this.game.houses.get(data.house);
+                const tokens = data.tokens;
+
+                return <>
+                    <b>Aeron Damphair</b>: <b>{house.name}</b> decided to increase
+                        the combat strength of this card by <b>{tokens}</b>.
+                </>;
+            }
+            case "tyrion-lannister-choice-made": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
                 const chooseToReplace = data.chooseToReplace;
 
                 return <>
-                    <strong>Tyrion Lannister</strong>: <strong>{house.name}</strong> {!chooseToReplace && "didn't "}force{chooseToReplace && "d"} <strong>
-                        {affectedHouse.name}</strong> to choose a new House card.
+                    <b>Tyrion Lannister</b>: <b>{house.name}</b> {!chooseToReplace && "didn't "}force{chooseToReplace && "d"} <b>
+                        {affectedHouse.name}</b> to choose a new House card.
                 </>;
-
-            case "tyrion-lannister-house-card-replaced":
-                affectedHouse = this.game.houses.get(data.affectedHouse);
+            }
+            case "tyrion-lannister-house-card-replaced": {
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
                 const newHouseCard = data.newHouseCard ? affectedHouse.houseCards.get(data.newHouseCard) : null;
 
                 return newHouseCard ? (
-                    <><strong>{affectedHouse.name}</strong> chose <strong>{newHouseCard.name}.</strong></>
+                    <><b>{affectedHouse.name}</b> chose <b>{newHouseCard.name}.</b></>
                 ) : (
-                    <><strong>{affectedHouse.name}</strong> had no other available House card</>
+                    <><b>{affectedHouse.name}</b> had no other available House card</>
                 );
-
+            }
             case "arianne-martell-prevent-movement":
                 const enemyHouse = this.game.houses.get(data.enemyHouse);
 
                 return <>
-                    <strong>Arianne Martell</strong>: <strong>{enemyHouse.name}</strong> cannot move their attacking
+                    <b>Arianne Martell</b>: <b>{enemyHouse.name}</b> cannot move their attacking
                     army to the embattled area.
                 </>;
 
-            case "roose-bolton-house-cards-returned":
-                house = this.game.houses.get(data.house);
+            case "roose-bolton-house-cards-returned": {
+                const house = this.game.houses.get(data.house);
                 const returnedHouseCards = data.houseCards.map(hcid => house.houseCards.get(hcid));
 
                 return <>
-                    <strong>Roose Bolton</strong>: <strong>{house.name}</strong> took back all discarded House
-                    cards ({joinReactNodes(returnedHouseCards.map(hc => <strong key={hc.id}>{hc.name}</strong>), ", ")}).
+                    <b>Roose Bolton</b>: <b>{house.name}</b> took back all discarded House
+                    cards ({joinReactNodes(returnedHouseCards.map(hc => <b key={`roose_${hc.id}`}>{hc.name}</b>), ", ")}).
                 </>;
-
+            }
             case "loras-tyrell-attack-order-moved":
                 const order = orders.get(data.order);
                 const embattledRegion = this.world.regions.get(data.region);
 
                 return <>
-                    <strong>Loras Tyrell</strong>: The <strong>{order.type.name}</strong> Order was moved
-                    to <strong>{embattledRegion.name}</strong>.
+                    <b>Loras Tyrell</b>: The <b>{order.type.name}</b> Order was moved
+                    to <b>{embattledRegion.name}</b>.
                 </>;
 
-            case "queen-of-thorns-no-order-available":
-                house = this.game.houses.get(data.house);
-                affectedHouse = this.game.houses.get(data.affectedHouse);
+            case "queen-of-thorns-no-order-available": {
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
 
                 return <>
-                    <strong>Queen of Thorns</strong>: <strong>{affectedHouse.name}</strong> had no adjacent Order tokens.
+                    <b>Queen of Thorns</b>: <b>{affectedHouse.name}</b> had no adjacent Order tokens.
                 </>;
-
-            case "queen-of-thorns-order-removed":
-                house = this.game.houses.get(data.house);
-                affectedHouse = this.game.houses.get(data.affectedHouse);
-                region = this.world.regions.get(data.region);
-                let removedOrder = orders.get(data.orderRemoved);
+            }
+            case "queen-of-thorns-order-removed": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+                const region = this.world.regions.get(data.region);
+                const removedOrder = orders.get(data.orderRemoved);
 
                 return <>
-                    <strong>Queen of Thorns</strong>: <strong>{house.name}</strong> removed
-                    a <strong>{removedOrder.type.name}</strong> Order of <strong>{affectedHouse.name}</strong> in <strong>{region.name}</strong>.
+                    <b>Queen of Thorns</b>: <b>{house.name}</b> removed
+                    a <b>{removedOrder.type.name}</b> Order of <b>{affectedHouse.name}</b> in <b>{region.name}</b>.
                 </>;
-
-            case "tywin-lannister-power-tokens-gained":
-                house = this.game.houses.get(data.house);
+            }
+            case "tywin-lannister-power-tokens-gained": {
+                const house = this.game.houses.get(data.house);
                 const powerTokensGained = data.powerTokensGained;
 
                 return <>
-                    <strong>Tywin Lannister</strong>: <strong>{house.name}</strong> gained {powerTokensGained} Power
+                    <b>Tywin Lannister</b>: <b>{house.name}</b> gained {powerTokensGained} Power
                     tokens.
                 </>;
-
-            case "renly-baratheon-no-knight-available":
-                house = this.game.houses.get(data.house);
-
-                return <>
-                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> had no available Knight to upgrade to.
-                </>;
-
-            case "renly-baratheon-no-footman-available":
-                house = this.game.houses.get(data.house);
+            }
+            case "qarl-the-maid-tokens-gained": {
+                const house = this.game.houses.get(data.house);
+                const powerTokensGained = data.powerTokensGained;
 
                 return <>
-                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> had no available Footman to upgrade.
+                    <b>Qarl the Maid</b>: <b>{house.name}</b> gained {powerTokensGained} Power
+                    tokens.
                 </>;
-
-            case "renly-baratheon-footman-upgraded-to-knight":
-                house = this.game.houses.get(data.house);
-                region = this.world.regions.get(data.region);
+            }
+            case "renly-baratheon-no-knight-available": {
+                const house = this.game.houses.get(data.house);
 
                 return <>
-                    <strong>Renly Baratheon</strong>: <strong>{house.name}</strong> upgraded a Footman to a Knight
-                    in <strong>{region.name}</strong>.
+                    <b>Renly Baratheon</b>: <b>{house.name}</b> had no available Knight to upgrade to.
                 </>;
-
-            case "mace-tyrell-casualties-prevented":
-                house = this.game.houses.get(data.house);
+            }
+            case "renly-baratheon-no-footman-available": {
+                const house = this.game.houses.get(data.house);
 
                 return <>
-                    <strong>Mace Tyrell</strong>: Casualties were prevented by <strong>The Blackfish</strong>.
+                    <b>Renly Baratheon</b>: <b>{house.name}</b> had no available Footman to upgrade.
                 </>;
+            }
+            case "renly-baratheon-footman-upgraded-to-knight": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
 
+                return <>
+                    <b>Renly Baratheon</b>: <b>{house.name}</b> upgraded a Footman to a Knight
+                    in <b>{region.name}</b>.
+                </>;
+            }
+            case "mace-tyrell-casualties-prevented": {
+                return <>
+                    <b>Mace Tyrell</b>: Casualties were prevented by <b>The Blackfish</b>.
+                </>;
+            }
             case "mace-tyrell-no-footman-available":
-                house = this.game.houses.get(data.house);
-
                 return <>
-                    <strong>Mace Tyrell</strong>: No enemy Footman was available to be killed.
+                    <b>Mace Tyrell</b>: No enemy Footman was available to be killed.
                 </>;
 
-            case "mace-tyrell-footman-killed":
-                house = this.game.houses.get(data.house);
-                region = this.world.regions.get(data.region);
+            case "mace-tyrell-footman-killed": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
 
                 return <>
-                    <strong>Mace Tyrell</strong>: <strong>{house.name}</strong> killed an enemy Footman
-                    in <strong>{region.name}</strong>.
+                    <b>Mace Tyrell</b>: <b>{house.name}</b> killed an enemy Footman
+                    in <b>{region.name}</b>.
                 </>;
+            }
+            case "ser-ilyn-payne-footman-killed": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
 
+                return <>
+                    <b>Ser Ilyn Payne</b>: <b>{house.name}</b> killed an enemy Footman
+                    in <b>{region.name}</b>.
+                </>;
+            }
             case "cersei-lannister-no-order-available":
                 return <>
-                    <strong>Cersei Lannister</strong>: There were no Order tokens to be removed.
+                    <b>Cersei Lannister</b>: There were no Order tokens to be removed.
                 </>;
 
-            case "cersei-lannister-order-removed":
-                house = this.game.houses.get(data.house);
-                affectedHouse = this.game.houses.get(data.affectedHouse);
-                region = this.world.regions.get(data.region);
-                removedOrder = orders.get(data.order);
+            case "cersei-lannister-order-removed": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+                const region = this.world.regions.get(data.region);
+                const removedOrder = orders.get(data.order);
 
                 return <>
-                    <strong>Cersei Lannister</strong>: <strong>{house.name}</strong> removed
-                    a <strong>{removedOrder.type.name}</strong> Order
-                    of <strong>{affectedHouse.name}</strong> in <strong>{region.name}</strong>.
+                    <b>Cersei Lannister</b>: <b>{house.name}</b> removed
+                    a <b>{removedOrder.type.name}</b> Order
+                    of <b>{affectedHouse.name}</b> in <b>{region.name}</b>.
                 </>;
-
-            case "robb-stark-retreat-location-overriden":
-                house = this.game.houses.get(data.house);
-                affectedHouse = this.game.houses.get(data.affectedHouse);
+            }
+            case "robb-stark-retreat-location-overriden": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
 
                 return <>
-                    <strong>Robb Stark</strong>: <strong>{house.name}</strong> chose the retreat location of the
-                    retreating army of <strong>{affectedHouse.name}</strong>.
+                    <b>Robb Stark</b>: <b>{house.name}</b> chose the retreat location of the
+                    retreating army of <b>{affectedHouse.name}</b>.
                 </>;
-
+            }
             case "retreat-region-chosen": {
                 const house = this.game.houses.get(data.house);
                 const regionFrom = this.game.world.regions.get(data.regionFrom);
                 const regionTo = this.game.world.regions.get(data.regionTo);
                 return <>
-                        <strong>{house.name}</strong> retreats from <strong>
-                        {regionFrom.name}</strong> to <strong>{regionTo.name}</strong>.
+                        <b>{house.name}</b> retreats from <b>
+                        {regionFrom.name}</b> to <b>{regionTo.name}</b>.
                 </>;
             }
             case "retreat-failed": {
@@ -708,15 +809,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>{
                     data.isAttacker ?
-                        <><strong>{house.name}</strong> was not able to retreat to <strong>{region.name}</strong>.</>   :
-                        <><strong>{house.name}</strong> was not able to retreat from <strong>{region.name}</strong>.</>
+                        <><b>{house.name}</b> was not able to retreat to <b>{region.name}</b>.</>   :
+                        <><b>{house.name}</b> was not able to retreat from <b>{region.name}</b>.</>
                 }</>;
             }
             case "retreat-casualties-suffered": {
                 const house = this.game.houses.get(data.house);
                 const units = data.units.map(ut => unitTypes.get(ut).name);
                 return <>
-                    <p><strong>{house.name}</strong> suffered casualties from the retreat: <>{joinReactNodes(units.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</p>
+                    <p><b>{house.name}</b> suffered casualties from the retreat: <>{joinReactNodes(units.map((unitType, i) => <b key={`retreat_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.</p>
                 </>;
             }
             case "enemy-port-taken": {
@@ -725,8 +826,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const port = this.world.regions.get(data.port);
                 return <>
                     {data.shipCount > 0
-                        ? <><strong>{newController.name}</strong> converted {data.shipCount} ship{data.shipCount == 1 ? "" : "s"} from <strong>{oldController.name}</strong> in <strong>{port.name}</strong>.</>
-                        : <><strong>{newController.name}</strong> destroyed all <strong>{oldController.name}</strong> ships in <strong>{port.name}</strong>.</>}
+                        ? <><b>{newController.name}</b> converted {data.shipCount} ship{data.shipCount == 1 ? "" : "s"} from <b>{oldController.name}</b> in <b>{port.name}</b>.</>
+                        : <><b>{newController.name}</b> destroyed all <b>{oldController.name}</b> ships in <b>{port.name}</b>.</>}
                 </>;
             }
             case "ships-destroyed-by-empty-castle": {
@@ -734,232 +835,232 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const port = this.game.world.regions.get(data.port);
                 const castle = this.game.world.regions.get(data.castle);
                 return <>
-                    <><strong>{house.name}</strong> lost {data.shipCount} Ship{data.shipCount>1?"s":""} in <strong>{port.name}</strong> because <strong>{castle.name}</strong> is empty now.</>
+                    <><b>{house.name}</b> lost {data.shipCount} Ship{data.shipCount>1?"s":""} in <b>{port.name}</b> because <b>{castle.name}</b> is empty now.</>
                 </>;
             }
             case "silence-at-the-wall-executed":
-                return <><strong>Silence at the Wall</strong>: Nothing happened.</>;
+                return <><b>Silence at the Wall</b>: Nothing happened.</>;
 
-            case "preemptive-raid-choice-done":
-                house = this.game.houses.get(data.house);
+            case "preemptive-raid-choice-done": {
+                const house = this.game.houses.get(data.house);
 
                 if (data.choice == 0) {
                     return <>
-                        <strong>Preemptive Raid</strong>: <strong>{house.name}</strong> chose to kill 2 of their
+                        <b>Preemptive Raid</b>: <b>{house.name}</b> chose to kill 2 of their
                         units.
                     </>;
                 } else {
                     return <>
-                        <strong>Preemptive Raid</strong>: <strong>{house.name}</strong> chose to reduce 2 positions
+                        <b>Preemptive Raid</b>: <b>{house.name}</b> chose to reduce 2 positions
                         on their highest Influence track.
                     </>;
                 }
-
-            case "preemptive-raid-track-reduced":
+            }
+            case "preemptive-raid-track-reduced": {
                 const chooser = data.chooser ? this.game.houses.get(data.chooser) : null;
-                house = this.game.houses.get(data.house);
-                let trackName = this.game.getNameInfluenceTrack(data.trackI);
+                const house = this.game.houses.get(data.house);
+                const trackName = this.game.getNameInfluenceTrack(data.trackI);
 
                 if (chooser == null) {
                     return <>
-                        <strong>{house.name}</strong> was reduced 2 positions on the <strong>{trackName}</strong> track.
+                        <b>{house.name}</b> was reduced 2 positions on the <b>{trackName}</b> track.
                     </>;
                 } else {
                     return <>
-                        <strong>{chooser.name}</strong> chose to reduce <strong>{house.name}</strong> 2 positions
-                        on the <strong>{trackName}</strong> track.
+                        <b>{chooser.name}</b> chose to reduce <b>{house.name}</b> 2 positions
+                        on the <b>{trackName}</b> track.
                     </>;
                 }
-
-            case "preemptive-raid-units-killed":
-                house = this.game.houses.get(data.house);
-                let units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))] as [Region, UnitType[]]);
+            }
+            case "preemptive-raid-units-killed": {
+                const house = this.game.houses.get(data.house);
+                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))] as [Region, UnitType[]]);
 
                 return <>
-                    <strong>{house.name}</strong>{units.length > 0 ? (<> chose to
-                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <strong key={i}>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), " and ")}.</>)
+                    <b>{house.name}</b>{units.length > 0 ? (<> chose to
+                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <b key={`preemptive_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></>), " and ")}.</>)
                     : <> had no units to destroy.</>}
                 </>;
-
-            case "preemptive-raid-wildlings-attack":
-                house = this.game.houses.get(data.house);
+            }
+            case "preemptive-raid-wildlings-attack": {
+                const house = this.game.houses.get(data.house);
 
                 return <>
-                    <strong>Preemptive Raid</strong>: A new Wildlings Attack with
-                    strength <strong>{data.wildlingStrength}</strong> was triggered
-                    where <strong>{house.name}</strong> will not be participating.
+                    <b>Preemptive Raid</b>: A new Wildlings Attack with
+                    strength <b>{data.wildlingStrength}</b> was triggered
+                    where <b>{house.name}</b> will not be participating.
                 </>;
-
-            case "massing-on-the-milkwater-house-cards-back":
-                house = this.game.houses.get(data.house);
+            }
+            case "massing-on-the-milkwater-house-cards-back": {
+                const house = this.game.houses.get(data.house);
                 const houseCardsReturned = data.houseCardsReturned.map(hcid => house.houseCards.get(hcid));
 
                 return <>
-                    <strong>Massing on the Milkwater</strong>: <strong>{house.name}</strong> took
-                    back {joinReactNodes(houseCardsReturned.map(hc => <strong key={hc.id}>{hc.name}</strong>), ", ")}
+                    <b>Massing on the Milkwater</b>: <b>{house.name}</b> took
+                    back {joinReactNodes(houseCardsReturned.map(hc => <b key={`massing-on-the-milkwater-cards-back_${hc.id}`}>{hc.name}</b>), ", ")}
                 </>;
-
-            case "massing-on-the-milkwater-wildling-victory":
-                lowestBidder = this.game.houses.get(data.lowestBidder);
+            }
+            case "massing-on-the-milkwater-wildling-victory": {
+                const lowestBidder = this.game.houses.get(data.lowestBidder);
 
                 return <>
-                    <strong>Massing on the Milkwater</strong>: <strong>{lowestBidder.name}</strong> discards all House
+                    <b>Massing on the Milkwater</b>: <b>{lowestBidder.name}</b> discards all House
                     cards with the highest combat strength, all other houses must discard one House card.
                 </>;
-
-            case "massing-on-the-milkwater-house-cards-removed":
-                house = this.game.houses.get(data.house);
+            }
+            case "massing-on-the-milkwater-house-cards-removed": {
+                const house = this.game.houses.get(data.house);
                 const houseCardsUsed = data.houseCardsUsed.map(hcid => house.houseCards.get(hcid));
 
                 return <>
                     {houseCardsUsed.length > 0
-                        ? <><strong>{house.name}</strong> discarded {joinReactNodes(houseCardsUsed.map(hc => <strong key={hc.id}>{hc.name}</strong>), ", ")}.</>
-                        : <><strong>{house.name}</strong> did not discard a House card.</>}
+                        ? <><b>{house.name}</b> discarded {joinReactNodes(houseCardsUsed.map(hc => <b key={`massing-on-the-milkwater-cards-removed_${hc.id}`}>{hc.name}</b>), ", ")}.</>
+                        : <><b>{house.name}</b> did not discard a House card.</>}
                 </>;
-
-            case "a-king-beyond-the-wall-highest-top-track":
-                house = this.game.houses.get(data.house);
-                trackName = this.game.getNameInfluenceTrack(data.trackI);
+            }
+            case "a-king-beyond-the-wall-highest-top-track": {
+                const house = this.game.houses.get(data.house);
+                const trackName = this.game.getNameInfluenceTrack(data.trackI);
 
                 return <>
-                    <strong>A King Beyond the Wall</strong>: <strong>{house.name}</strong> chose to move at the top
-                    of the <strong>{trackName}</strong> track.
+                    <b>A King Beyond the Wall</b>: <b>{house.name}</b> chose to move at the top
+                    of the <b>{trackName}</b> track.
                 </>;
-
+            }
             case "a-king-beyond-the-wall-lowest-reduce-tracks":
-                lowestBidder = this.game.houses.get(data.lowestBidder);
+                const lowestBidder = this.game.houses.get(data.lowestBidder);
 
                 return <>
-                    <strong>A King Beyond the Wall</strong>: <strong>{lowestBidder.name}</strong> was moved to the
+                    <b>A King Beyond the Wall</b>: <b>{lowestBidder.name}</b> was moved to the
                     bottom of all influence tracks.
                 </>;
 
-            case "a-king-beyond-the-wall-house-reduce-track":
-                house = this.game.houses.get(data.house);
-                trackName = this.game.getNameInfluenceTrack(data.trackI);
+            case "a-king-beyond-the-wall-house-reduce-track": {
+                const house = this.game.houses.get(data.house);
+                const trackName = this.game.getNameInfluenceTrack(data.trackI);
 
                 return <>
-                    <strong>A King Beyond the Wall</strong>: <strong>{house.name}</strong> chose to move at the bottom
-                    of the <strong>{trackName}</strong> influence track.
+                    <b>A King Beyond the Wall</b>: <b>{house.name}</b> chose to move at the bottom
+                    of the <b>{trackName}</b> influence track.
                 </>;
-
-            case "mammoth-riders-destroy-units":
-                house = this.game.houses.get(data.house);
-                units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
+            }
+            case "mammoth-riders-destroy-units": {
+                const house = this.game.houses.get(data.house);
+                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]) as [Region, UnitType[]][];
 
                 return <>
-                    <strong>Mammoth Riders</strong>: <strong>{house.name}</strong>{units.length > 0 ? (<> chose to
-                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <strong key={i}>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), ", ")}.</>)
+                    <b>Mammoth Riders</b>: <b>{house.name}</b>{units.length > 0 ? (<> chose to
+                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <b key={`mammoth-riders_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></>), ", ")}.</>)
                     : <> had no units to destroy.</>}
                 </>;
-
-            case "mammoth-riders-return-card":
-                house = this.game.houses.get(data.house);
-                houseCard = house.houseCards.get(data.houseCard);
+            }
+            case "mammoth-riders-return-card": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = house.houseCards.get(data.houseCard);
 
                 return <>
-                    <strong>Mammoth Riders</strong>: <strong>{house.name}</strong> chose to
-                    regain <strong>{houseCard.name}</strong>.
+                    <b>Mammoth Riders</b>: <b>{house.name}</b> chose to
+                    regain <b>{houseCard.name}</b>.
                 </>;
-
-            case "the-horde-descends-highest-muster":
-                house = this.game.houses.get(data.house);
+            }
+            case "the-horde-descends-highest-muster": {
+                const house = this.game.houses.get(data.house);
 
                 return <>
-                    <strong>The Horde Descends</strong>: <strong>{house.name}</strong> may muster forces in any one
+                    <b>The Horde Descends</b>: <b>{house.name}</b> may muster forces in any one
                     Castle or Stronghold they control.
                 </>;
-
-            case "the-horde-descends-units-killed":
-                house = this.game.houses.get(data.house);
-                units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
+            }
+            case "the-horde-descends-units-killed": {
+                const house = this.game.houses.get(data.house);
+                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]) as [Region, UnitType[]][];
 
                 return <>
-                    <strong>The Horde Descends</strong>: <strong>{house.name}</strong>{units.length > 0 ? (<> chose to
-                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <strong key={i}>{ut.name}</strong>), ", ")} in <strong>{region.name}</strong></>), ", ")}.</>)
+                    <b>The Horde Descends</b>: <b>{house.name}</b>{units.length > 0 ? (<> chose to
+                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <b key={`the-horde-descends_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></>), ", ")}.</>)
                     : <> had no units to destroy.</>}
                 </>;
-
-            case "crow-killers-knights-replaced":
-                house = this.game.houses.get(data.house);
-                units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
+            }
+            case "crow-killers-knights-replaced": {
+                const house = this.game.houses.get(data.house);
+                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]) as [Region, UnitType[]][];
 
                 return <>
                     {units.length > 0
-                    ? (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><strong>{unitTypes.length}</strong> Knight{unitTypes.length > 1 && "s"} in <strong>{region.name}</strong></>), ", ")} with Footmen.</>)
-                    : (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> had no Knights to replace with Footmen.</>)}
+                    ? (<><b>Crow Killers</b>: <b>{house.name}</b> replaced {joinReactNodes(units.map(([region, unitTypes], i) => <span key={`crow-killers-replace_${i}`}><b>{unitTypes.length}</b> Knight{unitTypes.length > 1 && "s"} in <b>{region.name}</b></span>), ", ")} with Footmen.</>)
+                    : (<><b>Crow Killers</b>: <b>{house.name}</b> had no Knights to replace with Footmen.</>)}
                 </>;
-
+            }
             case "crow-killers-knights-killed": {
                 const house = this.game.houses.get(data.house);
                 const units: [Region, UnitType[]][] = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
 
-                return <><b>Crow Killers</b>: <b>{house.name}</b> had to destroy {joinReactNodes(units.map(([region, unitTypes]) => <><b>{unitTypes.length}</b> Knight{unitTypes.length > 1 && "s"} in <b>{region.name}</b></>), ", ")}.</>;
+                return <><b>Crow Killers</b>: <b>{house.name}</b> had to destroy {joinReactNodes(units.map(([region, unitTypes], i) => <span key={`crow-killers-kill_${i}`}><b>{unitTypes.length}</b> Knight{unitTypes.length > 1 && "s"} in <b>{region.name}</b></span>), ", ")}.</>;
             }
 
-            case "crow-killers-footman-upgraded":
-                house = this.game.houses.get(data.house);
-                units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
+            case "crow-killers-footman-upgraded": {
+                const house = this.game.houses.get(data.house);
+                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]) as [Region, UnitType[]][];
 
                 return <>
                     {units.length > 0
-                    ? (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> replaced {joinReactNodes(units.map(([region, unitTypes]) => <><strong>{unitTypes.length}</strong> Footm{unitTypes.length == 1 ? "a" : "e"}n in <strong>{region.name}</strong></>), ", ")} with Knights.</>)
-                    : (<><strong>Crow Killers</strong>: <strong>{house.name}</strong> was not able to replace any Footman with Knights.</>)}
+                    ? (<><b>Crow Killers</b>: <b>{house.name}</b> replaced {joinReactNodes(units.map(([region, unitTypes], i) => <span key={`crow-killers-upgrade_${i}`}><b>{unitTypes.length}</b> Footm{unitTypes.length == 1 ? "a" : "e"}n in <b>{region.name}</b></span>), ", ")} with Knights.</>)
+                    : (<><b>Crow Killers</b>: <b>{house.name}</b> was not able to replace any Footman with Knights.</>)}
                 </>;
-
-            case "skinchanger-scout-nights-watch-victory":
-                house = this.game.houses.get(data.house);
+            }
+            case "skinchanger-scout-nights-watch-victory": {
+                const house = this.game.houses.get(data.house);
 
                 return <>
-                    <strong>Skinchanger Scout</strong>: <strong>{house.name}</strong> gets
-                    back <strong>{data.powerToken}</strong> Power tokens.
+                    <b>Skinchanger Scout</b>: <b>{house.name}</b> gets
+                    back <b>{data.powerToken}</b> Power tokens.
                 </>;
-
-            case "skinchanger-scout-wildling-victory":
-                house = this.game.houses.get(data.house);
+            }
+            case "skinchanger-scout-wildling-victory": {
+                const house = this.game.houses.get(data.house);
                 const powerTokensLost = data.powerTokensLost.map(([hid, amount]) => [this.game.houses.get(hid), amount] as [House, number]);
 
                 return <>
                     <p>
-                        <strong>Skinchanger Scout</strong>: <strong>{house.name}</strong> lost all of their Power
+                        <b>Skinchanger Scout</b>: <b>{house.name}</b> lost all of their Power
                         tokens, all other houses lost 2 Power tokens.
                     </p>
                     <ul>
                         {powerTokensLost.map(([house, amount]) => (
-                            <li key={house.id}><strong>{house.name}</strong> lost <strong>{amount}</strong> Power tokens.</li>
+                            <li key={`skinchanger-scout_${house.id}`}><b>{house.name}</b> lost <b>{amount}</b> Power tokens.</li>
                         ))}
                     </ul>
                 </>;
-
+            }
             case "rattleshirts-raiders-nights-watch-victory":
-                house = this.game.houses.get(data.house);
+                const house = this.game.houses.get(data.house);
 
                 return <>
-                    <strong>Rattleshirt&apos;s Raiders</strong>: <strong>{house.name}</strong> gained one level of supply,
-                    and is now at <strong>{data.newSupply}</strong>.
+                    <b>Rattleshirt&apos;s Raiders</b>: <b>{house.name}</b> gained one level of supply,
+                    and is now at <b>{data.newSupply}</b>.
                 </>;
 
-            case "rattleshirts-raiders-wildling-victory":
-                lowestBidder = this.game.houses.get(data.lowestBidder);
+            case "rattleshirts-raiders-wildling-victory": {
+                const lowestBidder = this.game.houses.get(data.lowestBidder);
                 const newSupply = data.newSupply.map(([hid, supply]) => [this.game.houses.get(hid), supply] as [House, number]);
 
                 return <>
-                    <strong>Rattleshirt&apos;s Raiders</strong>: <strong>{lowestBidder.name}</strong> lost 2 levels of supply,
+                    <b>Rattleshirt&apos;s Raiders</b>: <b>{lowestBidder.name}</b> lost 2 levels of supply,
                     all other houses lost 1 levels of supply.
                     <ul>
                         {newSupply.map(([house, supply]) => (
-                            <li key={house.id}><strong>{house.name}</strong> is now at <strong>{supply}</strong>.</li>
+                            <li key={`rattleshirts-raiders_${house.id}`}><b>{house.name}</b> is now at <b>{supply}</b>.</li>
                         ))}
                     </ul>
                 </>;
-
+            }
             case "game-of-thrones-power-tokens-gained":
                 const gains = data.gains.map(([hid, gain]) => [this.game.houses.get(hid), gain] as [House, number]);
 
                 return <>
                     <ul>
                         {gains.map(([house, gain]) => (
-                            <li key={house.id}><strong>{house.name}</strong> gained <strong>{gain}</strong> Power tokens.</li>
+                            <li key={`got-${house.id}`}><b>{house.name}</b> gained <b>{gain}</b> Power tokens.</li>
                         ))}
                     </ul>
                 </>;
@@ -968,15 +1069,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const killedBecauseWounded = data.killedBecauseWounded.map(utid => unitTypes.get(utid).name);
                 const killedBecauseCantRetreat = data.killedBecauseCantRetreat.map(utid => unitTypes.get(utid).name);
                 return <>
-                    {killedBecauseWounded.length > 0 && (<><strong>{house.name}</strong> suffered battle casualties because these units were wounded: <>{joinReactNodes(killedBecauseWounded.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</>)}
-                    {killedBecauseCantRetreat.length > 0 && (<><strong>{house.name}</strong> suffered battle casualties because these units can&apos;t retreat: <>{joinReactNodes(killedBecauseCantRetreat.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.</>)}
+                    {killedBecauseWounded.length > 0 && (<><b>{house.name}</b> suffered battle casualties because these units were wounded: <>{joinReactNodes(killedBecauseWounded.map((unitType, i) => <b key={`wounded_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.</>)}
+                    {killedBecauseCantRetreat.length > 0 && (<><b>{house.name}</b> suffered battle casualties because these units can&apos;t retreat: <>{joinReactNodes(killedBecauseCantRetreat.map((unitType, i) => <b key={`cant-retreat_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.</>)}
                 </>;
             }
             case "killed-after-combat": {
                 const house = this.game.houses.get(data.house);
                 const killed = data.killed.map(utid => unitTypes.get(utid).name);
                 return <>
-                    <strong>{house.name}</strong> suffered battle casualties and chose these units to be killed: <>{joinReactNodes(killed.map((unitType, i) => <strong key={i}>{unitType}</strong>), ', ')}</>.
+                    <b>{house.name}</b> suffered battle casualties and chose these units to be killed: <>{joinReactNodes(killed.map((unitType, i) => <b key={`casualties_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.
                 </>;
             }
             case "supply-adjusted":
@@ -986,33 +1087,35 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 <>
                     Supply levels have been adjusted:
                     <table cellPadding="5">
-                        {supplies.map(([house, supply]) => (
-                            <tr key={house.id}>
-                                <td>{house.name}</td>
-                                <td>{supply}</td>
-                            </tr>))}
+                        <tbody>
+                            {supplies.map(([house, supply]) => (
+                                <tr key={`supply_${house.id}`}>
+                                    <td>{house.name}</td>
+                                    <td>{supply}</td>
+                                </tr>))}
+                        </tbody>
                     </table>
                 </>);
-                
-            case "player-replaced":
+            case "player-replaced": {
                 const oldUser = this.props.ingameGameState.entireGame.users.get(data.oldUser);
                 const newUser = this.props.ingameGameState.entireGame.users.get(data.newUser);
-                house = this.game.houses.get(data.house);
+                const house = this.game.houses.get(data.house);
 
                 return (
                     <>
                         <b>{oldUser.name}</b> (<b>{house.name}</b>) was replaced by <b>{newUser.name}</b>.
                     </>
                 );
-
-            case "vassals-claimed":
+            }
+	    case "vassals-claimed": {
                 const vassals = data.vassals.map(hid => this.game.houses.get(hid));
-                house = this.game.houses.get(data.house);
+                const house = this.game.houses.get(data.house);
 
                 return <>
                     <b>{house.name}</b> claimed {joinReactNodes(vassals.map(v => <b key={v.id}>{v.name}</b>), ", ")} as
                     vassal{vassals.length > 0 && "s"}.
                 </>;
+	    }
         }
     }
 }

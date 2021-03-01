@@ -78,6 +78,14 @@
                                 <i class="fas fa-envelope"></i>
                             </span>
                         {% endif %}
+                        {% if game.player_in_game.data.needed_for_vote %}
+                            <span class="badge badge-danger"
+                                data-toggle="tooltip"
+                                title="There is an ongoing vote"
+                            >
+                                <i class="fas fa-vote-yea"></i>
+                            </span>
+                        {% endif %}
                     {% endif %}
 
                     {{ game.name }}

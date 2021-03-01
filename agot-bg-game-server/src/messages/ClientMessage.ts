@@ -3,7 +3,8 @@ export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | Unready |
     | ChooseTopWildlingCardAction | ReplaceOrder | SkipReplaceOrder | ResolveRaid | Bid | ChooseChoice
     | DecideBiggest | ReconcileArmies | Muster | ResolveTies | SelectUnits | LaunchGame | ChooseHouse
     | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings | CreatePrivateChatRoom | ChangeGameSettings
-    | CancelGame | Vote | LaunchCancelGameVote | CancelVote | LaunchReplacePlayerVote | UpdateNote | ClaimVassal;
+    | CancelGame | Vote | LaunchCancelGameVote | CancelVote | LaunchReplacePlayerVote | UpdateNote | SelectWesterosCard
+    | ClaimVassal;
 
 interface Ping {
     type: "ping";
@@ -156,6 +157,11 @@ interface SelectHouseCard {
     houseCard: string;
 }
 
+interface SelectWesterosCard {
+    type: "select-westeros-card";
+    westerosCardId: number;
+    deckId: number;
+}
 interface SelectRegion {
     type: "select-region";
     region: string;
@@ -170,6 +176,7 @@ interface ChangeSettings {
 export interface UserSettings {
     mapScrollbar: boolean;
     lastOpenedTab: string | null;
+    chatHouseNames: boolean;
 }
 
 interface ChangeGameSettings {

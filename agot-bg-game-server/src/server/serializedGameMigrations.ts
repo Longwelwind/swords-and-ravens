@@ -2,6 +2,7 @@ import BetterMap from "../utils/BetterMap";
 import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
 import staticWorld from "../common/ingame-game-state/game-data-structure/static-data-structure/globalStaticWorld";
 import { CrowKillersStep } from "../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/crow-killers-wildling-victory-game-state/CrowKillersWildlingVictoryGameState";
+import { SerializedHouse } from "../common/ingame-game-state/game-data-structure/House";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
     {
@@ -297,6 +298,140 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             if (serializedGame.childGameState.type == "ingame") {
                 const serializedIngameGameState = serializedGame.childGameState;
                 serializedIngameGameState.game.revealedWesterosCards = 0;
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "10",
+        migrate: (serializedGame: any) => {
+            // Migration for #785
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                const game = ingame.game;
+
+                game.houses.forEach((h: SerializedHouse) => {
+                    h.houseCards.forEach(([_hcid, shc]) => {
+                        shc.disabled = false;
+                        shc.disabledAbilityId = null;
+                        shc.originalCombatStrength = shc.combatStrength;
+                        shc.originalSwordIcons = shc.swordIcons;
+                        shc.originalTowerIcons = shc.towerIcons;
+                    });
+                });
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "11",
+        migrate: (serializedGame: any) => {
+            // Migration for #791
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                if (ingame.childGameState && ingame.childGameState.type == "action") {
+                    const action = ingame.childGameState;
+                    if (action.childGameState && action.childGameState.type == "resolve-march-order") {
+                        const resolveMarchOrders = action.childGameState;
+                        if (resolveMarchOrders.childGameState && resolveMarchOrders.childGameState.type == "combat") {
+                            const combat = resolveMarchOrders.childGameState;
+                            if (combat.childGameState && combat.childGameState.type == "immediately-house-card-abilities-resolution") {
+                                const immediatelyHouseCardResolution = combat.childGameState;
+                                if (immediatelyHouseCardResolution.childGameState &&
+                                    (immediatelyHouseCardResolution.childGameState.type == "aeron-damphair-dwd-ability" || immediatelyHouseCardResolution.childGameState.type == "qyburn-ability")) {
+                                        // Aron and Qyburn are now BeforeCombat states => Convert combat.childGameState to BeforeCombat
+                                        combat.childGameState.type = "before-combat-house-card-abilities-resolution";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "12",
+        migrate: (serializedGame: any) => {
+            // Migration for #795
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                const game = ingame.game;
+
+                game.houses.forEach((h: SerializedHouse) => {
+                    h.houseCards.forEach(([hcid, shc]) => {
+                        if (hcid == "asha-greyjoy-dwd") {
+                            shc.abilityId = null;
+                        }
+                    });
+                });
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "13",
+        migrate: (serializedGame: any) => {
+            // Migration for #808
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                if (ingame.childGameState && ingame.childGameState.type == "action") {
+                    const action = ingame.childGameState;
+                    if (action.childGameState && action.childGameState.type == "resolve-march-order") {
+                        const resolveMarchOrders = action.childGameState;
+                        if (resolveMarchOrders.childGameState && resolveMarchOrders.childGameState.type == "combat") {
+                            const combat = resolveMarchOrders.childGameState;
+                            if (combat.childGameState && combat.childGameState.type == "post-combat") {
+                                const postCombat = combat.childGameState;
+                                if (postCombat.childGameState && postCombat.childGameState.type == "after-combat-house-card-abilities") {
+                                    const afterCombatHouseCardAbilities = postCombat.childGameState;
+                                    if (afterCombatHouseCardAbilities.childGameState && afterCombatHouseCardAbilities.childGameState.type == "rodrik-the-reader-ability") {
+                                        // Rodrik is now a AfterWinner ability
+                                        postCombat.childGameState.type = "after-winner-determination";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "14",
+        migrate: (serializedGame: any) => {
+            // Migration for #TBD
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                // Abilities need to have the same id as the house card itself to allow house-card-ability-not-used giving the ability id.
+                // In the game log getHouseCardById then returns the house card with the name. We could introduce a getHouseCardByAbilityId at some point.
+                // For now lets migrate Melisandre DWD.
+
+                // Fix melisandre => melisandre-dwd ability
+                const game = ingame.game;
+                game.houses.forEach((h: SerializedHouse) => {
+                    h.houseCards.forEach(([hcid, shc]) => {
+                        if (hcid == "melisandre-dwd") {
+                            shc.abilityId = "melisandre-dwd";
+                        }
+                    });
+                });
+
+                // Fix invalid game logs
+                ingame.gameLogManager.logs
+                .filter((log: any) => log.data.type == "house-card-ability-not-used")
+                .forEach((log: any) => {
+                    if (log.data.houseCard == "melisandre") {
+                        log.data.houseCard = "melisandre-dwd";
+                    }
+                });
             }
 
             return serializedGame;

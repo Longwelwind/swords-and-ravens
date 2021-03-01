@@ -29,9 +29,9 @@ import orders from "../../../game-data-structure/orders";
 import CancelHouseCardAbilitiesGameState
     , {SerializedCancelHouseCardAbilitiesGameState} from "./cancel-house-card-abilities-game-state/CancelHouseCardAbilitiesGameState";
 import { observable } from "mobx";
+import BeforeCombatHouseCardAbilitiesGameState, { SerializedBeforeCombatHouseCardAbilitiesGameState } from "./before-combat-house-card-abilities-game-state/BeforeCombatHouseCardAbilitiesGameState";
 import DefenseMusterOrderType from "../../../game-data-structure/order-types/DefenseMusterOrderType";
 import RaidSupportOrderType from "../../../game-data-structure/order-types/RaidSupportOrderType";
-
 
 export interface HouseCombatData {
     army: Unit[];
@@ -41,9 +41,9 @@ export interface HouseCombatData {
 
 export default class CombatGameState extends GameState<
     ResolveMarchOrderGameState,
-    DeclareSupportGameState | ChooseHouseCardGameState | UseValyrianSteelBladeGameState
-    | ImmediatelyHouseCardAbilitiesResolutionGameState | PostCombatGameState
-    | CancelHouseCardAbilitiesGameState
+    DeclareSupportGameState | ChooseHouseCardGameState | CancelHouseCardAbilitiesGameState
+    | ImmediatelyHouseCardAbilitiesResolutionGameState | BeforeCombatHouseCardAbilitiesGameState
+    | UseValyrianSteelBladeGameState | PostCombatGameState
 > {
     winner: House | null;
     loser: House | null;
@@ -53,6 +53,9 @@ export default class CombatGameState extends GameState<
     defender: House;
     houseCombatDatas: BetterMap<House, HouseCombatData>;
     valyrianSteelBladeUser: House | null;
+
+    @observable
+    rerender = 0;
 
     // The key is the supporting house and the value is the supported house.
     // The value is always either attacker or defender or null if the supporter
@@ -250,7 +253,7 @@ export default class CombatGameState extends GameState<
     }
 
     getSupportStrengthForSide(supportedHouse: House): number {
-        return this.supporters.entries
+        return this.getHouseSupportStrength(supportedHouse, this.supporters.entries
             .filter(([_house, supHouse]) => supportedHouse == supHouse)
             .map(([house, _supHouse]) => {
                 // Compute the total strength that this supporting house is bringing
@@ -277,7 +280,7 @@ export default class CombatGameState extends GameState<
                     })
                     .reduce(_.add, 0);
             })
-            .reduce(_.add, 0);
+            .reduce(_.add, 0));
     }
 
     isHouseSupported(house: House): boolean {
@@ -322,6 +325,14 @@ export default class CombatGameState extends GameState<
     }
 
     onImmediatelyResolutionFinish(): void {
+        this.proceedBeforeCombatResolution();
+    }
+
+    proceedBeforeCombatResolution(): void {
+        this.setChildGameState(new BeforeCombatHouseCardAbilitiesGameState(this)).firstStart();
+    }
+
+    onBeforeCombatResolutionFinish(): void {
         // Check if the sword has not been used this round
         if (!this.game.valyrianSteelBladeUsed) {
             // Check if one of the two participants can use the sword.
@@ -448,6 +459,23 @@ export default class CombatGameState extends GameState<
         );
     }
 
+    getHouseSupportStrength(house: House, supportStrength: number): number {
+        const affectedHouseCard = this.houseCombatDatas.get(house).houseCard;
+
+        if (affectedHouseCard == null) {
+            return supportStrength;
+        }
+
+        return this.getOrderResolutionHouseCard().reduce((s, h) => {
+            const houseCard = this.houseCombatDatas.get(h).houseCard;
+
+            if (houseCard == null) {
+                return s;
+            }
+            return houseCard.ability ? houseCard.ability.modifySupportStrength(this, houseCard, affectedHouseCard, house, supportStrength) : s;
+        }, supportStrength);
+    }
+
     getHouseCardSwordIcons(house: House): number {
         return this.getStatOfHouseCard(
             house,
@@ -462,6 +490,24 @@ export default class CombatGameState extends GameState<
             hc => hc.towerIcons,
             (h, hc, a, ahc) => a.modifyTowerIcons(this, h, hc, ahc)
         );
+    }
+
+    getFinalCombatStrength(house: House, strength: number): number {
+        const affectedHouseCard = this.houseCombatDatas.get(house).houseCard;
+
+        if (affectedHouseCard == null) {
+            return strength;
+        }
+
+        return this.getOrderResolutionHouseCard().reduce((s, h) => {
+            const houseCard = this.houseCombatDatas.get(h).houseCard;
+
+            if (houseCard == null) {
+                return s;
+            }
+
+            return houseCard.ability ? houseCard.ability.finalCombatStrength(this, house, houseCard, affectedHouseCard, s) : s;
+        }, strength);
     }
 
     getStatOfHouseCard(
@@ -516,12 +562,13 @@ export default class CombatGameState extends GameState<
     }
 
     getTotalCombatStrength(house: House): number {
-        return this.getBaseCombatStrength(house)
+        const total = this.getBaseCombatStrength(house)
             + this.getOrderBonus(house)
             + this.getSupportStrengthForSide(house)
             + this.getValyrianBladeBonus(house)
             + this.getHouseCardCombatStrength(house)
             + this.getGarrisonCombatStrength(house);
+        return this.getFinalCombatStrength(house, total);
     }
 
     getEnemy(house: House): House {
@@ -588,6 +635,8 @@ export default class CombatGameState extends GameState<
                 return ImmediatelyHouseCardAbilitiesResolutionGameState.deserializeFromServer(this, data);
             case "cancel-house-card-abilities":
                 return CancelHouseCardAbilitiesGameState.deserializeFromServer(this, data);
+            case "before-combat-house-card-abilities-resolution":
+                return BeforeCombatHouseCardAbilitiesGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -602,5 +651,6 @@ export interface SerializedCombatGameState {
     childGameState: SerializedDeclareSupportGameState | SerializedChooseHouseCardGameState
         | SerializedUseValyrianSteelBladeGameState | SerializedPostCombatGameState
         | SerializedImmediatelyHouseCardAbilitiesResolutionGameState
-        | SerializedCancelHouseCardAbilitiesGameState;
+        | SerializedCancelHouseCardAbilitiesGameState
+        | SerializedBeforeCombatHouseCardAbilitiesGameState;
 }

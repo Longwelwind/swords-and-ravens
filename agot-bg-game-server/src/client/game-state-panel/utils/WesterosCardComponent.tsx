@@ -12,6 +12,8 @@ interface WesterosCardProps {
     size?: "small" | "medium";
     tooltip?: boolean;
     classNames?: string;
+    selected?: boolean;
+    onClick?: () => void;
 }
 
 @observer
@@ -32,10 +34,11 @@ export default class WesterosCardComponent extends Component<WesterosCardProps> 
                 placement="auto"
             >
                 <div
-                    className={classNames("horizontal-game-card hover-weak-outline", this.props.size, this.props.classNames)}
+                    className={classNames("horizontal-game-card hover-weak-outline", this.props.size, this.props.classNames, {"medium-outline hover-strong-outline": this.props.selected})}
                     style={{
                         backgroundImage: this.props.cardType ? `url(${westerosCardImages.get(this.props.westerosDeckI).get(this.props.cardType.id)})` : undefined
                     }}
+                    onClick={() => this.props.onClick ? this.props.onClick() : undefined}
                 />
             </OverlayTrigger>
         );

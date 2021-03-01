@@ -11,6 +11,7 @@ import BetterMap from "../../../../../../utils/BetterMap";
 import IngameGameState from "../../../../IngameGameState";
 import _ from "lodash";
 import User from "../../../../../../server/User";
+import { PlayerActionType } from "../../../../../ingame-game-state/game-data-structure/GameLog";
 
 export default class ChooseHouseCardGameState extends GameState<CombatGameState> {
     choosableHouseCards: BetterMap<House, HouseCard[]>;
@@ -89,6 +90,12 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                 type: "house-card-chosen",
                 houseId: commandedHouse.id,
                 houseCardId: houseCard.id
+            });
+
+            this.ingameGameState.log({
+                type: "player-action",
+                house: player.house.id,
+                action: PlayerActionType.HOUSE_CARD_CHOSEN
             });
 
             this.checkAndProceedEndOfChooseHouseCardGameState();
@@ -203,6 +210,11 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         if (choosableCards.length == 1 &&
             !this.combatGameState.supporters.values.includes(house)) {
             this.houseCards.set(house, choosableCards[0]);
+            this.ingameGameState.log({
+                type: "player-action",
+                house: house.id,
+                action: PlayerActionType.HOUSE_CARD_CHOSEN
+            });
         }
     }
 

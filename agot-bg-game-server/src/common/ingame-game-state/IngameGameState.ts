@@ -58,6 +58,11 @@ export default class IngameGameState extends GameState<
         this.game = createGame(this, housesToCreate);
         this.players = new BetterMap(futurePlayers.map((house, user) => [user, new Player(user, this.game.houses.get(house))]));
 
+        this.log({
+            type: "user-house-assignments",
+            assignments: futurePlayers.map((house, user) => [house, user.id]) as [string, string][]
+        });
+
         this.beginNewTurn();
     }
 

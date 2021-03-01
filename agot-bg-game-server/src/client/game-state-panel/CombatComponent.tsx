@@ -32,6 +32,8 @@ import { RegionOnMapProperties, UnitOnMapProperties } from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
 import _ from "lodash";
 import Unit from "../../common/ingame-game-state/game-data-structure/Unit";
+import BeforeCombatHouseCardAbilitiesGameState from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/before-combat-house-card-abilities-game-state/BeforeCombatHouseCardAbilitiesGameState";
+import BeforeCombatHouseCardAbilitiesComponent from "./house-card-abilities/BeforeCombatHouseCardsAbilitiesComponent";
 
 @observer
 export default class CombatComponent extends Component<GameStateComponentProps<CombatGameState>> {
@@ -54,7 +56,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
         return (
             <>
                 <Col xs={12}>
-                    {!(this.props.gameState.childGameState instanceof PostCombatGameState) && (
+                    {!(this.props.gameState.childGameState instanceof PostCombatGameState) && this.props.gameState.rerender >= 0 && (
                         <>
                             <div style={{ display: 'flex', justifyContent: 'center' }}>
                                 <h5>Battle for <strong>{this.combatGameState.defendingRegion.name}</strong></h5>
@@ -98,7 +100,8 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                     [UseValyrianSteelBladeGameState, UseValyrianSteelBladeComponent],
                     [PostCombatGameState, PostCombatComponent],
                     [ImmediatelyHouseCardAbilitiesResolutionGameState, ImmediatelyHouseCardAbilitiesResolutionComponent],
-                    [CancelHouseCardAbilitiesGameState, CancelHouseCardAbilitiesComponent]
+                    [CancelHouseCardAbilitiesGameState, CancelHouseCardAbilitiesComponent],
+                    [BeforeCombatHouseCardAbilitiesGameState, BeforeCombatHouseCardAbilitiesComponent]
                 ])}
             </>
         );
