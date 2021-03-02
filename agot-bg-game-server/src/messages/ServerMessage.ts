@@ -11,7 +11,7 @@ import { CrowKillersStep } from "../common/ingame-game-state/westeros-game-state
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady | PlayerUnready
     | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | SupportRefused | NewTurn | RemovePlacedOrder
-    | MoveUnits | CombatChangeArmy | VassalsClaimed
+    | MoveUnits | CombatChangeArmy
     | UnitsWounded | ChangeCombatHouseCard | BeginSeeTopWildlingCard
     | RavenOrderReplaced | RevealTopWildlingCard | HideTopWildlingCard | ProceedWesterosCard | ChangeGarrison
     | BiddingBegin | BidDone | BiddingNextTrack | GameStateChange | SupplyAdjusted
@@ -19,7 +19,8 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | RemoveUnits | AddUnits | ChangeTracker | ActionPhaseChangeOrder | ChangeStateHouseCard
     | SettingsChanged | ChangeValyrianSteelBladeUse |  NewPrivateChatRoom | GameSettingsChanged
     | UpdateWesterosDecks | UpdateConnectionStatus | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced
-    | CrowKillersStepChanged | ManipulateCombatHouseCard;
+    | CrowKillersStepChanged | ManipulateCombatHouseCard
+    | VassalRelations;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -300,8 +301,7 @@ interface CrowKillersStepChanged {
     newStep: CrowKillersStep;
 }
 
-interface VassalsClaimed {
-    type: "vassals-claimed";
-    vassals: string[];
-    house: string;
+interface VassalRelations {
+    type: "vassal-relations";
+    vassalRelations: [string, string][];
 }

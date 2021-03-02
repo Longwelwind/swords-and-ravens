@@ -444,10 +444,17 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </Col>
                 </Row>;
 
+            case "claim-vassals-began":
+                return <Row className="justify-content-center">
+                    <Col xs="auto">
+                        <h5><b>Claim Vassals</b></h5>
+                    </Col>
+                </Row>;
+
             case "planning-phase-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h5><b>Planning Phase</b></h5>
+                        <h5><b>{data.forVassals && "Vassal "}Planning Phase</b></h5>
                     </Col>
                 </Row>;
 

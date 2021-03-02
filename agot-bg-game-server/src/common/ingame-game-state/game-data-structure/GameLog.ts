@@ -7,7 +7,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | WesterosCardExecuted | WesterosCardDrawn | CombatResult | WildlingCardRevealed | WildlingBidding
     | HighestBidderChosen | LowestBidderChosen | PlayerMustered | WinnerDeclared
     | RavenHolderWildlingCardPutBottom | RavenHolderWildlingCardPutTop | RavenHolderReplaceOrder | RavenNotUsed | RaidDone | DarkWingsDarkWordsChoice
-    | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan
+    | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan | ClaimVassalsBegan
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
     | ActionPhaseBegan | ActionPhaseResolveRaidBegan | ActionPhaseResolveMarchBegan | ActionPhaseResolveConsolidatePowerBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingsAttack | MarchOrderRemoved
     | ConsolidatePowerOrderResolved | ArmiesReconciled | EnemyPortTaken | ShipsDestroyedByEmptyCastle
@@ -208,6 +208,10 @@ interface WinterIsComing {
     deckIndex: number;
 }
 
+interface ClaimVassalsBegan {
+    type: "claim-vassals-began";
+}
+
 interface WesterosPhaseBegan {
     type: "westeros-phase-began";
 }
@@ -252,6 +256,7 @@ interface ActionPhaseResolveConsolidatePowerBegan {
 
 interface PlanningPhaseBegan {
     type: "planning-phase-began";
+    forVassals?: boolean;
 }
 
 interface WildlingStrengthTriggerWildlingsAttack {

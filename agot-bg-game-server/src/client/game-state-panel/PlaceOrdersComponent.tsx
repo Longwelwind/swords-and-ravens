@@ -15,7 +15,6 @@ import PartialRecursive from "../../utils/PartialRecursive";
 import PlaceOrdersGameState from "../../common/ingame-game-state/planning-game-state/place-orders-game-state/PlaceOrdersGameState";
 import Player from "../../common/ingame-game-state/Player";
 import House from "../../common/ingame-game-state/game-data-structure/House";
-import { observable } from "mobx";
 import { OverlayTrigger, Popover } from "react-bootstrap";
 import BetterMap from "../../utils/BetterMap";
 import WesterosCardComponent from "./utils/WesterosCardComponent";
@@ -36,8 +35,6 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
 
     modifyRegionsOnMapCallback: any;
     modifyOrdersOnMapCallback: any;
-
-    @observable overlayTriggers = new BetterMap<Region, OverlayTrigger>();
 
     get player(): Player {
         if (!this.props.gameClient.authenticatedPlayer) {
@@ -74,7 +71,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                                 </Col> : <></>)
                         }
                         <Col xs={12}>
-                        {this.props.gameClient.authenticatedPlayer && (
+                        {this.props.gameClient.authenticatedPlayer && this.showButtons() && (
                                 <Row className="justify-content-center">
                                     <Col xs="auto">
                                         <Button
@@ -106,6 +103,10 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
         );
     }
 
+    showButtons(): boolean {
+        return !this.props.gameState.forVassals || this.props.gameState.ingameGameState.getVassalsControlledByPlayer(this.player).length > 0;
+    }
+
     isOrderAvailable(order: Order): boolean {
         if (!this.props.gameClient.authenticatedPlayer) {
             return false;
@@ -125,8 +126,13 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
 
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
         if (this.props.gameClient.authenticatedPlayer) {
-            return _.flatMap(
-                this.props.gameState.getHousesToPutOrdersForPlayer(this.props.gameClient.authenticatedPlayer).map(h => this.props.gameState.getPossibleRegionsForOrders(h).map(r => [
+            let possibleRegions = _.flatMap(this.props.gameState.getHousesToPutOrdersForPlayer(this.props.gameClient.authenticatedPlayer).map(h => this.props.gameState.getPossibleRegionsForOrders(h)));
+
+            if (this.forVassals && this.props.gameState.canReady(this.props.gameClient.authenticatedPlayer as Player).status) {
+                possibleRegions = [];
+            }
+
+            return possibleRegions.map(r => [
                     r,
                     {
                         // Highlight areas with no order
@@ -135,7 +141,6 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                             <OverlayTrigger
                                 placement="auto"
                                 trigger="click"
-                                ref={(ref: OverlayTrigger) => {this.overlayTriggers.set(r, ref)}}
                                 rootClose
                                 overlay={
                                     <Popover id={"region" + r.id}>
@@ -147,8 +152,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                                             }
                                             onOrderClick={o => {
                                                 this.props.gameState.assignOrder(r, o);
-                                                // @ts-ignore `hide` is not a public method of OverlayTrigger, but it does the job
-                                                this.overlayTriggers.get(r).hide();
+                                                document.body.click();
                                         }}/>
                                     </Popover>
                                 }
@@ -157,8 +161,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                             </OverlayTrigger>
                         )
                     }
-                ] as [Region, PartialRecursive<RegionOnMapProperties>]))
-            );
+                ] as [Region, PartialRecursive<RegionOnMapProperties>]);
         }
 
         return [];

@@ -46,11 +46,9 @@ export default class Game {
 
     /**
      * Contains the vassal relations of the game.
-     * `vassalRelations.get(lannister) == stark` means that
-     * the vassal house lannister is currently being commanded by
-     * stark.
+     * Key is the vassal house, value is the commander.
      */
-    vassalRelations = new BetterMap<House, House>();
+    @observable vassalRelations = new BetterMap<House, House>();
     revealedWesterosCards = 0;
 
     get ironThroneHolder(): House {

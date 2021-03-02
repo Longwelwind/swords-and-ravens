@@ -87,6 +87,8 @@ export default class IngameGameState extends GameState<
     }
 
     proceedPlanningGameState(planningRestrictions: PlanningRestriction[] = []): void {
+        this.game.vassalRelations = new BetterMap();
+        // this.broadcastVassalRelations();
         this.setChildGameState(new PlanningGameState(this)).firstStart(planningRestrictions);
     }
 
@@ -108,7 +110,7 @@ export default class IngameGameState extends GameState<
         this.log({type: "turn-begin", turn: this.game.turn});
 
         this.game.valyrianSteelBladeUsed = false;
-
+        
         // Unwound each units
         this.world.regions.forEach(r => r.units.forEach(u => u.wounded = false));
 
@@ -353,7 +355,6 @@ export default class IngameGameState extends GameState<
             this.game.turn++;
             this.game.valyrianSteelBladeUsed = false;
             this.world.regions.forEach(r => r.units.forEach(u => u.wounded = false));
-            this.game.vassalRelations = new BetterMap();
         } else if (message.type == "add-game-log") {
             this.gameLogManager.logs.push({data: message.data, time: new Date(message.time * 1000)});
         } else if (message.type == "change-tracker") {
@@ -395,7 +396,10 @@ export default class IngameGameState extends GameState<
 
             this.players.set(newUser, newPlayer);
             this.players.delete(oldPlayer.user);
-        } else {
+        } else if (message.type == "vassal-relations") {
+            this.game.vassalRelations = new BetterMap(message.vassalRelations.map(([vId, cId]) => [this.game.houses.get(vId), this.game.houses.get(cId)]));
+        }
+         else {
             this.childGameState.onServerMessage(message);
         }
     }
@@ -481,7 +485,7 @@ export default class IngameGameState extends GameState<
 
         return this.game.vassalRelations.tryGet(vassal, null) == player.house;
     }
-
+    
     getVassalsControlledByPlayer(player: Player): House[] {
         return this.getVassalHouses().filter(h => this.isVassalControlledByPlayer(h, player));
     }
@@ -496,6 +500,13 @@ export default class IngameGameState extends GameState<
 
     getTurnOrderWithoutVassals(): House[] {
         return this.game.getTurnOrder().filter(h => !this.isVassalHouse(h));
+    }
+
+    broadcastVassalRelations(): void {
+        this.entireGame.broadcastToClients({
+            type: "vassal-relations",
+            vassalRelations: this.game.vassalRelations.entries.map(([vassal, commander]) => [vassal.id, commander.id])
+        });
     }
 
     updateNote(note: string): void {
