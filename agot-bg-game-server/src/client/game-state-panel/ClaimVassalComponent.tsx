@@ -12,31 +12,38 @@ import _ from "lodash";
 export default class ClaimVassalComponent extends Component<GameStateComponentProps<ClaimVassalGameState>> {
     @observable selectedVassals: House[] = [];
 
-    // todo vassals: Polish the UI
     render(): ReactNode {
         return (
             <>
                 <Col xs={12} className="text-center">
-                    <strong>{this.props.gameState.house.name}</strong> may command <b>{this.props.gameState.count}</b> Vassal{this.props.gameState.count > 0 && "s"} house this turn.
+                    <strong>{this.props.gameState.house.name}</strong> may command <b>{this.props.gameState.count}</b> Vassal house{this.props.gameState.count > 0 && "s"} this turn.
                 </Col>
                 <Col xs={12}>
                     {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
-                        <div>
-                            {this.props.gameState.claimableVassals.map(h => (
-                                <Row key={h.id} className="mb-1">
-                                    <FormCheck
-                                        type="checkbox"
-                                        id={"vassal-" + h.id}
-                                        label={h.name}
-                                        checked={this.selectedVassals.includes(h)}
-                                        onChange={() => this.onChange(h)} />
+                        <>
+                            <Col xs={12}>
+                                {this.props.gameState.claimableVassals.map(h => (
+                                    <Row key={h.id} className="mb-1">
+                                        <FormCheck
+                                            type="checkbox"
+                                            id={"vassal-" + h.id}
+                                            label={h.name}
+                                            checked={this.selectedVassals.includes(h)}
+                                            onChange={() => this.onChange(h)} />
+                                    </Row>
+                                ))}
+                            </Col>
+                            <Col xs={12}>
+                                <Row className="justify-content-center">
+                                    <Col xs="auto">
+                                        <Button disabled={this.selectedVassals.length == 0} onClick={() => this.onClaimClick()}>Claim</Button>
+                                    </Col>
+                                    <Col xs="auto">
+                                        <Button onClick={() => this.onPassClick()}>Pass</Button>
+                                    </Col>
                                 </Row>
-                            ))}
-                            <Row>
-                                <Button disabled={this.selectedVassals.length == 0} onClick={() => this.onClaimClick()}>Claim</Button>
-                                <Button onClick={() => this.onPassClick()}>Pass</Button>
-                            </Row>
-                        </div>
+                            </Col>
+                        </>
                     ) : (
                         <>Waiting for {this.props.gameState.house.name}...</>
                     )}

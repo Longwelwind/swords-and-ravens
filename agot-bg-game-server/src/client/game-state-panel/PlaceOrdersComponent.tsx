@@ -126,11 +126,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
 
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
         if (this.props.gameClient.authenticatedPlayer) {
-            let possibleRegions = _.flatMap(this.props.gameState.getHousesToPutOrdersForPlayer(this.props.gameClient.authenticatedPlayer).map(h => this.props.gameState.getPossibleRegionsForOrders(h)));
-
-            if (this.forVassals && this.props.gameState.canReady(this.props.gameClient.authenticatedPlayer as Player).status) {
-                possibleRegions = [];
-            }
+            const possibleRegions = _.flatMap(this.housesToPlaceOrdersFor.map(h => this.props.gameState.getPossibleRegionsForOrders(h)));
 
             return possibleRegions.map(r => [
                     r,
@@ -170,7 +166,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
     modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
         if (this.props.gameClient.authenticatedPlayer) {
             return _.flatMap(
-                this.props.gameState.getHousesToPutOrdersForPlayer(this.props.gameClient.authenticatedPlayer).map(h => this.props.gameState.getPossibleRegionsForOrders(h).map(r => [
+                this.housesToPlaceOrdersFor.map(h => this.props.gameState.getPossibleRegionsForOrders(h).map(r => [
                     r,
                     {
                         highlight: {active: true},

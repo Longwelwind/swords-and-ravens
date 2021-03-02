@@ -54,7 +54,6 @@ export default class ClaimVassalsGameState extends GameState<PlanningGameState, 
         const countNonVassals = this.game.houses.size - countVassals;
         // Get the position in the Iron Throne track, but without considering the vassals
         const positionInTrack = this.game.ironThroneTrack.filter(h => !this.ingame.isVassalHouse(h)).indexOf(nextHouseToClaim);
-        // todo vassals: test passedVassalTokenSets
         const count = this.passedVassalsCount + (Math.floor(countVassals / countNonVassals) + (positionInTrack < (countVassals % countNonVassals) ? 1 : 0));
 
         console.log("proceed with ClaimVassalGameState. count: " + count);

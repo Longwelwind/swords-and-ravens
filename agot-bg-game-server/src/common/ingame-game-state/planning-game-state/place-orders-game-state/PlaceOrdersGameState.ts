@@ -62,7 +62,9 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
         });
 
         // Automatically set ready for houses which can't place orders
-        this.game.houses.forEach(h => {
+        this.game.houses.values.forEach(h => {
+            // The easiest way is to simply call this.setReady() as it checks for canReady
+            // but this from now on disables the possibilty to bypass canReady :(
             this.setReady(this.ingameGameState.getControllerOfHouse(h));
         });
     }
@@ -127,12 +129,15 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
             const house = _.find(this.getHousesToPutOrdersForPlayer(player), h => this.getPossibleRegionsForOrders(h).includes(region));
 
             if (house == null) {
-                throw new Error();
+                return;
             }
 
             if (order && !this.isOrderAvailable(house, order)) {
                 return;
             }
+
+            // When a player placed or removed an order he is unready
+            this.setUnready(player);
 
             if (order) {
                 this.placedOrders.set(region, order);
@@ -152,12 +157,12 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
             } else {
                 if (this.placedOrders.has(region)) {
                     this.placedOrders.delete(region);
-                }
 
-                this.entireGame.broadcastToClients({
-                    type: "remove-placed-order",
-                    regionId: region.id
-                });
+                    this.entireGame.broadcastToClients({
+                        type: "remove-placed-order",
+                        regionId: region.id
+                    });
+                }
             }
         } else if (message.type == "ready") {
             this.setReady(player);
@@ -167,7 +172,27 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
     }
 
     getPossibleRegionsForOrders(house: House): Region[] {
-        return this.game.world.getControlledRegions(house).filter(r => r.units.size > 0);
+        const possibleRegions = this.game.world.getControlledRegions(house).filter(r => r.units.size > 0);
+        
+        if (!this.forVassals) {
+            if (!this.ingameGameState.isVassalHouse(house)) {
+                return possibleRegions;
+            } else {
+                return [];
+            }
+        }
+
+        if (!this.ingameGameState.isVassalHouse(house)) {
+            return [];
+        }
+
+        const regionsWithOrders = possibleRegions.filter(r => this.placedOrders.has(r));
+
+        if (regionsWithOrders.length == MAX_VASSAL_ORDERS) {
+            return regionsWithOrders;
+        }
+
+        return possibleRegions;
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedPlaceOrdersGameState {
@@ -235,7 +260,6 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
     /**
      * Client
      */
-
     assignOrder(region: Region, order: Order | null): void {
         this.entireGame.sendMessageToServer({
             type: "place-order",
