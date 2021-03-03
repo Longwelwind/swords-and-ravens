@@ -41,6 +41,19 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         return this.props.gameClient.doesControlHouse(this.house);
     }
 
+    get defenseMusterOrderRegion(): Region | null {
+        if (this.props.gameState.type != PlayerMusteringType.DEFENSE_MUSTER_ORDER) {
+            return null;
+        }
+
+        const regions = this.props.gameState.resolveConsolidatePowerGameState.actionGameState.getRegionsWithDefenseMusterOrderOfHouse(this.house);
+        if (regions.length > 0) {
+            return regions[0];
+        }
+
+        return null;
+    }
+
     render(): ReactNode {
         return (
             <>
@@ -49,8 +62,10 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                         <>House <b>{this.house.name}</b> must resolve one of its Consolidate Power Orders.</>
                     ) : this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD ? (
                         <>Players can muster units in their controlled castles and fortresses.</>
-                    ) : this.props.gameState.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD && (
+                    ) : this.props.gameState.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD ? (
                         <>House <b>{this.house.name}</b> can muster units in one of their controlled castles or fortresses.</>
+                    ) : this.props.gameState.type == PlayerMusteringType.DEFENSE_MUSTER_ORDER && (
+                        <>Vassal house <b>{this.house.name}</b> can resolve their Muster Order{this.defenseMusterOrderRegion && <> in <b>{this.defenseMusterOrderRegion.name}</b></>}.</>
                     )}
                 </Col>
                 {this.doesControlCurrentHouse ? (
@@ -69,7 +84,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                                             <ul>
                                                 {musterings.map(({region, from, to}, i) => (
                                                     <li onClick={() => this.removeMustering(musterings, i)} key={i}>
-                                                        {from ? "Upgrading to " : "Recruiting "} a {to.name}{r != region && ("in " + region.name)}
+                                                        {from ? "Upgrading to " : "Recruiting "} a {to.name}{r != region && (" in " + region.name)}
                                                     </li>
                                                 ))}
                                             </ul>
@@ -181,6 +196,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                 // If he can't use it for muster, he has to use it for gaining PTs
                 return this.musterings.size == 1 && this.musterings.values.length > 0;
             case PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD:
+            case PlayerMusteringType.DEFENSE_MUSTER_ORDER:
                 return this.musterings.size <= 1;
         }
     }
@@ -228,8 +244,10 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
     private modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
         if (this.doesControlCurrentHouse) {
             let regionsToModify = (this.isStarredConsolidatePowerMusteringType
-                ? this.props.gameState.resolveConsolidatePowerGameState.actionGameState.getRegionsWithConsolidatePowerOrderOfHouse(this.house).map(([r, _order]) => r).filter(r => this.hasStarredConsolidatePowerOrder(r))
-                : this.props.gameState.game.world.regions.values.filter(r => r.getController() == this.house)).filter(r => this.props.gameState.getValidMusteringRulesForRegion(r, this.musterings).length > 0);
+                ? this.props.gameState.resolveConsolidatePowerGameState.actionGameState.getRegionsWithStarredConsolidatePowerOrderOfHouse(this.house)
+                : this.props.gameState.type == PlayerMusteringType.DEFENSE_MUSTER_ORDER 
+                    ? this.props.gameState.resolveConsolidatePowerGameState.actionGameState.getRegionsWithDefenseMusterOrderOfHouse(this.house)
+                    : this.props.gameState.game.world.regions.values.filter(r => r.getController() == this.house)).filter(r => this.props.gameState.getValidMusteringRulesForRegion(r, this.musterings).length > 0);
 
             if (this.props.gameState.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD) {
                 if (this.musterings.size == 1) {

@@ -25,6 +25,7 @@ import planningRestrictions from "../game-data-structure/westeros-card/planning-
 import RaidSupportOrderType from "../game-data-structure/order-types/RaidSupportOrderType";
 import Unit from "../game-data-structure/Unit";
 import {footman} from "../game-data-structure/unitTypes";
+import DefenseMusterOrderType from "../game-data-structure/order-types/DefenseMusterOrderType";
 
 export default class ActionGameState extends GameState<IngameGameState, UseRavenGameState | ResolveRaidOrderGameState | ResolveMarchOrderGameState | ResolveConsolidatePowerGameState> {
     planningRestrictions: PlanningRestriction[];
@@ -116,11 +117,11 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
         return footmen;
     }
 
-    getRegionsWithRaidOrderOfHouse(house: House): Region[] {
+    getRegionsWithRaidOrderOfHouse(house: House): [Region, RaidOrderType | RaidSupportOrderType][] {
         return this.ordersOnBoard.entries
             .filter(([region, _order]) => region.getController() == house)
             .filter(([_region, order]) => order.type instanceof RaidOrderType || order.type instanceof RaidSupportOrderType)
-            .map(([region, _order]) => region);
+            .map(([region, order]) => [region, order.type as RaidOrderType | RaidSupportOrderType]);
     }
 
     getRegionsWithMarchOrderOfHouse(house: House): Region[] {
@@ -130,14 +131,21 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
             .map(([region, _order]) => region);
     }
 
-    getRegionsWithConsolidatePowerOrderOfHouse(house: House): [Region, Order][] {
+    getRegionsWithConsolidatePowerOrderOfHouse(house: House): [Region, ConsolidatePowerOrderType][] {
         return this.ordersOnBoard.entries
             .filter(([region, _order]) => region.getController() == house)
-            .filter(([_region, order]) => order.type instanceof ConsolidatePowerOrderType);
+            .filter(([_region, order]) => order.type instanceof ConsolidatePowerOrderType)
+            .map(([region, order]) => [region, order.type]);
     }
 
     getRegionsWithStarredConsolidatePowerOrderOfHouse(house: House): Region[] {
-        return this.getRegionsWithConsolidatePowerOrderOfHouse(house).filter(([_, o]) => o.type.starred).map(([r, _]) => r);
+        return this.getRegionsWithConsolidatePowerOrderOfHouse(house).filter(([_, ot]) => ot.starred).map(([r, _]) => r);
+    }
+
+    getRegionsWithDefenseMusterOrderOfHouse(house: House): Region[] {
+        return this.ordersOnBoard.entries
+            .filter(([region, _order]) => region.getController() == house)
+            .filter(([_region, order]) => order.type instanceof DefenseMusterOrderType).map(([r, _]) => r);
     }
 
     getPossibleSupportingRegions(attackedRegion: Region): {region: Region; support: SupportOrderType}[] {

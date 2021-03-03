@@ -25,7 +25,7 @@ export const specialConsolidatePower = new ConsolidatePowerOrderType("special-co
 export const raid = new RaidOrderType("raid", "Raid", false);
 export const specialRaid = new RaidOrderType("special-raid", "Special Raid", true);
 
-export const raidSupportPlusOne = new RaidSupportOrderType("raid-support-plus-one", "Raid/Support +1", false);
+export const raidSupportPlusOne = new RaidSupportOrderType("raid-support-plus-one", "Raid/Support +1", false, 1);
 export const defensePlusOneMuster = new DefenseMusterOrderType("defense-plus-one-muster", "Defense +1/Muster", false);
 
 const orderTypes = new BetterMap<string, OrderType>([
@@ -40,7 +40,8 @@ const orderTypes = new BetterMap<string, OrderType>([
     [specialConsolidatePower.id, specialConsolidatePower],
     [raid.id, raid],
     [specialRaid.id, specialRaid],
-    [defensePlusThree.id, defensePlusThree],
+    [raidSupportPlusOne.id, raidSupportPlusOne],
+    [defensePlusOneMuster.id, defensePlusOneMuster]
 ]);
 
 export default orderTypes;

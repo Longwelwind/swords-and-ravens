@@ -15,7 +15,7 @@ export default class RaidSupportOrderType extends OrderType {
 
     getRaidableOrderTypes(): any[] {
         return _.concat(
-            [RaidOrderType, ConsolidatePowerOrderType, SupportOrderType]
+            [RaidOrderType, ConsolidatePowerOrderType, SupportOrderType, RaidSupportOrderType]
         );
     }
 
