@@ -92,7 +92,7 @@ import serDavenLannisterImage from "../../public/images/house-cards/DavenLannist
 
 import varysImage from "../../public/images/house-cards/Varys.png";
 import syrioImage from "../../public/images/house-cards/SyrioForel.png";
-import jaqenImage from "../../public/images/house-cards/JaqenHGar.png";
+import jaqenImage from "../../public/images/house-cards/JaqenHGhar.png";
 import janosImage from "../../public/images/house-cards/JanosSlynt.png";
 import jonConningtonImage from "../../public/images/house-cards/JonConnington.png";
 import bericImage from "../../public/images/house-cards/BericDondarrion.png";
