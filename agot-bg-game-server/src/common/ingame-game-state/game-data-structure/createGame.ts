@@ -82,7 +82,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
         Object.entries(baseGameData.houses as {[key: string]: HouseData})
         .filter(([hid, _]) => housesToCreate.includes(hid)));
 
-    /* In the previous version the productive system sometimes applied the garrisons (only the garrisons, 
+    /* In the previous version the productive system sometimes applied the garrisons (only the garrisons,
         not the tokens on board which is weird!) of the adwd setup though only adwdHouseCards were set with another game setup.
         Don't ask me why but it seems as getting the house cards from the adwd setup makes trouble in the productive system.
         During debug this never happened! So we now define the adwd house cards in the baseGameSetup directly, not under the adwd setup

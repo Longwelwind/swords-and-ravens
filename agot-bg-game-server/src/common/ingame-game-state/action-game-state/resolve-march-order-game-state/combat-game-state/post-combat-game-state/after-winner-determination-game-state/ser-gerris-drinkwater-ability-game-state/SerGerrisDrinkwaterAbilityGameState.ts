@@ -9,6 +9,8 @@ import {ClientMessage} from "../../../../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../../../../messages/ServerMessage";
 import ActionGameState from "../../../../../ActionGameState";
 import IngameGameState from "../../../../../../IngameGameState";
+import BetterMap from "../../../../../../../../utils/BetterMap";
+import { serGerrisDrinkwater } from "../../../../../../../../common/ingame-game-state/game-data-structure/house-card/houseCardAbilities";
 
 export default class SerGerrisDrinkwaterAbilityGameState extends GameState<
     AfterWinnerDeterminationGameState["childGameState"],
@@ -30,23 +32,31 @@ export default class SerGerrisDrinkwaterAbilityGameState extends GameState<
         return this.parentGameState.parentGameState.parentGameState.parentGameState.ingameGameState;
     }
 
+    getChoices(house: House): BetterMap<string, number> {
+        const choices = new BetterMap<string, number>();
+        choices.set("Ignore", -1);
+
+        for (let trackI = 0; trackI < this.game.influenceTracks.length; trackI++) {
+            const influenceTrack = this.game.getInfluenceTrackByI(trackI);
+            if (influenceTrack[0] != house && this.game.getTokenHolder(influenceTrack) != house) {
+                choices.set(this.game.getNameInfluenceTrack(trackI), trackI);
+            }
+        }
+
+        return choices;
+    }
+
     firstStart(house: House): void {
-        const choices: string[] = ["Ignore"];
-    
-        let influenceTrack = this.game.getInfluenceTrackByI(0);
-        if (influenceTrack[0] != house) {
-            choices.push("Iron Throne")
-        }
+        const choices = this.getChoices(house).keys;
+        if (choices.length == 1) {
+            this.ingame.log({
+                type: "house-card-ability-not-used",
+                house: house.id,
+                houseCard: serGerrisDrinkwater.id
+            });
 
-        influenceTrack = this.game.getInfluenceTrackByI(1);
-        if (influenceTrack[0] != house) {
-            choices.push("Fiefdoms")
-        }
-
-        influenceTrack = this.game.getInfluenceTrackByI(2);
-        if (influenceTrack[0] != house) {
-            choices.push("King's Court")
-        }
+            this.parentGameState.onHouseCardResolutionFinish(house);
+        };
 
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
             house,
@@ -59,20 +69,30 @@ export default class SerGerrisDrinkwaterAbilityGameState extends GameState<
         const house = this.childGameState.house;
 
         if (choice == 0) {
+            this.ingame.log({
+                type: "house-card-ability-not-used",
+                house: house.id,
+                houseCard: serGerrisDrinkwater.id
+            });
             this.parentGameState.onHouseCardResolutionFinish(house);
         } else {
-            const influenceTrack = this.game.getInfluenceTrackByI(choice-1);
+            const trackI = this.getChoices(house).values[choice];
+            const influenceTrack = this.game.getInfluenceTrackByI(trackI);
             const position = influenceTrack.indexOf(house);
             influenceTrack.splice(position-1, 0, influenceTrack.splice(position, 1)[0]);
-            this.parentGameState.onHouseCardResolutionFinish(house);
-
-            // event ze gerris dodal +1
-
             this.parentGameState.entireGame.broadcastToClients({
                 type: "change-tracker",
-                trackerI: choice-1,
+                trackerI: trackI,
                 tracker: influenceTrack.map(h => h.id)
             });
+
+            this.ingame.log({
+                type: "ser-gerris-drinkwater-used",
+                house: this.childGameState.house.id,
+                influenceTrack: trackI
+            });
+
+            this.parentGameState.onHouseCardResolutionFinish(house);
         }
     }
 
