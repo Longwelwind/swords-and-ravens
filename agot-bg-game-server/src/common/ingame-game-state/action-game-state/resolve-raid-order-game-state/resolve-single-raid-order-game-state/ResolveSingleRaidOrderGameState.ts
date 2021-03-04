@@ -81,9 +81,9 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
 
     resolveRaidOrder(orderRegion: Region, targetRegion: Region | null): void {
         const order = this.actionGameState.ordersOnBoard.get(orderRegion);
-        const orderType = order.type instanceof RaidOrderType 
-            ? order.type as RaidOrderType 
-            : order.type instanceof RaidSupportOrderType 
+        const orderType = order.type instanceof RaidOrderType
+            ? order.type as RaidOrderType
+            : order.type instanceof RaidSupportOrderType
                 ? order.type as RaidSupportOrderType : null;
 
         if (targetRegion && orderType) {

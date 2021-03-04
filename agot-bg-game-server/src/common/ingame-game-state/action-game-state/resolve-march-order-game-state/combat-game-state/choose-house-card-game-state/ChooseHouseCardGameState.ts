@@ -227,7 +227,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
             return [house, hcids.map(hcid => associatedHouseCards.get(hcid))];
         }));
-        
+
         chooseHouseCardGameState.houseCards = new BetterMap(data.houseCards.map(([hid, hcid]) => {
             const house = combatGameState.game.houses.get(hid);
 

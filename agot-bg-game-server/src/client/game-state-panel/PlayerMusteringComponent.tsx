@@ -245,7 +245,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         if (this.doesControlCurrentHouse) {
             let regionsToModify = (this.isStarredConsolidatePowerMusteringType
                 ? this.props.gameState.resolveConsolidatePowerGameState.actionGameState.getRegionsWithStarredConsolidatePowerOrderOfHouse(this.house)
-                : this.props.gameState.type == PlayerMusteringType.DEFENSE_MUSTER_ORDER 
+                : this.props.gameState.type == PlayerMusteringType.DEFENSE_MUSTER_ORDER
                     ? this.props.gameState.resolveConsolidatePowerGameState.actionGameState.getRegionsWithDefenseMusterOrderOfHouse(this.house)
                     : this.props.gameState.game.world.regions.values.filter(r => r.getController() == this.house)).filter(r => this.props.gameState.getValidMusteringRulesForRegion(r, this.musterings).length > 0);
 

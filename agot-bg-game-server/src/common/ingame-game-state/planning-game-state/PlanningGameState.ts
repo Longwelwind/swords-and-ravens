@@ -71,7 +71,7 @@ export default class PlanningGameState extends GameState<IngameGameState, PlaceO
 
         planningGameState.planningRestrictions = data.planningRestrictions.map(prid => planningRestrictions.get(prid));
         planningGameState.childGameState = planningGameState.deserializeChildGameState(data.childGameState);
-        
+
         return planningGameState;
     }
 

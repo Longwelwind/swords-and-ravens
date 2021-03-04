@@ -15,7 +15,7 @@ import RaidSupportOrderType from "../../game-data-structure/order-types/RaidSupp
 
 export default class ResolveRaidOrderGameState extends GameState<ActionGameState, ResolveSingleRaidOrderGameState> {
     resolvedRaidSupportOrderRegions: Region[] = [];
-    
+
     get actionGameState(): ActionGameState {
         return this.parentGameState;
     }
@@ -87,7 +87,7 @@ export default class ResolveRaidOrderGameState extends GameState<ActionGameState
         // If no house has any raid order available, return null
         return null;
     }
-    
+
     getRegionsWithRaidOrderOfHouse(house: House): [Region, RaidOrderType | RaidSupportOrderType][] {
         return this.actionGameState.getRegionsWithRaidOrderOfHouse(house).filter(([r, _ot]) => !this.resolvedRaidSupportOrderRegions.includes(r));
     }

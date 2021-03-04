@@ -110,7 +110,7 @@ export default class IngameGameState extends GameState<
         this.log({type: "turn-begin", turn: this.game.turn});
 
         this.game.valyrianSteelBladeUsed = false;
-        
+
         // Unwound each units
         this.world.regions.forEach(r => r.units.forEach(u => u.wounded = false));
 
@@ -469,11 +469,11 @@ export default class IngameGameState extends GameState<
             player: player.user.id
         });
     }
-    
+
     getVassalHouses(): House[] {
         return this.game.houses.values.filter(h => this.isVassalHouse(h));
     }
-    
+
     getNonVassalHouses(): House[] {
         return this.game.houses.values.filter(h => !this.isVassalHouse(h));
     }
@@ -485,7 +485,7 @@ export default class IngameGameState extends GameState<
 
         return this.game.vassalRelations.tryGet(vassal, null) == player.house;
     }
-    
+
     getVassalsControlledByPlayer(player: Player): House[] {
         return this.getVassalHouses().filter(h => this.isVassalControlledByPlayer(h, player));
     }

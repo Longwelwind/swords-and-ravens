@@ -32,7 +32,7 @@ export default class SerGerrisDrinkwaterAbilityGameState extends GameState<
 
     firstStart(house: House): void {
         const choices: string[] = ["Ignore"];
-    
+
         let influenceTrack = this.game.getInfluenceTrackByI(0);
         if (influenceTrack[0] != house) {
             choices.push("Iron Throne")

@@ -239,7 +239,7 @@ export default class CombatGameState extends GameState<
                 : order.type instanceof DefenseMusterOrderType
                     ? order.type as DefenseMusterOrderType
                     : null;
-                    
+
 
             if (orderType) {
                 return this.computeModifiedStat(
