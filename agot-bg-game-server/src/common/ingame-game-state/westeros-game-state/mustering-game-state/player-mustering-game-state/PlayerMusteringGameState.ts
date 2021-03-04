@@ -129,6 +129,13 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 }
             }
 
+            // A vassal can only muster to their home town
+            if (this.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD && this.ingame.isVassalHouse(this.house)) {
+                if (musterings.keys.some(r => r.superControlPowerToken != this.house)) {
+                    return;
+                }
+            }
+
             if (!this.isMusteringValid(musterings)) {
                 return;
             }
@@ -378,7 +385,11 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         switch(this.type) {
             case PlayerMusteringType.MUSTERING_WESTEROS_CARD:
                 // Return true if there is any valid mustering rule for any controlled castle unused
-                const controlledCastles = this.game.world.getControlledRegions(this.house).filter(r => r.castleLevel > 0);
+                let controlledCastles = this.game.world.getControlledRegions(this.house).filter(r => r.castleLevel > 0);
+                if (this.ingame.isVassalHouse(this.house)) {
+                    controlledCastles = controlledCastles.filter(r => r.superControlPowerToken == this.house);
+                }
+
                 return _.flatMap(controlledCastles.map(c => this.getValidMusteringRulesForRegion(c, musterings))).length > 0;
             case PlayerMusteringType.STARRED_CONSOLIDATE_POWER: {
                 const parentResolveConsolidatePowerGameState: ResolveConsolidatePowerGameState | null = this.parentGameState instanceof ResolveConsolidatePowerGameState ? this.parentGameState : null;

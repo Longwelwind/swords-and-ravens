@@ -255,6 +255,10 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                 }
             }
 
+            if (this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD && this.props.gameState.ingame.isVassalHouse(this.house)) {
+                regionsToModify = regionsToModify.filter(r => r.superControlPowerToken == this.house);
+            }
+
             return regionsToModify
                 .map(modifiedRegion => [
                         modifiedRegion,
