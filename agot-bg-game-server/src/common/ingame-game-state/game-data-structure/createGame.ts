@@ -33,6 +33,7 @@ interface UnitData {
     unitType: string;
     house: string;
     quantity: number;
+    quantityVassal?: number;
 }
 
 interface HouseCardData {
@@ -85,7 +86,7 @@ function createHouseCard(houseCardId: string, houseCardData: HouseCardData): Hou
 
     return houseCard;
 }
-export default function createGame(ingame: IngameGameState, housesToCreate: string[]): Game {
+export default function createGame(ingame: IngameGameState, housesToCreate: string[], playerHouses: string[]): Game {
     const entireGame = ingame.entireGame;
     const gameSettings = entireGame.gameSettings;
 
@@ -155,7 +156,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
                     .map(([unitTypeId, limit]) => [unitTypes.get(unitTypeId), limit])
             );
 
-            const house = new House(hid, houseData.name, houseData.color, houseCards, unitLimits, 5, houseData.supplyLevel);
+            const house = new House(hid, houseData.name, houseData.color, playerHouses.includes(hid) ? houseCards : new BetterMap(), unitLimits, 5, houseData.supplyLevel);
 
             return [hid, house];
         })
@@ -241,14 +242,14 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             const region = game.world.regions.get(regionId);
             const house = game.houses.get(unitData.house);
             const unitType = unitTypes.get(unitData.unitType);
-            const quantity = unitData.quantity;
+            const quantity = playerHouses.includes(house.id) ? unitData.quantity : (unitData.quantityVassal ? unitData.quantityVassal : 0);
 
             // Check if the game setup removed units off this region
             if (entireGame.selectedGameSetup.removedUnits && entireGame.selectedGameSetup.removedUnits.includes(region.id)) {
                 return;
             }
 
-            for (let i = 0;i < quantity;i++) {
+            for (let i = 0;i < quantity; i++) {
                 const unit = game.createUnit(region, unitType, house);
 
                 region.units.set(unit.id, unit);
