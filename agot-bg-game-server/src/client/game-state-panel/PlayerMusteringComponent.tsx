@@ -69,7 +69,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                                             <ul>
                                                 {musterings.map(({region, from, to}, i) => (
                                                     <li onClick={() => this.removeMustering(musterings, i)} key={i}>
-                                                        {from ? "Upgrading to " : "Recruiting "} a {to.name}{r != region && ("in " + region.name)}
+                                                        {from ? "Upgrading to " : "Recruiting "} a {to.name}{r != region && (" in " + region.name)}
                                                     </li>
                                                 ))}
                                             </ul>
