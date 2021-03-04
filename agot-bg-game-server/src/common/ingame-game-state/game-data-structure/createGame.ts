@@ -95,19 +95,16 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         Object.entries(baseGameData.houses as {[key: string]: HouseData})
         .filter(([hid, _]) => housesToCreate.includes(hid)));
 
-    // Overwrite house cards
-    if (entireGame.selectedGameSetup.houseCards != undefined) {
-        const newHouseCards = new BetterMap(
-            Object.entries(entireGame.selectedGameSetup.houseCards)
-            .filter(([hid, _]) => housesToCreate.includes(hid)));
+    /* In the previous version the productive system sometimes applied the garrisons (only the garrisons, 
+        not the tokens on board which is weird!) of the adwd setup though only adwdHouseCards were set with another game setup.
+        Don't ask me why but it seems as getting the house cards from the adwd setup makes trouble in the productive system.
+        During debug this never happened! So we now define the adwd house cards in the baseGameSetup directly, not under the adwd setup
+        which hopefully solves the issues (#792 #796).
+     */
 
-        newHouseCards.keys.forEach(hid => {
-           const newHouseData = baseGameHousesToCreate.get(hid);
-           newHouseData.houseCards = newHouseCards.get(hid).houseCards;
-           baseGameHousesToCreate.set(hid, newHouseData);
-        });
-    } else if (gameSettings.adwdHouseCards) {
-        const adwdHouseCards = allGameSetups.get("a-dance-with-dragons").playerSetups[0].houseCards as {[key: string]: HouseCardContainer};
+     // Overwrite house cards
+    if (gameSettings.adwdHouseCards) {
+        const adwdHouseCards = baseGameData.adwdHouseCards as {[key: string]: HouseCardContainer};
         const newHouseCards = new BetterMap(
             Object.entries(adwdHouseCards)
             .filter(([hid, _]) => housesToCreate.includes(hid)));
