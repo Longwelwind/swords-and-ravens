@@ -62,7 +62,6 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "resolve-march-order") {
             if (this.ingame.getControllerOfHouse(this.house) != player) {
-                console.warn("Not correct house");
                 return;
             }
 
@@ -75,7 +74,6 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
 
             // Check that there is indeed a march order there
             if (!this.getRegionsWithMarchOrder().includes(startingRegion)) {
-                console.warn("No march order on startingRegion");
                 return;
             }
 
@@ -99,7 +97,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             let leftPowerToken: boolean | null = null;
             const canLeavePowerToken = this.canLeavePowerToken(startingRegion, new BetterMap(moves)).success;
 
-            if (message.leavePowerToken && canLeavePowerToken) {
+            if ((message.leavePowerToken && canLeavePowerToken) || (this.ingame.isVassalHouse(this.house) && canLeavePowerToken)) {
                 startingRegion.controlPowerToken = this.house;
                 this.house.powerTokens -= 1;
 
@@ -417,10 +415,6 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             return {success: false, reason: "already-power-token"};
         }
 
-        if (this.house.powerTokens == 0) {
-            return {success: false, reason: "no-power-token-available"};
-        }
-
         if (startingRegion.type.kind != RegionKind.LAND) {
             return {success: false, reason: "not-a-land"};
         }
@@ -428,6 +422,14 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
         // The player can place a power token if all units go out
         if (!this.haveAllUnitsLeft(startingRegion, moves)) {
             return {success: false, reason: "no-all-units-go"}
+        }
+
+        if (this.ingame.isVassalHouse(this.house)) {
+            return {success: true, reason: "vassals-always-leave-power-token"}
+        }
+
+        if (this.house.powerTokens == 0) {
+            return {success: false, reason: "no-power-token-available"};
         }
 
         return {success: true, reason: "ok"};
