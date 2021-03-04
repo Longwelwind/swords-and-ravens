@@ -498,6 +498,31 @@ export default class IngameGameState extends GameState<
         return !this.players.values.map(p => p.house).includes(house);
     }
 
+    getOtherVassalFamilyHouses(house: House): (House | null)[] {
+        const result: House[] = [];
+        if (this.game.vassalRelations.has(house)) {
+            // If house is a vassal add its commander ...
+            const vassalCommader = this.game.vassalRelations.get(house);
+            result.push(vassalCommader);
+
+            // ... and all other vassals except myself
+            this.game.vassalRelations.entries.forEach(([vassal, commander]) => {
+                if (commander == vassalCommader && vassal != house) {
+                    result.push(vassal);
+                }
+            });
+        } else {
+            // If house is no vassal add potentially controlled vassals
+            this.game.vassalRelations.entries.forEach(([vassal, commander]) => {
+                if (commander == house) {
+                    result.push(vassal);
+                }
+            });
+        }
+
+        return result;
+    }
+
     getTurnOrderWithoutVassals(): House[] {
         return this.game.getTurnOrder().filter(h => !this.isVassalHouse(h));
     }
