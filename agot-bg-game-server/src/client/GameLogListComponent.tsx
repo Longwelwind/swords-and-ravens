@@ -1122,7 +1122,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>{house.name}</b> claimed {joinReactNodes(vassals.map(v => <b key={v.id}>{v.name}</b>), ", ")} as
                     vassal{vassals.length > 0 && "s"}.
                 </>;
-	    }
+	        }
+        case "commander-power-token-gained": {
+                const house = this.game.houses.get(data.house);
+                return <>
+                    Commander <b>{house.name}</b> gained a Power token for this battle.
+                </>;
+            }
         }
     }
 }

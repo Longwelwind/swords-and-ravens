@@ -211,6 +211,19 @@ export default class PostCombatGameState extends GameState<
     }
 
     proceedAfterWinnerDetermination(): void {
+        const ingame = this.combat.ingameGameState;
+        // A commander earns a Power Token if his vassal wins a battle
+        if (ingame.isVassalHouse(this.winner)) {
+            const commander = ingame.getControllerOfHouse(this.winner).house;
+            const changed = ingame.changePowerTokens(commander, 1);
+            if (changed > 0) {
+                ingame.log({
+                    type: "commander-power-token-gained",
+                    house: commander.id
+                });
+            }
+        }
+
         // Do abilities
         this.setChildGameState(new AfterWinnerDeterminationGameState(this)).firstStart();
     }
