@@ -16,6 +16,7 @@ import AfterWinnerDeterminationGameState
 import AfterCombatHouseCardAbilitiesGameState
     , {SerializedAfterCombatHouseCardAbilitiesGameState} from "./after-combat-house-card-abilities-game-state/AfterCombatHouseCardAbilitiesGameState";
 import ResolveRetreatGameState, {SerializedResolveRetreatGameState} from "./resolve-retreat-game-state/ResolveRetreatGameState";
+import BetterMap from "../../../../../../utils/BetterMap";
 
 export default class PostCombatGameState extends GameState<
     CombatGameState,
@@ -197,7 +198,14 @@ export default class PostCombatGameState extends GameState<
 
     proceedHouseCardHandling(): void {
         // Put the house cards as used
-        this.combat.houseCombatDatas.forEach(({houseCard}, house) => this.markHouseAsUsed(house, houseCard));
+        // Unassign the house cards from vassals again
+        this.combat.houseCombatDatas.forEach(({houseCard}, house) => {
+            if (this.combat.ingameGameState.isVassalHouse(house)) {
+                house.houseCards = new BetterMap();
+            } else {
+                this.markHouseAsUsed(house, houseCard);
+            }
+        });
 
         this.proceedAfterWinnerDetermination();
     }

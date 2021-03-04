@@ -43,6 +43,16 @@ export default class PatchfaceAbilityGameState extends GameState<
 
             const choosableHouseCards = enemy.houseCards.values.filter(hc => hc.state == HouseCardState.AVAILABLE);
 
+            if (choosableHouseCards.length == 0) { // Vassal house cards
+                this.ingame.log({
+                    type: "house-card-ability-not-used",
+                    house: house.id,
+                    houseCard: patchface.id
+                });
+
+                this.parentGameState.onHouseCardResolutionFinish(house);
+            }
+
             this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(house, choosableHouseCards);
         } else {
             this.ingame.log({
@@ -54,11 +64,7 @@ export default class PatchfaceAbilityGameState extends GameState<
         }
     }
 
-    onSelectHouseCardFinish(house: House, houseCard: HouseCard | null): void {
-        if (houseCard == null) {
-            return;
-        }
-
+    onSelectHouseCardFinish(house: House, houseCard: HouseCard): void {
         houseCard.state = HouseCardState.USED;
 
         const affectedHouse = this.game.houses.values.find(h => h.houseCards.values.includes(houseCard)) as House;

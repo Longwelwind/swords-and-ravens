@@ -74,18 +74,6 @@ export function getGameSetupContainer(setupId: string): GameSetupContainer {
     return allGameSetups.get(setupId);
 }
 
-function createHouseCard(houseCardId: string, houseCardData: HouseCardData): HouseCard {
-    const houseCard = new HouseCard(
-        houseCardId,
-        houseCardData.name,
-        houseCardData.combatStrength ? houseCardData.combatStrength : 0,
-        houseCardData.swordIcons ? houseCardData.swordIcons : 0,
-        houseCardData.towerIcons ? houseCardData.towerIcons : 0,
-        houseCardData.ability ? houseCardAbilities.get(houseCardData.ability) : null
-    );
-
-    return houseCard;
-}
 export default function createGame(ingame: IngameGameState, housesToCreate: string[], playerHouses: string[]): Game {
     const entireGame = ingame.entireGame;
     const gameSettings = entireGame.gameSettings;
@@ -220,11 +208,6 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
 
         return _.shuffle(cards);
     });
-
-    // Load vassal house cards
-    game.vassalHouseCards = new BetterMap(Object.entries(baseGameData.vassalHouseCards).map(([houseCardId, houseCardData]) => {
-        return [houseCardId, createHouseCard(houseCardId, houseCardData)];
-    }));
 
     // Load Wildling deck
     let lastId = 0;
