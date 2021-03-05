@@ -3,6 +3,7 @@ import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes
 import staticWorld from "../common/ingame-game-state/game-data-structure/static-data-structure/globalStaticWorld";
 import { CrowKillersStep } from "../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/crow-killers-wildling-victory-game-state/CrowKillersWildlingVictoryGameState";
 import { SerializedHouse } from "../common/ingame-game-state/game-data-structure/House";
+import { HouseCardState } from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
     {
@@ -432,6 +433,56 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         log.data.houseCard = "melisandre-dwd";
                     }
                 });
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "15",
+        migrate: (serializedGame: any) => {
+            // Migration for #450 Vassals
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                // Init vassal Relations
+                ingame.game.vassalRelations = [];
+
+                // Old planning phase is now child place-orders not for vassals
+                if (ingame.childGameState.type == "planning") {
+                    const planning = ingame.childGameState;
+
+                    planning.childGameState = {
+                        type: "place-orders",
+                        readyHouses: planning.readyHouses,
+                        placedOrders: planning.placedOrders,
+                        forVassals: false
+                    };
+                }
+
+                if (ingame.childGameState.type == "action") {
+                    const action = ingame.childGameState;
+
+                    if (action.childGameState.type == "resolve-raid-order") {
+                        const resolveRaid = action.childGameState;
+                        resolveRaid.resolvedRaidSupportOrderRegions = [];
+                    }
+
+                    if (action.childGameState.type == "resolve-march-order") {
+                        const resolveMarch = action.childGameState;
+                        if (resolveMarch.childGameState.type == "combat") {
+                            const combat = resolveMarch.childGameState;
+                            if (combat.childGameState.type == "choose-house-card") {
+                                const chooseHouseCard = combat.childGameState;
+                                const houses = new BetterMap((ingame.game.houses as SerializedHouse[]).map(h => [h.id, h]));
+                                const combatData = combat.combat.houseCombatDatas as [string, {houseCardId: string | null; army: number[]; regionId: string}][];
+                                const combatHouses = combatData.map(([h, _hcd]) => h);
+                                chooseHouseCard.choosableHouseCards = combatHouses.map(hid => [hid, 
+                                    houses.get(hid).houseCards.filter(([_hcid, hc]) => hc.state == HouseCardState.AVAILABLE).map(([hcid, _hc]) => hcid)]);
+                            }
+                        }
+                    }
+                }
             }
 
             return serializedGame;

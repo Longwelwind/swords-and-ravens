@@ -86,7 +86,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                             <Tooltip id="vassals-tooltip">
                                                 Unassigned houses will be vassals.
                                             </Tooltip>}>
-                                            <label htmlFor="vassals-setting">Vassals</label>
+                                            <label htmlFor="vassals-setting">Vassals - BETA</label>
                                         </OverlayTrigger>}
                                     disabled={!this.canChangeGameSettings}
                                     checked={this.gameSettings.vassals}
