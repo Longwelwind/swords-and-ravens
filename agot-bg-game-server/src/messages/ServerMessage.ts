@@ -2,22 +2,25 @@ import {SerializedSeeTopWildlingCardGameState} from "../common/ingame-game-state
 import {SerializedGameState} from "../common/GameState";
 import {SerializedUnit} from "../common/ingame-game-state/game-data-structure/Unit";
 import {SerializedUser} from "../server/User";
-import {HouseCardState} from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
+import {HouseCardState, SerializedHouseCard} from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import {GameLogData} from "../common/ingame-game-state/game-data-structure/GameLog";
 import {UserSettings} from "./ClientMessage";
 import { SerializedWesterosCard } from "../common/ingame-game-state/game-data-structure/westeros-card/WesterosCard";
 import { SerializedVote } from "../common/ingame-game-state/vote-system/Vote";
+import { CrowKillersStep } from "../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/crow-killers-wildling-victory-game-state/CrowKillersWildlingVictoryGameState";
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady | PlayerUnready
-    | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | NewTurn | RemovePlacedOrder
-    | MoveUnits | CombatChangeArmy | VassalsClaimed
+    | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | SupportRefused | NewTurn | RemovePlacedOrder
+    | MoveUnits | CombatChangeArmy
     | UnitsWounded | ChangeCombatHouseCard | BeginSeeTopWildlingCard
     | RavenOrderReplaced | RevealTopWildlingCard | HideTopWildlingCard | ProceedWesterosCard | ChangeGarrison
-    | BidDone | GameStateChange | SupplyAdjusted
+    | BiddingBegin | BidDone | BiddingNextTrack | GameStateChange | SupplyAdjusted
     | ChangeControlPowerToken | ChangePowerToken | ChangeWildlingStrength | AddGameLog | RevealWildlingCard
     | RemoveUnits | AddUnits | ChangeTracker | ActionPhaseChangeOrder | ChangeStateHouseCard
-    | SettingsChanged | ChangeValyrianSteelBladeUse | BiddingNextTrack | NewPrivateChatRoom | GameSettingsChanged
-    | UpdateWesterosDecks | UpdateConnectionStatus | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced;
+    | SettingsChanged | ChangeValyrianSteelBladeUse |  NewPrivateChatRoom | GameSettingsChanged
+    | UpdateWesterosDecks | UpdateConnectionStatus | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced
+    | CrowKillersStepChanged | ManipulateCombatHouseCard
+    | VassalRelations;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -68,6 +71,11 @@ interface SupportDeclared {
     supportedHouseId: string | null;
 }
 
+interface SupportRefused {
+    type: "support-refused";
+    houseId: string;
+}
+
 interface HouseCardChosen {
     type: "house-card-chosen";
     houseId: string;
@@ -77,6 +85,11 @@ interface HouseCardChosen {
 interface ChangeCombatHouseCard {
     type: "change-combat-house-card";
     houseCardIds: [string, string | null][];
+}
+
+interface ManipulateCombatHouseCard {
+    type: "manipulate-combat-house-card";
+    manipulatedHouseCards: [string, SerializedHouseCard][];
 }
 
 interface CombatImmediatelyKilledUnits {
@@ -138,9 +151,14 @@ interface ProceedWesterosCard {
     currentCardI: number;
 }
 
+interface BiddingBegin {
+    type: "bidding-begin";
+}
+
 interface BidDone {
     type: "bid-done";
     houseId: string;
+    value: number;
 }
 
 interface GameStateChange {
@@ -236,6 +254,7 @@ interface NewPrivateChatRoom {
     type: "new-private-chat-room";
     users: string[];
     roomId: string;
+    initiator: string;
 }
 
 interface GameSettingsChanged {
@@ -274,11 +293,15 @@ interface VoteDone {
 interface PlayerReplaced {
     type: "player-replaced";
     oldUser: string;
-    newUser: string;
+    newUser?: string ;
 }
 
-interface VassalsClaimed {
-    type: "vassals-claimed";
-    vassals: string[];
-    house: string;
+interface CrowKillersStepChanged {
+    type: "crow-killers-step-changed";
+    newStep: CrowKillersStep;
+}
+
+interface VassalRelations {
+    type: "vassal-relations";
+    vassalRelations: [string, string][];
 }

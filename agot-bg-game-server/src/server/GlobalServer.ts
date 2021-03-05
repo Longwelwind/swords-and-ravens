@@ -174,7 +174,8 @@ export default class GlobalServer {
                     u.send({
                         type: "new-private-chat-room",
                         users: users.map(u => u.id),
-                        roomId
+                        roomId,
+                        initiator: user.id
                     });
                 });
             } else {

@@ -2,38 +2,46 @@ import {observer} from "mobx-react";
 import BiddingGameState, {BiddingGameStateParent} from "../../common/ingame-game-state/westeros-game-state/bidding-game-state/BiddingGameState";
 import {Component, ReactNode} from "react";
 import * as React from "react";
-import {observable} from "mobx";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Player from "../../common/ingame-game-state/Player";
 
 @observer
 export default class BiddingComponent<ParentGameState extends BiddingGameStateParent> extends Component<GameStateComponentProps<BiddingGameState<ParentGameState>>> {
-    @observable powerTokensToBid = 0;
-    @observable dirty: boolean;
+    get gameState(): BiddingGameState<ParentGameState> {
+        return this.props.gameState;
+    }
+
+    get authenticatedPlayer(): Player | null {
+        return this.props.gameClient.authenticatedPlayer;
+    }
+
+    get powerTokensToBid(): number {
+        return this.gameState.powerTokensToBid;
+    }
+
+    get biddenPowerTokens(): number {
+        return this.authenticatedPlayer
+            ? this.gameState.bids.tryGet(this.authenticatedPlayer.house, -1)
+            : -1;
+    }
+
+    get dirty(): boolean {
+        return this.powerTokensToBid != this.biddenPowerTokens;
+    }
 
     constructor(props: GameStateComponentProps<BiddingGameState<ParentGameState>>) {
         super(props);
 
-        const authenticatedPlayer = this.props.gameClient.authenticatedPlayer;
-
-        this.powerTokensToBid = authenticatedPlayer
-            ? this.props.gameState.hasBid(authenticatedPlayer.house)
-                ? this.props.gameState.bids.get(authenticatedPlayer.house)
-                : 0
-            : 0;
-        this.dirty = authenticatedPlayer
-            ? this.props.gameState.hasBid(authenticatedPlayer.house)
-                ? false
-                : true
-            :  false;
+        this.gameState.powerTokensToBid = Math.max(this.biddenPowerTokens, 0);
     }
 
     render(): ReactNode {
         return (
             <>
-                {this.props.gameClient.authenticatedPlayer && this.props.gameState.participatingHouses.includes(this.props.gameClient.authenticatedPlayer.house) && (
+                {this.authenticatedPlayer && this.gameState.participatingHouses.includes(this.authenticatedPlayer.house) && (
                     <>
                         <Col xs={12}>
                             <Row className="justify-content-center">
@@ -42,10 +50,12 @@ export default class BiddingComponent<ParentGameState extends BiddingGameStatePa
                                         type="range"
                                         className="custom-range"
                                         min={0}
-                                        max={this.props.gameClient.authenticatedPlayer.house.powerTokens}
+                                        max={this.authenticatedPlayer.house.powerTokens}
                                         value={this.powerTokensToBid}
-                                        onChange={e => this.changePowerTokensToBid(parseInt(e.target.value))}
-                                        disabled={!this.dirty && this.props.gameClient.authenticatedPlayer.house.powerTokens==0}
+                                        onChange={e => {
+                                            this.gameState.powerTokensToBid = parseInt(e.target.value);
+                                        }}
+                                        disabled={this.authenticatedPlayer.house.powerTokens==0}
                                     />
                                 </Col>
                                 <Col xs="auto">
@@ -66,19 +76,13 @@ export default class BiddingComponent<ParentGameState extends BiddingGameStatePa
                     </>
                 )}
                 <Col xs={12} className="text-center">
-                    Waiting for {this.props.gameState.getHousesLeftToBid().map(h => h.name).join(", ")}
+                    Waiting for {this.gameState.getHousesLeftToBid().map(h => h.name).join(", ")}
                 </Col>
             </>
         );
     }
 
-    changePowerTokensToBid(count: number): void {
-        this.powerTokensToBid = count;
-        this.dirty = true;
-    }
-
     bid(powerTokens: number): void {
-        this.props.gameState.bid(powerTokens);
-        this.dirty = false;
+        this.gameState.bid(powerTokens);
     }
 }

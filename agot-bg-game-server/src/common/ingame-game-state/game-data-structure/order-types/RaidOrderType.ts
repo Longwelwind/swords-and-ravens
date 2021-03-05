@@ -4,12 +4,14 @@ import DefenseOrderType from "./DefenseOrderType";
 import ConsolidatePowerOrderType from "./ConsolidatePowerOrderType";
 import Order from "../Order";
 import SupportOrderType from "./SupportOrderType";
+import RaidSupportOrderType from "./RaidSupportOrderType";
+import DefenseMusterOrderType from "./DefenseMusterOrderType";
 
 export default class RaidOrderType extends OrderType {
     getRaidableOrderTypes(): any[] {
         return _.concat(
-            [RaidOrderType, ConsolidatePowerOrderType, SupportOrderType],
-            this.starred ? [DefenseOrderType] : []
+            [RaidOrderType, ConsolidatePowerOrderType, SupportOrderType, RaidSupportOrderType],
+            this.starred ? [DefenseOrderType, DefenseMusterOrderType] : []
         );
     }
 

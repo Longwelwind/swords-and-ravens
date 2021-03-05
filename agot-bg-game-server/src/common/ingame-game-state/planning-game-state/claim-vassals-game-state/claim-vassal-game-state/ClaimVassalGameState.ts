@@ -6,10 +6,12 @@ import { ClientMessage } from "../../../../../messages/ClientMessage";
 import House from "../../../../ingame-game-state/game-data-structure/House";
 import IngameGameState from "../../../IngameGameState";
 import User from "../../../../../server/User";
+import { observable } from "mobx";
 
 export default class ClaimVassalGameState extends GameState<ClaimVassalsGameState> {
     house: House;
     count: number;
+    @observable claimableVassals: House[];
 
     get ingame(): IngameGameState {
         return this.parentGameState.ingame;
@@ -18,6 +20,8 @@ export default class ClaimVassalGameState extends GameState<ClaimVassalsGameStat
     firstStart(house: House, count: number): void {
         this.house = house;
         this.count = count;
+
+        this.claimableVassals = this.getClaimableVassals();
     }
 
     onServerMessage(_message: ServerMessage): void {
@@ -34,13 +38,21 @@ export default class ClaimVassalGameState extends GameState<ClaimVassalsGameStat
             if (claimedVassals.length > this.count) {
                 return;
             }
-            
-            if (claimedVassals.every(v => !this.getClaimableVassals().includes(v))) {
+
+            if (claimedVassals.some(v => !this.getClaimableVassals().includes(v))) {
                 return;
             }
 
+            this.parentGameState.passedVassalsCount = this.count - claimedVassals.length;
+
             if (claimedVassals.length > 0) {
                 this.parentGameState.assignVassals(player.house, claimedVassals);
+            } else {
+                this.ingame.log({
+                    type: "vassals-claimed",
+                    house: player.house.id,
+                    vassals: []
+                });
             }
 
             this.parentGameState.onClaimVassalFinish(player.house);
@@ -58,7 +70,7 @@ export default class ClaimVassalGameState extends GameState<ClaimVassalsGameStat
         });
     }
 
-    getClaimableVassals(): House[] {
+    private getClaimableVassals(): House[] {
         return this.ingame.getNonClaimedVassalHouses();
     }
 
@@ -66,7 +78,8 @@ export default class ClaimVassalGameState extends GameState<ClaimVassalsGameStat
         return {
             type: "claim-vassal",
             house: this.house.id,
-            count: this.count
+            count: this.count,
+            claimableVassals: this.claimableVassals.map(h => h.id)
         };
     }
 
@@ -75,7 +88,8 @@ export default class ClaimVassalGameState extends GameState<ClaimVassalsGameStat
 
         claimVassal.house = claimVassals.game.houses.get(data.house);
         claimVassal.count = data.count;
-        
+        claimVassal.claimableVassals = data.claimableVassals.map(hid => claimVassals.game.houses.get(hid));
+
         return claimVassal;
     }
 }
@@ -84,4 +98,5 @@ export interface SerializedClaimVassalGameState {
     type: "claim-vassal";
     house: string;
     count: number;
+    claimableVassals: string[];
 }

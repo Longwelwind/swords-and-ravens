@@ -121,15 +121,15 @@ export default class TyrionLannisterAbilityGameState extends GameState<
         this.entireGame.broadcastToClients({
             type: "change-combat-house-card",
             houseCardIds: [[enemy.id, houseCard ? houseCard.id : null]]
-        })
+        });
     }
 
     static deserializeFromServer(houseCardResolution: CancelHouseCardAbilitiesGameState["childGameState"], data: SerializedTyrionLannisterAbilityGameState): TyrionLannisterAbilityGameState {
-        const queenOfThornsAbility = new TyrionLannisterAbilityGameState(houseCardResolution);
+        const tyrionLannisterAbilityGameState = new TyrionLannisterAbilityGameState(houseCardResolution);
 
-        queenOfThornsAbility.childGameState = queenOfThornsAbility.deserializeChildGameState(data.childGameState);
+        tyrionLannisterAbilityGameState.childGameState = tyrionLannisterAbilityGameState.deserializeChildGameState(data.childGameState);
 
-        return queenOfThornsAbility;
+        return tyrionLannisterAbilityGameState;
     }
 
     deserializeChildGameState(data: SerializedTyrionLannisterAbilityGameState["childGameState"]): TyrionLannisterAbilityGameState["childGameState"] {

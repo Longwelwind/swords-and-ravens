@@ -90,13 +90,13 @@ export default class GameClient {
     /**
      * Returns whether the given house is controlled by the authenticated player,
      * either because it is the directy controled house, or because it's one of its vassals.
-     * @param house 
+     * @param house
      */
     doesControlHouse(house: House | null): boolean {
         if (this.entireGame == null || !(this.entireGame.childGameState instanceof IngameGameState)) {
             throw new Error();
         }
-        
+
         const ingame = this.entireGame.childGameState;
 
         if (house == null) {
@@ -174,14 +174,16 @@ export default class GameClient {
 
             // @ts-ignore
             const users = message.users.map(uid => this.entireGame.users.get(uid));
+            const initiator = this.entireGame.users.get(message.initiator);
 
             if (!this.entireGame.privateChatRoomsIds.has(users[0])) {
                 this.entireGame.privateChatRoomsIds.set(users[0], new BetterMap());
             }
 
             this.entireGame.privateChatRoomsIds.get(users[0]).set(users[1], message.roomId);
-
-
+            if (this.entireGame.onNewPrivateChatRoomCreated && this.isAuthenticatedUser(initiator)) {
+                this.entireGame.onNewPrivateChatRoomCreated(message.roomId);
+            }
         } else {
             if (!this.entireGame) {
                 console.error("Message other than \"authenticate-response\" received but entireGame == null");

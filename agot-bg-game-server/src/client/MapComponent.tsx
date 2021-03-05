@@ -16,7 +16,7 @@ import unitImages from "./unitImages";
 import classNames = require("classnames");
 import housePowerTokensImages from "./housePowerTokensImages";
 import garrisonTokens from "./garrisonTokens";
-import {OverlayTrigger, Tooltip, Popover} from "react-bootstrap";
+import {OverlayTrigger, Tooltip} from "react-bootstrap";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import BetterMap from "../utils/BetterMap";
 import _ from "lodash";
@@ -128,13 +128,13 @@ export default class MapComponent extends Component<MapComponentProps> {
             {region.superControlPowerToken ? (
                 <small><br/>Capital of {region.superControlPowerToken.name} {region.garrison > 0 && <>(Garrison of <b>{region.garrison}</b>)</>}</small>
             ) : (
-                region.garrison > 0 && (<small><br />Neutral force of <b>{region.garrison}</b></small>)
+                region.garrison > 0 && (<small><br />{!region.getController() ? "Neutral force" : "Garrison"} of <b>{region.garrison}</b></small>)
             )}
             {(region.supplyIcons > 0 || region.crownIcons) > 0 && (
                 <>
-                    <br />{region.supplyIcons > 0 && <><b>{region.supplyIcons}</b> Barrels</>}
+                    <br />{region.supplyIcons > 0 && <><b>{region.supplyIcons}</b> Barrel{region.supplyIcons > 1 && "s"}</>}
                     {(region.supplyIcons > 0 && region.crownIcons > 0) && " - "}
-                    {region.crownIcons > 0 && <><b>{region.crownIcons}</b> Crowns</>}
+                    {region.crownIcons > 0 && <><b>{region.crownIcons}</b> Crown{region.crownIcons > 1 && "s"}</>}
                 </>
             )}
             {region.units.size > 0 && (
@@ -145,18 +145,19 @@ export default class MapComponent extends Component<MapComponentProps> {
 
     renderUnits(): ReactNode {
         const propertiesForUnits = this.getModifiedPropertiesForEntities<Unit, UnitOnMapProperties>(
-            _.flatMap(this.props.ingameGameState.world.regions.values.map(r => r.units.values)),
+            _.flatMap(this.props.ingameGameState.world.regions.values.map(r => r.allUnits)),
             this.props.mapControls.modifyUnitsOnMap,
             {highlight: {active: false, color: "white"}, onClick: null}
         );
 
-        return this.props.ingameGameState.world.regions.values.map(r => (
-            <div
+        return this.props.ingameGameState.world.regions.values.map(r => {
+            const controller = r.getController();
+            return <div
                 key={r.id}
                 className="units-container"
                 style={{left: r.unitSlot.point.x, top: r.unitSlot.point.y, width: r.unitSlot.width, flexWrap: r.type == land ? "wrap-reverse" : "wrap"}}
             >
-                {r.units.values.map(u => {
+                {r.allUnits.map(u => {
                     const property = propertiesForUnits.get(u);
 
                     let opacity: number;
@@ -174,23 +175,40 @@ export default class MapComponent extends Component<MapComponentProps> {
                         transform = `rotate(90deg)`;
                     }
 
-
-                    return <div key={u.id}
-                                onClick={property.onClick ? property.onClick : undefined}
+                return <OverlayTrigger
+                            key={"unit-overlay-" + u.id}
+                            delay={{ show: 750, hide: 100 }}
+                            placement="auto"
+                            overlay={<Tooltip id={"unit-tooltip-" + u.id}>
+                                <b>{u.type.name}</b>{controller != null && <small> of <b>{controller.name}</b></small>}
+                            </Tooltip>}
+                        >
+                            <div onClick={property.onClick ? property.onClick : undefined}
                                 className={classNames(
                                     "unit-icon hover-weak-outline",
                                     {
                                         "medium-outline hover-strong-outline": property.highlight.active
-                                    }
+                                    },
+                                    {
+                                        "attacking-army-highlight": property.highlight.color == "red"
+                                    },
+                                    {
+                                        "unit-highlight-yellow": property.highlight.color == "yellow"
+                                    },
+                                    {
+                                        "unit-highlight-green": property.highlight.color == "green"
+                                    },
                                 )}
                                 style={{
-                                    backgroundImage: `url(${unitImages.get(u.allegiance.id).get(u.type.id)})`,
+                                    backgroundImage: `url(${unitImages.get(u.allegiance.id).get(u.upgradedType ? u.upgradedType.id : u.type.id)})`,
                                     opacity: opacity,
                                     transform: transform
-                                }}/>;
+                                }}
+                            />
+                        </OverlayTrigger>
                 })}
             </div>
-        ));
+        });
     }
 
     renderOrders(): ReactNode {
@@ -212,7 +230,7 @@ export default class MapComponent extends Component<MapComponentProps> {
 
                     if (!controller) {
                         // Should never happen. If there's an order, there's a controller.
-                        throw new Error();
+                        throw new Error("Should never happen. If there's an order, there's a controller.");
                     }
 
                     const backgroundUrl = order ? orderImages.get(order.type.id) : houseOrderImages.get(controller.id);
@@ -262,7 +280,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         return propertiesForEntities;
     }
 
-    renderOrder(region: Region, order: Order | null, backgroundUrl: string, properties: OrderOnMapProperties, isActionGameState: boolean): ReactNode {
+    renderOrder(region: Region, order: Order | null, backgroundUrl: string, properties: OrderOnMapProperties, _isActionGameState: boolean): ReactNode {
         return (
             <div className={classNames(
                     "order-container", "hover-weak-outline",
@@ -274,19 +292,20 @@ export default class MapComponent extends Component<MapComponentProps> {
                  onClick={properties.onClick ? properties.onClick : undefined}
                  key={"region-" + region.id}
             >
-                <ConditionalWrap condition={isActionGameState}
-                                 wrap={child =>
-                                     <OverlayTrigger overlay={
-                                         <Tooltip id={"order-owner"}>
-                                             {this.getController(region)}
-                                         </Tooltip>
-                                     } delay={{show: 750, hide: 250}}>
-                                         {child}
-                                     </OverlayTrigger>}>
+                <OverlayTrigger overlay={this.renderOrderTooltip(order, region)}
+                    delay={{show: 750, hide: 100}}>
                     <div className="order-icon" style={{backgroundImage: `url(${backgroundUrl})`}}/>
-                </ConditionalWrap>
+                </OverlayTrigger>
             </div>
         );
+    }
+
+    private renderOrderTooltip(order: Order | null, region: Region): ReactNode {
+        const regionController = region.getController();
+
+        return <Tooltip id={"order-info"}>
+            <b>{order ? order.type.name : "Order token"}</b>{regionController != null && <small> of <b>{regionController.name}</b></small>}
+        </Tooltip>;
     }
 
     getBorderPathD(border: StaticBorder): string {
@@ -303,10 +322,5 @@ export default class MapComponent extends Component<MapComponentProps> {
         const points = this.props.ingameGameState.world.getContinuousBorder(region);
 
         return points.map(p => p.x + "," + p.y).join(" ");
-    }
-
-    getController(region: Region): string | null {
-        const controller = region.getController();
-        return (controller ? controller.name : null);
     }
 }

@@ -3,6 +3,7 @@ import House from "./House";
 import unitTypes from "./unitTypes";
 import Game from "./Game";
 import Region from "./Region";
+import { observable } from "mobx";
 
 export default class Unit {
     id: number;
@@ -10,6 +11,9 @@ export default class Unit {
     type: UnitType;
     wounded = false;
     allegiance: House;
+
+    // Client-side only to support live update of planned musterings
+    @observable upgradedType?: UnitType;
 
     constructor(id: number, type: UnitType, allegiance: House) {
         this.id = id;

@@ -13,6 +13,7 @@ import ActionGameState from "../../ActionGameState";
 import RaidOrderType from "../../../game-data-structure/order-types/RaidOrderType";
 import ConsolidatePowerOrderType from "../../../game-data-structure/order-types/ConsolidatePowerOrderType";
 import User from "../../../../../server/User";
+import RaidSupportOrderType from "../../../../../common/ingame-game-state/game-data-structure/order-types/RaidSupportOrderType";
 
 export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRaidOrderGameState> {
     house: House;
@@ -45,12 +46,13 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
         this.house = house;
 
         // Check if all raid orders can not be trivially resolved
-        const regionsWithRaidOrders = this.getRegionWithRaidOrders();
-        if (regionsWithRaidOrders.every(r => this.getRaidableRegions(r, this.actionGameState.ordersOnBoard.get(r).type as RaidOrderType).length == 0)) {
+        const regionsWithRaidOrders = this.parentGameState.getRegionsWithRaidOrderOfHouse(this.house);
+
+        if (!regionsWithRaidOrders.some(([r, ot]) => this.getRaidableRegions(r, ot).length > 0)) {
             // If yes, fast-track the game by resolving one
             const regionToResolve = regionsWithRaidOrders[0];
 
-            this.resolveRaidOrder(regionToResolve, null);
+            this.resolveRaidOrder(regionToResolve[0], null);
         }
     }
 
@@ -63,11 +65,13 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
             const orderRegion = this.world.regions.get(message.orderRegionId);
             const targetRegion = message.targetRegionId ? this.world.regions.get(message.targetRegionId) : null;
 
-            if (orderRegion.getController() != this.house) {
+            // We can safely cast as a region with an order must be controlled by a house
+            if (this.ingameGameState.getControllerOfHouse(orderRegion.getController() as House) != player) {
                 return;
             }
 
-            if (!this.getRegionWithRaidOrders().includes(orderRegion)) {
+            const regionsWithRaidOrders = this.parentGameState.getRegionsWithRaidOrderOfHouse(this.house).map(([r, _ot]) => r);
+            if (!regionsWithRaidOrders.includes(orderRegion)) {
                 return;
             }
 
@@ -76,9 +80,13 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
     }
 
     resolveRaidOrder(orderRegion: Region, targetRegion: Region | null): void {
-        const orderType = this.actionGameState.ordersOnBoard.get(orderRegion).type as RaidOrderType;
+        const order = this.actionGameState.ordersOnBoard.get(orderRegion);
+        const orderType = order.type instanceof RaidOrderType
+            ? order.type as RaidOrderType
+            : order.type instanceof RaidSupportOrderType
+                ? order.type as RaidSupportOrderType : null;
 
-        if (targetRegion) {
+        if (targetRegion && orderType) {
             const orderTarget = this.actionGameState.ordersOnBoard.get(targetRegion);
 
             if (!this.getRaidableRegions(orderRegion, orderType).includes(targetRegion)) {
@@ -130,12 +138,17 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
             });
         }
 
-        this.actionGameState.ordersOnBoard.delete(orderRegion);
-        this.entireGame.broadcastToClients({
-            type: "action-phase-change-order",
-            region: orderRegion.id,
-            order: null
-        });
+        // Keep an unresolved RaidSupportOrder to use it as support later
+        if (orderType instanceof RaidOrderType || targetRegion != null) {
+            this.actionGameState.ordersOnBoard.delete(orderRegion);
+            this.entireGame.broadcastToClients({
+                type: "action-phase-change-order",
+                region: orderRegion.id,
+                order: null
+            });
+        } else if (orderType instanceof RaidSupportOrderType && targetRegion == null) {
+            this.parentGameState.resolvedRaidSupportOrderRegions.push(orderRegion);
+        }
 
         this.resolveRaidOrderGameState.onResolveSingleRaidOrderGameStateEnd(this.house);
     }
@@ -144,20 +157,18 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
         return [this.ingameGameState.getControllerOfHouse(this.house).user];
     }
 
-    getRegionWithRaidOrders(): Region[] {
-        return this.actionGameState.getRegionsWithRaidOrderOfHouse(this.house);
-    }
-
     onServerMessage(_message: ServerMessage): void {
 
     }
 
-    getRaidableRegions(orderRegion: Region, raid: RaidOrderType): Region[] {
+    getRaidableRegions(orderRegion: Region, raid: RaidOrderType | RaidSupportOrderType): Region[] {
         return this.world.getNeighbouringRegions(orderRegion)
             .filter(r => r.getController() != this.house)
             .filter(r => this.actionGameState.ordersOnBoard.has(r))
             .filter(r => raid.isValidRaidableOrder(this.actionGameState.ordersOnBoard.get(r)))
-            .filter(r => r.type.kind == orderRegion.type.kind || orderRegion.type.canAdditionalyRaid == r.type.kind);
+            .filter(r => r.type.kind == orderRegion.type.kind || orderRegion.type.canAdditionalyRaid == r.type.kind)
+            // Vassal family members can't raid each other
+            .filter(r => !this.ingameGameState.getOtherVassalFamilyHouses(this.house).includes(r.getController()));
     }
 
     resolveRaid(orderRegion: Region, targetRegion: Region | null): void {

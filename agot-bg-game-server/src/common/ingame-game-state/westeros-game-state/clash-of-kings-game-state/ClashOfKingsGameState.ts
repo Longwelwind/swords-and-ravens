@@ -21,6 +21,18 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
     }
 
     firstStart(): void {
+        // Reset Iron Throne track but keep current holder to allow resolving ties
+        // Reset Fiefdoms and Kings Court completely
+        for (let influenceTrackId = 0; influenceTrackId < this.game.influenceTracks.length; influenceTrackId++) {
+            const newInfluenceTrack = influenceTrackId == 0 ? [this.game.ironThroneHolder] : [];
+            this.game.setInfluenceTrack(influenceTrackId, newInfluenceTrack);
+            this.entireGame.broadcastToClients({
+                type: "change-tracker",
+                trackerI: influenceTrackId,
+                tracker: newInfluenceTrack.map(h => h.id)
+            });
+        }
+
         this.proceedNextTrack();
     }
 

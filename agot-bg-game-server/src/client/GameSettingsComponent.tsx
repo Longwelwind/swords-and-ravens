@@ -9,6 +9,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import LobbyGameState from "../common/lobby-game-state/LobbyGameState";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { allGameSetups, getGameSetupContainer } from "../common/ingame-game-state/game-data-structure/createGame";
 
 interface GameSettingsComponentProps {
     gameClient: GameClient;
@@ -53,6 +54,9 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     {this.createPlayerCountItems()}
                                 </select>
                             </Col>
+                            <Col xs="auto">
+                                <>Players</>
+                            </Col>
                         </Row>
                         <Row>
                             <Col xs="auto">
@@ -72,14 +76,60 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                 />
                             </Col>
                         </Row>
-                        <FormCheck
-                            id="vassals-setting"
-                            type="checkbox"
-                            label="Vassals"
-                            disabled={!this.canChangeGameSettings}
-                            checked={this.gameSettings.vassals}
-                            onChange={() => this.changeGameSettings(() => this.gameSettings.vassals = !this.gameSettings.vassals)}
-                        />
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="vassals-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="vassals-tooltip">
+                                                Unassigned houses will be vassals.
+                                            </Tooltip>}>
+                                            <label htmlFor="vassals-setting">Vassals</label>
+                                        </OverlayTrigger>}
+                                    disabled={!this.canChangeGameSettings}
+                                    checked={this.gameSettings.vassals}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.vassals = !this.gameSettings.vassals)}
+                                />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="westeros-phase-variant-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="westeros-phase-variant-tooltip">
+                                                Players may look at the next 3 Westeros cards from each deck at any time.
+                                            </Tooltip>}>
+                                            <label htmlFor="westeros-phase-variant-setting">CoK Westeros Phase Variant</label>
+                                        </OverlayTrigger>}
+                                    disabled={!this.canChangeGameSettings}
+                                    checked={this.gameSettings.cokWesterosPhase}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.cokWesterosPhase = !this.gameSettings.cokWesterosPhase)}
+                                />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="adwd-house-cards"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="adwd-house-cards-tooltip">
+                                                The house cards will come from the Dance with Dragons expansion.
+                                            </Tooltip>}>
+                                            <label htmlFor="adwd-house-cards">Use <i>A Dance with Dragons</i> house cards (BETA)</label>
+                                        </OverlayTrigger>}
+                                    disabled={!this.canChangeGameSettings || this.props.entireGame.gameSettings.setupId == "a-dance-with-dragons"}
+                                    checked={this.gameSettings.adwdHouseCards}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.adwdHouseCards = !this.gameSettings.adwdHouseCards)}
+                                />
+                            </Col>
+                        </Row>
                     </>
                 )}
                 <Row>
@@ -109,7 +159,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
     createSetupItems(): ReactNode {
         const items: JSX.Element[] = [];
 
-        this.entireGame.allGameSetups.forEach(([setupId, setupData]) => {
+        allGameSetups.forEach((setupData, setupId) => {
             items.push(<option key={setupId} value={setupId}>{setupData.name}</option>);
         });
 
@@ -119,7 +169,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
     createPlayerCountItems(): ReactNode {
         const items: JSX.Element[] = [];
 
-        const playerSetups = this.entireGame.getGameSetupContainer(this.gameSettings.setupId).playerSetups;
+        const playerSetups = getGameSetupContainer(this.gameSettings.setupId).playerSetups;
 
         playerSetups.forEach(gameSetup => {
             items.push(<option key={gameSetup.playerCount} value={gameSetup.playerCount}>{gameSetup.playerCount}</option>);
@@ -132,7 +182,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
         this.gameSettings.setupId = newVal;
 
         // On setup change set player count to it's default value which should be the highest value (last element)
-        const container = this.entireGame.getGameSetupContainer(newVal);
+        const container = getGameSetupContainer(newVal);
         const playerCounts = container.playerSetups.map(playerSetup => playerSetup.playerCount);
         const defaultPlayerCount = playerCounts[playerCounts.length - 1];
         this.gameSettings.playerCount = defaultPlayerCount;

@@ -16,53 +16,72 @@ import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import {OrderOnMapProperties, RegionOnMapProperties, UnitOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
-
+import House from "../../common/ingame-game-state/game-data-structure/House";
 
 @observer
 export default class ResolveSingleMarchOrderComponent extends Component<GameStateComponentProps<ResolveSingleMarchOrderGameState>> {
     @observable selectedMarchOrderRegion: Region | null;
     @observable selectedUnits: Unit[] = [];
     @observable plannedMoves = new BetterMap<Region, Unit[]>();
-    @observable leavePowerToken = false;
+    @observable leavePowerToken: boolean | undefined = undefined;
+    canLeavePowerToken = false;
+    canLeavePowerTokenReason = "";
 
     modifyRegionsOnMapCallback: any;
     modifyUnitsOnMapCallback: any;
     modifyOrdersOnMapCallback: any;
 
+    get house(): House {
+        return this.props.gameState.house;
+    }
+
+    get isVassalHouse(): boolean {
+        return this.props.gameState.ingame.isVassalHouse(this.house);
+    }
+
     render(): ReactNode {
+        const allUnitsLeft = this.selectedMarchOrderRegion ? this.props.gameState.haveAllUnitsLeft(this.selectedMarchOrderRegion, this.plannedMoves) : false;
         return (
             <>
                 <Col xs={12} className="text-center">
-                    House <b>{this.props.gameState.house.name}</b> must resolve one of
+                    House <b>{this.house.name}</b> must resolve one of
                     its March Orders.
                 </Col>
-                {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
+                {this.props.gameClient.doesControlHouse(this.house) ? (
                     <>
                         <Col xs={12} className="text-center">
                             {this.selectedMarchOrderRegion == null ? (
                                 "Click on one of your March Orders."
-                            ) : this.selectedUnits.length == 0 ? (
-                                "Click on a subset of the troops in the marching region."
-                            ) : (
-                                "Click on a neighbouring region, or click on other units of the marching region."
-                            )}
+                            ) : this.selectedUnits.length == 0 && !allUnitsLeft ? (
+                                <>Click on a subset of the troops in <b>{this.selectedMarchOrderRegion.name}</b>.</>
+                            ) : !allUnitsLeft ? (
+                                <>Click on a neighbouring region, or click on other units in <b>{this.selectedMarchOrderRegion.name}</b>.</>
+                            ) : (<></>)}
                         </Col>
-                        {this.plannedMoves.size > 0 && (
-                            <Col xs={12} className="text-center">
-                                {this.plannedMoves.entries.map(([region, units]) => (
-                                    <div key={region.id}>
-                                        {units.map(u => u.type.name).join(", ")} =&gt; {region.name}
-                                    </div>
-                                ))}
+                        {this.selectedMarchOrderRegion && this.plannedMoves.size > 0 && (
+                            <Col xs={12} className="mt-2">
+                                <div>
+                                    Planned moves from <b>{this.selectedMarchOrderRegion.name}</b>:
+                                    <ul>
+                                        {this.plannedMoves.entries.map(([region, units]) => (
+                                            <li key={`planned-move_${region.id}`}>
+                                                {units.map(u => u.type.name).join(", ")} =&gt; {region.name}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
                             </Col>
                         )}
                         {this.selectedMarchOrderRegion != null && (
                             <>
-                                {this.renderLeavePowerToken(this.selectedMarchOrderRegion)}
+                                {allUnitsLeft && this.renderLeavePowerToken(this.selectedMarchOrderRegion)}
                                 <Col xs={12}>
                                     <Row className="justify-content-center">
                                         <Col xs="auto">
-                                            <Button onClick={() => this.confirm()}>
+                                            <Button
+                                                onClick={() => this.confirm()}
+                                                disabled={this.leavePowerToken == undefined}
+                                            >
                                                 Confirm
                                             </Button>
                                         </Col>
@@ -81,45 +100,92 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                     </>
                 ) : (
                     <Col xs={12} className="text-center">
-                        Waiting for {this.props.gameState.house.name}...
+                        Waiting for {this.house.name}...
                     </Col>
                 )}
             </>
         );
     }
 
-    renderLeavePowerToken(startingRegion: Region): ReactNode | null {
-        const {success, reason} = this.props.gameState.canLeavePowerToken(
-            startingRegion,
-            this.plannedMoves
-        );
+    componentWillMount(): any {
+        this.componentWillUpdate();
+    }
 
-        return (
+    componentWillUpdate(): any {
+        const {success, reason} = this.selectedMarchOrderRegion
+            ? this.props.gameState.canLeavePowerToken(this.selectedMarchOrderRegion, this.plannedMoves)
+            : {success: false, reason: "no-all-units-go"}
+
+        if (this.canLeavePowerToken != success) {
+            // Set undefined here to actively force a user decision when a move was done which changed canLeavePowerToken
+            this.leavePowerToken = undefined;
+        }
+
+        this.canLeavePowerToken = success;
+        this.canLeavePowerTokenReason = reason;
+
+        if (!this.canLeavePowerToken) {
+            this.leavePowerToken = false;
+        }
+
+        if (this.isVassalHouse && this.canLeavePowerToken) {
+            this.leavePowerToken = true;
+        }
+    }
+
+    renderLeavePowerToken(startingRegion: Region): ReactNode | null {
+        return this.plannedMoves.size > 0 && (
             <Col xs={12} className="text-center">
                 <OverlayTrigger overlay={
                     <Tooltip id={"leave-power-token"}>
-                        {reason == "already-capital" ? (
+                        {this.canLeavePowerTokenReason == "already-capital" ? (
                             <>Your capital is always controlled by your house, thus not requiring a Power
                                 token to be left when leaving the area to keep control of it.</>
-                        ) : reason == "already-power-token" ? (
+                        ) : this.canLeavePowerTokenReason == "already-power-token" ? (
                             <>A Power token is already present.</>
-                        ) : reason == "no-power-token-available" ? (
+                        ) : this.canLeavePowerTokenReason == "no-power-token-available" ? (
                             "You don't have any available Power token."
-                        ) : reason == "not-a-land" ? (
+                        ) : this.canLeavePowerTokenReason == "not-a-land" ? (
                             "Power tokens can only be left on land areas."
-                        ) : reason == "no-all-units-go" ? (
+                        ) : this.canLeavePowerTokenReason == "no-all-units-go" ? (
                             "All units must leave the area in order to leave a Power token."
+                        ) : this.canLeavePowerTokenReason == "vassals-always-leave-power-token" ? (
+                            "Vassals always leave a Power token."
                         ) : "Leaving a Power token in an area maintain the control your house has on it, even"
                             + " if all units your units leave the area."}
                     </Tooltip>
                 }>
-                    <Form.Check
-                        id="chk-leave-pt"
-                        label="Leave a Power Token"
-                        checked={this.leavePowerToken}
-                        onChange={() => this.leavePowerToken = !this.leavePowerToken}
-                        disabled={!success}
-                    />
+                    <Form>
+                        <fieldset>
+                            <Form.Group>
+                                <Col xs={12} className="mb-0 pb-0">
+                                    <Form.Label>
+                                        Do you want to leave a Power token in <b>{startingRegion.name}</b> to keep control?
+                                    </Form.Label>
+                                </Col>
+                                <Col xs={12} className="mt-0 pt-0">
+                                    <Form.Check
+                                        id="chk-leave-pt"
+                                        name="leave-pt-radios"
+                                        inline
+                                        type="radio"
+                                        label="Yes"
+                                        checked={this.leavePowerToken}
+                                        onChange={() => {this.leavePowerToken = true;}}
+                                        disabled={!this.canLeavePowerToken || this.isVassalHouse}/>
+                                    <Form.Check
+                                        id="chk-dont-leave-pt"
+                                        name="leave-pt-radios"
+                                        inline
+                                        type="radio"
+                                        label="No"
+                                        checked={this.leavePowerToken == false}
+                                        onChange={() => {this.leavePowerToken = false;}}
+                                        disabled={!this.canLeavePowerToken || this.isVassalHouse}/>
+                                </Col>
+                            </Form.Group>
+                        </fieldset>
+                    </Form>
                 </OverlayTrigger>
             </Col>
         );
@@ -148,6 +214,12 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
 
         this.plannedMoves.set(region, newGoingArmy);
 
+        // Make non combat moves directly visible by help of new/removedUnits to easily restore the original gameState by resetting new/removedUnits
+        if (this.selectedMarchOrderRegion && !this.props.gameState.doesMoveTriggerAttack(region)) {
+            region.newUnits = newGoingArmy;
+            this.selectedMarchOrderRegion.removedUnits = _.concat(this.selectedMarchOrderRegion.removedUnits, newGoingArmy);
+        }
+
         this.selectedUnits = [];
     }
 
@@ -156,13 +228,22 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     }
 
     reset(): void {
+        if (this.selectedMarchOrderRegion) {
+            this.selectedMarchOrderRegion.removedUnits = [];
+        }
+        this.plannedMoves.keys.forEach(r => r.newUnits = []);
+
         this.selectedMarchOrderRegion = null;
         this.selectedUnits = [];
         this.plannedMoves = new BetterMap<Region, Unit[]>();
-        this.leavePowerToken = false;
+        this.leavePowerToken = undefined;
     }
 
     confirm(): void {
+        if (this.leavePowerToken == undefined) {
+            return;
+        }
+
         if (!this.selectedMarchOrderRegion) {
             return;
         }
@@ -183,7 +264,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     }
 
     modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
-        if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
+        if (this.props.gameClient.doesControlHouse(this.house)) {
             if (this.selectedMarchOrderRegion == null) {
                 return this.props.gameState.getRegionsWithMarchOrder().map(r => [
                     r,
@@ -196,23 +277,33 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     }
 
     modifyUnitsOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {
-        if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
-            if (this.selectedMarchOrderRegion != null) {
-                return this.props.gameState.getValidMarchUnits(this.selectedMarchOrderRegion).filter(u => this.isUnitAvailable(u)).map(u => [
-                    u,
-                    {highlight: {active: true}, onClick: () => this.onUnitClick(this.selectedMarchOrderRegion as Region, u)}
-                ]);
-            }
+        if (this.props.gameClient.doesControlHouse(this.house)) {
+            const marchableUnits = this.selectedMarchOrderRegion != null ? this.props.gameState.getValidMarchUnits(this.selectedMarchOrderRegion).filter(u => this.isUnitAvailable(u)) : [];
+            const attackingUnits = _.flatMap(this.plannedMoves.entries.filter(([r, _u]) => this.props.gameState.doesMoveTriggerAttack(r)).map(([_r, u]) => u));
+
+            return _.concat(marchableUnits, attackingUnits).map(u => [
+                u,
+                {
+                    highlight: { active: true, color: attackingUnits.includes(u) ? "red" : "white"},
+                    onClick: () => marchableUnits.includes(u) && !attackingUnits.includes(u) ? this.onUnitClick(this.selectedMarchOrderRegion as Region, u) : null
+                }
+            ]);
         }
 
         return [];
     }
 
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
-        if (this.selectedMarchOrderRegion != null && this.selectedUnits.length > 0) {
-            return this.props.gameState.getValidTargetRegions(this.selectedMarchOrderRegion, this.plannedMoves.entries, this.selectedUnits).map(r => [
+        if (this.props.gameClient.doesControlHouse(this.house)) {
+            const targetRegions = this.selectedMarchOrderRegion != null && this.selectedUnits.length > 0 ? this.props.gameState.getValidTargetRegions(this.selectedMarchOrderRegion, this.plannedMoves.entries, this.selectedUnits) : [];
+            const combatRegions = this.plannedMoves.keys.filter(r => this.props.gameState.doesMoveTriggerAttack(r));
+
+            return _.concat(targetRegions, combatRegions).map(r => [
                 r,
-                {highlight: {active: true}, onClick: () => this.onRegionClick(r)}
+                {
+                    highlight: {active: true, color: combatRegions.includes(r) ? "yellow" : "white"},
+                    onClick: () => targetRegions.includes(r) ? this.onRegionClick(r) : null
+                }
             ]);
         }
 

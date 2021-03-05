@@ -10,14 +10,16 @@ import WesterosCard, {SerializedWesterosCard} from "./westeros-card/WesterosCard
 import shuffle from "../../../utils/shuffle";
 import WildlingCard, {SerializedWildlingCard} from "./wildling-card/WildlingCard";
 import BetterMap from "../../../utils/BetterMap";
-import HouseCard, { SerializedHouseCard } from "./house-card/HouseCard";
+import HouseCard from "./house-card/HouseCard";
 import {land, port} from "./regionTypes";
 import PlanningRestriction from "./westeros-card/planning-restriction/PlanningRestriction";
 import WesterosCardType from "./westeros-card/WesterosCardType";
 import IngameGameState from "../IngameGameState";
 import { vassalHousesOrders, playerHousesOrders } from "./orders";
+import { vassalHouseCards } from "./static-data-structure/vassalHouseCards";
 
 export const MAX_WILDLING_STRENGTH = 12;
+export const MIN_PLAYER_COUNT_WITH_VASSALS = 3;
 
 export default class Game {
     ingame: IngameGameState;
@@ -42,15 +44,17 @@ export default class Game {
     structuresCountNeededToWin: number;
     maxTurns: number;
     maxPowerTokens: number;
-    vassalHouseCards: BetterMap<string, HouseCard>;
+
+    get vassalHouseCards(): BetterMap<string, HouseCard> {
+        return new BetterMap(vassalHouseCards.map(hc => [hc.id, hc]));
+    }
 
     /**
      * Contains the vassal relations of the game.
-     * `vassalRelations.get(lannister) == stark` means that
-     * the vassal house lannister is currently being commanded by
-     * stark.
+     * Key is the vassal house, value is the commander.
      */
-    vassalRelations = new BetterMap<House, House>();
+    @observable vassalRelations = new BetterMap<House, House>();
+    revealedWesterosCards = 0;
 
     get ironThroneHolder(): House {
         return this.getTokenHolder(this.ironThroneTrack);
@@ -77,7 +81,7 @@ export default class Game {
 
         this.westerosDecks.forEach(wd => {
             const map = new BetterMap<WesterosCardType, number>();
-            wd.sort((a, b) => a.type.name.localeCompare(b.type.name)).forEach(wc => {
+            wd.slice(this.revealedWesterosCards).sort((a, b) => a.type.name.localeCompare(b.type.name)).forEach(wc => {
                 if (wc.discarded) {
                     return;
                 }
@@ -94,6 +98,21 @@ export default class Game {
 
     constructor(ingame: IngameGameState) {
         this.ingame = ingame;
+    }
+
+    get nextWesterosCardTypes(): WesterosCardType[][] {
+        const result: WesterosCardType[][] = [];
+
+        this.westerosDecks.forEach(wd => {
+            result.push(wd.slice(0, this.revealedWesterosCards).map((card) => card.type));
+        });
+
+        return result;
+    }
+
+    updateWildlingStrength(value: number): number {
+        this.wildlingStrength = Math.max(0, Math.min(this.wildlingStrength + value, MAX_WILDLING_STRENGTH));
+        return this.wildlingStrength;
     }
 
     getTokenHolder(track: House[]): House {
@@ -156,13 +175,14 @@ export default class Game {
 
     getPotentialWinners(): House[] {
         const victoryConditions: ((h: House) => number)[] = [
+            (h: House) => this.ingame.isVassalHouse(h) ? 1 : -1,
             (h: House) => -this.getTotalHeldStructures(h),
             (h: House) => -this.getTotalControlledLandRegions(h),
             (h: House) => -h.supplyLevel,
             (h: House) => this.ironThroneTrack.indexOf(h)
         ];
 
-        return _.sortBy(this.ingame.getNonVassalHouses(), victoryConditions);
+        return _.sortBy(this.houses.values, victoryConditions);
     }
 
     getTotalControlledLandRegions(h: House): number {
@@ -263,13 +283,27 @@ export default class Game {
     }
 
     getHouseCardById(id: string): HouseCard {
-        const houseCard = _.flatMap(this.houses.values, h => h.houseCards.values).find(hc => hc.id == id);
+        let houseCard = _.flatMap(this.houses.values, h => h.houseCards.values).find(hc => hc.id == id);
 
-        if (houseCard == null) {
-            throw new Error();
+        if (!houseCard) {
+            houseCard = this.vassalHouseCards.tryGet(id, undefined);
+
+            if (!houseCard) {
+                throw new Error(`House card ${id} not found`);
+            }
         }
 
         return houseCard;
+    }
+
+    getWesterosCardById(id: number, deckId: number): WesterosCard {
+        const westerosCard = this.westerosDecks[deckId].find(wc => wc.id == id);
+
+        if (westerosCard == null) {
+            throw new Error();
+        }
+
+        return westerosCard;
     }
 
     changeSupply(house: House, delta: number): void {
@@ -353,7 +387,9 @@ export default class Game {
             // without seeing the order of the cards
             westerosDecks: admin
                 ? this.westerosDecks.map(wd => wd.map(wc => wc.serializeToClient()))
-                : this.westerosDecks.map(wd => shuffle([...wd]).map(wc => wc.serializeToClient())),
+                : this.westerosDecks.map(wd => wd.slice(0, this.revealedWesterosCards)
+                    .concat(shuffle(wd.slice(this.revealedWesterosCards)))
+                    .map(wc => wc.serializeToClient())),
             // Same for the wildling deck
             wildlingDeck: admin
                 ? this.wildlingDeck.map(c => c.serializeToClient())
@@ -366,8 +402,8 @@ export default class Game {
             maxTurns: this.maxTurns,
             maxPowerTokens: this.maxPowerTokens,
             clientNextWidllingCardId: (admin || knowsNextWildlingCard) ? this.wildlingDeck[0].id : null,
-            vassalRelations: this.vassalRelations.map((key, value) => [key.id, value.id]),
-            vassalHouseCards: this.vassalHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])
+            revealedWesterosCards: this.revealedWesterosCards,
+            vassalRelations: this.vassalRelations.map((key, value) => [key.id, value.id])
         };
     }
 
@@ -391,9 +427,9 @@ export default class Game {
         game.structuresCountNeededToWin = data.structuresCountNeededToWin;
         game.maxTurns = data.maxTurns;
         game.maxPowerTokens = data.maxPowerTokens;
+        game.revealedWesterosCards = data.revealedWesterosCards;
         game.clientNextWildlingCardId = data.clientNextWidllingCardId;
-        game.vassalRelations = new BetterMap(data.vassalRelations.map(([vid, hid]) => [game.houses.get(vid), game.houses.get(hid)]));
-        game.vassalHouseCards = new BetterMap(data.vassalHouseCards.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
+        game.vassalRelations = new BetterMap(data.vassalRelations.map(([vid, hid]) => [game.houses.get(vid), game.houses.get(hid)]))
 
         return game;
     }
@@ -417,7 +453,7 @@ export interface SerializedGame {
     structuresCountNeededToWin: number;
     maxTurns: number;
     maxPowerTokens: number;
+    revealedWesterosCards: number;
     clientNextWidllingCardId: number | null;
     vassalRelations: [string, string][];
-    vassalHouseCards: [string, SerializedHouseCard][];
 }

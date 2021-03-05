@@ -28,9 +28,10 @@ import Order from "../../../game-data-structure/Order";
 import orders from "../../../game-data-structure/orders";
 import CancelHouseCardAbilitiesGameState
     , {SerializedCancelHouseCardAbilitiesGameState} from "./cancel-house-card-abilities-game-state/CancelHouseCardAbilitiesGameState";
+import { observable } from "mobx";
+import BeforeCombatHouseCardAbilitiesGameState, { SerializedBeforeCombatHouseCardAbilitiesGameState } from "./before-combat-house-card-abilities-game-state/BeforeCombatHouseCardAbilitiesGameState";
 import DefenseMusterOrderType from "../../../game-data-structure/order-types/DefenseMusterOrderType";
 import RaidSupportOrderType from "../../../game-data-structure/order-types/RaidSupportOrderType";
-
 
 export interface HouseCombatData {
     army: Unit[];
@@ -40,23 +41,23 @@ export interface HouseCombatData {
 
 export default class CombatGameState extends GameState<
     ResolveMarchOrderGameState,
-    DeclareSupportGameState | ChooseHouseCardGameState | UseValyrianSteelBladeGameState
-    | ImmediatelyHouseCardAbilitiesResolutionGameState | PostCombatGameState
-    | CancelHouseCardAbilitiesGameState
+    DeclareSupportGameState | ChooseHouseCardGameState | CancelHouseCardAbilitiesGameState
+    | ImmediatelyHouseCardAbilitiesResolutionGameState | BeforeCombatHouseCardAbilitiesGameState
+    | UseValyrianSteelBladeGameState | PostCombatGameState
 > {
-    winner: House | null;
-    loser: House | null;
-
     order: Order;
     attacker: House;
     defender: House;
     houseCombatDatas: BetterMap<House, HouseCombatData>;
     valyrianSteelBladeUser: House | null;
 
+    @observable
+    rerender = 0;
+
     // The key is the supporting house and the value is the supported house.
     // The value is always either attacker or defender or null if the supporter
     // decided to support no-one.
-    supporters = new BetterMap<House, House | null>();
+    @observable supporters = new BetterMap<House, House | null>();
 
     get attackingRegion(): Region {
         return this.attackingHouseCombatData.region;
@@ -127,10 +128,55 @@ export default class CombatGameState extends GameState<
             [defender, {region: combatRegion, army: combatRegion.units.values, houseCard: null}]
         ]);
 
+        // Automatically declare attackers and defenders support
+        const possibleSupporters = this.getPossibleSupportingHouses();
+
+        possibleSupporters.forEach(h => {
+            if (h == attacker || this.ingameGameState.getOtherVassalFamilyHouses(attacker).includes(h)) {
+                this.declareSupport(h, attacker, false);
+            }
+
+            if (h == defender || this.ingameGameState.getOtherVassalFamilyHouses(defender).includes(h)) {
+                this.declareSupport(h, defender, false);
+            }
+        });
+
         // Begin by the declaration of support
         if (!this.proceedNextSupportDeclaration()) {
             this.proceedToChooseGeneral();
         }
+    }
+
+    declareSupport(supportingHouse: House, supportedHouse: House | null, writeToGameLog: boolean): void {
+        if (supportedHouse != null) {
+            if (this.isRestrictedToHimself(supportingHouse) && supportedHouse != supportingHouse) {
+                return;
+            } else if (!this.houseCombatDatas.keys.includes(supportedHouse)) {
+                return;
+            }
+        }
+
+        this.supporters.set(supportingHouse, supportedHouse);
+
+        if (writeToGameLog) {
+            this.ingameGameState.log({
+                type: "support-declared",
+                supporter: supportingHouse.id,
+                supported: supportedHouse ? supportedHouse.id : null
+            });
+        }
+
+        this.entireGame.broadcastToClients({
+            type: "support-declared",
+            houseId: supportingHouse.id,
+            supportedHouseId: supportedHouse ? supportedHouse.id : null
+        });
+    }
+
+    isRestrictedToHimself(house: House): boolean {
+        // With automatically declaring support this is not really needed anymore.
+        // But it is never bad to double check things so lets keep it.
+        return this.houseCombatDatas.keys.includes(house);
     }
 
     onDeclareSupportGameStateEnd(): void {
@@ -193,7 +239,7 @@ export default class CombatGameState extends GameState<
                 : order.type instanceof DefenseMusterOrderType
                     ? order.type as DefenseMusterOrderType
                     : null;
-                    
+
 
             if (orderType) {
                 return this.computeModifiedStat(
@@ -207,7 +253,7 @@ export default class CombatGameState extends GameState<
     }
 
     getSupportStrengthForSide(supportedHouse: House): number {
-        return this.supporters.entries
+        return this.getHouseSupportStrength(supportedHouse, this.supporters.entries
             .filter(([_house, supHouse]) => supportedHouse == supHouse)
             .map(([house, _supHouse]) => {
                 // Compute the total strength that this supporting house is bringing
@@ -234,7 +280,16 @@ export default class CombatGameState extends GameState<
                     })
                     .reduce(_.add, 0);
             })
-            .reduce(_.add, 0);
+            .reduce(_.add, 0));
+    }
+
+    isHouseSupported(house: House): boolean {
+        const supportsForHouse = this.supporters.entries.filter(([_supporter, supportedHouse]) => supportedHouse == house);
+
+        // Check if the initial support order of the supporter is still present, it may have been removed by e.g. Queen of Thorns
+        return supportsForHouse.some(([supporter, _supportedHouse]) => {
+            return this.getPossibleSupportingRegions().some(({region}) => region.getController() == supporter);
+        });
     }
 
     getValyrianBladeBonus(house: House): number {
@@ -270,6 +325,14 @@ export default class CombatGameState extends GameState<
     }
 
     onImmediatelyResolutionFinish(): void {
+        this.proceedBeforeCombatResolution();
+    }
+
+    proceedBeforeCombatResolution(): void {
+        this.setChildGameState(new BeforeCombatHouseCardAbilitiesGameState(this)).firstStart();
+    }
+
+    onBeforeCombatResolutionFinish(): void {
         // Check if the sword has not been used this round
         if (!this.game.valyrianSteelBladeUsed) {
             // Check if one of the two participants can use the sword.
@@ -396,6 +459,23 @@ export default class CombatGameState extends GameState<
         );
     }
 
+    getHouseSupportStrength(house: House, supportStrength: number): number {
+        const affectedHouseCard = this.houseCombatDatas.get(house).houseCard;
+
+        if (affectedHouseCard == null) {
+            return supportStrength;
+        }
+
+        return this.getOrderResolutionHouseCard().reduce((s, h) => {
+            const houseCard = this.houseCombatDatas.get(h).houseCard;
+
+            if (houseCard == null) {
+                return s;
+            }
+            return houseCard.ability ? houseCard.ability.modifySupportStrength(this, houseCard, affectedHouseCard, house, supportStrength) : s;
+        }, supportStrength);
+    }
+
     getHouseCardSwordIcons(house: House): number {
         return this.getStatOfHouseCard(
             house,
@@ -410,6 +490,24 @@ export default class CombatGameState extends GameState<
             hc => hc.towerIcons,
             (h, hc, a, ahc) => a.modifyTowerIcons(this, h, hc, ahc)
         );
+    }
+
+    getFinalCombatStrength(house: House, strength: number): number {
+        const affectedHouseCard = this.houseCombatDatas.get(house).houseCard;
+
+        if (affectedHouseCard == null) {
+            return strength;
+        }
+
+        return this.getOrderResolutionHouseCard().reduce((s, h) => {
+            const houseCard = this.houseCombatDatas.get(h).houseCard;
+
+            if (houseCard == null) {
+                return s;
+            }
+
+            return houseCard.ability ? houseCard.ability.finalCombatStrength(this, house, houseCard, affectedHouseCard, s) : s;
+        }, strength);
     }
 
     getStatOfHouseCard(
@@ -464,12 +562,13 @@ export default class CombatGameState extends GameState<
     }
 
     getTotalCombatStrength(house: House): number {
-        return this.getBaseCombatStrength(house)
+        const total = this.getBaseCombatStrength(house)
             + this.getOrderBonus(house)
             + this.getSupportStrengthForSide(house)
             + this.getValyrianBladeBonus(house)
             + this.getHouseCardCombatStrength(house)
             + this.getGarrisonCombatStrength(house);
+        return this.getFinalCombatStrength(house, total);
     }
 
     getEnemy(house: House): House {
@@ -536,6 +635,8 @@ export default class CombatGameState extends GameState<
                 return ImmediatelyHouseCardAbilitiesResolutionGameState.deserializeFromServer(this, data);
             case "cancel-house-card-abilities":
                 return CancelHouseCardAbilitiesGameState.deserializeFromServer(this, data);
+            case "before-combat-house-card-abilities-resolution":
+                return BeforeCombatHouseCardAbilitiesGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -550,5 +651,6 @@ export interface SerializedCombatGameState {
     childGameState: SerializedDeclareSupportGameState | SerializedChooseHouseCardGameState
         | SerializedUseValyrianSteelBladeGameState | SerializedPostCombatGameState
         | SerializedImmediatelyHouseCardAbilitiesResolutionGameState
-        | SerializedCancelHouseCardAbilitiesGameState;
+        | SerializedCancelHouseCardAbilitiesGameState
+        | SerializedBeforeCombatHouseCardAbilitiesGameState;
 }

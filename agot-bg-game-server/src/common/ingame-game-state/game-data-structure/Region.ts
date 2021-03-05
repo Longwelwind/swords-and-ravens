@@ -8,6 +8,7 @@ import StaticRegion from "./static-data-structure/StaticRegion";
 import staticWorld from "./static-data-structure/globalStaticWorld";
 import Point from "../../../utils/Point";
 import UnitSlot from "../../../utils/unitSlot";
+import _ from "lodash";
 
 export default class Region {
     game: Game;
@@ -16,6 +17,11 @@ export default class Region {
     @observable units: BetterMap<number, Unit>;
     garrison: number;
     @observable controlPowerToken: House | null;
+
+    // Client-side only to support live update of planned musterings
+    @observable newUnits: Unit[];
+    @observable removedUnits: Unit[];
+
 
     get staticRegion(): StaticRegion {
         return staticWorld.staticRegions.get(this.id);
@@ -63,6 +69,10 @@ export default class Region {
         return this.staticRegion.powerTokenSlot;
     }
 
+    get allUnits(): Unit[] {
+        return _.difference(_.concat(this.units.values, this.newUnits), this.removedUnits);
+    }
+
     constructor(
         game: Game, id: string, garrison: number, controlPowerToken: House | null = null, units: BetterMap<number, Unit> = new BetterMap<number, Unit>()
     ) {
@@ -71,6 +81,8 @@ export default class Region {
         this.units = units;
         this.garrison = garrison;
         this.controlPowerToken = controlPowerToken;
+        this.newUnits = [];
+        this.removedUnits = [];
     }
 
     getController(): House | null {

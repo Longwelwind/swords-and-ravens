@@ -19,6 +19,8 @@ import castleImage from "../../public/images/icons/castle.svg";
 import battleGearImage from "../../public/images/icons/battle-gear.svg";
 import Player from "../common/ingame-game-state/Player";
 import UserLabel from "./UserLabel";
+import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
+import { observer } from "mobx-react";
 
 
 interface HouseRowComponentProps {
@@ -27,6 +29,7 @@ interface HouseRowComponentProps {
     ingame: IngameGameState;
 }
 
+@observer
 export default class HouseRowComponent extends Component<HouseRowComponentProps> {
     get house(): House {
         return this.props.house;
@@ -49,7 +52,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     }
 
     render(): ReactNode {
-        return <>
+        return this.props.ingame.rerender >= 0 && <>
             <ListGroupItem>
                 <Row className="align-items-center">
                     <Col xs="auto" className="pr-0" style={{width: "28px"}}>
@@ -103,12 +106,17 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                         <Col xs="auto">
                                             {this.game.getAvailableUnitsOfType(this.house, type)}
                                         </Col>
-                                        <Col xs="auto" style={{marginLeft: 4}}>
-                                            <div className="unit-icon small hover-weak-outline"
-                                                style={{
-                                                    backgroundImage: `url(${unitImages.get(this.house.id).get(type.id)})`,
-                                                }}
-                                            />
+                                        <Col xs="auto" style={{ marginLeft: 4 }}>
+                                            <OverlayTrigger
+                                                overlay={this.renderUnitTypeTooltip(type)}
+                                                delay={{ show: 250, hide: 100 }}
+                                                placement="auto">
+                                                <div className="unit-icon small hover-weak-outline"
+                                                    style={{
+                                                        backgroundImage: `url(${unitImages.get(this.house.id).get(type.id)})`,
+                                                    }}
+                                                />
+                                            </OverlayTrigger>
                                         </Col>
                                     </Row>
                                 </Col>
@@ -132,7 +140,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         <div style={{fontSize: "18px"}}>{this.house.powerTokens}</div>
                         <OverlayTrigger
                             overlay={this.renderPowerTooltip(this.house)}
-                            delay={{show: 750, hide: 100}}
+                            delay={{show: 250, hide: 100}}
                             placement="auto"
                         >
                             <div
@@ -146,7 +154,8 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     </Col>
                 </Row>
                 <Row className="justify-content-center">
-                    {_.sortBy(this.house.houseCards.values, hc => hc.combatStrength).map(hc => (
+                    {!this.props.ingame.isVassalHouse(this.house) ?
+                        _.sortBy(this.house.houseCards.values, hc => hc.combatStrength).map(hc => (
                         <Col xs="auto" key={hc.id}>
                             {hc.state == HouseCardState.AVAILABLE ? (
                                 <HouseCardComponent
@@ -161,10 +170,25 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                 />
                             )}
                         </Col>
+                    ))
+                    :  _.sortBy(this.game.vassalHouseCards.values, hc => hc.combatStrength).map(hc => (
+                        <Col xs="auto" key={hc.id}>
+                            <HouseCardComponent
+                                    houseCard={hc}
+                                    size="tiny"
+                            />
+                        </Col>
                     ))}
                 </Row>
             </ListGroupItem>
         </>;
+    }
+
+    private renderUnitTypeTooltip(unitType: UnitType): ReactNode {
+        return <Tooltip id={unitType.id + "-tooltip"}>
+            <b>{unitType.name}</b><br/>
+            <small>{unitType.description}</small>
+        </Tooltip>;
     }
 
     private renderTotalLandRegionsTooltip(house: House): ReactNode {

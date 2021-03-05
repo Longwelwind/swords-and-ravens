@@ -16,8 +16,8 @@ export default class ImmediatelyHouseCardAbilitiesResolutionGameState extends Ga
     CombatGameState,
     HouseCardResolutionGameState<
         ImmediatelyHouseCardAbilitiesResolutionGameState,
-        QueenOfThornsAbilityGameState | DoranMartellAbilityGameState | AeronDamphairAbilityGameState
-        | MaceTyrellAbilityGameState
+        QueenOfThornsAbilityGameState | DoranMartellAbilityGameState
+        | AeronDamphairAbilityGameState | MaceTyrellAbilityGameState
     >
 > {
     get combatGameState(): CombatGameState {
@@ -30,7 +30,8 @@ export default class ImmediatelyHouseCardAbilitiesResolutionGameState extends Ga
 
     firstStart(): void {
         this.setChildGameState(
-            new HouseCardResolutionGameState<ImmediatelyHouseCardAbilitiesResolutionGameState, QueenOfThornsAbilityGameState>(this)
+            new HouseCardResolutionGameState<ImmediatelyHouseCardAbilitiesResolutionGameState, QueenOfThornsAbilityGameState | DoranMartellAbilityGameState
+            | AeronDamphairAbilityGameState | MaceTyrellAbilityGameState>(this)
         ).firstStart();
     }
 

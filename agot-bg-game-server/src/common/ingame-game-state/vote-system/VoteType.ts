@@ -4,8 +4,9 @@ import CancelledGameState from "../../cancelled-game-state/CancelledGameState";
 import House from "../game-data-structure/House";
 import Player from "../Player";
 import User from "../../../server/User";
+import _ from "lodash";
 
-export type SerializedVoteType = SerializedCancelGame | SerializedReplacePlayer;
+export type SerializedVoteType = SerializedCancelGame | SerializedReplacePlayer | SerializedReplacePlayerByVassal;
 
 export default abstract class VoteType {
     abstract serializeToClient(): SerializedVoteType;
@@ -23,6 +24,10 @@ export default abstract class VoteType {
                 // Same than above
                 // eslint-disable-next-line @typescript-eslint/no-use-before-define
                 return ReplacePlayer.deserializeFromServer(ingame, data);
+            case "replace-player-by-vassal":
+                // Same than above
+                // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                return ReplacePlayerByVassal.deserializeFromServer(ingame, data);
         }
     }
 }
@@ -110,6 +115,68 @@ export class ReplacePlayer extends VoteType {
 export interface SerializedReplacePlayer {
     type: "replace-player";
     replacer: string;
+    replaced: string;
+    forHouse: string;
+}
+
+export class ReplacePlayerByVassal extends VoteType {
+    replaced: User;
+    forHouse: House;
+
+    constructor(replaced: User, forHouse: House) {
+        super();
+        this.replaced = replaced;
+        this.forHouse = forHouse;
+    }
+
+    verb(): string {
+        return `replace ${this.replaced.name} (${this.forHouse.name}) with a vassal`;
+    }
+
+    executeAccepted(vote: Vote): void {
+        const oldPlayer = vote.ingame.players.values.find(p => p.user == this.replaced) as Player;
+
+        vote.ingame.entireGame.broadcastToClients({
+            type: "player-replaced",
+            oldUser: oldPlayer.user.id
+        });
+
+        vote.ingame.log({
+            type: "player-replaced",
+            oldUser: this.replaced.id,
+            house: this.forHouse.id
+        });
+
+        vote.ingame.players.delete(oldPlayer.user);
+        // Assign this vassal to the weakest house
+        for (const h of _.reverse(vote.ingame.game.getPotentialWinners())) {
+            if (!vote.ingame.isVassalHouse(h)) {
+                vote.ingame.game.vassalRelations.set(oldPlayer.house, h);
+                break;
+            }
+        }
+
+        vote.ingame.broadcastVassalRelations();
+    }
+
+    serializeToClient(): SerializedReplacePlayerByVassal {
+        return {
+            type: "replace-player-by-vassal",
+            replaced: this.replaced.id,
+            forHouse: this.forHouse.id
+        };
+    }
+
+    static deserializeFromServer(ingame: IngameGameState, data: SerializedReplacePlayerByVassal): ReplacePlayerByVassal {
+        const replaced = ingame.entireGame.users.get(data.replaced);
+        const forHouse = ingame.game.houses.get(data.forHouse);
+
+        return new ReplacePlayerByVassal(replaced, forHouse);
+    }
+}
+
+export interface SerializedReplacePlayerByVassal {
+    type: "replace-player-by-vassal";
     replaced: string;
     forHouse: string;
 }

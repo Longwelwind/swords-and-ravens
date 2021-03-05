@@ -3,24 +3,22 @@ import LobbyGameState, {SerializedLobbyGameState} from "./lobby-game-state/Lobby
 import IngameGameState, {SerializedIngameGameState} from "./ingame-game-state/IngameGameState";
 import {ServerMessage} from "../messages/ServerMessage";
 import {ClientMessage} from "../messages/ClientMessage";
-import * as baseGameData from "../../data/baseGameData.json";
 import User, {SerializedUser} from "../server/User";
 import {observable} from "mobx";
 import * as _ from "lodash";
 import BetterMap from "../utils/BetterMap";
 import GameEndedGameState from "./ingame-game-state/game-ended-game-state/GameEndedGameState";
-import { GameSetup, GameSetupContainer } from "./ingame-game-state/game-data-structure/createGame";
+import { GameSetup, getGameSetupContainer } from "./ingame-game-state/game-data-structure/createGame";
 import CancelledGameState, { SerializedCancelledGameState } from "./cancelled-game-state/CancelledGameState";
+import { VoteState } from "./ingame-game-state/vote-system/Vote";
 
 export default class EntireGame extends GameState<null, LobbyGameState | IngameGameState | CancelledGameState> {
     id: string;
-    allGameSetups = Object.entries(baseGameData.setups);
-
     @observable users = new BetterMap<string, User>();
     ownerUserId: string;
     name: string;
 
-    @observable gameSettings: GameSettings = {pbem: false, setupId: "base-game", playerCount: 6, randomHouses: false, vassals: false};
+    @observable gameSettings: GameSettings = { pbem: false, setupId: "base-game", playerCount: 6, randomHouses: false, cokWesterosPhase: false, adwdHouseCards: false, vassals: false };
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -28,8 +26,32 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     // Keys are the two users participating in the private chat.
     // A pair of user is sorted alphabetically by their id when used as a key.
     @observable privateChatRoomsIds: BetterMap<User, BetterMap<User, string>> = new BetterMap();
+    // Client-side callback fired whenever a new private chat-window was created
+    onNewPrivateChatRoomCreated: ((roomId: string) => void) | null;
     // Client-side callback fired whenever the current GameState changes.
     onClientGameStateChange: (() => void) | null;
+
+    get lobbyGameState(): LobbyGameState | null{
+        return this.childGameState instanceof LobbyGameState ? this.childGameState : null;
+    }
+
+    get owner(): User | null {
+        return this.users.tryGet(this.ownerUserId, null);
+    }
+
+    get selectedGameSetup(): GameSetup {
+        const container = getGameSetupContainer(this.gameSettings.setupId);
+
+        const playerSetups = container.playerSetups;
+
+        const gameSetup = playerSetups.find(gameSetup => this.gameSettings.playerCount == gameSetup.playerCount);
+
+        if (gameSetup == undefined) {
+            throw new Error(`Invalid playerCount ${this.gameSettings.playerCount} for setupId ${this.gameSettings.setupId}`);
+        }
+
+        return gameSetup;
+    }
 
     constructor(id: string, ownerId: string, name: string) {
         super(null);
@@ -89,6 +111,34 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     isOwner(user: User): boolean {
+        const owner = this.owner;
+        if (!owner) {
+            return this.isRealOwner(user);
+        }
+
+        // If owner is not seated every player becomes owner ...
+        if (this.lobbyGameState) {
+            if (this.lobbyGameState.players.values.includes(owner)) {
+                return this.isRealOwner(user);
+            } else {
+                // ... and can kick players, change settings, start the game, etc. in LobbyGameState
+                return this.lobbyGameState.players.values.includes(user);
+            }
+        }
+
+        if (this.childGameState instanceof IngameGameState) {
+            if (this.childGameState.players.keys.includes(owner)) {
+                return this.isRealOwner(user);
+            } else {
+                // ... and can toggle PBEM during game
+                return this.childGameState.players.keys.includes(user);
+            }
+        }
+
+        return this.isRealOwner(user);
+    }
+
+    isRealOwner(user: User): boolean {
         return user.id == this.ownerUserId;
     }
 
@@ -114,19 +164,29 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 settings: user.settings
             })
         } else if (message.type == "change-game-settings") {
-            if (this.ownerUserId != user.id) {
+            if (!this.isOwner(user)) {
                 return;
             }
 
-            this.gameSettings = message.settings;
+            let settings =  message.settings as GameSettings;
+            if (!settings || (this.lobbyGameState && this.lobbyGameState.players.size > settings.playerCount)) {
+                // A variant which contains less players than connected is not allowed
+                settings = this.gameSettings;
+            }
 
-            if (this.childGameState instanceof LobbyGameState) {
-                this.childGameState.onGameSettingsChange();
+            if (settings.setupId == "a-dance-with-dragons") {
+                settings.adwdHouseCards = true;
+            }
+
+            this.gameSettings = settings;
+
+            if (this.lobbyGameState) {
+                this.lobbyGameState.onGameSettingsChange();
             }
 
             this.broadcastToClients({
                 type: "game-settings-changed",
-                settings: message.settings
+                settings: settings
             });
         } else {
             this.childGameState.onClientMessage(user, message);
@@ -227,9 +287,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 });
             });
         } else if (this.childGameState instanceof IngameGameState) {
-            const waitedForUsers = this.childGameState.getWaitedUsers();
+            const ingame = this.childGameState as IngameGameState;
+            const waitedForUsers = ingame.getWaitedUsers();
 
-            this.childGameState.players.forEach((player, user) => {
+            ingame.players.forEach((player, user) => {
                 // "Important chat rooms" are chat rooms where unseen messages will display
                 // a badge next to the game in the website.
                 // In this case, it's all private rooms with this player in it. The next line
@@ -242,7 +303,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                     data: {
                         "house": player.house.id,
                         "waited_for": waitedForUsers.includes(user),
-                        "important_chat_rooms": importantChatRooms.map(cr => cr.roomId)
+                        "important_chat_rooms": importantChatRooms.map(cr => cr.roomId),
+                        "is_winner": ingame.childGameState instanceof GameEndedGameState ? ingame.childGameState.winner == player.house : false,
+                        "needed_for_vote": ingame.votes.values.filter(vote => vote.state == VoteState.ONGOING).some(vote => !vote.votes.has(player.house))
                     }
                 });
             });
@@ -269,34 +332,6 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                     return {user: otherUser, roomId};
                 })
         ));
-    }
-
-    getGameSetupContainer(setupId: string): GameSetupContainer {
-        const container = this.allGameSetups.find(([sid, _]) => sid == setupId);
-
-        if (!container) {
-            throw new Error("Invalid setupId");
-        }
-
-        return container[1];
-    }
-
-    getGameSetupByIdAndPlayerCount(setupId: string, playerCount: number): GameSetup {
-        const container = this.getGameSetupContainer(setupId);
-
-        const playerSetups = container.playerSetups;
-
-        const gameSetup = playerSetups.find(gameSetup => playerCount == gameSetup.playerCount);
-
-        if (!gameSetup) {
-            throw new Error(`Invalid playerCount ${playerCount} for setupId ${setupId}`);
-        }
-
-        return gameSetup;
-    }
-
-    getSelectedGameSetup(): GameSetup {
-        return this.getGameSetupByIdAndPlayerCount(this.gameSettings.setupId, this.gameSettings.playerCount);
     }
 
     serializeToClient(user: User | null): SerializedEntireGame {
@@ -359,5 +394,7 @@ export interface GameSettings {
     setupId: string;
     playerCount: number;
     randomHouses: boolean;
+    adwdHouseCards: boolean;
+    cokWesterosPhase: boolean;
     vassals: boolean;
 }

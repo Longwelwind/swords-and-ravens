@@ -3,7 +3,6 @@ import PlanningGameState from "../../common/ingame-game-state/planning-game-stat
 import {observer} from "mobx-react";
 import React from "react";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
-import * as _ from "lodash";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import Row from "react-bootstrap/Row";
 import { OverlayTrigger } from "react-bootstrap";

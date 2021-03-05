@@ -9,7 +9,7 @@ import Region from "./game-data-structure/Region";
 import PlanningGameState, {SerializedPlanningGameState} from "./planning-game-state/PlanningGameState";
 import ActionGameState, {SerializedActionGameState} from "./action-game-state/ActionGameState";
 import Order from "./game-data-structure/Order";
-import Game, {SerializedGame} from "./game-data-structure/Game";
+import Game, {MIN_PLAYER_COUNT_WITH_VASSALS, SerializedGame} from "./game-data-structure/Game";
 import WesterosGameState, {SerializedWesterosGameState} from "./westeros-game-state/WesterosGameState";
 import createGame from "./game-data-structure/createGame";
 import BetterMap from "../../utils/BetterMap";
@@ -22,10 +22,11 @@ import GameEndedGameState, {SerializedGameEndedGameState} from "./game-ended-gam
 import UnitType from "./game-data-structure/UnitType";
 import WesterosCard from "./game-data-structure/westeros-card/WesterosCard";
 import Vote, { SerializedVote, VoteState } from "./vote-system/Vote";
-import VoteType, { CancelGame, ReplacePlayer } from "./vote-system/VoteType";
+import VoteType, { CancelGame, ReplacePlayer, ReplacePlayerByVassal } from "./vote-system/VoteType";
 import { v4 } from "uuid";
 import CancelledGameState, { SerializedCancelledGameState } from "../cancelled-game-state/CancelledGameState";
 import HouseCard from "./game-data-structure/house-card/HouseCard";
+import { observable } from "mobx";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -37,6 +38,7 @@ export default class IngameGameState extends GameState<
     game: Game;
     gameLogManager: GameLogManager = new GameLogManager(this);
     votes: BetterMap<string, Vote> = new BetterMap();
+    @observable rerender = 0;
 
     get entireGame(): EntireGame {
         return this.parentGameState;
@@ -55,8 +57,13 @@ export default class IngameGameState extends GameState<
     }
 
     beginGame(housesToCreate: string[], futurePlayers: BetterMap<string, User>): void {
-        this.game = createGame(this, housesToCreate);
+        this.game = createGame(this, housesToCreate, futurePlayers.keys);
         this.players = new BetterMap(futurePlayers.map((house, user) => [user, new Player(user, this.game.houses.get(house))]));
+
+        this.log({
+            type: "user-house-assignments",
+            assignments: futurePlayers.map((house, user) => [house, user.id]) as [string, string][]
+        });
 
         this.beginNewTurn();
     }
@@ -82,6 +89,8 @@ export default class IngameGameState extends GameState<
     }
 
     proceedPlanningGameState(planningRestrictions: PlanningRestriction[] = []): void {
+        this.game.vassalRelations = new BetterMap();
+        this.broadcastVassalRelations();
         this.setChildGameState(new PlanningGameState(this)).firstStart(planningRestrictions);
     }
 
@@ -127,7 +136,7 @@ export default class IngameGameState extends GameState<
         } else if (message.type == "launch-replace-player-vote") {
             const player = this.players.get(this.entireGame.users.get(message.player));
 
-            if (!this.canLaunchReplacePlayerVote(user, player).result) {
+            if (!this.canLaunchReplacePlayerVote(user).result) {
                 return;
             }
 
@@ -158,12 +167,22 @@ export default class IngameGameState extends GameState<
 
             vote.checkVoteFinished();
         } else if (message.type == "launch-cancel-game-vote") {
-            this.createVote(
-                player.user,
-                new CancelGame()
-            );
+            if (this.canLaunchCancelGameVote()) {
+                this.createVote(
+                    player.user,
+                    new CancelGame()
+                );
+            }
         } else if (message.type == "update-note") {
             player.note = message.note.substring(0, NOTE_MAX_LENGTH);
+        } else if (message.type == "launch-replace-player-by-vassal-vote") {
+            const playerToReplace = this.players.get(this.entireGame.users.get(message.player));
+
+            if (!this.canLaunchReplacePlayerVote(player.user, true).result) {
+                return;
+            }
+
+            this.createVote(player.user, new ReplacePlayerByVassal(playerToReplace.user, playerToReplace.house));
         } else {
             this.childGameState.onPlayerMessage(player, message);
         }
@@ -348,7 +367,6 @@ export default class IngameGameState extends GameState<
             this.game.turn++;
             this.game.valyrianSteelBladeUsed = false;
             this.world.regions.forEach(r => r.units.forEach(u => u.wounded = false));
-            this.game.vassalRelations = new BetterMap();
         } else if (message.type == "add-game-log") {
             this.gameLogManager.logs.push({data: message.data, time: new Date(message.time * 1000)});
         } else if (message.type == "change-tracker") {
@@ -384,13 +402,20 @@ export default class IngameGameState extends GameState<
             vote.votes.set(voter, message.choice);
         } else if (message.type == "player-replaced") {
             const oldPlayer = this.players.get(this.entireGame.users.get(message.oldUser));
-            const newUser = this.entireGame.users.get(message.newUser);
+            const newUser = message.newUser ? this.entireGame.users.get(message.newUser) : null;
 
-            const newPlayer = new Player(newUser, oldPlayer.house);
+            const newPlayer = newUser ? new Player(newUser, oldPlayer.house) : null;
 
-            this.players.set(newUser, newPlayer);
-            this.players.delete(oldPlayer.user);
-        } else {
+            if (newUser && newPlayer) {
+                this.players.set(newUser, newPlayer);
+            } else {
+                this.players.delete(oldPlayer.user);
+            }
+        } else if (message.type == "vassal-relations") {
+            this.game.vassalRelations = new BetterMap(message.vassalRelations.map(([vId, cId]) => [this.game.houses.get(vId), this.game.houses.get(cId)]));
+            this.rerender++;
+        }
+         else {
             this.childGameState.onServerMessage(message);
         }
     }
@@ -425,12 +450,22 @@ export default class IngameGameState extends GameState<
         return {result: true, reason: ""};
     }
 
-    canLaunchReplacePlayerVote(fromUser: User, _forPlayer: Player): {result: boolean; reason: string} {
-        if (this.players.keys.includes(fromUser)) {
+    canLaunchReplacePlayerVote(fromUser: User, replaceWithVassal = false): {result: boolean; reason: string} {
+        if (!replaceWithVassal && this.players.keys.includes(fromUser)) {
             return {result: false, reason: "already-playing"};
         }
 
-        const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof ReplacePlayer);
+        if (replaceWithVassal) {
+            if (!this.players.keys.includes(fromUser)) {
+                return {result: false, reason: "only-players-can-vote"};
+            }
+            
+            if (this.players.size - 1 < MIN_PLAYER_COUNT_WITH_VASSALS) {
+                return {result: false, reason: "min-player-count-reached"};
+            }
+        }
+
+        const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && (v.type instanceof ReplacePlayer || v.type instanceof ReplacePlayerByVassal));
         if (existingVotes.length > 0) {
             return {result: false, reason: "ongoing-vote"};
         }
@@ -460,11 +495,18 @@ export default class IngameGameState extends GameState<
             player: player.user.id
         });
     }
-    
+
+    launchReplacePlayerByVassalVote(player: Player): void {
+        this.entireGame.sendMessageToServer({
+            type: "launch-replace-player-by-vassal-vote",
+            player: player.user.id
+        });
+    }
+
     getVassalHouses(): House[] {
         return this.game.houses.values.filter(h => this.isVassalHouse(h));
     }
-    
+
     getNonVassalHouses(): House[] {
         return this.game.houses.values.filter(h => !this.isVassalHouse(h));
     }
@@ -489,8 +531,40 @@ export default class IngameGameState extends GameState<
         return !this.players.values.map(p => p.house).includes(house);
     }
 
+    getOtherVassalFamilyHouses(house: House): (House | null)[] {
+        const result: House[] = [];
+        if (this.game.vassalRelations.has(house)) {
+            // If house is a vassal add its commander ...
+            const vassalCommader = this.game.vassalRelations.get(house);
+            result.push(vassalCommader);
+
+            // ... and all other vassals except myself
+            this.game.vassalRelations.entries.forEach(([vassal, commander]) => {
+                if (commander == vassalCommader && vassal != house) {
+                    result.push(vassal);
+                }
+            });
+        } else {
+            // If house is no vassal add potentially controlled vassals
+            this.game.vassalRelations.entries.forEach(([vassal, commander]) => {
+                if (commander == house) {
+                    result.push(vassal);
+                }
+            });
+        }
+
+        return result;
+    }
+
     getTurnOrderWithoutVassals(): House[] {
         return this.game.getTurnOrder().filter(h => !this.isVassalHouse(h));
+    }
+
+    broadcastVassalRelations(): void {
+        this.entireGame.broadcastToClients({
+            type: "vassal-relations",
+            vassalRelations: this.game.vassalRelations.entries.map(([vassal, commander]) => [vassal.id, commander.id])
+        });
     }
 
     updateNote(note: string): void {

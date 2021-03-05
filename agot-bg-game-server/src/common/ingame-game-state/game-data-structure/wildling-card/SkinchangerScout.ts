@@ -40,4 +40,8 @@ export default class SkinchangerScout extends WildlingCardType {
 
         wildlingsAttack.onWildlingCardExecuteEnd();
     }
+
+    lowestBidderChoiceCanBeSkipped(wildlingsAttack: WildlingsAttackGameState): boolean {
+        return wildlingsAttack.lowestBidders.every(h => h.powerTokens <= 2);
+    }
 }

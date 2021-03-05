@@ -4,8 +4,7 @@ import GameStateComponentProps from "./GameStateComponentProps";
 import ClaimVassalGameState from "../../common/ingame-game-state/planning-game-state/claim-vassals-game-state/claim-vassal-game-state/ClaimVassalGameState";
 import Col from "react-bootstrap/Col";
 import House from "../../common/ingame-game-state/game-data-structure/House";
-import Form from "react-bootstrap/FormGroup";
-import { FormCheck, Button } from "react-bootstrap";
+import { FormCheck, Button, Row } from "react-bootstrap";
 import { observable } from "mobx";
 import _ from "lodash";
 
@@ -17,23 +16,34 @@ export default class ClaimVassalComponent extends Component<GameStateComponentPr
         return (
             <>
                 <Col xs={12} className="text-center">
-                    <strong>{this.props.gameState.house.name}</strong> may command <b>{this.props.gameState.count}</b> Vassal{this.props.gameState.count > 0 && "s"} house this turn.
+                    <strong>{this.props.gameState.house.name}</strong> may command <b>{this.props.gameState.count}</b> Vassal house{this.props.gameState.count > 0 && "s"} this turn.
                 </Col>
-                <Col xs={12} className="text-center">
+                <Col xs={12}>
                     {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
-                        <div>
-                            {this.props.gameState.getClaimableVassals().map(h => (
-                                <div key={h.id}>
-                                    <FormCheck
-                                        type="checkbox"
-                                        id={"vassal-" + h.id}
-                                        label={h.name}
-                                        checked={this.selectedVassals.includes(h)}
-                                        onChange={() => this.onChange(h)} />
-                                </div>
-                            ))}
-                            <Button onClick={() => this.onClick()}>Claim</Button>
-                        </div>
+                        <>
+                            <Col xs={12}>
+                                {this.props.gameState.claimableVassals.map(h => (
+                                    <Row key={h.id} className="mb-1">
+                                        <FormCheck
+                                            type="checkbox"
+                                            id={"vassal-" + h.id}
+                                            label={h.name}
+                                            checked={this.selectedVassals.includes(h)}
+                                            onChange={() => this.onChange(h)} />
+                                    </Row>
+                                ))}
+                            </Col>
+                            <Col xs={12}>
+                                <Row className="justify-content-center">
+                                    <Col xs="auto">
+                                        <Button disabled={this.selectedVassals.length == 0} onClick={() => this.onClaimClick()}>Claim</Button>
+                                    </Col>
+                                    <Col xs="auto">
+                                        <Button onClick={() => this.onPassClick()}>Pass</Button>
+                                    </Col>
+                                </Row>
+                            </Col>
+                        </>
                     ) : (
                         <>Waiting for {this.props.gameState.house.name}...</>
                     )}
@@ -54,7 +64,16 @@ export default class ClaimVassalComponent extends Component<GameStateComponentPr
         }
     }
 
-    onClick(): void {
+    onClaimClick(): void {
+        if (this.selectedVassals.length == 0) {
+            return;
+        }
+
         this.props.gameState.choose(this.selectedVassals);
+    }
+
+
+    onPassClick(): void {
+        this.props.gameState.choose([]);
     }
 }

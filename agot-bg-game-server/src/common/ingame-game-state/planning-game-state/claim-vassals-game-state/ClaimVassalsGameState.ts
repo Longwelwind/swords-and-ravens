@@ -10,6 +10,7 @@ import IngameGameState from "../../IngameGameState";
 import _ from "lodash";
 
 export default class ClaimVassalsGameState extends GameState<PlanningGameState, ClaimVassalGameState> {
+    passedVassalsCount = 0;
 
     get ingame(): IngameGameState {
         return this.parentGameState.ingameGameState;
@@ -20,6 +21,11 @@ export default class ClaimVassalsGameState extends GameState<PlanningGameState, 
     }
 
     firstStart(): void {
+        if (this.ingame.getVassalHouses().length > 0) {
+            this.ingame.log({
+                type: "claim-vassals-began"
+            });
+        }
         this.proceedNextVassal(null);
     }
 
@@ -48,8 +54,9 @@ export default class ClaimVassalsGameState extends GameState<PlanningGameState, 
         const countNonVassals = this.game.houses.size - countVassals;
         // Get the position in the Iron Throne track, but without considering the vassals
         const positionInTrack = this.game.ironThroneTrack.filter(h => !this.ingame.isVassalHouse(h)).indexOf(nextHouseToClaim);
-        const count = Math.floor(countVassals / countNonVassals) + (positionInTrack < (countVassals % countNonVassals) ? 1 : 0);
+        const count = this.passedVassalsCount + (Math.floor(countVassals / countNonVassals) + (positionInTrack < (countVassals % countNonVassals) ? 1 : 0));
 
+        console.log("proceed with ClaimVassalGameState. count: " + count);
         this.setChildGameState(new ClaimVassalGameState(this)).firstStart(nextHouseToClaim, count);
     }
 
@@ -60,11 +67,7 @@ export default class ClaimVassalsGameState extends GameState<PlanningGameState, 
     assignVassals(house: House, vassals: House[]): void {
         vassals.forEach(v => this.game.vassalRelations.set(v, house));
 
-        this.entireGame.broadcastToClients({
-            type: "vassals-claimed",
-            vassals: vassals.map(v => v.id),
-            house: house.id
-        });
+        this.ingame.broadcastVassalRelations();
 
         this.ingame.log({
             type: "vassals-claimed",
@@ -73,13 +76,7 @@ export default class ClaimVassalsGameState extends GameState<PlanningGameState, 
         });
     }
 
-    onServerMessage(message: ServerMessage): void {
-        if (message.type == "vassals-claimed") {
-            const vassals = message.vassals.map(hid => this.ingame.game.houses.get(hid));
-            const house = this.ingame.game.houses.get(message.house);
-
-            vassals.forEach(v => this.game.vassalRelations.set(v, house));
-        }
+    onServerMessage(_message: ServerMessage): void {
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -89,7 +86,8 @@ export default class ClaimVassalsGameState extends GameState<PlanningGameState, 
     serializeToClient(admin: boolean, player: Player | null): SerializedClaimVassalsGameState {
         return {
             type: "claim-vassals",
-            childGameState: this.childGameState.serializeToClient(admin, player)
+            childGameState: this.childGameState.serializeToClient(admin, player),
+            passedVassalsCount: this.passedVassalsCount
         };
     }
 
@@ -97,7 +95,8 @@ export default class ClaimVassalsGameState extends GameState<PlanningGameState, 
         const claimVassals = new ClaimVassalsGameState(planningGameState);
 
         claimVassals.childGameState = claimVassals.deserializeChildGameState(data.childGameState);
-        
+        claimVassals.passedVassalsCount = data.passedVassalsCount;
+
         return claimVassals;
     }
 
@@ -113,5 +112,5 @@ export default class ClaimVassalsGameState extends GameState<PlanningGameState, 
 export interface SerializedClaimVassalsGameState {
     type: "claim-vassals";
     childGameState: SerializedClaimVassalGameState;
-    
+    passedVassalsCount: number;
 }

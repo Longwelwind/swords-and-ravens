@@ -9,12 +9,14 @@ import {ServerMessage} from "../../../../../../../messages/ServerMessage";
 import {ClientMessage} from "../../../../../../../messages/ClientMessage";
 import PostCombatGameState from "../PostCombatGameState";
 import PatchfaceAbilityGameState, {SerializedPatchfaceAbilityGameState} from "./patchface-ability-game-state/PatchfaceAbilityGameState";
+import MelisandreAbilityGameState, {SerializedMelisandreAbilityGameState} from "./melisandre-ability-game-state/MelisandreAbilityGameState";
+import JonConningtonAbilityGameState, {SerializedJonConningtonAbilityGameState} from "./jon-connington-ability-game-state/JonConningtonAbilityGameState";
 
 export default class AfterCombatHouseCardAbilitiesGameState extends GameState<
     PostCombatGameState,
     HouseCardResolutionGameState<
         AfterCombatHouseCardAbilitiesGameState,
-        PatchfaceAbilityGameState
+        PatchfaceAbilityGameState | MelisandreAbilityGameState | JonConningtonAbilityGameState
     >
 >  {
     get postCombatGameState(): PostCombatGameState {
@@ -31,7 +33,7 @@ export default class AfterCombatHouseCardAbilitiesGameState extends GameState<
 
     firstStart(): void {
         this.setChildGameState(
-            new HouseCardResolutionGameState<AfterCombatHouseCardAbilitiesGameState, PatchfaceAbilityGameState>(this)
+            new HouseCardResolutionGameState<AfterCombatHouseCardAbilitiesGameState, PatchfaceAbilityGameState | MelisandreAbilityGameState | JonConningtonAbilityGameState>(this)
         ).firstStart();
     }
 
@@ -64,11 +66,11 @@ export default class AfterCombatHouseCardAbilitiesGameState extends GameState<
     }
 
     static deserializeFromServer(postCombat: PostCombatGameState, data: SerializedAfterCombatHouseCardAbilitiesGameState): AfterCombatHouseCardAbilitiesGameState {
-        const afterWinnerDetermination = new AfterCombatHouseCardAbilitiesGameState(postCombat);
+        const afterCombat = new AfterCombatHouseCardAbilitiesGameState(postCombat);
 
-        afterWinnerDetermination.childGameState = afterWinnerDetermination.deserializeChildGameState(data.childGameState);
+        afterCombat.childGameState = afterCombat.deserializeChildGameState(data.childGameState);
 
-        return afterWinnerDetermination;
+        return afterCombat;
     }
 
     deserializeChildGameState(data: SerializedAfterCombatHouseCardAbilitiesGameState["childGameState"]): AfterCombatHouseCardAbilitiesGameState["childGameState"] {
@@ -79,11 +81,15 @@ export default class AfterCombatHouseCardAbilitiesGameState extends GameState<
         switch (data.type) {
             case "patchface-ability":
                 return PatchfaceAbilityGameState.deserializeFromServer(houseCardResolution, data);
+            case "melisandre-ability":
+                return MelisandreAbilityGameState.deserializeFromServer(houseCardResolution, data);
+            case "jon-connington-ability":
+                return JonConningtonAbilityGameState.deserializeFromServer(houseCardResolution, data);
         }
     }
 }
 
 export interface SerializedAfterCombatHouseCardAbilitiesGameState {
     type: "after-combat-house-card-abilities";
-    childGameState: SerializedHouseCardResolutionGameState<SerializedPatchfaceAbilityGameState>;
+    childGameState: SerializedHouseCardResolutionGameState<SerializedPatchfaceAbilityGameState | SerializedMelisandreAbilityGameState | SerializedJonConningtonAbilityGameState>;
 }

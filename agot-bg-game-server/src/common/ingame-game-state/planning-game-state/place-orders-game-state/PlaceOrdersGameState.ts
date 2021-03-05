@@ -14,7 +14,10 @@ import Game from "../../game-data-structure/Game";
 import House from "../../game-data-structure/House";
 import User from "../../../../server/User";
 import PlanningGameState from "../PlanningGameState";
+import { PlayerActionType } from "../../game-data-structure/GameLog";
 import _ from "lodash";
+
+const MAX_VASSAL_ORDERS = 2;
 
 export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
     // Server-side, the value of the map should never be null.
@@ -24,7 +27,7 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
     @observable readyHouses: House[] = [];
 
     /**
-     * Indiates whether this PlaceOrdersGameState phase is for vassals or for non-vassals.
+     * Indicates whether this PlaceOrdersGameState phase is for vassals or for non-vassals.
      * PlanningGameState will first go through a phase for non-vassals and then a phase for vassals.
      */
     @observable forVassals: boolean;
@@ -54,14 +57,15 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
         this.forVassals = forVassals;
 
         this.ingameGameState.log({
-            type: "planning-phase-began"
+            type: "planning-phase-began",
+            forVassals: this.forVassals
         });
 
-        // Automatically set ready for houses which don't have units left
-        this.game.houses.forEach(h => {
-            if (this.getPossibleRegionsForOrders(h).length == 0) {
-                this.setReady(this.ingameGameState.getControllerOfHouse(h));
-            }
+        // Automatically set ready for houses which can't place orders
+        this.game.houses.values.forEach(h => {
+            // The easiest way is to simply call this.setReady() as it checks for canReady
+            // but this from now on disables the possibilty to bypass canReady :(
+            this.setReady(this.ingameGameState.getControllerOfHouse(h));
         });
     }
 
@@ -72,8 +76,16 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
 
         this.readyHouses.push(player.house);
 
-        // Check if all player are ready to go the action entireGame state
-        if (this.readyHouses.length == this.ingameGameState.players.values.length) {
+        if (!this.forVassals || this.ingameGameState.getVassalsControlledByPlayer(player).length > 0) {
+            this.ingameGameState.log({
+                type: "player-action",
+                house: player.house.id,
+                action: PlayerActionType.ORDERS_PLACED
+            })
+        }
+
+        // Check if all players are ready
+        if (this.readyHouses.length == this.ingameGameState.players.size) {
             this.planningGameState.onPlaceOrderFinish(this.forVassals, this.placedOrders as BetterMap<Region, Order>);
         } else {
             this.entireGame.broadcastToClients({
@@ -117,22 +129,18 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
             const house = _.find(this.getHousesToPutOrdersForPlayer(player), h => this.getPossibleRegionsForOrders(h).includes(region));
 
             if (house == null) {
-                throw new Error();
+                return;
             }
 
             if (order && !this.isOrderAvailable(house, order)) {
                 return;
             }
 
-            if (order) {
-                this.placedOrders.set(region, order);
-            } else {
-                if (this.placedOrders.has(region)) {
-                    this.placedOrders.delete(region);
-                }
-            }
+            // When a player placed or removed an order he is unready
+            this.setUnready(player);
 
             if (order) {
+                this.placedOrders.set(region, order);
                 player.user.send({
                     type: "order-placed",
                     order: order.id,
@@ -147,10 +155,14 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
                     });
                 });
             } else {
-                this.entireGame.broadcastToClients({
-                    type: "remove-placed-order",
-                    regionId: region.id
-                })
+                if (this.placedOrders.has(region)) {
+                    this.placedOrders.delete(region);
+
+                    this.entireGame.broadcastToClients({
+                        type: "remove-placed-order",
+                        regionId: region.id
+                    });
+                }
             }
         } else if (message.type == "ready") {
             this.setReady(player);
@@ -160,7 +172,27 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
     }
 
     getPossibleRegionsForOrders(house: House): Region[] {
-        return this.game.world.getControlledRegions(house).filter(r => r.units.size > 0);
+        const possibleRegions = this.game.world.getControlledRegions(house).filter(r => r.units.size > 0);
+
+        if (!this.forVassals) {
+            if (!this.ingameGameState.isVassalHouse(house)) {
+                return possibleRegions;
+            } else {
+                return [];
+            }
+        }
+
+        if (!this.ingameGameState.isVassalHouse(house)) {
+            return [];
+        }
+
+        const regionsWithOrders = possibleRegions.filter(r => this.placedOrders.has(r));
+
+        if (regionsWithOrders.length == MAX_VASSAL_ORDERS) {
+            return regionsWithOrders;
+        }
+
+        return possibleRegions;
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedPlaceOrdersGameState {
@@ -196,6 +228,18 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
         const possibleError = this.getHousesToPutOrdersForPlayer(player).reduce((state, house) => {
             const possibleRegions = this.getPossibleRegionsForOrders(house);
 
+            if (this.forVassals) {
+                const regionsWithOrders = possibleRegions.filter(r => this.placedOrders.has(r));
+
+                if (possibleRegions.length > MAX_VASSAL_ORDERS) {
+                    if(regionsWithOrders.length == MAX_VASSAL_ORDERS) {
+                        return state;
+                    } else if (regionsWithOrders.length > MAX_VASSAL_ORDERS) {
+                        return {status: false, reason: "too-much-orders-placed"};
+                    }
+                }
+            }
+
             if (possibleRegions.every(r => this.placedOrders.has(r)))
             {
                 // All possible regions have orders
@@ -209,14 +253,13 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
 
             return {status: false, reason: "not-all-regions-filled"};
         }, null);
-        
+
         return possibleError ? possibleError : {status: true, reason: ""};
     }
 
     /**
      * Client
      */
-
     assignOrder(region: Region, order: Order | null): void {
         this.entireGame.sendMessageToServer({
             type: "place-order",
@@ -260,10 +303,6 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
         }
     }
 
-    getPhaseName(): string {
-        return "Planning";
-    }
-
     /**
      * Queries
      */
@@ -280,7 +319,7 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
             return this.ingameGameState.getVassalsControlledByPlayer(player);
         }
     }
-    
+
     getNotReadyPlayers(): Player[] {
         return this.ingameGameState.players.values.filter(p => !this.readyHouses.includes(p.house));
     }

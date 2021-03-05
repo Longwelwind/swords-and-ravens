@@ -9,6 +9,7 @@ import {observable} from "mobx";
 import BetterMap from "../../../../utils/BetterMap";
 import User from "../../../../server/User";
 import IngameGameState from "../../IngameGameState";
+import { PlayerActionType } from "../../game-data-structure/GameLog";
 
 export interface BiddingGameStateParent extends GameState<any, any> {
     game: Game;
@@ -20,9 +21,14 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
     participatingHouses: House[];
     // Client-side, this structure will only contain -1 as value.
     @observable bids: BetterMap<House, number> = new BetterMap<House, number>();
+    @observable powerTokensToBid = 0;
 
     get game(): Game {
         return this.parentGameState.game;
+    }
+
+    get ingame(): IngameGameState {
+        return this.parentGameState.ingame;
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -34,18 +40,32 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
             const bid = Math.max(0, Math.min(message.powerTokens, player.house.powerTokens));
             this.bids.set(player.house, bid);
 
-            this.entireGame.broadcastToClients({
+            const otherHouses = _.difference(this.game.houses.values, [player.house]);
+            this.entireGame.sendMessageToClients(otherHouses.map(h => this.parentGameState.ingame.getControllerOfHouse(h).user), {
                 type: "bid-done",
-                houseId: player.house.id
+                houseId: player.house.id,
+                value: -1
+            });
+
+            this.entireGame.sendMessageToClients([player.user], {
+                type: "bid-done",
+                houseId: player.house.id,
+                value: bid
+            });
+
+            this.ingame.log({
+                type: "player-action",
+                house: player.house.id,
+                action: PlayerActionType.BID_MADE
             });
 
             this.checkAndProceedEndOfBidding();
         }
     }
 
-    checkAndProceedEndOfBidding(): void {
+    checkAndProceedEndOfBidding(): boolean {
         if (this.getHousesLeftToBid().length > 0) {
-            return;
+            return false;
         }
 
         // Remove the power tokens
@@ -72,12 +92,16 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
         const results = _.sortBy(housesPerBid.entries, ([bid, _]) => -bid);
 
         this.parentGameState.onBiddingGameStateEnd(results);
+        return true;
     }
 
     onServerMessage(message: ServerMessage): void {
         if (message.type == "bid-done") {
             const house = this.game.houses.get(message.houseId);
-            this.bids.set(house, -1);
+            this.bids.set(house, message.value);
+        } else if(message.type == "bidding-begin") {
+            this.bids = new BetterMap();
+            this.powerTokensToBid = 0;
         }
     }
 
@@ -105,13 +129,25 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
 
         // Already make the bidding for houses that have 0 power tokens
         this.participatingHouses.forEach(h => {
-            if (h.powerTokens == 0) {
+            if (h.powerTokens == 0 || this.ingame.isVassalHouse(h)) {
                 this.bids.set(h, 0);
+
+                if (!this.ingame.isVassalHouse(h)) {
+                    this.ingame.log({
+                        type: "player-action",
+                        house: h.id,
+                        action: PlayerActionType.BID_MADE
+                    })
+                }
             }
         });
 
         // All houses might have been fast-tracked, check if the bidding is over
-        this.checkAndProceedEndOfBidding();
+        if (! this.checkAndProceedEndOfBidding()) {
+            this.entireGame.broadcastToClients({
+                type: "bidding-begin"
+            })
+        }
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedBiddingGameState {

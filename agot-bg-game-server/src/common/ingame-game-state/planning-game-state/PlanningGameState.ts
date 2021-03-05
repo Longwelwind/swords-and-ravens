@@ -34,12 +34,7 @@ export default class PlanningGameState extends GameState<IngameGameState, PlaceO
     }
 
     firstStart(planningRestrictions: PlanningRestriction[]): void {
-        this.ingameGameState.log({
-            type: "planning-phase-began"
-        });
-
         this.planningRestrictions = planningRestrictions;
-
         this.setChildGameState(new ClaimVassalsGameState(this)).firstStart();
     }
 
@@ -76,7 +71,7 @@ export default class PlanningGameState extends GameState<IngameGameState, PlaceO
 
         planningGameState.planningRestrictions = data.planningRestrictions.map(prid => planningRestrictions.get(prid));
         planningGameState.childGameState = planningGameState.deserializeChildGameState(data.childGameState);
-        
+
         return planningGameState;
     }
 

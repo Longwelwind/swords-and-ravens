@@ -15,17 +15,26 @@ import PartialRecursive from "../../utils/PartialRecursive";
 import PlaceOrdersGameState from "../../common/ingame-game-state/planning-game-state/place-orders-game-state/PlaceOrdersGameState";
 import Player from "../../common/ingame-game-state/Player";
 import House from "../../common/ingame-game-state/game-data-structure/House";
-import { observable } from "mobx";
 import { OverlayTrigger, Popover } from "react-bootstrap";
 import BetterMap from "../../utils/BetterMap";
-
+import WesterosCardComponent from "./utils/WesterosCardComponent";
+import PlanningRestriction from "../../common/ingame-game-state/game-data-structure/westeros-card/planning-restriction/PlanningRestriction";
+import { noMarchPlusOneOrder, noDefenseOrder, noSupportOrder, noRaidOrder, noConsolidatePowerOrder } from "../../common/ingame-game-state/game-data-structure/westeros-card/planning-restriction/planningRestrictions";
+import WesterosCardType from "../../common/ingame-game-state/game-data-structure/westeros-card/WesterosCardType";
+import { rainsOfAutumn, stormOfSwords, webOfLies, seaOfStorms, feastForCrows } from "../../common/ingame-game-state/game-data-structure/westeros-card/westerosCardTypes";
 
 @observer
 export default class PlaceOrdersComponent extends Component<GameStateComponentProps<PlaceOrdersGameState>> {
+    restrictionToWesterosCardTypeMap = new BetterMap<PlanningRestriction, {deckId: number; westerosCardType: WesterosCardType}>([
+        [noMarchPlusOneOrder, { deckId: 2, westerosCardType: rainsOfAutumn } ],
+        [noDefenseOrder, { deckId: 2, westerosCardType: stormOfSwords } ],
+        [noSupportOrder, { deckId: 2, westerosCardType: webOfLies } ],
+        [noRaidOrder, { deckId: 2, westerosCardType: seaOfStorms } ],
+        [noConsolidatePowerOrder, { deckId: 2, westerosCardType: feastForCrows} ]
+    ]);
+
     modifyRegionsOnMapCallback: any;
     modifyOrdersOnMapCallback: any;
-
-    @observable overlayTriggers = new BetterMap<Region, OverlayTrigger>();
 
     get player(): Player {
         if (!this.props.gameClient.authenticatedPlayer) {
@@ -50,13 +59,19 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                     <Row>
                         <Col xs={12}>
                             {!this.forVassals ? (
-                                <>Players may now assign orders in each region where they possess at least one unit</>
+                                <>Players must assign orders in each region where they possess at least one unit now.</>
                             ) : (
-                                <>Players may now assign orders for their vassals</>
+                                <>Players must assign orders for their vassals now.</>
                             )}
                         </Col>
+                        {this.props.gameState.parentGameState.planningRestrictions.map(pr => this.restrictionToWesterosCardTypeMap.tryGet(pr, null))
+                            .map(prWc => prWc != null ?
+                                <Col xs={12} key={`prwc_${prWc.westerosCardType.id}`} className="d-flex flex-column align-items-center">
+                                    <WesterosCardComponent cardType={prWc.westerosCardType} size="medium" tooltip={true} westerosDeckI={prWc.deckId}/>
+                                </Col> : <></>)
+                        }
                         <Col xs={12}>
-                        {this.props.gameClient.authenticatedPlayer && (
+                        {this.props.gameClient.authenticatedPlayer && this.showButtons() && (
                                 <Row className="justify-content-center">
                                     <Col xs="auto">
                                         <Button
@@ -88,6 +103,10 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
         );
     }
 
+    showButtons(): boolean {
+        return !this.props.gameState.forVassals || this.props.gameState.ingameGameState.getVassalsControlledByPlayer(this.player).length > 0;
+    }
+
     isOrderAvailable(order: Order): boolean {
         if (!this.props.gameClient.authenticatedPlayer) {
             return false;
@@ -107,8 +126,9 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
 
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
         if (this.props.gameClient.authenticatedPlayer) {
-            return _.flatMap(
-                this.props.gameState.getHousesToPutOrdersForPlayer(this.props.gameClient.authenticatedPlayer).map(h => this.props.gameState.getPossibleRegionsForOrders(h).map(r => [
+            const possibleRegions = _.flatMap(this.housesToPlaceOrdersFor.map(h => this.props.gameState.getPossibleRegionsForOrders(h)));
+
+            return possibleRegions.map(r => [
                     r,
                     {
                         // Highlight areas with no order
@@ -117,7 +137,6 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                             <OverlayTrigger
                                 placement="auto"
                                 trigger="click"
-                                ref={(ref: OverlayTrigger) => {this.overlayTriggers.set(r, ref)}}
                                 rootClose
                                 overlay={
                                     <Popover id={"region" + r.id}>
@@ -129,8 +148,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                                             }
                                             onOrderClick={o => {
                                                 this.props.gameState.assignOrder(r, o);
-                                                // @ts-ignore `hide` is not a public method of OverlayTrigger, but it does the job
-                                                this.overlayTriggers.get(r).hide();
+                                                document.body.click();
                                         }}/>
                                     </Popover>
                                 }
@@ -139,8 +157,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                             </OverlayTrigger>
                         )
                     }
-                ] as [Region, PartialRecursive<RegionOnMapProperties>]))
-            );
+                ] as [Region, PartialRecursive<RegionOnMapProperties>]);
         }
 
         return [];
@@ -149,7 +166,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
     modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
         if (this.props.gameClient.authenticatedPlayer) {
             return _.flatMap(
-                this.props.gameState.getHousesToPutOrdersForPlayer(this.props.gameClient.authenticatedPlayer).map(h => this.props.gameState.getPossibleRegionsForOrders(h).map(r => [
+                this.housesToPlaceOrdersFor.map(h => this.props.gameState.getPossibleRegionsForOrders(h).map(r => [
                     r,
                     {
                         highlight: {active: true},

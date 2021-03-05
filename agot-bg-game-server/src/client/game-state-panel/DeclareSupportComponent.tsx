@@ -65,7 +65,7 @@ export default class DeclareSupportComponent extends Component<GameStateComponen
     }
 
     canChoose(supportedHouse: House): boolean {
-        return this.props.gameState.isRestrictedToHimself() ? supportedHouse == this.props.gameState.house : true;
+        return this.props.gameState.combatGameState.isRestrictedToHimself(this.props.gameState.house) ? supportedHouse == this.props.gameState.house : true;
     }
 
     choose(house: House | null): void {
