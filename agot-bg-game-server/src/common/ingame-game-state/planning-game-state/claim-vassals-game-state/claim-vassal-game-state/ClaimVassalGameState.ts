@@ -47,6 +47,12 @@ export default class ClaimVassalGameState extends GameState<ClaimVassalsGameStat
 
             if (claimedVassals.length > 0) {
                 this.parentGameState.assignVassals(player.house, claimedVassals);
+            } else {
+                this.ingame.log({
+                    type: "vassals-claimed",
+                    house: player.house.id,
+                    vassals: []
+                });
             }
 
             this.parentGameState.onClaimVassalFinish(player.house);

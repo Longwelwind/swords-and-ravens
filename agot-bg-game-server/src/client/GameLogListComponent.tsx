@@ -1127,10 +1127,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     const vassals = data.vassals.map(hid => this.game.houses.get(hid));
                     const house = this.game.houses.get(data.house);
 
-                    return <>
-                        <b>{house.name}</b> claimed {joinReactNodes(vassals.map(v => <b key={v.id}>{v.name}</b>), ", ")} as
-                        vassal{vassals.length > 0 && "s"}.
-                    </>;
+                    return <>{vassals.length > 0 
+                        ? (<><b>{house.name}</b> claimed {joinReactNodes(vassals.map(v => <b key={v.id}>{v.name}</b>), ", ")} as
+                                vassal{vassals.length > 0 && "s"}.</>) 
+                        : (<><b>{house.name}</b> passed their vassal marker set.</>)
+                    }</>;
                 }
             case "commander-power-token-gained": {
                     const house = this.game.houses.get(data.house);
@@ -1157,8 +1158,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const newHouseCard = this.game.getHouseCardById(data.newHouseCard);
 
                 return <>
-                    <b>Jaqen H&apos;Ghar</b>: {house.name} randomly chose <b>{newHouseCard.name}</b> as <b>
+                    <b>Jaqen H&apos;Ghar</b>: <b>{house.name}</b> randomly chose <b>{newHouseCard.name}</b> as <b>
                         {affectedHouse.name}&apos;s</b> new house card.
+                </>;
+            }
+            case "jon-connington-used": {
+                const house = this.game.houses.get(data.house);
+                const region = this.game.world.regions.get(data.region);
+                return <>
+                    <b>Jon Conningtion</b>: Vassal {house.name} chose to recruit a knight in <b>{region.name}</b>.
+                </>;
+            }
+            case "bronn-used": {
+                const house = this.game.houses.get(data.house);
+                return <>
+                    <b>Bronn</b>: <b>{house.name}</b> chose to discard 2 Power tokens to reduce Bron&apos;s combat strength to 0.
                 </>;
             }
         }

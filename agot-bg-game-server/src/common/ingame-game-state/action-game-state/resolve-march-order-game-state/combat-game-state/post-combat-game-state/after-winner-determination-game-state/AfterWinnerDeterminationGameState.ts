@@ -14,7 +14,7 @@ import JonSnowBaratheonAbilityGameState, {SerializedJonSnowBaratheonAbilityGameS
 import SerIlynPayneAbilityGameState, {SerializedSerIlynPayneAbilityGameState} from "./ser-ilyn-payne-ability-game-state/SerIlynPayneAbilityGameState";
 import SerGerrisDrinkwaterAbilityGameState, {SerializedSerGerrisDrinkwaterAbilityGameState} from "./ser-gerris-drinkwater-ability-game-state/SerGerrisDrinkwaterAbilityGameState";
 import ReekAbilityGameState, {SerializedReekAbilityGameState} from "./reek-ability-game-state/ReekAbilityGameState";
-import RodrikTheReaderAbilityGameState, { SerializedRodrikTheReaderAbilityGameState } from "../after-combat-house-card-abilities-game-state/rodrik-the-reader-ability-game-state/RodrikTheReaderAbilityGameState";
+import RodrikTheReaderAbilityGameState, { SerializedRodrikTheReaderAbilityGameState } from "./rodrik-the-reader-ability-game-state/RodrikTheReaderAbilityGameState";
 import BericDondarrionAbilityGameState, { SerializedBericDondarrionAbilityGameState } from "./beric-dondarrion-ability-game-state/BericDondarrionAbilityGameState";
 
 export default class AfterWinnerDeterminationGameState extends GameState<

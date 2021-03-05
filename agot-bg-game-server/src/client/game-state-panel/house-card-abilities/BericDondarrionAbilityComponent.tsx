@@ -14,7 +14,7 @@ export default class BericDondarrionAbilityComponent extends Component<GameState
         return (
             <>
                 <Col xs={12}>
-                    <b>Beric Dondarrion: </b> {this.props.gameState.house.name} must destroy 1 unit of their army.
+                    <b>Beric Dondarrion</b>: <b>{this.props.gameState.house.name}</b> must destroy 1 unit of their army.
                 </Col>
                 {renderChildGameState(this.props, [
                     [SelectUnitsGameState, SelectUnitsComponent]

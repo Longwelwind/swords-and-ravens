@@ -45,9 +45,6 @@ export default class CombatGameState extends GameState<
     | ImmediatelyHouseCardAbilitiesResolutionGameState | BeforeCombatHouseCardAbilitiesGameState
     | UseValyrianSteelBladeGameState | PostCombatGameState
 > {
-    winner: House | null;
-    loser: House | null;
-
     order: Order;
     attacker: House;
     defender: House;

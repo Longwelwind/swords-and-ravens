@@ -3,7 +3,7 @@ import HouseCardAbility from "./HouseCardAbility";
 import HouseCard from "./HouseCard";
 import House from "../House";
 import RodrikTheReaderAbilityGameState
-    from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-combat-house-card-abilities-game-state/rodrik-the-reader-ability-game-state/RodrikTheReaderAbilityGameState";
+    from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/rodrik-the-reader-ability-game-state/RodrikTheReaderAbilityGameState";
 import AfterWinnerDeterminationGameState from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/AfterWinnerDeterminationGameState";
 
 export default class RodrikTheReaderHouseCardAbility extends HouseCardAbility {

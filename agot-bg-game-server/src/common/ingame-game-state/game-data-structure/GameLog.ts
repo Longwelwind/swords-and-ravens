@@ -30,7 +30,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered
     | SupplyAdjusted | PlayerReplaced | UserHouseAssignments | PlayerAction | MelisandreUsed | JonSnowUsed
     | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed | SerIlynPayneFootmanKilled
-    | VassalsClaimed | CommanderPowerTokenGained | BericDondarrionUsed | VarysUsed | JaqenHGharUsed
+    | VassalsClaimed | CommanderPowerTokenGained | BericDondarrionUsed | VarysUsed | JaqenHGharUsed | JonConningtonUsed | BronnUsed
     | SerGerrisDrinkwaterUsed;
 
 export enum PlayerActionType {
@@ -679,4 +679,15 @@ interface JaqenHGharUsed {
     affectedHouse: string;
     oldHouseCard: string;
     newHouseCard: string;
+}
+
+interface JonConningtonUsed {
+    type: "jon-connington-used";
+    house: string;
+    region: string;
+}
+
+interface BronnUsed {
+    type: "bronn-used";
+    house: string;
 }

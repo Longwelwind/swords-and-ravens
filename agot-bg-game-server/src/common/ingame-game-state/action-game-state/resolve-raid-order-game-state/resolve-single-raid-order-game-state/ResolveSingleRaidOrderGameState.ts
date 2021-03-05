@@ -166,7 +166,9 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
             .filter(r => r.getController() != this.house)
             .filter(r => this.actionGameState.ordersOnBoard.has(r))
             .filter(r => raid.isValidRaidableOrder(this.actionGameState.ordersOnBoard.get(r)))
-            .filter(r => r.type.kind == orderRegion.type.kind || orderRegion.type.canAdditionalyRaid == r.type.kind);
+            .filter(r => r.type.kind == orderRegion.type.kind || orderRegion.type.canAdditionalyRaid == r.type.kind)
+            // Vassal family members can't raid each other
+            .filter(r => !this.ingameGameState.getOtherVassalFamilyHouses(this.house).includes(r.getController()));
     }
 
     resolveRaid(orderRegion: Region, targetRegion: Region | null): void {
