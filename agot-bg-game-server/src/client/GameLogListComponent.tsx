@@ -1136,6 +1136,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 <b>Beric Dondarrion</b>: <b>{house.name}</b> chose a <b>{casualty}</b> to be killed.
             </>;
             }
+        case "varys-used": {
+            const house = this.game.houses.get(data.house);
+            return <>
+                <b>Varys</b>: <b>{house.name}</b> is now on top of the Fiefdoms track.
+            </>;
+            }
         }
     }
 }
