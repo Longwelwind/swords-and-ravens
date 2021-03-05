@@ -43,7 +43,7 @@ export default class Game {
     structuresCountNeededToWin: number;
     maxTurns: number;
     maxPowerTokens: number;
-    
+
     get vassalHouseCards(): BetterMap<string, HouseCard> {
         return new BetterMap(vassalHouseCards.map(hc => [hc.id, hc]));
     }
@@ -281,10 +281,14 @@ export default class Game {
     }
 
     getHouseCardById(id: string): HouseCard {
-        const houseCard = _.flatMap(this.houses.values, h => h.houseCards.values).find(hc => hc.id == id);
+        let houseCard = _.flatMap(this.houses.values, h => h.houseCards.values).find(hc => hc.id == id);
 
-        if (houseCard == null) {
-            throw new Error();
+        if (!houseCard) {
+            houseCard = this.vassalHouseCards.tryGet(id, undefined);
+
+            if (!houseCard) {
+                throw new Error(`House card ${id} not found`);
+            }
         }
 
         return houseCard;

@@ -7,7 +7,6 @@ import BericDondarrionAbilityGameState from "../../action-game-state/resolve-mar
 
 export default class BericDondarrionHouseCardAbility extends HouseCardAbility {
     afterWinnerDetermination(afterWinnerDetermination: AfterWinnerDeterminationGameState, house: House, _houseCard: HouseCard): void {
-        console.log ("Beric Dondarrion ability triggered");
         if (afterWinnerDetermination.postCombatGameState.winner == house) {
             afterWinnerDetermination.childGameState
                 .setChildGameState(new BericDondarrionAbilityGameState(afterWinnerDetermination.childGameState))

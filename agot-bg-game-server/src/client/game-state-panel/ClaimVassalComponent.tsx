@@ -72,7 +72,7 @@ export default class ClaimVassalComponent extends Component<GameStateComponentPr
         this.props.gameState.choose(this.selectedVassals);
     }
 
-    
+
     onPassClick(): void {
         this.props.gameState.choose([]);
     }

@@ -133,13 +133,16 @@ export default class CombatGameState extends GameState<
 
         // Automatically declare attackers and defenders support
         const possibleSupporters = this.getPossibleSupportingHouses();
-        if (possibleSupporters.includes(attacker)) {
-            this.declareSupport(attacker, attacker, false);
-        }
 
-        if (possibleSupporters.includes(defender)) {
-            this.declareSupport(defender, defender, false);
-        }
+        possibleSupporters.forEach(h => {
+            if (h == attacker || this.ingameGameState.getOtherVassalFamilyHouses(attacker).includes(h)) {
+                this.declareSupport(h, attacker, false);
+            }
+
+            if (h == defender || this.ingameGameState.getOtherVassalFamilyHouses(defender).includes(h)) {
+                this.declareSupport(h, defender, false);
+            }
+        });
 
         // Begin by the declaration of support
         if (!this.proceedNextSupportDeclaration()) {

@@ -173,7 +173,7 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
 
     getPossibleRegionsForOrders(house: House): Region[] {
         const possibleRegions = this.game.world.getControlledRegions(house).filter(r => r.units.size > 0);
-        
+
         if (!this.forVassals) {
             if (!this.ingameGameState.isVassalHouse(house)) {
                 return possibleRegions;
@@ -253,7 +253,7 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
 
             return {status: false, reason: "not-all-regions-filled"};
         }, null);
-        
+
         return possibleError ? possibleError : {status: true, reason: ""};
     }
 
@@ -319,7 +319,7 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
             return this.ingameGameState.getVassalsControlledByPlayer(player);
         }
     }
-    
+
     getNotReadyPlayers(): Player[] {
         return this.ingameGameState.players.values.filter(p => !this.readyHouses.includes(p.house));
     }

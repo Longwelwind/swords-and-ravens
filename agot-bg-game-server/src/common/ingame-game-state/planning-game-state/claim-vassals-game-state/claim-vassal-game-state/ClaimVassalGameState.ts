@@ -11,7 +11,7 @@ import { observable } from "mobx";
 export default class ClaimVassalGameState extends GameState<ClaimVassalsGameState> {
     house: House;
     count: number;
-    @observable claimableVassals: House[]; 
+    @observable claimableVassals: House[];
 
     get ingame(): IngameGameState {
         return this.parentGameState.ingame;
@@ -83,7 +83,7 @@ export default class ClaimVassalGameState extends GameState<ClaimVassalsGameStat
         claimVassal.house = claimVassals.game.houses.get(data.house);
         claimVassal.count = data.count;
         claimVassal.claimableVassals = data.claimableVassals.map(hid => claimVassals.game.houses.get(hid));
-        
+
         return claimVassal;
     }
 }

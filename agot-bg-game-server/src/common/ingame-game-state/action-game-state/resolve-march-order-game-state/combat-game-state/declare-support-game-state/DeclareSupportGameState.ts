@@ -34,8 +34,7 @@ export default class DeclareSupportGameState extends GameState<CombatGameState> 
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "declare-support") {
-            if (player.house != this.house) {
-                console.warn();
+            if (this.ingameGameState.getControllerOfHouse(this.house) != player) {
                 return;
             }
 

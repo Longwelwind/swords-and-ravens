@@ -96,7 +96,7 @@ export default class ClaimVassalsGameState extends GameState<PlanningGameState, 
 
         claimVassals.childGameState = claimVassals.deserializeChildGameState(data.childGameState);
         claimVassals.passedVassalsCount = data.passedVassalsCount;
-        
+
         return claimVassals;
     }
 

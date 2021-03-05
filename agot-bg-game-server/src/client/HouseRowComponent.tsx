@@ -152,7 +152,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     </Col>
                 </Row>
                 <Row className="justify-content-center">
-                    {!this.props.ingame.isVassalHouse(this.house) ? 
+                    {!this.props.ingame.isVassalHouse(this.house) ?
                         _.sortBy(this.house.houseCards.values, hc => hc.combatStrength).map(hc => (
                         <Col xs="auto" key={hc.id}>
                             {hc.state == HouseCardState.AVAILABLE ? (
