@@ -4,6 +4,7 @@ import CancelledGameState from "../../cancelled-game-state/CancelledGameState";
 import House from "../game-data-structure/House";
 import Player from "../Player";
 import User from "../../../server/User";
+import _ from "lodash";
 
 export type SerializedVoteType = SerializedCancelGame | SerializedReplacePlayer | SerializedReplacePlayerByVassal;
 
@@ -147,7 +148,8 @@ export class ReplacePlayerByVassal extends VoteType {
         });
 
         vote.ingame.players.delete(oldPlayer.user);
-        for (const h of vote.ingame.game.ironThroneTrack) {
+        // Assign this vassal to the weakest house
+        for (const h of _.reverse(vote.ingame.game.getPotentialWinners())) {
             if (!vote.ingame.isVassalHouse(h)) {
                 vote.ingame.game.vassalRelations.set(oldPlayer.house, h);
                 break;

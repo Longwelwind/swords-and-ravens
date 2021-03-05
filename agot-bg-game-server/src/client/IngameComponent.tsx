@@ -184,7 +184,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         <Col>
                             <Card>
                                 <ListGroup variant="flush">
-                                    {this.game.houses.values.map(h => (
+                                    {this.props.gameState.game.getPotentialWinners().map(h => (
                                         <HouseRowComponent
                                             key={h.id}
                                             gameClient={this.props.gameClient}

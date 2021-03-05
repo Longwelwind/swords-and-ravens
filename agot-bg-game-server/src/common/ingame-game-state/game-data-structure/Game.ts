@@ -175,13 +175,14 @@ export default class Game {
 
     getPotentialWinners(): House[] {
         const victoryConditions: ((h: House) => number)[] = [
+            (h: House) => this.ingame.isVassalHouse(h) ? 1 : -1,
             (h: House) => -this.getTotalHeldStructures(h),
             (h: House) => -this.getTotalControlledLandRegions(h),
             (h: House) => -h.supplyLevel,
             (h: House) => this.ironThroneTrack.indexOf(h)
         ];
 
-        return _.sortBy(this.ingame.getNonVassalHouses(), victoryConditions);
+        return _.sortBy(this.houses.values, victoryConditions);
     }
 
     getTotalControlledLandRegions(h: House): number {
