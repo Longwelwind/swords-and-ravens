@@ -30,7 +30,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered
     | SupplyAdjusted | PlayerReplaced | UserHouseAssignments | PlayerAction | MelisandreUsed | JonSnowUsed
     | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed | SerIlynPayneFootmanKilled
-    | VassalsClaimed | CommanderPowerTokenGained | BericDondarrionUsed | VarysUsed
+    | VassalsClaimed | CommanderPowerTokenGained | BericDondarrionUsed | VarysUsed | JaqenHGharUsed
     | SerGerrisDrinkwaterUsed;
 
 export enum PlayerActionType {
@@ -671,4 +671,12 @@ interface BericDondarrionUsed {
 interface VarysUsed {
     type: "varys-used";
     house: string;
+}
+
+interface JaqenHGharUsed {
+    type: "jaqen-h-ghar-house-card-replaced";
+    house: string;
+    affectedHouse: string;
+    oldHouseCard: string;
+    newHouseCard: string;
 }

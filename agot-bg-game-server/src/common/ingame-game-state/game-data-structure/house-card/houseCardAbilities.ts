@@ -47,6 +47,7 @@ import MargaeryTyrellDwDAbility from "./MargaeryTyrellDwDAbilityHouseCardAbility
 import BericDondarrionHouseCardAbility from "./BericDondarrionHouseCardAbility";
 import VarysHouseCardAbility from "./VarysHouseCardAbility";
 import SyrioForelHouseCardAbility from "./SyrioForelHouseCardAbility";
+import JaqenHGharHouseCardAbility from "./JaqenHGharHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -266,11 +267,12 @@ export const varys = new VarysHouseCardAbility(
     "After combat, move this Vassal to the top of the fiefdoms track, shifting all other houses down."
 );
 
-// export const jaqenHGhar = new JaqenHGharHouseCardAbility(
-//     "jaqen-h-ghar",
-//     "Cancel your opponents chosen house card and return it to their hand."
-//     + " Then, randomly choose a house card from their hand to reveal as their chosen house card."
-// );
+export const jaqenHGhar = new JaqenHGharHouseCardAbility(
+    "jaqen-h-ghar",
+    "Cancel your opponents chosen house card and return it to their hand."
+    + " Then, randomly choose a house card from their hand to reveal as their chosen house card."
+);
+
 export const syrioForel = new SyrioForelHouseCardAbility(
     "syrio-forel",
     "If this vassal is defending, the combat strength of all non-vassal footman is reduced to 0."
@@ -332,7 +334,7 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [paxterRedwyne.id, paxterRedwyne],
     [margaeryTyrellDwD.id, margaeryTyrellDwD],
     [varys.id, varys],
-    // [jaqenHGhar.id, jaqenHGhar],
+    [jaqenHGhar.id, jaqenHGhar],
     [syrioForel.id, syrioForel],
     // [jonConnington.id, jonConnington],
     [bericDondarrion.id, bericDondarrion],

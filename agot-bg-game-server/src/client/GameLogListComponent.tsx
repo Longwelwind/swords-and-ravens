@@ -663,7 +663,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             }
             case "tyrion-lannister-house-card-replaced": {
                 const affectedHouse = this.game.houses.get(data.affectedHouse);
-                const newHouseCard = data.newHouseCard ? affectedHouse.houseCards.get(data.newHouseCard) : null;
+                const newHouseCard = data.newHouseCard ? this.game.getHouseCardById(data.newHouseCard) : null;
 
                 return newHouseCard ? (
                     <><b>{affectedHouse.name}</b> chose <b>{newHouseCard.name}.</b></>
@@ -1123,33 +1123,43 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </>
                 );
             }
-	    case "vassals-claimed": {
-                const vassals = data.vassals.map(hid => this.game.houses.get(hid));
+            case "vassals-claimed": {
+                    const vassals = data.vassals.map(hid => this.game.houses.get(hid));
+                    const house = this.game.houses.get(data.house);
+
+                    return <>
+                        <b>{house.name}</b> claimed {joinReactNodes(vassals.map(v => <b key={v.id}>{v.name}</b>), ", ")} as
+                        vassal{vassals.length > 0 && "s"}.
+                    </>;
+                }
+            case "commander-power-token-gained": {
+                    const house = this.game.houses.get(data.house);
+                    return <>
+                        Commander <b>{house.name}</b> gained a Power token for this battle.
+                    </>;
+                }
+            case "beric-dondarrion-used": {
                 const house = this.game.houses.get(data.house);
+                const casualty = unitTypes.get(data.casualty).name;
+                return <>
+                    <b>Beric Dondarrion</b>: <b>{house.name}</b> chose a <b>{casualty}</b> to be killed.
+                </>;
+                }
+            case "varys-used": {
+                const house = this.game.houses.get(data.house);
+                return <>
+                    <b>Varys</b>: <b>{house.name}</b> is now on top of the Fiefdoms track.
+                </>;
+            }
+            case "jaqen-h-ghar-house-card-replaced": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+                const newHouseCard = this.game.getHouseCardById(data.newHouseCard);
 
                 return <>
-                    <b>{house.name}</b> claimed {joinReactNodes(vassals.map(v => <b key={v.id}>{v.name}</b>), ", ")} as
-                    vassal{vassals.length > 0 && "s"}.
+                    <b>Jaqen H&apos;Ghar</b>: {house.name} randomly chose <b>{newHouseCard.name}</b> as <b>
+                        {affectedHouse.name}&apos;s</b> new house card.
                 </>;
-	        }
-        case "commander-power-token-gained": {
-                const house = this.game.houses.get(data.house);
-                return <>
-                    Commander <b>{house.name}</b> gained a Power token for this battle.
-                </>;
-            }
-        case "beric-dondarrion-used": {
-            const house = this.game.houses.get(data.house);
-            const casualty = unitTypes.get(data.casualty).name;
-            return <>
-                <b>Beric Dondarrion</b>: <b>{house.name}</b> chose a <b>{casualty}</b> to be killed.
-            </>;
-            }
-        case "varys-used": {
-            const house = this.game.houses.get(data.house);
-            return <>
-                <b>Varys</b>: <b>{house.name}</b> is now on top of the Fiefdoms track.
-            </>;
             }
         }
     }
