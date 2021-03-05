@@ -1114,12 +1114,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 </>);
             case "player-replaced": {
                 const oldUser = this.props.ingameGameState.entireGame.users.get(data.oldUser);
-                const newUser = this.props.ingameGameState.entireGame.users.get(data.newUser);
+                const newUser = data.newUser ? this.props.ingameGameState.entireGame.users.get(data.newUser) : null;
                 const house = this.game.houses.get(data.house);
 
                 return (
                     <>
-                        <b>{oldUser.name}</b> (<b>{house.name}</b>) was replaced by <b>{newUser.name}</b>.
+                        <b>{oldUser.name}</b> (<b>{house.name}</b>) was replaced by {newUser ? <b>{newUser.name}</b> : " a vassal"}.
                     </>
                 );
             }

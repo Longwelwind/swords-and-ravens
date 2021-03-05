@@ -293,7 +293,7 @@ interface VoteDone {
 interface PlayerReplaced {
     type: "player-replaced";
     oldUser: string;
-    newUser: string;
+    newUser?: string ;
 }
 
 interface CrowKillersStepChanged {

@@ -65,7 +65,8 @@ export default class UserLabel extends Component<UserLabelProps> {
     }
 
     renderIngameDropdownItems(ingame: IngameGameState): ReactNode {
-        const {result: canLaunchReplacePlayerVote, reason: canLaunchReplacePlayerVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser as User, this.player);
+        const {result: canLaunchReplacePlayerVote, reason: canLaunchReplacePlayerVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser as User);
+        const {result: canLaunchReplacePlayerByVassalVote, reason: canLaunchReplacePlayerByVassalVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser as User, true);
         return (
             <>
                 <Dropdown.Divider />
@@ -99,6 +100,35 @@ export default class UserLabel extends Component<UserLabelProps> {
                         Offer to replace this player
                     </Dropdown.Item>
                 </ConditionalWrap>
+                <Dropdown.Divider />
+                {/* Add a button to replace a place */}
+                <ConditionalWrap
+                    condition={!canLaunchReplacePlayerByVassalVote}
+                    wrap={children =>
+                        <OverlayTrigger
+                            overlay={
+                                <Tooltip id="replace-player-tooltip">
+                                    {canLaunchReplacePlayerByVassalVoteReason == "ongoing-vote" ?
+                                        <>A vote is already ongoing</>
+                                        : canLaunchReplacePlayerByVassalVoteReason == "game-cancelled" ?
+                                        <>The game has been cancelled</>
+                                        : canLaunchReplacePlayerByVassalVoteReason == "game-ended" &&
+                                        <>The game has ended</>
+                                    }
+                                </Tooltip>
+                            }
+                        >
+                            {children}
+                        </OverlayTrigger>
+                    }
+                >
+                    <Dropdown.Item
+                        onClick={() => this.onLaunchReplacePlayerByVassalVoteClick()}
+                        disabled={!canLaunchReplacePlayerByVassalVote}
+                    >
+                        Launch a vote to replace this player by a vassal
+                    </Dropdown.Item>
+                </ConditionalWrap>
             </>
         );
     }
@@ -110,6 +140,16 @@ export default class UserLabel extends Component<UserLabelProps> {
 
         if (window.confirm(`Do you want to launch a vote to replace ${this.player.user.name} who controls house ${this.player.house.name}?`)) {
             this.props.gameState.launchReplacePlayerVote(this.player);
+        }
+    }
+
+    onLaunchReplacePlayerByVassalVoteClick(): void {
+        if (!(this.props.gameState instanceof IngameGameState)) {
+            throw new Error("`launchReplacePlayerVote` called when the game was not in IngameGameState");
+        }
+
+        if (window.confirm(`Do you want to launch a vote to replace ${this.player.user.name} who controls house ${this.player.house.name} by a vassal?`)) {
+            this.props.gameState.launchReplacePlayerByVassalVote(this.player);
         }
     }
 }

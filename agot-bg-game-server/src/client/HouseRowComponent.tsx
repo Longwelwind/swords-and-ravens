@@ -20,6 +20,7 @@ import battleGearImage from "../../public/images/icons/battle-gear.svg";
 import Player from "../common/ingame-game-state/Player";
 import UserLabel from "./UserLabel";
 import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
+import { observer } from "mobx-react";
 
 
 interface HouseRowComponentProps {
@@ -28,6 +29,7 @@ interface HouseRowComponentProps {
     ingame: IngameGameState;
 }
 
+@observer
 export default class HouseRowComponent extends Component<HouseRowComponentProps> {
     get house(): House {
         return this.props.house;
@@ -50,7 +52,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     }
 
     render(): ReactNode {
-        return <>
+        return this.props.ingame.rerender >= 0 && <>
             <ListGroupItem>
                 <Row className="align-items-center">
                     <Col xs="auto" className="pr-0" style={{width: "28px"}}>

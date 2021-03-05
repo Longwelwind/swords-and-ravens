@@ -647,7 +647,7 @@ interface SupplyAdjusted {
 interface PlayerReplaced {
     type: "player-replaced";
     oldUser: string;
-    newUser: string;
+    newUser?: string;
     house: string;
 }
 
