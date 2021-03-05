@@ -44,6 +44,7 @@ import RamsayBoltonAbility from "./RamsayBoltonHouseCardAbility";
 import QueenOfThornsDwDAbility from "./QueenOfThornsDwDHouseCardAbility";
 import PaxterRedwyneAbility from "./PaxterRedwyneHouseCardAbility";
 import MargaeryTyrellDwDAbility from "./MargaeryTyrellDwDAbilityHouseCardAbility";
+import BericDondarrionHouseCardAbility from "./BericDondarrionHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -253,7 +254,10 @@ export const margaeryTyrellDwD = new MargaeryTyrellDwDAbility(
     "If you are defending your home area or an area that contains one of your Power tokens, "
     + " your opponents' final combat strength is 2."
 );
-
+export const bericDondarrion = new BericDondarrionHouseCardAbility(
+    "beric-dondarrion",
+    "If you win this combat, after casualties are taken, you must destroy 1 of this vassal's unit in the embattled area."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -300,6 +304,7 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [queenOfThornsDwD.id, queenOfThornsDwD],
     [paxterRedwyne.id, paxterRedwyne],
     [margaeryTyrellDwD.id, margaeryTyrellDwD],
+    [bericDondarrion.id, bericDondarrion]
 ]);
 
 export default houseCardAbilities;

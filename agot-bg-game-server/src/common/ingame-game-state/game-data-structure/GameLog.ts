@@ -30,7 +30,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered
     | SupplyAdjusted | PlayerReplaced | UserHouseAssignments | PlayerAction | MelisandreUsed | JonSnowUsed
     | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed | SerIlynPayneFootmanKilled
-    | VassalsClaimed | CommanderPowerTokenGained;
+    | VassalsClaimed | CommanderPowerTokenGained | BericDondarrionUsed;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -653,4 +653,10 @@ interface VassalsClaimed {
 interface CommanderPowerTokenGained {
     type: "commander-power-token-gained";
     house: string;
+}
+
+interface BericDondarrionUsed {
+    type: "beric-dondarrion-used";
+    house: string;
+    casualty: string;
 }

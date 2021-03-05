@@ -1129,6 +1129,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     Commander <b>{house.name}</b> gained a Power token for this battle.
                 </>;
             }
+        case "beric-dondarrion-used": {
+            const house = this.game.houses.get(data.house);
+            const casualty = unitTypes.get(data.casualty).name;
+            return <>
+                <b>Beric Dondarrion</b>: <b>{house.name}</b> chose a <b>{casualty}</b> to be killed.
+            </>;
+            }
         }
     }
 }
