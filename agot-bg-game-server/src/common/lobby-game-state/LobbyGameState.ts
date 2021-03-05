@@ -9,6 +9,7 @@ import baseGameData from "../../../data/baseGameData.json";
 import CancelledGameState from "../cancelled-game-state/CancelledGameState";
 import shuffle from "../../utils/shuffle";
 import _ from "lodash";
+import { MIN_PLAYER_COUNT_WITH_VASSALS } from "../ingame-game-state/game-data-structure/Game";
 
 export default class LobbyGameState extends GameState<EntireGame> {
     lobbyHouses: BetterMap<string, LobbyHouse>;
@@ -135,13 +136,14 @@ export default class LobbyGameState extends GameState<EntireGame> {
             return {success: false, reason: "not-owner"};
         }
 
-        // If Vassals are toggled, not all houses need to be taken
-        if (!this.entireGame.gameSettings.vassals) {
-            if (this.players.size < this.entireGame.selectedGameSetup.playerCount) {
+        // If Vassals are toggled we need at least min_player_count_with_vassals
+        if (this.entireGame.gameSettings.vassals) {
+            if (this.players.size < MIN_PLAYER_COUNT_WITH_VASSALS) {
                 return {success: false, reason: "not-enough-players"};
             }
+        } else if (this.players.size < this.entireGame.selectedGameSetup.playerCount) {
+            return {success: false, reason: "not-enough-players"};
         }
-        // Todo vassals: Add min playerCount
 
         return {success: true, reason: "ok"};
     }

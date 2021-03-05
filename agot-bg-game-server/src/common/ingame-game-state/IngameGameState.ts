@@ -9,7 +9,7 @@ import Region from "./game-data-structure/Region";
 import PlanningGameState, {SerializedPlanningGameState} from "./planning-game-state/PlanningGameState";
 import ActionGameState, {SerializedActionGameState} from "./action-game-state/ActionGameState";
 import Order from "./game-data-structure/Order";
-import Game, {SerializedGame} from "./game-data-structure/Game";
+import Game, {MIN_PLAYER_COUNT_WITH_VASSALS, SerializedGame} from "./game-data-structure/Game";
 import WesterosGameState, {SerializedWesterosGameState} from "./westeros-game-state/WesterosGameState";
 import createGame from "./game-data-structure/createGame";
 import BetterMap from "../../utils/BetterMap";
@@ -455,8 +455,14 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "already-playing"};
         }
 
-        if (replaceWithVassal && !this.players.keys.includes(fromUser)) {
-            return {result: false, reason: "only-players-can-vote"};
+        if (replaceWithVassal) {
+            if (!this.players.keys.includes(fromUser)) {
+                return {result: false, reason: "only-players-can-vote"};
+            }
+            
+            if (this.players.size - 1 < MIN_PLAYER_COUNT_WITH_VASSALS) {
+                return {result: false, reason: "min-player-count-reached"};
+            }
         }
 
         const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && (v.type instanceof ReplacePlayer || v.type instanceof ReplacePlayerByVassal));

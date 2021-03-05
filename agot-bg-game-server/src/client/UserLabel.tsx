@@ -88,6 +88,7 @@ export default class UserLabel extends Component<UserLabelProps> {
                                     }
                                 </Tooltip>
                             }
+                            placement="auto"
                         >
                             {children}
                         </OverlayTrigger>
@@ -107,16 +108,21 @@ export default class UserLabel extends Component<UserLabelProps> {
                     wrap={children =>
                         <OverlayTrigger
                             overlay={
-                                <Tooltip id="replace-player-tooltip">
+                                <Tooltip id="replace-player-by-vassal-tooltip">
                                     {canLaunchReplacePlayerByVassalVoteReason == "ongoing-vote" ?
                                         <>A vote is already ongoing</>
                                         : canLaunchReplacePlayerByVassalVoteReason == "game-cancelled" ?
                                         <>The game has been cancelled</>
-                                        : canLaunchReplacePlayerByVassalVoteReason == "game-ended" &&
+                                        : canLaunchReplacePlayerByVassalVoteReason == "game-ended" ?
                                         <>The game has ended</>
+                                        : canLaunchReplacePlayerByVassalVoteReason == "only-players-can-vote" ?
+                                        <>Only players can vote</>
+                                        : canLaunchReplacePlayerByVassalVoteReason == "min-player-count-reached" &&
+                                        <>At least 3 players are needed to play</>
                                     }
                                 </Tooltip>
                             }
+                            placement="auto"
                         >
                             {children}
                         </OverlayTrigger>
