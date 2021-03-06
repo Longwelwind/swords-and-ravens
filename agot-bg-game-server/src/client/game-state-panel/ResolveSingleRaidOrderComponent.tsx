@@ -13,22 +13,28 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import {OrderOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
+import RaidSupportOrderType from "../../common/ingame-game-state/game-data-structure/order-types/RaidSupportOrderType";
+import House from "../../common/ingame-game-state/game-data-structure/House";
 
 @observer
 export default class ResolveSingleRaidOrderComponent extends Component<GameStateComponentProps<ResolveSingleRaidOrderGameState>> {
     @observable selectedOrderRegion: Region | null;
-    @observable orderInOrderRegion: RaidOrderType | null;
+    @observable orderInOrderRegion: RaidOrderType | RaidSupportOrderType | null;
     @observable selectedTargetRegion: Region | null;
 
     modifyOrdersOnMapCallback: any;
+
+    get house(): House {
+        return this.props.gameState.house;
+    }
 
     render(): ReactNode {
         return (
             <>
                 <Col xs={12} className="text-center">
-                    House <b>{this.props.gameState.house.name}</b> must resolve one of its Raid Orders.
+                    House <b>{this.house.name}</b> must resolve one of its Raid Orders.
                 </Col>
-                {this.props.gameClient.authenticatedPlayer && this.props.gameState.house == this.props.gameClient.authenticatedPlayer.house ? (
+                {this.props.gameClient.doesControlHouse(this.house) ? (
                     this.selectedOrderRegion == null ? (
                         <Col xs={12} className="text-center">
                             Select a Raid Order token to resolve it.
@@ -37,7 +43,10 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
                         <>
                             <Col xs={12} className="text-center">
                                 {this.selectedTargetRegion == null ? (
-                                    <>Select a target region to raid, or click on <strong>Confirm</strong> to just remove the order.</>
+                                    <>
+                                        <p>Chosen Raid order: <b>{this.selectedOrderRegion.name}</b></p>
+                                        <p>Select a target region to raid, or click on <b>Confirm</b> for not using the Raid order.</p>
+                                    </>
                                 ) : (
                                     <>Target: {this.selectedTargetRegion.name}</>
                                 )}
@@ -56,7 +65,7 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
                     )
                 ) : (
                     <Col xs={12} className="text-center">
-                        Waiting for {this.props.gameState.house.name}...
+                        Waiting for {this.house.name}...
                     </Col>
                 )}
             </>
@@ -66,7 +75,7 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
     confirm(): void {
         if (this.selectedOrderRegion) {
             if (!this.selectedTargetRegion) {
-                if (!window.confirm('Do you want to remove your Raid Order?')) {
+                if (!window.confirm('Are you sure not to use your Raid order?')) {
                     return;
                 }
             }
@@ -82,20 +91,11 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
         this.selectedTargetRegion = null;
     }
 
-    onOrderClick(r: Region): void {
-        if (this.props.gameClient.authenticatedPlayer && this.props.gameState.house == this.props.gameClient.authenticatedPlayer.house) {
+    onOrderClick(r: Region, orderType: RaidOrderType | RaidSupportOrderType | null): void {
+        if (this.props.gameClient.doesControlHouse(this.house)) {
             if (this.selectedOrderRegion == null || this.orderInOrderRegion == null) {
-                const order = this.props.gameState.actionGameState.ordersOnBoard.tryGet(r, null);
-                if (!order) {
-                    return;
-                }
-
-                if (!(order.type instanceof RaidOrderType)) {
-                    return;
-                }
-
                 this.selectedOrderRegion = r;
-                this.orderInOrderRegion = order.type;
+                this.orderInOrderRegion = orderType;
             } else {
                 this.selectedTargetRegion = r;
             }
@@ -103,18 +103,18 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
     }
 
     modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
-        if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
+        if (this.props.gameClient.doesControlHouse(this.house)) {
             if (this.selectedOrderRegion == null || this.orderInOrderRegion == null) {
                 // Highlight the Raid orders of the house
-                return this.props.gameState.getRegionWithRaidOrders().map(r => [
+                return this.props.gameState.parentGameState.getRegionsWithRaidOrderOfHouse(this.house).map(([r, ot]) => [
                     r,
-                    {highlight: {active: true}, onClick: () => this.onOrderClick(r)}
+                    {highlight: {active: true}, onClick: () => this.onOrderClick(r, ot)}
                 ])
             } else {
-                // Highlight the possible raidable orders from the select Raid order
+                // Highlight the possible raidable orders from the selected Raid order
                 return this.props.gameState.getRaidableRegions(this.selectedOrderRegion, this.orderInOrderRegion).map(r => [
                     r,
-                    {highlight: {active: true}, onClick: () => this.onOrderClick(r)}
+                    {highlight: {active: true}, onClick: () => this.onOrderClick(r, null)}
                 ])
             }
         }

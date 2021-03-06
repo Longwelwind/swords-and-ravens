@@ -79,6 +79,24 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         <Row>
                             <Col xs="auto">
                                 <FormCheck
+                                    id="vassals-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="vassals-tooltip">
+                                                Unassigned houses will be vassals.
+                                            </Tooltip>}>
+                                            <label htmlFor="vassals-setting">Vassals - BETA</label>
+                                        </OverlayTrigger>}
+                                    disabled={!this.canChangeGameSettings}
+                                    checked={this.gameSettings.vassals}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.vassals = !this.gameSettings.vassals)}
+                                />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
                                     id="westeros-phase-variant-setting"
                                     type="checkbox"
                                     label={

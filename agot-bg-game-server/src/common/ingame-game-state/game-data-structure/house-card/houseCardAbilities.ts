@@ -44,6 +44,12 @@ import RamsayBoltonAbility from "./RamsayBoltonHouseCardAbility";
 import QueenOfThornsDwDAbility from "./QueenOfThornsDwDHouseCardAbility";
 import PaxterRedwyneAbility from "./PaxterRedwyneHouseCardAbility";
 import MargaeryTyrellDwDAbility from "./MargaeryTyrellDwDAbilityHouseCardAbility";
+import BericDondarrionHouseCardAbility from "./BericDondarrionHouseCardAbility";
+import VarysHouseCardAbility from "./VarysHouseCardAbility";
+import SyrioForelHouseCardAbility from "./SyrioForelHouseCardAbility";
+import JaqenHGharHouseCardAbility from "./JaqenHGharHouseCardAbility";
+import JonConningtonHouseCardAbility from "./JonConningtonHouseCardAbility";
+import BronnHouseCardAbility from "./BronnHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -253,7 +259,33 @@ export const margaeryTyrellDwD = new MargaeryTyrellDwDAbility(
     "If you are defending your home area or an area that contains one of your Power tokens, "
     + " your opponents' final combat strength is 2."
 );
-
+export const bericDondarrion = new BericDondarrionHouseCardAbility(
+    "beric-dondarrion",
+    "If you win this combat, after casualties are taken, you must destroy 1 of this vassal's unit in the embattled area."
+);
+export const varys = new VarysHouseCardAbility(
+    "varys",
+    "After combat, move this Vassal to the top of the fiefdoms track, shifting all other houses down."
+);
+export const jaqenHGhar = new JaqenHGharHouseCardAbility(
+    "jaqen-h-ghar",
+    "Cancel your opponents chosen house card and return it to their hand."
+    + " Then, randomly choose a house card from their hand to reveal as their chosen house card."
+);
+export const syrioForel = new SyrioForelHouseCardAbility(
+    "syrio-forel",
+    "If this vassal is defending, the combat strength of all non-vassal footman is reduced to 0."
+);
+export const jonConnington = new JonConningtonHouseCardAbility(
+    "jon-connington",
+    "If this vassal loses this combat, after combat, you may muster 1 of this vassal's knights"
+    + " in either the area it retreated to or it's home area (if able)."
+);
+export const bronn = new BronnHouseCardAbility(
+    "bronn",
+    "After you reveal house cards, your opponent may choose to discard 2 of"
+    + " their available power tokens to reduce this card's combat strength to 0."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -300,6 +332,13 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [queenOfThornsDwD.id, queenOfThornsDwD],
     [paxterRedwyne.id, paxterRedwyne],
     [margaeryTyrellDwD.id, margaeryTyrellDwD],
+    [varys.id, varys],
+    [jaqenHGhar.id, jaqenHGhar],
+    [syrioForel.id, syrioForel],
+    [jonConnington.id, jonConnington],
+    [bericDondarrion.id, bericDondarrion],
+    [bronn.id, bronn]
+
 ]);
 
 export default houseCardAbilities;

@@ -33,7 +33,12 @@ BeforeCombatHouseCardAbilitiesGameState["childGameState"],
         // house cards, don't even ask him.
         const availableHouseCards = this.getAvailableHouseCards();
         if (house.powerTokens < 2 || availableHouseCards.length == 0) {
-            // Todo: Log reason for fast-tracking
+            this.ingame.log({
+                type: "house-card-ability-not-used",
+                house: house.id,
+                houseCard: qyburn.id
+            });
+
             this.parentGameState.onHouseCardResolutionFinish(house);
             return;
         }

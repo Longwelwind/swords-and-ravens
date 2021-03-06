@@ -40,7 +40,7 @@ export default class SelectWesterosCardGameState<P extends ParentGameState> exte
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "select-westeros-card") {
-            if (player.house != this.house) {
+            if (this.parentGameState.ingame.getControllerOfHouse(this.house) != player) {
                 return;
             }
 

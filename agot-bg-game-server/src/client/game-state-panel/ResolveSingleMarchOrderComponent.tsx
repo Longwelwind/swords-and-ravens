@@ -16,6 +16,7 @@ import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import {OrderOnMapProperties, RegionOnMapProperties, UnitOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
+import House from "../../common/ingame-game-state/game-data-structure/House";
 
 @observer
 export default class ResolveSingleMarchOrderComponent extends Component<GameStateComponentProps<ResolveSingleMarchOrderGameState>> {
@@ -30,15 +31,23 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     modifyUnitsOnMapCallback: any;
     modifyOrdersOnMapCallback: any;
 
+    get house(): House {
+        return this.props.gameState.house;
+    }
+
+    get isVassalHouse(): boolean {
+        return this.props.gameState.ingame.isVassalHouse(this.house);
+    }
+
     render(): ReactNode {
         const allUnitsLeft = this.selectedMarchOrderRegion ? this.props.gameState.haveAllUnitsLeft(this.selectedMarchOrderRegion, this.plannedMoves) : false;
         return (
             <>
                 <Col xs={12} className="text-center">
-                    House <b>{this.props.gameState.house.name}</b> must resolve one of
+                    House <b>{this.house.name}</b> must resolve one of
                     its March Orders.
                 </Col>
-                {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
+                {this.props.gameClient.doesControlHouse(this.house) ? (
                     <>
                         <Col xs={12} className="text-center">
                             {this.selectedMarchOrderRegion == null ? (
@@ -91,7 +100,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                     </>
                 ) : (
                     <Col xs={12} className="text-center">
-                        Waiting for {this.props.gameState.house.name}...
+                        Waiting for {this.house.name}...
                     </Col>
                 )}
             </>
@@ -118,6 +127,10 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         if (!this.canLeavePowerToken) {
             this.leavePowerToken = false;
         }
+
+        if (this.isVassalHouse && this.canLeavePowerToken) {
+            this.leavePowerToken = true;
+        }
     }
 
     renderLeavePowerToken(startingRegion: Region): ReactNode | null {
@@ -136,6 +149,8 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                             "Power tokens can only be left on land areas."
                         ) : this.canLeavePowerTokenReason == "no-all-units-go" ? (
                             "All units must leave the area in order to leave a Power token."
+                        ) : this.canLeavePowerTokenReason == "vassals-always-leave-power-token" ? (
+                            "Vassals always leave a Power token."
                         ) : "Leaving a Power token in an area maintain the control your house has on it, even"
                             + " if all units your units leave the area."}
                     </Tooltip>
@@ -157,7 +172,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                         label="Yes"
                                         checked={this.leavePowerToken}
                                         onChange={() => {this.leavePowerToken = true;}}
-                                        disabled={!this.canLeavePowerToken}/>
+                                        disabled={!this.canLeavePowerToken || this.isVassalHouse}/>
                                     <Form.Check
                                         id="chk-dont-leave-pt"
                                         name="leave-pt-radios"
@@ -166,7 +181,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                         label="No"
                                         checked={this.leavePowerToken == false}
                                         onChange={() => {this.leavePowerToken = false;}}
-                                        disabled={!this.canLeavePowerToken}/>
+                                        disabled={!this.canLeavePowerToken || this.isVassalHouse}/>
                                 </Col>
                             </Form.Group>
                         </fieldset>
@@ -249,7 +264,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     }
 
     modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
-        if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
+        if (this.props.gameClient.doesControlHouse(this.house)) {
             if (this.selectedMarchOrderRegion == null) {
                 return this.props.gameState.getRegionsWithMarchOrder().map(r => [
                     r,
@@ -262,7 +277,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     }
 
     modifyUnitsOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {
-        if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
+        if (this.props.gameClient.doesControlHouse(this.house)) {
             const marchableUnits = this.selectedMarchOrderRegion != null ? this.props.gameState.getValidMarchUnits(this.selectedMarchOrderRegion).filter(u => this.isUnitAvailable(u)) : [];
             const attackingUnits = _.flatMap(this.plannedMoves.entries.filter(([r, _u]) => this.props.gameState.doesMoveTriggerAttack(r)).map(([_r, u]) => u));
 
@@ -279,7 +294,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     }
 
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
-        if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
+        if (this.props.gameClient.doesControlHouse(this.house)) {
             const targetRegions = this.selectedMarchOrderRegion != null && this.selectedUnits.length > 0 ? this.props.gameState.getValidTargetRegions(this.selectedMarchOrderRegion, this.plannedMoves.entries, this.selectedUnits) : [];
             const combatRegions = this.plannedMoves.keys.filter(r => this.props.gameState.doesMoveTriggerAttack(r));
 

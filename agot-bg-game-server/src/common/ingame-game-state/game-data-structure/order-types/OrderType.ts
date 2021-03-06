@@ -8,6 +8,4 @@ export default abstract class OrderType {
         this.name = name;
         this.starred = starred;
     }
-
-    abstract toString(): string;
 }

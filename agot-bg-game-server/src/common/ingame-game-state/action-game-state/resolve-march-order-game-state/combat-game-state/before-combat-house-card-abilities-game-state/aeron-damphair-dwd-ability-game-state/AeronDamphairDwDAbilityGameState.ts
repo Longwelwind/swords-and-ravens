@@ -67,7 +67,7 @@ export default class AeronDamphairDwDAbilityGameState extends GameState<
         this.ingame.log({
             type: "aeron-damphair-used",
             house: this.childGameState.house.id,
-            tokens: choice,
+            tokens: choice
         });
 
         this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);

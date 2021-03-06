@@ -17,18 +17,29 @@ export default class PatchfaceAbilityGameState extends GameState<
     SimpleChoiceGameState | SelectHouseCardGameState<PatchfaceAbilityGameState>
 > {
     get game(): Game {
-        return this.combat().game;
+        return this.combat.game;
     }
 
     get ingame(): IngameGameState {
-        return this.parentGameState.parentGameState.parentGameState.parentGameState.ingameGameState;
+        return this.combat.ingameGameState;
     }
 
-    combat(): CombatGameState {
+    get combat(): CombatGameState {
         return this.parentGameState.combatGameState;
     }
 
     firstStart(house: House): void {
+        if (this.getChoosableHouseCards(house).length == 0) { // Vassal house cards
+            this.ingame.log({
+                type: "house-card-ability-not-used",
+                house: house.id,
+                houseCard: patchface.id
+            });
+
+            this.parentGameState.onHouseCardResolutionFinish(house);
+            return;
+        }
+
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
             house,
             "",
@@ -36,14 +47,15 @@ export default class PatchfaceAbilityGameState extends GameState<
         );
     }
 
+    getChoosableHouseCards(house: House): HouseCard[] {
+        const enemy = this.combat.getEnemy(house);
+        return enemy.houseCards.values.filter(hc => hc.state == HouseCardState.AVAILABLE);
+    }
+
     onSimpleChoiceGameStateEnd(choice: number): void {
         const house = this.childGameState.house;
         if (choice == 0) {
-            const enemy = this.combat().getEnemy(house);
-
-            const choosableHouseCards = enemy.houseCards.values.filter(hc => hc.state == HouseCardState.AVAILABLE);
-
-            this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(house, choosableHouseCards);
+            this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(house, this.getChoosableHouseCards(house));
         } else {
             this.ingame.log({
                 type: "house-card-ability-not-used",
@@ -54,11 +66,7 @@ export default class PatchfaceAbilityGameState extends GameState<
         }
     }
 
-    onSelectHouseCardFinish(house: House, houseCard: HouseCard | null): void {
-        if (houseCard == null) {
-            return;
-        }
-
+    onSelectHouseCardFinish(house: House, houseCard: HouseCard): void {
         houseCard.state = HouseCardState.USED;
 
         const affectedHouse = this.game.houses.values.find(h => h.houseCards.values.includes(houseCard)) as House;
@@ -69,7 +77,7 @@ export default class PatchfaceAbilityGameState extends GameState<
             houseCard: houseCard.id
         });
 
-        this.combat().entireGame.broadcastToClients({
+        this.combat.entireGame.broadcastToClients({
             type: "change-state-house-card",
             houseId: affectedHouse.id,
             cardIds: [houseCard.id],
@@ -85,7 +93,7 @@ export default class PatchfaceAbilityGameState extends GameState<
                 hc.state = HouseCardState.AVAILABLE;
             });
 
-            this.combat().entireGame.broadcastToClients({
+            this.combat.entireGame.broadcastToClients({
                 type: "change-state-house-card",
                 houseId: affectedHouse.id,
                 cardIds: returnedHouseCards.map(hc => hc.id),

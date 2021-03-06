@@ -13,6 +13,7 @@ import PlayerMusteringGameState, {
 } from "../../westeros-game-state/mustering-game-state/player-mustering-game-state/PlayerMusteringGameState";
 import Region from "../../game-data-structure/Region";
 import IngameGameState from "../../IngameGameState";
+import _ from "lodash";
 
 export default class ResolveConsolidatePowerGameState extends GameState<ActionGameState, PlayerMusteringGameState> {
     get game(): Game {
@@ -81,12 +82,32 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
             return;
         }
 
+        if (this.ingame.isVassalHouse(nextToResolve)) {
+            const regions = this.actionGameState.getRegionsWithDefenseMusterOrderOfHouse(nextToResolve);
+            if (regions.length > 0) {
+                this.setChildGameState(new PlayerMusteringGameState(this)).firstStart(nextToResolve, PlayerMusteringType.DEFENSE_MUSTER_ORDER);
+            } else {
+                // Proceed to the next house
+                this.proceedNextResolve(nextToResolve);
+            }
+
+            return;
+        }
+
         // Before asking the player to resolve a Consolidate Power token,
         // check if they only have non-starred Consolidate Power tokens, or
         // if the starred ones are present on regions with no structure.
         // In that case, fast-track the process and simply resolve one of those.
         const consolidatePowerOrders = this.actionGameState.getRegionsWithConsolidatePowerOrderOfHouse(nextToResolve);
-        if (consolidatePowerOrders.every(([r, o]) => !o.type.starred || (o.type.starred && !r.hasStructure))) {
+
+        if (consolidatePowerOrders.length == 0) {
+            // This should never happen but for safety we check again
+            // If it really happens we proceed with the next house
+            this.proceedNextResolve(nextToResolve);
+            return;
+        }
+
+        if (consolidatePowerOrders.every(([r, ot]) => !ot.starred || (ot.starred && !r.hasStructure))) {
             // Take one of the CP order and resolve it
             const [region] = consolidatePowerOrders[0];
 
@@ -126,16 +147,19 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
     }
 
     getNextHouseToResolveOrder(lastHouseToResolve: House | null): House | null {
-        let currentHouseToCheck = lastHouseToResolve ? this.game.getNextInTurnOrder(lastHouseToResolve) : this.game.getTurnOrder()[0];
+        let currentHouseToCheck = lastHouseToResolve ? this.ingame.getNextInTurnOrder(lastHouseToResolve) : this.game.getTurnOrder()[0];
 
         // Check each house in order to find one that has a consolidate power
         for (let i = 0;i < this.game.houses.size;i++) {
-            const regions = this.actionGameState.getRegionsWithConsolidatePowerOrderOfHouse(currentHouseToCheck);
+            const regions = _.concat(
+                    this.actionGameState.getRegionsWithConsolidatePowerOrderOfHouse(currentHouseToCheck).map(([r, _ot]) => r),
+                    this.actionGameState.getRegionsWithDefenseMusterOrderOfHouse(currentHouseToCheck));
+
             if (regions.length > 0) {
                 return currentHouseToCheck;
             }
 
-            currentHouseToCheck = this.game.getNextInTurnOrder(currentHouseToCheck);
+            currentHouseToCheck = this.ingame.getNextInTurnOrder(currentHouseToCheck);
         }
 
         // If no house has any CP* order available, return null

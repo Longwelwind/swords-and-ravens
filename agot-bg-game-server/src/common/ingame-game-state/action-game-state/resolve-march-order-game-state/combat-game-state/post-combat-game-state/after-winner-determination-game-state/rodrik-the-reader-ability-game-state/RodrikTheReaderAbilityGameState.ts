@@ -11,7 +11,7 @@ import IngameGameState from "../../../../../../IngameGameState";
 import SimpleChoiceGameState, { SerializedSimpleChoiceGameState } from "../../../../../../simple-choice-game-state/SimpleChoiceGameState";
 import { rodrikTheReader } from "../../../../../../game-data-structure/house-card/houseCardAbilities";
 import shuffle from "../../../../../../../../utils/shuffle";
-import AfterWinnerDeterminationGameState from "../../after-winner-determination-game-state/AfterWinnerDeterminationGameState";
+import AfterWinnerDeterminationGameState from "../AfterWinnerDeterminationGameState";
 
 export default class RodrikTheReaderAbilityGameState extends GameState<
     AfterWinnerDeterminationGameState["childGameState"],

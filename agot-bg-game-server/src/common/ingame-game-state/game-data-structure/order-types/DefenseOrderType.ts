@@ -7,9 +7,4 @@ export default class DefenseOrderType extends OrderType {
         super(id, name, starred);
         this.defenseModifier = defenseModifier;
     }
-
-    toString(): string {
-        return "D" + (this.defenseModifier > 0 ? "+" + this.defenseModifier : this.defenseModifier < 0 ? this.defenseModifier : "");
-    }
-
 }

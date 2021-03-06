@@ -7,8 +7,4 @@ export default class MarchOrderType extends OrderType {
         super(id, name, starred);
         this.attackModifier = attackModifier;
     }
-
-    toString(): string {
-        return "M" + (this.attackModifier > 0 ? "+" + this.attackModifier : this.attackModifier < 0 ? this.attackModifier : "");
-    }
 }

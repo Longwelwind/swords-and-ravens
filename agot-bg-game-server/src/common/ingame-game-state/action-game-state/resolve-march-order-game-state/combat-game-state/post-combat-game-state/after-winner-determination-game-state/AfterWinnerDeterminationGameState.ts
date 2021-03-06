@@ -14,13 +14,16 @@ import JonSnowBaratheonAbilityGameState, {SerializedJonSnowBaratheonAbilityGameS
 import SerIlynPayneAbilityGameState, {SerializedSerIlynPayneAbilityGameState} from "./ser-ilyn-payne-ability-game-state/SerIlynPayneAbilityGameState";
 import SerGerrisDrinkwaterAbilityGameState, {SerializedSerGerrisDrinkwaterAbilityGameState} from "./ser-gerris-drinkwater-ability-game-state/SerGerrisDrinkwaterAbilityGameState";
 import ReekAbilityGameState, {SerializedReekAbilityGameState} from "./reek-ability-game-state/ReekAbilityGameState";
-import RodrikTheReaderAbilityGameState, { SerializedRodrikTheReaderAbilityGameState } from "../after-combat-house-card-abilities-game-state/rodrik-the-reader-ability-game-state/RodrikTheReaderAbilityGameState";
+import RodrikTheReaderAbilityGameState, { SerializedRodrikTheReaderAbilityGameState } from "./rodrik-the-reader-ability-game-state/RodrikTheReaderAbilityGameState";
+import BericDondarrionAbilityGameState, { SerializedBericDondarrionAbilityGameState } from "./beric-dondarrion-ability-game-state/BericDondarrionAbilityGameState";
+
 export default class AfterWinnerDeterminationGameState extends GameState<
     PostCombatGameState,
     HouseCardResolutionGameState<
         AfterWinnerDeterminationGameState,
         RenlyBaratheonAbilityGameState | CerseiLannisterAbilityGameState | JonSnowBaratheonAbilityGameState
         | SerIlynPayneAbilityGameState | SerGerrisDrinkwaterAbilityGameState | ReekAbilityGameState | RodrikTheReaderAbilityGameState
+        | BericDondarrionAbilityGameState
     >>
 {
     get postCombatGameState(): PostCombatGameState {
@@ -38,7 +41,7 @@ export default class AfterWinnerDeterminationGameState extends GameState<
     firstStart(): void {
         this.setChildGameState(
             new HouseCardResolutionGameState<AfterWinnerDeterminationGameState, RenlyBaratheonAbilityGameState | CerseiLannisterAbilityGameState | JonSnowBaratheonAbilityGameState
-            | SerIlynPayneAbilityGameState | SerGerrisDrinkwaterAbilityGameState | ReekAbilityGameState | RodrikTheReaderAbilityGameState>(this)
+            | SerIlynPayneAbilityGameState | SerGerrisDrinkwaterAbilityGameState | ReekAbilityGameState | RodrikTheReaderAbilityGameState | BericDondarrionAbilityGameState>(this)
         ).firstStart();
     }
 
@@ -98,6 +101,8 @@ export default class AfterWinnerDeterminationGameState extends GameState<
                 return ReekAbilityGameState.deserializeFromServer(houseCardResolution, data);
             case "rodrik-the-reader-ability":
                 return RodrikTheReaderAbilityGameState.deserializeFromServer(houseCardResolution, data);
+            case "beric-dondarrion-ability":
+                return BericDondarrionAbilityGameState.deserializeFromServer(houseCardResolution, data);
         }
     }
 }
@@ -108,5 +113,6 @@ export interface SerializedAfterWinnerDeterminationGameState {
         SerializedRenlyBaratheonAbilityGameState | SerializedCerseiLannisterAbilityGameState
         | SerializedJonSnowBaratheonAbilityGameState | SerializedSerIlynPayneAbilityGameState
         | SerializedSerGerrisDrinkwaterAbilityGameState | SerializedReekAbilityGameState | SerializedRodrikTheReaderAbilityGameState
+        | SerializedBericDondarrionAbilityGameState
     >;
 }

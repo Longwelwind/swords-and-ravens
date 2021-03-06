@@ -40,7 +40,7 @@ export default class SelectRegionGameState<P extends ParentGameState> extends Ga
         if (message.type == "select-region") {
             const region = this.game.world.regions.get(message.region);
 
-            if (player.house != this.house) {
+            if (this.parentGameState.ingame.getControllerOfHouse(this.house) != player) {
                 return;
             }
 

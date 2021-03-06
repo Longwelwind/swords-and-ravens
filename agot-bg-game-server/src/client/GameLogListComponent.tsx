@@ -187,11 +187,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "combat-result":
                 const houseCombatDatas = data.stats.map(stat => {
                     const house = this.game.houses.get(stat.house);
+                    const houseCard = stat.houseCard != null ? this.props.ingameGameState.getAssociatedHouseCards(house).get(stat.houseCard) : null;
+
                     return {
                         ...stat,
                         house,
                         region: this.world.regions.get(stat.region),
-                        houseCard: stat.houseCard != null ? house.houseCards.get(stat.houseCard) : null,
+                        houseCard: houseCard,
                         armyUnits: stat.armyUnits.map(ut => unitTypes.get(ut))
                     };
                 });
@@ -442,10 +444,17 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </Col>
                 </Row>;
 
+            case "claim-vassals-began":
+                return <Row className="justify-content-center">
+                    <Col xs="auto">
+                        <h5><b>Claim Vassals</b></h5>
+                    </Col>
+                </Row>;
+
             case "planning-phase-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h5><b>Planning Phase</b></h5>
+                        <h5><b>{data.forVassals && "Vassal "}Planning Phase</b></h5>
                     </Col>
                 </Row>;
 
@@ -485,7 +494,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "combat-house-card-chosen":
                 const houseCards = data.houseCards.map(([hid, hcid]) => {
                     const house = this.game.houses.get(hid);
-                    return [house, house.houseCards.get(hcid)];
+                    const houseCard = this.props.ingameGameState.getAssociatedHouseCards(house).get(hcid);
+                    return [house, houseCard];
                 });
 
                 return <>
@@ -653,7 +663,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             }
             case "tyrion-lannister-house-card-replaced": {
                 const affectedHouse = this.game.houses.get(data.affectedHouse);
-                const newHouseCard = data.newHouseCard ? affectedHouse.houseCards.get(data.newHouseCard) : null;
+                const newHouseCard = data.newHouseCard ? this.game.getHouseCardById(data.newHouseCard) : null;
 
                 return newHouseCard ? (
                     <><b>{affectedHouse.name}</b> chose <b>{newHouseCard.name}.</b></>
@@ -1104,14 +1114,66 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 </>);
             case "player-replaced": {
                 const oldUser = this.props.ingameGameState.entireGame.users.get(data.oldUser);
-                const newUser = this.props.ingameGameState.entireGame.users.get(data.newUser);
+                const newUser = data.newUser ? this.props.ingameGameState.entireGame.users.get(data.newUser) : null;
                 const house = this.game.houses.get(data.house);
 
                 return (
                     <>
-                        <b>{oldUser.name}</b> (<b>{house.name}</b>) was replaced by <b>{newUser.name}</b>.
+                        <b>{oldUser.name}</b> (<b>{house.name}</b>) was replaced by {newUser ? <b>{newUser.name}</b> : " a vassal"}.
                     </>
                 );
+            }
+            case "vassals-claimed": {
+                    const vassals = data.vassals.map(hid => this.game.houses.get(hid));
+                    const house = this.game.houses.get(data.house);
+
+                    return <>{vassals.length > 0 
+                        ? (<><b>{house.name}</b> claimed {joinReactNodes(vassals.map(v => <b key={v.id}>{v.name}</b>), ", ")} as
+                                vassal{vassals.length > 0 && "s"}.</>) 
+                        : (<><b>{house.name}</b> passed their vassal marker set.</>)
+                    }</>;
+                }
+            case "commander-power-token-gained": {
+                    const house = this.game.houses.get(data.house);
+                    return <>
+                        Commander <b>{house.name}</b> gained a Power token for this battle.
+                    </>;
+                }
+            case "beric-dondarrion-used": {
+                const house = this.game.houses.get(data.house);
+                const casualty = unitTypes.get(data.casualty).name;
+                return <>
+                    <b>Beric Dondarrion</b>: <b>{house.name}</b> chose a <b>{casualty}</b> to be killed.
+                </>;
+                }
+            case "varys-used": {
+                const house = this.game.houses.get(data.house);
+                return <>
+                    <b>Varys</b>: <b>{house.name}</b> is now on top of the Fiefdoms track.
+                </>;
+            }
+            case "jaqen-h-ghar-house-card-replaced": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+                const newHouseCard = this.game.getHouseCardById(data.newHouseCard);
+
+                return <>
+                    <b>Jaqen H&apos;Ghar</b>: <b>{house.name}</b> randomly chose <b>{newHouseCard.name}</b> as <b>
+                        {affectedHouse.name}&apos;s</b> new house card.
+                </>;
+            }
+            case "jon-connington-used": {
+                const house = this.game.houses.get(data.house);
+                const region = this.game.world.regions.get(data.region);
+                return <>
+                    <b>Jon Conningtion</b>: Vassal {house.name} chose to recruit a knight in <b>{region.name}</b>.
+                </>;
+            }
+            case "bronn-used": {
+                const house = this.game.houses.get(data.house);
+                return <>
+                    <b>Bronn</b>: <b>{house.name}</b> chose to discard 2 Power tokens to reduce Bron&apos;s combat strength to 0.
+                </>;
             }
         }
     }

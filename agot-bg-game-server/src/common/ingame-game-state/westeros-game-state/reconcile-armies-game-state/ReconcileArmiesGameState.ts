@@ -41,7 +41,7 @@ export default class ReconcileArmiesGameState<P extends ParentGameState> extends
             return;
         }
 
-        const nextHouseToReconcile = lastReconciled ? this.game.getNextInTurnOrder(lastReconciled) : this.game.ironThroneTrack[0];
+        const nextHouseToReconcile = lastReconciled ? this.ingame.getNextInTurnOrder(lastReconciled) : this.game.ironThroneTrack[0];
 
         // Check if this house needs to reconcile armies
         if (this.game.hasTooMuchArmies(nextHouseToReconcile)) {

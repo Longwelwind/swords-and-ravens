@@ -45,7 +45,7 @@ export default class SelectHouseCardGameState<P extends ParentGameState> extends
         if (message.type == "select-house-card") {
             const houseCard = this.parentGameState.game.getHouseCardById(message.houseCard);
 
-            if (player.house != this.house) {
+            if (this.parentGameState.ingame.getControllerOfHouse(this.house) != player) {
                 return;
             }
 

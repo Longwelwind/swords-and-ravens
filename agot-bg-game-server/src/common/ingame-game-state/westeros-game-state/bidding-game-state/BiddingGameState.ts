@@ -129,13 +129,16 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
 
         // Already make the bidding for houses that have 0 power tokens
         this.participatingHouses.forEach(h => {
-            if (h.powerTokens == 0) {
+            if (h.powerTokens == 0 || this.ingame.isVassalHouse(h)) {
                 this.bids.set(h, 0);
-                this.ingame.log({
-                    type: "player-action",
-                    house: h.id,
-                    action: PlayerActionType.BID_MADE
-                })
+
+                if (!this.ingame.isVassalHouse(h)) {
+                    this.ingame.log({
+                        type: "player-action",
+                        house: h.id,
+                        action: PlayerActionType.BID_MADE
+                    })
+                }
             }
         });
 

@@ -29,7 +29,7 @@ export default class UseRavenGameState extends GameState<ActionGameState, Replac
     }
 
     get ravenHolder(): House {
-        return this.game.kingsCourtTrack[0];
+        return this.game.ravenHolder;
     }
 
     get entireGame(): EntireGame {
