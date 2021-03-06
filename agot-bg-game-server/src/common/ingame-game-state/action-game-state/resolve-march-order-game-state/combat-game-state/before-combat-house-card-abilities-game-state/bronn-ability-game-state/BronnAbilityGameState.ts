@@ -27,10 +27,14 @@ export default class BronnAbilityGameState extends GameState<
         return this.parentGameState.parentGameState.parentGameState.ingameGameState;
     }
 
+    get controllerOfEnemy(): House {
+        return this.combatGameState.ingameGameState.getControllerOfHouse(this.enemy).house;
+    }
+
     firstStart(house: House): void {
         this.enemy = this.combatGameState.getEnemy(house);
 
-        if (this.enemy.powerTokens < 2) {
+        if (this.controllerOfEnemy.powerTokens < 2) {
             this.combatGameState.ingameGameState.log({
                 type: "house-card-ability-not-used",
                 house: this.enemy.id,
@@ -76,11 +80,11 @@ export default class BronnAbilityGameState extends GameState<
             manipulatedHouseCards: [bronnHouseCard].map(hc => [hc.id, hc.serializeToClient()])
         });
 
-        this.ingame.changePowerTokens(this.enemy, -2);
+        this.ingame.changePowerTokens(this.controllerOfEnemy, -2);
 
         this.ingame.log({
             type: "bronn-used",
-            house: this.enemy.id
+            house: this.controllerOfEnemy.id
         });
 
         this.parentGameState.onHouseCardResolutionFinish(house);
