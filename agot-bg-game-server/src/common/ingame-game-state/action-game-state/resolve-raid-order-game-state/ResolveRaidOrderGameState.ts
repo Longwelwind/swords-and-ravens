@@ -12,6 +12,7 @@ import {ServerMessage} from "../../../../messages/ServerMessage";
 import Region from "../../game-data-structure/Region";
 import RaidOrderType from "../../game-data-structure/order-types/RaidOrderType";
 import RaidSupportOrderType from "../../game-data-structure/order-types/RaidSupportOrderType";
+import { noRaidOrder } from "../../game-data-structure/westeros-card/planning-restriction/planningRestrictions";
 
 export default class ResolveRaidOrderGameState extends GameState<ActionGameState, ResolveSingleRaidOrderGameState> {
     resolvedRaidSupportOrderRegions: Region[] = [];
@@ -37,6 +38,11 @@ export default class ResolveRaidOrderGameState extends GameState<ActionGameState
     }
 
     firstStart(): void {
+        if (this.actionGameState.planningRestrictions.some(pr => pr == noRaidOrder)) {
+            // This will disallow a RaidOrSupportPlusOne Order to be executed
+            this.actionGameState.onResolveRaidOrderGameStateFinish();
+        };
+
         this.ingameGameState.log({
             type: "action-phase-resolve-raid-began"
         });

@@ -21,11 +21,12 @@ import ConsolidatePowerOrderType from "../game-data-structure/order-types/Consol
 import SupportOrderType from "../game-data-structure/order-types/SupportOrderType";
 import {port, sea, land} from "../game-data-structure/regionTypes";
 import PlanningRestriction from "../game-data-structure/westeros-card/planning-restriction/PlanningRestriction";
-import planningRestrictions from "../game-data-structure/westeros-card/planning-restriction/planningRestrictions";
+import planningRestrictions, { noSupportOrder } from "../game-data-structure/westeros-card/planning-restriction/planningRestrictions";
 import RaidSupportOrderType from "../game-data-structure/order-types/RaidSupportOrderType";
 import Unit from "../game-data-structure/Unit";
 import {footman} from "../game-data-structure/unitTypes";
 import DefenseMusterOrderType from "../game-data-structure/order-types/DefenseMusterOrderType";
+import { raidSupportPlusOne } from "../game-data-structure/order-types/orderTypes";
 
 export default class ActionGameState extends GameState<IngameGameState, UseRavenGameState | ResolveRaidOrderGameState | ResolveMarchOrderGameState | ResolveConsolidatePowerGameState> {
     planningRestrictions: PlanningRestriction[];
@@ -67,6 +68,19 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
     }
 
     onResolveRaidOrderGameStateFinish(): void {
+        // In case of no support orders (web of lies) now remove raid/support orders
+        if (this.planningRestrictions.some(pr => pr == noSupportOrder)) {
+            const regionsWithRaidSupportPlusOneOrders = this.ordersOnBoard.entries.filter(([_r, o]) => o.type == raidSupportPlusOne).map(([r, _o]) => r);
+            for(const region of regionsWithRaidSupportPlusOneOrders) {
+                this.ordersOnBoard.delete(region);
+                this.entireGame.broadcastToClients({
+                    type: "action-phase-change-order",
+                    region: region.id,
+                    order: null
+                });
+            }    
+        }
+
         this.setChildGameState(new ResolveMarchOrderGameState(this)).firstStart();
     }
 
