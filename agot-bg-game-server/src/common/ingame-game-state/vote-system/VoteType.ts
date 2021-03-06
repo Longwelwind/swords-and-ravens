@@ -148,13 +148,9 @@ export class ReplacePlayerByVassal extends VoteType {
         });
 
         vote.ingame.players.delete(oldPlayer.user);
-        // Assign this vassal to the weakest house
-        for (const h of _.reverse(vote.ingame.game.getPotentialWinners())) {
-            if (!vote.ingame.isVassalHouse(h)) {
-                vote.ingame.game.vassalRelations.set(oldPlayer.house, h);
-                break;
-            }
-        }
+        // Assign this vassal to the leading house, so the current leading house cannot march into
+        // the vassals region
+        vote.ingame.game.vassalRelations.set(oldPlayer.house, vote.ingame.game.getPotentialWinner());
 
         vote.ingame.broadcastVassalRelations();
     }
