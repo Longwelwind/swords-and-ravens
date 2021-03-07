@@ -45,7 +45,7 @@ export default class SimpleChoiceGameState extends GameState<ParentGameState> {
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "choose-choice") {
-            if (this.house != player.house) {
+            if (this.parentGameState.ingame.getControllerOfHouse(this.house) != player) {
                 return;
             }
 

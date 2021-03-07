@@ -3,7 +3,8 @@ export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | Unready |
     | ChooseTopWildlingCardAction | ReplaceOrder | SkipReplaceOrder | ResolveRaid | Bid | ChooseChoice
     | DecideBiggest | ReconcileArmies | Muster | ResolveTies | SelectUnits | LaunchGame | ChooseHouse
     | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings | CreatePrivateChatRoom | ChangeGameSettings
-    | CancelGame | Vote | LaunchCancelGameVote | CancelVote | LaunchReplacePlayerVote | UpdateNote | SelectWesterosCard;
+    | CancelGame | Vote | LaunchCancelGameVote | CancelVote | LaunchReplacePlayerVote | UpdateNote | SelectWesterosCard
+    | ClaimVassal | LaunchReplacePlayerByVassalVote;
 
 interface Ping {
     type: "ping";
@@ -216,4 +217,14 @@ interface LaunchReplacePlayerVote {
 interface UpdateNote {
     type: "update-note";
     note: string;
+}
+
+interface ClaimVassal {
+    type: "claim-vassal";
+    houses: string[];
+}
+
+interface LaunchReplacePlayerByVassalVote {
+    type: "launch-replace-player-by-vassal-vote";
+    player: string;
 }

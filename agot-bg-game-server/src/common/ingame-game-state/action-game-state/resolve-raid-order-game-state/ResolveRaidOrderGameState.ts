@@ -9,8 +9,14 @@ import House from "../../game-data-structure/House";
 import Player from "../../Player";
 import {ClientMessage} from "../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../messages/ServerMessage";
+import Region from "../../game-data-structure/Region";
+import RaidOrderType from "../../game-data-structure/order-types/RaidOrderType";
+import RaidSupportOrderType from "../../game-data-structure/order-types/RaidSupportOrderType";
+import { noRaidOrder } from "../../game-data-structure/westeros-card/planning-restriction/planningRestrictions";
 
 export default class ResolveRaidOrderGameState extends GameState<ActionGameState, ResolveSingleRaidOrderGameState> {
+    resolvedRaidSupportOrderRegions: Region[] = [];
+
     get actionGameState(): ActionGameState {
         return this.parentGameState;
     }
@@ -32,6 +38,11 @@ export default class ResolveRaidOrderGameState extends GameState<ActionGameState
     }
 
     firstStart(): void {
+        if (this.actionGameState.planningRestrictions.some(pr => pr == noRaidOrder)) {
+            // This will disallow a RaidOrSupportPlusOne Order to be executed
+            this.actionGameState.onResolveRaidOrderGameStateFinish();
+        };
+
         this.ingameGameState.log({
             type: "action-phase-resolve-raid-began"
         });
@@ -67,27 +78,31 @@ export default class ResolveRaidOrderGameState extends GameState<ActionGameState
     }
 
     getNextHouseToResolveRaidOrder(lastHouseToResolve: House | null): House | null {
-        let currentHouseToCheck = lastHouseToResolve ? this.game.getNextInTurnOrder(lastHouseToResolve) : this.game.getTurnOrder()[0];
+        let currentHouseToCheck = lastHouseToResolve ? this.ingameGameState.getNextInTurnOrder(lastHouseToResolve) : this.game.getTurnOrder()[0];
 
         // Check each house in order to find one that has an available March order.
         // Check at most once for each house
         for (let i = 0;i < this.game.houses.size;i++) {
-            const regions = this.actionGameState.getRegionsWithRaidOrderOfHouse(currentHouseToCheck);
-            if (regions.length > 0) {
+            if (this.getRegionsWithRaidOrderOfHouse(currentHouseToCheck).length > 0) {
                 return currentHouseToCheck;
             }
 
-            currentHouseToCheck = this.game.getNextInTurnOrder(currentHouseToCheck);
+            currentHouseToCheck = this.ingameGameState.getNextInTurnOrder(currentHouseToCheck);
         }
 
         // If no house has any raid order available, return null
         return null;
     }
 
+    getRegionsWithRaidOrderOfHouse(house: House): [Region, RaidOrderType | RaidSupportOrderType][] {
+        return this.actionGameState.getRegionsWithRaidOrderOfHouse(house).filter(([r, _ot]) => !this.resolvedRaidSupportOrderRegions.includes(r));
+    }
+
     serializeToClient(admin: boolean, player: Player | null): SerializedResolveRaidOrderGameState {
         return {
             type: "resolve-raid-order",
-            childGameState: this.childGameState.serializeToClient(admin, player)
+            childGameState: this.childGameState.serializeToClient(admin, player),
+            resolvedRaidSupportOrderRegions: this.resolvedRaidSupportOrderRegions.map(r => r.id)
         };
     }
 
@@ -95,6 +110,7 @@ export default class ResolveRaidOrderGameState extends GameState<ActionGameState
         const resolveRaidOrder = new ResolveRaidOrderGameState(actionGameState);
 
         resolveRaidOrder.childGameState = resolveRaidOrder.deserializeChildGameState(data.childGameState);
+        resolveRaidOrder.resolvedRaidSupportOrderRegions = data.resolvedRaidSupportOrderRegions.map(rid => actionGameState.game.world.regions.get(rid))
 
         return resolveRaidOrder;
     }
@@ -107,4 +123,5 @@ export default class ResolveRaidOrderGameState extends GameState<ActionGameState
 export interface SerializedResolveRaidOrderGameState {
     type: "resolve-raid-order";
     childGameState: SerializedResolveSingleRaidOrderGameState;
+    resolvedRaidSupportOrderRegions: string[];
 }

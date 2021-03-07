@@ -7,8 +7,4 @@ export default class SupportOrderType extends OrderType {
         super(id, name, starred);
         this.supportModifier = supportModifier;
     }
-
-    toString(): string {
-        return "S" + (this.supportModifier != 0 ? "+" + this.supportModifier : "");
-    }
 }

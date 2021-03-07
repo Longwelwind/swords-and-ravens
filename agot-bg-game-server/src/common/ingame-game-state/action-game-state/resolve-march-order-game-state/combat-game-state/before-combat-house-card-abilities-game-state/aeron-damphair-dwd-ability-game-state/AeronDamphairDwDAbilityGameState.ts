@@ -45,7 +45,11 @@ export default class AeronDamphairDwDAbilityGameState extends GameState<
 
         this.parentGameState.onHouseCardResolutionFinish(house);
 
-    }
+        this.ingame.log({
+            type: "aeron-damphair-used",
+            house: this.childGameState.house.id,
+            tokens: choice
+        });
 
     firstStart(house: House): void {
         // If the house doesn't have 2 power tokens, or doesn't have other available

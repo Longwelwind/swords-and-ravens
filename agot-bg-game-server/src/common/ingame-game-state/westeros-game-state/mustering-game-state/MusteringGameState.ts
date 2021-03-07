@@ -43,7 +43,7 @@ export default class MusteringGameState extends GameState<WesterosGameState, Pla
             return;
         }
 
-        const nextHouse = this.game.getNextInTurnOrder(house);
+        const nextHouse = this.ingame.getNextInTurnOrder(house);
 
         this.setChildGameState(new PlayerMusteringGameState(this)).firstStart(
             nextHouse,

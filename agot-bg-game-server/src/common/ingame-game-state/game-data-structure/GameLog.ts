@@ -7,7 +7,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | WesterosCardExecuted | WesterosCardDrawn | CombatResult | WildlingCardRevealed | WildlingBidding
     | HighestBidderChosen | LowestBidderChosen | PlayerMustered | WinnerDeclared
     | RavenHolderWildlingCardPutBottom | RavenHolderWildlingCardPutTop | RavenHolderReplaceOrder | RavenNotUsed | RaidDone | DarkWingsDarkWordsChoice
-    | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan
+    | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan | ClaimVassalsBegan
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
     | ActionPhaseBegan | ActionPhaseResolveRaidBegan | ActionPhaseResolveMarchBegan | ActionPhaseResolveConsolidatePowerBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingsAttack | MarchOrderRemoved
     | ConsolidatePowerOrderResolved | ArmiesReconciled | EnemyPortTaken | ShipsDestroyedByEmptyCastle
@@ -29,7 +29,9 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory
     | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered
     | SupplyAdjusted | PlayerReplaced | UserHouseAssignments | PlayerAction | MelisandreUsed | JonSnowUsed
-    | QarlTheMaidPowerTokensGained | QyburnUsed | AeronDwDBid | MelisandreDwDUsed | SerIlynPayneFootmanKilled;
+    | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed | SerIlynPayneFootmanKilled
+    | VassalsClaimed | CommanderPowerTokenGained | BericDondarrionUsed | VarysUsed | JaqenHGharUsed | JonConningtonUsed | BronnUsed
+    | SerGerrisDrinkwaterUsed;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -207,6 +209,10 @@ interface WinterIsComing {
     deckIndex: number;
 }
 
+interface ClaimVassalsBegan {
+    type: "claim-vassals-began";
+}
+
 interface WesterosPhaseBegan {
     type: "westeros-phase-began";
 }
@@ -251,6 +257,7 @@ interface ActionPhaseResolveConsolidatePowerBegan {
 
 interface PlanningPhaseBegan {
     type: "planning-phase-began";
+    forVassals?: boolean;
 }
 
 interface WildlingStrengthTriggerWildlingsAttack {
@@ -316,10 +323,10 @@ interface DoranUsed {
     influenceTrack: number;
 }
 
-interface AeronDwDBid {
-    type: "aeron-dwd-bid";
+interface SerGerrisDrinkwaterUsed {
+    type: "ser-gerris-drinkwater-used";
     house: string;
-    powerTokens: number;
+    influenceTrack: number;
 }
 
 interface QyburnUsed {
@@ -640,6 +647,47 @@ interface SupplyAdjusted {
 interface PlayerReplaced {
     type: "player-replaced";
     oldUser: string;
-    newUser: string;
+    newUser?: string;
+    house: string;
+}
+
+interface VassalsClaimed {
+    type: "vassals-claimed";
+    house: string;
+    vassals: string[];
+}
+
+interface CommanderPowerTokenGained {
+    type: "commander-power-token-gained";
+    house: string;
+}
+
+interface BericDondarrionUsed {
+    type: "beric-dondarrion-used";
+    house: string;
+    casualty: string;
+}
+
+interface VarysUsed {
+    type: "varys-used";
+    house: string;
+}
+
+interface JaqenHGharUsed {
+    type: "jaqen-h-ghar-house-card-replaced";
+    house: string;
+    affectedHouse: string;
+    oldHouseCard: string;
+    newHouseCard: string;
+}
+
+interface JonConningtonUsed {
+    type: "jon-connington-used";
+    house: string;
+    region: string;
+}
+
+interface BronnUsed {
+    type: "bronn-used";
     house: string;
 }

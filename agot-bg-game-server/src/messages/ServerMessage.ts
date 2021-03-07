@@ -19,7 +19,8 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | RemoveUnits | AddUnits | ChangeTracker | ActionPhaseChangeOrder | ChangeStateHouseCard
     | SettingsChanged | ChangeValyrianSteelBladeUse |  NewPrivateChatRoom | GameSettingsChanged
     | UpdateWesterosDecks | UpdateConnectionStatus | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced
-    | CrowKillersStepChanged | ManipulateCombatHouseCard;
+    | CrowKillersStepChanged | ManipulateCombatHouseCard
+    | VassalRelations;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -298,10 +299,15 @@ interface VoteDone {
 interface PlayerReplaced {
     type: "player-replaced";
     oldUser: string;
-    newUser: string;
+    newUser?: string ;
 }
 
 interface CrowKillersStepChanged {
     type: "crow-killers-step-changed";
     newStep: CrowKillersStep;
+}
+
+interface VassalRelations {
+    type: "vassal-relations";
+    vassalRelations: [string, string][];
 }

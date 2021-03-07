@@ -12,8 +12,8 @@ import wildlingCardTypes from "./wildling-card/wildlingCardTypes";
 import BetterMap from "../../../utils/BetterMap";
 import * as _ from "lodash";
 import houseCardAbilities from "./house-card/houseCardAbilities";
-import EntireGame from "../../EntireGame";
 import staticWorld from "./static-data-structure/globalStaticWorld";
+import IngameGameState from "../IngameGameState";
 
 const MAX_POWER_TOKENS = 20;
 
@@ -33,6 +33,7 @@ interface UnitData {
     unitType: string;
     house: string;
     quantity: number;
+    quantityVassal?: number;
 }
 
 interface HouseCardData {
@@ -73,28 +74,26 @@ export function getGameSetupContainer(setupId: string): GameSetupContainer {
     return allGameSetups.get(setupId);
 }
 
-export default function createGame(entireGame: EntireGame, housesToCreate: string[]): Game {
+export default function createGame(ingame: IngameGameState, housesToCreate: string[], playerHouses: string[]): Game {
+    const entireGame = ingame.entireGame;
     const gameSettings = entireGame.gameSettings;
 
-    const game = new Game();
+    const game = new Game(ingame);
 
     const baseGameHousesToCreate = new BetterMap(
         Object.entries(baseGameData.houses as {[key: string]: HouseData})
         .filter(([hid, _]) => housesToCreate.includes(hid)));
 
-    // Overwrite house cards
-    if (entireGame.selectedGameSetup.houseCards != undefined) {
-        const newHouseCards = new BetterMap(
-            Object.entries(entireGame.selectedGameSetup.houseCards)
-            .filter(([hid, _]) => housesToCreate.includes(hid)));
+    /* In the previous version the productive system sometimes applied the garrisons (only the garrisons,
+        not the tokens on board which is weird!) of the adwd setup though only adwdHouseCards were set with another game setup.
+        Don't ask me why but it seems as getting the house cards from the adwd setup makes trouble in the productive system.
+        During debug this never happened! So we now define the adwd house cards in the baseGameSetup directly, not under the adwd setup
+        which hopefully solves the issues (#792 #796).
+     */
 
-        newHouseCards.keys.forEach(hid => {
-           const newHouseData = baseGameHousesToCreate.get(hid);
-           newHouseData.houseCards = newHouseCards.get(hid).houseCards;
-           baseGameHousesToCreate.set(hid, newHouseData);
-        });
-    } else if (gameSettings.adwdHouseCards) {
-        const adwdHouseCards = allGameSetups.get("a-dance-with-dragons").playerSetups[0].houseCards as {[key: string]: HouseCardContainer};
+     // Overwrite house cards
+    if (gameSettings.adwdHouseCards) {
+        const adwdHouseCards = baseGameData.adwdHouseCards as {[key: string]: HouseCardContainer};
         const newHouseCards = new BetterMap(
             Object.entries(adwdHouseCards)
             .filter(([hid, _]) => housesToCreate.includes(hid)));
@@ -145,7 +144,7 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
                     .map(([unitTypeId, limit]) => [unitTypes.get(unitTypeId), limit])
             );
 
-            const house = new House(hid, houseData.name, houseData.color, houseCards, unitLimits, 5, houseData.supplyLevel);
+            const house = new House(hid, houseData.name, houseData.color, playerHouses.includes(hid) ? houseCards : new BetterMap(), unitLimits, 5, houseData.supplyLevel);
 
             return [hid, house];
         })
@@ -226,14 +225,14 @@ export default function createGame(entireGame: EntireGame, housesToCreate: strin
             const region = game.world.regions.get(regionId);
             const house = game.houses.get(unitData.house);
             const unitType = unitTypes.get(unitData.unitType);
-            const quantity = unitData.quantity;
+            const quantity = playerHouses.includes(house.id) ? unitData.quantity : (unitData.quantityVassal ? unitData.quantityVassal : 0);
 
             // Check if the game setup removed units off this region
             if (entireGame.selectedGameSetup.removedUnits && entireGame.selectedGameSetup.removedUnits.includes(region.id)) {
                 return;
             }
 
-            for (let i = 0;i < quantity;i++) {
+            for (let i = 0;i < quantity; i++) {
                 const unit = game.createUnit(region, unitType, house);
 
                 region.units.set(unit.id, unit);

@@ -121,7 +121,7 @@ export default class TyrionLannisterAbilityGameState extends GameState<
         this.entireGame.broadcastToClients({
             type: "change-combat-house-card",
             houseCardIds: [[enemy.id, houseCard ? houseCard.id : null]]
-        })
+        });
     }
 
     static deserializeFromServer(houseCardResolution: CancelHouseCardAbilitiesGameState["childGameState"], data: SerializedTyrionLannisterAbilityGameState): TyrionLannisterAbilityGameState {

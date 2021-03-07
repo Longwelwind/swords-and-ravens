@@ -90,6 +90,14 @@ import serJaimeLannisterDwDImage from "../../public/images/house-cards/SerJaimeL
 import serKevanLannisterDwDImage from "../../public/images/house-cards/SerKevanLannister.png";
 import serDavenLannisterImage from "../../public/images/house-cards/DavenLannister.png";
 
+import varysImage from "../../public/images/house-cards/Varys.png";
+import syrioImage from "../../public/images/house-cards/SyrioForel.png";
+import jaqenImage from "../../public/images/house-cards/JaqenHGhar.png";
+import janosImage from "../../public/images/house-cards/JanosSlynt.png";
+import jonConningtonImage from "../../public/images/house-cards/JonConnington.png";
+import bericImage from "../../public/images/house-cards/BericDondarrion.png";
+import bronnImage from "../../public/images/house-cards/Bronn.png";
+
 const houseCardImages = new BetterMap([
     ["queen-of-thorns", queenImage],
     ["aeron-damphair", aeronImage],
@@ -176,7 +184,13 @@ const houseCardImages = new BetterMap([
     ["ser-jaime-lannister-dwd", serJaimeLannisterDwDImage],
     ["ser-kevan-lannister-dwd", serKevanLannisterDwDImage],
     ["ser-daven-lannister", serDavenLannisterImage],
+    ["varys", varysImage],
+    ["syrio-forel", syrioImage],
+    ["jaqen-h-ghar", jaqenImage],
+    ["janos-slynt", janosImage],
+    ["jon-connington", jonConningtonImage],
+    ["beric-dondarrion", bericImage],
+    ["bronn", bronnImage]
 ]);
-
 
 export default houseCardImages;

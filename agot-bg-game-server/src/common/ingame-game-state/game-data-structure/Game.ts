@@ -4,7 +4,6 @@ import Region from "./Region";
 import UnitType from "./UnitType";
 import Unit from "./Unit";
 import Order from "./Order";
-import orders from "./orders";
 import * as _ from "lodash";
 import {observable} from "mobx";
 import WesterosCard, {SerializedWesterosCard} from "./westeros-card/WesterosCard";
@@ -15,10 +14,16 @@ import HouseCard from "./house-card/HouseCard";
 import {land, port} from "./regionTypes";
 import PlanningRestriction from "./westeros-card/planning-restriction/PlanningRestriction";
 import WesterosCardType from "./westeros-card/WesterosCardType";
+import IngameGameState from "../IngameGameState";
+import { vassalHousesOrders, playerHousesOrders } from "./orders";
+import { vassalHouseCards } from "./static-data-structure/vassalHouseCards";
 
 export const MAX_WILDLING_STRENGTH = 12;
+export const MIN_PLAYER_COUNT_WITH_VASSALS = 3;
 
 export default class Game {
+    ingame: IngameGameState;
+
     lastUnitId = 0;
 
     world: World;
@@ -39,6 +44,16 @@ export default class Game {
     structuresCountNeededToWin: number;
     maxTurns: number;
     maxPowerTokens: number;
+
+    get vassalHouseCards(): BetterMap<string, HouseCard> {
+        return new BetterMap(vassalHouseCards.map(hc => [hc.id, hc]));
+    }
+
+    /**
+     * Contains the vassal relations of the game.
+     * Key is the vassal house, value is the commander.
+     */
+    @observable vassalRelations = new BetterMap<House, House>();
     revealedWesterosCards = 0;
 
     get ironThroneHolder(): House {
@@ -81,6 +96,10 @@ export default class Game {
         return result;
     }
 
+    constructor(ingame: IngameGameState) {
+        this.ingame = ingame;
+    }
+
     get nextWesterosCardTypes(): WesterosCardType[][] {
         const result: WesterosCardType[][] = [];
 
@@ -97,7 +116,20 @@ export default class Game {
     }
 
     getTokenHolder(track: House[]): House {
-        return track[0];
+        // A vassal can never be the bearer of a dominance token
+        // Ignore them when finding the token holder
+        const nonVassalTrack = track.filter(h => !this.ingame.isVassalHouse(h));
+
+        // There should be at least one non-vassal in the track
+        if (nonVassalTrack.length == 0) {
+            throw new Error();
+        }
+
+        return nonVassalTrack[0];
+    }
+
+    getOrdersListForHouse(house: House): Order[] {
+        return this.ingame.isVassalHouse(house) ? vassalHousesOrders : playerHousesOrders;
     }
 
     getAvailableOrders(allPlacedOrders: BetterMap<Region, Order | null>, house: House, planningRestrictions: PlanningRestriction[]): Order[] {
@@ -105,8 +137,10 @@ export default class Game {
             .filter(([region, _order]) => region.getController() == house)
             .map(([_region, order]) => order as Order);
 
+        const ordersList = this.getOrdersListForHouse(house);
+
         let leftOrders = _.difference(
-            orders.values,
+            ordersList,
             placedOrders
         );
 
@@ -133,32 +167,15 @@ export default class Game {
         return track.indexOf(first) < track.indexOf(second);
     }
 
-    getNextInTurnOrder(house: House | null, except: House | null = null): House {
-        const turnOrder = this.getTurnOrder();
-
-        if (house == null) {
-            return turnOrder[0];
-        }
-
-        const i = turnOrder.indexOf(house);
-
-        const nextHouse = turnOrder[(i + 1) % turnOrder.length];
-
-        if (nextHouse == except) {
-            return this.getNextInTurnOrder(nextHouse);
-        }
-
-        return nextHouse;
-    }
-
     areVictoryConditionsFulfilled(): boolean {
-        const numberStructuresPerHouse = this.houses.values.map(h => this.getTotalHeldStructures(h));
+        const numberStructuresPerHouse = this.ingame.getNonVassalHouses().map(h => this.getTotalHeldStructures(h));
 
         return numberStructuresPerHouse.some(n => n >= this.structuresCountNeededToWin);
     }
 
     getPotentialWinners(): House[] {
         const victoryConditions: ((h: House) => number)[] = [
+            (h: House) => this.ingame.isVassalHouse(h) ? 1 : -1,
             (h: House) => -this.getTotalHeldStructures(h),
             (h: House) => -this.getTotalControlledLandRegions(h),
             (h: House) => -h.supplyLevel,
@@ -266,10 +283,14 @@ export default class Game {
     }
 
     getHouseCardById(id: string): HouseCard {
-        const houseCard = _.flatMap(this.houses.values, h => h.houseCards.values).find(hc => hc.id == id);
+        let houseCard = _.flatMap(this.houses.values, h => h.houseCards.values).find(hc => hc.id == id);
 
-        if (houseCard == null) {
-            throw new Error();
+        if (!houseCard) {
+            houseCard = this.vassalHouseCards.tryGet(id, undefined);
+
+            if (!houseCard) {
+                throw new Error(`House card ${id} not found`);
+            }
         }
 
         return houseCard;
@@ -380,16 +401,17 @@ export default class Game {
             structuresCountNeededToWin: this.structuresCountNeededToWin,
             maxTurns: this.maxTurns,
             maxPowerTokens: this.maxPowerTokens,
+            clientNextWidllingCardId: (admin || knowsNextWildlingCard) ? this.wildlingDeck[0].id : null,
             revealedWesterosCards: this.revealedWesterosCards,
-            clientNextWidllingCardId: (admin || knowsNextWildlingCard) ? this.wildlingDeck[0].id : null
+            vassalRelations: this.vassalRelations.map((key, value) => [key.id, value.id])
         };
     }
 
-    static deserializeFromServer(data: SerializedGame): Game {
-        const game = new Game();
+    static deserializeFromServer(ingame: IngameGameState, data: SerializedGame): Game {
+        const game = new Game(ingame);
 
         game.lastUnitId = data.lastUnitId;
-        game.houses = new BetterMap(data.houses.map(h => [h.id, House.deserializeFromServer(h)]));
+        game.houses = new BetterMap(data.houses.map(h => [h.id, House.deserializeFromServer(game, h)]));
         game.world = World.deserializeFromServer(game, data.world);
         game.turn = data.turn;
         game.ironThroneTrack = data.ironThroneTrack.map(hid => game.houses.get(hid));
@@ -407,6 +429,7 @@ export default class Game {
         game.maxPowerTokens = data.maxPowerTokens;
         game.revealedWesterosCards = data.revealedWesterosCards;
         game.clientNextWildlingCardId = data.clientNextWidllingCardId;
+        game.vassalRelations = new BetterMap(data.vassalRelations.map(([vid, hid]) => [game.houses.get(vid), game.houses.get(hid)]))
 
         return game;
     }
@@ -432,4 +455,5 @@ export interface SerializedGame {
     maxPowerTokens: number;
     revealedWesterosCards: number;
     clientNextWidllingCardId: number | null;
+    vassalRelations: [string, string][];
 }

@@ -63,7 +63,7 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "select-units") {
-            if (player.house != this.house) {
+            if (this.parentGameState.ingame.getControllerOfHouse(this.house) != player) {
                 return;
             }
 

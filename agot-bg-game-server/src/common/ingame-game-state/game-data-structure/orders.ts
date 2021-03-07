@@ -6,7 +6,7 @@ import {
     marchMinusOne,
     marchPlusOne, raid, specialRaid,
     support,
-    supportPlusOne, defensePlusOne, defensePlusTwo
+    supportPlusOne, defensePlusOne, defensePlusTwo, defensePlusThree, raidSupportPlusOne, defensePlusOneMuster
 } from "./order-types/orderTypes";
 import BetterMap from "../../../utils/BetterMap";
 
@@ -16,6 +16,7 @@ export const marchOrder = new Order(2, march);
 export const firstSupportOrder = new Order(7, support);
 
 const orders = new BetterMap<number, Order>([
+    // Player houses orders
     [marchMinusOneOrder.id, marchMinusOneOrder],
     [marchOrder.id, marchOrder],
     [3, new Order(3, marchPlusOne)],
@@ -30,7 +31,16 @@ const orders = new BetterMap<number, Order>([
     [12, new Order(12, specialConsolidatePower)],
     [13, new Order(13, raid)],
     [14, new Order(14, raid)],
-    [15, new Order(15, specialRaid)]
+    [15, new Order(15, specialRaid)],
+    // Vassal houses orders
+    [16, new Order(16, march)],
+    [17, new Order(17, raidSupportPlusOne)],
+    [18, new Order(18, defensePlusOneMuster)],
+    [19, new Order(19, defensePlusThree)],
 ]);
 
 export default orders;
+
+export const playerHousesOrders = orders.values.slice(0, 15);
+
+export const vassalHousesOrders = orders.values.slice(15);

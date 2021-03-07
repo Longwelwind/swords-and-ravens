@@ -76,7 +76,7 @@ export default class BiddingComponent<ParentGameState extends BiddingGameStatePa
                     </>
                 )}
                 <Col xs={12} className="text-center">
-                    Waiting for {this.gameState.getHousesLeftToBid().map(h => h.name).join(", ")}
+                    Waiting for {this.gameState.getHousesLeftToBid().map(h => this.props.gameState.ingame.getControllerOfHouse(h).house.name).join(", ")}
                 </Col>
             </>
         );

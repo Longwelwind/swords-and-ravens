@@ -18,6 +18,7 @@ import User from "../../../../../server/User";
 import MarchOrderType from "../../../game-data-structure/order-types/MarchOrderType";
 import { port } from "../../../game-data-structure/regionTypes";
 import { destroyAllShipsInPort } from "../../../../ingame-game-state/port-helper/PortHelper";
+import IngameGameState from "../../../IngameGameState";
 
 export default class ResolveSingleMarchOrderGameState extends GameState<ResolveMarchOrderGameState> {
     @observable house: House;
@@ -28,6 +29,10 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
 
     get entireGame(): EntireGame {
         return this.resolveMarchOrderGameState.entireGame;
+    }
+
+    get ingame(): IngameGameState {
+        return this.actionGameState.parentGameState;
     }
 
     get actionGameState(): ActionGameState {
@@ -56,8 +61,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "resolve-march-order") {
-            if (player.house != this.house) {
-                console.warn("Not correct house");
+            if (this.ingame.getControllerOfHouse(this.house) != player) {
                 return;
             }
 
@@ -70,7 +74,6 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
 
             // Check that there is indeed a march order there
             if (!this.getRegionsWithMarchOrder().includes(startingRegion)) {
-                console.warn("No march order on startingRegion");
                 return;
             }
 
@@ -94,7 +97,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             let leftPowerToken: boolean | null = null;
             const canLeavePowerToken = this.canLeavePowerToken(startingRegion, new BetterMap(moves)).success;
 
-            if (message.leavePowerToken && canLeavePowerToken) {
+            if ((message.leavePowerToken && canLeavePowerToken) || (this.ingame.isVassalHouse(this.house) && canLeavePowerToken)) {
                 startingRegion.controlPowerToken = this.house;
                 this.house.powerTokens -= 1;
 
@@ -315,7 +318,10 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                 }
 
                 return true;
-            });
+            })
+            // A commander cannot march into regions of one of its vassal. A vassal cannot march into regions of its commander
+            // or into regions of an other vassal of its commander
+            .filter(r => !this.ingame.getOtherVassalFamilyHouses(this.house).includes(r.getController()));
     }
 
     getMovesThatTriggerAttack(moves: [Region, Unit[]][]): [Region, Unit[]][] {
@@ -412,10 +418,6 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             return {success: false, reason: "already-power-token"};
         }
 
-        if (this.house.powerTokens == 0) {
-            return {success: false, reason: "no-power-token-available"};
-        }
-
         if (startingRegion.type.kind != RegionKind.LAND) {
             return {success: false, reason: "not-a-land"};
         }
@@ -423,6 +425,14 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
         // The player can place a power token if all units go out
         if (!this.haveAllUnitsLeft(startingRegion, moves)) {
             return {success: false, reason: "no-all-units-go"}
+        }
+
+        if (this.ingame.isVassalHouse(this.house)) {
+            return {success: true, reason: "vassals-always-leave-power-token"}
+        }
+
+        if (this.house.powerTokens == 0) {
+            return {success: false, reason: "no-power-token-available"};
         }
 
         return {success: true, reason: "ok"};

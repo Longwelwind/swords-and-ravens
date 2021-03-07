@@ -55,7 +55,8 @@ export default abstract class WildlingCardEffectInTurnOrderGameState<C extends G
         // the lowest bidder.
         const turnOrder = this.parentGameState.game.ironThroneTrack
             .filter(h => h != this.parentGameState.lowestBidder)
-            .filter(h => this.parentGameState.participatingHouses.includes(h));
+            .filter(h => this.parentGameState.participatingHouses.includes(h))
+            .filter(h => !this.parentGameState.ingame.isVassalHouse(h));
 
         // If the previous house is the lowest bidder, begin the "Everyone else" phase of the
         // card.
