@@ -12,7 +12,7 @@ import { CrowKillersStep } from "../common/ingame-game-state/westeros-game-state
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady | PlayerUnready
     | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | SupportRefused | NewTurn | RemovePlacedOrder
     | MoveUnits | CombatChangeArmy
-    | UnitsWounded | ChangeCombatHouseCard | BeginSeeTopWildlingCard
+    | UnitsWounded | ChangeCombatHouseCard | BeginSeeTopWildlingCard | ChangeHouseCardStrength
     | RavenOrderReplaced | RevealTopWildlingCard | HideTopWildlingCard | ProceedWesterosCard | ChangeGarrison
     | BiddingBegin | BidDone | BiddingNextTrack | GameStateChange | SupplyAdjusted
     | ChangeControlPowerToken | ChangePowerToken | ChangeWildlingStrength | AddGameLog | RevealWildlingCard
@@ -79,6 +79,12 @@ interface HouseCardChosen {
     type: "house-card-chosen";
     houseId: string;
     houseCardId: string | null;
+}
+
+interface ChangeHouseCardStrength {
+    type: "change-house-card-strength";
+    house: string;
+    strength: number;
 }
 
 interface ChangeCombatHouseCard {

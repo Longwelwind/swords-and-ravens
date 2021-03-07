@@ -375,6 +375,17 @@ export default class CombatGameState extends GameState<
             const units = message.army.map(uid => region.units.get(uid));
 
             this.houseCombatDatas.get(house).army = units;
+        }
+        else if (message.type == "change-house-card-strength"){
+            const house = this.game.houses.get(message.house);
+            const combatStrength = message.strength;
+
+            const houseCard =  this.houseCombatDatas.get(house).houseCard;
+
+            if (houseCard) {
+                houseCard.combatStrength = combatStrength;
+            }
+            this.houseCombatDatas.get(house).houseCard = houseCard;
         } else {
             this.childGameState.onServerMessage(message);
         }
