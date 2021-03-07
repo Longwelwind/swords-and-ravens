@@ -523,6 +523,12 @@ export default class IngameGameState extends GameState<
         return this.getVassalHouses().filter(h => this.isVassalControlledByPlayer(h, player));
     }
 
+    getControlledHouses(player: Player): House[] {
+        const houses  = this.getVassalsControlledByPlayer(player);
+        houses.unshift(player.house);
+        return houses; 
+    }
+
     getNonClaimedVassalHouses(): House[] {
         return this.getVassalHouses().filter(v => !this.game.vassalRelations.has(v));
     }
