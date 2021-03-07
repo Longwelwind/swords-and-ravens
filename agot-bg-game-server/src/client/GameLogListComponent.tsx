@@ -615,21 +615,20 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         {affectedHouse.name}</b> to the bottom of the <b>{influenceTrack}</b> track.
                 </>;
             }
+            case "aeron-dwd-bid": {
+                const powerTokens = data.powerTokens
+                const house = data.house
+                return <>
+                    <strong>Aeron Damphair</strong>: <strong>{house}</strong> spent <strong>{powerTokens}</strong> Power Tokens to 
+                    increase it's Combat Strength by <strong>{powerTokens}</strong>.
+                </>;
+            }
             case "qyburn-used": {
                 const house = this.game.houses.get(data.house);
                 const houseCard = this.game.getHouseCardById(data.houseCard);
 
                 return <>
                     <b>Qyburn</b>: <b>{house.name}</b> decided to use strength from <b>{houseCard.name}</b>
-                </>;
-            }
-            case "aeron-damphair-used": {
-                const house = this.game.houses.get(data.house);
-                const tokens = data.tokens;
-
-                return <>
-                    <b>Aeron Damphair</b>: <b>{house.name}</b> decided to increase
-                        the combat strength of this card by <b>{tokens}</b>.
                 </>;
             }
             case "tyrion-lannister-choice-made": {

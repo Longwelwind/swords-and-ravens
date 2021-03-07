@@ -29,7 +29,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory
     | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered
     | SupplyAdjusted | PlayerReplaced | UserHouseAssignments | PlayerAction | MelisandreUsed | JonSnowUsed
-    | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed | SerIlynPayneFootmanKilled;
+    | QarlTheMaidPowerTokensGained | QyburnUsed | AeronDwDBid | MelisandreDwDUsed | SerIlynPayneFootmanKilled;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -314,6 +314,12 @@ interface DoranUsed {
     house: string;
     affectedHouse: string;
     influenceTrack: number;
+}
+
+interface AeronDwDBid {
+    type: "aeron-dwd-bid";
+    house: string;
+    powerTokens: number;
 }
 
 interface QyburnUsed {
