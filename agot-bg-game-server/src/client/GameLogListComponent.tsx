@@ -187,7 +187,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "combat-result":
                 const houseCombatDatas = data.stats.map(stat => {
                     const house = this.game.houses.get(stat.house);
-                    const houseCard = stat.houseCard != null ? this.props.ingameGameState.getAssociatedHouseCards(house).get(stat.houseCard) : null;
+                    const houseCard = stat.houseCard != null ? this.game.getHouseCardById(stat.houseCard) : null;
 
                     return {
                         ...stat,
@@ -494,7 +494,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "combat-house-card-chosen":
                 const houseCards = data.houseCards.map(([hid, hcid]) => {
                     const house = this.game.houses.get(hid);
-                    const houseCard = this.props.ingameGameState.getAssociatedHouseCards(house).get(hcid);
+                    const houseCard = this.game.getHouseCardById(hcid);
                     return [house, houseCard];
                 });
 
@@ -681,7 +681,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
             case "roose-bolton-house-cards-returned": {
                 const house = this.game.houses.get(data.house);
-                const returnedHouseCards = data.houseCards.map(hcid => house.houseCards.get(hcid));
+                const returnedHouseCards = data.houseCards.map(hcid => this.game.getHouseCardById(hcid));
 
                 return <>
                     <b>Roose Bolton</b>: <b>{house.name}</b> took back all discarded House
