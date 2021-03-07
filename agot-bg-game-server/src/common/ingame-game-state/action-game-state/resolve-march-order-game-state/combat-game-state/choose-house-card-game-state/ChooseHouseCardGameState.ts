@@ -12,7 +12,6 @@ import IngameGameState from "../../../../IngameGameState";
 import _ from "lodash";
 import User from "../../../../../../server/User";
 import { PlayerActionType } from "../../../../../ingame-game-state/game-data-structure/GameLog";
-import shuffle from "../../../../../../utils/shuffle";
 
 export default class ChooseHouseCardGameState extends GameState<CombatGameState> {
     choosableHouseCards: BetterMap<House, HouseCard[]>;
@@ -35,7 +34,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
     firstStart(): void {
         // Setup the choosable house cards
-        const vassalHouseCards = _.shuffle(shuffle([...this.ingameGameState.game.vassalHouseCards.values]));
+        const vassalHouseCards = _.shuffle(this.ingameGameState.game.vassalHouseCards.values);
         this.choosableHouseCards = new BetterMap(this.combatGameState.houseCombatDatas.keys.map(h => {
             // If the house a player-controlled house, return the available cards.
             // If it a vassal, then randomly choose 3 of them.

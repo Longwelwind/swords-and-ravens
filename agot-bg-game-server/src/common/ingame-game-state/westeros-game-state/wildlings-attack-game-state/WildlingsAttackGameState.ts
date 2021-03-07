@@ -28,6 +28,7 @@ import TheHordeDescendsWildlingVictoryGameState, {SerializedTheHordeDescendsWild
 import TheHordeDescendsNightsWatchVictoryGameState, {SerializedTheHordeDescendsNightsWatchVictoryGameState} from "./the-horde-descends-nights-watch-victory-game-state/TheHordeDescendsNightsWatchVictoryGameState";
 import IngameGameState from "../../IngameGameState";
 import { observable } from "mobx";
+import BetterMap from "../../../../utils/BetterMap";
 
 export default class WildlingsAttackGameState extends GameState<WesterosGameState,
     BiddingGameState<WildlingsAttackGameState> | SimpleChoiceGameState | PreemptiveRaidWildlingVictoryGameState
@@ -71,7 +72,6 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
         if (this.biddingResults == null) {
             throw new Error();
         }
-
 
         return this.biddingResults[0][1];
     }
@@ -134,7 +134,16 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
     }
 
     onBiddingGameStateEnd(results: [number, House[]][]): void {
-        this.biddingResults = results;
+        const resultsWithoutVassals = new BetterMap(results);
+        resultsWithoutVassals.keys.forEach(bid => {
+            const houses = resultsWithoutVassals.get(bid).filter(h => !this.ingame.isVassalHouse(h));
+            if (houses.length > 0) {
+                resultsWithoutVassals.set(bid, houses);
+            } else {
+                resultsWithoutVassals.delete(bid);
+            }
+        });
+        this.biddingResults = resultsWithoutVassals.entries;
 
         this.westerosGameState.ingame.log({
             type: "wildling-bidding",

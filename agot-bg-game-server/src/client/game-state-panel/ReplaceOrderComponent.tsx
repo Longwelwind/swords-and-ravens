@@ -37,7 +37,7 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
                         ) : (
                             <Col xs={12}>
                                 Choose which order to place on <strong>{this.selectedRegion.name}</strong> or reset your selection by clicking it on the map again.<br/><br/>
-                                <OrderGridComponent orders={orders.values}
+                                <OrderGridComponent orders={this.props.gameState.ingameGameState.game.getOrdersListForHouse(this.props.gameState.ravenHolder)}
                                                     selectedOrder={this.selectedOrder}
                                                     availableOrders={this.props.gameState.getAvailableOrders(this.props.gameState.actionGameState.ordersOnBoard.get(this.selectedRegion))}
                                                     onOrderClick={o => this.selectOrder(o)}/>

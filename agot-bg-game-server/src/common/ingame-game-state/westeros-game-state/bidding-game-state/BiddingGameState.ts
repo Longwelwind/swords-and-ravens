@@ -33,12 +33,19 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "bid") {
-            if (!this.participatingHouses.includes(player.house)) {
+            // Allow to bid for a vassal in case a player has been replaced during bid phase
+            if (_.intersection(this.participatingHouses, this.ingame.getControlledHouses(player)).length == 0) {
                 return;
             }
 
             const bid = Math.max(0, Math.min(message.powerTokens, player.house.powerTokens));
             this.bids.set(player.house, bid);
+
+            this.ingame.getVassalsControlledByPlayer(player).forEach(h => {
+                if (this.participatingHouses.includes(h)) {
+                    this.bids.set(h, 0);
+                }
+            });
 
             const otherHouses = _.difference(this.game.houses.values, [player.house]);
             this.entireGame.sendMessageToClients(otherHouses.map(h => this.parentGameState.ingame.getControllerOfHouse(h).user), {
