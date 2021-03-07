@@ -136,23 +136,30 @@ export class ReplacePlayerByVassal extends VoteType {
     executeAccepted(vote: Vote): void {
         const oldPlayer = vote.ingame.players.values.find(p => p.user == this.replaced) as Player;
 
+        vote.ingame.players.delete(oldPlayer.user);
         vote.ingame.entireGame.broadcastToClients({
             type: "player-replaced",
             oldUser: oldPlayer.user.id
         });
+
+        // It may happen that you replace a player which commands vassals. Assign them to the potential winner.
+        vote.ingame.game.vassalRelations.entries.forEach(([vassal, commander]) => {
+            if (oldPlayer.house == commander) {
+                vote.ingame.game.vassalRelations.set(vassal, vote.ingame.game.getPotentialWinner());    
+            }
+        });
+
+        // Assign this vassal to the leading house, so the current leading house cannot march into
+        // the vassal regions
+        vote.ingame.game.vassalRelations.set(oldPlayer.house, vote.ingame.game.getPotentialWinner());
+
+        vote.ingame.broadcastVassalRelations();
 
         vote.ingame.log({
             type: "player-replaced",
             oldUser: this.replaced.id,
             house: this.forHouse.id
         });
-
-        vote.ingame.players.delete(oldPlayer.user);
-        // Assign this vassal to the leading house, so the current leading house cannot march into
-        // the vassals region
-        vote.ingame.game.vassalRelations.set(oldPlayer.house, vote.ingame.game.getPotentialWinner());
-
-        vote.ingame.broadcastVassalRelations();
     }
 
     serializeToClient(): SerializedReplacePlayerByVassal {
