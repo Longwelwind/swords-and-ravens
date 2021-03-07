@@ -62,3 +62,5 @@ jobs:
       run: ssh -o StrictHostKeyChecking=no $DOKKU_HOST "dokku tags:deploy play ${{ github.sha }}"
     - name: Deploy Website
       run: ssh -o StrictHostKeyChecking=no $DOKKU_HOST "dokku tags:deploy swordsandravens.net ${{ github.sha }}"
+    - name: Clean Host
+      run: ssh -o StrictHostKeyChecking=no $DOKKU_HOST "docker system prune -a"
