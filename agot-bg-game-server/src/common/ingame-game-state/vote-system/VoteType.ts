@@ -4,7 +4,7 @@ import CancelledGameState from "../../cancelled-game-state/CancelledGameState";
 import House from "../game-data-structure/House";
 import Player from "../Player";
 import User from "../../../server/User";
-import _ from "lodash";
+import BiddingGameState from "../westeros-game-state/bidding-game-state/BiddingGameState";
 
 export type SerializedVoteType = SerializedCancelGame | SerializedReplacePlayer | SerializedReplacePlayerByVassal;
 
@@ -136,12 +136,6 @@ export class ReplacePlayerByVassal extends VoteType {
     executeAccepted(vote: Vote): void {
         const oldPlayer = vote.ingame.players.values.find(p => p.user == this.replaced) as Player;
 
-        vote.ingame.players.delete(oldPlayer.user);
-        vote.ingame.entireGame.broadcastToClients({
-            type: "player-replaced",
-            oldUser: oldPlayer.user.id
-        });
-
         // It may happen that you replace a player which commands vassals. Assign them to the potential winner.
         vote.ingame.game.vassalRelations.entries.forEach(([vassal, commander]) => {
             if (oldPlayer.house == commander) {
@@ -155,11 +149,29 @@ export class ReplacePlayerByVassal extends VoteType {
 
         vote.ingame.broadcastVassalRelations();
 
+        vote.ingame.players.delete(oldPlayer.user);
+        vote.ingame.entireGame.broadcastToClients({
+            type: "player-replaced",
+            oldUser: oldPlayer.user.id
+        });
+
         vote.ingame.log({
             type: "player-replaced",
             oldUser: this.replaced.id,
             house: this.forHouse.id
         });
+
+        if (vote.ingame.leafState instanceof BiddingGameState &&
+            vote.ingame.leafState.participatingHouses.includes(oldPlayer.house)) {
+                vote.ingame.leafState.bids.set(oldPlayer.house, 0);
+                vote.ingame.entireGame.broadcastToClients({
+                    type: "bid-done",
+                    houseId: oldPlayer.house.id,
+                    // We can reveal the value here as it's clear vassals bid 0
+                    value: 0
+                });
+                vote.ingame.leafState.checkAndProceedEndOfBidding();
+        }
     }
 
     serializeToClient(): SerializedReplacePlayerByVassal {
