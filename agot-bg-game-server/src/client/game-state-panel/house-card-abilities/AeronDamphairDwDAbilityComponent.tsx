@@ -2,24 +2,30 @@ import {observer} from "mobx-react";
 import {Component, ReactNode} from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
 import renderChildGameState from "../../utils/renderChildGameState";
-import React from "react";
+import React, {Fragment} from "react";
+import Row from "react-bootstrap/Row";
+import ListGroupItem from "react-bootstrap/ListGroupItem";
 import Col from "react-bootstrap/Col";
-import SimpleChoiceGameState from "../../../common/ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
-import SimpleChoiceComponent from "../SimpleChoiceComponent";
-import AeronDamphairDwDAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/before-combat-house-card-abilities-game-state/aeron-damphair-dwd-ability-game-state/AeronDamphairDwDAbilityGameState";
+import AeronDamphairAdwdAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/before-combat-house-card-abilities-game-state/aeron-damphair-dwd-ability-game-state/AeronDamphairDwDAbilityGameState"
+import BiddingGameState from "../../../common/ingame-game-state/westeros-game-state/bidding-game-state/BiddingGameState";
+import BiddingComponent from "../BiddingComponent";
 
 @observer
-export default class AeronDamphairAbilityComponent extends Component<GameStateComponentProps<AeronDamphairDwDAbilityGameState>> {
+export default class AeronDamphairAdwdAbilityComponent extends Component<GameStateComponentProps<AeronDamphairAdwdAbilityGameState>> {
     render(): ReactNode {
-        return (
-            <>
-                <Col xs={12}>
-                    <b>Aeron Damphair:</b> Greyjoy may discard any number of available Power token to increase the combat strength of his card by the number of Power tokens discarded.
-                </Col>
-                {renderChildGameState(this.props, [
-                    [SimpleChoiceGameState, SimpleChoiceComponent],
-                ])}
-            </>
-        );
+        return <>
+            <ListGroupItem>
+                <Row>
+                    <Col xs={12}>
+                        <b>Aeron Damphair:</b> Greyjoy can spend power tokens to increase it's combat strength by the number of tokens spent.
+                    </Col>
+                    <Fragment key="Increase combat strength">
+                        {renderChildGameState(this.props, [
+                            [BiddingGameState, BiddingComponent]
+                        ])}
+                    </Fragment>
+                </Row>
+            </ListGroupItem>
+        </>;
     }
 }
