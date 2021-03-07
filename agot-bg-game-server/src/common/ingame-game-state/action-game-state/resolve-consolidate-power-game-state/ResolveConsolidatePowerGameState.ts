@@ -81,8 +81,10 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
             this.actionGameState.onResolveConsolidatePowerEnd();
             return;
         }
+        
+        const consolidatePowerOrders = this.actionGameState.getRegionsWithConsolidatePowerOrderOfHouse(nextToResolve);
 
-        if (this.ingame.isVassalHouse(nextToResolve)) {
+        if (consolidatePowerOrders.length == 0 && this.ingame.isVassalHouse(nextToResolve)) {
             const regions = this.actionGameState.getRegionsWithDefenseMusterOrderOfHouse(nextToResolve);
             if (regions.length > 0) {
                 this.setChildGameState(new PlayerMusteringGameState(this)).firstStart(nextToResolve, PlayerMusteringType.DEFENSE_MUSTER_ORDER);
@@ -98,7 +100,6 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
         // check if they only have non-starred Consolidate Power tokens, or
         // if the starred ones are present on regions with no structure.
         // In that case, fast-track the process and simply resolve one of those.
-        const consolidatePowerOrders = this.actionGameState.getRegionsWithConsolidatePowerOrderOfHouse(nextToResolve);
 
         if (consolidatePowerOrders.length == 0) {
             // This should never happen but for safety we check again
