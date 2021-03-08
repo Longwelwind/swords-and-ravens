@@ -378,7 +378,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
     private getSupportCombatStrengthAgainstNeutralForce(supportingHouse: House, attackedRegion: Region, movesThatDontTriggerAttack: [Region, Unit[]][]): number {
         const movesThatDontTriggerAttackMap = new BetterMap(movesThatDontTriggerAttack);
         return this.actionGameState.getPossibleSupportingRegions(attackedRegion)
-            .filter(({region}) => region.getController() == supportingHouse)
+            .filter(({region}) => region.getController() == supportingHouse || this.ingame.getOtherVassalFamilyHouses(supportingHouse).includes(region.getController()))
             .map(({region, support}) => this.getCombatStrengthOfArmyAgainstNeutralForce(region.units.values, attackedRegion.hasStructure, movesThatDontTriggerAttackMap.tryGet(region, null)) + support.supportModifier)
             .reduce(_.add, 0);
     }
