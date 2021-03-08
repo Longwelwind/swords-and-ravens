@@ -36,7 +36,7 @@ interface UnitData {
     quantityVassal?: number;
 }
 
-interface HouseCardData {
+export interface HouseCardData {
     name: string;
     combatStrength?: number;
     swordIcons?: number;
@@ -63,6 +63,17 @@ export interface GameSetupContainer {
     name: string;
     playerSetups: GameSetup[];
 }
+
+function getHouseCardData(container: {[key: string]: HouseCardContainer}): [string,HouseCardData][] {
+    let result: [string,HouseCardData][] = [];
+    new BetterMap(Object.entries(container)).values.forEach(container => {
+        result = _.concat(result, Object.entries(container.houseCards as {[key: string]: HouseCardData}));
+    });
+    return result;
+}
+
+export const baseHouseCardsData = getHouseCardData(baseGameData.houses);
+export const adwdHouseCardsData = getHouseCardData(baseGameData.adwdHouseCards);
 
 export const allGameSetups = new BetterMap(Object.entries(baseGameData.setups as {[key: string]: GameSetupContainer}));
 

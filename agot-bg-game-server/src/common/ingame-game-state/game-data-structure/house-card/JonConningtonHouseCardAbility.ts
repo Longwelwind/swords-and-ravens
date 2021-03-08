@@ -9,7 +9,7 @@ export default class JonConningtonHouseCardAbility extends HouseCardAbility {
     afterCombat(afterCombat: AfterCombatHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {
         if (afterCombat.postCombatGameState.loser == house) {
             afterCombat.childGameState.setChildGameState(new JonConningtonAbilityGameState(afterCombat.childGameState)).firstStart(house);
-            return;    
+            return;
         }
 
         afterCombat.childGameState.onHouseCardResolutionFinish(house);

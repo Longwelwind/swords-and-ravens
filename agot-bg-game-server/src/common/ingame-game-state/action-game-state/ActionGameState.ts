@@ -78,7 +78,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
                     region: region.id,
                     order: null
                 });
-            }    
+            }
         }
 
         this.setChildGameState(new ResolveMarchOrderGameState(this)).firstStart();
