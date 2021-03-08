@@ -459,7 +459,7 @@ export default class IngameGameState extends GameState<
             if (!this.players.keys.includes(fromUser)) {
                 return {result: false, reason: "only-players-can-vote"};
             }
-            
+
             if (this.players.size - 1 < MIN_PLAYER_COUNT_WITH_VASSALS) {
                 return {result: false, reason: "min-player-count-reached"};
             }
@@ -526,7 +526,7 @@ export default class IngameGameState extends GameState<
     getControlledHouses(player: Player): House[] {
         const houses  = this.getVassalsControlledByPlayer(player);
         houses.unshift(player.house);
-        return houses; 
+        return houses;
     }
 
     getNonClaimedVassalHouses(): House[] {

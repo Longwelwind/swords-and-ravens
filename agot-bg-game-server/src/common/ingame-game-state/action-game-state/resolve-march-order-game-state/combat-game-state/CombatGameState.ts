@@ -383,7 +383,7 @@ export default class CombatGameState extends GameState<
         } else if (message.type == "change-combat-house-card") {
             const houseCards: [House, HouseCard | null][] = message.houseCardIds.map(([houseId, houseCardId]) => [
                 this.game.houses.get(houseId),
-                houseCardId ? this.ingameGameState.getAssociatedHouseCards(this.game.houses.get(houseId)).get(houseCardId) : null
+                houseCardId ? this.ingameGameState.game.getHouseCardById(houseCardId) : null
             ]);
 
             houseCards.forEach(([house, houseCard]) => this.houseCombatDatas.get(house).houseCard = houseCard);
@@ -606,7 +606,7 @@ export default class CombatGameState extends GameState<
                 {
                     army: army.map(uid => combatGameState.world.getUnitById(uid)),
                     region,
-                    houseCard: houseCardId ? combatGameState.ingameGameState.getAssociatedHouseCards(house).get(houseCardId) : null
+                    houseCard: houseCardId ? combatGameState.ingameGameState.game.getHouseCardById(houseCardId) : null
                 }
             ]
         }));

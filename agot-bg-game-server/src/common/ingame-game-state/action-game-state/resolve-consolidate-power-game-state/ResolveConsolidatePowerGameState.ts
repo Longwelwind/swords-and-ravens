@@ -81,7 +81,7 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
             this.actionGameState.onResolveConsolidatePowerEnd();
             return;
         }
-        
+
         const consolidatePowerOrders = this.actionGameState.getRegionsWithConsolidatePowerOrderOfHouse(nextToResolve);
 
         if (consolidatePowerOrders.length == 0 && this.ingame.isVassalHouse(nextToResolve)) {

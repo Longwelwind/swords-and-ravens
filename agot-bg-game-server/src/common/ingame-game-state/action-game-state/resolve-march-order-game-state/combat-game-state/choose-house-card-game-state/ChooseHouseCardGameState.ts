@@ -76,10 +76,9 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
             }
 
             const commandedHouse = this.combatGameState.getCommandedHouseInCombat(player.house);
-            const commandedHouseHouseCard = this.ingameGameState.getAssociatedHouseCards(commandedHouse);
-            const houseCard = commandedHouseHouseCard.get(message.houseCardId);
+            const houseCard = this.getChoosableCards(commandedHouse).find(hc => hc.id == message.houseCardId);
 
-            if (!this.getChoosableCards(commandedHouse).includes(houseCard)) {
+            if (!houseCard) {
                 return;
             }
 
@@ -157,10 +156,19 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
     serializeToClient(admin: boolean, player: Player | null): SerializedChooseHouseCardGameState {
         return {
             type: "choose-house-card",
-            choosableHouseCards: this.choosableHouseCards.map((house, houseCards) => [house.id, houseCards.map(hc => hc.id)]),
+            choosableHouseCards: this.choosableHouseCards.map((house, houseCards) => {
+                // If a player requested the serialized version, only give his own house cards
+                // to avoid revealing the 3 shuffled vassal house cards
+                // In case a player replaces a commander during battle he will have to refresh to get the choosable house cards
+                if (admin || !this.ingameGameState.isVassalHouse(house) || this.ingameGameState.getControllerOfHouse(house) == player) {
+                    return [house.id, houseCards.map(hc => hc.id)];
+                } else {
+                    return [house.id, []]
+                }
+            }),
             houseCards: this.houseCards.map((h, hc) => {
                 // If a player requested the serialized version, only give his own house card.
-                if ((admin || (player && h == player.house)) && hc) {
+                if (hc && (admin || (player && this.ingameGameState.getControllerOfHouse(h) == player))) {
                     return [h.id, hc.id];
                 } else {
                     return [h.id, null];
@@ -229,9 +237,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
         chooseHouseCardGameState.choosableHouseCards = new BetterMap(data.choosableHouseCards.map(([hid, hcids]) => {
             const house = combatGameState.game.houses.get(hid);
-            const associatedHouseCards = combatGameState.ingameGameState.getAssociatedHouseCards(house);
-
-            return [house, hcids.map(hcid => associatedHouseCards.get(hcid))];
+            return [house, hcids.map(hcid => combatGameState.game.getHouseCardById(hcid))];
         }));
 
         chooseHouseCardGameState.houseCards = new BetterMap(data.houseCards.map(([hid, hcid]) => {
@@ -239,7 +245,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
             return [
                 house,
-                hcid ? combatGameState.ingameGameState.getAssociatedHouseCards(house).get(hcid) : null
+                hcid ? combatGameState.ingameGameState.game.getHouseCardById(hcid) : null
             ]
         }));
 

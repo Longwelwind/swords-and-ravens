@@ -21,6 +21,10 @@ import orders from "../common/ingame-game-state/game-data-structure/orders";
 import CombatInfoComponent from "./CombatInfoComponent";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import User from "../server/User";
+import { adwdHouseCardsData, baseHouseCardsData, HouseCardData } from "../common/ingame-game-state/game-data-structure/createGame";
+import HouseCard from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
+import houseCardAbilities from "../common/ingame-game-state/game-data-structure/house-card/houseCardAbilities";
+import BetterMap from "../utils/BetterMap";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -28,12 +32,33 @@ interface GameLogListComponentProps {
 
 @observer
 export default class GameLogListComponent extends Component<GameLogListComponentProps> {
+    allHouseCards = new BetterMap(this.getAllHouseCards());
+
     get game(): Game {
         return this.props.ingameGameState.game;
     }
 
     get world(): World {
         return this.game.world;
+    }
+
+    createHouseCards(data: [string, HouseCardData][]): [string, HouseCard][] {
+        return data.map(([houseCardId, houseCardData]) => {
+            const houseCard = new HouseCard(
+                houseCardId,
+                houseCardData.name,
+                houseCardData.combatStrength ? houseCardData.combatStrength : 0,
+                houseCardData.swordIcons ? houseCardData.swordIcons : 0,
+                houseCardData.towerIcons ? houseCardData.towerIcons : 0,
+                houseCardData.ability ? houseCardAbilities.get(houseCardData.ability) : null
+            );
+
+            return [houseCardId, houseCard];
+        });
+    }
+
+    getAllHouseCards(): [string, HouseCard][] {
+        return _.concat(this.createHouseCards(baseHouseCardsData), this.createHouseCards(adwdHouseCardsData), this.game.vassalHouseCards.entries);
     }
 
     render(): ReactNode {
@@ -187,7 +212,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "combat-result":
                 const houseCombatDatas = data.stats.map(stat => {
                     const house = this.game.houses.get(stat.house);
-                    const houseCard = stat.houseCard != null ? this.game.getHouseCardById(stat.houseCard) : null;
+                    const houseCard = stat.houseCard != null ? this.allHouseCards.get(stat.houseCard) : null;
 
                     return {
                         ...stat,
@@ -494,7 +519,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "combat-house-card-chosen":
                 const houseCards = data.houseCards.map(([hid, hcid]) => {
                     const house = this.game.houses.get(hid);
-                    const houseCard = this.game.getHouseCardById(hcid);
+                    const houseCard = this.allHouseCards.get(hcid);
                     return [house, houseCard];
                 });
 
@@ -573,7 +598,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             }
             case "house-card-ability-not-used": {
                 const house = this.game.houses.get(data.house);
-                const houseCard = this.game.getHouseCardById(data.houseCard);
+                const houseCard = this.allHouseCards.get(data.houseCard);
 
                 return <>
                     <b>{house.name}</b> did not use <b>{houseCard.name}&apos;s</b> ability.
@@ -582,7 +607,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "patchface-used": {
                 const house = this.game.houses.get(data.house);
                 const affectedHouse = this.game.houses.get(data.affectedHouse);
-                const houseCard = this.game.getHouseCardById(data.houseCard);
+                const houseCard = this.allHouseCards.get(data.houseCard);
                 return <>
                     <b>Patchface</b>: <b>{house.name}</b> decided to discard <b>
                         {houseCard.name}</b> from house <b>{affectedHouse.name}</b>.
@@ -590,7 +615,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             }
             case "melisandre-used": {
                 const house = this.game.houses.get(data.house);
-                const houseCard = this.game.getHouseCardById(data.houseCard);
+                const houseCard = this.allHouseCards.get(data.houseCard);
                 return <>
                     <strong>Melisandre</strong>: <strong>{house.name}</strong> decided to discard <strong>
                         {houseCard.name}</strong> from house.
@@ -598,7 +623,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             }
             case "melisandre-dwd-used": {
                 const house = this.game.houses.get(data.house);
-                const houseCard = this.game.getHouseCardById(data.houseCard);
+                const houseCard = this.allHouseCards.get(data.houseCard);
                 return <>
                     <strong>Melisandre</strong>: <strong>{house.name}</strong> decided to return <strong>
                         {houseCard.name}</strong> card to hand.
@@ -636,7 +661,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             }
             case "qyburn-used": {
                 const house = this.game.houses.get(data.house);
-                const houseCard = this.game.getHouseCardById(data.houseCard);
+                const houseCard = this.allHouseCards.get(data.houseCard);
 
                 return <>
                     <b>Qyburn</b>: <b>{house.name}</b> decided to use strength from <b>{houseCard.name}</b>
@@ -663,7 +688,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             }
             case "tyrion-lannister-house-card-replaced": {
                 const affectedHouse = this.game.houses.get(data.affectedHouse);
-                const newHouseCard = data.newHouseCard ? this.game.getHouseCardById(data.newHouseCard) : null;
+                const newHouseCard = data.newHouseCard ? this.allHouseCards.get(data.newHouseCard) : null;
 
                 return newHouseCard ? (
                     <><b>{affectedHouse.name}</b> chose <b>{newHouseCard.name}.</b></>
@@ -681,7 +706,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
             case "roose-bolton-house-cards-returned": {
                 const house = this.game.houses.get(data.house);
-                const returnedHouseCards = data.houseCards.map(hcid => this.game.getHouseCardById(hcid));
+                const returnedHouseCards = data.houseCards.map(hcid => this.allHouseCards.get(hcid));
 
                 return <>
                     <b>Roose Bolton</b>: <b>{house.name}</b> took back all discarded House
@@ -1127,9 +1152,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     const vassals = data.vassals.map(hid => this.game.houses.get(hid));
                     const house = this.game.houses.get(data.house);
 
-                    return <>{vassals.length > 0 
+                    return <>{vassals.length > 0
                         ? (<><b>{house.name}</b> claimed {joinReactNodes(vassals.map(v => <b key={v.id}>{v.name}</b>), ", ")} as
-                                vassal{vassals.length > 0 && "s"}.</>) 
+                                vassal{vassals.length > 0 && "s"}.</>)
                         : (<><b>{house.name}</b> passed their vassal marker set.</>)
                     }</>;
                 }
@@ -1155,7 +1180,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "jaqen-h-ghar-house-card-replaced": {
                 const house = this.game.houses.get(data.house);
                 const affectedHouse = this.game.houses.get(data.affectedHouse);
-                const newHouseCard = this.game.getHouseCardById(data.newHouseCard);
+                const newHouseCard = this.allHouseCards.get(data.newHouseCard);
 
                 return <>
                     <b>Jaqen H&apos;Ghar</b>: <b>{house.name}</b> randomly chose <b>{newHouseCard.name}</b> as <b>

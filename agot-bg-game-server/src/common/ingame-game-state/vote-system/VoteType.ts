@@ -5,6 +5,9 @@ import House from "../game-data-structure/House";
 import Player from "../Player";
 import User from "../../../server/User";
 import BiddingGameState from "../westeros-game-state/bidding-game-state/BiddingGameState";
+import ActionGameState from "../action-game-state/ActionGameState";
+import ResolveMarchOrderGameState from "../action-game-state/resolve-march-order-game-state/ResolveMarchOrderGameState";
+import CombatGameState from "../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 
 export type SerializedVoteType = SerializedCancelGame | SerializedReplacePlayer | SerializedReplacePlayerByVassal;
 
@@ -136,20 +139,45 @@ export class ReplacePlayerByVassal extends VoteType {
     executeAccepted(vote: Vote): void {
         const oldPlayer = vote.ingame.players.values.find(p => p.user == this.replaced) as Player;
 
+        // Delete the old player so the house is a vassal now
+        vote.ingame.players.delete(oldPlayer.user);
+
+        const forbiddenCommanders = [];
+        // If we are in combat we can't assign the vassal to the opponent
+        if (vote.ingame.childGameState instanceof ActionGameState
+            && vote.ingame.childGameState.childGameState instanceof ResolveMarchOrderGameState
+            && vote.ingame.childGameState.childGameState.childGameState instanceof CombatGameState) {
+                const combat = vote.ingame.childGameState.childGameState.childGameState as CombatGameState;
+                forbiddenCommanders.push(combat.defender);
+                forbiddenCommanders.push(combat.attacker);
+        }
+
+        let newCommander: House | null = null;
+        for (const house of vote.ingame.game.getPotentialWinners()) {
+            if (!vote.ingame.isVassalHouse(house) && !forbiddenCommanders.includes(house)) {
+                newCommander = house;
+                break;
+            }
+        }
+
+        if (!newCommander) {
+            throw new Error("Unable to determine new commander");
+        }
+
         // It may happen that you replace a player which commands vassals. Assign them to the potential winner.
         vote.ingame.game.vassalRelations.entries.forEach(([vassal, commander]) => {
             if (oldPlayer.house == commander) {
-                vote.ingame.game.vassalRelations.set(vassal, vote.ingame.game.getPotentialWinner());    
+                vote.ingame.game.vassalRelations.set(vassal, newCommander as House);
             }
         });
 
         // Assign this vassal to the leading house, so the current leading house cannot march into
         // the vassal regions
-        vote.ingame.game.vassalRelations.set(oldPlayer.house, vote.ingame.game.getPotentialWinner());
+        vote.ingame.game.vassalRelations.set(oldPlayer.house, newCommander);
 
+        // Broadcast new vassal relations before deletion of player!
         vote.ingame.broadcastVassalRelations();
 
-        vote.ingame.players.delete(oldPlayer.user);
         vote.ingame.entireGame.broadcastToClients({
             type: "player-replaced",
             oldUser: oldPlayer.user.id

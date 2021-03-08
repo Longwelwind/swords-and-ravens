@@ -477,7 +477,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                                 const houses = new BetterMap((ingame.game.houses as SerializedHouse[]).map(h => [h.id, h]));
                                 const combatData = combat.houseCombatDatas as [string, {houseCardId: string | null; army: number[]; regionId: string}][];
                                 const combatHouses = combatData.map(([h, _hcd]) => h);
-                                chooseHouseCard.choosableHouseCards = combatHouses.map(hid => [hid, 
+                                chooseHouseCard.choosableHouseCards = combatHouses.map(hid => [hid,
                                     houses.get(hid).houseCards.filter(([_hcid, hc]) => hc.state == HouseCardState.AVAILABLE).map(([hcid, _hc]) => hcid)]);
                             }
                         }
