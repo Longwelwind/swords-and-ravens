@@ -119,9 +119,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 })
             );
 
-            if (this.isStarredConsolidatePowerMusteringType
-                || this.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD || this.type == PlayerMusteringType.DEFENSE_MUSTER_ORDER
-            ) {
+            if (this.type != PlayerMusteringType.MUSTERING_WESTEROS_CARD) {
                 // If the mustering is from a Special Consolidate Power Order, "The hord descends" or the Defense/Muster Order
                 // there can only be mustering from one region
                 if (musterings.size > 1) {
@@ -216,6 +214,11 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                     [region.id, musterings.map(m => ({region: m.region.id, from: m.from ? m.from.type.id : null, to: m.to.id}))]
                 )
             });
+
+            if (this.type == PlayerMusteringType.DEFENSE_MUSTER_ORDER && musterings.size == 0) {
+                this.parentGameState.onPlayerMusteringEnd(this.house, this.resolveConsolidatePowerGameState.actionGameState.getRegionsWithDefenseMusterOrderOfHouse(this.house));
+                return;
+            }
 
             this.parentGameState.onPlayerMusteringEnd(this.house, musterings.entries.map(([region, _]) => region));
         }

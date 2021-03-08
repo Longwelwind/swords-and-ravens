@@ -136,7 +136,7 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
             throw new Error();
         }
 
-        // Remove Consolidate Power token
+        // Remove ConsolidatePower/Muster order token
         this.actionGameState.ordersOnBoard.delete(region);
         this.entireGame.broadcastToClients({
             type: "action-phase-change-order",
