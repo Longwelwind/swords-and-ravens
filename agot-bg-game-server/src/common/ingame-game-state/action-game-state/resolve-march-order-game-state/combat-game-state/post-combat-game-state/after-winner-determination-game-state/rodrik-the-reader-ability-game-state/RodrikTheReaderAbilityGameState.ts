@@ -10,8 +10,8 @@ import WesterosCard from "../../../../../../game-data-structure/westeros-card/We
 import IngameGameState from "../../../../../../IngameGameState";
 import SimpleChoiceGameState, { SerializedSimpleChoiceGameState } from "../../../../../../simple-choice-game-state/SimpleChoiceGameState";
 import { rodrikTheReader } from "../../../../../../game-data-structure/house-card/houseCardAbilities";
-import shuffle from "../../../../../../../../utils/shuffle";
 import AfterWinnerDeterminationGameState from "../AfterWinnerDeterminationGameState";
+import _ from "lodash";
 
 export default class RodrikTheReaderAbilityGameState extends GameState<
     AfterWinnerDeterminationGameState["childGameState"],
@@ -57,10 +57,16 @@ export default class RodrikTheReaderAbilityGameState extends GameState<
             return;
         }
 
-        let westerosCards = this.game.westerosDecks[deckId].filter(wc => wc != westerosCard);
-        westerosCards = shuffle([...westerosCards]);
+        this.game.westerosDecks[deckId].forEach(wc => wc.discarded = false);
+        const westerosCards = _.shuffle(this.game.westerosDecks[deckId].filter(wc => wc != westerosCard));
         westerosCards.unshift(westerosCard);
         this.game.westerosDecks[deckId] = westerosCards;
+        this.ingame.broadcastWesterosDecks();
+        this.ingame.log({
+            type: "rodrik-the-reader-used",
+            house: house.id,
+            westerosDeckI: deckId
+        });
         this.parentGameState.onHouseCardResolutionFinish(house);
     }
 

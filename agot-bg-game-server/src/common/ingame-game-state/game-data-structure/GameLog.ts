@@ -29,7 +29,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory
     | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered
     | SupplyAdjusted | PlayerReplaced | UserHouseAssignments | PlayerAction | MelisandreUsed | JonSnowUsed
-    | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed | SerIlynPayneFootmanKilled
+    | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed | SerIlynPayneFootmanKilled | RodrikTheReaderUsed
     | VassalsClaimed | CommanderPowerTokenGained | BericDondarrionUsed | VarysUsed | JaqenHGharUsed | JonConningtonUsed | BronnUsed
     | SerGerrisDrinkwaterUsed;
 
@@ -327,6 +327,12 @@ interface SerGerrisDrinkwaterUsed {
     type: "ser-gerris-drinkwater-used";
     house: string;
     influenceTrack: number;
+}
+
+interface RodrikTheReaderUsed {
+    type: "rodrik-the-reader-used";
+    house: string;
+    westerosDeckI: number;
 }
 
 interface QyburnUsed {
