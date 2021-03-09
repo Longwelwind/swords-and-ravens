@@ -12,13 +12,19 @@ import defencePusOneMusterImage from "../../public/images/orders/DefenceMusterVa
 import supportPlusOneRaidImage from "../../public/images/orders/SupportorRaidVassal.png";
 import raidImage from "../../public/images/orders/Raid.png";
 import raidPImage from "../../public/images/orders/RaidP.png";
+import seaMarchMinusOneImage from "../../public/images/orders/SeaMarchM.png"
+import seaSupportImage from "../../public/images/orders/SeaSupport.png"
+import seaIronBankImage from "../../public/images/orders/SeaIronBank.png"
+
 import BetterMap from "../utils/BetterMap";
 import {
-    consolidatePower,
+    raid, specialRaid,
+    marchMinusOne, march, marchPlusOne,
+    support, supportPlusOne,
     defensePlusOne, defensePlusTwo,
-    march,
-    marchMinusOne,
-    marchPlusOne, raid, specialConsolidatePower, specialRaid, support, supportPlusOne, defensePlusThree, raidSupportPlusOne, defensePlusOneMuster
+    consolidatePower, specialConsolidatePower,
+    seaMarchMinusOne, seaSupport, seaIronBank,
+    defensePlusThree, raidSupportPlusOne, defensePlusOneMuster
 } from "../common/ingame-game-state/game-data-structure/order-types/orderTypes";
 
 const orderImages = new BetterMap([
@@ -36,6 +42,9 @@ const orderImages = new BetterMap([
     [defensePlusThree.id, marchPlusThreeImage],
     [raidSupportPlusOne.id, supportPlusOneRaidImage],
     [defensePlusOneMuster.id, defencePusOneMusterImage],
+    [seaMarchMinusOne.id, seaMarchMinusOneImage],
+    [seaSupport.id, seaSupportImage],
+    [seaIronBank.id, seaIronBankImage]
 ]);
 
 export default orderImages;

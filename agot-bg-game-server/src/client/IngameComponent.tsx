@@ -554,7 +554,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         // Take the necessary votes to render, based on the `createdAt` times of
         // `previous` and `next`.
         const votesToRender = this.props.gameState.votes.values.filter(v => (previous != null ? previous.createdAt < v.createdAt : true) && (next ? v.createdAt < next.createdAt : true));
-        console.log(votesToRender);
         return _.sortBy(votesToRender, v => v.createdAt).map(v => (
             <VoteComponent key={v.id} vote={v} gameClient={this.props.gameClient} ingame={this.props.gameState} />
         ));

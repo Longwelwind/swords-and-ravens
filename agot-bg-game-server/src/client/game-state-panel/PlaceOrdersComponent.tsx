@@ -144,7 +144,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                                         <OrderGridComponent orders={this.props.gameState.getOrdersList(r.getController() as House)}
                                             selectedOrder={null}
                                             availableOrders={
-                                                this.props.gameState.getAvailableOrders(r.getController() as House)
+                                                this.props.gameState.getAvailableOrders(r.getController() as House, r)
                                             }
                                             onOrderClick={o => {
                                                 this.props.gameState.assignOrder(r, o);

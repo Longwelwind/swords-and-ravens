@@ -12,7 +12,6 @@ import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import OrderGridComponent from "./utils/OrderGridComponent";
-import orders from "../../common/ingame-game-state/game-data-structure/orders";
 import {OrderOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
 
@@ -39,7 +38,7 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
                                 Choose which order to place on <strong>{this.selectedRegion.name}</strong> or reset your selection by clicking it on the map again.<br/><br/>
                                 <OrderGridComponent orders={this.props.gameState.ingameGameState.game.getOrdersListForHouse(this.props.gameState.ravenHolder)}
                                                     selectedOrder={this.selectedOrder}
-                                                    availableOrders={this.props.gameState.getAvailableOrders(this.props.gameState.actionGameState.ordersOnBoard.get(this.selectedRegion))}
+                                                    availableOrders={this.props.gameState.getAvailableOrders(this.selectedRegion)}
                                                     onOrderClick={o => this.selectOrder(o)}/>
                             </Col>
                         )}

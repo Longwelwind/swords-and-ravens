@@ -14,6 +14,7 @@ import RaidOrderType from "../../../game-data-structure/order-types/RaidOrderTyp
 import ConsolidatePowerOrderType from "../../../game-data-structure/order-types/ConsolidatePowerOrderType";
 import User from "../../../../../server/User";
 import RaidSupportOrderType from "../../../../../common/ingame-game-state/game-data-structure/order-types/RaidSupportOrderType";
+import IronBankOrderType from "../../../../../common/ingame-game-state/game-data-structure/order-types/IronBankOrderType";
 
 export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRaidOrderGameState> {
     house: House;
@@ -103,7 +104,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
             let raiderGainedPowerToken: boolean | null = null;
             let raidedHouseLostPowerToken: boolean | null = null;
 
-            if (orderTarget.type instanceof ConsolidatePowerOrderType) {
+            if (orderTarget.type instanceof ConsolidatePowerOrderType && !(orderTarget.type instanceof IronBankOrderType)) {
                 raiderGainedPowerToken = this.ingameGameState.changePowerTokens(this.house, 1) != 0;
                 raidedHouseLostPowerToken = this.ingameGameState.changePowerTokens(raidedHouse, -1) != 0;
             }

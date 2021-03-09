@@ -1,10 +1,7 @@
-import OrderType from "./OrderType";
+import DefenseOrderType from "./DefenseOrderType";
 
-export default class DefenseMusterOrderType extends OrderType {
-    defenseModifier: number;
-
-    constructor(id: string, name: string, starred = false, defenseModifier = 0) {
-        super(id, name, starred);
-        this.defenseModifier = defenseModifier;
+export default class DefenseMusterOrderType extends DefenseOrderType {
+    constructor() {
+        super("defense-plus-one-muster", "Defense +1/Muster", false, 1);
     }
 }

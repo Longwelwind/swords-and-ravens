@@ -56,7 +56,6 @@ export default class ClaimVassalsGameState extends GameState<PlanningGameState, 
         const positionInTrack = this.game.ironThroneTrack.filter(h => !this.ingame.isVassalHouse(h)).indexOf(nextHouseToClaim);
         const count = this.passedVassalsCount + (Math.floor(countVassals / countNonVassals) + (positionInTrack < (countVassals % countNonVassals) ? 1 : 0));
 
-        console.log("proceed with ClaimVassalGameState. count: " + count);
         this.setChildGameState(new ClaimVassalGameState(this)).firstStart(nextHouseToClaim, count);
     }
 
