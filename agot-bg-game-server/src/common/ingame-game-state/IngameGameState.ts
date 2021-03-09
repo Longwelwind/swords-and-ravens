@@ -27,6 +27,7 @@ import { v4 } from "uuid";
 import CancelledGameState, { SerializedCancelledGameState } from "../cancelled-game-state/CancelledGameState";
 import HouseCard from "./game-data-structure/house-card/HouseCard";
 import { observable } from "mobx";
+import _ from "lodash";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -570,6 +571,14 @@ export default class IngameGameState extends GameState<
         this.entireGame.broadcastToClients({
             type: "vassal-relations",
             vassalRelations: this.game.vassalRelations.entries.map(([vassal, commander]) => [vassal.id, commander.id])
+        });
+    }
+
+    broadcastWesterosDecks(): void {
+        this.entireGame.broadcastToClients({
+            type: "update-westeros-decks",
+            westerosDecks: this.game.westerosDecks.map(wd => wd.slice(0, this.game.revealedWesterosCards)
+                .concat(_.shuffle(wd.slice(this.game.revealedWesterosCards))).map(wc => wc.serializeToClient()))
         });
     }
 

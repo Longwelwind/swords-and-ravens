@@ -676,6 +676,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         the combat strength of this card by <b>{tokens}</b>.
                 </>;
             }
+            case "rodrik-the-reader-used":  {
+                const house = this.game.houses.get(data.house);
+
+                return <>
+                    <b>Rodrik the Reader</b>: <b>{house.name}</b> decided to choose
+                        a card from Westeros Deck <b>{data.westerosDeckI + 1}</b>.
+                </>;
+            }
             case "tyrion-lannister-choice-made": {
                 const house = this.game.houses.get(data.house);
                 const affectedHouse = this.game.houses.get(data.affectedHouse);

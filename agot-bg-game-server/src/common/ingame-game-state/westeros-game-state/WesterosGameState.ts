@@ -19,7 +19,6 @@ import planningRestrictions from "../game-data-structure/westeros-card/planning-
 import PutToTheSwordGameState, {SerializedPutToTheSwordGameState} from "./put-to-the-swords-game-state/PutToTheSwordGameState";
 import AThroneOfBladesGameState, {SerializedAThroneOfBladesGameState} from "./thrones-of-blades-game-state/AThroneOfBladesGameState";
 import DarkWingsDarkWordsGameState, {SerializedDarkWingsDarkWordsGameState} from "./dark-wings-dark-words-game-state/DarkWingsDarkWordsGameState";
-import shuffle from "../../../utils/shuffle";
 
 export default class WesterosGameState extends GameState<IngameGameState,
     WildlingsAttackGameState | ReconcileArmiesGameState<WesterosGameState> | MusteringGameState | ClashOfKingsGameState
@@ -97,13 +96,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
             this.revealedCards[i].type.executeImmediately(this, i);
         }
 
-        const revealedWCs = this.game.revealedWesterosCards;
-
-        this.entireGame.broadcastToClients({
-            type: "update-westeros-decks",
-            westerosDecks: this.game.westerosDecks.map(wd => wd.slice(0, revealedWCs)
-                .concat(shuffle(wd.slice(revealedWCs))).map(wc => wc.serializeToClient()))
-        });
+        this.ingame.broadcastWesterosDecks();
 
         this.currentCardI = -1;
 
