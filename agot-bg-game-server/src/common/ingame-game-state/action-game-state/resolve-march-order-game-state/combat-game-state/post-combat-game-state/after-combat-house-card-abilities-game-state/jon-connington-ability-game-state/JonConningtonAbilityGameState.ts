@@ -117,7 +117,7 @@ export default class JonConningtonAbilityGameState extends GameState<
                     units: [[region.id, [unit.serializeToClient()]]]
                 });
             }
-            
+
             this.parentGameState.onHouseCardResolutionFinish(house);
         }
     }

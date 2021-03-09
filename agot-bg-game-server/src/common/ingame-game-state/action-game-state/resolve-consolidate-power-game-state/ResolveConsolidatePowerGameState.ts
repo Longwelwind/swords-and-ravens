@@ -14,6 +14,7 @@ import PlayerMusteringGameState, {
 import Region from "../../game-data-structure/Region";
 import IngameGameState from "../../IngameGameState";
 import _ from "lodash";
+import IronBankOrderType from "../../game-data-structure/order-types/IronBankOrderType";
 
 export default class ResolveConsolidatePowerGameState extends GameState<ActionGameState, PlayerMusteringGameState> {
     get game(): Game {
@@ -40,6 +41,12 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
     }
 
     getPotentialGainedPowerTokens(region: Region, house: House): number {
+        const order = this.actionGameState.ordersOnBoard.tryGet(region, null);
+        if (order && order.type instanceof IronBankOrderType) {
+            // Iron Bank orders can't be used for Consolidating Power
+            return 0;
+        }
+
         if (region.type == sea) {
             // A consolidate power on sea grants nothing.
             // Do nothing.
@@ -59,10 +66,10 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
     }
 
     resolveConsolidatePowerOrderForPt(region: Region, house: House): void {
-        const gains: number = this.getPotentialGainedPowerTokens(region, house);
+        let gains: number = this.getPotentialGainedPowerTokens(region, house);
 
         if(gains > 0) {
-            this.ingame.changePowerTokens(house, gains);
+            gains = this.ingame.changePowerTokens(house, gains);
         }
 
         this.ingame.log({
@@ -136,7 +143,7 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
             throw new Error();
         }
 
-        // Remove ConsolidatePower/Muster order token
+        // Remove ConsolidatePower/IronBank/Muster order token
         this.actionGameState.ordersOnBoard.delete(region);
         this.entireGame.broadcastToClients({
             type: "action-phase-change-order",

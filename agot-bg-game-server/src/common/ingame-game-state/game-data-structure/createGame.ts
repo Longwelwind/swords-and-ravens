@@ -155,7 +155,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
                     .map(([unitTypeId, limit]) => [unitTypes.get(unitTypeId), limit])
             );
 
-            const house = new House(hid, houseData.name, houseData.color, playerHouses.includes(hid) ? houseCards : new BetterMap(), unitLimits, 5, houseData.supplyLevel);
+            const house = new House(hid, houseData.name, houseData.color, playerHouses.includes(hid) ? houseCards : new BetterMap(), unitLimits, gameSettings.vassals ? 7 : 5, houseData.supplyLevel);
 
             return [hid, house];
         })

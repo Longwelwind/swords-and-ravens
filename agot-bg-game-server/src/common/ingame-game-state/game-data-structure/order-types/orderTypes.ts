@@ -7,6 +7,8 @@ import DefenseOrderType from "./DefenseOrderType";
 import BetterMap from "../../../../utils/BetterMap";
 import RaidSupportOrderType from "./RaidSupportOrderType";
 import DefenseMusterOrderType from "./DefenseMusterOrderType";
+import RegionKind from "../RegionKind";
+import IronBankOrderType from "./IronBankOrderType";
 
 export const marchMinusOne = new MarchOrderType("march-minus-one", "March -1", false, -1);
 export const march = new MarchOrderType("march", "March", false, 0);
@@ -26,7 +28,11 @@ export const raid = new RaidOrderType("raid", "Raid", false);
 export const specialRaid = new RaidOrderType("special-raid", "Special Raid", true);
 
 export const raidSupportPlusOne = new RaidSupportOrderType("raid-support-plus-one", "Raid/Support +1", false, 1);
-export const defensePlusOneMuster = new DefenseMusterOrderType("defense-plus-one-muster", "Defense +1/Muster", false);
+export const defensePlusOneMuster = new DefenseMusterOrderType();
+
+export const seaMarchMinusOne = new MarchOrderType("sea-march", "Sea March -1", false, -1, RegionKind.SEA);
+export const seaSupport = new SupportOrderType("sea-support", "Sea Support", false, 0, RegionKind.SEA);
+export const seaIronBank = new IronBankOrderType();
 
 const orderTypes = new BetterMap<string, OrderType>([
     [marchMinusOne.id, marchMinusOne],
@@ -41,7 +47,10 @@ const orderTypes = new BetterMap<string, OrderType>([
     [raid.id, raid],
     [specialRaid.id, specialRaid],
     [raidSupportPlusOne.id, raidSupportPlusOne],
-    [defensePlusOneMuster.id, defensePlusOneMuster]
+    [defensePlusOneMuster.id, defensePlusOneMuster],
+    [seaMarchMinusOne.id, seaMarchMinusOne],
+    [seaSupport.id, seaSupport],
+    [seaIronBank.id, seaIronBank]
 ]);
 
 export default orderTypes;

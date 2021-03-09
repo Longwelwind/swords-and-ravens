@@ -136,6 +136,10 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
                 return;
             }
 
+            if (order && order.type.restrictedTo != null && order.type.restrictedTo != region.type.kind) {
+                return;
+            }
+
             // When a player placed or removed an order he is unready
             this.setUnready(player);
 
@@ -238,16 +242,17 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
                         return {status: false, reason: "too-much-orders-placed"};
                     }
                 }
+
+                if (possibleRegions.every(r => this.placedOrders.has(r))) {
+                    return state;
+                } else {
+                    return {status: false, reason: "not-all-regions-filled"};
+                }
             }
 
-            if (possibleRegions.every(r => this.placedOrders.has(r)))
+            if (possibleRegions.every(r => this.placedOrders.has(r) || this.getAvailableOrders(house, r).length == 0))
             {
                 // All possible regions have orders
-                return state;
-            }
-
-            // It is possible that a house controls more areas than it has available orders
-            if (this.getAvailableOrders(house).length == 0) {
                 return state;
             }
 
@@ -332,8 +337,8 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
         return this.ingameGameState.game.getOrdersListForHouse(house);
     }
 
-    getAvailableOrders(house: House): Order[] {
-        return this.ingameGameState.game.getAvailableOrders(this.placedOrders, house, this.parentGameState.planningRestrictions);
+    getAvailableOrders(house: House, region: Region | null = null): Order[] {
+        return this.ingameGameState.game.getAvailableOrders(this.placedOrders, house, region, this.parentGameState.planningRestrictions);
     }
 
     isOrderRestricted(order: Order): boolean {

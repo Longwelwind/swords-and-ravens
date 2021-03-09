@@ -15,8 +15,9 @@ import {land, port} from "./regionTypes";
 import PlanningRestriction from "./westeros-card/planning-restriction/PlanningRestriction";
 import WesterosCardType from "./westeros-card/WesterosCardType";
 import IngameGameState from "../IngameGameState";
-import { vassalHousesOrders, playerHousesOrders } from "./orders";
+import { vassalHousesOrders, playerHousesOrders, seaOrders } from "./orders";
 import { vassalHouseCards } from "./static-data-structure/vassalHouseCards";
+import RegionKind from "./RegionKind";
 
 export const MAX_WILDLING_STRENGTH = 12;
 export const MIN_PLAYER_COUNT_WITH_VASSALS = 3;
@@ -128,16 +129,24 @@ export default class Game {
         return nonVassalTrack[0];
     }
 
-    getOrdersListForHouse(house: House): Order[] {
-        return this.ingame.isVassalHouse(house) ? vassalHousesOrders : playerHousesOrders;
+    getOrdersListForHouse(house: House, region: Region | null = null): Order[] {
+        if (this.ingame.isVassalHouse(house)) {
+            return vassalHousesOrders;
+        }
+
+        if (this.ingame.entireGame.gameSettings.seaOrderTokens && (region == null || region.type.kind == RegionKind.SEA)) {
+            return _.concat(playerHousesOrders, seaOrders);
+        }
+
+        return playerHousesOrders;
     }
 
-    getAvailableOrders(allPlacedOrders: BetterMap<Region, Order | null>, house: House, planningRestrictions: PlanningRestriction[]): Order[] {
+    getAvailableOrders(allPlacedOrders: BetterMap<Region, Order | null>, house: House, region: Region | null, planningRestrictions: PlanningRestriction[]): Order[] {
         const placedOrders = allPlacedOrders.entries
             .filter(([region, _order]) => region.getController() == house)
             .map(([_region, order]) => order as Order);
 
-        const ordersList = this.getOrdersListForHouse(house);
+        const ordersList = this.getOrdersListForHouse(house, region);
 
         let leftOrders = _.difference(
             ordersList,
