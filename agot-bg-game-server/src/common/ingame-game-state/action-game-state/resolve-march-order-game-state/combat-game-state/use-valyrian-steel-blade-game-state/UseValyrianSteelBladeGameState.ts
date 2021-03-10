@@ -31,24 +31,33 @@ export default class UseValyrianSteelBladeGameState extends GameState<CombatGame
     firstStart(house: House): void {
         this.house = house;
 
-        // Check if we can fast-track this state by checking that no involved house card forces the VSB decision
-        // and that VSB holders current battle strength is one less than his opponent
-        const forcedByHouseCard = this.combatGameState.houseCombatDatas.values.some(hcd => hcd.houseCard != null
-             && hcd.houseCard.ability != null
-             && hcd.houseCard.ability.forcesValyrianSteelBladeDecision(this.combatGameState, house));
-
-        if (forcedByHouseCard) {
-            return;
-        }
-
-        const vsbBattleStrength = this.combatGameState.getTotalCombatStrength(house);
-        const opponent = this.combatGameState.houseCombatDatas.keys.filter(h => h != house)[0];
-        const opponentsBattleStrength = this.combatGameState.getTotalCombatStrength(opponent);
-
-        if (opponentsBattleStrength - vsbBattleStrength != 1) {
+        if (this.canBeSkipped(house)) {
             // Using VSB would make no sense as battle is already won or VSB doesn't help to win it.
             // So we end this state with VSB not used
             this.combatGameState.onUseValyrianSteelBladeGameStateEnd();
+        }
+    }
+
+    canBeSkipped(house: House): boolean {
+        // Check if we can fast-track this state by checking that no involved house card forces the VSB decision
+        // and that VSB holders current battle strength is one less than his opponent
+        const forcedByHouseCard = this.combatGameState.houseCombatDatas.values.some(hcd => hcd.houseCard != null
+            && hcd.houseCard.ability != null
+            && hcd.houseCard.ability.forcesValyrianSteelBladeDecision(this.combatGameState, house));
+
+       if (forcedByHouseCard) {
+           return false;
+       }
+
+        const vsbBattleStrength = this.combatGameState.getTotalCombatStrength(house);
+        const enemy = this.combatGameState.getEnemy(house);
+        const enemyBattleStrength = this.combatGameState.getTotalCombatStrength(enemy);
+
+        // Due to vassals the VSB holder not necessarily must be in front of fief
+        if (this.game.isAheadInTrack(this.game.fiefdomsTrack, house, enemy)) {
+            return enemyBattleStrength - vsbBattleStrength != 1;
+        } else {
+            return enemyBattleStrength - vsbBattleStrength != 0;
         }
     }
 
