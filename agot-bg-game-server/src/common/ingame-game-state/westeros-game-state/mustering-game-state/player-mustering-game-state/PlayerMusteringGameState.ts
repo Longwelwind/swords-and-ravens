@@ -83,7 +83,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 musterings: []
             });
 
-            this.parentGameState.onPlayerMusteringEnd(house, []);
+            this.proceedToParentGameState(new BetterMap());
         }
     }
 
@@ -201,7 +201,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                     if (recruitments.length == 0) {
                         // The CP was resolved to get Power tokens
                         this.resolveConsolidatePowerGameState.resolveConsolidatePowerOrderForPt(startingRegion, this.house);
-                        this.resolveConsolidatePowerGameState.onPlayerMusteringEnd(this.house, [startingRegion]);
+                        this.proceedToParentGameState(musterings);
                         return;
                     }
                 }
@@ -215,13 +215,17 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 )
             });
 
-            if (this.type == PlayerMusteringType.DEFENSE_MUSTER_ORDER && musterings.size == 0) {
-                this.parentGameState.onPlayerMusteringEnd(this.house, this.resolveConsolidatePowerGameState.actionGameState.getRegionsWithDefenseMusterOrderOfHouse(this.house));
-                return;
-            }
-
-            this.parentGameState.onPlayerMusteringEnd(this.house, musterings.entries.map(([region, _]) => region));
+            this.proceedToParentGameState(musterings);
         }
+    }
+
+    proceedToParentGameState(musterings: BetterMap<Region, Mustering[]>): void {
+        if (this.type == PlayerMusteringType.DEFENSE_MUSTER_ORDER && musterings.size == 0) {
+            this.parentGameState.onPlayerMusteringEnd(this.house, this.resolveConsolidatePowerGameState.actionGameState.getRegionsWithDefenseMusterOrderOfHouse(this.house));
+            return;
+        }
+
+        this.parentGameState.onPlayerMusteringEnd(this.house, musterings.entries.map(([region, _]) => region));
     }
 
     muster(musterings: BetterMap<Region, Mustering[]>): void {

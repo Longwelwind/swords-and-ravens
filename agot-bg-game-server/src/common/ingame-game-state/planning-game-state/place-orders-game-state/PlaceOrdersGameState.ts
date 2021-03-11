@@ -56,10 +56,12 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
         this.placedOrders = orders;
         this.forVassals = forVassals;
 
-        this.ingameGameState.log({
-            type: "planning-phase-began",
-            forVassals: this.forVassals
-        });
+        if (!this.forVassals || this.ingameGameState.getVassalHouses().length > 0) {
+            this.ingameGameState.log({
+                type: "planning-phase-began",
+                forVassals: this.forVassals
+            });
+        }
 
         // Automatically set ready for houses which can't place orders
         this.game.houses.values.forEach(h => {
