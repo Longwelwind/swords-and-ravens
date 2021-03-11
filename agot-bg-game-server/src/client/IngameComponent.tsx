@@ -153,6 +153,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     <Col xs="auto" key={h.id}>
                                                         <InfluenceIconComponent
                                                             house={h}
+                                                            ingame={this.props.gameState}
+                                                            track={tracker}
                                                         />
                                                         <div className="tracker-star-container">
                                                             {stars && i < this.game.starredOrderRestrictions.length && (
