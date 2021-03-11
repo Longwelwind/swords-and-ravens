@@ -40,7 +40,7 @@ import stannisImage from "../../public/images/house-cards/Stannis.png";
 import theonImage from "../../public/images/house-cards/Theon.png";
 import tyrionImage from "../../public/images/house-cards/Tyrion.png";
 import tywinImage from "../../public/images/house-cards/Tywin.png";
-import victorianImage from "../../public/images/house-cards/Victorian.png";
+import victarionImage from "../../public/images/house-cards/Victarion.png";
 import rayderImage from "../../public/images/house-cards/Rayder.png";
 import melisandreDwDImage from "../../public/images/house-cards/Melisandre_DwD.png";
 import jonSnow from "../../public/images/house-cards/JonSnow.png";
@@ -141,7 +141,7 @@ const houseCardImages = new BetterMap([
     ["theon-greyjoy", theonImage],
     ["tyrion-lannister", tyrionImage],
     ["tywin-lannister", tywinImage],
-    ["victarion-greyjoy", victorianImage],
+    ["victarion-greyjoy", victarionImage],
     ["rayder", rayderImage],
     ["melisandre-dwd", melisandreDwDImage],
     ["jon-snow", jonSnow],
