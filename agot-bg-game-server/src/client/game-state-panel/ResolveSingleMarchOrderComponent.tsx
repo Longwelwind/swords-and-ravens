@@ -134,6 +134,19 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     }
 
     renderLeavePowerToken(startingRegion: Region): ReactNode | null {
+        const portRegion = startingRegion.game.world.getAdjacentPortOfCastle(startingRegion);
+        const hasShipsInPort = portRegion == null ? false : portRegion.units.size > 0;
+        const unitOwner = startingRegion.units.values[0].allegiance;
+        const superTokenOwner = startingRegion.superControlPowerToken;
+        const superTokenOwnerName = superTokenOwner != null ? superTokenOwner.name : "";
+        const warningToShow = superTokenOwner == null && portRegion != null && hasShipsInPort ? (
+            <small>If you do not leave a token, the ships in <b>{ portRegion.name }</b> will be destroyed.</small>
+        ) : superTokenOwner != null && superTokenOwner != unitOwner && portRegion != null && hasShipsInPort ? (
+            <small>If you do not leave a token, <b>{superTokenOwnerName}</b> will regain control of <b>{startingRegion.name}</b> and capture your ships in <b>{portRegion.name}</b>.</small>
+        ) : superTokenOwner != null && superTokenOwner != unitOwner && portRegion != null && !hasShipsInPort ? (
+            <small>If you do not leave a token, <b>{superTokenOwnerName}</b> will regain control of <b>{startingRegion.name}</b>.</small>
+        ) : null;
+
         return this.plannedMoves.size > 0 && (
             <Col xs={12} className="text-center">
                 <OverlayTrigger overlay={
@@ -183,6 +196,12 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                         onChange={() => {this.leavePowerToken = false;}}
                                         disabled={!this.canLeavePowerToken || this.isVassalHouse}/>
                                 </Col>
+                                {this.leavePowerToken == false && warningToShow != null && (
+                                <Col xs={12} className="mt-1 pt-0 mb-0 pb-0">
+                                    <Form.Label>
+                                        {warningToShow}
+                                    </Form.Label>
+                                </Col>)}
                             </Form.Group>
                         </fieldset>
                     </Form>
