@@ -491,7 +491,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
     {
         version: "16",
         migrate: (serializedGame: any) => {
-            // Migration for #TBD
+            // Migration for #850
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
                 const game = ingame.game;
@@ -503,6 +503,39 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         }
                     });
                 });
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "17",
+        migrate: (serializedGame: any) => {
+            // Migration for #854
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                if (ingame.childGameState && ingame.childGameState.type == "action") {
+                    const action = ingame.childGameState;
+                    if (action.childGameState && action.childGameState.type == "resolve-march-order") {
+                        const resolveMarchOrders = action.childGameState;
+                        if (resolveMarchOrders.childGameState && resolveMarchOrders.childGameState.type == "combat") {
+                            const combat = resolveMarchOrders.childGameState;
+                            if (combat.childGameState && combat.childGameState.type == "before-combat-house-card-abilities-resolution") {
+                                const beforeCombatResultion = combat.childGameState;
+                                if (beforeCombatResultion.childGameState && beforeCombatResultion.childGameState.type == "aeron-damphair-dwd-ability") {
+                                    // aeron child game state is now bidding instead of simple choice
+                                    const aeronDwdAbility = beforeCombatResultion.childGameState;
+                                    const house = aeronDwdAbility.childGameState.house;
+                                    aeronDwdAbility.childGameState = {
+                                        type: "bidding",
+                                        participatingHouses: [house],
+                                        bids: []
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             return serializedGame;
