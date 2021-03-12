@@ -1,5 +1,4 @@
 import GameState from "../../../../../../GameState";
-import SimpleChoiceGameState, {SerializedSimpleChoiceGameState} from "../../../../../simple-choice-game-state/SimpleChoiceGameState";
 import Game from "../../../../../game-data-structure/Game";
 import CombatGameState from "../../CombatGameState";
 import House from "../../../../../game-data-structure/House";
@@ -8,10 +7,11 @@ import {ClientMessage} from "../../../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../../../messages/ServerMessage";
 import IngameGameState from "../../../../../IngameGameState";
 import BeforeCombatHouseCardAbilitiesGameState from "../BeforeCombatHouseCardAbilitiesGameState";
+import BiddingGameState, { SerializedBiddingGameState } from "../../../../../westeros-game-state/bidding-game-state/BiddingGameState";
 
 
 export default class AeronDamphairDwDAbilityGameState extends GameState<
-    BeforeCombatHouseCardAbilitiesGameState["childGameState"], SimpleChoiceGameState
+    BeforeCombatHouseCardAbilitiesGameState["childGameState"], BiddingGameState<AeronDamphairDwDAbilityGameState>
 > {
     get game(): Game {
         return this.parentGameState.game;
@@ -26,25 +26,32 @@ export default class AeronDamphairDwDAbilityGameState extends GameState<
     }
 
     firstStart(house: House): void {
-        const choices: string[] = ["0"];
+        if (house.powerTokens > 0) {
+            this.setChildGameState(new BiddingGameState(this)).firstStart([house]);
+        } else {
+            this.ingame.log({
+                type: "aeron-damphair-used",
+                house: house.id,
+                tokens: 0
+            });
 
-        for(let i = 1;i<=house.powerTokens;i++) {
-            choices.push(i.toString());
+            this.parentGameState.onHouseCardResolutionFinish(house);
         }
-
-        this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
-            house,
-            "",
-            choices,
-        );
     }
 
-    onSimpleChoiceGameStateEnd(choice: number): void {
-        const house = this.childGameState.house;
-
-        if (choice > house.powerTokens) {
+    onBiddingGameStateEnd(result: [number, House[]][]): void {
+        // Removing power tokens is done by BiddingGameState!
+        if (result.length != 1) {
             return;
         }
+
+        const givenTokens = result[0][0];
+        const houses = result[0][1];
+        if (houses.length != 1) {
+            return;
+        }
+
+        const house = houses[0];
 
         const houseCombatData = this.combatGameState.houseCombatDatas.get(house);
         const aeronDamphairHouseCard = houseCombatData.houseCard;
@@ -55,22 +62,20 @@ export default class AeronDamphairDwDAbilityGameState extends GameState<
             throw new Error();
         }
 
-        aeronDamphairHouseCard.combatStrength += choice;
+        aeronDamphairHouseCard.combatStrength += givenTokens;
 
         this.entireGame.broadcastToClients({
             type: "manipulate-combat-house-card",
             manipulatedHouseCards: [aeronDamphairHouseCard].map(hc => [hc.id, hc.serializeToClient()])
         });
 
-        this.ingame.changePowerTokens(house, -choice);
-
         this.ingame.log({
             type: "aeron-damphair-used",
-            house: this.childGameState.house.id,
-            tokens: choice
+            house: house.id,
+            tokens: givenTokens
         });
 
-        this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);
+        this.parentGameState.onHouseCardResolutionFinish(house);
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -97,12 +102,12 @@ export default class AeronDamphairDwDAbilityGameState extends GameState<
     }
 
     deserializeChildGameState(data: SerializedAeronDamphairDwDAbilityGameState["childGameState"]): AeronDamphairDwDAbilityGameState["childGameState"] {
-        return SimpleChoiceGameState.deserializeFromServer(this, data);
+        return BiddingGameState.deserializeFromServer(this, data);
 
     }
 }
 
 export interface SerializedAeronDamphairDwDAbilityGameState {
     type: "aeron-damphair-dwd-ability";
-    childGameState: SerializedSimpleChoiceGameState;
+    childGameState: SerializedBiddingGameState;
 }
