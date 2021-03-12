@@ -142,6 +142,7 @@ export default class SerIlynPayneAbilityGameState extends GameState<
     serializeToClient(admin: boolean, player: Player | null): SerializedSerIlynPayneAbilityGameState {
         return {
             type: "ser-ilyn-payne-ability",
+            house: this.house.id,
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -149,6 +150,7 @@ export default class SerIlynPayneAbilityGameState extends GameState<
     static deserializeFromServer(afterWinnerDeterminationChild: AfterWinnerDeterminationGameState["childGameState"], data: SerializedSerIlynPayneAbilityGameState): SerIlynPayneAbilityGameState {
         const serIlynPayneAbility = new SerIlynPayneAbilityGameState(afterWinnerDeterminationChild);
 
+        serIlynPayneAbility.house = afterWinnerDeterminationChild.game.houses.get(data.house);
         serIlynPayneAbility.childGameState = serIlynPayneAbility.deserializeChildGameState(data.childGameState);
 
         return serIlynPayneAbility;
@@ -166,6 +168,6 @@ export default class SerIlynPayneAbilityGameState extends GameState<
 
 export interface SerializedSerIlynPayneAbilityGameState {
     type: "ser-ilyn-payne-ability";
-    childGameState: SerializedSimpleChoiceGameState
-        | SerializedSelectUnitsGameState;
+    house: string;
+    childGameState: SerializedSimpleChoiceGameState | SerializedSelectUnitsGameState;
 }
