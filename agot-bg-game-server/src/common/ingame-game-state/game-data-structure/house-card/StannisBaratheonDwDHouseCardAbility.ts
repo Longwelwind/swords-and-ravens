@@ -26,6 +26,6 @@ export default class StannisBaratheonDwDHouseCardAbility extends HouseCardAbilit
         }
 
         // Todo: Log which orders have been removed by Stannis
-        beforeCombatResolutionState.onHouseCardResolutionFinish();
+        beforeCombatResolutionState.childGameState.onHouseCardResolutionFinish(house);
     }
 }
