@@ -80,12 +80,7 @@ export default class HouseCardAbility {
         return strength;
     }
 
-    modifySupportStrength(_combat: CombatGameState, _houseCard: HouseCard, _affectedHouseCard: HouseCard, _house: House, strength: number): number {
-        return strength;
-    }
-
     forcesValyrianSteelBladeDecision(_combat: CombatGameState, _valyrianSteelBladeHolder: House): boolean {
         return false;
     }
-
 }
