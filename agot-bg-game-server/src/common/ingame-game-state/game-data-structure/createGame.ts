@@ -187,15 +187,21 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     }
 
     // Loading Tiled map
+    const garrisonsFromGameSetup = entireGame.selectedGameSetup.garrisons ? new BetterMap(Object.entries(entireGame.selectedGameSetup.garrisons)) : null;
+    const blockedRegions = entireGame.selectedGameSetup.blockedRegions;
+
     const regions = new BetterMap(staticWorld.staticRegions.values.map(staticRegion => {
-        const blocked = entireGame.selectedGameSetup.blockedRegions ? entireGame.selectedGameSetup.blockedRegions.includes(staticRegion.id) : false;
+        const blocked = blockedRegions ? blockedRegions.includes(staticRegion.id) : false;
+        const garrisonValue = garrisonsFromGameSetup ? garrisonsFromGameSetup.has(staticRegion.id) ? garrisonsFromGameSetup.get(staticRegion.id) 
+        : staticRegion.startingGarrison 
+        : staticRegion.startingGarrison;
 
         return [
             staticRegion.id,
             new Region(
                 game,
                 staticRegion.id,
-                blocked ? 1000 : staticRegion.startingGarrison
+                blocked ? 1000 : garrisonValue
             )
         ];
     }));
@@ -256,18 +262,11 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
 
     game.skipRavenPhase = false; // todo: Remove unused var
 
-    // Apply map changes
+    // Apply Power tokens from game setup
     if (entireGame.selectedGameSetup.powerTokensOnBoard != undefined) {
         Object.entries(entireGame.selectedGameSetup.powerTokensOnBoard).forEach(([houseId, regions]) => {
             const house = game.houses.tryGet(houseId, null);
-            regions.forEach(r => game.world.getRegion(staticWorld.staticRegions.get(r)).controlPowerToken = house);
-        });
-    }
-
-    if (entireGame.selectedGameSetup.garrisons != undefined) {
-        Object.entries(entireGame.selectedGameSetup.garrisons).forEach(([regionId, garrison]) => {
-            const staticRegion = staticWorld.staticRegions.get(regionId);
-            game.world.getRegion(staticRegion).garrison = staticRegion.startingGarrison = garrison;
+            regions.forEach(r => game.world.regions.get(r).controlPowerToken = house);
         });
     }
 
