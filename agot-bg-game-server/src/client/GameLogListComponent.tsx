@@ -942,7 +942,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             }
             case "massing-on-the-milkwater-house-cards-back": {
                 const house = this.game.houses.get(data.house);
-                const houseCardsReturned = data.houseCardsReturned.map(hcid => house.houseCards.get(hcid));
+                const houseCardsReturned = data.houseCardsReturned.map(hcid => this.allHouseCards.get(hcid));
 
                 return <>
                     <b>Massing on the Milkwater</b>: <b>{house.name}</b> took
@@ -959,7 +959,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             }
             case "massing-on-the-milkwater-house-cards-removed": {
                 const house = this.game.houses.get(data.house);
-                const houseCardsUsed = data.houseCardsUsed.map(hcid => house.houseCards.get(hcid));
+                const houseCardsUsed = data.houseCardsUsed.map(hcid => this.allHouseCards.get(hcid));
 
                 return <>
                     {houseCardsUsed.length > 0
@@ -1005,7 +1005,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             }
             case "mammoth-riders-return-card": {
                 const house = this.game.houses.get(data.house);
-                const houseCard = house.houseCards.get(data.houseCard);
+                const houseCard = this.allHouseCards.get(data.houseCard);
 
                 return <>
                     <b>Mammoth Riders</b>: <b>{house.name}</b> chose to
