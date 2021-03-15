@@ -53,7 +53,7 @@ export interface GameSetup {
     houseCards?: {[key: string]: HouseCardContainer};
     units?: {[key: string]: UnitData[]};
     structuresCountNeededToWin?: number;
-    maxTurn?: number;
+    maxTurns?: number;
     supplyLevels?: {[key: string]: number};
     powerTokensOnBoard?: {[key: string]: string[]};
     garrisons?: {[key: string]: number};
@@ -161,7 +161,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         })
     );
 
-    game.maxTurns = entireGame.selectedGameSetup.maxTurn != undefined ? entireGame.selectedGameSetup.maxTurn : baseGameData.maxTurns;
+    game.maxTurns = entireGame.selectedGameSetup.maxTurns ? entireGame.selectedGameSetup.maxTurns : baseGameData.maxTurns;
     game.structuresCountNeededToWin = entireGame.selectedGameSetup.structuresCountNeededToWin != undefined ? entireGame.selectedGameSetup.structuresCountNeededToWin : baseGameData.structuresCountNeededToWin;
     game.supplyRestrictions = baseGameData.supplyRestrictions;
     game.maxPowerTokens = MAX_POWER_TOKENS;

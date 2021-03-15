@@ -540,6 +540,24 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "18",
+        migrate: (serializedGame: any) => {
+            // Migration for #867
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                if (ingame.entireGame.gameSettings.setupId == "a-dance-with-dragons") {
+                    if (ingame.game.turn <= 6) {
+                        ingame.game.maxTurns = 6;
+                    } else {
+                        ingame.game.maxTurns = ingame.game.turn;
+                    }
+                }
+            }
+
+            return serializedGame;
+        }
     }
 ];
 
