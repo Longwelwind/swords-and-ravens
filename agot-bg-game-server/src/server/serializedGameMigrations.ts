@@ -547,7 +547,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             // Migration for #867
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
-                if (ingame.entireGame.gameSettings.setupId == "a-dance-with-dragons") {
+                if (serializedGame.gameSettings && serializedGame.gameSettings.setupId == "a-dance-with-dragons") {
                     if (ingame.game.turn <= 6) {
                         ingame.game.maxTurns = 6;
                     } else {
