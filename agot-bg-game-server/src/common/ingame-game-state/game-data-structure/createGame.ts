@@ -192,8 +192,8 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
 
     const regions = new BetterMap(staticWorld.staticRegions.values.map(staticRegion => {
         const blocked = blockedRegions ? blockedRegions.includes(staticRegion.id) : false;
-        const garrisonValue = garrisonsFromGameSetup ? garrisonsFromGameSetup.has(staticRegion.id) ? garrisonsFromGameSetup.get(staticRegion.id) 
-        : staticRegion.startingGarrison 
+        const garrisonValue = garrisonsFromGameSetup ? garrisonsFromGameSetup.has(staticRegion.id) ? garrisonsFromGameSetup.get(staticRegion.id)
+        : staticRegion.startingGarrison
         : staticRegion.startingGarrison;
 
         return [
