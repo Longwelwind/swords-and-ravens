@@ -10,13 +10,12 @@ import WesterosCard, {SerializedWesterosCard} from "./westeros-card/WesterosCard
 import shuffle from "../../../utils/shuffle";
 import WildlingCard, {SerializedWildlingCard} from "./wildling-card/WildlingCard";
 import BetterMap from "../../../utils/BetterMap";
-import HouseCard from "./house-card/HouseCard";
+import HouseCard, { SerializedHouseCard } from "./house-card/HouseCard";
 import {land, port} from "./regionTypes";
 import PlanningRestriction from "./westeros-card/planning-restriction/PlanningRestriction";
 import WesterosCardType from "./westeros-card/WesterosCardType";
 import IngameGameState from "../IngameGameState";
 import { vassalHousesOrders, playerHousesOrders, seaOrders } from "./orders";
-import { vassalHouseCards } from "./static-data-structure/vassalHouseCards";
 import RegionKind from "./RegionKind";
 
 export const MAX_WILDLING_STRENGTH = 12;
@@ -45,10 +44,7 @@ export default class Game {
     structuresCountNeededToWin: number;
     maxTurns: number;
     maxPowerTokens: number;
-
-    get vassalHouseCards(): BetterMap<string, HouseCard> {
-        return new BetterMap(vassalHouseCards.map(hc => [hc.id, hc]));
-    }
+    vassalHouseCards: BetterMap<string, HouseCard> = new BetterMap<string, HouseCard>();
 
     /**
      * Contains the vassal relations of the game.
@@ -412,7 +408,8 @@ export default class Game {
             maxPowerTokens: this.maxPowerTokens,
             clientNextWidllingCardId: (admin || knowsNextWildlingCard) ? this.wildlingDeck[0].id : null,
             revealedWesterosCards: this.revealedWesterosCards,
-            vassalRelations: this.vassalRelations.map((key, value) => [key.id, value.id])
+            vassalRelations: this.vassalRelations.map((key, value) => [key.id, value.id]),
+            vassalHouseCards: this.vassalHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])
         };
     }
 
@@ -438,7 +435,8 @@ export default class Game {
         game.maxPowerTokens = data.maxPowerTokens;
         game.revealedWesterosCards = data.revealedWesterosCards;
         game.clientNextWildlingCardId = data.clientNextWidllingCardId;
-        game.vassalRelations = new BetterMap(data.vassalRelations.map(([vid, hid]) => [game.houses.get(vid), game.houses.get(hid)]))
+        game.vassalRelations = new BetterMap(data.vassalRelations.map(([vid, hid]) => [game.houses.get(vid), game.houses.get(hid)]));
+        game.vassalHouseCards = new BetterMap(data.vassalHouseCards.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
 
         return game;
     }
@@ -465,4 +463,5 @@ export interface SerializedGame {
     revealedWesterosCards: number;
     clientNextWidllingCardId: number | null;
     vassalRelations: [string, string][];
+    vassalHouseCards: [string, SerializedHouseCard][];
 }

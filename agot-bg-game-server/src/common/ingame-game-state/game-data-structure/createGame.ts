@@ -14,6 +14,7 @@ import * as _ from "lodash";
 import houseCardAbilities from "./house-card/houseCardAbilities";
 import staticWorld from "./static-data-structure/globalStaticWorld";
 import IngameGameState from "../IngameGameState";
+import { vassalHouseCards } from "./static-data-structure/vassalHouseCards";
 
 const MAX_POWER_TOKENS = 20;
 
@@ -269,6 +270,9 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             regions.forEach(r => game.world.regions.get(r).controlPowerToken = house);
         });
     }
+
+    // Init the vassal house cards
+    game.vassalHouseCards = new BetterMap(vassalHouseCards.map(hc => [hc.id, hc]));
 
     return game;
 }
