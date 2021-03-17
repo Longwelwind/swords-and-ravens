@@ -38,6 +38,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
     }
 
     render(): ReactNode {
+        const showVsb = this.attacker.valyrianSteelBlade > 0 || this.defender.valyrianSteelBlade > 0;
         return (
             <>
                 <div style={{display: "grid", gridGap: "5px", gridTemplateColumns: "auto 1fr auto 1fr auto", justifyItems: "center", alignItems: "center"}} className="text-center">
@@ -100,13 +101,13 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                         {this.defender.houseCardStrength}
                     </div>
 
-                    <div style={{gridRow: "5", gridColumn: "2"}}>
+                    <div style={{gridRow: "5", gridColumn: "2", display: showVsb ? "inline" : "none"}}>
                         {this.attacker.valyrianSteelBlade}
                     </div>
-                    <div style={{gridRow: "5", gridColumn: "3"}}>
+                    <div style={{gridRow: "5", gridColumn: "3", display: showVsb ? "inline" : "none"}}>
                         <strong>Valyrian Steel<br/>Blade</strong>
                     </div>
-                    <div style={{gridRow: "5", gridColumn: "4"}}>
+                    <div style={{gridRow: "5", gridColumn: "4", display: showVsb ? "inline" : "none"}}>
                         {this.defender.valyrianSteelBlade}
                     </div>
 
