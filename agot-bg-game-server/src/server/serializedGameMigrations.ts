@@ -4,6 +4,7 @@ import staticWorld from "../common/ingame-game-state/game-data-structure/static-
 import { CrowKillersStep } from "../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/crow-killers-wildling-victory-game-state/CrowKillersWildlingVictoryGameState";
 import { SerializedHouse } from "../common/ingame-game-state/game-data-structure/House";
 import { HouseCardState } from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
+import { vassalHouseCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/vassalHouseCards";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
     {
@@ -554,6 +555,19 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         ingame.game.maxTurns = ingame.game.turn;
                     }
                 }
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "19",
+        migrate: (serializedGame: any) => {
+            // Migration for #TBD
+            // Make the vassal house cards non static again:
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.game.vassalHouseCards = vassalHouseCards.map(hc => [hc.id, hc.serializeToClient()]);
             }
 
             return serializedGame;
