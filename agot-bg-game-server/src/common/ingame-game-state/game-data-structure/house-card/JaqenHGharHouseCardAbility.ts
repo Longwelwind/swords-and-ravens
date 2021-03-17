@@ -6,8 +6,7 @@ import HouseCard, { HouseCardState } from "./HouseCard";
 import _ from "lodash";
 
 export default class JaqenHGharHouseCardAbility extends HouseCardAbility {
-
-    cancel(cancelResolutionState: CancelHouseCardAbilitiesGameState, house: House, houseCard: HouseCard): void {
+    cancel(cancelResolutionState: CancelHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {
         const combat = cancelResolutionState.combatGameState;
         const enemy = combat.getEnemy(house);
 
@@ -18,7 +17,7 @@ export default class JaqenHGharHouseCardAbility extends HouseCardAbility {
             type: "jaqen-h-ghar-house-card-replaced",
                 house: house.id,
                 affectedHouse: enemy.id,
-                oldHouseCard: houseCard.id,
+                oldHouseCard: (combat.houseCombatDatas.get(enemy).houseCard as HouseCard).id,
                 newHouseCard: newHouseCard.id
         });
 

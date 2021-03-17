@@ -204,10 +204,10 @@ export default class IngameGameState extends GameState<
 
     getControllerOfHouse(house: House): Player {
         if (this.isVassalHouse(house)) {
-            const suzerainHouse = this.game.vassalRelations.get(house);
+            const suzerainHouse = this.game.vassalRelations.tryGet(house, null);
 
             if (suzerainHouse == null) {
-                throw new Error();
+                throw new Error(`getControllerOfHouse(${house.name}) failed as there is no suzerainHouse`);
             }
 
             return this.getControllerOfHouse(suzerainHouse);
@@ -215,7 +215,7 @@ export default class IngameGameState extends GameState<
             const player = this.players.values.find(p => p.house == house);
 
             if (player == null) {
-                throw new Error();
+                throw new Error(`getControllerOfHouse(${house.name}) failed due to a fatal error`);
             }
 
             return player;

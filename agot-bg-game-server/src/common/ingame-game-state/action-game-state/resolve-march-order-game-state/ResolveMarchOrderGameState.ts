@@ -58,7 +58,7 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         this.findOrphanedOrdersAndRemoveThem();
 
         // Reset all card abilities (e.g. due to DWD Queen of Thorns)
-        const allHouseCards = _.flatMap(this.game.houses.values.map(h => h.houseCards.values));
+        const allHouseCards = _.concat(_.flatMap(this.game.houses.values.map(h => h.houseCards.values)), this.game.vassalHouseCards.values);
         const manipulatedHouseCards = allHouseCards.filter(hc =>
                hc.disabled
             || hc.combatStrength != hc.originalCombatStrength
