@@ -54,7 +54,7 @@ export default class Game {
      * Contains the vassal relations of the game.
      * Key is the vassal house, value is the commander.
      */
-    @observable vassalRelations = new BetterMap<House, House>();
+    vassalRelations = new BetterMap<House, House>();
     revealedWesterosCards = 0;
 
     get ironThroneHolder(): House {

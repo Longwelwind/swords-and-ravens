@@ -106,7 +106,13 @@ export default class GameClient {
         const player = this.authenticatedPlayer;
 
         if (player) {
-            return ingame.getControllerOfHouse(house) == player;
+            // Houses may be uncontrolled during Claim Vassals state and getControllerOfHouse will throw an error.
+            // We have to catch it here
+            try {
+                return ingame.getControllerOfHouse(house) == player;
+            } catch {
+                return false;
+            }
         } else {
             return false;
         }
