@@ -63,7 +63,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
             this.houseCards.set(house, message.houseCardId
                 ? this.combatGameState.game.getHouseCardById(message.houseCardId)
                 : null);
-            
+
             if (this.combatGameState.attacker == house) {
                 this.combatGameState.attackerHouseCardChosen = this.ingameGameState.isVassalHouse(house) ? "vassal" : house.id;
             } else {

@@ -102,14 +102,18 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
             });
         }
 
+        this.entireGame.broadcastToClients({
+            type: "player-ready",
+            userId: player.user.id
+        });
+
         // Check if all players are ready
+        this.checkAllPlayersReady();
+    }
+
+    private checkAllPlayersReady(): void {
         if (this.readyHouses.length == this.participatingHouses.length) {
             this.planningGameState.onPlaceOrderFinish(this.forVassals, this.placedOrders as BetterMap<Region, Order>);
-        } else {
-            this.entireGame.broadcastToClients({
-                type: "player-ready",
-                userId: player.user.id
-            });
         }
     }
 
@@ -379,6 +383,15 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
 
     isReady(house: House): boolean {
         return this.readyHouses.includes(house);
+    }
+
+    /*
+     Action after vassal replacement
+    */
+
+    actionAfterVassalReplacement(newVassal: House): void {
+        this.readyHouses = _.without(this.readyHouses, newVassal);
+        this.checkAllPlayersReady();
     }
 
     static deserializeFromServer(planning: PlanningGameState, data: SerializedPlaceOrdersGameState): PlaceOrdersGameState {

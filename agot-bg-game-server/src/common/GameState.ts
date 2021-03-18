@@ -1,6 +1,7 @@
 import {observable} from "mobx";
 import EntireGame from "./EntireGame";
 import User from "../server/User";
+import House from "./ingame-game-state/game-data-structure/House";
 
 type AnyGameState = GameState<any, any> | null;
 
@@ -95,6 +96,9 @@ export default class GameState<ParentGameState extends AnyGameState, ChildGameSt
 
     deserializeChildGameState(_data: any): ChildGameState {
         throw new Error(`"deserializeChildGameState" is not defined for class "${this.constructor.name}"`);
+    }
+
+    actionAfterVassalReplacement(_newVassal: House): void {
     }
 }
 

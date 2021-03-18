@@ -4,7 +4,6 @@ import CancelledGameState from "../../cancelled-game-state/CancelledGameState";
 import House from "../game-data-structure/House";
 import Player from "../Player";
 import User from "../../../server/User";
-import BiddingGameState from "../westeros-game-state/bidding-game-state/BiddingGameState";
 import ActionGameState from "../action-game-state/ActionGameState";
 import ResolveMarchOrderGameState from "../action-game-state/resolve-march-order-game-state/ResolveMarchOrderGameState";
 import CombatGameState from "../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
@@ -152,6 +151,7 @@ export class ReplacePlayerByVassal extends VoteType {
                 forbiddenCommanders.push(combat.attacker);
         }
 
+        // Find new commander beginning with the potential winner so he cannot simply march into the vassals regions now
         let newCommander: House | null = null;
         for (const house of vote.ingame.game.getPotentialWinners()) {
             if (!vote.ingame.isVassalHouse(house) && !forbiddenCommanders.includes(house)) {
@@ -171,8 +171,7 @@ export class ReplacePlayerByVassal extends VoteType {
             }
         });
 
-        // Assign this vassal to the leading house, so the current leading house cannot march into
-        // the vassal regions
+        // Assign new commander to replaced house
         vote.ingame.game.vassalRelations.set(oldPlayer.house, newCommander);
 
         // Broadcast new vassal relations before deletion of player!
@@ -186,20 +185,10 @@ export class ReplacePlayerByVassal extends VoteType {
         vote.ingame.log({
             type: "player-replaced",
             oldUser: this.replaced.id,
-            house: this.forHouse.id
+            house: oldPlayer.house.id
         });
 
-        if (vote.ingame.leafState instanceof BiddingGameState &&
-            vote.ingame.leafState.participatingHouses.includes(oldPlayer.house)) {
-                vote.ingame.leafState.bids.set(oldPlayer.house, 0);
-                vote.ingame.entireGame.broadcastToClients({
-                    type: "bid-done",
-                    houseId: oldPlayer.house.id,
-                    // We can reveal the value here as it's clear vassals bid 0
-                    value: 0
-                });
-                vote.ingame.leafState.checkAndProceedEndOfBidding();
-        }
+        vote.ingame.leafState.actionAfterVassalReplacement(oldPlayer.house);
     }
 
     serializeToClient(): SerializedReplacePlayerByVassal {

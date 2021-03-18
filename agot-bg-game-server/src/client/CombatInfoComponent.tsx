@@ -63,7 +63,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                         {this.attacker.houseCard ? (
                             <HouseCardComponent houseCard={this.attacker.houseCard}
                                                 size="small" />
-                        ) : this.attacker.attackerHouseCardChosen 
+                        ) : this.attacker.attackerHouseCardChosen
                         ? <div
                                 className="vertical-game-card small"
                                 style={{
@@ -78,7 +78,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                         {this.defender.houseCard ? (
                             <HouseCardComponent houseCard={this.defender.houseCard}
                                                 size="small" />
-                        ) : this.defender.defenderHouseCardChosen 
+                        ) : this.defender.defenderHouseCardChosen
                         ? <div
                                 className="vertical-game-card small"
                                 style={{

@@ -589,6 +589,22 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         placeOrders.readyHouses = placeOrders.readyHouses.filter((h: string) => placeOrders.forVassals ? vassalHouses.includes(h) : nonVassalHouses.includes(h));
                     }
                 }
+
+                if (ingame.childGameState.type == "action"
+                    && ingame.childGameState.childGameState.type == "resolve-march-order"
+                    && ingame.childGameState.childGameState.childGameState.type == "combat"
+                    && ingame.childGameState.childGameState.childGameState.childGameState.type == "before-combat-house-card-abilities-resolution"
+                    && ingame.childGameState.childGameState.childGameState.childGameState.childGameState.type == "house-card-resolution") {
+                        const houseCardResolution = ingame.childGameState.childGameState.childGameState.childGameState.childGameState;
+                        if (houseCardResolution.childGameState.type == "aeron-damphair-dwd-ability") {
+                            const oldAeronState = houseCardResolution.childGameState;
+
+                            houseCardResolution.childGameState = {
+                                type: "aeron-damphair-dwd-ability",
+                                house: oldAeronState.childGameState.participatingHouses[0]
+                            }
+                        }
+                }
             }
 
             return serializedGame;

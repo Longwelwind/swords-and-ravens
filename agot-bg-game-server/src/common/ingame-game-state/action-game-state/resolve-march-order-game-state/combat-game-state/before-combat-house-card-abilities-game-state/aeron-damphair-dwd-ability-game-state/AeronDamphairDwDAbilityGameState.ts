@@ -7,12 +7,13 @@ import {ClientMessage} from "../../../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../../../messages/ServerMessage";
 import IngameGameState from "../../../../../IngameGameState";
 import BeforeCombatHouseCardAbilitiesGameState from "../BeforeCombatHouseCardAbilitiesGameState";
-import BiddingGameState, { SerializedBiddingGameState } from "../../../../../westeros-game-state/bidding-game-state/BiddingGameState";
+import User from "../../../../../../../server/User";
 
 
 export default class AeronDamphairDwDAbilityGameState extends GameState<
-    BeforeCombatHouseCardAbilitiesGameState["childGameState"], BiddingGameState<AeronDamphairDwDAbilityGameState>
-> {
+    BeforeCombatHouseCardAbilitiesGameState["childGameState"]> {
+    house: House;
+
     get game(): Game {
         return this.parentGameState.game;
     }
@@ -26,9 +27,8 @@ export default class AeronDamphairDwDAbilityGameState extends GameState<
     }
 
     firstStart(house: House): void {
-        if (house.powerTokens > 0) {
-            this.setChildGameState(new BiddingGameState(this)).firstStart([house]);
-        } else {
+        this.house = house;
+        if (house.powerTokens == 0) {
             this.ingame.log({
                 type: "aeron-damphair-used",
                 house: house.id,
@@ -39,75 +39,72 @@ export default class AeronDamphairDwDAbilityGameState extends GameState<
         }
     }
 
-    onBiddingGameStateEnd(result: [number, House[]][]): void {
-        // Removing power tokens is done by BiddingGameState!
-        if (result.length != 1) {
-            return;
-        }
-
-        const givenTokens = result[0][0];
-        const houses = result[0][1];
-        if (houses.length != 1) {
-            return;
-        }
-
-        const house = houses[0];
-
-        const houseCombatData = this.combatGameState.houseCombatDatas.get(house);
-        const aeronDamphairHouseCard = houseCombatData.houseCard;
-
-        // This should normally never happen as there's no way for the houseCard of a house to
-        // be null if this game state was triggered.
-        if (aeronDamphairHouseCard == null) {
-            throw new Error();
-        }
-
-        aeronDamphairHouseCard.combatStrength += givenTokens;
-
-        this.entireGame.broadcastToClients({
-            type: "manipulate-combat-house-card",
-            manipulatedHouseCards: [aeronDamphairHouseCard].map(hc => [hc.id, hc.serializeToClient()])
-        });
-
-        this.ingame.log({
-            type: "aeron-damphair-used",
-            house: house.id,
-            tokens: givenTokens
-        });
-
-        this.parentGameState.onHouseCardResolutionFinish(house);
-    }
-
     onPlayerMessage(player: Player, message: ClientMessage): void {
-        this.childGameState.onPlayerMessage(player, message);
+        if (message.type == "bid") {
+            if (this.ingame.getControllerOfHouse(this.house) != player) {
+                return;
+            }
+
+            const pt = Math.max(0, Math.min(message.powerTokens, this.house.powerTokens));
+
+            const houseCombatData = this.combatGameState.houseCombatDatas.get(this.house);
+            const aeronDamphairHouseCard = houseCombatData.houseCard;
+
+            // This should normally never happen as there's no way for the houseCard of a house to
+            // be null if this game state was triggered.
+            if (aeronDamphairHouseCard == null) {
+                throw new Error();
+            }
+
+            this.ingame.changePowerTokens(this.house, -pt);
+            aeronDamphairHouseCard.combatStrength += pt;
+
+            this.entireGame.broadcastToClients({
+                type: "manipulate-combat-house-card",
+                manipulatedHouseCards: [aeronDamphairHouseCard].map(hc => [hc.id, hc.serializeToClient()])
+            });
+
+            this.ingame.log({
+                type: "aeron-damphair-used",
+                house: this.house.id,
+                tokens: pt
+            });
+
+            this.parentGameState.onHouseCardResolutionFinish(this.house);
+        }
     }
 
-    onServerMessage(message: ServerMessage): void {
-        this.childGameState.onServerMessage(message);
+    getWaitedUsers(): User[] {
+        return [this.ingame.getControllerOfHouse(this.house).user];
     }
 
-    serializeToClient(admin: boolean, player: Player | null): SerializedAeronDamphairDwDAbilityGameState {
+    onServerMessage(_message: ServerMessage): void {
+    }
+
+    sendPowerTokens(powerTokens: number): void {
+        this.entireGame.sendMessageToServer({
+            type: "bid",
+            powerTokens: powerTokens
+        });
+    }
+
+    serializeToClient(_admin: boolean, _player: Player | null): SerializedAeronDamphairDwDAbilityGameState {
         return {
             type: "aeron-damphair-dwd-ability",
-            childGameState: this.childGameState.serializeToClient(admin, player)
+            house: this.house.id
         };
     }
 
     static deserializeFromServer(houseCardResolution: BeforeCombatHouseCardAbilitiesGameState["childGameState"], data: SerializedAeronDamphairDwDAbilityGameState): AeronDamphairDwDAbilityGameState {
         const aeronDamphairDwDAbilityGameState = new AeronDamphairDwDAbilityGameState(houseCardResolution);
 
-        aeronDamphairDwDAbilityGameState.childGameState = aeronDamphairDwDAbilityGameState.deserializeChildGameState(data.childGameState);
+        aeronDamphairDwDAbilityGameState.house = houseCardResolution.game.houses.get(data.house);
 
         return aeronDamphairDwDAbilityGameState;
-    }
-
-    deserializeChildGameState(data: SerializedAeronDamphairDwDAbilityGameState["childGameState"]): AeronDamphairDwDAbilityGameState["childGameState"] {
-        return BiddingGameState.deserializeFromServer(this, data);
-
     }
 }
 
 export interface SerializedAeronDamphairDwDAbilityGameState {
     type: "aeron-damphair-dwd-ability";
-    childGameState: SerializedBiddingGameState;
+    house: string;
 }
