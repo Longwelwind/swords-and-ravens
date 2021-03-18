@@ -27,6 +27,7 @@ import stoneThroneImage from "../../public/images/icons/stone-throne.svg";
 import cancelImage from "../../public/images/icons/cancel.svg";
 import ravenImage from "../../public/images/icons/raven.svg";
 import diamondHiltImage from "../../public/images/icons/diamond-hilt.svg";
+import diamondHiltUsedImage from "../../public/images/icons/diamond-hilt-used.svg";
 import hourglassImage from "../../public/images/icons/hourglass.svg";
 import mammothImage from "../../public/images/icons/mammoth.svg";
 import chatBubble from "../../public/images/icons/chat-bubble.svg";
@@ -146,7 +147,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                         }
                                                         placement="right"
                                                     >
-                                                        <img src={i == 0 ? stoneThroneImage : i == 1 ? diamondHiltImage : ravenImage} width={32}/>
+                                                        <img src={i == 0 ? stoneThroneImage : i == 1 ? this.game.valyrianSteelBladeUsed ? diamondHiltUsedImage : diamondHiltImage : ravenImage} width={32}/>
                                                     </OverlayTrigger>
                                                 </Col>
                                                 {tracker.map((h, i) => (
