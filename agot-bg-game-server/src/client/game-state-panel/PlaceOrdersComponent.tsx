@@ -104,7 +104,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
     }
 
     showButtons(): boolean {
-        return !this.props.gameState.forVassals || this.props.gameState.ingameGameState.getVassalsControlledByPlayer(this.player).length > 0;
+        return !this.props.gameState.forVassals || this.props.gameState.ingame.getVassalsControlledByPlayer(this.player).length > 0;
     }
 
     isOrderAvailable(order: Order): boolean {
