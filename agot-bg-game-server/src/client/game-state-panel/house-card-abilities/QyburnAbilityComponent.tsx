@@ -18,7 +18,7 @@ export default class QyburnAbilityComponent extends Component<GameStateComponent
         return (
             <>
                 <Col xs={12}>
-                    <b>Qyburn</b>: Lannister may discard two of available Power tokens to choose a House card in any player&apos;s discard pile. Qyburn gains the printed combat strength and comabat icons of that card, ignoring its text ability.
+                    <b>Qyburn</b>: Lannister may discard two of available Power tokens to choose a House card in any player&apos;s discard pile. Qyburn gains the printed combat strength and combat icons of that card, ignoring its text ability.
                 </Col>
                 {renderChildGameState(this.props, [
                     [SimpleChoiceGameState, SimpleChoiceComponent],

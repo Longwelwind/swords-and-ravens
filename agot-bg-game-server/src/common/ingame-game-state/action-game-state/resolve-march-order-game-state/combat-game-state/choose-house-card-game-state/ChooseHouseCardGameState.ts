@@ -120,7 +120,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                 houseId: player.house.id
             });
 
-            // Reset comabatGameState.clientGameState to retrigger ChooseHouseCardGameState
+            // Reset combatGameState.clientGameState to retrigger ChooseHouseCardGameState
             this.combatGameState.proceedToChooseGeneral();
         }
     }
