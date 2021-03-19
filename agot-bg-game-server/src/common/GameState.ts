@@ -50,6 +50,14 @@ export default class GameState<ParentGameState extends AnyGameState, ChildGameSt
                 : false;
     }
 
+    getFirstChildGameState(gameState: any): AnyGameState | null {
+        return this instanceof gameState
+            ? this
+            : this.childGameState
+                ? this.childGameState.getFirstChildGameState(gameState)
+                : null;
+    }
+
     getWaitedUsers(): User[] {
         if (this.childGameState) {
             return this.childGameState.getWaitedUsers();

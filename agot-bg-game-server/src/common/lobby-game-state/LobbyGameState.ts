@@ -94,7 +94,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 }
             }
 
-            let housesToCreate = this.getAvailableHouses().map(h => h.id); 
+            let housesToCreate = this.getAvailableHouses().map(h => h.id);
             if (this.entireGame.gameSettings.setupId == "learn-the-game" && !this.entireGame.gameSettings.vassals) {
                 const lobbyHouses = this.players.keys.map(lh => lh.id);
                 housesToCreate = housesToCreate.filter(h => lobbyHouses.includes(h));
