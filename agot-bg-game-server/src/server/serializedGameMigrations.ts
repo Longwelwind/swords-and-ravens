@@ -5,6 +5,7 @@ import { CrowKillersStep } from "../common/ingame-game-state/westeros-game-state
 import { SerializedHouse } from "../common/ingame-game-state/game-data-structure/House";
 import { HouseCardState } from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import { vassalHouseCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/vassalHouseCards";
+import _ from "lodash";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
     {
@@ -568,6 +569,42 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
                 ingame.game.vassalHouseCards = vassalHouseCards.map(hc => [hc.id, hc.serializeToClient()]);
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "20",
+        migrate: (serializedGame: any) => {
+            // Migration for #TBD
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                if (ingame.childGameState.type == "planning") {
+                    const planning = ingame.childGameState;
+                    if (planning.childGameState.type == "place-orders") {
+                        const placeOrders = planning.childGameState;
+                        const vassalHouses = new BetterMap(ingame.game.vassalRelations).keys as string[];
+                        const nonVassalHouses = _.difference(ingame.game.houses.map((sh: SerializedHouse) => sh.id), vassalHouses);
+                        placeOrders.readyHouses = placeOrders.readyHouses.filter((h: string) => placeOrders.forVassals ? vassalHouses.includes(h) : nonVassalHouses.includes(h));
+                    }
+                }
+
+                if (ingame.childGameState.type == "action"
+                    && ingame.childGameState.childGameState.type == "resolve-march-order"
+                    && ingame.childGameState.childGameState.childGameState.type == "combat"
+                    && ingame.childGameState.childGameState.childGameState.childGameState.type == "before-combat-house-card-abilities-resolution"
+                    && ingame.childGameState.childGameState.childGameState.childGameState.childGameState.type == "house-card-resolution") {
+                        const houseCardResolution = ingame.childGameState.childGameState.childGameState.childGameState.childGameState;
+                        if (houseCardResolution.childGameState.type == "aeron-damphair-dwd-ability") {
+                            const oldAeronState = houseCardResolution.childGameState;
+
+                            houseCardResolution.childGameState = {
+                                type: "aeron-damphair-dwd-ability",
+                                house: oldAeronState.childGameState.participatingHouses[0]
+                            }
+                        }
+                }
             }
 
             return serializedGame;

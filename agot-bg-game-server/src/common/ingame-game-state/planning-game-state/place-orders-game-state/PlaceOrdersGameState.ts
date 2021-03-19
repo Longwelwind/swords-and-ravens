@@ -32,7 +32,7 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
      */
     @observable forVassals: boolean;
 
-    get ingameGameState(): IngameGameState {
+    get ingame(): IngameGameState {
         return this.parentGameState.parentGameState;
     }
 
@@ -41,7 +41,7 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
     }
 
     get game(): Game {
-        return this.ingameGameState.game;
+        return this.ingame.game;
     }
 
     get world(): World {
@@ -49,25 +49,33 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
     }
 
     get entireGame(): EntireGame {
-        return this.ingameGameState.entireGame;
+        return this.ingame.entireGame;
+    }
+
+    get participatingHouses(): House[] {
+        return this.forVassals ? this.game.houses.values.filter(h => this.ingame.isVassalHouse(h)) : this.game.houses.values.filter(h => !this.ingame.isVassalHouse(h));
     }
 
     firstStart(orders = new BetterMap<Region, Order>(), forVassals = false): void {
         this.placedOrders = orders;
         this.forVassals = forVassals;
 
-        if (!this.forVassals || this.ingameGameState.getVassalHouses().length > 0) {
-            this.ingameGameState.log({
+        if (!this.forVassals || this.ingame.getVassalHouses().length > 0) {
+            this.ingame.log({
                 type: "planning-phase-began",
                 forVassals: this.forVassals
             });
         }
 
         // Automatically set ready for houses which can't place orders
-        this.game.houses.values.forEach(h => {
-            // The easiest way is to simply call this.setReady() as it checks for canReady
-            // but this from now on disables the possibilty to bypass canReady :(
-            this.setReady(this.ingameGameState.getControllerOfHouse(h));
+        this.ingame.players.forEach(p => {
+            const availableRegionsForOrders = this.forVassals
+            ? this.ingame.getVassalsControlledByPlayer(p).reduce((count, h) => count + this.getPossibleRegionsForOrders(h).length, 0)
+            : this.getPossibleRegionsForOrders(p.house).length;
+
+            if (availableRegionsForOrders == 0) {
+                this.setReady(p);
+            }
         });
     }
 
@@ -76,29 +84,42 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
             return;
         }
 
-        this.readyHouses.push(player.house);
+        if (this.forVassals) {
+            this.readyHouses.push(...this.ingame.getVassalsControlledByPlayer(player));
+        } else {
+            this.readyHouses.push(player.house);
+        }
 
-        if (!this.forVassals || this.ingameGameState.getVassalsControlledByPlayer(player).length > 0) {
-            this.ingameGameState.log({
+        // This is for debug to allow bypassing canReady and a player sending "ready" more than once
+        // It doesn't hurt on the live system either...
+        this.readyHouses = _.uniq(this.readyHouses);
+
+        if (!this.forVassals || this.ingame.getVassalsControlledByPlayer(player).length > 0) {
+            this.ingame.log({
                 type: "player-action",
                 house: player.house.id,
                 action: PlayerActionType.ORDERS_PLACED
-            })
+            });
         }
 
+        this.entireGame.broadcastToClients({
+            type: "player-ready",
+            userId: player.user.id
+        });
+
         // Check if all players are ready
-        if (this.readyHouses.length == this.ingameGameState.players.size) {
+        this.checkAllPlayersReady();
+    }
+
+    private checkAllPlayersReady(): void {
+        if (this.readyHouses.length == this.participatingHouses.length) {
             this.planningGameState.onPlaceOrderFinish(this.forVassals, this.placedOrders as BetterMap<Region, Order>);
-        } else {
-            this.entireGame.broadcastToClients({
-                type: "player-ready",
-                userId: player.user.id
-            });
         }
     }
 
     canUnready(player: Player): {status: boolean; reason: string} {
-        if (!this.isReady(player)) {
+        if ((this.forVassals && this.ingame.getVassalsControlledByPlayer(player).some(h => !this.isReady(h)))
+            || (!this.forVassals && !this.isReady(player.house))) {
             return {status: false, reason: "not-ready"};
         }
 
@@ -110,7 +131,9 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
             return;
         }
 
-        this.readyHouses.splice(this.readyHouses.indexOf(player.house), 1);
+        this.readyHouses = this.forVassals
+                ? _.without(this.readyHouses, ...this.ingame.getVassalsControlledByPlayer(player))
+                : _.without(this.readyHouses, player.house);
 
         this.entireGame.broadcastToClients({
             type: "player-unready",
@@ -153,7 +176,7 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
                     region: region.id
                 });
 
-                this.ingameGameState.players.values.filter(p => p != player).forEach(p => {
+                this.ingame.players.values.filter(p => p != player).forEach(p => {
                     p.user.send({
                         type: "order-placed",
                         region: region.id,
@@ -181,14 +204,14 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
         const possibleRegions = this.game.world.getControlledRegions(house).filter(r => r.units.size > 0);
 
         if (!this.forVassals) {
-            if (!this.ingameGameState.isVassalHouse(house)) {
+            if (!this.ingame.isVassalHouse(house)) {
                 return possibleRegions;
             } else {
                 return [];
             }
         }
 
-        if (!this.ingameGameState.isVassalHouse(house)) {
+        if (!this.ingame.isVassalHouse(house)) {
             return [];
         }
 
@@ -206,7 +229,7 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
             // Hide orders that doesn't belong to the player
             // If admin, send all orders.
             const controller = r.getController();
-            if (admin || (player && controller != null && (controller == player.house || (this.ingameGameState.isVassalHouse(controller) && this.ingameGameState.isVassalControlledByPlayer(controller, player))))) {
+            if (admin || (player && controller != null && (controller == player.house || (this.ingame.isVassalHouse(controller) && this.ingame.isVassalControlledByPlayer(controller, player))))) {
                 return o ? o.id : null;
             }
             return null;
@@ -225,7 +248,12 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
      */
 
     canReady(player: Player): {status: boolean; reason: string} {
-        if (this.isReady(this.ingameGameState.getControllerOfHouse(player.house))) {
+        // Here we can bypass canReady for debugging
+        // return {status: true, reason: "bypassed"};
+
+        // Return false if player is already ready
+        if ((this.forVassals && this.ingame.getVassalsControlledByPlayer(player).every(h => this.isReady(h)))
+            || (!this.forVassals && this.isReady(player.house))) {
             return {status: false, reason: "already-ready"};
         }
 
@@ -261,7 +289,7 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
             return {status: false, reason: "not-all-regions-filled"};
         }, null);
 
-        return possibleError ? possibleError : {status: true, reason: ""};
+        return possibleError ? possibleError as {status: boolean; reason: string} : {status: true, reason: ""};
     }
 
     /**
@@ -300,13 +328,19 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
                 this.placedOrders.delete(region);
             }
         } else if (message.type == "player-ready") {
-            const player = this.ingameGameState.players.get(this.entireGame.users.get(message.userId));
+            const player = this.ingame.players.get(this.entireGame.users.get(message.userId));
 
-            this.readyHouses.push(player.house);
+            if (this.forVassals) {
+                this.readyHouses.push(...this.ingame.getVassalsControlledByPlayer(player));
+            } else {
+                this.readyHouses.push(player.house);
+            }
         } else if (message.type == "player-unready") {
-            const player = this.ingameGameState.players.get(this.entireGame.users.get(message.userId));
+            const player = this.ingame.players.get(this.entireGame.users.get(message.userId));
 
-            this.readyHouses.splice(this.readyHouses.indexOf(player.house), 1);
+            this.readyHouses = this.forVassals
+                ? _.without(this.readyHouses, ...this.ingame.getVassalsControlledByPlayer(player))
+                : _.without(this.readyHouses, player.house);
         }
     }
 
@@ -323,12 +357,12 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
         if (!this.forVassals) {
             return [player.house];
         } else {
-            return this.ingameGameState.getVassalsControlledByPlayer(player);
+            return this.ingame.getVassalsControlledByPlayer(player);
         }
     }
 
     getNotReadyPlayers(): Player[] {
-        return this.ingameGameState.players.values.filter(p => !this.readyHouses.includes(p.house));
+        return _.uniq(_.difference(this.participatingHouses, this.readyHouses).map(h => this.ingame.getControllerOfHouse(h)));
     }
 
     getWaitedUsers(): User[] {
@@ -336,19 +370,28 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
     }
 
     getOrdersList(house: House): Order[] {
-        return this.ingameGameState.game.getOrdersListForHouse(house);
+        return this.ingame.game.getOrdersListForHouse(house);
     }
 
     getAvailableOrders(house: House, region: Region | null = null): Order[] {
-        return this.ingameGameState.game.getAvailableOrders(this.placedOrders, house, region, this.parentGameState.planningRestrictions);
+        return this.ingame.game.getAvailableOrders(this.placedOrders, house, region, this.parentGameState.planningRestrictions);
     }
 
     isOrderRestricted(order: Order): boolean {
         return this.parentGameState.planningRestrictions.some(restriction => restriction.restriction(order.type));
     }
 
-    isReady(player: Player): boolean {
-        return this.readyHouses.includes(player.house);
+    isReady(house: House): boolean {
+        return this.readyHouses.includes(house);
+    }
+
+    /*
+     Action after vassal replacement
+    */
+
+    actionAfterVassalReplacement(newVassal: House): void {
+        this.readyHouses = _.without(this.readyHouses, newVassal);
+        this.checkAllPlayersReady();
     }
 
     static deserializeFromServer(planning: PlanningGameState, data: SerializedPlaceOrdersGameState): PlaceOrdersGameState {
