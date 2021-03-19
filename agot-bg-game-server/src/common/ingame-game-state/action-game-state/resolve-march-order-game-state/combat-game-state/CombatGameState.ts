@@ -59,6 +59,9 @@ export default class CombatGameState extends GameState<
     // decided to support no-one.
     @observable supporters = new BetterMap<House, House | null>();
 
+    @observable attackerHouseCardChosen?: string;
+    @observable defenderHouseCardChosen?: string;
+
     get attackingRegion(): Region {
         return this.attackingHouseCombatData.region;
     }

@@ -75,6 +75,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                                         houseCardStrength: this.combatGameState.getHouseCardCombatStrength(this.attacker),
                                         valyrianSteelBlade: this.combatGameState.getValyrianBladeBonus(this.attacker),
                                         total: this.combatGameState.getTotalCombatStrength(this.attacker),
+                                        attackerHouseCardChosen: this.combatGameState.attackerHouseCardChosen
                                     },
                                     {
                                         house: this.defender,
@@ -88,6 +89,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                                         houseCardStrength: this.combatGameState.getHouseCardCombatStrength(this.defender),
                                         valyrianSteelBlade: this.combatGameState.getValyrianBladeBonus(this.defender),
                                         total: this.combatGameState.getTotalCombatStrength(this.defender),
+                                        defenderHouseCardChosen: this.combatGameState.defenderHouseCardChosen
                                     }
                                 ]}
                             />
