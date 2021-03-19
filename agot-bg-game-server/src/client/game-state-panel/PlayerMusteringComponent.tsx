@@ -125,7 +125,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                             </Row>
                         </Col>
                     </>}
-                {(!this.doesControlCurrentHouse || this.props.gameState.ingame.isVassalHouse(this.house)) && 
+                {(!this.doesControlCurrentHouse || this.props.gameState.ingame.isVassalHouse(this.house)) &&
                 <Col xs={12} className="text-center">
                     Waiting for {this.house.name}...
                 </Col>}

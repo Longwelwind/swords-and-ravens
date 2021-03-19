@@ -538,6 +538,8 @@ export default class IngameGameState extends GameState<
         return !this.players.values.map(p => p.house).includes(house);
     }
 
+    // Returns (House | null) to support .includes(region.getController())
+    // but can safely be casted to House[]
     getOtherVassalFamilyHouses(house: House): (House | null)[] {
         const result: House[] = [];
         if (this.game.vassalRelations.has(house)) {
