@@ -94,8 +94,14 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 }
             }
 
+            let housesToCreate = this.getAvailableHouses().map(h => h.id); 
+            if (this.entireGame.gameSettings.setupId == "learn-the-game" && !this.entireGame.gameSettings.vassals) {
+                const lobbyHouses = this.players.keys.map(lh => lh.id);
+                housesToCreate = housesToCreate.filter(h => lobbyHouses.includes(h));
+            }
+
             this.entireGame.proceedToIngameGameState(
-                this.getAvailableHouses().map(h => h.id),
+                housesToCreate,
                 new BetterMap(this.players.map((h, u) => ([h.id, u])))
             );
         } else if (message.type == "kick-player") {
@@ -148,7 +154,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
         // If Vassals are toggled we need at least min_player_count_with_vassals
         if (this.entireGame.gameSettings.vassals) {
-            if (this.players.size < MIN_PLAYER_COUNT_WITH_VASSALS) {
+            if (this.players.size < MIN_PLAYER_COUNT_WITH_VASSALS && this.players.size != this.entireGame.selectedGameSetup.playerCount) {
                 return {success: false, reason: "not-enough-players"};
             }
         } else if (this.players.size < this.entireGame.selectedGameSetup.playerCount) {
