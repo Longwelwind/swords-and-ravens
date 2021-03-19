@@ -68,7 +68,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                         <>Vassal house <b>{this.house.name}</b> can resolve their Muster Order{this.defenseMusterOrderRegion && <> in <b>{this.defenseMusterOrderRegion.name}</b></>}.</>
                     )}
                 </Col>
-                {this.doesControlCurrentHouse ? (
+                {this.doesControlCurrentHouse &&
                     <>
                         {this.musterings.size > 0 &&
                             <Col xs={12}>
@@ -124,12 +124,11 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                                 </Col>
                             </Row>
                         </Col>
-                    </>
-                ) : (
-                    <Col xs={12} className="text-center">
-                        Waiting for {this.house.name}...
-                    </Col>
-                )}
+                    </>}
+                {(!this.doesControlCurrentHouse || this.props.gameState.ingame.isVassalHouse(this.house)) && 
+                <Col xs={12} className="text-center">
+                    Waiting for {this.house.name}...
+                </Col>}
             </>
         );
     }
