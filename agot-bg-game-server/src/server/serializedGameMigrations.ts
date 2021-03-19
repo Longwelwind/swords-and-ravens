@@ -609,6 +609,38 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "21",
+        migrate: (serializedGame: any) => {
+            // Migration for #TBD
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                if (ingame.childGameState.type == "planning") {
+                    const planning = ingame.childGameState;
+                    if (planning.childGameState.type == "place-orders") {
+                        const placeOrders = planning.childGameState;
+                        const vassalHouses = new BetterMap(ingame.game.vassalRelations).keys as string[];
+
+                        if (placeOrders.forVassals && vassalHouses.length == 0) {
+                            ingame.childGameState = {
+                                type: "action",
+                                ordersOnBoard: placeOrders.placedOrders as [string, number][],
+                                planningRestrictions: planning.planningRestrictions,
+                                childGameState: {
+                                    type: "use-raven",
+                                    childGameState: {
+                                        type: "replace-order"
+                                    }
+                                }
+                            };
+                        }
+                    }
+                }
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

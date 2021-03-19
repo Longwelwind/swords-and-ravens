@@ -67,6 +67,12 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
             });
         }
 
+        if (this.forVassals && this.ingame.getVassalHouses().length == 0) {
+            // No vassals, we can end this state
+            this.planningGameState.onPlaceOrderFinish(this.forVassals, this.placedOrders as BetterMap<Region, Order>);
+            return;
+        }
+
         // Automatically set ready for houses which can't place orders
         this.ingame.players.forEach(p => {
             const availableRegionsForOrders = this.forVassals
@@ -108,13 +114,16 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
         });
 
         // Check if all players are ready
-        this.checkAllPlayersReady();
+        this.checkAndProceedEndOfPlaceOrdersGameState();
     }
 
-    private checkAllPlayersReady(): void {
+    private checkAndProceedEndOfPlaceOrdersGameState(): boolean {
         if (this.readyHouses.length == this.participatingHouses.length) {
             this.planningGameState.onPlaceOrderFinish(this.forVassals, this.placedOrders as BetterMap<Region, Order>);
+            return true;
         }
+
+        return false;
     }
 
     canUnready(player: Player): {status: boolean; reason: string} {
@@ -391,7 +400,7 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
 
     actionAfterVassalReplacement(newVassal: House): void {
         this.readyHouses = _.without(this.readyHouses, newVassal);
-        this.checkAllPlayersReady();
+        this.checkAndProceedEndOfPlaceOrdersGameState();
     }
 
     static deserializeFromServer(planning: PlanningGameState, data: SerializedPlaceOrdersGameState): PlaceOrdersGameState {
