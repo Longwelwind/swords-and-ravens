@@ -63,6 +63,14 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
             this.houseCards.set(house, message.houseCardId
                 ? this.combatGameState.game.getHouseCardById(message.houseCardId)
                 : null);
+            
+            if (this.combatGameState.attacker == house) {
+                this.combatGameState.attackerHouseCardChosen = this.ingameGameState.isVassalHouse(house) ? "vassal" : house.id;
+            } else {
+                this.combatGameState.defenderHouseCardChosen = this.ingameGameState.isVassalHouse(house) ? "vassal" : house.id;
+            }
+
+            this.combatGameState.rerender++;
         } else if(message.type == "support-refused") {
             const house = this.combatGameState.game.houses.get(message.houseId);
             this.removeSupportForHouse(house);
@@ -84,8 +92,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
             this.houseCards.set(commandedHouse, houseCard);
 
-            const otherHouses = _.difference(this.parentGameState.game.houses.values, [commandedHouse]);
-            this.entireGame.sendMessageToClients(otherHouses.map(h => this.combatGameState.ingameGameState.getControllerOfHouse(h).user), {
+            this.entireGame.sendMessageToClients(_.without(this.entireGame.users.values, player.user), {
                 type: "house-card-chosen",
                 houseId: commandedHouse.id,
                 houseCardId: null
@@ -248,6 +255,15 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                 hcid ? combatGameState.ingameGameState.game.getHouseCardById(hcid) : null
             ]
         }));
+
+        const combat = chooseHouseCardGameState.combatGameState;
+        chooseHouseCardGameState.houseCards.keys.forEach(h => {
+            if (combat.attacker == h) {
+                combat.attackerHouseCardChosen = combat.ingameGameState.isVassalHouse(h) ? "vassal" : h.id;
+            } else {
+                combat.defenderHouseCardChosen = combat.ingameGameState.isVassalHouse(h) ? "vassal" : h.id;
+            }
+        });
 
         return chooseHouseCardGameState;
     }

@@ -6,6 +6,7 @@ import Region from "../common/ingame-game-state/game-data-structure/Region";
 import HouseCardComponent from "./game-state-panel/utils/HouseCardComponent";
 import HouseCard from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
+import houseCardsBackImages from "./houseCardsBackImages";
 
 interface HouseCombatData {
     house: House;
@@ -19,6 +20,8 @@ interface HouseCombatData {
     houseCardStrength: number;
     valyrianSteelBlade: number;
     total: number;
+    attackerHouseCardChosen?: string;
+    defenderHouseCardChosen?: string;
 }
 
 interface CombatInfoComponentProps {
@@ -60,7 +63,14 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                         {this.attacker.houseCard ? (
                             <HouseCardComponent houseCard={this.attacker.houseCard}
                                                 size="small" />
-                        ) : <div className="vertical-game-card game-card-slot small"/>}
+                        ) : this.attacker.attackerHouseCardChosen 
+                        ? <div
+                                className="vertical-game-card small"
+                                style={{
+                                    backgroundImage: `url(${houseCardsBackImages.get(this.attacker.attackerHouseCardChosen)})`
+                                }}
+                            />
+                        : <div className="vertical-game-card game-card-slot small"/>}
 
                     </div>
 
@@ -68,7 +78,14 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                         {this.defender.houseCard ? (
                             <HouseCardComponent houseCard={this.defender.houseCard}
                                                 size="small" />
-                        ) : <div className="vertical-game-card game-card-slot small"/>}
+                        ) : this.defender.defenderHouseCardChosen 
+                        ? <div
+                                className="vertical-game-card small"
+                                style={{
+                                    backgroundImage: `url(${houseCardsBackImages.get(this.defender.defenderHouseCardChosen)})`
+                                }}
+                            />
+                        : <div className="vertical-game-card game-card-slot small"/>}
                     </div>
 
                     <div style={{gridRow: "2", gridColumn: "2"}}>
