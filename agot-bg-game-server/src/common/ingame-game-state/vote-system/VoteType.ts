@@ -4,8 +4,6 @@ import CancelledGameState from "../../cancelled-game-state/CancelledGameState";
 import House from "../game-data-structure/House";
 import Player from "../Player";
 import User from "../../../server/User";
-import ActionGameState from "../action-game-state/ActionGameState";
-import ResolveMarchOrderGameState from "../action-game-state/resolve-march-order-game-state/ResolveMarchOrderGameState";
 import CombatGameState from "../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 
 export type SerializedVoteType = SerializedCancelGame | SerializedReplacePlayer | SerializedReplacePlayerByVassal;
@@ -138,25 +136,26 @@ export class ReplacePlayerByVassal extends VoteType {
     executeAccepted(vote: Vote): void {
         const oldPlayer = vote.ingame.players.values.find(p => p.user == this.replaced) as Player;
 
+        const forbiddenCommanders: House[] = [];
+        // If we are in combat we can't assign the vassal to the opponent
+        const anyCombat = vote.ingame.getFirstChildGameState(CombatGameState);
+        if (anyCombat) {
+            const combat = anyCombat as CombatGameState;
+            if (combat.isCommandingHouseInCombat(oldPlayer.house)) {
+                const commandedHouse = combat.getCommandedHouseInCombat(oldPlayer.house);
+                const enemy = combat.getEnemy(commandedHouse);
+
+                forbiddenCommanders.push(vote.ingame.getControllerOfHouse(enemy).house);
+            }
+        }
+
         // Delete the old player so the house is a vassal now
         vote.ingame.players.delete(oldPlayer.user);
 
-        const forbiddenCommanders: House[] = [];
-        // If we are in combat we can't assign the vassal to the opponent
-        if (vote.ingame.childGameState instanceof ActionGameState
-            && vote.ingame.childGameState.childGameState instanceof ResolveMarchOrderGameState
-            && vote.ingame.childGameState.childGameState.childGameState instanceof CombatGameState) {
-                const combat = vote.ingame.childGameState.childGameState.childGameState as CombatGameState;
-                forbiddenCommanders.push(combat.defender);
-                forbiddenCommanders.push(vote.ingame.getControllerOfHouse(combat.defender).house);
-                forbiddenCommanders.push(combat.attacker);
-                forbiddenCommanders.push(vote.ingame.getControllerOfHouse(combat.attacker).house);
-        }
-
         // Find new commander beginning with the potential winner so he cannot simply march into the vassals regions now
         let newCommander: House | null = null;
-        for (const house of vote.ingame.game.getPotentialWinners()) {
-            if (!vote.ingame.isVassalHouse(house) && !forbiddenCommanders.includes(house)) {
+        for (const house of vote.ingame.game.getPotentialWinners().filter(h => !vote.ingame.isVassalHouse(h))) {
+            if (!forbiddenCommanders.includes(house)) {
                 newCommander = house;
                 break;
             }
