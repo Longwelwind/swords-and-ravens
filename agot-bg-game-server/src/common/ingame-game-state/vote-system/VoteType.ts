@@ -141,14 +141,16 @@ export class ReplacePlayerByVassal extends VoteType {
         // Delete the old player so the house is a vassal now
         vote.ingame.players.delete(oldPlayer.user);
 
-        const forbiddenCommanders = [];
+        const forbiddenCommanders: House[] = [];
         // If we are in combat we can't assign the vassal to the opponent
         if (vote.ingame.childGameState instanceof ActionGameState
             && vote.ingame.childGameState.childGameState instanceof ResolveMarchOrderGameState
             && vote.ingame.childGameState.childGameState.childGameState instanceof CombatGameState) {
                 const combat = vote.ingame.childGameState.childGameState.childGameState as CombatGameState;
                 forbiddenCommanders.push(combat.defender);
+                forbiddenCommanders.push(vote.ingame.getControllerOfHouse(combat.defender).house);
                 forbiddenCommanders.push(combat.attacker);
+                forbiddenCommanders.push(vote.ingame.getControllerOfHouse(combat.attacker).house);
         }
 
         // Find new commander beginning with the potential winner so he cannot simply march into the vassals regions now
