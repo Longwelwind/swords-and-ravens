@@ -6,6 +6,7 @@ import { SerializedHouse } from "../common/ingame-game-state/game-data-structure
 import { HouseCardState } from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import { vassalHouseCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/vassalHouseCards";
 import _ from "lodash";
+//import { SerializedEntireGame } from "../common/EntireGame";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
     {
@@ -649,7 +650,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
                 for (const vote of ingame.votes) {
-                    vote.participatingPlayers = ingame.players;
+                    vote.participatingPlayers = [...ingame.players];
 
                     // Add at least the removed player for "replace-by-vassal"
                     // (there may be up to 2 more removed players but so what, it's just beauty)
@@ -661,6 +662,26 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                                 userId: vote.type.replaced,
                                 note: ""
                             });
+                        }
+                    }
+                }
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "23",
+        migrate: (serializedGame: any) => {
+            // Fix voted vassals have become active again
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                const vassalRelations = new BetterMap(ingame.game.vassalRelations);
+                for (const vassal of vassalRelations.keys) {
+                    for (const player of ingame.players) {
+                        if (player.houseId == vassal) {
+                            ingame.players = _.without(ingame.players, player);
+                            break;
                         }
                     }
                 }
