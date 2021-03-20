@@ -46,7 +46,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
             <>
                 <div style={{display: "grid", gridGap: "5px", gridTemplateColumns: "auto 1fr auto 1fr auto", justifyItems: "center", alignItems: "center"}} className="text-center">
                     <div style={{gridRow: "1", gridColumn: "1 / span 2"}}>
-                        <strong>{this.attacker.house.name}</strong><br/>
+                        <b style={{"color": this.attacker.house.color}}>{this.attacker.house.name}</b><br/>
                         <small>{this.attacker.region.name}</small><br/>
                         <small>{this.attacker.armyUnits.map(ut => ut.name).join(", ")}</small>
                     </div>
@@ -54,7 +54,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                         <img src={crossedSwordsImage} width={this.SIZE_MIDDLE_COLUMN}/>
                     </div>
                     <div style={{gridRow: "1", gridColumn: "4 / span 2"}}>
-                        <strong>{this.defender.house.name}</strong><br/>
+                        <b style={{"color": this.defender.house.color}}>{this.defender.house.name}</b><br/>
                         <small>{this.defender.region.name}</small><br/>
                         <small>{this.defender.armyUnits.map(ut => ut.name).join(", ")}</small>
                     </div>
@@ -92,7 +92,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                         {this.attacker.army} (+{this.attacker.orderBonus + this.attacker.garrison})
                     </div>
                     <div style={{gridRow: "2", gridColumn: "3"}}>
-                        <strong>Army</strong>
+                        <b>Army</b>
                     </div>
                     <div style={{gridRow: "2", gridColumn: "4"}}>
                         {this.defender.army} (+{this.defender.orderBonus + this.defender.garrison})
@@ -102,7 +102,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                         {this.attacker.support}
                     </div>
                     <div style={{gridRow: "3", gridColumn: "3"}}>
-                        <strong>Support</strong>
+                        <b>Support</b>
                     </div>
                     <div style={{gridRow: "3", gridColumn: "4"}}>
                         {this.defender.support}
@@ -112,7 +112,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                         {this.attacker.houseCardStrength}
                     </div>
                     <div style={{gridRow: "4", gridColumn: "3"}}>
-                        <strong>House card</strong>
+                        <b>House card</b>
                     </div>
                     <div style={{gridRow: "4", gridColumn: "4"}}>
                         {this.defender.houseCardStrength}
@@ -122,20 +122,20 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                         {this.attacker.valyrianSteelBlade}
                     </div>
                     <div style={{gridRow: "5", gridColumn: "3", display: showVsb ? "inline" : "none"}}>
-                        <strong>Valyrian Steel<br/>Blade</strong>
+                        <b>Valyrian Steel<br/>Blade</b>
                     </div>
                     <div style={{gridRow: "5", gridColumn: "4", display: showVsb ? "inline" : "none"}}>
                         {this.defender.valyrianSteelBlade}
                     </div>
 
                     <div style={{gridRow: "6", gridColumn: "2"}}>
-                        <strong>{this.attacker.total}</strong>
+                        <b>{this.attacker.total}</b>
                     </div>
                     <div style={{gridRow: "6", gridColumn: "3"}}>
-                        <strong>Total</strong>
+                        <b>Total</b>
                     </div>
                     <div style={{gridRow: "6", gridColumn: "4"}}>
-                        <strong>{this.defender.total}</strong>
+                        <b>{this.defender.total}</b>
                     </div>
                 </div>
             </>
