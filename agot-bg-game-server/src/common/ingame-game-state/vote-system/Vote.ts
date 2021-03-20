@@ -4,6 +4,7 @@ import VoteType, { SerializedVoteType } from "./VoteType";
 import IngameGameState from "../IngameGameState";
 import { observable } from "mobx";
 import House from "../game-data-structure/House";
+import Player, { SerializedPlayer } from "../Player";
 
 export enum VoteState {
     ONGOING,
@@ -21,9 +22,10 @@ export default class Vote {
     @observable votes: BetterMap<House, boolean>;
     createdAt: Date;
     cancelled: boolean;
+    participatingPlayers: Player[];
 
     get positiveCountToPass(): number {
-        return Math.floor(this.ingame.players.size * 2 / 3);
+        return Math.floor(this.participatingPlayers.length * 2 / 3);
     }
 
     get state(): VoteState {
@@ -36,7 +38,7 @@ export default class Vote {
 
         if (positiveCount >= this.positiveCountToPass) {
             return VoteState.ACCEPTED;
-        } else if (negativeCount > this.ingame.players.size - this.positiveCountToPass) {
+        } else if (negativeCount > this.participatingPlayers.length - this.positiveCountToPass) {
             return VoteState.REFUSED;
         } else {
             return VoteState.ONGOING;
@@ -44,13 +46,14 @@ export default class Vote {
     }
 
     constructor(
-        ingame: IngameGameState, id: string, initiator: User, type: VoteType,
+        ingame: IngameGameState, id: string, participatingPlayers: Player[], initiator: User, type: VoteType,
         votes: BetterMap<House, boolean> = new BetterMap(),
         createdAt = new Date(),
         cancelled = false
     ) {
         this.ingame = ingame;
         this.id = id;
+        this.participatingPlayers = participatingPlayers;
         this.initiator = initiator;
         this.type = type;
         this.votes = votes;
@@ -81,14 +84,15 @@ export default class Vote {
         });
     }
 
-    serializeToClient(): SerializedVote {
+    serializeToClient(admin: boolean, player: Player | null): SerializedVote {
         return {
             id: this.id,
             initiator: this.initiator.id,
             type: this.type.serializeToClient(),
             createdAt: this.createdAt.getTime(),
             votes: this.votes.entries.map(([h, v]) => [h.id, v]),
-            cancelled: this.cancelled
+            cancelled: this.cancelled,
+            participatingPlayers: this.participatingPlayers.map(p => p.serializeToClient(admin, player))
         };
     }
 
@@ -101,7 +105,7 @@ export default class Vote {
             return [house, vote];
         }));
 
-        return new Vote(ingame, data.id, initiator, type, votes, new Date(data.createdAt), data.cancelled);
+        return new Vote(ingame, data.id, data.participatingPlayers.map(sp => Player.deserializeFromServer(ingame, sp)), initiator, type, votes, new Date(data.createdAt), data.cancelled);
     }
 }
 
@@ -112,4 +116,5 @@ export interface SerializedVote {
     createdAt: number;
     votes: [string, boolean][];
     cancelled: boolean;
+    participatingPlayers: SerializedPlayer[];
 }

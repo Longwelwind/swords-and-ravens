@@ -38,7 +38,7 @@ export class CancelGame extends VoteType {
     }
 
     executeAccepted(vote: Vote): void {
-        vote.ingame.setChildGameState(new CancelledGameState(vote.ingame    )).firstStart();
+        vote.ingame.setChildGameState(new CancelledGameState(vote.ingame)).firstStart();
     }
 
     serializeToClient(): SerializedCancelGame {

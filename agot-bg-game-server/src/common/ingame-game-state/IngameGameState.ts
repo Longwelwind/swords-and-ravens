@@ -153,7 +153,7 @@ export default class IngameGameState extends GameState<
         if (message.type == "vote") {
             const vote = this.votes.get(message.vote);
 
-            if (vote.state != VoteState.ONGOING) {
+            if (vote.state != VoteState.ONGOING || !vote.participatingPlayers.includes(player)) {
                 return;
             }
 
@@ -190,13 +190,13 @@ export default class IngameGameState extends GameState<
     }
 
     createVote(initiator: User, type: VoteType): Vote {
-        const vote = new Vote(this, v4(), initiator, type);
+        const vote = new Vote(this, v4(), this.players.values, initiator, type);
 
         this.votes.set(vote.id, vote);
 
         this.entireGame.broadcastToClients({
             type: "vote-started",
-            vote: vote.serializeToClient()
+            vote: vote.serializeToClient(false, null)
         });
 
         return vote;
@@ -607,7 +607,7 @@ export default class IngameGameState extends GameState<
             players: this.players.values.map(p => p.serializeToClient(admin, player)),
             game: this.game.serializeToClient(admin, player != null && player.house.knowsNextWildlingCard),
             gameLogManager: this.gameLogManager.serializeToClient(),
-            votes: this.votes.values.map(v => v.serializeToClient()),
+            votes: this.votes.values.map(v => v.serializeToClient(admin, player)),
             childGameState: this.childGameState.serializeToClient(admin, player),
         };
     }

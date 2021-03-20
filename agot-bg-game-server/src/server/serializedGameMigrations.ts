@@ -641,6 +641,33 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "22",
+        migrate: (serializedGame: any) => {
+            // Migration for #TBD (Vote contains participatingPlayers now)
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                for (const vote of ingame.votes) {
+                    vote.participatingPlayers = ingame.players;
+
+                    // Add at least the removed player for "replace-by-vassal"
+                    // (there may be up to 2 more removed players but so what, it's just beauty)
+                    for(const vote of ingame.votes) {
+                        if (vote.type.type == "replace-player-by-vassal" &&
+                            !vote.participatingPlayers.some((sp: any) => sp.userId == (vote.type.replaced))) {
+                            vote.participatingPlayers.push({
+                                houseId: vote.type.forHouse,
+                                userId: vote.type.replaced,
+                                note: ""
+                            });
+                        }
+                    }
+                }
+            }
+
+            return serializedGame;
+        }
     }
 ];
 
