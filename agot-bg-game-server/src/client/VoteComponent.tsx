@@ -42,7 +42,7 @@ export default class VoteComponent extends Component<VoteComponentProps> {
                         </Col>
                         <Col>
                             <Row>
-                                {this.props.ingame.players.values.map(p => (
+                                {this.vote.participatingPlayers.map(p => (
                                     <Col xs={"auto"} key={p.user.id}>
                                         <div className="mb-2" key={p.user.id}>
                                             <div className="influence-icon"
