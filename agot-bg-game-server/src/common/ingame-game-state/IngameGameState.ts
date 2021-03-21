@@ -380,8 +380,6 @@ export default class IngameGameState extends GameState<
             } else if (message.trackerI == 2) {
                 this.game.kingsCourtTrack = newOrder;
             }
-        } else if (message.type == "change-valyrian-steel-blade-use") {
-            this.game.valyrianSteelBladeUsed = message.used;
         } else if (message.type == "update-westeros-decks") {
             this.game.westerosDecks = message.westerosDecks.map(wd => wd.map(wc => WesterosCard.deserializeFromServer(wc)));
         } else if (message.type == "hide-top-wildling-card") {
