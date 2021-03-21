@@ -75,6 +75,9 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                         }
                         <Col xs={12}>
                         {this.props.gameClient.authenticatedPlayer && this.showButtons() && (
+                                <><Row className="justify-content-center">
+                                    Click into one of the highlighted regions to assign an order.
+                                </Row> 
                                 <Row className="justify-content-center">
                                     <Col xs="auto">
                                         <Button
@@ -92,7 +95,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                                             Unready
                                         </Button>
                                     </Col>
-                                </Row>
+                                </Row></>
                             )}
                             <Row>
                                 <div className="text-center" style={{marginTop: 10}}>
