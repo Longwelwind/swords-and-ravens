@@ -396,6 +396,9 @@ export default class CombatGameState extends GameState<
             const units = message.army.map(uid => region.units.get(uid));
 
             this.houseCombatDatas.get(house).army = units;
+        }  else if (message.type == "change-valyrian-steel-blade-use") {
+            this.game.valyrianSteelBladeUsed = message.used;
+            this.rerender++;
         } else {
             this.childGameState.onServerMessage(message);
         }

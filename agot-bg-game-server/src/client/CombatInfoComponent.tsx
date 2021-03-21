@@ -118,13 +118,13 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                         {this.defender.houseCardStrength}
                     </div>
 
-                    <div style={{gridRow: "5", gridColumn: "2", display: showVsb ? "inline" : "none"}}>
+                    <div style={{gridRow: "5", gridColumn: "2"}} className={showVsb ? "" : "displayNone"}>
                         {this.attacker.valyrianSteelBlade}
                     </div>
-                    <div style={{gridRow: "5", gridColumn: "3", display: showVsb ? "inline" : "none"}}>
+                    <div style={{gridRow: "5", gridColumn: "3"}} className={showVsb ? "" : "displayNone"}>
                         <b>Valyrian Steel<br/>Blade</b>
                     </div>
-                    <div style={{gridRow: "5", gridColumn: "4", display: showVsb ? "inline" : "none"}}>
+                    <div style={{gridRow: "5", gridColumn: "4"}} className={showVsb ? "" : "displayNone"}>
                         {this.defender.valyrianSteelBlade}
                     </div>
 
