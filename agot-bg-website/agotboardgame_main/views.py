@@ -137,7 +137,7 @@ def about(request):
         {"name": "A Feast for Crows"},
         {"name": "A Dance with Dragons", "done": True},
         {"name": "Mother of Dragons", "children": [
-            {"name": "Vassals", "done": Truee},
+            {"name": "Vassals", "done": True},
             {"name": "House Arryn"},
             {"name": "Iron Bank"},
             {"name": "Essos and House Targaryen"}
