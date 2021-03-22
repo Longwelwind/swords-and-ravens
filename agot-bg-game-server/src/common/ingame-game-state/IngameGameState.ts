@@ -153,7 +153,7 @@ export default class IngameGameState extends GameState<
         if (message.type == "vote") {
             const vote = this.votes.get(message.vote);
 
-            if (vote.state != VoteState.ONGOING || !vote.participatingPlayers.includes(player)) {
+            if (vote.state != VoteState.ONGOING || !vote.participatingPlayers.some(p => p.user.id == player.user.id)) {
                 return;
             }
 
