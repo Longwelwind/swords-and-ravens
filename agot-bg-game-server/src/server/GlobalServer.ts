@@ -266,7 +266,7 @@ export default class GlobalServer {
     }
 
     onWaitedUsers(game: EntireGame, users: User[]): void {
-        this.websiteClient.notifyUsers(game.id, users.map(u => u.id));
+        this.websiteClient.notifyUsers(game.id, users.filter(u => !u.connected).map(u => u.id));
     }
 
     onClose(client: WebSocket): void {
