@@ -21,6 +21,36 @@ logger = logging.getLogger(__name__)
 
 def index(request):
     posts = [
+            "title": "An update on Swords and Ravens",
+            "content": """
+            <p>
+                These past few months has seen the introduction of 2 major features to <b>Swords
+                and Ravens</b>: the Dance of Dragons expansion (courtesy of mmasztalerczuk and Gereon), and
+                the Vassal feature from Mother of Dragons (courtesy of Gereon). You can now
+                create a game. Remember though that they are still in Beta, and that bugs might still happen.
+            </p>
+            <p>
+                This month also marks the 1-year anniversary of S&R! More than 1400 games have been played up until now,
+                and the platform draws around active 300 players every day. 🎉<br/>
+            </p>
+            <p>
+                If you've monitored the activity of the GitHub repository, you might have noticed that
+                I, Longwelwind, have not actively contributed to the project for a few months now. Indeed, while I greatly
+                enjoyed coding S&R at first, my time and my motivation for the project diminished over time, and I'm
+                now at a point where I'd like to move on to other projects. I've handed the keys to the kingdoms
+                (i.e. admin rights to the production server) to Gereon, who has been
+                contributing to the project since its beginning and to whom we can thank for 
+                all the recent additions to the platform.
+            </p>
+            <p>
+                As for me, I'm not done with online board games! I've learned a lot while developping S&R,
+                and I'm currently experimenting on <b>Ravens</b>, a library that would allow
+                anyone with coding skills to develop their own online-multiplayer board game. While it's still
+                in the prototype phase at the moment, I hope I'll have a working beta for those who are interested.
+            </p>
+        """,
+            "created_at": date(day=22, month=3, year=2021)
+        },
         {
             "title": "Swords and Ravens after 2 months: some numbers and what's to come!",
             "content": """
