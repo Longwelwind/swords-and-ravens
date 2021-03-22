@@ -101,6 +101,14 @@ export default class ChatClient {
         if (!channel.connected) {
             return;
         }
+
+        const authenticatedUser = this.gameClient.authenticatedUser;
+
+        // Only authenticated users can send messages
+        if (!authenticatedUser || !this.gameClient.entireGame || !this.gameClient.entireGame.users.has(authenticatedUser.id)) {
+            return;
+        }
+
         if (text == null || text.match(/^\s*$/)){
             return;
         }
@@ -132,6 +140,10 @@ export default class ChatClient {
         // the Entire game has been received from the server.
         if (this.gameClient.entireGame == null) {
             throw new Error();
+        }
+
+        if (!this.gameClient.entireGame.users.has(data.user_id)) {
+            return;
         }
 
         const id = data.id;
