@@ -135,9 +135,9 @@ def about(request):
             {"name": "Tides of Battle"}
         ]},
         {"name": "A Feast for Crows"},
-        {"name": "A Dance with Dragons"},
+        {"name": "A Dance with Dragons", "done": True},
         {"name": "Mother of Dragons", "children": [
-            {"name": "Vassals", "next": True},
+            {"name": "Vassals", "done": Truee},
             {"name": "House Arryn"},
             {"name": "Iron Bank"},
             {"name": "Essos and House Targaryen"}
