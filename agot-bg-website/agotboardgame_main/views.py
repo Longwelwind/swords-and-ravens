@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 def index(request):
     posts = [
+        {
             "title": "An update on Swords and Ravens",
             "content": """
             <p>
