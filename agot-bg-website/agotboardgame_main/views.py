@@ -24,10 +24,11 @@ def index(request):
             "title": "An update on Swords and Ravens",
             "content": """
             <p>
-                These past few months has seen the introduction of 2 major features to <b>Swords
+                These past few months have seen the introduction of 2 major features to <b>Swords
                 and Ravens</b>: the Dance of Dragons expansion (courtesy of mmasztalerczuk and Gereon), and
                 the Vassal feature from Mother of Dragons (courtesy of Gereon). You can now
-                create a game. Remember though that they are still in Beta, and that bugs might still happen.
+                create a game and toggle these features to test them out! Remember though that they are still
+                in Beta, and that bugs might still happen.
             </p>
             <p>
                 This month also marks the 1-year anniversary of S&R! More than 1400 games have been played up until now,
