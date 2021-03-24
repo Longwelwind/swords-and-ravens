@@ -39,7 +39,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             <Col xs="auto">
                                 <select id="setups" name="setups"
                                     value={this.gameSettings.setupId}
-                                    disabled={!this.canChangeGameSettings}
                                     onChange={e => this.onSetupChange(e.target.value)}>
                                     {this.createSetupItems()}
                                 </select>
@@ -49,7 +48,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             <Col xs="auto">
                                 <select id="player-count" name="playerCount"
                                     value={this.gameSettings.playerCount}
-                                    disabled={!this.canChangeGameSettings}
                                     onChange={e => this.onPlayerCountChange(e.target.value)}>
                                     {this.createPlayerCountItems()}
                                 </select>
@@ -70,7 +68,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                             </Tooltip>}>
                                             <label htmlFor="adwd-house-cards">Use <i>A Dance with Dragons</i> house cards (BETA)</label>
                                         </OverlayTrigger>}
-                                    disabled={!this.canChangeGameSettings || this.props.entireGame.gameSettings.setupId == "a-dance-with-dragons"}
+                                    disabled={this.props.entireGame.gameSettings.setupId == "a-dance-with-dragons"}
                                     checked={this.gameSettings.adwdHouseCards}
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.adwdHouseCards = !this.gameSettings.adwdHouseCards)}
                                 />
@@ -84,13 +82,30 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     label={
                                         <OverlayTrigger overlay={
                                             <Tooltip id="random-houses-tooltip">
-                                                Houses will be randomized before the game starts when this option is selected.
+                                                All houses will be randomized before the game starts when this option is selected.
                                             </Tooltip>}>
                                             <label htmlFor="random-houses-setting">Randomize houses</label>
                                         </OverlayTrigger>}
-                                    disabled={!this.canChangeGameSettings}
                                     checked={this.gameSettings.randomHouses}
-                                    onChange={() => this.changeGameSettings(() => this.gameSettings.randomHouses = !this.gameSettings.randomHouses)}
+                                    onChange={() => this.onRandomHousesChange()}
+                                />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="random-chosen-houses-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="random-chosen-houses-tooltip">
+                                                Only chosen houses will be randomized before the game starts when this option is selected.
+                                                This way users can define player and vassal houses and are still able to randomize the player houses.
+                                            </Tooltip>}>
+                                            <label htmlFor="random-chosen-houses-setting">Randomize chosen houses</label>
+                                        </OverlayTrigger>}
+                                    checked={this.gameSettings.randomChosenHouses}
+                                    onChange={() => this.onRandomChosenHousesChange()}
                                 />
                             </Col>
                         </Row>
@@ -106,7 +121,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                             </Tooltip>}>
                                             <label htmlFor="vassals-setting">MoD Vassals (BETA)</label>
                                         </OverlayTrigger>}
-                                    disabled={!this.canChangeGameSettings}
                                     checked={this.gameSettings.vassals}
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.vassals = !this.gameSettings.vassals)}
                                 />
@@ -124,7 +138,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                             </Tooltip>}>
                                             <label htmlFor="sea-orders-setting">MoD Sea Order Tokens (BETA)</label>
                                         </OverlayTrigger>}
-                                    disabled={!this.canChangeGameSettings}
                                     checked={this.gameSettings.seaOrderTokens}
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.seaOrderTokens = !this.gameSettings.seaOrderTokens)}
                                 />
@@ -142,7 +155,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                             </Tooltip>}>
                                             <label htmlFor="westeros-phase-variant-setting">CoK Westeros Phase Variant</label>
                                         </OverlayTrigger>}
-                                    disabled={!this.canChangeGameSettings}
                                     checked={this.gameSettings.cokWesterosPhase}
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.cokWesterosPhase = !this.gameSettings.cokWesterosPhase)}
                                 />
@@ -164,7 +176,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     </Tooltip>}>
                                     <label htmlFor="pbem-setting">PBEM</label>
                                 </OverlayTrigger>}
-                            disabled={!this.canChangeGameSettings}
                             checked={this.gameSettings.pbem}
                             onChange={() => this.changeGameSettings(() => this.gameSettings.pbem = !this.gameSettings.pbem)}
                         />
@@ -197,6 +208,10 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
     }
 
     onSetupChange(newVal: string): void {
+        if (!this.canChangeGameSettings) {
+            return;
+        }
+
         this.gameSettings.setupId = newVal;
 
         // On setup change set player count to it's default value which should be the highest value (last element)
@@ -209,9 +224,29 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
     }
 
     onPlayerCountChange(newVal: string): void {
+        if (!this.canChangeGameSettings) {
+            return;
+        }
+
         this.gameSettings.playerCount = parseInt(newVal);
 
         this.changeGameSettings();
+    }
+
+    onRandomChosenHousesChange(): void {
+        if (!this.entireGame.gameSettings.randomChosenHouses && this.entireGame.gameSettings.randomHouses) {
+            return;
+        }
+
+        this.changeGameSettings(() => this.entireGame.gameSettings.randomChosenHouses = !this.entireGame.gameSettings.randomChosenHouses)
+    }
+
+    onRandomHousesChange(): void {
+        if (!this.entireGame.gameSettings.randomHouses && this.entireGame.gameSettings.randomChosenHouses) {
+            return;
+        }
+
+        this.changeGameSettings(() => this.entireGame.gameSettings.randomHouses = !this.entireGame.gameSettings.randomHouses)
     }
 
     /**
@@ -219,6 +254,10 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
      * @param action Function that modifies gameSettings
      */
     changeGameSettings(action: () => void = () => {}): void {
+        if (!this.canChangeGameSettings) {
+            return;
+        }
+
         action();
 
         this.props.entireGame.updateGameSettings(this.gameSettings);

@@ -76,22 +76,20 @@ export default class LobbyGameState extends GameState<EntireGame> {
             }
 
             if (this.entireGame.gameSettings.randomHouses) {
-                if (this.entireGame.gameSettings.vassals) {
-                    // Assign a random house to the players
-                    const allShuffledHouses = _.shuffle(this.getAvailableHouses());
-                    const connectedUsers = this.players.values;
-                    this.players = new BetterMap();
-                    for(const user of connectedUsers) {
-                        this.players.set(allShuffledHouses.splice(0, 1)[0], user);
-                    }
-                } else {
-                    const shuffled = shuffle(this.players.entries);
+                // Assign a random house to the players
+                const allShuffledHouses = _.shuffle(this.getAvailableHouses());
+                const connectedUsers = this.players.values;
+                this.players = new BetterMap();
+                for(const user of connectedUsers) {
+                    this.players.set(allShuffledHouses.splice(0, 1)[0], user);
+                }
+            } else if (this.entireGame.gameSettings.randomChosenHouses) {
+                const shuffled = shuffle(this.players.entries);
 
                     const lobbyHouses = this.players.keys;
                     for (let i = 0; i < shuffled.length; i++) {
                         this.players.set(lobbyHouses[i], shuffled[i][1]);
                     }
-                }
             }
 
             let housesToCreate = this.getAvailableHouses().map(h => h.id);
