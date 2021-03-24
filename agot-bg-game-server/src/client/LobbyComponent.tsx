@@ -20,6 +20,7 @@ import Tooltip from "react-bootstrap/Tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faTimes} from "@fortawesome/free-solid-svg-icons/faTimes";
 import UserLabel from "./UserLabel";
+import EntireGame from "../common/EntireGame";
 
 interface LobbyComponentProps {
     gameClient: GameClient;
@@ -32,13 +33,21 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
         return this.props.gameClient.authenticatedUser as User;
     }
 
+    get entireGame(): EntireGame {
+        return this.lobby.entireGame;
+    }
+
     get randomHouses(): boolean {
-        return this.props.gameState.entireGame.gameSettings.randomHouses;
+        return this.entireGame.gameSettings.randomHouses;
+    }
+
+    get lobby(): LobbyGameState {
+        return this.props.gameState;
     }
 
     render(): ReactNode {
-        const {success: canStartGame, reason: canStartGameReason} = this.props.gameState.canStartGame(this.authenticatedUser);
-        const {success: canCancelGame, reason: canCancelGameReason} = this.props.gameState.canCancel(this.authenticatedUser);
+        const {success: canStartGame, reason: canStartGameReason} = this.lobby.canStartGame(this.authenticatedUser);
+        const {success: canCancelGame, reason: canCancelGameReason} = this.lobby.canCancel(this.authenticatedUser);
 
         return (
             <Col xs={12} sm={10} md={8} lg={6} xl={3}>
@@ -46,7 +55,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                     <Col>
                         <Card>
                             <ListGroup variant="flush">
-                                {this.props.gameState.lobbyHouses.values.map((h, i) => (
+                                {this.lobby.lobbyHouses.values.map((h, i) => (
                                     <ListGroupItem key={h.id} style={{opacity: this.isHouseAvailable(h) ? 1 : 0.3}}>
                                         <Row className="align-items-center">
                                             {!this.randomHouses && <Col xs="auto">
@@ -58,27 +67,24 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                                 <div>
                                                     <b>{this.randomHouses ? "Seat " + (i + 1): h.name}</b>
                                                 </div>
-                                                <div className={classNames({"invisible": !this.props.gameState.players.has(h)})}>
-                                                    {this.props.gameState.players.has(h) ? (
-                                                        <UserLabel
-                                                            gameClient={this.props.gameClient}
-                                                            gameState={this.props.gameState}
-                                                            user={this.props.gameState.players.get(h)}
-                                                        />
-                                                    ) : <div className="small">XXX</div>}
+                                                <div className={classNames({"invisible": !this.lobby.players.has(h)})}>
+                                                    {this.lobby.players.has(h) && <UserLabel
+                                                                gameClient={this.props.gameClient}
+                                                                gameState={this.lobby}
+                                                                user={this.lobby.players.get(h)}/>}
                                                 </div>
                                             </Col>
                                             {this.isHouseAvailable(h) && (
-                                                !this.props.gameState.players.has(h) ? (
+                                                !this.lobby.players.has(h) ? (
                                                     <Col xs="auto">
                                                         <Button onClick={() => this.choose(h)}>Choose</Button>
                                                     </Col>
-                                                ) : this.props.gameState.players.get(h) == this.authenticatedUser ? (
+                                                ) : this.lobby.players.get(h) == this.authenticatedUser ? (
                                                     <Col xs="auto">
                                                         <Button variant="danger" onClick={() => this.leave()}>Leave</Button>
                                                     </Col>
                                                 ) : (
-                                                    this.props.gameState.entireGame.isOwner(this.authenticatedUser) && (
+                                                    this.lobby.entireGame.isOwner(this.authenticatedUser) && (
                                                         <Col xs="auto">
                                                             <Button variant="danger" onClick={() => this.kick(h)}>Kick</Button>
                                                         </Col>
@@ -97,8 +103,8 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                         <Card>
                             <Card.Body>
                                 <ChatComponent gameClient={this.props.gameClient}
-                                               entireGame={this.props.gameState.entireGame}
-                                               roomId={this.props.gameState.entireGame.publicChatRoomId}
+                                               entireGame={this.lobby.entireGame}
+                                               roomId={this.lobby.entireGame.publicChatRoomId}
                                                currentlyViewed={true}/>
                             </Card.Body>
                         </Card>
@@ -112,7 +118,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                     <Col>
                                         <GameSettingsComponent
                                             gameClient={this.props.gameClient}
-                                            entireGame={this.props.gameState.entireGame} />
+                                            entireGame={this.lobby.entireGame} />
                                     </Col>
                                 </Row>
                                 <Row>
@@ -137,7 +143,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                         >
                                             <Button
                                                 block
-                                                onClick={() => this.props.gameState.start()}
+                                                onClick={() => this.lobby.start()}
                                                 disabled={!canStartGame}
                                             >
                                                 Start
@@ -180,24 +186,24 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
     }
 
     isHouseAvailable(house: LobbyHouse): boolean {
-        return this.props.gameState.getAvailableHouses().includes(house);
+        return this.lobby.getAvailableHouses().includes(house);
     }
 
     choose(house: LobbyHouse): void {
-        this.props.gameState.chooseHouse(house);
+        this.lobby.chooseHouse(house);
     }
 
     kick(house: LobbyHouse): void {
-        this.props.gameState.kick(this.props.gameState.players.get(house));
+        this.lobby.kick(this.lobby.players.get(house));
     }
 
     cancel(): void {
         if (confirm("Are you sure you want to cancel the game?")) {
-            this.props.gameState.cancel();
+            this.lobby.cancel();
         }
     }
 
     leave(): void {
-        this.props.gameState.chooseHouse(null);
+        this.lobby.chooseHouse(null);
     }
 }

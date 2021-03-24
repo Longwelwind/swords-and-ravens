@@ -13,6 +13,7 @@ import {faCaretDown} from "@fortawesome/free-solid-svg-icons/faCaretDown";
 import { Dropdown } from "react-bootstrap";
 import Player from "../common/ingame-game-state/Player";
 import ConditionalWrap from "./utils/ConditionalWrap";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
 
 interface UserLabelProps {
     gameClient: GameClient;
@@ -45,12 +46,17 @@ export default class UserLabel extends Component<UserLabelProps> {
     render(): ReactNode {
         return (
             <Dropdown>
-                <Dropdown.Toggle as={DropdownContainer} id={"dropdown-" + this.props.user.id}>
+                <Dropdown.Toggle as={DropdownContainer} id={"dropdown-" + this.user.id}>
                     <div className="small">
                         <OverlayTrigger overlay={<Tooltip id ={`${this.user.id}-connected`}>{this.user.connected ? "Connected" : "Disconnected"}</Tooltip>}>
                             <FontAwesomeIcon icon={faWifi} className={this.user.connected ? "text-success" : "text-danger"} />
                         </OverlayTrigger>
                         {" "}
+                        {this.isOwner() &&
+                            <OverlayTrigger overlay={<Tooltip id ={`${this.user.id}-owner-tooltip`}>Owner</Tooltip>}>
+                                <FontAwesomeIcon icon={faUser}/>
+                            </OverlayTrigger>}
+                        {this.isOwner() && " "}
                         {this.user.name}
                         {" "}
                         <FontAwesomeIcon icon={faCaretDown} />
@@ -62,6 +68,10 @@ export default class UserLabel extends Component<UserLabelProps> {
                 </Dropdown.Menu>
             </Dropdown>
         );
+    }
+
+    isOwner(): boolean {
+        return this.props.gameState.entireGame.isOwner(this.user);
     }
 
     renderIngameDropdownItems(ingame: IngameGameState): ReactNode {

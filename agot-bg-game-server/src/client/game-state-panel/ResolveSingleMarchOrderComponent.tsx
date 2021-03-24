@@ -184,8 +184,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                         type="radio"
                                         label="Yes"
                                         checked={this.leavePowerToken}
-                                        onChange={() => {this.leavePowerToken = true;}}
-                                        disabled={!this.canLeavePowerToken || this.isVassalHouse}/>
+                                        onChange={() => this.onLeavePowerTokenChange(true)}/>
                                     <Form.Check
                                         id="chk-dont-leave-pt"
                                         name="leave-pt-radios"
@@ -193,8 +192,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                         type="radio"
                                         label="No"
                                         checked={this.leavePowerToken == false}
-                                        onChange={() => {this.leavePowerToken = false;}}
-                                        disabled={!this.canLeavePowerToken || this.isVassalHouse}/>
+                                        onChange={() => this.onLeavePowerTokenChange(false)}/>
                                 </Col>
                                 {this.leavePowerToken == false && warningToShow != null && (
                                 <Col xs={12} className="mt-1 pt-0 mb-0 pb-0">
@@ -208,6 +206,18 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                 </OverlayTrigger>
             </Col>
         );
+    }
+
+    onLeavePowerTokenChange(leaveToken: boolean): void {
+        if (this.isVassalHouse) {
+            return;
+        }
+
+        if (!this.leavePowerToken && !this.canLeavePowerToken) {
+            return;
+        }
+
+        this.leavePowerToken = leaveToken;
     }
 
     onUnitClick(region: Region, unit: Unit): void {
