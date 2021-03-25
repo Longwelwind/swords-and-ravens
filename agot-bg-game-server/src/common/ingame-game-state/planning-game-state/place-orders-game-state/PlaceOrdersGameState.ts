@@ -170,10 +170,6 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
                 return;
             }
 
-            if (order && order.type.restrictedTo != null && order.type.restrictedTo != region.type.kind) {
-                return;
-            }
-
             // When a player placed or removed an order he is unready
             this.setUnready(player);
 
@@ -286,7 +282,7 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
                 }
             }
 
-            if (possibleRegions.every(r => this.placedOrders.has(r) || this.getAvailableOrders(house, r).length == 0))
+            if (possibleRegions.every(r => this.placedOrders.has(r)) || this.getAvailableOrders(house).length == 0)
             {
                 // All possible regions have orders
                 return state;
@@ -379,8 +375,8 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
         return this.ingame.game.getOrdersListForHouse(house);
     }
 
-    getAvailableOrders(house: House, region: Region | null = null): Order[] {
-        return this.ingame.game.getAvailableOrders(this.placedOrders, house, region, this.parentGameState.planningRestrictions);
+    getAvailableOrders(house: House): Order[] {
+        return this.ingame.game.getAvailableOrders(this.placedOrders, house, this.parentGameState.planningRestrictions);
     }
 
     isReady(house: House): boolean {

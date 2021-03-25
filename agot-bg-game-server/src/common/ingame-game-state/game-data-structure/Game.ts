@@ -16,7 +16,6 @@ import PlanningRestriction from "./westeros-card/planning-restriction/PlanningRe
 import WesterosCardType from "./westeros-card/WesterosCardType";
 import IngameGameState from "../IngameGameState";
 import { vassalHousesOrders, playerHousesOrders, seaOrders } from "./orders";
-import RegionKind from "./RegionKind";
 
 export const MAX_WILDLING_STRENGTH = 12;
 export const MIN_PLAYER_COUNT_WITH_VASSALS = 3;
@@ -125,36 +124,47 @@ export default class Game {
         return nonVassalTrack[0];
     }
 
-    getOrdersListForHouse(house: House, region: Region | null = null): Order[] {
+    getOrdersListForHouse(house: House): Order[] {
         if (this.ingame.isVassalHouse(house)) {
             return vassalHousesOrders;
         }
 
-        if (this.ingame.entireGame.gameSettings.seaOrderTokens && (region == null || region.type.kind == RegionKind.SEA)) {
+        if (this.ingame.entireGame.gameSettings.seaOrderTokens) {
             return _.concat(playerHousesOrders, seaOrders);
         }
 
         return playerHousesOrders;
     }
 
-    isOrderRestricted(house: House, order: Order, planningRestrictions: PlanningRestriction[]): boolean {
+    isOrderRestricted(region: Region, order: Order, planningRestrictions: PlanningRestriction[]): boolean {
+        const controller = region.getController();
+        if (!controller) {
+            console.error("An order without a controller should never happen");
+            return false;
+        }
+
         return planningRestrictions.some(restriction => restriction.restriction(order.type))
-            || (this.getAllowedCountOfStarredOrders(house) == 0 && order.type.starred);
+            || (this.getAllowedCountOfStarredOrders(controller) == 0 && order.type.starred)
+            || (order.type.restrictedTo != null && order.type.restrictedTo != region.type.kind);
     }
 
-    getRestrictedOrders(house: House, planningRestrictions: PlanningRestriction[]): Order[] {
-        return this.getOrdersListForHouse(house).filter(o => this.isOrderRestricted(house, o, planningRestrictions));
+    getRestrictedOrders(region: Region, planningRestrictions: PlanningRestriction[]): Order[] {
+        const controller = region.getController();
+        if (!controller) {
+            return [];
+        }
+
+        return this.getOrdersListForHouse(controller).filter(o => this.isOrderRestricted(region, o, planningRestrictions));
     }
 
-    getPlacedOrders(allPlacedOrders: BetterMap<Region, Order | null>, house: House): Order[] {
-        return allPlacedOrders.entries
-            .filter(([region, _order]) => region.getController() == house)
-            .map(([_region, order]) => order as Order);
+    getPlacedOrders(allPlacedOrders: BetterMap<Region, Order | null>, house: House): BetterMap<Region, Order> {
+        return new BetterMap(allPlacedOrders.entries
+            .filter(([region, _order]) => region.getController() == house) as [Region, Order][]);
     }
 
-    getAvailableOrders(allPlacedOrders: BetterMap<Region, Order | null>, house: House, region: Region | null, _planningRestrictions: PlanningRestriction[]): Order[] {
-        const ordersList = this.getOrdersListForHouse(house, region);
-        const placedOrders = this.getPlacedOrders(allPlacedOrders, house);
+    getAvailableOrders(allPlacedOrders: BetterMap<Region, Order | null>, house: House, _planningRestrictions: PlanningRestriction[]): Order[] {
+        const ordersList = this.getOrdersListForHouse(house);
+        const placedOrders = this.getPlacedOrders(allPlacedOrders, house).values;
         let leftOrders = _.difference(
             ordersList,
             placedOrders

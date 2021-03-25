@@ -26,7 +26,7 @@ export default class OrderGridComponent extends Component<OrderGridProps> {
                                 placement="right"
                                 overlay={
                                     <Tooltip id={"order-tooltip-" + o.id}><b>{o.type.name}</b>{this.props.restrictedOrders.includes(o) &&
-                                    <><br/>You are not allowed to place this order this round but it can be placed as dummy order token.</>}</Tooltip>
+                                    <><br/>You are not allowed to place this order but it can be placed as dummy order token and will be removed after the messenger raven has been used.</>}</Tooltip>
                                 }
                                 delay={{ show: 250, hide: 100 }}
                             >
