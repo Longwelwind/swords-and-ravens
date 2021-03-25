@@ -10,6 +10,7 @@ interface OrderGridProps {
     orders: Order[];
     selectedOrder: Order | null;
     availableOrders: Order[];
+    restrictedOrders: Order[];
     onOrderClick: (order: Order) => void;
 }
 
@@ -24,7 +25,8 @@ export default class OrderGridComponent extends Component<OrderGridProps> {
                                 key={"order-overlay-" + o.id}
                                 placement="right"
                                 overlay={
-                                    <Tooltip id={"order-tooltip-" + o.id}><b>{o.type.name}</b></Tooltip>
+                                    <Tooltip id={"order-tooltip-" + o.id}><b>{o.type.name}</b>{this.props.restrictedOrders.includes(o) &&
+                                    <><br/>You are not allowed to place this order this round but it can be placed as dummy order token.</>}</Tooltip>
                                 }
                                 delay={{ show: 250, hide: 100 }}
                             >
@@ -33,11 +35,13 @@ export default class OrderGridComponent extends Component<OrderGridProps> {
                                             "order-icon",
                                             {"clickable": this.isOrderAvailable(o) && this.props.selectedOrder != o},
                                             {"hover-weak-outline": this.isOrderAvailable(o) && this.props.selectedOrder != o},
-                                            {"strong-outline": this.props.selectedOrder == o})
+                                            {"strong-outline": this.props.selectedOrder == o},
+                                            {"restricted-order": this.props.restrictedOrders.includes(o)},
+                                            {"unavailable-order": !this.isOrderAvailable(o)}
+                                            )
                                         }
                                         style={{
-                                            backgroundImage: `url(${orderImages.get(o.type.id)})`,
-                                            opacity: this.props.availableOrders.includes(o) ? 1 : 0.1
+                                            backgroundImage: `url(${orderImages.get(o.type.id)})`
                                         }}
                                         onClick={() => this.onOrderClick(o)}
                                         key={o.id}/>

@@ -122,12 +122,7 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
             this.resolveConsolidatePowerOrderForPt(region, nextToResolve);
 
             // Remove the order from the board
-            this.actionGameState.ordersOnBoard.delete(region);
-            this.entireGame.broadcastToClients({
-                type: "action-phase-change-order",
-                region: region.id,
-                order: null
-            });
+            this.actionGameState.removeOrderFromRegion(region);
 
             // Proceed to the next house
             this.proceedNextResolve(nextToResolve);
@@ -144,13 +139,7 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
         }
 
         // Remove ConsolidatePower/IronBank/Muster order token
-        this.actionGameState.ordersOnBoard.delete(region);
-        this.entireGame.broadcastToClients({
-            type: "action-phase-change-order",
-            region: region.id,
-            order: null
-        });
-
+        this.actionGameState.removeOrderFromRegion(region);
         this.proceedNextResolve(house);
     }
 

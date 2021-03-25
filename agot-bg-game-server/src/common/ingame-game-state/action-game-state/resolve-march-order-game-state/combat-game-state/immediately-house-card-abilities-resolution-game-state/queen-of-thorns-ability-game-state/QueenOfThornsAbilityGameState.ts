@@ -10,6 +10,7 @@ import ActionGameState from "../../../../ActionGameState";
 import House from "../../../../../game-data-structure/House";
 import CombatGameState from "../../CombatGameState";
 import IngameGameState from "../../../../../IngameGameState";
+import Order from "../../../../../../../common/ingame-game-state/game-data-structure/Order";
 
 export default class QueenOfThornsAbilityGameState extends GameState<
     ImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"],
@@ -77,25 +78,16 @@ export default class QueenOfThornsAbilityGameState extends GameState<
     }
 
     onSelectOrdersFinish(regions: Region[]): void {
-        const region = regions[0];
-        const removedOrder = this.actionGameState.ordersOnBoard.get(regions[0]);
-        // Remove the order
-        regions.forEach(r => this.actionGameState.ordersOnBoard.delete(r));
+        regions.forEach(region => {
+            const removedOrder = this.actionGameState.removeOrderFromRegion(region) as Order;
 
-        regions.forEach(r => {
-            this.actionGameState.entireGame.broadcastToClients({
-                type: "action-phase-change-order",
-                region: r.id,
-                order: null
-            })
-        });
-
-        this.ingame.log({
-            type: "queen-of-thorns-order-removed",
-            house: this.childGameState.house.id,
-            affectedHouse: this.combatGameState.getEnemy(this.childGameState.house).id,
-            orderRemoved: removedOrder.id,
-            region: region.id
+            this.ingame.log({
+                type: "queen-of-thorns-order-removed",
+                house: this.childGameState.house.id,
+                affectedHouse: this.combatGameState.getEnemy(this.childGameState.house).id,
+                orderRemoved: removedOrder.id,
+                region: region.id
+            });
         });
 
         this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);
