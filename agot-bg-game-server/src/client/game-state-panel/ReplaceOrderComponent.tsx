@@ -39,7 +39,7 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
                                 <OrderGridComponent orders={this.props.gameState.ingameGameState.game.getOrdersListForHouse(this.props.gameState.ravenHolder)}
                                                     selectedOrder={this.selectedOrder}
                                                     availableOrders={this.props.gameState.getAvailableOrders(this.selectedRegion)}
-                                                    restrictedOrders={this.props.gameState.ingameGameState.game.getRestrictedOrders(this.props.gameState.ravenHolder, this.props.gameState.parentGameState.parentGameState.planningRestrictions)}
+                                                    restrictedOrders={this.props.gameState.ingameGameState.game.getRestrictedOrders(this.selectedRegion, this.props.gameState.parentGameState.parentGameState.planningRestrictions)}
                                                     onOrderClick={o => this.selectOrder(o)}/>
                             </Col>
                         )}
@@ -87,7 +87,7 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
 
     replaceOrder(): void {
         if (this.selectedRegion && this.selectedOrder) {
-            if (this.props.gameState.ingameGameState.game.isOrderRestricted(this.props.gameState.ravenHolder, this.selectedOrder, this.props.gameState.parentGameState.parentGameState.planningRestrictions)) {
+            if (this.props.gameState.ingameGameState.game.isOrderRestricted(this.selectedRegion, this.selectedOrder, this.props.gameState.parentGameState.parentGameState.planningRestrictions)) {
                 if (!window.confirm("Your replaced order is restricted and will be removed right away. Do you want to continue?")) {
                     return;
                 }

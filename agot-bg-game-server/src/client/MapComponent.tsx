@@ -285,15 +285,15 @@ export default class MapComponent extends Component<MapComponentProps> {
     }
 
     renderOrder(region: Region, order: Order | null, backgroundUrl: string, properties: OrderOnMapProperties, _isActionGameState: boolean): ReactNode {
-        const house = region.getController();
         const planningOrAction = this.ingame.childGameState instanceof PlanningGameState || this.ingame.childGameState instanceof ActionGameState ? this.ingame.childGameState : null;
 
         return (
             <div className={classNames(
-                    "order-container", "hover-weak-outline",
+                    "order-container",
                     {
-                        "medium-outline hover-strong-outline clickable": properties.highlight.active,
-                        "restricted-order": planningOrAction && house && order && this.ingame.game.isOrderRestricted(house, order, planningOrAction.planningRestrictions)
+                        "hover-weak-outline" : order != null,
+                        "medium-outline hover-strong-outline clickable": order && properties.highlight.active,
+                        "restricted-order": planningOrAction && order && this.ingame.game.isOrderRestricted(region, order, planningOrAction.planningRestrictions)
                     }
                 )}
                  style={{left: region.orderSlot.x, top: region.orderSlot.y}}

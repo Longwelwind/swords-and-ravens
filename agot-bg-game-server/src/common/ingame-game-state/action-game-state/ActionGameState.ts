@@ -100,8 +100,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
         // Remove restricted orders from board:
         this.ordersOnBoard.keys.forEach(region => {
             const order = this.ordersOnBoard.get(region);
-            const house = region.getController() as House;
-            if (this.game.isOrderRestricted(house, order, this.planningRestrictions)) {
+            if (this.game.isOrderRestricted(region, order, this.planningRestrictions)) {
                 this.removeOrderFromRegion(region);
             }
         });

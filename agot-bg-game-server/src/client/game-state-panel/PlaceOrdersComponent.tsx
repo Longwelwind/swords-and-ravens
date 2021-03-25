@@ -1,6 +1,5 @@
 import {Component, ReactNode, ReactElement} from "react";
 import {observer} from "mobx-react";
-import Order from "../../common/ingame-game-state/game-data-structure/Order";
 import React from "react";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
 import * as _ from "lodash";
@@ -111,13 +110,6 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
         return !this.placeOrders.forVassals || this.placeOrders.ingame.getVassalsControlledByPlayer(this.player).length > 0;
     }
 
-    isOrderAvailable(order: Order): boolean {
-        if (!this.props.gameClient.authenticatedPlayer) {
-            return false;
-        }
-        return this.placeOrders.isOrderAvailable(this.props.gameClient.authenticatedPlayer.house, order);
-    }
-
     componentDidMount(): void {
         this.props.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
         this.props.mapControls.modifyOrdersOnMap.push(this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap());
@@ -148,9 +140,9 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                                         <OrderGridComponent orders={this.placeOrders.getOrdersList(r.getController() as House)}
                                             selectedOrder={null}
                                             availableOrders={
-                                                this.placeOrders.getAvailableOrders(r.getController() as House, r)
+                                                this.placeOrders.getAvailableOrders(r.getController() as House)
                                             }
-                                            restrictedOrders={this.placeOrders.ingame.game.getRestrictedOrders(r.getController() as House, this.placeOrders.planningGameState.planningRestrictions)}
+                                            restrictedOrders={this.placeOrders.ingame.game.getRestrictedOrders(r, this.placeOrders.planningGameState.planningRestrictions)}
                                             onOrderClick={o => {
                                                 this.placeOrders.assignOrder(r, o);
                                                 document.body.click();
@@ -198,8 +190,8 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
         }
 
         if (this.placeOrders.getHousesToPutOrdersForPlayer(this.props.gameClient.authenticatedPlayer).some(
-            h => this.placeOrders.game.getPlacedOrders(this.placeOrders.placedOrders, h).some(
-                o => this.placeOrders.game.isOrderRestricted(h, o, this.placeOrders.planningGameState.planningRestrictions)))) {
+            h => this.placeOrders.game.getPlacedOrders(this.placeOrders.placedOrders, h).entries.some(
+                ([region, order]) => this.placeOrders.game.isOrderRestricted(region, order, this.placeOrders.planningGameState.planningRestrictions)))) {
             if (!window.confirm("You have placed restricted orders. They will be removed after the messenger raven has been used. Do you want to continue?")) {
                 return;
             }
