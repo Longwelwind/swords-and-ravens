@@ -210,6 +210,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 );
 
             case "combat-result":
+                const winner = this.game.houses.get(data.winner);
                 const houseCombatDatas = data.stats.map(stat => {
                     const house = this.game.houses.get(stat.house);
                     const houseCard = stat.houseCard != null ? this.allHouseCards.get(stat.houseCard) : null;
@@ -219,10 +220,10 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         house,
                         region: this.world.regions.get(stat.region),
                         houseCard: houseCard,
-                        armyUnits: stat.armyUnits.map(ut => unitTypes.get(ut))
+                        armyUnits: stat.armyUnits.map(ut => unitTypes.get(ut)),
+                        isWinner: house == winner
                     };
                 });
-                const winner = this.game.houses.get(data.winner);
 
                 return (
                     <>
