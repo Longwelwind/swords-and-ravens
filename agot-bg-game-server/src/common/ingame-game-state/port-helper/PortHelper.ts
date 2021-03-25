@@ -14,14 +14,7 @@ function removePossibleOrdersInPort(portRegion: Region, actionGameState: ActionG
         return;
     }
 
-    if (actionGameState.ordersOnBoard.has(portRegion)) {
-        actionGameState.ordersOnBoard.delete(portRegion);
-        actionGameState.entireGame.broadcastToClients({
-            type: "action-phase-change-order",
-            region: portRegion.id,
-            order: null
-        });
-    }
+    actionGameState.removeOrderFromRegion(portRegion);
 }
 
 export function destroyAllShipsInPort(portRegion: Region, entireGame: EntireGame, actionGameState: ActionGameState | null): number {

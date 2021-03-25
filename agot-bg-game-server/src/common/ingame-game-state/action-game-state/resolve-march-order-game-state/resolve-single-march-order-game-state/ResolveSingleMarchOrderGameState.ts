@@ -202,13 +202,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             }
 
             // Remove the order
-            this.actionGameState.ordersOnBoard.delete(startingRegion);
-            this.entireGame.broadcastToClients({
-                type: "action-phase-change-order",
-                region: startingRegion.id,
-                order: null
-            });
-
+            this.actionGameState.removeOrderFromRegion(startingRegion);
             this.resolveMarchOrderGameState.onResolveSingleMarchOrderGameStateFinish(this.house);
         }
     }

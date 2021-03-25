@@ -277,14 +277,7 @@ export default class PostCombatGameState extends GameState<
 
     removeOrderFromRegion(region: Region): void {
         // Always check if there is an order to be removed as e.g. Arianne or Loras might lead to an orphaned order
-        if (this.combat.actionGameState.ordersOnBoard.has(region)) {
-            this.combat.actionGameState.ordersOnBoard.delete(region);
-            this.entireGame.broadcastToClients({
-                type: "action-phase-change-order",
-                region: region.id,
-                order: null
-            });
-        }
+        this.combat.actionGameState.removeOrderFromRegion(region);
     }
 
     isAttackingArmyMovementPrevented(): boolean {

@@ -95,7 +95,7 @@ export default class ReplaceOrderGameState extends GameState<UseRavenGameState> 
     }
 
     getAvailableOrders(region: Region): Order[] {
-        const replacedOrder = this.actionGameState.ordersOnBoard.get(region);
+        const replacedOrder = this.actionGameState.ordersOnBoard.has(region) ? this.actionGameState.ordersOnBoard.get(region) : null;
 
         const placedOrders = new BetterMap(
             this.actionGameState.getOrdersOfHouse(this.ravenHolder).filter(([_r, o]) => replacedOrder != o)

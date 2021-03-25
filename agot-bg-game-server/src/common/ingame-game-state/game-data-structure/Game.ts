@@ -137,25 +137,41 @@ export default class Game {
         return playerHousesOrders;
     }
 
-    getAvailableOrders(allPlacedOrders: BetterMap<Region, Order | null>, house: House, region: Region | null, planningRestrictions: PlanningRestriction[]): Order[] {
-        const placedOrders = allPlacedOrders.entries
+    isOrderRestricted(house: House, order: Order, planningRestrictions: PlanningRestriction[]): boolean {
+        return planningRestrictions.some(restriction => restriction.restriction(order.type))
+            || (this.getAllowedCountOfStarredOrders(house) == 0 && order.type.starred);
+    }
+
+    getRestrictedOrders(house: House, planningRestrictions: PlanningRestriction[]): Order[] {
+        return this.getOrdersListForHouse(house).filter(o => this.isOrderRestricted(house, o, planningRestrictions));
+    }
+
+    getPlacedOrders(allPlacedOrders: BetterMap<Region, Order | null>, house: House): Order[] {
+        return allPlacedOrders.entries
             .filter(([region, _order]) => region.getController() == house)
             .map(([_region, order]) => order as Order);
+    }
 
+    getAvailableOrders(allPlacedOrders: BetterMap<Region, Order | null>, house: House, region: Region | null, _planningRestrictions: PlanningRestriction[]): Order[] {
         const ordersList = this.getOrdersListForHouse(house, region);
-
+        const placedOrders = this.getPlacedOrders(allPlacedOrders, house);
         let leftOrders = _.difference(
             ordersList,
             placedOrders
         );
 
-        // Remove restricted orders
-        leftOrders = leftOrders.filter(order => planningRestrictions.every(restriction => !restriction.restriction(order.type)));
+        // Don't remove restricted orders here anymore to allow placing a restricted one
+        // leftOrders = leftOrders.filter(order => planningRestrictions.every(restriction => !restriction.restriction(order.type)));
 
-        // Remove starred orders if the house used more than allowed
-        const starredOrderLeft = this.getAllowedCoundOfStarredOrders(house) - placedOrders.filter(o => o && o.type.starred).length;
+        // In case a house must not play any starred order they can use them as dummy order
+        const allowedStarredOrderCount = this.getAllowedCountOfStarredOrders(house);
 
-        leftOrders = leftOrders.filter(o => !o.type.starred || (o.type.starred && starredOrderLeft > 0));
+        if (allowedStarredOrderCount > 0) {
+            // Remove starred orders if the house used more than allowed
+            const starredOrderLeft = allowedStarredOrderCount - placedOrders.filter(o => o && o.type.starred).length;
+
+            leftOrders = leftOrders.filter(o => !o.type.starred || (o.type.starred && starredOrderLeft > 0));
+        }
 
         return leftOrders;
     }
@@ -367,7 +383,7 @@ export default class Game {
         return this.world.regions.values.filter(r => r.controlPowerToken == house).length;
     }
 
-    getAllowedCoundOfStarredOrders(house: House): number {
+    getAllowedCountOfStarredOrders(house: House): number {
         const place = this.kingsCourtTrack.indexOf(house);
 
         if (this.starredOrderRestrictions.length <= place) {

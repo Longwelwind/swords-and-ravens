@@ -105,13 +105,7 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         const orphanedOrders = this.actionGameState.ordersOnBoard.entries.filter(([region, _]) => region.units.size == 0);
 
         orphanedOrders.forEach(([region, _]) => {
-            // todo: Add a game log for this event
-            this.actionGameState.ordersOnBoard.delete(region);
-            this.actionGameState.entireGame.broadcastToClients({
-                type: "action-phase-change-order",
-                region: region.id,
-                order: null
-            });
+            this.actionGameState.removeOrderFromRegion(region);
         });
     }
 
@@ -162,15 +156,7 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
 
         if (controllerToRegion != units[0].allegiance) {
             // If there was an order from an other house, remove it
-            if (this.actionGameState.ordersOnBoard.has(to)) {
-                this.actionGameState.ordersOnBoard.delete(to);
-
-                this.entireGame.broadcastToClients({
-                    type: "action-phase-change-order",
-                    region: to.id,
-                    order: null
-                });
-            }
+            this.actionGameState.removeOrderFromRegion(to);
 
             // If there was a power token from an other house, remove it
             if (to.controlPowerToken) {

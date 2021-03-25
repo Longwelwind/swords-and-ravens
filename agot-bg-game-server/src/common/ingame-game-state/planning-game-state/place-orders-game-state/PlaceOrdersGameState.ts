@@ -192,15 +192,12 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
                         order: null
                     });
                 });
-            } else {
-                if (this.placedOrders.has(region)) {
-                    this.placedOrders.delete(region);
-
-                    this.entireGame.broadcastToClients({
-                        type: "remove-placed-order",
-                        regionId: region.id
-                    });
-                }
+            } else if (this.placedOrders.has(region)) {
+                this.placedOrders.delete(region);
+                this.entireGame.broadcastToClients({
+                    type: "remove-placed-order",
+                    regionId: region.id
+                });
             }
         } else if (message.type == "ready") {
             this.setReady(player);
@@ -384,10 +381,6 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
 
     getAvailableOrders(house: House, region: Region | null = null): Order[] {
         return this.ingame.game.getAvailableOrders(this.placedOrders, house, region, this.parentGameState.planningRestrictions);
-    }
-
-    isOrderRestricted(order: Order): boolean {
-        return this.parentGameState.planningRestrictions.some(restriction => restriction.restriction(order.type));
     }
 
     isReady(house: House): boolean {

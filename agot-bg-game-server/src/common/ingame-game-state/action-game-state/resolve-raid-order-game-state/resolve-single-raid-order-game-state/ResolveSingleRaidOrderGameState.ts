@@ -109,12 +109,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
                 raidedHouseLostPowerToken = this.ingameGameState.changePowerTokens(raidedHouse, -1) != 0;
             }
 
-            this.actionGameState.ordersOnBoard.delete(targetRegion);
-            this.entireGame.broadcastToClients({
-                type: "action-phase-change-order",
-                region: targetRegion.id,
-                order: null
-            });
+            this.actionGameState.removeOrderFromRegion(targetRegion);
 
             this.ingameGameState.log({
                 type: "raid-done",
@@ -141,12 +136,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
 
         // Keep an unresolved RaidSupportOrder to use it as support later
         if (orderType instanceof RaidOrderType || targetRegion != null) {
-            this.actionGameState.ordersOnBoard.delete(orderRegion);
-            this.entireGame.broadcastToClients({
-                type: "action-phase-change-order",
-                region: orderRegion.id,
-                order: null
-            });
+            this.actionGameState.removeOrderFromRegion(orderRegion);
         } else if (orderType instanceof RaidSupportOrderType && targetRegion == null) {
             this.parentGameState.resolvedRaidSupportOrderRegions.push(orderRegion);
         }

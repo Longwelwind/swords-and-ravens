@@ -12,6 +12,7 @@ import Region from "../../../../../../game-data-structure/Region";
 import ActionGameState from "../../../../../ActionGameState";
 import IngameGameState from "../../../../../../IngameGameState";
 import { cerseiLannister } from "../../../../../../game-data-structure/house-card/houseCardAbilities";
+import Order from "../../../../../../game-data-structure/Order";
 
 export default class CerseiLannisterAbilityGameState extends GameState<
     AfterWinnerDeterminationGameState["childGameState"],
@@ -81,14 +82,7 @@ export default class CerseiLannisterAbilityGameState extends GameState<
     onSelectOrdersFinish(regions: Region[]): void {
         // Remove the order
         regions.forEach(r => {
-            const order = this.actionGameState.ordersOnBoard.get(r);
-            this.actionGameState.ordersOnBoard.delete(r);
-
-            this.actionGameState.entireGame.broadcastToClients({
-                type: "action-phase-change-order",
-                region: r.id,
-                order: null
-            });
+            const order = this.actionGameState.removeOrderFromRegion(r) as Order;
 
             this.ingame.log({
                 type: "cersei-lannister-order-removed",

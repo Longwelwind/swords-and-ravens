@@ -45,11 +45,15 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
     }
 
     get housesToPlaceOrdersFor(): House[] {
-        return this.props.gameState.getHousesToPutOrdersForPlayer(this.player);
+        return this.placeOrders.getHousesToPutOrdersForPlayer(this.player);
     }
 
     get forVassals(): boolean {
-        return this.props.gameState.forVassals;
+        return this.placeOrders.forVassals;
+    }
+
+    get placeOrders(): PlaceOrdersGameState {
+        return this.props.gameState;
     }
 
     render(): ReactNode {
@@ -64,7 +68,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                                 <>Players must assign orders for their vassals now.</>
                             )}
                         </Col>
-                        {this.props.gameState.parentGameState.planningRestrictions.map(pr => this.restrictionToWesterosCardTypeMap.tryGet(pr, null))
+                        {this.placeOrders.parentGameState.planningRestrictions.map(pr => this.restrictionToWesterosCardTypeMap.tryGet(pr, null))
                             .map(prWc => prWc != null ?
                                 <Col xs={12} key={`prwc_${prWc.westerosCardType.id}`} className="d-flex flex-column align-items-center">
                                     <WesterosCardComponent cardType={prWc.westerosCardType} size="medium" tooltip={true} westerosDeckI={prWc.deckId}/>
@@ -75,7 +79,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                                 <Row className="justify-content-center">
                                     <Col xs="auto">
                                         <Button
-                                            disabled={!this.props.gameState.canReady(this.props.gameClient.authenticatedPlayer).status}
+                                            disabled={!this.placeOrders.canReady(this.props.gameClient.authenticatedPlayer).status}
                                             onClick={() => this.onReadyClick()}
                                         >
                                             Ready
@@ -83,7 +87,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                                     </Col>
                                     <Col xs="auto">
                                         <Button
-                                            disabled={!this.props.gameState.canUnready(this.props.gameClient.authenticatedPlayer).status}
+                                            disabled={!this.placeOrders.canUnready(this.props.gameClient.authenticatedPlayer).status}
                                             onClick={() => this.onUnreadyClick()}
                                         >
                                             Unready
@@ -93,7 +97,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                             )}
                             <Row>
                                 <div className="text-center" style={{marginTop: 10}}>
-                                    Waiting for {this.props.gameState.getNotReadyPlayers().map(p => p.house.name).join(', ')}...
+                                    Waiting for {this.placeOrders.getNotReadyPlayers().map(p => p.house.name).join(', ')}...
                                 </div>
                             </Row>
                         </Col>
@@ -104,14 +108,14 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
     }
 
     showButtons(): boolean {
-        return !this.props.gameState.forVassals || this.props.gameState.ingame.getVassalsControlledByPlayer(this.player).length > 0;
+        return !this.placeOrders.forVassals || this.placeOrders.ingame.getVassalsControlledByPlayer(this.player).length > 0;
     }
 
     isOrderAvailable(order: Order): boolean {
         if (!this.props.gameClient.authenticatedPlayer) {
             return false;
         }
-        return this.props.gameState.isOrderAvailable(this.props.gameClient.authenticatedPlayer.house, order);
+        return this.placeOrders.isOrderAvailable(this.props.gameClient.authenticatedPlayer.house, order);
     }
 
     componentDidMount(): void {
@@ -126,13 +130,13 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
 
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
         if (this.props.gameClient.authenticatedPlayer) {
-            const possibleRegions = _.flatMap(this.housesToPlaceOrdersFor.map(h => this.props.gameState.getPossibleRegionsForOrders(h)));
+            const possibleRegions = _.flatMap(this.housesToPlaceOrdersFor.map(h => this.placeOrders.getPossibleRegionsForOrders(h)));
 
             return possibleRegions.map(r => [
                     r,
                     {
                         // Highlight areas with no order
-                        highlight: {active: !this.props.gameState.placedOrders.has(r)},
+                        highlight: {active: !this.placeOrders.placedOrders.has(r)},
                         wrap: (child: ReactElement) => (
                             <OverlayTrigger
                                 placement="auto"
@@ -141,13 +145,14 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                                 overlay={
                                     <Popover id={"region" + r.id}>
                                         <p className="text-strong text-center">{r.name}</p>
-                                        <OrderGridComponent orders={this.props.gameState.getOrdersList(r.getController() as House)}
+                                        <OrderGridComponent orders={this.placeOrders.getOrdersList(r.getController() as House)}
                                             selectedOrder={null}
                                             availableOrders={
-                                                this.props.gameState.getAvailableOrders(r.getController() as House, r)
+                                                this.placeOrders.getAvailableOrders(r.getController() as House, r)
                                             }
+                                            restrictedOrders={this.placeOrders.ingame.game.getRestrictedOrders(r.getController() as House, this.placeOrders.planningGameState.planningRestrictions)}
                                             onOrderClick={o => {
-                                                this.props.gameState.assignOrder(r, o);
+                                                this.placeOrders.assignOrder(r, o);
                                                 document.body.click();
                                         }}/>
                                     </Popover>
@@ -166,7 +171,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
     modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
         if (this.props.gameClient.authenticatedPlayer) {
             return _.flatMap(
-                this.housesToPlaceOrdersFor.map(h => this.props.gameState.getPossibleRegionsForOrders(h).map(r => [
+                this.housesToPlaceOrdersFor.map(h => this.placeOrders.getPossibleRegionsForOrders(h).map(r => [
                     r,
                     {
                         highlight: {active: true},
@@ -184,14 +189,26 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
             return;
         }
 
-        this.props.gameState.assignOrder(region, null);
+        this.placeOrders.assignOrder(region, null);
     }
 
     onReadyClick(): void {
-        this.props.gameState.ready();
+        if (!this.props.gameClient.authenticatedPlayer) {
+            return;
+        }
+
+        if (this.placeOrders.getHousesToPutOrdersForPlayer(this.props.gameClient.authenticatedPlayer).some(
+            h => this.placeOrders.game.getPlacedOrders(this.placeOrders.placedOrders, h).some(
+                o => this.placeOrders.game.isOrderRestricted(h, o, this.placeOrders.planningGameState.planningRestrictions)))) {
+            if (!window.confirm("You have placed restricted orders. They will be removed after the messenger raven has been used. Do you want to continue?")) {
+                return;
+            }
+        }
+
+        this.placeOrders.ready();
     }
 
     onUnreadyClick(): void {
-        this.props.gameState.unready();
+        this.placeOrders.unready();
     }
 }

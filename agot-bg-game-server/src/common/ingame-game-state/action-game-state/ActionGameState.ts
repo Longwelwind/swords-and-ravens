@@ -72,19 +72,40 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
         if (this.planningRestrictions.some(pr => pr == noSupportOrder)) {
             const regionsWithRaidSupportPlusOneOrders = this.ordersOnBoard.entries.filter(([_r, o]) => o.type == raidSupportPlusOne).map(([r, _o]) => r);
             for(const region of regionsWithRaidSupportPlusOneOrders) {
-                this.ordersOnBoard.delete(region);
-                this.entireGame.broadcastToClients({
-                    type: "action-phase-change-order",
-                    region: region.id,
-                    order: null
-                });
+                this.removeOrderFromRegion(region);
             }
         }
 
         this.setChildGameState(new ResolveMarchOrderGameState(this)).firstStart();
     }
 
+    removeOrderFromRegion(region: Region): Order | null {
+        // todo: Add param to log this event
+        if (this.ordersOnBoard.has(region)) {
+            const order = this.ordersOnBoard.get(region);
+            this.ordersOnBoard.delete(region);
+            this.entireGame.broadcastToClients({
+                type: "action-phase-change-order",
+                region: region.id,
+                order: null
+            });
+
+            return order;
+        }
+
+        return null;
+    }
+
     onUseRavenGameStateEnd(): void {
+        // Remove restricted orders from board:
+        this.ordersOnBoard.keys.forEach(region => {
+            const order = this.ordersOnBoard.get(region);
+            const house = region.getController() as House;
+            if (this.game.isOrderRestricted(house, order, this.planningRestrictions)) {
+                this.removeOrderFromRegion(region);
+            }
+        });
+
         this.setChildGameState(new ResolveRaidOrderGameState(this)).firstStart();
     }
 
@@ -104,7 +125,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
             if (order) {
                 this.ordersOnBoard.set(region, order);
             } else {
-                this.ordersOnBoard.delete(region);
+                try { this.ordersOnBoard.delete(region); } catch { }
             }
         } else {
             this.childGameState.onServerMessage(message);
@@ -126,7 +147,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
                     if (unit.type == footman) {
                         footmen.push(unit);
                     }
-                })
+                });
             });
         return footmen;
     }
