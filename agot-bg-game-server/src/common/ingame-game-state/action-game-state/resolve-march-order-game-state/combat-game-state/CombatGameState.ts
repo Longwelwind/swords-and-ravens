@@ -37,6 +37,7 @@ export interface HouseCombatData {
     army: Unit[];
     region: Region;
     houseCard: HouseCard | null;
+    houseCardChosen?: boolean;
 }
 
 export default class CombatGameState extends GameState<
@@ -58,9 +59,6 @@ export default class CombatGameState extends GameState<
     // The value is always either attacker or defender or null if the supporter
     // decided to support no-one.
     @observable supporters = new BetterMap<House, House | null>();
-
-    @observable attackerHouseCardChosen?: string;
-    @observable defenderHouseCardChosen?: string;
 
     get attackingRegion(): Region {
         return this.attackingHouseCombatData.region;
@@ -417,6 +415,14 @@ export default class CombatGameState extends GameState<
         } else {
             throw new Error();
         }
+    }
+
+    tryGetCommandedHouseInCombat(player: Player | null): House | null {
+        if (player == null || !this.isCommandingHouseInCombat(player.house)) {
+            return null;
+        }
+
+        return this.getCommandedHouseInCombat(player.house);
     }
 
     proceedToChooseGeneral(): void {

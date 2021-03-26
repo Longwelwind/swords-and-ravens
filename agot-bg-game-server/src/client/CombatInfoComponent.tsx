@@ -21,8 +21,7 @@ interface HouseCombatData {
     houseCardStrength: number;
     valyrianSteelBlade: number;
     total: number;
-    attackerHouseCardChosen?: string;
-    defenderHouseCardChosen?: string;
+    houseCardBackId?: string;
     isWinner?: boolean;
 }
 
@@ -65,11 +64,11 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                         {this.attacker.houseCard ? (
                             <HouseCardComponent houseCard={this.attacker.houseCard}
                                                 size="small" />
-                        ) : this.attacker.attackerHouseCardChosen
+                        ) : this.attacker.houseCardBackId
                         ? <div
                                 className="vertical-game-card small"
                                 style={{
-                                    backgroundImage: `url(${houseCardsBackImages.get(this.attacker.attackerHouseCardChosen)})`
+                                    backgroundImage: `url(${houseCardsBackImages.get(this.attacker.houseCardBackId)})`
                                 }}
                             />
                         : <div className="vertical-game-card game-card-slot small"/>}
@@ -80,11 +79,11 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                         {this.defender.houseCard ? (
                             <HouseCardComponent houseCard={this.defender.houseCard}
                                                 size="small" />
-                        ) : this.defender.defenderHouseCardChosen
+                        ) : this.defender.houseCardBackId
                         ? <div
                                 className="vertical-game-card small"
                                 style={{
-                                    backgroundImage: `url(${houseCardsBackImages.get(this.defender.defenderHouseCardChosen)})`
+                                    backgroundImage: `url(${houseCardsBackImages.get(this.defender.houseCardBackId)})`
                                 }}
                             />
                         : <div className="vertical-game-card game-card-slot small"/>}

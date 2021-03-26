@@ -261,6 +261,11 @@ export default class ResolveRetreatGameState extends GameState<
                     possibleRetreatRegions = possibleRetreatRegions.filter(r => r != attackingRegion);
                 }
             }
+        } else {
+            // Filter out the attacking region as due to Berric Dondarrion (and maybe some other effects)
+            // The attacking region may not be occupied by the enemy anymore and therefore isn't filtered by
+            // getValidRetreatRegions anymore
+            possibleRetreatRegions = possibleRetreatRegions.filter(r => r != attackingRegion);
         }
 
         if (possibleRetreatRegions.length == 0) {

@@ -38,9 +38,9 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         this.choosableHouseCards = new BetterMap(this.combatGameState.houseCombatDatas.keys.map(h => {
             // If the house a player-controlled house, return the available cards.
             // If it a vassal, then randomly choose 3 of them.
-            const houseCards = !this.ingameGameState.isVassalHouse(h)
+            const houseCards = (!this.ingameGameState.isVassalHouse(h)
                 ? h.houseCards.values.filter(hc => hc.state == HouseCardState.AVAILABLE)
-                : vassalHouseCards.splice(0, 3);
+                : vassalHouseCards.splice(0, 3)).sort((a, b) => a.combatStrength - b.combatStrength);
 
             // Assign the chosen house cards to the vassal house as some abilities require a hand during resolution
             if (this.ingameGameState.isVassalHouse(h)) {
@@ -64,12 +64,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                 ? this.combatGameState.game.getHouseCardById(message.houseCardId)
                 : null);
 
-            if (this.combatGameState.attacker == house) {
-                this.combatGameState.attackerHouseCardChosen = this.ingameGameState.isVassalHouse(house) ? "vassal" : house.id;
-            } else {
-                this.combatGameState.defenderHouseCardChosen = this.ingameGameState.isVassalHouse(house) ? "vassal" : house.id;
-            }
-
+            this.combatGameState.houseCombatDatas.get(house).houseCardChosen = true;
             this.combatGameState.rerender++;
         } else if(message.type == "support-refused") {
             const house = this.combatGameState.game.houses.get(message.houseId);
@@ -112,19 +107,20 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
             this.checkAndProceedEndOfChooseHouseCardGameState();
         } else if(message.type == "refuse-support") {
-            if (!this.canRefuseSupport(player.house)) {
+            const commandedHouse = this.combatGameState.tryGetCommandedHouseInCombat(player);
+            if (commandedHouse == null || !this.canRefuseSupport(commandedHouse)) {
                 return;
             }
 
-            this.removeSupportForHouse(player.house);
+            this.removeSupportForHouse(commandedHouse);
             this.combatGameState.ingameGameState.log({
                 type: "support-refused",
-                house: player.house.id
+                house: commandedHouse.id
             });
 
             this.entireGame.broadcastToClients({
                 type: "support-refused",
-                houseId: player.house.id
+                houseId: commandedHouse.id
             });
 
             // Reset combatGameState.clientGameState to retrigger ChooseHouseCardGameState
@@ -213,9 +209,9 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         }
     }
 
-    canRefuseSupport(house: House): boolean {
+    canRefuseSupport(house: House | null): boolean {
         // Support can only be refused if house is supported and if it has not played a house card yet
-        return this.combatGameState.supporters.values.includes(house) && !this.houseCards.has(house);
+        return house != null && this.combatGameState.supporters.values.includes(house) && !this.houseCards.has(house);
     }
 
     refuseSupport(): void {
@@ -258,11 +254,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
         const combat = chooseHouseCardGameState.combatGameState;
         chooseHouseCardGameState.houseCards.keys.forEach(h => {
-            if (combat.attacker == h) {
-                combat.attackerHouseCardChosen = combat.ingameGameState.isVassalHouse(h) ? "vassal" : h.id;
-            } else {
-                combat.defenderHouseCardChosen = combat.ingameGameState.isVassalHouse(h) ? "vassal" : h.id;
-            }
+            combat.houseCombatDatas.get(h).houseCardChosen = true;
         });
 
         return chooseHouseCardGameState;

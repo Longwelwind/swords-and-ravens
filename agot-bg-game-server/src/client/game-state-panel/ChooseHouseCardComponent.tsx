@@ -10,15 +10,23 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import HouseCardComponent from "./utils/HouseCardComponent";
 import { observable } from "mobx";
+import CombatGameState from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 
 @observer
 export default class ChooseHouseCardComponent extends Component<GameStateComponentProps<ChooseHouseCardGameState>> {
     @observable dirty: boolean;
 
     get chosenHouseCard(): HouseCard | null {
-        return this.props.gameClient.authenticatedPlayer
-            ? this.props.gameState.houseCards.tryGet(this.props.gameClient.authenticatedPlayer.house, null)
-            : null;
+        const commandedHouse = this.combat.tryGetCommandedHouseInCombat(this.props.gameClient.authenticatedPlayer);
+        if (!commandedHouse) {
+            return null;
+        }
+
+        return this.props.gameState.houseCards.tryGet(commandedHouse, null);
+    }
+
+    get combat(): CombatGameState {
+        return this.props.gameState.combatGameState;
     }
 
     get selectedHouseCard(): HouseCard | null {
@@ -31,13 +39,10 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
 
     constructor(props: GameStateComponentProps<ChooseHouseCardGameState>) {
         super(props);
-
-        const authenticatedPlayer = this.props.gameClient.authenticatedPlayer;
-
         this.selectedHouseCard = this.chosenHouseCard;
-
-        this.dirty = authenticatedPlayer
-            ? !this.props.gameState.houseCards.has(authenticatedPlayer.house)
+        const commandedHouse = this.combat.tryGetCommandedHouseInCombat(this.props.gameClient.authenticatedPlayer);
+        this.dirty = commandedHouse
+            ? !this.props.gameState.houseCards.has(commandedHouse)
             :  false;
     }
 
@@ -82,7 +87,7 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
                                                 this.props.gameState.refuseSupport();
                                             }
                                         }}
-                                        disabled={!this.props.gameState.canRefuseSupport(this.props.gameClient.authenticatedPlayer.house)}>
+                                        disabled={!this.props.gameState.canRefuseSupport(this.combat.tryGetCommandedHouseInCombat(this.props.gameClient.authenticatedPlayer))}>
                                         Refuse received support
                                     </Button>
                                 </Col>}
@@ -113,12 +118,10 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
     }
 
     getChoosableHouseCards(): HouseCard[] {
-        if (!this.props.gameClient.authenticatedPlayer) {
+        const commandedHouse = this.props.gameState.combatGameState.tryGetCommandedHouseInCombat(this.props.gameClient.authenticatedPlayer);
+        if (!commandedHouse) {
             return [];
         }
-
-        const commandedHouse = this.props.gameState.combatGameState.getCommandedHouseInCombat(this.props.gameClient.authenticatedPlayer.house);
-
-        return this.props.gameState.getChoosableCards(commandedHouse).sort((a, b) => a.combatStrength - b.combatStrength);
+        return this.props.gameState.getChoosableCards(commandedHouse);
     }
 }
