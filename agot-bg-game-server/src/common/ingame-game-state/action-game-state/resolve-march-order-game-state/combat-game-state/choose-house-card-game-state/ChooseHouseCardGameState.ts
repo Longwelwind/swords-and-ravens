@@ -66,9 +66,13 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
             this.combatGameState.houseCombatDatas.get(house).houseCardChosen = true;
             this.combatGameState.rerender++;
-        } else if(message.type == "support-refused") {
+        } else if (message.type == "support-refused") {
             const house = this.combatGameState.game.houses.get(message.houseId);
             this.removeSupportForHouse(house);
+            this.combatGameState.houseCombatDatas.keys.forEach(h => {
+                this.combatGameState.houseCombatDatas.get(h).houseCardChosen = false;
+            });
+            this.combatGameState.rerender++;
         }
     }
 
