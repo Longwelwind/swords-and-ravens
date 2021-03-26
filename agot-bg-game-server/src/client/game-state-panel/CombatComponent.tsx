@@ -75,7 +75,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                                         houseCardStrength: this.combatGameState.getHouseCardCombatStrength(this.attacker),
                                         valyrianSteelBlade: this.combatGameState.getValyrianBladeBonus(this.attacker),
                                         total: this.combatGameState.getTotalCombatStrength(this.attacker),
-                                        attackerHouseCardChosen: this.combatGameState.attackerHouseCardChosen
+                                        houseCardBackId: this.getHouseCardBackId(this.attacker)
                                     },
                                     {
                                         house: this.defender,
@@ -89,7 +89,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                                         houseCardStrength: this.combatGameState.getHouseCardCombatStrength(this.defender),
                                         valyrianSteelBlade: this.combatGameState.getValyrianBladeBonus(this.defender),
                                         total: this.combatGameState.getTotalCombatStrength(this.defender),
-                                        defenderHouseCardChosen: this.combatGameState.defenderHouseCardChosen
+                                        houseCardBackId: this.getHouseCardBackId(this.defender)
                                     }
                                 ]}
                             />
@@ -107,6 +107,15 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                 ])}
             </>
         );
+    }
+
+    private getHouseCardBackId(house: House): string | undefined {
+        const combatData = this.combatGameState.houseCombatDatas.get(house);
+        if (combatData.houseCardChosen) {
+            return this.props.gameState.ingameGameState.isVassalHouse(house) ? "vassal" : house.id;
+        }
+
+        return undefined;
     }
 
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {

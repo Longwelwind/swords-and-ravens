@@ -1,6 +1,7 @@
 import {observer} from "mobx-react";
 import React, {Component, ReactNode} from "react";
 import crossedSwordsImage from "../../public/images/icons/crossed-swords.svg";
+import knightBannerImage from "../../public/images/icons/knight-banner.svg";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
 import HouseCardComponent from "./game-state-panel/utils/HouseCardComponent";
@@ -20,8 +21,8 @@ interface HouseCombatData {
     houseCardStrength: number;
     valyrianSteelBlade: number;
     total: number;
-    attackerHouseCardChosen?: string;
-    defenderHouseCardChosen?: string;
+    houseCardBackId?: string;
+    isWinner?: boolean;
 }
 
 interface CombatInfoComponentProps {
@@ -63,11 +64,11 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                         {this.attacker.houseCard ? (
                             <HouseCardComponent houseCard={this.attacker.houseCard}
                                                 size="small" />
-                        ) : this.attacker.attackerHouseCardChosen
+                        ) : this.attacker.houseCardBackId
                         ? <div
                                 className="vertical-game-card small"
                                 style={{
-                                    backgroundImage: `url(${houseCardsBackImages.get(this.attacker.attackerHouseCardChosen)})`
+                                    backgroundImage: `url(${houseCardsBackImages.get(this.attacker.houseCardBackId)})`
                                 }}
                             />
                         : <div className="vertical-game-card game-card-slot small"/>}
@@ -78,11 +79,11 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                         {this.defender.houseCard ? (
                             <HouseCardComponent houseCard={this.defender.houseCard}
                                                 size="small" />
-                        ) : this.defender.defenderHouseCardChosen
+                        ) : this.defender.houseCardBackId
                         ? <div
                                 className="vertical-game-card small"
                                 style={{
-                                    backgroundImage: `url(${houseCardsBackImages.get(this.defender.defenderHouseCardChosen)})`
+                                    backgroundImage: `url(${houseCardsBackImages.get(this.defender.houseCardBackId)})`
                                 }}
                             />
                         : <div className="vertical-game-card game-card-slot small"/>}
@@ -136,6 +137,14 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                     </div>
                     <div style={{gridRow: "6", gridColumn: "4"}}>
                         <b>{this.defender.total}</b>
+                    </div>
+
+                    <div style={{gridRow: "6 / span 2", gridColumn: "1"}} className={this.attacker.isWinner ? "" : "displayNone"}>
+                        <img src={knightBannerImage} width="24"/>
+                    </div>
+
+                    <div style={{gridRow: "6 / span 2", gridColumn: "5"}} className={this.defender.isWinner ? "" : "displayNone"}>
+                        <img src={knightBannerImage} width="24"/>
                     </div>
                 </div>
             </>
