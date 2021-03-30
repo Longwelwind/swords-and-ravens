@@ -103,10 +103,14 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 gameState = gameState.childGameState;
             }
 
-            // If the game is PBEM, send a notification to all waited users
-            if (this.gameSettings.pbem && this.onWaitedUsers) {
-                this.onWaitedUsers(this.leafState.getWaitedUsers());
-            }
+            this.notifyWaitedUsers();
+        }
+    }
+
+    notifyWaitedUsers(): void {
+        // If the game is PBEM, send a notification to all waited users
+        if (this.gameSettings.pbem && this.onWaitedUsers) {
+            this.onWaitedUsers(this.leafState.getWaitedUsers());
         }
     }
 
