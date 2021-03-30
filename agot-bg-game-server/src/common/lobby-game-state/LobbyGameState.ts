@@ -67,10 +67,6 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
     onClientMessage(user: User, message: ClientMessage): void {
         if (message.type == "launch-game") {
-            if (!this.entireGame.isOwner(user)) {
-                return;
-            }
-
             if (!this.canStartGame(user).success) {
                 return;
             }
@@ -143,6 +139,8 @@ export default class LobbyGameState extends GameState<EntireGame> {
             type: "house-chosen",
             players: this.players.entries.map(([house, user]) => [house.id, user.id])
         });
+
+        this.entireGame.notifyWaitedUsers();
     }
 
     canStartGame(user: User): {success: boolean; reason: string} {
