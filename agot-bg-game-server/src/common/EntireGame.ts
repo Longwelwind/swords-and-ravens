@@ -35,6 +35,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         return this.childGameState instanceof LobbyGameState ? this.childGameState : null;
     }
 
+    get ingameGameState(): IngameGameState | null{
+        return this.childGameState instanceof IngameGameState ? this.childGameState : null;
+    }
+
     get owner(): User | null {
         return this.users.tryGet(this.ownerUserId, null);
     }
@@ -182,7 +186,15 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 settings.adwdHouseCards = true;
             }
 
+            // Check if PBEM was enabled during ingame
+            const notifyWaitedUsersDueToPbemChange = this.ingameGameState && settings.pbem && !this.gameSettings.pbem;
+
             this.gameSettings = settings;
+
+            if (notifyWaitedUsersDueToPbemChange) {
+                // Notify waited users now
+                this.notifyWaitedUsers();
+            }
 
             if (this.lobbyGameState) {
                 this.lobbyGameState.onGameSettingsChange();
