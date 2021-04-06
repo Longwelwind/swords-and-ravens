@@ -48,7 +48,7 @@ export default class RodrikTheReaderAbilityGameState extends GameState<
             this.parentGameState.onHouseCardResolutionFinish(house);
         }
         else {
-            this.setChildGameState(new SelectWesterosCardGameState(this)).firstStart(house, this.game.westerosDecks[choice-1], choice-1);
+            this.setChildGameState(new SelectWesterosCardGameState(this)).firstStart(house, choice-1);
         }
     }
 
@@ -57,10 +57,16 @@ export default class RodrikTheReaderAbilityGameState extends GameState<
             return;
         }
 
-        this.game.westerosDecks[deckId].forEach(wc => wc.discarded = false);
-        const westerosCards = _.shuffle(this.game.westerosDecks[deckId].filter(wc => wc != westerosCard));
-        westerosCards.unshift(westerosCard);
-        this.game.westerosDecks[deckId] = westerosCards;
+        const westerosDeck = this.game.westerosDecks[deckId];
+        const discardedCards = westerosDeck.filter(wc => wc.discarded);
+        const unusedCards = _.shuffle(westerosDeck.filter(wc => wc != westerosCard && !wc.discarded));
+        unusedCards.unshift(westerosCard);
+        const newWesterosDeck = _.concat(unusedCards, discardedCards);
+        if (westerosDeck.length != newWesterosDeck.length) {
+            throw new Error(`Westeros deck ${deckId} is corrupt`);
+        }
+        this.game.westerosDecks[deckId] = newWesterosDeck;
+        // Broadcast manipulated deck for "CoK Westeros Phase Variant"
         this.ingame.broadcastWesterosDecks();
         this.ingame.log({
             type: "rodrik-the-reader-used",
