@@ -7,6 +7,7 @@ import {ClientMessage} from "../../../messages/ClientMessage";
 import IngameGameState from "../IngameGameState";
 import User from "../../../server/User";
 import WesterosCard from "../game-data-structure/westeros-card/WesterosCard";
+import _ from "lodash";
 
 interface ParentGameState extends GameState<any, any> {
     game: Game;
@@ -17,17 +18,15 @@ interface ParentGameState extends GameState<any, any> {
 
 export default class SelectWesterosCardGameState<P extends ParentGameState> extends GameState<P> {
     house: House;
-    westerosCards: WesterosCard[];
     deckId: number;
 
-    firstStart(house: House, westerosCards: WesterosCard[], deckId: number): void {
-        this.house = house;
-        this.westerosCards = westerosCards;
-        this.deckId = deckId;
+    get selectableCards(): WesterosCard[] {
+        return _.uniqBy(this.parentGameState.game.westerosDecks[this.deckId].filter(wc => !wc.discarded), wc => wc.type.id);
+    }
 
-        if (westerosCards.length == 0) {
-            throw new Error("SelectWesterosCardGameState called with westerosCards.length == 0!");
-        }
+    firstStart(house: House, deckId: number): void {
+        this.house = house;
+        this.deckId = deckId;
     }
 
     select(westerosCard: WesterosCard): void {
@@ -35,7 +34,7 @@ export default class SelectWesterosCardGameState<P extends ParentGameState> exte
             type: "select-westeros-card",
             westerosCardId: westerosCard.id,
             deckId: this.deckId
-        })
+        });
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -45,16 +44,13 @@ export default class SelectWesterosCardGameState<P extends ParentGameState> exte
             }
 
             const westerosCard = this.parentGameState.game.getWesterosCardById(message.westerosCardId, message.deckId);
-
-            if (!this.westerosCards.includes(westerosCard)) {
+            if (this.deckId != message.deckId
+                || !this.parentGameState.game.westerosDecks[this.deckId].includes(westerosCard)
+                || westerosCard.discarded) {
                 return;
             }
-
-            if (this.deckId != message.deckId) {
-                return;
-            }
-
-            this.parentGameState.onSelectWesterosCardFinish(this.house, westerosCard, message.deckId);
+            
+            this.parentGameState.onSelectWesterosCardFinish(this.house, westerosCard, this.deckId);
         }
     }
 
@@ -76,7 +72,6 @@ export default class SelectWesterosCardGameState<P extends ParentGameState> exte
         const selectHouseCardGameState = new SelectWesterosCardGameState(parent);
 
         selectHouseCardGameState.house = parent.game.houses.get(data.house);
-        selectHouseCardGameState.westerosCards = parent.game.westerosDecks[data.deckId];
         selectHouseCardGameState.deckId = data.deckId;
 
         return selectHouseCardGameState;
