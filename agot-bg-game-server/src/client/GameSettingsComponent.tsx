@@ -66,7 +66,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                             <Tooltip id="adwd-house-cards-tooltip">
                                                 The house cards will come from the Dance with Dragons expansion.
                                             </Tooltip>}>
-                                            <label htmlFor="adwd-house-cards">Use <i>A Dance with Dragons</i> house cards (BETA)</label>
+                                            <label htmlFor="adwd-house-cards">Use <i>A Dance with Dragons</i> house cards</label>
                                         </OverlayTrigger>}
                                     disabled={this.props.entireGame.gameSettings.setupId == "a-dance-with-dragons"}
                                     checked={this.gameSettings.adwdHouseCards}
@@ -119,7 +119,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                             <Tooltip id="vassals-tooltip">
                                                 Unassigned houses will be vassals from Mother of Dragons expansion and players start with 7 Power tokens instead of 5.
                                             </Tooltip>}>
-                                            <label htmlFor="vassals-setting">MoD Vassals (BETA)</label>
+                                            <label htmlFor="vassals-setting">MoD Vassals</label>
                                         </OverlayTrigger>}
                                     checked={this.gameSettings.vassals}
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.vassals = !this.gameSettings.vassals)}
@@ -136,7 +136,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                             <Tooltip id="sea-orders-tooltip">
                                                 Sea order tokens from Mother of Dragons expansion will be available.
                                             </Tooltip>}>
-                                            <label htmlFor="sea-orders-setting">MoD Sea Order Tokens (BETA)</label>
+                                            <label htmlFor="sea-orders-setting">MoD Sea Order Tokens</label>
                                         </OverlayTrigger>}
                                     checked={this.gameSettings.seaOrderTokens}
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.seaOrderTokens = !this.gameSettings.seaOrderTokens)}
