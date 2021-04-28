@@ -142,7 +142,7 @@ export default class UserLabel extends Component<UserLabelProps> {
                         onClick={() => this.onLaunchReplacePlayerByVassalVoteClick()}
                         disabled={!canLaunchReplacePlayerByVassalVote}
                     >
-                        Launch a vote to replace this player by a vassal (BETA!)
+                        Launch a vote to replace this player by a vassal
                     </Dropdown.Item>
                 </ConditionalWrap>
             </>

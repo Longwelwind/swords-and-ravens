@@ -27,7 +27,7 @@
       ]
     },
     "a-dance-with-dragons": {
-      "name": "A Dance with Dragons (6 players) - BETA",
+      "name": "A Dance with Dragons (6 players)",
       "playerSetups": [{
         "playerCount": 6,
         "houses": ["stark", "greyjoy", "lannister", "baratheon", "tyrell", "martell"],
