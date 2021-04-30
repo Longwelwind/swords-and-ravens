@@ -15,6 +15,6 @@ export default class JonSnowBaratheonHouseCardAbility extends HouseCardAbility {
                 .firstStart(house);
             return;
         }
-        afterWinnerDetermination.onHouseCardResolutionFinish();
+        afterWinnerDetermination.childGameState.onHouseCardResolutionFinish(house);
     }
 }
