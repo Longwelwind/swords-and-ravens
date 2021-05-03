@@ -68,7 +68,7 @@ export default class HouseCardAbility {
         return false;
     }
 
-    doesPreventCasualties(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _affectedHouse: House): boolean {
+    doesPreventCasualties(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _affectedHouseCard: HouseCard): boolean {
         return false;
     }
 
@@ -78,6 +78,10 @@ export default class HouseCardAbility {
 
     finalCombatStrength(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _affectedHouseCard: HouseCard, strength: number): number {
         return strength;
+    }
+
+    overwritesFinalCombatStrength(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _affectedHouseCard: HouseCard): boolean {
+        return false;
     }
 
     forcesValyrianSteelBladeDecision(_combat: CombatGameState, _valyrianSteelBladeHolder: House): boolean {

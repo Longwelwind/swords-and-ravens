@@ -352,11 +352,15 @@ export default class CombatGameState extends GameState<
                 this.proceedResolveCombat();
                 return;
             }
+        }
 
+        const valyrianSteelBladeHolder = this.game.valyrianSteelBladeHolder;
+
+        // Check if the sword has not been used this round and no house card has set final combat strength of VSB holder
+        if (!this.game.valyrianSteelBladeUsed && !this.isFinalCombatStrengthOverwritten(valyrianSteelBladeHolder)) {
             // Check if one of the two participants can use the sword.
             // The commander of a vassal can use their Valyrian Steel blade
             // for their vassal, thus why the `if` checks with `getControllerOfHouse`.
-            const valyrianSteelBladeHolder = this.game.valyrianSteelBladeHolder;
             if (this.ingameGameState.getControllerOfHouse(this.attacker).house == valyrianSteelBladeHolder) {
                 this.setChildGameState(new UseValyrianSteelBladeGameState(this)).firstStart(this.attacker);
                 return;
@@ -372,6 +376,12 @@ export default class CombatGameState extends GameState<
     }
 
     areCasulatiesPrevented(affectedHouse: House): boolean {
+        const affectedHouseCard = this.houseCombatDatas.get(affectedHouse).houseCard;
+
+        if (!affectedHouseCard) {
+            return false;
+        }
+
         return this.getOrderResolutionHouseCard().reduce((s, h) => {
             const houseCard = this.houseCombatDatas.get(h).houseCard;
 
@@ -379,7 +389,31 @@ export default class CombatGameState extends GameState<
                 return s;
             }
 
-            return houseCard.ability ? s || houseCard.ability.doesPreventCasualties(this, h, houseCard, affectedHouse) : s;
+            return houseCard.ability ? s || houseCard.ability.doesPreventCasualties(this, h, houseCard, affectedHouseCard) : s;
+        }, false);
+    }
+
+    isFinalCombatStrengthOverwritten(affectedHouse: House): boolean {
+        // We want to allow passing any house (like VSB holder) to this method,
+        // so we have to check if the house is really participating in combat
+        if (!this.houseCombatDatas.has(affectedHouse)) {
+            return false;
+        }
+
+        const affectedHouseCard = this.houseCombatDatas.get(affectedHouse).houseCard;
+
+        if (!affectedHouseCard) {
+            return false;
+        }
+
+        return this.getOrderResolutionHouseCard().reduce((res, h) => {
+            const houseCard = this.houseCombatDatas.get(h).houseCard;
+
+            if (houseCard == null) {
+                return res;
+            }
+
+            return houseCard.ability ? res || houseCard.ability.overwritesFinalCombatStrength(this, h, houseCard, affectedHouseCard) : res;
         }, false);
     }
 
