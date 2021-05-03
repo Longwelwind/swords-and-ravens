@@ -73,6 +73,13 @@ function getHouseCardData(container: {[key: string]: HouseCardContainer}): [stri
     return result;
 }
 
+function getTrackWithAdjustedVassalPositions(track: House[], playerHouses: string[]): House[] {
+    const vassalsInTopThreeSpaces = track.filter((h, i) => i <= 2 && !playerHouses.includes(h.id));
+    const newTrack = _.without(track, ...vassalsInTopThreeSpaces);
+    newTrack.push(...vassalsInTopThreeSpaces);
+    return newTrack;
+}
+
 export const baseHouseCardsData = getHouseCardData(baseGameData.houses);
 export const adwdHouseCardsData = getHouseCardData(baseGameData.adwdHouseCards);
 
@@ -187,6 +194,11 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     } else {
         game.kingsCourtTrack = baseGameData.tracks.kingsCourt.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     }
+
+    // Remove vassals from the top 3 spaces on each track
+    game.ironThroneTrack = getTrackWithAdjustedVassalPositions(game.ironThroneTrack, playerHouses);
+    game.fiefdomsTrack = getTrackWithAdjustedVassalPositions(game.fiefdomsTrack, playerHouses);
+    game.kingsCourtTrack = getTrackWithAdjustedVassalPositions(game.kingsCourtTrack, playerHouses);
 
     // Loading Tiled map
     const garrisonsFromGameSetup = entireGame.selectedGameSetup.garrisons ? new BetterMap(Object.entries(entireGame.selectedGameSetup.garrisons)) : null;
