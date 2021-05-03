@@ -36,7 +36,12 @@ export default class BericDondarrionAbilityGameState extends GameState<
 
     firstStart(house: House): void {
         this.house = house;
-        this.setChildGameState(new SelectUnitsGameState(this)).firstStart(house, this.combat.houseCombatDatas.get(house).army, 1);
+        const army = this.combat.houseCombatDatas.get(house).army;
+        if (army.length > 0) {
+            this.setChildGameState(new SelectUnitsGameState(this)).firstStart(house, army, 1);
+        } else {
+            this.parentGameState.onHouseCardResolutionFinish(house);
+        }
     }
 
     onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][]): void {
