@@ -49,7 +49,7 @@ export default class SelectWesterosCardGameState<P extends ParentGameState> exte
                 || westerosCard.discarded) {
                 return;
             }
-            
+
             this.parentGameState.onSelectWesterosCardFinish(this.house, westerosCard, this.deckId);
         }
     }
