@@ -31,11 +31,11 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     // Client-side callback fired whenever the current GameState changes.
     onClientGameStateChange: (() => void) | null;
 
-    get lobbyGameState(): LobbyGameState | null{
+    get lobbyGameState(): LobbyGameState | null {
         return this.childGameState instanceof LobbyGameState ? this.childGameState : null;
     }
 
-    get ingameGameState(): IngameGameState | null{
+    get ingameGameState(): IngameGameState | null {
         return this.childGameState instanceof IngameGameState ? this.childGameState : null;
     }
 
@@ -119,28 +119,20 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     isOwner(user: User): boolean {
-        const owner = this.owner;
-        if (!owner) {
-            return this.isRealOwner(user);
-        }
-
-        // If owner is not seated every player becomes owner ...
         if (this.lobbyGameState) {
-            if (this.lobbyGameState.players.values.includes(owner)) {
-                return this.isRealOwner(user);
-            } else {
-                // ... and can kick players, change settings, start the game, etc. in LobbyGameState
-                return this.lobbyGameState.players.values.includes(user);
-            }
+            // If owner is not seated every player becomes owner
+            // and can kick players, change settings, start the game, etc. in LobbyGameState
+            return this.lobbyGameState.players.values.map(u => u.id).includes(this.ownerUserId)
+                ? this.isRealOwner(user)
+                : this.isRealOwner(user) || this.lobbyGameState.players.values.includes(user);
         }
 
-        if (this.childGameState instanceof IngameGameState) {
-            if (this.childGameState.players.keys.includes(owner)) {
-                return this.isRealOwner(user);
-            } else {
-                // ... and can toggle PBEM during game
-                return this.childGameState.players.keys.includes(user);
-            }
+        if (this.ingameGameState) {
+            // If owner is not present ingame
+            // every player becomes owner to be able to toggle PBEM
+            return this.ingameGameState.players.keys.map(u => u.id).includes(this.ownerUserId)
+                ? this.isRealOwner(user)
+                : this.ingameGameState.players.keys.includes(user);
         }
 
         return this.isRealOwner(user);
