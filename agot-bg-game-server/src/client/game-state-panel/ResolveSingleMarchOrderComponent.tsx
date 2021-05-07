@@ -12,8 +12,6 @@ import BetterMap from "../../utils/BetterMap";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
 import {OrderOnMapProperties, RegionOnMapProperties, UnitOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
 import House from "../../common/ingame-game-state/game-data-structure/House";
@@ -74,7 +72,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                         )}
                         {this.selectedMarchOrderRegion != null && (
                             <>
-                                {allUnitsLeft && this.renderLeavePowerToken(this.selectedMarchOrderRegion)}
+                                {this.renderLeavePowerToken(this.selectedMarchOrderRegion)}
                                 <Col xs={12}>
                                     <Row className="justify-content-center">
                                         <Col xs="auto">
@@ -137,75 +135,65 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         const portRegion = startingRegion.game.world.getAdjacentPortOfCastle(startingRegion);
         const hasShipsInPort = portRegion == null ? false : portRegion.units.size > 0;
         const unitOwner = startingRegion.units.values[0].allegiance;
+        const noPowerTokenPresent = startingRegion.controlPowerToken == null;
         const superTokenOwner = startingRegion.superControlPowerToken;
         const superTokenOwnerName = superTokenOwner != null ? superTokenOwner.name : "";
-        const warningToShow = superTokenOwner == null && portRegion != null && hasShipsInPort ? (
+        const warningToShow = noPowerTokenPresent && superTokenOwner == null && portRegion != null && hasShipsInPort ? (
             <small>If you do not leave a token, the ships in <b>{ portRegion.name }</b> will be destroyed.</small>
-        ) : superTokenOwner != null && superTokenOwner != unitOwner && portRegion != null && hasShipsInPort ? (
+        ) : noPowerTokenPresent && superTokenOwner != null && superTokenOwner != unitOwner && portRegion != null && hasShipsInPort ? (
             <small>If you do not leave a token, <b>{superTokenOwnerName}</b> will regain control of <b>{startingRegion.name}</b> and capture your ships in <b>{portRegion.name}</b>.</small>
-        ) : superTokenOwner != null && superTokenOwner != unitOwner && portRegion != null && !hasShipsInPort ? (
+        ) : noPowerTokenPresent && superTokenOwner != null && superTokenOwner != unitOwner && portRegion != null && !hasShipsInPort ? (
             <small>If you do not leave a token, <b>{superTokenOwnerName}</b> will regain control of <b>{startingRegion.name}</b>.</small>
         ) : null;
 
-        return this.plannedMoves.size > 0 && (
+        const showLeavePowerTokenPrompt = this.canLeavePowerTokenReason == "ok";
+
+        return this.plannedMoves.size > 0 &&
             <Col xs={12} className="text-center">
-                <OverlayTrigger overlay={
-                    <Tooltip id={"leave-power-token"}>
-                        {this.canLeavePowerTokenReason == "already-capital" ? (
-                            <>Your capital is always controlled by your house, thus not requiring a Power
-                                token to be left when leaving the area to keep control of it.</>
-                        ) : this.canLeavePowerTokenReason == "already-power-token" ? (
-                            <>A Power token is already present.</>
-                        ) : this.canLeavePowerTokenReason == "no-power-token-available" ? (
-                            "You don't have any available Power token."
-                        ) : this.canLeavePowerTokenReason == "not-a-land" ? (
-                            "Power tokens can only be left on land areas."
-                        ) : this.canLeavePowerTokenReason == "no-all-units-go" ? (
-                            "All units must leave the area in order to leave a Power token."
-                        ) : this.canLeavePowerTokenReason == "vassals-always-leave-power-token" ? (
-                            "Vassals always leave a Power token."
-                        ) : "Leaving a Power token in an area maintain the control your house has on it, even"
-                            + " if all units your units leave the area."}
-                    </Tooltip>
-                }>
-                    <Form>
-                        <fieldset>
-                            <Form.Group>
-                                <Col xs={12} className="mb-0 pb-0">
-                                    <Form.Label>
-                                        Do you want to leave a Power token in <b>{startingRegion.name}</b> to keep control?
-                                    </Form.Label>
-                                </Col>
-                                <Col xs={12} className="mt-0 pt-0">
-                                    <Form.Check
-                                        id="chk-leave-pt"
-                                        name="leave-pt-radios"
-                                        inline
-                                        type="radio"
-                                        label="Yes"
-                                        checked={this.leavePowerToken}
-                                        onChange={() => this.onLeavePowerTokenChange(true)}/>
-                                    <Form.Check
-                                        id="chk-dont-leave-pt"
-                                        name="leave-pt-radios"
-                                        inline
-                                        type="radio"
-                                        label="No"
-                                        checked={this.leavePowerToken == false}
-                                        onChange={() => this.onLeavePowerTokenChange(false)}/>
-                                </Col>
-                                {this.leavePowerToken == false && warningToShow != null && (
-                                <Col xs={12} className="mt-1 pt-0 mb-0 pb-0">
-                                    <Form.Label>
-                                        {warningToShow}
-                                    </Form.Label>
-                                </Col>)}
-                            </Form.Group>
-                        </fieldset>
-                    </Form>
-                </OverlayTrigger>
+                <Form>
+                    <fieldset>
+                        <Form.Group>
+                            {showLeavePowerTokenPrompt
+                            ? <>
+                                    <Col xs={12} className="mb-0 pb-0">
+                                        <Form.Label>
+                                            Do you want to leave a Power token in <b>{startingRegion.name}</b> to keep control?
+                                        </Form.Label>
+                                    </Col>
+                                    <Col xs={12} className="mt-0 pt-0">
+                                        <Form.Check
+                                            id="chk-leave-pt"
+                                            name="leave-pt-radios"
+                                            inline
+                                            type="radio"
+                                            label="Yes"
+                                            checked={this.leavePowerToken}
+                                            onChange={() => this.onLeavePowerTokenChange(true)}/>
+                                        <Form.Check
+                                            id="chk-dont-leave-pt"
+                                            name="leave-pt-radios"
+                                            inline
+                                            type="radio"
+                                            label="No"
+                                            checked={this.leavePowerToken == false}
+                                            onChange={() => this.onLeavePowerTokenChange(false)}/>
+                                    </Col>
+                                </>
+                            : this.canLeavePowerTokenReason == "vassals-always-leave-power-token"
+                            ? <Col xs={12} className="text-center mb-0 pb-0"><small>Vassals automatically leave a Power token behind to maintain control of <b>{startingRegion.name}</b>.</small></Col>
+                            : this.canLeavePowerTokenReason == "no-power-token-available"
+                            ? <Col xs={12} className="text-center mb-0 pb-0">You don&apos;t have any Power tokens left!</Col>
+                            : <></>}
+                            {this.leavePowerToken == false && warningToShow != null && (
+                            <Col xs={12} className="mt-1 pt-0 mb-0 pb-0">
+                                <Form.Label>
+                                    {warningToShow}
+                                </Form.Label>
+                            </Col>)}
+                        </Form.Group>
+                    </fieldset>
+                </Form>
             </Col>
-        );
     }
 
     onLeavePowerTokenChange(leaveToken: boolean): void {
