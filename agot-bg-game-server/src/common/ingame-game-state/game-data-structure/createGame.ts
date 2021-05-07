@@ -74,10 +74,16 @@ function getHouseCardData(container: {[key: string]: HouseCardContainer}): [stri
 }
 
 function getTrackWithAdjustedVassalPositions(track: House[], playerHouses: string[]): House[] {
-    const vassalsInTopThreeSpaces = track.filter((h, i) => i <= 2 && !playerHouses.includes(h.id));
-    const newTrack = _.without(track, ...vassalsInTopThreeSpaces);
-    newTrack.push(...vassalsInTopThreeSpaces);
-    return newTrack;
+    const areVassalsInTopThreeSpaces = _.take(track, 3).some(h => !playerHouses.includes(h.id));
+
+    if (areVassalsInTopThreeSpaces) {
+        const vassals = track.filter(h => !playerHouses.includes(h.id));
+        const newTrack = _.without(track, ...vassals);
+        newTrack.push(...vassals);
+        return newTrack;
+    }
+
+    return track;
 }
 
 export const baseHouseCardsData = getHouseCardData(baseGameData.houses);
