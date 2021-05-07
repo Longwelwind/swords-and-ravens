@@ -109,6 +109,10 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                 action: PlayerActionType.HOUSE_CARD_CHOSEN
             });
 
+            if (message.burnValyrianSteelBlade && player.house == this.combatGameState.game.valyrianSteelBladeHolder) {
+                this.combatGameState.valyrianSteelBladeUser = player.house;
+            }
+
             this.checkAndProceedEndOfChooseHouseCardGameState();
         } else if(message.type == "refuse-support") {
             const commandedHouse = this.combatGameState.tryGetCommandedHouseInCombat(player);
@@ -153,10 +157,11 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         return this.choosableHouseCards.get(house);
     }
 
-    chooseHouseCard(houseCard: HouseCard): void {
+    chooseHouseCard(houseCard: HouseCard, burnValyrianSteelBlade: boolean): void {
         this.entireGame.sendMessageToServer({
             type: "choose-house-card",
-            houseCardId: houseCard.id
+            houseCardId: houseCard.id,
+            burnValyrianSteelBlade: burnValyrianSteelBlade
         });
     }
 

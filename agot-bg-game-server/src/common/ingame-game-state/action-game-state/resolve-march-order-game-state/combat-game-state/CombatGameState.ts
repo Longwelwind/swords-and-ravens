@@ -336,6 +336,23 @@ export default class CombatGameState extends GameState<
     onBeforeCombatResolutionFinish(): void {
         // Check if the sword has not been used this round
         if (!this.game.valyrianSteelBladeUsed) {
+            // Check if VSB holder already decided to use (burn) the VSB during choose house card game state
+            if (this.valyrianSteelBladeUser != null) {
+                this.game.valyrianSteelBladeUsed = true;
+                this.ingameGameState.log({
+                    type: "combat-valyrian-sword-used",
+                    house: this.valyrianSteelBladeUser.id
+                });
+
+                this.entireGame.broadcastToClients({
+                    type: "change-valyrian-steel-blade-use",
+                    used: true
+                });
+
+                this.proceedResolveCombat();
+                return;
+            }
+
             // Check if one of the two participants can use the sword.
             // The commander of a vassal can use their Valyrian Steel blade
             // for their vassal, thus why the `if` checks with `getControllerOfHouse`.

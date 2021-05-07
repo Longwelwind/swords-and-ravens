@@ -70,6 +70,7 @@ interface UseValyrianSteelBlade {
 interface ChooseHouseCard {
     type: "choose-house-card";
     houseCardId: string;
+    burnValyrianSteelBlade: boolean;
 }
 
 interface ChooseCasualties {
