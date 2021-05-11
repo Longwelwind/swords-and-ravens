@@ -7,6 +7,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import EntireGameComponent from "./EntireGameComponent";
 import Alert from "react-bootstrap/Alert";
+import User from "../server/User";
 
 interface AppProps {
     gameClient: GameClient;
@@ -14,9 +15,14 @@ interface AppProps {
 
 @observer
 export default class App extends Component<AppProps> {
+    get authenticatedUser(): User | null {
+        return this.props.gameClient.authenticatedUser;
+    }
     render(): ReactNode {
+        const responsiveLayout = this.authenticatedUser ? this.authenticatedUser.settings.responsiveLayout : false;
+        const minWidth = responsiveLayout ? "auto" : "1920px";
         return (
-            <Container fluid style={{marginTop: "1rem", marginBottom: "4.5rem", maxWidth: "1920px"}}>
+            <Container fluid={responsiveLayout} style={{marginTop: "1rem", marginBottom: "4.5rem", maxWidth: "1920px", minWidth: minWidth}}>
                 <Row className="justify-content-center">
                     {this.props.gameClient.connectionState == ConnectionState.INITIALIZING ? (
                         <Col xs={3}>

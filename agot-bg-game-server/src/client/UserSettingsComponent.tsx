@@ -20,12 +20,33 @@ interface UserSettingsComponentProps {
 export default class UserSettingsComponent extends Component<UserSettingsComponentProps> {
     @observable mapScrollbar = false;
     @observable chatHouseNames = false;
+    @observable responsiveLayout = false;
 
     render(): ReactNode {
         return (
             <>
                 {this.props.user && this.props.entireGame.childGameState instanceof IngameGameState && (
                     <>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="responsive-layout-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="responsive-layout-setting-tooltip">
+                                                Enables the previous responsive layout on devices with a small screen.
+                                            </Tooltip>}>
+                                            <label htmlFor="responsive-layout-setting">Responsive layout</label>
+                                        </OverlayTrigger>}
+                                    checked={this.responsiveLayout}
+                                    onChange={() => {
+                                        this.responsiveLayout = !this.responsiveLayout;
+                                        this.changeUserSettings();
+                                    }}
+                                />
+                            </Col>
+                        </Row>
                         <Row>
                             <Col xs="auto">
                                 <FormCheck
@@ -83,6 +104,7 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
         if (this.props.user) {
             this.props.user.settings.mapScrollbar = this.mapScrollbar;
             this.props.user.settings.chatHouseNames = this.chatHouseNames;
+            this.props.user.settings.responsiveLayout = this.responsiveLayout;
             this.props.user.syncSettings();
         }
 
