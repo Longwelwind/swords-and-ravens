@@ -178,6 +178,7 @@ export interface UserSettings {
     mapScrollbar: boolean;
     lastOpenedTab: string | null;
     chatHouseNames: boolean;
+    responsiveLayout: boolean;
 }
 
 interface ChangeGameSettings {

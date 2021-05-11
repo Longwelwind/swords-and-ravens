@@ -100,9 +100,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         const connectedSpectators = this.getConnectedSpectators();
 
+        const responsiveLayout = this.user ? this.user.settings.responsiveLayout : false;
+
         return (
             <>
-                <Col xs={{span: "auto", order: "3"}}  xl={{span: "auto", order: "1"}}>
+                <Col xs={{span: "auto", order: responsiveLayout ? "3" : "1"}}  xl={{span: "auto", order: "1"}}>
                     <Row className="stackable">
                         <Col>
                             <Card>
@@ -252,9 +254,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         />
                     </div>
                 </Col>
-                <Col xs={{span: "8", order: "1"}} xl={{span: 3, order: "3"}}>
+                <Col xs={{span: responsiveLayout ? "8" : "3", order: responsiveLayout ? "1" : "3"}} xl={{span: 3, order: "3"}}>
                     <Row className="mt-0"> {/* This row is necessary to make child column ordering work */}
-                        <Col xs={{span: "12", order: "2"}} xl={{span: "12", order: "1"}}>
+                        <Col xs={{span: "12", order: responsiveLayout ? "2" : "1"}} xl={{span: "12", order: "1"}}>
                             <Row>
                                 <Col>
                                     <Card border={this.props.gameClient.isOwnTurn() ? "warning" : undefined} bg={this.props.gameState.childGameState instanceof CancelledGameState ? "danger" : undefined}>
@@ -333,7 +335,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </Col>
                             </Row>
                         </Col>
-                        <Col xs={{span: "12", order: "1"}} xl={{span: "12", order: "2"}}>
+                        <Col xs={{span: "12", order: responsiveLayout ? "1" : "2"}} xl={{span: "12", order: "2"}}>
                             <Card>
                                 <Tab.Container activeKey={this.currentOpenedTab}
                                     onSelect={k => {
