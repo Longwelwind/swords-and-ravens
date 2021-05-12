@@ -8,21 +8,47 @@ import Col from "react-bootstrap/Col";
 import EntireGameComponent from "./EntireGameComponent";
 import Alert from "react-bootstrap/Alert";
 import User from "../server/User";
+import { observable } from "mobx";
+import EntireGame from "../common/EntireGame";
+import IngameGameState from "../common/ingame-game-state/IngameGameState";
 
 interface AppProps {
     gameClient: GameClient;
 }
 
+export const MIN_WIDTH_FOR_DESKTOP_LAYOUT = 1650;
+
 @observer
 export default class App extends Component<AppProps> {
-    get authenticatedUser(): User | null {
+    @observable width = window.innerWidth;
+
+    get user(): User | null {
         return this.props.gameClient.authenticatedUser;
     }
+
+    get entireGame(): EntireGame | null {
+        return this.props.gameClient.entireGame;
+    }
+
+    get isConnected(): boolean {
+        return this.props.gameClient.connectionState == ConnectionState.SYNCED &&  this.entireGame != null;
+    }
+
+    get isGameRunning(): boolean {
+        return this.entireGame != null && this.entireGame.childGameState instanceof IngameGameState;
+    }
+
     render(): ReactNode {
-        const responsiveLayout = this.authenticatedUser ? this.authenticatedUser.settings.responsiveLayout : false;
-        const minWidth = responsiveLayout ? "auto" : "1920px";
+        let responsiveLayout = true;
+        let minWidth = "auto";
+
+        if (this.isConnected && this.isGameRunning) {
+            responsiveLayout = this.width >= MIN_WIDTH_FOR_DESKTOP_LAYOUT || (this.user ? this.user.settings.responsiveLayout : false);
+            minWidth = responsiveLayout ? "auto" : `${MIN_WIDTH_FOR_DESKTOP_LAYOUT}px`;
+        }
+
         return (
-            <Container fluid={responsiveLayout} style={{marginTop: "1rem", marginBottom: "4.5rem", maxWidth: "1920px", minWidth: minWidth}}>
+            <Container fluid={responsiveLayout} style={{marginTop: "0.75rem", marginBottom: "2rem", maxWidth: "1910px", minWidth: minWidth}}>
                 <Row className="justify-content-center">
                     {this.props.gameClient.connectionState == ConnectionState.INITIALIZING ? (
                         <Col xs={3}>
@@ -36,8 +62,8 @@ export default class App extends Component<AppProps> {
                         <Col xs={3}>
                             Authenticating
                         </Col>
-                    ) : this.props.gameClient.connectionState == ConnectionState.SYNCED && this.props.gameClient.entireGame ? (
-                        <EntireGameComponent gameClient={this.props.gameClient} entireGame={this.props.gameClient.entireGame} />
+                    ) : this.isConnected ? (
+                        <EntireGameComponent gameClient={this.props.gameClient} entireGame={this.props.gameClient.entireGame as EntireGame} />
                     ) : this.props.gameClient.connectionState == ConnectionState.CLOSED ? (
                         <Col xs={12} md={3}>
                             <Alert variant="danger">
@@ -53,5 +79,17 @@ export default class App extends Component<AppProps> {
                 </Row>
             </Container>
         );
+    }
+
+    setWidth(): void {
+        this.width = window.innerWidth;
+    }
+
+    componentDidMount(): void {
+        window.addEventListener('resize', () => this.setWidth());
+    }
+
+    componentWillUnmount(): void {
+        window.removeEventListener('resize', () => this.setWidth());
     }
 }

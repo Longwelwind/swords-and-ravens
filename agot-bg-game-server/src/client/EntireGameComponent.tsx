@@ -29,7 +29,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 <link rel="icon" href={this.props.gameClient.isOwnTurn() ? faviconAlert : faviconNormal} sizes="16x16" />
             </Helmet>
             <Col xs={12}>
-                    <h3 style={{marginLeft: "1rem"}}>
+                    <h3 style={{marginLeft: "1rem", marginBottom: "0rem", textAlign: "center"}}>
                         {this.props.entireGame.name} <Badge variant="primary" className={classNames({'invisible': !this.props.entireGame.gameSettings.pbem})}>PBEM</Badge>
                     </h3>
                 </Col>

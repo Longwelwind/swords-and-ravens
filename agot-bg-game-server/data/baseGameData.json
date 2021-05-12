@@ -8,7 +8,7 @@
   },
   "setups": {
     "base-game": {
-      "name": "2nd Edition Base Game (3 or 6 players)",
+      "name": "2nd Edition Base Game (3p/6p)",
       "playerSetups": [
         {
           "playerCount": 3,
@@ -27,7 +27,7 @@
       ]
     },
     "a-dance-with-dragons": {
-      "name": "A Dance with Dragons (6 players)",
+      "name": "A Dance with Dragons (6p)",
       "playerSetups": [{
         "playerCount": 6,
         "houses": ["stark", "greyjoy", "lannister", "baratheon", "tyrell", "martell"],
@@ -368,7 +368,7 @@
       }]
     },
     "struggle-in-the-north": {
-      "name": "Struggle in the North (4 or 5 players)",
+      "name": "Struggle in the North (4p/5p)",
       "playerSetups": [
         {
           "playerCount": 4,
@@ -390,7 +390,7 @@
       ]
     },
     "rumble-in-the-south": {
-      "name": "Rumble in the South (4 players)",
+      "name": "Rumble in the South (4p)",
       "playerSetups": [
         {
           "playerCount": 4,
@@ -406,7 +406,7 @@
       ]
     },
     "race-to-kings-landing": {
-      "name": "Race to King's Landing (5 players)",
+      "name": "Race to King's Landing (5p)",
       "playerSetups": [
         {
           "playerCount": 5,
@@ -421,7 +421,7 @@
       ]
     },
     "no-kraken-for-dinner": {
-      "name": "No Kraken for Dinner (5 players)",
+      "name": "No Kraken for Dinner (5p)",
       "playerSetups": [
         {
           "playerCount": 5,
@@ -434,7 +434,7 @@
       ]
     },
     "learn-the-game": {
-      "name": "Learn the Game (2 players)",
+      "name": "Teach the Game (2p)",
       "playerSetups": [
         {
           "playerCount": 2,
