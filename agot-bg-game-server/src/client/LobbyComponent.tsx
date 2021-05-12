@@ -50,7 +50,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
         const {success: canCancelGame, reason: canCancelGameReason} = this.lobby.canCancel(this.authenticatedUser);
 
         return (
-            <Col xs={12} sm={10} md={8} lg={6} xl={3}>
+            <Col xs={11} md={8} xl={6}>
                 <Row>
                     <Col>
                         <Card>

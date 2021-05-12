@@ -71,7 +71,7 @@ interface IngameComponentProps {
 export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
     @observable currentOpenedTab = (this.user && this.user.settings.lastOpenedTab) ? this.user.settings.lastOpenedTab : "chat";
-    @observable height: number | null = null;
+    @observable height = (this.user && this.user.settings.mapScrollbar) ? window.innerHeight : null;
 
     get game(): Game {
         return this.props.gameState.game;
@@ -246,7 +246,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </Row>
                 </Col>
                 <Col xs={{span: "auto", order: "2"}} xl={{span: "auto", order: "2"}}>
-                    <div style={{height: this.height != null ? this.height - 90 : "auto", overflowY: this.height != null ? "scroll" : "visible", maxHeight: 1378, minHeight: 460}}>
+                    <div style={{height: this.height != null ? this.height - 100 : "auto", overflowY: this.height != null ? "scroll" : "visible", maxHeight: 1378, minHeight: 460}}>
                         <MapComponent
                             gameClient={this.props.gameClient}
                             ingameGameState={this.props.gameState}
@@ -564,7 +564,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         ));
     }
 
-    adjustMapHeight(): void {
+    setHeight(): void {
         this.height = (this.user && this.user.settings.mapScrollbar) ? window.innerHeight : null;
     }
 
@@ -574,12 +574,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     componentDidMount(): void {
         this.props.gameState.entireGame.onNewPrivateChatRoomCreated = (roomId: string) => this.onNewPrivateChatRoomCreated(roomId);
-        this.adjustMapHeight();
-        window.addEventListener('resize', () => this.adjustMapHeight());
+        window.addEventListener('resize', () => this.setHeight());
     }
 
     componentWillUnmount(): void {
         this.props.gameState.entireGame.onNewPrivateChatRoomCreated = null;
-        window.removeEventListener('resize', () => this.adjustMapHeight());
+        window.removeEventListener('resize', () => this.setHeight());
     }
 }
