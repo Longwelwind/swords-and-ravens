@@ -44,7 +44,7 @@ export default class App extends Component<AppProps> {
 
         if (this.isConnected && this.isGameRunning) {
             responsiveLayout = this.width >= MIN_WIDTH_FOR_DESKTOP_LAYOUT || (this.user ? this.user.settings.responsiveLayout : false);
-            minWidth = responsiveLayout ? "auto" : `${MIN_WIDTH_FOR_DESKTOP_LAYOUT}px`;
+            minWidth = responsiveLayout ? "auto" : "1910px";
         }
 
         return (
