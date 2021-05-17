@@ -8,7 +8,7 @@ import Col from "react-bootstrap/Col";
 import EntireGameComponent from "./EntireGameComponent";
 import Alert from "react-bootstrap/Alert";
 import User from "../server/User";
-import { observable } from "mobx";
+import {isMobile} from 'react-device-detect';
 import EntireGame from "../common/EntireGame";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 
@@ -16,12 +16,8 @@ interface AppProps {
     gameClient: GameClient;
 }
 
-export const MIN_WIDTH_FOR_DESKTOP_LAYOUT = 1650;
-
 @observer
 export default class App extends Component<AppProps> {
-    @observable width = window.innerWidth;
-
     get user(): User | null {
         return this.props.gameClient.authenticatedUser;
     }
@@ -42,8 +38,8 @@ export default class App extends Component<AppProps> {
         let responsiveLayout = true;
         let minWidth = "auto";
 
-        if (this.isConnected && this.isGameRunning) {
-            responsiveLayout = this.width >= MIN_WIDTH_FOR_DESKTOP_LAYOUT || (this.user ? this.user.settings.responsiveLayout : false);
+        if (isMobile && this.isConnected && this.isGameRunning) {
+            responsiveLayout = this.user ? this.user.settings.responsiveLayout : false;
             minWidth = responsiveLayout ? "auto" : "1910px";
         }
 
@@ -79,17 +75,5 @@ export default class App extends Component<AppProps> {
                 </Row>
             </Container>
         );
-    }
-
-    setWidth(): void {
-        this.width = window.innerWidth;
-    }
-
-    componentDidMount(): void {
-        window.addEventListener('resize', () => this.setWidth());
-    }
-
-    componentWillUnmount(): void {
-        window.removeEventListener('resize', () => this.setWidth());
     }
 }
