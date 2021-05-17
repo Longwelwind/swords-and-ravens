@@ -38,7 +38,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     }
 
     render(): ReactNode {
-        const allUnitsLeft = this.selectedMarchOrderRegion ? this.props.gameState.haveAllUnitsLeft(this.selectedMarchOrderRegion, this.plannedMoves) : false;
+        const allUnitsWillLeaveStartingRegion = this.selectedMarchOrderRegion ? this.props.gameState.haveAllUnitsLeft(this.selectedMarchOrderRegion, this.plannedMoves) : false;
         return (
             <>
                 <Col xs={12} className="text-center">
@@ -50,9 +50,9 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                         <Col xs={12} className="text-center">
                             {this.selectedMarchOrderRegion == null ? (
                                 "Click on one of your March Orders."
-                            ) : this.selectedUnits.length == 0 && !allUnitsLeft ? (
+                            ) : this.selectedUnits.length == 0 && !allUnitsWillLeaveStartingRegion ? (
                                 <>Click on a subset of the troops in <b>{this.selectedMarchOrderRegion.name}</b>.</>
-                            ) : !allUnitsLeft ? (
+                            ) : !allUnitsWillLeaveStartingRegion ? (
                                 <>Click on a neighbouring region, or click on other units in <b>{this.selectedMarchOrderRegion.name}</b>.</>
                             ) : (<></>)}
                         </Col>
@@ -72,7 +72,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                         )}
                         {this.selectedMarchOrderRegion != null && (
                             <>
-                                {this.renderLeavePowerToken(this.selectedMarchOrderRegion)}
+                                {this.renderLeavePowerToken(this.selectedMarchOrderRegion, allUnitsWillLeaveStartingRegion)}
                                 <Col xs={12}>
                                     <Row className="justify-content-center">
                                         <Col xs="auto">
@@ -131,18 +131,18 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         }
     }
 
-    renderLeavePowerToken(startingRegion: Region): ReactNode | null {
+    renderLeavePowerToken(startingRegion: Region, allUnitsWillLeaveStartingRegion: boolean): ReactNode | null {
         const portRegion = startingRegion.game.world.getAdjacentPortOfCastle(startingRegion);
         const hasShipsInPort = portRegion == null ? false : portRegion.units.size > 0;
         const unitOwner = startingRegion.units.values[0].allegiance;
-        const noPowerTokenPresent = startingRegion.controlPowerToken == null;
+        const moveWillLoseControlOverRegion = startingRegion.controlPowerToken == null && allUnitsWillLeaveStartingRegion;
         const superTokenOwner = startingRegion.superControlPowerToken;
         const superTokenOwnerName = superTokenOwner != null ? superTokenOwner.name : "";
-        const warningToShow = noPowerTokenPresent && superTokenOwner == null && portRegion != null && hasShipsInPort ? (
+        const warningToShow = moveWillLoseControlOverRegion && superTokenOwner == null && portRegion != null && hasShipsInPort ? (
             <small>If you do not leave a token, the ships in <b>{ portRegion.name }</b> will be destroyed.</small>
-        ) : noPowerTokenPresent && superTokenOwner != null && superTokenOwner != unitOwner && portRegion != null && hasShipsInPort ? (
+        ) : moveWillLoseControlOverRegion && superTokenOwner != null && superTokenOwner != unitOwner && portRegion != null && hasShipsInPort ? (
             <small>If you do not leave a token, <b>{superTokenOwnerName}</b> will regain control of <b>{startingRegion.name}</b> and capture your ships in <b>{portRegion.name}</b>.</small>
-        ) : noPowerTokenPresent && superTokenOwner != null && superTokenOwner != unitOwner && portRegion != null && !hasShipsInPort ? (
+        ) : moveWillLoseControlOverRegion && superTokenOwner != null && superTokenOwner != unitOwner && portRegion != null && !hasShipsInPort ? (
             <small>If you do not leave a token, <b>{superTokenOwnerName}</b> will regain control of <b>{startingRegion.name}</b>.</small>
         ) : null;
 

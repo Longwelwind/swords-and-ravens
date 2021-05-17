@@ -25,6 +25,7 @@ import joinReactNodes from "./utils/joinReactNodes";
 import StaticBorder from "../common/ingame-game-state/game-data-structure/static-data-structure/StaticBorder";
 import { land } from "../common/ingame-game-state/game-data-structure/regionTypes";
 import PlaceOrdersGameState from "../common/ingame-game-state/planning-game-state/place-orders-game-state/PlaceOrdersGameState";
+import UseRavenGameState from "../common/ingame-game-state/action-game-state/use-raven-game-state/UseRavenGameState";
 
 interface MapComponentProps {
     gameClient: GameClient;
@@ -285,7 +286,12 @@ export default class MapComponent extends Component<MapComponentProps> {
     }
 
     renderOrder(region: Region, order: Order | null, backgroundUrl: string, properties: OrderOnMapProperties, _isActionGameState: boolean): ReactNode {
-        const planningOrAction = this.ingame.childGameState instanceof PlanningGameState || this.ingame.childGameState instanceof ActionGameState ? this.ingame.childGameState : null;
+        let planningOrAction = (this.ingame.childGameState instanceof PlanningGameState || this.ingame.childGameState instanceof ActionGameState) ? this.ingame.childGameState : null;
+
+        if (planningOrAction instanceof ActionGameState && !(planningOrAction.childGameState instanceof UseRavenGameState)) {
+            // Do not show restricted orders after Raven state because Doran may cause a restricted order to be shown which still can be executed
+            planningOrAction = null;
+        }
 
         return (
             <div className={classNames(
