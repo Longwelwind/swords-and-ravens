@@ -35,12 +35,19 @@ export default class App extends Component<AppProps> {
     }
 
     render(): ReactNode {
-        let responsiveLayout = true;
+        const responsiveLayout = this.user ? this.user.settings.responsiveLayout : false;
         let minWidth = "auto";
 
-        if (isMobile && this.isConnected && this.isGameRunning) {
-            responsiveLayout = this.user ? this.user.settings.responsiveLayout : false;
+        const mobileDevice = isMobile;
+        const isConnected = this.isConnected;
+        const isGameRunning = this.isGameRunning;
+
+        if (mobileDevice && isConnected && isGameRunning) {
             minWidth = responsiveLayout ? "auto" : "1910px";
+        }
+
+        if (!mobileDevice && isConnected && isGameRunning) {
+            minWidth = "1650px";
         }
 
         return (

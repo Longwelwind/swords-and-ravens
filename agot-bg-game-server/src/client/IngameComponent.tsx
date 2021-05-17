@@ -61,6 +61,7 @@ import NoteComponent from "./NoteComponent";
 import HouseRowComponent from "./HouseRowComponent";
 import UserSettingsComponent from "./UserSettingsComponent";
 import { GameSettings } from '../common/EntireGame';
+import {isMobile} from 'react-device-detect';
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -100,11 +101,15 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         const connectedSpectators = this.getConnectedSpectators();
 
-        const responsiveLayout = this.user ? this.user.settings.responsiveLayout : false;
+        const forceResponsiveLayout = this.user ? this.user.settings.responsiveLayout : false;
+        const mobileDevice = isMobile;
+
+        const columnOrders = this.getColumnOrders(mobileDevice);
+        const gameStatePanelOrders = this.getGameStatePanelOrders(mobileDevice, forceResponsiveLayout);
 
         return (
             <>
-                <Col xs={{span: "auto", order: responsiveLayout ? "3" : "1"}}  xl={{span: "auto", order: "1"}}>
+                <Col xs={{span: "auto", order: columnOrders.tracksColumn}}>
                     <Row className="stackable">
                         <Col>
                             <Card>
@@ -245,7 +250,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         )}
                     </Row>
                 </Col>
-                <Col xs={{span: "auto", order: "2"}} xl={{span: "auto", order: "2"}}>
+                <Col xs={{span: "auto", order: columnOrders.mapColumn}}>
                     <div style={{height: this.height != null ? this.height - 100 : "auto", overflowY: this.height != null ? "scroll" : "visible", maxHeight: 1378, minHeight: 460}}>
                         <MapComponent
                             gameClient={this.props.gameClient}
@@ -254,9 +259,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         />
                     </div>
                 </Col>
-                <Col xs={{span: responsiveLayout ? "8" : "3", order: responsiveLayout ? "1" : "3"}} xl={{span: 3, order: "3"}}>
+                <Col xs={{span: forceResponsiveLayout ? "8" : "3", order: columnOrders.gameStateColumn}} xl={{span: 3, order: columnOrders.gameStateColumn}}>
                     <Row className="mt-0"> {/* This row is necessary to make child column ordering work */}
-                        <Col xs={{span: "12", order: responsiveLayout ? "2" : "1"}} xl={{span: "12", order: "1"}}>
+                        <Col xs={{span: "12", order: gameStatePanelOrders.gameStatePanel}}>
                             <Row>
                                 <Col>
                                     <Card border={this.props.gameClient.isOwnTurn() ? "warning" : undefined} bg={this.props.gameState.childGameState instanceof CancelledGameState ? "danger" : undefined}>
@@ -335,7 +340,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </Col>
                             </Row>
                         </Col>
-                        <Col xs={{span: "12", order: responsiveLayout ? "1" : "2"}} xl={{span: "12", order: "2"}}>
+                        <Col xs={{span: "12", order: gameStatePanelOrders.gameLogAndChatPanel}}>
                             <Card>
                                 <Tab.Container activeKey={this.currentOpenedTab}
                                     onSelect={k => {
@@ -446,6 +451,32 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 </Col>
             </>
         );
+    }
+
+    getColumnOrders(mobileDevice: boolean): { tracksColumn: number; mapColumn: number; gameStateColumn: number } {
+        const result = { tracksColumn: 1, mapColumn: 2, gameStateColumn: 3};
+
+        if (mobileDevice) {
+            result.tracksColumn = 3;
+            result.gameStateColumn = 1;
+        }
+
+        return result;
+    }
+
+    getGameStatePanelOrders(mobileDevice: boolean, forceResponsiveLayout: boolean): {gameStatePanel: number; gameLogAndChatPanel: number} {
+        const result = {gameStatePanel: 1, gameLogAndChatPanel: 2};
+
+        if (!mobileDevice) {
+            return result;
+        }
+
+        if (mobileDevice && forceResponsiveLayout) {
+            result.gameLogAndChatPanel = 1;
+            result.gameStatePanel = 2;
+        }
+
+        return result;
     }
 
     getUserDisplayName(user: User): React.ReactNode {
