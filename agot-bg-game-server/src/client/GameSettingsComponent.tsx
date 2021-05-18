@@ -10,6 +10,7 @@ import Col from "react-bootstrap/Col";
 import LobbyGameState from "../common/lobby-game-state/LobbyGameState";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { allGameSetups, getGameSetupContainer } from "../common/ingame-game-state/game-data-structure/createGame";
+import IngameGameState from "../common/ingame-game-state/IngameGameState";
 
 interface GameSettingsComponentProps {
     gameClient: GameClient;
@@ -30,27 +31,39 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
         return this.props.gameClient.isOwner();
     }
 
+    get selectedGameSetupName(): string {
+        const name = allGameSetups.get(this.props.entireGame.gameSettings.setupId).name;
+        return name.substring(0, name.indexOf(" ("));
+    }
+
     render(): ReactNode {
         return (
             <Row>
-                <Col xs={12} className="mb-1">
-                <Row className="justify-content-center">
-                    <OverlayTrigger overlay={
-                        <Tooltip id="pbem-tooltip">
-                            <b>Live Game</b><br />
-                            A live game can be played when all players are online.
-                            They are notified by sound when it is their turn.<br /><br />
-                            <b>P</b>lay <b>B</b>y <b>E</b>-<b>M</b>ail<br />
-                            The asynchronous game mode. Players receive an e-mail when it is their turn.
-                            Those games are typically played over days or weeks.
-                        </Tooltip>}>
-                        <select id="pbem-setting" name="pbem"
-                            value={this.gameSettings.pbem ? "PBEM" : "Live"}
-                            onChange={e => this.changeGameSettings(() => this.gameSettings.pbem = e.target.value == "PBEM")}>
-                            <option key="Live" value="Live">Live Game</option>
-                            <option key="PBEM" value="PBEM">Play By E-Mail</option>
-                        </select>
-                    </OverlayTrigger>
+                {this.props.entireGame.childGameState instanceof IngameGameState && (
+                <Col xs={12} className="mb-1 mt-1">
+                    <Row className="justify-content-center">
+                        {this.selectedGameSetupName}
+                    </Row>
+                </Col>
+                )}
+                <Col xs={12} className="mb-1 mt-1">
+                    <Row className="justify-content-center">
+                        <OverlayTrigger overlay={
+                            <Tooltip id="pbem-tooltip">
+                                <b>Live Game</b><br />
+                                A live game can be played when all players are online.
+                                They are notified by sound when it is their turn.<br /><br />
+                                <b>P</b>lay <b>B</b>y <b>E</b>-<b>M</b>ail<br />
+                                The asynchronous game mode. Players receive an e-mail when it is their turn.
+                                Those games are typically played over days or weeks.
+                            </Tooltip>}>
+                            <select id="pbem-setting" name="pbem"
+                                value={this.gameSettings.pbem ? "PBEM" : "Live"}
+                                onChange={e => this.changeGameSettings(() => this.gameSettings.pbem = e.target.value == "PBEM")}>
+                                <option key="Live" value="Live">Live Game</option>
+                                <option key="PBEM" value="PBEM">Play By E-Mail</option>
+                            </select>
+                        </OverlayTrigger>
                     </Row>
                 </Col>
                 {this.props.entireGame.childGameState instanceof LobbyGameState && (
