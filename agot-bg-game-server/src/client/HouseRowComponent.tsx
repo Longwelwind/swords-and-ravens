@@ -52,6 +52,9 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     }
 
     render(): ReactNode {
+        const totalHeldStructures = this.game.getTotalHeldStructures(this.house);
+        const victoryPointsWarning = this.game.structuresCountNeededToWin - 2 == totalHeldStructures;
+        const victoryPointsCritical = this.game.structuresCountNeededToWin - 1 == totalHeldStructures;
         return this.props.ingame.rerender >= 0 && <>
             <ListGroupItem>
                 <Row className="align-items-center">
@@ -129,9 +132,13 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         placement="auto"
                     >
                         <Col xs="auto" className={classNames("d-flex align-items-center", {"invisible": this.isVassal})}>
-                            <div style={{fontSize: "18px"}}>{this.game.getTotalHeldStructures(this.house)}</div>
+                            <div style={{fontSize: "20px", color: victoryPointsWarning ? "#F39C12" : victoryPointsCritical ? "#FF0000" : undefined}}><b>{totalHeldStructures}</b></div>
                             <img
-                                src={castleImage} width={32} className="hover-weak-outline"
+                                className={classNames(
+                                    "hover-weak-outline",
+                                    {"victoryPointsWarning": victoryPointsWarning},
+                                    {"victoryPointsCritical": victoryPointsCritical})}
+                                src={castleImage} width={32}
                                 style={{marginLeft: "10px"}}
                             />
                     </Col>
