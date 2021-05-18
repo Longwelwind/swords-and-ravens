@@ -32,6 +32,7 @@ import { observable } from "mobx";
 import BeforeCombatHouseCardAbilitiesGameState, { SerializedBeforeCombatHouseCardAbilitiesGameState } from "./before-combat-house-card-abilities-game-state/BeforeCombatHouseCardAbilitiesGameState";
 import DefenseMusterOrderType from "../../../game-data-structure/order-types/DefenseMusterOrderType";
 import RaidSupportOrderType from "../../../game-data-structure/order-types/RaidSupportOrderType";
+import HouseCardModifier from "../../../game-data-structure/house-card/HouseCardModifier";
 
 export interface HouseCombatData {
     army: Unit[];
@@ -51,6 +52,9 @@ export default class CombatGameState extends GameState<
     defender: House;
     houseCombatDatas: BetterMap<House, HouseCombatData>;
     valyrianSteelBladeUser: House | null;
+
+    @observable
+    houseCardModifiers: BetterMap<string, HouseCardModifier> = new BetterMap();
 
     @observable
     rerender = 0;
@@ -414,6 +418,8 @@ export default class CombatGameState extends GameState<
         }  else if (message.type == "change-valyrian-steel-blade-use") {
             this.game.valyrianSteelBladeUsed = message.used;
             this.rerender++;
+        } else if (message.type == "update-house-card-modifier") {
+            this.houseCardModifiers.set(message.id, message.modifier);
         } else {
             this.childGameState.onServerMessage(message);
         }
@@ -599,6 +605,7 @@ export default class CombatGameState extends GameState<
                 regionId: houseCombatData.region.id
             }]),
             supporters: this.supporters.entries.map(([house, supportedHouse]) => [house.id, supportedHouse ? supportedHouse.id : null]),
+            houseCardModifiers: this.houseCardModifiers.entries,
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -628,6 +635,7 @@ export default class CombatGameState extends GameState<
                 supportedHouseId ? resolveMarchOrderGameState.game.houses.get(supportedHouseId) : null
             ])
         );
+        combatGameState.houseCardModifiers = new BetterMap(data.houseCardModifiers);
         combatGameState.childGameState = combatGameState.deserializeChildGameState(data.childGameState);
 
         return combatGameState;
@@ -660,6 +668,7 @@ export interface SerializedCombatGameState {
     defenderId: string;
     supporters: [string, string | null][];
     houseCombatDatas: [string, {houseCardId: string | null; army: number[]; regionId: string}][];
+    houseCardModifiers: [string, HouseCardModifier][];
     childGameState: SerializedDeclareSupportGameState | SerializedChooseHouseCardGameState
         | SerializedUseValyrianSteelBladeGameState | SerializedPostCombatGameState
         | SerializedImmediatelyHouseCardAbilitiesResolutionGameState
