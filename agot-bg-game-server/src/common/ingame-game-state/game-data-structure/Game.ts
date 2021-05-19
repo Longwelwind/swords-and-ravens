@@ -44,6 +44,7 @@ export default class Game {
     maxTurns: number;
     maxPowerTokens: number;
     vassalHouseCards: BetterMap<string, HouseCard> = new BetterMap<string, HouseCard>();
+    houseCardsForDrafting: BetterMap<string, HouseCard> = new BetterMap();
 
     /**
      * Contains the vassal relations of the game.
@@ -318,11 +319,13 @@ export default class Game {
         let houseCard = _.flatMap(this.houses.values, h => h.houseCards.values).find(hc => hc.id == id);
 
         if (!houseCard) {
-            houseCard = this.vassalHouseCards.tryGet(id, undefined);
+            houseCard = this.vassalHouseCards.has(id)
+                ? this.vassalHouseCards.get(id) : this.houseCardsForDrafting.has(id)
+                ? this.houseCardsForDrafting.get(id) : undefined;
+        }
 
-            if (!houseCard) {
-                throw new Error(`House card ${id} not found`);
-            }
+        if (!houseCard) {
+            throw new Error(`House card ${id} not found`);
         }
 
         return houseCard;
@@ -436,7 +439,8 @@ export default class Game {
             clientNextWidllingCardId: (admin || knowsNextWildlingCard) ? this.wildlingDeck[0].id : null,
             revealedWesterosCards: this.revealedWesterosCards,
             vassalRelations: this.vassalRelations.map((key, value) => [key.id, value.id]),
-            vassalHouseCards: this.vassalHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])
+            vassalHouseCards: this.vassalHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
+            houseCardsForDrafting: this.houseCardsForDrafting.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])
         };
     }
 
@@ -464,6 +468,7 @@ export default class Game {
         game.clientNextWildlingCardId = data.clientNextWidllingCardId;
         game.vassalRelations = new BetterMap(data.vassalRelations.map(([vid, hid]) => [game.houses.get(vid), game.houses.get(hid)]));
         game.vassalHouseCards = new BetterMap(data.vassalHouseCards.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
+        game.houseCardsForDrafting = new BetterMap(data.houseCardsForDrafting.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
 
         return game;
     }
@@ -491,4 +496,5 @@ export interface SerializedGame {
     clientNextWidllingCardId: number | null;
     vassalRelations: [string, string][];
     vassalHouseCards: [string, SerializedHouseCard][];
+    houseCardsForDrafting: [string, SerializedHouseCard][];
 }

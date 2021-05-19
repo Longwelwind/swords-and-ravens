@@ -10,14 +10,16 @@ import ReekAbilityGameState
 
 export default class ReekHouseCardAbility extends HouseCardAbility {
     immediatelyResolution(immediately: ImmediatelyHouseCardAbilitiesResolutionGameState, house: House, _houseCard: HouseCard): void {
-        const ramsaybolton = house.houseCards.get("ramsay-bolton");
-        ramsaybolton.state = HouseCardState.AVAILABLE;
-        immediately.entireGame.broadcastToClients({
-            type: "change-state-house-card",
-            houseId: house.id,
-            cardIds: [ramsaybolton.id],
-            state: HouseCardState.AVAILABLE
-        });
+        const ramsaybolton = house.houseCards.tryGet("ramsay-bolton", null);
+        if (ramsaybolton) {
+            ramsaybolton.state = HouseCardState.AVAILABLE;
+            immediately.entireGame.broadcastToClients({
+                type: "change-state-house-card",
+                houseId: house.id,
+                cardIds: [ramsaybolton.id],
+                state: HouseCardState.AVAILABLE
+            });
+        }
         immediately.childGameState.onHouseCardResolutionFinish(house);
     }
 

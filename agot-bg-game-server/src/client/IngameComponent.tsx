@@ -62,6 +62,8 @@ import HouseRowComponent from "./HouseRowComponent";
 import UserSettingsComponent from "./UserSettingsComponent";
 import { GameSettings } from '../common/EntireGame';
 import {isMobile} from 'react-device-detect';
+import DraftHouseCardsGameState from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
+import DraftHouseCardsComponent from "./game-state-panel/DraftHouseCardsComponent";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -103,8 +105,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         const forceResponsiveLayout = this.user ? this.user.settings.responsiveLayout : false;
         const mobileDevice = isMobile;
+        const draftHouseCards = this.props.gameState.childGameState instanceof DraftHouseCardsGameState;
 
         const columnOrders = this.getColumnOrders(mobileDevice);
+        const gameStateColumnSpan = this.getGameStateColumnSpan(mobileDevice, forceResponsiveLayout, draftHouseCards);
         const gameStatePanelOrders = this.getGameStatePanelOrders(mobileDevice, forceResponsiveLayout);
 
         return (
@@ -250,7 +254,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         )}
                     </Row>
                 </Col>
-                <Col xs={{span: "auto", order: columnOrders.mapColumn}}>
+                {!draftHouseCards && <Col xs={{span: "auto", order: columnOrders.mapColumn}}>
                     <div style={{height: this.height != null ? this.height - 100 : "auto", overflowY: this.height != null ? "scroll" : "visible", maxHeight: 1378, minHeight: 460}}>
                         <MapComponent
                             gameClient={this.props.gameClient}
@@ -258,8 +262,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             mapControls={this.mapControls}
                         />
                     </div>
-                </Col>
-                <Col xs={{span: forceResponsiveLayout ? "8" : "3", order: columnOrders.gameStateColumn}} xl={{span: 3, order: columnOrders.gameStateColumn}}>
+                </Col>}
+                <Col xs={{span: gameStateColumnSpan, order: columnOrders.gameStateColumn}}>
                     <Row className="mt-0"> {/* This row is necessary to make child column ordering work */}
                         <Col xs={{span: "12", order: gameStatePanelOrders.gameStatePanel}}>
                             <Row>
@@ -294,8 +298,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 {mapControls: this.mapControls, ...this.props},
                                                 _.concat(
                                                     phases.map(phase => [phase.gameState, phase.component] as [any, typeof Component]),
+                                                    [[DraftHouseCardsGameState, DraftHouseCardsComponent]],
                                                     [[GameEndedGameState, GameEndedComponent]],
-                                                    [[CancelledGameState, IngameCancelledComponent]],
+                                                    [[CancelledGameState, IngameCancelledComponent]]
                                                 )
                                             )}
                                         </ListGroup>
@@ -451,6 +456,18 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 </Col>
             </>
         );
+    }
+
+    getGameStateColumnSpan(mobileDevice: boolean, forceResponsiveLayout: boolean, draftHouseCards: boolean): any {
+        if (draftHouseCards) {
+            return undefined;
+        }
+
+        if (mobileDevice && forceResponsiveLayout) {
+            return "8";
+        }
+
+        return "3";
     }
 
     getColumnOrders(mobileDevice: boolean): { tracksColumn: number; mapColumn: number; gameStateColumn: number } {

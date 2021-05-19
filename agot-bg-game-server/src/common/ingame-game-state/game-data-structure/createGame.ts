@@ -86,6 +86,17 @@ function getTrackWithAdjustedVassalPositions(track: House[], playerHouses: strin
     return track;
 }
 
+function createHouseCard(id: string, houseCardData: HouseCardData): HouseCard {
+    return new HouseCard(
+        id,
+        houseCardData.name,
+        houseCardData.combatStrength ? houseCardData.combatStrength : 0,
+        houseCardData.swordIcons ? houseCardData.swordIcons : 0,
+        houseCardData.towerIcons ? houseCardData.towerIcons : 0,
+        houseCardData.ability ? houseCardAbilities.get(houseCardData.ability) : null
+    );
+}
+
 export const baseHouseCardsData = getHouseCardData(baseGameData.houses);
 export const adwdHouseCardsData = getHouseCardData(baseGameData.adwdHouseCards);
 
@@ -151,15 +162,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
 
                 Object.entries(houseData.houseCards)
                     .map(([houseCardId, houseCardData]) => {
-                        const houseCard = new HouseCard(
-                            houseCardId,
-                            houseCardData.name,
-                            houseCardData.combatStrength ? houseCardData.combatStrength : 0,
-                            houseCardData.swordIcons ? houseCardData.swordIcons : 0,
-                            houseCardData.towerIcons ? houseCardData.towerIcons : 0,
-                            houseCardData.ability ? houseCardAbilities.get(houseCardData.ability) : null
-                        );
-
+                        const houseCard = createHouseCard(houseCardId, houseCardData);
                         return [houseCardId, houseCard];
                     })
             );
@@ -175,6 +178,26 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             return [hid, house];
         })
     );
+
+    if (gameSettings.draftHouseCards) {
+        const baseGameHouses = new BetterMap(Object.entries(baseGameData.houses as {[key: string]: HouseData}));
+        const allBaseGameHouseCardData = _.flatMap(baseGameHouses.entries.map(([_hid, h]) => Object.entries(h.houseCards)));
+        const baseGameHouseCards = allBaseGameHouseCardData.map(([hcid, hcd]) => createHouseCard(hcid, hcd));
+
+        const adwdHouseCardContainers = Object.entries(baseGameData.adwdHouseCards as {[key: string]: HouseCardContainer});
+        const allAdwdHouseCardData = _.flatMap(adwdHouseCardContainers.map(([_hid, hcc]) => Object.entries(hcc.houseCards)));
+        const adwdHouseCards = allAdwdHouseCardData.map(([hcid, hcd]) => createHouseCard(hcid, hcd));
+
+        const allHouseCards = _.concat(baseGameHouseCards, adwdHouseCards);
+        game.houseCardsForDrafting = new BetterMap(allHouseCards.map(hc => [hc.id, hc]));
+
+        game.houses.forEach(h => {
+            // Reset already assigned house cards
+            if (playerHouses.includes(h.id)) {
+                h.houseCards = new BetterMap();
+            }
+        });
+    }
 
     game.maxTurns = entireGame.selectedGameSetup.maxTurns ? entireGame.selectedGameSetup.maxTurns : baseGameData.maxTurns;
     game.structuresCountNeededToWin = entireGame.selectedGameSetup.structuresCountNeededToWin != undefined ? entireGame.selectedGameSetup.structuresCountNeededToWin : baseGameData.structuresCountNeededToWin;

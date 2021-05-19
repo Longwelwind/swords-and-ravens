@@ -28,12 +28,13 @@ import CancelledGameState, { SerializedCancelledGameState } from "../cancelled-g
 import HouseCard from "./game-data-structure/house-card/HouseCard";
 import { observable } from "mobx";
 import _ from "lodash";
+import DraftHouseCardsGameState, { SerializedDraftHouseCardsGameState } from "./draft-house-cards-game-state/DraftHouseCardsGameState";
 
 export const NOTE_MAX_LENGTH = 5000;
 
 export default class IngameGameState extends GameState<
     EntireGame,
-    WesterosGameState | PlanningGameState | ActionGameState | CancelledGameState | GameEndedGameState
+    DraftHouseCardsGameState | WesterosGameState | PlanningGameState | ActionGameState | CancelledGameState | GameEndedGameState
 > {
     players: BetterMap<User, Player> = new BetterMap<User, Player>();
     game: Game;
@@ -66,6 +67,18 @@ export default class IngameGameState extends GameState<
             assignments: futurePlayers.map((house, user) => [house, user.id]) as [string, string][]
         });
 
+        if (this.entireGame.gameSettings.draftHouseCards) {
+            this.beginDraftingHouseCards();
+        } else {
+            this.beginNewTurn();
+        }
+    }
+
+    beginDraftingHouseCards(): void {
+        this.setChildGameState(new DraftHouseCardsGameState(this)).firstStart();
+    }
+
+    onDraftHouseCardsGameStateFinish(): void {
         this.beginNewTurn();
     }
 
@@ -413,8 +426,10 @@ export default class IngameGameState extends GameState<
         } else if (message.type == "vassal-relations") {
             this.game.vassalRelations = new BetterMap(message.vassalRelations.map(([vId, cId]) => [this.game.houses.get(vId), this.game.houses.get(cId)]));
             this.rerender++;
-        }
-         else {
+        } else if (message.type == "update-house-cards") {
+            const house = this.game.houses.get(message.house);
+            house.houseCards = new BetterMap(message.houseCards.map(hc => [hc, this.game.getHouseCardById(hc)]));
+        } else {
             this.childGameState.onServerMessage(message);
         }
     }
@@ -475,6 +490,10 @@ export default class IngameGameState extends GameState<
 
         if (this.childGameState instanceof GameEndedGameState) {
             return {result: false, reason: "game-ended"};
+        }
+
+        if (this.childGameState instanceof DraftHouseCardsGameState) {
+            return {result: false, reason: "ongoing-house-card-drafting"}
         }
 
         return {result: true, reason: ""};
@@ -606,7 +625,7 @@ export default class IngameGameState extends GameState<
             game: this.game.serializeToClient(admin, player != null && player.house.knowsNextWildlingCard),
             gameLogManager: this.gameLogManager.serializeToClient(),
             votes: this.votes.values.map(v => v.serializeToClient(admin, player)),
-            childGameState: this.childGameState.serializeToClient(admin, player),
+            childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
 
@@ -636,6 +655,8 @@ export default class IngameGameState extends GameState<
                 return GameEndedGameState.deserializeFromServer(this, data);
             case "cancelled":
                 return CancelledGameState.deserializeFromServer(this, data);
+            case "draft-house-cards":
+                return DraftHouseCardsGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -647,5 +668,5 @@ export interface SerializedIngameGameState {
     votes: SerializedVote[];
     gameLogManager: SerializedGameLogManager;
     childGameState: SerializedPlanningGameState | SerializedActionGameState | SerializedWesterosGameState
-        | SerializedGameEndedGameState | SerializedCancelledGameState;
+        | SerializedGameEndedGameState | SerializedCancelledGameState | SerializedDraftHouseCardsGameState;
 }

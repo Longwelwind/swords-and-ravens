@@ -20,7 +20,7 @@ export default class CancelledGameState extends GameState<EntireGame | IngameGam
     }
 
     getWaitedUsers(): User[] {
-        return [];
+        return this.parentGameState instanceof IngameGameState ? this.parentGameState.players.keys : [];
     }
 
     serializeToClient(_admin: boolean, _user: User | Player | null): SerializedCancelledGameState {
