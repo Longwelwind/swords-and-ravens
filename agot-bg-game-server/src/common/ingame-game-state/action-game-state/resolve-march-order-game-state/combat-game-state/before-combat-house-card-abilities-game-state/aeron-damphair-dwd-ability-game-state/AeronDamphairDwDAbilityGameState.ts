@@ -8,7 +8,8 @@ import {ServerMessage} from "../../../../../../../messages/ServerMessage";
 import IngameGameState from "../../../../../IngameGameState";
 import BeforeCombatHouseCardAbilitiesGameState from "../BeforeCombatHouseCardAbilitiesGameState";
 import User from "../../../../../../../server/User";
-
+import { aeronDamphairDwD } from "../../../../../game-data-structure/house-card/houseCardAbilities";
+import HouseCardModifier from "../../../../../game-data-structure/house-card/HouseCardModifier";
 
 export default class AeronDamphairDwDAbilityGameState extends GameState<
     BeforeCombatHouseCardAbilitiesGameState["childGameState"]> {
@@ -30,9 +31,9 @@ export default class AeronDamphairDwDAbilityGameState extends GameState<
         this.house = house;
         if (house.powerTokens == 0) {
             this.ingame.log({
-                type: "aeron-damphair-used",
+                type: "house-card-ability-not-used",
                 house: house.id,
-                tokens: 0
+                houseCard: aeronDamphairDwD.id
             });
 
             this.parentGameState.onHouseCardResolutionFinish(house);
@@ -46,22 +47,16 @@ export default class AeronDamphairDwDAbilityGameState extends GameState<
             }
 
             const pt = Math.max(0, Math.min(message.powerTokens, this.house.powerTokens));
-
-            const houseCombatData = this.combatGameState.houseCombatDatas.get(this.house);
-            const aeronDamphairHouseCard = houseCombatData.houseCard;
-
-            // This should normally never happen as there's no way for the houseCard of a house to
-            // be null if this game state was triggered.
-            if (aeronDamphairHouseCard == null) {
-                throw new Error();
-            }
-
             this.ingame.changePowerTokens(this.house, -pt);
-            aeronDamphairHouseCard.combatStrength += pt;
+
+            const houseCardModifier = new HouseCardModifier();
+            houseCardModifier.combatStrength = pt;
+            this.combatGameState.houseCardModifiers.set(aeronDamphairDwD.id, houseCardModifier);
 
             this.entireGame.broadcastToClients({
-                type: "manipulate-combat-house-card",
-                manipulatedHouseCards: [aeronDamphairHouseCard].map(hc => [hc.id, hc.serializeToClient()])
+                type: "update-house-card-modifier",
+                id: aeronDamphairDwD.id,
+                modifier: houseCardModifier
             });
 
             this.ingame.log({

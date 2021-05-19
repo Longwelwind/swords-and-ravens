@@ -11,6 +11,7 @@ import HouseCard, {HouseCardState} from "../../../../../game-data-structure/hous
 import IngameGameState from "../../../../../IngameGameState";
 import { qyburn } from "../../../../../game-data-structure/house-card/houseCardAbilities";
 import BeforeCombatHouseCardAbilitiesGameState from "../BeforeCombatHouseCardAbilitiesGameState";
+import HouseCardModifier from "../../../../../game-data-structure/house-card/HouseCardModifier";
 
 export default class QyburnAbilityGameState extends GameState<
 BeforeCombatHouseCardAbilitiesGameState["childGameState"],
@@ -29,8 +30,9 @@ BeforeCombatHouseCardAbilitiesGameState["childGameState"],
     }
 
     firstStart(house: House): void {
-        // If the house doesn't have 2 power tokens, or doesn't have other available
-        // house cards, don't even ask him.
+        // If the house doesn't have 2 power tokens
+        // or there are no discarded house cards
+        // don't even ask
         const availableHouseCards = this.getAvailableHouseCards();
         if (house.powerTokens < 2 || availableHouseCards.length == 0) {
             this.ingame.log({
@@ -68,15 +70,6 @@ BeforeCombatHouseCardAbilitiesGameState["childGameState"],
     }
 
     onSelectHouseCardFinish(house: House, houseCard: HouseCard): void {
-        const houseCombatData = this.combatGameState.houseCombatDatas.get(house);
-        const qyburnHouseCard = houseCombatData.houseCard;
-
-        // This should normally never happen as there's no way for the houseCard of a house to
-        // be null if this game state was triggered.
-        if (qyburnHouseCard == null) {
-            throw new Error();
-        }
-
         this.ingame.log({
             type: "qyburn-used",
             house: house.id,
@@ -84,13 +77,17 @@ BeforeCombatHouseCardAbilitiesGameState["childGameState"],
         });
 
         // Mark the new house card as the one used by the house
-        qyburnHouseCard.combatStrength = houseCard.combatStrength;
-        qyburnHouseCard.towerIcons = houseCard.towerIcons;
-        qyburnHouseCard.swordIcons = houseCard.swordIcons;
+        const houseCardModifier = new HouseCardModifier();
+        houseCardModifier.combatStrength = houseCard.combatStrength;
+        houseCardModifier.swordIcons = houseCard.swordIcons;
+        houseCardModifier.towerIcons = houseCard.towerIcons;
+
+        this.combatGameState.houseCardModifiers.set(qyburn.id, houseCardModifier);
 
         this.entireGame.broadcastToClients({
-            type: "manipulate-combat-house-card",
-            manipulatedHouseCards: [[qyburnHouseCard.id, qyburnHouseCard.serializeToClient()]]
+            type: "update-house-card-modifier",
+            id: qyburn.id,
+            modifier: houseCardModifier
         });
 
         // Remove 2 power tokens

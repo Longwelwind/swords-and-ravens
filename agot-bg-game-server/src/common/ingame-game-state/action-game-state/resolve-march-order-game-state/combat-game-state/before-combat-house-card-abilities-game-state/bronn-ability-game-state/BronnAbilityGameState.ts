@@ -9,6 +9,7 @@ import {ServerMessage} from "../../../../../../../messages/ServerMessage";
 import IngameGameState from "../../../../../IngameGameState";
 import BeforeCombatHouseCardAbilitiesGameState from "../BeforeCombatHouseCardAbilitiesGameState";
 import { bronn } from "../../../../../../../common/ingame-game-state/game-data-structure/house-card/houseCardAbilities";
+import HouseCardModifier from "../../../../../game-data-structure/house-card/HouseCardModifier";
 
 export default class BronnAbilityGameState extends GameState<
     BeforeCombatHouseCardAbilitiesGameState["childGameState"], SimpleChoiceGameState
@@ -73,11 +74,15 @@ export default class BronnAbilityGameState extends GameState<
             throw new Error();
         }
 
-        bronnHouseCard.combatStrength = 0;
+        const houseCardModifier = new HouseCardModifier();
+        houseCardModifier.combatStrength = -bronnHouseCard.combatStrength;
+
+        this.combatGameState.houseCardModifiers.set(bronn.id, houseCardModifier);
 
         this.entireGame.broadcastToClients({
-            type: "manipulate-combat-house-card",
-            manipulatedHouseCards: [bronnHouseCard].map(hc => [hc.id, hc.serializeToClient()])
+            type: "update-house-card-modifier",
+            id: bronn.id,
+            modifier: houseCardModifier
         });
 
         this.ingame.changePowerTokens(this.controllerOfEnemy, -2);

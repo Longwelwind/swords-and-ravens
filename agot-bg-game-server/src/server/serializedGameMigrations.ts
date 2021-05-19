@@ -687,6 +687,23 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "24",
+        migrate: (serializedGame: any) => {
+            // Migration for #952
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                if (ingame.childGameState.type == "action"
+                    && ingame.childGameState.childGameState.type == "resolve-march-order"
+                    && ingame.childGameState.childGameState.childGameState.type == "combat") {
+                        ingame.childGameState.childGameState.childGameState.houseCardModifiers = [];
+                }
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

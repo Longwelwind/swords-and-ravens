@@ -8,6 +8,7 @@ import {UserSettings} from "./ClientMessage";
 import { SerializedWesterosCard } from "../common/ingame-game-state/game-data-structure/westeros-card/WesterosCard";
 import { SerializedVote } from "../common/ingame-game-state/vote-system/Vote";
 import { CrowKillersStep } from "../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/crow-killers-wildling-victory-game-state/CrowKillersWildlingVictoryGameState";
+import HouseCardModifier from "../common/ingame-game-state/game-data-structure/house-card/HouseCardModifier";
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady | PlayerUnready
     | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | SupportRefused | NewTurn | RemovePlacedOrder
@@ -20,7 +21,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | SettingsChanged | ChangeValyrianSteelBladeUse |  NewPrivateChatRoom | GameSettingsChanged
     | UpdateWesterosDecks | UpdateConnectionStatus | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced
     | CrowKillersStepChanged | ManipulateCombatHouseCard
-    | VassalRelations;
+    | VassalRelations | UpdateHouseCardModifier;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -304,4 +305,10 @@ interface CrowKillersStepChanged {
 interface VassalRelations {
     type: "vassal-relations";
     vassalRelations: [string, string][];
+}
+
+interface UpdateHouseCardModifier {
+    type: "update-house-card-modifier";
+    id: string;
+    modifier: HouseCardModifier;
 }
