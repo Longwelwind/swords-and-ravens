@@ -18,7 +18,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     ownerUserId: string;
     name: string;
 
-    @observable gameSettings: GameSettings = { pbem: false, setupId: "base-game", playerCount: 6, randomHouses: false, cokWesterosPhase: false, adwdHouseCards: false, vassals: false, seaOrderTokens: false, randomChosenHouses: false };
+    @observable gameSettings: GameSettings = { pbem: false, setupId: "base-game", playerCount: 6, randomHouses: false, cokWesterosPhase: false, adwdHouseCards: false, vassals: false, seaOrderTokens: false, randomChosenHouses: false, draftHouseCards: false };
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -176,6 +176,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
             if (settings.setupId == "a-dance-with-dragons") {
                 settings.adwdHouseCards = true;
+            }
+
+            if (settings.draftHouseCards) {
+                settings.adwdHouseCards = false;
             }
 
             // Check if PBEM was enabled during ingame
@@ -407,4 +411,5 @@ export interface GameSettings {
     cokWesterosPhase: boolean;
     vassals: boolean;
     seaOrderTokens: boolean;
+    draftHouseCards: boolean;
 }

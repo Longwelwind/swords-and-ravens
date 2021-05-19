@@ -18,37 +18,37 @@ export default class SelectHouseCardComponent extends Component<GameStateCompone
     render(): ReactNode {
         return (
             <>
+                {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
                 <Col xs={12}>
-                    {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
-                        <Row className="justify-content-center">
-                            <Col xs="12">
-                                <Row className="justify-content-center">
-                                    {this.props.gameState.houseCards.map(hc => (
-                                        // The house argument is used to decide which card-back is used
-                                        // Since we will never show a back-card here, we can give whatever value fits.
-                                        <Col xs="auto" key={hc.id}>
-                                            <HouseCardComponent
-                                                houseCard={hc}
-                                                size="small"
-                                                selected={this.selectedHouseCard == hc}
-                                                onClick={() => this.selectedHouseCard != hc ? this.selectedHouseCard = hc : this.selectedHouseCard = null}
-                                            />
-                                        </Col>
-                                    ))}
-                                </Row>
-                            </Col>
-                            <Col xs="auto">
-                                <Button onClick={() => this.confirm()} disabled={this.selectedHouseCard == null}>
-                                    Confirm
-                                </Button>
-                            </Col>
-                        </Row>
-                    ) : (
-                        <div className="text-center">
-                            Waiting for {this.props.gameState.house.name}...
-                        </div>
-                    )}
-                </Col>
+                    <Row className="justify-content-center">
+                        <Col xs="12">
+                            <Row className="justify-content-center">
+                                {this.props.gameState.houseCards.map(hc => (
+                                    // The house argument is used to decide which card-back is used
+                                    // Since we will never show a back-card here, we can give whatever value fits.
+                                    <Col xs="auto" key={hc.id}>
+                                        <HouseCardComponent
+                                            houseCard={hc}
+                                            size="small"
+                                            selected={this.selectedHouseCard == hc}
+                                            onClick={() => this.selectedHouseCard != hc ? this.selectedHouseCard = hc : this.selectedHouseCard = null}
+                                        />
+                                    </Col>
+                                ))}
+                            </Row>
+                        </Col>
+                        <Col xs="auto">
+                            <Button onClick={() => this.confirm()} disabled={this.selectedHouseCard == null}>
+                                Confirm
+                            </Button>
+                        </Col>
+                    </Row>
+                </Col>)
+                : (<Col xs={12}>
+                    <Row className="justify-content-center">
+                        Waiting for {this.props.gameState.house.name}...
+                    </Row>
+                </Col>)}
             </>
         );
     }

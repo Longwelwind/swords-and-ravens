@@ -113,6 +113,23 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     <Row>
                         <Col xs="auto">
                             <FormCheck
+                                id="draft-house-cards"
+                                type="checkbox"
+                                label={
+                                    <OverlayTrigger overlay={
+                                        <Tooltip id="draft-house-cards-tooltip">
+                                            Players will draft their house cards step by step in a randomly chosen order before the game starts.
+                                        </Tooltip>}>
+                                        <label htmlFor="draft-house-cards">Draft house cards (BETA)</label>
+                                    </OverlayTrigger>}
+                                checked={this.gameSettings.draftHouseCards}
+                                onChange={() => this.changeGameSettings(() => this.gameSettings.draftHouseCards = !this.gameSettings.draftHouseCards)}
+                            />
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs="auto">
+                            <FormCheck
                                 id="random-houses-setting"
                                 type="checkbox"
                                 label={

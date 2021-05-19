@@ -10,7 +10,7 @@ export default class House {
     name: string;
     color: string;
     knowsNextWildlingCard: boolean;
-    houseCards: BetterMap<string, HouseCard>;
+    @observable houseCards: BetterMap<string, HouseCard>;
     unitLimits: BetterMap<UnitType, number>;
     @observable powerTokens: number;
     @observable supplyLevel: number;
