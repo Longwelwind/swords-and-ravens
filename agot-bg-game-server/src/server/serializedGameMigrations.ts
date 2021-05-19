@@ -704,6 +704,18 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "25",
+        migrate: (serializedGame: any) => {
+            // Migration for #954
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.game.houseCardsForDrafting = [];
+            }
+
+            return serializedGame;
+        }
     }
 ];
 
