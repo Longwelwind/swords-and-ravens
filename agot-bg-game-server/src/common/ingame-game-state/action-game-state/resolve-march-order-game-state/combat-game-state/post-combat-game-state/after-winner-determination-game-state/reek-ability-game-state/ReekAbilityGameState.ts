@@ -54,12 +54,12 @@ export default class ReekAbilityGameState extends GameState<
                 houseCard: reek.id
             });
         } else {
-            const reek = house.houseCards.get("reek");
-            reek.state = HouseCardState.AVAILABLE;
+            const reekHc = house.houseCards.get("reek");
+            reekHc.state = HouseCardState.AVAILABLE;
             this.entireGame.broadcastToClients({
                 type: "change-state-house-card",
                 houseId: house.id,
-                cardIds: [reek.id],
+                cardIds: [reekHc.id],
                 state: HouseCardState.AVAILABLE
             });
 
@@ -83,11 +83,11 @@ export default class ReekAbilityGameState extends GameState<
     }
 
     static deserializeFromServer(afterWinnerDeterminationChild: AfterWinnerDeterminationGameState["childGameState"], data: SerializedReekAbilityGameState): ReekAbilityGameState {
-        const jonSnowBaratheonAbility = new ReekAbilityGameState(afterWinnerDeterminationChild);
+        const reekAbilityGameState = new ReekAbilityGameState(afterWinnerDeterminationChild);
 
-        jonSnowBaratheonAbility.childGameState = jonSnowBaratheonAbility.deserializeChildGameState(data.childGameState);
+        reekAbilityGameState.childGameState = reekAbilityGameState.deserializeChildGameState(data.childGameState);
 
-        return jonSnowBaratheonAbility;
+        return reekAbilityGameState;
     }
 
     deserializeChildGameState(data: SerializedReekAbilityGameState["childGameState"]): ReekAbilityGameState["childGameState"] {
