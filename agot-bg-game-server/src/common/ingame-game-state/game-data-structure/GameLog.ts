@@ -31,7 +31,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | SupplyAdjusted | PlayerReplaced | UserHouseAssignments | PlayerAction | MelisandreUsed | JonSnowUsed
     | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed | SerIlynPayneFootmanKilled | RodrikTheReaderUsed
     | VassalsClaimed | CommanderPowerTokenGained | BericDondarrionUsed | VarysUsed | JaqenHGharUsed | JonConningtonUsed | BronnUsed
-    | SerGerrisDrinkwaterUsed;
+    | SerGerrisDrinkwaterUsed | DraftHouseCardsBegan | HouseCardPicked;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -696,4 +696,14 @@ interface JonConningtonUsed {
 interface BronnUsed {
     type: "bronn-used";
     house: string;
+}
+
+interface DraftHouseCardsBegan {
+    type: "draft-house-cards-began";
+}
+
+interface HouseCardPicked {
+    type: "house-card-picked";
+    house: string;
+    houseCard: string;
 }

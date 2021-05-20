@@ -484,6 +484,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </Col>
                 </Row>;
 
+            case "draft-house-cards-began":
+                return <Row className="justify-content-center">
+                    <Col xs="auto">
+                        <h5><b>Draft house cards</b></h5>
+                    </Col>
+                </Row>;
+
+            case "house-card-picked": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = this.allHouseCards.get(data.houseCard);
+                return <>
+                    <p><b>{house.name}</b> picked <b>{houseCard.name}</b></p>
+                </>;
+            }
+
             case "action-phase-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">

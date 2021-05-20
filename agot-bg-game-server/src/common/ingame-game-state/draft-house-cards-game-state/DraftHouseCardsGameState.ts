@@ -12,17 +12,43 @@ import SelectHouseCardGameState, { SerializedSelectHouseCardGameState } from "..
 import HouseCard from "../game-data-structure/house-card/HouseCard";
 import _ from "lodash";
 
-export enum DraftDirection {
-    FORWARD,
-    BACKWARD
-}
+export const draftOrders: number[][][] = [
+        [
+            [ 0 ]
+        ],
+        [
+            [0, 1],
+            [1, 0]
+        ],
+        [
+            [0, 1, 2],
+            [1, 2, 0],
+            [2, 0, 1]
+        ],
+        [
+            [0, 1, 2, 3],
+            [2, 3, 1, 0],
+            [1, 0, 3, 2],
+            [3, 2, 0, 1]
+        ],
+        [
+            [0, 1, 2, 3, 4],
+            [2, 4, 3, 1, 0],
+            [1, 0, 4, 2, 3],
+            [4, 3, 1, 0, 2],
+            [3, 2, 0, 4, 1]
+        ],
+        [
+            [0, 1, 2, 3, 4, 5],
+            [3, 5, 4, 2, 1, 0],
+            [2, 0, 1, 4, 5, 3],
+            [4, 3, 5, 1, 0, 2],
+            [1, 2, 0, 5, 3, 4],
+            [5, 4, 3, 0, 2, 1]
+        ]
+    ];
 
-export default class DraftHouseCardsGameState extends GameState<IngameGameState, SelectHouseCardGameState<DraftHouseCardsGameState>> {
-    draftOrder: House[];
-    draftDirection: DraftDirection;
-    currentHouseIndex: number;
-
-    houseCardCombatStrengthAllocations = new BetterMap<number, number>(
+export const houseCardCombatStrengthAllocations = new BetterMap<number, number>(
     [
         [0, 1],
         [1, 2],
@@ -30,6 +56,12 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
         [3, 1],
         [4, 1]
     ]);
+
+export default class DraftHouseCardsGameState extends GameState<IngameGameState, SelectHouseCardGameState<DraftHouseCardsGameState>> {
+    houses: House[];
+    draftOrder: number[][];
+    currentRowIndex: number;
+    currentColumnIndex: number;
 
     get ingame(): IngameGameState {
         return this.parentGameState;
@@ -48,9 +80,14 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
     }
 
     firstStart(): void {
-        this.draftOrder = _.shuffle(this.ingame.players.values.map(p => p.house));
-        this.currentHouseIndex = -1;
+        this.ingame.log({
+            type: "draft-house-cards-began"
+        });
 
+        this.houses = _.shuffle(this.ingame.players.values.map(p => p.house));
+        this.draftOrder = draftOrders[this.houses.length - 1];
+        this.currentRowIndex = 0;
+        this.currentColumnIndex = -1;
         this.proceedNextHouse();
     }
 
@@ -58,6 +95,7 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
         const houseToResolve = this.getNextHouseToSelectHouseCard();
 
         if (houseToResolve == null) {
+            this.game.houseCardsForDrafting = new BetterMap();
             this.ingame.onDraftHouseCardsGameStateFinish();
             return;
         }
@@ -65,7 +103,7 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
         let availableCards = _.sortBy(this.game.houseCardsForDrafting.values, hc => -hc.combatStrength);
         houseToResolve.houseCards.forEach(card => {
             const countOfCardsWithThisCombatStrength = houseToResolve.houseCards.values.filter(hc => hc.combatStrength == card.combatStrength).length;
-            if (this.houseCardCombatStrengthAllocations.get(card.combatStrength) == countOfCardsWithThisCombatStrength) {
+            if (houseCardCombatStrengthAllocations.get(card.combatStrength) == countOfCardsWithThisCombatStrength) {
                 availableCards = availableCards.filter(hc => hc.combatStrength != card.combatStrength);
             }
         });
@@ -74,28 +112,21 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
 
     getNextHouseToSelectHouseCard(): House | null {
         // If all houses have 7 house cards, return null
-        if (this.draftOrder.every(h => h.houseCards.size == 7)) {
+        if (this.houses.every(h => h.houseCards.size == 7)) {
             return null;
         }
 
-        if (this.draftDirection == DraftDirection.FORWARD) {
-            this.currentHouseIndex ++;
-        } else if (this.draftDirection == DraftDirection.BACKWARD) {
-            this.currentHouseIndex --;
+        this.currentColumnIndex++;
+
+        if (this.currentColumnIndex == this.houses.length) {
+            this.currentColumnIndex = 0;
+            this.currentRowIndex++;
+            if (this.currentRowIndex == this.houses.length) {
+                this.currentRowIndex = 0;
+            }
         }
 
-        if (this.currentHouseIndex == -1) {
-            // If we reach -1, the edge house 0 was the last active house.
-            // So it's their turn again but we switch the direction
-            this.currentHouseIndex = 0;
-            this.draftDirection = DraftDirection.FORWARD;
-        } else if (this.currentHouseIndex == this.draftOrder.length) {
-            // Same here but the other way around
-            this.currentHouseIndex = this.draftOrder.length - 1;
-            this.draftDirection = DraftDirection.BACKWARD;
-        }
-
-        return this.draftOrder[this.currentHouseIndex];
+        return this.houses[this.draftOrder[this.currentRowIndex][this.currentColumnIndex]];
     }
 
     onSelectHouseCardFinish(house: House, houseCard: HouseCard): void {
@@ -106,6 +137,12 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
             type: "update-house-cards",
             house: house.id,
             houseCards: house.houseCards.values.map(hc => hc.id)
+        });
+
+        this.ingame.log({
+            type: "house-card-picked",
+            house: house.id,
+            houseCard: houseCard.id
         });
 
         this.proceedNextHouse();
@@ -121,9 +158,10 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
     serializeToClient(admin: boolean, player: Player | null): SerializedDraftHouseCardsGameState {
         return {
             type: "draft-house-cards",
-            draftOrder: this.draftOrder.map(h => h.id),
-            draftDirection: this.draftDirection,
-            currentHouseIndex: this.currentHouseIndex,
+            houses: this.houses.map(h => h.id),
+            draftOrder: this.draftOrder,
+            currentRowIndex: this.currentRowIndex,
+            currentColumnIndex: this.currentColumnIndex,
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -131,9 +169,10 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
     static deserializeFromServer(ingameGameState: IngameGameState, data: SerializedDraftHouseCardsGameState): DraftHouseCardsGameState {
         const draftHouseCardsGameState = new DraftHouseCardsGameState(ingameGameState);
 
-        draftHouseCardsGameState.draftOrder = data.draftOrder.map(hid => ingameGameState.game.houses.get(hid));
-        draftHouseCardsGameState.draftDirection = data.draftDirection;
-        draftHouseCardsGameState.currentHouseIndex = data.currentHouseIndex;
+        draftHouseCardsGameState.houses = data.houses.map(hid => ingameGameState.game.houses.get(hid));
+        draftHouseCardsGameState.draftOrder = data.draftOrder;
+        draftHouseCardsGameState.currentRowIndex = data.currentRowIndex;
+        draftHouseCardsGameState.currentColumnIndex = data.currentColumnIndex;
         draftHouseCardsGameState.childGameState = draftHouseCardsGameState.deserializeChildGameState(data.childGameState);
 
         return draftHouseCardsGameState;
@@ -150,8 +189,9 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
 
 export interface SerializedDraftHouseCardsGameState {
     type: "draft-house-cards";
-    draftOrder: string[];
-    draftDirection: DraftDirection;
-    currentHouseIndex: number;
+    houses: string[];
+    draftOrder: number[][];
+    currentRowIndex: number;
+    currentColumnIndex: number;
     childGameState: SerializedSelectHouseCardGameState;
 }
