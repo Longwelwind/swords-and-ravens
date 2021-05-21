@@ -1402,7 +1402,8 @@
       "houseCards": {
         "bronze-yohn-royce-ffc": {
           "name": "Bronze Yohn Royce",
-          "combatStrength": 4
+          "combatStrength": 4,
+          "ability": "bronze-yohn-royce-ffc"
         },
         "littlefinger": {
           "name": "Littlefinger",

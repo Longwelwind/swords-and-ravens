@@ -50,6 +50,7 @@ import SyrioForelHouseCardAbility from "./SyrioForelHouseCardAbility";
 import JaqenHGharHouseCardAbility from "./JaqenHGharHouseCardAbility";
 import JonConningtonHouseCardAbility from "./JonConningtonHouseCardAbility";
 import BronnHouseCardAbility from "./BronnHouseCardAbility";
+import BronzeYohnRoyceFfcHouseCardAbility from "./BronzeYohnRoyceFfcHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -286,6 +287,10 @@ export const bronn = new BronnHouseCardAbility(
     "After you reveal house cards, your opponent may choose to discard 2 of"
     + " their available power tokens to reduce this card's combat strength to 0."
 );
+export const bronzeYohnRoyceFfc = new BronzeYohnRoyceFfcHouseCardAbility(
+    "bronze-yohn-royce-ffc",
+    "If you have more available Power tokens than your opponent, this card gains +1 combat strength."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -337,8 +342,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [syrioForel.id, syrioForel],
     [jonConnington.id, jonConnington],
     [bericDondarrion.id, bericDondarrion],
-    [bronn.id, bronn]
-
+    [bronn.id, bronn],
+    [bronzeYohnRoyceFfc.id, bronzeYohnRoyceFfc]
 ]);
 
 export default houseCardAbilities;
