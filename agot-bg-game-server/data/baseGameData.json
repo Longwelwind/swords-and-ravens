@@ -1432,7 +1432,8 @@
           "towerIcons": 1
         },
         "lysa-arryn-ffc": {
-          "name": "Lysa Arryn"
+          "name": "Lysa Arryn",
+          "ability": "lysa-arryn-ffc"
         }
       }
     }

@@ -1243,6 +1243,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Alayne Stone</b>: <b>{house.name}</b> forced <b>{affectedHouse.name}</b> to discard all his {data.lostPowerTokens} available Power tokens.
                 </>;
             }
+            case "lysa-arryn-ffc-power-tokens-gained": {
+                const house = this.game.houses.get(data.house);
+                return <>
+                    <b>Lysa Arryn</b>: <b>{house.name}</b> gained {data.powerTokens} Power tokens.
+                </>;
+            }
         }
     }
 }
