@@ -1407,7 +1407,8 @@
         },
         "littlefinger": {
           "name": "Littlefinger",
-          "combatStrength": 3
+          "combatStrength": 3,
+          "ability": "littlefinger"
         },
         "nestor-royce": {
           "name": "Nestor Royce",

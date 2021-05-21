@@ -1230,6 +1230,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Bronn</b>: <b>{house.name}</b> chose to discard 2 Power tokens to reduce Bron&apos;s combat strength to 0.
                 </>;
             }
+            case "littlefinger-power-tokens-gained": {
+                const house = this.game.houses.get(data.house);
+                return <>
+                    <b>Littlefinger</b>: <b>{house.name}</b> gained {data.powerTokens} Power tokens.
+                </>;
+            }
         }
     }
 }

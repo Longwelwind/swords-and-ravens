@@ -31,7 +31,8 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | SupplyAdjusted | PlayerReplaced | UserHouseAssignments | PlayerAction | MelisandreUsed | JonSnowUsed
     | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed | SerIlynPayneFootmanKilled | RodrikTheReaderUsed
     | VassalsClaimed | CommanderPowerTokenGained | BericDondarrionUsed | VarysUsed | JaqenHGharUsed | JonConningtonUsed | BronnUsed
-    | SerGerrisDrinkwaterUsed | DraftHouseCardsBegan | HouseCardPicked;
+    | SerGerrisDrinkwaterUsed | DraftHouseCardsBegan | HouseCardPicked
+    | LittlefingerPowerTokensGained;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -706,4 +707,10 @@ interface HouseCardPicked {
     type: "house-card-picked";
     house: string;
     houseCard: string;
+}
+
+interface LittlefingerPowerTokensGained {
+    type: "littlefinger-power-tokens-gained";
+    house: string;
+    powerTokens: number;
 }
