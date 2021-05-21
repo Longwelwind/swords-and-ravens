@@ -1396,5 +1396,150 @@
         }
       }
     }
+  },
+  "ffcHouseCards": {
+    "arryn": {
+      "houseCards": {
+        "bronze-yohn-royce-ffc": {
+          "name": "Bronze Yohn Royce",
+          "combatStrength": 4
+        },
+        "littlefinger": {
+          "name": "Littlefinger",
+          "combatStrength": 3
+        },
+        "nestor-royce": {
+          "name": "Nestor Royce",
+          "combatStrength": 2,
+          "towerIcons": 2
+        },
+        "lyn-corbray": {
+          "name": "Lyn Corbray",
+          "combatStrength": 2,
+          "swordIcons": 1
+        },
+        "alayne-stone": {
+          "name": "Alayne Stone",
+          "combatStrength": 1
+        },
+        "lothor-brune": {
+          "name": "Lothor Brune",
+          "combatStrength": 1,
+          "swordIcons": 1,
+          "towerIcons": 1
+        },
+        "lysa-arryn-ffc": {
+          "name": "Lysa Arryn"
+        }
+      }
+    }
+  },
+  "modAHouseCards": {
+    "arryn": {
+      "houseCards": {
+        "lysa-arryn-mod": {
+          "name": "Lysa Arryn",
+          "combatStrength": 4
+        },
+        "bronze-yohn-royce-mod": {
+          "name": "Bronze Yohn Royce",
+          "combatStrength": 3,
+          "swordIcons": 1,
+          "towerIcons": 2
+        },
+        "ser-vardis-egen": {
+          "name": "Ser Vardis Egen",
+          "combatStrength": 2
+        },
+        "harry-hardyng": {
+          "name": "Harry Hardyng",
+          "combatStrength": 2,
+          "swordIcons": 1
+        },
+        "godric-borrell": {
+          "name": "Godric Borrell",
+          "combatStrength": 1
+        },
+        "anya-waynwood": {
+          "name": "Anya Waynwood",
+          "combatStrength": 1
+        },
+        "robert-arryn": {
+          "name": "Robert Arryn"
+        }
+      }
+    },
+    "targaryen": {
+      "houseCards": {
+        "khal-drogo": {
+          "name": "Khal Drogo",
+          "combatStrength": 4
+        },
+        "arstan-whitebeard": {
+          "name": "Arstan Whitebeard",
+          "combatStrength": 3,
+          "swordIcons": 1,
+          "towerIcons": 1
+        },
+        "xaro-xhoan-daxos": {
+          "name": "Xaro Xhoan Daxos",
+          "combatStrength": 2
+        },
+        "ser-jorah-mormont": {
+          "name": "Ser Jorah Mormont",
+          "combatStrength": 2,
+          "swordIcons": 1,
+          "towerIcons": 1
+        },
+        "daenerys-targaryen-a": {
+          "name": "Daenerys Targaryen",
+          "combatStrength": 1
+        },
+        "viserys-targaryen": {
+          "name": "Viserys Targaryen",
+          "combatStrength": 1
+        },
+        "illyrio-mopatis": {
+          "name": "Illyrio Mopatis"
+        }
+      }
+    }
+  },
+  "modBHouseCards": {
+    "targaryen": {
+      "houseCards": {
+        "daenerys-targaryen-b": {
+          "name": "Daenerys Targaryen",
+          "combatStrength": 4
+        },
+        "daario-naharis": {
+          "name": "Daario Naharis",
+          "combatStrength": 3,
+          "swordIcons": 1
+        },
+        "gray-worm": {
+          "name": "Gray Worm",
+          "combatStrength": 2,
+          "swordIcons": 1,
+          "towerIcons": 1
+        },
+        "strong-belwas": {
+          "name": "Strong Belwas",
+          "combatStrength": 2,
+          "swordIcons": 2
+        },
+        "captain-groleo": {
+          "name": "Captain Groleo",
+          "combatStrength": 1
+        },
+        "rakharo": {
+          "name": "Rakharo",
+          "combatStrength": 1
+        },
+        "missandei": {
+          "name": "Missandei"
+        }
+      }
+    }
   }
 }

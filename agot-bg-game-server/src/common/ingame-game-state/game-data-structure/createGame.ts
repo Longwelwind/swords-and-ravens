@@ -99,6 +99,9 @@ function createHouseCard(id: string, houseCardData: HouseCardData): HouseCard {
 
 export const baseHouseCardsData = getHouseCardData(baseGameData.houses);
 export const adwdHouseCardsData = getHouseCardData(baseGameData.adwdHouseCards);
+export const ffcHouseCardsData = getHouseCardData(baseGameData.ffcHouseCards);
+export const modAHouseCardsData = getHouseCardData(baseGameData.modAHouseCards);
+export const modBHouseCardsData = getHouseCardData(baseGameData.modBHouseCards);
 
 export const allGameSetups = new BetterMap(Object.entries(baseGameData.setups as {[key: string]: GameSetupContainer}));
 
@@ -184,11 +187,23 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         const allBaseGameHouseCardData = _.flatMap(baseGameHouses.entries.map(([_hid, h]) => Object.entries(h.houseCards)));
         const baseGameHouseCards = allBaseGameHouseCardData.map(([hcid, hcd]) => createHouseCard(hcid, hcd));
 
-        const adwdHouseCardContainers = Object.entries(baseGameData.adwdHouseCards as {[key: string]: HouseCardContainer});
-        const allAdwdHouseCardData = _.flatMap(adwdHouseCardContainers.map(([_hid, hcc]) => Object.entries(hcc.houseCards)));
+        const adwdHouseCardContainer = Object.entries(baseGameData.adwdHouseCards as {[key: string]: HouseCardContainer});
+        const allAdwdHouseCardData = _.flatMap(adwdHouseCardContainer.map(([_hid, hcc]) => Object.entries(hcc.houseCards)));
         const adwdHouseCards = allAdwdHouseCardData.map(([hcid, hcd]) => createHouseCard(hcid, hcd));
 
-        const allHouseCards = _.concat(baseGameHouseCards, adwdHouseCards);
+        const ffcHouseCardContainer = Object.entries(baseGameData.ffcHouseCards as {[key: string]: HouseCardContainer});
+        const allFfcHouseCardData = _.flatMap(ffcHouseCardContainer.map(([_hid, hcc]) => Object.entries(hcc.houseCards)));
+        const ffcHouseCards = allFfcHouseCardData.map(([hcid, hcd]) => createHouseCard(hcid, hcd));
+
+        const modAHouseCardContainer = Object.entries(baseGameData.modAHouseCards as {[key: string]: HouseCardContainer});
+        const allModAHouseCardData = _.flatMap(modAHouseCardContainer.map(([_hid, hcc]) => Object.entries(hcc.houseCards)));
+        const modAHouseCards = allModAHouseCardData.map(([hcid, hcd]) => createHouseCard(hcid, hcd));
+
+        const modBHouseCardContainer = Object.entries(baseGameData.modBHouseCards as {[key: string]: HouseCardContainer});
+        const allModBHouseCardData = _.flatMap(modBHouseCardContainer.map(([_hid, hcc]) => Object.entries(hcc.houseCards)));
+        const modBHouseCards = allModBHouseCardData.map(([hcid, hcd]) => createHouseCard(hcid, hcd));
+
+        const allHouseCards = _.concat(baseGameHouseCards, adwdHouseCards, ffcHouseCards, modAHouseCards, modBHouseCards);
         game.houseCardsForDrafting = new BetterMap(allHouseCards.map(hc => [hc.id, hc]));
 
         game.houses.forEach(h => {
