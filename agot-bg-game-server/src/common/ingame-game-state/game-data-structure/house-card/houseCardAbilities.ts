@@ -54,6 +54,7 @@ import BronzeYohnRoyceFfcHouseCardAbility from "./BronzeYohnRoyceFfcHouseCardAbi
 import LittlefingerHouseCardAbility from "./LittlefingerHouseCardAbility";
 import AlayneStoneHouseCardAbility from "./AlayneStoneHouseCardAbility";
 import LysaArrynFfcHouseCardAbility from "./LysaArrynFfcHouseCardAbility";
+import SerVardisEgenHouseCardAbility from "./SerVardisEgenHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -309,6 +310,11 @@ export const lysaArrynFfc = new LysaArrynFfcHouseCardAbility(
     "After this combat, if your opponent has more available Power tokens than you,"
      + " gain 3 Power tokens."
 );
+export const serVardisEgen = new SerVardisEgenHouseCardAbility(
+    "ser-vardis-egen",
+    "If the printed combat strength of your opponent's house card is 2 or less,"
+     + " this card gains +1 combat strength and 2 fortification icons."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -364,7 +370,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [bronzeYohnRoyceFfc.id, bronzeYohnRoyceFfc],
     [littlefinger.id, littlefinger],
     [alayneStone.id, alayneStone],
-    [lysaArrynFfc.id, lysaArrynFfc]
+    [lysaArrynFfc.id, lysaArrynFfc],
+    [serVardisEgen.id, serVardisEgen]
 ]);
 
 export default houseCardAbilities;

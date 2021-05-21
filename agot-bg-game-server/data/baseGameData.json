@@ -1453,7 +1453,8 @@
         },
         "ser-vardis-egen": {
           "name": "Ser Vardis Egen",
-          "combatStrength": 2
+          "combatStrength": 2,
+          "ability": "ser-vardis-egen"
         },
         "harry-hardyng": {
           "name": "Harry Hardyng",
