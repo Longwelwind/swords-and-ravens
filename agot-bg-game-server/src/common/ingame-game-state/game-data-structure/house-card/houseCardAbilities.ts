@@ -52,6 +52,7 @@ import JonConningtonHouseCardAbility from "./JonConningtonHouseCardAbility";
 import BronnHouseCardAbility from "./BronnHouseCardAbility";
 import BronzeYohnRoyceFfcHouseCardAbility from "./BronzeYohnRoyceFfcHouseCardAbility";
 import LittlefingerHouseCardAbility from "./LittlefingerHouseCardAbility";
+import AlayneStoneHouseCardAbility from "./AlayneStoneHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -297,6 +298,11 @@ export const littlefinger = new LittlefingerHouseCardAbility(
     "If you control The Eyrie after this combat, gain a number of Power tokens equal to"
      + " twice the printed combat strength of your opponent's played House card."
 );
+export const alayneStone = new AlayneStoneHouseCardAbility(
+    "alayne-stone",
+    "If you control The Eyrie after this combat, gain a number of Power tokens equal to"
+     + " twice the printed combat strength of your opponent's played House card."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -350,7 +356,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [bericDondarrion.id, bericDondarrion],
     [bronn.id, bronn],
     [bronzeYohnRoyceFfc.id, bronzeYohnRoyceFfc],
-    [littlefinger.id, littlefinger]
+    [littlefinger.id, littlefinger],
+    [alayneStone.id, alayneStone]
 ]);
 
 export default houseCardAbilities;

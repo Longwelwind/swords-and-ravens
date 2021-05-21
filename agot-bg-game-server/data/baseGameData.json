@@ -1422,7 +1422,8 @@
         },
         "alayne-stone": {
           "name": "Alayne Stone",
-          "combatStrength": 1
+          "combatStrength": 1,
+          "ability": "alayne-stone"
         },
         "lothor-brune": {
           "name": "Lothor Brune",

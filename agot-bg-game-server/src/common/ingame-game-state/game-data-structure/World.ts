@@ -191,6 +191,11 @@ export default class World {
         return region.units.get(unitId);
     }
 
+    getCapitalOfHouse(house: House): Region | null {
+        const capital = this.regions.values.filter(r => r.superControlPowerToken == house);
+        return capital.length == 1 ? capital[0] : null;
+    }
+
     serializeToClient(): SerializedWorld {
         return {
             regions: this.regions.values.map(r => r.serializeToClient()),

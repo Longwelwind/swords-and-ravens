@@ -1236,6 +1236,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Littlefinger</b>: <b>{house.name}</b> gained {data.powerTokens} Power tokens.
                 </>;
             }
+            case "alayne-stone-used": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+                return <>
+                    <b>Alayne Stone</b>: <b>{house.name}</b> forced <b>{affectedHouse.name}</b> to discard all his {data.lostPowerTokens} available Power tokens.
+                </>;
+            }
         }
     }
 }

@@ -26,6 +26,8 @@ import RodrikTheReaderAbilityGameState from "../../../common/ingame-game-state/a
 import RodrikTheReaderAbilityComponent from "./RodrikTheReaderAbilityComponent";
 import BericDondarrionAbilityComponent from "./BericDondarrionAbilityComponent";
 import BericDondarrionAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/beric-dondarrion-ability-game-state/BericDondarrionAbilityGameState";
+import AlayneStoneAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/alayne-stone-ability-game-state/AlayneStoneAbilityGameState";
+import AlayneStoneAbilityComponent from "./AlayneStoneAbilityComponent";
 
 @observer
 export default class AfterWinnerDeterminationComponent extends Component<GameStateComponentProps<AfterWinnerDeterminationGameState>> {
@@ -38,7 +40,8 @@ export default class AfterWinnerDeterminationComponent extends Component<GameSta
             [SerGerrisDrinkwaterAbilityGameState, SerGerrisDrinkwaterAbilityComponent],
             [ReekAbilityGameState, ReekAbilityComponent],
             [RodrikTheReaderAbilityGameState, RodrikTheReaderAbilityComponent],
-            [BericDondarrionAbilityGameState, BericDondarrionAbilityComponent]
+            [BericDondarrionAbilityGameState, BericDondarrionAbilityComponent],
+            [AlayneStoneAbilityGameState, AlayneStoneAbilityComponent]
         ]);
     }
 }
