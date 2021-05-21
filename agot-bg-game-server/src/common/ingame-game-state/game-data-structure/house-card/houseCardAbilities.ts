@@ -55,6 +55,7 @@ import LittlefingerHouseCardAbility from "./LittlefingerHouseCardAbility";
 import AlayneStoneHouseCardAbility from "./AlayneStoneHouseCardAbility";
 import LysaArrynFfcHouseCardAbility from "./LysaArrynFfcHouseCardAbility";
 import SerVardisEgenHouseCardAbility from "./SerVardisEgenHouseCardAbility";
+import GodricBorrellHouseCardAbility from "./GodricBorrellHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -315,6 +316,11 @@ export const serVardisEgen = new SerVardisEgenHouseCardAbility(
     "If the printed combat strength of your opponent's house card is 2 or less,"
      + " this card gains +1 combat strength and 2 fortification icons."
 );
+export const godricBorrell = new GodricBorrellHouseCardAbility(
+    "godric-borrell",
+    "If you are defending in a sea area, this card gains +1 combat strength for each land area" +
+    " you control adjacent to the embattled area."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -371,7 +377,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [littlefinger.id, littlefinger],
     [alayneStone.id, alayneStone],
     [lysaArrynFfc.id, lysaArrynFfc],
-    [serVardisEgen.id, serVardisEgen]
+    [serVardisEgen.id, serVardisEgen],
+    [godricBorrell.id, godricBorrell]
 ]);
 
 export default houseCardAbilities;
