@@ -1249,6 +1249,18 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Lysa Arryn</b>: <b>{house.name}</b> gained {data.powerTokens} Power tokens.
                 </>;
             }
+            case "anya-waynwood-power-tokens-gained": {
+                const gains = data.gains.map(([hid, gain]) => [this.game.houses.get(hid), gain] as [House, number]);
+
+                return <>
+                    <p><b>Anya Waynwood</b>:</p>
+                    <ul>
+                        {gains.map(([house, gain]) => (
+                            <li key={`anya-waynwood-${house.id}`}><b>{house.name}</b> gained <b>{gain}</b> Power tokens.</li>
+                        ))}
+                    </ul>
+                </>;
+            }
         }
     }
 }

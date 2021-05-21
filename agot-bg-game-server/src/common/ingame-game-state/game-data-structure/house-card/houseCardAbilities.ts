@@ -56,6 +56,7 @@ import AlayneStoneHouseCardAbility from "./AlayneStoneHouseCardAbility";
 import LysaArrynFfcHouseCardAbility from "./LysaArrynFfcHouseCardAbility";
 import SerVardisEgenHouseCardAbility from "./SerVardisEgenHouseCardAbility";
 import GodricBorrellHouseCardAbility from "./GodricBorrellHouseCardAbility";
+import AnyaWaynwoodHouseCardAbility from "./AnyaWaynwoodHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -321,6 +322,10 @@ export const godricBorrell = new GodricBorrellHouseCardAbility(
     "If you are defending in a sea area, this card gains +1 combat strength for each land area" +
     " you control adjacent to the embattled area."
 );
+export const anyaWaynwood = new AnyaWaynwoodHouseCardAbility(
+    "anya-waynwood",
+    "If you win this combat, you and all other players who supported you each gain 3 power tokens."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -378,7 +383,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [alayneStone.id, alayneStone],
     [lysaArrynFfc.id, lysaArrynFfc],
     [serVardisEgen.id, serVardisEgen],
-    [godricBorrell.id, godricBorrell]
+    [godricBorrell.id, godricBorrell],
+    [anyaWaynwood.id, anyaWaynwood]
 ]);
 
 export default houseCardAbilities;
