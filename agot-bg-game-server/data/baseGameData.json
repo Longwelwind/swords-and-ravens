@@ -1482,7 +1482,8 @@
       "houseCards": {
         "khal-drogo": {
           "name": "Khal Drogo",
-          "combatStrength": 4
+          "combatStrength": 4,
+          "ability": "khal-drogo"
         },
         "arstan-whitebeard": {
           "name": "Arstan Whitebeard",

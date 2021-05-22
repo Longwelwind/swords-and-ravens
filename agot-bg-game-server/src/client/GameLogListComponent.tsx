@@ -1271,6 +1271,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <>and <b>{removedHouseCard.name}</b> of <b>{affectedHouse.name}</b> </>}from the game.
                 </>;
             }
+            case "house-card-removed-from-game": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = this.allHouseCards.get(data.houseCard);
+
+                return <>
+                    <b>{houseCard.name}</b> of house <b>{house.name}</b> was removed from the game.
+                </>;
+            }
         }
     }
 }

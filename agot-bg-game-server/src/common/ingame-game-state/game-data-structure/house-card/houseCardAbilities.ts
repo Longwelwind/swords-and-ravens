@@ -59,6 +59,7 @@ import GodricBorrellHouseCardAbility from "./GodricBorrellHouseCardAbility";
 import AnyaWaynwoodHouseCardAbility from "./AnyaWaynwoodHouseCardAbility";
 import LysaArrynModHouseCardAbility from "./LysaArrynModHouseCardAbility";
 import RobertArrynHouseCardAbility from "./RobertArrynHouseCardAbility";
+import KhalDrogoHouseCardAbility from "./KhalDrogoHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -338,6 +339,11 @@ export const robertArryn = new RobertArrynHouseCardAbility(
     "If you are defending, after combat, you may remove \"Robert Arryn\" and the lowest strength" +
     " house card in your opponent's discard pile from the game."
 );
+export const khalDrogo = new KhalDrogoHouseCardAbility(
+    "khal-drogo",
+    "This card gains 1 sword icon and +1 strength for each of your Knights in the embattled area." +
+    " After combat, remove \"Khal Drogo\" from the game."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -398,7 +404,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [godricBorrell.id, godricBorrell],
     [anyaWaynwood.id, anyaWaynwood],
     [lysaArrynMod.id, lysaArrynMod],
-    [robertArryn.id, robertArryn]
+    [robertArryn.id, robertArryn],
+    [khalDrogo.id, khalDrogo]
 ]);
 
 export default houseCardAbilities;
