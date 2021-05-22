@@ -41,7 +41,6 @@ export default class ReekAbilityGameState extends GameState<
                 "",
                 ["Ignore", "Return Reek to Hand"]
             );
-
     }
 
     onSimpleChoiceGameStateEnd(choice: number): void {
