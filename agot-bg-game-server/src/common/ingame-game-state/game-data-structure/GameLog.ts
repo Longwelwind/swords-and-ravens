@@ -32,7 +32,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed | SerIlynPayneFootmanKilled | RodrikTheReaderUsed
     | VassalsClaimed | CommanderPowerTokenGained | BericDondarrionUsed | VarysUsed | JaqenHGharUsed | JonConningtonUsed | BronnUsed
     | SerGerrisDrinkwaterUsed | DraftHouseCardsBegan | HouseCardPicked
-    | LittlefingerPowerTokensGained | AlayneStoneUsed | LysaArrynFfcPowerTokensGained | AnyaWaynwoodPowerTokensGained;
+    | LittlefingerPowerTokensGained | AlayneStoneUsed | LysaArrynFfcPowerTokensGained | AnyaWaynwoodPowerTokensGained | RobertArrynUsed;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -731,4 +731,11 @@ interface LysaArrynFfcPowerTokensGained {
 interface AnyaWaynwoodPowerTokensGained {
     type: "anya-waynwood-power-tokens-gained";
     gains: [string, number][];
+}
+
+interface RobertArrynUsed {
+    type: "robert-arryn-used";
+    house: string;
+    affectedHouse: string;
+    removedHouseCard: string | null;
 }

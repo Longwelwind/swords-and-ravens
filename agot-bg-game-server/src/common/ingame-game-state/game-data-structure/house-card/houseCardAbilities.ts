@@ -58,6 +58,7 @@ import SerVardisEgenHouseCardAbility from "./SerVardisEgenHouseCardAbility";
 import GodricBorrellHouseCardAbility from "./GodricBorrellHouseCardAbility";
 import AnyaWaynwoodHouseCardAbility from "./AnyaWaynwoodHouseCardAbility";
 import LysaArrynModHouseCardAbility from "./LysaArrynModHouseCardAbility";
+import RobertArrynHouseCardAbility from "./RobertArrynHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -332,6 +333,11 @@ export const lysaArrynMod = new LysaArrynModHouseCardAbility(
     "If you have a defense order token in the embattled area and you win this combat," +
     " you may choose to return this card to your hand instead of discarding it."
 );
+export const robertArryn = new RobertArrynHouseCardAbility(
+    "robert-arryn",
+    "If you are defending, after combat, you may remove \"Robert Arryn\" and the lowest strength" +
+    " house card in your opponent's discard pile from the game."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -391,7 +397,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [serVardisEgen.id, serVardisEgen],
     [godricBorrell.id, godricBorrell],
     [anyaWaynwood.id, anyaWaynwood],
-    [lysaArrynMod.id, lysaArrynMod]
+    [lysaArrynMod.id, lysaArrynMod],
+    [robertArryn.id, robertArryn]
 ]);
 
 export default houseCardAbilities;

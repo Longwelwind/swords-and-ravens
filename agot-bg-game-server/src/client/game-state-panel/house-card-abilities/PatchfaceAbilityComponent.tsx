@@ -18,7 +18,7 @@ export default class PatchfaceAbilityComponent extends Component<GameStateCompon
         return (
             <>
                 <Col xs={12}>
-                    <b>Patchface: </b> Baratheon must choose one house card of the opponent to discard.
+                    <b>Patchface</b>: {this.props.gameState.childGameState.house.name} must choose one house card of the opponent to discard.
                 </Col>
                 {renderChildGameState(this.props, [
                     [SimpleChoiceGameState, SimpleChoiceComponent],

@@ -11,12 +11,13 @@ import PostCombatGameState from "../PostCombatGameState";
 import PatchfaceAbilityGameState, {SerializedPatchfaceAbilityGameState} from "./patchface-ability-game-state/PatchfaceAbilityGameState";
 import MelisandreAbilityGameState, {SerializedMelisandreAbilityGameState} from "./melisandre-ability-game-state/MelisandreAbilityGameState";
 import JonConningtonAbilityGameState, {SerializedJonConningtonAbilityGameState} from "./jon-connington-ability-game-state/JonConningtonAbilityGameState";
+import RobertArrynAbilityGameState, { SerializedRobertArrynAbilityGameState } from "./robert-arryn-ability-game-state/RobertArrynAbilityGameState";
 
 export default class AfterCombatHouseCardAbilitiesGameState extends GameState<
     PostCombatGameState,
     HouseCardResolutionGameState<
         AfterCombatHouseCardAbilitiesGameState,
-        PatchfaceAbilityGameState | MelisandreAbilityGameState | JonConningtonAbilityGameState
+        PatchfaceAbilityGameState | MelisandreAbilityGameState | JonConningtonAbilityGameState | RobertArrynAbilityGameState
     >
 >  {
     get postCombatGameState(): PostCombatGameState {
@@ -33,7 +34,8 @@ export default class AfterCombatHouseCardAbilitiesGameState extends GameState<
 
     firstStart(): void {
         this.setChildGameState(
-            new HouseCardResolutionGameState<AfterCombatHouseCardAbilitiesGameState, PatchfaceAbilityGameState | MelisandreAbilityGameState | JonConningtonAbilityGameState>(this)
+            new HouseCardResolutionGameState<AfterCombatHouseCardAbilitiesGameState, PatchfaceAbilityGameState | MelisandreAbilityGameState
+            | JonConningtonAbilityGameState | RobertArrynAbilityGameState>(this)
         ).firstStart();
     }
 
@@ -85,11 +87,14 @@ export default class AfterCombatHouseCardAbilitiesGameState extends GameState<
                 return MelisandreAbilityGameState.deserializeFromServer(houseCardResolution, data);
             case "jon-connington-ability":
                 return JonConningtonAbilityGameState.deserializeFromServer(houseCardResolution, data);
+            case "robert-arryn-ability":
+                return RobertArrynAbilityGameState.deserializeFromServer(houseCardResolution, data);
         }
     }
 }
 
 export interface SerializedAfterCombatHouseCardAbilitiesGameState {
     type: "after-combat-house-card-abilities";
-    childGameState: SerializedHouseCardResolutionGameState<SerializedPatchfaceAbilityGameState | SerializedMelisandreAbilityGameState | SerializedJonConningtonAbilityGameState>;
+    childGameState: SerializedHouseCardResolutionGameState<SerializedPatchfaceAbilityGameState | SerializedMelisandreAbilityGameState
+    | SerializedJonConningtonAbilityGameState | SerializedRobertArrynAbilityGameState>;
 }
