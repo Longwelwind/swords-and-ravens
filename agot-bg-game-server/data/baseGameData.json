@@ -1443,7 +1443,8 @@
       "houseCards": {
         "lysa-arryn-mod": {
           "name": "Lysa Arryn",
-          "combatStrength": 4
+          "combatStrength": 4,
+          "ability": "lysa-arryn-mod"
         },
         "bronze-yohn-royce-mod": {
           "name": "Bronze Yohn Royce",

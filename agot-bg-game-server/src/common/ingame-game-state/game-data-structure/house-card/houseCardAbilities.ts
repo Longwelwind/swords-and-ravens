@@ -57,6 +57,7 @@ import LysaArrynFfcHouseCardAbility from "./LysaArrynFfcHouseCardAbility";
 import SerVardisEgenHouseCardAbility from "./SerVardisEgenHouseCardAbility";
 import GodricBorrellHouseCardAbility from "./GodricBorrellHouseCardAbility";
 import AnyaWaynwoodHouseCardAbility from "./AnyaWaynwoodHouseCardAbility";
+import LysaArrynModHouseCardAbility from "./LysaArrynModHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -326,6 +327,11 @@ export const anyaWaynwood = new AnyaWaynwoodHouseCardAbility(
     "anya-waynwood",
     "If you win this combat, you and all other players who supported you each gain 3 power tokens."
 );
+export const lysaArrynMod = new LysaArrynModHouseCardAbility(
+    "lysa-arryn-mod",
+    "If you have a defense order token in the embattled area and you win this combat," +
+    " you may choose to return this card to your hand instead of discarding it."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -384,7 +390,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [lysaArrynFfc.id, lysaArrynFfc],
     [serVardisEgen.id, serVardisEgen],
     [godricBorrell.id, godricBorrell],
-    [anyaWaynwood.id, anyaWaynwood]
+    [anyaWaynwood.id, anyaWaynwood],
+    [lysaArrynMod.id, lysaArrynMod]
 ]);
 
 export default houseCardAbilities;
