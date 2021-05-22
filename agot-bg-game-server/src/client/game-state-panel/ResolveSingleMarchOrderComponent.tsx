@@ -182,7 +182,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                             : this.canLeavePowerTokenReason == "vassals-always-leave-power-token"
                             ? <Col xs={12} className="text-center mb-0 pb-0"><small>Vassals automatically leave a Power token behind to maintain control of <b>{startingRegion.name}</b>.</small></Col>
                             : this.canLeavePowerTokenReason == "no-power-token-available"
-                            ? <Col xs={12} className="text-center mb-0 pb-0">You don&apos;t have any Power tokens left!</Col>
+                            ? <Col xs={12} className="text-center mb-0 pb-0">You don&apos;t have any Power tokens left and will lose control over {startingRegion.name}!</Col>
                             : <></>}
                             {this.leavePowerToken == false && warningToShow != null && (
                             <Col xs={12} className="mt-1 pt-0 mb-0 pb-0">

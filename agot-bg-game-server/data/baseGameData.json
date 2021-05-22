@@ -1493,7 +1493,8 @@
         },
         "xaro-xhoan-daxos": {
           "name": "Xaro Xhoan Daxos",
-          "combatStrength": 2
+          "combatStrength": 2,
+          "ability": "xaro-xhoan-daxos"
         },
         "ser-jorah-mormont": {
           "name": "Ser Jorah Mormont",

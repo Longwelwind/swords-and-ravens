@@ -60,6 +60,7 @@ import AnyaWaynwoodHouseCardAbility from "./AnyaWaynwoodHouseCardAbility";
 import LysaArrynModHouseCardAbility from "./LysaArrynModHouseCardAbility";
 import RobertArrynHouseCardAbility from "./RobertArrynHouseCardAbility";
 import KhalDrogoHouseCardAbility from "./KhalDrogoHouseCardAbility";
+import XaroXhoanDaxosHouseCardAbility from "./XaroXhoanDaxosHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -344,6 +345,11 @@ export const khalDrogo = new KhalDrogoHouseCardAbility(
     "This card gains 1 sword icon and +1 strength for each of your Knights in the embattled area." +
     " After combat, remove \"Khal Drogo\" from the game."
 );
+export const xaroXhoanDaxos = new XaroXhoanDaxosHouseCardAbility(
+    "xaro-xhoan-daxos",
+    "If you have more Ships in the embattled area than your opponent, each of your Ships" +
+    " in the embattled area add +2 combat strength (instead of +1)."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -405,7 +411,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [anyaWaynwood.id, anyaWaynwood],
     [lysaArrynMod.id, lysaArrynMod],
     [robertArryn.id, robertArryn],
-    [khalDrogo.id, khalDrogo]
+    [khalDrogo.id, khalDrogo],
+    [xaroXhoanDaxos.id, xaroXhoanDaxos]
 ]);
 
 export default houseCardAbilities;
