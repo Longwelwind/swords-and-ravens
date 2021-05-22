@@ -100,14 +100,19 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
             return;
         }
 
+        this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(houseToResolve, this.getFilteredHouseCardsForHouse(houseToResolve));
+    }
+
+    getFilteredHouseCardsForHouse(house: House): HouseCard[] {
         let availableCards = _.sortBy(this.game.houseCardsForDrafting.values, hc => -hc.combatStrength);
-        houseToResolve.houseCards.forEach(card => {
-            const countOfCardsWithThisCombatStrength = houseToResolve.houseCards.values.filter(hc => hc.combatStrength == card.combatStrength).length;
+        house.houseCards.forEach(card => {
+            const countOfCardsWithThisCombatStrength = house.houseCards.values.filter(hc => hc.combatStrength == card.combatStrength).length;
             if (houseCardCombatStrengthAllocations.get(card.combatStrength) == countOfCardsWithThisCombatStrength) {
                 availableCards = availableCards.filter(hc => hc.combatStrength != card.combatStrength);
             }
         });
-        this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(houseToResolve, availableCards);
+
+        return availableCards;
     }
 
     getNextHouseToSelectHouseCard(): House | null {
@@ -137,6 +142,11 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
             type: "update-house-cards",
             house: house.id,
             houseCards: house.houseCards.values.map(hc => hc.id)
+        });
+
+        this.entireGame.broadcastToClients({
+            type: "update-house-cards-for-drafting",
+            houseCards: this.game.houseCardsForDrafting.values.map(hc => hc.id)
         });
 
         this.ingame.log({

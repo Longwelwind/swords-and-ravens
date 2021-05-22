@@ -21,7 +21,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | SettingsChanged | ChangeValyrianSteelBladeUse |  NewPrivateChatRoom | GameSettingsChanged
     | UpdateWesterosDecks | UpdateConnectionStatus | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced
     | CrowKillersStepChanged | ManipulateCombatHouseCard
-    | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards;
+    | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -316,5 +316,10 @@ interface UpdateHouseCardModifier {
 interface UpdateHouseCards {
     type: "update-house-cards";
     house: string;
+    houseCards: string[];
+}
+
+interface UpdateHouseCardsForDrafting {
+    type: "update-house-cards-for-drafting";
     houseCards: string[];
 }

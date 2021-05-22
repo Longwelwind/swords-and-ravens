@@ -429,6 +429,8 @@ export default class IngameGameState extends GameState<
         } else if (message.type == "update-house-cards") {
             const house = this.game.houses.get(message.house);
             house.houseCards = new BetterMap(message.houseCards.map(hc => [hc, this.game.getHouseCardById(hc)]));
+        } else if (message.type == "update-house-cards-for-drafting") {
+            this.game.houseCardsForDrafting = new BetterMap(message.houseCards.map(hc => [hc, this.game.getHouseCardById(hc)]));
         } else {
             this.childGameState.onServerMessage(message);
         }

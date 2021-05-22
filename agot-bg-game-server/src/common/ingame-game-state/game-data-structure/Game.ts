@@ -44,7 +44,7 @@ export default class Game {
     maxTurns: number;
     maxPowerTokens: number;
     vassalHouseCards: BetterMap<string, HouseCard> = new BetterMap<string, HouseCard>();
-    houseCardsForDrafting: BetterMap<string, HouseCard> = new BetterMap();
+    @observable houseCardsForDrafting: BetterMap<string, HouseCard> = new BetterMap();
 
     /**
      * Contains the vassal relations of the game.
