@@ -61,6 +61,7 @@ import LysaArrynModHouseCardAbility from "./LysaArrynModHouseCardAbility";
 import RobertArrynHouseCardAbility from "./RobertArrynHouseCardAbility";
 import KhalDrogoHouseCardAbility from "./KhalDrogoHouseCardAbility";
 import XaroXhoanDaxosHouseCardAbility from "./XaroXhoanDaxosHouseCardAbility";
+import DaenerysTargaryenAHouseCardAbility from "./DaenerysTargaryenAHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -350,6 +351,10 @@ export const xaroXhoanDaxos = new XaroXhoanDaxosHouseCardAbility(
     "If you have more Ships in the embattled area than your opponent, each of your Ships" +
     " in the embattled area add +2 combat strength (instead of +1)."
 );
+export const daenerysTargaryenA = new DaenerysTargaryenAHouseCardAbility(
+    "daenerys-targaryen-a",
+    "If the embattled area contains a Dragon, this card gains +2 combat strength."
+)
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -412,7 +417,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [lysaArrynMod.id, lysaArrynMod],
     [robertArryn.id, robertArryn],
     [khalDrogo.id, khalDrogo],
-    [xaroXhoanDaxos.id, xaroXhoanDaxos]
+    [xaroXhoanDaxos.id, xaroXhoanDaxos],
+    [daenerysTargaryenA.id, daenerysTargaryenA]
 ]);
 
 export default houseCardAbilities;

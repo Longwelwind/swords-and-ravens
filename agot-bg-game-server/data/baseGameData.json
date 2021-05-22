@@ -1504,7 +1504,8 @@
         },
         "daenerys-targaryen-a": {
           "name": "Daenerys Targaryen",
-          "combatStrength": 1
+          "combatStrength": 1,
+          "ability": "daenerys-targaryen-a"
         },
         "viserys-targaryen": {
           "name": "Viserys Targaryen",
