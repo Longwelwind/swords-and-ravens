@@ -9,13 +9,13 @@ import {ServerMessage} from "../../../../../../../messages/ServerMessage";
 import SelectHouseCardGameState, {SerializedSelectHouseCardGameState} from "../../../../../select-house-card-game-state/SelectHouseCardGameState";
 import HouseCard, {HouseCardState} from "../../../../../game-data-structure/house-card/HouseCard";
 import IngameGameState from "../../../../../IngameGameState";
-import { qyburn } from "../../../../../game-data-structure/house-card/houseCardAbilities";
+import { viserysTargaryen } from "../../../../../game-data-structure/house-card/houseCardAbilities";
 import BeforeCombatHouseCardAbilitiesGameState from "../BeforeCombatHouseCardAbilitiesGameState";
 import HouseCardModifier from "../../../../../game-data-structure/house-card/HouseCardModifier";
 
-export default class QyburnAbilityGameState extends GameState<
+export default class ViserysTargaryenAbilityGameState extends GameState<
 BeforeCombatHouseCardAbilitiesGameState["childGameState"],
-    SimpleChoiceGameState | SelectHouseCardGameState<QyburnAbilityGameState>
+    SimpleChoiceGameState | SelectHouseCardGameState<ViserysTargaryenAbilityGameState>
 > {
     get game(): Game {
         return this.parentGameState.game;
@@ -30,15 +30,11 @@ BeforeCombatHouseCardAbilitiesGameState["childGameState"],
     }
 
     firstStart(house: House): void {
-        // If the house doesn't have 2 power tokens
-        // or there are no discarded house cards
-        // don't even ask
-        const availableHouseCards = this.getAvailableHouseCards();
-        if (house.powerTokens < 2 || availableHouseCards.length == 0) {
+        if (this.getAvailableHouseCards(house).length == 0) {
             this.ingame.log({
                 type: "house-card-ability-not-used",
                 house: house.id,
-                houseCard: qyburn.id
+                houseCard: viserysTargaryen.id
             });
 
             this.parentGameState.onHouseCardResolutionFinish(house);
@@ -55,14 +51,12 @@ BeforeCombatHouseCardAbilitiesGameState["childGameState"],
     onSimpleChoiceGameStateEnd(choice: number): void {
         const house = this.childGameState.house;
         if (choice == 0) {
-            const possibleHouseCards = this.getAvailableHouseCards();
-
-            this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(house, possibleHouseCards);
+            this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(house, this.getAvailableHouseCards(house));
         } else {
             this.ingame.log({
                 type: "house-card-ability-not-used",
                 house: house.id,
-                houseCard: qyburn.id
+                houseCard: viserysTargaryen.id
             });
 
             this.parentGameState.onHouseCardResolutionFinish(house);
@@ -70,38 +64,39 @@ BeforeCombatHouseCardAbilitiesGameState["childGameState"],
     }
 
     onSelectHouseCardFinish(house: House, houseCard: HouseCard): void {
+        // todo:
         this.ingame.log({
-            type: "qyburn-used",
+            type: "viserys-targaryen-used",
             house: house.id,
             houseCard: houseCard.id
         });
 
+        houseCard.state = HouseCardState.USED;
+
+        // No need to handle the last house card being discarded here as we are in BeforeCombat and Viserys at this point is available
+        this.entireGame.broadcastToClients({
+            type: "change-state-house-card",
+            houseId: house.id,
+            cardIds: [houseCard.id],
+            state: HouseCardState.USED
+        });
+
         const houseCardModifier = new HouseCardModifier();
         houseCardModifier.combatStrength = houseCard.combatStrength;
-        houseCardModifier.swordIcons = houseCard.swordIcons;
-        houseCardModifier.towerIcons = houseCard.towerIcons;
 
-        this.combatGameState.houseCardModifiers.set(qyburn.id, houseCardModifier);
+        this.combatGameState.houseCardModifiers.set(viserysTargaryen.id, houseCardModifier);
 
         this.entireGame.broadcastToClients({
             type: "update-house-card-modifier",
-            id: qyburn.id,
+            id: viserysTargaryen.id,
             modifier: houseCardModifier
         });
-
-        // Remove 2 power tokens
-        this.ingame.changePowerTokens(house, -2);
 
         this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);
     }
 
-    getAvailableHouseCards(): HouseCard[] {
-        let availableHouseCards: HouseCard[] = [];
-        this.game.houses.forEach(h => {
-                const cards = h.houseCards.values.filter(hc => hc.state == HouseCardState.USED);
-                availableHouseCards = availableHouseCards.concat(cards);
-            });
-        return availableHouseCards;
+    getAvailableHouseCards(house: House): HouseCard[] {
+        return house.houseCards.values.filter(hc => hc.state == HouseCardState.AVAILABLE);
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -112,22 +107,22 @@ BeforeCombatHouseCardAbilitiesGameState["childGameState"],
         this.childGameState.onServerMessage(message);
     }
 
-    serializeToClient(admin: boolean, player: Player | null): SerializedQyburnAbilityGameState {
+    serializeToClient(admin: boolean, player: Player | null): SerializedViserysTargaryenAbilityGameState {
         return {
-            type: "qyburn-ability",
+            type: "viserys-targaryen-ability",
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
 
-    static deserializeFromServer(houseCardResolution: BeforeCombatHouseCardAbilitiesGameState["childGameState"], data: SerializedQyburnAbilityGameState): QyburnAbilityGameState {
-        const qyburnAbilityGameState = new QyburnAbilityGameState(houseCardResolution);
+    static deserializeFromServer(houseCardResolution: BeforeCombatHouseCardAbilitiesGameState["childGameState"], data: SerializedViserysTargaryenAbilityGameState): ViserysTargaryenAbilityGameState {
+        const viserysTargaryenGameState = new ViserysTargaryenAbilityGameState(houseCardResolution);
 
-        qyburnAbilityGameState.childGameState = qyburnAbilityGameState.deserializeChildGameState(data.childGameState);
+        viserysTargaryenGameState.childGameState = viserysTargaryenGameState.deserializeChildGameState(data.childGameState);
 
-        return qyburnAbilityGameState;
+        return viserysTargaryenGameState;
     }
 
-    deserializeChildGameState(data: SerializedQyburnAbilityGameState["childGameState"]): QyburnAbilityGameState["childGameState"] {
+    deserializeChildGameState(data: SerializedViserysTargaryenAbilityGameState["childGameState"]): ViserysTargaryenAbilityGameState["childGameState"] {
         switch (data.type) {
             case "simple-choice":
                 return SimpleChoiceGameState.deserializeFromServer(this, data);
@@ -137,7 +132,7 @@ BeforeCombatHouseCardAbilitiesGameState["childGameState"],
     }
 }
 
-export interface SerializedQyburnAbilityGameState {
-    type: "qyburn-ability";
+export interface SerializedViserysTargaryenAbilityGameState {
+    type: "viserys-targaryen-ability";
     childGameState: SerializedSimpleChoiceGameState | SerializedSelectHouseCardGameState;
 }

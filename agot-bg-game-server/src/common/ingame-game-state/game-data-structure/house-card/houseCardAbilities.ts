@@ -62,6 +62,7 @@ import RobertArrynHouseCardAbility from "./RobertArrynHouseCardAbility";
 import KhalDrogoHouseCardAbility from "./KhalDrogoHouseCardAbility";
 import XaroXhoanDaxosHouseCardAbility from "./XaroXhoanDaxosHouseCardAbility";
 import DaenerysTargaryenAHouseCardAbility from "./DaenerysTargaryenAHouseCardAbility";
+import ViserysTargaryenHouseCardAbility from "./ViserysTargaryenHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -355,6 +356,11 @@ export const daenerysTargaryenA = new DaenerysTargaryenAHouseCardAbility(
     "daenerys-targaryen-a",
     "If the embattled area contains a Dragon, this card gains +2 combat strength."
 )
+export const viserysTargaryen = new ViserysTargaryenHouseCardAbility(
+    "viserys-targaryen",
+    "You may discard a house card from your hand to add its printed combat strength to your combat strength." +
+    " If you lose this combat, remove \"Viserys Targaryen\" from the game."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -418,7 +424,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [robertArryn.id, robertArryn],
     [khalDrogo.id, khalDrogo],
     [xaroXhoanDaxos.id, xaroXhoanDaxos],
-    [daenerysTargaryenA.id, daenerysTargaryenA]
+    [daenerysTargaryenA.id, daenerysTargaryenA],
+    [viserysTargaryen.id, viserysTargaryen]
 ]);
 
 export default houseCardAbilities;

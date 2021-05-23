@@ -686,7 +686,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const houseCard = this.allHouseCards.get(data.houseCard);
 
                 return <>
-                    <b>Qyburn</b>: <b>{house.name}</b> decided to use strength from <b>{houseCard.name}</b>
+                    <b>Qyburn</b>: <b>{house.name}</b> decided to use the combat strength <b>{houseCard.combatStrength}</b> from <b>{houseCard.name}</b>.
                 </>;
             }
             case "aeron-damphair-used": {
@@ -1277,6 +1277,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <b>{houseCard.name}</b> of house <b>{house.name}</b> was removed from the game.
+                </>;
+            }
+            case "viserys-targaryen-used": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = this.allHouseCards.get(data.houseCard);
+
+                return <>
+                    <b>Viserys Targaryen</b>: <b>{house.name}</b> decided to add the strength <b>{houseCard.combatStrength}</b> from <b>{houseCard.name}</b>.
                 </>;
             }
         }
