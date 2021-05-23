@@ -66,6 +66,7 @@ import ViserysTargaryenHouseCardAbility from "./ViserysTargaryenHouseCardAbility
 import IllyrioMopatisHouseCardAbility from "./IllyrioMopatisHouseCardAbility";
 import DaenerysTargaryenBHouseCardAbility from "./DaenerysTargaryenBHouseCardAbility";
 import RakharoHouseCardAbility from "./RakharoHouseCardAbility";
+import MissandeiHouseCardAbility from "./MissandeiHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -379,6 +380,11 @@ export const rakharo = new RakharoHouseCardAbility(
     "If the embattled area is a land area that does not contain a stronghold or a castle," +
     " each of your Knights in the embattled area adds +4 combat strength (instead of +2)."
 );
+export const missandei = new MissandeiHouseCardAbility(
+    "missandei",
+    "If you lose this combat by 2 combat strength or less, you may return any other house card" +
+    " in your discard pile to your hand."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -446,7 +452,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [viserysTargaryen.id, viserysTargaryen],
     [illyrioMopatis.id, illyrioMopatis],
     [daenerysTargaryenB.id, daenerysTargaryenB],
-    [rakharo.id, rakharo]
+    [rakharo.id, rakharo],
+    [missandei.id, missandei]
 ]);
 
 export default houseCardAbilities;

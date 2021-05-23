@@ -1553,7 +1553,8 @@
           "ability": "rakharo"
         },
         "missandei": {
-          "name": "Missandei"
+          "name": "Missandei",
+          "ability": "missandei"
         }
       }
     }

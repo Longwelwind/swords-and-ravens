@@ -28,12 +28,12 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | SkinchangerScoutNightsWatchVictory | SkinchangerScoutWildlingVictory
     | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory
     | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered
-    | SupplyAdjusted | PlayerReplaced | UserHouseAssignments | PlayerAction | MelisandreUsed | JonSnowUsed
+    | SupplyAdjusted | PlayerReplaced | UserHouseAssignments | PlayerAction | JonSnowUsed
     | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed | SerIlynPayneFootmanKilled | RodrikTheReaderUsed
     | VassalsClaimed | CommanderPowerTokenGained | BericDondarrionUsed | VarysUsed | JaqenHGharUsed | JonConningtonUsed | BronnUsed
     | SerGerrisDrinkwaterUsed | DraftHouseCardsBegan | HouseCardPicked
     | LittlefingerPowerTokensGained | AlayneStoneUsed | LysaArrynFfcPowerTokensGained | AnyaWaynwoodPowerTokensGained | RobertArrynUsed
-    | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained | DaenerysTargaryenPowerTokensDiscarded;
+    | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained | DaenerysTargaryenPowerTokensDiscarded | MissandeiUsed;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -297,12 +297,6 @@ interface PatchfaceUsed {
     type: "patchface-used";
     house: string;
     affectedHouse: string;
-    houseCard: string;
-}
-
-interface MelisandreUsed {
-    type: "melisandre-used";
-    house: string;
     houseCard: string;
 }
 
@@ -764,4 +758,10 @@ interface DaenerysTargaryenPowerTokensDiscarded {
     house: string;
     affectedHouse: string;
     powerTokensDiscarded: number;
+}
+
+interface MissandeiUsed {
+    type: "missandei-used";
+    house: string;
+    houseCard: string;
 }

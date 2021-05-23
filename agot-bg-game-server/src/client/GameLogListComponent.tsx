@@ -307,7 +307,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <>
                         {musterings.length == 0 && (
                             <p>
-                                <strong>{house.name}</strong> mustered nothing.
+                                <b>{house.name}</b> mustered nothing.
                             </p>
                         )}
                         {musterings.length > 0 && (
@@ -322,10 +322,10 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                                                 <li key={"recruitment-" + region.id + "-" + i}>
                                                     {from ? (
                                                         <>
-                                                            A <strong>{to.name}</strong> from a <strong>{from.name}</strong>{originatingRegion != region && (<> to <strong>{region.name}</strong></>)}
+                                                            A <b>{to.name}</b> from a <b>{from.name}</b>{originatingRegion != region && (<> to <b>{region.name}</b></>)}
                                                         </>
                                                     ) : (
-                                                            <>A <strong>{to.name}</strong>{originatingRegion != region && (<> to <strong>{region.name}</strong></>)}</>
+                                                            <>A <b>{to.name}</b>{originatingRegion != region && (<> to <b>{region.name}</b></>)}</>
                                                         )}
                                                 </li>
                                             ))}
@@ -635,20 +635,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         {houseCard.name}</b> from house <b>{affectedHouse.name}</b>.
                 </>;
             }
-            case "melisandre-used": {
-                const house = this.game.houses.get(data.house);
-                const houseCard = this.allHouseCards.get(data.houseCard);
-                return <>
-                    <strong>Melisandre</strong>: <strong>{house.name}</strong> decided to discard <strong>
-                        {houseCard.name}</strong> from house.
-                </>;
-            }
             case "melisandre-dwd-used": {
                 const house = this.game.houses.get(data.house);
                 const houseCard = this.allHouseCards.get(data.houseCard);
                 return <>
-                    <strong>Melisandre</strong>: <strong>{house.name}</strong> decided to return <strong>
-                        {houseCard.name}</strong> card to hand.
+                   b <b>Melisandre</b>: <b>{house.name}</b> decided to return <b>
+                        {houseCard.name}</b> card to hand.
                 </>;
             }
             case "jon-snow-used": {
@@ -658,8 +650,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     wilddlingStatus = "decrease";
                 }
                 return <>
-                    <strong>Jon Snow</strong>: <strong>{house.name}</strong> decided to  <strong>
-                        {wilddlingStatus} </strong> the Wildling track by one space.
+                    <b>Jon Snow</b>: <b>{house.name}</b> decided to  <b>
+                        {wilddlingStatus} </b> the Wildling track by one space.
                 </>;
             }
             case "doran-used": {
@@ -1300,6 +1292,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <b>Daenerys Targaryen</b>: <b>{house.name}</b> forced house <b>{affectedHouse.name}</b> to discard {data.powerTokensDiscarded} Power tokens.
+                </>;
+            }
+            case "missandei-used": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = this.allHouseCards.get(data.houseCard);
+                return <>
+                    <b>Missandei</b>: <b>{house.name}</b> decided to return <b>{houseCard.name}</b> to hand.
                 </>;
             }
         }
