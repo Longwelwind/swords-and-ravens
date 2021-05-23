@@ -1524,7 +1524,8 @@
       "houseCards": {
         "daenerys-targaryen-b": {
           "name": "Daenerys Targaryen",
-          "combatStrength": 4
+          "combatStrength": 4,
+          "ability": "daenerys-targaryen-b"
         },
         "daario-naharis": {
           "name": "Daario Naharis",

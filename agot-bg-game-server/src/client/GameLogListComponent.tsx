@@ -1294,6 +1294,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Illyrio Mopatis</b>: <b>{house.name}</b> gained {powerTokensGained} Power tokens.
                 </>;
             }
+            case "daenerys-targaryen-b-power-tokens-discarded": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+
+                return <>
+                    <b>Daenerys Targaryen</b>: <b>{house.name}</b> forced house <b>{affectedHouse.name}</b> to discard {data.powerTokensDiscarded} Power tokens.
+                </>;
+            }
         }
     }
 }

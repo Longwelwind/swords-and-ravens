@@ -33,7 +33,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | VassalsClaimed | CommanderPowerTokenGained | BericDondarrionUsed | VarysUsed | JaqenHGharUsed | JonConningtonUsed | BronnUsed
     | SerGerrisDrinkwaterUsed | DraftHouseCardsBegan | HouseCardPicked
     | LittlefingerPowerTokensGained | AlayneStoneUsed | LysaArrynFfcPowerTokensGained | AnyaWaynwoodPowerTokensGained | RobertArrynUsed
-    | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained;
+    | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained | DaenerysTargaryenPowerTokensDiscarded;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -757,4 +757,11 @@ interface IllyrioMopatisPowerTokensGained {
     type: "illyrio-mopatis-power-tokens-gained";
     house: string;
     powerTokensGained: number;
+}
+
+interface DaenerysTargaryenPowerTokensDiscarded {
+    type: "daenerys-targaryen-b-power-tokens-discarded";
+    house: string;
+    affectedHouse: string;
+    powerTokensDiscarded: number;
 }

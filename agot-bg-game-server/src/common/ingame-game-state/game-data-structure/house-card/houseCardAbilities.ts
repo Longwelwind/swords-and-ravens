@@ -64,6 +64,7 @@ import XaroXhoanDaxosHouseCardAbility from "./XaroXhoanDaxosHouseCardAbility";
 import DaenerysTargaryenAHouseCardAbility from "./DaenerysTargaryenAHouseCardAbility";
 import ViserysTargaryenHouseCardAbility from "./ViserysTargaryenHouseCardAbility";
 import IllyrioMopatisHouseCardAbility from "./IllyrioMopatisHouseCardAbility";
+import DaenerysTargaryenBHouseCardAbility from "./DaenerysTargaryenBHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -367,6 +368,11 @@ export const illyrioMopatis = new IllyrioMopatisHouseCardAbility(
     "After combat, gain a number of power tokens equal to the difference of the final combat strengths." +
     " Then, if you have 5 or more available power tokens, remove \"Illyrio Mopatis\" from the game."
 );
+export const daenerysTargaryenB = new DaenerysTargaryenBHouseCardAbility(
+    "daenerys-targaryen-b",
+    "After combat, your opponent must disacard a number of their available power tokens equal" +
+    " to the difference of the final combat strengths."
+)
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -432,7 +438,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [xaroXhoanDaxos.id, xaroXhoanDaxos],
     [daenerysTargaryenA.id, daenerysTargaryenA],
     [viserysTargaryen.id, viserysTargaryen],
-    [illyrioMopatis.id, illyrioMopatis]
+    [illyrioMopatis.id, illyrioMopatis],
+    [daenerysTargaryenB.id, daenerysTargaryenB]
 ]);
 
 export default houseCardAbilities;
