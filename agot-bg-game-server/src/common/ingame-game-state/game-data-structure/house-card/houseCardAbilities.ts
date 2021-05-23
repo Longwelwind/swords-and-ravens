@@ -63,6 +63,7 @@ import KhalDrogoHouseCardAbility from "./KhalDrogoHouseCardAbility";
 import XaroXhoanDaxosHouseCardAbility from "./XaroXhoanDaxosHouseCardAbility";
 import DaenerysTargaryenAHouseCardAbility from "./DaenerysTargaryenAHouseCardAbility";
 import ViserysTargaryenHouseCardAbility from "./ViserysTargaryenHouseCardAbility";
+import IllyrioMopatisHouseCardAbility from "./IllyrioMopatisHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -361,6 +362,11 @@ export const viserysTargaryen = new ViserysTargaryenHouseCardAbility(
     "You may discard a house card from your hand to add its printed combat strength to your combat strength." +
     " If you lose this combat, remove \"Viserys Targaryen\" from the game."
 );
+export const illyrioMopatis = new IllyrioMopatisHouseCardAbility(
+    "illyrio-mopatis",
+    "After combat, gain a number of power tokens equal to the difference of the final combat strengths." +
+    " Then, if you have 5 or more available power tokens, remove \"Illyrio Mopatis\" from the game."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -425,7 +431,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [khalDrogo.id, khalDrogo],
     [xaroXhoanDaxos.id, xaroXhoanDaxos],
     [daenerysTargaryenA.id, daenerysTargaryenA],
-    [viserysTargaryen.id, viserysTargaryen]
+    [viserysTargaryen.id, viserysTargaryen],
+    [illyrioMopatis.id, illyrioMopatis]
 ]);
 
 export default houseCardAbilities;

@@ -784,8 +784,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const powerTokensGained = data.powerTokensGained;
 
                 return <>
-                    <b>Qarl the Maid</b>: <b>{house.name}</b> gained {powerTokensGained} Power
-                    tokens.
+                    <b>Qarl the Maid</b>: <b>{house.name}</b> gained {powerTokensGained} Power tokens.
                 </>;
             }
             case "renly-baratheon-no-knight-available": {
@@ -1285,6 +1284,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <b>Viserys Targaryen</b>: <b>{house.name}</b> decided to add the strength <b>{houseCard.combatStrength}</b> from <b>{houseCard.name}</b>.
+                </>;
+            }
+            case "illyrio-mopatis-power-tokens-gained": {
+                const house = this.game.houses.get(data.house);
+                const powerTokensGained = data.powerTokensGained;
+
+                return <>
+                    <b>Illyrio Mopatis</b>: <b>{house.name}</b> gained {powerTokensGained} Power tokens.
                 </>;
             }
         }

@@ -33,7 +33,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | VassalsClaimed | CommanderPowerTokenGained | BericDondarrionUsed | VarysUsed | JaqenHGharUsed | JonConningtonUsed | BronnUsed
     | SerGerrisDrinkwaterUsed | DraftHouseCardsBegan | HouseCardPicked
     | LittlefingerPowerTokensGained | AlayneStoneUsed | LysaArrynFfcPowerTokensGained | AnyaWaynwoodPowerTokensGained | RobertArrynUsed
-    | HouseCardRemovedFromGame | ViserysTargaryenUsed;
+    | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -751,4 +751,10 @@ interface ViserysTargaryenUsed {
     type: "viserys-targaryen-used";
     house: string;
     houseCard: string;
+}
+
+interface IllyrioMopatisPowerTokensGained {
+    type: "illyrio-mopatis-power-tokens-gained";
+    house: string;
+    powerTokensGained: number;
 }
