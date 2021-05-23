@@ -15,7 +15,8 @@ export default class MaceTyrellAbilityComponent extends Component<GameStateCompo
         return (
             <>
                 <Col xs={12}>
-                    <b>Mace Tyrell: </b> Tyrell immediately kills a Footman of the opponent.
+                    <b>Mace Tyrell: </b> House <b>{this.props.gameState.childGameState.house.name}</b> immediately kills a Footman of
+                    house <b>{this.props.gameState.combatGameState.getEnemy(this.props.gameState.childGameState.house).name}</b>.
                 </Col>
                 {renderChildGameState(this.props, [
                     [SelectUnitsGameState, SelectUnitsComponent]

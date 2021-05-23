@@ -15,7 +15,7 @@ export default class RobertArrynAbilityComponent extends Component<GameStateComp
         return (
             <>
                 <Col xs={12}>
-                    <b>Robert Arryn</b>: {this.props.gameState.childGameState.house.name} may
+                    <b>Robert Arryn</b>: House <b>{this.props.gameState.childGameState.house.name}</b> may
                     remove <b>Robert Arryn</b> {possibleHouseCardToRemove && <>and <b>{possibleHouseCardToRemove.name}</b> </>}from the game.
                 </Col>
                 {renderChildGameState(this.props, [

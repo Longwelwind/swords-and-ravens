@@ -14,7 +14,7 @@ export default class LysaArrynFfcAbilityComponent extends Component<GameStateCom
         return (
             <>
                 <Col xs={12}>
-                    <b>Lysa Arryn</b>: {this.props.gameState.childGameState.house.name} may return Lysa Arryn to their hand.
+                    <b>Lysa Arryn</b>: House <b>{this.props.gameState.childGameState.house.name}</b> may return Lysa Arryn to their hand.
                 </Col>
                 {renderChildGameState(this.props, [
                     [SimpleChoiceGameState, SimpleChoiceComponent],

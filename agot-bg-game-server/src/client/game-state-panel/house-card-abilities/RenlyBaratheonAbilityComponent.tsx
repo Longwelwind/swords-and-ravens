@@ -15,7 +15,7 @@ export default class RenlyBaratheonAbilityComponent extends Component<GameStateC
         return (
             <>
                 <Col xs={12}>
-                    Baratheon can choose one footmen to upgrade to a knight.
+                    <b>Renly Baratheon</b>: House <b>{this.props.gameState.childGameState.house.name}</b> can choose one footmen to upgrade to a knight.
                 </Col>
                 {renderChildGameState(this.props, [
                     [SelectUnitsGameState, SelectUnitsComponent]

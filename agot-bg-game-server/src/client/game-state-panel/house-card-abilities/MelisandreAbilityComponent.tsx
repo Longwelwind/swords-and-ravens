@@ -18,7 +18,8 @@ export default class MelisandreAbilityComponent extends Component<GameStateCompo
         return (
             <>
                 <Col xs={12}>
-                    <b>Melisandre</b>: {this.props.gameState.childGameState.house.name} may return any House card from discard pile (including this card) by discarding a number of available Power tokens equal to the printed combat strength of that card.
+                    <b>Melisandre</b>: House <b>{this.props.gameState.childGameState.house.name}</b> may return any House card from their discard pile (including this card)
+                    by discarding a number of available Power tokens equal to the printed combat strength of that card.
                 </Col>
                 {renderChildGameState(this.props, [
                     [SimpleChoiceGameState, SimpleChoiceComponent],

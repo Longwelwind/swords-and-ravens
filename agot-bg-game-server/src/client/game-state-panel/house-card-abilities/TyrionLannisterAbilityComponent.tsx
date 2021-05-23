@@ -11,14 +11,35 @@ import SimpleChoiceComponent from "../SimpleChoiceComponent";
 import SelectHouseCardGameState
     from "../../../common/ingame-game-state/select-house-card-game-state/SelectHouseCardGameState";
 import SelectHouseCardComponent from "../SelectHouseCardComponent";
+import CombatGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
+import House from "../../../common/ingame-game-state/game-data-structure/House";
 
 @observer
 export default class TyrionLannisterAbilityComponent extends Component<GameStateComponentProps<TyrionLannisterAbilityGameState>> {
+    get combat(): CombatGameState {
+        return this.props.gameState.combatGameState;
+    }
+
+    get house(): House {
+        if (this.props.gameState.childGameState instanceof SimpleChoiceGameState) {
+            return this.props.gameState.childGameState.house;
+        } else if (this.props.gameState.childGameState instanceof SelectHouseCardGameState) {
+            return this.combat.getEnemy(this.props.gameState.childGameState.house);
+        }
+
+        throw new Error("Tyrion Lannister childGameState must be instance of SimpleChoice or SelectHouseCard!");
+    }
+
+    get enemy(): House {
+        return this.combat.getEnemy(this.house);
+    }
+
     render(): ReactNode {
         return (
             <>
                 <Col xs={12}>
-                    <b>Tyrion Lannister: </b> Lannister may choose to change the house card of the opponent.
+                    <b>Tyrion Lannister</b>: House <b>{this.house.name}</b> may cancel
+                    <b>{this.enemy.name}&apos;s</b> house card.
                 </Col>
                 {renderChildGameState(this.props, [
                     [SimpleChoiceGameState, SimpleChoiceComponent],

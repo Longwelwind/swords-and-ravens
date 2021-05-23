@@ -15,8 +15,8 @@ export default class QueenOfThornsAbilityComponent extends Component<GameStateCo
         return (
             <>
                 <Col xs={12}>
-                    <b>Queen of Thorns: </b> Tyrell must remove one enemy order adjacent to the embattled
-                    area.
+                    <b>Queen of Thorns</b>: House <b>{this.props.gameState.childGameState.house.name}</b> must remove one enemy order adjacent
+                    to the embattled area.
                 </Col>
                 {renderChildGameState(this.props, [
                     [SelectOrdersGameState, SelectOrdersComponent]

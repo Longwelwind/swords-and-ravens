@@ -18,7 +18,8 @@ export default class PatchfaceAbilityComponent extends Component<GameStateCompon
         return (
             <>
                 <Col xs={12}>
-                    <b>Patchface</b>: {this.props.gameState.childGameState.house.name} must choose one house card of the opponent to discard.
+                    <b>Patchface</b>: House <b>{this.props.gameState.childGameState.house.name}</b> must choose one house card of
+                    house <b>{this.props.gameState.combat.getEnemy(this.props.gameState.childGameState.house).name}</b> to discard.
                 </Col>
                 {renderChildGameState(this.props, [
                     [SimpleChoiceGameState, SimpleChoiceComponent],

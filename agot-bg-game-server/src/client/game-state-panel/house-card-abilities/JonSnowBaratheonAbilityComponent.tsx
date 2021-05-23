@@ -15,7 +15,7 @@ export default class JonSnowBaratheonAbilityComponent extends Component<GameStat
         return (
             <>
                 <Col xs={12}>
-                    <b>Jon Snow:</b> You may decrease or increase the Wildling track by one space (to a minimum of 0 and a maximum of 10).
+                    <b>Jon Snow:</b> House <b>{this.props.gameState.childGameState.house.name}</b> may decrease or increase the Wildling track by one space (to a minimum of 0 and a maximum of 10).
                 </Col>
                 {renderChildGameState(this.props, [
                     [SimpleChoiceGameState, SimpleChoiceComponent],

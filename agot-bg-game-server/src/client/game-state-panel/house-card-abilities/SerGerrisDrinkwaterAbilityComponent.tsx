@@ -17,7 +17,8 @@ export default class SerGerrisDrinkwaterAbilityComponent extends Component<GameS
         return (
             <>
                 <Col xs={12}>
-                    <b>Ser Gerris Drinkwater:</b> Martell may move one position higher on one Influence track of his choice.
+                    <b>Ser Gerris Drinkwater</b>: House <b>{this.props.gameState.childGameState.house.name}</b> may move one position higher
+                    on one Influence track of their choice.
                 </Col>
                 {renderChildGameState(this.props, [
                     [SimpleChoiceGameState, SimpleChoiceComponent],
