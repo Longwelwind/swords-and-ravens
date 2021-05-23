@@ -1549,7 +1549,8 @@
         },
         "rakharo": {
           "name": "Rakharo",
-          "combatStrength": 1
+          "combatStrength": 1,
+          "ability": "rakharo"
         },
         "missandei": {
           "name": "Missandei"

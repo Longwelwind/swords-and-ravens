@@ -65,6 +65,7 @@ import DaenerysTargaryenAHouseCardAbility from "./DaenerysTargaryenAHouseCardAbi
 import ViserysTargaryenHouseCardAbility from "./ViserysTargaryenHouseCardAbility";
 import IllyrioMopatisHouseCardAbility from "./IllyrioMopatisHouseCardAbility";
 import DaenerysTargaryenBHouseCardAbility from "./DaenerysTargaryenBHouseCardAbility";
+import RakharoHouseCardAbility from "./RakharoHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -372,7 +373,12 @@ export const daenerysTargaryenB = new DaenerysTargaryenBHouseCardAbility(
     "daenerys-targaryen-b",
     "After combat, your opponent must disacard a number of their available power tokens equal" +
     " to the difference of the final combat strengths."
-)
+);
+export const rakharo = new RakharoHouseCardAbility(
+    "rakharo",
+    "If the embattled area is a land area that does not contain a stronghold or a castle," +
+    " each of your Knights in the embattled area adds +4 combat strength (instead of +2)."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -439,7 +445,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [daenerysTargaryenA.id, daenerysTargaryenA],
     [viserysTargaryen.id, viserysTargaryen],
     [illyrioMopatis.id, illyrioMopatis],
-    [daenerysTargaryenB.id, daenerysTargaryenB]
+    [daenerysTargaryenB.id, daenerysTargaryenB],
+    [rakharo.id, rakharo]
 ]);
 
 export default houseCardAbilities;
