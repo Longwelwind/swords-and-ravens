@@ -9,6 +9,7 @@ import * as _ from "lodash";
 import StaticBorder from "./static-data-structure/StaticBorder";
 import staticWorld from "./static-data-structure/globalStaticWorld";
 import StaticRegion from "./static-data-structure/StaticRegion";
+import RegionKind from "./RegionKind";
 
 export default class World {
     regions: BetterMap<string, Region>;
@@ -89,8 +90,8 @@ export default class World {
         );
     }
 
-    getReachableRegions(startingRegion: Region, house: House, army: Unit[]): Region[] {
-        const regionsToCheck: Region[] = this.getNeighbouringRegions(startingRegion);
+    getReachableRegions(startingRegion: Region, house: House, army: Unit[], viaTransportOnly = false): Region[] {
+        let regionsToCheck: Region[] = this.getNeighbouringRegions(startingRegion);
         const checkedRegions: Region[] = [];
         const reachableRegions: Region[] = [];
 
@@ -98,6 +99,10 @@ export default class World {
         const regionKindOfArmy = army[0].type.walksOn;
         if (!army.every(u => u.type.walksOn == regionKindOfArmy)) {
             throw new Error();
+        }
+
+        if (viaTransportOnly) {
+            regionsToCheck = regionsToCheck.filter(r => this.canActAsBridge(r, house, regionKindOfArmy));
         }
 
         // This is basically a DFS, where some units can act as bridges
@@ -114,16 +119,18 @@ export default class World {
             }
 
             // Can this region act as a bridge ?
-            if (region.getController() == house && region.units.size > 0) {
-                if (region.units.values.some(u => u.type.canTransport == regionKindOfArmy)) {
-                    regionsToCheck.push(...this.getNeighbouringRegions(region));
-                }
+            if (this.canActAsBridge(region, house, regionKindOfArmy)) {
+                regionsToCheck.push(...this.getNeighbouringRegions(region));
             }
 
             checkedRegions.push(region);
         }
 
         return reachableRegions;
+    }
+
+    canActAsBridge(region: Region, house: House, regionKindOfArmy: RegionKind): boolean {
+        return region.getController() == house && region.units.values.some(u => u.type.canTransport == regionKindOfArmy)
     }
 
     getControlledRegions(house: House): Region[] {

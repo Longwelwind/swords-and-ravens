@@ -67,6 +67,7 @@ import IllyrioMopatisHouseCardAbility from "./IllyrioMopatisHouseCardAbility";
 import DaenerysTargaryenBHouseCardAbility from "./DaenerysTargaryenBHouseCardAbility";
 import RakharoHouseCardAbility from "./RakharoHouseCardAbility";
 import MissandeiHouseCardAbility from "./MissandeiHouseCardAbility";
+import CaptainGroleoHouseCardAbility from "./CaptainGroleoHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -385,6 +386,11 @@ export const missandei = new MissandeiHouseCardAbility(
     "If you lose this combat by 2 combat strength or less, you may return any other house card" +
     " in your discard pile to your hand."
 );
+export const captainGroleo = new CaptainGroleoHouseCardAbility(
+    "captain-groleo",
+    "If you are attacking a land area by using ship transport, this card gains +1 combat strength"
+    + " for each Targaryen Ship in areas adjacent to the embattled area."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -453,7 +459,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [illyrioMopatis.id, illyrioMopatis],
     [daenerysTargaryenB.id, daenerysTargaryenB],
     [rakharo.id, rakharo],
-    [missandei.id, missandei]
+    [missandei.id, missandei],
+    [captainGroleo.id, captainGroleo]
 ]);
 
 export default houseCardAbilities;
