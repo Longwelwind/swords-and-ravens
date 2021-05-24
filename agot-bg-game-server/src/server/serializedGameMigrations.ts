@@ -6,7 +6,7 @@ import { SerializedHouse } from "../common/ingame-game-state/game-data-structure
 import { HouseCardState } from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import { vassalHouseCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/vassalHouseCards";
 import _ from "lodash";
-//import { SerializedEntireGame } from "../common/EntireGame";
+// import { SerializedEntireGame } from "../common/EntireGame";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
     {
@@ -712,6 +712,20 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
                 ingame.game.houseCardsForDrafting = [];
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "26",
+        migrate: (serializedGame: any) => {
+            // Migration for #954
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.game.houses.forEach((h: any) => {
+                    h.unitLimits.push(["dragon", 0]);
+                });
             }
 
             return serializedGame;
