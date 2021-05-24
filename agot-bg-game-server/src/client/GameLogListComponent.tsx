@@ -21,7 +21,7 @@ import orders from "../common/ingame-game-state/game-data-structure/orders";
 import CombatInfoComponent from "./CombatInfoComponent";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import User from "../server/User";
-import { adwdHouseCardsData, baseHouseCardsData, HouseCardData } from "../common/ingame-game-state/game-data-structure/createGame";
+import { baseHouseCardsData, adwdHouseCardsData, ffcHouseCardsData, modAHouseCardsData, modBHouseCardsData , HouseCardData } from "../common/ingame-game-state/game-data-structure/createGame";
 import HouseCard from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import houseCardAbilities from "../common/ingame-game-state/game-data-structure/house-card/houseCardAbilities";
 import BetterMap from "../utils/BetterMap";
@@ -58,7 +58,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
     }
 
     getAllHouseCards(): [string, HouseCard][] {
-        return _.concat(this.createHouseCards(baseHouseCardsData), this.createHouseCards(adwdHouseCardsData), this.game.vassalHouseCards.entries);
+        return _.concat(
+            this.createHouseCards(baseHouseCardsData),
+            this.createHouseCards(adwdHouseCardsData),
+            this.createHouseCards(ffcHouseCardsData),
+            this.createHouseCards(modAHouseCardsData),
+            this.createHouseCards(modBHouseCardsData),
+            this.game.vassalHouseCards.entries);
     }
 
     render(): ReactNode {
@@ -301,7 +307,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <>
                         {musterings.length == 0 && (
                             <p>
-                                <strong>{house.name}</strong> mustered nothing.
+                                <b>{house.name}</b> mustered nothing.
                             </p>
                         )}
                         {musterings.length > 0 && (
@@ -316,10 +322,10 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                                                 <li key={"recruitment-" + region.id + "-" + i}>
                                                     {from ? (
                                                         <>
-                                                            A <strong>{to.name}</strong> from a <strong>{from.name}</strong>{originatingRegion != region && (<> to <strong>{region.name}</strong></>)}
+                                                            A <b>{to.name}</b> from a <b>{from.name}</b>{originatingRegion != region && (<> to <b>{region.name}</b></>)}
                                                         </>
                                                     ) : (
-                                                            <>A <strong>{to.name}</strong>{originatingRegion != region && (<> to <strong>{region.name}</strong></>)}</>
+                                                            <>A <b>{to.name}</b>{originatingRegion != region && (<> to <b>{region.name}</b></>)}</>
                                                         )}
                                                 </li>
                                             ))}
@@ -629,20 +635,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         {houseCard.name}</b> from house <b>{affectedHouse.name}</b>.
                 </>;
             }
-            case "melisandre-used": {
-                const house = this.game.houses.get(data.house);
-                const houseCard = this.allHouseCards.get(data.houseCard);
-                return <>
-                    <strong>Melisandre</strong>: <strong>{house.name}</strong> decided to discard <strong>
-                        {houseCard.name}</strong> from house.
-                </>;
-            }
             case "melisandre-dwd-used": {
                 const house = this.game.houses.get(data.house);
                 const houseCard = this.allHouseCards.get(data.houseCard);
                 return <>
-                    <strong>Melisandre</strong>: <strong>{house.name}</strong> decided to return <strong>
-                        {houseCard.name}</strong> card to hand.
+                   b <b>Melisandre</b>: <b>{house.name}</b> decided to return <b>
+                        {houseCard.name}</b> card to hand.
                 </>;
             }
             case "jon-snow-used": {
@@ -652,8 +650,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     wilddlingStatus = "decrease";
                 }
                 return <>
-                    <strong>Jon Snow</strong>: <strong>{house.name}</strong> decided to  <strong>
-                        {wilddlingStatus} </strong> the Wildling track by one space.
+                    <b>Jon Snow</b>: <b>{house.name}</b> decided to  <b>
+                        {wilddlingStatus} </b> the Wildling track by one space.
                 </>;
             }
             case "doran-used": {
@@ -680,7 +678,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const houseCard = this.allHouseCards.get(data.houseCard);
 
                 return <>
-                    <b>Qyburn</b>: <b>{house.name}</b> decided to use strength from <b>{houseCard.name}</b>
+                    <b>Qyburn</b>: <b>{house.name}</b> decided to use the combat strength <b>{houseCard.combatStrength}</b> from <b>{houseCard.name}</b>.
                 </>;
             }
             case "aeron-damphair-used": {
@@ -778,8 +776,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const powerTokensGained = data.powerTokensGained;
 
                 return <>
-                    <b>Qarl the Maid</b>: <b>{house.name}</b> gained {powerTokensGained} Power
-                    tokens.
+                    <b>Qarl the Maid</b>: <b>{house.name}</b> gained {powerTokensGained} Power tokens.
                 </>;
             }
             case "renly-baratheon-no-knight-available": {
@@ -1222,6 +1219,86 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 return <>
                     <b>Bronn</b>: <b>{house.name}</b> chose to discard 2 Power tokens to reduce Bron&apos;s combat strength to 0.
+                </>;
+            }
+            case "littlefinger-power-tokens-gained": {
+                const house = this.game.houses.get(data.house);
+                return <>
+                    <b>Littlefinger</b>: <b>{house.name}</b> gained {data.powerTokens} Power tokens.
+                </>;
+            }
+            case "alayne-stone-used": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+                return <>
+                    <b>Alayne Stone</b>: <b>{house.name}</b> forced <b>{affectedHouse.name}</b> to discard all his {data.lostPowerTokens} available Power tokens.
+                </>;
+            }
+            case "lysa-arryn-ffc-power-tokens-gained": {
+                const house = this.game.houses.get(data.house);
+                return <>
+                    <b>Lysa Arryn</b>: <b>{house.name}</b> gained {data.powerTokens} Power tokens.
+                </>;
+            }
+            case "anya-waynwood-power-tokens-gained": {
+                const gains = data.gains.map(([hid, gain]) => [this.game.houses.get(hid), gain] as [House, number]);
+
+                return <>
+                    <p><b>Anya Waynwood</b>:</p>
+                    <ul>
+                        {gains.map(([house, gain]) => (
+                            <li key={`anya-waynwood-${house.id}`}><b>{house.name}</b> gained <b>{gain}</b> Power tokens.</li>
+                        ))}
+                    </ul>
+                </>;
+            }
+            case "robert-arryn-used": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+                const removedHouseCard = data.removedHouseCard ? this.allHouseCards.get(data.removedHouseCard) : null;
+
+                return <>
+                    <b>Robert Arryn</b>: <b>{house.name}</b> decided to remove <b>Robert Arryn</b> {removedHouseCard &&
+                    <>and <b>{removedHouseCard.name}</b> of <b>{affectedHouse.name}</b> </>}from the game.
+                </>;
+            }
+            case "house-card-removed-from-game": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = this.allHouseCards.get(data.houseCard);
+
+                return <>
+                    <b>{houseCard.name}</b> of house <b>{house.name}</b> was removed from the game.
+                </>;
+            }
+            case "viserys-targaryen-used": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = this.allHouseCards.get(data.houseCard);
+
+                return <>
+                    <b>Viserys Targaryen</b>: <b>{house.name}</b> decided to add the strength <b>{houseCard.combatStrength}</b> from <b>{houseCard.name}</b>.
+                </>;
+            }
+            case "illyrio-mopatis-power-tokens-gained": {
+                const house = this.game.houses.get(data.house);
+                const powerTokensGained = data.powerTokensGained;
+
+                return <>
+                    <b>Illyrio Mopatis</b>: <b>{house.name}</b> gained {powerTokensGained} Power tokens.
+                </>;
+            }
+            case "daenerys-targaryen-b-power-tokens-discarded": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+
+                return <>
+                    <b>Daenerys Targaryen</b>: <b>{house.name}</b> forced house <b>{affectedHouse.name}</b> to discard {data.powerTokensDiscarded} Power tokens.
+                </>;
+            }
+            case "missandei-used": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = this.allHouseCards.get(data.houseCard);
+                return <>
+                    <b>Missandei</b>: <b>{house.name}</b> decided to return <b>{houseCard.name}</b> to hand.
                 </>;
             }
         }

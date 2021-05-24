@@ -10,6 +10,8 @@ import BeforeCombatHouseCardAbilitiesGameState from "../../../common/ingame-game
 import AeronDamphairDwDAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/before-combat-house-card-abilities-game-state/aeron-damphair-dwd-ability-game-state/AeronDamphairDwDAbilityGameState";
 import BronnAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/before-combat-house-card-abilities-game-state/bronn-ability-game-state/BronnAbilityGameState";
 import BronnAbilityComponent from "./BronnAbilityComponent";
+import ViserysTargaryenAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/before-combat-house-card-abilities-game-state/viserys-targaryen-ability-game-state/ViserysTargaryenAbilityGameState";
+import ViserysTargaryenAbilityComponent from "./ViserysTargaryenAbilityComponent";
 
 @observer
 export default class BeforeCombatHouseCardAbilitiesComponent extends Component<GameStateComponentProps<BeforeCombatHouseCardAbilitiesGameState>> {
@@ -17,7 +19,8 @@ export default class BeforeCombatHouseCardAbilitiesComponent extends Component<G
         return renderChildGameState({...this.props, gameState: this.props.gameState.childGameState}, [
             [AeronDamphairDwDAbilityGameState, AeronDamphairDwDAbilityComponent],
             [QyburnAbilityGameState, QyburnAbilityComponent],
-            [BronnAbilityGameState, BronnAbilityComponent]
+            [BronnAbilityGameState, BronnAbilityComponent],
+            [ViserysTargaryenAbilityGameState, ViserysTargaryenAbilityComponent]
         ]);
     }
 }

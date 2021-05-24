@@ -76,7 +76,6 @@ BeforeCombatHouseCardAbilitiesGameState["childGameState"],
             houseCard: houseCard.id
         });
 
-        // Mark the new house card as the one used by the house
         const houseCardModifier = new HouseCardModifier();
         houseCardModifier.combatStrength = houseCard.combatStrength;
         houseCardModifier.swordIcons = houseCard.swordIcons;

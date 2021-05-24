@@ -12,6 +12,8 @@ import PatchfaceAbilityComponent from "./PatchfaceAbilityComponent";
 import MelisandreAbilityComponent from "./MelisandreAbilityComponent";
 import JonConningtonAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-combat-house-card-abilities-game-state/jon-connington-ability-game-state/JonConningtonAbilityGameState";
 import JonConningtonAbilityComponent from "./JonConningtonAbilityComponent";
+import RobertArrynAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-combat-house-card-abilities-game-state/robert-arryn-ability-game-state/RobertArrynAbilityGameState";
+import RobertArrynAbilityComponent from "./RobertArrynAbilityComponent";
 
 @observer
 export default class AfterCombatHouseCardAbilitiesComponent extends Component<GameStateComponentProps<AfterCombatHouseCardAbilitiesGameState>> {
@@ -19,7 +21,8 @@ export default class AfterCombatHouseCardAbilitiesComponent extends Component<Ga
         return renderChildGameState({...this.props, gameState: this.props.gameState.childGameState}, [
             [PatchfaceAbilityGameState, PatchfaceAbilityComponent],
             [MelisandreAbilityGameState, MelisandreAbilityComponent],
-            [JonConningtonAbilityGameState, JonConningtonAbilityComponent]
+            [JonConningtonAbilityGameState, JonConningtonAbilityComponent],
+            [RobertArrynAbilityGameState, RobertArrynAbilityComponent]
         ]);
     }
 }

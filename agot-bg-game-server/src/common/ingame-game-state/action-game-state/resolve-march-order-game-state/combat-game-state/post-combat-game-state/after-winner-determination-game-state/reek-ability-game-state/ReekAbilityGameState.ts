@@ -16,8 +16,6 @@ export default class ReekAbilityGameState extends GameState<
     AfterWinnerDeterminationGameState["childGameState"],
     SimpleChoiceGameState
 > {
-    wildingsTrackChange: number[] | null;
-
     get game(): Game {
         return this.parentGameState.game;
     }

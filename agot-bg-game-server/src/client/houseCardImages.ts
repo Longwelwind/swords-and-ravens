@@ -98,6 +98,35 @@ import jonConningtonImage from "../../public/images/house-cards/JonConnington.pn
 import bericImage from "../../public/images/house-cards/BericDondarrion.png";
 import bronnImage from "../../public/images/house-cards/Bronn.png";
 
+import alayneStoneFfcImage from "../../public/images/house-cards/AlayneStone-ffc.png"
+import anyaWaynwoodModImage from "../../public/images/house-cards/AnyaWaynwood-mod.png"
+import arstanWhitebeardAImage from "../../public/images/house-cards/ArstanWhitebeard-A.png"
+import bronzeYohnRoyceFfcImage from "../../public/images/house-cards/BronzeYohnRoyce-ffc.png"
+import bronzeYohnRoyceModImage from "../../public/images/house-cards/BronzeYohnRoyce-mod.png"
+import captainGroleoBImage from "../../public/images/house-cards/CaptainGroleo-B.png"
+import daarioNaharisBImage from "../../public/images/house-cards/DaarioNaharis-B.png"
+import daenerysTargaryenAImage from "../../public/images/house-cards/DaenerysTargaryen-A.png"
+import daenerysTargaryenBImage from "../../public/images/house-cards/DaenerysTargaryen-B.png"
+import godricBorrellModImage from "../../public/images/house-cards/GodricBorrell-mod.png"
+import grayWormBImage from "../../public/images/house-cards/GrayWorm-B.png"
+import harryHardyngModImage from "../../public/images/house-cards/HarryHardyng-mod.png"
+import illyrioMopatisAImage from "../../public/images/house-cards/IllyrioMopatis-A.png"
+import khalDrogoAImage from "../../public/images/house-cards/KhalDrogo-A.png"
+import littlefingerFfcImage from "../../public/images/house-cards/Littlefinger-ffc.png"
+import lothorBruneFfcImage from "../../public/images/house-cards/LothorBrune-ffc.png"
+import lynCorbrayFfcImage from "../../public/images/house-cards/LynCorbray-ffc.png"
+import lysaArrynFfcImage from "../../public/images/house-cards/LysaArryn-ffc.png"
+import lysaArrynModImage from "../../public/images/house-cards/LysaArryn-mod.png"
+import missandeiBImage from "../../public/images/house-cards/Missandei-B.png"
+import nestorRoyceFfcImage from "../../public/images/house-cards/NestorRoyce-ffc.png"
+import rakharoBImage from "../../public/images/house-cards/Rakharo-B.png"
+import robertArrynModImage from "../../public/images/house-cards/RobertArryn-mod.png"
+import serJorahMormontAImage from "../../public/images/house-cards/SerJorahMormont-A.png"
+import serVardisEgenModImage from "../../public/images/house-cards/SerVardisEgen-mod.png"
+import strongBelwasBImage from "../../public/images/house-cards/StrongBelwas-B.png"
+import viserysTargaryenAImage from "../../public/images/house-cards/ViserysTargaryen-A.png"
+import xaroXhoanDaxosAImage from "../../public/images/house-cards/XaroXhoanDaxos-A.png"
+
 const houseCardImages = new BetterMap([
     ["queen-of-thorns", queenImage],
     ["aeron-damphair", aeronImage],
@@ -190,7 +219,35 @@ const houseCardImages = new BetterMap([
     ["janos-slynt", janosImage],
     ["jon-connington", jonConningtonImage],
     ["beric-dondarrion", bericImage],
-    ["bronn", bronnImage]
+    ["bronn", bronnImage],
+    ["alayne-stone", alayneStoneFfcImage],
+    ["anya-waynwood", anyaWaynwoodModImage],
+    ["arstan-whitebeard", arstanWhitebeardAImage],
+    ["bronze-yohn-royce-ffc", bronzeYohnRoyceFfcImage],
+    ["bronze-yohn-royce-mod", bronzeYohnRoyceModImage],
+    ["captain-groleo", captainGroleoBImage],
+    ["daario-naharis", daarioNaharisBImage],
+    ["daenerys-targaryen-a", daenerysTargaryenAImage],
+    ["daenerys-targaryen-b", daenerysTargaryenBImage],
+    ["godric-borrell", godricBorrellModImage],
+    ["gray-worm", grayWormBImage],
+    ["harry-hardyng", harryHardyngModImage],
+    ["illyrio-mopatis", illyrioMopatisAImage],
+    ["khal-drogo", khalDrogoAImage],
+    ["littlefinger", littlefingerFfcImage],
+    ["lothor-brune", lothorBruneFfcImage],
+    ["lyn-corbray", lynCorbrayFfcImage],
+    ["lysa-arryn-ffc", lysaArrynFfcImage],
+    ["lysa-arryn-mod", lysaArrynModImage],
+    ["missandei", missandeiBImage],
+    ["nestor-royce", nestorRoyceFfcImage],
+    ["rakharo", rakharoBImage],
+    ["robert-arryn", robertArrynModImage],
+    ["ser-jorah-mormont", serJorahMormontAImage],
+    ["ser-vardis-egen", serVardisEgenModImage],
+    ["strong-belwas", strongBelwasBImage],
+    ["viserys-targaryen", viserysTargaryenAImage],
+    ["xaro-xhoan-daxos", xaroXhoanDaxosAImage]
 ]);
 
 export default houseCardImages;

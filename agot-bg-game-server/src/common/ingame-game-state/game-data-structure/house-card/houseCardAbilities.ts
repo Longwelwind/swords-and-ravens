@@ -50,6 +50,24 @@ import SyrioForelHouseCardAbility from "./SyrioForelHouseCardAbility";
 import JaqenHGharHouseCardAbility from "./JaqenHGharHouseCardAbility";
 import JonConningtonHouseCardAbility from "./JonConningtonHouseCardAbility";
 import BronnHouseCardAbility from "./BronnHouseCardAbility";
+import BronzeYohnRoyceFfcHouseCardAbility from "./BronzeYohnRoyceFfcHouseCardAbility";
+import LittlefingerHouseCardAbility from "./LittlefingerHouseCardAbility";
+import AlayneStoneHouseCardAbility from "./AlayneStoneHouseCardAbility";
+import LysaArrynFfcHouseCardAbility from "./LysaArrynFfcHouseCardAbility";
+import SerVardisEgenHouseCardAbility from "./SerVardisEgenHouseCardAbility";
+import GodricBorrellHouseCardAbility from "./GodricBorrellHouseCardAbility";
+import AnyaWaynwoodHouseCardAbility from "./AnyaWaynwoodHouseCardAbility";
+import LysaArrynModHouseCardAbility from "./LysaArrynModHouseCardAbility";
+import RobertArrynHouseCardAbility from "./RobertArrynHouseCardAbility";
+import KhalDrogoHouseCardAbility from "./KhalDrogoHouseCardAbility";
+import XaroXhoanDaxosHouseCardAbility from "./XaroXhoanDaxosHouseCardAbility";
+import DaenerysTargaryenAHouseCardAbility from "./DaenerysTargaryenAHouseCardAbility";
+import ViserysTargaryenHouseCardAbility from "./ViserysTargaryenHouseCardAbility";
+import IllyrioMopatisHouseCardAbility from "./IllyrioMopatisHouseCardAbility";
+import DaenerysTargaryenBHouseCardAbility from "./DaenerysTargaryenBHouseCardAbility";
+import RakharoHouseCardAbility from "./RakharoHouseCardAbility";
+import MissandeiHouseCardAbility from "./MissandeiHouseCardAbility";
+import CaptainGroleoHouseCardAbility from "./CaptainGroleoHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -286,6 +304,93 @@ export const bronn = new BronnHouseCardAbility(
     "After you reveal house cards, your opponent may choose to discard 2 of"
     + " their available power tokens to reduce this card's combat strength to 0."
 );
+export const bronzeYohnRoyceFfc = new BronzeYohnRoyceFfcHouseCardAbility(
+    "bronze-yohn-royce-ffc",
+    "If you have more available Power tokens than your opponent, this card gains +1 combat strength."
+);
+export const littlefinger = new LittlefingerHouseCardAbility(
+    "littlefinger",
+    "If you control The Eyrie after this combat, gain a number of Power tokens equal to"
+     + " twice the printed combat strength of your opponent's played House card."
+);
+export const alayneStone = new AlayneStoneHouseCardAbility(
+    "alayne-stone",
+    "If you control The Eyrie after this combat, gain a number of Power tokens equal to"
+     + " twice the printed combat strength of your opponent's played House card."
+);
+export const lysaArrynFfc = new LysaArrynFfcHouseCardAbility(
+    "lysa-arryn-ffc",
+    "After this combat, if your opponent has more available Power tokens than you,"
+     + " gain 3 Power tokens."
+);
+export const serVardisEgen = new SerVardisEgenHouseCardAbility(
+    "ser-vardis-egen",
+    "If the printed combat strength of your opponent's house card is 2 or less,"
+     + " this card gains +1 combat strength and 2 fortification icons."
+);
+export const godricBorrell = new GodricBorrellHouseCardAbility(
+    "godric-borrell",
+    "If you are defending in a sea area, this card gains +1 combat strength for each land area" +
+    " you control adjacent to the embattled area."
+);
+export const anyaWaynwood = new AnyaWaynwoodHouseCardAbility(
+    "anya-waynwood",
+    "If you win this combat, you and all other players who supported you each gain 3 power tokens."
+);
+export const lysaArrynMod = new LysaArrynModHouseCardAbility(
+    "lysa-arryn-mod",
+    "If you have a defense order token in the embattled area and you win this combat," +
+    " you may choose to return this card to your hand instead of discarding it."
+);
+export const robertArryn = new RobertArrynHouseCardAbility(
+    "robert-arryn",
+    "If you are defending, after combat, you may remove \"Robert Arryn\" and the lowest strength" +
+    " house card in your opponent's discard pile from the game."
+);
+export const khalDrogo = new KhalDrogoHouseCardAbility(
+    "khal-drogo",
+    "This card gains 1 sword icon and +1 strength for each of your Knights in the embattled area." +
+    " After combat, remove \"Khal Drogo\" from the game."
+);
+export const xaroXhoanDaxos = new XaroXhoanDaxosHouseCardAbility(
+    "xaro-xhoan-daxos",
+    "If you have more Ships in the embattled area than your opponent, each of your Ships" +
+    " in the embattled area add +2 combat strength (instead of +1)."
+);
+export const daenerysTargaryenA = new DaenerysTargaryenAHouseCardAbility(
+    "daenerys-targaryen-a",
+    "If the embattled area contains a Dragon, this card gains +2 combat strength."
+)
+export const viserysTargaryen = new ViserysTargaryenHouseCardAbility(
+    "viserys-targaryen",
+    "You may discard a house card from your hand to add its printed combat strength to your combat strength." +
+    " If you lose this combat, remove \"Viserys Targaryen\" from the game."
+);
+export const illyrioMopatis = new IllyrioMopatisHouseCardAbility(
+    "illyrio-mopatis",
+    "After combat, gain a number of power tokens equal to the difference of the final combat strengths." +
+    " Then, if you have 5 or more available power tokens, remove \"Illyrio Mopatis\" from the game."
+);
+export const daenerysTargaryenB = new DaenerysTargaryenBHouseCardAbility(
+    "daenerys-targaryen-b",
+    "After combat, your opponent must disacard a number of their available power tokens equal" +
+    " to the difference of the final combat strengths."
+);
+export const rakharo = new RakharoHouseCardAbility(
+    "rakharo",
+    "If the embattled area is a land area that does not contain a stronghold or a castle," +
+    " each of your Knights in the embattled area adds +4 combat strength (instead of +2)."
+);
+export const missandei = new MissandeiHouseCardAbility(
+    "missandei",
+    "If you lose this combat by 2 combat strength or less, you may return any other house card" +
+    " in your discard pile to your hand."
+);
+export const captainGroleo = new CaptainGroleoHouseCardAbility(
+    "captain-groleo",
+    "If you are attacking a land area by using ship transport, this card gains +1 combat strength"
+    + " for each Targaryen Ship in areas adjacent to the embattled area."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -337,8 +442,25 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [syrioForel.id, syrioForel],
     [jonConnington.id, jonConnington],
     [bericDondarrion.id, bericDondarrion],
-    [bronn.id, bronn]
-
+    [bronn.id, bronn],
+    [bronzeYohnRoyceFfc.id, bronzeYohnRoyceFfc],
+    [littlefinger.id, littlefinger],
+    [alayneStone.id, alayneStone],
+    [lysaArrynFfc.id, lysaArrynFfc],
+    [serVardisEgen.id, serVardisEgen],
+    [godricBorrell.id, godricBorrell],
+    [anyaWaynwood.id, anyaWaynwood],
+    [lysaArrynMod.id, lysaArrynMod],
+    [robertArryn.id, robertArryn],
+    [khalDrogo.id, khalDrogo],
+    [xaroXhoanDaxos.id, xaroXhoanDaxos],
+    [daenerysTargaryenA.id, daenerysTargaryenA],
+    [viserysTargaryen.id, viserysTargaryen],
+    [illyrioMopatis.id, illyrioMopatis],
+    [daenerysTargaryenB.id, daenerysTargaryenB],
+    [rakharo.id, rakharo],
+    [missandei.id, missandei],
+    [captainGroleo.id, captainGroleo]
 ]);
 
 export default houseCardAbilities;

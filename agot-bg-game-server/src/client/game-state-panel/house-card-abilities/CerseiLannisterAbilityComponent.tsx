@@ -17,7 +17,8 @@ export default class CerseiLannisterAbilityComponent extends Component<GameState
         return (
             <>
                 <Col xs={12}>
-                    <b>Cersei Lannister:</b> Lannister can choose to remove one order of the opponent.
+                    <b>Cersei Lannister:</b> House <b>{this.props.gameState.childGameState.house.name}</b> can choose to remove one order of
+                    house <b>{this.props.gameState.combatGameState.getEnemy(this.props.gameState.childGameState.house).name}</b>.
                 </Col>
                 {renderChildGameState(this.props, [
                     [SimpleChoiceGameState, SimpleChoiceComponent],

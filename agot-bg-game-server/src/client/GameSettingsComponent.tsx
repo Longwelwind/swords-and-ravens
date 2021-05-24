@@ -119,6 +119,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     <OverlayTrigger overlay={
                                         <Tooltip id="draft-house-cards-tooltip">
                                             Players will draft their house cards step by step in a randomly chosen order before the game starts.
+                                            Cards can be chosen from all 2nd Edition Base Game house cards and all expansions (ADwD, AFfC and MoD) house cards.
                                         </Tooltip>}>
                                         <label htmlFor="draft-house-cards">Draft house cards (BETA)</label>
                                     </OverlayTrigger>}

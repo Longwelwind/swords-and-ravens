@@ -15,8 +15,8 @@ export default class DoranMartellAbilityComponent extends Component<GameStateCom
         return (
             <>
                 <Col xs={12}>
-                    <b>Doran Martell: </b> Martell must move the enemy to the bottom of one influence track of its
-                    choice.
+                    <b>Doran Martell: </b> House <b>{this.props.gameState.childGameState.house.name}</b> must move
+                    house <b>{this.props.gameState.combatGameState.getEnemy(this.props.gameState.childGameState.house).name}</b> to the bottom of one influence track of their choice.
                 </Col>
                 {renderChildGameState(this.props, [
                     [SimpleChoiceGameState, SimpleChoiceComponent]

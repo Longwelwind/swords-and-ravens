@@ -20,7 +20,7 @@ export default class AeronDamphairAbilityComponent extends Component<GameStateCo
         return (
             <>
                 <Col xs={12}>
-                    <b>Aeron Damphair:</b> Greyjoy may discard any number of available Power token to increase the combat strength of his card by the number of Power tokens discarded.
+                    <b>Aeron Damphair:</b> House <b>{this.props.gameState.house.name}</b> may discard any number of available Power token to increase the combat strength of his card by the number of Power tokens discarded.
                 </Col>
                 {this.authenticatedPlayer && this.props.gameClient.doesControlHouse(this.props.gameState.house) && (
                     <>

@@ -28,10 +28,12 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | SkinchangerScoutNightsWatchVictory | SkinchangerScoutWildlingVictory
     | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory
     | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered
-    | SupplyAdjusted | PlayerReplaced | UserHouseAssignments | PlayerAction | MelisandreUsed | JonSnowUsed
+    | SupplyAdjusted | PlayerReplaced | UserHouseAssignments | PlayerAction | JonSnowUsed
     | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed | SerIlynPayneFootmanKilled | RodrikTheReaderUsed
     | VassalsClaimed | CommanderPowerTokenGained | BericDondarrionUsed | VarysUsed | JaqenHGharUsed | JonConningtonUsed | BronnUsed
-    | SerGerrisDrinkwaterUsed | DraftHouseCardsBegan | HouseCardPicked;
+    | SerGerrisDrinkwaterUsed | DraftHouseCardsBegan | HouseCardPicked
+    | LittlefingerPowerTokensGained | AlayneStoneUsed | LysaArrynFfcPowerTokensGained | AnyaWaynwoodPowerTokensGained | RobertArrynUsed
+    | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained | DaenerysTargaryenPowerTokensDiscarded | MissandeiUsed;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -295,12 +297,6 @@ interface PatchfaceUsed {
     type: "patchface-used";
     house: string;
     affectedHouse: string;
-    houseCard: string;
-}
-
-interface MelisandreUsed {
-    type: "melisandre-used";
-    house: string;
     houseCard: string;
 }
 
@@ -704,6 +700,68 @@ interface DraftHouseCardsBegan {
 
 interface HouseCardPicked {
     type: "house-card-picked";
+    house: string;
+    houseCard: string;
+}
+
+interface LittlefingerPowerTokensGained {
+    type: "littlefinger-power-tokens-gained";
+    house: string;
+    powerTokens: number;
+}
+
+interface AlayneStoneUsed {
+    type: "alayne-stone-used";
+    house: string;
+    affectedHouse: string;
+    lostPowerTokens: number;
+}
+
+interface LysaArrynFfcPowerTokensGained {
+    type: "lysa-arryn-ffc-power-tokens-gained";
+    house: string;
+    powerTokens: number;
+}
+
+interface AnyaWaynwoodPowerTokensGained {
+    type: "anya-waynwood-power-tokens-gained";
+    gains: [string, number][];
+}
+
+interface RobertArrynUsed {
+    type: "robert-arryn-used";
+    house: string;
+    affectedHouse: string;
+    removedHouseCard: string | null;
+}
+
+interface HouseCardRemovedFromGame {
+    type: "house-card-removed-from-game";
+    house: string;
+    houseCard: string;
+}
+
+interface ViserysTargaryenUsed {
+    type: "viserys-targaryen-used";
+    house: string;
+    houseCard: string;
+}
+
+interface IllyrioMopatisPowerTokensGained {
+    type: "illyrio-mopatis-power-tokens-gained";
+    house: string;
+    powerTokensGained: number;
+}
+
+interface DaenerysTargaryenPowerTokensDiscarded {
+    type: "daenerys-targaryen-b-power-tokens-discarded";
+    house: string;
+    affectedHouse: string;
+    powerTokensDiscarded: number;
+}
+
+interface MissandeiUsed {
+    type: "missandei-used";
     house: string;
     houseCard: string;
 }

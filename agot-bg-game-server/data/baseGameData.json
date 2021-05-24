@@ -1396,5 +1396,168 @@
         }
       }
     }
+  },
+  "ffcHouseCards": {
+    "arryn": {
+      "houseCards": {
+        "bronze-yohn-royce-ffc": {
+          "name": "Bronze Yohn Royce",
+          "combatStrength": 4,
+          "ability": "bronze-yohn-royce-ffc"
+        },
+        "littlefinger": {
+          "name": "Littlefinger",
+          "combatStrength": 3,
+          "ability": "littlefinger"
+        },
+        "nestor-royce": {
+          "name": "Nestor Royce",
+          "combatStrength": 2,
+          "towerIcons": 2
+        },
+        "lyn-corbray": {
+          "name": "Lyn Corbray",
+          "combatStrength": 2,
+          "swordIcons": 1
+        },
+        "alayne-stone": {
+          "name": "Alayne Stone",
+          "combatStrength": 1,
+          "ability": "alayne-stone"
+        },
+        "lothor-brune": {
+          "name": "Lothor Brune",
+          "combatStrength": 1,
+          "swordIcons": 1,
+          "towerIcons": 1
+        },
+        "lysa-arryn-ffc": {
+          "name": "Lysa Arryn",
+          "ability": "lysa-arryn-ffc"
+        }
+      }
+    }
+  },
+  "modAHouseCards": {
+    "arryn": {
+      "houseCards": {
+        "lysa-arryn-mod": {
+          "name": "Lysa Arryn",
+          "combatStrength": 4,
+          "ability": "lysa-arryn-mod"
+        },
+        "bronze-yohn-royce-mod": {
+          "name": "Bronze Yohn Royce",
+          "combatStrength": 3,
+          "swordIcons": 1,
+          "towerIcons": 2
+        },
+        "ser-vardis-egen": {
+          "name": "Ser Vardis Egen",
+          "combatStrength": 2,
+          "ability": "ser-vardis-egen"
+        },
+        "harry-hardyng": {
+          "name": "Harry Hardyng",
+          "combatStrength": 2,
+          "swordIcons": 1
+        },
+        "godric-borrell": {
+          "name": "Godric Borrell",
+          "combatStrength": 1,
+          "ability": "godric-borrell"
+        },
+        "anya-waynwood": {
+          "name": "Anya Waynwood",
+          "combatStrength": 1,
+          "ability": "anya-waynwood"
+        },
+        "robert-arryn": {
+          "name": "Robert Arryn",
+          "ability": "robert-arryn"
+        }
+      }
+    },
+    "targaryen": {
+      "houseCards": {
+        "khal-drogo": {
+          "name": "Khal Drogo",
+          "combatStrength": 4,
+          "ability": "khal-drogo"
+        },
+        "arstan-whitebeard": {
+          "name": "Arstan Whitebeard",
+          "combatStrength": 3,
+          "swordIcons": 1,
+          "towerIcons": 1
+        },
+        "xaro-xhoan-daxos": {
+          "name": "Xaro Xhoan Daxos",
+          "combatStrength": 2,
+          "ability": "xaro-xhoan-daxos"
+        },
+        "ser-jorah-mormont": {
+          "name": "Ser Jorah Mormont",
+          "combatStrength": 2,
+          "swordIcons": 1,
+          "towerIcons": 1
+        },
+        "daenerys-targaryen-a": {
+          "name": "Daenerys Targaryen",
+          "combatStrength": 1,
+          "ability": "daenerys-targaryen-a"
+        },
+        "viserys-targaryen": {
+          "name": "Viserys Targaryen",
+          "combatStrength": 1,
+          "ability": "viserys-targaryen"
+        },
+        "illyrio-mopatis": {
+          "name": "Illyrio Mopatis",
+          "ability": "illyrio-mopatis"
+        }
+      }
+    }
+  },
+  "modBHouseCards": {
+    "targaryen": {
+      "houseCards": {
+        "daenerys-targaryen-b": {
+          "name": "Daenerys Targaryen",
+          "combatStrength": 4,
+          "ability": "daenerys-targaryen-b"
+        },
+        "daario-naharis": {
+          "name": "Daario Naharis",
+          "combatStrength": 3,
+          "swordIcons": 1
+        },
+        "gray-worm": {
+          "name": "Gray Worm",
+          "combatStrength": 2,
+          "swordIcons": 1,
+          "towerIcons": 1
+        },
+        "strong-belwas": {
+          "name": "Strong Belwas",
+          "combatStrength": 2,
+          "swordIcons": 2
+        },
+        "captain-groleo": {
+          "name": "Captain Groleo",
+          "combatStrength": 1,
+          "ability": "captain-groleo"
+        },
+        "rakharo": {
+          "name": "Rakharo",
+          "combatStrength": 1,
+          "ability": "rakharo"
+        },
+        "missandei": {
+          "name": "Missandei",
+          "ability": "missandei"
+        }
+      }
+    }
   }
 }
