@@ -16,17 +16,19 @@ export default class KhalDrogoHouseCardAbility extends HouseCardAbility {
     }
 
     afterCombat(afterCombat: AfterCombatHouseCardAbilitiesGameState, house: House, houseCard: HouseCard): void {
-        house.houseCards.delete(houseCard.id);
-        afterCombat.entireGame.broadcastToClients({
-            type: "update-house-cards",
-            house: house.id,
-            houseCards: house.houseCards.keys
-        });
-        afterCombat.combatGameState.ingameGameState.log({
-            type: "house-card-removed-from-game",
-            house: house.id,
-            houseCard: houseCard.id
-        });
+        if (house.houseCards.has(houseCard.id)) {
+            house.houseCards.delete(houseCard.id);
+            afterCombat.entireGame.broadcastToClients({
+                type: "update-house-cards",
+                house: house.id,
+                houseCards: house.houseCards.keys
+            });
+            afterCombat.combatGameState.ingameGameState.log({
+                type: "house-card-removed-from-game",
+                house: house.id,
+                houseCard: houseCard.id
+            });
+        }
         afterCombat.childGameState.onHouseCardResolutionFinish(house);
     }
 }
