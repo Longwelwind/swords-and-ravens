@@ -720,14 +720,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
     {
         version: "26",
         migrate: (serializedGame: any) => {
-            // Migration for #954
-            if (serializedGame.childGameState.type == "ingame") {
-                const ingame = serializedGame.childGameState;
-                ingame.game.houses.forEach((h: any) => {
-                    h.unitLimits.push(["dragon", 0]);
-                });
-            }
-
+            // This was a weird migration which is not necessary anymore
             return serializedGame;
         }
     }

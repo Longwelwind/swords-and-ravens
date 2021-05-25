@@ -3,7 +3,7 @@ import { Component, ReactNode } from "react";
 import React from "react";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import House from "../common/ingame-game-state/game-data-structure/House";
-import { ListGroupItem, Row, Col, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { ListGroupItem, Row, Col, OverlayTrigger, Tooltip, Popover } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
 import { faStar } from "@fortawesome/free-solid-svg-icons/faStar";
@@ -21,6 +21,7 @@ import Player from "../common/ingame-game-state/Player";
 import UserLabel from "./UserLabel";
 import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
 import { observer } from "mobx-react";
+import GiftPowerTokensComponent from "./GiftPowerTokensComponent";
 
 
 interface HouseRowComponentProps {
@@ -103,7 +104,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     </Col>
                     <Col xs="auto">
                         <Row className="justify-content-center align-items-center" style={{width: 110}}>
-                            {unitTypes.values.filter(ut => ut.id != "dragon").map(type => (
+                            {unitTypes.values.map(type => (
                                 <Col xs={6} key={type.id}>
                                     <Row className="justify-content-center no-gutters align-items-center">
                                         <Col xs="auto">
@@ -146,9 +147,10 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     <Col xs="auto" className={classNames("d-flex align-items-center", {"invisible": this.isVassal})}>
                         <div style={{fontSize: "18px"}}>{this.house.powerTokens}</div>
                         <OverlayTrigger
-                            overlay={this.renderPowerTooltip(this.house)}
-                            delay={{show: 250, hide: 100}}
+                            overlay={this.renderPowerPopover(this.house)}
                             placement="auto"
+                            trigger="click"
+                            rootClose
                         >
                             <div
                                 className="house-power-token hover-weak-outline"
@@ -204,16 +206,19 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         </Tooltip>;
     }
 
-    private renderPowerTooltip(house: House): ReactNode {
+    private renderPowerPopover(house: House): ReactNode {
         const availablePower =  house.powerTokens;
         const powerTokensOnBoard = this.game.countPowerTokensOnBoard(house);
         const powerInPool = this.game.maxPowerTokens - availablePower - powerTokensOnBoard;
 
-        return <Tooltip id={house.id + "-power-tooltip"}>
+        return <Popover id={house.id + "-power-tooltip"}>
             <b>{house.name}</b><br/>
             <small>Available: </small><b>{availablePower}</b><br/>
             <small>On the board: </small><b>{powerTokensOnBoard}</b><br/>
             <small>Power Pool: </small><b>{powerInPool}</b>
-        </Tooltip>;
+            {this.props.gameClient.authenticatedPlayer && this.props.gameClient.authenticatedPlayer.house != house &&
+                <div className="mt-1" ><br/><GiftPowerTokensComponent toHouse={this.house} authenticatedPlayer={this.props.gameClient.authenticatedPlayer} ingame={this.props.ingame}/></div>
+            }
+        </Popover>;
     }
 }

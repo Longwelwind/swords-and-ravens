@@ -884,8 +884,7 @@
         "footman": 10,
         "knight": 5,
         "ship": 6,
-        "siege-engine": 2,
-        "dragon": 0
+        "siege-engine": 2
       },
       "houseCards": {
         "tywin-lannister": {
@@ -932,8 +931,7 @@
         "footman": 10,
         "knight": 5,
         "ship": 6,
-        "siege-engine": 2,
-        "dragon": 0
+        "siege-engine": 2
       },
       "houseCards": {
         "eddard-stark": {
@@ -980,8 +978,7 @@
         "footman": 10,
         "knight": 5,
         "ship": 6,
-        "siege-engine": 2,
-        "dragon": 0
+        "siege-engine": 2
       },
       "houseCards": {
         "stannis-baratheon": {
@@ -1029,8 +1026,7 @@
         "footman": 10,
         "knight": 5,
         "ship": 6,
-        "siege-engine": 2,
-        "dragon": 0
+        "siege-engine": 2
       },
       "houseCards": {
         "euron-crows-eye": {
@@ -1078,8 +1074,7 @@
         "footman": 10,
         "knight": 5,
         "ship": 6,
-        "siege-engine": 2,
-        "dragon": 0
+        "siege-engine": 2
       },
       "houseCards": {
         "the-red-viper": {
@@ -1127,8 +1122,7 @@
         "footman": 10,
         "knight": 5,
         "ship": 6,
-        "siege-engine": 2,
-        "dragon": 0
+        "siege-engine": 2
       },
       "houseCards": {
         "mace-tyrell": {
