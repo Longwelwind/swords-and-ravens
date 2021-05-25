@@ -12,8 +12,7 @@ const unitTypes = new BetterMap<string, UnitType>([
     [footman.id, footman],
     [knight.id, knight],
     [siegeEngine.id, siegeEngine],
-    [ship.id, ship],
-    [dragon.id, dragon]
+    [ship.id, ship]
 ]);
 
 export default unitTypes;

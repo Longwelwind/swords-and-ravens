@@ -103,7 +103,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     </Col>
                     <Col xs="auto">
                         <Row className="justify-content-center align-items-center" style={{width: 110}}>
-                            {unitTypes.values.filter(ut => ut.id != "dragon").map(type => (
+                            {unitTypes.values.map(type => (
                                 <Col xs={6} key={type.id}>
                                     <Row className="justify-content-center no-gutters align-items-center">
                                         <Col xs="auto">
