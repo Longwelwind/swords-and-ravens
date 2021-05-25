@@ -197,6 +197,22 @@ export default class IngameGameState extends GameState<
             }
 
             this.createVote(player.user, new ReplacePlayerByVassal(playerToReplace.user, playerToReplace.house));
+        } else if (message.type == "gift-power-tokens") {
+            const toHouse = this.game.houses.get(message.toHouse);
+
+            if (!this.isVassalHouse(toHouse)
+                    && player.house != toHouse
+                    && message.powerTokens > 0
+                    && message.powerTokens <= player.house.powerTokens) {
+                this.changePowerTokens(player.house, -message.powerTokens);
+                this.changePowerTokens(toHouse, message.powerTokens);
+                this.log({
+                    type: "power-tokens-gifted",
+                    house: player.house.id,
+                    affectedHouse: toHouse.id,
+                    powerTokens: message.powerTokens
+                });
+            }
         } else {
             this.childGameState.onPlayerMessage(player, message);
         }
@@ -607,6 +623,14 @@ export default class IngameGameState extends GameState<
         this.entireGame.sendMessageToServer({
             type: "update-note",
             note: note
+        });
+    }
+
+    giftPowerTokens(toHouse: House, powerTokens: number): void {
+        this.entireGame.sendMessageToServer({
+            type: "gift-power-tokens",
+            toHouse: toHouse.id,
+            powerTokens: powerTokens
         });
     }
 

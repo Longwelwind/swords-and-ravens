@@ -1301,6 +1301,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Missandei</b>: <b>{house.name}</b> decided to return <b>{houseCard.name}</b> to hand.
                 </>;
             }
+            case "power-tokens-gifted": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+                return <>
+                    House <b>{house.name}</b> gifted {data.powerTokens} Power token{data.powerTokens > 1 && "s"} to house <b>{affectedHouse.name}</b>.
+                </>;
+            }
         }
     }
 }

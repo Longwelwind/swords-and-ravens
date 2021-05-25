@@ -33,7 +33,8 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | VassalsClaimed | CommanderPowerTokenGained | BericDondarrionUsed | VarysUsed | JaqenHGharUsed | JonConningtonUsed | BronnUsed
     | SerGerrisDrinkwaterUsed | DraftHouseCardsBegan | HouseCardPicked
     | LittlefingerPowerTokensGained | AlayneStoneUsed | LysaArrynFfcPowerTokensGained | AnyaWaynwoodPowerTokensGained | RobertArrynUsed
-    | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained | DaenerysTargaryenPowerTokensDiscarded | MissandeiUsed;
+    | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained | DaenerysTargaryenPowerTokensDiscarded | MissandeiUsed
+    | PowerTokensGifted;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -764,4 +765,11 @@ interface MissandeiUsed {
     type: "missandei-used";
     house: string;
     houseCard: string;
+}
+
+interface PowerTokensGifted {
+    type: "power-tokens-gifted";
+    house: string;
+    affectedHouse: string;
+    powerTokens: number;
 }
