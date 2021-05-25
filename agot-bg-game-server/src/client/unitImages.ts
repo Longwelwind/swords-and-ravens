@@ -24,6 +24,11 @@ import tyrFoot from "../../public/images/units/TyrFoot.png";
 import tyrKnight from "../../public/images/units/TyrKnight.png";
 import tyrSiege from "../../public/images/units/TyrSeige.png";
 import tyrShip from "../../public/images/units/TyrShip.png";
+import arrynFoot from "../../public/images/units/ArrynFoot.png"
+import arrynKnight from "../../public/images/units/ArrynKnight.png";
+import arrynSiege from "../../public/images/units/ArrynSiege.png";
+import arrynShip from "../../public/images/units/ArrynShip.png";
+
 
 const unitImages = new BetterMap([
     ["baratheon", new BetterMap([
@@ -62,6 +67,12 @@ const unitImages = new BetterMap([
         [siegeEngine.id, tyrSiege],
         [ship.id, tyrShip]
     ])],
+    ["arryn", new BetterMap([
+        [footman.id, arrynFoot],
+        [knight.id, arrynKnight],
+        [siegeEngine.id, arrynSiege],
+        [ship.id, arrynShip]
+    ])]
 ]);
 
 export default unitImages;

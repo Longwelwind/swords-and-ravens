@@ -26,6 +26,20 @@
         }
       ]
     },
+    "mother-of-dragons": {
+      "name": "Mother of Dragons (7p) - BETA",
+      "playerSetups": [
+        {
+          "playerCount": 7,
+          "houses": ["stark", "greyjoy", "lannister", "baratheon", "tyrell", "martell", "arryn"],
+          "tracks": {
+            "ironThrone": ["baratheon", "lannister", "stark", "martell", "greyjoy", "tyrell", "arryn"],
+            "fiefdoms": ["greyjoy", "tyrell", "martell", "arryn", "stark", "baratheon", "lannister"],
+            "kingsCourt": ["lannister", "stark", "martell", "tyrell", "arryn", "baratheon", "greyjoy"]
+          }
+        }
+      ]
+    },
     "a-dance-with-dragons": {
       "name": "A Dance with Dragons (6p)",
       "playerSetups": [{
@@ -765,6 +779,66 @@
         "quantity": 0,
         "quantityVassal": 1
       }
+    ],
+    "the-eyrie": [
+      {
+        "unitType": "knight",
+        "house": "arryn",
+        "quantity": 2,
+        "quantityVassal": 1
+      }
+    ],
+    "port-of-the-eyrie": [
+      {
+        "unitType": "ship",
+        "house": "arryn",
+        "quantity": 1,
+        "quantityVassal": 1
+      }
+    ],
+    "the-bite": [
+      {
+        "unitType": "ship",
+        "house": "arryn",
+        "quantity": 0,
+        "quantityVassal": 1
+      }
+    ],
+    "the-narrow-sea": [
+      {
+        "unitType": "ship",
+        "house": "arryn",
+        "quantity": 0,
+        "quantityVassal": 1
+      }
+    ],
+    "the-vale-of-arryn": [
+      {
+        "unitType": "knight",
+        "house": "arryn",
+        "quantity": 1,
+        "quantityVassal": 1
+      },
+      {
+        "unitType": "footman",
+        "house": "arryn",
+        "quantity": 0,
+        "quantityVassal": 1
+      }
+    ],
+    "the-mountains-of-the-moon": [
+      {
+        "unitType": "knight",
+        "house": "arryn",
+        "quantity": 0,
+        "quantityVassal": 1
+      },
+      {
+        "unitType": "footman",
+        "house": "arryn",
+        "quantity": 0,
+        "quantityVassal": 1
+      }
     ]
   },
   "starredOrderRestrictions": [
@@ -1161,6 +1235,54 @@
         }
       },
       "supplyLevel": 2
+    },
+    "arryn": {
+      "name": "Arryn",
+      "color": "#32aadc",
+      "unitLimits": {
+        "footman": 10,
+        "knight": 5,
+        "ship": 6,
+        "siege-engine": 2
+      },
+      "houseCards": {
+        "lysa-arryn-mod": {
+          "name": "Lysa Arryn",
+          "combatStrength": 4,
+          "ability": "lysa-arryn-mod"
+        },
+        "bronze-yohn-royce-mod": {
+          "name": "Bronze Yohn Royce",
+          "combatStrength": 3,
+          "swordIcons": 1,
+          "towerIcons": 2
+        },
+        "ser-vardis-egen": {
+          "name": "Ser Vardis Egen",
+          "combatStrength": 2,
+          "ability": "ser-vardis-egen"
+        },
+        "harry-hardyng": {
+          "name": "Harry Hardyng",
+          "combatStrength": 2,
+          "swordIcons": 1
+        },
+        "godric-borrell": {
+          "name": "Godric Borrell",
+          "combatStrength": 1,
+          "ability": "godric-borrell"
+        },
+        "anya-waynwood": {
+          "name": "Anya Waynwood",
+          "combatStrength": 1,
+          "ability": "anya-waynwood"
+        },
+        "robert-arryn": {
+          "name": "Robert Arryn",
+          "ability": "robert-arryn"
+        }
+      },
+      "supplyLevel": 1
     }
   },
   "adwdHouseCards": {
@@ -1439,45 +1561,6 @@
     }
   },
   "modAHouseCards": {
-    "arryn": {
-      "houseCards": {
-        "lysa-arryn-mod": {
-          "name": "Lysa Arryn",
-          "combatStrength": 4,
-          "ability": "lysa-arryn-mod"
-        },
-        "bronze-yohn-royce-mod": {
-          "name": "Bronze Yohn Royce",
-          "combatStrength": 3,
-          "swordIcons": 1,
-          "towerIcons": 2
-        },
-        "ser-vardis-egen": {
-          "name": "Ser Vardis Egen",
-          "combatStrength": 2,
-          "ability": "ser-vardis-egen"
-        },
-        "harry-hardyng": {
-          "name": "Harry Hardyng",
-          "combatStrength": 2,
-          "swordIcons": 1
-        },
-        "godric-borrell": {
-          "name": "Godric Borrell",
-          "combatStrength": 1,
-          "ability": "godric-borrell"
-        },
-        "anya-waynwood": {
-          "name": "Anya Waynwood",
-          "combatStrength": 1,
-          "ability": "anya-waynwood"
-        },
-        "robert-arryn": {
-          "name": "Robert Arryn",
-          "ability": "robert-arryn"
-        }
-      }
-    },
     "targaryen": {
       "houseCards": {
         "khal-drogo": {
