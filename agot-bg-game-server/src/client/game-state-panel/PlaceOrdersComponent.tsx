@@ -21,6 +21,8 @@ import PlanningRestriction from "../../common/ingame-game-state/game-data-struct
 import { noMarchPlusOneOrder, noDefenseOrder, noSupportOrder, noRaidOrder, noConsolidatePowerOrder } from "../../common/ingame-game-state/game-data-structure/westeros-card/planning-restriction/planningRestrictions";
 import WesterosCardType from "../../common/ingame-game-state/game-data-structure/westeros-card/WesterosCardType";
 import { rainsOfAutumn, stormOfSwords, webOfLies, seaOfStorms, feastForCrows } from "../../common/ingame-game-state/game-data-structure/westeros-card/westerosCardTypes";
+import { renderRegionTooltip } from "../regionTooltip";
+import info from "../../../public/images/icons/info.svg"
 
 @observer
 export default class PlaceOrdersComponent extends Component<GameStateComponentProps<PlaceOrdersGameState>> {
@@ -136,17 +138,28 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                                 rootClose
                                 overlay={
                                     <Popover id={"region" + r.id}>
-                                        <p className="text-strong text-center">{r.name}</p>
-                                        <OrderGridComponent orders={this.placeOrders.getOrdersList(r.getController() as House)}
-                                            selectedOrder={null}
-                                            availableOrders={
-                                                this.placeOrders.getAvailableOrders(r.getController() as House)
-                                            }
-                                            restrictedOrders={this.placeOrders.ingame.game.getRestrictedOrders(r, this.placeOrders.planningGameState.planningRestrictions)}
-                                            onOrderClick={o => {
-                                                this.placeOrders.assignOrder(r, o);
-                                                document.body.click();
-                                        }}/>
+                                        <Row className="justify-content-center align-items-center">
+                                            <Col xs="auto"><b>{r.name}</b></Col>
+                                            <Col xs="auto">
+                                                <OverlayTrigger overlay={renderRegionTooltip(r)}
+                                                    popperConfig={{ modifiers: { preventOverflow: { boundariesElement: "viewport" } } }}
+                                                    placement="auto">
+                                                <div style={{backgroundImage: `url(${info})`, width: 16, height: 16, backgroundSize: "contain", backgroundPosition: "center", backgroundRepeat: "no-repeat"}}/>
+                                                </OverlayTrigger>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <OrderGridComponent orders={this.placeOrders.getOrdersList(r.getController() as House)}
+                                                selectedOrder={null}
+                                                availableOrders={
+                                                    this.placeOrders.getAvailableOrders(r.getController() as House)
+                                                }
+                                                restrictedOrders={this.placeOrders.ingame.game.getRestrictedOrders(r, this.placeOrders.planningGameState.planningRestrictions)}
+                                                onOrderClick={o => {
+                                                    this.placeOrders.assignOrder(r, o);
+                                                    document.body.click();
+                                            }}/>
+                                        </Row>
                                     </Popover>
                                 }
                             >

@@ -21,11 +21,11 @@ import ConditionalWrap from "./utils/ConditionalWrap";
 import BetterMap from "../utils/BetterMap";
 import _ from "lodash";
 import PartialRecursive from "../utils/PartialRecursive";
-import joinReactNodes from "./utils/joinReactNodes";
 import StaticBorder from "../common/ingame-game-state/game-data-structure/static-data-structure/StaticBorder";
 import { land } from "../common/ingame-game-state/game-data-structure/regionTypes";
 import PlaceOrdersGameState from "../common/ingame-game-state/planning-game-state/place-orders-game-state/PlaceOrdersGameState";
 import UseRavenGameState from "../common/ingame-game-state/action-game-state/use-raven-game-state/UseRavenGameState";
+import { renderRegionTooltip } from "./regionTooltip";
 
 interface MapComponentProps {
     gameClient: GameClient;
@@ -97,7 +97,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                     key={region.id}
                     wrap={wrap ? wrap : child =>
                         <OverlayTrigger
-                            overlay={this.renderRegionTooltip(region)}
+                            overlay={renderRegionTooltip(region)}
                             delay={{ show: 750, hide: 100 }}
                             placement="auto"
                             rootClose
@@ -123,29 +123,6 @@ export default class MapComponent extends Component<MapComponentProps> {
                 </ConditionalWrap>
             );
         });
-    }
-
-    private renderRegionTooltip(region: Region): ReactNode {
-        const controller =  region.getController();
-
-        return <Tooltip id="region-details">
-            <b>{region.name}</b> {controller && (<small>of <b>{controller.name}</b></small>)} {region.castleLevel > 0 && (<small> ({region.castleLevel == 1 ? "Castle" : "Stronghold"})</small>)}
-            {region.superControlPowerToken ? (
-                <small><br/>Capital of {region.superControlPowerToken.name} {region.garrison > 0 && <>(Garrison of <b>{region.garrison}</b>)</>}</small>
-            ) : (
-                region.garrison > 0 && (<small><br />{!region.getController() ? "Neutral force" : "Garrison"} of <b>{region.garrison}</b></small>)
-            )}
-            {(region.supplyIcons > 0 || region.crownIcons) > 0 && (
-                <>
-                    <br />{region.supplyIcons > 0 && <><b>{region.supplyIcons}</b> Barrel{region.supplyIcons > 1 && "s"}</>}
-                    {(region.supplyIcons > 0 && region.crownIcons > 0) && " - "}
-                    {region.crownIcons > 0 && <><b>{region.crownIcons}</b> Crown{region.crownIcons > 1 && "s"}</>}
-                </>
-            )}
-            {region.units.size > 0 && (
-                <><br/>{joinReactNodes(region.units.values.map(u => u.wounded ? <s key={u.id}>{u.type.name}</s> : <b key={u.id}>{u.type.name}</b>), ", ")}</>
-            )}
-        </Tooltip>;
     }
 
     renderUnits(): ReactNode {
