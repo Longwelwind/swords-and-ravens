@@ -723,6 +723,19 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             // This was a weird migration which is not necessary anymore
             return serializedGame;
         }
+    },
+    {
+        version: "27",
+        migrate: (serializedGame: any) => {
+            // Fix the unit type dragon shit
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.game.houses.forEach((h: SerializedHouse) => {
+                    h.unitLimits = h.unitLimits.filter(([utid, _limit]) => utid != "dragon");
+                });
+            }
+            return serializedGame;
+        }
     }
 ];
 
