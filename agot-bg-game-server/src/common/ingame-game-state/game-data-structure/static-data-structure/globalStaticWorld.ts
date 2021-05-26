@@ -7,7 +7,7 @@ import StaticRegion from "./StaticRegion";
 import regionTypes from "../regionTypes";
 import UnitSlot from "../../../../utils/unitSlot";
 
-interface TiledSquareObject {
+export interface TiledSquareObject {
     name: string;
     x: number;
     y: number;
@@ -17,7 +17,7 @@ interface TiledSquareObject {
 
 }
 
-interface TiledPolygonObject {
+export interface TiledPolygonObject {
     name: string;
     polygon: {x: number; y: number}[];
     x: number;
@@ -25,17 +25,17 @@ interface TiledPolygonObject {
     properties: TiledProperty[];
 }
 
-interface TiledProperty {
+export interface TiledProperty {
     name: string;
     value: any;
     type: string;
 }
 
-function hasTiledProperty(properties: TiledProperty[], name: string): boolean {
+export function hasTiledProperty(properties: TiledProperty[], name: string): boolean {
     return properties.find(p => p.name == name) != null;
 }
 
-function getTiledProperty<E = string>(properties: TiledProperty[], name: string): E {
+export function getTiledProperty<E = string>(properties: TiledProperty[], name: string): E {
     const property = properties.find(p => p.name == name);
     if (!property) {
         throw new Error("No property with name " + name + " found");
@@ -44,7 +44,7 @@ function getTiledProperty<E = string>(properties: TiledProperty[], name: string)
     return property.value as E;
 }
 
-function tryGetTiledProperty<E = string>(properties: TiledProperty[], name: string, defaultValue: E): E {
+export function tryGetTiledProperty<E = string>(properties: TiledProperty[], name: string, defaultValue: E): E {
     const property = properties.find(p => p.name == name);
     if (!property) {
         return defaultValue;

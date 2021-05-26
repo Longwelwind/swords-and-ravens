@@ -5,10 +5,10 @@ import {observable} from "mobx";
 import Game from "./Game";
 import BetterMap from "../../../utils/BetterMap";
 import StaticRegion from "./static-data-structure/StaticRegion";
-import staticWorld from "./static-data-structure/globalStaticWorld";
 import Point from "../../../utils/Point";
 import UnitSlot from "../../../utils/unitSlot";
 import _ from "lodash";
+import getStaticWorld from "./static-data-structure/getStaticWorld";
 
 export default class Region {
     game: Game;
@@ -24,7 +24,7 @@ export default class Region {
 
 
     get staticRegion(): StaticRegion {
-        return staticWorld.staticRegions.get(this.id);
+        return getStaticWorld(this.game.ingame.entireGame.gameSettings.setupId).staticRegions.get(this.id);
     }
 
     get hasStructure(): boolean {

@@ -736,6 +736,17 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "28",
+        migrate: (serializedGame: any) => {
+            // Add the gameSetupId to the world to load the correct borders
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.game.world.gameSetupId = serializedGame.gameSettings.setupId;
+            }
+            return serializedGame;
+        }
     }
 ];
 

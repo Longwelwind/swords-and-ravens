@@ -9,13 +9,13 @@ import MapControls, {OrderOnMapProperties, RegionOnMapProperties, UnitOnMapPrope
 import {observer} from "mobx-react";
 import ActionGameState from "../common/ingame-game-state/action-game-state/ActionGameState";
 import Order from "../common/ingame-game-state/game-data-structure/Order";
-import backgroundImage from "../../public/images/westeros.jpg";
+import westerosImage from "../../public/images/westeros.jpg";
+import westeros7pImage from "../../public/images/westeros-7p.jpg";
 import houseOrderImages from "./houseOrderImages";
 import orderImages from "./orderImages";
 import unitImages from "./unitImages";
 import classNames = require("classnames");
 import housePowerTokensImages from "./housePowerTokensImages";
-import garrisonTokens from "./garrisonTokens";
 import {OverlayTrigger, Tooltip} from "react-bootstrap";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import BetterMap from "../utils/BetterMap";
@@ -26,6 +26,7 @@ import { land } from "../common/ingame-game-state/game-data-structure/regionType
 import PlaceOrdersGameState from "../common/ingame-game-state/planning-game-state/place-orders-game-state/PlaceOrdersGameState";
 import UseRavenGameState from "../common/ingame-game-state/action-game-state/use-raven-game-state/UseRavenGameState";
 import { renderRegionTooltip } from "./regionTooltip";
+import getGarrisonToken from "./garrisonTokens";
 
 interface MapComponentProps {
     gameClient: GameClient;
@@ -35,24 +36,26 @@ interface MapComponentProps {
 
 @observer
 export default class MapComponent extends Component<MapComponentProps> {
-    refOverlayTriggerRegion: OverlayTrigger;
-
     get ingame(): IngameGameState {
         return this.props.ingameGameState;
     }
 
     render(): ReactNode {
+        const backgroundImage = this.ingame.entireGame.gameSettings.setupId == "mother-of-dragons" ? westeros7pImage : westerosImage;
+        const garrisons = new BetterMap(this.props.ingameGameState.world.regions
+            .values.filter(r => r.garrison > 0 && r.garrison != 1000)
+            .map(r => [r.id, getGarrisonToken(r.id, r.garrison)]));
         return (
             <div className="map"
                  style={{backgroundImage: `url(${backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem"}}>
                 <div style={{position: "relative"}}>
                     {this.props.ingameGameState.world.regions.values.map(r => (
                         <div key={r.id}>
-                            {r.garrison > 0 && r.garrison != 1000 && (
+                            {garrisons.tryGet(r.id, null) && (
                                 <div
                                     className="garrison-token hover-weak-outline"
                                     style={{
-                                        backgroundImage: `url(${garrisonTokens.get(r.id)})`,
+                                        backgroundImage: `url(${garrisons.get(r.id)})`,
                                         left: r.unitSlot.point.x, top: r.unitSlot.point.y
                                     }}
                                 >

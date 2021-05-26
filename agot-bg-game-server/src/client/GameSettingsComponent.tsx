@@ -100,9 +100,9 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                 label={
                                     <OverlayTrigger overlay={
                                         <Tooltip id="adwd-house-cards-tooltip">
-                                            The house cards will come from the Dance with Dragons expansion.
+                                            The house cards will come from the Dance with Dragons and A Feast for Crows expansions.
                                         </Tooltip>}>
-                                        <label htmlFor="adwd-house-cards">Use <i>A Dance with Dragons</i> house cards</label>
+                                        <label htmlFor="adwd-house-cards">Use <i>A Dance with Dragons / A Feast for Crows (BETA)</i> house cards</label>
                                     </OverlayTrigger>}
                                 disabled={this.props.entireGame.gameSettings.setupId == "a-dance-with-dragons"}
                                 checked={this.gameSettings.adwdHouseCards}
@@ -177,6 +177,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     </OverlayTrigger>}
                                 checked={this.gameSettings.vassals}
                                 onChange={() => this.changeGameSettings(() => this.gameSettings.vassals = !this.gameSettings.vassals)}
+                                disabled={this.props.entireGame.gameSettings.setupId == "mother-of-dragons"}
                             />
                         </Col>
                     </Row>
@@ -194,6 +195,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     </OverlayTrigger>}
                                 checked={this.gameSettings.seaOrderTokens}
                                 onChange={() => this.changeGameSettings(() => this.gameSettings.seaOrderTokens = !this.gameSettings.seaOrderTokens)}
+                                disabled={this.props.entireGame.gameSettings.setupId == "mother-of-dragons"}
                             />
                         </Col>
                     </Row>

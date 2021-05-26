@@ -12,9 +12,9 @@ import wildlingCardTypes from "./wildling-card/wildlingCardTypes";
 import BetterMap from "../../../utils/BetterMap";
 import * as _ from "lodash";
 import houseCardAbilities from "./house-card/houseCardAbilities";
-import staticWorld from "./static-data-structure/globalStaticWorld";
 import IngameGameState from "../IngameGameState";
 import { vassalHouseCards } from "./static-data-structure/vassalHouseCards";
+import getStaticWorld from "./static-data-structure/getStaticWorld";
 
 const MAX_POWER_TOKENS = 20;
 
@@ -133,8 +133,9 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
      // Overwrite house cards
     if (gameSettings.adwdHouseCards) {
         const adwdHouseCards = baseGameData.adwdHouseCards as {[key: string]: HouseCardContainer};
+        const ffcHouseCards = baseGameData.ffcHouseCards as {[key: string]: HouseCardContainer};
         const newHouseCards = new BetterMap(
-            Object.entries(adwdHouseCards)
+            _.concat(Object.entries(adwdHouseCards), Object.entries(ffcHouseCards))
             .filter(([hid, _]) => housesToCreate.includes(hid)));
 
         newHouseCards.keys.forEach(hid => {
@@ -175,7 +176,10 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
                     .map(([unitTypeId, limit]) => [unitTypes.get(unitTypeId), limit])
             );
 
-            const powerTokens = gameSettings.vassals ? playerHouses.length < entireGame.selectedGameSetup.playerCount ? 7 : 5 : 5;
+            let powerTokens = gameSettings.vassals ? playerHouses.length < entireGame.selectedGameSetup.playerCount ? 7 : 5 : 5;
+            if (entireGame.gameSettings.setupId == "mother-of-dragons") {
+                powerTokens = 7;
+            }
             const house = new House(hid, houseData.name, houseData.color, playerHouses.includes(hid) ? houseCards : new BetterMap(), unitLimits, powerTokens, houseData.supplyLevel);
 
             return [hid, house];
@@ -248,7 +252,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     const garrisonsFromGameSetup = entireGame.selectedGameSetup.garrisons ? new BetterMap(Object.entries(entireGame.selectedGameSetup.garrisons)) : null;
     const blockedRegions = entireGame.selectedGameSetup.blockedRegions;
 
-    const regions = new BetterMap(staticWorld.staticRegions.values.map(staticRegion => {
+    const regions = new BetterMap(getStaticWorld(entireGame.gameSettings.setupId).staticRegions.values.map(staticRegion => {
         const blocked = blockedRegions ? blockedRegions.includes(staticRegion.id) : false;
         const garrisonValue = garrisonsFromGameSetup ? garrisonsFromGameSetup.has(staticRegion.id) ? garrisonsFromGameSetup.get(staticRegion.id)
         : staticRegion.startingGarrison
@@ -264,7 +268,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         ];
     }));
 
-    game.world = new World(regions);
+    game.world = new World(regions, entireGame.gameSettings.setupId);
 
     // Load Westeros Cards
     game.westerosDecks = baseGameData.westerosCards.map(westerosDeckData => {

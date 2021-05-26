@@ -181,7 +181,7 @@ export interface UserSettings {
     responsiveLayout: boolean;
 }
 
-interface ChangeGameSettings {
+export interface ChangeGameSettings {
     type: "change-game-settings";
     settings: any;
 }

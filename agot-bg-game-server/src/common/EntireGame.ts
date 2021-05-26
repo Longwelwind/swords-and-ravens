@@ -2,7 +2,7 @@ import GameState, {SerializedGameState} from "./GameState";
 import LobbyGameState, {SerializedLobbyGameState} from "./lobby-game-state/LobbyGameState";
 import IngameGameState, {SerializedIngameGameState} from "./ingame-game-state/IngameGameState";
 import {ServerMessage} from "../messages/ServerMessage";
-import {ClientMessage} from "../messages/ClientMessage";
+import {ChangeGameSettings, ClientMessage} from "../messages/ClientMessage";
 import User, {SerializedUser} from "../server/User";
 import {observable} from "mobx";
 import * as _ from "lodash";
@@ -164,42 +164,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 settings: user.settings
             })
         } else if (message.type == "change-game-settings") {
-            if (!this.isOwner(user)) {
-                return;
-            }
-
-            let settings =  message.settings as GameSettings;
-            if (!settings || (this.lobbyGameState && this.lobbyGameState.players.size > settings.playerCount)) {
-                // A variant which contains less players than connected is not allowed
-                settings = this.gameSettings;
-            }
-
-            if (settings.setupId == "a-dance-with-dragons") {
-                settings.adwdHouseCards = true;
-            }
-
-            if (settings.draftHouseCards) {
-                settings.adwdHouseCards = false;
-            }
-
-            // Check if PBEM was enabled during ingame
-            const notifyWaitedUsersDueToPbemChange = this.ingameGameState && settings.pbem && !this.gameSettings.pbem;
-
-            this.gameSettings = settings;
-
-            if (notifyWaitedUsersDueToPbemChange) {
-                // Notify waited users now
-                this.notifyWaitedUsers();
-            }
-
-            if (this.lobbyGameState) {
-                this.lobbyGameState.onGameSettingsChange();
-            }
-
-            this.broadcastToClients({
-                type: "game-settings-changed",
-                settings: settings
-            });
+            this.onGameSettingsChange(user, message);
         } else {
             this.childGameState.onClientMessage(user, message);
         }
@@ -235,6 +200,50 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         } else {
             this.childGameState.onServerMessage(message);
         }
+    }
+
+    onGameSettingsChange(user: User, message: ChangeGameSettings): void {
+        if (!this.isOwner(user)) {
+            return;
+        }
+
+        let settings =  message.settings as GameSettings;
+        if (!settings || (this.lobbyGameState && this.lobbyGameState.players.size > settings.playerCount)) {
+            // A variant which contains less players than connected is not allowed
+            settings = this.gameSettings;
+        }
+
+        if (settings.setupId == "a-dance-with-dragons") {
+            settings.adwdHouseCards = true;
+        }
+
+        if (settings.draftHouseCards) {
+            settings.adwdHouseCards = false;
+        }
+
+        if (settings.setupId == "mother-of-dragons") {
+            settings.vassals = true;
+            settings.seaOrderTokens = true;
+        }
+
+        // Check if PBEM was enabled during ingame
+        const notifyWaitedUsersDueToPbemChange = this.ingameGameState && settings.pbem && !this.gameSettings.pbem;
+
+        this.gameSettings = settings;
+
+        if (notifyWaitedUsersDueToPbemChange) {
+            // Notify waited users now
+            this.notifyWaitedUsers();
+        }
+
+        if (this.lobbyGameState) {
+            this.lobbyGameState.onGameSettingsChange();
+        }
+
+        this.broadcastToClients({
+            type: "game-settings-changed",
+            settings: settings
+        });
     }
 
     broadcastToClients(message: ServerMessage): void {

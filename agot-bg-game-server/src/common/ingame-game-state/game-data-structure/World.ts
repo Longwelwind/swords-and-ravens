@@ -7,19 +7,21 @@ import BetterMap from "../../../utils/BetterMap";
 import {land, port, sea} from "./regionTypes";
 import * as _ from "lodash";
 import StaticBorder from "./static-data-structure/StaticBorder";
-import staticWorld from "./static-data-structure/globalStaticWorld";
 import StaticRegion from "./static-data-structure/StaticRegion";
 import RegionKind from "./RegionKind";
+import getStaticWorld from "./static-data-structure/getStaticWorld";
 
 export default class World {
+    gameSetupId: string;
     regions: BetterMap<string, Region>;
 
     get borders(): StaticBorder[] {
-        return staticWorld.staticBorders;
+        return getStaticWorld(this.gameSetupId).staticBorders;
     }
 
-    constructor(regions: BetterMap<string, Region>) {
+    constructor(regions: BetterMap<string, Region>, gameSetupId: string) {
         this.regions = regions;
+        this.gameSetupId = gameSetupId;
     }
 
     getRegion(staticRegion: StaticRegion): Region {
@@ -206,16 +208,18 @@ export default class World {
     serializeToClient(): SerializedWorld {
         return {
             regions: this.regions.values.map(r => r.serializeToClient()),
+            gameSetupId: this.gameSetupId
         };
     }
 
     static deserializeFromServer(game: Game, data: SerializedWorld): World {
         const regions = new BetterMap(data.regions.map(r => [r.id, Region.deserializeFromServer(game, r)]));
 
-        return new World(regions);
+        return new World(regions, data.gameSetupId);
     }
 }
 
 export interface SerializedWorld {
     regions: SerializedRegion[];
+    gameSetupId: string;
 }
