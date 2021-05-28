@@ -6,7 +6,7 @@ import { SerializedHouse } from "../common/ingame-game-state/game-data-structure
 import { HouseCardState } from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import { vassalHouseCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/vassalHouseCards";
 import _ from "lodash";
-// import { SerializedEntireGame } from "../common/EntireGame";
+//import { SerializedEntireGame } from "../common/EntireGame";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
     {
@@ -744,6 +744,46 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
                 ingame.game.world.gameSetupId = serializedGame.gameSettings.setupId;
+            }
+            return serializedGame;
+        }
+    },
+    {
+        version: "29",
+        migrate: (serializedGame: any) => {
+            // Migration for Tides of Battle
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                ingame.gameLogManager.logs.forEach((log: any) => {
+                    if (log.data.type == "combat-valyrian-sword-used") {
+                        log.data.forNewTidesOfBattleCard = false;
+                    }
+                });
+
+                if (ingame.childGameState.type == "action" && ingame.childGameState.childGameState.type == "resolve-march-order" &&
+                    ingame.childGameState.childGameState.childGameState.type == "combat") {
+                    const combat = ingame.childGameState.childGameState.childGameState;
+                    combat.tidesOfBattleDeck = [];
+                    combat.revealTidesOfBattleCards = false;
+
+                    (combat.houseCombatDatas as
+                        [string, {
+                            houseCardId: string | null;
+                            army: number[];
+                            regionId: string;
+                            tidesOfBattleCardId: string | null | undefined;
+                        }][]
+                    ).forEach(([_houseId, hcd]) => hcd.tidesOfBattleCardId = null);
+
+                    if (combat.childGameState.type == "use-valyrian-steel-blade") {
+                        combat.childGameState.forNewTidesOfBattleCard = false;
+                    }
+
+                    if (combat.childGameState.type == "post-combat") {
+                        combat.childGameState.resolvedSkullIcons = [];
+                    }
+                }
             }
             return serializedGame;
         }

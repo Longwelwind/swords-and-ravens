@@ -117,6 +117,7 @@ interface CombatResult {
         houseCard: string | null;
         houseCardStrength: number;
         valyrianSteelBlade: number;
+        tidesOfBattleCard: string | null | undefined;
         total: number;
     }[];
 }
@@ -228,6 +229,7 @@ interface CombatHouseCardChosen {
 interface CombatValyrianSwordUsed {
     type: "combat-valyrian-sword-used";
     house: string;
+    forNewTidesOfBattleCard: boolean;
 }
 
 interface ClashOfKingsBiddingDone {

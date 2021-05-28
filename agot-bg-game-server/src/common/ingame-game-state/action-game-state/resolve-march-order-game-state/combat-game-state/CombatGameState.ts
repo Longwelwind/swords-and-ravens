@@ -33,12 +33,15 @@ import BeforeCombatHouseCardAbilitiesGameState, { SerializedBeforeCombatHouseCar
 import DefenseMusterOrderType from "../../../game-data-structure/order-types/DefenseMusterOrderType";
 import RaidSupportOrderType from "../../../game-data-structure/order-types/RaidSupportOrderType";
 import HouseCardModifier from "../../../game-data-structure/house-card/HouseCardModifier";
+import getShuffledTidesOfBattleDeck, { TidesOfBattleCard, tidesOfBattleCards } from "../../../../../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
+import popRandom from "../../../../../utils/popRandom";
 
 export interface HouseCombatData {
     army: Unit[];
     region: Region;
     houseCard: HouseCard | null;
     houseCardChosen?: boolean;
+    tidesOfBattleCard?: TidesOfBattleCard | null;
 }
 
 export default class CombatGameState extends GameState<
@@ -52,6 +55,8 @@ export default class CombatGameState extends GameState<
     defender: House;
     houseCombatDatas: BetterMap<House, HouseCombatData>;
     valyrianSteelBladeUser: House | null;
+    revealTidesOfBattleCards: boolean;
+    tidesOfBattleDeck: TidesOfBattleCard[] = this.isTidesOfBattleCardsActive ? getShuffledTidesOfBattleDeck() : [];
 
     @observable
     houseCardModifiers: BetterMap<string, HouseCardModifier> = new BetterMap();
@@ -88,12 +93,30 @@ export default class CombatGameState extends GameState<
         return this.defendingHouseCombatData.houseCard;
     }
 
+    get attackerTidesOfBattleCard(): TidesOfBattleCard | null | undefined {
+        if (!this.isTidesOfBattleCardsActive) {
+            return undefined;
+        }
+        return this.attackingHouseCombatData.tidesOfBattleCard;
+    }
+
+    get defenderTidesOfBattleCard(): TidesOfBattleCard | null | undefined {
+        if (!this.isTidesOfBattleCardsActive) {
+            return undefined;
+        }
+        return this.defendingHouseCombatData.tidesOfBattleCard;
+    }
+
     get attackingHouseCombatData(): HouseCombatData {
         return this.houseCombatDatas.get(this.attacker);
     }
 
     get defendingHouseCombatData(): HouseCombatData {
         return this.houseCombatDatas.get(this.defender);
+    }
+
+    get isTidesOfBattleCardsActive(): boolean {
+        return this.entireGame.gameSettings.tidesOfBattle;
     }
 
     get resolveMarchOrderGameState(): ResolveMarchOrderGameState {
@@ -129,8 +152,8 @@ export default class CombatGameState extends GameState<
         this.attacker = attacker;
         this.defender = defender;
         this.houseCombatDatas = new BetterMap([
-            [attacker, {region: attackerComingFrom, army: army, houseCard: null}],
-            [defender, {region: combatRegion, army: combatRegion.units.values, houseCard: null}]
+            [attacker, {region: attackerComingFrom, army: army, houseCard: null, tidesOfBattleCard: this.isTidesOfBattleCardsActive ? null : undefined}],
+            [defender, {region: combatRegion, army: combatRegion.units.values, houseCard: null, tidesOfBattleCard: this.isTidesOfBattleCardsActive ? null : undefined}]
         ]);
 
         // Automatically declare attackers and defenders support
@@ -193,6 +216,9 @@ export default class CombatGameState extends GameState<
     }
 
     proceedResolveCombat(): void {
+        if (this.isTidesOfBattleCardsActive) {
+            this.revealDrawnTidesOfBattleCards();
+        }
         this.setChildGameState(new PostCombatGameState(this)).firstStart();
     }
 
@@ -301,6 +327,11 @@ export default class CombatGameState extends GameState<
         return house == this.valyrianSteelBladeUser ? 1 : 0;
     }
 
+    getTidesOfBattleBonus(house: House): number {
+        const hcd = this.houseCombatDatas.get(house);
+        return hcd.tidesOfBattleCard ? hcd.tidesOfBattleCard.combatStrength : 0;
+    }
+
     isAttackingAStructure(house: House): boolean {
         if (house == this.attacker) {
             return this.defendingRegion.castleLevel > 0;
@@ -337,7 +368,24 @@ export default class CombatGameState extends GameState<
         this.setChildGameState(new BeforeCombatHouseCardAbilitiesGameState(this)).firstStart();
     }
 
-    onBeforeCombatResolutionFinish(): void {
+    revealDrawnTidesOfBattleCards(): void {
+        this.revealTidesOfBattleCards = true;
+        this.entireGame.broadcastToClients({
+            type: "change-combat-tides-of-battle-card",
+            tidesOfBattleCardIds: this.houseCombatDatas.entries.map(
+                ([house, hcd]) => [house.id, (hcd.tidesOfBattleCard as TidesOfBattleCard).id]
+            )
+        });
+    }
+
+    proceedValyrianSteelBladeUsage(): boolean {
+        // First the VSB can be used to change the drawn ToB card, so if the current childGameState is not UseVsbGameState ist must be for ToB change
+        const forNewTidesOfBattleCard = this.isTidesOfBattleCardsActive && !(this.childGameState instanceof UseValyrianSteelBladeGameState);
+
+        if (this.isTidesOfBattleCardsActive && !forNewTidesOfBattleCard) {
+            this.revealDrawnTidesOfBattleCards();
+        }
+
         // Check if the sword has not been used this round
         if (!this.game.valyrianSteelBladeUsed) {
             // Check if VSB holder already decided to use (burn) the VSB during choose house card game state
@@ -345,7 +393,8 @@ export default class CombatGameState extends GameState<
                 this.game.valyrianSteelBladeUsed = true;
                 this.ingameGameState.log({
                     type: "combat-valyrian-sword-used",
-                    house: this.valyrianSteelBladeUser.id
+                    house: this.valyrianSteelBladeUser.id,
+                    forNewTidesOfBattleCard: false
                 });
 
                 this.entireGame.broadcastToClients({
@@ -353,8 +402,7 @@ export default class CombatGameState extends GameState<
                     used: true
                 });
 
-                this.proceedResolveCombat();
-                return;
+                return false;
             }
 
             // Check if one of the two participants can use the sword.
@@ -362,29 +410,43 @@ export default class CombatGameState extends GameState<
             // for their vassal, thus why the `if` checks with `getControllerOfHouse`.
             const valyrianSteelBladeHolder = this.game.valyrianSteelBladeHolder;
             if (this.ingameGameState.getControllerOfHouse(this.attacker).house == valyrianSteelBladeHolder) {
-                this.setChildGameState(new UseValyrianSteelBladeGameState(this)).firstStart(this.attacker);
-                return;
+                this.setChildGameState(new UseValyrianSteelBladeGameState(this)).firstStart(this.attacker, forNewTidesOfBattleCard);
+                return true;
 
             } else if (this.ingameGameState.getControllerOfHouse(this.defender).house == valyrianSteelBladeHolder) {
-                this.setChildGameState(new UseValyrianSteelBladeGameState(this)).firstStart(this.defender);
-                return;
+                this.setChildGameState(new UseValyrianSteelBladeGameState(this)).firstStart(this.defender, forNewTidesOfBattleCard);
+                return true;
             }
         }
 
-        // Otherwise, proceed
-        this.proceedResolveCombat();
+        return false;
     }
 
-    areCasulatiesPrevented(affectedHouse: House): boolean {
-        return this.getOrderResolutionHouseCard().reduce((s, h) => {
-            const houseCard = this.houseCombatDatas.get(h).houseCard;
+    onBeforeCombatResolutionFinish(): void {
+        if (this.isTidesOfBattleCardsActive) {
+            this.houseCombatDatas.entries.forEach(([house, hcd]) => {
+                // Assign Tides of Battle card and send it to the controllers of the houses
+                hcd.tidesOfBattleCard = popRandom(this.tidesOfBattleDeck);
+                this.entireGame.sendMessageToClients([this.ingameGameState.getControllerOfHouse(house).user],
+                {
+                    type: "change-combat-tides-of-battle-card",
+                    tidesOfBattleCardIds: [[house.id, (hcd.tidesOfBattleCard as TidesOfBattleCard).id]]
+                });
+            });
+        }
 
-            if (houseCard == null) {
-                return s;
-            }
+        if (!this.proceedValyrianSteelBladeUsage()) {
+            this.proceedResolveCombat();
+        }
+    }
 
-            return houseCard.ability ? s || houseCard.ability.doesPreventCasualties(this, h, houseCard, affectedHouse) : s;
-        }, false);
+    areCasualtiesPrevented(affectedHouse: House): boolean {
+        const affectedHouseCard = this.houseCombatDatas.get(affectedHouse).houseCard;
+        if (!affectedHouseCard) {
+            return false;
+        }
+
+        return affectedHouseCard.ability ? affectedHouseCard.ability.doesPreventCasualties(this, affectedHouse, affectedHouseCard) : false;
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -409,6 +471,14 @@ export default class CombatGameState extends GameState<
             ]);
 
             houseCards.forEach(([house, houseCard]) => this.houseCombatDatas.get(house).houseCard = houseCard);
+        } else if (message.type == "change-combat-tides-of-battle-card") {
+            const drawnTidesOfBattleCards: [House, TidesOfBattleCard][] = message.tidesOfBattleCardIds.map(([houseId, tobId]) => [
+                this.game.houses.get(houseId),
+                tidesOfBattleCards.get(tobId)
+            ]);
+
+            drawnTidesOfBattleCards.forEach(([house, tob]) => this.houseCombatDatas.get(house).tidesOfBattleCard = tob);
+            this.rerender++;
         } else if (message.type == "combat-change-army") {
             const house = this.game.houses.get(message.house);
             const region = this.game.world.regions.get(message.region);
@@ -585,7 +655,8 @@ export default class CombatGameState extends GameState<
             + this.getSupportStrengthForSide(house)
             + this.getValyrianBladeBonus(house)
             + this.getHouseCardCombatStrength(house)
-            + this.getGarrisonCombatStrength(house);
+            + this.getGarrisonCombatStrength(house)
+            + this.getTidesOfBattleBonus(house);
         return this.getFinalCombatStrength(house, total);
     }
 
@@ -599,11 +670,22 @@ export default class CombatGameState extends GameState<
             order: this.order.id,
             attackerId: this.attacker.id,
             defenderId: this.defender.id,
-            houseCombatDatas: this.houseCombatDatas.map((house, houseCombatData) => [house.id, {
+            tidesOfBattleDeck: admin ? this.tidesOfBattleDeck.map(tob => tob.id) : [],
+            revealTidesOfBattleCards: this.revealTidesOfBattleCards,
+            houseCombatDatas: this.houseCombatDatas.map((house, houseCombatData) => {
+                const tidesOfBattleCardsId =
+                    (admin
+                    || this.revealTidesOfBattleCards
+                    || this.ingameGameState.getControllerOfHouse(house) == player)
+                    ? (houseCombatData.tidesOfBattleCard ? houseCombatData.tidesOfBattleCard.id : null)
+                    : null;
+                return [house.id, {
                 houseCardId: houseCombatData.houseCard ? houseCombatData.houseCard.id : null,
                 army: houseCombatData.army.map(u => u.id),
-                regionId: houseCombatData.region.id
-            }]),
+                regionId: houseCombatData.region.id,
+                tidesOfBattleCardId: tidesOfBattleCardsId
+                }]
+            }),
             supporters: this.supporters.entries.map(([house, supportedHouse]) => [house.id, supportedHouse ? supportedHouse.id : null]),
             houseCardModifiers: this.houseCardModifiers.entries,
             childGameState: this.childGameState.serializeToClient(admin, player)
@@ -616,7 +698,9 @@ export default class CombatGameState extends GameState<
         combatGameState.order = orders.get(data.order);
         combatGameState.attacker = resolveMarchOrderGameState.game.houses.get(data.attackerId);
         combatGameState.defender = resolveMarchOrderGameState.game.houses.get(data.defenderId);
-        combatGameState.houseCombatDatas = new BetterMap(data.houseCombatDatas.map(([houseId, {regionId, houseCardId, army}]) => {
+        combatGameState.tidesOfBattleDeck = data.tidesOfBattleDeck.map(tob => tidesOfBattleCards.get(tob));
+        combatGameState.revealTidesOfBattleCards = data.revealTidesOfBattleCards;
+        combatGameState.houseCombatDatas = new BetterMap(data.houseCombatDatas.map(([houseId, {regionId, houseCardId, army, tidesOfBattleCardId}]) => {
             const house = resolveMarchOrderGameState.game.houses.get(houseId);
             const region = resolveMarchOrderGameState.game.world.regions.get(regionId);
 
@@ -625,7 +709,8 @@ export default class CombatGameState extends GameState<
                 {
                     army: army.map(uid => combatGameState.world.getUnitById(uid)),
                     region,
-                    houseCard: houseCardId ? combatGameState.ingameGameState.game.getHouseCardById(houseCardId) : null
+                    houseCard: houseCardId ? combatGameState.ingameGameState.game.getHouseCardById(houseCardId) : null,
+                    tidesOfBattleCard: tidesOfBattleCardId ? tidesOfBattleCards.get(tidesOfBattleCardId): null
                 }
             ]
         }));
@@ -666,8 +751,10 @@ export interface SerializedCombatGameState {
     order: number;
     attackerId: string;
     defenderId: string;
+    tidesOfBattleDeck: string[];
+    revealTidesOfBattleCards: boolean;
     supporters: [string, string | null][];
-    houseCombatDatas: [string, {houseCardId: string | null; army: number[]; regionId: string}][];
+    houseCombatDatas: [string, {houseCardId: string | null; army: number[]; regionId: string; tidesOfBattleCardId: string | null}][];
     houseCardModifiers: [string, HouseCardModifier][];
     childGameState: SerializedDeclareSupportGameState | SerializedChooseHouseCardGameState
         | SerializedUseValyrianSteelBladeGameState | SerializedPostCombatGameState

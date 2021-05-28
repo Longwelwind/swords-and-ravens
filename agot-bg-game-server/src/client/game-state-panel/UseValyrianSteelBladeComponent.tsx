@@ -7,17 +7,26 @@ import GameStateComponentProps from "./GameStateComponentProps";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import House from "../../common/ingame-game-state/game-data-structure/House";
 
 @observer
 export default class UseValyrianSteelBladeComponent extends Component<GameStateComponentProps<UseValyrianSteelBladeGameState>> {
+    get gameState(): UseValyrianSteelBladeGameState {
+        return this.props.gameState;
+    }
+    get house(): House {
+        return this.gameState.house;
+    }
     render(): ReactNode {
         return (
             <>
                 <Col xs={12}>
-                    The holder of the Valyrian Steel Blade may choose to use it...
+                    {this.gameState.ingame.getControllerOfHouse(this.house).house.name} may choose to use the
+                    Valyrian Steel Blade to {this.gameState.forNewTidesOfBattleCard
+                    ? "draw a new Tides of Battle card" : "increase their combat strength by 1"}.
                 </Col>
                 <Col xs={12}>
-                    {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
+                    {this.props.gameClient.doesControlHouse(this.house) ? (
                         <Row className="justify-content-center">
                             <Col xs="auto">
                                 <Button onClick={() => this.choose(true)}>Use it</Button>
@@ -28,7 +37,7 @@ export default class UseValyrianSteelBladeComponent extends Component<GameStateC
                         </Row>
                     ) : (
                         <div className="text-center">
-                            Waiting for {this.props.gameState.house.name}...
+                            Waiting for {this.gameState.ingame.getControllerOfHouse(this.house).house.name}...
                         </div>
                     )}
                 </Col>

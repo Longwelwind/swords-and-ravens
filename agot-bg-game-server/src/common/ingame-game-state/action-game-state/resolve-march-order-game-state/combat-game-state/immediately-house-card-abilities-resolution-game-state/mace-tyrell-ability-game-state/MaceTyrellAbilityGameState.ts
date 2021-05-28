@@ -41,7 +41,7 @@ export default class MaceTyrellAbilityGameState extends GameState<
             });
 
             this.parentGameState.onHouseCardResolutionFinish(house);
-        } else if (this.combatGameState.areCasulatiesPrevented(enemy)) {
+        } else if (this.combatGameState.areCasualtiesPrevented(enemy)) {
             this.ingame.log({
                 type: "mace-tyrell-casualties-prevented",
                 house: house.id

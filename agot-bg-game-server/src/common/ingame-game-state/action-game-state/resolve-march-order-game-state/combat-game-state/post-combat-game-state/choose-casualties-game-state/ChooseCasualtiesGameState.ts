@@ -64,10 +64,10 @@ export default class ChooseCasualtiesGameState extends GameState<PostCombatGameS
         this.childGameState.onPlayerMessage(player, message);
     }
 
-    onSelectUnitsEnd(_house: House, selectedUnits: [Region, Unit[]][]): void {
+    onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][]): void {
         const [region, units] = selectedUnits[0];
 
-        this.postCombatGameState.onChooseCasualtiesGameStateEnd(region, units);
+        this.postCombatGameState.onChooseCasualtiesGameStateEnd(house, region, units);
     }
 
     onServerMessage(_message: ServerMessage): void {
