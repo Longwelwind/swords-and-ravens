@@ -1212,7 +1212,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const region = this.game.world.regions.get(data.region);
                 return <>
-                    <b>Jon Conningtion</b>: Vassal {house.name} chose to recruit a knight in <b>{region.name}</b>.
+                    <b>Jon Conningtion</b>: <b>{house.name}</b> chose to recruit a knight in <b>{region.name}</b>.
                 </>;
             }
             case "bronn-used": {
