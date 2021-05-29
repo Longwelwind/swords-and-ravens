@@ -107,7 +107,7 @@ export default class JonConningtonAbilityGameState extends GameState<
             if (region) {
                 this.ingame.log({
                     type: "jon-connington-used",
-                    house: house.id,
+                    house: this.ingame.getControllerOfHouse(house).house.id,
                     region: region.id
                 });
                 const unit = this.game.createUnit(region, knight, house);

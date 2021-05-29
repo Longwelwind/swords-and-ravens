@@ -44,6 +44,10 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     <Row className="justify-content-center">
                         {this.selectedGameSetupName}
                     </Row>
+                    {this.entireGame.gameSettings.tidesOfBattle &&
+                    <Row className="justify-content-center">
+                        <small>Tides of Battle (BETA)</small>
+                    </Row>}
                 </Col>
                 )}
                 <Col xs={12} className="mb-1 mt-1">
@@ -87,6 +91,17 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         </Col>
                         <Col xs="auto">
                             <>Players</>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs="auto">
+                            <FormCheck
+                                id="tides-of-battle"
+                                type="checkbox"
+                                label="Tides of Battle (BETA)"
+                                checked={this.gameSettings.tidesOfBattle}
+                                onChange={() => this.changeGameSettings(() => this.gameSettings.tidesOfBattle = !this.gameSettings.tidesOfBattle)}
+                            />
                         </Col>
                     </Row>
                 </Col>)}

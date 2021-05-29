@@ -42,7 +42,7 @@ export default class SerIlynPayneAbilityGameState extends GameState<
     firstStart(house: House): void {
         this.house = house
 
-        if (this.combatGameState.areCasulatiesPrevented(this.enemy)) {
+        if (this.combatGameState.areCasualtiesPrevented(this.enemy)) {
             // todo: Log
             this.parentGameState.onHouseCardResolutionFinish(house);
             return;

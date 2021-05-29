@@ -25,6 +25,7 @@ import { baseHouseCardsData, adwdHouseCardsData, ffcHouseCardsData, modAHouseCar
 import HouseCard from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import houseCardAbilities from "../common/ingame-game-state/game-data-structure/house-card/houseCardAbilities";
 import BetterMap from "../utils/BetterMap";
+import { tidesOfBattleCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -220,6 +221,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const houseCombatDatas = data.stats.map(stat => {
                     const house = this.game.houses.get(stat.house);
                     const houseCard = stat.houseCard != null ? this.allHouseCards.get(stat.houseCard) : null;
+                    const tidesOfBattleCard = stat.tidesOfBattleCard == undefined ? undefined : stat.tidesOfBattleCard != null ? tidesOfBattleCards.get(stat.tidesOfBattleCard) : null;
 
                     return {
                         ...stat,
@@ -227,6 +229,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         region: this.world.regions.get(stat.region),
                         houseCard: houseCard,
                         armyUnits: stat.armyUnits.map(ut => unitTypes.get(ut)),
+                        tidesOfBattleCard: tidesOfBattleCard,
                         isWinner: house == winner
                     };
                 });
@@ -536,7 +539,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "combat-valyrian-sword-used": {
                 const house = this.game.houses.get(data.house);
 
-                return <><b>{house.name}</b> used the <b>Valyrian Steel Blade</b>.</>;
+                return <><b>{house.name}</b> used the <b>Valyrian Steel Blade</b> to {data.forNewTidesOfBattleCard
+                    ? "draw a new Tides of Battle card" : "increase their combat strength by 1"}.</>;
             }
             case "combat-house-card-chosen":
                 const houseCards = data.houseCards.map(([hid, hcid]) => {
@@ -1138,9 +1142,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "killed-after-combat": {
                 const house = this.game.houses.get(data.house);
                 const killed = data.killed.map(utid => unitTypes.get(utid).name);
-                return <>
+                return killed.length > 0 ?
+                <>
                     <b>{house.name}</b> suffered battle casualties and chose these units to be killed: <>{joinReactNodes(killed.map((unitType, i) => <b key={`casualties_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.
-                </>;
+                </> :
+                <></>;
             }
             case "supply-adjusted":
                 const supplies: [House, number][] = data.supplies.map(([hid, supply]) => [this.game.houses.get(hid), supply]);
@@ -1212,7 +1218,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const region = this.game.world.regions.get(data.region);
                 return <>
-                    <b>Jon Conningtion</b>: Vassal {house.name} chose to recruit a knight in <b>{region.name}</b>.
+                    <b>Jon Conningtion</b>: <b>{house.name}</b> chose to recruit a knight in <b>{region.name}</b>.
                 </>;
             }
             case "bronn-used": {

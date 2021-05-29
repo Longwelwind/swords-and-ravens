@@ -8,6 +8,8 @@ import HouseCardComponent from "./game-state-panel/utils/HouseCardComponent";
 import HouseCard from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
 import houseCardsBackImages from "./houseCardsBackImages";
+import { TidesOfBattleCard } from "../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
+import TidesOfBattleCardComponent from "./game-state-panel/utils/TidesOfBattleCardComponent";
 
 interface HouseCombatData {
     house: House;
@@ -20,6 +22,7 @@ interface HouseCombatData {
     houseCard: HouseCard | null;
     houseCardStrength: number;
     valyrianSteelBlade: number;
+    tidesOfBattleCard?: TidesOfBattleCard | null;
     total: number;
     houseCardBackId?: string;
     isWinner?: boolean;
@@ -43,10 +46,12 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
 
     render(): ReactNode {
         const showVsb = this.attacker.valyrianSteelBlade > 0 || this.defender.valyrianSteelBlade > 0;
+        const showTob = this.attacker.tidesOfBattleCard != undefined || this.defender.tidesOfBattleCard != undefined;
         return (
             <>
                 <div style={{display: "grid", gridGap: "5px", gridTemplateColumns: "auto 1fr auto 1fr auto", justifyItems: "center", alignItems: "center"}} className="text-center">
                     <div style={{gridRow: "1", gridColumn: "1 / span 2"}}>
+                        <img src={knightBannerImage} width="24" style={{"display": this.attacker.isWinner ? "inline" : "none", marginLeft: this.attacker.isWinner ? 3 : 0}}/>
                         <b style={{"color": this.attacker.house.color}}>{this.attacker.house.name}</b><br/>
                         <small>{this.attacker.region.name}</small><br/>
                         <small>{this.attacker.armyUnits.map(ut => ut.name).join(", ")}</small>
@@ -55,6 +60,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                         <img src={crossedSwordsImage} width={this.SIZE_MIDDLE_COLUMN}/>
                     </div>
                     <div style={{gridRow: "1", gridColumn: "4 / span 2"}}>
+                        <img src={knightBannerImage} width="24" style={{"display": this.defender.isWinner ? "inline" : "none", marginLeft: this.attacker.isWinner ? 3 : 0}}/>
                         <b style={{"color": this.defender.house.color}}>{this.defender.house.name}</b><br/>
                         <small>{this.defender.region.name}</small><br/>
                         <small>{this.defender.armyUnits.map(ut => ut.name).join(", ")}</small>
@@ -119,32 +125,47 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                         {this.defender.houseCardStrength}
                     </div>
 
-                    <div style={{gridRow: "5", gridColumn: "2"}} className={showVsb ? "" : "displayNone"}>
+                    <div style={{gridRow: "5", gridColumn: "2"}} className={showTob ? "" : "displayNone"}>
+                        {this.attacker.tidesOfBattleCard ? this.attacker.tidesOfBattleCard.combatStrength : 0}
+                    </div>
+                    <div style={{gridRow: "5", gridColumn: "3"}} className={showTob ? "" : "displayNone"}>
+                        <b>Tides<br/>of Battle</b>
+                    </div>
+                    <div style={{gridRow: "5", gridColumn: "4"}} className={showTob ? "" : "displayNone"}>
+                        {this.defender.tidesOfBattleCard ? this.defender.tidesOfBattleCard.combatStrength : 0}
+                    </div>
+
+                    <div style={{gridRow: "6", gridColumn: "2"}} className={showVsb ? "" : "displayNone"}>
                         {this.attacker.valyrianSteelBlade}
                     </div>
-                    <div style={{gridRow: "5", gridColumn: "3"}} className={showVsb ? "" : "displayNone"}>
+                    <div style={{gridRow: "6", gridColumn: "3"}} className={showVsb ? "" : "displayNone"}>
                         <b>Valyrian Steel<br/>Blade</b>
                     </div>
-                    <div style={{gridRow: "5", gridColumn: "4"}} className={showVsb ? "" : "displayNone"}>
+                    <div style={{gridRow: "6", gridColumn: "4"}} className={showVsb ? "" : "displayNone"}>
                         {this.defender.valyrianSteelBlade}
                     </div>
 
-                    <div style={{gridRow: "6", gridColumn: "2"}}>
+                    <div style={{gridRow: "6 / span 3", gridColumn: "1"}} className={showTob ? "" : "displayNone"}>
+                        {this.attacker.tidesOfBattleCard ? (
+                            <TidesOfBattleCardComponent tidesOfBattleCard={this.attacker.tidesOfBattleCard}/>
+                        ) : <div className="vertical-game-card game-card-slot small"/>}
+
+                    </div>
+
+                    <div style={{gridRow: "6 / span 3", gridColumn: "5"}} className={showTob ? "" : "displayNone"}>
+                        {this.defender.tidesOfBattleCard ? (
+                            <TidesOfBattleCardComponent tidesOfBattleCard={this.defender.tidesOfBattleCard}/>
+                        ) : <div className="vertical-game-card game-card-slot small"/>}
+                    </div>
+
+                    <div style={{gridRow: "7", gridColumn: "2"}}>
                         <b>{this.attacker.total}</b>
                     </div>
-                    <div style={{gridRow: "6", gridColumn: "3"}}>
+                    <div style={{gridRow: "7", gridColumn: "3"}}>
                         <b>Total</b>
                     </div>
-                    <div style={{gridRow: "6", gridColumn: "4"}}>
+                    <div style={{gridRow: "7", gridColumn: "4"}}>
                         <b>{this.defender.total}</b>
-                    </div>
-
-                    <div style={{gridRow: "6 / span 2", gridColumn: "1"}} className={this.attacker.isWinner ? "" : "displayNone"}>
-                        <img src={knightBannerImage} width="24"/>
-                    </div>
-
-                    <div style={{gridRow: "6 / span 2", gridColumn: "5"}} className={this.defender.isWinner ? "" : "displayNone"}>
-                        <img src={knightBannerImage} width="24"/>
                     </div>
                 </div>
             </>

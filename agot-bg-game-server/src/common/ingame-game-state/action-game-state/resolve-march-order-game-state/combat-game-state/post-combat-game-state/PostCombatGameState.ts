@@ -17,6 +17,7 @@ import AfterCombatHouseCardAbilitiesGameState
     , {SerializedAfterCombatHouseCardAbilitiesGameState} from "./after-combat-house-card-abilities-game-state/AfterCombatHouseCardAbilitiesGameState";
 import ResolveRetreatGameState, {SerializedResolveRetreatGameState} from "./resolve-retreat-game-state/ResolveRetreatGameState";
 import BetterMap from "../../../../../../utils/BetterMap";
+import { TidesOfBattleCard } from "../../../../game-data-structure/static-data-structure/tidesOfBattleCards";
 
 export default class PostCombatGameState extends GameState<
     CombatGameState,
@@ -25,6 +26,7 @@ export default class PostCombatGameState extends GameState<
 > {
     winner: House;
     loser: House;
+    resolvedSkullIcons: House[] = [];
 
     get combat(): CombatGameState {
         return this.parentGameState;
@@ -71,6 +73,7 @@ export default class PostCombatGameState extends GameState<
             winner: this.winner.id,
             stats: [this.attacker, this.defender].map(h => {
                 const houseCard = this.combat.houseCombatDatas.get(h).houseCard;
+                const tidesOfBattleCard = this.combat.houseCombatDatas.get(h).tidesOfBattleCard;
 
                 return {
                     house: h.id,
@@ -83,6 +86,7 @@ export default class PostCombatGameState extends GameState<
                     houseCard: houseCard ? houseCard.id : null,
                     houseCardStrength: this.combat.getHouseCardCombatStrength(h),
                     valyrianSteelBlade: this.combat.getValyrianBladeBonus(h),
+                    tidesOfBattleCard: tidesOfBattleCard == undefined ? undefined : tidesOfBattleCard ? tidesOfBattleCard.id : null,
                     total: Math.max(this.combat.getTotalCombatStrength(h), 0)
                 }
             })
@@ -91,11 +95,11 @@ export default class PostCombatGameState extends GameState<
         this.proceedCasualties();
     }
 
-    onChooseCasualtiesGameStateEnd(region: Region, selectedCasualties: Unit[]): void {
+    onChooseCasualtiesGameStateEnd(house: House, region: Region, selectedCasualties: Unit[]): void {
         this.combat.ingameGameState.log(
             {
                 type: "killed-after-combat",
-                house: this.loser.id,
+                house: house.id,
                 killed: selectedCasualties.map(u => u.type.id)
             }
         );
@@ -103,14 +107,14 @@ export default class PostCombatGameState extends GameState<
         // Remove the selected casualties
         selectedCasualties.forEach(u => region.units.delete(u.id));
         // Remove them from the house combat datas
-        const loserCombatData = this.combat.houseCombatDatas.get(this.loser);
-        loserCombatData.army = _.without(loserCombatData.army, ...selectedCasualties);
+        const hcd = this.combat.houseCombatDatas.get(house);
+        hcd.army = _.without(hcd.army, ...selectedCasualties);
 
         this.entireGame.broadcastToClients({
             type: "combat-change-army",
             region: region.id,
-            house: this.loser.id,
-            army: loserCombatData.army.map(u => u.id)
+            house: house.id,
+            army: hcd.army.map(u => u.id)
         });
 
         this.entireGame.broadcastToClients({
@@ -119,7 +123,7 @@ export default class PostCombatGameState extends GameState<
             unitIds: selectedCasualties.map(u => u.id)
         });
 
-        this.proceedHouseCardHandling();
+        this.proceedSkullIconHandling();
     }
 
     proceedCasualties(): void {
@@ -139,10 +143,15 @@ export default class PostCombatGameState extends GameState<
 
         const winnerSwordIcons = this.attacker == this.winner
             ? this.combat.getHouseCardSwordIcons(this.attacker)
-            : this.combat.getHouseCardSwordIcons(this.defender);
+                + (this.combat.attackerTidesOfBattleCard ? this.combat.attackerTidesOfBattleCard.swordIcons : 0)
+            : this.combat.getHouseCardSwordIcons(this.defender)
+                + (this.combat.defenderTidesOfBattleCard ? this.combat.defenderTidesOfBattleCard.swordIcons : 0);
+
         const loserTowerIcons = this.attacker == this.loser
             ? this.combat.getHouseCardTowerIcons(this.attacker)
-            : this.combat.getHouseCardTowerIcons(this.defender);
+                + (this.combat.attackerTidesOfBattleCard ? this.combat.attackerTidesOfBattleCard.towerIcons : 0)
+            : this.combat.getHouseCardTowerIcons(this.defender)
+                + (this.combat.defenderTidesOfBattleCard ? this.combat.defenderTidesOfBattleCard.towerIcons : 0);
 
         // All units of the loser army that can't retreat or are wounded are immediately killed
         const immediatelyKilledLoserUnits = loserArmy.filter(u => u.wounded || !u.type.canRetreat);
@@ -181,14 +190,43 @@ export default class PostCombatGameState extends GameState<
 
         if (loserCasualtiesCount > 0) {
             // Check if casualties are prevented this combat
-            if (!this.combat.areCasulatiesPrevented(this.loser)) {
+            if (!this.combat.areCasualtiesPrevented(this.loser)) {
                 if (loserCasualtiesCount < loserArmyLeft.length) {
                     this.setChildGameState(new ChooseCasualtiesGameState(this)).firstStart(this.loser, loserArmyLeft, loserCasualtiesCount);
                 } else {
                     // If the count of casualties is bigger or equal than the remaining army, a ChooseCasualtiesGameSTate
                     // is not needed. The army left can be exterminated.
-                    this.onChooseCasualtiesGameStateEnd(locationLoserArmy, loserArmyLeft);
+                    this.onChooseCasualtiesGameStateEnd(this.loser, locationLoserArmy, loserArmyLeft);
                 }
+                return;
+            }
+        }
+
+        this.proceedSkullIconHandling();
+    }
+
+    proceedSkullIconHandling(): void {
+        const nextHousesToResolve = this.combat.houseCombatDatas.entries.filter(([h, hcd]) =>
+            !this.resolvedSkullIcons.includes(h) && hcd.tidesOfBattleCard && hcd.tidesOfBattleCard.skullIcons > 0)
+            .map(([h, _hcd]) => h);
+
+        if (nextHousesToResolve.length > 0) {
+            const house = nextHousesToResolve[0];
+            this.resolvedSkullIcons.push(house);
+            const skullCount = (this.combat.houseCombatDatas.get(house).tidesOfBattleCard as TidesOfBattleCard).skullIcons;
+            const enemy = this.combat.getEnemy(house);
+            const enemyCombatData = this.combat.houseCombatDatas.get(enemy);
+            if (!this.combat.areCasualtiesPrevented(enemy)) {
+                if (skullCount < enemyCombatData.army.length) {
+                    this.setChildGameState(new ChooseCasualtiesGameState(this)).firstStart(enemy, enemyCombatData.army, skullCount);
+                } else {
+                    // If the count of casualties is bigger or equal than the remaining army, a ChooseCasualtiesGameSTate
+                    // is not needed. The army left can be exterminated.
+                    this.onChooseCasualtiesGameStateEnd(enemy, enemyCombatData.region, enemyCombatData.army);
+                }
+                return;
+            } else {
+                this.proceedSkullIconHandling();
                 return;
             }
         }
@@ -331,6 +369,7 @@ export default class PostCombatGameState extends GameState<
             type: "post-combat",
             winner: this.winner.id,
             loser: this.loser.id,
+            resolvedSkullIcons: this.resolvedSkullIcons.map(h => h.id),
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -340,6 +379,7 @@ export default class PostCombatGameState extends GameState<
 
         postCombat.winner = combat.game.houses.get(data.winner);
         postCombat.loser = combat.game.houses.get(data.loser);
+        postCombat.resolvedSkullIcons = data.resolvedSkullIcons.map(hid => combat.game.houses.get(hid));
         postCombat.childGameState = postCombat.deserializeChildGameState(data.childGameState);
 
         return postCombat;
@@ -363,6 +403,7 @@ export interface SerializedPostCombatGameState {
     type: "post-combat";
     winner: string;
     loser: string;
+    resolvedSkullIcons: string[];
     childGameState: SerializedResolveRetreatGameState
         | SerializedChooseCasualtiesGameState
         | SerializedAfterWinnerDeterminationGameState
