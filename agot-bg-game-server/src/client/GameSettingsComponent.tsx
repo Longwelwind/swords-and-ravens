@@ -41,7 +41,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             <Row>
                 {this.props.entireGame.childGameState instanceof IngameGameState && (
                 <Col xs={12} className="mb-1 mt-1">
-                    <Row className="justify-content-center">
+                    <Row className="justify-content-center mb-1">
                         {this.selectedGameSetupName}
                     </Row>
                     {this.entireGame.gameSettings.tidesOfBattle &&

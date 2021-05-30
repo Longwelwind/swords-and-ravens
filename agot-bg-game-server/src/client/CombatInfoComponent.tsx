@@ -148,14 +148,14 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                     <div style={{gridRow: "6 / span 3", gridColumn: "1"}} className={showTob ? "" : "displayNone"}>
                         {this.attacker.tidesOfBattleCard ? (
                             <TidesOfBattleCardComponent tidesOfBattleCard={this.attacker.tidesOfBattleCard}/>
-                        ) : <div className="vertical-game-card game-card-slot small"/>}
+                        ) : <div className="vertical-game-card game-card-slot tiny"/>}
 
                     </div>
 
                     <div style={{gridRow: "6 / span 3", gridColumn: "5"}} className={showTob ? "" : "displayNone"}>
                         {this.defender.tidesOfBattleCard ? (
                             <TidesOfBattleCardComponent tidesOfBattleCard={this.defender.tidesOfBattleCard}/>
-                        ) : <div className="vertical-game-card game-card-slot small"/>}
+                        ) : <div className="vertical-game-card game-card-slot tiny"/>}
                     </div>
 
                     <div style={{gridRow: "7", gridColumn: "2"}}>
