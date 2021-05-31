@@ -9,6 +9,7 @@ interface HouseCardComponentProps {
     houseCard: HouseCard;
     size?: "small" | "medium" | "tiny";
     selected?: boolean;
+    unavailable?: boolean;
     onClick?: () => void;
 }
 
@@ -26,15 +27,14 @@ export default class HouseCardComponent extends Component<HouseCardComponentProp
                 delay={{show: 120, hide: 0}}
                 placement="auto"
             >
-                <div
+                <img
                     className={classNames(
                         "vertical-game-card hover-weak-outline",
+                        {"unavailable-monotone": this.props.unavailable},
                         this.props.size,
                         {"medium-outline hover-strong-outline": this.props.selected}
                     )}
-                    style={{
-                        backgroundImage: `url(${houseCardImages.get(this.props.houseCard.id)})`
-                    }}
+                    src={houseCardImages.get(this.props.houseCard.id)}
                     onClick={() => this.props.onClick ? this.props.onClick() : undefined}
                 />
             </OverlayTrigger>
