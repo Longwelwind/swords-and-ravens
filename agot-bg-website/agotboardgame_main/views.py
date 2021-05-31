@@ -134,13 +134,13 @@ def register(request):
 def about(request):
     game_tasks = [
         {"name": "Base Game Second Edition", "done": True, "children": [
-            {"name": "Tides of Battle"}
+            {"name": "Tides of Battle", "done": True}
         ]},
         {"name": "A Feast for Crows"},
         {"name": "A Dance with Dragons", "done": True},
         {"name": "Mother of Dragons", "children": [
             {"name": "Vassals", "done": True},
-            {"name": "House Arryn"},
+            {"name": "House Arryn", "done": True},
             {"name": "Iron Bank"},
             {"name": "Essos and House Targaryen"}
         ]}
