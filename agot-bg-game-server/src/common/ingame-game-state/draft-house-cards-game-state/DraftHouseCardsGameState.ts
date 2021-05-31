@@ -112,6 +112,12 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
         this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(houseToResolve, this.getFilteredHouseCardsForHouse(houseToResolve));
     }
 
+    getAllHouseCards(): HouseCard[] {
+        return _.sortBy(_.concat(
+                this.game.houseCardsForDrafting.values,
+                _.flatMap(this.game.houses.values.map(h => h.houseCards.values))), hc => -hc.combatStrength);
+    }
+
     getFilteredHouseCardsForHouse(house: House): HouseCard[] {
         let availableCards = _.sortBy(this.game.houseCardsForDrafting.values, hc => -hc.combatStrength);
         house.houseCards.forEach(card => {

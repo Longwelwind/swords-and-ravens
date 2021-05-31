@@ -417,3 +417,15 @@ div.new-event {
 .victoryPointsCritical:hover {
   filter: brightness(0) saturate(100%) invert(11%) sepia(82%) saturate(7445%) hue-rotate(4deg) brightness(109%) contrast(114%);
 }
+
+.unavailable-monotone {
+  -webkit-filter: grayscale(100%);
+  filter: grayscale(100%);
+  opacity: 0.2;
+}
+
+.unavailable-monotone:hover {
+  -webkit-filter: grayscale(100%);
+  filter: grayscale(100%);
+  opacity: 0.5;
+}
