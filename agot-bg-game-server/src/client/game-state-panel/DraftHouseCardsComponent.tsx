@@ -25,6 +25,14 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                     <Row className="mt-1 mb-3 justify-content-center">
                         <div style={{textAlign: "center"}}><b>{this.props.gameState.childGameState.house.name}</b> must select one house card.</div>
                     </Row>
+                    <Row>
+                        <p>
+                            <b>Note</b>: All house cards work in a generic way.<br/>
+                            That means house card abilities (e.g. Salladhor) referring to specific houses are always available for any house you use.<br/>
+                            Character references are equivalent to the same-strength character in your hand (e.g. Reek and any 3-strength card).<br/>
+                            References to capitals always refer to your house&apos;s home territory (e.g. Littlefinger).
+                        </p>
+                    </Row>
                     {this.props.gameClient.doesControlHouse(this.props.gameState.childGameState.house) &&
                     <Row>
                         {renderChildGameState(this.props, [
