@@ -16,7 +16,7 @@ export default class DaenerysTargaryenBHouseCardAbility extends HouseCardAbility
             type: "daenerys-targaryen-b-power-tokens-discarded",
             house: house.id,
             affectedHouse: enemy.id,
-            powerTokensDiscarded: powerTokensDiscarded
+            powerTokensDiscarded: Math.abs(powerTokensDiscarded)
         });
 
         afterCombat.childGameState.onHouseCardResolutionFinish(house);
