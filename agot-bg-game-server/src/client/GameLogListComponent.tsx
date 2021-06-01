@@ -1297,7 +1297,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const affectedHouse = this.game.houses.get(data.affectedHouse);
 
                 return <>
-                    <b>Daenerys Targaryen</b>: <b>{house.name}</b> forced house <b>{affectedHouse.name}</b> to discard {data.powerTokensDiscarded} Power tokens.
+                    <b>Daenerys Targaryen</b>: <b>{house.name}</b> forced house <b>{affectedHouse.name}</b> to
+                    discard {data.powerTokensDiscarded} Power token{data.powerTokensDiscarded != 1 && "s"}.
                 </>;
             }
             case "missandei-used": {
