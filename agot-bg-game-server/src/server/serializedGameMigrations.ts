@@ -787,6 +787,24 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "30",
+        migrate: (serializedGame: any) => {
+            // Migration for Show Combat Info during Post Combat as well
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                if (ingame.childGameState.type == "action" && ingame.childGameState.childGameState.type == "resolve-march-order" &&
+                    ingame.childGameState.childGameState.childGameState.type == "combat" &&
+                    ingame.childGameState.childGameState.childGameState.childGameState.type == "post-combat" ) {
+                    const postCombat = ingame.childGameState.childGameState.childGameState.childGameState;
+
+                    postCombat.combatStats = [];
+                }
+            }
+            return serializedGame;
+        }
     }
 ];
 

@@ -1,3 +1,5 @@
+import { CombatStats } from "../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState";
+
 export default interface GameLog {
     time: Date;
     data: GameLogData;
@@ -106,20 +108,7 @@ interface WesterosCardDrawn {
 interface CombatResult {
     type: "combat-result";
     winner: string;
-    stats: {
-        house: string;
-        region: string;
-        army: number;
-        armyUnits: string[];
-        orderBonus: number;
-        support: number;
-        garrison: number;
-        houseCard: string | null;
-        houseCardStrength: number;
-        valyrianSteelBlade: number;
-        tidesOfBattleCard: string | null | undefined;
-        total: number;
-    }[];
+    stats: CombatStats[];
 }
 
 interface WildlingCardRevealed {
