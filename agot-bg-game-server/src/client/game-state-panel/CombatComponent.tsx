@@ -59,7 +59,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                     {!(this.props.gameState.childGameState instanceof PostCombatGameState) && this.props.gameState.rerender >= 0 && (
                         <>
                             <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                <h5>Battle for <strong>{this.combatGameState.defendingRegion.name}</strong></h5>
+                                <h5>Battle for <b>{this.combatGameState.defendingRegion.name}</b></h5>
                             </div>
                             <CombatInfoComponent
                                 housesCombatData={[
