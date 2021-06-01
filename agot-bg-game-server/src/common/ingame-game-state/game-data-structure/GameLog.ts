@@ -1,4 +1,4 @@
-import { CombatStats } from "../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState";
+import { CombatStats } from "../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 
 export default interface GameLog {
     time: Date;

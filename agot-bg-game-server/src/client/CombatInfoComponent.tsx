@@ -46,7 +46,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
 
     render(): ReactNode {
         const showVsb = this.attacker.valyrianSteelBlade > 0 || this.defender.valyrianSteelBlade > 0;
-        const showTob = this.attacker.tidesOfBattleCard != undefined || this.defender.tidesOfBattleCard != undefined;
+        const showTob = this.attacker.tidesOfBattleCard !== undefined || this.defender.tidesOfBattleCard !== undefined;
         return (
             <>
                 <div style={{display: "grid", gridGap: "5px", gridTemplateColumns: "auto 1fr auto 1fr auto", justifyItems: "center", alignItems: "center"}} className="text-center">

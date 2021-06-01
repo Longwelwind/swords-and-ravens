@@ -7,8 +7,8 @@ import CombatGameState from "../../action-game-state/resolve-march-order-game-st
 export default class DaenerysTargaryenBHouseCardAbility extends HouseCardAbility {
     afterCombat(afterCombat: AfterCombatHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {
         const enemy = afterCombat.combatGameState.getEnemy(house);
-        const totalDifference = Math.abs(afterCombat.postCombatGameState.combatStats[0].total -
-            afterCombat.postCombatGameState.combatStats[1].total);
+        const totalDifference = Math.abs(afterCombat.combatGameState.stats[0].total -
+            afterCombat.combatGameState.stats[1].total);
 
         const powerTokensDiscarded = afterCombat.combatGameState.ingameGameState.changePowerTokens(enemy, -totalDifference);
 

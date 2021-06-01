@@ -61,6 +61,7 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
 
     render(): JSX.Element {
         return (
+            this.combat.stats.length > 0 ? <></> :
             <>
                 <Col xs={12}>
                     The attacker and the defender must choose a House Card

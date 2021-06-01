@@ -36,6 +36,22 @@ import HouseCardModifier from "../../../game-data-structure/house-card/HouseCard
 import getShuffledTidesOfBattleDeck, { TidesOfBattleCard, tidesOfBattleCards } from "../../../../../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
 import popRandom from "../../../../../utils/popRandom";
 
+export interface CombatStats {
+    house: string;
+    region: string;
+    army: number;
+    armyUnits: string[];
+    orderBonus: number;
+    support: number;
+    garrison: number;
+    houseCard: string | null;
+    houseCardStrength: number;
+    valyrianSteelBlade: number;
+    tidesOfBattleCard: string | null | undefined;
+    total: number;
+    isWinner: boolean;
+};
+
 export interface HouseCombatData {
     army: Unit[];
     region: Region;
@@ -57,6 +73,9 @@ export default class CombatGameState extends GameState<
     valyrianSteelBladeUser: House | null;
     revealTidesOfBattleCards: boolean;
     tidesOfBattleDeck: TidesOfBattleCard[] = this.isTidesOfBattleCardsActive ? getShuffledTidesOfBattleDeck() : [];
+
+    @observable
+    stats: CombatStats[] = [];
 
     @observable
     houseCardModifiers: BetterMap<string, HouseCardModifier> = new BetterMap();
@@ -216,9 +235,6 @@ export default class CombatGameState extends GameState<
     }
 
     proceedResolveCombat(): void {
-        if (this.isTidesOfBattleCardsActive) {
-            this.revealDrawnTidesOfBattleCards();
-        }
         this.setChildGameState(new PostCombatGameState(this)).firstStart();
     }
 
@@ -373,7 +389,7 @@ export default class CombatGameState extends GameState<
         this.entireGame.broadcastToClients({
             type: "change-combat-tides-of-battle-card",
             tidesOfBattleCardIds: this.houseCombatDatas.entries.map(
-                ([house, hcd]) => [house.id, (hcd.tidesOfBattleCard as TidesOfBattleCard).id]
+                ([house, hcd]) => [house.id, hcd.tidesOfBattleCard ? hcd.tidesOfBattleCard.id : null]
             )
         });
     }
@@ -430,7 +446,10 @@ export default class CombatGameState extends GameState<
                 this.entireGame.sendMessageToClients([this.ingameGameState.getControllerOfHouse(house).user],
                 {
                     type: "change-combat-tides-of-battle-card",
-                    tidesOfBattleCardIds: [[house.id, (hcd.tidesOfBattleCard as TidesOfBattleCard).id]]
+                    tidesOfBattleCardIds: [
+                        [house.id, (hcd.tidesOfBattleCard as TidesOfBattleCard).id],
+                        [this.getEnemy(house).id, null]
+                    ]
                 });
             });
         }
@@ -472,9 +491,9 @@ export default class CombatGameState extends GameState<
 
             houseCards.forEach(([house, houseCard]) => this.houseCombatDatas.get(house).houseCard = houseCard);
         } else if (message.type == "change-combat-tides-of-battle-card") {
-            const drawnTidesOfBattleCards: [House, TidesOfBattleCard][] = message.tidesOfBattleCardIds.map(([houseId, tobId]) => [
+            const drawnTidesOfBattleCards: [House, TidesOfBattleCard | null][] = message.tidesOfBattleCardIds.map(([houseId, tobId]) => [
                 this.game.houses.get(houseId),
-                tidesOfBattleCards.get(tobId)
+                tobId ? tidesOfBattleCards.get(tobId) : null
             ]);
 
             drawnTidesOfBattleCards.forEach(([house, tob]) => this.houseCombatDatas.get(house).tidesOfBattleCard = tob);
@@ -490,6 +509,8 @@ export default class CombatGameState extends GameState<
             this.rerender++;
         } else if (message.type == "update-house-card-modifier") {
             this.houseCardModifiers.set(message.id, message.modifier);
+        } else if (message.type == "update-combat-stats") {
+            this.stats = message.stats;
         } else {
             this.childGameState.onServerMessage(message);
         }
@@ -673,7 +694,7 @@ export default class CombatGameState extends GameState<
             tidesOfBattleDeck: admin ? this.tidesOfBattleDeck.map(tob => tob.id) : [],
             revealTidesOfBattleCards: this.revealTidesOfBattleCards,
             houseCombatDatas: this.houseCombatDatas.map((house, houseCombatData) => {
-                const tidesOfBattleCardsId =
+                const tidesOfBattleCardId =
                     (admin
                     || this.revealTidesOfBattleCards
                     || this.ingameGameState.getControllerOfHouse(house) == player)
@@ -683,11 +704,12 @@ export default class CombatGameState extends GameState<
                 houseCardId: houseCombatData.houseCard ? houseCombatData.houseCard.id : null,
                 army: houseCombatData.army.map(u => u.id),
                 regionId: houseCombatData.region.id,
-                tidesOfBattleCardId: tidesOfBattleCardsId
+                tidesOfBattleCardId: tidesOfBattleCardId
                 }]
             }),
             supporters: this.supporters.entries.map(([house, supportedHouse]) => [house.id, supportedHouse ? supportedHouse.id : null]),
             houseCardModifiers: this.houseCardModifiers.entries,
+            stats: this.stats,
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -721,6 +743,7 @@ export default class CombatGameState extends GameState<
             ])
         );
         combatGameState.houseCardModifiers = new BetterMap(data.houseCardModifiers);
+        combatGameState.stats = data.stats;
         combatGameState.childGameState = combatGameState.deserializeChildGameState(data.childGameState);
 
         return combatGameState;
@@ -756,6 +779,7 @@ export interface SerializedCombatGameState {
     supporters: [string, string | null][];
     houseCombatDatas: [string, {houseCardId: string | null; army: number[]; regionId: string; tidesOfBattleCardId: string | null}][];
     houseCardModifiers: [string, HouseCardModifier][];
+    stats: CombatStats[];
     childGameState: SerializedDeclareSupportGameState | SerializedChooseHouseCardGameState
         | SerializedUseValyrianSteelBladeGameState | SerializedPostCombatGameState
         | SerializedImmediatelyHouseCardAbilitiesResolutionGameState

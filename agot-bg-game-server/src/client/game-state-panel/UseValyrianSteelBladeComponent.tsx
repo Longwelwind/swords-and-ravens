@@ -19,6 +19,7 @@ export default class UseValyrianSteelBladeComponent extends Component<GameStateC
     }
     render(): ReactNode {
         return (
+            this.gameState.combatGameState.stats.length > 0 ? <></> :
             <>
                 <Col xs={12}>
                     {this.gameState.ingame.getControllerOfHouse(this.house).house.name} may choose to use the
