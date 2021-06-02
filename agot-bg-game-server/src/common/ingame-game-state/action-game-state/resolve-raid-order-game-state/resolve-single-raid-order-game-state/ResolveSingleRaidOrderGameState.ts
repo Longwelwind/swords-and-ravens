@@ -105,7 +105,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
             let raidedHouseLostPowerToken: boolean | null = null;
 
             if (orderTarget.type instanceof ConsolidatePowerOrderType && !(orderTarget.type instanceof IronBankOrderType)) {
-                raiderGainedPowerToken = this.ingameGameState.changePowerTokens(this.ingameGameState.getControllerOfHouse(this.house).house, 1) != 0;
+                raiderGainedPowerToken = this.ingameGameState.changePowerTokens(this.house, 1) != 0 && !this.ingameGameState.isVassalHouse(this.house);
                 raidedHouseLostPowerToken = this.ingameGameState.changePowerTokens(raidedHouse, -1) != 0;
             }
 
@@ -113,7 +113,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
 
             this.ingameGameState.log({
                 type: "raid-done",
-                raider: this.ingameGameState.getControllerOfHouse(this.house).house.id,
+                raider: this.house.id,
                 raidee: raidedHouse.id,
                 raiderRegion: orderRegion.id,
                 raidedRegion: targetRegion.id,
