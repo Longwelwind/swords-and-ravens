@@ -818,6 +818,8 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                     ingame.childGameState.childGameState.childGameState.type == "combat") {
                     const combat = ingame.childGameState.childGameState.childGameState;
 
+                    combat.stats = [];
+
                     if (combat.childGameState.type == "post-combat") {
                         const postCombat = ingame.childGameState.childGameState.childGameState.childGameState;
                         combat.stats = postCombat.combatStats;
