@@ -221,7 +221,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const houseCombatDatas = data.stats.map(stat => {
                     const house = this.game.houses.get(stat.house);
                     const houseCard = stat.houseCard != null ? this.allHouseCards.get(stat.houseCard) : null;
-                    const tidesOfBattleCard = stat.tidesOfBattleCard == undefined ? undefined : stat.tidesOfBattleCard != null ? tidesOfBattleCards.get(stat.tidesOfBattleCard) : null;
+                    const tidesOfBattleCard = stat.tidesOfBattleCard === undefined ? undefined : stat.tidesOfBattleCard != null ? tidesOfBattleCards.get(stat.tidesOfBattleCard) : null;
 
                     return {
                         ...stat,

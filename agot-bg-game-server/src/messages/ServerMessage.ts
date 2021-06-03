@@ -9,6 +9,7 @@ import { SerializedWesterosCard } from "../common/ingame-game-state/game-data-st
 import { SerializedVote } from "../common/ingame-game-state/vote-system/Vote";
 import { CrowKillersStep } from "../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/crow-killers-wildling-victory-game-state/CrowKillersWildlingVictoryGameState";
 import HouseCardModifier from "../common/ingame-game-state/game-data-structure/house-card/HouseCardModifier";
+import { CombatStats } from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady | PlayerUnready
     | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | SupportRefused | NewTurn | RemovePlacedOrder
@@ -21,7 +22,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | SettingsChanged | ChangeValyrianSteelBladeUse |  NewPrivateChatRoom | GameSettingsChanged
     | UpdateWesterosDecks | UpdateConnectionStatus | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced
     | CrowKillersStepChanged | ManipulateCombatHouseCard | ChangeCombatTidesOfBattleCard
-    | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting;
+    | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting | UpdateCombatStats;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -90,7 +91,7 @@ interface ChangeCombatHouseCard {
 
 interface ChangeCombatTidesOfBattleCard {
     type: "change-combat-tides-of-battle-card";
-    tidesOfBattleCardIds: [string, string][];
+    tidesOfBattleCardIds: [string, string | null][];
 }
 
 interface ManipulateCombatHouseCard {
@@ -327,4 +328,9 @@ interface UpdateHouseCards {
 interface UpdateHouseCardsForDrafting {
     type: "update-house-cards-for-drafting";
     houseCards: string[];
+}
+
+interface UpdateCombatStats {
+    type: "update-combat-stats";
+    stats: CombatStats[];
 }

@@ -805,6 +805,28 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "31",
+        migrate: (serializedGame: any) => {
+            // Migration for Wait 3s after combat is finished
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                if (ingame.childGameState.type == "action" &&
+                    ingame.childGameState.childGameState.type == "resolve-march-order" &&
+                    ingame.childGameState.childGameState.childGameState.type == "combat") {
+                    const combat = ingame.childGameState.childGameState.childGameState;
+
+                    if (combat.childGameState.type == "post-combat") {
+                        const postCombat = ingame.childGameState.childGameState.childGameState.childGameState;
+                        combat.stats = postCombat.combatStats;
+                    }
+                }
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

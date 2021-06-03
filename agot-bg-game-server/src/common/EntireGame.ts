@@ -11,6 +11,9 @@ import GameEndedGameState from "./ingame-game-state/game-ended-game-state/GameEn
 import { GameSetup, getGameSetupContainer } from "./ingame-game-state/game-data-structure/createGame";
 import CancelledGameState, { SerializedCancelledGameState } from "./cancelled-game-state/CancelledGameState";
 import { VoteState } from "./ingame-game-state/vote-system/Vote";
+import CombatGameState from "./ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
+import sleep from "../utils/sleep";
+import PostCombatGameState from "./ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState";
 
 export default class EntireGame extends GameState<null, LobbyGameState | IngameGameState | CancelledGameState> {
     id: string;
@@ -175,13 +178,18 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         this.checkGameStateChanged();
     }
 
-    onServerMessage(message: ServerMessage): void {
+    async onServerMessage(message: ServerMessage): Promise<void> {
         if (message.type == "game-state-change") {
             const {level, serializedGameState} = message;
 
             // Get the GameState for whose the childGameState must change
             const parentGameState = this.getGameStateNthLevelDown(level - 1);
-            parentGameState.childGameState = parentGameState.deserializeChildGameState(serializedGameState);
+
+            const newChildGameState = parentGameState.deserializeChildGameState(serializedGameState);
+
+            await this.waitBeforeChangingChildGameState(parentGameState, newChildGameState);
+
+            parentGameState.childGameState = newChildGameState;
 
             if (this.onClientGameStateChange) {
                 this.onClientGameStateChange();
@@ -201,6 +209,17 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             user.connected = message.status;
         } else {
             this.childGameState.onServerMessage(message);
+        }
+    }
+
+    async waitBeforeChangingChildGameState(parentGameState: GameState<any, any>, newChildGameState: GameState<any, any>): Promise<void> {
+        // Wait 4 seconds when CombatGameState is over to show the battle results via the CombatInfoComponent
+        if (this.hasChildGameState(CombatGameState) &&
+                // Only do it when there is no PostCombatGameState in the tree as PostCombat shows the dialog already
+                !this.hasChildGameState(PostCombatGameState) &&
+                !parentGameState.hasParentGameState(CombatGameState) &&
+                !newChildGameState.hasChildGameState(CombatGameState)) {
+            await sleep(5000);
         }
     }
 

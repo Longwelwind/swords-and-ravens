@@ -1,7 +1,7 @@
 import {observer} from "mobx-react";
 import {Component, ReactNode} from "react";
 import CombatGameState
-    from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
+, { CombatStats }    from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import DeclareSupportGameState
     from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/declare-support-game-state/DeclareSupportGameState";
 import DeclareSupportComponent from "./DeclareSupportComponent";
@@ -34,70 +34,99 @@ import _ from "lodash";
 import Unit from "../../common/ingame-game-state/game-data-structure/Unit";
 import BeforeCombatHouseCardAbilitiesGameState from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/before-combat-house-card-abilities-game-state/BeforeCombatHouseCardAbilitiesGameState";
 import BeforeCombatHouseCardAbilitiesComponent from "./house-card-abilities/BeforeCombatHouseCardsAbilitiesComponent";
+import HouseCard from "../../common/ingame-game-state/game-data-structure/house-card/HouseCard";
+import { tidesOfBattleCards } from "../../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
+import unitTypes from "../../common/ingame-game-state/game-data-structure/unitTypes";
 
 @observer
 export default class CombatComponent extends Component<GameStateComponentProps<CombatGameState>> {
     modifyRegionsOnMapCallback: any;
     modifyUnitsOnMapCallback: any;
 
-    get combatGameState(): CombatGameState {
+    get combat(): CombatGameState {
         return this.props.gameState;
     }
 
     get attacker(): House {
-        return this.combatGameState.attacker;
+        return this.combat.attacker;
     }
 
     get defender(): House {
-        return this.combatGameState.defender;
+        return this.combat.defender;
+    }
+
+    get combatStats(): CombatStats[] {
+        return this.props.gameState.stats;
     }
 
     render(): ReactNode {
+        // If combatStats have been set by PostCombatState show the fixed dialog, otherwise the dynamic one!
+        const winners = this.combatStats.filter(cs => cs.isWinner);
+        const winner: House | null = winners.length > 0
+            ? this.combat.game.houses.get(winners[0].house)
+            : null;
+        const houseCombatDatas = this.combatStats.length > 0 ? this.combatStats.map(stat => {
+            const house = this.combat.game.houses.get(stat.house);
+            const houseCard = stat.houseCard ? this.getHouseCard(stat.houseCard) : null;
+            const tidesOfBattleCard = stat.tidesOfBattleCard === undefined ? undefined : stat.tidesOfBattleCard != null ? tidesOfBattleCards.get(stat.tidesOfBattleCard) : null;
+
+            return {
+                ...stat,
+                house,
+                region: this.combat.world.regions.get(stat.region),
+                houseCard: houseCard,
+                armyUnits: stat.armyUnits.map(ut => unitTypes.get(ut)),
+                tidesOfBattleCard: tidesOfBattleCard};
+            })
+            : [
+                {
+                    house: this.attacker,
+                    houseCard: this.props.gameState.attackerHouseCard,
+                    region: this.props.gameState.attackingRegion,
+                    army: this.combat.getBaseCombatStrength(this.attacker),
+                    armyUnits: this.combat.attackingArmy.map(u => u.type),
+                    orderBonus: this.combat.getOrderBonus(this.attacker),
+                    garrison: this.combat.getGarrisonCombatStrength(this.attacker),
+                    support: this.combat.getSupportStrengthForSide(this.attacker),
+                    houseCardStrength: this.combat.getHouseCardCombatStrength(this.attacker),
+                    valyrianSteelBlade: this.combat.getValyrianBladeBonus(this.attacker),
+                    total: this.combat.getTotalCombatStrength(this.attacker),
+                    houseCardBackId: this.getHouseCardBackId(this.attacker),
+                    tidesOfBattleCard: this.props.gameState.attackerTidesOfBattleCard
+                },
+                {
+                    house: this.defender,
+                    houseCard: this.props.gameState.defenderHouseCard,
+                    region: this.props.gameState.defendingRegion,
+                    army: this.combat.getBaseCombatStrength(this.defender),
+                    armyUnits: this.combat.defendingArmy.map(u => u.type),
+                    orderBonus: this.combat.getOrderBonus(this.defender),
+                    garrison: this.combat.getGarrisonCombatStrength(this.defender),
+                    support: this.combat.getSupportStrengthForSide(this.defender),
+                    houseCardStrength: this.combat.getHouseCardCombatStrength(this.defender),
+                    valyrianSteelBlade: this.combat.getValyrianBladeBonus(this.defender),
+                    total: this.combat.getTotalCombatStrength(this.defender),
+                    houseCardBackId: this.getHouseCardBackId(this.defender),
+                    tidesOfBattleCard: this.props.gameState.defenderTidesOfBattleCard
+                }
+            ];
         return (
             <>
                 <Col xs={12}>
-                    {!(this.props.gameState.childGameState instanceof PostCombatGameState) && this.props.gameState.rerender >= 0 && (
+                    {this.props.gameState.rerender >= 0 && (
                         <>
                             <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                <h5>Battle for <b>{this.combatGameState.defendingRegion.name}</b></h5>
+                                <h5>Battle {this.combatStats.length > 0 && "results "} for <b>{this.combat.defendingRegion.name}</b></h5>
                             </div>
                             <CombatInfoComponent
-                                housesCombatData={[
-                                    {
-                                        house: this.attacker,
-                                        houseCard: this.props.gameState.attackerHouseCard,
-                                        region: this.props.gameState.attackingRegion,
-                                        army: this.combatGameState.getBaseCombatStrength(this.attacker),
-                                        armyUnits: this.combatGameState.attackingArmy.map(u => u.type),
-                                        orderBonus: this.combatGameState.getOrderBonus(this.attacker),
-                                        garrison: this.combatGameState.getGarrisonCombatStrength(this.attacker),
-                                        support: this.combatGameState.getSupportStrengthForSide(this.attacker),
-                                        houseCardStrength: this.combatGameState.getHouseCardCombatStrength(this.attacker),
-                                        valyrianSteelBlade: this.combatGameState.getValyrianBladeBonus(this.attacker),
-                                        total: this.combatGameState.getTotalCombatStrength(this.attacker),
-                                        houseCardBackId: this.getHouseCardBackId(this.attacker),
-                                        tidesOfBattleCard: this.props.gameState.attackerTidesOfBattleCard ? this.props.gameState.attackerTidesOfBattleCard : null
-                                    },
-                                    {
-                                        house: this.defender,
-                                        houseCard: this.props.gameState.defenderHouseCard,
-                                        region: this.props.gameState.defendingRegion,
-                                        army: this.combatGameState.getBaseCombatStrength(this.defender),
-                                        armyUnits: this.combatGameState.defendingArmy.map(u => u.type),
-                                        orderBonus: this.combatGameState.getOrderBonus(this.defender),
-                                        garrison: this.combatGameState.getGarrisonCombatStrength(this.defender),
-                                        support: this.combatGameState.getSupportStrengthForSide(this.defender),
-                                        houseCardStrength: this.combatGameState.getHouseCardCombatStrength(this.defender),
-                                        valyrianSteelBlade: this.combatGameState.getValyrianBladeBonus(this.defender),
-                                        total: this.combatGameState.getTotalCombatStrength(this.defender),
-                                        houseCardBackId: this.getHouseCardBackId(this.defender),
-                                        tidesOfBattleCard: this.props.gameState.defenderTidesOfBattleCard ? this.props.gameState.defenderTidesOfBattleCard : null
-                                    }
-                                ]}
+                                housesCombatData={houseCombatDatas}
                             />
                         </>
                     )}
                 </Col>
+                {winner && <Col xs={12} className="text-center">
+                    Winner: <b style={{"color": winner.color}}>{winner.name}</b>
+                </Col>}
                 {renderChildGameState(this.props, [
                     [DeclareSupportGameState, DeclareSupportComponent],
                     [ChooseHouseCardGameState, ChooseHouseCardComponent],
@@ -111,8 +140,17 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
         );
     }
 
+    getHouseCard(id: string): HouseCard | null {
+        const filtered = this.combat.houseCombatDatas.values.filter(hcd => hcd.houseCard && hcd.houseCard.id == id);
+        if (filtered.length == 1) {
+            return filtered[0].houseCard;
+        }
+
+        return null;
+    }
+
     private getHouseCardBackId(house: House): string | undefined {
-        const combatData = this.combatGameState.houseCombatDatas.get(house);
+        const combatData = this.combat.houseCombatDatas.get(house);
         if (combatData.houseCardChosen) {
             return this.props.gameState.ingameGameState.isVassalHouse(house) ? "vassal" : house.id;
         }

@@ -19,21 +19,6 @@ import ResolveRetreatGameState, {SerializedResolveRetreatGameState} from "./reso
 import BetterMap from "../../../../../../utils/BetterMap";
 import { TidesOfBattleCard } from "../../../../game-data-structure/static-data-structure/tidesOfBattleCards";
 
-export interface CombatStats {
-    house: string;
-    region: string;
-    army: number;
-    armyUnits: string[];
-    orderBonus: number;
-    support: number;
-    garrison: number;
-    houseCard: string | null;
-    houseCardStrength: number;
-    valyrianSteelBlade: number;
-    tidesOfBattleCard: string | null | undefined;
-    total: number;
-};
-
 export default class PostCombatGameState extends GameState<
     CombatGameState,
     ResolveRetreatGameState | ChooseCasualtiesGameState | AfterWinnerDeterminationGameState
@@ -42,7 +27,6 @@ export default class PostCombatGameState extends GameState<
     winner: House;
     loser: House;
     resolvedSkullIcons: House[] = [];
-    combatStats: CombatStats[];
 
     get combat(): CombatGameState {
         return this.parentGameState;
@@ -84,7 +68,7 @@ export default class PostCombatGameState extends GameState<
                 : this.game.whoIsAheadInTrack(this.game.fiefdomsTrack, this.attacker, this.defender);
         this.loser = this.winner == this.attacker ? this.defender : this.attacker;
 
-        this.combatStats = [this.attacker, this.defender].map(h => {
+        this.combat.stats = [this.attacker, this.defender].map(h => {
             const houseCard = this.combat.houseCombatDatas.get(h).houseCard;
             const tidesOfBattleCard = this.combat.houseCombatDatas.get(h).tidesOfBattleCard;
 
@@ -99,15 +83,21 @@ export default class PostCombatGameState extends GameState<
                 houseCard: houseCard ? houseCard.id : null,
                 houseCardStrength: this.combat.getHouseCardCombatStrength(h),
                 valyrianSteelBlade: this.combat.getValyrianBladeBonus(h),
-                tidesOfBattleCard: tidesOfBattleCard == undefined ? undefined : tidesOfBattleCard ? tidesOfBattleCard.id : null,
-                total: Math.max(this.combat.getTotalCombatStrength(h), 0)
+                tidesOfBattleCard: tidesOfBattleCard === undefined ? undefined : tidesOfBattleCard ? tidesOfBattleCard.id : null,
+                total: Math.max(this.combat.getTotalCombatStrength(h), 0),
+                isWinner: this.winner == h
             }
         });
+
+        this.combat.entireGame.broadcastToClients({
+            type: "update-combat-stats",
+            stats: this.combat.stats
+        })
 
         this.combat.ingameGameState.log({
             type: "combat-result",
             winner: this.winner.id,
-            stats: this.combatStats
+            stats: this.combat.stats
         });
 
         this.proceedCasualties();
@@ -388,7 +378,6 @@ export default class PostCombatGameState extends GameState<
             winner: this.winner.id,
             loser: this.loser.id,
             resolvedSkullIcons: this.resolvedSkullIcons.map(h => h.id),
-            combatStats: this.combatStats,
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -399,7 +388,6 @@ export default class PostCombatGameState extends GameState<
         postCombat.winner = combat.game.houses.get(data.winner);
         postCombat.loser = combat.game.houses.get(data.loser);
         postCombat.resolvedSkullIcons = data.resolvedSkullIcons.map(hid => combat.game.houses.get(hid));
-        postCombat.combatStats = data.combatStats;
         postCombat.childGameState = postCombat.deserializeChildGameState(data.childGameState);
 
         return postCombat;
@@ -424,7 +412,6 @@ export interface SerializedPostCombatGameState {
     winner: string;
     loser: string;
     resolvedSkullIcons: string[];
-    combatStats: CombatStats[];
     childGameState: SerializedResolveRetreatGameState
         | SerializedChooseCasualtiesGameState
         | SerializedAfterWinnerDeterminationGameState

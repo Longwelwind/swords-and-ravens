@@ -50,6 +50,14 @@ export default class GameState<ParentGameState extends AnyGameState, ChildGameSt
                 : false;
     }
 
+    hasParentGameState(gameState: any): boolean {
+        return this instanceof gameState
+            ? true
+            : this.parentGameState
+                ? this.parentGameState.hasParentGameState(gameState)
+                : false;
+    }
+
     getFirstChildGameState(gameState: any): AnyGameState | null {
         return this instanceof gameState
             ? this
