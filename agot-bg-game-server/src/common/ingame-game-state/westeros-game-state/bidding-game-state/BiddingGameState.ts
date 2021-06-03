@@ -33,11 +33,13 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "bid") {
-            if (!this.participatingHouses.includes(player.house)) {
+            const bid = message.powerTokens;
+            if (!this.participatingHouses.includes(player.house)
+                || bid < 0
+                || bid > player.house.powerTokens) {
                 return;
             }
 
-            const bid = Math.max(0, Math.min(message.powerTokens, player.house.powerTokens));
             this.bids.set(player.house, bid);
 
             this.entireGame.sendMessageToClients(_.without(this.entireGame.users.values, player.user), {
