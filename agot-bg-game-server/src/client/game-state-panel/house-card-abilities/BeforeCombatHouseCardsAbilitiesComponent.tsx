@@ -12,11 +12,13 @@ import BronnAbilityGameState from "../../../common/ingame-game-state/action-game
 import BronnAbilityComponent from "./BronnAbilityComponent";
 import ViserysTargaryenAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/before-combat-house-card-abilities-game-state/viserys-targaryen-ability-game-state/ViserysTargaryenAbilityGameState";
 import ViserysTargaryenAbilityComponent from "./ViserysTargaryenAbilityComponent";
+import React from "react";
 
 @observer
 export default class BeforeCombatHouseCardAbilitiesComponent extends Component<GameStateComponentProps<BeforeCombatHouseCardAbilitiesGameState>> {
     render(): ReactNode {
-        return renderChildGameState({...this.props, gameState: this.props.gameState.childGameState}, [
+        return this.props.gameState.combatGameState.stats.length > 0 ? <></> :
+            renderChildGameState({...this.props, gameState: this.props.gameState.childGameState}, [
             [AeronDamphairDwDAbilityGameState, AeronDamphairDwDAbilityComponent],
             [QyburnAbilityGameState, QyburnAbilityComponent],
             [BronnAbilityGameState, BronnAbilityComponent],
