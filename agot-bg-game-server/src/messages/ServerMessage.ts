@@ -22,7 +22,8 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | SettingsChanged | ChangeValyrianSteelBladeUse |  NewPrivateChatRoom | GameSettingsChanged
     | UpdateWesterosDecks | UpdateConnectionStatus | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced
     | CrowKillersStepChanged | ManipulateCombatHouseCard | ChangeCombatTidesOfBattleCard
-    | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting | UpdateCombatStats;
+    | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting | UpdateCombatStats
+    | UpdateDraftIndices;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -333,4 +334,10 @@ interface UpdateHouseCardsForDrafting {
 interface UpdateCombatStats {
     type: "update-combat-stats";
     stats: CombatStats[];
+}
+
+interface UpdateDraftIndices {
+    type: "update-draft-indices";
+    rowIndex: number;
+    columnIndex: number;
 }

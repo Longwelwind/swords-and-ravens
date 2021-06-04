@@ -11,6 +11,7 @@ import Game from "../game-data-structure/Game";
 import SelectHouseCardGameState, { SerializedSelectHouseCardGameState } from "../select-house-card-game-state/SelectHouseCardGameState";
 import HouseCard from "../game-data-structure/house-card/HouseCard";
 import _ from "lodash";
+import { observable } from "mobx";
 
 export const draftOrders: number[][][] = [
         [
@@ -69,8 +70,8 @@ export const houseCardCombatStrengthAllocations = new BetterMap<number, number>(
 export default class DraftHouseCardsGameState extends GameState<IngameGameState, SelectHouseCardGameState<DraftHouseCardsGameState>> {
     houses: House[];
     draftOrder: number[][];
-    currentRowIndex: number;
-    currentColumnIndex: number;
+    @observable currentRowIndex: number;
+    @observable currentColumnIndex: number;
 
     get ingame(): IngameGameState {
         return this.parentGameState;
@@ -146,6 +147,12 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
             }
         }
 
+        this.ingame.entireGame.broadcastToClients({
+            type: "update-draft-indices",
+            rowIndex: this.currentRowIndex,
+            columnIndex: this.currentColumnIndex
+        });
+
         return this.houses[this.draftOrder[this.currentRowIndex][this.currentColumnIndex]];
     }
 
@@ -177,7 +184,13 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
         this.childGameState.onPlayerMessage(player, message);
     }
 
-    onServerMessage(_message: ServerMessage): void {
+    onServerMessage(message: ServerMessage): void {
+        if (message.type == "update-draft-indices") {
+            this.currentRowIndex = message.rowIndex;
+            this.currentColumnIndex = message.columnIndex;
+        } else {
+            this.childGameState.onServerMessage(message);
+        }
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedDraftHouseCardsGameState {
@@ -209,6 +222,35 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
         } else {
             throw new Error();
         }
+    }
+
+    /* Client-side only */
+    getNextHouses(): House[] {
+        let currentCol = this.currentColumnIndex;
+        let currentRow = this.currentRowIndex;
+
+        const houses: House[] = [];
+        for(let i=0; i<this.houses.length; i++) {
+            const nextIndices = this.getNextIndices(currentCol, currentRow);
+            houses.push(this.houses[this.draftOrder[nextIndices.row][nextIndices.col]]);
+            currentCol = nextIndices.col;
+            currentRow = nextIndices.row;
+        }
+        return houses;
+    }
+
+    getNextIndices(colIndex: number, rowIndex: number): {row: number; col: number} {
+        colIndex++;
+
+        if (colIndex == this.houses.length) {
+            colIndex = 0;
+            rowIndex++;
+            if (rowIndex == this.houses.length) {
+                rowIndex = 0;
+            }
+        }
+
+        return {row: rowIndex, col: colIndex};
     }
 }
 
