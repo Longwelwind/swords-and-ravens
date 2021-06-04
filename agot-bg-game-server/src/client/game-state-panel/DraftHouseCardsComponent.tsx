@@ -31,6 +31,7 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
         const availableCards = this.player && !this.doesControlHouse ? this.props.gameState.getFilteredHouseCardsForHouse(this.player.house) : [];
         return (
             <>
+                {this.props.gameState.currentColumnIndex > -1 && this.props.gameState.currentRowIndex > -1 &&
                 <ListGroupItem>
                     <Row className="mt-1 mb-3 justify-content-center">
                         <div style={{textAlign: "center"}}><b>{this.house.name}</b> must select one house card.</div>
@@ -41,6 +42,11 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                             That means house card abilities (e.g. Salladhor) referring to specific houses are always available for any house you use.<br/>
                             Character references are equivalent to the same-strength character in your hand (e.g. Reek and any 3-strength card).<br/>
                             References to capitals always refer to your house&apos;s home territory (e.g. Littlefinger).
+                        </p>
+                    </Row>
+                    <Row>
+                        <p>
+                            These are the next houses: {this.props.gameState.getNextHouses().map(h => h.name).join(", ")}
                         </p>
                     </Row>
                     {this.doesControlHouse &&
@@ -66,7 +72,7 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                             </Row>
                         </Col>
                     </Row>}
-                </ListGroupItem>
+                </ListGroupItem>}
             </>
         );
     }
