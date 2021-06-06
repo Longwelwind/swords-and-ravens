@@ -84,7 +84,7 @@ export default class MissandeiAbilityGameState extends GameState<
     }
 
     getChoosableHouseCards(house: House): HouseCard[] {
-        return house.houseCards.values.filter(hc => hc.state == HouseCardState.USED);
+        return house.houseCards.values.filter(hc => hc.state == HouseCardState.USED && hc.id != missandei.id);
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {

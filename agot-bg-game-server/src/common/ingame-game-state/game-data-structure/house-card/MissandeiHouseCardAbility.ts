@@ -7,10 +7,8 @@ import MissandeiAbilityGameState from "../../action-game-state/resolve-march-ord
 
 export default class MissandeiHouseCardAbility extends HouseCardAbility {
     afterWinnerDetermination(afterWinnerDetermination: AfterWinnerDeterminationGameState, house: House, _houseCard: HouseCard): void {
-        const houseFinalCombatStrength = Math.max(afterWinnerDetermination.combatGameState.getTotalCombatStrength(house), 0);
-        const enemyFinalCombatStrength = Math.max(afterWinnerDetermination.combatGameState.getTotalCombatStrength(afterWinnerDetermination.combatGameState.getEnemy(house)), 0);
-
-        const difference = Math.abs(houseFinalCombatStrength-enemyFinalCombatStrength);
+        const difference = Math.abs(afterWinnerDetermination.combatGameState.stats[0].total
+            - afterWinnerDetermination.combatGameState.stats[1].total);
 
         if (afterWinnerDetermination.postCombatGameState.loser == house && difference <= 2) {
             afterWinnerDetermination.childGameState
