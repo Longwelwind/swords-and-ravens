@@ -28,18 +28,16 @@ export default class InfluenceIconComponent extends Component<InfluenceIconCompo
     }
 
     render(): ReactNode {
-        return (
-            <OverlayTrigger overlay={
-                    <Tooltip id="influence-icon">
-                        <b>{this.house.name}</b>
-                    </Tooltip>
-                }
-                placement="bottom"
-            >
-                <div className={classNames("influence-icon", {"medium-outline": this.ingame.game.getTokenHolder(this.track) == this.house})}
-                    style={{backgroundImage: `url(${houseInfluenceImages.get(this.house.id)})`}}>
-                </div>
-            </OverlayTrigger>
-        );
+        return <OverlayTrigger overlay={
+                <Tooltip id="influence-icon">
+                    <b>{this.house.name}</b>
+                </Tooltip>
+            }
+            placement="bottom"
+        >
+            <div className={classNames("influence-icon", {"medium-outline": this.ingame.game.getTokenHolder(this.track) == this.house})}
+                style={{backgroundImage: `url(${houseInfluenceImages.get(this.house.id)})`}}>
+            </div>
+        </OverlayTrigger>;
     }
 }

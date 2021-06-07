@@ -10,10 +10,11 @@ import GameStateComponentProps from "./GameStateComponentProps";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import Button from "react-bootstrap/Button";
-import houseInfluenceImages from "../houseInfluenceImages";
 import {faAngleLeft} from "@fortawesome/free-solid-svg-icons/faAngleLeft";
 import {faAngleRight} from "@fortawesome/free-solid-svg-icons/faAngleRight";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import SimpleInfluenceIconComponent from "./utils/SimpleInfluenceIconComponent";
+import HouseNumberResultsComponent from "../HouseNumberResultsComponent";
 
 @observer
 export default class ResolveTiesComponent extends Component<GameStateComponentProps<ResolveTiesGameState>> {
@@ -26,6 +27,7 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
     }
 
     render(): ReactNode {
+        const results = _.flatMap(this.props.gameState.bidResults.map(([bid, houses]) => houses.map(h => [h, bid] as [House, number])));
         return (
             <>
                 <Col xs={12}>
@@ -38,9 +40,7 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
                                 {this.currentOrdering.map((h, i) => (
                                     <Col xs="auto" key={h.id} className="d-flex flex-md-column align-items-center">
                                         <div className="mb-2">
-                                            <div className="influence-icon"
-                                                 style={{backgroundImage: `url(${houseInfluenceImages.get(h.id)})`}}>
-                                            </div>
+                                            <SimpleInfluenceIconComponent house={h}/>
                                         </div>
                                         <div className="text-center" style={{fontSize: "18px", marginBottom: "5px"}}>{this.props.gameState.getBidOfHouse(h)}</div>
                                         <div className="btn-group btn-group-xs">
@@ -67,9 +67,13 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
                             <Button onClick={() => this.submit()}>Resolve</Button>
                         </Col>
                     </>
-                ) : (
+                ) : <>
+                    <Col xs={12}>
+                        <p>Bidding results:</p>
+                        <HouseNumberResultsComponent results={results} key="cok"/>
+                    </Col>
                     <Col xs={12} className="text-center">Waiting for {this.props.gameState.decider.name}...</Col>
-                )}
+                </>}
             </>
         );
     }

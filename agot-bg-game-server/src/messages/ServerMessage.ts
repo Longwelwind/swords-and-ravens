@@ -23,7 +23,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | UpdateWesterosDecks | UpdateConnectionStatus | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced
     | CrowKillersStepChanged | ManipulateCombatHouseCard | ChangeCombatTidesOfBattleCard
     | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting | UpdateCombatStats
-    | UpdateDraftIndices;
+    | UpdateDraftIndices | RevealBids;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -340,4 +340,9 @@ interface UpdateDraftIndices {
     type: "update-draft-indices";
     rowIndex: number;
     columnIndex: number;
+}
+
+interface RevealBids {
+    type: "reveal-bids";
+    bids: [number, string[]][];
 }

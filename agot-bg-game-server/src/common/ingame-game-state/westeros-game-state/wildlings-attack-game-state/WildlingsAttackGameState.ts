@@ -46,7 +46,7 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
     wildlingStrength: number;
     _highestBidder: House | null;
     _lowestBidder: House | null;
-    biddingResults: [number, House[]][] | null;
+    @observable biddingResults: [number, House[]][] | null;
 
     get excludedHouses(): House[] {
         return _.difference(this.game.houses.values, this.participatingHouses);
@@ -128,6 +128,8 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
     onServerMessage(message: ServerMessage): void {
         if (message.type == "reveal-wildling-card") {
             this.wildlingCard = this.game.wildlingDeck.find(c => c.id == message.wildlingCard) as WildlingCard;
+        } else if (message.type == "reveal-bids") {
+            this.biddingResults = message.bids.map(([bid, houses]) => [bid, houses.map(h => this.game.houses.get(h))]);
         } else {
             this.childGameState.onServerMessage(message);
         }
@@ -145,10 +147,15 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
         });
         this.biddingResults = resultsWithoutVassals.entries;
 
+        this.westerosGameState.entireGame.broadcastToClients({
+            type: "reveal-bids",
+            bids: this.biddingResults.map(([bid, houses]) => [bid, houses.map(h => h.id)])
+        });
+
         this.westerosGameState.ingame.log({
             type: "wildling-bidding",
             wildlingStrength: this.westerosGameState.game.wildlingStrength,
-            results: results.map(([bid, houses]) => [bid, houses.map(h => h.id)]),
+            results: this.biddingResults.map(([bid, houses]) => [bid, houses.map(h => h.id)]),
             nightsWatchVictory: this.nightsWatchWon
         });
 

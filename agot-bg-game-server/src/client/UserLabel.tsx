@@ -24,7 +24,7 @@ interface UserLabelProps {
 // eslint-disable-next-line react/display-name
 const DropdownContainer: FunctionComponent<{onClick: (e: any) => void}> = React.forwardRef(
     // eslint-disable-next-line react/prop-types
-    ({children, onClick}) => <a className="text-body" href="" onClick={e => {e.preventDefault(); onClick(e)}}>
+    ({children, onClick}, _ref) => <a className="text-body" href="" onClick={e => {e.preventDefault(); onClick(e)}}>
         {children}
     </a>
 );
