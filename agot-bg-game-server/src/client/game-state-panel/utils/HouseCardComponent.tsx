@@ -4,6 +4,7 @@ import HouseCard from "../../../common/ingame-game-state/game-data-structure/hou
 import houseCardImages from "../../houseCardImages";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import classNames = require("classnames");
+import ImagePopover from "./ImagePopover";
 
 interface HouseCardComponentProps {
     houseCard: HouseCard;
@@ -16,13 +17,8 @@ interface HouseCardComponentProps {
 @observer
 export default class HouseCardComponent extends Component<HouseCardComponentProps> {
     render(): ReactNode {
-        return (
-            <OverlayTrigger
-                overlay={
-                    <div className="vertical-game-card" style={{
-                        backgroundImage: `url(${houseCardImages.get(this.props.houseCard.id)})`
-                    }}/>
-                }
+        return <OverlayTrigger
+                overlay={this.renderPopover()}
                 popperConfig={{modifiers: {preventOverflow: {boundariesElement: "viewport"}}}}
                 delay={{show: 120, hide: 0}}
                 placement="auto"
@@ -37,7 +33,12 @@ export default class HouseCardComponent extends Component<HouseCardComponentProp
                     src={houseCardImages.get(this.props.houseCard.id)}
                     onClick={() => this.props.onClick ? this.props.onClick() : undefined}
                 />
-            </OverlayTrigger>
-        );
+            </OverlayTrigger>;
+    }
+
+    private renderPopover(): ReactNode {
+        return <ImagePopover className="vertical-game-card" style={{
+            backgroundImage: `url(${houseCardImages.get(this.props.houseCard.id)})`}}
+        />;
     }
 }

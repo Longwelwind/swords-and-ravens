@@ -436,7 +436,7 @@ export default class Game {
             structuresCountNeededToWin: this.structuresCountNeededToWin,
             maxTurns: this.maxTurns,
             maxPowerTokens: this.maxPowerTokens,
-            clientNextWidllingCardId: (admin || knowsNextWildlingCard) ? this.wildlingDeck[0].id : null,
+            clientNextWildlingCardId: (admin || knowsNextWildlingCard) ? this.wildlingDeck[0].id : null,
             revealedWesterosCards: this.revealedWesterosCards,
             vassalRelations: this.vassalRelations.map((key, value) => [key.id, value.id]),
             vassalHouseCards: this.vassalHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
@@ -465,7 +465,7 @@ export default class Game {
         game.maxTurns = data.maxTurns;
         game.maxPowerTokens = data.maxPowerTokens;
         game.revealedWesterosCards = data.revealedWesterosCards;
-        game.clientNextWildlingCardId = data.clientNextWidllingCardId;
+        game.clientNextWildlingCardId = data.clientNextWildlingCardId;
         game.vassalRelations = new BetterMap(data.vassalRelations.map(([vid, hid]) => [game.houses.get(vid), game.houses.get(hid)]));
         game.vassalHouseCards = new BetterMap(data.vassalHouseCards.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
         game.houseCardsForDrafting = new BetterMap(data.houseCardsForDrafting.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
@@ -493,7 +493,7 @@ export interface SerializedGame {
     maxTurns: number;
     maxPowerTokens: number;
     revealedWesterosCards: number;
-    clientNextWidllingCardId: number | null;
+    clientNextWildlingCardId: number | null;
     vassalRelations: [string, string][];
     vassalHouseCards: [string, SerializedHouseCard][];
     houseCardsForDrafting: [string, SerializedHouseCard][];

@@ -9,7 +9,6 @@ import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
-import houseInfluenceImages from "./houseInfluenceImages";
 import classNames = require("classnames");
 import ChatComponent from "./chat-client/ChatComponent";
 import GameSettingsComponent from "./GameSettingsComponent";
@@ -21,6 +20,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faTimes} from "@fortawesome/free-solid-svg-icons/faTimes";
 import UserLabel from "./UserLabel";
 import EntireGame from "../common/EntireGame";
+import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
 
 interface LobbyComponentProps {
     gameClient: GameClient;
@@ -59,9 +59,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                     <ListGroupItem key={h.id} style={{opacity: this.isHouseAvailable(h) ? 1 : 0.3}}>
                                         <Row className="align-items-center">
                                             {!this.randomHouses && <Col xs="auto">
-                                                <div className="influence-icon"
-                                                     style={{backgroundImage: `url(${houseInfluenceImages.get(h.id)})`}}>
-                                                </div>
+                                                <SimpleInfluenceIconComponent house={h}/>
                                             </Col>}
                                             <Col>
                                                 <div>

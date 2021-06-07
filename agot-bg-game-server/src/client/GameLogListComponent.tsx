@@ -26,6 +26,8 @@ import HouseCard from "../common/ingame-game-state/game-data-structure/house-car
 import houseCardAbilities from "../common/ingame-game-state/game-data-structure/house-card/houseCardAbilities";
 import BetterMap from "../utils/BetterMap";
 import { tidesOfBattleCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
+import HouseNumberResultsComponent from "./HouseNumberResultsComponent";
+import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -254,22 +256,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         </Row>
                     </>
                 );
-            case "wildling-bidding":
-                const results: [number, House[]][] = data.results.map(([bid, hids]) => [bid, hids.map(hid => this.game.houses.get(hid))]);
+            case "wildling-bidding": {
+                const bids = _.flatMap(data.results.map(([bid, hids]) => hids.map(hid => [this.game.houses.get(hid), bid] as [House, number])));
 
                 return (
                     <>
-                        Wildling bidding results for Wildling Threat <b>{data.wildlingStrength}</b>:
-                        <table cellPadding="5">
-                            <tbody>
-                                {results.map(([bid, houses]) => houses.map(h => (
-                                    <tr key={`bid_${h.id}`}>
-                                        <td>{h.name}</td>
-                                        <td>{bid}</td>
-                                    </tr>
-                                )))}
-                            </tbody>
-                        </table>
+                        <p>Wildling bidding results for Wildling Threat <b>{data.wildlingStrength}</b>:</p>
+                        <div className="mt-1"><HouseNumberResultsComponent results={bids} key="wildlings"></HouseNumberResultsComponent></div>
                         {data.nightsWatchVictory ? (
                             <>The <b>Night&apos;s Watch</b> won!</>
                         ) : (
@@ -277,7 +270,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         )}
                     </>
                 );
-
+            }
             case "lowest-bidder-chosen": {
                 const lowestBidder = this.game.houses.get(data.lowestBidder);
 
@@ -563,25 +556,25 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <p>
-                        Final order for {this.game.getNameInfluenceTrack(data.trackerI)}: {
-                        joinReactNodes(finalOrder.map(h => <b key={`cok_final_${h.id}`}>{h.name}</b>), ", ")}
+                        Final order of <b>{this.game.getNameInfluenceTrack(data.trackerI)}</b> track:
                     </p>
+                    <Row className="mb-2 mt-1">
+                        {finalOrder.map(h => <Col xs="auto" key={`cok_final_${h.id}`}><SimpleInfluenceIconComponent house={h}/></Col>)}
+                    </Row>
                 </>;
 
-            case "clash-of-kings-bidding-done":
-                const bids = _.flatMap(data.results.map(([bid, hids]) => hids.map(hid => [bid, this.game.houses.get(hid)] as [number, House])));
+            case "clash-of-kings-bidding-done": {
+                const bids = _.flatMap(data.results.map(([bid, hids]) => hids.map(hid => [this.game.houses.get(hid), bid] as [House, number])));
 
                 return <>
                     <p>
-                        Houses bid for the {this.game.getNameInfluenceTrack(data.trackerI)}:
+                        Houses bid for <b>{this.game.getNameInfluenceTrack(data.trackerI)}</b> track:
                     </p>
-                    <ul>
-                        {bids.map(([bid, house]) => (
-                            <li key={`cok_bid_done_${house.id}`}><b>{house.name}</b> bid <b>{bid}</b></li>
-                        ))}
-                    </ul>
+                    <Row className="mb-1 mt-2">
+                        <HouseNumberResultsComponent results={bids} key={`cok_${data.trackerI}`}/>
+                    </Row>
                 </>;
-
+            }
             case "wildling-strength-trigger-wildlings-attack":
                 return <>
                     <b>Wildling Threat</b> reached <b>{data.wildlingStrength}</b>, triggering a <b>Wildling Attack</b>
@@ -1153,16 +1146,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                 <>
-                    Supply levels have been adjusted:
-                    <table cellPadding="5">
-                        <tbody>
-                            {supplies.map(([house, supply]) => (
-                                <tr key={`supply_${house.id}`}>
-                                    <td>{house.name}</td>
-                                    <td>{supply}</td>
-                                </tr>))}
-                        </tbody>
-                    </table>
+                    <p>Supply levels have been adjusted:</p>
+                    <div className="mt-1"><HouseNumberResultsComponent results={supplies} key="supply"/></div>
                 </>);
             case "player-replaced": {
                 const oldUser = this.props.ingameGameState.entireGame.users.get(data.oldUser);

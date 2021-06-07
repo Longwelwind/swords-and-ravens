@@ -45,11 +45,17 @@ import TheHordeDescendsNightsWatchVictoryComponent from "./TheHordeDescendsNight
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import WildlingCardComponent from "../utils/WildlingCardComponent";
 import joinReactNodes from "../../../client/utils/joinReactNodes";
+import House from "../../../common/ingame-game-state/game-data-structure/House";
+import _ from "lodash";
+import HouseNumberResultsComponent from "../../../client/HouseNumberResultsComponent";
 
 @observer
 export default class WildlingsAttackComponent extends Component<GameStateComponentProps<WildlingsAttackGameState>> {
     render(): ReactNode {
         const wildlingCardType = this.props.gameState.wildlingCard ? this.props.gameState.wildlingCard.type : null;
+        const results = this.props.gameState.biddingResults
+            ? _.flatMap(this.props.gameState.biddingResults.map(([bid, houses]) => houses.map(h => [h, bid] as [House, number])))
+            : null;
         return (
             <>
                 {wildlingCardType && (
@@ -63,14 +69,19 @@ export default class WildlingsAttackComponent extends Component<GameStateCompone
                 )}
                 <ListGroupItem>
                     <Row>
-                        {this.props.gameState.childGameState instanceof BiddingGameState && (
+                        {this.props.gameState.childGameState instanceof BiddingGameState ? (
                             <Col xs={12}>
                                 <b>All houses</b>{this.props.gameState.excludedHouses.length >0 &&
                                 (<> except {joinReactNodes(this.props.gameState.excludedHouses.map(h =>
                                 <b key={h.id}>{h.name}</b>), ", ")}</>)} bid Power tokens to overcome the
                                 Wildlings which are attacking with a strength of <b>{this.props.gameState.game.wildlingStrength}</b>!
                             </Col>
-                        )}
+                        ) : results ?
+                            <Col xs={12}>
+                                <p>Bidding results:</p>
+                                <HouseNumberResultsComponent results={results} key="wildlings"/>
+                            </Col>
+                        : <></>}
                         {renderChildGameState<WildlingsAttackGameState>(this.props, [
                             [SimpleChoiceGameState, SimpleChoiceComponent],
                             [BiddingGameState, BiddingComponent],
