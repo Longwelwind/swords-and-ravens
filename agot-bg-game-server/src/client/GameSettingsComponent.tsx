@@ -46,7 +46,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     </Row>
                     {this.entireGame.gameSettings.tidesOfBattle &&
                     <Row className="justify-content-center">
-                        <small>Tides of Battle (BETA)</small>
+                        <small>Tides of Battle</small>
                     </Row>}
                 </Col>
                 )}
@@ -98,7 +98,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             <FormCheck
                                 id="tides-of-battle"
                                 type="checkbox"
-                                label="Tides of Battle (BETA)"
+                                label="Tides of Battle"
                                 checked={this.gameSettings.tidesOfBattle}
                                 onChange={() => this.changeGameSettings(() => this.gameSettings.tidesOfBattle = !this.gameSettings.tidesOfBattle)}
                             />
@@ -115,9 +115,9 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                 label={
                                     <OverlayTrigger overlay={
                                         <Tooltip id="adwd-house-cards-tooltip">
-                                            The house cards will come from the Dance with Dragons and A Feast for Crows expansions.
+                                            The house cards will come from the A Dance with Dragons and A Feast for Crows expansions.
                                         </Tooltip>}>
-                                        <label htmlFor="adwd-house-cards">Use <i>A Dance with Dragons / A Feast for Crows (BETA)</i> house cards</label>
+                                        <label htmlFor="adwd-house-cards">Use <i>ADwD / AFfC</i> house cards</label>
                                     </OverlayTrigger>}
                                 disabled={this.props.entireGame.gameSettings.setupId == "a-dance-with-dragons"}
                                 checked={this.gameSettings.adwdHouseCards}
@@ -136,7 +136,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                             Players will draft their house cards step by step in a randomly chosen order before the game starts.
                                             Cards can be chosen from all 2nd Edition Base Game house cards and all expansions (ADwD, AFfC and MoD) house cards.
                                         </Tooltip>}>
-                                        <label htmlFor="draft-house-cards">Draft house cards (BETA)</label>
+                                        <label htmlFor="draft-house-cards">Draft house cards</label>
                                     </OverlayTrigger>}
                                 checked={this.gameSettings.draftHouseCards}
                                 onChange={() => this.changeGameSettings(() => this.gameSettings.draftHouseCards = !this.gameSettings.draftHouseCards)}
