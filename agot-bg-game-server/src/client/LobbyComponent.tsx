@@ -21,6 +21,7 @@ import {faTimes} from "@fortawesome/free-solid-svg-icons/faTimes";
 import UserLabel from "./UserLabel";
 import EntireGame from "../common/EntireGame";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
+import { observable } from "mobx";
 
 interface LobbyComponentProps {
     gameClient: GameClient;
@@ -45,13 +46,15 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
         return this.props.gameState;
     }
 
+    @observable chatHeight: number;
+
     render(): ReactNode {
         const {success: canStartGame, reason: canStartGameReason} = this.lobby.canStartGame(this.authenticatedUser);
         const {success: canCancelGame, reason: canCancelGameReason} = this.lobby.canCancel(this.authenticatedUser);
 
         return <>
-                <Col xs={10} md={4} className="mb-3">
-                    <Card>
+                <Col xs={10} lg={4} className="mb-3">
+                    <Card id="lobby-houses-list">
                         <ListGroup variant="flush">
                             {this.lobby.lobbyHouses.values.map((h, i) => (
                                 <ListGroupItem key={h.id} style={{opacity: this.isHouseAvailable(h) ? 1 : 0.3}}>
@@ -93,9 +96,9 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                         </ListGroup>
                     </Card>
                 </Col>
-                <Col xs={10} md={6} className="mb-3">
+                <Col xs={10} lg={6} className="mb-3">
                     <Card>
-                        <Card.Body style={{height: "430px"}}>
+                        <Card.Body style={{height: this.chatHeight}}>
                             <ChatComponent gameClient={this.props.gameClient}
                                         entireGame={this.lobby.entireGame}
                                         roomId={this.lobby.entireGame.publicChatRoomId}
@@ -103,7 +106,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col xs={8}>
+                <Col xs={10} lg={5}>
                     <Card>
                         <Card.Body>
                             <Row>
@@ -195,5 +198,23 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
 
     leave(): void {
         this.lobby.chooseHouse(null);
+    }
+
+    componentWillMount(): void {
+        this.setChatHeight();
+    }
+
+    componentDidMount(): void {
+        window.addEventListener('resize', () => this.setChatHeight());
+    }
+
+    componentWillUnmount(): void {
+        window.removeEventListener('resize', () => this.setChatHeight());
+    }
+
+    setChatHeight(): void {
+        const lobbyHousesList = document.getElementById("lobby-houses-list");
+        const boundingClientRect = lobbyHousesList ? lobbyHousesList.getBoundingClientRect() : null;
+        this.chatHeight = boundingClientRect ? boundingClientRect.height : 430;
     }
 }

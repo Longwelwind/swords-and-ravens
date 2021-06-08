@@ -38,7 +38,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
 
     render(): ReactNode {
         return (
-            <Row>
+            <Row className="justify-content-center">
                 {this.props.entireGame.childGameState instanceof IngameGameState && (
                 <Col xs={12} className="mb-1 mt-1">
                     <Row className="justify-content-center mb-1">
