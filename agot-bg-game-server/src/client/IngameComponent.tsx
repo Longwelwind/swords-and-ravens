@@ -311,7 +311,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         <Row className="mb-3">
                                             <OverlayTrigger overlay={
                                                     <Tooltip id="round">
-                                                        <b>Round</b>
+                                                        <b>Round {this.game.turn} / {this.game.maxTurns}</b>
                                                     </Tooltip>
                                                 }
                                                 placement="auto">

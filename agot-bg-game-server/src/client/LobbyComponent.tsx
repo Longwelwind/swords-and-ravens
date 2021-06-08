@@ -49,138 +49,130 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
         const {success: canStartGame, reason: canStartGameReason} = this.lobby.canStartGame(this.authenticatedUser);
         const {success: canCancelGame, reason: canCancelGameReason} = this.lobby.canCancel(this.authenticatedUser);
 
-        return (
-            <Col xs={11} md={8} xl={6}>
-                <Row>
-                    <Col>
-                        <Card>
-                            <ListGroup variant="flush">
-                                {this.lobby.lobbyHouses.values.map((h, i) => (
-                                    <ListGroupItem key={h.id} style={{opacity: this.isHouseAvailable(h) ? 1 : 0.3}}>
-                                        <Row className="align-items-center">
-                                            {!this.randomHouses && <Col xs="auto">
-                                                <SimpleInfluenceIconComponent house={h}/>
-                                            </Col>}
-                                            <Col>
-                                                <div>
-                                                    <b>{this.randomHouses ? "Seat " + (i + 1): h.name}</b>
-                                                </div>
-                                                <div className={classNames({"invisible": !this.lobby.players.has(h)})}>
-                                                    {this.lobby.players.has(h) && <UserLabel
-                                                                gameClient={this.props.gameClient}
-                                                                gameState={this.lobby}
-                                                                user={this.lobby.players.get(h)}/>}
-                                                </div>
-                                            </Col>
-                                            {this.isHouseAvailable(h) && (
-                                                !this.lobby.players.has(h) ? (
+        return <>
+                <Col xs={10} md={4} className="mb-3">
+                    <Card>
+                        <ListGroup variant="flush">
+                            {this.lobby.lobbyHouses.values.map((h, i) => (
+                                <ListGroupItem key={h.id} style={{opacity: this.isHouseAvailable(h) ? 1 : 0.3}}>
+                                    <Row className="align-items-center">
+                                        {!this.randomHouses && <Col xs="auto">
+                                            <SimpleInfluenceIconComponent house={h}/>
+                                        </Col>}
+                                        <Col>
+                                            <div>
+                                                <b>{this.randomHouses ? "Seat " + (i + 1): h.name}</b>
+                                            </div>
+                                            <div className={classNames({"invisible": !this.lobby.players.has(h)})}>
+                                                {this.lobby.players.has(h) && <UserLabel
+                                                            gameClient={this.props.gameClient}
+                                                            gameState={this.lobby}
+                                                            user={this.lobby.players.get(h)}/>}
+                                            </div>
+                                        </Col>
+                                        {this.isHouseAvailable(h) && (
+                                            !this.lobby.players.has(h) ? (
+                                                <Col xs="auto">
+                                                    <Button onClick={() => this.choose(h)}>Choose</Button>
+                                                </Col>
+                                            ) : this.lobby.players.get(h) == this.authenticatedUser ? (
+                                                <Col xs="auto">
+                                                    <Button variant="danger" onClick={() => this.leave()}>Leave</Button>
+                                                </Col>
+                                            ) : (
+                                                this.lobby.entireGame.isOwner(this.authenticatedUser) && (
                                                     <Col xs="auto">
-                                                        <Button onClick={() => this.choose(h)}>Choose</Button>
+                                                        <Button variant="danger" onClick={() => this.kick(h)}>Kick</Button>
                                                     </Col>
-                                                ) : this.lobby.players.get(h) == this.authenticatedUser ? (
-                                                    <Col xs="auto">
-                                                        <Button variant="danger" onClick={() => this.leave()}>Leave</Button>
-                                                    </Col>
-                                                ) : (
-                                                    this.lobby.entireGame.isOwner(this.authenticatedUser) && (
-                                                        <Col xs="auto">
-                                                            <Button variant="danger" onClick={() => this.kick(h)}>Kick</Button>
-                                                        </Col>
-                                                    )
                                                 )
-                                            )}
-                                        </Row>
-                                    </ListGroupItem>
-                                ))}
-                            </ListGroup>
-                        </Card>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <Card>
-                            <Card.Body style={{height: "300px"}}>
-                                <ChatComponent gameClient={this.props.gameClient}
-                                               entireGame={this.lobby.entireGame}
-                                               roomId={this.lobby.entireGame.publicChatRoomId}
-                                               currentlyViewed={true}/>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <Card>
-                            <Card.Body>
-                                <Row>
-                                    <Col>
-                                        <GameSettingsComponent
-                                            gameClient={this.props.gameClient}
-                                            entireGame={this.lobby.entireGame} />
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col>
-                                        <ConditionalWrap
-                                            condition={!canStartGame}
-                                            wrap={children =>
-                                                <OverlayTrigger
-                                                    overlay={
-                                                        <Tooltip id="start-game">
-                                                            {canStartGameReason == "not-owner" ?
-                                                                "Only the owner of the game can start it"
-                                                            : canStartGameReason == "not-enough-players" ?
-                                                                "Not all houses have been taken"
-                                                            : null}
-                                                        </Tooltip>
-                                                    }
-                                                >
-                                                    {children}
-                                                </OverlayTrigger>
-                                            }
-                                        >
-                                            <Button
-                                                block
-                                                onClick={() => this.lobby.start()}
-                                                disabled={!canStartGame}
-                                            >
-                                                Start
-                                            </Button>
-                                        </ConditionalWrap>
-                                    </Col>
-                                    <Col xs="auto">
+                                            )
+                                        )}
+                                    </Row>
+                                </ListGroupItem>
+                            ))}
+                        </ListGroup>
+                    </Card>
+                </Col>
+                <Col xs={10} md={6} className="mb-3">
+                    <Card>
+                        <Card.Body style={{height: "430px"}}>
+                            <ChatComponent gameClient={this.props.gameClient}
+                                        entireGame={this.lobby.entireGame}
+                                        roomId={this.lobby.entireGame.publicChatRoomId}
+                                        currentlyViewed={true}/>
+                        </Card.Body>
+                    </Card>
+                </Col>
+                <Col xs={8}>
+                    <Card>
+                        <Card.Body>
+                            <Row>
+                                <Col>
+                                    <GameSettingsComponent
+                                        gameClient={this.props.gameClient}
+                                        entireGame={this.lobby.entireGame} />
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col>
                                     <ConditionalWrap
-                                            condition={!canCancelGame}
-                                            wrap={children =>
-                                                <OverlayTrigger
-                                                    overlay={
-                                                        <Tooltip id="start-game">
-                                                            {canCancelGameReason == "not-owner" ?
-                                                                "Only the owner of the game can cancel it"
-                                                            : null}
-                                                        </Tooltip>
-                                                    }
-                                                >
-                                                    {children}
-                                                </OverlayTrigger>
-                                            }
-                                        >
-                                            <Button
-                                                variant="danger"
-                                                onClick={() => this.cancel()}
-                                                disabled={!canCancelGame}
+                                        condition={!canStartGame}
+                                        wrap={children =>
+                                            <OverlayTrigger
+                                                overlay={
+                                                    <Tooltip id="start-game">
+                                                        {canStartGameReason == "not-owner" ?
+                                                            "Only the owner of the game can start it"
+                                                        : canStartGameReason == "not-enough-players" ?
+                                                            "Not all houses have been taken"
+                                                        : null}
+                                                    </Tooltip>
+                                                }
                                             >
-                                                <FontAwesomeIcon icon={faTimes} />
-                                            </Button>
-                                        </ConditionalWrap>
-                                    </Col>
-                                </Row>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
-            </Col>
-        );
+                                                {children}
+                                            </OverlayTrigger>
+                                        }
+                                    >
+                                        <Button
+                                            block
+                                            onClick={() => this.lobby.start()}
+                                            disabled={!canStartGame}
+                                        >
+                                            Start
+                                        </Button>
+                                    </ConditionalWrap>
+                                </Col>
+                                <Col xs="auto">
+                                <ConditionalWrap
+                                        condition={!canCancelGame}
+                                        wrap={children =>
+                                            <OverlayTrigger
+                                                overlay={
+                                                    <Tooltip id="start-game">
+                                                        {canCancelGameReason == "not-owner" ?
+                                                            "Only the owner of the game can cancel it"
+                                                        : null}
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                {children}
+                                            </OverlayTrigger>
+                                        }
+                                    >
+                                        <Button
+                                            variant="danger"
+                                            onClick={() => this.cancel()}
+                                            disabled={!canCancelGame}
+                                        >
+                                            <FontAwesomeIcon icon={faTimes} />
+                                        </Button>
+                                    </ConditionalWrap>
+                                </Col>
+                            </Row>
+                        </Card.Body>
+                    </Card>
+                </Col>
+        </>;
     }
 
     isHouseAvailable(house: LobbyHouse): boolean {
