@@ -698,8 +698,8 @@ export default class CombatGameState extends GameState<
                     (admin
                     || this.revealTidesOfBattleCards
                     || this.ingameGameState.getControllerOfHouse(house) == player)
-                    ? (houseCombatData.tidesOfBattleCard ? houseCombatData.tidesOfBattleCard.id : null)
-                    : null;
+                    ? (houseCombatData.tidesOfBattleCard === undefined ? undefined : houseCombatData.tidesOfBattleCard ? houseCombatData.tidesOfBattleCard.id : null)
+                    : this.isTidesOfBattleCardsActive ? null : undefined;
                 return [house.id, {
                 houseCardId: houseCombatData.houseCard ? houseCombatData.houseCard.id : null,
                 army: houseCombatData.army.map(u => u.id),
@@ -732,7 +732,7 @@ export default class CombatGameState extends GameState<
                     army: army.map(uid => combatGameState.world.getUnitById(uid)),
                     region,
                     houseCard: houseCardId ? combatGameState.ingameGameState.game.getHouseCardById(houseCardId) : null,
-                    tidesOfBattleCard: tidesOfBattleCardId ? tidesOfBattleCards.get(tidesOfBattleCardId): null
+                    tidesOfBattleCard: tidesOfBattleCardId === undefined ? undefined : tidesOfBattleCardId ? tidesOfBattleCards.get(tidesOfBattleCardId) : null
                 }
             ]
         }));
@@ -777,7 +777,7 @@ export interface SerializedCombatGameState {
     tidesOfBattleDeck: string[];
     revealTidesOfBattleCards: boolean;
     supporters: [string, string | null][];
-    houseCombatDatas: [string, {houseCardId: string | null; army: number[]; regionId: string; tidesOfBattleCardId: string | null}][];
+    houseCombatDatas: [string, {houseCardId: string | null; army: number[]; regionId: string; tidesOfBattleCardId?: string | null}][];
     houseCardModifiers: [string, HouseCardModifier][];
     stats: CombatStats[];
     childGameState: SerializedDeclareSupportGameState | SerializedChooseHouseCardGameState
