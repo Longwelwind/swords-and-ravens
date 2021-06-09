@@ -29,6 +29,8 @@ import HouseCard from "./game-data-structure/house-card/HouseCard";
 import { observable } from "mobx";
 import _ from "lodash";
 import DraftHouseCardsGameState, { SerializedDraftHouseCardsGameState } from "./draft-house-cards-game-state/DraftHouseCardsGameState";
+import CombatGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
+import DeclareSupportGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/declare-support-game-state/DeclareSupportGameState";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -198,6 +200,10 @@ export default class IngameGameState extends GameState<
 
             this.createVote(player.user, new ReplacePlayerByVassal(playerToReplace.user, playerToReplace.house));
         } else if (message.type == "gift-power-tokens") {
+            if (!this.canGiftPowerTokens()) {
+                return;
+            }
+
             const toHouse = this.game.houses.get(message.toHouse);
 
             if (!this.isVassalHouse(toHouse)
@@ -632,6 +638,15 @@ export default class IngameGameState extends GameState<
             toHouse: toHouse.id,
             powerTokens: powerTokens
         });
+    }
+
+    canGiftPowerTokens(): boolean {
+        if (this.entireGame.hasChildGameState(CombatGameState) &&
+            !(this.entireGame.leafState instanceof DeclareSupportGameState)) {
+            return false;
+        }
+
+        return true;
     }
 
     serializeToClient(admin: boolean, user: User | null): SerializedIngameGameState {
