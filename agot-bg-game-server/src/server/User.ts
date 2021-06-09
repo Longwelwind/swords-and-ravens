@@ -7,6 +7,7 @@ import {observable} from "mobx";
 export default class User {
     id: string;
     name: string;
+    currentIp = "";
     @observable settings: UserSettings;
     entireGame: EntireGame;
     connectedClients: WebSocket[] = [];

@@ -2,6 +2,7 @@ import {Server} from "ws";
 import {ClientMessage} from "../messages/ClientMessage";
 import User from "./User";
 import * as WebSocket from "ws";
+import * as http from 'http';
 import EntireGame, {SerializedEntireGame} from "../common/EntireGame";
 import {ServerMessage} from "../messages/ServerMessage";
 import WebsiteClient, { StoredGameData } from "./website-client/WebsiteClient";
@@ -46,10 +47,11 @@ export default class GlobalServer {
     }
 
     async start(): Promise<void> {
-        this.server.on("connection", (client: WebSocket) => {
-            console.log("Connection");
+        this.server.on("connection", (client: WebSocket, incomingMsg: http.IncomingMessage) => {
+            const clientIp = this.parseClientIp(incomingMsg);
+            console.log("New user connected: " + clientIp);
             client.on("message", (data: WebSocket.Data) => {
-                this.onMessage(client, data as string);
+                this.onMessage(client, data as string, clientIp);
             });
             client.on("close", () => {
                 this.onClose(client);
@@ -73,7 +75,7 @@ export default class GlobalServer {
         })
     }
 
-    async onMessage(client: WebSocket, data: string): Promise<void> {
+    async onMessage(client: WebSocket, data: string, clientIp: string): Promise<void> {
         let message: ClientMessage | null = null;
         try {
             message = JSON.parse(data) as ClientMessage;
@@ -115,8 +117,8 @@ export default class GlobalServer {
                 return;
             }
 
-            if (this.areThereOtherUsersWithSameIp(entireGame, client)) {
-                console.warn(`${userData.name} with id ${userData.id} is possible multi-accounting`);
+            if (this.areThereOtherUsersWithSameIp(entireGame, clientIp)) {
+                console.error(`${userData.name} with id ${userData.id} and IP ${clientIp} is possibly multi-accounting!`);
                 return;
             }
 
@@ -124,6 +126,8 @@ export default class GlobalServer {
             const user = entireGame.users.has(userData.id)
                 ? entireGame.users.get(userData.id)
                 : entireGame.addUser(userData.id, userData.name);
+
+            user.currentIp = clientIp;
 
             this.clientToUser.set(client, user);
             user.connectedClients.push(client);
@@ -270,20 +274,36 @@ export default class GlobalServer {
         return entireGame;
     }
 
-    areThereOtherUsersWithSameIp(entireGame: EntireGame, client: WebSocket): boolean {
-        // @ts-ignore
-        const clientRemoteAddress = client._socket.remoteAddress;
-        console.log(`IP connected: ${clientRemoteAddress}`);
-
-        if (process.env.MASTER_API_ENABLED == null) {
+    areThereOtherUsersWithSameIp(_entireGame: EntireGame, clientIp: string): boolean {
+        if (process.env.MASTER_API_ENABLED == null || !clientIp) {
             return false;
         }
 
         // We can check all users connected clients as the current client has not been added to connected clients yet
-        // @ts-ignore
-        // return entireGame.users.values.some(u => u.connectedClients.some(ws => ws._socket.remoteAddress == clientRemoteAddress));
-
+        // return entireGame.users.values.some(u => u.currentIp == clientIp);
         return false;
+    }
+
+    parseClientIp(incomingMessage: http.IncomingMessage): string {
+        const xForwardedForHeader = incomingMessage.headers['x-forwarded-for'];
+        if (!xForwardedForHeader) {
+            console.log("Fetched IP from remoteAddress");
+            return incomingMessage.socket.remoteAddress ? incomingMessage.socket.remoteAddress : "";
+        }
+
+        let xForwardedFor = "";
+        if (Array.isArray(xForwardedForHeader) && xForwardedForHeader.length > 0) {
+            console.log("Fetched IP from x-forward-for array");
+            xForwardedFor = xForwardedForHeader.shift() as string;
+        }
+
+        if (typeof xForwardedForHeader === "string") {
+            console.log("Fetched IP from x-forward-for string");
+            xForwardedFor = xForwardedForHeader;
+        }
+
+        const firstValue = xForwardedFor.split(',').shift();
+        return firstValue ? firstValue.trim() : "";
     }
 
     onWaitedUsers(game: EntireGame, users: User[]): void {
@@ -295,6 +315,7 @@ export default class GlobalServer {
 
         if (this.clientToUser.has(client)) {
             const user = this.clientToUser.get(client) as User;
+            user.currentIp = "";
             user.connectedClients.splice(user.connectedClients.indexOf(client), 1);
             this.clientToUser.delete(client);
 
