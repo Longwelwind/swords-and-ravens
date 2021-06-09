@@ -50,12 +50,12 @@ export default class GiftPowerTokensComponent extends Component<GiftPowerTokensC
                             type="range"
                             className="custom-range"
                             min={0}
-                            max={this.props.authenticatedPlayer.house.powerTokens}
+                            max={this.house.powerTokens}
                             value={this.powerTokens}
                             onChange={e => {
                                 this.powerTokens = parseInt(e.target.value);
                             }}
-                            disabled={this.props.authenticatedPlayer.house.powerTokens == 0}
+                            disabled={!this.canGiftPowerTokens()}
                         />
                     </Col>
                     <Col xs="auto">
@@ -72,11 +72,15 @@ export default class GiftPowerTokensComponent extends Component<GiftPowerTokensC
                         this.powerTokens = 0;
                         document.body.click();
                     }}
-                    disabled={this.powerTokens == 0}
+                    disabled={!this.canGiftPowerTokens()}
                 >
                     Confirm
                 </Button>
             </Col>
         </>;
+    }
+
+    canGiftPowerTokens(): boolean {
+        return this.house.powerTokens > 0 && this.props.ingame.canGiftPowerTokens();
     }
 }
