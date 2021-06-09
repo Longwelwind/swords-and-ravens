@@ -271,16 +271,19 @@ export default class GlobalServer {
     }
 
     areThereOtherUsersWithSameIp(entireGame: EntireGame, client: WebSocket): boolean {
+        // @ts-ignore
+        const clientRemoteAddress = client._socket.remoteAddress;
+        console.log(`IP connected: ${clientRemoteAddress}`);
+
         if (process.env.MASTER_API_ENABLED == null) {
             return false;
         }
 
-        // @ts-ignore
-        const clientRemoteAddress = client._socket.remoteAddress;
-
         // We can check all users connected clients as the current client has not been added to connected clients yet
         // @ts-ignore
-        return entireGame.users.values.some(u => u.connectedClients.some(ws => ws._socket.remoteAddress == clientRemoteAddress));
+        // return entireGame.users.values.some(u => u.connectedClients.some(ws => ws._socket.remoteAddress == clientRemoteAddress));
+
+        return false;
     }
 
     onWaitedUsers(game: EntireGame, users: User[]): void {
