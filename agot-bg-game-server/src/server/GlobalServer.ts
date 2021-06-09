@@ -13,6 +13,7 @@ import schema from "./ClientMessage.json";
 import Ajv, {ValidateFunction} from "ajv";
 import _ from "lodash";
 import serializedGameMigrations from "./serializedGameMigrations";
+import * as Sentry from "@sentry/node"
 
 export default class GlobalServer {
     server: Server;
@@ -117,8 +118,12 @@ export default class GlobalServer {
                 return;
             }
 
-            if (this.areThereOtherUsersWithSameIp(entireGame, clientIp)) {
-                console.error(`${userData.name} with id ${userData.id} and IP ${clientIp} is possibly multi-accounting!`);
+            const otherUsersWithSameIp = this.getOtherUsersWithSameIp(entireGame, clientIp, userData.id);
+            if (otherUsersWithSameIp.length > 0) {
+                const message = `${userData.name} with id ${userData.id} and IP ${clientIp} is possibly multi-accounting!\n` +
+                    `Other users with same IP:\n${otherUsersWithSameIp.map(u => u.toJson()).join("\n")}`;
+                console.warn(message);
+                Sentry.captureMessage(message, Sentry.Severity.Warning);
                 return;
             }
 
@@ -274,13 +279,13 @@ export default class GlobalServer {
         return entireGame;
     }
 
-    areThereOtherUsersWithSameIp(entireGame: EntireGame, clientIp: string): boolean {
+    getOtherUsersWithSameIp(entireGame: EntireGame, clientIp: string, userId: string): User[] {
         if (process.env.MASTER_API_ENABLED == null || !clientIp) {
-            return false;
+            return [];
         }
 
         // We can check all users connected clients as the current client has not been added to connected clients yet
-        return entireGame.users.values.some(u => u.currentIp == clientIp);
+        return entireGame.users.values.filter(u => u.id != userId && u.currentIp != "" && u.currentIp == clientIp);
     }
 
     parseClientIp(incomingMessage: http.IncomingMessage): string {

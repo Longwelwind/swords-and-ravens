@@ -55,6 +55,10 @@ export default class User {
         }
     }
 
+    toJson(): string {
+        return JSON.stringify({id: this.id, name: this.name}, null, 1);
+    }
+
     static deserializeFromServer(game: EntireGame, data: SerializedUser): User {
         return new User(data.id, data.name, game, data.settings, data.connected);
     }
