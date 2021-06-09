@@ -274,31 +274,27 @@ export default class GlobalServer {
         return entireGame;
     }
 
-    areThereOtherUsersWithSameIp(_entireGame: EntireGame, clientIp: string): boolean {
+    areThereOtherUsersWithSameIp(entireGame: EntireGame, clientIp: string): boolean {
         if (process.env.MASTER_API_ENABLED == null || !clientIp) {
             return false;
         }
 
         // We can check all users connected clients as the current client has not been added to connected clients yet
-        // return entireGame.users.values.some(u => u.currentIp == clientIp);
-        return false;
+        return entireGame.users.values.some(u => u.currentIp == clientIp);
     }
 
     parseClientIp(incomingMessage: http.IncomingMessage): string {
         const xForwardedForHeader = incomingMessage.headers['x-forwarded-for'];
         if (!xForwardedForHeader) {
-            console.log("Fetched IP from remoteAddress");
             return incomingMessage.socket.remoteAddress ? incomingMessage.socket.remoteAddress : "";
         }
 
         let xForwardedFor = "";
         if (Array.isArray(xForwardedForHeader) && xForwardedForHeader.length > 0) {
-            console.log("Fetched IP from x-forward-for array");
             xForwardedFor = xForwardedForHeader.shift() as string;
         }
 
         if (typeof xForwardedForHeader === "string") {
-            console.log("Fetched IP from x-forward-for string");
             xForwardedFor = xForwardedForHeader;
         }
 
