@@ -115,6 +115,11 @@ export default class GlobalServer {
                 return;
             }
 
+            if (this.areThereOtherUsersWithSameIp(entireGame, client)) {
+                console.warn(`${userData.name} with id ${userData.id} is possible multi-accounting`);
+                return;
+            }
+
             // Check if the game already contains this user
             const user = entireGame.users.has(userData.id)
                 ? entireGame.users.get(userData.id)
@@ -263,6 +268,19 @@ export default class GlobalServer {
         entireGame.firstStart();
 
         return entireGame;
+    }
+
+    areThereOtherUsersWithSameIp(entireGame: EntireGame, client: WebSocket): boolean {
+        if (process.env.MASTER_API_ENABLED == null) {
+            return false;
+        }
+
+        // @ts-ignore
+        const clientRemoteAddress = client._socket.remoteAddress;
+
+        // We can check all users connected clients as the current client has not been added to connected clients yet
+        // @ts-ignore
+        return entireGame.users.values.some(u => u.connectedClients.some(ws => ws._socket.remoteAddress == clientRemoteAddress));
     }
 
     onWaitedUsers(game: EntireGame, users: User[]): void {
