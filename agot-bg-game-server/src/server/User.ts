@@ -7,7 +7,6 @@ import {observable} from "mobx";
 export default class User {
     id: string;
     name: string;
-    currentIp = "";
     @observable settings: UserSettings;
     entireGame: EntireGame;
     connectedClients: WebSocket[] = [];
@@ -53,10 +52,6 @@ export default class User {
             settings: this.settings,
             connected: this.connected
         }
-    }
-
-    toJson(): string {
-        return JSON.stringify({id: this.id, name: this.name}, null, 1);
     }
 
     static deserializeFromServer(game: EntireGame, data: SerializedUser): User {

@@ -14,3 +14,4 @@ const wsServer = new Server({port: parseInt(process.env.PORT || "5000")});
 
 const globalServer = new GlobalServer(wsServer);
 globalServer.start();
+globalServer.invalidateOutdatedIpEntries();

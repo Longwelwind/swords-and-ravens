@@ -46,7 +46,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
         return this.props.gameState;
     }
 
-    @observable chatHeight: number;
+    @observable chatHeight = 430;
 
     render(): ReactNode {
         const {success: canStartGame, reason: canStartGameReason} = this.lobby.canStartGame(this.authenticatedUser);
@@ -200,12 +200,9 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
         this.lobby.chooseHouse(null);
     }
 
-    componentWillMount(): void {
-        this.setChatHeight();
-    }
-
     componentDidMount(): void {
         window.addEventListener('resize', () => this.setChatHeight());
+        this.setChatHeight();
     }
 
     componentWillUnmount(): void {

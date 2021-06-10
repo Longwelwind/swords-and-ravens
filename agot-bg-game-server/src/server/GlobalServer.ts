@@ -5,7 +5,7 @@ import * as WebSocket from "ws";
 import * as http from 'http';
 import EntireGame, {SerializedEntireGame} from "../common/EntireGame";
 import {ServerMessage} from "../messages/ServerMessage";
-import WebsiteClient, { StoredGameData } from "./website-client/WebsiteClient";
+import WebsiteClient, { StoredGameData, StoredUserData } from "./website-client/WebsiteClient";
 import LocalWebsiteClient from "./website-client/LocalWebsiteClient";
 import LiveWebsiteClient from "./website-client/LiveWebsiteClient";
 import BetterMap from "../utils/BetterMap";
@@ -14,6 +14,15 @@ import Ajv, {ValidateFunction} from "ajv";
 import _ from "lodash";
 import serializedGameMigrations from "./serializedGameMigrations";
 import * as Sentry from "@sentry/node"
+import { v4 } from "uuid";
+import sleep from "../utils/sleep";
+
+interface UserConnectionInfo {
+    userId: string;
+    userName: string;
+    userIp: string;
+    invalidatesAt?: Date;
+}
 
 export default class GlobalServer {
     server: Server;
@@ -22,6 +31,10 @@ export default class GlobalServer {
     loadedGames = new BetterMap<string, EntireGame>();
     clientToUser: Map<WebSocket, User> = new Map<WebSocket, User>();
     clientMessageValidator: ValidateFunction;
+    // The key of the outer map is the entireGameId. The key of the inner map is the socket id
+    // So we can invalidate the correct UserConnectionInfo object after a defined period of time
+    multiAccountingProtection = new BetterMap<string, BetterMap<string, UserConnectionInfo>>();
+    socketIds = new BetterMap<WebSocket, string>();
 
     get latestSerializedGameVersion(): string {
         const lastMigration = _.last(serializedGameMigrations);
@@ -51,8 +64,10 @@ export default class GlobalServer {
         this.server.on("connection", (client: WebSocket, incomingMsg: http.IncomingMessage) => {
             const clientIp = this.parseClientIp(incomingMsg);
             console.log("New user connected: " + clientIp);
+            const socketId = v4();
+            this.socketIds.set(client, socketId);
             client.on("message", (data: WebSocket.Data) => {
-                this.onMessage(client, data as string, clientIp);
+                this.onMessage(client, data as string, clientIp, socketId);
             });
             client.on("close", () => {
                 this.onClose(client);
@@ -76,7 +91,7 @@ export default class GlobalServer {
         })
     }
 
-    async onMessage(client: WebSocket, data: string, clientIp: string): Promise<void> {
+    async onMessage(client: WebSocket, data: string, clientIp: string, socketId: string): Promise<void> {
         let message: ClientMessage | null = null;
         try {
             message = JSON.parse(data) as ClientMessage;
@@ -118,21 +133,17 @@ export default class GlobalServer {
                 return;
             }
 
-            const otherUsersWithSameIp = this.getOtherUsersWithSameIp(entireGame, clientIp, userData.id);
-            if (otherUsersWithSameIp.length > 0) {
-                const message = `${userData.name} with id ${userData.id} and IP ${clientIp} is possibly multi-accounting!\n` +
-                    `Other users with same IP:\n${otherUsersWithSameIp.map(u => u.toJson()).join("\n")}`;
-                console.warn(message);
-                Sentry.captureMessage(message, Sentry.Severity.Warning);
-                return;
+            if (this.checkIfThereAreOtherUsersWithSameIpInSameGame(entireGame, userData, socketId, clientIp)) {
+                // return;
+                // We could return here and disallow the connection.
+                // For now we silently continue and log the possible cheaters.
+                // This way they don't recognize we caught them and we can check their ingame actions.
             }
 
             // Check if the game already contains this user
             const user = entireGame.users.has(userData.id)
                 ? entireGame.users.get(userData.id)
                 : entireGame.addUser(userData.id, userData.name);
-
-            user.currentIp = clientIp;
 
             this.clientToUser.set(client, user);
             user.connectedClients.push(client);
@@ -279,15 +290,6 @@ export default class GlobalServer {
         return entireGame;
     }
 
-    getOtherUsersWithSameIp(entireGame: EntireGame, clientIp: string, userId: string): User[] {
-        if (process.env.MASTER_API_ENABLED == null || !clientIp) {
-            return [];
-        }
-
-        // We can check all users connected clients as the current client has not been added to connected clients yet
-        return entireGame.users.values.filter(u => u.id != userId && u.currentIp != "" && u.currentIp == clientIp);
-    }
-
     parseClientIp(incomingMessage: http.IncomingMessage): string {
         const xForwardedForHeader = incomingMessage.headers['x-forwarded-for'];
         if (!xForwardedForHeader) {
@@ -316,11 +318,72 @@ export default class GlobalServer {
 
         if (this.clientToUser.has(client)) {
             const user = this.clientToUser.get(client) as User;
-            user.currentIp = "";
             user.connectedClients.splice(user.connectedClients.indexOf(client), 1);
             this.clientToUser.delete(client);
 
             user.updateConnectionStatus();
+
+            if (this.socketIds.has(client)) {
+                const socketId = this.socketIds.get(client);
+                if (this.multiAccountingProtection.has(user.entireGame.id)) {
+                    const userConnectionInfos = this.multiAccountingProtection.get(user.entireGame.id);
+                    if (userConnectionInfos.has(socketId)) {
+                        const date = new Date();
+                        date.setHours(date.getHours() + 1);
+                        userConnectionInfos.get(socketId).invalidatesAt = date;
+                    }
+                }
+                this.socketIds.delete(client);
+            }
+        }
+    }
+
+    checkIfThereAreOtherUsersWithSameIpInSameGame(entireGame: EntireGame, userData: StoredUserData, socketId: string, clientIp: string): boolean {
+        if (!this.multiAccountingProtection.has(entireGame.id)) {
+            this.multiAccountingProtection.set(entireGame.id, new BetterMap());
+        }
+
+        const userConnectionInfos = this.multiAccountingProtection.get(entireGame.id);
+        userConnectionInfos.set(socketId, {
+            userId: userData.id,
+            userName: userData.name,
+            userIp: clientIp
+        });
+
+        const otherUsersWithSameIp = userConnectionInfos.values.filter(
+            uci => uci.userId != userData.id && uci.userIp == clientIp
+        );
+
+        if (otherUsersWithSameIp.length > 0) {
+            const message = `${userData.name} with id ${userData.id} and IP ${clientIp} is possibly multi-accounting in game ${entireGame.id}!\n` +
+                `Other users with same IP:\n${otherUsersWithSameIp.map(u => JSON.stringify(u, null, 1)).join("\n")}`;
+            console.warn(message);
+            Sentry.captureMessage(message, Sentry.Severity.Warning);
+            return true;
+        }
+
+        return false;
+    }
+
+    async invalidateOutdatedIpEntries(): Promise<void> {
+        while (true) {
+            const now = new Date();
+            // console.log(`multiAccountingProtection values: ${JSON.stringify(this.multiAccountingProtection.values, null, 1)}`);
+            this.multiAccountingProtection.keys.forEach(entireGameId => {
+                const userConnectionInfos = this.multiAccountingProtection.get(entireGameId);
+                userConnectionInfos.keys.forEach(socketId => {
+                    const uci = userConnectionInfos.get(socketId);
+                    if (uci.invalidatesAt && now.getTime() > uci.invalidatesAt.getTime()) {
+                        // console.log(`Invalidated ${JSON.stringify(uci, null, 1)}`);
+                        userConnectionInfos.delete(socketId);
+                    }
+                });
+
+                if (userConnectionInfos.size == 0) {
+                    this.multiAccountingProtection.delete(entireGameId);
+                }
+            });
+            await sleep(60000);
         }
     }
 }
