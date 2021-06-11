@@ -25,6 +25,7 @@ import {faStickyNote} from "@fortawesome/free-solid-svg-icons/faStickyNote";
 import Tooltip from "react-bootstrap/Tooltip";
 import stoneThroneImage from "../../public/images/icons/stone-throne.svg";
 import cancelImage from "../../public/images/icons/cancel.svg";
+import truceImage from "../../public/images/icons/truce.svg";
 import ravenImage from "../../public/images/icons/raven.svg";
 import diamondHiltImage from "../../public/images/icons/diamond-hilt.svg";
 import diamondHiltUsedImage from "../../public/images/icons/diamond-hilt-used.svg";
@@ -95,6 +96,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         return this.props.gameState;
     }
 
+    get authenticatedPlayer(): Player | null {
+        return this.props.gameClient.authenticatedPlayer;
+    }
+
     get tracks(): {name: string; tracker: House[]; stars: boolean}[] {
         const influenceTracks = this.game.influenceTracks;
         if (this.ingame.hasChildGameState(ClashOfKingsGameState)) {
@@ -117,11 +122,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             {name: "Action", gameState: ActionGameState, component: ActionComponent}
         ];
 
-        const knowsWildlingCard = this.props.gameClient.authenticatedPlayer != null &&
-            this.props.gameClient.authenticatedPlayer.house.knowsNextWildlingCard;
+        const knowsWildlingCard = this.authenticatedPlayer != null &&
+            this.authenticatedPlayer.house.knowsNextWildlingCard;
         const nextWildlingCard = this.game.wildlingDeck.filter(c => c.id == this.game.clientNextWildlingCardId)[0];
 
-        const {result: canLaunchCancelGameVote, reason: canLaunchCancelGameVoteReason} = this.props.gameState.canLaunchCancelGameVote();
+        const {result: canLaunchCancelGameVote, reason: canLaunchCancelGameVoteReason} = this.props.gameState.canLaunchCancelGameVote(this.authenticatedPlayer);
+        const {result: canLaunchEndGameVote, reason: canLaunchEndGameVoteReason} = this.props.gameState.canLaunchEndGameVote(this.authenticatedPlayer);
 
         const connectedSpectators = this.getConnectedSpectators();
 
@@ -247,31 +253,63 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 <img src={this.props.gameClient.muted ? speakerOff : speaker} width={32}/>
                             </button>
                         </Col>
-                        {this.props.gameState.players.has(this.props.gameClient.authenticatedUser as User) && (
+                        {this.authenticatedPlayer && (
                             <Col xs="auto">
-                                <OverlayTrigger
-                                    overlay={
-                                        <Tooltip id="cancel-game-vote-tooltip">
-                                            {canLaunchCancelGameVote ? (
-                                                "Launch a vote to cancel the game"
-                                            ) : canLaunchCancelGameVoteReason == "already-existing" ? (
-                                                "A vote to cancel the game is already ongoing"
-                                            ) : canLaunchCancelGameVoteReason == "already-cancelled" ? (
-                                                "Game has already been cancelled"
-                                            ) : canLaunchCancelGameVoteReason == "already-ended" && (
-                                                "Game has already ended"
-                                            )}
-                                        </Tooltip>
-                                    }
+                                <button
+                                    className="btn btn-outline-light btn-sm"
+                                    onClick={() => this.props.gameState.launchCancelGameVote()}
+                                    disabled={!canLaunchCancelGameVote}
                                 >
-                                    <button
-                                        className="btn btn-outline-light btn-sm"
-                                        onClick={() => this.props.gameState.launchCancelGameVote()}
-                                        disabled={!canLaunchCancelGameVote}
+                                    <OverlayTrigger
+                                        overlay={
+                                            <Tooltip id="cancel-game-vote-tooltip">
+                                                {canLaunchCancelGameVote ? (
+                                                    "Launch a vote to cancel the game"
+                                                ) : canLaunchCancelGameVoteReason == "only-players-can-vote" ? (
+                                                    "Only participating players can vote"
+                                                ) : canLaunchCancelGameVoteReason == "already-existing" ? (
+                                                    "A vote to cancel the game is already ongoing"
+                                                ) : canLaunchCancelGameVoteReason == "already-cancelled" ? (
+                                                    "Game has already been cancelled"
+                                                ) : canLaunchCancelGameVoteReason == "already-ended" ? (
+                                                    "Game has already ended"
+                                                ) : "Vote not possible"}
+                                            </Tooltip>
+                                        }
                                     >
                                         <img src={cancelImage} width={32}/>
+                                    </OverlayTrigger>
+                                </button>
+                            </Col>
+                        )}
+                        {this.authenticatedPlayer && (
+                            <Col xs="auto">
+                                    <button
+                                        className="btn btn-outline-light btn-sm"
+                                        onClick={() => this.props.gameState.launchEndGameVote()}
+                                        disabled={!canLaunchEndGameVote}
+                                    >
+                                        <OverlayTrigger
+                                            overlay={
+                                                <Tooltip id="end-game-vote-tooltip">
+                                                    {canLaunchEndGameVote ? (
+                                                        "Launch a vote to end the game after the current round"
+                                                    ) : canLaunchEndGameVoteReason == "only-players-can-vote" ? (
+                                                        "Only participating players can vote"
+                                                    ) : canLaunchEndGameVoteReason == "already-last-turn" ? (
+                                                        "It is already the last round"
+                                                    ) : canLaunchEndGameVoteReason == "already-existing" ? (
+                                                        "A vote to end the game is already ongoing"
+                                                    ) : canLaunchEndGameVoteReason == "already-cancelled" ? (
+                                                        "Game has already been cancelled"
+                                                    ) : canLaunchEndGameVoteReason == "already-ended" ? (
+                                                        "Game has already ended"
+                                                    ) : "Vote not possible"}
+                                                </Tooltip>}
+                                        >
+                                            <img src={truceImage} width={32}/>
+                                        </OverlayTrigger>
                                     </button>
-                                </OverlayTrigger>
                             </Col>
                         )}
                     </Row>
@@ -390,7 +428,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     </Nav.Link>
                                                 </div>
                                             </Nav.Item>
-                                            {this.props.gameClient.authenticatedPlayer && (
+                                            {this.authenticatedPlayer && (
                                                 <Nav.Item>
                                                     <Nav.Link eventKey="note">
                                                         <OverlayTrigger
@@ -456,7 +494,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                         entireGame={this.props.gameState.entireGame}
                                                                         parent={this} />
                                             </Tab.Pane>
-                                            {this.props.gameClient.authenticatedPlayer && (
+                                            {this.authenticatedPlayer && (
                                                 <Tab.Pane eventKey="note" className="h-100">
                                                     <NoteComponent gameClient={this.props.gameClient} ingame={this.props.gameState} />
                                                 </Tab.Pane>
