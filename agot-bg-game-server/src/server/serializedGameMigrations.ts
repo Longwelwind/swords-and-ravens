@@ -315,8 +315,9 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                 const ingame = serializedGame.childGameState;
                 const game = ingame.game;
 
-                game.houses.forEach((h: SerializedHouse) => {
-                    h.houseCards.forEach(([_hcid, shc]) => {
+                game.houses.forEach((h: any) => {
+                    h.houseCards.forEach((value: any) => {
+                        const shc = value[1];
                         shc.disabled = false;
                         shc.disabledAbilityId = null;
                         shc.originalCombatStrength = shc.combatStrength;

@@ -64,6 +64,8 @@ import { GameSettings } from '../common/EntireGame';
 import {isMobile} from 'react-device-detect';
 import DraftHouseCardsGameState from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import DraftHouseCardsComponent from "./game-state-panel/DraftHouseCardsComponent";
+import ThematicDraftHouseCardsGameState from "../common/ingame-game-state/thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
+import ThematicDraftHouseCardsComponent from "./game-state-panel/ThematicDraftHouseCardsComponent";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -298,6 +300,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 {mapControls: this.mapControls, ...this.props},
                                                 _.concat(
                                                     phases.map(phase => [phase.gameState, phase.component] as [any, typeof Component]),
+                                                    [[ThematicDraftHouseCardsGameState, ThematicDraftHouseCardsComponent]],
                                                     [[DraftHouseCardsGameState, DraftHouseCardsComponent]],
                                                     [[GameEndedGameState, GameEndedComponent]],
                                                     [[CancelledGameState, IngameCancelledComponent]]

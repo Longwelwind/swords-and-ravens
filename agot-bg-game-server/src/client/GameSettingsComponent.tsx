@@ -40,15 +40,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
         return (
             <Row className="justify-content-center">
                 {this.props.entireGame.childGameState instanceof IngameGameState && (
-                <Col xs={12} className="mb-1 mt-1">
-                    <Row className="justify-content-center mb-1">
-                        {this.selectedGameSetupName}
-                    </Row>
-                    {this.entireGame.gameSettings.tidesOfBattle &&
-                    <Row className="justify-content-center">
-                        <small>Tides of Battle</small>
-                    </Row>}
-                </Col>
+                    <Col xs={12} className="mb-1 mt-1">
+                        <Row className="justify-content-center mb-1">
+                            {this.selectedGameSetupName}
+                        </Row>
+                        {this.entireGame.gameSettings.tidesOfBattle &&
+                            <Row className="justify-content-center">
+                                <small>Tides of Battle</small>
+                            </Row>}
+                    </Col>
                 )}
                 <Col xs={12} className="mb-1 mt-1">
                     <Row className="justify-content-center">
@@ -71,167 +71,180 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     </Row>
                 </Col>
                 {this.props.entireGame.childGameState instanceof LobbyGameState && (
-                <Col xs="auto">
-                    <Row>
-                        <Col xs="auto">
-                            <select id="setups" name="setups"
-                                value={this.gameSettings.setupId}
-                                onChange={e => this.onSetupChange(e.target.value)}>
-                                {this.createSetupItems()}
-                            </select>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs="auto">
-                            <select id="player-count" name="playerCount"
-                                value={this.gameSettings.playerCount}
-                                onChange={e => this.onPlayerCountChange(e.target.value)}>
-                                {this.createPlayerCountItems()}
-                            </select>
-                        </Col>
-                        <Col xs="auto">
-                            <>Players</>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs="auto">
-                            <FormCheck
-                                id="tides-of-battle"
-                                type="checkbox"
-                                label="Tides of Battle"
-                                checked={this.gameSettings.tidesOfBattle}
-                                onChange={() => this.changeGameSettings(() => this.gameSettings.tidesOfBattle = !this.gameSettings.tidesOfBattle)}
-                            />
-                        </Col>
-                    </Row>
-                </Col>)}
+                    <Col xs="auto">
+                        <Row>
+                            <Col xs="auto">
+                                <select id="setups" name="setups"
+                                    value={this.gameSettings.setupId}
+                                    onChange={e => this.onSetupChange(e.target.value)}>
+                                    {this.createSetupItems()}
+                                </select>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <select id="player-count" name="playerCount"
+                                    value={this.gameSettings.playerCount}
+                                    onChange={e => this.onPlayerCountChange(e.target.value)}>
+                                    {this.createPlayerCountItems()}
+                                </select>
+                            </Col>
+                            <Col xs="auto">
+                                <>Players</>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="adwd-house-cards"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="adwd-house-cards-tooltip">
+                                                The house cards will come from the A Dance with Dragons and A Feast for Crows expansions.
+                                        </Tooltip>}>
+                                            <label htmlFor="adwd-house-cards">Use <i>ADwD / AFfC</i> house cards</label>
+                                        </OverlayTrigger>}
+                                    disabled={this.props.entireGame.gameSettings.setupId == "a-dance-with-dragons"}
+                                    checked={this.gameSettings.adwdHouseCards}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.adwdHouseCards = !this.gameSettings.adwdHouseCards)}
+                                />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="vassals-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="vassals-tooltip">
+                                                Unassigned houses will be vassals from Mother of Dragons expansion and players start with 7 Power tokens instead of 5.
+                                        </Tooltip>}>
+                                            <label htmlFor="vassals-setting">MoD Vassals</label>
+                                        </OverlayTrigger>}
+                                    checked={this.gameSettings.vassals}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.vassals = !this.gameSettings.vassals)}
+                                    disabled={this.props.entireGame.gameSettings.setupId == "mother-of-dragons"}
+                                />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="sea-orders-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="sea-orders-tooltip">
+                                                Sea order tokens from Mother of Dragons expansion will be available.
+                                        </Tooltip>}>
+                                            <label htmlFor="sea-orders-setting">MoD Sea Order Tokens</label>
+                                        </OverlayTrigger>}
+                                    checked={this.gameSettings.seaOrderTokens}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.seaOrderTokens = !this.gameSettings.seaOrderTokens)}
+                                    disabled={this.props.entireGame.gameSettings.setupId == "mother-of-dragons"}
+                                />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="tides-of-battle"
+                                    type="checkbox"
+                                    label="Tides of Battle"
+                                    checked={this.gameSettings.tidesOfBattle}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.tidesOfBattle = !this.gameSettings.tidesOfBattle)}
+                                />
+                            </Col>
+                        </Row>
+                    </Col>)}
                 {this.props.entireGame.childGameState instanceof LobbyGameState && (
-                <Col xs="auto">
-                    <Row>
-                        <Col xs="auto">
-                            <FormCheck
-                                id="adwd-house-cards"
-                                type="checkbox"
-                                label={
-                                    <OverlayTrigger overlay={
-                                        <Tooltip id="adwd-house-cards-tooltip">
-                                            The house cards will come from the A Dance with Dragons and A Feast for Crows expansions.
+                    <Col xs="auto">
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="random-houses-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="random-houses-tooltip">
+                                                All houses will be randomized before the game starts when this option is selected.
                                         </Tooltip>}>
-                                        <label htmlFor="adwd-house-cards">Use <i>ADwD / AFfC</i> house cards</label>
-                                    </OverlayTrigger>}
-                                disabled={this.props.entireGame.gameSettings.setupId == "a-dance-with-dragons"}
-                                checked={this.gameSettings.adwdHouseCards}
-                                onChange={() => this.changeGameSettings(() => this.gameSettings.adwdHouseCards = !this.gameSettings.adwdHouseCards)}
-                            />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs="auto">
-                            <FormCheck
-                                id="draft-house-cards"
-                                type="checkbox"
-                                label={
-                                    <OverlayTrigger overlay={
-                                        <Tooltip id="draft-house-cards-tooltip">
-                                            Players will draft their house cards step by step in a randomly chosen order before the game starts.
-                                            Cards can be chosen from all 2nd Edition Base Game house cards and all expansions (ADwD, AFfC and MoD) house cards.
+                                            <label htmlFor="random-houses-setting">Random houses</label>
+                                        </OverlayTrigger>}
+                                    checked={this.gameSettings.randomHouses}
+                                    onChange={() => this.onRandomHousesChange()}
+                                />
+                            </Col>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="random-chosen-houses-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="random-chosen-houses-tooltip">
+                                                Only chosen houses will be randomized before the game starts when this option is selected.
+                                                This way users can define player and vassal houses and are still able to randomize the player houses.
                                         </Tooltip>}>
-                                        <label htmlFor="draft-house-cards">Draft house cards</label>
-                                    </OverlayTrigger>}
-                                checked={this.gameSettings.draftHouseCards}
-                                onChange={() => this.changeGameSettings(() => this.gameSettings.draftHouseCards = !this.gameSettings.draftHouseCards)}
-                            />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs="auto">
-                            <FormCheck
-                                id="random-houses-setting"
-                                type="checkbox"
-                                label={
-                                    <OverlayTrigger overlay={
-                                        <Tooltip id="random-houses-tooltip">
-                                            All houses will be randomized before the game starts when this option is selected.
+                                            <label htmlFor="random-chosen-houses-setting">Random chosen houses</label>
+                                        </OverlayTrigger>}
+                                    checked={this.gameSettings.randomChosenHouses}
+                                    onChange={() => this.onRandomChosenHousesChange()}
+                                />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="draft-house-cards"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="draft-house-cards-tooltip">
+                                                Players will draft their house cards step by step in a randomly chosen order before the game starts.
+                                                Cards can be chosen from all 2nd Edition Base Game house cards and all expansions (ADwD, AFfC and MoD) house cards.
                                         </Tooltip>}>
-                                        <label htmlFor="random-houses-setting">Randomize houses</label>
-                                    </OverlayTrigger>}
-                                checked={this.gameSettings.randomHouses}
-                                onChange={() => this.onRandomHousesChange()}
-                            />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs="auto">
-                            <FormCheck
-                                id="random-chosen-houses-setting"
-                                type="checkbox"
-                                label={
-                                    <OverlayTrigger overlay={
-                                        <Tooltip id="random-chosen-houses-tooltip">
-                                            Only chosen houses will be randomized before the game starts when this option is selected.
-                                            This way users can define player and vassal houses and are still able to randomize the player houses.
+                                            <label htmlFor="draft-house-cards">Draft house cards</label>
+                                        </OverlayTrigger>}
+                                    checked={this.gameSettings.draftHouseCards}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.draftHouseCards = !this.gameSettings.draftHouseCards)}
+                                />
+                            </Col>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="thematic-draft"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="thematic-draft-tooltip">
+                                                Players will draft their house cards simultaneously from the available decks of their house.
                                         </Tooltip>}>
-                                        <label htmlFor="random-chosen-houses-setting">Randomize chosen houses</label>
-                                    </OverlayTrigger>}
-                                checked={this.gameSettings.randomChosenHouses}
-                                onChange={() => this.onRandomChosenHousesChange()}
-                            />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs="auto">
-                            <FormCheck
-                                id="vassals-setting"
-                                type="checkbox"
-                                label={
-                                    <OverlayTrigger overlay={
-                                        <Tooltip id="vassals-tooltip">
-                                            Unassigned houses will be vassals from Mother of Dragons expansion and players start with 7 Power tokens instead of 5.
+                                            <label htmlFor="thematic-draft">Thematic draft</label>
+                                        </OverlayTrigger>}
+                                    checked={this.gameSettings.thematicDraft}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.thematicDraft = !this.gameSettings.thematicDraft)}
+                                />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="westeros-phase-variant-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="westeros-phase-variant-tooltip">
+                                                Players may look at the next 3 Westeros cards from each deck at any time.
                                         </Tooltip>}>
-                                        <label htmlFor="vassals-setting">MoD Vassals</label>
-                                    </OverlayTrigger>}
-                                checked={this.gameSettings.vassals}
-                                onChange={() => this.changeGameSettings(() => this.gameSettings.vassals = !this.gameSettings.vassals)}
-                                disabled={this.props.entireGame.gameSettings.setupId == "mother-of-dragons"}
-                            />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs="auto">
-                            <FormCheck
-                                id="sea-orders-setting"
-                                type="checkbox"
-                                label={
-                                    <OverlayTrigger overlay={
-                                        <Tooltip id="sea-orders-tooltip">
-                                            Sea order tokens from Mother of Dragons expansion will be available.
-                                        </Tooltip>}>
-                                        <label htmlFor="sea-orders-setting">MoD Sea Order Tokens</label>
-                                    </OverlayTrigger>}
-                                checked={this.gameSettings.seaOrderTokens}
-                                onChange={() => this.changeGameSettings(() => this.gameSettings.seaOrderTokens = !this.gameSettings.seaOrderTokens)}
-                                disabled={this.props.entireGame.gameSettings.setupId == "mother-of-dragons"}
-                            />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs="auto">
-                            <FormCheck
-                                id="westeros-phase-variant-setting"
-                                type="checkbox"
-                                label={
-                                    <OverlayTrigger overlay={
-                                        <Tooltip id="westeros-phase-variant-tooltip">
-                                            Players may look at the next 3 Westeros cards from each deck at any time.
-                                        </Tooltip>}>
-                                        <label htmlFor="westeros-phase-variant-setting">CoK Westeros Phase Variant</label>
-                                    </OverlayTrigger>}
-                                checked={this.gameSettings.cokWesterosPhase}
-                                onChange={() => this.changeGameSettings(() => this.gameSettings.cokWesterosPhase = !this.gameSettings.cokWesterosPhase)}
-                            />
-                        </Col>
-                    </Row>
-                </Col>)}
+                                            <label htmlFor="westeros-phase-variant-setting">CoK Westeros Phase Variant</label>
+                                        </OverlayTrigger>}
+                                    checked={this.gameSettings.cokWesterosPhase}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.cokWesterosPhase = !this.gameSettings.cokWesterosPhase)}
+                                />
+                            </Col>
+                        </Row>
+                    </Col>)}
             </Row>
         );
     }
@@ -304,7 +317,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
      * Helper function to modify gameSettings and update the game settings.
      * @param action Function that modifies gameSettings
      */
-    changeGameSettings(action: () => void = () => {}): void {
+    changeGameSettings(action: () => void = () => { }): void {
         if (!this.canChangeGameSettings) {
             return;
         }

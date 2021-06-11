@@ -23,7 +23,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
     @observable gameSettings: GameSettings = { pbem: false, setupId: "base-game", playerCount: 6, randomHouses: false,
         cokWesterosPhase: false, adwdHouseCards: false, vassals: false,
-        seaOrderTokens: false, randomChosenHouses: false, draftHouseCards: false, tidesOfBattle: false };
+        seaOrderTokens: false, randomChosenHouses: false, draftHouseCards: false, tidesOfBattle: false,
+        thematicDraft: false };
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -238,6 +239,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             settings.adwdHouseCards = true;
         }
 
+        if (settings.thematicDraft) {
+            settings.draftHouseCards = true;
+        }
+
         if (settings.draftHouseCards) {
             settings.adwdHouseCards = false;
         }
@@ -443,4 +448,5 @@ export interface GameSettings {
     seaOrderTokens: boolean;
     draftHouseCards: boolean;
     tidesOfBattle: boolean;
+    thematicDraft: boolean;
 }
