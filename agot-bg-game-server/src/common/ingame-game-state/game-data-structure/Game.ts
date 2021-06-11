@@ -41,7 +41,7 @@ export default class Game {
     westerosDecks: WesterosCard[][];
     skipRavenPhase: boolean;
     structuresCountNeededToWin: number;
-    maxTurns: number;
+    @observable maxTurns: number;
     maxPowerTokens: number;
     vassalHouseCards: BetterMap<string, HouseCard> = new BetterMap<string, HouseCard>();
     @observable houseCardsForDrafting: BetterMap<string, HouseCard> = new BetterMap();

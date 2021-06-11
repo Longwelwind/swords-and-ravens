@@ -75,8 +75,8 @@ export default class UserLabel extends Component<UserLabelProps> {
     }
 
     renderIngameDropdownItems(ingame: IngameGameState): ReactNode {
-        const {result: canLaunchReplacePlayerVote, reason: canLaunchReplacePlayerVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser as User);
-        const {result: canLaunchReplacePlayerByVassalVote, reason: canLaunchReplacePlayerByVassalVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser as User, true);
+        const {result: canLaunchReplacePlayerVote, reason: canLaunchReplacePlayerVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser);
+        const {result: canLaunchReplacePlayerByVassalVote, reason: canLaunchReplacePlayerByVassalVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser, true);
         return (
             <>
                 <Dropdown.Divider />
@@ -88,13 +88,14 @@ export default class UserLabel extends Component<UserLabelProps> {
                             overlay={
                                 <Tooltip id="replace-player-tooltip">
                                     {canLaunchReplacePlayerVoteReason == "already-playing" ?
-                                        <>You are already playing in this game</>
+                                        "You are already playing in this game"
                                         : canLaunchReplacePlayerVoteReason == "ongoing-vote" ?
-                                        <>A vote is already ongoing</>
+                                        "A vote is already ongoing"
                                         : canLaunchReplacePlayerVoteReason == "game-cancelled" ?
-                                        <>The game has been cancelled</>
-                                        : canLaunchReplacePlayerVoteReason == "game-ended" &&
-                                        <>The game has ended</>
+                                        "The game has been cancelled"
+                                        : canLaunchReplacePlayerVoteReason == "game-ended" ?
+                                        "The game has ended"
+                                        : "Vote not possible"
                                     }
                                 </Tooltip>
                             }
@@ -104,12 +105,14 @@ export default class UserLabel extends Component<UserLabelProps> {
                         </OverlayTrigger>
                     }
                 >
-                    <Dropdown.Item
-                        onClick={() => this.onLaunchReplacePlayerVoteClick()}
-                        disabled={!canLaunchReplacePlayerVote}
-                    >
-                        Offer to replace this player
-                    </Dropdown.Item>
+                    <div id="replace-player-tooltip-wrapper">
+                        <Dropdown.Item
+                            onClick={() => this.onLaunchReplacePlayerVoteClick()}
+                            disabled={!canLaunchReplacePlayerVote}
+                        >
+                            Offer to replace this player
+                        </Dropdown.Item>
+                    </div>
                 </ConditionalWrap>
                 <Dropdown.Divider />
                 {/* Add a button to replace a place */}
@@ -120,15 +123,16 @@ export default class UserLabel extends Component<UserLabelProps> {
                             overlay={
                                 <Tooltip id="replace-player-by-vassal-tooltip">
                                     {canLaunchReplacePlayerByVassalVoteReason == "ongoing-vote" ?
-                                        <>A vote is already ongoing</>
+                                        "A vote is already ongoing"
                                         : canLaunchReplacePlayerByVassalVoteReason == "game-cancelled" ?
-                                        <>The game has been cancelled</>
+                                        "The game has been cancelled"
                                         : canLaunchReplacePlayerByVassalVoteReason == "game-ended" ?
-                                        <>The game has ended</>
+                                        "The game has ended"
                                         : canLaunchReplacePlayerByVassalVoteReason == "only-players-can-vote" ?
-                                        <>Only players can vote</>
-                                        : canLaunchReplacePlayerByVassalVoteReason == "min-player-count-reached" &&
-                                        <>At least 3 players are needed to play</>
+                                        "Only players can vote"
+                                        : canLaunchReplacePlayerByVassalVoteReason == "min-player-count-reached" ?
+                                        "At least 3 players are needed to play"
+                                        : "Vote not possible"
                                     }
                                 </Tooltip>
                             }
@@ -138,12 +142,14 @@ export default class UserLabel extends Component<UserLabelProps> {
                         </OverlayTrigger>
                     }
                 >
-                    <Dropdown.Item
-                        onClick={() => this.onLaunchReplacePlayerByVassalVoteClick()}
-                        disabled={!canLaunchReplacePlayerByVassalVote}
-                    >
-                        Launch a vote to replace this player by a vassal
-                    </Dropdown.Item>
+                    <div id="replace-byvassal-tooltip-wrapper">
+                        <Dropdown.Item
+                            onClick={() => this.onLaunchReplacePlayerByVassalVoteClick()}
+                            disabled={!canLaunchReplacePlayerByVassalVote}
+                        >
+                            Launch a vote to replace this player by a vassal
+                        </Dropdown.Item>
+                    </div>
                 </ConditionalWrap>
             </>
         );

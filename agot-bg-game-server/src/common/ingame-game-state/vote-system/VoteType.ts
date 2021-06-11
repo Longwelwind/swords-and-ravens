@@ -6,7 +6,7 @@ import Player from "../Player";
 import User from "../../../server/User";
 import CombatGameState from "../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 
-export type SerializedVoteType = SerializedCancelGame | SerializedReplacePlayer | SerializedReplacePlayerByVassal;
+export type SerializedVoteType = SerializedCancelGame | SerializedEndGame | SerializedReplacePlayer | SerializedReplacePlayerByVassal;
 
 export default abstract class VoteType {
     abstract serializeToClient(): SerializedVoteType;
@@ -28,6 +28,10 @@ export default abstract class VoteType {
                 // Same than above
                 // eslint-disable-next-line @typescript-eslint/no-use-before-define
                 return ReplacePlayerByVassal.deserializeFromServer(ingame, data);
+            case "end-game":
+                // Same than above
+                // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                return EndGame.deserializeFromServer(ingame, data);
         }
     }
 }
@@ -54,6 +58,34 @@ export class CancelGame extends VoteType {
 
 export interface SerializedCancelGame {
     type: "cancel-game";
+}
+
+export class EndGame extends VoteType {
+    verb(): string {
+        return "end the game after the current round";
+    }
+
+    executeAccepted(vote: Vote): void {
+        vote.ingame.game.maxTurns = vote.ingame.game.turn;
+        vote.ingame.entireGame.broadcastToClients({
+            type: "update-max-turns",
+            maxTurns: vote.ingame.game.maxTurns
+        });
+    }
+
+    serializeToClient(): SerializedEndGame {
+        return {
+            type: "end-game"
+        };
+    }
+
+    static deserializeFromServer(_ingame: IngameGameState, _data: SerializedEndGame): EndGame {
+        return new EndGame();
+    }
+}
+
+export interface SerializedEndGame {
+    type: "end-game";
 }
 
 export class ReplacePlayer extends VoteType {

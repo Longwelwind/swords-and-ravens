@@ -22,7 +22,7 @@ import GameEndedGameState, {SerializedGameEndedGameState} from "./game-ended-gam
 import UnitType from "./game-data-structure/UnitType";
 import WesterosCard from "./game-data-structure/westeros-card/WesterosCard";
 import Vote, { SerializedVote, VoteState } from "./vote-system/Vote";
-import VoteType, { CancelGame, ReplacePlayer, ReplacePlayerByVassal } from "./vote-system/VoteType";
+import VoteType, { CancelGame, EndGame, ReplacePlayer, ReplacePlayerByVassal } from "./vote-system/VoteType";
 import { v4 } from "uuid";
 import CancelledGameState, { SerializedCancelledGameState } from "../cancelled-game-state/CancelledGameState";
 import HouseCard from "./game-data-structure/house-card/HouseCard";
@@ -188,10 +188,17 @@ export default class IngameGameState extends GameState<
 
             vote.checkVoteFinished();
         } else if (message.type == "launch-cancel-game-vote") {
-            if (this.canLaunchCancelGameVote()) {
+            if (this.canLaunchCancelGameVote(player).result) {
                 this.createVote(
                     player.user,
                     new CancelGame()
+                );
+            }
+        } else if (message.type == "launch-end-game-vote") {
+            if (this.canLaunchEndGameVote(player).result) {
+                this.createVote(
+                    player.user,
+                    new EndGame()
                 );
             }
         } else if (message.type == "update-note") {
@@ -458,6 +465,8 @@ export default class IngameGameState extends GameState<
             house.houseCards = new BetterMap(message.houseCards.map(hc => [hc, this.game.getHouseCardById(hc)]));
         } else if (message.type == "update-house-cards-for-drafting") {
             this.game.houseCardsForDrafting = new BetterMap(message.houseCards.map(hc => [hc, this.game.getHouseCardById(hc)]));
+        } else if (message.type == "update-max-turns") {
+            this.game.maxTurns = message.maxTurns;
         } else {
             this.childGameState.onServerMessage(message);
         }
@@ -475,11 +484,23 @@ export default class IngameGameState extends GameState<
         }
     }
 
-    canLaunchCancelGameVote(): {result: boolean; reason: string} {
+    launchEndGameVote(): void {
+        if (window.confirm('Do you want to launch a vote to end the game after the current round?')) {
+            this.entireGame.sendMessageToServer({
+                type: "launch-end-game-vote"
+            });
+        }
+    }
+
+    canLaunchCancelGameVote(player: Player | null): {result: boolean; reason: string} {
         const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof CancelGame);
 
         if (existingVotes.length > 0) {
             return {result: false, reason: "already-existing"};
+        }
+
+        if (player == null || !this.players.values.includes(player)) {
+            return {result: false, reason: "only-players-can-vote"};
         }
 
         if (this.childGameState instanceof CancelledGameState) {
@@ -493,7 +514,37 @@ export default class IngameGameState extends GameState<
         return {result: true, reason: ""};
     }
 
-    canLaunchReplacePlayerVote(fromUser: User, replaceWithVassal = false): {result: boolean; reason: string} {
+    canLaunchEndGameVote(player: Player | null): {result: boolean; reason: string} {
+        const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof EndGame);
+
+        if (existingVotes.length > 0) {
+            return {result: false, reason: "already-existing"};
+        }
+
+        if (player == null || !this.players.values.includes(player)) {
+            return {result: false, reason: "only-players-can-vote"};
+        }
+
+        if (this.childGameState instanceof CancelledGameState) {
+            return {result: false, reason: "already-cancelled"};
+        }
+
+        if (this.childGameState instanceof GameEndedGameState) {
+            return {result: false, reason: "already-ended"};
+        }
+
+        if (this.game.turn == this.game.maxTurns) {
+            return {result: false, reason: "already-last-turn"};
+        }
+
+        return {result: true, reason: ""};
+    }
+
+    canLaunchReplacePlayerVote(fromUser: User | null, replaceWithVassal = false): {result: boolean; reason: string} {
+        if (!fromUser) {
+            return {result: false, reason: "only-authenticated-users-can-vote"};
+        }
+
         if (!replaceWithVassal && this.players.keys.includes(fromUser)) {
             return {result: false, reason: "already-playing"};
         }

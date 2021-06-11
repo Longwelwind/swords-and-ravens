@@ -21,18 +21,6 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
     }
 
     firstStart(): void {
-        // Don't reset Iron Throne track anymore as we need him for vassals. Todo: solve in ui only
-        // Reset Fiefdoms and Kings Court completely
-        for (let influenceTrackId = 0; influenceTrackId < this.game.influenceTracks.length; influenceTrackId++) {
-            const newInfluenceTrack = influenceTrackId == 0 ? this.game.ironThroneTrack : [];
-            this.game.setInfluenceTrack(influenceTrackId, newInfluenceTrack);
-            this.entireGame.broadcastToClients({
-                type: "change-tracker",
-                trackerI: influenceTrackId,
-                tracker: newInfluenceTrack.map(h => h.id)
-            });
-        }
-
         this.proceedNextTrack();
     }
 
