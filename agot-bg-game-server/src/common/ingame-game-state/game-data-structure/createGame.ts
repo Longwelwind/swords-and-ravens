@@ -86,15 +86,27 @@ function getTrackWithAdjustedVassalPositions(track: House[], playerHouses: strin
     return track;
 }
 
-function createHouseCard(id: string, houseCardData: HouseCardData): HouseCard {
+function createHouseCard(id: string, houseCardData: HouseCardData, houseId: string): HouseCard {
     return new HouseCard(
         id,
         houseCardData.name,
         houseCardData.combatStrength ? houseCardData.combatStrength : 0,
         houseCardData.swordIcons ? houseCardData.swordIcons : 0,
         houseCardData.towerIcons ? houseCardData.towerIcons : 0,
-        houseCardData.ability ? houseCardAbilities.get(houseCardData.ability) : null
+        houseCardData.ability ? houseCardAbilities.get(houseCardData.ability) : null,
+        houseId
     );
+}
+
+function getHouseCardSet(container: {[key: string]: HouseCardContainer}): HouseCard[] {
+    const houseDatas = new BetterMap(Object.entries(container));
+    const houseCardDatasMap = new BetterMap(houseDatas.entries.map(([hid, hcc]) => [hid, Object.entries(hcc.houseCards)] as [string, [string, HouseCardData][]]));
+    const set: HouseCard[] = [];
+    houseCardDatasMap.keys.forEach(houseId => {
+        const houseCardsData = houseCardDatasMap.get(houseId);
+        set.push(...houseCardsData.map(([hcid, hcd]) => createHouseCard(hcid, hcd, houseId)));
+    });
+    return set;
 }
 
 export const baseHouseCardsData = getHouseCardData(baseGameData.houses);
@@ -166,7 +178,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
 
                 Object.entries(houseData.houseCards)
                     .map(([houseCardId, houseCardData]) => {
-                        const houseCard = createHouseCard(houseCardId, houseCardData);
+                        const houseCard = createHouseCard(houseCardId, houseCardData, hid);
                         return [houseCardId, houseCard];
                     })
             );
@@ -187,25 +199,11 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     );
 
     if (gameSettings.draftHouseCards) {
-        const baseGameHouses = new BetterMap(Object.entries(baseGameData.houses as {[key: string]: HouseData}));
-        const allBaseGameHouseCardData = _.flatMap(baseGameHouses.entries.map(([_hid, h]) => Object.entries(h.houseCards)));
-        const baseGameHouseCards = allBaseGameHouseCardData.map(([hcid, hcd]) => createHouseCard(hcid, hcd));
-
-        const adwdHouseCardContainer = Object.entries(baseGameData.adwdHouseCards as {[key: string]: HouseCardContainer});
-        const allAdwdHouseCardData = _.flatMap(adwdHouseCardContainer.map(([_hid, hcc]) => Object.entries(hcc.houseCards)));
-        const adwdHouseCards = allAdwdHouseCardData.map(([hcid, hcd]) => createHouseCard(hcid, hcd));
-
-        const ffcHouseCardContainer = Object.entries(baseGameData.ffcHouseCards as {[key: string]: HouseCardContainer});
-        const allFfcHouseCardData = _.flatMap(ffcHouseCardContainer.map(([_hid, hcc]) => Object.entries(hcc.houseCards)));
-        const ffcHouseCards = allFfcHouseCardData.map(([hcid, hcd]) => createHouseCard(hcid, hcd));
-
-        const modAHouseCardContainer = Object.entries(baseGameData.modAHouseCards as {[key: string]: HouseCardContainer});
-        const allModAHouseCardData = _.flatMap(modAHouseCardContainer.map(([_hid, hcc]) => Object.entries(hcc.houseCards)));
-        const modAHouseCards = allModAHouseCardData.map(([hcid, hcd]) => createHouseCard(hcid, hcd));
-
-        const modBHouseCardContainer = Object.entries(baseGameData.modBHouseCards as {[key: string]: HouseCardContainer});
-        const allModBHouseCardData = _.flatMap(modBHouseCardContainer.map(([_hid, hcc]) => Object.entries(hcc.houseCards)));
-        const modBHouseCards = allModBHouseCardData.map(([hcid, hcd]) => createHouseCard(hcid, hcd));
+        const baseGameHouseCards = getHouseCardSet(baseGameData.houses);
+        const adwdHouseCards = getHouseCardSet(baseGameData.adwdHouseCards);
+        const ffcHouseCards = getHouseCardSet(baseGameData.ffcHouseCards);
+        const modAHouseCards = getHouseCardSet(baseGameData.modAHouseCards);
+        const modBHouseCards = getHouseCardSet(baseGameData.modBHouseCards);
 
         const allHouseCards = _.concat(baseGameHouseCards, adwdHouseCards, ffcHouseCards, modAHouseCards, modBHouseCards);
         game.houseCardsForDrafting = new BetterMap(allHouseCards.map(hc => [hc.id, hc]));

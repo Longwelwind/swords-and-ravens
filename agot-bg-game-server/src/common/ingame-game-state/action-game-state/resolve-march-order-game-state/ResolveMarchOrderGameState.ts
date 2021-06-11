@@ -59,28 +59,17 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
 
         // Reset all card abilities (e.g. due to DWD Queen of Thorns)
         const allHouseCards = _.concat(_.flatMap(this.game.houses.values.map(h => h.houseCards.values)), this.game.vassalHouseCards.values);
-        const manipulatedHouseCards = allHouseCards.filter(hc =>
-               hc.disabled
-            || hc.combatStrength != hc.originalCombatStrength
-            || hc.swordIcons != hc.originalSwordIcons
-            || hc.originalTowerIcons != hc.originalTowerIcons);
+        const disabledHouseCards = allHouseCards.filter(hc => hc.disabled);
 
-        manipulatedHouseCards.filter(hc => hc.disabled).forEach(card => {
+        disabledHouseCards.forEach(card => {
             card.ability = card.disabledAbility;
             card.disabled = false;
             card.disabledAbility = null;
         });
 
-        // Reset DWD Aeron and Qyburn
-        manipulatedHouseCards.forEach(hc => {
-                hc.combatStrength = hc.originalCombatStrength;
-                hc.swordIcons = hc.originalSwordIcons;
-                hc.towerIcons = hc.originalTowerIcons;
-        });
-
         this.entireGame.broadcastToClients({
             type: "manipulate-combat-house-card",
-            manipulatedHouseCards: manipulatedHouseCards.map(hc => [hc.id, hc.serializeToClient()])
+            manipulatedHouseCards: disabledHouseCards.map(hc => [hc.id, hc.serializeToClient()])
         });
 
         //   ... destroy orphaned ships (e.g. caused by Arianne)

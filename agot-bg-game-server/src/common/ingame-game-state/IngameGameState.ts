@@ -31,12 +31,13 @@ import _ from "lodash";
 import DraftHouseCardsGameState, { SerializedDraftHouseCardsGameState } from "./draft-house-cards-game-state/DraftHouseCardsGameState";
 import CombatGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import DeclareSupportGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/declare-support-game-state/DeclareSupportGameState";
+import ThematicDraftHouseCardsGameState, { SerializedThematicDraftHouseCardsGameState } from "./thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 
 export const NOTE_MAX_LENGTH = 5000;
 
 export default class IngameGameState extends GameState<
     EntireGame,
-    DraftHouseCardsGameState | WesterosGameState | PlanningGameState | ActionGameState | CancelledGameState | GameEndedGameState
+    DraftHouseCardsGameState | ThematicDraftHouseCardsGameState | WesterosGameState | PlanningGameState | ActionGameState | CancelledGameState | GameEndedGameState
 > {
     players: BetterMap<User, Player> = new BetterMap<User, Player>();
     game: Game;
@@ -77,7 +78,11 @@ export default class IngameGameState extends GameState<
     }
 
     beginDraftingHouseCards(): void {
-        this.setChildGameState(new DraftHouseCardsGameState(this)).firstStart();
+        if (this.entireGame.gameSettings.thematicDraft) {
+            this.setChildGameState(new ThematicDraftHouseCardsGameState(this)).firstStart();
+        } else {
+            this.setChildGameState(new DraftHouseCardsGameState(this)).firstStart();
+        }
     }
 
     onDraftHouseCardsGameStateFinish(): void {
@@ -501,6 +506,14 @@ export default class IngameGameState extends GameState<
             if (this.players.size - 1 < MIN_PLAYER_COUNT_WITH_VASSALS) {
                 return {result: false, reason: "min-player-count-reached"};
             }
+
+            if (this.childGameState instanceof DraftHouseCardsGameState) {
+                return {result: false, reason: "ongoing-house-card-drafting"}
+            }
+
+            if (this.childGameState instanceof ThematicDraftHouseCardsGameState) {
+                return {result: false, reason: "ongoing-house-card-drafting"}
+            }
         }
 
         const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && (v.type instanceof ReplacePlayer || v.type instanceof ReplacePlayerByVassal));
@@ -514,10 +527,6 @@ export default class IngameGameState extends GameState<
 
         if (this.childGameState instanceof GameEndedGameState) {
             return {result: false, reason: "game-ended"};
-        }
-
-        if (this.childGameState instanceof DraftHouseCardsGameState) {
-            return {result: false, reason: "ongoing-house-card-drafting"}
         }
 
         return {result: true, reason: ""};
@@ -698,6 +707,8 @@ export default class IngameGameState extends GameState<
                 return CancelledGameState.deserializeFromServer(this, data);
             case "draft-house-cards":
                 return DraftHouseCardsGameState.deserializeFromServer(this, data);
+            case "thematic-draft-house-cards":
+                return ThematicDraftHouseCardsGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -709,5 +720,6 @@ export interface SerializedIngameGameState {
     votes: SerializedVote[];
     gameLogManager: SerializedGameLogManager;
     childGameState: SerializedPlanningGameState | SerializedActionGameState | SerializedWesterosGameState
-        | SerializedGameEndedGameState | SerializedCancelledGameState | SerializedDraftHouseCardsGameState;
+        | SerializedGameEndedGameState | SerializedCancelledGameState | SerializedDraftHouseCardsGameState
+        | SerializedThematicDraftHouseCardsGameState;
 }
