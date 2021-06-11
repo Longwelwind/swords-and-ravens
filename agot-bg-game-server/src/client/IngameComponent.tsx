@@ -66,6 +66,7 @@ import DraftHouseCardsGameState from "../common/ingame-game-state/draft-house-ca
 import DraftHouseCardsComponent from "./game-state-panel/DraftHouseCardsComponent";
 import ThematicDraftHouseCardsGameState from "../common/ingame-game-state/thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 import ThematicDraftHouseCardsComponent from "./game-state-panel/ThematicDraftHouseCardsComponent";
+import ClashOfKingsGameState from "../common/ingame-game-state/westeros-game-state/clash-of-kings-game-state/ClashOfKingsGameState";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -79,15 +80,34 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     @observable height = (this.user && this.user.settings.mapScrollbar) ? window.innerHeight : null;
 
     get game(): Game {
-        return this.props.gameState.game;
+        return this.ingame.game;
     }
 
     get gameSettings(): GameSettings {
-        return this.props.gameState.entireGame.gameSettings;
+        return this.ingame.entireGame.gameSettings;
     }
 
     get user(): User | null {
         return this.props.gameClient.authenticatedUser ? this.props.gameClient.authenticatedUser : null;
+    }
+
+    get ingame(): IngameGameState {
+        return this.props.gameState;
+    }
+
+    get tracks(): {name: string; tracker: House[]; stars: boolean}[] {
+        const influenceTracks = this.game.influenceTracks;
+        if (this.ingame.hasChildGameState(ClashOfKingsGameState)) {
+            const cok = this.ingame.getChildGameState(ClashOfKingsGameState) as ClashOfKingsGameState;
+            for (let i = cok.currentTrackI; i < influenceTracks.length; i++) {
+                influenceTracks[i] = i == 0 ? [this.game.ironThroneHolder] : [];
+            }
+        }
+        return [
+            {name: "Iron Throne", tracker: influenceTracks[0], stars: false},
+            {name: "Fiefdoms", tracker: influenceTracks[1], stars: false},
+            {name: "King's Court", tracker: influenceTracks[2], stars: true},
+        ]
     }
 
     render(): ReactNode {
@@ -511,14 +531,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         }
 
         return <>{user.name}</>;
-    }
-
-    get tracks(): {name: string; tracker: House[]; stars: boolean}[] {
-        return [
-            {name: "Iron Throne", tracker: this.game.ironThroneTrack, stars: false},
-            {name: "Fiefdoms", tracker: this.game.fiefdomsTrack, stars: false},
-            {name: "King's Court", tracker: this.game.kingsCourtTrack, stars: true},
-        ]
     }
 
     get publicChatRoom(): Channel {
