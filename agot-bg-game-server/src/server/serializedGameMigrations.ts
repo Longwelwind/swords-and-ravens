@@ -841,6 +841,31 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "33",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.game.houses.forEach((h: any) => {
+                    h.houseCards.forEach((value: any) => {
+                        const shc = value[1];
+                        if (shc.id == "damon-dance-for-me") {
+                            shc.name = "Damon Dance-For-Me";
+                        }
+                    });
+                });
+
+                ingame.game.houseCardsForDrafting.forEach((value: any) => {
+                    const shc = value[1];
+                    if (shc.id == "damon-dance-for-me") {
+                        shc.name = "Damon Dance-For-Me";
+                    }
+                });
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

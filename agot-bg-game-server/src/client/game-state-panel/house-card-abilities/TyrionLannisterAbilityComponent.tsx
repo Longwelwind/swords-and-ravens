@@ -38,8 +38,8 @@ export default class TyrionLannisterAbilityComponent extends Component<GameState
         return (
             <>
                 <Col xs={12}>
-                    <b>Tyrion Lannister</b>: House <b>{this.house.name}</b> may cancel
-                    <b>{this.enemy.name}&apos;s</b> house card.
+                    <b>Tyrion Lannister</b>: House <b>{this.house.name}</b> may
+                    cancel <b>{this.enemy.name}&apos;s</b> house card.
                 </Col>
                 {renderChildGameState(this.props, [
                     [SimpleChoiceGameState, SimpleChoiceComponent],
