@@ -22,6 +22,8 @@ import UserLabel from "./UserLabel";
 import EntireGame from "../common/EntireGame";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
 import { observable } from "mobx";
+import DebouncedPasswordComponent from "./utils/DebouncedPasswordComponent";
+import { faLock } from "@fortawesome/free-solid-svg-icons";
 
 interface LobbyComponentProps {
     gameClient: GameClient;
@@ -30,6 +32,8 @@ interface LobbyComponentProps {
 
 @observer
 export default class LobbyComponent extends Component<LobbyComponentProps> {
+    @observable password = this.props.gameClient.isRealOwner() ? this.props.gameState.password : "";
+
     get authenticatedUser(): User {
         return this.props.gameClient.authenticatedUser as User;
     }
@@ -73,23 +77,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                                             user={this.lobby.players.get(h)}/>}
                                             </div>
                                         </Col>
-                                        {this.isHouseAvailable(h) && (
-                                            !this.lobby.players.has(h) ? (
-                                                <Col xs="auto">
-                                                    <Button onClick={() => this.choose(h)}>Choose</Button>
-                                                </Col>
-                                            ) : this.lobby.players.get(h) == this.authenticatedUser ? (
-                                                <Col xs="auto">
-                                                    <Button variant="danger" onClick={() => this.leave()}>Leave</Button>
-                                                </Col>
-                                            ) : (
-                                                this.lobby.entireGame.isOwner(this.authenticatedUser) && (
-                                                    <Col xs="auto">
-                                                        <Button variant="danger" onClick={() => this.kick(h)}>Kick</Button>
-                                                    </Col>
-                                                )
-                                            )
-                                        )}
+                                        {this.renderLobbyHouseButtons(h)}
                                     </Row>
                                 </ListGroupItem>
                             ))}
@@ -116,66 +104,113 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                         entireGame={this.lobby.entireGame} />
                                 </Col>
                             </Row>
-                            <Row>
+                            <Row className="mt-2">
                                 <Col>
-                                    <ConditionalWrap
-                                        condition={!canStartGame}
-                                        wrap={children =>
-                                            <OverlayTrigger
-                                                overlay={
-                                                    <Tooltip id="start-game">
-                                                        {canStartGameReason == "not-owner" ?
-                                                            "Only the owner of the game can start it"
-                                                        : canStartGameReason == "not-enough-players" ?
-                                                            "Not all houses have been taken"
-                                                        : null}
-                                                    </Tooltip>
-                                                }
-                                            >
-                                                {children}
-                                            </OverlayTrigger>
-                                        }
+                                    <Row className="justify-content-center">
+                                        <DebouncedPasswordComponent
+                                            password={this.password}
+                                            onChangeCallback={newPassword => {
+                                                this.password = newPassword;
+                                                this.props.gameState.sendPassword(newPassword);
+                                            }}
+                                        />
+                                    </Row>
+                                </Col>
+                            </Row>
+                            <Row className="mt-3">
+                                <Col>
+                                    <Button
+                                        block
+                                        onClick={() => this.lobby.start()}
+                                        disabled={!canStartGame}
                                     >
-                                        <Button
-                                            block
-                                            onClick={() => this.lobby.start()}
-                                            disabled={!canStartGame}
+                                        <ConditionalWrap
+                                            condition={!canStartGame}
+                                            wrap={children =>
+                                                <OverlayTrigger
+                                                    overlay={
+                                                        <Tooltip id="start-game">
+                                                            {canStartGameReason == "not-owner" ?
+                                                                "Only the owner of the game can start it"
+                                                            : canStartGameReason == "not-enough-players" ?
+                                                                "Not all houses have been taken"
+                                                            : null}
+                                                        </Tooltip>
+                                                    }
+                                                >
+                                                    {children}
+                                                </OverlayTrigger>
+                                            }
                                         >
-                                            Start
-                                        </Button>
-                                    </ConditionalWrap>
+                                            <span>Start</span>
+                                        </ConditionalWrap>
+                                    </Button>
                                 </Col>
                                 <Col xs="auto">
-                                <ConditionalWrap
-                                        condition={!canCancelGame}
-                                        wrap={children =>
-                                            <OverlayTrigger
-                                                overlay={
-                                                    <Tooltip id="start-game">
-                                                        {canCancelGameReason == "not-owner" ?
-                                                            "Only the owner of the game can cancel it"
-                                                        : null}
-                                                    </Tooltip>
-                                                }
-                                            >
-                                                {children}
-                                            </OverlayTrigger>
-                                        }
+                                    <Button
+                                        variant="danger"
+                                        onClick={() => this.cancel()}
+                                        disabled={!canCancelGame}
                                     >
-                                        <Button
-                                            variant="danger"
-                                            onClick={() => this.cancel()}
-                                            disabled={!canCancelGame}
+                                        <ConditionalWrap
+                                            condition={!canCancelGame}
+                                            wrap={children =>
+                                                <OverlayTrigger
+                                                    overlay={
+                                                        <Tooltip id="start-game">
+                                                            {canCancelGameReason == "not-owner" ?
+                                                                "Only the owner of the game can cancel it"
+                                                            : null}
+                                                        </Tooltip>
+                                                    }
+                                                >
+                                                    {children}
+                                                </OverlayTrigger>
+                                            }
                                         >
                                             <FontAwesomeIcon icon={faTimes} />
-                                        </Button>
-                                    </ConditionalWrap>
+                                        </ConditionalWrap>
+                                    </Button>
                                 </Col>
                             </Row>
                         </Card.Body>
                     </Card>
                 </Col>
         </>;
+    }
+
+    renderLobbyHouseButtons(h: LobbyHouse): React.ReactNode {
+        if (!this.isHouseAvailable(h)) {
+            return <></>;
+        }
+
+        if (!this.props.gameClient.isRealOwner() &&
+            this.props.gameState.password != "" &&
+            this.password != this.props.gameState.password &&
+            // If user is already seated, allow them to "Leave"
+            (!this.lobby.players.has(h) || this.lobby.players.get(h) != this.authenticatedUser)) {
+            return <Col xs="auto">
+                <FontAwesomeIcon icon={faLock} />
+            </Col>;
+        }
+
+        return  (
+            !this.lobby.players.has(h) ? (
+                <Col xs="auto">
+                    <Button onClick={() => this.choose(h)}>Choose</Button>
+                </Col>
+            ) : this.lobby.players.get(h) == this.authenticatedUser ? (
+                <Col xs="auto">
+                    <Button variant="danger" onClick={() => this.leave()}>Leave</Button>
+                </Col>
+            ) : (
+                this.props.gameClient.isOwner() && (
+                    <Col xs="auto">
+                        <Button variant="danger" onClick={() => this.kick(h)}>Kick</Button>
+                    </Col>
+                )
+            )
+        );
     }
 
     isHouseAvailable(house: LobbyHouse): boolean {

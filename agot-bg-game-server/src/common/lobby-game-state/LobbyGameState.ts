@@ -10,10 +10,12 @@ import CancelledGameState from "../cancelled-game-state/CancelledGameState";
 import shuffle from "../../utils/shuffle";
 import _ from "lodash";
 import { MIN_PLAYER_COUNT_WITH_VASSALS } from "../ingame-game-state/game-data-structure/Game";
+import { v4 } from "uuid";
 
 export default class LobbyGameState extends GameState<EntireGame> {
     lobbyHouses: BetterMap<string, LobbyHouse>;
     @observable players = new BetterMap<LobbyHouse, User>();
+    @observable password = "";
 
     get entireGame(): EntireGame {
         return this.parentGameState;
@@ -121,6 +123,30 @@ export default class LobbyGameState extends GameState<EntireGame> {
             }
 
             this.setUserForLobbyHouse(house, user);
+        } else if (message.type == "set-password") {
+            let answer = v4();
+            if (this.entireGame.isRealOwner(user)) {
+                this.password = message.password;
+                // If owner has reset the password, send "" to the clients
+                // Otherwise send a GUID so their password validation check fails
+                this.entireGame.sendMessageToClients(_.without(this.entireGame.users.values, user), {
+                    type: "password-response",
+                    password: message.password == "" ? "" : answer
+                });
+                // Always send back the chosen password to the owner
+                answer = message.password;
+            } else {
+                // If user sent the correct password, or no password is set
+                // send password back the correct password
+                if (this.password == "" || this.password == message.password) {
+                    answer = this.password;
+                }
+            }
+
+            this.entireGame.sendMessageToClients([user], {
+                type: "password-response",
+                password: answer
+            });
         }
     }
 
@@ -179,6 +205,8 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 // Fake a game state change to play a sound also in case lobby is full
                 this.entireGame.onClientGameStateChange();
             }
+        } else if (message.type == "password-response") {
+            this.password = message.password;
         }
     }
 
@@ -208,6 +236,13 @@ export default class LobbyGameState extends GameState<EntireGame> {
         });
     }
 
+    sendPassword(password: string): void {
+        this.entireGame.sendMessageToServer({
+            type: "set-password",
+            password: password
+        });
+    }
+
     getWaitedUsers(): User[] {
         const owner = this.entireGame.owner;
         if (!owner || !this.canStartGame(owner).success) {
@@ -217,11 +252,15 @@ export default class LobbyGameState extends GameState<EntireGame> {
         return [owner];
     }
 
-    serializeToClient(_admin: boolean, _user: User | null): SerializedLobbyGameState {
+    serializeToClient(admin: boolean, user: User | null): SerializedLobbyGameState {
         return {
             type: "lobby",
             lobbyHouses: this.lobbyHouses.values,
-            players: this.players.entries.map(([h, u]) => [h.id, u.id])
+            players: this.players.entries.map(([h, u]) => [h.id, u.id]),
+            password: this.password == "" ||
+                admin || (user && this.entireGame.isRealOwner(user))
+                ? this.password
+                : v4()
         };
     }
 
@@ -230,6 +269,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
         lobbyGameState.lobbyHouses = new BetterMap(data.lobbyHouses.map(h => [h.id, h]));
         lobbyGameState.players = new BetterMap(data["players"].map(([hid, uid]) => [lobbyGameState.lobbyHouses.get(hid), entireGame.users.get(uid)]));
+        lobbyGameState.password = data.password;
 
         return lobbyGameState;
     }
@@ -239,6 +279,7 @@ export interface SerializedLobbyGameState {
     type: "lobby";
     players: [string, string][];
     lobbyHouses: LobbyHouse[];
+    password: string;
 }
 
 export interface LobbyHouse {

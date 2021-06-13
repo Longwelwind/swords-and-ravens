@@ -23,7 +23,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | UpdateWesterosDecks | UpdateConnectionStatus | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced
     | CrowKillersStepChanged | ManipulateCombatHouseCard | ChangeCombatTidesOfBattleCard
     | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting | UpdateCombatStats
-    | UpdateDraftIndices | RevealBids | UpdateMaxTurns;
+    | UpdateDraftIndices | RevealBids | UpdateMaxTurns | PasswordResponse;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -350,4 +350,9 @@ interface RevealBids {
 interface UpdateMaxTurns {
     type: "update-max-turns";
     maxTurns: number;
+}
+
+interface PasswordResponse {
+    type: "password-response";
+    password: string;
 }
