@@ -78,7 +78,7 @@ interface IngameComponentProps {
 export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
     @observable currentOpenedTab = (this.user && this.user.settings.lastOpenedTab) ? this.user.settings.lastOpenedTab : "chat";
-    @observable height = (this.user && this.user.settings.mapScrollbar) ? window.innerHeight : null;
+    @observable height: number | null;
 
     get game(): Game {
         return this.ingame.game;
@@ -666,7 +666,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     setHeight(): void {
-        this.height = (this.user && this.user.settings.mapScrollbar) ? window.innerHeight : null;
+        this.height = (!isMobile && this.user && this.user.settings.mapScrollbar) ? window.innerHeight : null;
     }
 
     onNewPrivateChatRoomCreated(roomId: string): void {
@@ -676,6 +676,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     componentDidMount(): void {
         this.props.gameState.entireGame.onNewPrivateChatRoomCreated = (roomId: string) => this.onNewPrivateChatRoomCreated(roomId);
         window.addEventListener('resize', () => this.setHeight());
+        this.setHeight();
     }
 
     componentWillUnmount(): void {
