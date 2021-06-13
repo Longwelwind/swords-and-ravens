@@ -52,11 +52,11 @@ export default class UserLabel extends Component<UserLabelProps> {
                             <FontAwesomeIcon icon={faWifi} className={this.user.connected ? "text-success" : "text-danger"} />
                         </OverlayTrigger>
                         {" "}
-                        {this.isOwner() &&
+                        {this.props.gameClient.isOwner() &&
                             <OverlayTrigger overlay={<Tooltip id ={`${this.user.id}-owner-tooltip`}>Owner</Tooltip>}>
                                 <FontAwesomeIcon icon={faUser}/>
                             </OverlayTrigger>}
-                        {this.isOwner() && " "}
+                        {this.props.gameClient.isOwner() && " "}
                         {this.user.name}
                         {" "}
                         <FontAwesomeIcon icon={faCaretDown} />
@@ -68,10 +68,6 @@ export default class UserLabel extends Component<UserLabelProps> {
                 </Dropdown.Menu>
             </Dropdown>
         );
-    }
-
-    isOwner(): boolean {
-        return this.props.gameState.entireGame.isOwner(this.user);
     }
 
     renderIngameDropdownItems(ingame: IngameGameState): ReactNode {

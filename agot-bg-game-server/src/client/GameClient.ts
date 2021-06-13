@@ -130,6 +130,18 @@ export default class GameClient {
         return this.entireGame.isOwner(this.authenticatedUser);
     }
 
+    isRealOwner(): boolean {
+        if (!this.entireGame) {
+            throw new Error();
+        }
+
+        if (!this.authenticatedUser) {
+            throw new Error();
+        }
+
+        return this.entireGame.isRealOwner(this.authenticatedUser);
+    }
+
     onOpen(): void {
         // Authenticate
         this.send({

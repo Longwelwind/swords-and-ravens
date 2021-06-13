@@ -6,7 +6,7 @@ import { SerializedHouse } from "../common/ingame-game-state/game-data-structure
 import { HouseCardState } from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import { vassalHouseCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/vassalHouseCards";
 import _ from "lodash";
-import { SerializedEntireGame } from "../common/EntireGame";
+//import { SerializedEntireGame } from "../common/EntireGame";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
     {
@@ -869,11 +869,21 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
     },
     {
         version: "34",
-        migrate: (serializedGame: SerializedEntireGame) => {
+        migrate: (serializedGame: any) => {
             if (serializedGame.childGameState.type == "ingame") {
-                serializedGame.users.forEach(u => {
+                serializedGame.users.forEach((u: any) => {
                     u.settings.mapScrollbar = true;
                 });
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "35",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "lobby") {
+                serializedGame.childGameState.password = "";
             }
 
             return serializedGame;
