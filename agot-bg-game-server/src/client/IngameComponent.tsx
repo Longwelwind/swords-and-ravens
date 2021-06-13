@@ -168,9 +168,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                         In case of a tie in a combat, the winner is the house which is
                                                                         the highest in this tracker.<br/><br/>
                                                                         {this.props.gameState.game.valyrianSteelBladeUsed ? (
-                                                                            <>The Valyrian Steel Blade has been used this round</>
+                                                                            <>The Valyrian Steel Blade has been used this round.</>
                                                                         ) : (
-                                                                            <>The Valyrian Steel Blade is available</>
+                                                                            <>The Valyrian Steel Blade is available.</>
                                                                         )}
                                                                     </>
                                                                 ) : (

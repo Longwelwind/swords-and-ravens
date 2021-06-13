@@ -44,6 +44,7 @@ export default class UserLabel extends Component<UserLabelProps> {
     }
 
     render(): ReactNode {
+        const isOwner = this.props.gameState.entireGame.isOwner(this.user);
         return (
             <Dropdown>
                 <Dropdown.Toggle as={DropdownContainer} id={"dropdown-" + this.user.id}>
@@ -52,11 +53,11 @@ export default class UserLabel extends Component<UserLabelProps> {
                             <FontAwesomeIcon icon={faWifi} className={this.user.connected ? "text-success" : "text-danger"} />
                         </OverlayTrigger>
                         {" "}
-                        {this.props.gameClient.isOwner() &&
+                        {isOwner &&
                             <OverlayTrigger overlay={<Tooltip id ={`${this.user.id}-owner-tooltip`}>Owner</Tooltip>}>
                                 <FontAwesomeIcon icon={faUser}/>
                             </OverlayTrigger>}
-                        {this.props.gameClient.isOwner() && " "}
+                        {isOwner && " "}
                         {this.user.name}
                         {" "}
                         <FontAwesomeIcon icon={faCaretDown} />
