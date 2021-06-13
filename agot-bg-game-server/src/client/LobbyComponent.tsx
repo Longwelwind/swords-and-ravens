@@ -104,6 +104,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                         entireGame={this.lobby.entireGame} />
                                 </Col>
                             </Row>
+                            {(this.props.gameClient.isRealOwner() || this.props.gameState.password != "") &&
                             <Row className="mt-2">
                                 <Col>
                                     <Row className="justify-content-center">
@@ -116,7 +117,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                         />
                                     </Row>
                                 </Col>
-                            </Row>
+                            </Row>}
                             <Row className="mt-3">
                                 <Col>
                                     <Button
