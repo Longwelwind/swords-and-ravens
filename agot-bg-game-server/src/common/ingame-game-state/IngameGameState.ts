@@ -246,6 +246,8 @@ export default class IngameGameState extends GameState<
             vote: vote.serializeToClient(false, null)
         });
 
+        this.entireGame.notifyUsers(_.without(this.players.keys, initiator));
+
         return vote;
     }
 

@@ -125,6 +125,12 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         }
     }
 
+    notifyUsers(users: User[], forceNotification = false): void {
+        if ((this.gameSettings.pbem || forceNotification) && this.onWaitedUsers) {
+            this.onWaitedUsers(users, forceNotification);
+        }
+    }
+
     isOwner(user: User): boolean {
         if (this.lobbyGameState) {
             // If owner is not seated every player becomes owner
