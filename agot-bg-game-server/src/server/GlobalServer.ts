@@ -247,7 +247,7 @@ export default class GlobalServer {
         entireGame.onSendServerMessage = (users, message) => {
             this.onSendServerMessage(users, message);
         };
-        entireGame.onWaitedUsers = (users) => this.onWaitedUsers(entireGame, users);
+        entireGame.onWaitedUsers = (users, forceNotification) => this.onWaitedUsers(entireGame, users, forceNotification);
 
         // Set the connection status of all users to false
         entireGame.users.values.forEach(u => u.connected = false);
@@ -309,8 +309,8 @@ export default class GlobalServer {
         return firstValue ? firstValue.trim() : "";
     }
 
-    onWaitedUsers(game: EntireGame, users: User[]): void {
-        this.websiteClient.notifyUsers(game.id, users.filter(u => !u.connected).map(u => u.id));
+    onWaitedUsers(game: EntireGame, users: User[], forceNotification: boolean): void {
+        this.websiteClient.notifyUsers(game.id, users.filter(u => forceNotification || !u.connected).map(u => u.id));
     }
 
     onClose(client: WebSocket): void {

@@ -244,12 +244,13 @@ export default class LobbyGameState extends GameState<EntireGame> {
     }
 
     getWaitedUsers(): User[] {
-        const owner = this.entireGame.owner;
-        if (!owner || !this.canStartGame(owner).success) {
+        if (!this.entireGame.users.has(this.entireGame.ownerUserId)) {
             return [];
         }
 
-        return [owner];
+        const owner = this.entireGame.users.get(this.entireGame.ownerUserId);
+
+        return this.canStartGame(owner).success ? [owner] : [];
     }
 
     serializeToClient(admin: boolean, user: User | null): SerializedLobbyGameState {
