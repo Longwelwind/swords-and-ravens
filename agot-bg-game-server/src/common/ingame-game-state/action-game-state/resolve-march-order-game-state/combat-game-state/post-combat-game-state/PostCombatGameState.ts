@@ -339,6 +339,9 @@ export default class PostCombatGameState extends GameState<
     }
 
     onAfterCombatHouseCardAbilitiesFinish(): void {
+        // Notify combatans about end of combat
+        this.combat.entireGame.notifyUsers(this.combat.houseCombatDatas.keys.map(h =>
+            this.combat.ingameGameState.getControllerOfHouse(h).user));
         this.combat.resolveMarchOrderGameState.onResolveSingleMarchOrderGameStateFinish(this.attacker);
     }
 
