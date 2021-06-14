@@ -27,7 +27,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         thematicDraft: false };
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
-    onWaitedUsers: (users: User[]) => void;
+    onWaitedUsers: (users: User[], forceNotification: boolean) => void;
     publicChatRoomId: string;
     // Keys are the two users participating in the private chat.
     // A pair of user is sorted alphabetically by their id when used as a key.
@@ -43,10 +43,6 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
     get ingameGameState(): IngameGameState | null {
         return this.childGameState instanceof IngameGameState ? this.childGameState : null;
-    }
-
-    get owner(): User | null {
-        return this.users.tryGet(this.ownerUserId, null);
     }
 
     get selectedGameSetup(): GameSetup {
@@ -118,9 +114,14 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     notifyWaitedUsers(): void {
-        // If the game is PBEM, send a notification to all waited users
-        if (this.gameSettings.pbem && this.onWaitedUsers) {
-            this.onWaitedUsers(this.leafState.getWaitedUsers());
+        if (!this.onWaitedUsers) {
+            return;
+        }
+
+        // If game is in LobbyGameState, always notify the owner when game is ready to start or
+        // if the game is PBEM, send a notification to all waited users
+        if (this.leafState instanceof LobbyGameState || this.gameSettings.pbem) {
+            this.onWaitedUsers(this.leafState.getWaitedUsers(), this.leafState instanceof LobbyGameState);
         }
     }
 
