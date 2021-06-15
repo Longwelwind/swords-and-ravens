@@ -44,7 +44,7 @@ def notify_ready_to_start(request, game_id):
 
     mails = [
         (
-            f'{game.name} -  Ready to start!',
+            f'Your game is ready to start: {game.name}',
             render_to_string(
                 'agotboardgame_main/ready_to_start_notification.html',
                 {'game': game, 'user': user, 'game_url': request.build_absolute_uri(reverse('play', args=[game.id]))}
@@ -71,7 +71,7 @@ def notify_your_turn(request, game_id):
 
     mails = [
         (
-            f'{game.name} -  It\'s your turn!',
+            f'It\'s your turn in {game.name}!',
             render_to_string(
                 'agotboardgame_main/mail_notification.html',
                 {'game': game, 'user': user, 'game_url': request.build_absolute_uri(reverse('play', args=[game.id]))}
@@ -98,7 +98,7 @@ def notify_battle_results(request, game_id):
 
     mails = [
         (
-            f'{game.name} -  Battle results!',
+            f'Your battle is over -  {game.name}',
             render_to_string(
                 'agotboardgame_main/battle_results_notification.html',
                 {'game': game, 'user': user, 'game_url': request.build_absolute_uri(reverse('play', args=[game.id]))}
@@ -125,7 +125,7 @@ def notify_new_vote(request, game_id):
 
     mails = [
         (
-            f'{game.name} -  A vote has been started!',
+            f'Your vote is needed in {game.name}',
             render_to_string(
                 'agotboardgame_main/vote_notification.html',
                 {'game': game, 'user': user, 'game_url': request.build_absolute_uri(reverse('play', args=[game.id]))}
