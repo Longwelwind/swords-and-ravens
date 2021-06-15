@@ -96,8 +96,36 @@ export default class LiveWebsiteClient implements WebsiteClient {
         });
     }
 
-    async notifyUsers(gameId: string, userIds: string[]): Promise<void> {
-        await post(`${this.masterApiBaseUrl}/notify/${gameId}`, {
+    async notifyReadyToStart(gameId: string, userIds: string[]): Promise<void> {
+        await post(`${this.masterApiBaseUrl}/notifyReadyToStart/${gameId}`, {
+            body: {users: userIds},
+            json: true,
+        }).auth(this.masterApiUsername, this.masterApiPassword, true);
+    }
+
+    async notifyYourTurn(gameId: string, userIds: string[]): Promise<void> {
+        await post(`${this.masterApiBaseUrl}/notifyYourTurn/${gameId}`, {
+            body: {users: userIds},
+            json: true,
+        }).auth(this.masterApiUsername, this.masterApiPassword, true);
+    }
+
+    async notifyBattleResults(gameId: string, userIds: string[]): Promise<void> {
+        await post(`${this.masterApiBaseUrl}/notifyBattleResults/${gameId}`, {
+            body: {users: userIds},
+            json: true,
+        }).auth(this.masterApiUsername, this.masterApiPassword, true);
+    }
+
+    async notifyNewVote(gameId: string, userIds: string[]): Promise<void> {
+        await post(`${this.masterApiBaseUrl}/notifyNewVote/${gameId}`, {
+            body: {users: userIds},
+            json: true,
+        }).auth(this.masterApiUsername, this.masterApiPassword, true);
+    }
+
+    async notifyGameEnded(gameId: string, userIds: string[]): Promise<void> {
+        await post(`${this.masterApiBaseUrl}/notifyGameEnded/${gameId}`, {
             body: {users: userIds},
             json: true,
         }).auth(this.masterApiUsername, this.masterApiPassword, true);

@@ -18,6 +18,7 @@ import AfterCombatHouseCardAbilitiesGameState
 import ResolveRetreatGameState, {SerializedResolveRetreatGameState} from "./resolve-retreat-game-state/ResolveRetreatGameState";
 import BetterMap from "../../../../../../utils/BetterMap";
 import { TidesOfBattleCard } from "../../../../game-data-structure/static-data-structure/tidesOfBattleCards";
+import { NotificationType } from "../../../../../EntireGame";
 
 export default class PostCombatGameState extends GameState<
     CombatGameState,
@@ -341,7 +342,7 @@ export default class PostCombatGameState extends GameState<
     onAfterCombatHouseCardAbilitiesFinish(): void {
         // Notify combatans about end of combat
         this.combat.entireGame.notifyUsers(this.combat.houseCombatDatas.keys.map(h =>
-            this.combat.ingameGameState.getControllerOfHouse(h).user));
+            this.combat.ingameGameState.getControllerOfHouse(h).user), NotificationType.BATTLE_RESULTS);
         this.combat.resolveMarchOrderGameState.onResolveSingleMarchOrderGameStateFinish(this.attacker);
     }
 

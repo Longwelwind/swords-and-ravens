@@ -2,7 +2,6 @@ import WebsiteClient, {StoredGameData, StoredUserData} from "./WebsiteClient";
 import User from "../User";
 
 export default class LocalWebsiteClient implements WebsiteClient {
-
     async getGame(gameId: string): Promise<StoredGameData> {
         if (gameId != "1") {
             throw new Error();
@@ -26,11 +25,27 @@ export default class LocalWebsiteClient implements WebsiteClient {
     }
 
     async saveGame(_gameId: string, _serializedGame: any, _viewOfGame: any, _players: {userId: string; data: object}[], _state: string, _version: string): Promise<void> {
-        // Do nothing
+        console.log("Game saved.");
     }
 
-    async notifyUsers(_gameId: string, _userIds: string[]): Promise<void> {
-        // Do Nothing
+    async notifyReadyToStart(_gameId: string, userIds: string[]): Promise<void> {
+        console.log(`notifyReadyToStart: ${userIds.join(", ")}`);
+    }
+
+    async notifyYourTurn(_gameId: string, userIds: string[]): Promise<void> {
+        console.log(`notifyYourTurn: ${userIds.join(", ")}`);
+    }
+
+    async notifyBattleResults(_gameId: string, userIds: string[]): Promise<void> {
+        console.log(`notifyBattleResults: ${userIds.join(", ")}`);
+    }
+
+    async notifyNewVote(_gameId: string, userIds: string[]): Promise<void> {
+        console.log(`notifyNewVoteStarted: ${userIds.join(", ")}`);
+    }
+
+    async notifyGameEnded(_gameId: string, userIds: string[]): Promise<void> {
+        console.log(`notifyGameEnded: ${userIds.join(", ")}`);
     }
 
     async createPublicChatRoom(name: string): Promise<string> {

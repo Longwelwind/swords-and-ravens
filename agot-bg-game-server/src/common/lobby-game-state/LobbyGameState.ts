@@ -1,4 +1,4 @@
-import EntireGame from "../EntireGame";
+import EntireGame, { NotificationType } from "../EntireGame";
 import GameState from "../GameState";
 import User from "../../server/User";
 import {ClientMessage} from "../../messages/ClientMessage";
@@ -166,7 +166,19 @@ export default class LobbyGameState extends GameState<EntireGame> {
             players: this.players.entries.map(([house, user]) => [house.id, user.id])
         });
 
-        this.entireGame.notifyWaitedUsers();
+        this.notifyOwnerWhenGameCanBestarted();
+    }
+
+    notifyOwnerWhenGameCanBestarted(): void {
+        if (!this.entireGame.users.has(this.entireGame.ownerUserId)) {
+            return;
+        }
+
+        const owner = this.entireGame.users.get(this.entireGame.ownerUserId);
+
+        if (this.canStartGame(owner).success) {
+            this.entireGame.notifyUsers([owner], NotificationType.READY_TO_START);
+        }
     }
 
     canStartGame(user: User): {success: boolean; reason: string} {

@@ -247,7 +247,12 @@ export default class GlobalServer {
         entireGame.onSendServerMessage = (users, message) => {
             this.onSendServerMessage(users, message);
         };
-        entireGame.onWaitedUsers = (users, forceNotification) => this.onWaitedUsers(entireGame, users, forceNotification);
+
+        entireGame.onReadyToStart = (users) => this.onReadyToStart(entireGame, users);
+        entireGame.onWaitedUsers = (users) => this.onWaitedUsers(entireGame, users);
+        entireGame.onBattleResults = (users) => this.onBattleResults(entireGame, users);
+        entireGame.onNewVoteStarted = (users) => this.onNewVoteStarted(entireGame, users);
+        entireGame.onGameEnded = (users) => this.onGameEnded(entireGame, users);
 
         // Set the connection status of all users to false
         entireGame.users.values.forEach(u => u.connected = false);
@@ -309,8 +314,44 @@ export default class GlobalServer {
         return firstValue ? firstValue.trim() : "";
     }
 
-    onWaitedUsers(game: EntireGame, users: User[], forceNotification: boolean): void {
-        this.websiteClient.notifyUsers(game.id, users.filter(u => forceNotification || !u.connected).map(u => u.id));
+    onReadyToStart(game: EntireGame, users: User[]): void {
+        this.websiteClient.notifyReadyToStart(game.id, users.map(u => u.id));
+    }
+
+    onWaitedUsers(game: EntireGame, users: User[]): void {
+        const offlineUsers = users.filter(u => !u.connected);
+        if (offlineUsers.length == 0) {
+            return;
+        }
+
+        this.websiteClient.notifyYourTurn(game.id, offlineUsers.map(u => u.id));
+    }
+
+    onBattleResults(game: EntireGame, users: User[]): void {
+        const offlineUsers = users.filter(u => !u.connected);
+        if (offlineUsers.length == 0) {
+            return;
+        }
+
+        this.websiteClient.notifyBattleResults(game.id, offlineUsers.map(u => u.id));
+    }
+
+    onNewVoteStarted(game: EntireGame, users: User[]): void {
+        const offlineUsers = users.filter(u => !u.connected);
+        if (offlineUsers.length == 0) {
+            return;
+        }
+
+        this.websiteClient.notifyNewVote(game.id, offlineUsers.map(u => u.id));
+    }
+
+    onGameEnded(game: EntireGame, users: User[]): any {
+        const offlineUsers = users.filter(u => !u.connected);
+        if (offlineUsers.length == 0) {
+            return;
+        }
+
+        this.websiteClient.notifyGameEnded(game.id, offlineUsers.map(u => u.id));
     }
 
     onClose(client: WebSocket): void {
