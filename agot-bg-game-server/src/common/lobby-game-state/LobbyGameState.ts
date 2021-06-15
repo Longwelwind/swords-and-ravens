@@ -122,6 +122,14 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 return;
             }
 
+            // Check password if a password is set and player has chosen a house (i.e. house != null to always allow leaving)
+            if (this.password != "" &&
+                house &&
+                this.password != message.password &&
+                !this.entireGame.isRealOwner(user)) {
+                return;
+            }
+
             this.setUserForLobbyHouse(house, user);
         } else if (message.type == "set-password") {
             let answer = v4();
@@ -222,10 +230,11 @@ export default class LobbyGameState extends GameState<EntireGame> {
         }
     }
 
-    chooseHouse(house: LobbyHouse | null): void {
+    chooseHouse(house: LobbyHouse | null, password: string): void {
         this.entireGame.sendMessageToServer({
             type: "choose-house",
-            house: house ? house.id : null
+            house: house ? house.id : null,
+            password: password
         });
     }
 
