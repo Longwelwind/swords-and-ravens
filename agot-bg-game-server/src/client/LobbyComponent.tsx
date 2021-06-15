@@ -219,7 +219,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
     }
 
     choose(house: LobbyHouse): void {
-        this.lobby.chooseHouse(house);
+        this.lobby.chooseHouse(house, this.password);
     }
 
     kick(house: LobbyHouse): void {
@@ -233,7 +233,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
     }
 
     leave(): void {
-        this.lobby.chooseHouse(null);
+        this.lobby.chooseHouse(null, this.password);
     }
 
     componentDidMount(): void {

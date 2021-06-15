@@ -32,6 +32,7 @@ interface CancelGame {
 interface ChooseHouse {
     type: "choose-house";
     house: string | null;
+    password: string;
 }
 
 interface Ready {
