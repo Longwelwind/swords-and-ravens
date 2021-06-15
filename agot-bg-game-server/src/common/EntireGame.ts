@@ -132,13 +132,22 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     notifyUsers(users: User[], type: NotificationType): void {
-        // Always notify on Ready to Start, even for live games!
-        if (type == NotificationType.READY_TO_START && this.onReadyToStart) {
-            this.onReadyToStart(users);
+        // Always notify on Ready to Start and Game Ended, even for live games!
+        switch (type) {
+            case NotificationType.READY_TO_START:
+                if (this.onReadyToStart) {
+                    this.onReadyToStart(users);
+                }
+                break;
+            case NotificationType.GAME_ENDED:
+                if (this.onGameEnded) {
+                    this.onGameEnded(users);
+                }
+                break;
         }
 
         if (!this.gameSettings.pbem) {
-            // If game is no PBEM, don't notify users
+            // If game is no PBEM, don't send further notifications
             return;
         }
 
@@ -151,11 +160,6 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             case NotificationType.BATTLE_RESULTS:
                 if (this.onBattleResults) {
                     this.onBattleResults(users);
-                }
-                break;
-            case NotificationType.GAME_ENDED:
-                if (this.onGameEnded) {
-                    this.onGameEnded(users);
                 }
                 break;
         }

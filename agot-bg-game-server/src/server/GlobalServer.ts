@@ -346,12 +346,7 @@ export default class GlobalServer {
     }
 
     onGameEnded(game: EntireGame, users: User[]): any {
-        const offlineUsers = users.filter(u => !u.connected);
-        if (offlineUsers.length == 0) {
-            return;
-        }
-
-        this.websiteClient.notifyGameEnded(game.id, offlineUsers.map(u => u.id));
+        this.websiteClient.notifyGameEnded(game.id, users.map(u => u.id));
     }
 
     onClose(client: WebSocket): void {
