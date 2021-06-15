@@ -41,7 +41,7 @@ def index(request):
                 enjoyed coding S&R at first, my time and my motivation for the project diminished over time, and I'm
                 now at a point where I'd like to move on to other projects. I've handed the keys to the kingdoms
                 (i.e. admin rights to the production server) to Gereon, who has been
-                contributing to the project since its beginning and to whom we can thank for 
+                contributing to the project since its beginning and to whom we can thank for
                 all the recent additions to the platform.
             </p>
             <p>

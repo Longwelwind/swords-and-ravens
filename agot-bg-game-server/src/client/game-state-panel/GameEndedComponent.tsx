@@ -17,7 +17,7 @@ export default class GameEndedComponent extends Component<GameStateComponentProp
                     <Col xs={12}>
                         <Row className="justify-content-center text-center">
                             <Col xs="auto" >
-                                <p><strong>Game finished!</strong></p>
+                                <p><strong>Game has ended!</strong></p>
                                 <p>The winner is...</p>
                                 <Row className="justify-content-center align-items-center">
                                     <Col xs="auto">

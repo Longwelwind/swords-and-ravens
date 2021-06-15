@@ -15,6 +15,13 @@ import CombatGameState from "./ingame-game-state/action-game-state/resolve-march
 import sleep from "../utils/sleep";
 import PostCombatGameState from "./ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState";
 
+export enum NotificationType {
+    READY_TO_START,
+    BATTLE_RESULTS,
+    NEW_VOTE_STARTED,
+    GAME_ENDED
+}
+
 export default class EntireGame extends GameState<null, LobbyGameState | IngameGameState | CancelledGameState> {
     id: string;
     @observable users = new BetterMap<string, User>();
@@ -27,7 +34,11 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         thematicDraft: false };
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
-    onWaitedUsers: (users: User[], forceNotification: boolean) => void;
+    onWaitedUsers: (users: User[]) => void;
+    onReadyToStart: (users: User[]) => void;
+    onNewVoteStarted: (users: User[]) => void;
+    onBattleResults: (users: User[]) => void;
+    onGameEnded: (users: User[]) => void;
     publicChatRoomId: string;
     // Keys are the two users participating in the private chat.
     // A pair of user is sorted alphabetically by their id when used as a key.
@@ -114,20 +125,39 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     notifyWaitedUsers(): void {
-        if (!this.onWaitedUsers) {
-            return;
-        }
-
-        // If game is in LobbyGameState, always notify the owner when game is ready to start or
-        // if the game is PBEM, send a notification to all waited users
-        if (this.leafState instanceof LobbyGameState || this.gameSettings.pbem) {
-            this.onWaitedUsers(this.leafState.getWaitedUsers(), this.leafState instanceof LobbyGameState);
+        // If the game is PBEM, send a notification to all waited users
+        if (this.gameSettings.pbem && this.onWaitedUsers) {
+            this.onWaitedUsers(this.leafState.getWaitedUsers());
         }
     }
 
-    notifyUsers(users: User[], forceNotification = false): void {
-        if ((this.gameSettings.pbem || forceNotification) && this.onWaitedUsers) {
-            this.onWaitedUsers(users, forceNotification);
+    notifyUsers(users: User[], type: NotificationType): void {
+        // Always notify on Ready to Start, even for live games!
+        if (type == NotificationType.READY_TO_START && this.onReadyToStart) {
+            this.onReadyToStart(users);
+        }
+
+        if (!this.gameSettings.pbem) {
+            // If game is no PBEM, don't notify users
+            return;
+        }
+
+        switch (type) {
+            case NotificationType.NEW_VOTE_STARTED:
+                if (this.onNewVoteStarted) {
+                    this.onNewVoteStarted(users);
+                }
+                break;
+            case NotificationType.BATTLE_RESULTS:
+                if (this.onBattleResults) {
+                    this.onBattleResults(users);
+                }
+                break;
+            case NotificationType.GAME_ENDED:
+                if (this.onGameEnded) {
+                    this.onGameEnded(users);
+                }
+                break;
         }
     }
 

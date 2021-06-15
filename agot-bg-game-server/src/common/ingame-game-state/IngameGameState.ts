@@ -1,4 +1,4 @@
-import EntireGame from "../EntireGame";
+import EntireGame, { NotificationType } from "../EntireGame";
 import GameState from "../GameState";
 import {ClientMessage} from "../../messages/ClientMessage";
 import {ServerMessage} from "../../messages/ServerMessage";
@@ -246,7 +246,7 @@ export default class IngameGameState extends GameState<
             vote: vote.serializeToClient(false, null)
         });
 
-        this.entireGame.notifyUsers(_.without(this.players.keys, initiator));
+        this.entireGame.notifyUsers(_.without(this.players.keys, initiator), NotificationType.NEW_VOTE_STARTED);
 
         return vote;
     }

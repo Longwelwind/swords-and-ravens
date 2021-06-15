@@ -5,6 +5,7 @@ import {ClientMessage} from "../../../messages/ClientMessage";
 import {ServerMessage} from "../../../messages/ServerMessage";
 import IngameGameState from "../IngameGameState";
 import User from "../../../server/User";
+import { NotificationType } from "../../EntireGame";
 
 export default class GameEndedGameState extends GameState<IngameGameState> {
     winner: House;
@@ -15,6 +16,8 @@ export default class GameEndedGameState extends GameState<IngameGameState> {
 
     firstStart(winner: House): void {
         this.winner = winner;
+
+        this.entireGame.notifyUsers(this.ingame.players.keys, NotificationType.GAME_ENDED)
     }
 
     onPlayerMessage(_player: Player, _message: ClientMessage): void {
@@ -25,7 +28,7 @@ export default class GameEndedGameState extends GameState<IngameGameState> {
     }
 
     getWaitedUsers(): User[] {
-        return this.ingame.players.keys;
+        return [];
     }
 
     serializeToClient(_admin: boolean, _player: Player | null): SerializedGameEndedGameState{
