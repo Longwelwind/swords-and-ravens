@@ -42,7 +42,7 @@ Games -
                             setInterval(update, 1000);
                         </script>
                     </h4>
-                    <div style="height: 440px; overflow-y: auto">
+                    <div style="height: 400px; overflow-y: auto">
                         {% games_table games user perms %}
                     </div>
                 </div>
@@ -59,8 +59,8 @@ Games -
             {% if perms.agotboardgame_main.add_game %}
             <div class="card">
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-lg-4">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
                             <form action="/games/" method="POST">
                                 {% csrf_token %}
                                 <div class="form-group">
