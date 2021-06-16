@@ -217,6 +217,11 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     }
 
     game.maxTurns = entireGame.selectedGameSetup.maxTurns ? entireGame.selectedGameSetup.maxTurns : baseGameData.maxTurns;
+
+    if (gameSettings.endless) {
+        game.maxTurns = 1000;
+    }
+
     game.structuresCountNeededToWin = entireGame.selectedGameSetup.structuresCountNeededToWin != undefined ? entireGame.selectedGameSetup.structuresCountNeededToWin : baseGameData.structuresCountNeededToWin;
     game.supplyRestrictions = baseGameData.supplyRestrictions;
     game.maxPowerTokens = MAX_POWER_TOKENS;

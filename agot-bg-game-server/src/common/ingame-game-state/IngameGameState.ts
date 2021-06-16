@@ -129,6 +129,17 @@ export default class IngameGameState extends GameState<
             return;
         }
 
+        if (this.game.turn != 0 && this.game.turn % 10 == 0) {
+            // Refresh the Westeros decks after every 10th round
+            for (let i=0; i < this.game.westerosDecks.length; i++) {
+                const deck = this.game.westerosDecks[i];
+                deck.forEach(wc => wc.discarded = false);
+                this.game.westerosDecks[i] = _.shuffle(deck);
+            };
+
+            this.broadcastWesterosDecks();
+        }
+
         this.game.turn++;
         this.log({type: "turn-begin", turn: this.game.turn});
 
