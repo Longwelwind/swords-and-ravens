@@ -102,7 +102,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                         <OverlayTrigger overlay={
                                             <Tooltip id="adwd-house-cards-tooltip">
                                                 The house cards will come from the A Dance with Dragons and A Feast for Crows expansions.
-                                        </Tooltip>}>
+                                            </Tooltip>}>
                                             <label htmlFor="adwd-house-cards">Use <i>ADwD / AFfC</i> house cards</label>
                                         </OverlayTrigger>}
                                     disabled={this.props.entireGame.gameSettings.setupId == "a-dance-with-dragons"}
@@ -120,7 +120,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                         <OverlayTrigger overlay={
                                             <Tooltip id="vassals-tooltip">
                                                 Unassigned houses will be vassals from Mother of Dragons expansion and players start with 7 Power tokens instead of 5.
-                                        </Tooltip>}>
+                                            </Tooltip>}>
                                             <label htmlFor="vassals-setting">MoD Vassals</label>
                                         </OverlayTrigger>}
                                     checked={this.gameSettings.vassals}
@@ -138,7 +138,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                         <OverlayTrigger overlay={
                                             <Tooltip id="sea-orders-tooltip">
                                                 Sea order tokens from Mother of Dragons expansion will be available.
-                                        </Tooltip>}>
+                                            </Tooltip>}>
                                             <label htmlFor="sea-orders-setting">MoD Sea Order Tokens</label>
                                         </OverlayTrigger>}
                                     checked={this.gameSettings.seaOrderTokens}
@@ -170,7 +170,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                         <OverlayTrigger overlay={
                                             <Tooltip id="random-houses-tooltip">
                                                 All houses will be randomized before the game starts when this option is selected.
-                                        </Tooltip>}>
+                                            </Tooltip>}>
                                             <label htmlFor="random-houses-setting">Random houses</label>
                                         </OverlayTrigger>}
                                     checked={this.gameSettings.randomHouses}
@@ -186,7 +186,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                             <Tooltip id="random-chosen-houses-tooltip">
                                                 Only chosen houses will be randomized before the game starts when this option is selected.
                                                 This way users can define player and vassal houses and are still able to randomize the player houses.
-                                        </Tooltip>}>
+                                            </Tooltip>}>
                                             <label htmlFor="random-chosen-houses-setting">Random chosen houses</label>
                                         </OverlayTrigger>}
                                     checked={this.gameSettings.randomChosenHouses}
@@ -204,7 +204,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                             <Tooltip id="draft-house-cards-tooltip">
                                                 Players will draft their house cards step by step in a randomly chosen order before the game starts.
                                                 Cards can be chosen from all 2nd Edition Base Game house cards and all expansions (ADwD, AFfC and MoD) house cards.
-                                        </Tooltip>}>
+                                            </Tooltip>}>
                                             <label htmlFor="draft-house-cards">Draft house cards</label>
                                         </OverlayTrigger>}
                                     checked={this.gameSettings.draftHouseCards}
@@ -219,7 +219,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                         <OverlayTrigger overlay={
                                             <Tooltip id="thematic-draft-tooltip">
                                                 Players will draft their house cards simultaneously from the available decks of their house.
-                                        </Tooltip>}>
+                                            </Tooltip>}>
                                             <label htmlFor="thematic-draft">Thematic draft</label>
                                         </OverlayTrigger>}
                                     checked={this.gameSettings.thematicDraft}
@@ -236,11 +236,28 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                         <OverlayTrigger overlay={
                                             <Tooltip id="westeros-phase-variant-tooltip">
                                                 Players may look at the next 3 Westeros cards from each deck at any time.
-                                        </Tooltip>}>
+                                            </Tooltip>}>
                                             <label htmlFor="westeros-phase-variant-setting">CoK Westeros Phase Variant</label>
                                         </OverlayTrigger>}
                                     checked={this.gameSettings.cokWesterosPhase}
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.cokWesterosPhase = !this.gameSettings.cokWesterosPhase)}
+                                />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="endless-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="endless-setting-tooltip">
+                                                The game will last until round 1000 unless a winner is declared earlier.
+                                            </Tooltip>}>
+                                            <label htmlFor="endless-setting">Endless mode</label>
+                                        </OverlayTrigger>}
+                                    checked={this.gameSettings.endless}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.endless = !this.gameSettings.endless)}
                                 />
                             </Col>
                         </Row>
