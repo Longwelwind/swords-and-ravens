@@ -1,4 +1,4 @@
-<div id="chat-container" style="height: 252px"></div>
+<div id="chat-container" style="height: 352px"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/preact/8.5.2/preact.min.js"
         integrity="sha256-uE3E2W7iyrYJy+/48n4qGW6IgqbRFBjALmSYLHzJtSs="
         crossorigin="anonymous">
@@ -58,12 +58,12 @@
 
         render() {
             return html`
-                <div style="overflow-y: scroll; overflow-x: hidden; height: 200px; background-color: #444; border-radius: 4px" class="p-2 mb-3">
+                <div style="overflow-y: scroll; overflow-x: hidden; height: 300px; background-color: #444; border-radius: 4px" class="p-2 mb-3">
                     <div class="row">
                         ${this.state.messages.slice().reverse().map(m => html`
                             <div class="col-12">
                                 <div class="row flex-nowrap no-gutters">
-                                    <div class="col-auto mx-1" style="margin-top: 0.2rem;">
+                                    <div class="col-auto mx-1" style="margin-top: 0.2rem;" data-toggle="tooltip" title="${m.created_at.toLocaleString()}">
                                         <small class="text-muted">${('0' + m.created_at.getHours()).slice(-2)}:${('0' + m.created_at.getMinutes()).slice(-2)}</small>
                                     </div>
                                     <div class="col-auto mx-2">
