@@ -130,16 +130,14 @@ export default class IngameGameState extends GameState<
         }
 
         if (this.game.turn != 0 && this.game.turn % 10 == 0) {
-            // Refresh the Westeros decks after every 10th round
-            for (let i=0; i < this.game.westerosDecks.length; i++) {
-                const deck = this.game.westerosDecks[i];
-                deck.forEach(wc => wc.discarded = false);
-                this.game.westerosDecks[i] = _.shuffle(deck);
-            };
+            // Refresh Westeros deck 3 after every 10th round
+            const deck3 = this.game.westerosDecks[2];
+            deck3.forEach(wc => wc.discarded = false);
+            this.game.westerosDecks[2] = _.shuffle(deck3);
 
             this.broadcastWesterosDecks();
 
-            // Shuffle the wildlings deck
+            // Reshuffle the wildling deck
             this.game.wildlingDeck = _.shuffle(this.game.wildlingDeck);
             this.game.houses.forEach(h => h.knowsNextWildlingCard = false);
             this.entireGame.broadcastToClients({type: "hide-top-wildling-card"});
