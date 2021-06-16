@@ -468,11 +468,13 @@ export default class IngameGameState extends GameState<
 
             const newPlayer = newUser ? new Player(newUser, oldPlayer.house) : null;
 
+            this.players.delete(oldPlayer.user);
+
             if (newUser && newPlayer) {
                 this.players.set(newUser, newPlayer);
-            } else {
-                this.players.delete(oldPlayer.user);
             }
+
+            this.rerender++;
         } else if (message.type == "vassal-relations") {
             this.game.vassalRelations = new BetterMap(message.vassalRelations.map(([vId, cId]) => [this.game.houses.get(vId), this.game.houses.get(cId)]));
             this.rerender++;

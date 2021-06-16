@@ -124,6 +124,11 @@ export class ReplacePlayer extends VoteType {
             newUser: this.replacer.id,
             house: this.forHouse.id
         });
+
+        // If we are waiting for the newPlayer, notify them about their turn
+        if (vote.ingame.leafState.getWaitedUsers().includes(newPlayer.user)) {
+            vote.ingame.entireGame.notifyWaitedUsers([newPlayer.user]);
+        }
     }
 
     serializeToClient(): SerializedReplacePlayer {
