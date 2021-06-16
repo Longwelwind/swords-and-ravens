@@ -13,7 +13,7 @@ interface ParentGameState extends GameState<any, any> {
     game: Game;
     ingame: IngameGameState;
 
-    onSelectWesterosCardFinish(house: House, westerosCard: WesterosCard, deckId: number): void;
+    onSelectWesterosCardFinish(house: House, westerosCard: WesterosCard | null, deckId: number): void;
 }
 
 export default class SelectWesterosCardGameState<P extends ParentGameState> extends GameState<P> {
@@ -27,6 +27,11 @@ export default class SelectWesterosCardGameState<P extends ParentGameState> exte
     firstStart(house: House, deckId: number): void {
         this.house = house;
         this.deckId = deckId;
+
+        // Due to endless mode Deck 3 will be completely discarded in round 20, 30, etc...
+        if (this.parentGameState.game.westerosDecks[deckId].every(wc => wc.discarded)) {
+            this.parentGameState.onSelectWesterosCardFinish(house, null, deckId);
+        }
     }
 
     select(westerosCard: WesterosCard): void {

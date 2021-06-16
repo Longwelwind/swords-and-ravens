@@ -138,6 +138,11 @@ export default class IngameGameState extends GameState<
             };
 
             this.broadcastWesterosDecks();
+
+            // Shuffle the wildlings deck
+            this.game.wildlingDeck = _.shuffle(this.game.wildlingDeck);
+            this.game.houses.forEach(h => h.knowsNextWildlingCard = false);
+            this.entireGame.broadcastToClients({type: "hide-top-wildling-card"});
         }
 
         this.game.turn++;
