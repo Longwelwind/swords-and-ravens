@@ -180,6 +180,7 @@ export interface UserSettings {
     lastOpenedTab: string | null;
     chatHouseNames: boolean;
     responsiveLayout: boolean;
+    muted: boolean;
 }
 
 export interface ChangeGameSettings {

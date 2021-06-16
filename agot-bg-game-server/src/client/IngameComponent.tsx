@@ -250,7 +250,17 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     <Row>
                         <Col xs="auto">
                             <button className="btn btn-outline-light btn-sm" onClick={() => this.props.gameClient.muted = !this.props.gameClient.muted}>
-                                <img src={this.props.gameClient.muted ? speakerOff : speaker} width={32}/>
+                                <OverlayTrigger
+                                    overlay={
+                                        <Tooltip id="mute-tooltip">
+                                            {this.props.gameClient.muted
+                                                ? "Unmute"
+                                                : "Mute"}
+                                        </Tooltip>
+                                    }
+                                >
+                                    <img src={this.props.gameClient.muted ? speakerOff : speaker} width={32}/>
+                                </OverlayTrigger>
                             </button>
                         </Col>
                         {this.authenticatedPlayer && (

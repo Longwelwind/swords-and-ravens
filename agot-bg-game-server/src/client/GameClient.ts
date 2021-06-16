@@ -32,7 +32,23 @@ export default class GameClient {
     @observable authenticated = false;
     @observable authenticatedUser: User | null = null
     chatClient: ChatClient = new ChatClient(this);
-    @observable muted = false;
+
+    get muted(): boolean {
+        if (!this.authenticatedUser) {
+            throw new Error("Game client must have an authenticated user");
+        }
+
+        return this.authenticatedUser.settings.muted;
+    }
+
+    set muted(value: boolean) {
+        if (!this.authenticatedUser) {
+            throw new Error("Game client must have an authenticated user");
+        }
+
+        this.authenticatedUser.settings.muted = value;
+        this.authenticatedUser.syncSettings();
+    }
 
     authData: AuthData;
 
@@ -40,11 +56,11 @@ export default class GameClient {
 
     get authenticatedPlayer(): Player | null {
         if (!this.authenticatedUser) {
-            throw new Error();
+            throw new Error("Game client must have an authenticated user");
         }
 
         if (!this.entireGame || !(this.entireGame.childGameState instanceof IngameGameState)) {
-            throw new Error();
+            throw new Error("authenticatedPlayer requires IngameGameState");
         }
 
         if (this.entireGame.childGameState.players.has(this.authenticatedUser)) {
