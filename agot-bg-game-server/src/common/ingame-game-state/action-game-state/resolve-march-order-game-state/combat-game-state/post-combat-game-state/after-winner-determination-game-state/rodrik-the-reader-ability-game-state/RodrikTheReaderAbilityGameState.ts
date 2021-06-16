@@ -52,8 +52,15 @@ export default class RodrikTheReaderAbilityGameState extends GameState<
         }
     }
 
-    onSelectWesterosCardFinish(house: House, westerosCard: WesterosCard, deckId: number): void {
+    onSelectWesterosCardFinish(house: House, westerosCard: WesterosCard | null, deckId: number): void {
         if (westerosCard == null) {
+            this.ingame.log({
+                type: "house-card-ability-not-used",
+                house: house.id,
+                houseCard: rodrikTheReader.id
+            });
+
+            this.parentGameState.onHouseCardResolutionFinish(house);
             return;
         }
 

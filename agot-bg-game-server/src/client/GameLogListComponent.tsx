@@ -937,7 +937,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <b>{house.name}</b>{units.length > 0 ? (<> chose to
-                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <b key={`preemptive_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></>), " and ")}.</>)
+                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <span key={`preemptive_${region.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`preemptive_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), " and ")}.</>)
                     : <> had no units to destroy.</>}
                 </>;
             }
@@ -1009,7 +1009,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <b>Mammoth Riders</b>: <b>{house.name}</b>{units.length > 0 ? (<> chose to
-                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <b key={`mammoth-riders_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></>), ", ")}.</>)
+                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <span key={`mammoth-riders_${region.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`mammoth-riders_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), ", ")}.</>)
                     : <> had no units to destroy.</>}
                 </>;
             }
@@ -1036,7 +1036,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <b>The Horde Descends</b>: <b>{house.name}</b>{units.length > 0 ? (<> chose to
-                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <>{joinReactNodes(unitTypes.map((ut, i) => <b key={`the-horde-descends_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></>), ", ")}.</>)
+                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <span key={`the-horde-descends_${region.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`the-horde-descends_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), ", ")}.</>)
                     : <> had no units to destroy.</>}
                 </>;
             }
