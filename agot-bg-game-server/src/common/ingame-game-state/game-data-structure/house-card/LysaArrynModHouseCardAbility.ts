@@ -9,7 +9,9 @@ import LysaArrynModAbilityGameState from "../../action-game-state/resolve-march-
 export default class LysaArrynModHouseCardAbility extends HouseCardAbility {
     afterWinnerDetermination(afterWinnerDetermination: AfterWinnerDeterminationGameState, house: House, _houseCard: HouseCard): void {
         const orderInDefendingRegion = afterWinnerDetermination.combatGameState.actionGameState.ordersOnBoard.tryGet(afterWinnerDetermination.combatGameState.defendingRegion, null);
-        if (orderInDefendingRegion && orderInDefendingRegion.type instanceof DefenseOrderType && afterWinnerDetermination.postCombatGameState.winner == house) {
+        if (house == afterWinnerDetermination.combatGameState.defender &&
+            orderInDefendingRegion && orderInDefendingRegion.type instanceof DefenseOrderType &&
+            afterWinnerDetermination.postCombatGameState.winner == house) {
             afterWinnerDetermination.childGameState
                 .setChildGameState(new LysaArrynModAbilityGameState(afterWinnerDetermination.childGameState))
                 .firstStart(house);
