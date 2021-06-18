@@ -89,6 +89,9 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                                 />
                             </Col>
                         </Row>
+                        <Row className="justify-content-center mt-2 mb-1">
+                            <a href="https://alecejones-noodoe.github.io/" target="_blank" rel="noopener noreferrer">FAQ</a>
+                        </Row>
                     </>
                 )}
             </>
