@@ -48,6 +48,10 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
     _lowestBidder: House | null;
     @observable biddingResults: [number, House[]][] | null;
 
+    get participatingHousesWithoutVassals(): House[] {
+        return this.participatingHouses.filter(h => !this.ingame.isVassalHouse(h));
+    }
+
     get excludedHouses(): House[] {
         return _.difference(this.game.houses.values, this.participatingHouses);
     }

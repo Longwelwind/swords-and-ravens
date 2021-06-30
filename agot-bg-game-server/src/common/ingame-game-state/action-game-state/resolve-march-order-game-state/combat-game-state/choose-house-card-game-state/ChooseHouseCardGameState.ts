@@ -70,7 +70,16 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
             const house = this.combatGameState.game.houses.get(message.houseId);
             this.removeSupportForHouse(house);
             this.combatGameState.houseCombatDatas.keys.forEach(h => {
-                this.combatGameState.houseCombatDatas.get(h).houseCardChosen = false;
+                const hcd = this.combatGameState.houseCombatDatas.get(h);
+                hcd.houseCardChosen = false;
+                hcd.houseCard = null;
+            });
+            this.combatGameState.rerender++;
+        } else if (message.type == "replaced-by-vassal") {
+            this.combatGameState.houseCombatDatas.keys.forEach(h => {
+                const hcd = this.combatGameState.houseCombatDatas.get(h);
+                hcd.houseCardChosen = false;
+                hcd.houseCard = null;
             });
             this.combatGameState.rerender++;
         }
@@ -226,6 +235,13 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
     refuseSupport(): void {
         this.entireGame.sendMessageToServer({
             type: "refuse-support"
+        });
+    }
+
+    actionAfterVassalReplacement(): void {
+        this.combatGameState.proceedToChooseGeneral();
+        this.entireGame.broadcastToClients({
+            type: "replaced-by-vassal"
         });
     }
 

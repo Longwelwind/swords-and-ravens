@@ -25,7 +25,7 @@ export default class SkinchangerScout extends WildlingCardType {
     executeWildlingWon(wildlingsAttack: WildlingsAttackGameState): void {
         const lowestBidder = wildlingsAttack.lowestBidder;
         const powerTokensToLose = [wildlingsAttack.lowestBidder]
-            .concat(wildlingsAttack.participatingHouses.filter(h => h != lowestBidder))
+            .concat(wildlingsAttack.participatingHousesWithoutVassals.filter(h => h != lowestBidder))
             .map((h, i) => [h, i == 0 ? -h.powerTokens : -2] as [House, number]);
 
         powerTokensToLose.forEach(([house, powerTokens]) => {

@@ -16,11 +16,13 @@ import AeronDamphairAbilityComponent from "./AeronDamphairAbilityComponent";
 import MaceTyrellAbilityGameState
     from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/immediately-house-card-abilities-resolution-game-state/mace-tyrell-ability-game-state/MaceTyrellAbilityGameState";
 import MaceTyrellAbilityComponent from "./MaceTyrellAbilityComponent";
+import React from "react";
 
 @observer
 export default class ImmediatelyHouseCardAbilitiesResolutionComponent extends Component<GameStateComponentProps<ImmediatelyHouseCardAbilitiesResolutionGameState>> {
     render(): ReactNode {
-        return renderChildGameState({...this.props, gameState: this.props.gameState.childGameState}, [
+        return this.props.gameState.combatGameState.stats.length > 0 ? <></> :
+            renderChildGameState({...this.props, gameState: this.props.gameState.childGameState}, [
             [QueenOfThornsAbilityGameState, QueenOfThornsAbilityComponent],
             [DoranMartellAbilityGameState, DoranMartellAbilityComponent],
             [AeronDamphairAbilityGameState, AeronDamphairAbilityComponent],

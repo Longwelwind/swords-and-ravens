@@ -60,6 +60,7 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
     }
 
     render(): JSX.Element {
+        const waitingFor = this.props.gameState.getWaitingForHouses();
         return (
             this.combat.stats.length > 0 ? <></> :
             <>
@@ -129,7 +130,7 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
                 )}
                 <Col xs={12}>
                     <div>
-                        Waiting for {this.props.gameState.getWaitingForHouses().map(h => h.name).join(" and ")} to choose their House Cards...
+                        Waiting for {waitingFor.map(h => h.name).join(" and ")} to choose their House Card{waitingFor.length > 1 && "s"}...
                     </div>
                 </Col>
             </>

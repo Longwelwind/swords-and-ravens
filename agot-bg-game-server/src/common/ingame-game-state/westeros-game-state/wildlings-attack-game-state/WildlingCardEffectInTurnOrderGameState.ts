@@ -47,6 +47,12 @@ export default abstract class WildlingCardEffectInTurnOrderGameState<C extends G
             return;
         }
 
+        if (this.parentGameState.ingame.isVassalHouse(nextHouse)) {
+            // This may happen when a house is replaced by a vassal during this game state
+            this.proceedNextHouse(nextHouse);
+            return;
+        }
+
         this.executeForEveryoneElse(nextHouse);
     }
 
@@ -55,8 +61,12 @@ export default abstract class WildlingCardEffectInTurnOrderGameState<C extends G
         // the lowest bidder.
         const turnOrder = this.parentGameState.game.ironThroneTrack
             .filter(h => h != this.parentGameState.lowestBidder)
-            .filter(h => this.parentGameState.participatingHouses.includes(h))
-            .filter(h => !this.parentGameState.ingame.isVassalHouse(h));
+            .filter(h => this.parentGameState.participatingHouses.includes(h));
+            // The vassal houses don't need to be filtered out here as
+            // participatingHouses are already filtered for non-vassals when starting the game state.
+            // This way the next house can be determined even if a player is replaced by a vassal
+            // during execution of a wildling penalty.
+            // .filter(h => !this.parentGameState.ingame.isVassalHouse(h));
 
         // If the previous house is the lowest bidder, begin the "Everyone else" phase of the
         // card.

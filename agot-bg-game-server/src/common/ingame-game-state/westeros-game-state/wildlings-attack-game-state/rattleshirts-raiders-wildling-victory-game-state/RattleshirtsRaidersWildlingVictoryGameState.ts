@@ -25,7 +25,7 @@ export default class RattleshirtsRaidersWildlingVictoryGameState extends GameSta
     }
 
     firstStart(): void {
-        [this.wildlingsAttack.lowestBidder].concat(_.without(this.wildlingsAttack.participatingHouses, this.wildlingsAttack.lowestBidder)).forEach((house, i) => {
+        [this.wildlingsAttack.lowestBidder].concat(_.without(this.wildlingsAttack.participatingHousesWithoutVassals, this.wildlingsAttack.lowestBidder)).forEach((house, i) => {
             const delta = i == 0 ? 2 : 1;
 
             this.wildlingsAttack.game.changeSupply(house, -delta);
@@ -33,13 +33,13 @@ export default class RattleshirtsRaidersWildlingVictoryGameState extends GameSta
 
         this.wildlingsAttack.entireGame.broadcastToClients({
             type: "supply-adjusted",
-            supplies: this.wildlingsAttack.participatingHouses.map(h => [h.id, h.supplyLevel])
+            supplies: this.wildlingsAttack.participatingHousesWithoutVassals.map(h => [h.id, h.supplyLevel])
         });
 
         this.ingame.log({
             type: "rattleshirts-raiders-wildling-victory",
             lowestBidder: this.wildlingsAttack.lowestBidder.id,
-            newSupply: this.wildlingsAttack.participatingHouses.map(h => [h.id, h.supplyLevel])
+            newSupply: this.wildlingsAttack.participatingHousesWithoutVassals.map(h => [h.id, h.supplyLevel])
         });
 
         this.setChildGameState(new ReconcileArmiesGameState(this)).firstStart();

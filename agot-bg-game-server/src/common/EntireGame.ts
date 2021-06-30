@@ -259,13 +259,13 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     async waitBeforeChangingChildGameState(parentGameState: GameState<any, any>, newChildGameState: GameState<any, any>): Promise<void> {
-        // Wait 4 seconds when CombatGameState is over to show the battle results via the CombatInfoComponent
+        // Wait 6 seconds when CombatGameState is over to show the battle results via the CombatInfoComponent
         if (this.hasChildGameState(CombatGameState) &&
                 // Only do it when there is no PostCombatGameState in the tree as PostCombat shows the dialog already
                 !this.hasChildGameState(PostCombatGameState) &&
                 !parentGameState.hasParentGameState(CombatGameState) &&
                 !newChildGameState.hasChildGameState(CombatGameState)) {
-            await sleep(5000);
+            await sleep(6000);
         }
     }
 
