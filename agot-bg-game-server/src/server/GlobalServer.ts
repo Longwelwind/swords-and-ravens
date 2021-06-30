@@ -105,8 +105,8 @@ export default class GlobalServer {
             console.warn(`Unvalid schema of JSON message: ${data}, ${this.clientMessageValidator.errors}`);
             return;
         }
-        console.log(message);
 
+        console.log(JSON.stringify(message));
 
         if (message.type == "authenticate") {
             const {userId, gameId, authToken} = message.authData;
@@ -365,7 +365,7 @@ export default class GlobalServer {
                     const userConnectionInfos = this.multiAccountingProtection.get(user.entireGame.id);
                     if (userConnectionInfos.has(socketId)) {
                         const date = new Date();
-                        date.setHours(date.getHours() + 1);
+                        date.setHours(date.getHours() + 3);
                         userConnectionInfos.get(socketId).invalidatesAt = date;
                     }
                 }
