@@ -7,7 +7,6 @@ import House from "../../../../ingame-game-state/game-data-structure/House";
 import IngameGameState from "../../../IngameGameState";
 import User from "../../../../../server/User";
 import { observable } from "mobx";
-import _ from "lodash";
 
 export default class ClaimVassalGameState extends GameState<ClaimVassalsGameState> {
     house: House;
@@ -84,14 +83,11 @@ export default class ClaimVassalGameState extends GameState<ClaimVassalsGameStat
         };
     }
 
-    actionAfterVassalReplacement(newVassal: House): void {
-        if (this.house == _.last(this.ingame.getTurnOrderWithoutVassals())) {
-            const vassalsToClaim = this.ingame.getNonClaimedVassalHouses();
-            this.parentGameState.assignVassals(this.house, vassalsToClaim);
-            this.parentGameState.parentGameState.onClaimVassalsFinished();
-        } else if (newVassal == this.house) {
-            this.parentGameState.onClaimVassalFinish(newVassal);
-        }
+    actionAfterVassalReplacement(_newVassal: House): void {
+        this.ingame.game.vassalRelations.keys.forEach(vassal => this.ingame.game.vassalRelations.delete(vassal));
+        this.ingame.broadcastVassalRelations();
+        const planning = this.parentGameState.parentGameState;
+        planning.setChildGameState(new ClaimVassalsGameState(planning)).firstStart();
     }
 
     static deserializeFromServer(claimVassals: ClaimVassalsGameState, data: SerializedClaimVassalGameState): ClaimVassalGameState {
