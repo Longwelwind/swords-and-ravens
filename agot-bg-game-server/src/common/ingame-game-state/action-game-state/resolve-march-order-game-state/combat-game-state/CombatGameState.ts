@@ -394,6 +394,7 @@ export default class CombatGameState extends GameState<
         });
     }
 
+    // This method returns true if it sets UseValyrianSteelBladeGameState as new childGameState
     proceedValyrianSteelBladeUsage(): boolean {
         // First the VSB can be used to change the drawn ToB card, so if the current childGameState is not UseVsbGameState ist must be for ToB change
         const forNewTidesOfBattleCard = this.isTidesOfBattleCardsActive && !(this.childGameState instanceof UseValyrianSteelBladeGameState);
@@ -405,7 +406,8 @@ export default class CombatGameState extends GameState<
         // Check if the sword has not been used this round
         if (!this.game.valyrianSteelBladeUsed) {
             // Check if VSB holder already decided to use (burn) the VSB during choose house card game state
-            if (this.valyrianSteelBladeUser != null) {
+            // And check as well the blade user is still the VSB holder (Doran!)
+            if (this.valyrianSteelBladeUser == this.game.valyrianSteelBladeHolder) {
                 this.game.valyrianSteelBladeUsed = true;
                 this.ingameGameState.log({
                     type: "combat-valyrian-sword-used",
@@ -419,6 +421,8 @@ export default class CombatGameState extends GameState<
                 });
 
                 return false;
+            } else {
+                this.valyrianSteelBladeUser = null;
             }
 
             // Check if one of the two participants can use the sword.
@@ -539,8 +543,8 @@ export default class CombatGameState extends GameState<
         return this.getCommandedHouseInCombat(player.house);
     }
 
-    proceedToChooseGeneral(): void {
-        this.setChildGameState(new ChooseHouseCardGameState(this)).firstStart();
+    proceedToChooseGeneral(choosableHouseCards: BetterMap<House, HouseCard[]> | null = null): void {
+        this.setChildGameState(new ChooseHouseCardGameState(this)).firstStart(choosableHouseCards);
     }
 
     proceedNextSupportDeclaration(): boolean {
