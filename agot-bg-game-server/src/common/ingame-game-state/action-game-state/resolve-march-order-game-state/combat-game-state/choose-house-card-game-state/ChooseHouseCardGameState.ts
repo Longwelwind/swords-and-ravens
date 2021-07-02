@@ -32,15 +32,27 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         return this.combatGameState.ingameGameState;
     }
 
-    firstStart(): void {
+    // To support assigning the same vassal cards after Refuse support has been triggered
+    // we allow passing the previous chosen house cards
+    firstStart(choosableHouseCards: BetterMap<House, HouseCard[]> | null = null): void {
         // Setup the choosable house cards
-        const vassalHouseCards = _.shuffle(this.ingameGameState.game.vassalHouseCards.values);
+        let vassalHouseCards = _.shuffle(this.ingameGameState.game.vassalHouseCards.values);
+        if (choosableHouseCards) {
+            const allCards = _.flatMap(choosableHouseCards.values);
+            vassalHouseCards = _.without(vassalHouseCards, ...allCards);
+        }
+
         this.choosableHouseCards = new BetterMap(this.combatGameState.houseCombatDatas.keys.map(h => {
             // If the house a player-controlled house, return the available cards.
             // If it a vassal, then randomly choose 3 of them.
-            const houseCards = (!this.ingameGameState.isVassalHouse(h)
-                ? h.houseCards.values.filter(hc => hc.state == HouseCardState.AVAILABLE)
-                : vassalHouseCards.splice(0, 3)).sort((a, b) => a.combatStrength - b.combatStrength);
+            let houseCards: HouseCard[];
+            if (choosableHouseCards && choosableHouseCards.has(h)) {
+                houseCards = choosableHouseCards.get(h);
+            } else {
+                houseCards = (!this.ingameGameState.isVassalHouse(h)
+                    ? h.houseCards.values.filter(hc => hc.state == HouseCardState.AVAILABLE)
+                    : vassalHouseCards.splice(0, 3)).sort((a, b) => a.combatStrength - b.combatStrength);
+            }
 
             // Assign the chosen house cards to the vassal house as some abilities require a hand during resolution
             if (this.ingameGameState.isVassalHouse(h)) {
@@ -140,8 +152,11 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                 houseId: commandedHouse.id
             });
 
+            const vassals = this.choosableHouseCards.keys.filter(h => this.ingameGameState.isVassalHouse(h));
+            const choosableHouseCards = vassals.length > 0 ? new BetterMap(vassals.map(h => [h, this.choosableHouseCards.get(h)])) : null;
+
             // Reset combatGameState.clientGameState to retrigger ChooseHouseCardGameState
-            this.combatGameState.proceedToChooseGeneral();
+            this.combatGameState.proceedToChooseGeneral(choosableHouseCards);
         }
     }
 
