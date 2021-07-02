@@ -543,8 +543,8 @@ export default class CombatGameState extends GameState<
         return this.getCommandedHouseInCombat(player.house);
     }
 
-    proceedToChooseGeneral(): void {
-        this.setChildGameState(new ChooseHouseCardGameState(this)).firstStart();
+    proceedToChooseGeneral(choosableHouseCards: BetterMap<House, HouseCard[]> | null = null): void {
+        this.setChildGameState(new ChooseHouseCardGameState(this)).firstStart(choosableHouseCards);
     }
 
     proceedNextSupportDeclaration(): boolean {
