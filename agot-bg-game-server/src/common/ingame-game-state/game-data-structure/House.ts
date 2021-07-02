@@ -26,13 +26,13 @@ export default class House {
         this.supplyLevel = supplyLevel;
     }
 
-    serializeToClient(): SerializedHouse {
+    serializeToClient(admin: boolean, isVassalHouse: boolean): SerializedHouse {
         return {
             id: this.id,
             name: this.name,
             color: this.color,
             knowsNextWildlingCard: this.knowsNextWildlingCard,
-            houseCards: this.houseCards.entries.map(([houseCardId, houseCard]) => [houseCardId, houseCard.serializeToClient()]),
+            houseCards: (admin || !isVassalHouse) ? this.houseCards.entries.map(([houseCardId, houseCard]) => [houseCardId, houseCard.serializeToClient()]) : [],
             unitLimits: this.unitLimits.map((unitType, limit) => [unitType.id, limit]),
             powerTokens: this.powerTokens,
             supplyLevel: this.supplyLevel

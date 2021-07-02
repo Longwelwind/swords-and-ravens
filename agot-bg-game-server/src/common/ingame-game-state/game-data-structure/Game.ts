@@ -410,7 +410,7 @@ export default class Game {
     serializeToClient(admin: boolean, knowsNextWildlingCard: boolean): SerializedGame {
         return {
             lastUnitId: this.lastUnitId,
-            houses: this.houses.values.map(h => h.serializeToClient()),
+            houses: this.houses.values.map(h => h.serializeToClient(admin, this.ingame.isVassalHouse(h))),
             world: this.world.serializeToClient(),
             turn: this.turn,
             ironThroneTrack: this.ironThroneTrack.map(h => h.id),
