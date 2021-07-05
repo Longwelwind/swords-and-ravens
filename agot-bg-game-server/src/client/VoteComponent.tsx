@@ -36,7 +36,7 @@ export default class VoteComponent extends Component<VoteComponentProps> {
                 <Col>
                     <b>{this.vote.initiator.name}</b> initiated a vote to <b>{this.vote.type.verb()}</b>. <b>{this.vote.positiveCountToPass} players must accept to pass the vote.</b>
                     <Row className="mt-1">
-                        <Col xs="auto" className={classNames({"displayNone": state != VoteState.ONGOING || this.props.gameClient.authenticatedPlayer == null})}>
+                        <Col xs="auto" className={classNames({"display-none": state != VoteState.ONGOING || this.props.gameClient.authenticatedPlayer == null})}>
                             <Button className="mb-1" variant="success" size="sm" onClick={() => this.vote.vote(true)}>Accept</Button><br/>
                             <Button variant="danger" size="sm" onClick={() => this.vote.vote(false)}>Refuse</Button>
                         </Col>

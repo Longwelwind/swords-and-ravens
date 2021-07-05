@@ -383,7 +383,7 @@ div.new-event {
   max-width: 100%;
 }
 
-.displayNone {
+.display-none {
   display: none;
 }
 
@@ -402,19 +402,19 @@ div.new-event {
  First we make the image black with "brightness(0) saturate(100%)"
  and then we apply the specified filters to get the color F39C12 (orange) for warning and FF0000 (red) for critical
 */
-.victoryPointsWarning {
+.dye-warning {
   filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(565%) hue-rotate(353deg) brightness(98%) contrast(94%);
 }
 
-.victoryPointsWarning:hover {
+.dye-warning:hover {
   filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(565%) hue-rotate(353deg) brightness(98%) contrast(94%);
 }
 
-.victoryPointsCritical {
+.dye-critical {
   filter: brightness(0) saturate(100%) invert(11%) sepia(82%) saturate(7445%) hue-rotate(4deg) brightness(109%) contrast(114%);
 }
 
-.victoryPointsCritical:hover {
+.dye-critical:hover {
   filter: brightness(0) saturate(100%) invert(11%) sepia(82%) saturate(7445%) hue-rotate(4deg) brightness(109%) contrast(114%);
 }
 

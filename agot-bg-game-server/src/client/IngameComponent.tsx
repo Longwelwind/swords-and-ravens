@@ -37,7 +37,7 @@ import speakerOff from "../../public/images/icons/speaker-off.svg";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import marked from "marked";
 import GameLogListComponent from "./GameLogListComponent";
-import Game from "../common/ingame-game-state/game-data-structure/Game";
+import Game, { MAX_WILDLING_STRENGTH } from "../common/ingame-game-state/game-data-structure/Game";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
 import GameEndedComponent from "./game-state-panel/GameEndedComponent";
 import Nav from "react-bootstrap/Nav";
@@ -138,6 +138,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const columnOrders = this.getColumnOrders(mobileDevice);
         const gameStateColumnSpan = this.getGameStateColumnSpan(mobileDevice, forceResponsiveLayout, draftHouseCards);
         const gameStatePanelOrders = this.getGameStatePanelOrders(mobileDevice, forceResponsiveLayout);
+
+        const gameRunning = !(this.ingame.leafState instanceof GameEndedGameState) && !(this.ingame.leafState instanceof CancelledGameState);
+        const roundWarning = gameRunning && (this.game.maxTurns - this.game.turn) == 1;
+        const roundCritical = gameRunning && (this.game.turn == this.game.maxTurns);
+
+        const wildlingsWarning = gameRunning && (this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 2 || this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 4);
+        const wildlingsCritical = gameRunning && this.game.wildlingStrength == MAX_WILDLING_STRENGTH;
 
         return (
             <>
@@ -387,8 +394,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 }
                                                 placement="auto">
                                                 <div>
-                                                    <img src={hourglassImage} width={28}/>
-                                                    {this.game.turn}
+                                                    <img className={classNames(
+                                                        {"dye-warning": roundWarning},
+                                                        {"dye-critical": roundCritical})}
+                                                        src={hourglassImage} width={28}/>
+                                                    <div style={{color: roundWarning ? "#F39C12" : roundCritical ? "#FF0000" : undefined}}>{this.game.turn}</div>
                                                 </div>
                                             </OverlayTrigger>
                                         </Row>
@@ -407,8 +417,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 }
                                                 placement="auto">
                                                 <div>
-                                                    <img src={mammothImage} width={28} className={knowsWildlingCard ? "wildling-highlight" : ""}/>
-                                                    {this.game.wildlingStrength}
+                                                    <img src={mammothImage} width={28} className={classNames(
+                                                        {"dye-warning": wildlingsWarning},
+                                                        {"dye-critical": wildlingsCritical},
+                                                        {"wildling-highlight": knowsWildlingCard})}
+                                                    />
+                                                    <div style={{color: wildlingsWarning ? "#F39C12" : wildlingsCritical ? "#FF0000" : undefined}}>{this.game.wildlingStrength}</div>
                                                 </div>
                                             </OverlayTrigger>
                                         </Row>

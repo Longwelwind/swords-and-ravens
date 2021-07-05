@@ -125,34 +125,34 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                         {this.defender.houseCardStrength}
                     </div>
 
-                    <div style={{gridRow: "5", gridColumn: "2"}} className={showTob ? "" : "displayNone"}>
+                    <div style={{gridRow: "5", gridColumn: "2"}} className={showTob ? "" : "display-none"}>
                         {this.attacker.tidesOfBattleCard ? this.attacker.tidesOfBattleCard.combatStrength : 0}
                     </div>
-                    <div style={{gridRow: "5", gridColumn: "3"}} className={showTob ? "" : "displayNone"}>
+                    <div style={{gridRow: "5", gridColumn: "3"}} className={showTob ? "" : "display-none"}>
                         <b>Tides<br/>of Battle</b>
                     </div>
-                    <div style={{gridRow: "5", gridColumn: "4"}} className={showTob ? "" : "displayNone"}>
+                    <div style={{gridRow: "5", gridColumn: "4"}} className={showTob ? "" : "display-none"}>
                         {this.defender.tidesOfBattleCard ? this.defender.tidesOfBattleCard.combatStrength : 0}
                     </div>
 
-                    <div style={{gridRow: "6", gridColumn: "2"}} className={showVsb ? "" : "displayNone"}>
+                    <div style={{gridRow: "6", gridColumn: "2"}} className={showVsb ? "" : "display-none"}>
                         {this.attacker.valyrianSteelBlade}
                     </div>
-                    <div style={{gridRow: "6", gridColumn: "3"}} className={showVsb ? "" : "displayNone"}>
+                    <div style={{gridRow: "6", gridColumn: "3"}} className={showVsb ? "" : "display-none"}>
                         <b>Valyrian Steel<br/>Blade</b>
                     </div>
-                    <div style={{gridRow: "6", gridColumn: "4"}} className={showVsb ? "" : "displayNone"}>
+                    <div style={{gridRow: "6", gridColumn: "4"}} className={showVsb ? "" : "display-none"}>
                         {this.defender.valyrianSteelBlade}
                     </div>
 
-                    <div style={{gridRow: "6 / span 3", gridColumn: "1"}} className={showTob ? "" : "displayNone"}>
+                    <div style={{gridRow: "6 / span 3", gridColumn: "1"}} className={showTob ? "" : "display-none"}>
                         {this.attacker.tidesOfBattleCard ? (
                             <TidesOfBattleCardComponent tidesOfBattleCard={this.attacker.tidesOfBattleCard}/>
                         ) : <div className="vertical-game-card game-card-slot tiny"/>}
 
                     </div>
 
-                    <div style={{gridRow: "6 / span 3", gridColumn: "5"}} className={showTob ? "" : "displayNone"}>
+                    <div style={{gridRow: "6 / span 3", gridColumn: "5"}} className={showTob ? "" : "display-none"}>
                         {this.defender.tidesOfBattleCard ? (
                             <TidesOfBattleCardComponent tidesOfBattleCard={this.defender.tidesOfBattleCard}/>
                         ) : <div className="vertical-game-card game-card-slot tiny"/>}
