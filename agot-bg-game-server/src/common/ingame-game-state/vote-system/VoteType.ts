@@ -5,6 +5,8 @@ import House from "../game-data-structure/House";
 import Player from "../Player";
 import User from "../../../server/User";
 import CombatGameState from "../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
+import WildlingCardEffectInTurnOrderGameState from "../westeros-game-state/wildlings-attack-game-state/WildlingCardEffectInTurnOrderGameState";
+import GameState from "../../../common/GameState";
 
 export type SerializedVoteType = SerializedCancelGame | SerializedEndGame | SerializedReplacePlayer | SerializedReplacePlayerByVassal;
 
@@ -227,6 +229,14 @@ export class ReplacePlayerByVassal extends VoteType {
         });
 
         vote.ingame.leafState.actionAfterVassalReplacement(oldPlayer.house);
+
+        if (vote.ingame.hasChildGameState(WildlingCardEffectInTurnOrderGameState)) {
+            const wildlingEffect = vote.ingame.getChildGameState(WildlingCardEffectInTurnOrderGameState) as WildlingCardEffectInTurnOrderGameState<GameState<any, any>>;
+            const leaf = vote.ingame.leafState as any;
+            if (leaf.house && leaf.house == oldPlayer.house) {
+                wildlingEffect.proceedNextHouse(oldPlayer.house);
+            }
+        }
     }
 
     serializeToClient(): SerializedReplacePlayerByVassal {
