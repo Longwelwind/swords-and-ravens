@@ -22,6 +22,8 @@ import UserLabel from "./UserLabel";
 import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
 import { observer } from "mobx-react";
 import GiftPowerTokensComponent from "./GiftPowerTokensComponent";
+import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
+import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
 
 
 interface HouseRowComponentProps {
@@ -53,9 +55,10 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     }
 
     render(): ReactNode {
+        const gameRunning = !(this.props.ingame.leafState instanceof GameEndedGameState) && !(this.props.ingame.leafState instanceof CancelledGameState);
         const totalHeldStructures = this.game.getTotalHeldStructures(this.house);
-        const victoryPointsWarning = this.game.structuresCountNeededToWin - 2 == totalHeldStructures;
-        const victoryPointsCritical = this.game.structuresCountNeededToWin - 1 == totalHeldStructures;
+        const victoryPointsWarning = gameRunning && (this.game.structuresCountNeededToWin - 2 == totalHeldStructures);
+        const victoryPointsCritical = gameRunning && (this.game.structuresCountNeededToWin - 1 == totalHeldStructures);
         return this.props.ingame.rerender >= 0 && <>
             <ListGroupItem>
                 <Row className="align-items-center">
@@ -137,8 +140,8 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                             <img
                                 className={classNames(
                                     "hover-weak-outline",
-                                    {"victoryPointsWarning": victoryPointsWarning},
-                                    {"victoryPointsCritical": victoryPointsCritical})}
+                                    {"dye-warning": victoryPointsWarning},
+                                    {"dye-critical": victoryPointsCritical})}
                                 src={castleImage} width={32}
                                 style={{marginLeft: "10px"}}
                             />

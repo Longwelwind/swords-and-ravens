@@ -6,6 +6,7 @@ import {ServerMessage} from "../../../messages/ServerMessage";
 import Game from "../game-data-structure/Game";
 import IngameGameState from "../IngameGameState";
 import User from "../../../server/User";
+import _ from "lodash";
 
 interface ParentGameState extends GameState<any, any> {
     game: Game;
@@ -72,6 +73,18 @@ export default class SimpleChoiceGameState extends GameState<ParentGameState> {
             type: "choose-choice",
             choice: choice
         });
+    }
+
+    actionAfterVassalReplacement(newVassal: House): void {
+        if (!this.description.includes("The holder of the Iron Throne must choose between")) {
+            super.actionAfterVassalReplacement(newVassal);
+            return;
+        }
+
+        this.parentGameState.setChildGameState(new SimpleChoiceGameState(this.parentGameState)).firstStart(
+            this.parentGameState.ingame.game.ironThroneHolder,
+            this.description,
+            _.without(this.choices, newVassal.name));
     }
 
     static deserializeFromServer(parentGameState: ParentGameState, data: SerializedSimpleChoiceGameState): SimpleChoiceGameState {
