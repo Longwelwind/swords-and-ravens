@@ -1,5 +1,6 @@
 import BetterMap from "../utils/BetterMap";
 import baratheonBack from "../../public/images/house-cards/BaratheonBack.png";
+import boltonBack from "../../public/images/house-cards/BoltonBack.png";
 import starkBack from "../../public/images/house-cards/StarkBack.png";
 import lannisterBack from "../../public/images/house-cards/LannisterBack.png";
 import greyjoyBack from "../../public/images/house-cards/GreyjoyBack.png";
@@ -19,7 +20,8 @@ const houseCardsBackImages = new BetterMap([
     ["martell", martellBack],
     ["vassal", vassalBack],
     ["arryn", arrynBack],
-    ["targaryen", targaryenBack]
+    ["targaryen", targaryenBack],
+    ["bolton", boltonBack]
 ]);
 
 export default houseCardsBackImages;

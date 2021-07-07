@@ -1,5 +1,6 @@
 import BetterMap from "../utils/BetterMap";
 import baratheonPowerToken from "../../public/images/power-tokens/BaratheonPower.png";
+import boltonPowerToken from '../../public/images/power-tokens/BoltonPower.png'
 import tyrellPowerToken from "../../public/images/power-tokens/TyrellPower.png";
 import martellPowerToken from "../../public/images/power-tokens/MartellPower.png";
 import starkPowerToken from "../../public/images/power-tokens/StarkPower.png";
@@ -14,7 +15,8 @@ const housePowerTokensImages = new BetterMap([
     ["martell", martellPowerToken],
     ["lannister", lannisterPowerToken],
     ["greyjoy", greyjoyPowerToken],
-    ["arryn", arrynPowerToken]
+    ["arryn", arrynPowerToken],
+    ["bolton", boltonPowerToken]
 ]);
 
 export default housePowerTokensImages;

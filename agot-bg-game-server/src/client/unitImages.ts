@@ -4,6 +4,10 @@ import barathFoot from "../../public/images/units/BarathFoot.png";
 import barathKnight from "../../public/images/units/BarathKnight.png";
 import barathSiege from "../../public/images/units/BarathSeige.png";
 import barathShip from "../../public/images/units/BarathShip.png";
+import boltonFoot from "../../public/images/units/BoltonFoot.png";
+import boltonKnight from "../../public/images/units/BoltonKnight.png";
+import boltonSiege from "../../public/images/units/BoltonSiege.png";
+import boltonShip from "../../public/images/units/BoltonShip.png";
 import lanFoot from "../../public/images/units/LanFoot.png";
 import lanKnight from "../../public/images/units/LanKnight.png";
 import lanSiege from "../../public/images/units/LanSeige.png";
@@ -72,6 +76,12 @@ const unitImages = new BetterMap([
         [knight.id, arrynKnight],
         [siegeEngine.id, arrynSiege],
         [ship.id, arrynShip]
+    ])],
+    ["bolton", new BetterMap([
+        [footman.id, boltonFoot],
+        [knight.id, boltonKnight],
+        [siegeEngine.id, boltonSiege],
+        [ship.id, boltonShip]
     ])]
 ]);
 
