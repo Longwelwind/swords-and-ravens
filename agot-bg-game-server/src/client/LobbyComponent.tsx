@@ -24,6 +24,7 @@ import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluen
 import { observable } from "mobx";
 import DebouncedPasswordComponent from "./utils/DebouncedPasswordComponent";
 import { faLock } from "@fortawesome/free-solid-svg-icons";
+import houseInfluenceImages, { boltonInfluenceImage, starkInfluenceImage } from "./houseInfluenceImages";
 
 interface LobbyComponentProps {
     gameClient: GameClient;
@@ -234,6 +235,16 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
 
     leave(): void {
         this.lobby.chooseHouse(null, this.password);
+    }
+
+    componentWillUpdate(): void {
+        if (this.entireGame.gameSettings.adwdHouseCards || this.entireGame.gameSettings.setupId == "a-dance-with-dragons") {
+            houseInfluenceImages.set("stark", boltonInfluenceImage);
+            this.lobby.lobbyHouses.get("stark").name = "Bolton";
+        } else {
+            houseInfluenceImages.set("stark", starkInfluenceImage);
+            this.lobby.lobbyHouses.get("stark").name = "Stark";
+        }
     }
 
     componentDidMount(): void {

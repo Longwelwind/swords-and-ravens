@@ -19,4 +19,6 @@ const houseInfluenceImages = new BetterMap([
     ["bolton", boltonInfluence]
 ]);
 
+export const boltonInfluenceImage = boltonInfluence;
+export const starkInfluenceImage = starkInfluence;
 export default houseInfluenceImages;

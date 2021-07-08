@@ -703,21 +703,20 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     componentWillMount(): void {
-        // Check for Dance with Dragons setup
-        if (this.props.gameState.entireGame.gameSettings.setupId != 'a-dance-with-dragons') {
-            return;
+        // Check for Dance with Dragons house cards
+        if (this.props.gameState.entireGame.gameSettings.adwdHouseCards ||
+            this.props.gameState.entireGame.gameSettings.setupId == "a-dance-with-dragons") {
+            // Replace Stark images with Bolton images for DwD
+            houseCardsBackImages.set("stark", houseCardsBackImages.get("bolton"));
+            houseInfluenceImages.set("stark", houseInfluenceImages.get("bolton"));
+            houseOrderImages.set("stark", houseOrderImages.get("bolton"));
+            housePowerTokensImages.set("stark", housePowerTokensImages.get("bolton"));
+            unitImages.set("stark", unitImages.get("bolton"));
+
+            const boltons = this.props.gameState.game.houses.get("stark");
+            boltons.name = "Bolton";
+            boltons.color = "#3f67b6"
         }
-
-        // Replace Stark images with Bolton images for DwD
-        houseCardsBackImages.set("stark", houseCardsBackImages.get("bolton"));
-        houseInfluenceImages.set("stark", houseInfluenceImages.get("bolton"));
-        houseOrderImages.set("stark", houseOrderImages.get("bolton"));
-        housePowerTokensImages.set("stark", housePowerTokensImages.get("bolton"));
-        unitImages.set("stark", unitImages.get("bolton"));
-
-        const boltons = this.props.gameState.game.houses.get("stark");
-        boltons.name = "Bolton";
-        boltons.color = "#3f67b6"
     }
 
     componentDidMount(): void {
