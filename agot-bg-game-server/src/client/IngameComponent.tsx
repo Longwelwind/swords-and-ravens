@@ -68,6 +68,11 @@ import DraftHouseCardsComponent from "./game-state-panel/DraftHouseCardsComponen
 import ThematicDraftHouseCardsGameState from "../common/ingame-game-state/thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 import ThematicDraftHouseCardsComponent from "./game-state-panel/ThematicDraftHouseCardsComponent";
 import ClashOfKingsGameState from "../common/ingame-game-state/westeros-game-state/clash-of-kings-game-state/ClashOfKingsGameState";
+import houseCardsBackImages from "./houseCardsBackImages";
+import houseInfluenceImages from "./houseInfluenceImages";
+import houseOrderImages from "./houseOrderImages";
+import housePowerTokensImages from "./housePowerTokensImages";
+import unitImages from "./unitImages";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -698,9 +703,26 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     componentDidMount(): void {
+        this.checkAndReplaceStarkWithBoltonImages();
         this.props.gameState.entireGame.onNewPrivateChatRoomCreated = (roomId: string) => this.onNewPrivateChatRoomCreated(roomId);
         window.addEventListener('resize', () => this.setHeight());
         this.setHeight();
+    }
+
+    checkAndReplaceStarkWithBoltonImages(): void {
+        if (this.props.gameState.entireGame.gameSettings.setupId != 'a-dance-with-dragons') {
+            return;
+        }
+
+        houseCardsBackImages.set("stark", houseCardsBackImages.get("bolton"));
+        houseInfluenceImages.set("stark", houseInfluenceImages.get("bolton"));
+        houseOrderImages.set("stark", houseOrderImages.get("bolton"));
+        housePowerTokensImages.set("stark", housePowerTokensImages.get("bolton"));
+        unitImages.set("stark", unitImages.get("bolton"));
+
+        const boltons = this.props.gameState.game.houses.get("stark");
+        boltons.name = "Bolton";
+        boltons.color = "#3f67b6"
     }
 
     componentWillUnmount(): void {
