@@ -702,18 +702,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         this.currentOpenedTab = roomId;
     }
 
-    componentDidMount(): void {
-        this.checkAndReplaceStarkWithBoltonImages();
-        this.props.gameState.entireGame.onNewPrivateChatRoomCreated = (roomId: string) => this.onNewPrivateChatRoomCreated(roomId);
-        window.addEventListener('resize', () => this.setHeight());
-        this.setHeight();
-    }
-
-    checkAndReplaceStarkWithBoltonImages(): void {
+    componentWillMount(): void {
+        // Check for Dance with Dragons setup
         if (this.props.gameState.entireGame.gameSettings.setupId != 'a-dance-with-dragons') {
             return;
         }
 
+        // Replace Stark images with Bolton images for DwD
         houseCardsBackImages.set("stark", houseCardsBackImages.get("bolton"));
         houseInfluenceImages.set("stark", houseInfluenceImages.get("bolton"));
         houseOrderImages.set("stark", houseOrderImages.get("bolton"));
@@ -723,6 +718,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const boltons = this.props.gameState.game.houses.get("stark");
         boltons.name = "Bolton";
         boltons.color = "#3f67b6"
+    }
+
+    componentDidMount(): void {
+        this.props.gameState.entireGame.onNewPrivateChatRoomCreated = (roomId: string) => this.onNewPrivateChatRoomCreated(roomId);
+        window.addEventListener('resize', () => this.setHeight());
+        this.setHeight();
     }
 
     componentWillUnmount(): void {
