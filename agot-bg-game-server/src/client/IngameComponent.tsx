@@ -715,7 +715,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
             const boltons = this.props.gameState.game.houses.get("stark");
             boltons.name = "Bolton";
-            boltons.color = "#3f67b6"
+            boltons.color = "#c59699"
         }
     }
 
