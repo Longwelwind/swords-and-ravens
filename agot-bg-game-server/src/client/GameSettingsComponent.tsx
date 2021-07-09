@@ -330,6 +330,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
         this.changeGameSettings(() => this.entireGame.gameSettings.randomHouses = !this.entireGame.gameSettings.randomHouses)
     }
 
+    componentDidMount(): void {
+        // Fake a dummy initial settings change, to properly update the Stark / Bolton house name the first time
+        if (this.props.gameClient.isRealOwner() &&
+            this.props.entireGame.childGameState instanceof LobbyGameState &&
+            this.props.entireGame.childGameState.players.size == 0) {
+            this.changeGameSettings(() => {});
+        }
+    }
+
     /**
      * Helper function to modify gameSettings and update the game settings.
      * @param action Function that modifies gameSettings
