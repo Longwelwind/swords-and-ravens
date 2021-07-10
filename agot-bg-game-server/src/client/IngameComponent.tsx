@@ -713,9 +713,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             housePowerTokensImages.set("stark", housePowerTokensImages.get("bolton"));
             unitImages.set("stark", unitImages.get("bolton"));
 
-            const boltons = this.props.gameState.game.houses.get("stark");
-            boltons.name = "Bolton";
-            boltons.color = "#c59699"
+            const boltons = this.props.gameState.game.houses.tryGet("stark", null);
+            if (boltons) {
+                boltons.name = "Bolton";
+                boltons.color = "#c59699"
+            }
         }
     }
 
