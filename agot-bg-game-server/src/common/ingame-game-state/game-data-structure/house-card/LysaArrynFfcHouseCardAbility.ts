@@ -7,7 +7,7 @@ import House from "../House";
 export default class LysaArrynFfcHouseCardAbility extends HouseCardAbility {
     afterCombat(afterCombat: AfterCombatHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {
         const enemy = afterCombat.combatGameState.getEnemy(house);
-        if (afterCombat.combatGameState.ingameGameState.getControllerOfHouse(enemy).house.powerTokens > house.powerTokens) {
+        if (!afterCombat.combatGameState.ingameGameState.isVassalHouse(enemy) && enemy.powerTokens > house.powerTokens) {
             const gainedPowerTokens = afterCombat.combatGameState.ingameGameState.changePowerTokens(house, 3);
             afterCombat.combatGameState.ingameGameState.log({
                 type: "lysa-arryn-ffc-power-tokens-gained",

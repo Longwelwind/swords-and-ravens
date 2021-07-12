@@ -5,6 +5,10 @@ import CombatGameState from "../../action-game-state/resolve-march-order-game-st
 
 export default class BronzeYohnRoyceFfcHouseCardAbility extends HouseCardAbility {
     modifyCombatStrength(combat: CombatGameState, house: House, houseCard: HouseCard, affectedHouseCard: HouseCard): number {
-        return houseCard == affectedHouseCard && house.powerTokens > combat.ingameGameState.getControllerOfHouse(combat.getEnemy(house)).house.powerTokens ? 1 : 0;
+        if (houseCard != affectedHouseCard) {
+            return 0;
+        }
+        const enemy = combat.getEnemy(house);
+        return combat.ingameGameState.isVassalHouse(enemy) || house.powerTokens > enemy.powerTokens ? 1 : 0;
     }
 }
