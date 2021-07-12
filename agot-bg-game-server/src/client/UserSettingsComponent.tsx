@@ -56,8 +56,7 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                                         <OverlayTrigger overlay={
                                             <Tooltip id="map-scrollbar-tooltip">
                                                 Enables a fixed game map with a scrollbar. The map height then resizes with the actual window height.
-                                                It will be only available for desktop browsers. So you can keep it activated without affecting the
-                                                mobile decvice experience.
+                                                Keeping it activated won&apos;t affect the mobile experience.
                                             </Tooltip>}>
                                             <label htmlFor="map-scrollbar-setting">Map scrollbar (Desktop only)</label>
                                         </OverlayTrigger>}
