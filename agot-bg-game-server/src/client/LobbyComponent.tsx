@@ -239,10 +239,10 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
 
     componentWillUpdate(): void {
         if (this.entireGame.gameSettings.adwdHouseCards || this.entireGame.gameSettings.setupId == "a-dance-with-dragons") {
-            setStarkInfluenceImage();
+            setBoltonInfluenceImage();
             this.lobby.lobbyHouses.get("stark").name = "Bolton";
         } else {
-            setBoltonInfluenceImage();
+            setStarkInfluenceImage();
             this.lobby.lobbyHouses.get("stark").name = "Stark";
         }
     }
