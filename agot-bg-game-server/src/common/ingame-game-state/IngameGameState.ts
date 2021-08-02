@@ -465,14 +465,13 @@ export default class IngameGameState extends GameState<
         } else if (message.type == "player-replaced") {
             const oldPlayer = this.players.get(this.entireGame.users.get(message.oldUser));
             const newUser = message.newUser ? this.entireGame.users.get(message.newUser) : null;
-
             const newPlayer = newUser ? new Player(newUser, oldPlayer.house) : null;
-
-            this.players.delete(oldPlayer.user);
 
             if (newUser && newPlayer) {
                 this.players.set(newUser, newPlayer);
             }
+
+            this.players.delete(oldPlayer.user);
 
             this.rerender++;
         } else if (message.type == "vassal-relations") {

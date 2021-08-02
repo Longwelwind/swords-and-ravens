@@ -10,7 +10,10 @@ export default class AlayneStoneHouseCardAbility extends HouseCardAbility {
     afterWinnerDetermination(afterWinnerDetermination: AfterWinnerDeterminationGameState, house: House, _houseCard: HouseCard): void {
         if (afterWinnerDetermination.postCombatGameState.winner == house && house.powerTokens >= 2) {
             const capitalOfHouse = afterWinnerDetermination.combatGameState.world.getCapitalOfHouse(house);
-            if (capitalOfHouse && capitalOfHouse.getController() == house) {
+            // getController() will return the wrong house when the player regains their capital with the current fight
+            // as the attacking army hasn't moved into the attacked region yet. Therefore we need an extra handling.
+            if ((capitalOfHouse && capitalOfHouse.getController() == house) ||
+                (afterWinnerDetermination.postCombatGameState.combat.defendingRegion == capitalOfHouse)) {
                 afterWinnerDetermination.childGameState
                     .setChildGameState(new AlayneStoneAbilityGameState(afterWinnerDetermination.childGameState))
                     .firstStart(house);
