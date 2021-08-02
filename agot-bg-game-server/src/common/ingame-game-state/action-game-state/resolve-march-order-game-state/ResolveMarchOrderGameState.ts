@@ -17,6 +17,7 @@ import { port } from "../../game-data-structure/regionTypes";
 import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameState } from "./take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
 import { findOrphanedShipsAndDestroyThem } from "../../port-helper/PortHelper";
 import _ from "lodash";
+import houseCardAbilities from "../../game-data-structure/house-card/houseCardAbilities";
 
 export default class ResolveMarchOrderGameState extends GameState<ActionGameState, ResolveSingleMarchOrderGameState | CombatGameState | TakeControlOfEnemyPortGameState> {
     public currentTurnOrderIndex: number;
@@ -207,9 +208,9 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
             message.manipulatedHouseCards.forEach(([hcid, shc]) => {
                 const found = allHouseCards.find(hc => hc.id == hcid);
                 if (found) {
-                    found.combatStrength = shc.combatStrength;
-                    found.swordIcons = shc.swordIcons;
-                    found.towerIcons = shc.towerIcons;
+                    found.ability = shc.abilityId ? houseCardAbilities.get(shc.abilityId) : null;
+                    found.disabled = shc.disabled;
+                    found.disabledAbility = shc.disabledAbilityId ? houseCardAbilities.get(shc.disabledAbilityId) : null;
                 }
             });
 
