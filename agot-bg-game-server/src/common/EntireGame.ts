@@ -31,7 +31,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     @observable gameSettings: GameSettings = { pbem: false, setupId: "base-game", playerCount: 6, randomHouses: false,
         cokWesterosPhase: false, adwdHouseCards: false, vassals: false,
         seaOrderTokens: false, randomChosenHouses: false, draftHouseCards: false, tidesOfBattle: false,
-        thematicDraft: false, endless: false };
+        thematicDraft: false, endless: false, startWithSevenPowerTokens: false, allowGiftingPowerTokens: false };
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -292,9 +292,12 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             settings.adwdHouseCards = false;
         }
 
-        if (settings.setupId == "mother-of-dragons") {
+        // Allow disabling MoD options but enable them when switching to this setup
+        if (this.gameSettings.setupId != "mother-of-dragons" && settings.setupId == "mother-of-dragons") {
             settings.vassals = true;
             settings.seaOrderTokens = true;
+            settings.allowGiftingPowerTokens = true;
+            settings.startWithSevenPowerTokens = true;
         }
 
         // Check if PBEM was enabled during ingame
@@ -446,13 +449,14 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
         entireGame.users = new BetterMap<string, User>(data.users.map((ur: any) => [ur.id, User.deserializeFromServer(entireGame, ur)]));
         entireGame.ownerUserId = data.ownerUserId;
-        entireGame.childGameState = entireGame.deserializeChildGameState(data.childGameState);
         entireGame.publicChatRoomId = data.publicChatRoomId;
         entireGame.gameSettings = data.gameSettings;
         entireGame.privateChatRoomsIds = new BetterMap(data.privateChatRoomIds.map(([uid1, bm]) => [
             entireGame.users.get(uid1),
             new BetterMap(bm.map(([uid2, roomId]) => [entireGame.users.get(uid2), roomId]))
         ]));
+
+        entireGame.childGameState = entireGame.deserializeChildGameState(data.childGameState);
 
         return entireGame;
     }
@@ -491,8 +495,10 @@ export interface GameSettings {
     cokWesterosPhase: boolean;
     vassals: boolean;
     seaOrderTokens: boolean;
-    draftHouseCards: boolean;
+    startWithSevenPowerTokens: boolean;
+    allowGiftingPowerTokens: boolean;
     tidesOfBattle: boolean;
+    draftHouseCards: boolean;
     thematicDraft: boolean;
     endless: boolean;
 }

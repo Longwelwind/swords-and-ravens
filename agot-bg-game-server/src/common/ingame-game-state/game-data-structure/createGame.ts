@@ -188,11 +188,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
                     .map(([unitTypeId, limit]) => [unitTypes.get(unitTypeId), limit])
             );
 
-            let powerTokens = gameSettings.vassals ? playerHouses.length < entireGame.selectedGameSetup.playerCount ? 7 : 5 : 5;
-            if (entireGame.gameSettings.setupId == "mother-of-dragons") {
-                powerTokens = 7;
-            }
-            const house = new House(hid, houseData.name, houseData.color, playerHouses.includes(hid) ? houseCards : new BetterMap(), unitLimits, powerTokens, houseData.supplyLevel);
+            const house = new House(hid, houseData.name, houseData.color, playerHouses.includes(hid) ? houseCards : new BetterMap(), unitLimits, gameSettings.startWithSevenPowerTokens ? 7 : 5, houseData.supplyLevel);
 
             return [hid, house];
         })

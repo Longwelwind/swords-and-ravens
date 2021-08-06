@@ -898,6 +898,21 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "37",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                if (serializedGame.gameSettings.setupId == "mother-of-dragons") {
+                    serializedGame.gameSettings.allowGiftingPowerTokens = true;
+                    serializedGame.gameSettings.seaOrderTokens = true;
+                    serializedGame.gameSettings.vassals = true;
+                    serializedGame.gameSettings.startWithSevenPowerTokens = true;
+                }
+            }
+
+            return serializedGame;
+        }
     }
 ];
 
