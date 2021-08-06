@@ -735,7 +735,7 @@ export default class CombatGameState extends GameState<
                 {
                     army: army.map(uid => combatGameState.world.getUnitById(uid)),
                     region,
-                    houseCard: houseCardId ? combatGameState.ingameGameState.game.getHouseCardById(houseCardId) : null,
+                    houseCard: houseCardId ? combatGameState.game.getHouseCardById(houseCardId) : null,
                     tidesOfBattleCard: tidesOfBattleCardId === undefined ? undefined : tidesOfBattleCardId ? tidesOfBattleCards.get(tidesOfBattleCardId) : null
                 }
             ]

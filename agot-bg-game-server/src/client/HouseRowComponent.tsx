@@ -219,8 +219,15 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
             <small>Available: </small><b>{availablePower}</b><br/>
             <small>On the board: </small><b>{powerTokensOnBoard}</b><br/>
             <small>Power Pool: </small><b>{powerInPool}</b>
-            {this.props.gameClient.authenticatedPlayer && this.props.gameClient.authenticatedPlayer.house != house &&
-                <div className="mt-1" ><br/><GiftPowerTokensComponent toHouse={this.house} authenticatedPlayer={this.props.gameClient.authenticatedPlayer} ingame={this.props.ingame}/></div>
+            {this.props.ingame.entireGame.gameSettings.allowGiftingPowerTokens &&
+                this.props.gameClient.authenticatedPlayer &&
+                this.props.gameClient.authenticatedPlayer.house != house &&
+                <div className="mt-1" ><br/>
+                    <GiftPowerTokensComponent 
+                        toHouse={this.house}
+                        authenticatedPlayer={this.props.gameClient.authenticatedPlayer}
+                        ingame={this.props.ingame}/>
+                </div>
             }
         </Popover>;
     }

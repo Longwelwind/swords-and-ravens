@@ -720,6 +720,10 @@ export default class IngameGameState extends GameState<
     }
 
     canGiftPowerTokens(): boolean {
+        if (!this.entireGame.gameSettings.allowGiftingPowerTokens) {
+            return false;
+        }
+
         if (this.entireGame.hasChildGameState(CombatGameState) &&
             !(this.entireGame.leafState instanceof DeclareSupportGameState)) {
             return false;

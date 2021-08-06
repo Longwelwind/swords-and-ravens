@@ -114,18 +114,34 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         <Row>
                             <Col xs="auto">
                                 <FormCheck
+                                    id="tides-of-battle-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="tides-of-battle-tooltip">
+                                                Optional game module that enhances the risks and uncertainty of combat.
+                                            </Tooltip>}>
+                                            <label htmlFor="tides-of-battle-setting">Tides of Battle</label>
+                                        </OverlayTrigger>}
+                                    checked={this.gameSettings.tidesOfBattle}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.tidesOfBattle = !this.gameSettings.tidesOfBattle)}
+                                />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
                                     id="vassals-setting"
                                     type="checkbox"
                                     label={
                                         <OverlayTrigger overlay={
                                             <Tooltip id="vassals-tooltip">
-                                                Unassigned houses will be vassals from Mother of Dragons expansion and players start with 7 Power tokens instead of 5.
+                                                Unassigned houses will be vassals introduced by the Mother of Dragons expansion.
                                             </Tooltip>}>
                                             <label htmlFor="vassals-setting">MoD Vassals</label>
                                         </OverlayTrigger>}
                                     checked={this.gameSettings.vassals}
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.vassals = !this.gameSettings.vassals)}
-                                    disabled={this.props.entireGame.gameSettings.setupId == "mother-of-dragons"}
                                 />
                             </Col>
                         </Row>
@@ -137,24 +153,46 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     label={
                                         <OverlayTrigger overlay={
                                             <Tooltip id="sea-orders-tooltip">
-                                                Sea order tokens from Mother of Dragons expansion will be available.
+                                                Enable Sea Order tokens from the Mother of Dragons expansion.
                                             </Tooltip>}>
                                             <label htmlFor="sea-orders-setting">MoD Sea Order Tokens</label>
                                         </OverlayTrigger>}
                                     checked={this.gameSettings.seaOrderTokens}
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.seaOrderTokens = !this.gameSettings.seaOrderTokens)}
-                                    disabled={this.props.entireGame.gameSettings.setupId == "mother-of-dragons"}
                                 />
                             </Col>
                         </Row>
                         <Row>
                             <Col xs="auto">
                                 <FormCheck
-                                    id="tides-of-battle"
+                                    id="seven-pt-setting"
                                     type="checkbox"
-                                    label="Tides of Battle"
-                                    checked={this.gameSettings.tidesOfBattle}
-                                    onChange={() => this.changeGameSettings(() => this.gameSettings.tidesOfBattle = !this.gameSettings.tidesOfBattle)}
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="seven-pt-tooltip">
+                                                Houses will start with 7 Power tokens instead of 5.
+                                            </Tooltip>}>
+                                            <label htmlFor="seven-pt-setting">MoD Start with 7 PT</label>
+                                        </OverlayTrigger>}
+                                    checked={this.gameSettings.startWithSevenPowerTokens}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.startWithSevenPowerTokens = !this.gameSettings.startWithSevenPowerTokens)}
+                                />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="gift-power-tokens-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="gift-power-tokens-tooltip">
+                                                Players can freely gift Power tokens to other players.
+                                            </Tooltip>}>
+                                            <label htmlFor="gift-power-tokens-setting">MoD Gifting Power Tokens</label>
+                                        </OverlayTrigger>}
+                                    checked={this.gameSettings.allowGiftingPowerTokens}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.allowGiftingPowerTokens = !this.gameSettings.allowGiftingPowerTokens)}
                                 />
                             </Col>
                         </Row>
@@ -169,7 +207,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     label={
                                         <OverlayTrigger overlay={
                                             <Tooltip id="random-houses-tooltip">
-                                                All houses will be randomized before the game starts when this option is selected.
+                                                All houses will be randomized before the game starts.
                                             </Tooltip>}>
                                             <label htmlFor="random-houses-setting">Random houses</label>
                                         </OverlayTrigger>}
@@ -184,7 +222,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     label={
                                         <OverlayTrigger overlay={
                                             <Tooltip id="random-chosen-houses-tooltip">
-                                                Only chosen houses will be randomized before the game starts when this option is selected.
+                                                Only chosen houses will be randomized before the game starts.
                                                 This way users can define player and vassal houses and are still able to randomize the player houses.
                                             </Tooltip>}>
                                             <label htmlFor="random-chosen-houses-setting">Random chosen houses</label>
