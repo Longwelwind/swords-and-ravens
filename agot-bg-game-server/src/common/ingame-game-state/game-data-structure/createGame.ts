@@ -143,7 +143,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
      */
 
      // Overwrite house cards
-    if (gameSettings.adwdHouseCards) {
+    if (gameSettings.adwdHouseCards && !gameSettings.limitedDraft) {
         const adwdHouseCards = baseGameData.adwdHouseCards as {[key: string]: HouseCardContainer};
         const ffcHouseCards = baseGameData.ffcHouseCards as {[key: string]: HouseCardContainer};
         const newHouseCards = new BetterMap(
@@ -201,8 +201,26 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         const modAHouseCards = getHouseCardSet(baseGameData.modAHouseCards);
         const modBHouseCards = getHouseCardSet(baseGameData.modBHouseCards);
 
-        const allHouseCards = _.concat(baseGameHouseCards, adwdHouseCards, ffcHouseCards, modAHouseCards, modBHouseCards);
-        game.houseCardsForDrafting = new BetterMap(allHouseCards.map(hc => [hc.id, hc]));
+        if (gameSettings.limitedDraft) {
+            let limitedHouseCards
+
+            if(gameSettings.setupId == 'mother-of-dragons') {
+                if(gameSettings.adwdHouseCards){
+                    limitedHouseCards = _.concat(modBHouseCards, adwdHouseCards, ffcHouseCards);
+                } else{
+                    limitedHouseCards = _.concat(baseGameHouseCards, modAHouseCards);
+                }
+            }else if(gameSettings.adwdHouseCards){
+                limitedHouseCards = _.concat(adwdHouseCards);
+            }else {
+                const excludeArryn = baseGameHouseCards.filter(hc => hc.houseId != "arryn")
+                limitedHouseCards = excludeArryn;
+            }
+            game.houseCardsForDrafting = new BetterMap(limitedHouseCards.map(hc => [hc.id, hc]));
+        } else {
+            const allHouseCards = _.concat(baseGameHouseCards, adwdHouseCards, ffcHouseCards, modAHouseCards, modBHouseCards);
+            game.houseCardsForDrafting = new BetterMap(allHouseCards.map(hc => [hc.id, hc]));
+        }
 
         game.houses.forEach(h => {
             // Reset already assigned house cards
