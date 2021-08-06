@@ -482,6 +482,8 @@ export default class IngameGameState extends GameState<
             house.houseCards = new BetterMap(message.houseCards.map(hc => [hc, this.game.getHouseCardById(hc)]));
         } else if (message.type == "update-house-cards-for-drafting") {
             this.game.houseCardsForDrafting = new BetterMap(message.houseCards.map(hc => [hc, this.game.getHouseCardById(hc)]));
+        } else if (message.type == "update-replaced-player-house-cards") {
+            this.game.replacedPlayerHouseCards = new BetterMap(message.houseCards.map(hc => [hc, this.game.getHouseCardById(hc)]));
         } else if (message.type == "update-max-turns") {
             this.game.maxTurns = message.maxTurns;
         } else {

@@ -252,11 +252,13 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         });
     }
 
-    actionAfterVassalReplacement(): void {
-        this.combatGameState.proceedToChooseGeneral();
-        this.entireGame.broadcastToClients({
-            type: "replaced-by-vassal"
-        });
+    actionAfterVassalReplacement(newVassal: House): void {
+        if (this.combatGameState.houseCombatDatas.keys.includes(newVassal)) {
+            this.combatGameState.proceedToChooseGeneral();
+            this.entireGame.broadcastToClients({
+                type: "replaced-by-vassal"
+            });
+        }
     }
 
     private tryAutomaticallyChooseLastHouseCard(house: House): void {

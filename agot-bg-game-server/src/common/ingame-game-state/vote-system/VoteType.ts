@@ -7,6 +7,7 @@ import User from "../../../server/User";
 import CombatGameState from "../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import WildlingCardEffectInTurnOrderGameState from "../westeros-game-state/wildlings-attack-game-state/WildlingCardEffectInTurnOrderGameState";
 import GameState from "../../../common/GameState";
+import BetterMap from "../../../utils/BetterMap";
 
 export type SerializedVoteType = SerializedCancelGame | SerializedEndGame | SerializedReplacePlayer | SerializedReplacePlayerByVassal;
 
@@ -174,14 +175,15 @@ export class ReplacePlayerByVassal extends VoteType {
 
     executeAccepted(vote: Vote): void {
         const oldPlayer = vote.ingame.players.values.find(p => p.user == this.replaced) as Player;
+        const newVassalHouse = oldPlayer.house;
 
         const forbiddenCommanders: House[] = [];
         // If we are in combat we can't assign the vassal to the opponent
         const anyCombat = vote.ingame.getFirstChildGameState(CombatGameState);
         if (anyCombat) {
             const combat = anyCombat as CombatGameState;
-            if (combat.isCommandingHouseInCombat(oldPlayer.house)) {
-                const commandedHouse = combat.getCommandedHouseInCombat(oldPlayer.house);
+            if (combat.isCommandingHouseInCombat(newVassalHouse)) {
+                const commandedHouse = combat.getCommandedHouseInCombat(newVassalHouse);
                 const enemy = combat.getEnemy(commandedHouse);
 
                 forbiddenCommanders.push(vote.ingame.getControllerOfHouse(enemy).house);
@@ -206,13 +208,13 @@ export class ReplacePlayerByVassal extends VoteType {
 
         // It may happen that you replace a player which commands vassals. Assign them to the potential winner.
         vote.ingame.game.vassalRelations.entries.forEach(([vassal, commander]) => {
-            if (oldPlayer.house == commander) {
+            if (newVassalHouse == commander) {
                 vote.ingame.game.vassalRelations.set(vassal, newCommander as House);
             }
         });
 
         // Assign new commander to replaced house
-        vote.ingame.game.vassalRelations.set(oldPlayer.house, newCommander);
+        vote.ingame.game.vassalRelations.set(newVassalHouse, newCommander);
 
         // Broadcast new vassal relations before deletion of player!
         vote.ingame.broadcastVassalRelations();
@@ -225,16 +227,33 @@ export class ReplacePlayerByVassal extends VoteType {
         vote.ingame.log({
             type: "player-replaced",
             oldUser: this.replaced.id,
-            house: oldPlayer.house.id
+            house: newVassalHouse.id
         });
 
-        vote.ingame.leafState.actionAfterVassalReplacement(oldPlayer.house);
+        // Remove house cards from new vassal house so abilities like Qyburn cannot use this cards anymore
+        newVassalHouse.houseCards.forEach(hc => vote.ingame.game.replacedPlayerHouseCards.set(hc.id, hc));
+        newVassalHouse.houseCards = new BetterMap();
 
+        vote.ingame.entireGame.broadcastToClients({
+            type: "update-replaced-player-house-cards",
+            houseCards: vote.ingame.game.replacedPlayerHouseCards.values.map(hc => hc.id)
+        });
+
+        vote.ingame.entireGame.broadcastToClients({
+            type: "update-house-cards",
+            house: newVassalHouse.id,
+            houseCards: []
+        });
+
+        // Perform action of current state
+        vote.ingame.leafState.actionAfterVassalReplacement(newVassalHouse);
+
+        // In case the new vassal should execute a wildlings effect, skip it
         if (vote.ingame.hasChildGameState(WildlingCardEffectInTurnOrderGameState)) {
             const wildlingEffect = vote.ingame.getChildGameState(WildlingCardEffectInTurnOrderGameState) as WildlingCardEffectInTurnOrderGameState<GameState<any, any>>;
             const leaf = vote.ingame.leafState as any;
-            if (leaf.house && leaf.house == oldPlayer.house) {
-                wildlingEffect.proceedNextHouse(oldPlayer.house);
+            if (leaf.house && leaf.house == newVassalHouse) {
+                wildlingEffect.proceedNextHouse(newVassalHouse);
             }
         }
     }

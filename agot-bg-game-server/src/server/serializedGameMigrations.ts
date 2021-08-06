@@ -888,6 +888,16 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "36",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                serializedGame.childGameState.game.replacedPlayerHouseCards = [];
+            }
+
+            return serializedGame;
+        }
     }
 ];
 
