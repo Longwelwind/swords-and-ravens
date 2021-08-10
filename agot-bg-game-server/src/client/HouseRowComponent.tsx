@@ -223,7 +223,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                 this.props.gameClient.authenticatedPlayer &&
                 this.props.gameClient.authenticatedPlayer.house != house &&
                 <div className="mt-1" ><br/>
-                    <GiftPowerTokensComponent 
+                    <GiftPowerTokensComponent
                         toHouse={this.house}
                         authenticatedPlayer={this.props.gameClient.authenticatedPlayer}
                         ingame={this.props.ingame}/>

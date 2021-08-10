@@ -31,7 +31,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     @observable gameSettings: GameSettings = { pbem: false, setupId: "base-game", playerCount: 6, randomHouses: false,
         cokWesterosPhase: false, adwdHouseCards: false, vassals: false,
         seaOrderTokens: false, randomChosenHouses: false, draftHouseCards: false, tidesOfBattle: false,
-        thematicDraft: false, endless: false, startWithSevenPowerTokens: false, allowGiftingPowerTokens: false };
+        thematicDraft: false, limitedDraft: false, endless: false, startWithSevenPowerTokens: false, allowGiftingPowerTokens: false };
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -286,10 +286,16 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
         if (settings.thematicDraft) {
             settings.draftHouseCards = true;
+            settings.limitedDraft = false;
         }
 
-        if (settings.draftHouseCards) {
+        if (settings.draftHouseCards && !settings.limitedDraft) {
             settings.adwdHouseCards = false;
+        }
+
+        if (settings.limitedDraft) {
+            settings.draftHouseCards = true;
+            settings.thematicDraft = false;
         }
 
         // Allow disabling MoD options but enable them when switching to this setup
@@ -500,5 +506,6 @@ export interface GameSettings {
     tidesOfBattle: boolean;
     draftHouseCards: boolean;
     thematicDraft: boolean;
+    limitedDraft: boolean;
     endless: boolean;
 }
