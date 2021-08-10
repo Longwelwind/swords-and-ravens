@@ -2,7 +2,7 @@ import GameState, {SerializedGameState} from "./GameState";
 import LobbyGameState, {SerializedLobbyGameState} from "./lobby-game-state/LobbyGameState";
 import IngameGameState, {SerializedIngameGameState} from "./ingame-game-state/IngameGameState";
 import {ServerMessage} from "../messages/ServerMessage";
-import {ChangeGameSettings, ClientMessage} from "../messages/ClientMessage";
+import {ClientMessage} from "../messages/ClientMessage";
 import User, {SerializedUser} from "../server/User";
 import {observable} from "mobx";
 import * as _ from "lodash";
@@ -215,7 +215,31 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 settings: user.settings
             })
         } else if (message.type == "change-game-settings") {
-            this.onGameSettingsChange(user, message);
+            if (!this.isOwner(user)) {
+                return;
+            }
+
+            // Only allow PBEM to be changed ingame
+            const settings = message.settings as GameSettings;
+
+            if (this.gameSettings.pbem != settings.pbem) {
+                this.gameSettings.pbem = settings.pbem;
+                this.broadcastToClients({
+                    type: "game-settings-changed",
+                    settings: this.gameSettings
+                });
+
+                if (this.ingameGameState) {
+                    // Notify waited users due to ingame PBEM change
+                    this.notifyWaitedUsers();
+                }
+
+                // The PBEM setting has been changed => no need to pass the message to the child game state
+                return;
+            }
+
+            // For changing settings other than PBEM pass the message to the client game state
+            this.childGameState.onClientMessage(user, message);
         } else {
             this.childGameState.onClientMessage(user, message);
         }
@@ -267,63 +291,6 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 !newChildGameState.hasChildGameState(CombatGameState)) {
             await sleep(6000);
         }
-    }
-
-    onGameSettingsChange(user: User, message: ChangeGameSettings): void {
-        if (!this.isOwner(user)) {
-            return;
-        }
-
-        let settings =  message.settings as GameSettings;
-        if (!settings || (this.lobbyGameState && this.lobbyGameState.players.size > settings.playerCount)) {
-            // A variant which contains less players than connected is not allowed
-            settings = this.gameSettings;
-        }
-
-        if (settings.setupId == "a-dance-with-dragons") {
-            settings.adwdHouseCards = true;
-        }
-
-        if (settings.thematicDraft) {
-            settings.draftHouseCards = true;
-            settings.limitedDraft = false;
-        }
-
-        if (settings.draftHouseCards && !settings.limitedDraft) {
-            settings.adwdHouseCards = false;
-        }
-
-        if (settings.limitedDraft) {
-            settings.draftHouseCards = true;
-            settings.thematicDraft = false;
-        }
-
-        // Allow disabling MoD options but enable them when switching to this setup
-        if (this.gameSettings.setupId != "mother-of-dragons" && settings.setupId == "mother-of-dragons") {
-            settings.vassals = true;
-            settings.seaOrderTokens = true;
-            settings.allowGiftingPowerTokens = true;
-            settings.startWithSevenPowerTokens = true;
-        }
-
-        // Check if PBEM was enabled during ingame
-        const notifyWaitedUsersDueToPbemChange = this.ingameGameState && settings.pbem && !this.gameSettings.pbem;
-
-        this.gameSettings = settings;
-
-        if (notifyWaitedUsersDueToPbemChange) {
-            // Notify waited users now
-            this.notifyWaitedUsers();
-        }
-
-        if (this.lobbyGameState) {
-            this.lobbyGameState.onGameSettingsChange();
-        }
-
-        this.broadcastToClients({
-            type: "game-settings-changed",
-            settings: settings
-        });
     }
 
     broadcastToClients(message: ServerMessage): void {
