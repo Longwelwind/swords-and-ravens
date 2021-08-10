@@ -7,12 +7,14 @@ import TyrionLannisterAbilityGameState
     from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/cancel-house-card-abilities-game-state/tyrion-lannister-ability-game-state/TyrionLannisterAbilityGameState";
 import CancelHouseCardAbilitiesGameState
     from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/cancel-house-card-abilities-game-state/CancelHouseCardAbilitiesGameState";
+import React from "react";
 
 
 @observer
 export default class CancelHouseCardAbilitiesComponent extends Component<GameStateComponentProps<CancelHouseCardAbilitiesGameState>> {
     render(): ReactNode {
-        return renderChildGameState({...this.props, gameState: this.props.gameState.childGameState}, [
+        return this.props.gameState.combatGameState.stats.length > 0 ? <></> :
+            renderChildGameState({...this.props, gameState: this.props.gameState.childGameState}, [
             [TyrionLannisterAbilityGameState, TyrionLannisterAbilityComponent]
         ]);
     }

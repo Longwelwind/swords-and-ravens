@@ -951,6 +951,54 @@
     }
   ],
   "houses": {
+    "baratheon": {
+      "name": "Baratheon",
+      "color": "#ffc107",
+      "unitLimits": {
+        "footman": 10,
+        "knight": 5,
+        "ship": 6,
+        "siege-engine": 2
+      },
+      "houseCards": {
+        "stannis-baratheon": {
+          "name": "Stannis Baratheon",
+          "combatStrength": 4,
+          "ability": "stannis-baratheon"
+        },
+        "renly-baratheon": {
+          "name": "Renly Baratheon",
+          "combatStrength": 3,
+          "ability": "renly-baratheon"
+        },
+        "ser-davos-seaworth": {
+          "name": "Ser Davos Seaworth",
+          "combatStrength": 2,
+          "ability": "ser-davos-seaworth"
+        },
+        "brienne-of-tarth": {
+          "name": "Brienne of Tarth",
+          "combatStrength": 2,
+          "swordIcons": 1,
+          "towerIcons": 1
+        },
+        "salladhor-saan": {
+          "name": "Salladhor Saan",
+          "combatStrength": 1,
+          "ability": "salladhor-saan"
+        },
+        "melisandre": {
+          "name": "Melisandre",
+          "combatStrength": 1,
+          "swordIcons": 1
+        },
+        "patchface": {
+          "name": "Patchface",
+          "ability": "patchface"
+        }
+      },
+      "supplyLevel": 2
+    },
     "lannister": {
       "name": "Lannister",
       "color": "#dc3545",
@@ -1045,9 +1093,9 @@
       },
       "supplyLevel": 1
     },
-    "baratheon": {
-      "name": "Baratheon",
-      "color": "#ffc107",
+    "martell": {
+      "name": "Martell",
+      "color": "orange",
       "unitLimits": {
         "footman": 10,
         "knight": 5,
@@ -1055,40 +1103,40 @@
         "siege-engine": 2
       },
       "houseCards": {
-        "stannis-baratheon": {
-          "name": "Stannis Baratheon",
+        "the-red-viper": {
+          "name": "The Red Viper",
           "combatStrength": 4,
-          "ability": "stannis-baratheon"
-        },
-        "renly-baratheon": {
-          "name": "Renly Baratheon",
-          "combatStrength": 3,
-          "ability": "renly-baratheon"
-        },
-        "ser-davos-seaworth": {
-          "name": "Ser Davos Seaworth",
-          "combatStrength": 2,
-          "ability": "ser-davos-seaworth"
-        },
-        "brienne-of-tarth": {
-          "name": "Brienne of Tarth",
-          "combatStrength": 2,
-          "swordIcons": 1,
+          "swordIcons": 2,
           "towerIcons": 1
         },
-        "salladhor-saan": {
-          "name": "Salladhor Saan",
-          "combatStrength": 1,
-          "ability": "salladhor-saan"
+        "areo-hotah": {
+          "name": "Areo Hotah",
+          "combatStrength": 3,
+          "towerIcons": 1
         },
-        "melisandre": {
-          "name": "Melisandre",
-          "combatStrength": 1,
+        "darkstar": {
+          "name": "Darkstar",
+          "combatStrength": 2,
           "swordIcons": 1
         },
-        "patchface": {
-          "name": "Patchface",
-          "ability": "patchface"
+        "obara-sand": {
+          "name": "Obara Sand",
+          "combatStrength": 2,
+          "swordIcons": 1
+        },
+        "arianne-martell": {
+          "name": "Arianne Martell",
+          "combatStrength": 1,
+          "ability": "arianne-martell"
+        },
+        "nymeria-sand": {
+          "name": "Nymeria Sand",
+          "combatStrength": 1,
+          "ability": "nymeria-sand"
+        },
+        "doran-martell": {
+          "name": "Doran Martell",
+          "ability": "doran-martell"
         }
       },
       "supplyLevel": 2
@@ -1137,54 +1185,6 @@
         "aeron-damphair": {
           "name": "Aeron Damphair",
           "ability": "aeron-damphair"
-        }
-      },
-      "supplyLevel": 2
-    },
-    "martell": {
-      "name": "Martell",
-      "color": "orange",
-      "unitLimits": {
-        "footman": 10,
-        "knight": 5,
-        "ship": 6,
-        "siege-engine": 2
-      },
-      "houseCards": {
-        "the-red-viper": {
-          "name": "The Red Viper",
-          "combatStrength": 4,
-          "swordIcons": 2,
-          "towerIcons": 1
-        },
-        "areo-hotah": {
-          "name": "Areo Hotah",
-          "combatStrength": 3,
-          "towerIcons": 1
-        },
-        "darkstar": {
-          "name": "Darkstar",
-          "combatStrength": 2,
-          "swordIcons": 1
-        },
-        "obara-sand": {
-          "name": "Obara Sand",
-          "combatStrength": 2,
-          "swordIcons": 1
-        },
-        "arianne-martell": {
-          "name": "Arianne Martell",
-          "combatStrength": 1,
-          "ability": "arianne-martell"
-        },
-        "nymeria-sand": {
-          "name": "Nymeria Sand",
-          "combatStrength": 1,
-          "ability": "nymeria-sand"
-        },
-        "doran-martell": {
-          "name": "Doran Martell",
-          "ability": "doran-martell"
         }
       },
       "supplyLevel": 2

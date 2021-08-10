@@ -1,4 +1,4 @@
-import EntireGame, { NotificationType } from "../EntireGame";
+import EntireGame, { GameSettings, NotificationType } from "../EntireGame";
 import GameState from "../GameState";
 import User from "../../server/User";
 import {ClientMessage} from "../../messages/ClientMessage";
@@ -154,6 +154,47 @@ export default class LobbyGameState extends GameState<EntireGame> {
             this.entireGame.sendMessageToClients([user], {
                 type: "password-response",
                 password: answer
+            });
+        } else if (message.type == "change-game-settings") {
+            let settings =  message.settings as GameSettings;
+            if (this.players.size > settings.playerCount) {
+                // A variant which contains less players than connected is not allowed
+                settings = this.entireGame.gameSettings;
+            }
+
+            if (settings.setupId == "a-dance-with-dragons") {
+                settings.adwdHouseCards = true;
+            }
+
+            if (settings.thematicDraft) {
+                settings.draftHouseCards = true;
+                settings.limitedDraft = false;
+            }
+
+            if (settings.draftHouseCards && !settings.limitedDraft) {
+                settings.adwdHouseCards = false;
+            }
+
+            if (settings.limitedDraft) {
+                settings.draftHouseCards = true;
+                settings.thematicDraft = false;
+            }
+
+            // Allow disabling MoD options but enable them when switching to this setup
+            if (this.entireGame.gameSettings.setupId != "mother-of-dragons" && settings.setupId == "mother-of-dragons") {
+                settings.vassals = true;
+                settings.seaOrderTokens = true;
+                settings.allowGiftingPowerTokens = true;
+                settings.startWithSevenPowerTokens = true;
+            }
+
+            this.entireGame.gameSettings = settings;
+
+            this.onGameSettingsChange();
+
+            this.entireGame.broadcastToClients({
+                type: "game-settings-changed",
+                settings: settings
             });
         }
     }

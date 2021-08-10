@@ -231,12 +231,12 @@ export class ReplacePlayerByVassal extends VoteType {
         });
 
         // Remove house cards from new vassal house so abilities like Qyburn cannot use this cards anymore
-        newVassalHouse.houseCards.forEach(hc => vote.ingame.game.replacedPlayerHouseCards.set(hc.id, hc));
+        newVassalHouse.houseCards.forEach(hc => vote.ingame.game.deletedHouseCards.set(hc.id, hc));
         newVassalHouse.houseCards = new BetterMap();
 
         vote.ingame.entireGame.broadcastToClients({
-            type: "update-replaced-player-house-cards",
-            houseCards: vote.ingame.game.replacedPlayerHouseCards.values.map(hc => hc.id)
+            type: "update-deleted-house-cards",
+            houseCards: vote.ingame.game.deletedHouseCards.values.map(hc => hc.serializeToClient())
         });
 
         vote.ingame.entireGame.broadcastToClients({

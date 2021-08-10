@@ -163,12 +163,12 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
         this.entireGame.broadcastToClients({
             type: "update-house-cards",
             house: house.id,
-            houseCards: house.houseCards.keys
+            houseCards: house.houseCards.values.map(hc => hc.serializeToClient())
         });
 
         this.entireGame.broadcastToClients({
             type: "update-house-cards-for-drafting",
-            houseCards: this.game.houseCardsForDrafting.values.map(hc => hc.id)
+            houseCards: this.game.houseCardsForDrafting.values.map(hc => hc.serializeToClient())
         });
 
         this.ingame.log({

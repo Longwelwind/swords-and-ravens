@@ -913,6 +913,41 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "38",
+        migrate: (serializedGame: any) => {
+            // Migrate renaming of of deletedHouseCards
+            if (serializedGame.childGameState.type == "ingame") {
+                serializedGame.childGameState.game.deletedHouseCards = serializedGame.childGameState.game.replacedPlayerHouseCards;
+            }
+
+            // Migrate RobertArrynAbilityGameState
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                if (ingame.childGameState.type == "action") {
+                    const action = ingame.childGameState;
+                    if (action.childGameState.type == "resolve-march-order") {
+                        const resolveMarch = action.childGameState;
+                        if (resolveMarch.childGameState.type == "combat") {
+                            const combat = resolveMarch.childGameState;
+                            if (combat.childGameState.type == "post-combat") {
+                                const postCombat = combat.childGameState;
+                                if (postCombat.childGameState.type == "after-combat-house-card-abilities") {
+                                    const afterCombatAbilities = postCombat.childGameState;
+                                    if (afterCombatAbilities.childGameState.childGameState.type == "robert-arryn-ability") {
+                                        const robertArryn = afterCombatAbilities.childGameState.childGameState;
+                                        robertArryn.house = robertArryn.childGameState.house;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return serializedGame;
+        }
     }
 ];
 
