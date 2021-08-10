@@ -913,6 +913,16 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "38",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                serializedGame.childGameState.game.deletedHouseCards = serializedGame.childGameState.game.replacedPlayerHouseCards;
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

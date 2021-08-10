@@ -50,21 +50,29 @@ export default class RobertArrynAbilityGameState extends GameState<
             const enemy = this.combat.getEnemy(house);
             const enemyHouseCard = this.enemyHouseCardToRemove;
 
-            house.houseCards.delete("robert-arryn");
+            const robertArrynHc = house.houseCards.get("robert-arryn");
+            this.game.deletedHouseCards.set(robertArrynHc.id, robertArrynHc);
+            house.houseCards.delete(robertArrynHc.id);
             this.entireGame.broadcastToClients({
                 type: "update-house-cards",
                 house: house.id,
-                houseCards: house.houseCards.keys
+                houseCards: house.houseCards.values.map(hc => hc.serializeToClient())
             });
 
             if (enemyHouseCard) {
+                this.game.deletedHouseCards.set(enemyHouseCard.id, enemyHouseCard);
                 enemy.houseCards.delete(enemyHouseCard.id);
                 this.entireGame.broadcastToClients({
                     type: "update-house-cards",
                     house: enemy.id,
-                    houseCards: enemy.houseCards.keys
+                    houseCards: enemy.houseCards.values.map(hc => hc.serializeToClient())
                 });
             }
+
+            this.entireGame.broadcastToClients({
+                type: "update-deleted-house-cards",
+                houseCards: this.game.deletedHouseCards.values.map(hc => hc.serializeToClient())
+            });
 
             this.ingame.log({
                 type: "robert-arryn-used",

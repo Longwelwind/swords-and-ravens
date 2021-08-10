@@ -45,7 +45,7 @@ export default class Game {
     maxPowerTokens: number;
     vassalHouseCards: BetterMap<string, HouseCard> = new BetterMap<string, HouseCard>();
     @observable houseCardsForDrafting: BetterMap<string, HouseCard> = new BetterMap();
-    replacedPlayerHouseCards: BetterMap<string, HouseCard> = new BetterMap();
+    deletedHouseCards: BetterMap<string, HouseCard> = new BetterMap();
 
     /**
      * Contains the vassal relations of the game.
@@ -324,8 +324,8 @@ export default class Game {
                 ? this.vassalHouseCards.get(id)
                 : this.houseCardsForDrafting.has(id)
                 ? this.houseCardsForDrafting.get(id)
-                : this.replacedPlayerHouseCards.has(id)
-                ? this.replacedPlayerHouseCards.get(id)
+                : this.deletedHouseCards.has(id)
+                ? this.deletedHouseCards.get(id)
                 : undefined;
         }
 
@@ -446,7 +446,7 @@ export default class Game {
             vassalRelations: this.vassalRelations.map((key, value) => [key.id, value.id]),
             vassalHouseCards: this.vassalHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
             houseCardsForDrafting: this.houseCardsForDrafting.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
-            replacedPlayerHouseCards: this.replacedPlayerHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])
+            deletedHouseCards: this.deletedHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])
         };
     }
 
@@ -475,7 +475,7 @@ export default class Game {
         game.vassalRelations = new BetterMap(data.vassalRelations.map(([vid, hid]) => [game.houses.get(vid), game.houses.get(hid)]));
         game.vassalHouseCards = new BetterMap(data.vassalHouseCards.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
         game.houseCardsForDrafting = new BetterMap(data.houseCardsForDrafting.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
-        game.replacedPlayerHouseCards = new BetterMap(data.replacedPlayerHouseCards.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
+        game.deletedHouseCards = new BetterMap(data.deletedHouseCards.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
 
         return game;
     }
@@ -504,5 +504,5 @@ export interface SerializedGame {
     vassalRelations: [string, string][];
     vassalHouseCards: [string, SerializedHouseCard][];
     houseCardsForDrafting: [string, SerializedHouseCard][];
-    replacedPlayerHouseCards: [string, SerializedHouseCard][];
+    deletedHouseCards: [string, SerializedHouseCard][];
 }

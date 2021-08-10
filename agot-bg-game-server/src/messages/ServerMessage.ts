@@ -23,7 +23,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | UpdateWesterosDecks | UpdateConnectionStatus | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced
     | CrowKillersStepChanged | ManipulateCombatHouseCard | ChangeCombatTidesOfBattleCard
     | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting | UpdateCombatStats
-    | UpdateDraftIndices | RevealBids | UpdateMaxTurns | PasswordResponse | ReplacedByVassal | UpdateReplacedPlayerHouseCards;
+    | UpdateDraftIndices | RevealBids | UpdateMaxTurns | PasswordResponse | ReplacedByVassal | UpdateDeletedHouseCards;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -323,12 +323,12 @@ interface UpdateHouseCardModifier {
 interface UpdateHouseCards {
     type: "update-house-cards";
     house: string;
-    houseCards: string[];
+    houseCards: SerializedHouseCard[];
 }
 
 interface UpdateHouseCardsForDrafting {
     type: "update-house-cards-for-drafting";
-    houseCards: string[];
+    houseCards: SerializedHouseCard[];
 }
 
 interface UpdateCombatStats {
@@ -361,7 +361,7 @@ interface ReplacedByVassal {
     type: "replaced-by-vassal";
 }
 
-interface UpdateReplacedPlayerHouseCards {
-    type: "update-replaced-player-house-cards";
-    houseCards: string[];
+interface UpdateDeletedHouseCards {
+    type: "update-deleted-house-cards";
+    houseCards: SerializedHouseCard[];
 }

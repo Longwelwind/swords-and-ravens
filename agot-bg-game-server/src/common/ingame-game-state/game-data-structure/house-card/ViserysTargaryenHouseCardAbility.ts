@@ -18,11 +18,16 @@ export default class ViserysTargaryenHouseCardAbility extends HouseCardAbility {
 
     afterWinnerDetermination(afterWinnerDetermination: AfterWinnerDeterminationGameState, house: House, houseCard: HouseCard): void {
         if (afterWinnerDetermination.postCombatGameState.loser == house && house.houseCards.has(houseCard.id)) {
+            afterWinnerDetermination.game.deletedHouseCards.set(houseCard.id, houseCard);
+            afterWinnerDetermination.entireGame.broadcastToClients({
+                type: "update-deleted-house-cards",
+                houseCards: afterWinnerDetermination.game.deletedHouseCards.values.map(hc => hc.serializeToClient())
+            });
             house.houseCards.delete(houseCard.id);
             afterWinnerDetermination.entireGame.broadcastToClients({
                 type: "update-house-cards",
                 house: house.id,
-                houseCards: house.houseCards.keys
+                houseCards: house.houseCards.values.map(hc => hc.serializeToClient())
             });
 
             afterWinnerDetermination.combatGameState.ingameGameState.log({

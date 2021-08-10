@@ -17,11 +17,16 @@ export default class KhalDrogoHouseCardAbility extends HouseCardAbility {
 
     afterCombat(afterCombat: AfterCombatHouseCardAbilitiesGameState, house: House, houseCard: HouseCard): void {
         if (house.houseCards.has(houseCard.id)) {
+            afterCombat.game.deletedHouseCards.set(houseCard.id, houseCard);
+            afterCombat.entireGame.broadcastToClients({
+                type: "update-deleted-house-cards",
+                houseCards: afterCombat.game.deletedHouseCards.values.map(hc => hc.serializeToClient())
+            });
             house.houseCards.delete(houseCard.id);
             afterCombat.entireGame.broadcastToClients({
                 type: "update-house-cards",
                 house: house.id,
-                houseCards: house.houseCards.keys
+                houseCards: house.houseCards.values.map(hc => hc.serializeToClient())
             });
             afterCombat.combatGameState.ingameGameState.log({
                 type: "house-card-removed-from-game",
