@@ -506,6 +506,6 @@ export interface GameSettings {
     tidesOfBattle: boolean;
     draftHouseCards: boolean;
     thematicDraft: boolean;
-    limitedDraft:boolean;
+    limitedDraft: boolean;
     endless: boolean;
 }

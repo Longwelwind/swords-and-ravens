@@ -249,6 +249,8 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.draftHouseCards = !this.gameSettings.draftHouseCards)}
                                 />
                             </Col>
+                        </Row>
+                        <Row>
                             <Col xs="auto">
                                 <FormCheck
                                     id="thematic-draft"
@@ -264,17 +266,19 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.thematicDraft = !this.gameSettings.thematicDraft)}
                                 />
                             </Col>
+                        </Row>
+                        <Row>
                             <Col xs="auto">
                                 <FormCheck
-                                    id="limited-draft"
+                                    id="limited-draft-setting"
                                     type="checkbox"
                                     label={
                                         <OverlayTrigger overlay={
                                             <Tooltip id="limited-draft-tooltip">
                                                 Players will draft their house cards step by step in a randomly chosen order before the game starts.
-                                                Cards can be chosen from 2nd Edition Base Game or selected expansions.
+                                                Cards can be chosen only from the selected game setup.
                                             </Tooltip>}>
-                                            <label htmlFor="limited-draft">Limited draft</label>
+                                            <label htmlFor="limited-draft-setting">Limited draft</label>
                                         </OverlayTrigger>}
                                     checked={this.gameSettings.limitedDraft}
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.limitedDraft = !this.gameSettings.limitedDraft)}

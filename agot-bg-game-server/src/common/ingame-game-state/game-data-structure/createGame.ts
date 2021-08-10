@@ -202,18 +202,18 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         const modBHouseCards = getHouseCardSet(baseGameData.modBHouseCards);
 
         if (gameSettings.limitedDraft) {
-            let limitedHouseCards
+            let limitedHouseCards = [];
 
-            if(gameSettings.setupId == 'mother-of-dragons') {
-                if(gameSettings.adwdHouseCards){
+            if (gameSettings.setupId == 'mother-of-dragons') {
+                if (gameSettings.adwdHouseCards) {
                     limitedHouseCards = _.concat(modBHouseCards, adwdHouseCards, ffcHouseCards);
-                } else{
+                } else {
                     limitedHouseCards = _.concat(baseGameHouseCards, modAHouseCards);
                 }
-            }else if(gameSettings.adwdHouseCards){
+            } else if (gameSettings.adwdHouseCards) {
                 limitedHouseCards = _.concat(adwdHouseCards);
-            }else {
-                const excludeArryn = baseGameHouseCards.filter(hc => hc.houseId != "arryn")
+            } else {
+                const excludeArryn = baseGameHouseCards.filter(hc => hc.houseId != "arryn");
                 limitedHouseCards = excludeArryn;
             }
             game.houseCardsForDrafting = new BetterMap(limitedHouseCards.map(hc => [hc.id, hc]));
