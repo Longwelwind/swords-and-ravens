@@ -17,7 +17,7 @@ export default class GameEndedGameState extends GameState<IngameGameState> {
     firstStart(winner: House): void {
         this.winner = winner;
 
-        this.entireGame.notifyUsers(this.ingame.players.keys, NotificationType.GAME_ENDED)
+        this.entireGame.notifyUsers(this.ingame.players.keys, NotificationType.GAME_ENDED);
     }
 
     onPlayerMessage(_player: Player, _message: ClientMessage): void {

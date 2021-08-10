@@ -1,4 +1,4 @@
-import EntireGame from "../EntireGame";
+import EntireGame, { NotificationType } from "../EntireGame";
 import GameState from "../GameState";
 import User from "../../server/User";
 import {ClientMessage} from "../../messages/ClientMessage";
@@ -7,7 +7,14 @@ import IngameGameState from "../ingame-game-state/IngameGameState";
 import Player from "../ingame-game-state/Player";
 
 export default class CancelledGameState extends GameState<EntireGame | IngameGameState> {
+    get ingame(): IngameGameState | null {
+        return this.parentGameState instanceof IngameGameState ? this.parentGameState : null;
+    }
+
     firstStart(): void {
+        if (this.ingame) {
+            this.entireGame.notifyUsers(this.ingame.players.keys, NotificationType.GAME_ENDED)
+        }
     }
 
     onClientMessage(_user: User, _message: ClientMessage): void {
@@ -20,7 +27,7 @@ export default class CancelledGameState extends GameState<EntireGame | IngameGam
     }
 
     getWaitedUsers(): User[] {
-        return this.parentGameState instanceof IngameGameState ? this.parentGameState.players.keys : [];
+        return [];
     }
 
     serializeToClient(_admin: boolean, _user: User | Player | null): SerializedCancelledGameState {
