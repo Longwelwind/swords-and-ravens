@@ -974,6 +974,11 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                     draft.draftStep = DraftStep.HOUSE_CARD;
                     draft.vassalsOnInfluenceTracks = [];
                 }
+
+                if (ingame.childGameState.type == "thematic-draft-house-cards") {
+                    const thematic = ingame.childGameState;
+                    thematic.vassalsOnInfluenceTracks = [];
+                }
             }
 
             return serializedGame;

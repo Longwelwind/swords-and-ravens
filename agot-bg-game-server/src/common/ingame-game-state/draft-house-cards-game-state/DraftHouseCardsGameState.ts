@@ -1,7 +1,6 @@
 import IngameGameState from "../IngameGameState";
 import GameState from "../../GameState";
 import EntireGame from "../../EntireGame";
-//import {observable} from "mobx";
 import Player from "../Player";
 import {ClientMessage} from "../../../messages/ClientMessage";
 import {ServerMessage} from "../../../messages/ServerMessage";
@@ -132,7 +131,7 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
                 });
             }
 
-            this.ingame.onDraftHouseCardsGameStateFinish();
+            this.ingame.beginNewTurn();
             return;
         }
 

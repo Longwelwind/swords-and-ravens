@@ -264,12 +264,10 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             }
         });
 
-        if (!gameSettings.thematicDraft) {
-            // Remove player houses from the influence tracks allowing to draft them as well
-            game.ironThroneTrack = game.ironThroneTrack.filter(h => !playerHouses.includes(h.id));
-            game.fiefdomsTrack = game.fiefdomsTrack.filter(h => !playerHouses.includes(h.id));
-            game.kingsCourtTrack = game.kingsCourtTrack.filter(h => !playerHouses.includes(h.id));
-        }
+        // Remove player houses from the influence tracks allowing to draft them as well
+        game.ironThroneTrack = game.ironThroneTrack.filter(h => !playerHouses.includes(h.id));
+        game.fiefdomsTrack = game.fiefdomsTrack.filter(h => !playerHouses.includes(h.id));
+        game.kingsCourtTrack = game.kingsCourtTrack.filter(h => !playerHouses.includes(h.id));
     }
 
     // Loading Tiled map

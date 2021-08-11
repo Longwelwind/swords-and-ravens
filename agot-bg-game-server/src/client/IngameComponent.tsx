@@ -73,6 +73,8 @@ import houseInfluenceImages from "./houseInfluenceImages";
 import houseOrderImages from "./houseOrderImages";
 import housePowerTokensImages from "./housePowerTokensImages";
 import unitImages from "./unitImages";
+import DraftInfluencePositionsGameState from "../common/ingame-game-state/draft-influence-positions-game-state/DraftInfluencePositionsGameState";
+import DraftInfluencePositionsComponent from "./game-state-panel/DraftInfluencePositionsComponent";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -382,6 +384,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     phases.map(phase => [phase.gameState, phase.component] as [any, typeof Component]),
                                                     [[ThematicDraftHouseCardsGameState, ThematicDraftHouseCardsComponent]],
                                                     [[DraftHouseCardsGameState, DraftHouseCardsComponent]],
+                                                    [[DraftInfluencePositionsGameState, DraftInfluencePositionsComponent]],
                                                     [[GameEndedGameState, GameEndedComponent]],
                                                     [[CancelledGameState, IngameCancelledComponent]]
                                                 )
