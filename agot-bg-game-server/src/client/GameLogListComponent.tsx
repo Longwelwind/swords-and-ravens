@@ -1300,6 +1300,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     House <b>{house.name}</b> gifted {data.powerTokens} Power token{data.powerTokens > 1 && "s"} to house <b>{affectedHouse.name}</b>.
                 </>;
             }
+            case "influence-track-position-chosen": {
+                const house = this.game.houses.get(data.house);
+                const track = this.game.getNameInfluenceTrack(data.trackerI);
+                return <>
+                    House <b>{house.name}</b> has chosen position <b>{data.position}</b> on <b>{track} Track</b>.
+                </>;
+            }
         }
     }
 }

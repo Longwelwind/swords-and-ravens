@@ -12,6 +12,7 @@ import SelectHouseCardGameState, { SerializedSelectHouseCardGameState } from "..
 import HouseCard from "../game-data-structure/house-card/HouseCard";
 import _ from "lodash";
 import { observable } from "mobx";
+import SimpleChoiceGameState, { SerializedSimpleChoiceGameState } from "../simple-choice-game-state/SimpleChoiceGameState";
 
 export const draftOrders: number[][][] = [
         [
@@ -67,9 +68,17 @@ export const houseCardCombatStrengthAllocations = new BetterMap<number, number>(
         [4, 1]
     ]);
 
-export default class DraftHouseCardsGameState extends GameState<IngameGameState, SelectHouseCardGameState<DraftHouseCardsGameState>> {
+export enum DraftStep {
+    DECIDE,
+    HOUSE_CARD,
+    INFLUENCE_TRACK
+}
+
+export default class DraftHouseCardsGameState extends GameState<IngameGameState, SelectHouseCardGameState<DraftHouseCardsGameState> | SimpleChoiceGameState> {
     houses: House[];
     draftOrder: number[][];
+    @observable draftStep: DraftStep;
+    vassalsOnInfluenceTracks: House[][];
     @observable currentRowIndex: number;
     @observable currentColumnIndex: number;
 
@@ -98,19 +107,85 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
         this.draftOrder = draftOrders[this.houses.length - 1];
         this.currentRowIndex = 0;
         this.currentColumnIndex = -1;
+        this.vassalsOnInfluenceTracks = this.game.influenceTracks.map(track => [...track]);
+
+        // Clear the influence tracks:
+        for(let i=0; i<this.game.influenceTracks.length; i++) {
+            this.game.influenceTracks[i].length = 0;
+        }
+
         this.proceedNextHouse();
     }
 
     proceedNextHouse(): void {
-        const houseToResolve = this.getNextHouseToSelectHouseCard();
+        const houseToResolve = this.getNextHouse();
 
         if (houseToResolve == null) {
             this.game.houseCardsForDrafting = new BetterMap();
+            // Append vassals back to the tracks:
+            for(let i=0; i<this.vassalsOnInfluenceTracks.length; i++) {
+                this.game.influenceTracks[i].push(...this.vassalsOnInfluenceTracks[i]);
+                this.entireGame.broadcastToClients({
+                    type: "change-tracker",
+                    tracker: this.game.influenceTracks[i].map(h => h.id),
+                    trackerI: i
+                });
+            }
+
             this.ingame.onDraftHouseCardsGameStateFinish();
             return;
         }
 
-        this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(houseToResolve, this.getFilteredHouseCardsForHouse(houseToResolve));
+        const houseHasFullHand = houseToResolve.houseCards.size == 7;
+        const houseHasPositionOnAllInfluenceTracks = this.game.influenceTracks.every(track => track.includes(houseToResolve));
+
+        if (houseHasFullHand && houseHasPositionOnAllInfluenceTracks) {
+            // This should never happen, but for safety we handle it
+            this.proceedNextHouse();
+            return;
+        }
+
+        if (houseHasFullHand) {
+            this.proceedChooseInfluencePosition(houseToResolve);
+            return;
+        }
+
+        if (houseHasPositionOnAllInfluenceTracks) {
+            this.proceedSelectHouseCard(houseToResolve);
+            return;
+        }
+
+        this.draftStep = DraftStep.DECIDE;
+        this.updateDraftState();
+        this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(houseToResolve,
+            "Decide whether to choose an Influence track position or to select a House card.",
+            ["House card", "Influence track"]);
+    }
+
+    proceedSelectHouseCard(house: House): void {
+        this.draftStep = DraftStep.HOUSE_CARD;
+        this.updateDraftState();
+        this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(house, this.getFilteredHouseCardsForHouse(house));
+    }
+
+    proceedChooseInfluencePosition(house: House): void {
+        this.draftStep = DraftStep.INFLUENCE_TRACK;
+        this.updateDraftState();
+        this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(house, "Choose an influence track.", this.getInfluenceChoicesForHouse(house).values);
+    }
+
+    getInfluenceChoicesForHouse(house: House): BetterMap<number, string> {
+        const result = new BetterMap<number, string>();
+        if (!this.game.ironThroneTrack.includes(house)) {
+            result.set(0, "Iron Throne");
+        }
+        if (!this.game.fiefdomsTrack.includes(house)) {
+            result.set(1, "Fiefdoms");
+        }
+        if (!this.game.kingsCourtTrack.includes(house)) {
+            result.set(2, "King's Court");
+        }
+        return result;
     }
 
     getAllHouseCards(): HouseCard[] {
@@ -131,9 +206,10 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
         return availableCards;
     }
 
-    getNextHouseToSelectHouseCard(): House | null {
-        // If all houses have 7 house cards, return null
-        if (this.houses.every(h => h.houseCards.size == 7)) {
+    getNextHouse(): House | null {
+        // If all houses have 7 house cards and all houses have positions in all 3 influence tracks return null
+        if (this.houses.every(h => h.houseCards.size == 7) &&
+            this.game.influenceTracks.every(track => _.intersection(track, this.houses).length == this.houses.length)) {
             return null;
         }
 
@@ -147,13 +223,52 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
             }
         }
 
-        this.ingame.entireGame.broadcastToClients({
-            type: "update-draft-indices",
-            rowIndex: this.currentRowIndex,
-            columnIndex: this.currentColumnIndex
-        });
+        this.updateDraftState();
 
         return this.houses[this.draftOrder[this.currentRowIndex][this.currentColumnIndex]];
+    }
+
+    private updateDraftState(): void {
+        this.ingame.entireGame.broadcastToClients({
+            type: "update-draft-state",
+            rowIndex: this.currentRowIndex,
+            columnIndex: this.currentColumnIndex,
+            draftStep: this.draftStep
+        });
+    }
+
+    onSimpleChoiceGameStateEnd(choice: number): void {
+        const house = this.childGameState.house;
+
+        if (this.draftStep == DraftStep.DECIDE) {
+            if (choice == 0) {
+                this.proceedSelectHouseCard(house);
+                return;
+            } else {
+                this.proceedChooseInfluencePosition(house);
+                return;
+            }
+        } else if (this.draftStep == DraftStep.INFLUENCE_TRACK) {
+            const trackIndex = this.getInfluenceChoicesForHouse(house).keys[choice];
+            const track = this.game.influenceTracks[trackIndex];
+            track.push(house);
+            this.entireGame.broadcastToClients({
+                type: "change-tracker",
+                tracker: track.map(h => h.id),
+                trackerI: trackIndex
+            });
+
+            this.ingame.log({
+                type: "influence-track-position-chosen",
+                house: house.id,
+                trackerI: trackIndex,
+                position: track.length
+            });
+
+            this.proceedNextHouse();
+        } else {
+            throw new Error("Invalid DraftStep received");
+        }
     }
 
     onSelectHouseCardFinish(house: House, houseCard: HouseCard): void {
@@ -185,9 +300,10 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
     }
 
     onServerMessage(message: ServerMessage): void {
-        if (message.type == "update-draft-indices") {
+        if (message.type == "update-draft-state") {
             this.currentRowIndex = message.rowIndex;
             this.currentColumnIndex = message.columnIndex;
+            this.draftStep = message.draftStep;
         } else {
             this.childGameState.onServerMessage(message);
         }
@@ -198,6 +314,8 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
             type: "draft-house-cards",
             houses: this.houses.map(h => h.id),
             draftOrder: this.draftOrder,
+            draftStep: this.draftStep,
+            vassalsOnInfluenceTracks: this.vassalsOnInfluenceTracks.map(track => track.map(h => h.id)),
             currentRowIndex: this.currentRowIndex,
             currentColumnIndex: this.currentColumnIndex,
             childGameState: this.childGameState.serializeToClient(admin, player)
@@ -209,6 +327,8 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
 
         draftHouseCardsGameState.houses = data.houses.map(hid => ingameGameState.game.houses.get(hid));
         draftHouseCardsGameState.draftOrder = data.draftOrder;
+        draftHouseCardsGameState.draftStep = data.draftStep;
+        draftHouseCardsGameState.vassalsOnInfluenceTracks = data.vassalsOnInfluenceTracks.map(track => track.map(hid => ingameGameState.game.houses.get(hid)));
         draftHouseCardsGameState.currentRowIndex = data.currentRowIndex;
         draftHouseCardsGameState.currentColumnIndex = data.currentColumnIndex;
         draftHouseCardsGameState.childGameState = draftHouseCardsGameState.deserializeChildGameState(data.childGameState);
@@ -216,10 +336,13 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
         return draftHouseCardsGameState;
     }
 
-    deserializeChildGameState(data: SerializedDraftHouseCardsGameState["childGameState"]): SelectHouseCardGameState<DraftHouseCardsGameState> {
+    deserializeChildGameState(data: SerializedDraftHouseCardsGameState["childGameState"]): DraftHouseCardsGameState["childGameState"] {
         if (data.type == "select-house-card") {
             return SelectHouseCardGameState.deserializeFromServer(this, data);
-        } else {
+        } else if (data.type == "simple-choice") {
+            return SimpleChoiceGameState.deserializeFromServer(this, data);
+        }
+        else {
             throw new Error();
         }
     }
@@ -258,7 +381,9 @@ export interface SerializedDraftHouseCardsGameState {
     type: "draft-house-cards";
     houses: string[];
     draftOrder: number[][];
+    draftStep: DraftStep;
+    vassalsOnInfluenceTracks: string[][];
     currentRowIndex: number;
     currentColumnIndex: number;
-    childGameState: SerializedSelectHouseCardGameState;
+    childGameState: SerializedSelectHouseCardGameState | SerializedSimpleChoiceGameState;
 }

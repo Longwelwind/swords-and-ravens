@@ -118,9 +118,8 @@ export default class Game {
         // Ignore them when finding the token holder
         const nonVassalTrack = track.filter(h => !this.ingame.isVassalHouse(h));
 
-        // There should be at least one non-vassal in the track
         if (nonVassalTrack.length == 0) {
-            throw new Error();
+            throw new Error("There must be at least one non-vassal in the track");
         }
 
         return nonVassalTrack[0];
