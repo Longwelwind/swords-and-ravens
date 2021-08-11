@@ -948,6 +948,19 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "39",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.votes.forEach((v: any) => {
+                    v.participatingHouses = v.participatingPlayers.map((p: any) => p.houseId);
+                });
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

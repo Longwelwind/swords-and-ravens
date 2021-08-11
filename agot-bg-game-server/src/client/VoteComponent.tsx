@@ -42,14 +42,14 @@ export default class VoteComponent extends Component<VoteComponentProps> {
                         </Col>
                         <Col>
                             <Row>
-                                {this.vote.participatingPlayers.map(p => (
-                                    <Col xs={"auto"} key={p.user.id}>
-                                        <div className="mb-2" key={p.user.id}>
-                                            <SimpleInfluenceIconComponent house={p.house}/>
+                                {this.vote.participatingHouses.map(h => (
+                                    <Col xs={"auto"} key={`vote-${this.vote.id}-${h.id}`}>
+                                        <div className="mb-2">
+                                            <SimpleInfluenceIconComponent house={h}/>
                                         </div>
                                         <div className="text-center">
-                                            {this.vote.votes.has(p.house) ? (
-                                                this.vote.votes.get(p.house) ? (
+                                            {this.vote.votes.has(h) ? (
+                                                this.vote.votes.get(h) ? (
                                                     <FontAwesomeIcon className="text-success" icon={faCheck} />
                                                 ) : (
                                                     <FontAwesomeIcon className="text-danger" icon={faBan} />
