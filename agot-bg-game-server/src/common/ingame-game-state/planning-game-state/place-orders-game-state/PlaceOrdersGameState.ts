@@ -181,8 +181,8 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
                     region: region.id
                 });
 
-                this.ingame.players.values.filter(p => p != player).forEach(p => {
-                    p.user.send({
+                this.entireGame.users.values.filter(u => u != player.user).forEach(u => {
+                    u.send({
                         type: "order-placed",
                         region: region.id,
                         order: null
