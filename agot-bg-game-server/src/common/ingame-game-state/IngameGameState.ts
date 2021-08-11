@@ -187,7 +187,7 @@ export default class IngameGameState extends GameState<
         if (message.type == "vote") {
             const vote = this.votes.get(message.vote);
 
-            if (vote.state != VoteState.ONGOING || !vote.participatingPlayers.some(p => p.user.id == player.user.id)) {
+            if (vote.state != VoteState.ONGOING || !vote.participatingHouses.includes(player.house)) {
                 return;
             }
 
@@ -251,7 +251,7 @@ export default class IngameGameState extends GameState<
     }
 
     createVote(initiator: User, type: VoteType): Vote {
-        const vote = new Vote(this, v4(), this.players.values, initiator, type);
+        const vote = new Vote(this, v4(), this.players.values.map(p => p.house), initiator, type);
 
         this.votes.set(vote.id, vote);
 
