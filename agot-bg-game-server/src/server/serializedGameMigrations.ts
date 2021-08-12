@@ -981,6 +981,11 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                 }
             }
 
+            // Set chat house names to true by default
+            serializedGame.users.forEach((u: any) => {
+                u.settings.chatHouseNames = true;
+            });
+
             return serializedGame;
         }
     }
