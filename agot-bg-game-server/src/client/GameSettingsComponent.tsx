@@ -240,13 +240,31 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     label={
                                         <OverlayTrigger overlay={
                                             <Tooltip id="draft-house-cards-tooltip">
-                                                Players will draft their house cards step by step in a randomly chosen order before the game starts.
-                                                Cards can be chosen from all 2nd Edition Base Game house cards and all expansions (ADwD, AFfC and MoD) house cards.
+                                                Players will draft their house cards or a position on a chosen Influence track step by step
+                                                in a randomly chosen order before the game starts. House cards can be chosen from all 2nd Edition Base Game house cards
+                                                and from all 2nd Edition expansions (ADwD, AFfC, MoD) house cards.
                                             </Tooltip>}>
                                             <label htmlFor="draft-house-cards">Draft house cards</label>
                                         </OverlayTrigger>}
                                     checked={this.gameSettings.draftHouseCards}
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.draftHouseCards = !this.gameSettings.draftHouseCards)}
+                                />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="limited-draft-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="limited-draft-tooltip">
+                                                Same as normal draft mode but house cards can be chosen from the selected game scenario only.
+                                            </Tooltip>}>
+                                            <label htmlFor="limited-draft-setting">Limited draft</label>
+                                        </OverlayTrigger>}
+                                    checked={this.gameSettings.limitedDraft}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.limitedDraft = !this.gameSettings.limitedDraft)}
                                 />
                             </Col>
                         </Row>
@@ -259,29 +277,12 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                         <OverlayTrigger overlay={
                                             <Tooltip id="thematic-draft-tooltip">
                                                 Players will draft their house cards simultaneously from the available decks of their house.
+                                                Afterwards players will draft the Influence tracks step by step in a randomly chosen order.
                                             </Tooltip>}>
                                             <label htmlFor="thematic-draft">Thematic draft</label>
                                         </OverlayTrigger>}
                                     checked={this.gameSettings.thematicDraft}
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.thematicDraft = !this.gameSettings.thematicDraft)}
-                                />
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col xs="auto">
-                                <FormCheck
-                                    id="limited-draft-setting"
-                                    type="checkbox"
-                                    label={
-                                        <OverlayTrigger overlay={
-                                            <Tooltip id="limited-draft-tooltip">
-                                                Players will draft their house cards step by step in a randomly chosen order before the game starts.
-                                                Cards can be chosen only from the selected game setup.
-                                            </Tooltip>}>
-                                            <label htmlFor="limited-draft-setting">Limited draft</label>
-                                        </OverlayTrigger>}
-                                    checked={this.gameSettings.limitedDraft}
-                                    onChange={() => this.changeGameSettings(() => this.gameSettings.limitedDraft = !this.gameSettings.limitedDraft)}
                                 />
                             </Col>
                         </Row>

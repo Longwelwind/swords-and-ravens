@@ -5,6 +5,7 @@ import { CrowKillersStep } from "../common/ingame-game-state/westeros-game-state
 import { SerializedHouse } from "../common/ingame-game-state/game-data-structure/House";
 import { HouseCardState } from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import { vassalHouseCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/vassalHouseCards";
+import { DraftStep } from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import _ from "lodash";
 //import { SerializedEntireGame } from "../common/EntireGame";
 
@@ -958,6 +959,32 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                     v.participatingHouses = v.participatingPlayers.map((p: any) => p.houseId);
                 });
             }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "40",
+        migrate: (serializedGame: any) => {
+            // Migrate DraftHouseCardsGameState
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                if (ingame.childGameState.type == "draft-house-cards") {
+                    const draft = ingame.childGameState;
+                    draft.draftStep = DraftStep.HOUSE_CARD;
+                    draft.vassalsOnInfluenceTracks = [];
+                }
+
+                if (ingame.childGameState.type == "thematic-draft-house-cards") {
+                    const thematic = ingame.childGameState;
+                    thematic.vassalsOnInfluenceTracks = [];
+                }
+            }
+
+            // Set chat house names to true by default
+            serializedGame.users.forEach((u: any) => {
+                u.settings.chatHouseNames = true;
+            });
 
             return serializedGame;
         }

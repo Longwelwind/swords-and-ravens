@@ -28,6 +28,12 @@ export default class InfluenceIconComponent extends Component<InfluenceIconCompo
     }
 
     render(): ReactNode {
+        let isTokenHolder = false;
+        try {
+            isTokenHolder = this.ingame.game.getTokenHolder(this.track) == this.house;
+        } catch {
+            // just swallow this
+        }
         return <OverlayTrigger overlay={
                 <Tooltip id="influence-icon">
                     <b>{this.house.name}</b>
@@ -35,7 +41,7 @@ export default class InfluenceIconComponent extends Component<InfluenceIconCompo
             }
             placement="bottom"
         >
-            <div className={classNames("influence-icon", {"medium-outline": this.ingame.game.getTokenHolder(this.track) == this.house})}
+            <div className={classNames("influence-icon", {"medium-outline": isTokenHolder})}
                 style={{backgroundImage: `url(${houseInfluenceImages.get(this.house.id)})`}}>
             </div>
         </OverlayTrigger>;

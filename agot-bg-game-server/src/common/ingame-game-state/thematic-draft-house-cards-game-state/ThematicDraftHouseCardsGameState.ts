@@ -12,6 +12,8 @@ import User from "../../../server/User";
 import { houseCardCombatStrengthAllocations } from "../draft-house-cards-game-state/DraftHouseCardsGameState";
 
 export default class ThematicDraftHouseCardsGameState extends GameState<IngameGameState> {
+    vassalsOnInfluenceTracks: House[][];
+
     get ingame(): IngameGameState {
         return this.parentGameState;
     }
@@ -36,6 +38,13 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
         this.ingame.log({
             type: "draft-house-cards-began"
         });
+
+        this.vassalsOnInfluenceTracks = this.game.influenceTracks.map(track => [...track]);
+
+        // Clear the influence tracks:
+        for(let i=0; i<this.game.influenceTracks.length; i++) {
+            this.game.influenceTracks[i].length = 0;
+        }
     }
 
     getFilteredHouseCardsForHouse(house: House): HouseCard[] {
@@ -99,7 +108,7 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
             });
 
             if (this.participatingHouses.every(h => h.houseCards.size == 7)) {
-                this.ingame.onDraftHouseCardsGameStateFinish();
+                this.ingame.proceedDraftingInfluencePositions(this.vassalsOnInfluenceTracks);
             }
         }
     }
@@ -109,16 +118,19 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
 
     serializeToClient(_admin: boolean, _player: Player | null): SerializedThematicDraftHouseCardsGameState {
         return {
-            type: "thematic-draft-house-cards"
+            type: "thematic-draft-house-cards",
+            vassalsOnInfluenceTracks: this.vassalsOnInfluenceTracks.map(track => track.map(h => h.id))
         };
     }
 
-    static deserializeFromServer(ingameGameState: IngameGameState, _data: SerializedThematicDraftHouseCardsGameState): ThematicDraftHouseCardsGameState {
+    static deserializeFromServer(ingameGameState: IngameGameState, data: SerializedThematicDraftHouseCardsGameState): ThematicDraftHouseCardsGameState {
         const thematicDraftHouseCardsGameState = new ThematicDraftHouseCardsGameState(ingameGameState);
+        thematicDraftHouseCardsGameState.vassalsOnInfluenceTracks = data.vassalsOnInfluenceTracks.map(track => track.map(hid => ingameGameState.game.houses.get(hid)))
         return thematicDraftHouseCardsGameState;
     }
 }
 
 export interface SerializedThematicDraftHouseCardsGameState {
     type: "thematic-draft-house-cards";
+    vassalsOnInfluenceTracks: string[][];
 }

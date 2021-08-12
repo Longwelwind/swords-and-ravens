@@ -10,6 +10,7 @@ import { SerializedVote } from "../common/ingame-game-state/vote-system/Vote";
 import { CrowKillersStep } from "../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/crow-killers-wildling-victory-game-state/CrowKillersWildlingVictoryGameState";
 import HouseCardModifier from "../common/ingame-game-state/game-data-structure/house-card/HouseCardModifier";
 import { CombatStats } from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
+import { DraftStep } from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady | PlayerUnready
     | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | SupportRefused | NewTurn | RemovePlacedOrder
@@ -23,7 +24,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | UpdateWesterosDecks | UpdateConnectionStatus | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced
     | CrowKillersStepChanged | ManipulateCombatHouseCard | ChangeCombatTidesOfBattleCard
     | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting | UpdateCombatStats
-    | UpdateDraftIndices | RevealBids | UpdateMaxTurns | PasswordResponse | ReplacedByVassal | UpdateDeletedHouseCards;
+    | UpdateDraftState | RevealBids | UpdateMaxTurns | PasswordResponse | ReplacedByVassal | UpdateDeletedHouseCards;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -336,10 +337,11 @@ interface UpdateCombatStats {
     stats: CombatStats[];
 }
 
-interface UpdateDraftIndices {
-    type: "update-draft-indices";
+interface UpdateDraftState {
+    type: "update-draft-state";
     rowIndex: number;
     columnIndex: number;
+    draftStep: DraftStep;
 }
 
 interface RevealBids {

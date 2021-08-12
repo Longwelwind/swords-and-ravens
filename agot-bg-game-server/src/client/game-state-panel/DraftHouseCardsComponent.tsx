@@ -5,13 +5,15 @@ import ListGroupItem from "react-bootstrap/ListGroupItem";
 import renderChildGameState from "../utils/renderChildGameState";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Row from "react-bootstrap/Row";
-import DraftHouseCardsGameState from "../../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
+import DraftHouseCardsGameState, { DraftStep } from "../../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import SelectHouseCardGameState from "../../common/ingame-game-state/select-house-card-game-state/SelectHouseCardGameState";
 import SelectHouseCardComponent from "./SelectHouseCardComponent";
 import Player from "../../common/ingame-game-state/Player";
 import { Col } from "react-bootstrap";
 import HouseCardComponent from "./utils/HouseCardComponent";
 import House from "../../common/ingame-game-state/game-data-structure/House";
+import SimpleChoiceGameState from "../../common/ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
+import SimpleChoiceComponent from "./SimpleChoiceComponent";
 
 @observer
 export default class DraftHouseCardsComponent extends Component<GameStateComponentProps<DraftHouseCardsGameState>> {
@@ -27,6 +29,10 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
         return this.props.gameClient.doesControlHouse(this.house);
     }
 
+    get draftStep(): DraftStep {
+        return this.props.gameState.draftStep;
+    }
+
     render(): ReactNode {
         const availableCards = this.player && !this.doesControlHouse ? this.props.gameState.getFilteredHouseCardsForHouse(this.player.house) : [];
         return (
@@ -34,7 +40,13 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                 {this.props.gameState.currentColumnIndex > -1 && this.props.gameState.currentRowIndex > -1 &&
                 <ListGroupItem>
                     <Row className="mt-1 mb-3 justify-content-center">
-                        <div style={{textAlign: "center"}}><b>{this.house.name}</b> must select one house card.</div>
+                        {this.draftStep == DraftStep.DECIDE
+                        ? <div style={{textAlign: "center"}}><b>{this.house.name}</b> must decide whether to select a House card or an Influence track position.</div>
+                        : this.draftStep == DraftStep.HOUSE_CARD
+                        ? <div style={{textAlign: "center"}}><b>{this.house.name}</b> must select one House card.</div>
+                        : this.draftStep == DraftStep.INFLUENCE_TRACK
+                        ? <div style={{textAlign: "center"}}><b>{this.house.name}</b> must choose one Influence track.</div>
+                        : <></>}
                     </Row>
                     <Row>
                         <p>
@@ -52,7 +64,8 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                     {this.doesControlHouse &&
                     <Row>
                         {renderChildGameState(this.props, [
-                            [SelectHouseCardGameState, SelectHouseCardComponent]
+                            [SelectHouseCardGameState, SelectHouseCardComponent],
+                            [SimpleChoiceGameState, SimpleChoiceComponent]
                         ])}
                     </Row>}
                     {this.player && !this.doesControlHouse &&
