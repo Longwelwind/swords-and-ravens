@@ -36,7 +36,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | SerGerrisDrinkwaterUsed | DraftHouseCardsBegan | HouseCardPicked
     | LittlefingerPowerTokensGained | AlayneStoneUsed | LysaArrynFfcPowerTokensGained | AnyaWaynwoodPowerTokensGained | RobertArrynUsed
     | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained | DaenerysTargaryenPowerTokensDiscarded | MissandeiUsed
-    | PowerTokensGifted | InfluenceTrackPositionChosen;
+    | PowerTokensGifted | InfluenceTrackPositionChosen | TiesDecided;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -770,4 +770,9 @@ interface InfluenceTrackPositionChosen {
     house: string;
     trackerI: number;
     position: number;
+}
+
+interface TiesDecided {
+    type: "ties-decided";
+    house: string;
 }

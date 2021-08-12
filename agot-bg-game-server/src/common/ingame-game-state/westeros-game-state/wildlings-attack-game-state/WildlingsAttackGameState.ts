@@ -218,6 +218,10 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
     }
 
     onSimpleChoiceGameStateEnd(choice: number): void {
+        this.westerosGameState.ingame.log({
+            type:"ties-decided",
+            house:this.game.ironThroneHolder.id
+        });
         if (this.nightsWatchWon) {
             const highestBidder = this.highestBidders[choice];
 
