@@ -54,9 +54,10 @@ export default class ResolveTiesGameState extends GameState<ClashOfKingsGameStat
                     return;
                 }
             }
+            
             this.parentGameState.ingame.log({
-                type:"ties-decided",
-                house:this.decider.id
+                type: "ties-decided",
+                house: this.decider.id
             });
 
             // Create the final order of the track

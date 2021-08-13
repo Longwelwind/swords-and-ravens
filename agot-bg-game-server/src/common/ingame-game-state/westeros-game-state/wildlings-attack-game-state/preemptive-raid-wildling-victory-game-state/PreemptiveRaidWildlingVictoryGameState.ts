@@ -98,6 +98,11 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
                 }
             }
         } else if (this.step == PreemptiveRaidStep.REDUCING_INFLUENCE_TRACKS) {
+            this.ingame.log({
+                type: "ties-decided",
+                house: this.game.ironThroneHolder.id
+            });
+            
             this.proceedReduceInfluenceTrack(this.highestInfluenceTracks[choice], this.game.ironThroneHolder);
         }
     }
