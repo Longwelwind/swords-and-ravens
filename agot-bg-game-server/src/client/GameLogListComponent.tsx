@@ -1307,6 +1307,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     House <b>{house.name}</b> has chosen position <b>{data.position}</b> on <b>{track} Track</b>.
                 </>;
             }
+            case "ties-decided": {
+                const house = this.game.houses.get(data.house);
+                return <>
+                    House <b>{house.name}</b> has decided ties.
+                </>;
+            }
         }
     }
 }
