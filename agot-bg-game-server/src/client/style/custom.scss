@@ -429,3 +429,7 @@ div.new-event {
   filter: grayscale(100%);
   opacity: 0.5;
 }
+
+.tooltip.show {
+  opacity: 1;
+}
