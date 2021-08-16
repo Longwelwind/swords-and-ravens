@@ -148,7 +148,12 @@
             "unitType": "footman",
             "house": "lannister",
             "quantity": 1,
-            "quantityVassal": 2
+            "quantityVassal": 1
+          }, {
+            "unitType": "knight",
+            "house": "lannister",
+            "quantity": 0,
+            "quantityVassal": 1
           }],
           "the-golden-sound": [{
             "unitType": "ship",
@@ -158,7 +163,7 @@
           }],
           "stoney-sept": [
             {
-              "unitType": "knight",
+              "unitType": "footman",
               "house": "lannister",
               "quantity": 0,
               "quantityVassal": 1
@@ -168,24 +173,46 @@
             "unitType": "footman",
             "house": "lannister",
             "quantity": 2,
-            "quantityVassal": 1
-          },
-          {
+            "quantityVassal": 2
+          }],
+          "harrenhal": [{
+            "unitType": "footman",
+            "house": "lannister",
+            "quantity": 1,
+            "quantityVassal": 0
+          }, {
             "unitType": "knight",
             "house": "lannister",
             "quantity": 0,
             "quantityVassal": 1
           }],
-          "harrenhal": [{
-            "unitType": "footman",
-            "house": "lannister",
-            "quantity": 1
-          }],
           "kings-landing": [{
             "unitType": "footman",
             "house": "lannister",
-            "quantity": 2
+            "quantity": 2,
+            "quantityVassal": 1
+          }, {
+            "unitType": "knight",
+            "house": "lannister",
+            "quantity": 0,
+            "quantityVassal": 2
           }],
+          "blackwater-bay": [
+            {
+              "unitType": "ship",
+              "house": "lannister",
+              "quantity": 0,
+              "quantityVassal": 1
+            }
+          ],
+          "port-of-lannisport": [
+            {
+              "unitType": "ship",
+              "house": "lannister",
+              "quantity": 0,
+              "quantityVassal": 1
+            }
+          ],
           "port-of-dragonstone": [{
             "unitType": "ship",
             "house": "baratheon",
