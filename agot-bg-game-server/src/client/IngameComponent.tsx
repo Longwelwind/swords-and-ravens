@@ -608,7 +608,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     private renderRemainingWesterosCards(): ReactNode {
-        const remainingCards = this.game.remainingWesterosCardTypes;
+        const remainingCards = this.game.remainingWesterosCardTypes.map(deck => _.sortBy(deck.entries, rwct => -rwct[1]));
         const nextCards = this.game.nextWesterosCardTypes;
 
         return <Tooltip id="remaining-westeros-cards" className="westeros-tooltip">
@@ -621,29 +621,29 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </Row>
                     <Row>
                         {nextCards.map((_, i) =>
-                            <Col key={"westeros-deck-" + i + "-header"} className='text-center'>Deck {i + 1}</Col>)}
+                            <Col key={"westeros-deck-" + i + "-header"} className='text-center'><b>Deck {i + 1}</b></Col>)}
                     </Row>
                     <Row>
                         {nextCards.map((wd, i) =>
                             <Col key={"westeros-deck-" + i + "-data"}>
-                                {wd.map((wc, j) => <div key={"westeros-deck-" + i + "-" + j + "-data"}><small>{wc.name}</small></div>)}
+                                {wd.map((wc, j) => <div key={"westeros-deck-" + i + "-" + j + "-data"}>{wc.name}{wc.shortDescription && (<span>&ensp;<small>({wc.shortDescription})</small></span>)}</div>)}
                             </Col>)}
                     </Row>
                 </>
             )}
-            <Row className='mt-0'>
+            <Row className={this.gameSettings.cokWesterosPhase ? 'mt-4' : 'mt-0'}>
                 <Col>
                     <h5 className='text-center'>Remaining Westeros Cards</h5>
                 </Col>
             </Row>
             <Row>
                 {remainingCards.map((_, i) =>
-                    <Col key={"westeros-deck-" + i + "-header"} style={{ textAlign: "center" }}>Deck {i + 1}</Col>)}
+                    <Col key={"westeros-deck-" + i + "-header"} style={{ textAlign: "center" }}><b>Deck {i + 1}</b></Col>)}
             </Row>
-            <Row>
+            <Row className="mb-2">
                 {remainingCards.map((rc, i) =>
                     <Col key={"westeros-deck-" + i + "-data"}>
-                        {rc.entries.map(([wc, count], j) => <div key={"westeros-deck-" + i + "-" + j + "-data"}><small>{wc.name}</small> ({count})</div>)}
+                        {rc.map(([wc, count], j) => <div key={"westeros-deck-" + i + "-" + j + "-data"}>{count}x {wc.name}{wc.shortDescription && (<span>&ensp;<small>({wc.shortDescription})</small></span>)}</div>)}
                     </Col>
                 )}
             </Row>
