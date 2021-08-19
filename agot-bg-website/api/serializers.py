@@ -8,7 +8,7 @@ from chat.models import Room, UserInRoom
 class UserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'game_token', 'is_staff']
+        fields = ['id', 'username', 'game_token', 'is_staff', 'mute_games', 'use_house_names_for_chat', 'use_map_scrollbar', 'use_responsive_layout_on_mobile']
 
 
 class PlayerInGameSerializer(ModelSerializer):
