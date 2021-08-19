@@ -14,6 +14,7 @@ import { VoteState } from "./ingame-game-state/vote-system/Vote";
 import CombatGameState from "./ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import sleep from "../utils/sleep";
 import PostCombatGameState from "./ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState";
+import { StoredProfileSettings } from "../server/website-client/WebsiteClient";
 
 export enum NotificationType {
     READY_TO_START,
@@ -193,8 +194,14 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         return user.id == this.ownerUserId;
     }
 
-    addUser(userId: string, userName: string): User {
-        const user = new User(userId, userName, this);
+    addUser(userId: string, userName: string, profileSettings: StoredProfileSettings): User {
+        const user = new User(userId, userName, this, {
+            chatHouseNames: profileSettings.houseNamesForChat,
+            mapScrollbar: profileSettings.mapScrollbar,
+            responsiveLayout: profileSettings.responsiveLayout,
+            muted: profileSettings.muted,
+            lastOpenedTab: null
+        });
         this.users.set(user.id, user);
 
         this.broadcastToClients({

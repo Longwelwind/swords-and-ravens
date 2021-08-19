@@ -143,7 +143,7 @@ export default class GlobalServer {
             // Check if the game already contains this user
             const user = entireGame.users.has(userData.id)
                 ? entireGame.users.get(userData.id)
-                : entireGame.addUser(userData.id, userData.name);
+                : entireGame.addUser(userData.id, userData.name, userData.profileSettings);
 
             this.clientToUser.set(client, user);
             user.connectedClients.push(client);

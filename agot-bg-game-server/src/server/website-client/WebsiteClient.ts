@@ -1,5 +1,12 @@
 import User from "../User";
 
+export interface StoredProfileSettings {
+    muted: boolean;
+    houseNamesForChat: boolean;
+    mapScrollbar: boolean;
+    responsiveLayout: boolean;
+}
+
 export interface StoredGameData {
     id: string;
     name: string;
@@ -12,6 +19,7 @@ export interface StoredUserData {
     id: string;
     name: string;
     token: string;
+    profileSettings: StoredProfileSettings;
 }
 
 export default interface WebsiteClient {
