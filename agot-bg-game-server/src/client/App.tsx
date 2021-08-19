@@ -1,16 +1,20 @@
 import * as React from "react";
-import {Component, ReactNode} from "react";
-import {observer} from "mobx-react";
-import GameClient, {ConnectionState} from "./GameClient";
+import { Component, ReactNode } from "react";
+import { observer } from "mobx-react";
+import GameClient, { ConnectionState } from "./GameClient";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import EntireGameComponent from "./EntireGameComponent";
 import Alert from "react-bootstrap/Alert";
 import User from "../server/User";
-import {isMobile} from 'react-device-detect';
+import { isMobile } from 'react-device-detect';
 import EntireGame from "../common/EntireGame";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
+import { observable } from "mobx";
+
+const DEFAULT_WIDTH = "1910px";
+const MIN_WIDTH_FOR_RENDERING_GAME_NICELY = "1740px";
 
 interface AppProps {
     gameClient: GameClient;
@@ -18,6 +22,8 @@ interface AppProps {
 
 @observer
 export default class App extends Component<AppProps> {
+    @observable maxWidth: string = DEFAULT_WIDTH;
+
     get user(): User | null {
         return this.props.gameClient.authenticatedUser;
     }
@@ -27,11 +33,15 @@ export default class App extends Component<AppProps> {
     }
 
     get isConnected(): boolean {
-        return this.props.gameClient.connectionState == ConnectionState.SYNCED &&  this.entireGame != null;
+        return this.props.gameClient.connectionState == ConnectionState.SYNCED && this.entireGame != null;
     }
 
     get isGameRunning(): boolean {
         return this.entireGame != null && this.entireGame.childGameState instanceof IngameGameState;
+    }
+
+    get actualScreenWidth(): string {
+        return `${Math.trunc(window.screen.width * window.devicePixelRatio) - 10}px`;
     }
 
     render(): ReactNode {
@@ -43,15 +53,15 @@ export default class App extends Component<AppProps> {
         const isGameRunning = this.isGameRunning;
 
         if (mobileDevice && isConnected && isGameRunning) {
-            minWidth = responsiveLayout ? "auto" : "1910px";
+            minWidth = responsiveLayout ? "auto" : DEFAULT_WIDTH;
         }
 
         if (!mobileDevice && isConnected && isGameRunning) {
-            minWidth = "1650px";
+            minWidth = MIN_WIDTH_FOR_RENDERING_GAME_NICELY;
         }
 
         return (
-            <Container fluid={responsiveLayout} style={{marginTop: "0.75rem", marginBottom: "2rem", maxWidth: "1910px", minWidth: minWidth}}>
+            <Container fluid={responsiveLayout} style={{ marginTop: "0.75rem", marginBottom: "2rem", maxWidth: this.maxWidth, minWidth: minWidth }}>
                 <Row className="justify-content-center">
                     {this.props.gameClient.connectionState == ConnectionState.INITIALIZING ? (
                         <Col xs={3}>
@@ -78,9 +88,31 @@ export default class App extends Component<AppProps> {
                                 </p>
                             </Alert>
                         </Col>
-                    ) : (function() { throw "Should never happen" })()}
+                    ) : (function () { throw "Should never happen" })()}
                 </Row>
             </Container>
         );
+    }
+
+    setMaxWidth() {
+        if (!isMobile) {
+            this.maxWidth = this.actualScreenWidth;
+        } else {
+            this.maxWidth = DEFAULT_WIDTH;
+        }
+    }
+
+    componentDidMount(): void {
+        if (!isMobile) {
+            window.addEventListener('resize', () => this.setMaxWidth());
+        }
+
+        this.setMaxWidth();
+    }
+
+    componentWillUnmount(): void {
+        if (!isMobile) {
+            window.removeEventListener('resize', () => this.setMaxWidth());
+        }
     }
 }
