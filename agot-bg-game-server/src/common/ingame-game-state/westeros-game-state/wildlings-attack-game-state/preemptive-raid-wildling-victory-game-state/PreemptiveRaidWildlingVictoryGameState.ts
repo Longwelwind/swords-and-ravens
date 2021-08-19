@@ -102,7 +102,7 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
                 type: "ties-decided",
                 house: this.game.ironThroneHolder.id
             });
-            
+
             this.proceedReduceInfluenceTrack(this.highestInfluenceTracks[choice], this.game.ironThroneHolder);
         }
     }

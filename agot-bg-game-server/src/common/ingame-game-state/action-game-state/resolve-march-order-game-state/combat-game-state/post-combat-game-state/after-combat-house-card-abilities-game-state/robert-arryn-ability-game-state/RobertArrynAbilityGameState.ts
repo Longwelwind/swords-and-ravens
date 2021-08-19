@@ -116,7 +116,7 @@ export default class RobertArrynAbilityGameState extends GameState<
             type: "ties-decided",
             house: this.game.ironThroneHolder.id
         });
-        
+
         this.executeRobertsAbility(houseCard);
         this.parentGameState.onHouseCardResolutionFinish(this.house);
     }
