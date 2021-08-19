@@ -222,7 +222,7 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
             type: "ties-decided",
             house: this.game.ironThroneHolder.id
         });
-        
+
         if (this.nightsWatchWon) {
             const highestBidder = this.highestBidders[choice];
 
