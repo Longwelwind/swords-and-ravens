@@ -20,7 +20,13 @@ export default class LocalWebsiteClient implements WebsiteClient {
         return {
             id: userId,
             name: `Player #${userId}`,
-            token: userId
+            token: userId,
+            profileSettings: {
+                muted: true,
+                houseNamesForChat: true,
+                mapScrollbar: true,
+                responsiveLayout: false
+            }
         };
     }
 
