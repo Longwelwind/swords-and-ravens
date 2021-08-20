@@ -10,6 +10,31 @@ $grid-breakpoints: (
 @import './theme/_variables';
 @import '../../../node_modules/bootstrap/scss/bootstrap';
 
+:root{
+  scrollbar-color: #28282a #7c7c7d !important;
+  scrollbar-width: thin !important;
+}
+
+* {
+  scrollbar-width: thin !important;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #28282a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #7c7c7d;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 strong
 {
   font-weight: bold;
@@ -336,12 +361,8 @@ $wildling-outline: rgba(#f8ff00, 0.5);
   animation: 1s ease-out 3s infinite normal both running background_fade;
 }
 
-.game-log-content p, .game-log-content ul {
+.game-log-content, .game-log-content p, .game-log-content ul {
   margin-bottom: 0.5em;
-}
-
-.game-log-content p:last-child {
-  margin-bottom: 0;
 }
 
 .btn-xs, .btn-group-xs > .btn {

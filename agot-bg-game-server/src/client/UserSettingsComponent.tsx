@@ -114,7 +114,7 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
         }
 
         if (this.props.parent) {
-            this.props.parent.setHeight();
+            this.props.parent.setHeights();
         }
     }
 }
