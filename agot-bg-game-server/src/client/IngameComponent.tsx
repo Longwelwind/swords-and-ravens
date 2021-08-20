@@ -91,9 +91,9 @@ const MAP_MIN_HEIGHT = Math.trunc(MAP_HEIGHT / 2);
 export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
     @observable currentOpenedTab = (this.user && this.user.settings.lastOpenedTab) ? this.user.settings.lastOpenedTab : "chat";
-    @observable windowHeight: number | null;
+    @observable windowHeight: number | null = null;
     @observable gameLogHeight: number = GAME_LOG_MIN_HEIGHT;
-    @observable housesHeight: number = HOUSES_PANEL_MIN_HEIGHT;
+    @observable housesHeight: number | null = null;
     resizeObserver: ResizeObserver | null = null;
 
     get game(): Game {
@@ -189,6 +189,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             minHeight: MAP_MIN_HEIGHT
         };
 
+        const housesPanelStyle = {
+            height: this.housesHeight != null ? `${this.housesHeight}px` : "auto",
+            overflowY: (mobileDevice ? "visible" : "scroll") as any,
+            minHeight: mobileDevice ? "auto" : `${HOUSES_PANEL_MIN_HEIGHT}px`
+        };
+
         return (
             <>
                 <Col xs={{span: "auto", order: columnOrders.tracksColumn}}>
@@ -274,7 +280,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </Row>
                     <Row className="stackable">
                         <Col className="pb-0">
-                            <div style={{overflowY: "scroll", minHeight: HOUSES_PANEL_MIN_HEIGHT, height: this.housesHeight}}>
+                            <div style={housesPanelStyle}>
                                 <Card id="houses-panel">
                                     <ListGroup variant="flush">
                                         {this.props.gameState.game.getPotentialWinners().map(h => (
@@ -736,15 +742,23 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const mobileDevice = isMobile;
         this.windowHeight = (!mobileDevice && this.user && this.user.settings.mapScrollbar) ? window.innerHeight : null;
         this.gameLogHeight = (!mobileDevice || (this.user && !this.user.settings.responsiveLayout)) ? window.innerHeight - this.gameLogPanel.getBoundingClientRect().top - BOTTOM_MARGIN_PX : GAME_LOG_MIN_HEIGHT;
-        // The additional 5 px are needed to get rid of the outer scrollbar. Probably due to different padding behaviour compared to the map and game state panels.
-        // It's not nice but ok for now.
-        let calculatedHousesHeight = (!mobileDevice || (this.user && !this.user.settings.responsiveLayout)) ? window.innerHeight - this.housesPanel.getBoundingClientRect().top - BOTTOM_MARGIN_PX - 5: HOUSES_PANEL_MIN_HEIGHT;
-        if (this.gameControlsRow) { // Spectators don't see this row
+        let calculatedHousesHeight = mobileDevice
+            ? null
+            // The additional 5 px are needed to get rid of the outer window scrollbar. Probably due to different padding behaviour compared to the map and game state panels.
+            // It's not nice but ok for now.
+            : Math.trunc(Math.max(window.innerHeight - this.housesPanel.getBoundingClientRect().top - BOTTOM_MARGIN_PX - 5, HOUSES_PANEL_MIN_HEIGHT));
+
+        if (!calculatedHousesHeight) {
+            this.housesHeight = null;
+            return;
+        }
+
+        if (this.gameControlsRow) { // Spectators don't have this row in their DOM
             calculatedHousesHeight -= this.gameControlsRow.offsetHeight;
         }
 
-        const actualHousesHeight = this.housesPanel.offsetHeight;
-        this.housesHeight = (actualHousesHeight < calculatedHousesHeight) ? actualHousesHeight : calculatedHousesHeight;
+        // If actual height is less than calculated height, we dont need to stretch this panel
+        this.housesHeight = Math.min(calculatedHousesHeight, this.housesPanel.offsetHeight);
     }
 
     onNewPrivateChatRoomCreated(roomId: string): void {
