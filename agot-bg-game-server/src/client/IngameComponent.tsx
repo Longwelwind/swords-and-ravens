@@ -82,7 +82,7 @@ interface IngameComponentProps {
     gameState: IngameGameState;
 }
 
-const TITLE_OFFSET = 100;
+const BOTTOM_MARGIN_PX = 35;
 const GAME_LOG_MIN_HEIGHT = 450;
 const MAP_MIN_HEIGHT = Math.trunc(MAP_HEIGHT / 2);
 
@@ -129,8 +129,16 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         ]
     }
 
-    get gameStatePanel(): HTMLElement | null {
-        return document.getElementById('game-state-panel');
+    get gameStatePanel(): HTMLElement {
+        return document.getElementById('game-state-panel') as HTMLElement;
+    }
+
+    get mapComponent(): HTMLElement {
+        return document.getElementById('map-component') as HTMLElement;
+    }
+
+    get gameLogPanel(): HTMLElement {
+        return document.getElementById('game-log-panel') as HTMLElement;
     }
 
     render(): ReactNode {
@@ -165,7 +173,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const wildlingsCritical = gameRunning && this.game.wildlingStrength == MAX_WILDLING_STRENGTH;
 
         const mapStyle = {
-            height: this.windowHeight != null ? this.windowHeight - TITLE_OFFSET : "auto",
+            height: this.windowHeight != null ? this.windowHeight - this.mapComponent.getBoundingClientRect().top - BOTTOM_MARGIN_PX : "auto",
             overflowY: (this.windowHeight != null ? "scroll" : "visible") as any,
             maxHeight: MAP_HEIGHT,
             minHeight: MAP_MIN_HEIGHT
@@ -357,7 +365,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </Row>
                 </Col>
                 {!draftHouseCards && <Col xs={{span: "auto", order: columnOrders.mapColumn}}>
-                    <div style={mapStyle}>
+                    <div id="map-component" style={mapStyle}>
                         <MapComponent
                             gameClient={this.props.gameClient}
                             ingameGameState={this.props.gameState}
@@ -522,7 +530,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             </Nav.Item>
                                         </Nav>
                                     </Card.Header>
-                                    <Card.Body style={{minHeight: GAME_LOG_MIN_HEIGHT, height: this.gameLogHeight}} >
+                                    <Card.Body id="game-log-panel" style={{minHeight: GAME_LOG_MIN_HEIGHT, height: this.gameLogHeight}} >
                                         <Tab.Content className="h-100">
                                             <Tab.Pane eventKey="chat" className="h-100">
                                                 <ChatComponent gameClient={this.props.gameClient}
@@ -717,8 +725,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     setHeights(): void {
         this.windowHeight = (!isMobile && this.user && this.user.settings.mapScrollbar) ? window.innerHeight : null;
-        const gameStatePanel = this.gameStatePanel;
-        this.gameLogHeight = (this.user && !this.user.settings.responsiveLayout && gameStatePanel) ? window.innerHeight - (1.6 * TITLE_OFFSET) - gameStatePanel.offsetHeight : GAME_LOG_MIN_HEIGHT;
+        this.gameLogHeight = (!isMobile || (this.user && !this.user.settings.responsiveLayout)) ? window.innerHeight - this.gameLogPanel.getBoundingClientRect().top - BOTTOM_MARGIN_PX : GAME_LOG_MIN_HEIGHT;
     }
 
     onNewPrivateChatRoomCreated(roomId: string): void {
@@ -746,19 +753,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     componentDidMount(): void {
         this.props.gameState.entireGame.onNewPrivateChatRoomCreated = (roomId: string) => this.onNewPrivateChatRoomCreated(roomId);
-        const mobileDevice = isMobile;
-        if (!mobileDevice) {
+        if (!isMobile) {
             window.addEventListener('resize', () => this.setHeights());
         }
 
-        const gameStatePanel = this.gameStatePanel;
-
-        if (gameStatePanel) {
-            this.resizeObserver = new ResizeObserver(() => this.setHeights());
-            this.resizeObserver.observe(gameStatePanel);
-        } else {
-            this.setHeights();
-        }
+        this.resizeObserver = new ResizeObserver(() => this.setHeights());
+        this.resizeObserver.observe(this.gameStatePanel);
     }
 
     componentWillUnmount(): void {
