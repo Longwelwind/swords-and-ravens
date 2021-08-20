@@ -717,7 +717,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     setHeights(): void {
         this.windowHeight = (!isMobile && this.user && this.user.settings.mapScrollbar) ? window.innerHeight : null;
-        this.gameLogHeight = this.gameStatePanel ? window.innerHeight - (1.5 * TITLE_OFFSET) - this.gameStatePanel.offsetHeight : GAME_LOG_MIN_HEIGHT;
+        const gameStatePanel = this.gameStatePanel;
+        this.gameLogHeight = (this.user && !this.user.settings.responsiveLayout && gameStatePanel) ? window.innerHeight - (1.6 * TITLE_OFFSET) - gameStatePanel.offsetHeight : GAME_LOG_MIN_HEIGHT;
     }
 
     onNewPrivateChatRoomCreated(roomId: string): void {
@@ -745,21 +746,27 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     componentDidMount(): void {
         this.props.gameState.entireGame.onNewPrivateChatRoomCreated = (roomId: string) => this.onNewPrivateChatRoomCreated(roomId);
-        window.addEventListener('resize', () => this.setHeights());
+        const mobileDevice = isMobile;
+        if (!mobileDevice) {
+            window.addEventListener('resize', () => this.setHeights());
+        }
 
-        if (this.gameStatePanel) {
+        const gameStatePanel = this.gameStatePanel;
+
+        if (!mobileDevice && gameStatePanel) {
             this.resizeObserver = new ResizeObserver(() => this.setHeights());
-            this.resizeObserver.observe(this.gameStatePanel);
+            this.resizeObserver.observe(gameStatePanel);
         } else {
-            // This should never happen and we could throw an error but for safety we simply call setHeights once.
-            // If something really goes wrong here the game page at least can be loaded
             this.setHeights();
         }
     }
 
     componentWillUnmount(): void {
         this.props.gameState.entireGame.onNewPrivateChatRoomCreated = null;
-        window.removeEventListener('resize', () => this.setHeights());
+
+        if (!isMobile) {
+            window.removeEventListener('resize', () => this.setHeights());
+        }
 
         if (this.resizeObserver) {
             this.resizeObserver.disconnect();
