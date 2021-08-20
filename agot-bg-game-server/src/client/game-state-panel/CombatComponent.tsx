@@ -118,9 +118,11 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                             <div style={{ display: 'flex', justifyContent: 'center' }}>
                                 <h5>Battle {this.combatStats.length > 0 && "results "} for <b>{this.combat.defendingRegion.name}</b></h5>
                             </div>
-                            <CombatInfoComponent
-                                housesCombatData={houseCombatDatas}
-                            />
+                            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                <CombatInfoComponent
+                                    housesCombatData={houseCombatDatas}
+                                />
+                            </div>
                         </>
                     )}
                 </Col>
