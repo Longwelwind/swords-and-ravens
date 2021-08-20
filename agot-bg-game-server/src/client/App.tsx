@@ -94,7 +94,7 @@ export default class App extends Component<AppProps> {
         );
     }
 
-    setMaxWidth() {
+    setMaxWidth(): void {
         if (!isMobile) {
             this.maxWidth = this.actualScreenWidth;
         } else {
