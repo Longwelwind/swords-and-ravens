@@ -83,7 +83,8 @@ interface IngameComponentProps {
 }
 
 const BOTTOM_MARGIN_PX = 35;
-const GAME_LOG_MIN_HEIGHT = 450;
+const GAME_LOG_MIN_HEIGHT = 400;
+const HOUSES_PANEL_MIN_HEIGHT = 430;
 const MAP_MIN_HEIGHT = Math.trunc(MAP_HEIGHT / 2);
 
 @observer
@@ -92,6 +93,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     @observable currentOpenedTab = (this.user && this.user.settings.lastOpenedTab) ? this.user.settings.lastOpenedTab : "chat";
     @observable windowHeight: number | null;
     @observable gameLogHeight: number = GAME_LOG_MIN_HEIGHT;
+    @observable housesHeight: number = HOUSES_PANEL_MIN_HEIGHT;
     resizeObserver: ResizeObserver | null = null;
 
     get game(): Game {
@@ -139,6 +141,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     get gameLogPanel(): HTMLElement {
         return document.getElementById('game-log-panel') as HTMLElement;
+    }
+
+    get housesPanel(): HTMLElement {
+        return document.getElementById('houses-panel') as HTMLElement;
+    }
+
+    get gameControlsRow(): HTMLElement | null {
+        return document.getElementById('game-controls');
     }
 
     render(): ReactNode {
@@ -263,31 +273,34 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         </Col>
                     </Row>
                     <Row className="stackable">
-                        <Col>
-                            <Card>
-                                <ListGroup variant="flush">
-                                    {this.props.gameState.game.getPotentialWinners().map(h => (
-                                        <HouseRowComponent
-                                            key={h.id}
-                                            gameClient={this.props.gameClient}
-                                            ingame={this.props.gameState}
-                                            house={h}
-                                        />
-                                    ))}
-                                    <ListGroupItem className="text-center font-italic">
-                                        <small>
-                                        {connectedSpectators.length > 0 ? (
-                                            <>Spectators: {joinReactNodes(this.getConnectedSpectators().map(u => <strong key={u.id}>{u.name}</strong>), ", ")}</>
-                                        ) : (
-                                            <>No spectators</>
-                                        )}
-                                        </small>
-                                    </ListGroupItem>
-                                </ListGroup>
-                            </Card>
+                        <Col className="pb-0">
+                            <div style={{overflowY: "scroll", minHeight: HOUSES_PANEL_MIN_HEIGHT, height: this.housesHeight}}>
+                                <Card id="houses-panel">
+                                    <ListGroup variant="flush">
+                                        {this.props.gameState.game.getPotentialWinners().map(h => (
+                                            <HouseRowComponent
+                                                key={h.id}
+                                                gameClient={this.props.gameClient}
+                                                ingame={this.props.gameState}
+                                                house={h}
+                                            />
+                                        ))}
+                                        <ListGroupItem className="text-center font-italic">
+                                            <small>
+                                            {connectedSpectators.length > 0 ? (
+                                                <>Spectators: {joinReactNodes(this.getConnectedSpectators().map(u => <strong key={u.id}>{u.name}</strong>), ", ")}</>
+                                            ) : (
+                                                <>No spectators</>
+                                            )}
+                                            </small>
+                                        </ListGroupItem>
+                                    </ListGroup>
+                                </Card>
+                            </div>
                         </Col>
                     </Row>
-                    <Row>
+                    {this.authenticatedPlayer && (
+                    <Row id="game-controls">
                         <Col xs="auto">
                             <button className="btn btn-outline-light btn-sm" onClick={() => this.props.gameClient.muted = !this.props.gameClient.muted}>
                                 <OverlayTrigger
@@ -303,66 +316,62 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </OverlayTrigger>
                             </button>
                         </Col>
-                        {this.authenticatedPlayer && (
-                            <Col xs="auto">
+                        <Col xs="auto">
+                            <button
+                                className="btn btn-outline-light btn-sm"
+                                onClick={() => this.props.gameState.launchCancelGameVote()}
+                                disabled={!canLaunchCancelGameVote}
+                            >
+                                <OverlayTrigger
+                                    overlay={
+                                        <Tooltip id="cancel-game-vote-tooltip">
+                                            {canLaunchCancelGameVote ? (
+                                                "Launch a vote to cancel the game"
+                                            ) : canLaunchCancelGameVoteReason == "only-players-can-vote" ? (
+                                                "Only participating players can vote"
+                                            ) : canLaunchCancelGameVoteReason == "already-existing" ? (
+                                                "A vote to cancel the game is already ongoing"
+                                            ) : canLaunchCancelGameVoteReason == "already-cancelled" ? (
+                                                "Game has already been cancelled"
+                                            ) : canLaunchCancelGameVoteReason == "already-ended" ? (
+                                                "Game has already ended"
+                                            ) : "Vote not possible"}
+                                        </Tooltip>
+                                    }
+                                >
+                                    <img src={cancelImage} width={32}/>
+                                </OverlayTrigger>
+                            </button>
+                        </Col>
+                        <Col xs="auto">
                                 <button
                                     className="btn btn-outline-light btn-sm"
-                                    onClick={() => this.props.gameState.launchCancelGameVote()}
-                                    disabled={!canLaunchCancelGameVote}
+                                    onClick={() => this.props.gameState.launchEndGameVote()}
+                                    disabled={!canLaunchEndGameVote}
                                 >
                                     <OverlayTrigger
                                         overlay={
-                                            <Tooltip id="cancel-game-vote-tooltip">
-                                                {canLaunchCancelGameVote ? (
-                                                    "Launch a vote to cancel the game"
-                                                ) : canLaunchCancelGameVoteReason == "only-players-can-vote" ? (
+                                            <Tooltip id="end-game-vote-tooltip">
+                                                {canLaunchEndGameVote ? (
+                                                    "Launch a vote to end the game after the current round"
+                                                ) : canLaunchEndGameVoteReason == "only-players-can-vote" ? (
                                                     "Only participating players can vote"
-                                                ) : canLaunchCancelGameVoteReason == "already-existing" ? (
-                                                    "A vote to cancel the game is already ongoing"
-                                                ) : canLaunchCancelGameVoteReason == "already-cancelled" ? (
+                                                ) : canLaunchEndGameVoteReason == "already-last-turn" ? (
+                                                    "It is already the last round"
+                                                ) : canLaunchEndGameVoteReason == "already-existing" ? (
+                                                    "A vote to end the game is already ongoing"
+                                                ) : canLaunchEndGameVoteReason == "already-cancelled" ? (
                                                     "Game has already been cancelled"
-                                                ) : canLaunchCancelGameVoteReason == "already-ended" ? (
+                                                ) : canLaunchEndGameVoteReason == "already-ended" ? (
                                                     "Game has already ended"
                                                 ) : "Vote not possible"}
-                                            </Tooltip>
-                                        }
+                                            </Tooltip>}
                                     >
-                                        <img src={cancelImage} width={32}/>
+                                        <img src={truceImage} width={32}/>
                                     </OverlayTrigger>
                                 </button>
-                            </Col>
-                        )}
-                        {this.authenticatedPlayer && (
-                            <Col xs="auto">
-                                    <button
-                                        className="btn btn-outline-light btn-sm"
-                                        onClick={() => this.props.gameState.launchEndGameVote()}
-                                        disabled={!canLaunchEndGameVote}
-                                    >
-                                        <OverlayTrigger
-                                            overlay={
-                                                <Tooltip id="end-game-vote-tooltip">
-                                                    {canLaunchEndGameVote ? (
-                                                        "Launch a vote to end the game after the current round"
-                                                    ) : canLaunchEndGameVoteReason == "only-players-can-vote" ? (
-                                                        "Only participating players can vote"
-                                                    ) : canLaunchEndGameVoteReason == "already-last-turn" ? (
-                                                        "It is already the last round"
-                                                    ) : canLaunchEndGameVoteReason == "already-existing" ? (
-                                                        "A vote to end the game is already ongoing"
-                                                    ) : canLaunchEndGameVoteReason == "already-cancelled" ? (
-                                                        "Game has already been cancelled"
-                                                    ) : canLaunchEndGameVoteReason == "already-ended" ? (
-                                                        "Game has already ended"
-                                                    ) : "Vote not possible"}
-                                                </Tooltip>}
-                                        >
-                                            <img src={truceImage} width={32}/>
-                                        </OverlayTrigger>
-                                    </button>
-                            </Col>
-                        )}
-                    </Row>
+                        </Col>
+                    </Row>)}
                 </Col>
                 {!draftHouseCards && <Col xs={{span: "auto", order: columnOrders.mapColumn}}>
                     <div id="map-component" style={mapStyle}>
@@ -724,8 +733,18 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     setHeights(): void {
-        this.windowHeight = (!isMobile && this.user && this.user.settings.mapScrollbar) ? window.innerHeight : null;
-        this.gameLogHeight = (!isMobile || (this.user && !this.user.settings.responsiveLayout)) ? window.innerHeight - this.gameLogPanel.getBoundingClientRect().top - BOTTOM_MARGIN_PX : GAME_LOG_MIN_HEIGHT;
+        const mobileDevice = isMobile;
+        this.windowHeight = (!mobileDevice && this.user && this.user.settings.mapScrollbar) ? window.innerHeight : null;
+        this.gameLogHeight = (!mobileDevice || (this.user && !this.user.settings.responsiveLayout)) ? window.innerHeight - this.gameLogPanel.getBoundingClientRect().top - BOTTOM_MARGIN_PX : GAME_LOG_MIN_HEIGHT;
+        // The additional 5 px are needed to get rid of the outer scrollbar. Probably due to different padding behaviour compared to the map and game state panels.
+        // It's not nice but ok for now.
+        let calculatedHousesHeight = (!mobileDevice || (this.user && !this.user.settings.responsiveLayout)) ? window.innerHeight - this.housesPanel.getBoundingClientRect().top - BOTTOM_MARGIN_PX - 5: HOUSES_PANEL_MIN_HEIGHT;
+        if (this.gameControlsRow) { // Spectators don't see this row
+            calculatedHousesHeight -= this.gameControlsRow.offsetHeight;
+        }
+
+        const actualHousesHeight = this.housesPanel.offsetHeight;
+        this.housesHeight = (actualHousesHeight < calculatedHousesHeight) ? actualHousesHeight : calculatedHousesHeight;
     }
 
     onNewPrivateChatRoomCreated(roomId: string): void {
