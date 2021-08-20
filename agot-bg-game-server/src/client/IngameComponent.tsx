@@ -753,7 +753,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         const gameStatePanel = this.gameStatePanel;
 
-        if (!mobileDevice && gameStatePanel) {
+        if (gameStatePanel) {
             this.resizeObserver = new ResizeObserver(() => this.setHeights());
             this.resizeObserver.observe(gameStatePanel);
         } else {
