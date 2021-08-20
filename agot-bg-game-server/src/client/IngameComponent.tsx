@@ -1,9 +1,10 @@
 import * as React from "react";
 import {Component, ReactNode} from "react";
+import ResizeObserver from 'resize-observer-polyfill';
 import GameClient from "./GameClient";
 import {observer} from "mobx-react";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
-import MapComponent from "./MapComponent";
+import MapComponent, { MAP_HEIGHT } from "./MapComponent";
 import MapControls from "./MapControls";
 import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
@@ -81,11 +82,17 @@ interface IngameComponentProps {
     gameState: IngameGameState;
 }
 
+const TITLE_OFFSET = 100;
+const GAME_LOG_MIN_HEIGHT = 450;
+const MAP_MIN_HEIGHT = Math.trunc(MAP_HEIGHT / 2);
+
 @observer
 export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
     @observable currentOpenedTab = (this.user && this.user.settings.lastOpenedTab) ? this.user.settings.lastOpenedTab : "chat";
-    @observable height: number | null;
+    @observable windowHeight: number | null;
+    @observable gameLogHeight: number = GAME_LOG_MIN_HEIGHT;
+    resizeObserver: ResizeObserver | null = null;
 
     get game(): Game {
         return this.ingame.game;
@@ -122,6 +129,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         ]
     }
 
+    get gameStatePanel(): HTMLElement | null {
+        return document.getElementById('game-state-panel');
+    }
+
     render(): ReactNode {
         const phases: {name: string; gameState: any; component: typeof Component}[] = [
             {name: "Westeros", gameState: WesterosGameState, component: WesterosGameStateComponent},
@@ -152,6 +163,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         const wildlingsWarning = gameRunning && (this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 2 || this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 4);
         const wildlingsCritical = gameRunning && this.game.wildlingStrength == MAX_WILDLING_STRENGTH;
+
+        const mapStyle = {
+            height: this.windowHeight != null ? this.windowHeight - TITLE_OFFSET : "auto",
+            overflowY: (this.windowHeight != null ? "scroll" : "visible") as any,
+            maxHeight: MAP_HEIGHT,
+            minHeight: MAP_MIN_HEIGHT
+        };
 
         return (
             <>
@@ -339,7 +357,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </Row>
                 </Col>
                 {!draftHouseCards && <Col xs={{span: "auto", order: columnOrders.mapColumn}}>
-                    <div style={{height: this.height != null ? this.height - 100 : "auto", overflowY: this.height != null ? "scroll" : "visible", maxHeight: 1378, minHeight: 460}}>
+                    <div style={mapStyle}>
                         <MapComponent
                             gameClient={this.props.gameClient}
                             ingameGameState={this.props.gameState}
@@ -349,7 +367,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 </Col>}
                 <Col xs={{span: gameStateColumnSpan, order: columnOrders.gameStateColumn}}>
                     <Row className="mt-0"> {/* This row is necessary to make child column ordering work */}
-                        <Col xs={{span: "12", order: gameStatePanelOrders.gameStatePanel}}>
+                        <Col id="game-state-panel" xs={{span: "12", order: gameStatePanelOrders.gameStatePanel}}>
                             <Row>
                                 <Col>
                                     <Card border={this.props.gameClient.isOwnTurn() ? "warning" : undefined} bg={this.props.gameState.childGameState instanceof CancelledGameState ? "danger" : undefined}>
@@ -504,7 +522,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             </Nav.Item>
                                         </Nav>
                                     </Card.Header>
-                                    <Card.Body style={{height: "450px"}}>
+                                    <Card.Body style={{minHeight: GAME_LOG_MIN_HEIGHT, height: this.gameLogHeight}} >
                                         <Tab.Content className="h-100">
                                             <Tab.Pane eventKey="chat" className="h-100">
                                                 <ChatComponent gameClient={this.props.gameClient}
@@ -697,8 +715,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         ));
     }
 
-    setHeight(): void {
-        this.height = (!isMobile && this.user && this.user.settings.mapScrollbar) ? window.innerHeight : null;
+    setHeights(): void {
+        this.windowHeight = (!isMobile && this.user && this.user.settings.mapScrollbar) ? window.innerHeight : null;
+        this.gameLogHeight = this.gameStatePanel ? window.innerHeight - (1.5 * TITLE_OFFSET) - this.gameStatePanel.offsetHeight : GAME_LOG_MIN_HEIGHT;
     }
 
     onNewPrivateChatRoomCreated(roomId: string): void {
@@ -726,12 +745,24 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     componentDidMount(): void {
         this.props.gameState.entireGame.onNewPrivateChatRoomCreated = (roomId: string) => this.onNewPrivateChatRoomCreated(roomId);
-        window.addEventListener('resize', () => this.setHeight());
-        this.setHeight();
+        window.addEventListener('resize', () => this.setHeights());
+
+        if (this.gameStatePanel) {
+            this.resizeObserver = new ResizeObserver(() => this.setHeights());
+            this.resizeObserver.observe(this.gameStatePanel);
+        } else {
+            // This should never happen and we could throw an error but for safety we simply call setHeights once.
+            // If something really goes wrong here the game page at least can be loaded
+            this.setHeights();
+        }
     }
 
     componentWillUnmount(): void {
         this.props.gameState.entireGame.onNewPrivateChatRoomCreated = null;
-        window.removeEventListener('resize', () => this.setHeight());
+        window.removeEventListener('resize', () => this.setHeights());
+
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+        }
     }
 }

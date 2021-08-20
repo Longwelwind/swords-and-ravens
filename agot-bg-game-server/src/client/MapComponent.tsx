@@ -27,6 +27,11 @@ import PlaceOrdersGameState from "../common/ingame-game-state/planning-game-stat
 import UseRavenGameState from "../common/ingame-game-state/action-game-state/use-raven-game-state/UseRavenGameState";
 import { renderRegionTooltip } from "./regionTooltip";
 import getGarrisonToken from "./garrisonTokens";
+import { ship } from "../common/ingame-game-state/game-data-structure/unitTypes";
+
+export const MAP_HEIGHT = 1378;
+export const MAP_WIDTH = 741;
+const BLOCKED_REGION_BY_INFINITE_GARRISON = 1000;
 
 interface MapComponentProps {
     gameClient: GameClient;
@@ -43,7 +48,7 @@ export default class MapComponent extends Component<MapComponentProps> {
     render(): ReactNode {
         const backgroundImage = this.ingame.entireGame.gameSettings.setupId == "mother-of-dragons" ? westeros7pImage : westerosImage;
         const garrisons = new BetterMap(this.props.ingameGameState.world.regions
-            .values.filter(r => r.garrison > 0 && r.garrison != 1000)
+            .values.filter(r => r.garrison > 0 && r.garrison != BLOCKED_REGION_BY_INFINITE_GARRISON)
             .map(r => [r.id, getGarrisonToken(r.id, r.garrison)]));
         return (
             <div className="map"
@@ -77,7 +82,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                     {this.renderUnits()}
                     {this.renderOrders()}
                 </div>
-                <svg style={{width: "741px", height: "1378px"}}>
+                <svg style={{width: `${MAP_WIDTH}px`, height: `${MAP_HEIGHT}px`}}>
                     {this.renderRegions()}
                 </svg>
             </div>
@@ -92,7 +97,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         );
 
         return propertiesForRegions.entries.map(([region, properties]) => {
-            const blocked = region.garrison == 1000;
+            const blocked = region.garrison == BLOCKED_REGION_BY_INFINITE_GARRISON;
             const wrap = properties.wrap;
 
             return (
@@ -152,7 +157,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                     if (!u.wounded) {
                         opacity = 1;
                         transform = `none`;
-                    } else if (u.type.name == "Ship") {
+                    } else if (u.type == ship) {
                         opacity = 0.5;
                         transform = `none`;
                     } else {
@@ -182,7 +187,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                                     },
                                     {
                                         "unit-highlight-green": property.highlight.color == "green"
-                                    },
+                                    }
                                 )}
                                 style={{
                                     backgroundImage: `url(${unitImages.get(u.allegiance.id).get(u.upgradedType ? u.upgradedType.id : u.type.id)})`,
