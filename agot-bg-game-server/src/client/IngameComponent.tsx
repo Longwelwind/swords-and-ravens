@@ -135,8 +135,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         return document.getElementById('game-state-panel') as HTMLElement;
     }
 
-    get mapComponent(): HTMLElement {
-        return document.getElementById('map-component') as HTMLElement;
+    get mapComponent(): HTMLElement | null { // The map is hidden from the DOM in drafting mode, therefore this element can be null
+        return document.getElementById('map-component');
     }
 
     get gameLogPanel(): HTMLElement {
@@ -147,7 +147,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         return document.getElementById('houses-panel') as HTMLElement;
     }
 
-    get gameControlsRow(): HTMLElement | null {
+    get gameControlsRow(): HTMLElement | null { // Spectators don't see this game controls, therefore this element can be null
         return document.getElementById('game-controls');
     }
 
@@ -183,7 +183,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const wildlingsCritical = gameRunning && this.game.wildlingStrength == MAX_WILDLING_STRENGTH;
 
         const mapStyle = {
-            height: this.windowHeight != null ? this.windowHeight - this.mapComponent.getBoundingClientRect().top - BOTTOM_MARGIN_PX : "auto",
+            height: (this.windowHeight != null && this.mapComponent != null) ? (this.windowHeight - this.mapComponent.getBoundingClientRect().top - BOTTOM_MARGIN_PX) : "auto",
             overflowY: (this.windowHeight != null ? "scroll" : "visible") as any,
             maxHeight: MAP_HEIGHT,
             minHeight: MAP_MIN_HEIGHT
