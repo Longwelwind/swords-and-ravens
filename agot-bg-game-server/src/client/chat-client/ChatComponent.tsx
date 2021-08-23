@@ -13,6 +13,7 @@ import EntireGame from "../../common/EntireGame";
 import ScrollToBottom from "react-scroll-to-bottom";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import User from "../../server/User";
+import { preventOverflow } from "@popperjs/core";
 
 interface ChatComponentProps {
     gameClient: GameClient;
@@ -77,7 +78,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                     <OverlayTrigger
                                         placement="auto"
                                         overlay={<Tooltip id={"message-date-" + m.id}>{m.createdAt.toLocaleString()}</Tooltip>}
-                                        popperConfig={{modifiers: {preventOverflow: {boundariesElement: "viewport"}}}}
+                                        popperConfig={{modifiers: [preventOverflow]}}
                                     >
                                         <small className="text-muted">
                                             {('0' + m.createdAt.getHours()).slice(-2)}:{('0' + m.createdAt.getMinutes()).slice(-2)}

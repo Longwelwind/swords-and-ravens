@@ -28,6 +28,7 @@ import BetterMap from "../utils/BetterMap";
 import { tidesOfBattleCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
 import HouseNumberResultsComponent from "./HouseNumberResultsComponent";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
+import { preventOverflow } from "@popperjs/core";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -77,7 +78,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <OverlayTrigger
                         placement="auto"
                         overlay={<Tooltip id={"log-date-" + l.time.getUTCMilliseconds()}>{l.time.toLocaleString()}</Tooltip>}
-                        popperConfig={{ modifiers: { preventOverflow: { boundariesElement: "viewport" } } }}
+                        popperConfig={{modifiers: [preventOverflow]}}
                     >
                         <small>
                             {l.time.getHours().toString().padStart(2, "0")}

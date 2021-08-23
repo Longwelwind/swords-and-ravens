@@ -1,4 +1,6 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Node 14",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": { "*": ["types/*"] },
@@ -7,8 +9,9 @@
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "strictNullChecks": true,
+    "lib": ["es2020", "DOM"],
     "module": "commonjs",
-    "target": "es5",
+    "target": "es2020",
     "jsx": "react",
     "allowJs": true,
     "moduleResolution": "node",

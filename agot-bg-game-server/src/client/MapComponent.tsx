@@ -14,7 +14,7 @@ import westeros7pImage from "../../public/images/westeros-7p.jpg";
 import houseOrderImages from "./houseOrderImages";
 import orderImages from "./orderImages";
 import unitImages from "./unitImages";
-import classNames = require("classnames");
+import classNames from "classnames";
 import housePowerTokensImages from "./housePowerTokensImages";
 import {OverlayTrigger, Tooltip} from "react-bootstrap";
 import ConditionalWrap from "./utils/ConditionalWrap";
@@ -28,6 +28,7 @@ import UseRavenGameState from "../common/ingame-game-state/action-game-state/use
 import { renderRegionTooltip } from "./regionTooltip";
 import getGarrisonToken from "./garrisonTokens";
 import { ship } from "../common/ingame-game-state/game-data-structure/unitTypes";
+import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -299,7 +300,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         );
     }
 
-    private renderOrderTooltip(order: Order | null, region: Region): ReactNode {
+    private renderOrderTooltip(order: Order | null, region: Region): OverlayChildren {
         const regionController = region.getController();
 
         return <Tooltip id={"order-info"}>

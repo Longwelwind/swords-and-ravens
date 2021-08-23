@@ -2,12 +2,8 @@ import {Component, ReactNode} from "react";
 import PlanningGameState from "../../common/ingame-game-state/planning-game-state/PlanningGameState";
 import {observer} from "mobx-react";
 import React from "react";
-import Region from "../../common/ingame-game-state/game-data-structure/Region";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import Row from "react-bootstrap/Row";
-import { OverlayTrigger } from "react-bootstrap";
-import { observable } from "mobx";
-import BetterMap from "../../utils/BetterMap";
 import GameStateComponentProps from "./GameStateComponentProps";
 import ClaimVassalsGameState from "../../common/ingame-game-state/planning-game-state/claim-vassals-game-state/ClaimVassalsGameState";
 import PlaceOrdersGameState from "../../common/ingame-game-state/planning-game-state/place-orders-game-state/PlaceOrdersGameState";
@@ -19,8 +15,6 @@ import PlaceOrdersComponent from "./PlaceOrdersComponent";
 export default class PlanningComponent extends Component<GameStateComponentProps<PlanningGameState>> {
     modifyRegionsOnMapCallback: any;
     modifyOrdersOnMapCallback: any;
-
-    @observable overlayTriggers = new BetterMap<Region, OverlayTrigger>();
 
     render(): ReactNode {
         return (

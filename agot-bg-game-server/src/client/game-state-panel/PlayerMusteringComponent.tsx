@@ -269,7 +269,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                                     trigger="click"
                                     rootClose
                                     overlay={
-                                        <Popover id={"region-popover-" + modifiedRegion.id}>
+                                        <Popover id={"region-popover-" + modifiedRegion.id} className="p-2">
                                             <h5 style={{textAlign: "center"}}>{modifiedRegion.name} <small>({this.props.gameState.getUsedPointsForRegion(modifiedRegion, this.musterings)} / {modifiedRegion.castleLevel})</small></h5>
                                             <>
                                                 {this.props.gameState.getValidMusteringRulesForRegion(modifiedRegion, this.musterings).length > 0 && (

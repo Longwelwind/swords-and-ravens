@@ -24,6 +24,7 @@ import { observer } from "mobx-react";
 import GiftPowerTokensComponent from "./GiftPowerTokensComponent";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
 import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
+import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 
 
 interface HouseRowComponentProps {
@@ -196,25 +197,25 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         </>;
     }
 
-    private renderUnitTypeTooltip(unitType: UnitType): ReactNode {
+    private renderUnitTypeTooltip(unitType: UnitType): OverlayChildren {
         return <Tooltip id={unitType.id + "-tooltip"}>
             <b>{unitType.name}</b><br/>
             <small>{unitType.description}</small>
         </Tooltip>;
     }
 
-    private renderTotalLandRegionsTooltip(house: House): ReactNode {
+    private renderTotalLandRegionsTooltip(house: House): OverlayChildren {
         return <Tooltip id={house.id + "-total-land-regions"}>
             <h5>Total Land Areas</h5><br/><h4 style={{textAlign: "center"}}><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
         </Tooltip>;
     }
 
-    private renderPowerPopover(house: House): ReactNode {
+    private renderPowerPopover(house: House): OverlayChildren {
         const availablePower =  house.powerTokens;
         const powerTokensOnBoard = this.game.countPowerTokensOnBoard(house);
         const powerInPool = this.game.maxPowerTokens - availablePower - powerTokensOnBoard;
 
-        return <Popover id={house.id + "-power-tooltip"}>
+        return <Popover id={house.id + "-power-tooltip"} className="p-2">
             <b>{house.name}</b><br/>
             <small>Available: </small><b>{availablePower}</b><br/>
             <small>On the board: </small><b>{powerTokensOnBoard}</b><br/>

@@ -13,7 +13,7 @@ export default class ClaimVassalsComponent extends Component<GameStateComponentP
     render(): ReactNode {
         return (
             <>
-                <ListGroupItem>
+                <ListGroupItem style={{borderStyle: "none"}}>
                     <Row>
                         {renderChildGameState(this.props, [
                             [ClaimVassalGameState, ClaimVassalComponent],

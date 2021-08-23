@@ -3,6 +3,7 @@ import Tooltip from "react-bootstrap/Tooltip";
 import houseInfluenceImages from "../../houseInfluenceImages";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import { LobbyHouse } from "../../../common/lobby-game-state/LobbyGameState";
+import { preventOverflow } from "@popperjs/core";
 
 interface SimpleInfluenceIconComponentProps {
     house: LobbyHouse;
@@ -20,7 +21,7 @@ export default class SimpleInfluenceIconComponent extends Component<SimpleInflue
                 </Tooltip>
             }
             placement="bottom"
-            popperConfig={{ modifiers: { preventOverflow: { boundariesElement: "viewport" } } }}
+            popperConfig={{modifiers: [preventOverflow]}}
         >
             <div className="influence-icon"
                 style={{backgroundImage: `url(${houseInfluenceImages.get(this.house.id)})`}}/>

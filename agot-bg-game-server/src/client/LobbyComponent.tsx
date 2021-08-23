@@ -9,7 +9,7 @@ import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
-import classNames = require("classnames");
+import classNames from "classnames";
 import ChatComponent from "./chat-client/ChatComponent";
 import GameSettingsComponent from "./GameSettingsComponent";
 import User from "../server/User";
@@ -237,7 +237,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
         this.lobby.chooseHouse(null, this.password);
     }
 
-    componentWillUpdate(): void {
+    UNSAFE_componentWillUpdate(): void {
         if (this.entireGame.gameSettings.adwdHouseCards || this.entireGame.gameSettings.setupId == "a-dance-with-dragons") {
             setBoltonInfluenceImage();
             this.lobby.lobbyHouses.get("stark").name = "Bolton";
