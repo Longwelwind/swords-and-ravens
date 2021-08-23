@@ -5,8 +5,9 @@ import {observer} from "mobx-react";
 import WildlingCardType from "../../../common/ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
 import wildlingCardImages from "../../wildlingCardImages";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import {Placement} from "react-bootstrap/Overlay";
+import {OverlayChildren, Placement} from "react-bootstrap/Overlay";
 import ImagePopover from "./ImagePopover";
+import { preventOverflow } from "@popperjs/core";
 
 interface WildlingCardProps {
     cardType: WildlingCardType;
@@ -21,7 +22,7 @@ export default class WildlingCardComponent extends Component<WildlingCardProps> 
         return <OverlayTrigger
             overlay={this.renderPopover()}
             delay={{show: 120, hide: 0}}
-            popperConfig={{modifiers: {preventOverflow: {boundariesElement: "viewport"}}}}
+            popperConfig={{modifiers: [preventOverflow]}}
             placement={this.props.placement}
         >
             <div
@@ -33,7 +34,7 @@ export default class WildlingCardComponent extends Component<WildlingCardProps> 
         </OverlayTrigger>;
     }
 
-    renderPopover(): ReactNode {
+    renderPopover(): OverlayChildren {
         return this.props.tooltip ? <ImagePopover className="vertical-game-card"
             style={{
                 backgroundImage: `url(${wildlingCardImages.get(this.props.cardType.id)})`}}

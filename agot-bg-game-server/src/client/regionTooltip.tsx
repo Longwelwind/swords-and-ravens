@@ -1,10 +1,11 @@
 import React from "react";
 import { ReactNode } from "react";
 import { Tooltip } from "react-bootstrap";
+import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
 // import joinReactNodes from "./utils/joinReactNodes";
 
-export function renderRegionTooltip(region: Region): ReactNode {
+export function renderRegionTooltip(region: Region): OverlayChildren {
     const controller =  region.getController();
 
     return <Tooltip id={`region-${region.id}-details`}>

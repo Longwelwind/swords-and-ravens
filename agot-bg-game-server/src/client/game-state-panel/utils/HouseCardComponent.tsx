@@ -3,8 +3,10 @@ import {observer} from "mobx-react";
 import HouseCard from "../../../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import houseCardImages from "../../houseCardImages";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import classNames = require("classnames");
+import classNames from "classnames";
 import ImagePopover from "./ImagePopover";
+import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { preventOverflow } from "@popperjs/core";
 
 interface HouseCardComponentProps {
     houseCard: HouseCard;
@@ -19,7 +21,7 @@ export default class HouseCardComponent extends Component<HouseCardComponentProp
     render(): ReactNode {
         return <OverlayTrigger
                 overlay={this.renderPopover()}
-                popperConfig={{modifiers: {preventOverflow: {boundariesElement: "viewport"}}}}
+                popperConfig={{modifiers: [preventOverflow]}}
                 delay={{show: 120, hide: 0}}
                 placement="auto"
             >
@@ -36,7 +38,7 @@ export default class HouseCardComponent extends Component<HouseCardComponentProp
             </OverlayTrigger>;
     }
 
-    private renderPopover(): ReactNode {
+    private renderPopover(): OverlayChildren {
         return <ImagePopover className="vertical-game-card" style={{
             backgroundImage: `url(${houseCardImages.get(this.props.houseCard.id)})`}}
         />;

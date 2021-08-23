@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import orderImages from "../../orderImages";
-import classNames = require("classnames");
+import classNames from "classnames";
 import Order from "../../../common/ingame-game-state/game-data-structure/Order";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
@@ -19,7 +19,7 @@ export default class OrderGridComponent extends Component<OrderGridProps> {
         return (
             <Row className="justify-content-center">
                 <Col xs="auto">
-                    <Row style={{width: "180px"}} className="no-gutters justify-content-center">
+                    <Row style={{width: "180px"}} className="justify-content-center m-3">
                         {this.props.orders.map(o => (
                             <OverlayTrigger
                                 key={"order-overlay-" + o.id}

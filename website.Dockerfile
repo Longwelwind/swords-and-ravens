@@ -1,4 +1,4 @@
-FROM node:10.16-slim AS build-client
+FROM node:14 AS build-client
 # Build the client of the game
 WORKDIR /app
 

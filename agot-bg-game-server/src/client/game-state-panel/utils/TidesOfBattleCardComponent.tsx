@@ -4,6 +4,8 @@ import { TidesOfBattleCard } from "../../../common/ingame-game-state/game-data-s
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import tidesOfBattleImages from "../../../client/tidesOfBattleImages";
 import ImagePopover from "./ImagePopover";
+import { preventOverflow } from "@popperjs/core";
+import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 
 interface TidesOfBattleCardComponentProps {
     tidesOfBattleCard: TidesOfBattleCard;
@@ -14,7 +16,7 @@ export default class TidesOfBattleCardComponent extends Component<TidesOfBattleC
     render(): ReactNode {
         return <OverlayTrigger
             overlay={this.renderPopover()}
-            popperConfig={{modifiers: {preventOverflow: {boundariesElement: "viewport"}}}}
+            popperConfig={{modifiers: [preventOverflow]}}
             delay={{show: 120, hide: 0}}
             placement="auto"
         >
@@ -27,7 +29,7 @@ export default class TidesOfBattleCardComponent extends Component<TidesOfBattleC
         </OverlayTrigger>;
     }
 
-    renderPopover(): ReactNode {
+    renderPopover(): OverlayChildren {
         return <ImagePopover className="vertical-game-card small" style={{
             backgroundImage: `url(${tidesOfBattleImages.get(this.props.tidesOfBattleCard.id)})`}}
         />;

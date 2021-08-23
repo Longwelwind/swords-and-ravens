@@ -37,6 +37,11 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         return this.props.gameState.ingame.isVassalHouse(this.house);
     }
 
+    constructor(props: GameStateComponentProps<ResolveSingleMarchOrderGameState>) {
+        super(props);
+        this.UNSAFE_componentWillUpdate();
+    }
+
     render(): ReactNode {
         const allUnitsWillLeaveStartingRegion = this.selectedMarchOrderRegion ? this.props.gameState.haveAllUnitsLeft(this.selectedMarchOrderRegion, this.plannedMoves) : false;
         return (
@@ -105,11 +110,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         );
     }
 
-    componentWillMount(): any {
-        this.componentWillUpdate();
-    }
-
-    componentWillUpdate(): any {
+    UNSAFE_componentWillUpdate(): any {
         const {success, reason} = this.selectedMarchOrderRegion
             ? this.props.gameState.canLeavePowerToken(this.selectedMarchOrderRegion, this.plannedMoves)
             : {success: false, reason: "no-all-units-go"}

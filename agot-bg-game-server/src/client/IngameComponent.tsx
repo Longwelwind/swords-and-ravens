@@ -50,7 +50,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import User from "../server/User";
 import Player from "../common/ingame-game-state/Player";
 import {observable} from "mobx";
-import classNames = require("classnames");
+import classNames from "classnames";
 import {Channel, Message} from "./chat-client/ChatClient";
 // @ts-ignore
 import ScrollToBottom from "react-scroll-to-bottom";
@@ -76,6 +76,8 @@ import housePowerTokensImages from "./housePowerTokensImages";
 import unitImages from "./unitImages";
 import DraftInfluencePositionsGameState from "../common/ingame-game-state/draft-influence-positions-game-state/DraftInfluencePositionsGameState";
 import DraftInfluencePositionsComponent from "./game-state-panel/DraftInfluencePositionsComponent";
+import { preventOverflow } from "@popperjs/core";
+import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 
 interface IngameComponentProps {
     gameClient: GameClient;
@@ -147,8 +149,28 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         return document.getElementById('houses-panel') as HTMLElement;
     }
 
-    get gameControlsRow(): HTMLElement | null { // Spectators don't see this game controls, therefore this element can be null
+    get gameControlsRow(): HTMLElement | null { // Spectators don' see this game controls, therefore this element can be null
         return document.getElementById('game-controls');
+    }
+
+    constructor(props: IngameComponentProps) {
+        super(props);
+        // Check for Dance with Dragons house cards
+        if (props.gameState.entireGame.gameSettings.adwdHouseCards ||
+            props.gameState.entireGame.gameSettings.setupId == "a-dance-with-dragons") {
+            // Replace Stark images with Bolton images for DwD
+            houseCardsBackImages.set("stark", houseCardsBackImages.get("bolton"));
+            houseInfluenceImages.set("stark", houseInfluenceImages.get("bolton"));
+            houseOrderImages.set("stark", houseOrderImages.get("bolton"));
+            housePowerTokensImages.set("stark", housePowerTokensImages.get("bolton"));
+            unitImages.set("stark", unitImages.get("bolton"));
+
+            const boltons = this.props.gameState.game.houses.tryGet("stark", null);
+            if (boltons) {
+                boltons.name = "Bolton";
+                boltons.color = "#c59699"
+            }
+        }
     }
 
     render(): ReactNode {
@@ -401,7 +423,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                         overlay={this.renderRemainingWesterosCards()}
                                                         delay={{ show: 250, hide: 100 }}
                                                         placement="bottom"
-                                                        popperConfig={{modifiers: {preventOverflow: {boundariesElement: "viewport"}}}}
+                                                        popperConfig={{modifiers: [preventOverflow]}}
                                                     >
                                                         <Row className="justify-content-between">
                                                             {phases.map((phase, i) => (
@@ -483,7 +505,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             <Card>
                                 <Tab.Container activeKey={this.currentOpenedTab}
                                     onSelect={k => {
-                                        this.currentOpenedTab = k;
+                                        if (k) {
+                                            this.currentOpenedTab = k;
+                                        }
                                         if (this.user) {
                                             this.user.settings.lastOpenedTab = k;
                                             this.user.syncSettings();
@@ -648,7 +672,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         return this.props.gameClient.chatClient.channels.get(this.props.gameState.entireGame.publicChatRoomId);
     }
 
-    private renderRemainingWesterosCards(): ReactNode {
+    private renderRemainingWesterosCards(): OverlayChildren {
         const remainingCards = this.game.remainingWesterosCardTypes.map(deck => _.sortBy(deck.entries, rwct => -rwct[1]));
         const nextCards = this.game.nextWesterosCardTypes;
 
@@ -763,25 +787,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     onNewPrivateChatRoomCreated(roomId: string): void {
         this.currentOpenedTab = roomId;
-    }
-
-    componentWillMount(): void {
-        // Check for Dance with Dragons house cards
-        if (this.props.gameState.entireGame.gameSettings.adwdHouseCards ||
-            this.props.gameState.entireGame.gameSettings.setupId == "a-dance-with-dragons") {
-            // Replace Stark images with Bolton images for DwD
-            houseCardsBackImages.set("stark", houseCardsBackImages.get("bolton"));
-            houseInfluenceImages.set("stark", houseInfluenceImages.get("bolton"));
-            houseOrderImages.set("stark", houseOrderImages.get("bolton"));
-            housePowerTokensImages.set("stark", housePowerTokensImages.get("bolton"));
-            unitImages.set("stark", unitImages.get("bolton"));
-
-            const boltons = this.props.gameState.game.houses.tryGet("stark", null);
-            if (boltons) {
-                boltons.name = "Bolton";
-                boltons.color = "#c59699"
-            }
-        }
     }
 
     componentDidMount(): void {

@@ -10,7 +10,7 @@ Suggestions, remarks and other feedbacks can done on [the discord server](https:
 
 The project is separated into 2 components:
 
-* A website in `Python` with the `Django` framework. This component handles user registrations, creating games as well as a joining them. It exposes a REST API used by the game server. Finally, it also contains the logic for the chat used in the games. The code is located in `agot-bg-website/`.
+* A website in `Python` with the `Django` framework. This component handles user registrations, creating games as well as joining them. It exposes a REST API used by the game server. Finally, it also contains the logic for the chat used in the games. The code is located in `agot-bg-website/`.
 * A game server in `Typescript` with `React`, `mobx` and `bootstrap`. It runs the games of AGoT. It is itself composed of a front-end and a back-end. The code is located in `agot-bg-game-server/`.
 
 Additional documentation about how those components work can be found in the folder of each component.
@@ -21,7 +21,7 @@ There a multiple ways to run the code, depending on what components on what you 
 
 ### Launching the Game Only
 
-Requires `NodeJS` and `yarn`. Install the dependencies and initialize the environment variables by executing:
+Requires `NodeJS v14` and `yarn`. Install the dependencies and initialize the environment variables by executing:
 
 ```bash
 cd agot-bg-game-server/
@@ -76,6 +76,8 @@ The website will be accessible at `http://localhost:8000/` (as well as `http://l
 To launch the 2 components and make them inter-connected, make sure the dependencies are installed and the database is up and running (follow the instructions given in the precedent sections).
 
 Replace the environment configuration of the game-server with a live one: `cp .env.live .env`.
+
+Replace the webpack configuration of the game-server with a live one: `cp webpack.client.js.live webpack.client.js`.
 
 The front-end of the game server must be built and placed in the website. This can be done by executing `./build_and_place_game_client_into_django.sh`.
 

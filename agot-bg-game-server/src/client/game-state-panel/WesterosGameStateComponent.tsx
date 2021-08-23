@@ -26,7 +26,7 @@ import GameStateComponentProps from "./GameStateComponentProps";
 import renderChildGameState from "../utils/renderChildGameState";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import classNames = require("classnames");
+import classNames from "classnames";
 import WesterosCardComponent from "./utils/WesterosCardComponent";
 
 @observer

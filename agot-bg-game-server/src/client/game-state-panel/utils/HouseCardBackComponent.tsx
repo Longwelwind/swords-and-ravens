@@ -1,11 +1,12 @@
 import {Component, default as React, ReactNode} from "react";
 import {observer} from "mobx-react";
 import houseCardImages from "../../houseCardImages";
-import classNames = require("classnames");
+import classNames from "classnames";
 import House from "../../../common/ingame-game-state/game-data-structure/House";
 import houseCardsBackImages from "../../houseCardsBackImages";
 import HouseCard from "../../../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import { preventOverflow } from "@popperjs/core";
 
 interface HouseCardBackComponentProps {
     house: House;
@@ -23,7 +24,7 @@ export default class HouseCardBackComponent extends Component<HouseCardBackCompo
                         backgroundImage: `url(${houseCardImages.get(this.props.houseCard.id)})`
                     }}/>
                 }
-                popperConfig={{modifiers: {preventOverflow: {boundariesElement: "viewport"}}}}
+                popperConfig={{modifiers: [preventOverflow]}}
                 delay={{show: 120, hide: 0}}
                 placement="auto"
             >

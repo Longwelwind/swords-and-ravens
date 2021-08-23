@@ -8,6 +8,7 @@ import Player from "../common/ingame-game-state/Player";
 import Game from "../common/ingame-game-state/game-data-structure/Game";
 import { observer } from "mobx-react";
 import { observable } from "mobx";
+import { preventOverflow } from "@popperjs/core";
 
 interface GiftPowerTokensComponentProps {
     toHouse: House;
@@ -40,7 +41,7 @@ export default class GiftPowerTokensComponent extends Component<GiftPowerTokensC
                             <Tooltip id="gift-power-tokens-tooltip">
                                 Gift Power tokens to<br/>house <b>{this.toHouse.name}</b>
                             </Tooltip>}
-                            popperConfig={{ modifiers: { preventOverflow: { boundariesElement: "viewport" } } }}
+                            popperConfig={{modifiers: [preventOverflow]}}
                             placement="auto">
                             <div style={{backgroundImage: `url(${present})`, width: 24, height: 24}}/>
                         </OverlayTrigger>
