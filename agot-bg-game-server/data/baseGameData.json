@@ -980,7 +980,7 @@
   "houses": {
     "baratheon": {
       "name": "Baratheon",
-      "color": "#ffc107",
+      "color": "#e6d228",
       "unitLimits": {
         "footman": 10,
         "knight": 5,
