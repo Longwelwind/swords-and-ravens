@@ -988,6 +988,20 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "41",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                const baratheon = ingame.game.houses.find((h: any) => h.id == "baratheon");
+                if (baratheon !== undefined) {
+                    baratheon.color = "#e6d228";
+                }
+            }
+
+            return serializedGame;
+        }
     }
 ];
 
