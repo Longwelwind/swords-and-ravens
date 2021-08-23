@@ -12,7 +12,7 @@ export default class User {
     connectedClients: WebSocket[] = [];
     @observable connected: boolean;
 
-    constructor(id: string, name: string, game: EntireGame, settings: UserSettings = {mapScrollbar: true, lastOpenedTab: null, chatHouseNames: true, responsiveLayout: false, muted: false}, connected = false) {
+    constructor(id: string, name: string, game: EntireGame, settings: UserSettings, connected = false) {
         this.id = id;
         this.name = name;
         this.settings = settings;

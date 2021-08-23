@@ -55,7 +55,13 @@ export default class LiveWebsiteClient implements WebsiteClient {
             return {
                 id: response.id,
                 name: response.username,
-                token: response.game_token
+                token: response.game_token,
+                profileSettings: {
+                    muted: response.mute_games,
+                    houseNamesForChat: response.use_house_names_for_chat,
+                    mapScrollbar: response.use_map_scrollbar,
+                    responsiveLayout: response.use_responsive_layout_on_mobile
+                }
             };
         } catch (e) {
             if (e instanceof StatusCodeError) {
