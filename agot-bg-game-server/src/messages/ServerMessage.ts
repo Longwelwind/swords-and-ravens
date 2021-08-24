@@ -121,13 +121,6 @@ interface ChangeStateHouseCard {
     state: HouseCardState;
 }
 
-interface ArmyRetreated {
-    type: "army-retreated";
-    startingRegionId: string;
-    retreatRegionId: string;
-    unitIds: number[];
-}
-
 interface UnitsWounded {
     type: "units-wounded";
     regionId: string;

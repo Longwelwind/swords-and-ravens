@@ -78,13 +78,14 @@ import DraftInfluencePositionsGameState from "../common/ingame-game-state/draft-
 import DraftInfluencePositionsComponent from "./game-state-panel/DraftInfluencePositionsComponent";
 import { preventOverflow } from "@popperjs/core";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { faChevronCircleLeft, faChevronCircleRight } from "@fortawesome/free-solid-svg-icons";
 
 interface IngameComponentProps {
     gameClient: GameClient;
     gameState: IngameGameState;
 }
 
-const BOTTOM_MARGIN_PX = 35;
+const BOTTOM_MARGIN_PX = 20;
 const GAME_LOG_MIN_HEIGHT = 400;
 const HOUSES_PANEL_MIN_HEIGHT = 430;
 const MAP_MIN_HEIGHT = Math.trunc(MAP_HEIGHT / 2);
@@ -92,10 +93,11 @@ const MAP_MIN_HEIGHT = Math.trunc(MAP_HEIGHT / 2);
 @observer
 export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
-    @observable currentOpenedTab = (this.user && this.user.settings.lastOpenedTab) ? this.user.settings.lastOpenedTab : "chat";
+    @observable currentOpenedTab = this.user?.settings.lastOpenedTab ?? "chat";
     @observable windowHeight: number | null = null;
     @observable gameLogHeight: number = GAME_LOG_MIN_HEIGHT;
     @observable housesHeight: number | null = null;
+    @observable tracksColumnCollapsed = this.props.gameClient.authenticatedUser?.settings.tracksColumnCollapsed ?? false;
     resizeObserver: ResizeObserver | null = null;
 
     get game(): Game {
@@ -145,7 +147,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         return document.getElementById('game-log-panel') as HTMLElement;
     }
 
-    get housesPanel(): HTMLElement {
+    get housesPanel(): HTMLElement | null {
         return document.getElementById('houses-panel') as HTMLElement;
     }
 
@@ -219,7 +221,16 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         return (
             <>
-                <Col xs={{span: "auto", order: columnOrders.tracksColumn}}>
+                {!mobileDevice && <button className="btn btn-sm" onClick={() => {
+                    this.tracksColumnCollapsed = !this.tracksColumnCollapsed;
+                    if (this.props.gameClient.authenticatedUser) {
+                        this.props.gameClient.authenticatedUser.settings.tracksColumnCollapsed = this.tracksColumnCollapsed;
+                        this.props.gameClient.authenticatedUser.syncSettings();
+                    }
+                }}>
+                    <FontAwesomeIcon icon={this.tracksColumnCollapsed ? faChevronCircleLeft : faChevronCircleRight} />
+                </button>}
+                {(!this.tracksColumnCollapsed || mobileDevice) && <Col xs={{ span: "auto", order: columnOrders.tracksColumn }} id="tracks-houses-column">
                     <Row className="stackable">
                         <Col>
                             <Card>
@@ -301,7 +312,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         </Col>
                     </Row>
                     <Row className="stackable">
-                        <Col className="pb-0">
+                        <Col>
                             <div style={housesPanelStyle}>
                                 <Card id="houses-panel">
                                     <ListGroup variant="flush">
@@ -400,7 +411,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </button>
                         </Col>
                     </Row>)}
-                </Col>
+                </Col>}
                 {!draftHouseCards && <Col xs={{span: "auto", order: columnOrders.mapColumn}}>
                     <div id="map-component" style={mapStyle}>
                         <MapComponent
@@ -414,7 +425,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     <Row className="mt-0"> {/* This row is necessary to make child column ordering work */}
                         <Col id="game-state-panel" xs={{span: "12", order: gameStatePanelOrders.gameStatePanel}}>
                             <Row>
-                                <Col>
+                                <Col className="pt-0">
                                     <Card border={this.props.gameClient.isOwnTurn() ? "warning" : undefined} bg={this.props.gameState.childGameState instanceof CancelledGameState ? "danger" : undefined}>
                                         <ListGroup variant="flush">
                                             {phases.some(phase => this.props.gameState.childGameState instanceof phase.gameState) && (
@@ -625,7 +636,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             return "8";
         }
 
-        return "3";
+        if (mobileDevice) {
+            return "3";
+        }
+
+        return undefined;
     }
 
     getColumnOrders(mobileDevice: boolean): { tracksColumn: number; mapColumn: number; gameStateColumn: number } {
@@ -764,9 +779,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     setHeights(): void {
         const mobileDevice = isMobile;
-        this.windowHeight = (!mobileDevice && this.user && this.user.settings.mapScrollbar) ? window.innerHeight : null;
-        this.gameLogHeight = (!mobileDevice || (this.user && !this.user.settings.responsiveLayout)) ? window.innerHeight - this.gameLogPanel.getBoundingClientRect().top - BOTTOM_MARGIN_PX : GAME_LOG_MIN_HEIGHT;
-        let calculatedHousesHeight = mobileDevice
+        this.windowHeight = (!mobileDevice && this.user?.settings.mapScrollbar) ? window.innerHeight : null;
+        this.gameLogHeight = (!mobileDevice || !(this.user?.settings.responsiveLayout ?? false)) ? window.innerHeight - this.gameLogPanel.getBoundingClientRect().top - BOTTOM_MARGIN_PX : GAME_LOG_MIN_HEIGHT;
+        let calculatedHousesHeight = (mobileDevice || !this.housesPanel)
             ? null
             // The additional 5 px are needed to get rid of the outer window scrollbar. Probably due to different padding behaviour compared to the map and game state panels.
             // It's not nice but ok for now.
@@ -782,7 +797,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         }
 
         // If actual height is less than calculated height, we dont need to stretch this panel
-        this.housesHeight = Math.min(calculatedHousesHeight, this.housesPanel.offsetHeight);
+        this.housesHeight = Math.min(calculatedHousesHeight, this.housesPanel?.offsetHeight ?? Number.MAX_VALUE);
     }
 
     onNewPrivateChatRoomCreated(roomId: string): void {

@@ -181,6 +181,7 @@ export interface UserSettings {
     chatHouseNames: boolean;
     responsiveLayout: boolean;
     muted: boolean;
+    tracksColumnCollapsed: boolean;
 }
 
 export interface ChangeGameSettings {
