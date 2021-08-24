@@ -59,30 +59,32 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
 
         return <>
                 <Col xs={10} lg={4} className="mb-3">
-                    <Card id="lobby-houses-list">
-                        <ListGroup variant="flush">
-                            {this.lobby.lobbyHouses.values.map((h, i) => (
-                                <ListGroupItem key={h.id} style={{opacity: this.isHouseAvailable(h) ? 1 : 0.3, minHeight: "62px"}}>
-                                    <Row className="align-items-center">
-                                        {!this.randomHouses && <Col xs="auto" className="no-gutters">
-                                            <SimpleInfluenceIconComponent house={h}/>
-                                        </Col>}
-                                        <Col className="no-gutters">
-                                            <div>
-                                                <b>{this.randomHouses ? "Seat " + (i + 1): h.name}</b>
-                                            </div>
-                                            <div className={classNames({"invisible": !this.lobby.players.has(h)})}>
-                                                {this.lobby.players.has(h) && <UserLabel
-                                                            gameClient={this.props.gameClient}
-                                                            gameState={this.lobby}
-                                                            user={this.lobby.players.get(h)}/>}
-                                            </div>
-                                        </Col>
-                                        {this.renderLobbyHouseButtons(h)}
-                                    </Row>
-                                </ListGroupItem>
-                            ))}
-                        </ListGroup>
+                    <Card>
+                        <Card.Body id="lobby-houses-list" className="no-space-around">
+                            <ListGroup variant="flush">
+                                {this.lobby.lobbyHouses.values.map((h, i) => (
+                                    <ListGroupItem key={h.id} style={{minHeight: "62px"}}>
+                                        <Row className="align-items-center" style={{opacity: this.isHouseAvailable(h) ? 1 : 0.3}}>
+                                            {!this.randomHouses && <Col xs="auto" className="no-gutters">
+                                                <SimpleInfluenceIconComponent house={h}/>
+                                            </Col>}
+                                            <Col className="no-gutters">
+                                                <div>
+                                                    <b>{this.randomHouses ? "Seat " + (i + 1): h.name}</b>
+                                                </div>
+                                                <div className={classNames({"invisible": !this.lobby.players.has(h)})}>
+                                                    {this.lobby.players.has(h) && <UserLabel
+                                                                gameClient={this.props.gameClient}
+                                                                gameState={this.lobby}
+                                                                user={this.lobby.players.get(h)}/>}
+                                                </div>
+                                            </Col>
+                                            {this.renderLobbyHouseButtons(h)}
+                                        </Row>
+                                    </ListGroupItem>
+                                ))}
+                            </ListGroup>
+                        </Card.Body>
                     </Card>
                 </Col>
                 <Col xs={10} lg={6} className="mb-3">
@@ -255,8 +257,6 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
     }
 
     setChatHeight(): void {
-        const lobbyHousesList = document.getElementById("lobby-houses-list");
-        const boundingClientRect = lobbyHousesList ? lobbyHousesList.getBoundingClientRect() : null;
-        this.chatHeight = boundingClientRect ? boundingClientRect.height : 430;
+        this.chatHeight = document.getElementById("lobby-houses-list")?.getBoundingClientRect()?.height ?? 430;
     }
 }
