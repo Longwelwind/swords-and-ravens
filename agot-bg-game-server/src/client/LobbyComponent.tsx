@@ -62,12 +62,12 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                     <Card id="lobby-houses-list">
                         <ListGroup variant="flush">
                             {this.lobby.lobbyHouses.values.map((h, i) => (
-                                <ListGroupItem key={h.id} style={{opacity: this.isHouseAvailable(h) ? 1 : 0.3}}>
+                                <ListGroupItem key={h.id} style={{opacity: this.isHouseAvailable(h) ? 1 : 0.3, minHeight: "62px"}}>
                                     <Row className="align-items-center">
-                                        {!this.randomHouses && <Col xs="auto">
+                                        {!this.randomHouses && <Col xs="auto" className="no-gutters">
                                             <SimpleInfluenceIconComponent house={h}/>
                                         </Col>}
-                                        <Col>
+                                        <Col className="no-gutters">
                                             <div>
                                                 <b>{this.randomHouses ? "Seat " + (i + 1): h.name}</b>
                                             </div>
@@ -182,32 +182,30 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
     }
 
     renderLobbyHouseButtons(h: LobbyHouse): React.ReactNode {
-        if (!this.isHouseAvailable(h)) {
-            return <></>;
-        }
+        const invisible = !this.isHouseAvailable(h);
 
         if (!this.props.gameClient.isRealOwner() &&
             this.props.gameState.password != "" &&
             this.password != this.props.gameState.password &&
             // If user is already seated, allow them to "Leave"
             (!this.lobby.players.has(h) || this.lobby.players.get(h) != this.authenticatedUser)) {
-            return <Col xs="auto">
-                <FontAwesomeIcon icon={faLock} />
+            return <Col xs="auto" className={invisible ? "invisible" : ""}>
+                <FontAwesomeIcon icon={faLock} size="2x"/>
             </Col>;
         }
 
         return  (
             !this.lobby.players.has(h) ? (
-                <Col xs="auto">
+                <Col xs="auto" className={invisible ? "invisible" : ""}>
                     <Button onClick={() => this.choose(h)}>Choose</Button>
                 </Col>
             ) : this.lobby.players.get(h) == this.authenticatedUser ? (
-                <Col xs="auto">
+                <Col xs="auto" className={invisible ? "invisible" : ""}>
                     <Button variant="danger" onClick={() => this.leave()}>Leave</Button>
                 </Col>
             ) : (
                 this.props.gameClient.isOwner() && (
-                    <Col xs="auto">
+                    <Col xs="auto" className={invisible ? "invisible" : ""}>
                         <Button variant="danger" onClick={() => this.kick(h)}>Kick</Button>
                     </Col>
                 )

@@ -1,4 +1,4 @@
-import { Component, ReactNode, FunctionComponent } from "react";
+import { Component, ReactNode } from "react";
 import User from "../server/User";
 import React from "react";
 import { observer } from "mobx-react";
@@ -9,8 +9,7 @@ import GameClient from "./GameClient";
 import LobbyGameState from "../common/lobby-game-state/LobbyGameState";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCaretDown} from "@fortawesome/free-solid-svg-icons/faCaretDown";
-import { Dropdown } from "react-bootstrap";
+import { Dropdown, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import Player from "../common/ingame-game-state/Player";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
@@ -21,13 +20,6 @@ interface UserLabelProps {
     user: User;
 }
 
-// eslint-disable-next-line react/display-name
-const DropdownContainer: FunctionComponent<{onClick: (e: any) => void}> = React.forwardRef(
-    // eslint-disable-next-line react/prop-types
-    ({children, onClick}, _ref) => <a className="text-body" href="" onClick={e => {e.preventDefault(); onClick(e)}}>
-        {children}
-    </a>
-);
 
 @observer
 export default class UserLabel extends Component<UserLabelProps> {
@@ -46,28 +38,28 @@ export default class UserLabel extends Component<UserLabelProps> {
     render(): ReactNode {
         const isOwner = this.props.gameState.entireGame.isOwner(this.user);
         return (
-            <Dropdown>
-                <Dropdown.Toggle as={DropdownContainer} id={"dropdown-" + this.user.id}>
-                    <div className="small">
+            <Navbar variant="dark" className="no-space-around">
+                <Navbar.Brand className="no-space-around">
+                    <small>
+                        {isOwner &&
+                                <><OverlayTrigger overlay={<Tooltip id ={`${this.user.id}-owner-tooltip`}>Owner</Tooltip>}>
+                                    <FontAwesomeIcon icon={faUser}/>
+                                </OverlayTrigger>&nbsp;&nbsp;</>}
                         <OverlayTrigger overlay={<Tooltip id ={`${this.user.id}-connected`}>{this.user.connected ? "Connected" : "Disconnected"}</Tooltip>}>
                             <FontAwesomeIcon icon={faWifi} className={this.user.connected ? "text-success" : "text-danger"} />
                         </OverlayTrigger>
-                        {" "}
-                        {isOwner &&
-                            <OverlayTrigger overlay={<Tooltip id ={`${this.user.id}-owner-tooltip`}>Owner</Tooltip>}>
-                                <FontAwesomeIcon icon={faUser}/>
-                            </OverlayTrigger>}
-                        {isOwner && " "}
-                        {this.user.name}
-                        {" "}
-                        <FontAwesomeIcon icon={faCaretDown} />
-                    </div>
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                    <Dropdown.Item href={`/user/${this.user.id}`} target="_blank" rel="noopener noreferrer">See Profile</Dropdown.Item>
-                    {this.props.gameState instanceof IngameGameState && this.renderIngameDropdownItems(this.props.gameState)}
-                </Dropdown.Menu>
-            </Dropdown>
+                    </small>
+                </Navbar.Brand>
+                <Navbar.Toggle aria-controls={`navbar-${this.user.id}`} className="no-space-around"/>
+                <Navbar.Collapse id={`navbar-${this.user.id}`} className="no-space-around">
+                    <Nav className="no-space-around">
+                        <NavDropdown id={`nav-dropdown-${this.user.id}`} title={<span className="userlabel">{this.user.name}</span>} className="no-gutters">
+                            <Dropdown.Item href={`/user/${this.user.id}`} target="_blank" rel="noopener noreferrer">See Profile</Dropdown.Item>
+                            {this.props.gameState instanceof IngameGameState && this.renderIngameDropdownItems(this.props.gameState)}
+                        </NavDropdown>
+                    </Nav>
+                </Navbar.Collapse>
+            </Navbar>
         );
     }
 
@@ -76,7 +68,7 @@ export default class UserLabel extends Component<UserLabelProps> {
         const {result: canLaunchReplacePlayerByVassalVote, reason: canLaunchReplacePlayerByVassalVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser, true);
         return (
             <>
-                <Dropdown.Divider />
+                <NavDropdown.Divider />
                 {/* Add a button to replace a place */}
                 <ConditionalWrap
                     condition={!canLaunchReplacePlayerVote}
@@ -103,15 +95,15 @@ export default class UserLabel extends Component<UserLabelProps> {
                     }
                 >
                     <div id="replace-player-tooltip-wrapper">
-                        <Dropdown.Item
+                        <NavDropdown.Item
                             onClick={() => this.onLaunchReplacePlayerVoteClick()}
                             disabled={!canLaunchReplacePlayerVote}
                         >
                             Offer to replace this player
-                        </Dropdown.Item>
+                        </NavDropdown.Item>
                     </div>
                 </ConditionalWrap>
-                <Dropdown.Divider />
+                <NavDropdown.Divider />
                 {/* Add a button to replace a place */}
                 <ConditionalWrap
                     condition={!canLaunchReplacePlayerByVassalVote}
@@ -140,12 +132,12 @@ export default class UserLabel extends Component<UserLabelProps> {
                     }
                 >
                     <div id="replace-byvassal-tooltip-wrapper">
-                        <Dropdown.Item
+                        <NavDropdown.Item
                             onClick={() => this.onLaunchReplacePlayerByVassalVoteClick()}
                             disabled={!canLaunchReplacePlayerByVassalVote}
                         >
                             Launch a vote to replace this player by a vassal
-                        </Dropdown.Item>
+                        </NavDropdown.Item>
                     </div>
                 </ConditionalWrap>
             </>
