@@ -7,10 +7,10 @@ from agotboardgame_main.models import User
 
 
 def forward(apps, schema_editor):
-    group = Group.objects.get(name=settings.DEFAULT_GROUP)
+    new_group, created = Group.objects.get_or_create(name='Member')
 
     for user in User.objects.all():
-        group.user_set.add(user)
+        new_group.user_set.add(user)
 
 
 def reverse(apps, schema_editor):

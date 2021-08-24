@@ -50,16 +50,6 @@ strong
   padding-bottom: 0.5rem;
 }
 
-.no-gutters {
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-.no-gutters .col, .no-gutters .col-auto {
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
 .stackable {
   margin-bottom: $grid-gutter-width / 2;
 }
@@ -453,4 +443,25 @@ div.new-event {
 
 .tooltip.show {
   opacity: 1;
+}
+
+.no-space-around {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.no-gutters, .no-gutters .col, .no-gutters .col-auto, .no-gutters .nav-link {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.userlabel {
+  color: white;
+}
+
+.userlabel:hover {
+  color: white;
+  text-decoration: underline;
 }

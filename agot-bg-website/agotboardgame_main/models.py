@@ -56,7 +56,7 @@ class User(AbstractUser):
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if settings.DEFAULT_GROUP and created:
-        group = Group.objects.get(name=settings.DEFAULT_GROUP)
+        group = Group.objects.get(name="Member")
         group.user_set.add(instance)
 
 

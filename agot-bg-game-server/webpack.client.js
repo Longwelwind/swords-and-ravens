@@ -25,21 +25,13 @@ module.exports = (env, argv) => {
                     use:['style-loader','css-loader', 'sass-loader']
                 },
                 {
-                    test: /\.(jpe?g|png|gif|svg)$/,
+                    test: /\.(gif|png|jpe?g|svg)$/i,
                     use: [
+                        'file-loader',
                         {
-                            loader: 'file-loader',
-                            options: {
-                                name: "[name].[contenthash].[ext]"
-                            }
-                        },
-                        {
-                            loader: "image-webpack-loader",
-                            options: {
-                                disabled: true
-                            }
+                            loader: 'image-webpack-loader'
                         }
-                    ],
+                    ]
                 },
                 {
                     test: /\.(ogg|mp3|wav|mpe?g)$/i,
