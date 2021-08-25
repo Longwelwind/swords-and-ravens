@@ -221,7 +221,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         return (
             <>
-                {!mobileDevice && <button className="btn btn-sm" onClick={() => {
+                {!mobileDevice && <button className="btn btn-sm my-2" onClick={() => {
                     this.tracksColumnCollapsed = !this.tracksColumnCollapsed;
                     if (this.props.gameClient.authenticatedUser) {
                         this.props.gameClient.authenticatedUser.settings.tracksColumnCollapsed = this.tracksColumnCollapsed;
