@@ -33,6 +33,7 @@ import CombatGameState from "./action-game-state/resolve-march-order-game-state/
 import DeclareSupportGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/declare-support-game-state/DeclareSupportGameState";
 import ThematicDraftHouseCardsGameState, { SerializedThematicDraftHouseCardsGameState } from "./thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 import DraftInfluencePositionsGameState, { SerializedDraftInfluencePositionsGameState } from "./draft-influence-positions-game-state/DraftInfluencePositionsGameState";
+import shuffleInPlace, { shuffle } from "../../utils/shuffle";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -135,12 +136,12 @@ export default class IngameGameState extends GameState<
             // Refresh Westeros deck 3 after every 10th round
             const deck3 = this.game.westerosDecks[2];
             deck3.forEach(wc => wc.discarded = false);
-            this.game.westerosDecks[2] = _.shuffle(deck3);
+            this.game.westerosDecks[2] = shuffle(deck3);
 
             this.broadcastWesterosDecks();
 
             // Reshuffle the wildling deck
-            this.game.wildlingDeck = _.shuffle(this.game.wildlingDeck);
+            this.game.wildlingDeck = shuffle(this.game.wildlingDeck);
             this.game.houses.forEach(h => h.knowsNextWildlingCard = false);
             this.entireGame.broadcastToClients({type: "hide-top-wildling-card"});
         }
@@ -702,7 +703,7 @@ export default class IngameGameState extends GameState<
         this.entireGame.broadcastToClients({
             type: "update-westeros-decks",
             westerosDecks: this.game.westerosDecks.map(wd => wd.slice(0, this.game.revealedWesterosCards)
-                .concat(_.shuffle(wd.slice(this.game.revealedWesterosCards))).map(wc => wc.serializeToClient()))
+                .concat(shuffleInPlace(wd.slice(this.game.revealedWesterosCards))).map(wc => wc.serializeToClient()))
         });
     }
 

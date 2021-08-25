@@ -7,7 +7,7 @@ import {observable} from "mobx";
 import BetterMap from "../../utils/BetterMap";
 import baseGameData from "../../../data/baseGameData.json";
 import CancelledGameState from "../cancelled-game-state/CancelledGameState";
-import shuffle from "../../utils/shuffle";
+import shuffleInPlace, { shuffle } from "../../utils/shuffle";
 import _ from "lodash";
 import { MIN_PLAYER_COUNT_WITH_VASSALS } from "../ingame-game-state/game-data-structure/Game";
 import { v4 } from "uuid";
@@ -75,14 +75,16 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
             if (this.entireGame.gameSettings.randomHouses) {
                 // Assign a random house to the players
-                const allShuffledHouses = _.shuffle(this.getAvailableHouses());
+                // We could shuffle in place as getAvailableHouses will return a new array.
+                // But it is best practice to only shuffle in place when we create the shuffled array by mapping, filtering, slicing, etc. ourselves
+                const allShuffledHouses = shuffle(this.getAvailableHouses());
                 const connectedUsers = this.players.values;
                 this.players = new BetterMap();
                 for(const user of connectedUsers) {
                     this.players.set(allShuffledHouses.splice(0, 1)[0], user);
                 }
             } else if (this.entireGame.gameSettings.randomChosenHouses) {
-                const shuffled = shuffle(this.players.entries);
+                const shuffled = shuffleInPlace(this.players.entries); // The BetterMap methods always use Array.from and this will never change. So it is ok to shuffleInPlace here.
 
                     const lobbyHouses = this.players.keys;
                     for (let i = 0; i < shuffled.length; i++) {

@@ -12,6 +12,7 @@ import HouseCard from "../game-data-structure/house-card/HouseCard";
 import _ from "lodash";
 import { observable } from "mobx";
 import SimpleChoiceGameState, { SerializedSimpleChoiceGameState } from "../simple-choice-game-state/SimpleChoiceGameState";
+import shuffleInPlace from "../../../utils/shuffle";
 
 export const draftOrders: number[][][] = [
         [
@@ -102,7 +103,7 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
             type: "draft-house-cards-began"
         });
 
-        this.houses = _.shuffle(this.ingame.players.values.map(p => p.house));
+        this.houses = shuffleInPlace(this.ingame.players.values.map(p => p.house));
         this.draftOrder = draftOrders[this.houses.length - 1];
         this.currentRowIndex = 0;
         this.currentColumnIndex = -1;
