@@ -7,7 +7,7 @@ import Order from "./Order";
 import * as _ from "lodash";
 import {observable} from "mobx";
 import WesterosCard, {SerializedWesterosCard} from "./westeros-card/WesterosCard";
-import shuffle from "../../../utils/shuffle";
+import shuffleInPlace, { shuffle } from "../../../utils/shuffle";
 import WildlingCard, {SerializedWildlingCard} from "./wildling-card/WildlingCard";
 import BetterMap from "../../../utils/BetterMap";
 import HouseCard, { SerializedHouseCard } from "./house-card/HouseCard";
@@ -427,12 +427,12 @@ export default class Game {
             westerosDecks: admin
                 ? this.westerosDecks.map(wd => wd.map(wc => wc.serializeToClient()))
                 : this.westerosDecks.map(wd => wd.slice(0, this.revealedWesterosCards)
-                    .concat(shuffle(wd.slice(this.revealedWesterosCards)))
+                    .concat(shuffleInPlace(wd.slice(this.revealedWesterosCards)))
                     .map(wc => wc.serializeToClient())),
             // Same for the wildling deck
             wildlingDeck: admin
                 ? this.wildlingDeck.map(c => c.serializeToClient())
-                : shuffle([...this.wildlingDeck]).map(c => c.serializeToClient()),
+                : shuffle(this.wildlingDeck).map(c => c.serializeToClient()),
             wildlingStrength: this.wildlingStrength,
             supplyRestrictions: this.supplyRestrictions,
             starredOrderRestrictions: this.starredOrderRestrictions,

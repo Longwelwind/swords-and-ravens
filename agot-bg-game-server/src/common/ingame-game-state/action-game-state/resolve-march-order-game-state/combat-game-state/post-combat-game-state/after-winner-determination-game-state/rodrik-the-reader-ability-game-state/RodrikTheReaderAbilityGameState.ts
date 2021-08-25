@@ -12,6 +12,7 @@ import SimpleChoiceGameState, { SerializedSimpleChoiceGameState } from "../../..
 import { rodrikTheReader } from "../../../../../../game-data-structure/house-card/houseCardAbilities";
 import AfterWinnerDeterminationGameState from "../AfterWinnerDeterminationGameState";
 import _ from "lodash";
+import shuffleInPlace from "../../../../../../../../utils/shuffle";
 
 export default class RodrikTheReaderAbilityGameState extends GameState<
     AfterWinnerDeterminationGameState["childGameState"],
@@ -66,7 +67,7 @@ export default class RodrikTheReaderAbilityGameState extends GameState<
 
         const westerosDeck = this.game.westerosDecks[deckId];
         const discardedCards = westerosDeck.filter(wc => wc.discarded);
-        const unusedCards = _.shuffle(westerosDeck.filter(wc => wc != westerosCard && !wc.discarded));
+        const unusedCards = shuffleInPlace(westerosDeck.filter(wc => wc != westerosCard && !wc.discarded));
         unusedCards.unshift(westerosCard);
         const newWesterosDeck = _.concat(unusedCards, discardedCards);
         if (westerosDeck.length != newWesterosDeck.length) {

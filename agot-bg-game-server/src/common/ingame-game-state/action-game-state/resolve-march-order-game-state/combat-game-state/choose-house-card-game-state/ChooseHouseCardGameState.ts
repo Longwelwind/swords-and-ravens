@@ -12,6 +12,7 @@ import IngameGameState from "../../../../IngameGameState";
 import _ from "lodash";
 import User from "../../../../../../server/User";
 import { PlayerActionType } from "../../../../../ingame-game-state/game-data-structure/GameLog";
+import shuffleInPlace from "../../../../../../utils/shuffle";
 
 export default class ChooseHouseCardGameState extends GameState<CombatGameState> {
     choosableHouseCards: BetterMap<House, HouseCard[]>;
@@ -36,7 +37,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
     // we allow passing the previous chosen house cards
     firstStart(choosableHouseCards: BetterMap<House, HouseCard[]> | null = null): void {
         // Setup the choosable house cards
-        let vassalHouseCards = _.shuffle(this.ingameGameState.game.vassalHouseCards.values);
+        let vassalHouseCards = shuffleInPlace(this.ingameGameState.game.vassalHouseCards.values);
         if (choosableHouseCards) {
             vassalHouseCards = _.without(vassalHouseCards, ...(_.flatMap(choosableHouseCards.values)));
         }

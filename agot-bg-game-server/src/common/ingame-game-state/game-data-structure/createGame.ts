@@ -15,6 +15,7 @@ import houseCardAbilities from "./house-card/houseCardAbilities";
 import IngameGameState from "../IngameGameState";
 import { vassalHouseCards } from "./static-data-structure/vassalHouseCards";
 import getStaticWorld from "./static-data-structure/getStaticWorld";
+import shuffleInPlace from "../../../utils/shuffle";
 
 const MAX_POWER_TOKENS = 20;
 
@@ -307,7 +308,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             }
         });
 
-        return _.shuffle(cards);
+        return shuffleInPlace(cards);
     });
 
     // Load Wildling deck
@@ -316,7 +317,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         return new WildlingCard(++lastId, wildlingCardTypes.get(wildlingCardData.type));
     });
     // Shuffle the deck
-    game.wildlingDeck = _.shuffle(game.wildlingDeck);
+    game.wildlingDeck = shuffleInPlace(game.wildlingDeck);
 
     const units = entireGame.selectedGameSetup.units != undefined ? entireGame.selectedGameSetup.units : baseGameData.units;
 

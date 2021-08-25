@@ -11,6 +11,7 @@ import _ from "lodash";
 import { observable } from "mobx";
 import SimpleChoiceGameState, { SerializedSimpleChoiceGameState } from "../simple-choice-game-state/SimpleChoiceGameState";
 import { draftOrders, DraftStep } from "../draft-house-cards-game-state/DraftHouseCardsGameState";
+import shuffleInPlace from "../../../utils/shuffle";
 
 export default class DraftInfluencePositionsGameState extends GameState<IngameGameState, SimpleChoiceGameState> {
     houses: House[];
@@ -36,7 +37,7 @@ export default class DraftInfluencePositionsGameState extends GameState<IngameGa
     }
 
     firstStart(vassalsOnInfluenceTracks: House[][]): void {
-        this.houses = _.shuffle(this.ingame.players.values.map(p => p.house));
+        this.houses = shuffleInPlace(this.ingame.players.values.map(p => p.house));
         this.draftOrder = draftOrders[this.houses.length - 1];
         this.currentRowIndex = 0;
         this.currentColumnIndex = -1;

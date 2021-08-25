@@ -1,7 +1,7 @@
 import WesterosCardType from "./WesterosCardType";
 import WesterosGameState from "../../westeros-game-state/WesterosGameState";
 import WesterosCard from "./WesterosCard";
-import shuffle from "../../../../utils/shuffle";
+import shuffleInPlace from "../../../../utils/shuffle";
 import { winterIsComing } from "./westerosCardTypes";
 
 export default class WinterIsComingWesterosCardType extends WesterosCardType {
@@ -19,7 +19,7 @@ export default class WinterIsComingWesterosCardType extends WesterosCardType {
         deck.forEach(card => { card.discarded = false; });
 
         // Shuffle the deck
-        deck = deck.slice(0, dontShuffle).concat(shuffle(deck.slice(dontShuffle)));
+        deck = deck.slice(0, dontShuffle).concat(shuffleInPlace(deck.slice(dontShuffle)));
 
         // Draw a new card from this deck ...
         const newDrawnCard = deck.splice(dontShuffle, 1)[0] as WesterosCard;

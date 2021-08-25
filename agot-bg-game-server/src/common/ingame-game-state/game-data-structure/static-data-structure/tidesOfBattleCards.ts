@@ -1,4 +1,4 @@
-import _ from "lodash";
+import shuffleInPlace from "../../../../utils/shuffle";
 import BetterMap from "../../../../utils/BetterMap";
 
 export class TidesOfBattleCard {
@@ -51,5 +51,5 @@ export default function getShuffledTidesOfBattleDeck(): TidesOfBattleCard[] {
        }
     });
 
-    return _.shuffle(result);
-};
+    return shuffleInPlace(result);
+}
