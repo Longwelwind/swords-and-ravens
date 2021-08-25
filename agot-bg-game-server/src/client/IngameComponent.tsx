@@ -238,8 +238,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         <Col>
                             <Card>
                                 <ListGroup variant="flush">
-                                    {this.tracks.map(({tracker, stars}, i) => (
-                                        <ListGroupItem key={i}>
+                                    {this.tracks.map(({name, tracker, stars}, i) => (
+                                        <ListGroupItem key={`influence-track-${i}`}>
                                             <Row className="align-items-center">
                                                 <Col xs="auto" className="text-center" style={{width: "46px"}}>
                                                     <OverlayTrigger
@@ -281,17 +281,18 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                         <img src={i == 0 ? stoneThroneImage : i == 1 ? this.game.valyrianSteelBladeUsed ? diamondHiltUsedImage : diamondHiltImage : ravenImage} width={32}/>
                                                     </OverlayTrigger>
                                                 </Col>
-                                                {tracker.map((h, i) => (
-                                                    <Col xs="auto" key={h.id}>
+                                                {tracker.map((h, j) => (
+                                                    <Col xs="auto" key={`track_${i}_${h.id}`}>
                                                         <InfluenceIconComponent
                                                             house={h}
                                                             ingame={this.props.gameState}
                                                             track={tracker}
+                                                            name={name}
                                                         />
                                                         <div className="tracker-star-container">
                                                             {stars && i < this.game.starredOrderRestrictions.length && (
-                                                                _.range(0, this.game.starredOrderRestrictions[i]).map(i => (
-                                                                    <div key={i}>
+                                                                _.range(0, this.game.starredOrderRestrictions[j]).map(k => (
+                                                                    <div key={`stars_${h.id}_${k}`}>
                                                                         <FontAwesomeIcon
                                                                             style={{color: "#ffc107", fontSize: "9px"}}
                                                                             icon={faStar}/>
@@ -316,8 +317,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </Row>
                     <Row className="stackable">
                         <Col>
-                            <div style={housesPanelStyle}>
-                                <Card>
+                            <Card>
+                                <div style={housesPanelStyle}>
                                     <Card.Body id="houses-panel" className="no-space-around">
                                         <ListGroup variant="flush">
                                             {this.props.gameState.game.getPotentialWinners().map(h => (
@@ -339,8 +340,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             </ListGroupItem>
                                         </ListGroup>
                                     </Card.Body>
-                                </Card>
-                            </div>
+                                </div>
+                            </Card>
                         </Col>
                     </Row>
                     {this.authenticatedPlayer && (
@@ -788,8 +789,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         this.gameLogHeight = (!mobileDevice || !(this.user?.settings.responsiveLayout ?? false)) ? window.innerHeight - this.gameLogPanel.getBoundingClientRect().top - BOTTOM_MARGIN_PX : GAME_LOG_MIN_HEIGHT;
         let calculatedHousesHeight = (mobileDevice || !this.housesPanel)
             ? null
-            // The additional 5 px are needed to get rid of the outer window scrollbar. Probably due to different padding behaviour compared to the map and game state panels.
-            // It's not nice but ok for now.
             : Math.trunc(Math.max(window.innerHeight - this.housesPanel.getBoundingClientRect().top - BOTTOM_MARGIN_PX, HOUSES_PANEL_MIN_HEIGHT));
 
         if (!calculatedHousesHeight) {
