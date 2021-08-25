@@ -85,7 +85,7 @@ interface IngameComponentProps {
     gameState: IngameGameState;
 }
 
-const BOTTOM_MARGIN_PX = 20;
+const BOTTOM_MARGIN_PX = 35;
 const GAME_LOG_MIN_HEIGHT = 400;
 const HOUSES_PANEL_MIN_HEIGHT = 430;
 const MAP_MIN_HEIGHT = Math.trunc(MAP_HEIGHT / 2);
@@ -221,15 +221,18 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         return (
             <>
-                {!mobileDevice && <button className="btn btn-sm my-2" onClick={() => {
-                    this.tracksColumnCollapsed = !this.tracksColumnCollapsed;
-                    if (this.props.gameClient.authenticatedUser) {
-                        this.props.gameClient.authenticatedUser.settings.tracksColumnCollapsed = this.tracksColumnCollapsed;
-                        this.props.gameClient.authenticatedUser.syncSettings();
-                    }
-                }}>
-                    <FontAwesomeIcon icon={this.tracksColumnCollapsed ? faChevronCircleLeft : faChevronCircleRight} />
-                </button>}
+                {!mobileDevice &&
+                    <Col xs="auto" className="pr-0">
+                        <button className="btn btn-sm p-0" onClick={() => {
+                            this.tracksColumnCollapsed = !this.tracksColumnCollapsed;
+                            if (this.props.gameClient.authenticatedUser) {
+                                this.props.gameClient.authenticatedUser.settings.tracksColumnCollapsed = this.tracksColumnCollapsed;
+                                this.props.gameClient.authenticatedUser.syncSettings();
+                            }
+                        }}>
+                            <FontAwesomeIcon icon={this.tracksColumnCollapsed ? faChevronCircleLeft : faChevronCircleRight} />
+                        </button>
+                    </Col>}
                 {(!this.tracksColumnCollapsed || mobileDevice) && <Col xs={{ span: "auto", order: columnOrders.tracksColumn }} id="tracks-houses-column">
                     <Row className="stackable">
                         <Col>
@@ -314,33 +317,35 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     <Row className="stackable">
                         <Col>
                             <div style={housesPanelStyle}>
-                                <Card id="houses-panel">
-                                    <ListGroup variant="flush">
-                                        {this.props.gameState.game.getPotentialWinners().map(h => (
-                                            <HouseRowComponent
-                                                key={h.id}
-                                                gameClient={this.props.gameClient}
-                                                ingame={this.props.gameState}
-                                                house={h}
-                                            />
-                                        ))}
-                                        <ListGroupItem className="text-center font-italic">
-                                            <small>
-                                            {connectedSpectators.length > 0 ? (
-                                                <>Spectators: {joinReactNodes(this.getConnectedSpectators().map(u => <strong key={u.id}>{u.name}</strong>), ", ")}</>
-                                            ) : (
-                                                <>No spectators</>
-                                            )}
-                                            </small>
-                                        </ListGroupItem>
-                                    </ListGroup>
+                                <Card>
+                                    <Card.Body id="houses-panel" className="no-space-around">
+                                        <ListGroup variant="flush">
+                                            {this.props.gameState.game.getPotentialWinners().map(h => (
+                                                <HouseRowComponent
+                                                    key={h.id}
+                                                    gameClient={this.props.gameClient}
+                                                    ingame={this.props.gameState}
+                                                    house={h}
+                                                />
+                                            ))}
+                                            <ListGroupItem className="text-center font-italic">
+                                                <small>
+                                                {connectedSpectators.length > 0 ? (
+                                                    <>Spectators: {joinReactNodes(this.getConnectedSpectators().map(u => <strong key={u.id}>{u.name}</strong>), ", ")}</>
+                                                ) : (
+                                                    <>No spectators</>
+                                                )}
+                                                </small>
+                                            </ListGroupItem>
+                                        </ListGroup>
+                                    </Card.Body>
                                 </Card>
                             </div>
                         </Col>
                     </Row>
                     {this.authenticatedPlayer && (
                     <Row id="game-controls">
-                        <Col xs="auto">
+                        <Col xs="auto" className="pb-0">
                             <button className="btn btn-outline-light btn-sm" onClick={() => this.props.gameClient.muted = !this.props.gameClient.muted}>
                                 <OverlayTrigger
                                     overlay={
@@ -355,7 +360,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </OverlayTrigger>
                             </button>
                         </Col>
-                        <Col xs="auto">
+                        <Col xs="auto" className="pb-0">
                             <button
                                 className="btn btn-outline-light btn-sm"
                                 onClick={() => this.props.gameState.launchCancelGameVote()}
@@ -382,7 +387,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </OverlayTrigger>
                             </button>
                         </Col>
-                        <Col xs="auto">
+                        <Col xs="auto" className="pb-0">
                                 <button
                                     className="btn btn-outline-light btn-sm"
                                     onClick={() => this.props.gameState.launchEndGameVote()}
@@ -785,7 +790,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             ? null
             // The additional 5 px are needed to get rid of the outer window scrollbar. Probably due to different padding behaviour compared to the map and game state panels.
             // It's not nice but ok for now.
-            : Math.trunc(Math.max(window.innerHeight - this.housesPanel.getBoundingClientRect().top - BOTTOM_MARGIN_PX - 5, HOUSES_PANEL_MIN_HEIGHT));
+            : Math.trunc(Math.max(window.innerHeight - this.housesPanel.getBoundingClientRect().top - BOTTOM_MARGIN_PX, HOUSES_PANEL_MIN_HEIGHT));
 
         if (!calculatedHousesHeight) {
             this.housesHeight = null;
@@ -793,7 +798,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         }
 
         if (this.gameControlsRow) { // Spectators don't have this row in their DOM
-            calculatedHousesHeight -= this.gameControlsRow.offsetHeight;
+            calculatedHousesHeight -= this.gameControlsRow.offsetHeight + 8; // +8 because of the padding between the both components
         }
 
         // If actual height is less than calculated height, we dont need to stretch this panel

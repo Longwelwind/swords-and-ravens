@@ -65,7 +65,7 @@ export default class App extends Component<AppProps> {
         }
 
         return (
-            <Container fluid={responsiveLayout} style={{ marginTop: "0.75rem", marginBottom: "0.75rem", paddingRight: this.paddingX, paddingLeft: this.paddingX, maxWidth: this.maxWidth, minWidth: minWidth }}>
+            <Container fluid={responsiveLayout} style={{ paddingTop: "0.5rem", paddingBottom: "1rem", paddingRight: this.paddingX, paddingLeft: this.paddingX, maxWidth: this.maxWidth, minWidth: minWidth }}>
                 <Row className="justify-content-center">
                     {this.props.gameClient.connectionState == ConnectionState.INITIALIZING ? (
                         <Col xs={3}>
