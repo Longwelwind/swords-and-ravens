@@ -20,7 +20,7 @@ export default class PlanningComponent extends Component<GameStateComponentProps
         return (
             <>
                 <ListGroupItem>
-                    <Row>
+                    <Row className="justify-content-center">
                         {renderChildGameState(this.props, [
                             [PlaceOrdersGameState, PlaceOrdersComponent],
                             [ClaimVassalsGameState, ClaimVassalsComponent],

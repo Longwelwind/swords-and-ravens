@@ -62,8 +62,8 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
         return (
             <>
                 <ListGroupItem style={{borderStyle: "none"}}>
-                    <Row>
-                        <Col xs={12}>
+                    <Row className="justify-content-center">
+                        <Col xs={12} className="text-center">
                             {!this.forVassals ? (
                                 <>Players must assign orders in each region where they possess at least one unit now.</>
                             ) : (
@@ -98,9 +98,9 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                                 </Row>
                             )}
                             <Row>
-                                <div className="text-center" style={{marginTop: 10}}>
+                                <Col xs={12} className="text-center" style={{marginTop: 10}}>
                                     Waiting for {this.placeOrders.getNotReadyPlayers().map(p => p.house.name).join(', ')}...
-                                </div>
+                                </Col>
                             </Row>
                         </Col>
                     </Row>
