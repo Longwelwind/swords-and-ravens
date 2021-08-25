@@ -13,8 +13,11 @@ import EntireGame from "../common/EntireGame";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import { observable } from "mobx";
 
+const DEFAULT_PADDING_X = "3rem";
 const DEFAULT_WIDTH = "1910px";
-const MIN_WIDTH_FOR_RENDERING_GAME_NICELY = "1740px";
+const MIN_WIDTH_FOR_RENDERING_GAME_NICELY = "1760px";
+const ULTRA_LARGE_SCREEN_WIDTH_THRESHOLD = 2000;
+const ULTRA_LARGE_PADDING_X = "10rem";
 
 interface AppProps {
     gameClient: GameClient;
@@ -23,6 +26,7 @@ interface AppProps {
 @observer
 export default class App extends Component<AppProps> {
     @observable maxWidth: string = DEFAULT_WIDTH;
+    @observable paddingX: string | undefined = DEFAULT_PADDING_X;
 
     get user(): User | null {
         return this.props.gameClient.authenticatedUser;
@@ -61,7 +65,7 @@ export default class App extends Component<AppProps> {
         }
 
         return (
-            <Container fluid={responsiveLayout} style={{ marginTop: "0.75rem", marginBottom: "2rem", maxWidth: this.maxWidth, minWidth: minWidth }}>
+            <Container fluid={responsiveLayout} style={{ marginTop: "0.75rem", marginBottom: "0.75rem", paddingRight: this.paddingX, paddingLeft: this.paddingX, maxWidth: this.maxWidth, minWidth: minWidth }}>
                 <Row className="justify-content-center">
                     {this.props.gameClient.connectionState == ConnectionState.INITIALIZING ? (
                         <Col xs={3}>
@@ -97,8 +101,14 @@ export default class App extends Component<AppProps> {
     setMaxWidth(): void {
         if (!isMobile) {
             this.maxWidth = this.actualScreenWidth;
+            if (window.innerWidth <= ULTRA_LARGE_SCREEN_WIDTH_THRESHOLD) {
+                this.paddingX = DEFAULT_PADDING_X;
+            } else {
+                this.paddingX = ULTRA_LARGE_PADDING_X;
+            }
         } else {
             this.maxWidth = DEFAULT_WIDTH;
+            this.paddingX = undefined;
         }
     }
 

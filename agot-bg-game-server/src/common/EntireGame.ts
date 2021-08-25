@@ -200,7 +200,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             mapScrollbar: profileSettings.mapScrollbar,
             responsiveLayout: profileSettings.responsiveLayout,
             muted: profileSettings.muted,
-            lastOpenedTab: null
+            lastOpenedTab: null,
+            tracksColumnCollapsed: false
         });
         this.users.set(user.id, user);
 
