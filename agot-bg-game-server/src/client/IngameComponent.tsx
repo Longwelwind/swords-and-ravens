@@ -239,7 +239,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             <Card>
                                 <ListGroup variant="flush">
                                     {this.tracks.map(({name, tracker, stars}, i) => (
-                                        <ListGroupItem key={`influence-track-${i}`}>
+                                        <ListGroupItem key={`influence-track-${i}`} style={{minHeight: "61px"}}>
                                             <Row className="align-items-center">
                                                 <Col xs="auto" className="text-center" style={{width: "46px"}}>
                                                     <OverlayTrigger
@@ -305,7 +305,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             </Row>
                                         </ListGroupItem>
                                     ))}
-                                    <ListGroupItem>
+                                    <ListGroupItem style={{minHeight: "130px"}}>
                                         <SupplyTrackComponent
                                             supplyRestrictions={this.game.supplyRestrictions}
                                             houses={this.game.houses}
@@ -816,13 +816,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         this.resizeObserver = new ResizeObserver(() => this.setHeights());
         this.resizeObserver.observe(this.gameStatePanel);
-
-        // Ususally the ResizeObserver automatically calls setHeights after component did mount.
-        // But sometimes it seems to happen to early and the height is calculated wrong, resulting in the window scrollbar again.
-        // After a resize everything is ok again but we want to have no scrollbars directly after page loaded.
-        // So this is my first shot to solve it, as the only game where I can observe this is a live one:
-        // https://swordsandravens.net/play/c80cd9c6-759c-4ecd-8958-e24702c39416
-        this.setHeights();
     }
 
     componentWillUnmount(): void {
