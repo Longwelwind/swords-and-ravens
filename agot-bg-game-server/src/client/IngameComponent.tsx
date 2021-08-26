@@ -816,6 +816,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         this.resizeObserver = new ResizeObserver(() => this.setHeights());
         this.resizeObserver.observe(this.gameStatePanel);
+
+        // Ususally the ResizeObserver automatically calls setHeights after component did mount.
+        // But sometimes it seems to happen to early and the height is calculated wrong, resulting in the window scrollbar again.
+        // After a resize everything is ok again but we want to have no scrollbars directly after page loaded.
+        // So this is my first shot to solve it, as the only game where I can observe this is a live one:
+        // https://swordsandravens.net/play/c80cd9c6-759c-4ecd-8958-e24702c39416
+        this.setHeights();
     }
 
     componentWillUnmount(): void {
