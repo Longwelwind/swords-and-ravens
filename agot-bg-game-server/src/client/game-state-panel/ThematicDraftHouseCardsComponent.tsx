@@ -26,8 +26,8 @@ export default class ThematicDraftHouseCardsComponent extends Component<GameStat
                     {this.player && this.props.gameState.getNotReadyPlayers().includes(this.player) &&
                         <>
                             <Row  className="justify-content-center">
-                                <Col xs="12">
-                                    <div style={{ textAlign: "center" }}>Please select a house card:</div>
+                                <Col xs="12" className="text-center">
+                                    Please select a house card:
                                 </Col>
                             </Row>
                             <Row className="justify-content-center">

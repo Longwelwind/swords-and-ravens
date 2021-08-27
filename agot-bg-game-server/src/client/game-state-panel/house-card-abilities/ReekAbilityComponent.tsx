@@ -14,7 +14,7 @@ export default class ReekAbilityComponent extends Component<GameStateComponentPr
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     <b>Reek</b>: House <b>{this.props.gameState.childGameState.house.name}</b> may return Reek to their hand.
                 </Col>
                 {renderChildGameState(this.props, [

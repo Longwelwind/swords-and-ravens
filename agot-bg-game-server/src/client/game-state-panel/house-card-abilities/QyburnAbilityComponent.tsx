@@ -17,7 +17,7 @@ export default class QyburnAbilityComponent extends Component<GameStateComponent
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     <b>Qyburn</b>: House <b>{this.props.gameState.childGameState.house.name}</b> may discard two of available Power tokens
                     to choose a House card in any player&apos;s discard pile.
                     Qyburn gains the printed combat strength and combat icons of that card, ignoring its text ability.

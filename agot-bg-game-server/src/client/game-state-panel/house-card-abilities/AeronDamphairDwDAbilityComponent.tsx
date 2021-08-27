@@ -19,7 +19,7 @@ export default class AeronDamphairAbilityComponent extends Component<GameStateCo
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     <b>Aeron Damphair:</b> House <b>{this.props.gameState.house.name}</b> may discard any number of available Power token to increase the combat strength of his card by the number of Power tokens discarded.
                 </Col>
                 {this.authenticatedPlayer && this.props.gameClient.doesControlHouse(this.props.gameState.house) && (

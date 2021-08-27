@@ -15,7 +15,7 @@ export default class SeeTopWildlingCardComponent extends Component<GameStateComp
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     The holder of the Messenger Raven sees the card at the top of the Wildling deck
                     and may choose to either leave it at the top, or put it at the bottom
                     of the deck.
@@ -42,7 +42,7 @@ export default class SeeTopWildlingCardComponent extends Component<GameStateComp
                             </Col>
                         </Row>
                     ) : (
-                        <>Waiting for {this.props.gameState.ravenHolder.name}...</>
+                        <Col xs={12} className="text-center">Waiting for {this.props.gameState.ravenHolder.name}...</Col>
                     )}
                 </Col>
             </>

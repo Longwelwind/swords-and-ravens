@@ -13,7 +13,7 @@ export default class AlayneStoneAbilityComponent extends Component<GameStateComp
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     <b>Alayne Stone</b>: House <b>{this.props.gameState.childGameState.house.name}</b> may discard 2 Power tokens to force their opponent to discard all their available power tokens.
                 </Col>
                 {renderChildGameState(this.props, [

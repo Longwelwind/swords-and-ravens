@@ -13,7 +13,7 @@ export default class TakeControlOfEnemyPortComponent extends Component<GameState
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     <p><strong>{this.props.gameState.newController.name}</strong> has to choose the amount of ships to convert.</p>
                 </Col>
                 {renderChildGameState(this.props, [

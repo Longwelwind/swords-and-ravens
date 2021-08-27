@@ -14,7 +14,7 @@ export default class ChooseCasualtiesComponent extends Component<GameStateCompon
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     House <b>{this.props.gameState.childGameState.house.name}</b> must choose {this.props.gameState.childGameState.count} of their units as casualties of the fight.
                 </Col>
                 {renderChildGameState(this.props, [

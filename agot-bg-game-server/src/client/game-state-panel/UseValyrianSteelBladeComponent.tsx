@@ -21,7 +21,7 @@ export default class UseValyrianSteelBladeComponent extends Component<GameStateC
         return (
             this.gameState.combatGameState.stats.length > 0 ? <></> :
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     {this.gameState.ingame.getControllerOfHouse(this.house).house.name} may choose to use the
                     Valyrian Steel Blade to {this.gameState.forNewTidesOfBattleCard
                     ? "draw a new Tides of Battle card" : "increase their combat strength by 1"}.

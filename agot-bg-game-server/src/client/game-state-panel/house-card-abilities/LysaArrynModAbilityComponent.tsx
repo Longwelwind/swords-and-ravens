@@ -13,7 +13,7 @@ export default class LysaArrynFfcAbilityComponent extends Component<GameStateCom
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     <b>Lysa Arryn</b>: House <b>{this.props.gameState.childGameState.house.name}</b> may return Lysa Arryn to their hand.
                 </Col>
                 {renderChildGameState(this.props, [

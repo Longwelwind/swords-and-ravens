@@ -17,7 +17,7 @@ export default class AeronDamphairAbilityComponent extends Component<GameStateCo
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     <b>Aeron Damphair:</b> House <b>{this.props.gameState.childGameState.house.name}</b> can spend 2 Power tokens to change their house card.
                 </Col>
                 {renderChildGameState(this.props, [

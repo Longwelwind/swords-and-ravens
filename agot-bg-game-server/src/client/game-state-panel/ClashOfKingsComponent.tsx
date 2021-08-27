@@ -19,8 +19,8 @@ export default class ClashOfKingsComponent extends Component<GameStateComponentP
     render(): ReactNode {
         return <>
             <ListGroupItem>
-                <Row>
-                    <Col xs={12}>
+                <Row className="justify-content-center">
+                    <Col xs={12} className="text-center">
                         Houses bid for the <strong>
                         {this.props.gameState.game.getNameInfluenceTrack(this.props.gameState.currentTrackI)}</strong> track.
                     </Col>

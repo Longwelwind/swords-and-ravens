@@ -16,7 +16,7 @@ export default class SerIlynPayneAbilityComponent extends Component<GameStateCom
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     <b>Ser Ilyn Payne</b>: House <b>{this.props.gameState.house.name}</b> may kill a Footman of
                     house <b>{this.props.gameState.combatGameState.getEnemy(this.props.gameState.house).name}</b>.
                 </Col>

@@ -17,7 +17,7 @@ export default class RodrikTheReaderAbilityComponent extends Component<GameState
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     <b>Rodrik The Reader</b>: House <b>{this.props.gameState.childGameState.house.name}</b> may search any Westeros deck for a card
                     of his choice and place the chosen card facedown on top of the deck.
                 </Col>

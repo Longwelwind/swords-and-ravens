@@ -14,7 +14,7 @@ export default class JonSnowBaratheonAbilityComponent extends Component<GameStat
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     <b>Jon Snow:</b> House <b>{this.props.gameState.childGameState.house.name}</b> may decrease or increase the Wildling track by one space (to a minimum of 0 and a maximum of 10).
                 </Col>
                 {renderChildGameState(this.props, [

@@ -15,8 +15,8 @@ export default class GameEndedComponent extends Component<GameStateComponentProp
             <ListGroupItem>
                 <Row>
                     <Col xs={12}>
-                        <Row className="justify-content-center text-center">
-                            <Col xs="auto" >
+                        <Row className="justify-content-center">
+                            <Col xs="auto" className="text-center">
                                 <p><strong>Game has ended!</strong></p>
                                 <p>The winner is...</p>
                                 <Row className="justify-content-center align-items-center">

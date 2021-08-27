@@ -13,7 +13,7 @@ export default class BronnAbilityComponent extends Component<GameStateComponentP
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     <b>Bronn</b>: House <b>{this.props.gameState.enemy.name}</b> may discard two of available Power tokens to reduce Bronn&apos;s combat strength to 0.
                 </Col>
                 {renderChildGameState(this.props, [

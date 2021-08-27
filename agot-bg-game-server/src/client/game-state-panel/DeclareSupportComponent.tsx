@@ -17,7 +17,7 @@ export default class DeclareSupportComponent extends Component<GameStateComponen
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     {this.props.gameState.house.name} may support one belligerent of the fight
                 </Col>
                 <Col xs={12}>

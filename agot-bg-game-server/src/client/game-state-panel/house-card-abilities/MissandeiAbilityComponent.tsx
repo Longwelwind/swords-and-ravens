@@ -17,7 +17,7 @@ export default class MissandeiAbilityComponent extends Component<GameStateCompon
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     <b>Missandei</b>: House <b>{this.props.gameState.childGameState.house.name}</b> may return any House card from their discard pile to their hand.
                 </Col>
                 {renderChildGameState(this.props, [
