@@ -15,7 +15,7 @@ import { observable } from "mobx";
 
 const DEFAULT_PADDING_X = "3rem";
 const DEFAULT_WIDTH = "1910px";
-const MIN_WIDTH_FOR_RENDERING_GAME_NICELY = "1760px";
+const MIN_WIDTH_FOR_RENDERING_GAME_NICELY = "1765px";
 const ULTRA_LARGE_SCREEN_WIDTH_THRESHOLD = 2000;
 const ULTRA_LARGE_PADDING_X = "10rem";
 
@@ -44,12 +44,11 @@ export default class App extends Component<AppProps> {
         return this.entireGame != null && this.entireGame.childGameState instanceof IngameGameState;
     }
 
-    get actualScreenWidth(): string {
-        return `${Math.trunc(window.screen.width * window.devicePixelRatio) - 10}px`;
+    get actualScreenWidth(): number {
+        return Math.trunc(window.screen.width * window.devicePixelRatio);
     }
 
     render(): ReactNode {
-        const responsiveLayout = this.user ? this.user.settings.responsiveLayout : false;
         let minWidth = "auto";
 
         const mobileDevice = isMobile;
@@ -57,7 +56,7 @@ export default class App extends Component<AppProps> {
         const isGameRunning = this.isGameRunning;
 
         if (mobileDevice && isConnected && isGameRunning) {
-            minWidth = responsiveLayout ? "auto" : DEFAULT_WIDTH;
+            minWidth = DEFAULT_WIDTH;
         }
 
         if (!mobileDevice && isConnected && isGameRunning) {
@@ -65,7 +64,7 @@ export default class App extends Component<AppProps> {
         }
 
         return (
-            <Container fluid={responsiveLayout} style={{ paddingTop: "0.5rem", paddingBottom: "1rem", paddingRight: this.paddingX, paddingLeft: this.paddingX, maxWidth: this.maxWidth, minWidth: minWidth }}>
+            <Container fluid={false} style={{ paddingTop: "0.5rem", paddingBottom: "1rem", paddingRight: this.paddingX, paddingLeft: this.paddingX, maxWidth: this.maxWidth, minWidth: minWidth }}>
                 <Row className="justify-content-center">
                     {this.props.gameClient.connectionState == ConnectionState.INITIALIZING ? (
                         <Col xs={3}>
@@ -100,7 +99,7 @@ export default class App extends Component<AppProps> {
 
     setMaxWidth(): void {
         if (!isMobile) {
-            this.maxWidth = this.actualScreenWidth;
+            this.maxWidth = `${this.actualScreenWidth - 10}px`; // -10 because of the possible map scrollbar
             if (window.innerWidth <= ULTRA_LARGE_SCREEN_WIDTH_THRESHOLD) {
                 this.paddingX = DEFAULT_PADDING_X;
             } else {
