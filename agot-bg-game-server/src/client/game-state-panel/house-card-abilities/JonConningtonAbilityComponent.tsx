@@ -13,7 +13,7 @@ export default class JonConningtonAbilityComponent extends Component<GameStateCo
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     <b>Jon Connington</b>: Vassal house <b>{this.props.gameState.house.name}</b> may muster a knight either to the retreating region or to their capital.
                 </Col>
                 {renderChildGameState(this.props, [

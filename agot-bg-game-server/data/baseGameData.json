@@ -1310,6 +1310,19 @@
         }
       },
       "supplyLevel": 1
+    },
+    "targaryen": {
+      "name": "Targaryen",
+      "color": "#7026a1",
+      "unitLimits": {
+        "footman": 8,
+        "knight": 6,
+        "ship": 8,
+        "siege-engine": 0
+      },
+      "houseCards": {
+      },
+      "supplyLevel": 4
     }
   },
   "adwdHouseCards": {

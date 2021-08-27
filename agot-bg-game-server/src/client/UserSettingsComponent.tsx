@@ -68,7 +68,7 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                                 />
                             </Col>
                         </Row>
-                        <Row>
+                        {false && <Row>
                             <Col xs="auto">
                                 <FormCheck
                                     id="responsive-layout-setting"
@@ -76,18 +76,17 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                                     label={
                                         <OverlayTrigger overlay={
                                             <Tooltip id="responsive-layout-setting-tooltip">
-                                                Enables a responsive layout on devices with a small screen.
+                                                Enables a responsive layout on devices with a small screen. (No longer supported)
                                             </Tooltip>}>
                                             <label htmlFor="responsive-layout-setting">Responsive layout</label>
                                         </OverlayTrigger>}
                                     checked={this.responsiveLayout}
                                     onChange={() => {
                                         this.responsiveLayout = !this.responsiveLayout;
-                                        this.changeUserSettings();
                                     }}
                                 />
                             </Col>
-                        </Row>
+                        </Row>}
                         <Row className="justify-content-center mt-2 mb-1">
                             <a href="https://faq.swordsandravens.net" target="_blank" rel="noopener noreferrer">FAQ</a>
                         </Row>
@@ -106,15 +105,19 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
     }
 
     changeUserSettings(): void {
+        let triggerResize = false;
         if (this.props.user) {
+            if (this.props.user.settings.mapScrollbar != this.mapScrollbar) {
+                triggerResize = true;
+            }
             this.props.user.settings.mapScrollbar = this.mapScrollbar;
             this.props.user.settings.chatHouseNames = this.chatHouseNames;
             this.props.user.settings.responsiveLayout = this.responsiveLayout;
             this.props.user.syncSettings();
         }
 
-        if (this.props.parent) {
-            this.props.parent.setHeights();
+        if (triggerResize && this.props.parent) {
+            this.props.parent.onWindowResize();
         }
     }
 }

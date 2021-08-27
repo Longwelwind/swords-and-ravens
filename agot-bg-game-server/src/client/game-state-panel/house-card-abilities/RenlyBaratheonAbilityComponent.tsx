@@ -14,7 +14,7 @@ export default class RenlyBaratheonAbilityComponent extends Component<GameStateC
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     <b>Renly Baratheon</b>: House <b>{this.props.gameState.childGameState.house.name}</b> can choose one footmen to upgrade to a knight.
                 </Col>
                 {renderChildGameState(this.props, [

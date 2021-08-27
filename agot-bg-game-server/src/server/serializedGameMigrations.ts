@@ -1002,6 +1002,19 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "42",
+        migrate: (serializedGame: any) => {
+            // Turn on mapScrollbar again for all users as the new desktop experience is best with the map scrollbar
+            if (serializedGame.childGameState.type == "ingame") {
+                serializedGame.users.forEach((u: any) => {
+                    u.settings.mapScrollbar = true;
+                });
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

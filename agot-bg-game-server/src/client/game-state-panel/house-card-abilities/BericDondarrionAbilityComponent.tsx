@@ -13,7 +13,7 @@ export default class BericDondarrionAbilityComponent extends Component<GameState
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     <b>Beric Dondarrion</b>: House <b>{this.props.gameState.house.name}</b> must destroy 1 unit of their army.
                 </Col>
                 {renderChildGameState(this.props, [

@@ -23,19 +23,19 @@ export default class ResolveRetreatComponent extends Component<GameStateComponen
             <>
                 {this.props.gameState.childGameState instanceof SelectRegionGameState ? (
                     <>
-                        <Col xs={12}>
+                        <Col xs={12} className="text-center">
                             {this.props.gameState.childGameState.house.name} must choose the retreat location
                             of the defeated army.
                         </Col>
                         {this.selectRegionComponent && this.selectRegionComponent.selectedRegion && this.getUnitsToKillToRetreatTo(this.selectRegionComponent.selectedRegion) > 0 && (
-                            <Col xs={12}>
+                            <Col xs={12} className="text-center">
                                 {this.getUnitsToKillToRetreatTo(this.selectRegionComponent.selectedRegion)} units would need
                                 to be killed if you retreat to <strong>{this.selectRegionComponent.selectedRegion.name}</strong>.
                             </Col>
                         )}
                     </>
                 ) : this.props.gameState.childGameState instanceof SelectUnitsGameState ? (
-                    <Col xs={12}>
+                    <Col xs={12} className="text-center">
                         {this.props.gameState.childGameState.house.name} must
                         choose {this.props.gameState.childGameState.count} casualties to reconcile their armies.
                     </Col>

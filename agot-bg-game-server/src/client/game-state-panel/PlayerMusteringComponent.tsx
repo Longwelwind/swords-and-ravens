@@ -57,7 +57,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     {this.isStarredConsolidatePowerMusteringType ? (
                         <>House <b>{this.house.name}</b> must resolve one of its Consolidate Power Orders.</>
                     ) : this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD ? (
@@ -94,7 +94,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                             </Col>
                         }
                         {(this.musterings.size == 0 || (this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD && this.props.gameState.anyUsablePointsLeft(this.musterings))) && (
-                            <Col xs={12}>
+                            <Col xs={12} className="text-center">
                                 {this.isStarredConsolidatePowerMusteringType ?
                                     <>Click on a Consolidate Power Order token to resolve it for gaining Power tokens or click on a region with a
                                     Special Consolidate Power Order token to initiate a recruitment from there.</>

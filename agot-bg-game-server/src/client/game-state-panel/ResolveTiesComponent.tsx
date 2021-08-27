@@ -30,7 +30,7 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
         const results = _.flatMap(this.props.gameState.bidResults.map(([bid, houses]) => houses.map(h => [h, bid] as [House, number])));
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     The holder of the Iron Throne can resolve the ties of the bidding.
                 </Col>
                 {this.props.gameClient.doesControlHouse(this.props.gameState.decider) ? (

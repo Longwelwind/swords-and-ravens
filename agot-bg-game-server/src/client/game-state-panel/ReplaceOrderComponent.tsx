@@ -25,16 +25,16 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     The holder of the Raven token may now choose to replace one of its Order tokens or to look at the top
                     card of the Wildling deck.
                 </Col>
                 {this.props.gameClient.doesControlHouse(this.props.gameState.ravenHolder) ? (
                     <>
                         {this.selectedRegion == null ? (
-                            <Col xs={12}>Click on the order you want to replace on the map.</Col>
+                            <Col xs={12} className="text-center">Click on the order you want to replace on the map.</Col>
                         ) : (
-                            <Col xs={12}>
+                            <Col xs={12} className="text-center">
                                 Choose which order to place on <strong>{this.selectedRegion.name}</strong> or reset your selection by clicking it on the map again.<br/><br/>
                                 <OrderGridComponent orders={this.props.gameState.ingameGameState.game.getOrdersListForHouse(this.props.gameState.ravenHolder)}
                                                     selectedOrder={this.selectedOrder}

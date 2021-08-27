@@ -16,7 +16,7 @@ export default class SerGerrisDrinkwaterAbilityComponent extends Component<GameS
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     <b>Ser Gerris Drinkwater</b>: House <b>{this.props.gameState.childGameState.house.name}</b> may move one position higher
                     on one Influence track of their choice.
                 </Col>

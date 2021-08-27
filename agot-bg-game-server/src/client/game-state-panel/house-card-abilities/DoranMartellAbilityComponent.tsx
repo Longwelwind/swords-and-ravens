@@ -14,7 +14,7 @@ export default class DoranMartellAbilityComponent extends Component<GameStateCom
     render(): ReactNode {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     <b>Doran Martell: </b> House <b>{this.props.gameState.childGameState.house.name}</b> must move
                     house <b>{this.props.gameState.combatGameState.getEnemy(this.props.gameState.childGameState.house).name}</b> to the bottom of one influence track of their choice.
                 </Col>

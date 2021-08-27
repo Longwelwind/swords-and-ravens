@@ -35,13 +35,13 @@ export default class RobertArrynAbilityComponent extends Component<GameStateComp
         return (
             <>
                 {this.simpleChoice && (
-                    <Col xs={12}>
+                    <Col xs={12} className="text-center">
                         <b>Robert Arryn</b>: House <b>{this.house.name}</b> may
                         remove <b>Robert Arryn</b> {possibleHouseCardToRemove && <>and {joinReactNodes(possibleHouseCardToRemove.map(hc => <b key={`robert_arryn_${hc.id}`}>{hc.name}</b>), " or ")} </>}from the game.
                     </Col>
                 )}
                 {this.selectHouseCard && (
-                    <Col xs={12}>
+                    <Col xs={12} className="text-center">
                         <b>Robert Arryn</b>: Iron Throne holder <b>{this.house.name}</b> has to decide which house card to remove from the game.
                     </Col>
                 )}
