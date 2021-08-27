@@ -97,15 +97,13 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col xs={10} lg={5}>
+                <Col xs={10} xl={5}>
                     <Card>
-                        <Card.Body>
+                        <Card.Body style={{paddingTop: "10px", paddingBottom: "10px"}}>
                             <Row>
-                                <Col>
-                                    <GameSettingsComponent
-                                        gameClient={this.props.gameClient}
-                                        entireGame={this.lobby.entireGame} />
-                                </Col>
+                                <GameSettingsComponent
+                                    gameClient={this.props.gameClient}
+                                    entireGame={this.lobby.entireGame} />
                             </Row>
                             {(this.props.gameClient.isRealOwner() || this.props.gameState.password != "") &&
                             <Row className="mt-2">
@@ -248,15 +246,10 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
     }
 
     componentDidMount(): void {
-        window.addEventListener('resize', () => this.setChatHeight());
         this.setChatHeight();
     }
 
-    componentWillUnmount(): void {
-        window.removeEventListener('resize', () => this.setChatHeight());
-    }
-
     setChatHeight(): void {
-        this.chatHeight = document.getElementById("lobby-houses-list")?.getBoundingClientRect()?.height ?? 430;
+        this.chatHeight = document.getElementById("lobby-houses-list")?.getBoundingClientRect()?.height ?? 496;
     }
 }
