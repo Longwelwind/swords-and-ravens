@@ -223,7 +223,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         const gameStatePanelStyle = {
             maxHeight: this.gameStatePanelMaxHeight == null ? "none" : `${this.gameStatePanelMaxHeight}px`,
-            overflowY: (this.gameStatePanelMaxHeight == null ? "visible" : "scroll") as any
+            overflowY: (this.gameStatePanelMaxHeight == null ? "visible" : "scroll") as any,
+            paddingRight: "10px"
         };
 
         return (
@@ -482,8 +483,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         </ListGroup>
                                     </Col>
                                     <Col xs="auto" className="mx-1 px-0">
-                                        <Col style={{ width: "28px", fontSize: "22px", textAlign: "center" }} className="px-0 mx-0">
-                                            <Row className="mb-3">
+                                        <Col style={{ width: "28px", fontSize: "22px", textAlign: "center" }} className="px-0">
+                                            <Row className="mb-3 mx-0">
                                                 <OverlayTrigger overlay={
                                                     <Tooltip id="round">
                                                         <b>Round {this.game.turn} / {this.game.maxTurns}</b>
@@ -499,7 +500,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     </div>
                                                 </OverlayTrigger>
                                             </Row>
-                                            <Row>
+                                            <Row className="mx-0">
                                                 <OverlayTrigger overlay={
                                                     <Tooltip id="wildling-threat">
                                                         <b>Wildling Threat</b>{knowsWildlingCard && nextWildlingCard ?
