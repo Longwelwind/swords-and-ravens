@@ -438,11 +438,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 </Col>}
                 <Col xs={{span: gameStateColumnSpan, order: columnOrders.gameStateColumn}}>
                     <Row className="mt-0"> {/* This row is necessary to make child column ordering work */}
-                        <Col xs={"12"}>
-                            <Row>
-                                <Col className="pt-0">
-                                    <Card id="game-state-panel" border={this.props.gameClient.isOwnTurn() ? "warning" : undefined} bg={this.props.gameState.childGameState instanceof CancelledGameState ? "danger" : undefined}
-                                        style={gameStatePanelStyle}>
+                        <Col xs={"12"} className="pt-0">
+                            <Card id="game-state-panel" border={this.props.gameClient.isOwnTurn() ? "warning" : undefined} bg={this.props.gameState.childGameState instanceof CancelledGameState ? "danger" : undefined}
+                                style={gameStatePanelStyle}>
+                                <Row>
+                                    <Col>
                                         <ListGroup variant="flush">
                                             {phases.some(phase => this.props.gameState.childGameState instanceof phase.gameState) && (
                                                 <ListGroupItem>
@@ -450,7 +450,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                         overlay={this.renderRemainingWesterosCards()}
                                                         delay={{ show: 250, hide: 100 }}
                                                         placement="bottom"
-                                                        popperConfig={{modifiers: [preventOverflow]}}
+                                                        popperConfig={{ modifiers: [preventOverflow] }}
                                                     >
                                                         <Row className="justify-content-between">
                                                             {phases.map((phase, i) => (
@@ -458,10 +458,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                     {this.props.gameState.childGameState instanceof phase.gameState ? (
                                                                         <strong className="weak-outline">{phase.name} phase</strong>
                                                                     ) : (
-                                                                            <span className="text-muted">
-                                                                                {phase.name} phase
-                                                                            </span>
-                                                                        )}
+                                                                        <span className="text-muted">
+                                                                            {phase.name} phase
+                                                                        </span>
+                                                                    )}
                                                                 </Col>
                                                             ))}
                                                         </Row>
@@ -469,7 +469,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 </ListGroupItem>
                                             )}
                                             {renderChildGameState(
-                                                {mapControls: this.mapControls, ...this.props},
+                                                { mapControls: this.mapControls, ...this.props },
                                                 _.concat(
                                                     phases.map(phase => [phase.gameState, phase.component] as [any, typeof Component]),
                                                     [[ThematicDraftHouseCardsGameState, ThematicDraftHouseCardsComponent]],
@@ -480,53 +480,53 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 )
                                             )}
                                         </ListGroup>
-                                    </Card>
-                                </Col>
-                                <Col xs="auto">
-                                    <Col style={{width: "28px", fontSize: "22px", textAlign: "center"}}>
-                                        <Row className="mb-3">
-                                            <OverlayTrigger overlay={
+                                    </Col>
+                                    <Col xs="auto" className="mx-1 px-0">
+                                        <Col style={{ width: "28px", fontSize: "22px", textAlign: "center" }} className="px-0 mx-0">
+                                            <Row className="mb-3">
+                                                <OverlayTrigger overlay={
                                                     <Tooltip id="round">
                                                         <b>Round {this.game.turn} / {this.game.maxTurns}</b>
                                                     </Tooltip>
                                                 }
-                                                placement="auto">
-                                                <div>
-                                                    <img className={classNames(
-                                                        {"dye-warning": roundWarning},
-                                                        {"dye-critical": roundCritical})}
-                                                        src={hourglassImage} width={28}/>
-                                                    <div style={{color: roundWarning ? "#F39C12" : roundCritical ? "#FF0000" : undefined}}>{this.game.turn}</div>
-                                                </div>
-                                            </OverlayTrigger>
-                                        </Row>
-                                        <Row>
-                                            <OverlayTrigger overlay={
+                                                    placement="auto">
+                                                    <div>
+                                                        <img className={classNames(
+                                                            { "dye-warning": roundWarning },
+                                                            { "dye-critical": roundCritical })}
+                                                            src={hourglassImage} width={28} />
+                                                        <div style={{ color: roundWarning ? "#F39C12" : roundCritical ? "#FF0000" : undefined }}>{this.game.turn}</div>
+                                                    </div>
+                                                </OverlayTrigger>
+                                            </Row>
+                                            <Row>
+                                                <OverlayTrigger overlay={
                                                     <Tooltip id="wildling-threat">
-                                                        <b>Wildling Threat</b>{ knowsWildlingCard && nextWildlingCard ?
-                                                        <><br/><br/><strong><u>{nextWildlingCard.type.name}</u></strong><br/>
-                                                        <strong>Lowest Bidder:</strong> {nextWildlingCard.type.wildlingVictoryLowestBidderDescription}<br/>
-                                                        <strong>Everyone Else:</strong> {nextWildlingCard.type.wildlingVictoryEverybodyElseDescription}<br/><br/>
-                                                        <strong>Highest Bidder:</strong> {nextWildlingCard.type.nightsWatchDescription}
-                                                        </>
-                                                        : <></>
+                                                        <b>Wildling Threat</b>{knowsWildlingCard && nextWildlingCard ?
+                                                            <><br /><br /><strong><u>{nextWildlingCard.type.name}</u></strong><br />
+                                                                <strong>Lowest Bidder:</strong> {nextWildlingCard.type.wildlingVictoryLowestBidderDescription}<br />
+                                                                <strong>Everyone Else:</strong> {nextWildlingCard.type.wildlingVictoryEverybodyElseDescription}<br /><br />
+                                                                <strong>Highest Bidder:</strong> {nextWildlingCard.type.nightsWatchDescription}
+                                                            </>
+                                                            : <></>
                                                         }
                                                     </Tooltip>
                                                 }
-                                                placement="auto">
-                                                <div>
-                                                    <img src={mammothImage} width={28} className={classNames(
-                                                        {"dye-warning": wildlingsWarning},
-                                                        {"dye-critical": wildlingsCritical},
-                                                        {"wildling-highlight": knowsWildlingCard})}
-                                                    />
-                                                    <div style={{color: wildlingsWarning ? "#F39C12" : wildlingsCritical ? "#FF0000" : undefined}}>{this.game.wildlingStrength}</div>
-                                                </div>
-                                            </OverlayTrigger>
-                                        </Row>
+                                                    placement="auto">
+                                                    <div>
+                                                        <img src={mammothImage} width={28} className={classNames(
+                                                            { "dye-warning": wildlingsWarning },
+                                                            { "dye-critical": wildlingsCritical },
+                                                            { "wildling-highlight": knowsWildlingCard })}
+                                                        />
+                                                        <div style={{ color: wildlingsWarning ? "#F39C12" : wildlingsCritical ? "#FF0000" : undefined }}>{this.game.wildlingStrength}</div>
+                                                    </div>
+                                                </OverlayTrigger>
+                                            </Row>
+                                        </Col>
                                     </Col>
-                                </Col>
-                            </Row>
+                                </Row>
+                            </Card>
                         </Col>
                         <Col xs={"12"}>
                             <Card>
