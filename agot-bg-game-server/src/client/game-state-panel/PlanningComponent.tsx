@@ -19,7 +19,7 @@ export default class PlanningComponent extends Component<GameStateComponentProps
     render(): ReactNode {
         return (
             <>
-                <ListGroupItem>
+                <ListGroupItem className="px-2">
                     <Row className="justify-content-center">
                         {renderChildGameState(this.props, [
                             [PlaceOrdersGameState, PlaceOrdersComponent],

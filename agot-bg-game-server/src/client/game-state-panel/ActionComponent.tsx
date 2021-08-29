@@ -23,7 +23,7 @@ export default class ActionComponent extends Component<GameStateComponentProps<A
     render(): ReactNode {
         return (
             <>
-                <ListGroupItem>
+                <ListGroupItem className="px-2">
                     <Row>
                         {renderChildGameState(this.props, [
                             [UseRavenGameState, UseRavenGameStatePanelComponent],

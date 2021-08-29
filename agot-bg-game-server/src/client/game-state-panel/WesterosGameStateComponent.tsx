@@ -35,7 +35,7 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
         return (
             <>
                 {this.props.gameState.currentCard && (
-                    <ListGroupItem>
+                    <ListGroupItem className="px-2">
                         <Row className="justify-content-around">
                             {this.props.gameState.revealedCards.map((wc, i) => (
                                 <Col xs="auto" key={i}>
@@ -52,7 +52,7 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
                     </ListGroupItem>
                 )}
                 {this.props.gameState.childGameState instanceof PutToTheSwordGameState ? (
-                    <ListGroupItem>
+                    <ListGroupItem className="px-2">
                         <Row>
                             <SimpleChoiceComponent gameClient={this.props.gameClient}
                                                    gameState={this.props.gameState.childGameState.childGameState}
@@ -60,7 +60,7 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
                         </Row>
                     </ListGroupItem>
                 ) : this.props.gameState.childGameState instanceof DarkWingsDarkWordsGameState ? (
-                    <ListGroupItem>
+                    <ListGroupItem className="px-2">
                         <Row>
                             <SimpleChoiceComponent gameClient={this.props.gameClient}
                                                    gameState={this.props.gameState.childGameState.childGameState}
@@ -68,7 +68,7 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
                         </Row>
                     </ListGroupItem>
                 ) : this.props.gameState.childGameState instanceof AThroneOfBladesGameState ? (
-                    <ListGroupItem>
+                    <ListGroupItem className="px-2">
                         <Row>
                             <SimpleChoiceComponent gameClient={this.props.gameClient}
                                                    gameState={this.props.gameState.childGameState.childGameState}
