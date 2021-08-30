@@ -11,13 +11,7 @@ import User from "../server/User";
 import { isMobile } from 'react-device-detect';
 import EntireGame from "../common/EntireGame";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
-import { observable } from "mobx";
 
-const DEFAULT_PADDING_X = "3rem";
-const DEFAULT_WIDTH = "1910px";
-const MIN_WIDTH_FOR_RENDERING_GAME_NICELY = "1765px";
-const ULTRA_LARGE_SCREEN_WIDTH_THRESHOLD = 2000;
-const ULTRA_LARGE_PADDING_X = "10rem";
 
 interface AppProps {
     gameClient: GameClient;
@@ -25,9 +19,6 @@ interface AppProps {
 
 @observer
 export default class App extends Component<AppProps> {
-    @observable maxWidth: string = DEFAULT_WIDTH;
-    @observable paddingX: string | undefined = DEFAULT_PADDING_X;
-
     get user(): User | null {
         return this.props.gameClient.authenticatedUser;
     }
@@ -41,7 +32,11 @@ export default class App extends Component<AppProps> {
     }
 
     get isGameRunning(): boolean {
-        return this.entireGame != null && this.entireGame.childGameState instanceof IngameGameState;
+        return this.entireGame?.childGameState instanceof IngameGameState;
+    }
+
+    get is8pGame(): boolean {
+        return this.isGameRunning && (this.entireGame?.gameSettings.playerCount ?? -1) >= 8;
     }
 
     get actualScreenWidth(): number {
@@ -49,22 +44,15 @@ export default class App extends Component<AppProps> {
     }
 
     render(): ReactNode {
-        let minWidth = "auto";
-
-        const mobileDevice = isMobile;
-        const isConnected = this.isConnected;
-        const isGameRunning = this.isGameRunning;
-
-        if (mobileDevice && isConnected && isGameRunning) {
-            minWidth = DEFAULT_WIDTH;
-        }
-
-        if (!mobileDevice && isConnected && isGameRunning) {
-            minWidth = MIN_WIDTH_FOR_RENDERING_GAME_NICELY;
-        }
-
+        const minWidth = isMobile ? this.is8pGame ? "2400px" : "1850px" : "auto";
         return (
-            <Container fluid={false} style={{ paddingTop: "0.5rem", paddingBottom: "1rem", paddingRight: this.paddingX, paddingLeft: this.paddingX, maxWidth: this.maxWidth, minWidth: minWidth }}>
+            <Container fluid={false} style={{
+                paddingTop: "0.5rem",
+                paddingBottom: "1rem",
+                paddingRight: "3rem",
+                paddingLeft: "3rem",
+                maxWidth: "2800px",
+                minWidth: minWidth }}>
                 <Row className="justify-content-center">
                     {this.props.gameClient.connectionState == ConnectionState.INITIALIZING ? (
                         <Col xs={3}>
@@ -95,33 +83,5 @@ export default class App extends Component<AppProps> {
                 </Row>
             </Container>
         );
-    }
-
-    setMaxWidth(): void {
-        if (!isMobile) {
-            this.maxWidth = `${this.actualScreenWidth - 10}px`; // -10 because of the possible map scrollbar
-            if (window.innerWidth <= ULTRA_LARGE_SCREEN_WIDTH_THRESHOLD) {
-                this.paddingX = DEFAULT_PADDING_X;
-            } else {
-                this.paddingX = ULTRA_LARGE_PADDING_X;
-            }
-        } else {
-            this.maxWidth = DEFAULT_WIDTH;
-            this.paddingX = undefined;
-        }
-    }
-
-    componentDidMount(): void {
-        if (!isMobile) {
-            window.addEventListener('resize', () => this.setMaxWidth());
-        }
-
-        this.setMaxWidth();
-    }
-
-    componentWillUnmount(): void {
-        if (!isMobile) {
-            window.removeEventListener('resize', () => this.setMaxWidth());
-        }
     }
 }

@@ -5,6 +5,8 @@ $grid-breakpoints: (
         md: 768px,
         lg: 992px,
         xl: 1565px,
+        xxl: 1768px,
+        xxxl: 1875px
 );
 
 @import './theme/_variables';

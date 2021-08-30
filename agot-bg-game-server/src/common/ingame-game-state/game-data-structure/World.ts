@@ -12,16 +12,16 @@ import RegionKind from "./RegionKind";
 import getStaticWorld from "./static-data-structure/getStaticWorld";
 
 export default class World {
-    gameSetupId: string;
+    playerCount: number;
     regions: BetterMap<string, Region>;
 
     get borders(): StaticBorder[] {
-        return getStaticWorld(this.gameSetupId).staticBorders;
+        return getStaticWorld(this.playerCount).staticBorders;
     }
 
-    constructor(regions: BetterMap<string, Region>, gameSetupId: string) {
+    constructor(regions: BetterMap<string, Region>, playerCount: number) {
         this.regions = regions;
-        this.gameSetupId = gameSetupId;
+        this.playerCount = playerCount;
     }
 
     getRegion(staticRegion: StaticRegion): Region {
@@ -208,18 +208,18 @@ export default class World {
     serializeToClient(): SerializedWorld {
         return {
             regions: this.regions.values.map(r => r.serializeToClient()),
-            gameSetupId: this.gameSetupId
+            playerCount: this.playerCount
         };
     }
 
     static deserializeFromServer(game: Game, data: SerializedWorld): World {
         const regions = new BetterMap(data.regions.map(r => [r.id, Region.deserializeFromServer(game, r)]));
 
-        return new World(regions, data.gameSetupId);
+        return new World(regions, data.playerCount);
     }
 }
 
 export interface SerializedWorld {
     regions: SerializedRegion[];
-    gameSetupId: string;
+    playerCount: number;
 }

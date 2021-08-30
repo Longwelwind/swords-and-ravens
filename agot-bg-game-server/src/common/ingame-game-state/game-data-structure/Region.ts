@@ -24,7 +24,7 @@ export default class Region {
 
 
     get staticRegion(): StaticRegion {
-        return getStaticWorld(this.game.ingame.entireGame.gameSettings.setupId).staticRegions.get(this.id);
+        return getStaticWorld(this.game.ingame.entireGame.gameSettings.playerCount).staticRegions.get(this.id);
     }
 
     get hasStructure(): boolean {

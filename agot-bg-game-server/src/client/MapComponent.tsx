@@ -11,6 +11,7 @@ import ActionGameState from "../common/ingame-game-state/action-game-state/Actio
 import Order from "../common/ingame-game-state/game-data-structure/Order";
 import westerosImage from "../../public/images/westeros.jpg";
 import westeros7pImage from "../../public/images/westeros-7p.jpg";
+import westerosWithEssosImage from "../../public/images/westeros-with-essos.jpg";
 import houseOrderImages from "./houseOrderImages";
 import orderImages from "./orderImages";
 import unitImages from "./unitImages";
@@ -32,6 +33,7 @@ import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
+export const DELUXE_MAT_WIDTH = 1204;
 const BLOCKED_REGION_BY_INFINITE_GARRISON = 1000;
 
 interface MapComponentProps {
@@ -42,18 +44,31 @@ interface MapComponentProps {
 
 @observer
 export default class MapComponent extends Component<MapComponentProps> {
+    backgroundImage: string = westerosImage;
+    mapWidth: number = MAP_WIDTH;
+
     get ingame(): IngameGameState {
         return this.props.ingameGameState;
     }
 
+    constructor(props: MapComponentProps) {
+        super(props);
+
+        this.backgroundImage = this.ingame.entireGame.gameSettings.playerCount == 7
+        ? westeros7pImage
+        : this.ingame.entireGame.gameSettings.playerCount == 8 ? westerosWithEssosImage
+        : westerosImage;
+
+        this.mapWidth = this.ingame.entireGame.gameSettings.playerCount == 8 ? DELUXE_MAT_WIDTH : MAP_WIDTH;
+    }
+
     render(): ReactNode {
-        const backgroundImage = this.ingame.entireGame.gameSettings.setupId == "mother-of-dragons" ? westeros7pImage : westerosImage;
         const garrisons = new BetterMap(this.props.ingameGameState.world.regions
             .values.filter(r => r.garrison > 0 && r.garrison != BLOCKED_REGION_BY_INFINITE_GARRISON)
             .map(r => [r.id, getGarrisonToken(r.id, r.garrison)]));
         return (
             <div className="map"
-                 style={{backgroundImage: `url(${backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem"}}>
+                 style={{backgroundImage: `url(${this.backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem"}}>
                 <div style={{position: "relative"}}>
                     {this.props.ingameGameState.world.regions.values.map(r => (
                         <div key={r.id}>
@@ -83,7 +98,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                     {this.renderUnits()}
                     {this.renderOrders()}
                 </div>
-                <svg style={{width: `${MAP_WIDTH}px`, height: `${MAP_HEIGHT}px`}}>
+                <svg style={{width: `${this.mapWidth}px`, height: `${MAP_HEIGHT}px`}}>
                     {this.renderRegions()}
                 </svg>
             </div>

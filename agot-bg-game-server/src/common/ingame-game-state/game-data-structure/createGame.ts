@@ -275,7 +275,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     const garrisonsFromGameSetup = entireGame.selectedGameSetup.garrisons ? new BetterMap(Object.entries(entireGame.selectedGameSetup.garrisons)) : null;
     const blockedRegions = entireGame.selectedGameSetup.blockedRegions;
 
-    const regions = new BetterMap(getStaticWorld(entireGame.gameSettings.setupId).staticRegions.values.map(staticRegion => {
+    const regions = new BetterMap(getStaticWorld(entireGame.gameSettings.playerCount).staticRegions.values.map(staticRegion => {
         const blocked = blockedRegions ? blockedRegions.includes(staticRegion.id) : false;
         const garrisonValue = garrisonsFromGameSetup ? garrisonsFromGameSetup.has(staticRegion.id) ? garrisonsFromGameSetup.get(staticRegion.id)
         : staticRegion.startingGarrison
@@ -291,7 +291,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         ];
     }));
 
-    game.world = new World(regions, entireGame.gameSettings.setupId);
+    game.world = new World(regions, entireGame.gameSettings.playerCount);
 
     // Load Westeros Cards
     game.westerosDecks = baseGameData.westerosCards.map(westerosDeckData => {

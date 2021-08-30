@@ -29,17 +29,17 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 <link rel="icon" href={this.props.gameClient.isOwnTurn() ? faviconAlert : faviconNormal} sizes="16x16" />
             </Helmet>
             <Col xs={12} className={this.props.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
-                    <h4 style={{marginLeft: "1rem", marginBottom: "0rem", textAlign: "center"}}>
-                        {this.props.entireGame.name} <Badge variant="primary" className={classNames({'invisible': !this.props.entireGame.gameSettings.pbem})}>PBEM</Badge>
-                    </h4>
-                </Col>
+                <h4 style={{ marginLeft: "1rem", marginBottom: "0rem", textAlign: "center" }}>
+                    {this.props.entireGame.name} <Badge variant="primary" className={classNames({ 'invisible': !this.props.entireGame.gameSettings.pbem })}>PBEM</Badge>
+                </h4>
+            </Col>
             {
                 this.props.entireGame.childGameState instanceof LobbyGameState ? (
-                    <LobbyComponent gameClient={this.props.gameClient} gameState={this.props.entireGame.childGameState}/>
+                    <LobbyComponent gameClient={this.props.gameClient} gameState={this.props.entireGame.childGameState} />
                 ) : this.props.entireGame.childGameState instanceof IngameGameState ? (
-                    <IngameComponent gameClient={this.props.gameClient} gameState={this.props.entireGame.childGameState}/>
+                    <IngameComponent gameClient={this.props.gameClient} gameState={this.props.entireGame.childGameState} />
                 ) : this.props.entireGame.childGameState instanceof CancelledGameState && (
-                    <CancelledComponent gameClient={this.props.gameClient} gameState={this.props.entireGame.childGameState}/>
+                    <CancelledComponent gameClient={this.props.gameClient} gameState={this.props.entireGame.childGameState} />
                 )
             }
         </>;
