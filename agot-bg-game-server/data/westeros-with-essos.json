@@ -1098,8 +1098,8 @@
                  "type":"",
                  "visible":true,
                  "width":65,
-                 "x":794.833333333333,
-                 "y":888.833333333333
+                 "x":786.833333333333,
+                 "y":895.5
                 }, 
                 {
                  "height":65,
@@ -1307,7 +1307,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":false,
+         "visible":true,
          "x":0,
          "y":0
         }, 
@@ -2406,8 +2406,8 @@
                  "type":"",
                  "visible":true,
                  "width":42,
-                 "x":788.333333333333,
-                 "y":661
+                 "x":849,
+                 "y":877
                 }, 
                 {
                  "height":42,
@@ -2598,7 +2598,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":false,
+         "visible":true,
          "x":0,
          "y":0
         }, 
@@ -15243,14 +15243,14 @@
                         }],
                  "properties":[
                         {
-                         "name":"bay-of-pentos",
-                         "type":"string",
-                         "value":"os"
-                        }, 
-                        {
                          "name":"from",
                          "type":"string",
                          "value":"port-of-pentos"
+                        }, 
+                        {
+                         "name":"to",
+                         "type":"string",
+                         "value":"bay-of-pentos"
                         }],
                  "rotation":0,
                  "type":"",
@@ -18870,7 +18870,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":true,
+         "visible":false,
          "x":0,
          "y":0
         }, 

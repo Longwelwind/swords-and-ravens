@@ -4,7 +4,7 @@ export default class UnitType {
     id: string;
     name: string;
     description: string;
-    combatStrength: number | null;
+    combatStrength: number;
     combatStrengthOnAttackStructure: number | null;
     walksOn: RegionKind;
     canTransport: RegionKind | null;
@@ -15,7 +15,7 @@ export default class UnitType {
         name: string,
         description: string,
         walksOn: RegionKind,
-        combatStrength: number | null,
+        combatStrength: number,
         combatStrengthOnAttackStructure: number | null = null,
         canTransport: RegionKind | null = null,
         canRetreat = true

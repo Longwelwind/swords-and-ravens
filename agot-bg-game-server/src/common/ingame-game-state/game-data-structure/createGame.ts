@@ -78,9 +78,9 @@ function getTrackWithAdjustedVassalPositions(track: House[], playerHouses: strin
     const areVassalsInTopThreeSpaces = _.take(track, 3).some(h => !playerHouses.includes(h.id));
 
     if (areVassalsInTopThreeSpaces) {
-        const vassals = track.filter(h => !playerHouses.includes(h.id));
-        const newTrack = _.without(track, ...vassals);
-        newTrack.push(...vassals);
+        const vassalsAndTargaryen = track.filter(h => !playerHouses.includes(h.id) || h.id == "targaryen");
+        const newTrack = _.without(track, ...vassalsAndTargaryen);
+        newTrack.push(...vassalsAndTargaryen);
         return newTrack;
     }
 
@@ -113,7 +113,7 @@ function getHouseCardSet(container: {[key: string]: HouseCardContainer}): HouseC
 export const baseHouseCardsData = getHouseCardData(baseGameData.houses);
 export const adwdHouseCardsData = getHouseCardData(baseGameData.adwdHouseCards);
 export const ffcHouseCardsData = getHouseCardData(baseGameData.ffcHouseCards);
-export const modAHouseCardsData = getHouseCardData(baseGameData.modAHouseCards);
+//export const modAHouseCardsData = getHouseCardData(baseGameData.modAHouseCards);
 export const modBHouseCardsData = getHouseCardData(baseGameData.modBHouseCards);
 
 export const allGameSetups = new BetterMap(Object.entries(baseGameData.setups as {[key: string]: GameSetupContainer}));
@@ -147,8 +147,9 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     if (gameSettings.adwdHouseCards && !gameSettings.limitedDraft) {
         const adwdHouseCards = baseGameData.adwdHouseCards as {[key: string]: HouseCardContainer};
         const ffcHouseCards = baseGameData.ffcHouseCards as {[key: string]: HouseCardContainer};
+        const modBHouseCards = baseGameData.modBHouseCards as {[key: string]: HouseCardContainer};
         const newHouseCards = new BetterMap(
-            _.concat(Object.entries(adwdHouseCards), Object.entries(ffcHouseCards))
+            _.concat(Object.entries(adwdHouseCards), Object.entries(ffcHouseCards), Object.entries(modBHouseCards))
             .filter(([hid, _]) => housesToCreate.includes(hid)));
 
         newHouseCards.keys.forEach(hid => {
@@ -234,17 +235,15 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         const baseGameHouseCards = getHouseCardSet(baseGameData.houses);
         const adwdHouseCards = getHouseCardSet(baseGameData.adwdHouseCards);
         const ffcHouseCards = getHouseCardSet(baseGameData.ffcHouseCards);
-        const modAHouseCards = getHouseCardSet(baseGameData.modAHouseCards);
+        // const modAHouseCards = getHouseCardSet(baseGameData.modAHouseCards);
         const modBHouseCards = getHouseCardSet(baseGameData.modBHouseCards);
 
         if (gameSettings.limitedDraft) {
-            let limitedHouseCards = [];
+            let limitedHouseCards: HouseCard[] = [];
 
             if (gameSettings.setupId == 'mother-of-dragons') {
                 if (gameSettings.adwdHouseCards) {
                     limitedHouseCards = _.concat(modBHouseCards, adwdHouseCards, ffcHouseCards);
-                } else {
-                    limitedHouseCards = _.concat(baseGameHouseCards, modAHouseCards);
                 }
             } else if (gameSettings.adwdHouseCards) {
                 limitedHouseCards = _.concat(adwdHouseCards);
@@ -254,7 +253,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             }
             game.houseCardsForDrafting = new BetterMap(limitedHouseCards.map(hc => [hc.id, hc]));
         } else {
-            const allHouseCards = _.concat(baseGameHouseCards, adwdHouseCards, ffcHouseCards, modAHouseCards, modBHouseCards);
+            const allHouseCards = _.concat(baseGameHouseCards, adwdHouseCards, ffcHouseCards, modBHouseCards);
             game.houseCardsForDrafting = new BetterMap(allHouseCards.map(hc => [hc.id, hc]));
         }
 

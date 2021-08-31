@@ -316,10 +316,8 @@ export default class MapComponent extends Component<MapComponentProps> {
     }
 
     private renderOrderTooltip(order: Order | null, region: Region): OverlayChildren {
-        const regionController = region.getController();
-
         return <Tooltip id={"order-info"}>
-            <b>{order ? order.type.name : "Order token"}</b>{regionController != null && <small> of <b>{regionController.name}</b></small>}
+            <b>{order ? order.type.name : "Order token"}</b><small> of <b>{region.getController()?.name ?? "Unknown"}</b><br/><b>{region.name}</b></small>
         </Tooltip>;
     }
 

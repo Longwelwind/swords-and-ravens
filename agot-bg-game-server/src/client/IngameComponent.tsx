@@ -440,7 +440,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const knowsWildlingCard = this.authenticatedPlayer != null &&
             this.authenticatedPlayer.house.knowsNextWildlingCard;
         const nextWildlingCard = this.game.wildlingDeck.filter(c => c.id == this.game.clientNextWildlingCardId)[0];
-        
+
         const gameRunning = !(this.ingame.leafState instanceof GameEndedGameState) && !(this.ingame.leafState instanceof CancelledGameState);
         const roundWarning = gameRunning && (this.game.maxTurns - this.game.turn) == 1;
         const roundCritical = gameRunning && (this.game.turn == this.game.maxTurns);

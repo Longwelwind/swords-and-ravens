@@ -107,27 +107,28 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     </Col>
                     <Col xs="auto">
                         <Row className="justify-content-center align-items-center" style={{width: 110}}>
-                            {unitTypes.values.map(type => (
-                                <Col xs={6} key={type.id}>
-                                    <Row className="justify-content-center no-gutters align-items-center">
-                                        <Col xs="auto">
-                                            {this.game.getAvailableUnitsOfType(this.house, type)}
-                                        </Col>
-                                        <Col xs="auto" style={{ marginLeft: 4 }}>
-                                            <OverlayTrigger
-                                                overlay={this.renderUnitTypeTooltip(type)}
-                                                delay={{ show: 250, hide: 100 }}
-                                                placement="auto">
-                                                <div className="unit-icon small hover-weak-outline"
-                                                    style={{
-                                                        backgroundImage: `url(${unitImages.get(this.house.id).get(type.id)})`,
-                                                    }}
-                                                />
-                                            </OverlayTrigger>
-                                        </Col>
-                                    </Row>
-                                </Col>
-                            ))}
+                            {unitTypes.values.map(type =>
+                                (this.game.getUnitLimitOfType(this.house, type) > 0) && (
+                                    <Col xs={6} key={type.id}>
+                                        <Row className="justify-content-center no-gutters align-items-center">
+                                            <Col xs="auto">
+                                                {this.game.getAvailableUnitsOfType(this.house, type)}
+                                            </Col>
+                                            <Col xs="auto" style={{ marginLeft: 4 }}>
+                                                <OverlayTrigger
+                                                    overlay={this.renderUnitTypeTooltip(type)}
+                                                    delay={{ show: 250, hide: 100 }}
+                                                    placement="auto">
+                                                    <div className="unit-icon small hover-weak-outline"
+                                                        style={{
+                                                            backgroundImage: `url(${unitImages.get(this.house.id).get(type.id)})`,
+                                                        }}
+                                                    />
+                                                </OverlayTrigger>
+                                            </Col>
+                                        </Row>
+                                    </Col>)
+                            )}
                         </Row>
                     </Col>
                     {!this.isVassal && (<OverlayTrigger

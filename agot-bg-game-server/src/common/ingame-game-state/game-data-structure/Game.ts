@@ -234,6 +234,10 @@ export default class Game {
         return house.unitLimits.get(unitType) - this.getCountUnitsOfType(house, unitType);
     }
 
+    getUnitLimitOfType(house: House, unitType: UnitType): number {
+        return house.unitLimits.has(unitType) ? house.unitLimits.get(unitType) : 0;
+    }
+
     createUnit(region: Region, unitType: UnitType, allegiance: House): Unit {
         this.lastUnitId++;
         const unit = new Unit(this.lastUnitId, unitType, allegiance);
