@@ -260,7 +260,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
                     return {success: false, reason: "not-enough-players"};
                 }
             }
-            else if (this.players.size < MIN_PLAYER_COUNT_WITH_VASSALS && this.players.size) {
+            else if (this.players.size < MIN_PLAYER_COUNT_WITH_VASSALS) {
                 return {success: false, reason: "not-enough-players"};
             }
         } else if (this.players.size < this.entireGame.selectedGameSetup.playerCount) {
