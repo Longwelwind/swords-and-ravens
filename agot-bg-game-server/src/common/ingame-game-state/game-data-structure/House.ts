@@ -14,8 +14,9 @@ export default class House {
     unitLimits: BetterMap<UnitType, number>;
     @observable powerTokens: number;
     @observable supplyLevel: number;
+    @observable gainedLoyaltyTokens: number;
 
-    constructor(id: string, name: string, color: string, houseCards: BetterMap<string, HouseCard>, unitLimits: BetterMap<UnitType, number>, powerTokens: number, supplyLevel: number) {
+    constructor(id: string, name: string, color: string, houseCards: BetterMap<string, HouseCard>, unitLimits: BetterMap<UnitType, number>, powerTokens: number, supplyLevel: number, gainedLoyaltyTokens: number) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -24,6 +25,7 @@ export default class House {
         this.unitLimits = unitLimits;
         this.powerTokens = powerTokens;
         this.supplyLevel = supplyLevel;
+        this.gainedLoyaltyTokens = gainedLoyaltyTokens;
     }
 
     serializeToClient(admin: boolean, isVassalHouse: boolean): SerializedHouse {
@@ -35,7 +37,8 @@ export default class House {
             houseCards: (admin || !isVassalHouse) ? this.houseCards.entries.map(([houseCardId, houseCard]) => [houseCardId, houseCard.serializeToClient()]) : [],
             unitLimits: this.unitLimits.map((unitType, limit) => [unitType.id, limit]),
             powerTokens: this.powerTokens,
-            supplyLevel: this.supplyLevel
+            supplyLevel: this.supplyLevel,
+            gainedLoyaltyTokens: this.gainedLoyaltyTokens
         };
     }
 
@@ -51,7 +54,8 @@ export default class House {
                 data.unitLimits.map(([utid, limit]) => [unitTypes.get(utid), limit])
             ),
             data.powerTokens,
-            data.supplyLevel
+            data.supplyLevel,
+            data.gainedLoyaltyTokens
         );
 
         house.knowsNextWildlingCard = data.knowsNextWildlingCard;
@@ -68,4 +72,5 @@ export interface SerializedHouse {
     unitLimits: [string, number][];
     powerTokens: number;
     supplyLevel: number;
+    gainedLoyaltyTokens: number;
 }

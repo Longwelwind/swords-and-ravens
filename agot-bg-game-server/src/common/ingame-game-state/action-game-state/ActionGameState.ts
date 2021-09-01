@@ -56,11 +56,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
             type: "action-phase-began"
         });
 
-        if (!this.game.skipRavenPhase) {
-            this.setChildGameState(new UseRavenGameState(this)).firstStart();
-        } else {
-            this.onUseRavenGameStateEnd();
-        }
+        this.setChildGameState(new UseRavenGameState(this)).firstStart();
     }
 
     onResolveMarchOrderGameStateFinish(): void {

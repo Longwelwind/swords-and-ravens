@@ -17,6 +17,7 @@ import HouseCardBackComponent from "./game-state-panel/utils/HouseCardBackCompon
 import Game from "../common/ingame-game-state/game-data-structure/Game";
 import castleImage from "../../public/images/icons/castle.svg";
 import battleGearImage from "../../public/images/icons/battle-gear.svg";
+import verticalBanner from "../../public/images/icons/vertical-banner.svg"
 import Player from "../common/ingame-game-state/Player";
 import UserLabel from "./UserLabel";
 import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
@@ -25,6 +26,7 @@ import GiftPowerTokensComponent from "./GiftPowerTokensComponent";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
 import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+
 
 
 interface HouseRowComponentProps {
@@ -57,9 +59,9 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
 
     render(): ReactNode {
         const gameRunning = !(this.props.ingame.leafState instanceof GameEndedGameState) && !(this.props.ingame.leafState instanceof CancelledGameState);
-        const totalHeldStructures = this.game.getTotalHeldStructures(this.house);
-        const victoryPointsWarning = gameRunning && (this.game.structuresCountNeededToWin - 2 == totalHeldStructures);
-        const victoryPointsCritical = gameRunning && (this.game.structuresCountNeededToWin - 1 == totalHeldStructures);
+        const victoryPoints = this.game.getVictoryPoints(this.house);
+        const victoryPointsWarning = gameRunning && (this.game.structuresCountNeededToWin - 2 == victoryPoints);
+        const victoryPointsCritical = gameRunning && (this.game.structuresCountNeededToWin - 1 == victoryPoints);
         return this.props.ingame.rerender >= 0 && <>
             <ListGroupItem style={{paddingLeft: "8px", paddingRight: "10px"}}>
                 <Row className="align-items-center">
@@ -137,13 +139,13 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         placement="auto"
                     >
                         <Col xs="auto" className="d-flex align-items-center">
-                            <div style={{fontSize: "20px", color: victoryPointsWarning ? "#F39C12" : victoryPointsCritical ? "#FF0000" : undefined}}><b>{totalHeldStructures}</b></div>
+                            <div style={{fontSize: "20px", color: victoryPointsWarning ? "#F39C12" : victoryPointsCritical ? "#FF0000" : undefined}}><b>{victoryPoints}</b></div>
                             <img
                                 className={classNames(
                                     "hover-weak-outline",
                                     {"dye-warning": victoryPointsWarning},
                                     {"dye-critical": victoryPointsCritical})}
-                                src={castleImage} width={32}
+                                src={this.house.id == "targaryen" ? verticalBanner : castleImage} width={40}
                                 style={{marginLeft: "10px"}}
                             />
                     </Col>

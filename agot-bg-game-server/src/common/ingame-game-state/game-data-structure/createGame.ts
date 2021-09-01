@@ -59,6 +59,7 @@ export interface GameSetup {
     supplyLevels?: {[key: string]: number};
     powerTokensOnBoard?: {[key: string]: string[]};
     garrisons?: {[key: string]: number};
+    loyaltyTokens?: {[key: string]: number};
 }
 
 export interface GameSetupContainer {
@@ -173,24 +174,30 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     game.houses = new BetterMap(
         baseGameHousesToCreate.entries
         .map(([hid, houseData]) => {
-            const houseCards = new BetterMap<string, HouseCard>(
-                // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-                // @ts-ignore The conversion provokes n error in the CI
-                // Don't ask me why.
+            const houseCards = playerHouses.includes(hid)
+                ? new BetterMap<string, HouseCard>(
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                    // @ts-ignore The conversion provokes n error in the CI
+                    // Don't ask me why.
 
-                Object.entries(houseData.houseCards)
-                    .map(([houseCardId, houseCardData]) => {
-                        const houseCard = createHouseCard(houseCardId, houseCardData, hid);
-                        return [houseCardId, houseCard];
-                    })
-            );
+                    Object.entries(houseData.houseCards)
+                        .map(([houseCardId, houseCardData]) => {
+                            const houseCard = createHouseCard(houseCardId, houseCardData, hid);
+                            return [houseCardId, houseCard];
+                        })
+                )
+                // Vassals have no own house cards
+                : new BetterMap<string, HouseCard>();
 
             const unitLimits = new BetterMap(
                 Object.entries(houseData.unitLimits as {[key: string]: number})
                     .map(([unitTypeId, limit]) => [unitTypes.get(unitTypeId), limit])
             );
 
-            const house = new House(hid, houseData.name, houseData.color, playerHouses.includes(hid) ? houseCards : new BetterMap(), unitLimits, gameSettings.startWithSevenPowerTokens ? 7 : 5, houseData.supplyLevel);
+            // Vassals always start with a supply of 4
+            const supplyLevel = playerHouses.includes(hid) ? houseData.supplyLevel : 4;
+
+            const house = new House(hid, houseData.name, houseData.color, houseCards, unitLimits, gameSettings.startWithSevenPowerTokens ? 7 : 5, supplyLevel, 0);
 
             return [hid, house];
         })
@@ -344,13 +351,19 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     game.starredOrderRestrictions = baseGameData.starredOrderRestrictions[baseGameData.starredOrderRestrictions.findIndex(
         restrictions => game.houses.size <= restrictions.length)];
 
-    game.skipRavenPhase = false; // todo: Remove unused var
-
     // Apply Power tokens from game setup
     if (entireGame.selectedGameSetup.powerTokensOnBoard != undefined) {
         Object.entries(entireGame.selectedGameSetup.powerTokensOnBoard).forEach(([houseId, regions]) => {
             const house = game.houses.tryGet(houseId, null);
             regions.forEach(r => game.world.regions.get(r).controlPowerToken = house);
+        });
+    }
+
+    // Apply loyalty tokens
+    if (entireGame.selectedGameSetup.loyaltyTokens != undefined) {
+        const loyaltyTokens = new BetterMap(Object.entries(entireGame.selectedGameSetup.loyaltyTokens));
+        loyaltyTokens.entries.forEach(([regionId, count]) => {
+            regions.get(regionId).loyaltyTokens = count;
         });
     }
 

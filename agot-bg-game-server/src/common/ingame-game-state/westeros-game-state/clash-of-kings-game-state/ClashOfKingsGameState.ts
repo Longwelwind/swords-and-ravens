@@ -32,6 +32,7 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
             nextTrack: this.currentTrackI
         });
 
+        // Todo: Fix this with "AdaptBidsGameState" and allow Targaryen to participate
         this.setChildGameState(new BiddingGameState(this)).firstStart(this.game.houses.values.filter(h => h.id != "targaryen"));
     }
 

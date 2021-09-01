@@ -30,6 +30,7 @@ import { renderRegionTooltip } from "./regionTooltip";
 import getGarrisonToken from "./garrisonTokens";
 import { ship } from "../common/ingame-game-state/game-data-structure/unitTypes";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import loyaltyTokenImage from "../../public/images/power-tokens/Loyalty.png"
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -91,6 +92,19 @@ export default class MapComponent extends Component<MapComponentProps> {
                                         backgroundImage: `url(${housePowerTokensImages.get(r.controlPowerToken.id)})`
                                     }}
                                 >
+                                </div>
+                            )}
+                            {r.loyaltyTokens > 0 && (
+                                <div
+                                    className="loyalty-token"
+                                    style={{
+                                        left: r.powerTokenSlot.x,
+                                        top: r.powerTokenSlot.y,
+                                        backgroundImage: `url(${loyaltyTokenImage})`,
+                                        textAlign: "center",
+                                        color: "white"
+                                    }}
+                                >{r.loyaltyTokens > 1 ? r.loyaltyTokens : ""}
                                 </div>
                             )}
                         </div>

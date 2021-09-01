@@ -45,6 +45,9 @@
             "ironThrone": ["baratheon", "lannister", "stark", "martell", "greyjoy", "tyrell", "arryn", "targaryen"],
             "fiefdoms": ["greyjoy", "tyrell", "martell", "arryn", "stark", "baratheon", "lannister", "targaryen"],
             "kingsCourt": ["lannister", "stark", "martell", "tyrell", "arryn", "baratheon", "greyjoy", "targaryen"]
+          },
+          "loyaltyTokens": {
+            "kings-landing": 1
           }
         }
       ]

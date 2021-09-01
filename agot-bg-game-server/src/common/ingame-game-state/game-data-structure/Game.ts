@@ -40,7 +40,6 @@ export default class Game {
     supplyRestrictions: number[][];
     starredOrderRestrictions: number[];
     westerosDecks: WesterosCard[][];
-    skipRavenPhase: boolean;
     structuresCountNeededToWin: number;
     @observable maxTurns: number;
     maxPowerTokens: number;
@@ -202,7 +201,7 @@ export default class Game {
     }
 
     areVictoryConditionsFulfilled(): boolean {
-        const numberStructuresPerHouse = this.ingame.getNonVassalHouses().map(h => this.getTotalHeldStructures(h));
+        const numberStructuresPerHouse = this.ingame.getNonVassalHouses().map(h => this.getVictoryPoints(h));
 
         return numberStructuresPerHouse.some(n => n >= this.structuresCountNeededToWin);
     }
@@ -210,7 +209,7 @@ export default class Game {
     getPotentialWinners(): House[] {
         const victoryConditions: ((h: House) => number)[] = [
             (h: House) => this.ingame.isVassalHouse(h) ? 1 : -1,
-            (h: House) => -this.getTotalHeldStructures(h),
+            (h: House) => -this.getVictoryPoints(h),
             (h: House) => -this.getTotalControlledLandRegions(h),
             (h: House) => -h.supplyLevel,
             (h: House) => this.ironThroneTrack.indexOf(h)
@@ -368,8 +367,15 @@ export default class Game {
         return counts;
     }
 
-    getTotalHeldStructures(house: House): number {
-        return _.sum(this.getCountHeldStructures(house).values);
+    getVictoryPoints(house: House): number {
+        return house.id == "targaryen"
+            ? this.getTotalLoyaltyTokenCount(house)
+            : _.sum(this.getCountHeldStructures(house).values);
+    }
+
+    getTotalLoyaltyTokenCount(house: House): number {
+        const superLoyaltyTokens = this.world.getControlledRegions(house).filter(r => r.superLoyaltyToken).length;
+        return superLoyaltyTokens + house.gainedLoyaltyTokens;
     }
 
     getAllowedArmySizes(house: House): number[] {
@@ -441,7 +447,6 @@ export default class Game {
             wildlingStrength: this.wildlingStrength,
             supplyRestrictions: this.supplyRestrictions,
             starredOrderRestrictions: this.starredOrderRestrictions,
-            skipRavenPhase: this.skipRavenPhase,
             structuresCountNeededToWin: this.structuresCountNeededToWin,
             maxTurns: this.maxTurns,
             maxPowerTokens: this.maxPowerTokens,
@@ -470,7 +475,6 @@ export default class Game {
         game.valyrianSteelBladeUsed = data.valyrianSteelBladeUsed;
         game.wildlingDeck = data.wildlingDeck.map(c => WildlingCard.deserializeFromServer(c));
         game.starredOrderRestrictions = data.starredOrderRestrictions;
-        game.skipRavenPhase = data.skipRavenPhase;
         game.structuresCountNeededToWin = data.structuresCountNeededToWin;
         game.maxTurns = data.maxTurns;
         game.maxPowerTokens = data.maxPowerTokens;
@@ -499,7 +503,6 @@ export interface SerializedGame {
     valyrianSteelBladeUsed: boolean;
     wildlingDeck: SerializedWildlingCard[];
     supplyRestrictions: number[][];
-    skipRavenPhase: boolean;
     structuresCountNeededToWin: number;
     maxTurns: number;
     maxPowerTokens: number;

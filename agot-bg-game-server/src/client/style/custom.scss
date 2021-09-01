@@ -102,6 +102,17 @@ strong
   transform: translate(-50%, -50%);
 }
 
+.map .loyalty-token {
+  position: absolute;
+  width: 27px;
+  height: 45px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+ // This allows the power token to be center on the position-absolute reference points
+ transform: translate(-50%, -50%);
+}
+
 .house-power-token {
   width: 25px;
   height: 35px;

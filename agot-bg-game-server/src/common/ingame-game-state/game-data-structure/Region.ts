@@ -17,7 +17,7 @@ export default class Region {
     @observable units: BetterMap<number, Unit>;
     @observable garrison: number;
     @observable controlPowerToken: House | null;
-    @observable loyaltyToken: boolean;
+    @observable loyaltyTokens: number;
 
     // Client-side only to support live update of planned musterings
     @observable newUnits: Unit[];
@@ -70,8 +70,8 @@ export default class Region {
         return this.staticRegion.powerTokenSlot;
     }
 
-    get isLoyaltyTokenPresent(): boolean {
-        return this.staticRegion.superLoyaltyToken || this.loyaltyToken;
+    get superLoyaltyToken(): boolean {
+        return this.staticRegion.superLoyaltyToken;
     }
 
     get allUnits(): Unit[] {
@@ -79,14 +79,14 @@ export default class Region {
     }
 
     constructor(
-        game: Game, id: string, garrison: number, controlPowerToken: House | null = null, units: BetterMap<number, Unit> = new BetterMap<number, Unit>(), loyaltyToken = false
+        game: Game, id: string, garrison: number, controlPowerToken: House | null = null, units: BetterMap<number, Unit> = new BetterMap<number, Unit>(), loyaltyTokens = 0
     ) {
         this.game = game;
         this.id = id;
         this.units = units;
         this.garrison = garrison;
         this.controlPowerToken = controlPowerToken;
-        this.loyaltyToken = loyaltyToken;
+        this.loyaltyTokens = loyaltyTokens;
         this.newUnits = [];
         this.removedUnits = [];
     }
@@ -120,7 +120,7 @@ export default class Region {
             units: this.units.values.map(u => u.serializeToClient()),
             garrison: this.garrison,
             controlPowerToken: this.controlPowerToken ? this.controlPowerToken.id : null,
-            loyaltyToken: this.loyaltyToken
+            loyaltyTokens: this.loyaltyTokens
         }
     }
 
@@ -131,7 +131,7 @@ export default class Region {
             game, data.id, data.garrison,
             data.controlPowerToken ? game.houses.get(data.controlPowerToken) : null,
             units,
-            data.loyaltyToken
+            data.loyaltyTokens
         );
 
         units.values.forEach(u => u.region = region);
@@ -145,5 +145,5 @@ export interface SerializedRegion {
     units: SerializedUnit[];
     garrison: number;
     controlPowerToken: string | null;
-    loyaltyToken: boolean;
+    loyaltyTokens: number;
 }
