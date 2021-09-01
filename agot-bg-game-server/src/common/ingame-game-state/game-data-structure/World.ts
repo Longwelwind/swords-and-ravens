@@ -10,6 +10,7 @@ import StaticBorder from "./static-data-structure/StaticBorder";
 import StaticRegion from "./static-data-structure/StaticRegion";
 import RegionKind from "./RegionKind";
 import getStaticWorld from "./static-data-structure/getStaticWorld";
+import { dragon } from "./unitTypes";
 
 export default class World {
     playerCount: number;
@@ -96,7 +97,7 @@ export default class World {
         );
     }
 
-    getReachableRegions(startingRegion: Region, house: House, army: Unit[], viaTransportOnly = false): Region[] {
+    getReachableRegions(startingRegion: Region, house: House, army: Unit[], viaTransportOnly = false, retreat = false): Region[] {
         let regionsToCheck: Region[] = this.getNeighbouringRegions(startingRegion);
         const checkedRegions: Region[] = [];
         const reachableRegions: Region[] = [];
@@ -105,6 +106,10 @@ export default class World {
         const regionKindOfArmy = army[0].type.walksOn;
         if (!army.every(u => u.type.walksOn == regionKindOfArmy)) {
             throw new Error();
+        }
+
+        if (army.every(u => u.type == dragon) && !retreat) {
+            return this.regions.values.filter(r => r != startingRegion && r.type == land);
         }
 
         if (viaTransportOnly) {
@@ -144,7 +149,7 @@ export default class World {
     }
 
     getValidRetreatRegions(startingRegion: Region, house: House, army: Unit[]): Region[] {
-        return this.getReachableRegions(startingRegion, house, army)
+        return this.getReachableRegions(startingRegion, house, army, false, true)
             // A retreat can be done in a port only if the adjacent land area is controlled
             // by the retreater
             .filter(r => !(r.type == port && this.getAdjacentLandOfPort(r).getController() != house))

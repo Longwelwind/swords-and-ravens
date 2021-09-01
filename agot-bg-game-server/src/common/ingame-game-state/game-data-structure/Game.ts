@@ -94,6 +94,10 @@ export default class Game {
         return result;
     }
 
+    get currentDragonStrength(): number {
+        return Math.min(5, Math.floor(this.turn/2));
+    }
+
     constructor(ingame: IngameGameState) {
         this.ingame = ingame;
     }

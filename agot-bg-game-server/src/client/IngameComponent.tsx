@@ -32,6 +32,7 @@ import diamondHiltImage from "../../public/images/icons/diamond-hilt.svg";
 import diamondHiltUsedImage from "../../public/images/icons/diamond-hilt-used.svg";
 import hourglassImage from "../../public/images/icons/hourglass.svg";
 import mammothImage from "../../public/images/icons/mammoth.svg";
+import spikedDragonHeadImage from "../../public/images/icons/spiked-dragon-head.svg";
 import chatBubble from "../../public/images/icons/chat-bubble.svg";
 import speaker from "../../public/images/icons/speaker.svg";
 import speakerOff from "../../public/images/icons/speaker-off.svg";
@@ -503,7 +504,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             <Col style={{ width: "28px", fontSize: "22px", textAlign: "center" }} className="px-0">
                                 <Row className="mb-3 mx-0">
                                     <OverlayTrigger overlay={
-                                        <Tooltip id="round">
+                                        <Tooltip id="round-tooltip">
                                             <b>Round {this.game.turn} / {this.game.maxTurns}</b>
                                         </Tooltip>
                                     }
@@ -519,7 +520,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </Row>
                                 <Row className="mx-0">
                                     <OverlayTrigger overlay={
-                                        <Tooltip id="wildling-threat">
+                                        <Tooltip id="wildling-threat-tooltip">
                                             <b>Wildling Threat</b>{knowsWildlingCard && nextWildlingCard ?
                                                 <><br /><br /><strong><u>{nextWildlingCard.type.name}</u></strong><br />
                                                     <strong>Lowest Bidder:</strong> {nextWildlingCard.type.wildlingVictoryLowestBidderDescription}<br />
@@ -541,6 +542,19 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         </div>
                                     </OverlayTrigger>
                                 </Row>
+                                {this.props.gameState.entireGame.gameSettings.playerCount >= 8 && <Row className="mx-0 mt-3">
+                                    <OverlayTrigger overlay={
+                                        <Tooltip id="dragon-strength-tooltip">
+                                            <b>Current Dragon Strength</b>
+                                        </Tooltip>
+                                    }
+                                        placement="auto">
+                                        <div>
+                                            <img src={spikedDragonHeadImage} width={28}/>
+                                            <div>{this.game.currentDragonStrength}</div>
+                                        </div>
+                                    </OverlayTrigger>
+                                </Row>}
                             </Col>
                         </Col>
                     </Row>
