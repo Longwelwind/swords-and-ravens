@@ -11,7 +11,8 @@ export default class StaticRegion {
     castleLevel: number;
     startingGarrison: number;
     superControlPowerToken: string | null;
-    superLoyalityToken: boolean;
+    superLoyaltyToken: boolean;
+    canRegainGarrison: boolean;
 
     // Display attributes
     nameSlot: Point;
@@ -21,8 +22,9 @@ export default class StaticRegion {
 
     constructor(
         id: string, name: string, nameSlot: Point, type: RegionType,
-        unitSlot: UnitSlot, orderSlot: Point, powerTokenSlot: Point, crownIcons: number, supplyIcons: number, castleLevel: number, startingGarrison: number,
-        superControlPowerToken: string | null, superLoyalityToken = false
+        unitSlot: UnitSlot, orderSlot: Point, powerTokenSlot: Point,
+        crownIcons: number, supplyIcons: number, castleLevel: number,
+        startingGarrison: number, superControlPowerToken: string | null, superLoyaltyToken = false, canRegainGarrison = false
     ) {
         this.id = id;
         this.nameSlot = nameSlot;
@@ -36,7 +38,8 @@ export default class StaticRegion {
         this.supplyIcons = supplyIcons;
         this.startingGarrison = startingGarrison;
         this.superControlPowerToken = superControlPowerToken;
-        this.superLoyalityToken = superLoyalityToken;
+        this.superLoyaltyToken = superLoyaltyToken;
+        this.canRegainGarrison = canRegainGarrison;
     }
 
     get hasStructure(): boolean {

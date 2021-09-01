@@ -19,6 +19,10 @@ export default class World {
         return getStaticWorld(this.playerCount).staticBorders;
     }
 
+    get regionsWhichCanRegainGarrison(): StaticRegion[] {
+        return getStaticWorld(this.playerCount).staticRegions.values.filter(region => region.canRegainGarrison);
+    }
+
     constructor(regions: BetterMap<string, Region>, playerCount: number) {
         this.regions = regions;
         this.playerCount = playerCount;

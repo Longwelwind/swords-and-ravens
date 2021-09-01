@@ -1023,6 +1023,8 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
                 ingame.game.world.playerCount = ingame.game.houses.length;
+
+                ingame.game.world.regions.forEach((region: any) => region.loyaltyToken = false);
             }
 
             return serializedGame;

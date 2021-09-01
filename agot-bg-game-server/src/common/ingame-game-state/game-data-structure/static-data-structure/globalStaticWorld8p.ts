@@ -88,10 +88,9 @@ const regions = new BetterMap<string, StaticRegion>((regionsLayer.objects as Til
     const supplyIcons = tryGetTiledProperty<number>(regionData.properties, "supplyIcons", 0);
     const castleLevel = tryGetTiledProperty<number>(regionData.properties, "castleLevel", 0);
     const garrison = tryGetTiledProperty<number>(regionData.properties, "garrison", 0);
-    const superControlPowerTokenHouseId = tryGetTiledProperty<string | null>(regionData.properties, "superController", null);
-    const superLoyalityToken = tryGetTiledProperty<boolean>(regionData.properties, "superLoyalityToken", false);
-
-    const superControlPowerToken = superControlPowerTokenHouseId;
+    const superControlPowerToken = tryGetTiledProperty<string | null>(regionData.properties, "superController", null);
+    const superLoyaltyToken = tryGetTiledProperty<boolean>(regionData.properties, "superLoyaltyToken", false);
+    const canRegainGarrison = tryGetTiledProperty<boolean>(regionData.properties, "canRegainGarrison", false);
 
     if (!regionIdToUnitSlots.has(id)) {
         throw new Error("No unit slots for region id: " + id);
@@ -105,7 +104,7 @@ const regions = new BetterMap<string, StaticRegion>((regionsLayer.objects as Til
         id,
         new StaticRegion(
             id, regionData.name, {x, y}, regionTypes.get(type), unitSlot, orderSlot, powerTokenSlot, crownIcons,
-            supplyIcons, castleLevel, garrison, superControlPowerToken, superLoyalityToken
+            supplyIcons, castleLevel, garrison, superControlPowerToken, superLoyaltyToken, canRegainGarrison
         )
     ];
 }));

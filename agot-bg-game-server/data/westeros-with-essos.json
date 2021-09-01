@@ -22158,6 +22158,11 @@
                  "name":"Pentos",
                  "properties":[
                         {
+                         "name":"canRegainGarrison",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
                          "name":"castleLevel",
                          "type":"int",
                          "value":2
@@ -22178,7 +22183,7 @@
                          "value":"targaryen"
                         }, 
                         {
-                         "name":"superLoyalityToken",
+                         "name":"superLoyaltyToken",
                          "type":"bool",
                          "value":true
                         }, 
@@ -22267,7 +22272,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":false,
+         "visible":true,
          "x":0,
          "y":0
         }],

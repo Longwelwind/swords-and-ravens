@@ -82,6 +82,19 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
             return;
         }
 
+        // Restore Garrisons (Pentos)
+        this.world.regionsWhichCanRegainGarrison.forEach(staticRegion => {
+            const region = this.world.getRegion(staticRegion);
+            if (region.getController() == region.superControlPowerToken && region.garrison != staticRegion.startingGarrison) {
+                region.garrison = staticRegion.startingGarrison;
+                this.entireGame.broadcastToClients({
+                    type: "change-garrison",
+                    region: region.id,
+                    newGarrison: region.garrison
+                });
+            }
+        })
+
         //   ... check victory conditions
         if(this.ingameGameState.checkVictoryConditions()) {
             return;
