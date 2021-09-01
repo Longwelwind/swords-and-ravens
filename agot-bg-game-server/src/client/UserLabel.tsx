@@ -65,7 +65,7 @@ export default class UserLabel extends Component<UserLabelProps> {
 
     renderIngameDropdownItems(ingame: IngameGameState): ReactNode {
         const {result: canLaunchReplacePlayerVote, reason: canLaunchReplacePlayerVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser);
-        const {result: canLaunchReplacePlayerByVassalVote, reason: canLaunchReplacePlayerByVassalVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser, true);
+        const {result: canLaunchReplacePlayerByVassalVote, reason: canLaunchReplacePlayerByVassalVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser, true, this.player.house);
         return (
             <>
                 <NavDropdown.Divider />
@@ -112,15 +112,19 @@ export default class UserLabel extends Component<UserLabelProps> {
                             overlay={
                                 <Tooltip id="replace-player-by-vassal-tooltip">
                                     {canLaunchReplacePlayerByVassalVoteReason == "ongoing-vote" ?
-                                        "A vote is already ongoing"
+                                            "A vote is already ongoing"
                                         : canLaunchReplacePlayerByVassalVoteReason == "game-cancelled" ?
-                                        "The game has been cancelled"
+                                            "The game has been cancelled"
                                         : canLaunchReplacePlayerByVassalVoteReason == "game-ended" ?
-                                        "The game has ended"
+                                            "The game has ended"
                                         : canLaunchReplacePlayerByVassalVoteReason == "only-players-can-vote" ?
-                                        "Only players can vote"
+                                            "Only players can vote"
                                         : canLaunchReplacePlayerByVassalVoteReason == "min-player-count-reached" ?
-                                        "At least 3 players are needed to play"
+                                            "Minimum player count reached"
+                                        : canLaunchReplacePlayerByVassalVoteReason == "targaryen-must-be-a-player-controlled-house" ?
+                                            "Targaryen cannot be replaced by a vassal"
+                                        : canLaunchReplacePlayerByVassalVoteReason == "ongoing-house-card-drafting" ?
+                                            "During drafting houses cannot be replaced by vassals"
                                         : "Vote not possible"
                                     }
                                 </Tooltip>
@@ -131,7 +135,7 @@ export default class UserLabel extends Component<UserLabelProps> {
                         </OverlayTrigger>
                     }
                 >
-                    <div id="replace-byvassal-tooltip-wrapper">
+                    <div id="replace-by-vassal-tooltip-wrapper">
                         <NavDropdown.Item
                             onClick={() => this.onLaunchReplacePlayerByVassalVoteClick()}
                             disabled={!canLaunchReplacePlayerByVassalVote}

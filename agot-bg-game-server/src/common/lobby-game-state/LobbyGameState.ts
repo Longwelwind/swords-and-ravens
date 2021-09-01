@@ -9,7 +9,7 @@ import baseGameData from "../../../data/baseGameData.json";
 import CancelledGameState from "../cancelled-game-state/CancelledGameState";
 import shuffleInPlace, { shuffle } from "../../utils/shuffle";
 import _ from "lodash";
-import { MIN_PLAYER_COUNT_WITH_VASSALS } from "../ingame-game-state/game-data-structure/Game";
+import { MIN_PLAYER_COUNT_WITH_VASSALS, MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN } from "../ingame-game-state/game-data-structure/Game";
 import { v4 } from "uuid";
 
 export default class LobbyGameState extends GameState<EntireGame> {
@@ -77,12 +77,16 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 // Assign a random house to the players
                 // We could shuffle in place as getAvailableHouses will return a new array.
                 // But it is best practice to only shuffle in place when we create the shuffled array by mapping, filtering, slicing, etc. ourselves
-                const allShuffledHouses = shuffle(this.getAvailableHouses());
-                const connectedUsers = this.players.values;
-                this.players = new BetterMap();
-                for(const user of connectedUsers) {
-                    this.players.set(allShuffledHouses.splice(0, 1)[0], user);
+                const availableHouses = this.getAvailableHouses();
+                do {
+                    const allShuffledHouses = shuffle(availableHouses);
+                    const connectedUsers = this.players.values;
+                    this.players = new BetterMap();
+                    for(const user of connectedUsers) {
+                        this.players.set(allShuffledHouses.splice(0, 1)[0], user);
+                    }
                 }
+                while (availableHouses.map(lh => lh.id).includes("targaryen") && !this.players.keys.map(lh => lh.id).includes("targaryen"))
             } else if (this.entireGame.gameSettings.randomChosenHouses) {
                 const shuffled = shuffleInPlace(this.players.entries); // The BetterMap methods always use Array.from and this will never change. So it is ok to shuffleInPlace here.
 
@@ -245,13 +249,28 @@ export default class LobbyGameState extends GameState<EntireGame> {
             return {success: false, reason: "not-owner"};
         }
 
+        if (this.players.size == this.entireGame.selectedGameSetup.playerCount) {
+            return {success: true, reason: "ok"};
+        }
+
         // If Vassals are toggled we need at least min_player_count_with_vassals
         if (this.entireGame.gameSettings.vassals) {
-            if (this.players.size < MIN_PLAYER_COUNT_WITH_VASSALS && this.players.size != this.entireGame.selectedGameSetup.playerCount) {
+            if (this.entireGame.selectedGameSetup.playerCount >= 8) {
+                if (this.players.size < MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN) {
+                    return {success: false, reason: "not-enough-players"};
+                }
+            }
+            else if (this.players.size < MIN_PLAYER_COUNT_WITH_VASSALS && this.players.size) {
                 return {success: false, reason: "not-enough-players"};
             }
         } else if (this.players.size < this.entireGame.selectedGameSetup.playerCount) {
             return {success: false, reason: "not-enough-players"};
+        }
+
+        if (this.entireGame.gameSettings.playerCount == 8 && !this.entireGame.gameSettings.randomHouses) {
+            if (!this.players.keys.map(lh => lh.id).includes("targaryen")) {
+                return {success: false, reason: "targaryen-must-be-a-player-controlled-house"};
+            }
         }
 
         return {success: true, reason: "ok"};

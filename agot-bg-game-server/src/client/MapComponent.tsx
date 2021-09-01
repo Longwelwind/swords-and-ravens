@@ -56,10 +56,10 @@ export default class MapComponent extends Component<MapComponentProps> {
 
         this.backgroundImage = this.ingame.entireGame.gameSettings.playerCount == 7
         ? westeros7pImage
-        : this.ingame.entireGame.gameSettings.playerCount == 8 ? westerosWithEssosImage
+        : this.ingame.entireGame.gameSettings.playerCount >= 8 ? westerosWithEssosImage
         : westerosImage;
 
-        this.mapWidth = this.ingame.entireGame.gameSettings.playerCount == 8 ? DELUXE_MAT_WIDTH : MAP_WIDTH;
+        this.mapWidth = this.ingame.entireGame.gameSettings.playerCount >= 8 ? DELUXE_MAT_WIDTH : MAP_WIDTH;
     }
 
     render(): ReactNode {

@@ -9,7 +9,7 @@ import Region from "./game-data-structure/Region";
 import PlanningGameState, {SerializedPlanningGameState} from "./planning-game-state/PlanningGameState";
 import ActionGameState, {SerializedActionGameState} from "./action-game-state/ActionGameState";
 import Order from "./game-data-structure/Order";
-import Game, {MIN_PLAYER_COUNT_WITH_VASSALS, SerializedGame} from "./game-data-structure/Game";
+import Game, {MIN_PLAYER_COUNT_WITH_VASSALS, MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN, SerializedGame} from "./game-data-structure/Game";
 import WesterosGameState, {SerializedWesterosGameState} from "./westeros-game-state/WesterosGameState";
 import createGame from "./game-data-structure/createGame";
 import BetterMap from "../../utils/BetterMap";
@@ -562,7 +562,7 @@ export default class IngameGameState extends GameState<
         return {result: true, reason: ""};
     }
 
-    canLaunchReplacePlayerVote(fromUser: User | null, replaceWithVassal = false): {result: boolean; reason: string} {
+    canLaunchReplacePlayerVote(fromUser: User | null, replaceWithVassal = false, forHouse: House | null = null): {result: boolean; reason: string} {
         if (!fromUser) {
             return {result: false, reason: "only-authenticated-users-can-vote"};
         }
@@ -576,8 +576,14 @@ export default class IngameGameState extends GameState<
                 return {result: false, reason: "only-players-can-vote"};
             }
 
-            if (this.players.size - 1 < MIN_PLAYER_COUNT_WITH_VASSALS) {
-                return {result: false, reason: "min-player-count-reached"};
+            if (this.game.houses.keys.includes("targaryen")) {
+                if (this.players.size - 1 < MIN_PLAYER_COUNT_WITH_VASSALS) {
+                    return {result: false, reason: "min-player-count-reached"};
+                }
+            } else {
+                if (this.players.size - 1 < MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN) {
+                    return {result: false, reason: "min-player-count-reached"};
+                }
             }
 
             if (this.childGameState instanceof DraftHouseCardsGameState) {
@@ -587,9 +593,13 @@ export default class IngameGameState extends GameState<
             if (this.childGameState instanceof ThematicDraftHouseCardsGameState) {
                 return {result: false, reason: "ongoing-house-card-drafting"}
             }
+
+            if (forHouse?.id == "targaryen") {
+                return {result: false, reason: "targaryen-must-be-a-player-controlled-house"}
+            }
         }
 
-        const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && (v.type instanceof ReplacePlayer || v.type instanceof ReplacePlayerByVassal));
+        const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && ((!replaceWithVassal && v.type instanceof ReplacePlayer) || v.type instanceof ReplacePlayerByVassal));
         if (existingVotes.length > 0) {
             return {result: false, reason: "ongoing-vote"};
         }

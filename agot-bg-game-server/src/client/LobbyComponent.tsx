@@ -132,10 +132,12 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                                 <OverlayTrigger
                                                     overlay={
                                                         <Tooltip id="start-game">
-                                                            {canStartGameReason == "not-owner" ?
+                                                            {canStartGameReason == "not-enough-players" ?
+                                                                "More players must join to be able to start the game."
+                                                            : canStartGameReason == "targaryen-must-be-a-player-controlled-house" ?
+                                                                "House Targaryen must be chosen by a player"
+                                                            : canStartGameReason == "not-owner" ?
                                                                 "Only the owner of the game can start it"
-                                                            : canStartGameReason == "not-enough-players" ?
-                                                                "Not all houses have been taken"
                                                             : null}
                                                         </Tooltip>
                                                     }

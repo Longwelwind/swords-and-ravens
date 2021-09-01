@@ -19,6 +19,7 @@ import { vassalHousesOrders, playerHousesOrders, seaOrders } from "./orders";
 
 export const MAX_WILDLING_STRENGTH = 12;
 export const MIN_PLAYER_COUNT_WITH_VASSALS = 3;
+export const MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN = 4;
 
 export default class Game {
     ingame: IngameGameState;
