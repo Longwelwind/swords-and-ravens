@@ -1,6 +1,6 @@
 import UnitType from "./UnitType";
 import House from "./House";
-import unitTypes from "./unitTypes";
+import unitTypes, { dragon } from "./unitTypes";
 import Game from "./Game";
 import Region from "./Region";
 import { observable } from "mobx";
@@ -22,12 +22,16 @@ export default class Unit {
     }
 
     getCombatStrength(attackingAStructure: boolean): number {
-        if (this.type.combatStrength) {
+        if (this.type.combatStrength > 0) {
             return this.type.combatStrength;
         }
 
         if (attackingAStructure && this.type.combatStrengthOnAttackStructure) {
             return this.type.combatStrengthOnAttackStructure;
+        }
+
+        if (this.type == dragon) {
+            return this.region.game.currentDragonStrength;
         }
 
         return 0;

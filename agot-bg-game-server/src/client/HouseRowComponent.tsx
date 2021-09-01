@@ -17,6 +17,7 @@ import HouseCardBackComponent from "./game-state-panel/utils/HouseCardBackCompon
 import Game from "../common/ingame-game-state/game-data-structure/Game";
 import castleImage from "../../public/images/icons/castle.svg";
 import battleGearImage from "../../public/images/icons/battle-gear.svg";
+import verticalBanner from "../../public/images/icons/vertical-banner.svg"
 import Player from "../common/ingame-game-state/Player";
 import UserLabel from "./UserLabel";
 import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
@@ -25,6 +26,7 @@ import GiftPowerTokensComponent from "./GiftPowerTokensComponent";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
 import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+
 
 
 interface HouseRowComponentProps {
@@ -57,9 +59,9 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
 
     render(): ReactNode {
         const gameRunning = !(this.props.ingame.leafState instanceof GameEndedGameState) && !(this.props.ingame.leafState instanceof CancelledGameState);
-        const totalHeldStructures = this.game.getTotalHeldStructures(this.house);
-        const victoryPointsWarning = gameRunning && (this.game.structuresCountNeededToWin - 2 == totalHeldStructures);
-        const victoryPointsCritical = gameRunning && (this.game.structuresCountNeededToWin - 1 == totalHeldStructures);
+        const victoryPoints = this.game.getVictoryPoints(this.house);
+        const victoryPointsWarning = gameRunning && (this.game.structuresCountNeededToWin - 2 == victoryPoints);
+        const victoryPointsCritical = gameRunning && (this.game.structuresCountNeededToWin - 1 == victoryPoints);
         return this.props.ingame.rerender >= 0 && <>
             <ListGroupItem style={{paddingLeft: "8px", paddingRight: "10px"}}>
                 <Row className="align-items-center">
@@ -107,27 +109,28 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     </Col>
                     <Col xs="auto">
                         <Row className="justify-content-center align-items-center" style={{width: 110}}>
-                            {unitTypes.values.map(type => (
-                                <Col xs={6} key={type.id}>
-                                    <Row className="justify-content-center no-gutters align-items-center">
-                                        <Col xs="auto">
-                                            {this.game.getAvailableUnitsOfType(this.house, type)}
-                                        </Col>
-                                        <Col xs="auto" style={{ marginLeft: 4 }}>
-                                            <OverlayTrigger
-                                                overlay={this.renderUnitTypeTooltip(type)}
-                                                delay={{ show: 250, hide: 100 }}
-                                                placement="auto">
-                                                <div className="unit-icon small hover-weak-outline"
-                                                    style={{
-                                                        backgroundImage: `url(${unitImages.get(this.house.id).get(type.id)})`,
-                                                    }}
-                                                />
-                                            </OverlayTrigger>
-                                        </Col>
-                                    </Row>
-                                </Col>
-                            ))}
+                            {unitTypes.values.map(type =>
+                                (this.game.getUnitLimitOfType(this.house, type) > 0) && (
+                                    <Col xs={6} key={type.id}>
+                                        <Row className="justify-content-center no-gutters align-items-center">
+                                            <Col xs="auto">
+                                                {this.game.getAvailableUnitsOfType(this.house, type)}
+                                            </Col>
+                                            <Col xs="auto" style={{ marginLeft: 4 }}>
+                                                <OverlayTrigger
+                                                    overlay={this.renderUnitTypeTooltip(type)}
+                                                    delay={{ show: 250, hide: 100 }}
+                                                    placement="auto">
+                                                    <div className="unit-icon small hover-weak-outline"
+                                                        style={{
+                                                            backgroundImage: `url(${unitImages.get(this.house.id).get(type.id)})`,
+                                                        }}
+                                                    />
+                                                </OverlayTrigger>
+                                            </Col>
+                                        </Row>
+                                    </Col>)
+                            )}
                         </Row>
                     </Col>
                     {!this.isVassal && (<OverlayTrigger
@@ -136,13 +139,13 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         placement="auto"
                     >
                         <Col xs="auto" className="d-flex align-items-center">
-                            <div style={{fontSize: "20px", color: victoryPointsWarning ? "#F39C12" : victoryPointsCritical ? "#FF0000" : undefined}}><b>{totalHeldStructures}</b></div>
+                            <div style={{fontSize: "20px", color: victoryPointsWarning ? "#F39C12" : victoryPointsCritical ? "#FF0000" : undefined}}><b>{victoryPoints}</b></div>
                             <img
                                 className={classNames(
                                     "hover-weak-outline",
                                     {"dye-warning": victoryPointsWarning},
                                     {"dye-critical": victoryPointsCritical})}
-                                src={castleImage} width={32}
+                                src={this.house.id == "targaryen" ? verticalBanner : castleImage} width={40}
                                 style={{marginLeft: "10px"}}
                             />
                     </Col>

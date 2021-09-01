@@ -11,6 +11,7 @@ import ActionGameState from "../common/ingame-game-state/action-game-state/Actio
 import Order from "../common/ingame-game-state/game-data-structure/Order";
 import westerosImage from "../../public/images/westeros.jpg";
 import westeros7pImage from "../../public/images/westeros-7p.jpg";
+import westerosWithEssosImage from "../../public/images/westeros-with-essos.jpg";
 import houseOrderImages from "./houseOrderImages";
 import orderImages from "./orderImages";
 import unitImages from "./unitImages";
@@ -29,9 +30,11 @@ import { renderRegionTooltip } from "./regionTooltip";
 import getGarrisonToken from "./garrisonTokens";
 import { ship } from "../common/ingame-game-state/game-data-structure/unitTypes";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import loyaltyTokenImage from "../../public/images/power-tokens/Loyalty.png"
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
+export const DELUXE_MAT_WIDTH = 1204;
 const BLOCKED_REGION_BY_INFINITE_GARRISON = 1000;
 
 interface MapComponentProps {
@@ -42,18 +45,31 @@ interface MapComponentProps {
 
 @observer
 export default class MapComponent extends Component<MapComponentProps> {
+    backgroundImage: string = westerosImage;
+    mapWidth: number = MAP_WIDTH;
+
     get ingame(): IngameGameState {
         return this.props.ingameGameState;
     }
 
+    constructor(props: MapComponentProps) {
+        super(props);
+
+        this.backgroundImage = this.ingame.entireGame.gameSettings.playerCount == 7
+        ? westeros7pImage
+        : this.ingame.entireGame.gameSettings.playerCount >= 8 ? westerosWithEssosImage
+        : westerosImage;
+
+        this.mapWidth = this.ingame.entireGame.gameSettings.playerCount >= 8 ? DELUXE_MAT_WIDTH : MAP_WIDTH;
+    }
+
     render(): ReactNode {
-        const backgroundImage = this.ingame.entireGame.gameSettings.setupId == "mother-of-dragons" ? westeros7pImage : westerosImage;
         const garrisons = new BetterMap(this.props.ingameGameState.world.regions
             .values.filter(r => r.garrison > 0 && r.garrison != BLOCKED_REGION_BY_INFINITE_GARRISON)
             .map(r => [r.id, getGarrisonToken(r.id, r.garrison)]));
         return (
             <div className="map"
-                 style={{backgroundImage: `url(${backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem"}}>
+                 style={{backgroundImage: `url(${this.backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem"}}>
                 <div style={{position: "relative"}}>
                     {this.props.ingameGameState.world.regions.values.map(r => (
                         <div key={r.id}>
@@ -78,12 +94,25 @@ export default class MapComponent extends Component<MapComponentProps> {
                                 >
                                 </div>
                             )}
+                            {r.loyaltyTokens > 0 && (
+                                <div
+                                    className="loyalty-token"
+                                    style={{
+                                        left: r.powerTokenSlot.x,
+                                        top: r.powerTokenSlot.y,
+                                        backgroundImage: `url(${loyaltyTokenImage})`,
+                                        textAlign: "center",
+                                        color: "white"
+                                    }}
+                                >{r.loyaltyTokens > 1 ? r.loyaltyTokens : ""}
+                                </div>
+                            )}
                         </div>
                     ))}
                     {this.renderUnits()}
                     {this.renderOrders()}
                 </div>
-                <svg style={{width: `${MAP_WIDTH}px`, height: `${MAP_HEIGHT}px`}}>
+                <svg style={{width: `${this.mapWidth}px`, height: `${MAP_HEIGHT}px`}}>
                     {this.renderRegions()}
                 </svg>
             </div>
@@ -301,10 +330,8 @@ export default class MapComponent extends Component<MapComponentProps> {
     }
 
     private renderOrderTooltip(order: Order | null, region: Region): OverlayChildren {
-        const regionController = region.getController();
-
         return <Tooltip id={"order-info"}>
-            <b>{order ? order.type.name : "Order token"}</b>{regionController != null && <small> of <b>{regionController.name}</b></small>}
+            <b>{order ? order.type.name : "Order token"}</b><small> of <b>{region.getController()?.name ?? "Unknown"}</b><br/><b>{region.name}</b></small>
         </Tooltip>;
     }
 

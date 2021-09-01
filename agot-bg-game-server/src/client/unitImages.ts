@@ -1,5 +1,5 @@
 import BetterMap from "../utils/BetterMap";
-import {footman, knight, ship, siegeEngine} from "../common/ingame-game-state/game-data-structure/unitTypes";
+import {dragon, footman, knight, ship, siegeEngine} from "../common/ingame-game-state/game-data-structure/unitTypes";
 import barathFoot from "../../public/images/units/BarathFoot.png";
 import barathKnight from "../../public/images/units/BarathKnight.png";
 import barathSiege from "../../public/images/units/BarathSeige.png";
@@ -32,6 +32,10 @@ import arrynFoot from "../../public/images/units/ArrynFoot.png"
 import arrynKnight from "../../public/images/units/ArrynKnight.png";
 import arrynSiege from "../../public/images/units/ArrynSiege.png";
 import arrynShip from "../../public/images/units/ArrynShip.png";
+import targaryenShip from "../../public/images/units/TargShip.png";
+import targaryenFoot from "../../public/images/units/TargFoot.png";
+import targKnight from "../../public/images/units/TargKnight.png";
+import targDragon from "../../public/images/units/TargDragon.png";
 
 
 const unitImages = new BetterMap([
@@ -82,6 +86,12 @@ const unitImages = new BetterMap([
         [knight.id, boltonKnight],
         [siegeEngine.id, boltonSiege],
         [ship.id, boltonShip]
+    ])],
+    ["targaryen", new BetterMap([
+        [footman.id, targaryenFoot],
+        [knight.id, targKnight],
+        [dragon.id, targDragon],
+        [ship.id, targaryenShip]
     ])]
 ]);
 

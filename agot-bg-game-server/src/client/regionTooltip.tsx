@@ -28,6 +28,9 @@ export function renderRegionTooltip(region: Region): OverlayChildren {
             {region.controlPowerToken && (
                 <><br/><small>Power token</small></>
             )}
+            {region.loyaltyTokens >0 && (
+                <><br/><small>{region.loyaltyTokens} Loyalty token{region.loyaltyTokens > 1 && "s"}</small></>
+            )}
             {/* {region.units.size > 0 && (
                 <><br/>{joinReactNodes(region.units.values.map(u => u.wounded ? <s key={u.id}>{u.type.name}</s> : <b key={u.id}>{u.type.name}</b>), ", ")}</>
             )} */}

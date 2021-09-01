@@ -21,7 +21,7 @@ import orders from "../common/ingame-game-state/game-data-structure/orders";
 import CombatInfoComponent from "./CombatInfoComponent";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import User from "../server/User";
-import { baseHouseCardsData, adwdHouseCardsData, ffcHouseCardsData, modAHouseCardsData, modBHouseCardsData , HouseCardData } from "../common/ingame-game-state/game-data-structure/createGame";
+import { baseHouseCardsData, adwdHouseCardsData, ffcHouseCardsData, modBHouseCardsData , HouseCardData } from "../common/ingame-game-state/game-data-structure/createGame";
 import HouseCard from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import houseCardAbilities from "../common/ingame-game-state/game-data-structure/house-card/houseCardAbilities";
 import BetterMap from "../utils/BetterMap";
@@ -66,7 +66,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             this.createHouseCards(baseHouseCardsData),
             this.createHouseCards(adwdHouseCardsData),
             this.createHouseCards(ffcHouseCardsData),
-            this.createHouseCards(modAHouseCardsData),
+            //this.createHouseCards(modAHouseCardsData),
             this.createHouseCards(modBHouseCardsData),
             this.game.vassalHouseCards.entries);
     }

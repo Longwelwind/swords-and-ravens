@@ -24,7 +24,8 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | UpdateWesterosDecks | UpdateConnectionStatus | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced
     | CrowKillersStepChanged | ManipulateCombatHouseCard | ChangeCombatTidesOfBattleCard
     | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting | UpdateCombatStats
-    | UpdateDraftState | RevealBids | UpdateMaxTurns | PasswordResponse | ReplacedByVassal | UpdateDeletedHouseCards;
+    | UpdateDraftState | RevealBids | UpdateMaxTurns | PasswordResponse | ReplacedByVassal | UpdateDeletedHouseCards
+    | LoyaltyTokenGained | LoyaltyTokenPlaced;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -359,4 +360,17 @@ interface ReplacedByVassal {
 interface UpdateDeletedHouseCards {
     type: "update-deleted-house-cards";
     houseCards: SerializedHouseCard[];
+}
+
+interface LoyaltyTokenGained {
+    type: "loyalty-token-gained";
+    house: string;
+    newLoyaltyTokenCount: number;
+    region: string;
+}
+
+interface LoyaltyTokenPlaced {
+    type: "loyalty-token-placed";
+    region: string;
+    newLoyaltyTokenCount: number;
 }

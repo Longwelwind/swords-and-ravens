@@ -59,6 +59,7 @@ export interface GameSetup {
     supplyLevels?: {[key: string]: number};
     powerTokensOnBoard?: {[key: string]: string[]};
     garrisons?: {[key: string]: number};
+    loyaltyTokens?: {[key: string]: number};
 }
 
 export interface GameSetupContainer {
@@ -78,9 +79,9 @@ function getTrackWithAdjustedVassalPositions(track: House[], playerHouses: strin
     const areVassalsInTopThreeSpaces = _.take(track, 3).some(h => !playerHouses.includes(h.id));
 
     if (areVassalsInTopThreeSpaces) {
-        const vassals = track.filter(h => !playerHouses.includes(h.id));
-        const newTrack = _.without(track, ...vassals);
-        newTrack.push(...vassals);
+        const vassalsAndTargaryen = track.filter(h => !playerHouses.includes(h.id) || h.id == "targaryen");
+        const newTrack = _.without(track, ...vassalsAndTargaryen);
+        newTrack.push(...vassalsAndTargaryen);
         return newTrack;
     }
 
@@ -113,7 +114,7 @@ function getHouseCardSet(container: {[key: string]: HouseCardContainer}): HouseC
 export const baseHouseCardsData = getHouseCardData(baseGameData.houses);
 export const adwdHouseCardsData = getHouseCardData(baseGameData.adwdHouseCards);
 export const ffcHouseCardsData = getHouseCardData(baseGameData.ffcHouseCards);
-export const modAHouseCardsData = getHouseCardData(baseGameData.modAHouseCards);
+//export const modAHouseCardsData = getHouseCardData(baseGameData.modAHouseCards);
 export const modBHouseCardsData = getHouseCardData(baseGameData.modBHouseCards);
 
 export const allGameSetups = new BetterMap(Object.entries(baseGameData.setups as {[key: string]: GameSetupContainer}));
@@ -147,8 +148,9 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     if (gameSettings.adwdHouseCards && !gameSettings.limitedDraft) {
         const adwdHouseCards = baseGameData.adwdHouseCards as {[key: string]: HouseCardContainer};
         const ffcHouseCards = baseGameData.ffcHouseCards as {[key: string]: HouseCardContainer};
+        const modBHouseCards = baseGameData.modBHouseCards as {[key: string]: HouseCardContainer};
         const newHouseCards = new BetterMap(
-            _.concat(Object.entries(adwdHouseCards), Object.entries(ffcHouseCards))
+            _.concat(Object.entries(adwdHouseCards), Object.entries(ffcHouseCards), Object.entries(modBHouseCards))
             .filter(([hid, _]) => housesToCreate.includes(hid)));
 
         newHouseCards.keys.forEach(hid => {
@@ -172,24 +174,30 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     game.houses = new BetterMap(
         baseGameHousesToCreate.entries
         .map(([hid, houseData]) => {
-            const houseCards = new BetterMap<string, HouseCard>(
-                // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-                // @ts-ignore The conversion provokes n error in the CI
-                // Don't ask me why.
+            const houseCards = playerHouses.includes(hid)
+                ? new BetterMap<string, HouseCard>(
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+                    // @ts-ignore The conversion provokes n error in the CI
+                    // Don't ask me why.
 
-                Object.entries(houseData.houseCards)
-                    .map(([houseCardId, houseCardData]) => {
-                        const houseCard = createHouseCard(houseCardId, houseCardData, hid);
-                        return [houseCardId, houseCard];
-                    })
-            );
+                    Object.entries(houseData.houseCards)
+                        .map(([houseCardId, houseCardData]) => {
+                            const houseCard = createHouseCard(houseCardId, houseCardData, hid);
+                            return [houseCardId, houseCard];
+                        })
+                )
+                // Vassals have no own house cards
+                : new BetterMap<string, HouseCard>();
 
             const unitLimits = new BetterMap(
                 Object.entries(houseData.unitLimits as {[key: string]: number})
                     .map(([unitTypeId, limit]) => [unitTypes.get(unitTypeId), limit])
             );
 
-            const house = new House(hid, houseData.name, houseData.color, playerHouses.includes(hid) ? houseCards : new BetterMap(), unitLimits, gameSettings.startWithSevenPowerTokens ? 7 : 5, houseData.supplyLevel);
+            // Vassals always start with a supply of 4
+            const supplyLevel = playerHouses.includes(hid) ? houseData.supplyLevel : 4;
+
+            const house = new House(hid, houseData.name, houseData.color, houseCards, unitLimits, gameSettings.startWithSevenPowerTokens ? 7 : 5, supplyLevel, 0);
 
             return [hid, house];
         })
@@ -234,17 +242,15 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         const baseGameHouseCards = getHouseCardSet(baseGameData.houses);
         const adwdHouseCards = getHouseCardSet(baseGameData.adwdHouseCards);
         const ffcHouseCards = getHouseCardSet(baseGameData.ffcHouseCards);
-        const modAHouseCards = getHouseCardSet(baseGameData.modAHouseCards);
+        // const modAHouseCards = getHouseCardSet(baseGameData.modAHouseCards);
         const modBHouseCards = getHouseCardSet(baseGameData.modBHouseCards);
 
         if (gameSettings.limitedDraft) {
-            let limitedHouseCards = [];
+            let limitedHouseCards: HouseCard[] = [];
 
             if (gameSettings.setupId == 'mother-of-dragons') {
                 if (gameSettings.adwdHouseCards) {
                     limitedHouseCards = _.concat(modBHouseCards, adwdHouseCards, ffcHouseCards);
-                } else {
-                    limitedHouseCards = _.concat(baseGameHouseCards, modAHouseCards);
                 }
             } else if (gameSettings.adwdHouseCards) {
                 limitedHouseCards = _.concat(adwdHouseCards);
@@ -254,7 +260,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             }
             game.houseCardsForDrafting = new BetterMap(limitedHouseCards.map(hc => [hc.id, hc]));
         } else {
-            const allHouseCards = _.concat(baseGameHouseCards, adwdHouseCards, ffcHouseCards, modAHouseCards, modBHouseCards);
+            const allHouseCards = _.concat(baseGameHouseCards, adwdHouseCards, ffcHouseCards, modBHouseCards);
             game.houseCardsForDrafting = new BetterMap(allHouseCards.map(hc => [hc.id, hc]));
         }
 
@@ -275,7 +281,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     const garrisonsFromGameSetup = entireGame.selectedGameSetup.garrisons ? new BetterMap(Object.entries(entireGame.selectedGameSetup.garrisons)) : null;
     const blockedRegions = entireGame.selectedGameSetup.blockedRegions;
 
-    const regions = new BetterMap(getStaticWorld(entireGame.gameSettings.setupId).staticRegions.values.map(staticRegion => {
+    const regions = new BetterMap(getStaticWorld(entireGame.gameSettings.playerCount).staticRegions.values.map(staticRegion => {
         const blocked = blockedRegions ? blockedRegions.includes(staticRegion.id) : false;
         const garrisonValue = garrisonsFromGameSetup ? garrisonsFromGameSetup.has(staticRegion.id) ? garrisonsFromGameSetup.get(staticRegion.id)
         : staticRegion.startingGarrison
@@ -291,7 +297,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         ];
     }));
 
-    game.world = new World(regions, entireGame.gameSettings.setupId);
+    game.world = new World(regions, entireGame.gameSettings.playerCount);
 
     // Load Westeros Cards
     game.westerosDecks = baseGameData.westerosCards.map(westerosDeckData => {
@@ -345,13 +351,19 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     game.starredOrderRestrictions = baseGameData.starredOrderRestrictions[baseGameData.starredOrderRestrictions.findIndex(
         restrictions => game.houses.size <= restrictions.length)];
 
-    game.skipRavenPhase = false; // todo: Remove unused var
-
     // Apply Power tokens from game setup
     if (entireGame.selectedGameSetup.powerTokensOnBoard != undefined) {
         Object.entries(entireGame.selectedGameSetup.powerTokensOnBoard).forEach(([houseId, regions]) => {
             const house = game.houses.tryGet(houseId, null);
             regions.forEach(r => game.world.regions.get(r).controlPowerToken = house);
+        });
+    }
+
+    // Apply loyalty tokens
+    if (entireGame.selectedGameSetup.loyaltyTokens != undefined) {
+        const loyaltyTokens = new BetterMap(Object.entries(entireGame.selectedGameSetup.loyaltyTokens));
+        loyaltyTokens.entries.forEach(([regionId, count]) => {
+            regions.get(regionId).loyaltyTokens = count;
         });
     }
 

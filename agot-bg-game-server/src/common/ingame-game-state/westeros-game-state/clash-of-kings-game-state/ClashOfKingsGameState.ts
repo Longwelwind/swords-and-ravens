@@ -32,7 +32,8 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
             nextTrack: this.currentTrackI
         });
 
-        this.setChildGameState(new BiddingGameState(this)).firstStart(this.game.houses.values);
+        // Todo: Fix this with "AdaptBidsGameState" and allow Targaryen to participate
+        this.setChildGameState(new BiddingGameState(this)).firstStart(this.game.houses.values.filter(h => h.id != "targaryen"));
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -67,6 +68,11 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
     }
 
     onResolveTiesGameState(_biddingResults: [number, House[]][], finalOrdering: House[]): void {
+        const targaryen = this.game.houses.tryGet("targaryen", null);
+        if (targaryen) {
+            finalOrdering.push(targaryen);
+        }
+
         this.parentGameState.ingame.log({
             type: "clash-of-kings-final-ordering",
             trackerI: this.currentTrackI,

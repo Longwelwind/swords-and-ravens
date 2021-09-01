@@ -9,6 +9,8 @@ import highgarden from "../../public/images/garrisons/highgarden-2.png";
 import dragonstone from "../../public/images/garrisons/dragonstone-2.png";
 import stormsend from "../../public/images/garrisons/storms-end.png";
 import oldtown from "../../public/images/garrisons/oldtown.png";
+import braavos from "../../public/images/garrisons/braavos-5.png";
+import pentos from "../../public/images/garrisons/pentos-2.png";
 
 import BetterMap from "../utils/BetterMap";
 
@@ -22,7 +24,9 @@ const garrisonTokens = new BetterMap([
     ["lannisport", new BetterMap([[2, lannisport]])],
     ["dragonstone", new BetterMap([[2, dragonstone]])],
     ["storms-end", new BetterMap([[4, stormsend]])],
-    ["oldtown", new BetterMap([[3, oldtown]])]
+    ["oldtown", new BetterMap([[3, oldtown]])],
+    ["braavos", new BetterMap([[2, braavos]])],
+    ["pentos", new BetterMap([[2, pentos]])]
 ]);
 
 export default function getGarrisonToken(regionId: string, garrisonValue: number): string | null {

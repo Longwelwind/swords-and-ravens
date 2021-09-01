@@ -9,7 +9,7 @@ import Region from "./game-data-structure/Region";
 import PlanningGameState, {SerializedPlanningGameState} from "./planning-game-state/PlanningGameState";
 import ActionGameState, {SerializedActionGameState} from "./action-game-state/ActionGameState";
 import Order from "./game-data-structure/Order";
-import Game, {MIN_PLAYER_COUNT_WITH_VASSALS, SerializedGame} from "./game-data-structure/Game";
+import Game, {MIN_PLAYER_COUNT_WITH_VASSALS, MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN, SerializedGame} from "./game-data-structure/Game";
 import WesterosGameState, {SerializedWesterosGameState} from "./westeros-game-state/WesterosGameState";
 import createGame from "./game-data-structure/createGame";
 import BetterMap from "../../utils/BetterMap";
@@ -34,6 +34,8 @@ import DeclareSupportGameState from "./action-game-state/resolve-march-order-gam
 import ThematicDraftHouseCardsGameState, { SerializedThematicDraftHouseCardsGameState } from "./thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 import DraftInfluencePositionsGameState, { SerializedDraftInfluencePositionsGameState } from "./draft-influence-positions-game-state/DraftInfluencePositionsGameState";
 import shuffleInPlace, { shuffle } from "../../utils/shuffle";
+import popRandom from "../../utils/popRandom";
+import { land } from "./game-data-structure/regionTypes";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -159,6 +161,29 @@ export default class IngameGameState extends GameState<
         });
 
         if (this.game.turn > 1) {
+            // Todo: Remove this when Westeros deck 4 is implemented
+            // But for now place a random loyalty token
+            if (this.entireGame.gameSettings.playerCount >= 8) {
+                const nonTargRegions = this.world.regions.values.filter(r => {
+                    const controller = r.getController();
+                    return r.type == land && (controller == null || controller.id != "targaryen");
+                });
+
+                const regionsWithEnemyUnits = nonTargRegions.filter(r => r.units.size > 0);
+                const regionToPutLoyaltyToken = regionsWithEnemyUnits.length > 0
+                    ? popRandom(regionsWithEnemyUnits)
+                    : popRandom(nonTargRegions);
+
+                if (regionToPutLoyaltyToken) {
+                    regionToPutLoyaltyToken.loyaltyTokens = 1;
+                    this.entireGame.broadcastToClients({
+                        type: "loyalty-token-placed",
+                        region: regionToPutLoyaltyToken.id,
+                        newLoyaltyTokenCount: regionToPutLoyaltyToken.loyaltyTokens
+                    });
+                }
+            }
+
             this.setChildGameState(new WesterosGameState(this)).firstStart();
         } else {
             // No Westeros phase during the first turn
@@ -489,6 +514,14 @@ export default class IngameGameState extends GameState<
             this.game.deletedHouseCards = new BetterMap(message.houseCards.map(hc => [hc.id, HouseCard.deserializeFromServer(hc)]));
         } else if (message.type == "update-max-turns") {
             this.game.maxTurns = message.maxTurns;
+        } else if (message.type == "loyalty-token-gained") {
+            const house = this.game.houses.get(message.house);
+            const region = this.world.regions.get(message.region);
+            house.gainedLoyaltyTokens = message.newLoyaltyTokenCount;
+            region.loyaltyTokens = 0;
+        } else if (message.type == "loyalty-token-placed") {
+            const region = this.world.regions.get(message.region);
+            region.loyaltyTokens = message.newLoyaltyTokenCount;
         } else {
             this.childGameState.onServerMessage(message);
         }
@@ -562,7 +595,7 @@ export default class IngameGameState extends GameState<
         return {result: true, reason: ""};
     }
 
-    canLaunchReplacePlayerVote(fromUser: User | null, replaceWithVassal = false): {result: boolean; reason: string} {
+    canLaunchReplacePlayerVote(fromUser: User | null, replaceWithVassal = false, forHouse: House | null = null): {result: boolean; reason: string} {
         if (!fromUser) {
             return {result: false, reason: "only-authenticated-users-can-vote"};
         }
@@ -576,8 +609,14 @@ export default class IngameGameState extends GameState<
                 return {result: false, reason: "only-players-can-vote"};
             }
 
-            if (this.players.size - 1 < MIN_PLAYER_COUNT_WITH_VASSALS) {
-                return {result: false, reason: "min-player-count-reached"};
+            if (this.game.houses.keys.includes("targaryen")) {
+                if (this.players.size - 1 < MIN_PLAYER_COUNT_WITH_VASSALS) {
+                    return {result: false, reason: "min-player-count-reached"};
+                }
+            } else {
+                if (this.players.size - 1 < MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN) {
+                    return {result: false, reason: "min-player-count-reached"};
+                }
             }
 
             if (this.childGameState instanceof DraftHouseCardsGameState) {
@@ -587,9 +626,13 @@ export default class IngameGameState extends GameState<
             if (this.childGameState instanceof ThematicDraftHouseCardsGameState) {
                 return {result: false, reason: "ongoing-house-card-drafting"}
             }
+
+            if (forHouse?.id == "targaryen") {
+                return {result: false, reason: "targaryen-must-be-a-player-controlled-house"}
+            }
         }
 
-        const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && (v.type instanceof ReplacePlayer || v.type instanceof ReplacePlayerByVassal));
+        const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && ((!replaceWithVassal && v.type instanceof ReplacePlayer) || v.type instanceof ReplacePlayerByVassal));
         if (existingVotes.length > 0) {
             return {result: false, reason: "ongoing-vote"};
         }

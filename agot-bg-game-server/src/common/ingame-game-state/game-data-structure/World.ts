@@ -10,18 +10,23 @@ import StaticBorder from "./static-data-structure/StaticBorder";
 import StaticRegion from "./static-data-structure/StaticRegion";
 import RegionKind from "./RegionKind";
 import getStaticWorld from "./static-data-structure/getStaticWorld";
+import { dragon } from "./unitTypes";
 
 export default class World {
-    gameSetupId: string;
+    playerCount: number;
     regions: BetterMap<string, Region>;
 
     get borders(): StaticBorder[] {
-        return getStaticWorld(this.gameSetupId).staticBorders;
+        return getStaticWorld(this.playerCount).staticBorders;
     }
 
-    constructor(regions: BetterMap<string, Region>, gameSetupId: string) {
+    get regionsWhichCanRegainGarrison(): StaticRegion[] {
+        return getStaticWorld(this.playerCount).staticRegions.values.filter(region => region.canRegainGarrison);
+    }
+
+    constructor(regions: BetterMap<string, Region>, playerCount: number) {
         this.regions = regions;
-        this.gameSetupId = gameSetupId;
+        this.playerCount = playerCount;
     }
 
     getRegion(staticRegion: StaticRegion): Region {
@@ -92,7 +97,7 @@ export default class World {
         );
     }
 
-    getReachableRegions(startingRegion: Region, house: House, army: Unit[], viaTransportOnly = false): Region[] {
+    getReachableRegions(startingRegion: Region, house: House, army: Unit[], viaTransportOnly = false, retreat = false): Region[] {
         let regionsToCheck: Region[] = this.getNeighbouringRegions(startingRegion);
         const checkedRegions: Region[] = [];
         const reachableRegions: Region[] = [];
@@ -101,6 +106,10 @@ export default class World {
         const regionKindOfArmy = army[0].type.walksOn;
         if (!army.every(u => u.type.walksOn == regionKindOfArmy)) {
             throw new Error();
+        }
+
+        if (army.every(u => u.type == dragon) && !retreat) {
+            return this.regions.values.filter(r => r != startingRegion && r.type == land);
         }
 
         if (viaTransportOnly) {
@@ -140,7 +149,7 @@ export default class World {
     }
 
     getValidRetreatRegions(startingRegion: Region, house: House, army: Unit[]): Region[] {
-        return this.getReachableRegions(startingRegion, house, army)
+        return this.getReachableRegions(startingRegion, house, army, false, true)
             // A retreat can be done in a port only if the adjacent land area is controlled
             // by the retreater
             .filter(r => !(r.type == port && this.getAdjacentLandOfPort(r).getController() != house))
@@ -208,18 +217,18 @@ export default class World {
     serializeToClient(): SerializedWorld {
         return {
             regions: this.regions.values.map(r => r.serializeToClient()),
-            gameSetupId: this.gameSetupId
+            playerCount: this.playerCount
         };
     }
 
     static deserializeFromServer(game: Game, data: SerializedWorld): World {
         const regions = new BetterMap(data.regions.map(r => [r.id, Region.deserializeFromServer(game, r)]));
 
-        return new World(regions, data.gameSetupId);
+        return new World(regions, data.playerCount);
     }
 }
 
 export interface SerializedWorld {
     regions: SerializedRegion[];
-    gameSetupId: string;
+    playerCount: number;
 }

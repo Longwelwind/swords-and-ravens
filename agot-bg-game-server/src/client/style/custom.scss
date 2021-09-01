@@ -5,6 +5,8 @@ $grid-breakpoints: (
         md: 768px,
         lg: 992px,
         xl: 1565px,
+        xxl: 1768px,
+        xxxl: 1875px
 );
 
 @import './theme/_variables';
@@ -98,6 +100,17 @@ strong
    background-repeat: no-repeat;
   // This allows the power token to be center on the position-absolute reference points
   transform: translate(-50%, -50%);
+}
+
+.map .loyalty-token {
+  position: absolute;
+  width: 27px;
+  height: 45px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+ // This allows the power token to be center on the position-absolute reference points
+ transform: translate(-50%, -50%);
 }
 
 .house-power-token {

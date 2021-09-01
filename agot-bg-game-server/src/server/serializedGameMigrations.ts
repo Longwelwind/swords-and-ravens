@@ -1015,6 +1015,21 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "43",
+        migrate: (serializedGame: any) => {
+            // Turn on mapScrollbar again for all users as the new desktop experience is best with the map scrollbar
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                ingame.game.world.playerCount = ingame.game.houses.length;
+                ingame.game.world.regions.forEach((region: any) => region.loyaltyTokens = 0);
+                ingame.game.houses.forEach((h: any) => h.gainedLoyaltyTokens = 0);
+            }
+
+            return serializedGame;
+        }
     }
 ];
 
