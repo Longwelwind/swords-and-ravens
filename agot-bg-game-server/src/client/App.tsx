@@ -44,7 +44,7 @@ export default class App extends Component<AppProps> {
     }
 
     render(): ReactNode {
-        const minWidth = isMobile && this.isGameRunning ? this.is8pGame ? "2400px" : "1850px" : "auto";
+        const minWidth = isMobile && this.isGameRunning ? this.is8pGame ? "2400px" : "1920px" : "auto";
         return (
             <Container fluid={false} style={{
                 paddingTop: "0.5rem",
