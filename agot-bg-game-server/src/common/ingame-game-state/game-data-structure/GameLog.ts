@@ -71,11 +71,6 @@ interface SupportRefused {
     house: string;
 }
 
-interface HouseCardChosen {
-    type: "house-card-chosen";
-    houseCards: [string, string][];
-}
-
 interface Attack {
     type: "attack";
     attacker: string;
@@ -225,6 +220,7 @@ interface ClashOfKingsBiddingDone {
     type: "clash-of-kings-bidding-done";
     trackerI: number;
     results: [number, string[]][];
+    distributor: string | null;
 }
 
 interface ClashOfKingsFinalOrdering {

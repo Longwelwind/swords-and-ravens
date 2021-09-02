@@ -13,6 +13,8 @@ import GameStateComponentProps from "./GameStateComponentProps";
 import Row from "react-bootstrap/Row";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import Col from "react-bootstrap/Col";
+import DistributePowerTokensGameState from "../../common/ingame-game-state/westeros-game-state/clash-of-kings-game-state/distribute-power-tokens-game-state/DistributePowerTokensGameState";
+import DistributePowerTokensComponent from "./DistributePowerTokensComponent";
 
 @observer
 export default class ClashOfKingsComponent extends Component<GameStateComponentProps<ClashOfKingsGameState>> {
@@ -27,7 +29,8 @@ export default class ClashOfKingsComponent extends Component<GameStateComponentP
                     <Fragment key={this.props.gameState.currentTrackI}>
                         {renderChildGameState(this.props, [
                             [BiddingGameState, BiddingComponent],
-                            [ResolveTiesGameState, ResolveTiesComponent]
+                            [ResolveTiesGameState, ResolveTiesComponent],
+                            [DistributePowerTokensGameState, DistributePowerTokensComponent]
                         ])}
                     </Fragment>
                 </Row>

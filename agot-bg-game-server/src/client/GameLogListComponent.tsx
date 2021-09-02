@@ -571,11 +571,19 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
             case "clash-of-kings-bidding-done": {
                 const bids = _.flatMap(data.results.map(([bid, hids]) => hids.map(hid => [this.game.houses.get(hid), bid] as [House, number])));
+                const distributor = data.distributor ? this.game.houses.get(data.distributor) : null;
 
                 return <>
+                    {distributor != null
+                    ?
+                    <p>
+                        <b>{distributor.name}</b> adapted the biddings for <b>{this.game.getNameInfluenceTrack(data.trackerI)}</b> track:
+                    </p>
+                    :
                     <p>
                         Houses bid for <b>{this.game.getNameInfluenceTrack(data.trackerI)}</b> track:
-                    </p>
+                    </p>}
+
                     <Row className="mb-1 mt-2">
                         <HouseNumberResultsComponent results={bids} key={`cok_${data.trackerI}`}/>
                     </Row>
