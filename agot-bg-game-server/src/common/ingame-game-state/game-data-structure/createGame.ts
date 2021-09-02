@@ -145,7 +145,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
      */
 
      // Overwrite house cards
-    if (gameSettings.adwdHouseCards && !gameSettings.limitedDraft) {
+    if (gameSettings.adwdHouseCards) {
         const adwdHouseCards = baseGameData.adwdHouseCards as {[key: string]: HouseCardContainer};
         const ffcHouseCards = baseGameData.ffcHouseCards as {[key: string]: HouseCardContainer};
         const modBHouseCards = baseGameData.modBHouseCards as {[key: string]: HouseCardContainer};
@@ -242,7 +242,6 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         const baseGameHouseCards = getHouseCardSet(baseGameData.houses);
         const adwdHouseCards = getHouseCardSet(baseGameData.adwdHouseCards);
         const ffcHouseCards = getHouseCardSet(baseGameData.ffcHouseCards);
-        // const modAHouseCards = getHouseCardSet(baseGameData.modAHouseCards);
         const modBHouseCards = getHouseCardSet(baseGameData.modBHouseCards);
 
         if (gameSettings.limitedDraft) {
@@ -251,12 +250,14 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             if (gameSettings.setupId == 'mother-of-dragons') {
                 if (gameSettings.adwdHouseCards) {
                     limitedHouseCards = _.concat(modBHouseCards, adwdHouseCards, ffcHouseCards);
+                } else {
+                    limitedHouseCards = baseGameHouseCards;
                 }
             } else if (gameSettings.adwdHouseCards) {
-                limitedHouseCards = _.concat(adwdHouseCards);
+                limitedHouseCards = adwdHouseCards;
             } else {
-                const excludeArryn = baseGameHouseCards.filter(hc => hc.houseId != "arryn");
-                limitedHouseCards = excludeArryn;
+                const excludeArrynAndTargaryen = baseGameHouseCards.filter(hc => hc.houseId != "arryn" && hc.houseId != "targaryen");
+                limitedHouseCards = excludeArrynAndTargaryen;
             }
             game.houseCardsForDrafting = new BetterMap(limitedHouseCards.map(hc => [hc.id, hc]));
         } else {
