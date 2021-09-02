@@ -34,8 +34,6 @@ import DeclareSupportGameState from "./action-game-state/resolve-march-order-gam
 import ThematicDraftHouseCardsGameState, { SerializedThematicDraftHouseCardsGameState } from "./thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 import DraftInfluencePositionsGameState, { SerializedDraftInfluencePositionsGameState } from "./draft-influence-positions-game-state/DraftInfluencePositionsGameState";
 import shuffleInPlace, { shuffle } from "../../utils/shuffle";
-import popRandom from "../../utils/popRandom";
-import { land } from "./game-data-structure/regionTypes";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -161,29 +159,6 @@ export default class IngameGameState extends GameState<
         });
 
         if (this.game.turn > 1) {
-            // Todo: Remove this when Westeros deck 4 is implemented
-            // But for now place a random loyalty token
-            if (this.entireGame.gameSettings.playerCount >= 8) {
-                const nonTargRegions = this.world.regions.values.filter(r => {
-                    const controller = r.getController();
-                    return r.type == land && (controller == null || controller.id != "targaryen");
-                });
-
-                const regionsWithEnemyUnits = nonTargRegions.filter(r => r.units.size > 0);
-                const regionToPutLoyaltyToken = regionsWithEnemyUnits.length > 0
-                    ? popRandom(regionsWithEnemyUnits)
-                    : popRandom(nonTargRegions);
-
-                if (regionToPutLoyaltyToken) {
-                    regionToPutLoyaltyToken.loyaltyTokens = 1;
-                    this.entireGame.broadcastToClients({
-                        type: "loyalty-token-placed",
-                        region: regionToPutLoyaltyToken.id,
-                        newLoyaltyTokenCount: regionToPutLoyaltyToken.loyaltyTokens
-                    });
-                }
-            }
-
             this.setChildGameState(new WesterosGameState(this)).firstStart();
         } else {
             // No Westeros phase during the first turn
@@ -264,8 +239,8 @@ export default class IngameGameState extends GameState<
                     && player.house != toHouse
                     && message.powerTokens > 0
                     && message.powerTokens <= player.house.powerTokens) {
-                this.changePowerTokens(player.house, -message.powerTokens);
-                this.changePowerTokens(toHouse, message.powerTokens);
+                const delta = Math.abs(this.changePowerTokens(toHouse, message.powerTokens));
+                this.changePowerTokens(player.house, -delta);
                 this.log({
                     type: "power-tokens-gifted",
                     house: player.house.id,

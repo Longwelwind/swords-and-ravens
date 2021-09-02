@@ -1325,6 +1325,27 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     House <b>{house.name}</b> has decided ties.
                 </p>;
             }
+            case "place-loyalty-choice": {
+                const house = this.game.houses.get(data.house);
+                const verb = data.discardedPowerTokens == 0
+                    ? "place no loyalty token"
+                    : data.discardedPowerTokens == 1
+                    ? "place a loyalty token in the suggested region"
+                    : data.discardedPowerTokens == 2
+                    ? "place a loyalty token in a random region"
+                    : data.discardedPowerTokens == 5
+                    ? "place two loyalty tokens in random regions"
+                    : null;
+                return <p>
+                    House <b>{house.name}</b> decided to discard {data.discardedPowerTokens} Power token{data.discardedPowerTokens != 1 &&"s"}{verb && ` and ${verb}`}.
+                </p>;
+            }
+            case "loyalty-token-placed": {
+                const region = this.world.regions.get(data.region);
+                return <p>
+                    A loyalty token has been placed in <b>{region.name}</b>.
+                </p>;
+            }
         }
     }
 }

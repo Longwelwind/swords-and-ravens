@@ -19,10 +19,11 @@ import planningRestrictions from "../game-data-structure/westeros-card/planning-
 import PutToTheSwordGameState, {SerializedPutToTheSwordGameState} from "./put-to-the-swords-game-state/PutToTheSwordGameState";
 import AThroneOfBladesGameState, {SerializedAThroneOfBladesGameState} from "./thrones-of-blades-game-state/AThroneOfBladesGameState";
 import DarkWingsDarkWordsGameState, {SerializedDarkWingsDarkWordsGameState} from "./dark-wings-dark-words-game-state/DarkWingsDarkWordsGameState";
+import WesterosDeck4GameState, { SerializedWesterosDeck4GameState } from "./westeros-deck-4-game-state/WesterosDeck4GameState";
 
 export default class WesterosGameState extends GameState<IngameGameState,
     WildlingsAttackGameState | ReconcileArmiesGameState<WesterosGameState> | MusteringGameState | ClashOfKingsGameState
-    | PutToTheSwordGameState | AThroneOfBladesGameState | DarkWingsDarkWordsGameState
+    | PutToTheSwordGameState | AThroneOfBladesGameState | DarkWingsDarkWordsGameState | WesterosDeck4GameState
 > {
     revealedCards: WesterosCard[];
     @observable currentCardI = -1;
@@ -109,7 +110,6 @@ export default class WesterosGameState extends GameState<IngameGameState,
             addedWildlingStrength: addedWildlingStrength
         });
 
-
         if (addedWildlingStrength > 0) {
             this.game.updateWildlingStrength(addedWildlingStrength);
 
@@ -131,6 +131,17 @@ export default class WesterosGameState extends GameState<IngameGameState,
         }
 
         this.executeNextCard();
+    }
+
+    proceedTemporaryLoyaltyTokenHandling(): boolean {
+        // Todo: Remove this when Westeros deck 4 is implemented
+        const targaryen = this.game.houses.tryGet("targaryen", null);
+        if (!targaryen) {
+            return false;
+        }
+
+        this.setChildGameState(new WesterosDeck4GameState(this)).firstStart(targaryen);
+        return true;
     }
 
 
@@ -158,8 +169,14 @@ export default class WesterosGameState extends GameState<IngameGameState,
             this.executeCard(this.currentCard);
         } else {
             // Last card processed, go to next phase
-            this.ingame.onWesterosGameStateFinish(this.planningRestrictions);
+            if (!this.proceedTemporaryLoyaltyTokenHandling()) {
+                this.onWesterosGameStateFinish();
+            }
         }
+    }
+
+    onWesterosGameStateFinish(): void {
+        this.ingame.onWesterosGameStateFinish(this.planningRestrictions);
     }
 
     executeCard(card: WesterosCard): void {
@@ -207,6 +224,8 @@ export default class WesterosGameState extends GameState<IngameGameState,
             return AThroneOfBladesGameState.deserializeFromServer(this, data);
         } else if (data.type == "dark-wings-dark-words") {
             return DarkWingsDarkWordsGameState.deserializeFromServer(this, data);
+        } else if (data.type == "westeros-deck-4") {
+            return WesterosDeck4GameState.deserializeFromServer(this, data);
         } else  {
             throw new Error();
         }
@@ -220,5 +239,5 @@ export interface SerializedWesterosGameState {
     planningRestrictions: string[];
     childGameState: SerializedWildlingsAttackGameState
         | SerializedReconcileArmiesGameState | SerializedMusteringGameState | SerializedClashOfKingsGameState
-        | SerializedPutToTheSwordGameState | SerializedAThroneOfBladesGameState | SerializedDarkWingsDarkWordsGameState;
+        | SerializedPutToTheSwordGameState | SerializedAThroneOfBladesGameState | SerializedDarkWingsDarkWordsGameState | SerializedWesterosDeck4GameState;
 }

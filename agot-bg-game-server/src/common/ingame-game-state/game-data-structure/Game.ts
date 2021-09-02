@@ -18,6 +18,7 @@ import IngameGameState from "../IngameGameState";
 import { vassalHousesOrders, playerHousesOrders, seaOrders } from "./orders";
 
 export const MAX_WILDLING_STRENGTH = 12;
+export const MAX_LOYALTY_TOKEN_COUNT = 20;
 export const MIN_PLAYER_COUNT_WITH_VASSALS = 3;
 export const MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN = 4;
 
@@ -96,6 +97,10 @@ export default class Game {
 
     get currentDragonStrength(): number {
         return Math.min(5, Math.floor(this.turn/2));
+    }
+
+    get loyaltyTokensOnBoardCount(): number {
+        return _.sum(this.world.regions.values.map(r => r.loyaltyTokens));
     }
 
     constructor(ingame: IngameGameState) {

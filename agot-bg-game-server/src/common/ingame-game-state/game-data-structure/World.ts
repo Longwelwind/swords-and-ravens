@@ -11,6 +11,7 @@ import StaticRegion from "./static-data-structure/StaticRegion";
 import RegionKind from "./RegionKind";
 import getStaticWorld from "./static-data-structure/getStaticWorld";
 import { dragon } from "./unitTypes";
+import staticWorld7p from "./static-data-structure/globalStaticWorld7p";
 
 export default class World {
     playerCount: number;
@@ -22,6 +23,10 @@ export default class World {
 
     get regionsWhichCanRegainGarrison(): StaticRegion[] {
         return getStaticWorld(this.playerCount).staticRegions.values.filter(region => region.canRegainGarrison);
+    }
+
+    get westerosLandRegionIds(): string[] {
+        return staticWorld7p.staticRegions.values.filter(r => r.type == land).map(r => r.id);
     }
 
     constructor(regions: BetterMap<string, Region>, playerCount: number) {
