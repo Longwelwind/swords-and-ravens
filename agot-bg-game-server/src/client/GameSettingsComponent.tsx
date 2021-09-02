@@ -236,7 +236,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 </Col>
                 <Col xs="12">
                     <FormCheck
-                        id="draft-house-cards"
+                        id="draft-house-cards-settings"
                         type="checkbox"
                         label={
                             <OverlayTrigger overlay={
@@ -245,7 +245,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     in a randomly chosen order before the game starts. House cards can be chosen from all 2nd Edition Base Game house cards
                                     and from all 2nd Edition expansions (ADwD, AFfC, MoD) house cards.
                                 </Tooltip>}>
-                                <label htmlFor="draft-house-cards">Draft house cards</label>
+                                <label htmlFor="draft-house-cards-settings">Draft house cards</label>
                             </OverlayTrigger>}
                         checked={this.gameSettings.draftHouseCards}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.draftHouseCards = !this.gameSettings.draftHouseCards)}
@@ -268,7 +268,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 </Col>
                 <Col xs="12">
                     <FormCheck
-                        id="thematic-draft"
+                        id="thematic-draft-setting"
                         type="checkbox"
                         label={
                             <OverlayTrigger overlay={
@@ -276,10 +276,25 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     Players will draft their house cards simultaneously from the available decks of their house.
                                     Afterwards players will draft the Influence tracks step by step in a randomly chosen order.
                                 </Tooltip>}>
-                                <label htmlFor="thematic-draft">Thematic draft</label>
+                                <label htmlFor="thematic-draft-setting">Thematic draft</label>
                             </OverlayTrigger>}
                         checked={this.gameSettings.thematicDraft}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.thematicDraft = !this.gameSettings.thematicDraft)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="blind-draft-setting"
+                        type="checkbox"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="blind-draft-tooltip">
+                                    Players receive random house cards and influence positions. Can be combined with limited draft.
+                                </Tooltip>}>
+                                <label htmlFor="blind-draft-setting">Blind draft</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.blindDraft}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.blindDraft = !this.gameSettings.blindDraft)}
                     />
                 </Col>
                 <Col xs="12">

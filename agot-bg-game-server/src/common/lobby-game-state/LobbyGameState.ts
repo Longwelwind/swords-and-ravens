@@ -175,6 +175,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
             if (settings.thematicDraft) {
                 settings.draftHouseCards = true;
                 settings.limitedDraft = false;
+                settings.blindDraft = false;
             }
 
             if (settings.draftHouseCards && !settings.limitedDraft) {
@@ -182,6 +183,11 @@ export default class LobbyGameState extends GameState<EntireGame> {
             }
 
             if (settings.limitedDraft) {
+                settings.draftHouseCards = true;
+                settings.thematicDraft = false;
+            }
+
+            if (settings.blindDraft) {
                 settings.draftHouseCards = true;
                 settings.thematicDraft = false;
             }

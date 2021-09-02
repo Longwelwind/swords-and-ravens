@@ -28,12 +28,13 @@ import CancelledGameState, { SerializedCancelledGameState } from "../cancelled-g
 import HouseCard from "./game-data-structure/house-card/HouseCard";
 import { observable } from "mobx";
 import _ from "lodash";
-import DraftHouseCardsGameState, { SerializedDraftHouseCardsGameState } from "./draft-house-cards-game-state/DraftHouseCardsGameState";
+import DraftHouseCardsGameState, { houseCardCombatStrengthAllocations, SerializedDraftHouseCardsGameState } from "./draft-house-cards-game-state/DraftHouseCardsGameState";
 import CombatGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import DeclareSupportGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/declare-support-game-state/DeclareSupportGameState";
 import ThematicDraftHouseCardsGameState, { SerializedThematicDraftHouseCardsGameState } from "./thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 import DraftInfluencePositionsGameState, { SerializedDraftInfluencePositionsGameState } from "./draft-influence-positions-game-state/DraftInfluencePositionsGameState";
 import shuffleInPlace, { shuffle } from "../../utils/shuffle";
+import popRandom from "../../utils/popRandom";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -83,9 +84,43 @@ export default class IngameGameState extends GameState<
     beginDraftingHouseCards(): void {
         if (this.entireGame.gameSettings.thematicDraft) {
             this.setChildGameState(new ThematicDraftHouseCardsGameState(this)).firstStart();
+        } else if (this.entireGame.gameSettings.blindDraft) {
+            houseCardCombatStrengthAllocations.entries.forEach(([hcStrength, count]) => {
+                for(let i=0; i<count; i++) {
+                    this.players.values.forEach(p => {
+                        const house = p.house;
+                        const availableCards = this.game.houseCardsForDrafting.values.filter(hc => hc.combatStrength == hcStrength);
+                        const houseCard = popRandom(availableCards) as HouseCard;
+                        house.houseCards.set(houseCard.id, houseCard);
+                        this.game.houseCardsForDrafting.delete(houseCard.id);
+                    });
+                }
+            });
+
+            this.game.houseCardsForDrafting = new BetterMap();
+
+            this.game.ironThroneTrack = this.getRandomTrackOrder();
+            this.game.fiefdomsTrack = this.getRandomTrackOrder();
+            this.game.kingsCourtTrack = this.getRandomTrackOrder();
+
+            this.beginNewTurn();
         } else {
             this.setChildGameState(new DraftHouseCardsGameState(this)).firstStart();
         }
+    }
+
+    getRandomTrackOrder(): House[] {
+        const playerHouses = this.game.houses.values.filter(h => !this.isVassalHouse(h));
+        const vassalHouses = _.without(this.game.houses.values, ...playerHouses);
+
+        const result = _.concat(shuffleInPlace(playerHouses), shuffleInPlace(vassalHouses));
+        const targaryen = result.find(h => h.id == "targaryen");
+
+        if (!targaryen) {
+            return result;
+        }
+
+        return _.concat(_.without(result, targaryen), targaryen);
     }
 
     proceedDraftingInfluencePositions(vassalsOnInfluenceTracks: House[][]): void {
