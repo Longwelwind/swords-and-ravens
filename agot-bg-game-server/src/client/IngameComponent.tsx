@@ -440,14 +440,29 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         const knowsWildlingCard = this.authenticatedPlayer != null &&
             this.authenticatedPlayer.house.knowsNextWildlingCard;
-        const nextWildlingCard = this.game.wildlingDeck.filter(c => c.id == this.game.clientNextWildlingCardId)[0];
+        const nextWildlingCard = this.game.wildlingDeck.find(c => c.id == this.game.clientNextWildlingCardId);
 
         const gameRunning = !(this.ingame.leafState instanceof GameEndedGameState) && !(this.ingame.leafState instanceof CancelledGameState);
         const roundWarning = gameRunning && (this.game.maxTurns - this.game.turn) == 1;
         const roundCritical = gameRunning && (this.game.turn == this.game.maxTurns);
 
-        const wildlingsWarning = gameRunning && (this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 2 || this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 4);
-        const wildlingsCritical = gameRunning && this.game.wildlingStrength == MAX_WILDLING_STRENGTH;
+        let wildlingsWarning = gameRunning && (this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 2 || this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 4);
+        let wildlingsCritical = gameRunning && this.game.wildlingStrength == MAX_WILDLING_STRENGTH;
+
+        let warningAndKnowsNextWildingCard = false;
+        let criticalAndKnowsNextWildingCard = false;
+
+        if (knowsWildlingCard && nextWildlingCard) {
+            if (wildlingsWarning) {
+                warningAndKnowsNextWildingCard = true;
+                wildlingsWarning = false;
+            }
+
+            if (wildlingsCritical) {
+                criticalAndKnowsNextWildingCard = true;
+                wildlingsCritical = false;
+            }
+        }
 
         const gameStatePanelStyle = {
             maxHeight: this.gameStatePanelMaxHeight == null ? "none" : `${this.gameStatePanelMaxHeight}px`,
@@ -534,9 +549,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         placement="auto">
                                         <div>
                                             <img src={mammothImage} width={28} className={classNames(
-                                                { "dye-warning": wildlingsWarning },
-                                                { "dye-critical": wildlingsCritical },
-                                                { "wildling-highlight": knowsWildlingCard })}
+                                                { "dye-warning": wildlingsWarning && !warningAndKnowsNextWildingCard },
+                                                { "dye-critical": wildlingsCritical && !criticalAndKnowsNextWildingCard },
+                                                { "wildling-highlight": knowsWildlingCard && !warningAndKnowsNextWildingCard && !criticalAndKnowsNextWildingCard},
+                                                { "dye-warning-highlight": warningAndKnowsNextWildingCard},
+                                                { "dye-critical-highlight": criticalAndKnowsNextWildingCard}
+                                                )}
                                             />
                                             <div style={{ color: wildlingsWarning ? "#F39C12" : wildlingsCritical ? "#FF0000" : undefined }}>{this.game.wildlingStrength}</div>
                                         </div>
