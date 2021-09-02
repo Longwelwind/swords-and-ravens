@@ -4,7 +4,8 @@ export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | Unready |
     | DecideBiggest | ReconcileArmies | Muster | ResolveTies | SelectUnits | LaunchGame | ChooseHouse
     | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings | CreatePrivateChatRoom | ChangeGameSettings
     | CancelGame | Vote | LaunchCancelGameVote | CancelVote | LaunchReplacePlayerVote | UpdateNote | SelectWesterosCard
-    | ClaimVassal | LaunchReplacePlayerByVassalVote | GiftPowerTokens | LaunchEndGameVote | SetPassword;
+    | ClaimVassal | LaunchReplacePlayerByVassalVote | GiftPowerTokens | LaunchEndGameVote | SetPassword
+    | DistributePowerTokens;
 
 interface Ping {
     type: "ping";
@@ -247,4 +248,9 @@ interface LaunchEndGameVote {
 interface SetPassword {
     type: "set-password";
     password: string;
+}
+
+interface DistributePowerTokens {
+    type: "distribute-power-tokens";
+    powerTokensForHouses: [string, number][];
 }

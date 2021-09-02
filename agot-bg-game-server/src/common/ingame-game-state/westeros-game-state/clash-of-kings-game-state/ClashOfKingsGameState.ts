@@ -8,8 +8,10 @@ import Game from "../../game-data-structure/Game";
 import {ClientMessage} from "../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../messages/ServerMessage";
 import IngameGameState from "../../IngameGameState";
+import DistributePowerTokensGameState, { SerializedDistributePowerTokensGameState } from "./distribute-power-tokens-game-state/DistributePowerTokensGameState";
+import _ from "lodash";
 
-export default class ClashOfKingsGameState extends GameState<WesterosGameState, BiddingGameState<ClashOfKingsGameState> | ResolveTiesGameState> {
+export default class ClashOfKingsGameState extends GameState<WesterosGameState, BiddingGameState<ClashOfKingsGameState> | ResolveTiesGameState | DistributePowerTokensGameState> {
     currentTrackI = -1;
 
     get game(): Game {
@@ -32,8 +34,7 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
             nextTrack: this.currentTrackI
         });
 
-        // Todo: Fix this with "AdaptBidsGameState" and allow Targaryen to participate
-        this.setChildGameState(new BiddingGameState(this)).firstStart(this.game.houses.values.filter(h => h.id != "targaryen"));
+        this.setChildGameState(new BiddingGameState(this)).firstStart(this.game.houses.values);
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -52,11 +53,43 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
         this.parentGameState.ingame.log({
             type: "clash-of-kings-bidding-done",
             trackerI: this.currentTrackI,
-            results: results.map(([bid, houses]) => [bid, houses.map(h => h.id)])
+            results: results.map(([bid, houses]) => [bid, houses.map(h => h.id)]),
+            distributor: null
         });
 
+        const targaryen = this.game.houses.tryGet("targaryen", null);
+        if (targaryen && results.some(([bid, houses]) => bid > 0 && houses.includes(targaryen))) {
+            this.setChildGameState(new DistributePowerTokensGameState(this)).firstStart(targaryen, results);
+            return;
+        }
+
+        this.proceedCheckForTies(results);
+    }
+
+    onDistributePowerTokensFinish(results: [number, House[]][], distributor: House | null): void {
+        if (distributor) {
+            this.parentGameState.ingame.log({
+                type: "clash-of-kings-bidding-done",
+                trackerI: this.currentTrackI,
+                results: results.map(([bid, houses]) => [bid, houses.map(h => h.id)]),
+                distributor: distributor.id
+            });
+        }
+
+        this.proceedCheckForTies(results);
+    }
+
+    proceedCheckForTies(results: [number, House[]][]): void {
         // Check if there's at least one tie.
         if (results.some(([_, houses]) => houses.length > 1)) {
+            // Remove a possible bid of Targaryen:
+            results.forEach(([_bid, houses]) => {
+                const targIndex = houses.findIndex(h => h.id == "targaryen");
+                if (targIndex > -1) {
+                    houses.splice(targIndex, 1);
+                }
+            });
+
             // Ask the iron throne holder to resolve them
             this.setChildGameState(new ResolveTiesGameState(this)).firstStart(results);
         } else {
@@ -70,7 +103,7 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
     onResolveTiesGameState(_biddingResults: [number, House[]][], finalOrdering: House[]): void {
         const targaryen = this.game.houses.tryGet("targaryen", null);
         if (targaryen) {
-            finalOrdering.push(targaryen);
+            finalOrdering = _.concat(_.without(finalOrdering, targaryen), targaryen);
         }
 
         this.parentGameState.ingame.log({
@@ -127,6 +160,8 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
             return BiddingGameState.deserializeFromServer(this, data);
         } else if (data.type == "resolve-ties") {
             return ResolveTiesGameState.deserializeFromServer(this, data);
+        } else if (data.type == "distribute-power-tokens") {
+            return DistributePowerTokensGameState.deserializeFromServer(this, data);
         } else {
             throw new Error();
         }
@@ -136,5 +171,5 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
 export interface SerializedClashOfKingsGameState {
     type: "clash-of-kings";
     currentTrackI: number;
-    childGameState: SerializedBiddingGameState | SerializedResolveTiesGameState;
+    childGameState: SerializedBiddingGameState | SerializedResolveTiesGameState | SerializedDistributePowerTokensGameState;
 }
