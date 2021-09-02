@@ -32,6 +32,10 @@ export default class GiftPowerTokensComponent extends Component<GiftPowerTokensC
         return this.props.ingame.game;
     }
 
+    get receivablePowerTokens(): number {
+        return this.props.ingame.game.maxPowerTokens - this.toHouse.powerTokens - this.props.ingame.game.countPowerTokensOnBoard(this.toHouse);
+    }
+
     render(): ReactNode {
         return <>
             <Col xs={12}>
@@ -51,7 +55,7 @@ export default class GiftPowerTokensComponent extends Component<GiftPowerTokensC
                             type="range"
                             className="custom-range"
                             min={0}
-                            max={this.house.powerTokens}
+                            max={Math.min(this.house.powerTokens, this.receivablePowerTokens)}
                             value={this.powerTokens}
                             onChange={e => {
                                 this.powerTokens = parseInt(e.target.value);
@@ -82,6 +86,6 @@ export default class GiftPowerTokensComponent extends Component<GiftPowerTokensC
     }
 
     canGiftPowerTokens(): boolean {
-        return this.house.powerTokens > 0 && this.props.ingame.canGiftPowerTokens();
+        return this.house.powerTokens > 0 && this.receivablePowerTokens > 0 && this.props.ingame.canGiftPowerTokens();
     }
 }

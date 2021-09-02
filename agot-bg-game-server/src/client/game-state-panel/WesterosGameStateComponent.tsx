@@ -28,6 +28,7 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import classNames from "classnames";
 import WesterosCardComponent from "./utils/WesterosCardComponent";
+import WesterosDeck4GameState from "../../common/ingame-game-state/westeros-game-state/westeros-deck-4-game-state/WesterosDeck4GameState";
 
 @observer
 export default class WesterosGameStateComponent extends Component<GameStateComponentProps<WesterosGameState>> {
@@ -73,6 +74,14 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
                             <SimpleChoiceComponent gameClient={this.props.gameClient}
                                                    gameState={this.props.gameState.childGameState.childGameState}
                                                    mapControls={this.props.mapControls}/>
+                        </Row>
+                    </ListGroupItem>
+                ) : this.props.gameState.childGameState instanceof WesterosDeck4GameState ? (
+                    <ListGroupItem className="px-2">
+                        <Row>
+                            <SimpleChoiceComponent gameClient={this.props.gameClient}
+                                                    gameState={this.props.gameState.childGameState.childGameState}
+                                                    mapControls={this.props.mapControls}/>
                         </Row>
                     </ListGroupItem>
                 ) : renderChildGameState(this.props, [
