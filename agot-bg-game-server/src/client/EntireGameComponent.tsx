@@ -30,7 +30,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             </Helmet>
             <Col xs={12} className={this.props.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
                 <h4 style={{ marginLeft: "1rem", marginBottom: "0rem", textAlign: "center" }}>
-                    {this.props.entireGame.name} <Badge variant="primary" className={classNames({ 'invisible': !this.props.entireGame.gameSettings.pbem })}>PBEM</Badge>
+                    {this.props.entireGame.name} <Badge variant="primary" className={classNames({ 'display-none': !this.props.entireGame.gameSettings.pbem })}>PBEM</Badge> {this.props.entireGame.gameSettings.playerCount == 8 && this.getBetaWarning()}
                 </h4>
             </Col>
             {
@@ -43,6 +43,10 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 )
             }
         </>;
+    }
+
+    getBetaWarning(): ReactNode {
+        return <small>(BETA! Westeros Deck 4 and Iron Bank are not yet available!)</small>
     }
 
     componentDidMount(): void {
