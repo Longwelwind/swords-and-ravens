@@ -12,7 +12,7 @@ export default class SimpleChoiceComponent extends Component<GameStateComponentP
     render(): JSX.Element {
         return (
             <>
-                <Col xs={12}>
+                <Col xs={12} className="text-center">
                     {this.props.gameState.description}
                 </Col>
                 <Col xs={12} className="text-center">

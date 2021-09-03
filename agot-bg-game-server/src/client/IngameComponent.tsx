@@ -630,7 +630,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         </div>
                                     </Nav.Item>
                                 ))}
-                                <Nav.Item>
+                                {this.authenticatedPlayer && <Nav.Item>
                                     <Dropdown>
                                         <Dropdown.Toggle id="private-chat-room-dropdown" variant="link">
                                             <img src={chatBubble} width={16} />
@@ -643,7 +643,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             ))}
                                         </Dropdown.Menu>
                                     </Dropdown>
-                                </Nav.Item>
+                                </Nav.Item>}
                             </Nav>
                         </Card.Header>
                         <Card.Body id="game-log-panel" style={{ minHeight: this.gameLogMinHeight, height: this.gameLogHeight }} >
