@@ -101,10 +101,7 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
     }
 
     onResolveTiesGameState(_biddingResults: [number, House[]][], finalOrdering: House[]): void {
-        const targaryen = this.game.houses.tryGet("targaryen", null);
-        if (targaryen) {
-            finalOrdering = _.concat(_.without(finalOrdering, targaryen), targaryen);
-        }
+        finalOrdering = this.ingame.getInfluenceTrackWithRespectTargaryenIsAlwaysLast(finalOrdering);
 
         this.parentGameState.ingame.log({
             type: "clash-of-kings-final-ordering",
@@ -112,18 +109,7 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
             finalOrder: finalOrdering.map(h => h.id)
         });
 
-        // The concept of tracks probably should have been generalized (so that the game
-        // has a list of tracks, instead of 3 different variables, one for each track).
-        // This would have made the code easier, but what is done is done.
-        if (this.currentTrackI == 0) {
-            this.game.ironThroneTrack = finalOrdering;
-        } else if (this.currentTrackI == 1) {
-            this.game.fiefdomsTrack = finalOrdering;
-        } else if (this.currentTrackI == 2) {
-            this.game.kingsCourtTrack = finalOrdering;
-        } else {
-            throw new Error();
-        }
+        this.game.setInfluenceTrack(this.currentTrackI, finalOrdering);
 
         this.entireGame.broadcastToClients({
             type: "change-tracker",
