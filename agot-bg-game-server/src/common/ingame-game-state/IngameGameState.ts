@@ -114,13 +114,17 @@ export default class IngameGameState extends GameState<
         const vassalHouses = _.without(this.game.houses.values, ...playerHouses);
 
         const result = _.concat(shuffleInPlace(playerHouses), shuffleInPlace(vassalHouses));
-        const targaryen = result.find(h => h.id == "targaryen");
+        return this.getInfluenceTrackWithRespectTargaryenIsAlwaysLast(result);
+    }
+
+    getInfluenceTrackWithRespectTargaryenIsAlwaysLast(track: House[]): House[] {
+        const targaryen = this.game.houses.tryGet("targaryen", null);
 
         if (!targaryen) {
-            return result;
+            return track;
         }
 
-        return _.concat(_.without(result, targaryen), targaryen);
+        return _.concat(_.without(track, targaryen), targaryen);
     }
 
     proceedDraftingInfluencePositions(vassalsOnInfluenceTracks: House[][]): void {

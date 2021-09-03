@@ -28,7 +28,13 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
     }
 
     firstStart(house: House): void {
-        if (house.powerTokens == 0) {
+        // Every 2nd round place a loyalty token:
+        const regions = this.westerosLandRegions;
+        if (this.ingame.game.turn % 2 == 1 && this.ingame.game.loyaltyTokensOnBoardCount + 1 <= MAX_LOYALTY_TOKEN_COUNT) {
+            this.placeLoyaltyToken(popRandom(regions) as Region);
+        }
+
+        if (house.powerTokens == 0 || this.ingame.game.loyaltyTokensOnBoardCount + 1 > MAX_LOYALTY_TOKEN_COUNT) {
             this.parentGameState.ingame.log({
                 type: "place-loyalty-choice",
                 house: house.id,
@@ -39,7 +45,7 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
             return;
         }
 
-        this.possbileRegionForLoyaltyToken = popRandom(this.westerosLandRegions) as Region;
+        this.possbileRegionForLoyaltyToken = popRandom(regions) as Region;
 
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(house,
             `House ${house.name} may choose to discard Power tokens to place loyalty tokens.`,
@@ -64,8 +70,8 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
             result.set(`Discard 2 Power tokens to place a loyalty token in a random region`, 2);
         }
 
-        if (currentTokensOnBoard + 2 <= MAX_LOYALTY_TOKEN_COUNT && house.powerTokens >= 5) {
-            result.set(`Discard 5 Power tokens to place two loyalty tokens in random regions`, 5);
+        if (this.game.turn % 2 == 0 && currentTokensOnBoard + 2 <= MAX_LOYALTY_TOKEN_COUNT && house.powerTokens >= 4) {
+            result.set(`Discard 4 Power tokens to place two loyalty tokens in random regions`, 4);
         }
 
         return result;
@@ -90,28 +96,30 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
             case 2:
                 regionsToPlaceNewLoyaltyTokens.push(popRandom(this.westerosLandRegions) as Region);
                 break;
-            case 5:
+            case 4:
                 regionsToPlaceNewLoyaltyTokens.push(popRandom(this.westerosLandRegions) as Region);
                 regionsToPlaceNewLoyaltyTokens.push(popRandom(this.westerosLandRegions) as Region);
             default:
                 break;
         }
 
-        regionsToPlaceNewLoyaltyTokens.forEach(r => {
-            r.loyaltyTokens += 1;
-            this.entireGame.broadcastToClients({
-                type: "loyalty-token-placed",
-                region: r.id,
-                newLoyaltyTokenCount: r.loyaltyTokens
-            });
-
-            this.parentGameState.ingame.log({
-                type: "loyalty-token-placed",
-                region: r.id
-            });
-        });
+        regionsToPlaceNewLoyaltyTokens.forEach(r => this.placeLoyaltyToken(r));
 
         this.parentGameState.onWesterosGameStateFinish();
+    }
+
+    placeLoyaltyToken(region: Region): void {
+        region.loyaltyTokens += 1;
+        this.entireGame.broadcastToClients({
+            type: "loyalty-token-placed",
+            region: region.id,
+            newLoyaltyTokenCount: region.loyaltyTokens
+        });
+
+        this.parentGameState.ingame.log({
+            type: "loyalty-token-placed",
+            region: region.id
+        });
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
