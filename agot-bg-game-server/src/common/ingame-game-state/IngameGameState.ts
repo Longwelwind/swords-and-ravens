@@ -205,6 +205,31 @@ export default class IngameGameState extends GameState<
         }
     }
 
+    gainLoyaltyTokens(): void {
+        const targaryen = this.game.houses.tryGet("targaryen", null);
+        if (targaryen) {
+            this.world.getControlledRegions(targaryen).filter(r => r.loyaltyTokens > 0).forEach(r => {
+                targaryen.gainedLoyaltyTokens += r.loyaltyTokens;
+
+                this.entireGame.broadcastToClients({
+                    type: "loyalty-token-gained",
+                    house: targaryen.id,
+                    newLoyaltyTokenCount: targaryen.gainedLoyaltyTokens,
+                    region: r.id
+                });
+
+                this.log({
+                    type: "loyalty-token-gained",
+                    house: targaryen.id,
+                    count: r.loyaltyTokens,
+                    region: r.id
+                });
+
+                r.loyaltyTokens = 0;
+            });
+        }
+    }
+
     onClientMessage(user: User, message: ClientMessage): void {
         if (message.type == "cancel-vote") {
             const vote = this.votes.get(message.vote);

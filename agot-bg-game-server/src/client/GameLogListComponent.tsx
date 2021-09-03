@@ -1346,6 +1346,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     A loyalty token has been placed in <b>{region.name}</b>.
                 </p>;
             }
+            case "loyalty-token-gained": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
+                return <p>
+                    House <b>{house.name}</b> gained {data.count} Loyalty token{data.count > 1 && "s"} in <b>{region.name}</b>.
+                </p>
+            }
         }
     }
 }

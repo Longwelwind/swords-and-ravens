@@ -36,7 +36,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | SerGerrisDrinkwaterUsed | DraftHouseCardsBegan | HouseCardPicked
     | LittlefingerPowerTokensGained | AlayneStoneUsed | LysaArrynFfcPowerTokensGained | AnyaWaynwoodPowerTokensGained | RobertArrynUsed
     | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained | DaenerysTargaryenPowerTokensDiscarded | MissandeiUsed
-    | PowerTokensGifted | InfluenceTrackPositionChosen | TiesDecided | PlaceLoyaltyChoice | LoyaltyTokenPlaced;
+    | PowerTokensGifted | InfluenceTrackPositionChosen | TiesDecided | PlaceLoyaltyChoice | LoyaltyTokenPlaced | LoyaltyTokenGained;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -781,5 +781,12 @@ interface PlaceLoyaltyChoice {
 
 interface LoyaltyTokenPlaced {
     type: "loyalty-token-placed",
+    region: string;
+}
+
+interface LoyaltyTokenGained {
+    type: "loyalty-token-gained",
+    house: string;
+    count: number;
     region: string;
 }
