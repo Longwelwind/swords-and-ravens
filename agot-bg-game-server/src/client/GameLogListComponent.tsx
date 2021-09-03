@@ -1141,6 +1141,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const killedBecauseCantRetreat = data.killedBecauseCantRetreat.map(utid => unitTypes.get(utid).name);
                 return <p>
                     {killedBecauseWounded.length > 0 && (<><b>{house.name}</b> suffered battle casualties because these units were wounded: <>{joinReactNodes(killedBecauseWounded.map((unitType, i) => <b key={`wounded_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.</>)}
+                    {killedBecauseWounded.length > 0 && killedBecauseCantRetreat.length > 0 && (<br/>)}
                     {killedBecauseCantRetreat.length > 0 && (<><b>{house.name}</b> suffered battle casualties because these units can&apos;t retreat: <>{joinReactNodes(killedBecauseCantRetreat.map((unitType, i) => <b key={`cant-retreat_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.</>)}
                 </p>;
             }
