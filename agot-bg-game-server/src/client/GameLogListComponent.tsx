@@ -1333,7 +1333,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     ? "place a loyalty token in the suggested region"
                     : data.discardedPowerTokens == 2
                     ? "place a loyalty token in a random region"
-                    : data.discardedPowerTokens == 5
+                    : data.discardedPowerTokens == 4
                     ? "place two loyalty tokens in random regions"
                     : null;
                 return <p>
