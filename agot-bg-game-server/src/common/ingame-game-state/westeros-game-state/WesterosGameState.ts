@@ -176,6 +176,8 @@ export default class WesterosGameState extends GameState<IngameGameState,
     }
 
     onWesterosGameStateFinish(): void {
+        // Some loyalty tokens may have appeared on areas with Targaryen units in it => Gain them now!
+        this.ingame.gainLoyaltyTokens();
         this.ingame.onWesterosGameStateFinish(this.planningRestrictions);
     }
 

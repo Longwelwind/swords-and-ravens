@@ -87,19 +87,7 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         })
 
         // Gain Loyalty tokens
-        const targaryen = this.game.houses.tryGet("targaryen", null);
-        if (targaryen) {
-            this.world.getControlledRegions(targaryen).filter(r => r.loyaltyTokens).forEach(r => {
-                targaryen.gainedLoyaltyTokens += r.loyaltyTokens;
-                r.loyaltyTokens = 0;
-                this.entireGame.broadcastToClients({
-                    type: "loyalty-token-gained",
-                    house: targaryen.id,
-                    newLoyaltyTokenCount: targaryen.gainedLoyaltyTokens,
-                    region: r.id
-                });
-            });
-        }
+        this.ingameGameState.gainLoyaltyTokens();
 
         //   ... destroy orphaned ships (e.g. caused by Arianne)
         findOrphanedShipsAndDestroyThem(this.world, this.ingameGameState, this.actionGameState);
