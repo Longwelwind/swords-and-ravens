@@ -113,7 +113,7 @@ export default class World {
             throw new Error();
         }
 
-        if (army.every(u => u.type == dragon) && !retreat) {
+        if (army.every(u => u.type == dragon) && !retreat && !viaTransportOnly) {
             return this.regions.values.filter(r => r != startingRegion && r.type == land);
         }
 
