@@ -83,6 +83,19 @@ export default class MapComponent extends Component<MapComponentProps> {
                                 >
                                 </div>
                             )}
+                            {r.loyaltyTokens > 0 && (
+                                <div
+                                    className="loyalty-token"
+                                    style={{
+                                        left: r.unitSlot.point.x,
+                                        top: r.unitSlot.point.y,
+                                        backgroundImage: `url(${loyaltyTokenImage})`,
+                                        textAlign: "center",
+                                        color: "white"
+                                    }}
+                                >{r.loyaltyTokens > 1 ? r.loyaltyTokens : ""}
+                                </div>
+                            )}
                             {r.controlPowerToken && (
                                 <div
                                     className="power-token hover-weak-outline"
@@ -92,19 +105,6 @@ export default class MapComponent extends Component<MapComponentProps> {
                                         backgroundImage: `url(${housePowerTokensImages.get(r.controlPowerToken.id)})`
                                     }}
                                 >
-                                </div>
-                            )}
-                            {r.loyaltyTokens > 0 && (
-                                <div
-                                    className="loyalty-token"
-                                    style={{
-                                        left: r.powerTokenSlot.x,
-                                        top: r.powerTokenSlot.y,
-                                        backgroundImage: `url(${loyaltyTokenImage})`,
-                                        textAlign: "center",
-                                        color: "white"
-                                    }}
-                                >{r.loyaltyTokens > 1 ? r.loyaltyTokens : ""}
                                 </div>
                             )}
                         </div>
