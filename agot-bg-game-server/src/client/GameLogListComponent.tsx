@@ -1331,11 +1331,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const verb = data.discardedPowerTokens == 0
                     ? "place no loyalty token"
                     : data.discardedPowerTokens == 1
-                    ? "place a loyalty token in the suggested region"
-                    : data.discardedPowerTokens == 2
-                    ? "place a loyalty token in a random region"
-                    : data.discardedPowerTokens == 4
-                    ? "place two loyalty tokens in random regions"
+                    ? "place a loyalty token."
                     : null;
                 return <p>
                     House <b>{house.name}</b> decided to discard {data.discardedPowerTokens} Power token{data.discardedPowerTokens != 1 &&"s"}{verb && ` and ${verb}`}.

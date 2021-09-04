@@ -15,6 +15,16 @@ import StormOfSwordsWesterosCardType from "./StormOfSwordsWesterosCardType";
 import RainsOfAutumnWesterosCardType from "./RainsOfAutumnWesterosCardType";
 import BetterMap from "../../../../utils/BetterMap";
 import WildlingsAttackWesterosCardType from "./WildlingsAttackWesterosCardType";
+import DomesticDisputesWesterosCardType from "./DomesticDisputesWesterosCardType";
+import EmptyPromisesWesterosCardType from "./EmptyPromisesWesterosCardType";
+import FireMadeFleshWesterosCardType from "./FireMadeFleshWesterosCardType";
+import PlayingWithFireWesterosCardType from "./PlayingWithFireWesterosCardType";
+import ScatteringDissentWesterosCardType from "./ScatteringDissentWesterosCardType";
+import SouthronAmbitionsWesterosCardType from "./SouthronAmbitionsWesterosCardType";
+import StrongholdsOfResistanceWesterosCardType from "./StrongholdsOfResistanceWesterosCardType";
+import TheLongPlanWesterosCardType from "./TheLongPlanWesterosCardType";
+import WateringTheSeedWesterosCardType from "./WateringTheSeedWesterosCardType";
+import WordSpreadsQuicklyWesterosCardType from "./WordSpreadsQuicklyWesterosCardType";
 
 export const lastDaysOfSummer = new LastDaysOfSummerWesterosCardType("last-days-of-summer", "Last\xa0Days\xa0of\xa0Summer", "Nothing happens.", "Nothing\xa0happens", 2);
 export const winterIsComing = new WinterIsComingWesterosCardType("winter-is-coming", "Winter\xa0is\xa0Coming", "Immediately shuffle this deck. Then draw and resolve a new card.", "Reshuffle\xa0deck");
@@ -35,6 +45,17 @@ export const rainsOfAutumn = new RainsOfAutumnWesterosCardType("rains-of-autumn"
 export const putToTheSword = new PutToTheSwordWesterosCardType("put-to-the-sword", "Put\xa0to\xa0the\xa0Sword", "The holder of the Valyrian Steel Blade chooses one of the following conditions for this Planning Phase: a) Defense Orders cannot be played b) March +1 Orders cannot be played, or c) no restrictions.", "VSB\xa0decides");
 export const wildlingsAttack = new WildlingsAttackWesterosCardType("wildlings-attack", "Wildlings\xa0Attack", "The wildlings attack Westeros.", "");
 
+export const domesticDisputes = new DomesticDisputesWesterosCardType("domestic-disputes", "Domestic\xa0Disputes", "The Targaryen player may discard 1 power token to choose up to 4 other houses. Place 1 loyalty token on the home areas of those houses.", "Loyalty tokens in home areas", 0, ["storms-end"]);
+export const emptyPromises = new EmptyPromisesWesterosCardType("empty-promises", "Empty\xa0Promises", "The Targaryen player may discard 1 power token to place a loyalty token on either: The Mountains of the Moon or Moat Cailin.", "Place loyalty tokens", 0, ["the-stony-shore"], ["the-mountains-of-the-moon", "moat-cailin"]);
+export const fireMadeFlesh = new FireMadeFleshWesterosCardType("fire-made-flesh", "Fire\xa0Made\xa0Flesh", "The Targaryen player may either: a) destroy one Dragon to move any dragon strength token from the round track to the dragon strength box or b) place a destroyed Dragon in their home area (if able) or c) do nothing.", "Increase dragon strength or regain dragon", 0, ["the-reach"]);
+export const playingWithFire = new PlayingWithFireWesterosCardType("playing-with-fire", "Playing\xa0With\xa0Fire", "The Targaryen player may discard 1 power token to choose 1 uncontrolled land area and 1 other player. Place 1 loyalty token and 1 unit from the chosen player (of their choice) in the chosen area.", "Place loyalty token in an uncontrolled area", 0, ["riverrun", "the-arbor"]);
+export const scatteringDissent = new ScatteringDissentWesterosCardType("scattering-dissent", "Scattering\xa0Dissent", "In reverse turn order, each player moves a loyalty token to an adjacent area (if able). The Targaryen player may cancel each movement as it happens by discarding 1 power token.", "Move loyalty tokens in reverse order", 0, ["karhold", "oldtown"]);
+export const southronAmbitions = new SouthronAmbitionsWesterosCardType("southron-ambitions", "Southron\xa0Ambitions", "The Targaryen player may discard 1 power token to place a loyalty token on either: Blackwater or The Boneway", "Place loyalty tokens", 0, ["searoad-marches", "dornish-marches"], ["blackwater", "the-boneway"]);
+export const strongholdsOfResistance = new StrongholdsOfResistanceWesterosCardType("strongholds-of-resistance", "Strongholds\xa0Of\xa0Resistance", "The Targaryen player may discard 1 power token to place a loyalty token on either: Harrenhal or White Harbor", "Place loyalty tokens", 0, ["seagard"], ["harrenhal", "white-harbor"]);
+export const theLongPlan = new TheLongPlanWesterosCardType("the-long-plan", "The\xa0Long\xa0Plan", "The Targaryen player may discard 1 power token to choose 1 other player. The chosen player places 1 loyalty token in 2 different land areas.", "Other player places 2 loyalty tokens", 0, ["castle-black", "yronwood"]);
+export const wateringTheSeed = new WateringTheSeedWesterosCardType("watering-the-seed", "Watering\xa0The\xa0Seed", "The Targaryen player may discard power tokens equal to their current position on the victory track to place 1 loyalty token on 2 different land areas they do not control and that are adjacent to a river.", "Place loyalty tokens adjacent to a river", 0);
+export const wordSpreadsQuickly = new WordSpreadsQuicklyWesterosCardType("word-spreads-quickly", "Word\xa0Spreads\xa0Quickly", "In turn order, each player moves a loyalty token to an adjacent area (if able). The Targaryen player may cancel each movement as it happens by discarding 2 power tokens.", "Move loyalty tokens in turn order", 0, ["crackclaw-point", "three-towers"]);
+
 export const westerosCardTypes = new BetterMap<string, WesterosCardType>([
     [lastDaysOfSummer.id, lastDaysOfSummer],
     [winterIsComing.id, winterIsComing],
@@ -50,5 +71,15 @@ export const westerosCardTypes = new BetterMap<string, WesterosCardType>([
     [stormOfSwords.id, stormOfSwords],
     [rainsOfAutumn.id, rainsOfAutumn],
     [putToTheSword.id, putToTheSword],
-    [wildlingsAttack.id, wildlingsAttack]
+    [wildlingsAttack.id, wildlingsAttack],
+    [domesticDisputes.id, domesticDisputes],
+    [emptyPromises.id, emptyPromises],
+    [fireMadeFlesh.id, fireMadeFlesh],
+    [playingWithFire.id, playingWithFire],
+    [scatteringDissent.id, scatteringDissent],
+    [southronAmbitions.id, southronAmbitions],
+    [strongholdsOfResistance.id, strongholdsOfResistance],
+    [theLongPlan.id, theLongPlan],
+    [wateringTheSeed.id, wateringTheSeed],
+    [wordSpreadsQuickly.id, wordSpreadsQuickly]
 ]);

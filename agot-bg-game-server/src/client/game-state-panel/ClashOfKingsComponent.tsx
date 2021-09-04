@@ -20,7 +20,7 @@ import DistributePowerTokensComponent from "./DistributePowerTokensComponent";
 export default class ClashOfKingsComponent extends Component<GameStateComponentProps<ClashOfKingsGameState>> {
     render(): ReactNode {
         return <>
-            <ListGroupItem>
+            <ListGroupItem className="px-2">
                 <Row className="justify-content-center">
                     <Col xs={12} className="text-center">
                         Houses bid for the <strong>

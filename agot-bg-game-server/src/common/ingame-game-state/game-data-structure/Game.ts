@@ -67,6 +67,10 @@ export default class Game {
         return this.getTokenHolder(this.kingsCourtTrack);
     }
 
+    get targaryen(): House | null {
+        return this.houses.tryGet("targaryen", null);
+    }
+
     get influenceTracks(): House[][] {
         return [
             this.ironThroneTrack,
@@ -107,11 +111,11 @@ export default class Game {
         this.ingame = ingame;
     }
 
-    get nextWesterosCardTypes(): WesterosCardType[][] {
-        const result: WesterosCardType[][] = [];
+    get nextWesterosCardTypes(): (WesterosCardType | null)[][] {
+        const result: (WesterosCardType | null)[][] = [];
 
         this.westerosDecks.forEach(wd => {
-            result.push(wd.slice(0, this.revealedWesterosCards).map((card) => card.type));
+            result.push(wd.slice(0, this.revealedWesterosCards).map((card) => card.discarded ? null : card.type));
         });
 
         return result;

@@ -15,7 +15,7 @@ import Row from "react-bootstrap/Row";
 export default class MusteringComponent extends Component<GameStateComponentProps<MusteringGameState>> {
     render(): React.ReactNode {
         return (
-            <ListGroupItem>
+            <ListGroupItem className="px-2">
                 <Row>
                     {renderChildGameState(this.props, [[PlayerMusteringGameState, PlayerMusteringComponent]])}
                 </Row>

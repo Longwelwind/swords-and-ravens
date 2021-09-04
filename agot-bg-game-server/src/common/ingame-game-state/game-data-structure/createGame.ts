@@ -23,6 +23,12 @@ interface HouseCardContainer {
     houseCards: {[key: string]: HouseCardData};
 }
 
+interface WesterosCardData {
+    type: string;
+    quantity?: number;
+    loyaltyTokens?: string[];
+}
+
 interface HouseData {
     name: string;
     color: string;
@@ -60,6 +66,7 @@ export interface GameSetup {
     powerTokensOnBoard?: {[key: string]: string[]};
     garrisons?: {[key: string]: number};
     loyaltyTokens?: {[key: string]: number};
+    westerosCards?: WesterosCardData[][];
 }
 
 export interface GameSetupContainer {
@@ -297,15 +304,15 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     game.world = new World(regions, entireGame.gameSettings.playerCount);
 
     // Load Westeros Cards
+    let lastWesterosCardId = 0;
     game.westerosDecks = baseGameData.westerosCards.map(westerosDeckData => {
-        let lastId = 0;
 
         const cards: WesterosCard[] = [];
-        westerosDeckData.forEach(westerosCardData => {
+        westerosDeckData.forEach((westerosCardData: WesterosCardData) => {
             const westerosCardType = westerosCardTypes.get(westerosCardData.type);
             const quantity = westerosCardData.quantity ? westerosCardData.quantity : 1;
             for (let i = 0;i < quantity;i++) {
-                const id = ++lastId;
+                const id = ++lastWesterosCardId;
 
                 cards.push(new WesterosCard(id, westerosCardType));
             }
@@ -314,10 +321,38 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         return shuffleInPlace(cards);
     });
 
+    // Apply Westeros deck changes
+    if (entireGame.selectedGameSetup.westerosCards != undefined) {
+        const westerosCards = entireGame.selectedGameSetup.westerosCards;
+
+        for (let i=0; i< westerosCards.length; i++) {
+            if (westerosCards[i] != undefined) {
+                const cards: WesterosCard[] = [];
+                westerosCards[i].forEach((westerosCardData: WesterosCardData) => {
+                    const westerosCardType = westerosCardTypes.get(westerosCardData.type);
+                    const quantity = westerosCardData.quantity ? westerosCardData.quantity : 1;
+                    for (let i = 0;i < quantity;i++) {
+                        const id = ++lastWesterosCardId;
+
+                        cards.push(new WesterosCard(id, westerosCardType));
+                    }
+                });
+
+                shuffleInPlace(cards);
+
+                if (game.westerosDecks[i] == undefined) {
+                    game.westerosDecks.push(cards);
+                } else {
+                    game.westerosDecks[i] = cards;
+                }
+            }
+        }
+    }
+
     // Load Wildling deck
-    let lastId = 0;
+    let lastWildlingCardId = 0;
     game.wildlingDeck = baseGameData.wildlingCards.map(wildlingCardData => {
-        return new WildlingCard(++lastId, wildlingCardTypes.get(wildlingCardData.type));
+        return new WildlingCard(++lastWildlingCardId, wildlingCardTypes.get(wildlingCardData.type));
     });
     // Shuffle the deck
     game.wildlingDeck = shuffleInPlace(game.wildlingDeck);

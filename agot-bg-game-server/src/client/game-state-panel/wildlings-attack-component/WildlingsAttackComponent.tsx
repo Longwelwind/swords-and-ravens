@@ -59,7 +59,7 @@ export default class WildlingsAttackComponent extends Component<GameStateCompone
         return (
             <>
                 {wildlingCardType && (
-                    <ListGroupItem>
+                    <ListGroupItem className="px-2">
                         <Row className="justify-content-center">
                             <Col xs="auto">
                                 <WildlingCardComponent cardType={wildlingCardType}/>
@@ -67,7 +67,7 @@ export default class WildlingsAttackComponent extends Component<GameStateCompone
                         </Row>
                     </ListGroupItem>
                 )}
-                <ListGroupItem>
+                <ListGroupItem className="px-2">
                     <Row>
                         {this.props.gameState.childGameState instanceof BiddingGameState ? (
                             <Col xs={12}>

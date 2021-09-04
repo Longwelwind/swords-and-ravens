@@ -56,7 +56,7 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
             distributor: null
         });
 
-        const targaryen = this.game.houses.tryGet("targaryen", null);
+        const targaryen = this.game.targaryen;
         if (targaryen && results.some(([bid, houses]) => bid > 0 && houses.includes(targaryen))) {
             this.setChildGameState(new DistributePowerTokensGameState(this)).firstStart(targaryen, results);
             return;

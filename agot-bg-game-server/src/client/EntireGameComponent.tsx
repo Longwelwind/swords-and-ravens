@@ -46,7 +46,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     getBetaWarning(): ReactNode {
-        return <small>(BETA! Westeros Deck 4 and Iron Bank are not yet available!)</small>
+        return <small>(BETA! Some Westeros Deck IV effects and the Iron Bank are not yet available!)</small>
     }
 
     componentDidMount(): void {

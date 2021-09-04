@@ -746,7 +746,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     <Row>
                         {nextCards.map((wd, i) =>
                             <Col key={"westeros-deck-" + i + "-data"}>
-                                {wd.map((wc, j) => <div key={"westeros-deck-" + i + "-" + j + "-data"}>{wc.name}{wc.shortDescription && (<span>&ensp;<small>({wc.shortDescription})</small></span>)}</div>)}
+                                {wd.map((wc, j) => wc ? <div key={"westeros-deck-" + i + "-" + j + "-data"}>{wc.name}{wc.shortDescription && (<span>&ensp;<small>({wc.shortDescription})</small></span>)}</div> : <></>)}
                             </Col>)}
                     </Row>
                 </>

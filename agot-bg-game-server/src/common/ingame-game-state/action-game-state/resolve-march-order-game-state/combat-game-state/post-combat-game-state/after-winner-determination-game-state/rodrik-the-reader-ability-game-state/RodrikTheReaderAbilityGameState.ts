@@ -30,11 +30,19 @@ export default class RodrikTheReaderAbilityGameState extends GameState<
         return this.parentGameState.combatGameState;
     }
 
+    getChoices(): string[] {
+        const choices = ["Ignore", "First", "Second", "Third"];
+        if (this.game.westerosDecks.length == 4) {
+            choices.push("Fourth");
+        }
+        return choices;
+    }
+
     firstStart(house: House): void {
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
             house,
             "",
-            ["Ignore", "First", "Second", "Third"]
+            this.getChoices()
         );
     }
 

@@ -1,7 +1,7 @@
 import GameState from "../../GameState";
 import IngameGameState from "../IngameGameState";
 import WesterosCard from "../game-data-structure/westeros-card/WesterosCard";
-import Game, {MAX_WILDLING_STRENGTH} from "../game-data-structure/Game";
+import Game, {MAX_LOYALTY_TOKEN_COUNT, MAX_WILDLING_STRENGTH} from "../game-data-structure/Game";
 import World from "../game-data-structure/World";
 import {observable} from "mobx";
 import getById from "../../../utils/getById";
@@ -20,6 +20,7 @@ import PutToTheSwordGameState, {SerializedPutToTheSwordGameState} from "./put-to
 import AThroneOfBladesGameState, {SerializedAThroneOfBladesGameState} from "./thrones-of-blades-game-state/AThroneOfBladesGameState";
 import DarkWingsDarkWordsGameState, {SerializedDarkWingsDarkWordsGameState} from "./dark-wings-dark-words-game-state/DarkWingsDarkWordsGameState";
 import WesterosDeck4GameState, { SerializedWesterosDeck4GameState } from "./westeros-deck-4-game-state/WesterosDeck4GameState";
+import Region from "../game-data-structure/Region";
 
 export default class WesterosGameState extends GameState<IngameGameState,
     WildlingsAttackGameState | ReconcileArmiesGameState<WesterosGameState> | MusteringGameState | ClashOfKingsGameState
@@ -32,10 +33,6 @@ export default class WesterosGameState extends GameState<IngameGameState,
      * Elements are added by WesterosCardType.
      */
     planningRestrictions: PlanningRestriction[] = [];
-
-    get currentCard(): WesterosCard {
-        return this.revealedCards[this.currentCardI];
-    }
 
     get ingame(): IngameGameState {
         return this.parentGameState;
@@ -81,19 +78,28 @@ export default class WesterosGameState extends GameState<IngameGameState,
         });
 
         // Reveal the top cards of each deck
-        this.revealedCards = this.game.westerosDecks.map(deck => {
+        // Note: For the endless mode it doesn't make sense to execute Westeros deck 4 cards again!
+        // Therefore we apply a hack here: If the drawn card is already discarded, we don't add it to the revealed cards array anymore,
+        // which results then in only 3 revealed cards. This is absolutely non generic and only works because Westeros deck 4 is the last deck.
+        // But this requires no additional code changes and as we don't expect a third edition of the game it is ok for now.
+        // The better solution would be to have: "revealedCards: (WesterosCard | null)[]" but to fully support this we should
+        // then change game.westerosDecks as well to allow nulls and this is too much for now.
+        this.revealedCards = [];
+        for (let i=0; i < this.game.westerosDecks.length; i++) {
+            const deck = this.game.westerosDecks[i];
             const card = deck.shift() as WesterosCard;
 
-            card.discarded = true;
+            if (i != 3 || !card.discarded) {
+                card.discarded = true;
+                this.revealedCards.push(card);
+            }
 
             // Burry the card at the bottom of the deck
             deck.push(card);
-
-            return card;
-        });
+        }
 
         // Execute all immediately effects
-        for(let i=0; i<this.game.westerosDecks.length; i++) {
+        for(let i=0; i<this.revealedCards.length; i++) {
             this.revealedCards[i].type.executeImmediately(this, i);
         }
 
@@ -133,18 +139,6 @@ export default class WesterosGameState extends GameState<IngameGameState,
         this.executeNextCard();
     }
 
-    proceedTemporaryLoyaltyTokenHandling(): boolean {
-        // Todo: Remove this when Westeros deck 4 is implemented
-        const targaryen = this.game.houses.tryGet("targaryen", null);
-        if (!targaryen) {
-            return false;
-        }
-
-        this.setChildGameState(new WesterosDeck4GameState(this)).firstStart(targaryen);
-        return true;
-    }
-
-
     triggerWildlingsAttack(): void {
         this.setChildGameState(new WildlingsAttackGameState(this)).firstStart(this.game.wildlingStrength, this.game.houses.values);
     }
@@ -166,12 +160,9 @@ export default class WesterosGameState extends GameState<IngameGameState,
                 currentCardI: this.currentCardI
             });
 
-            this.executeCard(this.currentCard);
+            this.executeCard(this.revealedCards[this.currentCardI]);
         } else {
-            // Last card processed, go to next phase
-            if (!this.proceedTemporaryLoyaltyTokenHandling()) {
-                this.onWesterosGameStateFinish();
-            }
+            this.onWesterosGameStateFinish();
         }
     }
 
@@ -197,6 +188,22 @@ export default class WesterosGameState extends GameState<IngameGameState,
 
     onMusteringGameStateEnd(): void {
         this.executeNextCard();
+    }
+
+    placeLoyaltyToken(region: Region): void {
+        if (this.game.loyaltyTokensOnBoardCount + 1 <= MAX_LOYALTY_TOKEN_COUNT) {
+            region.loyaltyTokens += 1;
+            this.entireGame.broadcastToClients({
+                type: "loyalty-token-placed",
+                region: region.id,
+                newLoyaltyTokenCount: region.loyaltyTokens
+            });
+
+            this.ingame.log({
+                type: "loyalty-token-placed",
+                region: region.id
+            });
+        }
     }
 
     static deserializeFromServer(ingameGameState: IngameGameState, data: SerializedWesterosGameState): WesterosGameState {
