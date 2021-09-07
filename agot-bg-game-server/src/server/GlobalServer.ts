@@ -271,6 +271,7 @@ export default class GlobalServer {
         return EntireGame.deserializeFromServer(gameData.serializedGame as SerializedEntireGame);
     }
 
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     migrateSerializedGame(serializedGame: any, version: string): any {
         const migrationI = serializedGameMigrations.findIndex(m => m.version == version);
 

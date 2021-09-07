@@ -176,10 +176,6 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         .map(([hid, houseData]) => {
             const houseCards = playerHouses.includes(hid)
                 ? new BetterMap<string, HouseCard>(
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-                    // @ts-ignore The conversion provokes n error in the CI
-                    // Don't ask me why.
-
                     Object.entries(houseData.houseCards)
                         .map(([houseCardId, houseCardData]) => {
                             const houseCard = createHouseCard(houseCardId, houseCardData, hid);

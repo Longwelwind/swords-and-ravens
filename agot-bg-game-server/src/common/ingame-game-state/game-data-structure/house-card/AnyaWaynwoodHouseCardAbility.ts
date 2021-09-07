@@ -26,4 +26,4 @@ export default class AnyaWaynwoodHouseCardAbility extends HouseCardAbility {
         }
         afterWinnerDetermination.childGameState.onHouseCardResolutionFinish(house);
     }
-};
+}

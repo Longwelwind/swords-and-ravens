@@ -50,7 +50,7 @@ export interface CombatStats {
     tidesOfBattleCard: string | null | undefined;
     total: number;
     isWinner: boolean;
-};
+}
 
 export interface HouseCombatData {
     army: Unit[];

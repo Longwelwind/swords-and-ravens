@@ -56,7 +56,7 @@ export default class SerGerrisDrinkwaterAbilityGameState extends GameState<
             });
 
             this.parentGameState.onHouseCardResolutionFinish(house);
-        };
+        }
 
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
             house,

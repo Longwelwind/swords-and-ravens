@@ -17,4 +17,4 @@ export default class QarlTheMaidHouseCardAbility extends HouseCardAbility {
         }
         afterWinnerDetermination.childGameState.onHouseCardResolutionFinish(house);
     }
-};
+}

@@ -53,7 +53,7 @@ import Player from "../common/ingame-game-state/Player";
 import {observable} from "mobx";
 import classNames from "classnames";
 import {Channel, Message} from "./chat-client/ChatClient";
-// @ts-ignore
+// @ts-expect-error Somehow this module cannot be found while it is
 import ScrollToBottom from "react-scroll-to-bottom";
 import GameSettingsComponent from "./GameSettingsComponent";
 import VoteComponent from "./VoteComponent";

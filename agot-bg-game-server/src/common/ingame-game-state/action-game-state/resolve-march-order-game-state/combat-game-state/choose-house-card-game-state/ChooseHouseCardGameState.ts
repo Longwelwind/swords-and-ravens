@@ -224,9 +224,9 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
             this.ingameGameState.log({
                 type: "combat-house-card-chosen",
                 houseCards: [
-                    // @ts-ignore
+                    // @ts-expect-error House card is never null here
                     [this.combatGameState.attacker.id, this.combatGameState.attackingHouseCombatData.houseCard.id],
-                    // @ts-ignore
+                    // @ts-expect-error House card is never null here
                     [this.combatGameState.defender.id, this.combatGameState.defendingHouseCombatData.houseCard.id]
                 ]
             });
@@ -234,7 +234,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
             this.entireGame.broadcastToClients({
                 type: "change-combat-house-card",
                 // Same here, the houseCards will always be non-null
-                // @ts-ignore
+                // @ts-expect-error House card is never null here
                 houseCardIds: this.combatGameState.houseCombatDatas.map((h, hcd) => [h.id, hcd.houseCard.id])
             });
 

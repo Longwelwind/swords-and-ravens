@@ -175,7 +175,6 @@ export default class GameClient {
             message = JSON.parse(data) as ServerMessage;
         } catch (e) {
             console.error("Error occured while parsing server message");
-            console.exception(e);
             return;
         }
 
@@ -206,7 +205,7 @@ export default class GameClient {
             // Launch a WebSocket connection to this chat room
             this.chatClient.addChannel(message.roomId);
 
-            // @ts-ignore
+            // @ts-expect-error this.entireGame is always non-null here!
             const users = message.users.map(uid => this.entireGame.users.get(uid));
             const initiator = this.entireGame.users.get(message.initiator);
 

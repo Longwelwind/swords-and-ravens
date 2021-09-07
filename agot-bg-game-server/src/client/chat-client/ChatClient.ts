@@ -45,7 +45,7 @@ export class Channel {
             return false;
         }
 
-        // @ts-ignore
+        // @ts-expect-error As we checked for messages length before _.last will never return undefined
         return _.last(this.messages).id != this.lastViewedMessageId;
     }
 
@@ -84,7 +84,6 @@ export default class ChatClient {
      * @param channel Channel to mark as viewed
      */
     markAsViewed(channel: Channel): void {
-        // @ts-ignore
         const lastMessage = _.last(channel.messages);
         // Check if the last message viewed is already the last message
         if (lastMessage == null || lastMessage.id == channel.lastViewedMessageId) {
@@ -93,7 +92,6 @@ export default class ChatClient {
         channel.lastViewedMessageId = lastMessage.id;
         console.log('Marking as viewed');
 
-        // eslint-disable-next-line @typescript-eslint/camelcase
         channel.websocket.send(JSON.stringify({type: 'chat_view_message', message_id: channel.lastViewedMessageId}));
     }
 

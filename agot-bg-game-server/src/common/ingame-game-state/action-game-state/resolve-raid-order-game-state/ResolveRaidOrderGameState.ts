@@ -42,7 +42,7 @@ export default class ResolveRaidOrderGameState extends GameState<ActionGameState
             // This will disallow a RaidOrSupportPlusOne Order to be executed
             this.actionGameState.onResolveRaidOrderGameStateFinish();
             return;
-        };
+        }
 
         this.ingameGameState.log({
             type: "action-phase-resolve-raid-began"
