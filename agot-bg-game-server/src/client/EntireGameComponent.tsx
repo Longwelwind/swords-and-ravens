@@ -10,7 +10,6 @@ import CancelledComponent from "./CancelledComponent";
 import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
 import Col from "react-bootstrap/Col";
 import Badge from "react-bootstrap/Badge";
-import classNames from "classnames";
 import notificationSound from "../../public/sounds/notification.ogg";
 import faviconNormal from "../../public/images/favicon.ico";
 import faviconAlert from "../../public/images/favicon-alert.ico";
@@ -29,9 +28,10 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 <link rel="icon" href={this.props.gameClient.isOwnTurn() ? faviconAlert : faviconNormal} sizes="16x16" />
             </Helmet>
             <Col xs={12} className={this.props.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
-                <h4 style={{ marginLeft: "1rem", marginBottom: "0rem", textAlign: "center" }}>
-                    {this.props.entireGame.name} <Badge variant="primary" className={classNames({ 'display-none': !this.props.entireGame.gameSettings.pbem })}>PBEM</Badge> {this.props.entireGame.gameSettings.playerCount == 8 && this.getBetaWarning()}
-                </h4>
+                <div style={{ marginLeft: "1rem", marginBottom: "0rem", textAlign: "center"}}>
+                    <h4 style={{ display: "inline" }}>{this.props.entireGame.name} {this.getGameTypeBadge()}</h4>
+                    {this.props.entireGame.gameSettings.playerCount == 8 && this.getBetaWarning()}
+                </div>
             </Col>
             {
                 this.props.entireGame.childGameState instanceof LobbyGameState ? (
@@ -45,8 +45,14 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         </>;
     }
 
+    getGameTypeBadge(): ReactNode {
+        return this.props.entireGame.gameSettings.pbem
+            ? <Badge variant="primary" className="mx-3">PBEM</Badge>
+            : <Badge variant="success" className="mx-3">Live</Badge>;
+    }
+
     getBetaWarning(): ReactNode {
-        return <small>(BETA! The Iron Bank is not yet available!)</small>
+        return <h6 style={{display: "inline", fontWeight: "normal"}}>(BETA! The Iron Bank is not yet available!)</h6>
     }
 
     componentDidMount(): void {

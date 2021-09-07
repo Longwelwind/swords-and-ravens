@@ -1082,7 +1082,6 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         if (reveleadCard) {
                             reveleadCard.discarded = true;
                             ingame.game.westerosDecks[3].push(reveleadCard);
-    
                             westeros.revealedCardIds.push(reveleadCard.id);
                         }
                     }
