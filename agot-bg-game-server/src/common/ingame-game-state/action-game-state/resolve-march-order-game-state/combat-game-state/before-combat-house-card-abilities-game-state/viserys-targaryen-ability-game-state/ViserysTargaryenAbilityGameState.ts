@@ -96,7 +96,7 @@ BeforeCombatHouseCardAbilitiesGameState["childGameState"],
     }
 
     getAvailableHouseCards(house: House): HouseCard[] {
-        return house.houseCards.values.filter(hc => hc.state == HouseCardState.AVAILABLE);
+        return house.houseCards.values.filter(hc => hc.state == HouseCardState.AVAILABLE && hc.id != viserysTargaryen.id);
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
