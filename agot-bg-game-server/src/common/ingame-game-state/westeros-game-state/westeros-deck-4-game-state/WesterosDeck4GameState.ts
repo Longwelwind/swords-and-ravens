@@ -18,7 +18,6 @@ import FireMadeFleshGameState, { SerializedFireMadeFleshGameState } from "./fire
 import PlayingWithFireGameState, { SerializedPlayingWithFireGameState } from "./playing-with-fire-game-state/PlayingWithFireGameState";
 import TheLongPlanGameState, { SerializedTheLongPlanGameState } from "./the-long-plan-game-state/TheLongPlanGameState";
 import MoveLoyaltyTokensGameState, { SerializedMoveLoyaltyTokensGameState } from "./move-loyalty-tokens-game-state/MoveLoyaltyTokensGameState";
-import _ from "lodash";
 
 // Keep SimpleChoice as possible child game state for now to not migrate the running games.
 // Todo: Remove this at some point
@@ -71,12 +70,12 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
                 break;
             }
             case wordSpreadsQuickly.id: {
-                const resolveOrder = _.without(this.game.getTurnOrder(), this.game.targaryen).filter(h => !this.ingame.isVassalHouse(h));
+                const resolveOrder = this.game.getTurnOrder().filter(h => !this.ingame.isVassalHouse(h));
                 this.setChildGameState(new MoveLoyaltyTokensGameState(this)).firstStart(resolveOrder, 2);
                 break;
             }
             case scatteringDissent.id: {
-                const resolveOrder = _.reverse(_.without(this.game.getTurnOrder(), this.game.targaryen).filter(h => !this.ingame.isVassalHouse(h)));
+                const resolveOrder = this.game.getTurnOrder().filter(h => !this.ingame.isVassalHouse(h)).reverse();
                 this.setChildGameState(new MoveLoyaltyTokensGameState(this)).firstStart(resolveOrder, 1);
                 break;
             }
