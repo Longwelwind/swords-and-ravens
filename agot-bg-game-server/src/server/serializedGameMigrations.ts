@@ -1069,6 +1069,27 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "45",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                if (ingame.childGameState.type == "westeros") {
+                    const westeros = ingame.childGameState;
+                    if (ingame.game.houses.length == 8 && westeros.revealedCardIds.length == 3 && westeros.childGameState.type != "westeros-deck-4") {
+                        const reveleadCard = ingame.game.westerosDecks[3].shift();
+                        if (reveleadCard) {
+                            reveleadCard.discarded = true;
+                            ingame.game.westerosDecks[3].push(reveleadCard);
+    
+                            westeros.revealedCardIds.push(reveleadCard.id);
+                        }
+                    }
+                }
+            }
+            return serializedGame;
+        }
     }
 ];
 
