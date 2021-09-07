@@ -29,29 +29,28 @@ import Row from "react-bootstrap/Row";
 import classNames from "classnames";
 import WesterosCardComponent from "./utils/WesterosCardComponent";
 import WesterosDeck4GameState from "../../common/ingame-game-state/westeros-game-state/westeros-deck-4-game-state/WesterosDeck4GameState";
+import WesterosDeck4Component from "./westeros-deck-4-component/WesterosDeck4Component";
 
 @observer
 export default class WesterosGameStateComponent extends Component<GameStateComponentProps<WesterosGameState>> {
     render(): ReactNode {
         return (
             <>
-                {this.props.gameState.currentCard && (
-                    <ListGroupItem className="px-2">
-                        <Row className="justify-content-around">
-                            {this.props.gameState.revealedCards.map((wc, i) => (
-                                <Col xs="auto" key={i}>
-                                    <WesterosCardComponent
-                                        cardType={wc.type}
-                                        westerosDeckI={i}
-                                        size={"small"}
-                                        tooltip={true}
-                                        classNames={classNames({"medium-outline": this.props.gameState.currentCardI == i})}
-                                    />
-                                </Col>
-                            ))}
-                        </Row>
-                    </ListGroupItem>
-                )}
+                <ListGroupItem className="px-2">
+                    <Row className="justify-content-around">
+                        {this.props.gameState.revealedCards.map((wc, i) => (
+                            <Col xs="auto" key={i}>
+                                <WesterosCardComponent
+                                    cardType={wc.type}
+                                    westerosDeckI={i}
+                                    size={"small"}
+                                    tooltip={true}
+                                    classNames={classNames({"medium-outline": this.props.gameState.currentCardI == i})}
+                                />
+                            </Col>
+                        ))}
+                    </Row>
+                </ListGroupItem>
                 {this.props.gameState.childGameState instanceof PutToTheSwordGameState ? (
                     <ListGroupItem className="px-2">
                         <Row>
@@ -76,19 +75,12 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
                                                    mapControls={this.props.mapControls}/>
                         </Row>
                     </ListGroupItem>
-                ) : this.props.gameState.childGameState instanceof WesterosDeck4GameState ? (
-                    <ListGroupItem className="px-2">
-                        <Row>
-                            <SimpleChoiceComponent gameClient={this.props.gameClient}
-                                                    gameState={this.props.gameState.childGameState.childGameState}
-                                                    mapControls={this.props.mapControls}/>
-                        </Row>
-                    </ListGroupItem>
                 ) : renderChildGameState(this.props, [
                     [WildlingsAttackGameState, WildlingsAttackComponent],
                     [ReconcileArmiesGameState, ReconcileArmiesComponent],
                     [ClashOfKingsGameState, ClashOfKingsComponent],
-                    [MusteringGameState, MusteringComponent]
+                    [MusteringGameState, MusteringComponent],
+                    [WesterosDeck4GameState, WesterosDeck4Component]
                 ])}
             </>
         );

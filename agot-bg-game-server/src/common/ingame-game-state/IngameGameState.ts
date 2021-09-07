@@ -118,13 +118,11 @@ export default class IngameGameState extends GameState<
     }
 
     getInfluenceTrackWithRespectTargaryenIsAlwaysLast(track: House[]): House[] {
-        const targaryen = this.game.houses.tryGet("targaryen", null);
-
-        if (!targaryen) {
+        if (!this.game.targaryen) {
             return track;
         }
 
-        return _.concat(_.without(track, targaryen), targaryen);
+        return _.concat(_.without(track, this.game.targaryen), this.game.targaryen);
     }
 
     proceedDraftingInfluencePositions(vassalsOnInfluenceTracks: House[][]): void {
@@ -206,7 +204,7 @@ export default class IngameGameState extends GameState<
     }
 
     gainLoyaltyTokens(): void {
-        const targaryen = this.game.houses.tryGet("targaryen", null);
+        const targaryen = this.game.targaryen;
         if (targaryen) {
             this.world.getControlledRegions(targaryen).filter(r => r.loyaltyTokens > 0).forEach(r => {
                 targaryen.gainedLoyaltyTokens += r.loyaltyTokens;
@@ -561,6 +559,14 @@ export default class IngameGameState extends GameState<
         } else if (message.type == "loyalty-token-placed") {
             const region = this.world.regions.get(message.region);
             region.loyaltyTokens = message.newLoyaltyTokenCount;
+        } else if (message.type == "dragon-strength-token-removed") {
+            this.game.removedDragonStrengthToken = message.fromRound;
+        } else if (message.type == "move-loyalty-token") {
+            const regionFrom = this.world.regions.get(message.regionFrom);
+            const regionTo = this.world.regions.get(message.regionTo);
+
+            regionFrom.loyaltyTokens -= 1;
+            regionTo.loyaltyTokens += 1;
         } else {
             this.childGameState.onServerMessage(message);
         }

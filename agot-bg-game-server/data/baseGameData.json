@@ -48,7 +48,44 @@
           },
           "loyaltyTokens": {
             "kings-landing": 1
-          }
+          },
+          "westerosCards": [
+            null,
+            null,
+            null,
+            [
+              {
+                "type": "domestic-disputes"
+              },
+              {
+                "type": "empty-promises"
+              },
+              {
+                "type": "fire-made-flesh"
+              },
+              {
+                "type": "playing-with-fire"
+              },
+              {
+                "type": "scattering-dissent"
+              },
+              {
+                "type": "southron-ambitions"
+              },
+              {
+                "type": "strongholds-of-resistance"
+              },
+              {
+                "type": "the-long-plan"
+              },
+              {
+                "type": "watering-the-seed"
+              },
+              {
+                "type": "word-spreads-quickly"
+              }
+            ]
+          ]
         }
       ]
     },

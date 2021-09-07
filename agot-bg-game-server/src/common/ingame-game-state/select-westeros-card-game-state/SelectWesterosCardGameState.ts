@@ -28,7 +28,7 @@ export default class SelectWesterosCardGameState<P extends ParentGameState> exte
         this.house = house;
         this.deckId = deckId;
 
-        // Due to endless mode Deck 3 will be completely discarded in round 20, 30, etc...
+        // Due to endless mode Deck 3 will be completely discarded in round 20, 30, etc... Deck 4 will be completely discarded after round 11.
         if (this.parentGameState.game.westerosDecks[deckId].every(wc => wc.discarded)) {
             this.parentGameState.onSelectWesterosCardFinish(house, null, deckId);
         }

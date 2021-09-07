@@ -16,6 +16,16 @@ import webOfLies from "../../public/images/westeros-cards/WebOfLies.png";
 import wildlingsAttackIII from "../../public/images/westeros-cards/WildlingsAttackIII.png";
 import winterIsComing from "../../public/images/westeros-cards/WinterIsComing.png";
 import winterIsComingII from "../../public/images/westeros-cards/WinterIsComingII.png";
+import domesticDisputes from "../../public/images/westeros-cards/4/DomesticDisputes.png";
+import emptyPromises from "../../public/images/westeros-cards/4/EmptyPromises.png";
+import fireMadeFlesh from "../../public/images/westeros-cards/4/FireMadeFlesh.png";
+import playingWithFire from "../../public/images/westeros-cards/4/PlayingWithFire.png";
+import scatteringDissent from "../../public/images/westeros-cards/4/ScatteringDissent.png";
+import southronAmbitions from "../../public/images/westeros-cards/4/SouthronAmbitions.png";
+import strongholdsOfResistance from "../../public/images/westeros-cards/4/StrongholdsOfResistance.png";
+import theLongPlan from "../../public/images/westeros-cards/4/TheLongPlan.png";
+import wateringTheSeed from "../../public/images/westeros-cards/4/WateringTheSeed.png";
+import wordSpreadsQuickly from "../../public/images/westeros-cards/4/WordSpreadsQuickly.png";
 
 const westerosCardImages = new BetterMap([
     [0, new BetterMap([
@@ -40,6 +50,18 @@ const westerosCardImages = new BetterMap([
         ["storm-of-swords", stormOfSwords],
         ["web-of-lies", webOfLies],
         ["wildlings-attack", wildlingsAttackIII],
+    ])],
+    [3, new BetterMap([
+        ["domestic-disputes", domesticDisputes],
+        ["empty-promises", emptyPromises],
+        ["fire-made-flesh", fireMadeFlesh],
+        ["playing-with-fire", playingWithFire],
+        ["scattering-dissent", scatteringDissent],
+        ["southron-ambitions", southronAmbitions],
+        ["strongholds-of-resistance", strongholdsOfResistance],
+        ["the-long-plan", theLongPlan],
+        ["watering-the-seed", wateringTheSeed],
+        ["word-spreads-quickly", wordSpreadsQuickly]
     ])]
 ]);
 

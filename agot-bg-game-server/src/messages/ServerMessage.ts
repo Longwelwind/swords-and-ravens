@@ -25,7 +25,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | CrowKillersStepChanged | ManipulateCombatHouseCard | ChangeCombatTidesOfBattleCard
     | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting | UpdateCombatStats
     | UpdateDraftState | RevealBids | UpdateMaxTurns | PasswordResponse | ReplacedByVassal | UpdateDeletedHouseCards
-    | LoyaltyTokenGained | LoyaltyTokenPlaced;
+    | LoyaltyTokenGained | LoyaltyTokenPlaced | DrangonStrengthTokenRemoved | MoveLoyaltyToken | UpdateMoveLoyaltyTokenGameState;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -373,4 +373,21 @@ interface LoyaltyTokenPlaced {
     type: "loyalty-token-placed";
     region: string;
     newLoyaltyTokenCount: number;
+}
+
+interface DrangonStrengthTokenRemoved {
+    type: "dragon-strength-token-removed";
+    fromRound: number;
+}
+
+interface MoveLoyaltyToken {
+    type: "move-loyalty-token";
+    regionFrom: string;
+    regionTo: string;
+}
+
+interface UpdateMoveLoyaltyTokenGameState {
+    type: "update-move-loyalty-token-game-state";
+    regionFrom: string | null;
+    regionTo: string | null;
 }

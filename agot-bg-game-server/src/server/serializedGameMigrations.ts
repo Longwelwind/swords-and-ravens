@@ -8,6 +8,7 @@ import { HouseCardState } from "../common/ingame-game-state/game-data-structure/
 import { vassalHouseCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/vassalHouseCards";
 import { DraftStep } from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import _ from "lodash";
+import shuffleInPlace from "../utils/shuffle";
 //import { SerializedEntireGame } from "../common/EntireGame";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
@@ -1020,13 +1021,50 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
     {
         version: "43",
         migrate: (serializedGame: any) => {
-            // Turn on mapScrollbar again for all users as the new desktop experience is best with the map scrollbar
+            // Add migration for Targaryen beta
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
 
                 ingame.game.world.playerCount = ingame.game.houses.length;
                 ingame.game.world.regions.forEach((region: any) => region.loyaltyTokens = 0);
                 ingame.game.houses.forEach((h: any) => h.gainedLoyaltyTokens = 0);
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "44",
+        migrate: (serializedGame: any) => {
+            // Add Westeros deck 4
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                ingame.game.removedDragonStrengthToken = 0;
+
+                if (ingame.game.houses.length == 8) {
+                    let lastId = Math.max(..._.flatten(ingame.game.westerosDecks).map((wc: any) => wc.id));
+
+                    const wd4_ids = [ "domestic-disputes", "empty-promises", "fire-made-flesh",
+                        "playing-with-fire", "scattering-dissent", "southron-ambitions", "strongholds-of-resistance",
+                        "the-long-plan", "watering-the-seed", "word-spreads-quickly" ];
+                    const deck = wd4_ids.map(wd4id => ({
+                        id: ++lastId,
+                        typeId: wd4id,
+                        discarded: false
+                    }));
+
+                    shuffleInPlace(deck);
+                    ingame.game.westerosDecks.push(deck);
+
+                    ingame.gameLogManager.logs.forEach((l: any) => {
+                        if (l.data.type == "place-loyalty-choice") {
+                            l.data.loyaltyTokenCount = l.data.discardedPowerTokens == 0
+                                ? 0 : l.data.discardedPowerTokens == 1 || l.data.discardedPowerTokens == 2
+                                ? 1 : 2;
+                        }
+                    });
+                }
             }
 
             return serializedGame;

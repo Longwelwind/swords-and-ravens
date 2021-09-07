@@ -29,6 +29,17 @@ export default class World {
         return staticWorld7p.staticRegions.values.filter(r => r.type == land).map(r => r.id);
     }
 
+    get westerosLandRegions(): Region[] {
+        const westerosLandRegionIds = this.westerosLandRegionIds;
+        return this.regions.values.filter(r => westerosLandRegionIds.includes(r.id));
+    }
+
+    get regionsAdjacentToARiver(): Region[] {
+        const riverRegionsIds = [ "winterfell", "moat-cailin", "greywater-watch", "seagard", "the-twins", "riverrun", "the-mountains-of-the-moon", "harrenhal", "crackclaw-point",
+            "three-towers", "princes-pass", "starfall" ];
+        return this.regions.values.filter(r => riverRegionsIds.includes(r.id));
+    }
+
     constructor(regions: BetterMap<string, Region>, playerCount: number) {
         this.regions = regions;
         this.playerCount = playerCount;

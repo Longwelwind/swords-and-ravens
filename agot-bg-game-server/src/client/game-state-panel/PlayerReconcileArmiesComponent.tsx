@@ -62,7 +62,7 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
         const tooMuch = this.tooMuchReconciled;
         const notEnough = !this.enoughReconciled;
         return (
-            <ListGroupItem>
+            <ListGroupItem className="px-2">
                 <Row>
                     <Col xs={12} className="text-center">
                         <strong>{this.props.gameState.house.name}</strong> must reconcile their armies according to their supply limits.

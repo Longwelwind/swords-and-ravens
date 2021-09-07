@@ -1,7 +1,7 @@
 import WesterosGameState from "../WesterosGameState";
 import GameState from "../../../GameState";
 import SimpleChoiceGameState, {SerializedSimpleChoiceGameState} from "../../simple-choice-game-state/SimpleChoiceGameState";
-import Game, { MAX_LOYALTY_TOKEN_COUNT } from "../../game-data-structure/Game";
+import Game from "../../game-data-structure/Game";
 import Player from "../../Player";
 import {ClientMessage} from "../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../messages/ServerMessage";
@@ -10,10 +10,22 @@ import House from "../../game-data-structure/House";
 import BetterMap from "../../../../utils/BetterMap";
 import Region from "../../game-data-structure/Region";
 import popRandom from "../../../../utils/popRandom";
+import WesterosCardType from "../../game-data-structure/westeros-card/WesterosCardType";
+import ChooseRegionForLoyaltyTokenGameState, { SerializedChooseRegionForLoyaltyTokenGameState } from "./choose-region-for-loyalty-token-game-state/ChooseRegionForLoyaltyTokenGameState";
+import { domesticDisputes, emptyPromises, fireMadeFlesh, playingWithFire, scatteringDissent, southronAmbitions, strongholdsOfResistance, theLongPlan, wateringTheSeed, wordSpreadsQuickly } from "../../game-data-structure/westeros-card/westerosCardTypes";
+import ChooseMultipleRegionsForLoyaltyTokenGameState, { SerializedChooseMultipleRegionsForLoyaltyTokenGameState } from "./choose-multiple-regions-for-loyalty-token-game-state/ChooseMultipleRegionsForLoyaltyTokenGameState";
+import FireMadeFleshGameState, { SerializedFireMadeFleshGameState } from "./fire-made-flesh-game-state/FireMadeFleshGameState";
+import PlayingWithFireGameState, { SerializedPlayingWithFireGameState } from "./playing-with-fire-game-state/PlayingWithFireGameState";
+import TheLongPlanGameState, { SerializedTheLongPlanGameState } from "./the-long-plan-game-state/TheLongPlanGameState";
+import MoveLoyaltyTokensGameState, { SerializedMoveLoyaltyTokensGameState } from "./move-loyalty-tokens-game-state/MoveLoyaltyTokensGameState";
+import _ from "lodash";
 
-export default class WesterosDeck4GameState extends GameState<WesterosGameState, SimpleChoiceGameState> {
-    possbileRegionForLoyaltyToken: Region;
-
+// Keep SimpleChoice as possible child game state for now to not migrate the running games.
+// Todo: Remove this at some point
+export default class WesterosDeck4GameState extends GameState<WesterosGameState,
+    SimpleChoiceGameState | ChooseRegionForLoyaltyTokenGameState | ChooseMultipleRegionsForLoyaltyTokenGameState
+    | FireMadeFleshGameState | PlayingWithFireGameState | TheLongPlanGameState | MoveLoyaltyTokensGameState> {
+    possbileRegionForLoyaltyToken?: Region;
     get game(): Game {
         return this.parentGameState.game;
     }
@@ -22,35 +34,55 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
         return this.parentGameState.ingame;
     }
 
-    get westerosLandRegions(): Region[] {
-        const westerosLandRegionIds = this.ingame.world.westerosLandRegionIds;
-        return this.ingame.world.regions.values.filter(r => westerosLandRegionIds.includes(r.id));
-    }
-
-    firstStart(house: House): void {
-        // Every 2nd round place a loyalty token:
-        const regions = this.westerosLandRegions;
-        if (this.ingame.game.turn % 2 == 1 && this.ingame.game.loyaltyTokensOnBoardCount + 1 <= MAX_LOYALTY_TOKEN_COUNT) {
-            this.placeLoyaltyToken(popRandom(regions) as Region);
-        }
-
-        if (house.powerTokens == 0 || this.ingame.game.loyaltyTokensOnBoardCount + 1 > MAX_LOYALTY_TOKEN_COUNT) {
-            this.parentGameState.ingame.log({
-                type: "place-loyalty-choice",
-                house: house.id,
-                discardedPowerTokens: 0
-            });
-
-            this.parentGameState.onWesterosGameStateFinish();
+    firstStart(type: WesterosCardType): void {
+        if (!this.game.targaryen) {
+            this.parentGameState.onWesterosCardEnd();
             return;
         }
 
-        this.possbileRegionForLoyaltyToken = popRandom(regions) as Region;
-
-        this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(house,
-            `House ${house.name} may choose to discard Power tokens to place loyalty tokens.`,
-            this.getChoices(house).keys
-        );
+        switch(type.id) {
+            case emptyPromises.id:
+            case southronAmbitions.id:
+            case strongholdsOfResistance.id: {
+                const regions = type.choosableLoyaltyTokenRegions.map(rid => this.parentGameState.world.regions.get(rid));
+                this.setChildGameState(new ChooseRegionForLoyaltyTokenGameState(this)).firstStart(this.game.targaryen, regions);
+                break;
+            }
+            case domesticDisputes.id: {
+                const regions = this.game.world.westerosLandRegions.filter(r => r.superControlPowerToken != null);
+                this.setChildGameState(new ChooseMultipleRegionsForLoyaltyTokenGameState(this)).firstStart(this.game.targaryen, 1, regions, 4, "House Targaryen may place loyalty tokens in up to 4 capitals.");
+                break;
+            }
+            case wateringTheSeed.id: {
+                const regions = this.game.world.regionsAdjacentToARiver.filter(r => r.getController() != this.game.targaryen);
+                this.setChildGameState(new ChooseMultipleRegionsForLoyaltyTokenGameState(this)).firstStart(this.game.targaryen, this.game.getVictoryPoints(this.game.targaryen), regions, 2, "House Targaryen may place up to 2 loyalty tokens in regions adjacent to a river.");
+                break;
+            }
+            case fireMadeFlesh.id: {
+                this.setChildGameState(new FireMadeFleshGameState(this)).firstStart(this.game.targaryen);
+                break;
+            }
+            case playingWithFire.id: {
+                this.setChildGameState(new PlayingWithFireGameState(this)).firstStart(this.game.targaryen);
+                break;
+            }
+            case theLongPlan.id: {
+                this.setChildGameState(new TheLongPlanGameState(this)).firstStart(this.game.targaryen);
+                break;
+            }
+            case wordSpreadsQuickly.id: {
+                const resolveOrder = _.without(this.game.getTurnOrder(), this.game.targaryen).filter(h => !this.ingame.isVassalHouse(h));
+                this.setChildGameState(new MoveLoyaltyTokensGameState(this)).firstStart(resolveOrder, 2);
+                break;
+            }
+            case scatteringDissent.id: {
+                const resolveOrder = _.reverse(_.without(this.game.getTurnOrder(), this.game.targaryen).filter(h => !this.ingame.isVassalHouse(h)));
+                this.setChildGameState(new MoveLoyaltyTokensGameState(this)).firstStart(resolveOrder, 1);
+                break;
+            }
+            default:
+                this.parentGameState.onWesterosCardEnd();
+        }
     }
 
     getChoices(house: House): BetterMap<string, number> {
@@ -60,17 +92,17 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
             return result;
         }
 
-        const currentTokensOnBoard = this.ingame.game.loyaltyTokensOnBoardCount;
+        const available = this.ingame.game.isLoyaltyTokenAvailable;
 
-        if (currentTokensOnBoard + 1 <= MAX_LOYALTY_TOKEN_COUNT) {
+        if (this.possbileRegionForLoyaltyToken && available) {
             result.set(`Discard 1 Power token to place a loyalty token in ${this.possbileRegionForLoyaltyToken.name}`, 1);
         }
 
-        if (currentTokensOnBoard + 1 <= MAX_LOYALTY_TOKEN_COUNT && house.powerTokens >= 2) {
+        if (house.powerTokens >= 2 && available) {
             result.set(`Discard 2 Power tokens to place a loyalty token in a random region`, 2);
         }
 
-        if (this.game.turn % 2 == 0 && currentTokensOnBoard + 2 <= MAX_LOYALTY_TOKEN_COUNT && house.powerTokens >= 4) {
+        if (this.game.turn % 2 == 0 && house.powerTokens >= 4 && available) {
             result.set(`Discard 4 Power tokens to place two loyalty tokens in random regions`, 4);
         }
 
@@ -78,48 +110,42 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
     }
 
     onSimpleChoiceGameStateEnd(choice: number): void {
-        const discardedPowerTokens = this.getChoices(this.childGameState.house).values[choice];
-        this.parentGameState.ingame.log({
-            type: "place-loyalty-choice",
-            house: this.childGameState.house.id,
-            discardedPowerTokens: discardedPowerTokens
-        });
+        const simpleChoice = this.childGameState as SimpleChoiceGameState;
+        const discardedPowerTokens = this.getChoices(simpleChoice.house).values[choice];
 
-        this.ingame.changePowerTokens(this.childGameState.house, -discardedPowerTokens);
+        this.ingame.changePowerTokens(simpleChoice.house, -discardedPowerTokens);
 
         const regionsToPlaceNewLoyaltyTokens: Region[] = [];
-
+        let loyaltyTokenCount = 0;
         switch(discardedPowerTokens) {
             case 1:
-                regionsToPlaceNewLoyaltyTokens.push(this.possbileRegionForLoyaltyToken);
+                if (this.possbileRegionForLoyaltyToken) {
+                    regionsToPlaceNewLoyaltyTokens.push(this.possbileRegionForLoyaltyToken);
+                    loyaltyTokenCount = 1;
+                }
                 break;
             case 2:
-                regionsToPlaceNewLoyaltyTokens.push(popRandom(this.westerosLandRegions) as Region);
+                regionsToPlaceNewLoyaltyTokens.push(popRandom(this.game.world.westerosLandRegions) as Region);
+                loyaltyTokenCount = 1;
                 break;
             case 4:
-                regionsToPlaceNewLoyaltyTokens.push(popRandom(this.westerosLandRegions) as Region);
-                regionsToPlaceNewLoyaltyTokens.push(popRandom(this.westerosLandRegions) as Region);
+                regionsToPlaceNewLoyaltyTokens.push(popRandom(this.game.world.westerosLandRegions) as Region);
+                regionsToPlaceNewLoyaltyTokens.push(popRandom(this.game.world.westerosLandRegions) as Region);
+                loyaltyTokenCount = 2;
             default:
                 break;
         }
 
-        regionsToPlaceNewLoyaltyTokens.forEach(r => this.placeLoyaltyToken(r));
+        this.parentGameState.ingame.log({
+            type: "place-loyalty-choice",
+            house: simpleChoice.house.id,
+            discardedPowerTokens: discardedPowerTokens,
+            loyaltyTokenCount: loyaltyTokenCount
+        });
+
+        regionsToPlaceNewLoyaltyTokens.forEach(r => this.parentGameState.placeLoyaltyToken(r));
 
         this.parentGameState.onWesterosGameStateFinish();
-    }
-
-    placeLoyaltyToken(region: Region): void {
-        region.loyaltyTokens += 1;
-        this.entireGame.broadcastToClients({
-            type: "loyalty-token-placed",
-            region: region.id,
-            newLoyaltyTokenCount: region.loyaltyTokens
-        });
-
-        this.parentGameState.ingame.log({
-            type: "loyalty-token-placed",
-            region: region.id
-        });
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -133,7 +159,7 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
     serializeToClient(admin: boolean, player: Player | null): SerializedWesterosDeck4GameState {
         return {
             type: "westeros-deck-4",
-            possbileRegionForLoyaltyToken: this.possbileRegionForLoyaltyToken.id,
+            possbileRegionForLoyaltyToken: this.possbileRegionForLoyaltyToken?.id,
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -141,19 +167,36 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
     static deserializeFromServer(westeros: WesterosGameState, data: SerializedWesterosDeck4GameState): WesterosDeck4GameState {
         const westerosDeck4 = new WesterosDeck4GameState(westeros);
 
-        westerosDeck4.possbileRegionForLoyaltyToken = westeros.world.regions.get(data.possbileRegionForLoyaltyToken);
+        westerosDeck4.possbileRegionForLoyaltyToken = data.possbileRegionForLoyaltyToken ? westeros.world.regions.get(data.possbileRegionForLoyaltyToken) : undefined;
         westerosDeck4.childGameState = westerosDeck4.deserializeChildGameState(data.childGameState);
 
         return westerosDeck4;
     }
 
-    deserializeChildGameState(data: SerializedWesterosDeck4GameState["childGameState"]): SimpleChoiceGameState {
-        return SimpleChoiceGameState.deserializeFromServer(this, data);
+    deserializeChildGameState(data: SerializedWesterosDeck4GameState["childGameState"]): WesterosDeck4GameState["childGameState"] {
+        if (data.type == "simple-choice") {
+            return SimpleChoiceGameState.deserializeFromServer(this, data);
+        } else if (data.type == "choose-region-for-loyalty-token") {
+            return ChooseRegionForLoyaltyTokenGameState.deserializeFromServer(this, data);
+        } else if (data.type == "choose-multiple-regions-for-loyalty-token") {
+            return ChooseMultipleRegionsForLoyaltyTokenGameState.deserializeFromServer(this, data);
+        } else if (data.type == "fire-made-flesh") {
+            return FireMadeFleshGameState.deserializeFromServer(this, data);
+        } else if (data.type == "playing-with-fire") {
+            return PlayingWithFireGameState.deserializeFromServer(this, data);
+        } else if (data.type == "the-long-plan") {
+            return TheLongPlanGameState.deserializeFromServer(this, data);
+        } else if (data.type == "move-loyalty-tokens") {
+            return MoveLoyaltyTokensGameState.deserializeFromServer(this, data);
+        } else {
+            throw new Error();
+        }
     }
 }
 
 export interface SerializedWesterosDeck4GameState {
     type: "westeros-deck-4";
-    possbileRegionForLoyaltyToken: string;
-    childGameState: SerializedSimpleChoiceGameState;
+    possbileRegionForLoyaltyToken?: string;
+    childGameState: SerializedSimpleChoiceGameState | SerializedChooseRegionForLoyaltyTokenGameState | SerializedChooseMultipleRegionsForLoyaltyTokenGameState
+        | SerializedFireMadeFleshGameState | SerializedPlayingWithFireGameState | SerializedTheLongPlanGameState | SerializedMoveLoyaltyTokensGameState;
 }
