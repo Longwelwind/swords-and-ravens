@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import {observable} from "mobx";
 import EntireGame from "./EntireGame";
 import User from "../server/User";
@@ -31,8 +32,7 @@ export default class GameState<ParentGameState extends AnyGameState, ChildGameSt
 
     getChildGameState<GS extends GameState<any, any>>(gameState: any): GS {
         if (this instanceof gameState) {
-            // @ts-ignore
-            return this as GS;
+            return this as unknown as GS;
         } else {
             if (this.childGameState) {
                 return this.childGameState.getChildGameState(gameState);

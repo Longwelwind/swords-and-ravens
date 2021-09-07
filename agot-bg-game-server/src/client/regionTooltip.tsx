@@ -1,5 +1,4 @@
 import React from "react";
-import { ReactNode } from "react";
 import { Tooltip } from "react-bootstrap";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import Region from "../common/ingame-game-state/game-data-structure/Region";

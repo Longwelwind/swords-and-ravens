@@ -30,6 +30,7 @@ export default class LocalWebsiteClient implements WebsiteClient {
         };
     }
 
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/ban-types
     async saveGame(_gameId: string, _serializedGame: any, _viewOfGame: any, _players: {userId: string; data: object}[], _state: string, _version: string): Promise<void> {
         console.log("Game saved.");
     }

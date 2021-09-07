@@ -9,7 +9,6 @@ import {ClientMessage} from "../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../messages/ServerMessage";
 import IngameGameState from "../../IngameGameState";
 import DistributePowerTokensGameState, { SerializedDistributePowerTokensGameState } from "./distribute-power-tokens-game-state/DistributePowerTokensGameState";
-import _ from "lodash";
 
 export default class ClashOfKingsGameState extends GameState<WesterosGameState, BiddingGameState<ClashOfKingsGameState> | ResolveTiesGameState | DistributePowerTokensGameState> {
     currentTrackI = -1;

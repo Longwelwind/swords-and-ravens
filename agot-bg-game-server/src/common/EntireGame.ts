@@ -347,7 +347,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         return {turn, maxPlayerCount, settings};
     }
 
+    // eslint-disable-next-line @typescript-eslint/ban-types
     getPlayersInGame(): {userId: string; data: object}[] {
+        // eslint-disable-next-line @typescript-eslint/ban-types
         const players: {userId: string; data: object}[] = [];
         if (this.childGameState instanceof LobbyGameState) {
             this.childGameState.players.forEach((user, house) => {

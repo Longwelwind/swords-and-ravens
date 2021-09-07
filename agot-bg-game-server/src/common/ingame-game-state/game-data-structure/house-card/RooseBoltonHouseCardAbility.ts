@@ -26,4 +26,4 @@ export default class RooseBoltonHouseCardAbility extends HouseCardAbility {
 
         afterWinnerDetermination.childGameState.onHouseCardResolutionFinish(house);
     }
-};
+}

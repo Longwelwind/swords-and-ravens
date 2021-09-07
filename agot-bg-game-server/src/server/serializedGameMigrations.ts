@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import BetterMap from "../utils/BetterMap";
 import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
 import staticWorld from "../common/ingame-game-state/game-data-structure/static-data-structure/globalStaticWorld";

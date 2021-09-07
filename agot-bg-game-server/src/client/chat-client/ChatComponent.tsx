@@ -9,7 +9,7 @@ import Form from "react-bootstrap/Form";
 import {observable} from "mobx";
 import ChatClient, {Channel, Message} from "./ChatClient";
 import EntireGame from "../../common/EntireGame";
-// @ts-ignore
+// @ts-expect-error Somehow ts complains that this module cannot be found while it is
 import ScrollToBottom from "react-scroll-to-bottom";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import User from "../../server/User";
@@ -40,8 +40,8 @@ export default class ChatComponent extends Component<ChatComponentProps> {
     @observable inputText = "";
 
     static defaultProps = {
-        injectBetweenMessages: () => <></>,
-        getUserDisplayName: (u: User) => <>{u.name}</>
+        injectBetweenMessages: (): any => <></>,
+        getUserDisplayName: (u: User): any => <>{u.name}</>
     };
 
     get chatClient(): ChatClient {
@@ -132,7 +132,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
         this.channel.onMessage = null;
     }
 
-    componentDidUpdate(_prevProps: Readonly<ChatComponentProps>, _prevState: Readonly<{}>, _snapshot?: any): void {
+    componentDidUpdate(_prevProps: Readonly<ChatComponentProps>, _prevState: Readonly<Record<string, unknown>>): void {
         if (this.props.currentlyViewed) {
             this.chatClient.markAsViewed(this.channel);
         }

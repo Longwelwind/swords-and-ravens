@@ -89,6 +89,7 @@ export default class HouseCardResolutionGameState<P extends ParentGameState, C e
         return houseCardResolution;
     }
 
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     deserializeChildGameState(data: any): C {
         return this.parentGameState.deserializeHouseCardResolutionChild(this, data);
     }

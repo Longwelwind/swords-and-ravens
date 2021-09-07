@@ -32,4 +32,4 @@ export default class SerLorasTyrellHouseCardAbility extends HouseCardAbility {
 
         afterCombat.childGameState.onHouseCardResolutionFinish(house);
     }
-};
+}
