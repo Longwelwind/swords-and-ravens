@@ -1,7 +1,7 @@
 import GameState from "../../GameState";
 import IngameGameState from "../IngameGameState";
 import WesterosCard from "../game-data-structure/westeros-card/WesterosCard";
-import Game, {MAX_LOYALTY_TOKEN_COUNT, MAX_WILDLING_STRENGTH} from "../game-data-structure/Game";
+import Game, {MAX_WILDLING_STRENGTH} from "../game-data-structure/Game";
 import World from "../game-data-structure/World";
 import {observable} from "mobx";
 import getById from "../../../utils/getById";
@@ -191,7 +191,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
     }
 
     placeLoyaltyToken(region: Region): void {
-        if (this.game.loyaltyTokensOnBoardCount + 1 <= MAX_LOYALTY_TOKEN_COUNT) {
+        if (this.game.isLoyaltyTokenAvailable) {
             region.loyaltyTokens += 1;
             this.entireGame.broadcastToClients({
                 type: "loyalty-token-placed",

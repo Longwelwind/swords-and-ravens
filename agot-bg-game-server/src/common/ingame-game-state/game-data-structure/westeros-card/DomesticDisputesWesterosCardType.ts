@@ -1,5 +1,6 @@
 import WesterosCardType from "./WesterosCardType";
 import WesterosGameState from "../../westeros-game-state/WesterosGameState";
+import WesterosDeck4GameState from "../../westeros-game-state/westeros-deck-4-game-state/WesterosDeck4GameState";
 
 export default class DomesticDisputesWesterosCardType extends WesterosCardType {
     execute(westerosGameState: WesterosGameState): void {
@@ -8,6 +9,6 @@ export default class DomesticDisputesWesterosCardType extends WesterosCardType {
             westerosGameState.placeLoyaltyToken(region);
         });
 
-        westerosGameState.onWesterosCardEnd();
+        westerosGameState.setChildGameState(new WesterosDeck4GameState(westerosGameState)).firstStart(this);
     }
 }

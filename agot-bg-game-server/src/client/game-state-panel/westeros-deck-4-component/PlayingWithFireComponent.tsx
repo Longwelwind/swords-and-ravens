@@ -3,15 +3,16 @@ import {Component, ReactNode} from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
 import renderChildGameState from "../../utils/renderChildGameState";
 import React from "react";
-import ChooseRegionForLoyaltyTokenGameState from "../../../common/ingame-game-state/westeros-game-state/westeros-deck-4-game-state/choose-region-for-loyalty-token-game-state/ChooseRegionForLoyaltyTokenGameState";
+import PlayingWithFireGameState from "../../../common/ingame-game-state/westeros-game-state/westeros-deck-4-game-state/playing-with-fire-game-state/PlayingWithFireGameState";
 import SimpleChoiceGameState from "../../../common/ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
 import SimpleChoiceComponent from "../SimpleChoiceComponent";
 import SelectRegionGameState from "../../../common/ingame-game-state/select-region-game-state/SelectRegionGameState";
 import SelectRegionComponent from "../SelectRegionComponent";
 import { Col } from "react-bootstrap";
 
+
 @observer
-export default class ChooseRegionForLoyaltyTokenComponent extends Component<GameStateComponentProps<ChooseRegionForLoyaltyTokenGameState>> {
+export default class PlayingWithFireComponent extends Component<GameStateComponentProps<PlayingWithFireGameState>> {
     render(): ReactNode {
         return (
             <>

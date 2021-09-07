@@ -47,6 +47,7 @@ export default class Game {
     vassalHouseCards: BetterMap<string, HouseCard> = new BetterMap<string, HouseCard>();
     @observable houseCardsForDrafting: BetterMap<string, HouseCard> = new BetterMap();
     deletedHouseCards: BetterMap<string, HouseCard> = new BetterMap();
+    @observable removedDragonStrengthToken = 0;
 
     /**
      * Contains the vassal relations of the game.
@@ -100,11 +101,19 @@ export default class Game {
     }
 
     get currentDragonStrength(): number {
-        return Math.min(5, Math.floor(this.turn/2));
+        if (this.removedDragonStrengthToken > 0 && this.turn < this.removedDragonStrengthToken) {
+            return Math.min(5, Math.floor(this.turn/2) + 1);
+        } else {
+            return Math.min(5, Math.floor(this.turn/2));
+        }
     }
 
     get loyaltyTokensOnBoardCount(): number {
         return _.sum(this.world.regions.values.map(r => r.loyaltyTokens));
+    }
+
+    get isLoyaltyTokenAvailable(): boolean {
+        return (this.loyaltyTokensOnBoardCount + 1) <= MAX_LOYALTY_TOKEN_COUNT;
     }
 
     constructor(ingame: IngameGameState) {
@@ -244,7 +253,7 @@ export default class Game {
     }
 
     getAvailableUnitsOfType(house: House, unitType: UnitType): number {
-        return house.unitLimits.get(unitType) - this.getCountUnitsOfType(house, unitType);
+        return this.getUnitLimitOfType(house, unitType) - this.getCountUnitsOfType(house, unitType);
     }
 
     getUnitLimitOfType(house: House, unitType: UnitType): number {
@@ -468,7 +477,8 @@ export default class Game {
             vassalRelations: this.vassalRelations.map((key, value) => [key.id, value.id]),
             vassalHouseCards: this.vassalHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
             houseCardsForDrafting: this.houseCardsForDrafting.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
-            deletedHouseCards: this.deletedHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])
+            deletedHouseCards: this.deletedHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
+            removedDragonStrengthToken: this.removedDragonStrengthToken
         };
     }
 
@@ -497,6 +507,7 @@ export default class Game {
         game.vassalHouseCards = new BetterMap(data.vassalHouseCards.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
         game.houseCardsForDrafting = new BetterMap(data.houseCardsForDrafting.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
         game.deletedHouseCards = new BetterMap(data.deletedHouseCards.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
+        game.removedDragonStrengthToken = data.removedDragonStrengthToken;
 
         return game;
     }
@@ -525,4 +536,5 @@ export interface SerializedGame {
     vassalHouseCards: [string, SerializedHouseCard][];
     houseCardsForDrafting: [string, SerializedHouseCard][];
     deletedHouseCards: [string, SerializedHouseCard][];
+    removedDragonStrengthToken: number;
 }

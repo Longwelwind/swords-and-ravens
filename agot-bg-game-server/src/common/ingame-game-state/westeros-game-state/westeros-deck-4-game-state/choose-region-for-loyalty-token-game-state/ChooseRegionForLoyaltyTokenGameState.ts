@@ -1,15 +1,15 @@
-import GameState from "../../../GameState";
-import SimpleChoiceGameState, {SerializedSimpleChoiceGameState} from "../../simple-choice-game-state/SimpleChoiceGameState";
-import Game, { MAX_LOYALTY_TOKEN_COUNT } from "../../game-data-structure/Game";
-import Player from "../../Player";
-import {ClientMessage} from "../../../../messages/ClientMessage";
-import {ServerMessage} from "../../../../messages/ServerMessage";
-import IngameGameState from "../../IngameGameState";
-import House from "../../game-data-structure/House";
-import Region from "../../game-data-structure/Region";
-import SelectRegionGameState, { SerializedSelectRegionGameState } from "../../select-region-game-state/SelectRegionGameState";
-import WesterosDeck4GameState from "../westeros-deck-4-game-state/WesterosDeck4GameState";
-import WesterosGameState from "../WesterosGameState";
+import GameState from "../../../../GameState";
+import SimpleChoiceGameState, {SerializedSimpleChoiceGameState} from "../../../simple-choice-game-state/SimpleChoiceGameState";
+import Game from "../../../game-data-structure/Game";
+import Player from "../../../Player";
+import {ClientMessage} from "../../../../../messages/ClientMessage";
+import {ServerMessage} from "../../../../../messages/ServerMessage";
+import IngameGameState from "../../../IngameGameState";
+import House from "../../../game-data-structure/House";
+import Region from "../../../game-data-structure/Region";
+import SelectRegionGameState, { SerializedSelectRegionGameState } from "../../../select-region-game-state/SelectRegionGameState";
+import WesterosDeck4GameState from "../../westeros-deck-4-game-state/WesterosDeck4GameState";
+import WesterosGameState from "../../WesterosGameState";
 
 export default class ChooseRegionForLoyaltyTokenGameState extends GameState<WesterosDeck4GameState,
     SelectRegionGameState<ChooseRegionForLoyaltyTokenGameState> | SimpleChoiceGameState> {
@@ -34,7 +34,7 @@ export default class ChooseRegionForLoyaltyTokenGameState extends GameState<West
     getChoices(house: House): string[] {
         const result = [];
         result.push("Ignore");
-        if (house.powerTokens <= 0 && this.game.loyaltyTokensOnBoardCount + 1 <= MAX_LOYALTY_TOKEN_COUNT) {
+        if (house.powerTokens < 1 || !this.game.isLoyaltyTokenAvailable) {
             return result;
         }
 
@@ -48,14 +48,16 @@ export default class ChooseRegionForLoyaltyTokenGameState extends GameState<West
             this.ingame.log({
                 type: "place-loyalty-choice",
                 house: this.childGameState.house.id,
-                discardedPowerTokens: 0
+                discardedPowerTokens: 0,
+                loyaltyTokenCount: 0
             });
             this.westeros.onWesterosCardEnd();
         } else if (choice == 1) {
             this.ingame.log({
                 type: "place-loyalty-choice",
                 house: this.childGameState.house.id,
-                discardedPowerTokens: 1
+                discardedPowerTokens: 1,
+                loyaltyTokenCount: 1
             });
 
             // Remove the power token

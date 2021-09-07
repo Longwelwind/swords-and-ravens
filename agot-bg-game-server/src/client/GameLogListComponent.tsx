@@ -1131,7 +1131,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <>
                     <ul>
                         {gains.map(([house, gain]) => (
-                            <li key={`got-${house.id}`}><b>{house.name}</b> gained <b>{gain}</b> Power tokens.</li>
+                            <li key={`got-${house.id}`}><b>{house.name}</b> gained <b>{gain}</b> Power token{gain > 1 ? "s" : ""}.</li>
                         ))}
                     </ul>
                 </>;
@@ -1331,7 +1331,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const verb = data.discardedPowerTokens == 0
                     ? "place no loyalty token"
                     : data.discardedPowerTokens == 1
-                    ? "place a loyalty token."
+                    ? `place ${data.loyaltyTokenCount > 1 ? "loyalty tokens" : "a loyalty token"}`
                     : null;
                 return <p>
                     House <b>{house.name}</b> decided to discard {data.discardedPowerTokens} Power token{data.discardedPowerTokens != 1 &&"s"}{verb && ` and ${verb}`}.
@@ -1349,6 +1349,70 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <p>
                     House <b>{house.name}</b> gained {data.count} Loyalty token{data.count > 1 && "s"} in <b>{region.name}</b>.
                 </p>
+            }
+            case "fire-made-flesh-choice": {
+                const house = this.game.houses.get(data.house);
+
+                if (data.ignored) {
+                    return <p>
+                        <b>Fire Made Flesh</b>: House <b>{house.name}</b> decided to do nothing.
+                    </p>
+                } else if (data.dragonKilledInRegion) {
+                    const region = this.world.regions.get(data.dragonKilledInRegion);
+                    return <p>
+                        <b>Fire Made Flesh</b>: House <b>{house.name}</b> decided to destroy a dragon in <b>{region.name}</b>.
+                    </p>
+                } else if (data.removedDragonStrengthToken) {
+                    return <p>
+                        <b>Fire Made Flesh</b>: House <b>{house.name}</b> decided to remove the dragon strength token from round {data.removedDragonStrengthToken}.
+                    </p>
+                } else if (data.regainedDragonRegion) {
+                    const region = this.world.regions.get(data.regainedDragonRegion);
+                    return <p>
+                        <b>Fire Made Flesh</b>: House <b>{house.name}</b> decided to place a dragon in <b>{region.name}</b>.
+                    </p>
+                } else {
+                    return <></>;
+                }
+            }
+            case "playing-with-fire-choice": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
+                const unitType = unitTypes.get(data.unitType);
+
+                return <p>
+                    <b>Playing with Fire</b>: House <b>{house.name}</b> chose to place a <b>{unitType.name}</b> in <b>{region.name}</b>.
+                </p>
+            }
+            case "the-long-plan-choice": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+
+                return <p>
+                    <b>The Long Plan</b>: House <b>{house.name}</b> chose house <b>{affectedHouse.name}</b> to place 2 loyalty tokens.
+                </p>
+            }
+            case "move-loyalty-token-choice": {
+                const house = this.game.houses.get(data.house);
+
+                if (data.powerTokensDiscardedToCancelMovement == 0) {
+                    return <p>
+                        House <b>{house.name}</b> chose not to cancel the previous movement.
+                    </p>
+                } else if (data.powerTokensDiscardedToCancelMovement &&  data.powerTokensDiscardedToCancelMovement > 0) {
+                    return <p>
+                        House <b>{house.name}</b> discarded {data.powerTokensDiscardedToCancelMovement} Power token{data.powerTokensDiscardedToCancelMovement > 1 ? "s" : ""} to cancel the previous movement.
+                    </p>
+                } else if (data.regionFrom && data.regionTo) {
+                    const regionFrom = this.world.regions.get(data.regionFrom);
+                    const regionTo = this.world.regions.get(data.regionTo);
+
+                    return <p>
+                        House <b>{house.name}</b> moved a loyalty token from <b>{regionFrom.name}</b> to <b>{regionTo.name}</b>.
+                    </p>
+                } else {
+                    return <></>;
+                }
             }
         }
     }

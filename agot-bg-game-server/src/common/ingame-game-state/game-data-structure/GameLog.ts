@@ -36,7 +36,8 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | SerGerrisDrinkwaterUsed | DraftHouseCardsBegan | HouseCardPicked
     | LittlefingerPowerTokensGained | AlayneStoneUsed | LysaArrynFfcPowerTokensGained | AnyaWaynwoodPowerTokensGained | RobertArrynUsed
     | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained | DaenerysTargaryenPowerTokensDiscarded | MissandeiUsed
-    | PowerTokensGifted | InfluenceTrackPositionChosen | TiesDecided | PlaceLoyaltyChoice | LoyaltyTokenPlaced | LoyaltyTokenGained;
+    | PowerTokensGifted | InfluenceTrackPositionChosen | TiesDecided | PlaceLoyaltyChoice | LoyaltyTokenPlaced | LoyaltyTokenGained
+    | FireMadeFleshChoice | PlayWithFireChoice | TheLongPlanChoice | MoveLoyaltyTokenChoice;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -774,19 +775,50 @@ interface TiesDecided {
 }
 
 interface PlaceLoyaltyChoice {
-    type: "place-loyalty-choice",
+    type: "place-loyalty-choice";
     house: string;
     discardedPowerTokens: number;
+    loyaltyTokenCount: number;
 }
 
 interface LoyaltyTokenPlaced {
-    type: "loyalty-token-placed",
+    type: "loyalty-token-placed";
     region: string;
 }
 
 interface LoyaltyTokenGained {
-    type: "loyalty-token-gained",
+    type: "loyalty-token-gained";
     house: string;
     count: number;
     region: string;
+}
+
+interface FireMadeFleshChoice {
+    type: "fire-made-flesh-choice";
+    house: string;
+    ignored?: boolean;
+    dragonKilledInRegion?: string;
+    removedDragonStrengthToken?: number;
+    regainedDragonRegion?: string;
+}
+
+interface PlayWithFireChoice {
+    type: "playing-with-fire-choice";
+    house: string;
+    unitType: string;
+    region: string;
+}
+
+interface TheLongPlanChoice {
+    type: "the-long-plan-choice";
+    house: string;
+    affectedHouse: string;
+}
+
+interface MoveLoyaltyTokenChoice {
+    type: "move-loyalty-token-choice";
+    house: string;
+    regionFrom?: string;
+    regionTo?: string;
+    powerTokensDiscardedToCancelMovement?: number;
 }

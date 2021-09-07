@@ -9,7 +9,7 @@ import { vassalHouseCards } from "../common/ingame-game-state/game-data-structur
 import { DraftStep } from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import _ from "lodash";
 import shuffleInPlace from "../utils/shuffle";
-// import { SerializedEntireGame } from "../common/EntireGame";
+//import { SerializedEntireGame } from "../common/EntireGame";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
     {
@@ -1040,63 +1040,30 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
 
+                ingame.game.removedDragonStrengthToken = 0;
+
                 if (ingame.game.houses.length == 8) {
                     let lastId = Math.max(..._.flatten(ingame.game.westerosDecks).map((wc: any) => wc.id));
-                    const deck = [];
 
-                    deck.push({
+                    const wd4_ids = [ "domestic-disputes", "empty-promises", "fire-made-flesh",
+                        "playing-with-fire", "scattering-dissent", "southron-ambitions", "strongholds-of-resistance",
+                        "the-long-plan", "watering-the-seed", "word-spreads-quickly" ];
+                    const deck = wd4_ids.map(wd4id => ({
                         id: ++lastId,
-                        typeId: "domestic-disputes",
+                        typeId: wd4id,
                         discarded: false
-                    });
-                    deck.push({
-                        id: ++lastId,
-                        typeId: "empty-promises",
-                        discarded: false
-                    });
-                    deck.push({
-                        id: ++lastId,
-                        typeId: "fire-made-flesh",
-                        discarded: false
-                    });
-                    deck.push({
-                        id: ++lastId,
-                        typeId: "playing-with-fire",
-                        discarded: false
-                    });
-                    deck.push({
-                        id: ++lastId,
-                        typeId: "scattering-dissent",
-                        discarded: false
-                    });
-                    deck.push({
-                        id: ++lastId,
-                        typeId: "southron-ambitions",
-                        discarded: false
-                    });
-                    deck.push({
-                        id: ++lastId,
-                        typeId: "strongholds-of-resistance",
-                        discarded: false
-                    });
-                    deck.push({
-                        id: ++lastId,
-                        typeId: "the-long-plan",
-                        discarded: false
-                    });
-                    deck.push({
-                        id: ++lastId,
-                        typeId: "watering-the-seed",
-                        discarded: false
-                    });
-                    deck.push({
-                        id: ++lastId,
-                        typeId: "word-spreads-quickly",
-                        discarded: false
-                    });
+                    }));
 
                     shuffleInPlace(deck);
                     ingame.game.westerosDecks.push(deck);
+
+                    ingame.gameLogManager.logs.forEach((l: any) => {
+                        if (l.data.type == "place-loyalty-choice") {
+                            l.data.loyaltyTokenCount = l.data.discardedPowerTokens == 0
+                                ? 0 : l.data.discardedPowerTokens == 1 || l.data.discardedPowerTokens == 2
+                                ? 1 : 2;
+                        }
+                    });
                 }
             }
 

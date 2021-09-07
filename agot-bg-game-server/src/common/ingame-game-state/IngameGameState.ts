@@ -559,6 +559,14 @@ export default class IngameGameState extends GameState<
         } else if (message.type == "loyalty-token-placed") {
             const region = this.world.regions.get(message.region);
             region.loyaltyTokens = message.newLoyaltyTokenCount;
+        } else if (message.type == "dragon-strength-token-removed") {
+            this.game.removedDragonStrengthToken = message.fromRound;
+        } else if (message.type == "move-loyalty-token") {
+            const regionFrom = this.world.regions.get(message.regionFrom);
+            const regionTo = this.world.regions.get(message.regionTo);
+
+            regionFrom.loyaltyTokens -= 1;
+            regionTo.loyaltyTokens += 1;
         } else {
             this.childGameState.onServerMessage(message);
         }
