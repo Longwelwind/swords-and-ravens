@@ -16,7 +16,7 @@ export default class LocalWebsiteClient implements WebsiteClient {
         };
     }
 
-    async getUser(userId: string): Promise<StoredUserData> {
+    async getUser(matchId: string, userId: string): Promise<StoredUserData> {
         return {
             id: userId,
             name: `Player #${userId}`,

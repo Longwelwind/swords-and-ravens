@@ -25,6 +25,7 @@
     "ajv": "^8.6.2",
     "bootstrap": "^4.6.0",
     "classnames": "^2.2.6",
+    "copy-webpack-plugin": "^9.0.1",
     "crypto-browserify": "^3.12.0",
     "css-loader": "^6.2.0",
     "dotenv": "^10.0.0",
@@ -74,6 +75,8 @@
     "run-client": "webpack-dev-server --config webpack.client.js --mode=development",
     "build-client": "webpack --config webpack.client.js --mode=production",
     "run-server": "ts-node -T src/server/server.ts",
+    "build": "yarn run generate-json-schemas",
+    "start": "ts-node -T src/server/server.ts",
     "generate-json-schemas": "typescript-json-schema --strict-null-checks src/messages/ClientMessage.ts ClientMessage -o src/server/ClientMessage.json --include src/messages/*.ts",
     "lint": "eslint . --ext .ts,.tsx"
   },

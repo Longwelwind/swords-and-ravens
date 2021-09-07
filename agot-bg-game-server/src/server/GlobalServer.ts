@@ -16,6 +16,7 @@ import serializedGameMigrations from "./serializedGameMigrations";
 import * as Sentry from "@sentry/node"
 import { v4 } from "uuid";
 import sleep from "../utils/sleep";
+import AirMeepleWebsiteClient from "./website-client/AirMeepleWebsiteClient";
 
 interface UserConnectionInfo {
     userId: string;
@@ -52,6 +53,9 @@ export default class GlobalServer {
         if (process.env.MASTER_API_ENABLED != null) {
             console.log("Launching with live-website client");
             this.websiteClient = new LiveWebsiteClient();
+        } else if (process.env.AIRMEEPLE_API_ENABLED != null) {
+            console.log("Launching with airmeepl-website client");
+            this.websiteClient = new AirMeepleWebsiteClient();
         } else {
             console.log("Launching with local-website client");
             this.websiteClient = new LocalWebsiteClient();
@@ -112,7 +116,7 @@ export default class GlobalServer {
             const {userId, gameId, authToken} = message.authData;
 
             // Check that the user exists
-            const userData = await this.websiteClient.getUser(userId);
+            const userData = await this.websiteClient.getUser(gameId, userId);
 
             if (!userData) {
                 console.warn("Non-existing userId");

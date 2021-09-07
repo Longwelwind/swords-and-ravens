@@ -337,14 +337,37 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     getViewOfGame(): any {
-        // Creating a view of the current turn of the game
-        const turn = this.childGameState instanceof IngameGameState
-            ? this.childGameState.game.turn
-            : -1;
-        const maxPlayerCount = this.gameSettings.playerCount;
-        const settings = this.gameSettings;
+        // Create a view of game integrated with AirMeeple
+        const popover = this.childGameState instanceof IngameGameState ? `<p>Turn: <b>${this.childGameState.game.turn}</b></p>` : "";
+        
+        const badges = this.gameSettings.pbem
+            ? `<span class="badge badge-info">PBEM</span>`
+            : `<span class="badge badge-info">LIVE</span>`;
 
-        return {turn, maxPlayerCount, settings};
+        return {
+            popover,
+            badges,
+        };
+    }
+
+    getIconForHouse(houseId: string): string {
+        const iconsForHouses: {[key: string]: string} = {
+            "arryn": "ArrynInfluence",
+            "baratheon": "BaratheonInfluence",
+            "bolton": "BoltonInfluence",
+            "greyjoy": "GreyjoyInfluence",
+            "lannister": "LannisterInfluence",
+            "martell": "MartellInfluence",
+            "stark": "StarkInfluence",
+            "targaryen": "TargaryenInfluence",
+            "tyrell": "TyrellInfluence",
+        };
+
+        const icon = iconsForHouses[houseId];
+        return `
+            <span style="margin-top: -3.5px;margin-bottom: 2px;margin-right: 2px;display: inline-block;height: 0px;">
+                <img style="width: 18px; height: 18px" src="https://agot-bg.airmeeple.io/icons/${icon}.png" />
+            </span>`;
     }
 
     // eslint-disable-next-line @typescript-eslint/ban-types
@@ -357,7 +380,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 const playerData: {[key: string]: any} = {};
 
                 if (!this.gameSettings.randomHouses && !this.gameSettings.randomChosenHouses) {
+                    const houseImg = this.getIconForHouse(house.id);
+
                     playerData["house"] = house.id;
+                    playerData["badges"] = `<span class="badge badge-info">${houseImg} Playing</span>`;
                 }
 
                 players.push({
@@ -377,9 +403,30 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 // showing the badge or not, based on whether there are unseen messages.
                 const importantChatRooms = this.getPrivateChatRoomsOf(user);
 
+                let badges = "";
+
+                const houseImg = this.getIconForHouse(player.house.id);
+
+                if (waitedForUsers.includes(user)) {
+                    badges += `<span class="badge badge-info">${houseImg} YOUR TURN</span>`;
+                } else {
+                    badges += `<span class="badge badge-info">${houseImg} Playing</span>`;
+                }
+
+                const neededForVotes = ingame.votes.values.filter(vote => vote.state == VoteState.ONGOING).some(vote => !vote.votes.has(player.house));
+
+                if (neededForVotes) {
+                    badges += `
+                        <span class="badge badge-danger" data-toggle="tooltip" title="There is an ongoing vote">
+                            <i class="fas fa-vote-yea"></i>
+                        </span>
+                    `;
+                }
+
                 players.push({
                     userId: user.id,
                     data: {
+                        "badges": badges,
                         "house": player.house.id,
                         "waited_for": waitedForUsers.includes(user),
                         "important_chat_rooms": importantChatRooms.map(cr => cr.roomId),

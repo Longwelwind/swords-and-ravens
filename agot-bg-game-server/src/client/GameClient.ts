@@ -77,7 +77,7 @@ export default class GameClient {
     start(): void {
         const websocketHost = location.hostname == "localhost"
             ? "ws://localhost:5000"
-            : "wss://play." + location.hostname;
+            : "wss://play-" + location.hostname;
 
         console.log(`Connecting to ${websocketHost}`);
 

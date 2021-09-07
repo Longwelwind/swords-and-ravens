@@ -48,7 +48,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
         }
     }
 
-    async getUser(userId: string): Promise<StoredUserData | null> {
+    async getUser(matchId: string, userId: string): Promise<StoredUserData | null> {
         try {
             const response = await this.request.get(`${this.masterApiBaseUrl}/user/${userId}`);
 

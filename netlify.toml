@@ -1,0 +1,12 @@
+[build]
+    base = "agot-bg-game-server/"
+    publish = "dist/"
+    command = "yarn run generate-json-schemas && yarn run build-client"
+
+[build.environment]
+    NODE_VERSION = "14"
+
+[[redirects]]
+    from = "/*"
+    to = "/index.html"
+    status = 200
