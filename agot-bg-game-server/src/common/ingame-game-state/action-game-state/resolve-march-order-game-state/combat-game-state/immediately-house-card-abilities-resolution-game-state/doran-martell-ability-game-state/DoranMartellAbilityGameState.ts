@@ -31,8 +31,7 @@ export default class DoranMartellAbilityGameState extends GameState<
 
         // Put the enemy at the end of the influence track
         const influenceTrack = this.game.getInfluenceTrackByI(choice);
-        let newInfluenceTrack = _.concat(_.without(influenceTrack, enemy), enemy);
-        newInfluenceTrack = this.ingame.getInfluenceTrackWithRespectTargaryenIsAlwaysLast(newInfluenceTrack);
+        const newInfluenceTrack = _.concat(_.without(influenceTrack, enemy), enemy);
         this.game.setInfluenceTrack(choice, newInfluenceTrack);
 
         this.ingame.log({

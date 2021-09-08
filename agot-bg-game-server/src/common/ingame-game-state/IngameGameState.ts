@@ -99,9 +99,9 @@ export default class IngameGameState extends GameState<
 
             this.game.houseCardsForDrafting = new BetterMap();
 
-            this.game.ironThroneTrack = this.getRandomTrackOrder();
-            this.game.fiefdomsTrack = this.getRandomTrackOrder();
-            this.game.kingsCourtTrack = this.getRandomTrackOrder();
+            this.game.setInfluenceTrack(0, this.getRandomTrackOrder());
+            this.game.setInfluenceTrack(1, this.getRandomTrackOrder());
+            this.game.setInfluenceTrack(2, this.getRandomTrackOrder());
 
             this.beginNewTurn();
         } else {
@@ -113,16 +113,7 @@ export default class IngameGameState extends GameState<
         const playerHouses = this.game.houses.values.filter(h => !this.isVassalHouse(h));
         const vassalHouses = _.without(this.game.houses.values, ...playerHouses);
 
-        const result = _.concat(shuffleInPlace(playerHouses), shuffleInPlace(vassalHouses));
-        return this.getInfluenceTrackWithRespectTargaryenIsAlwaysLast(result);
-    }
-
-    getInfluenceTrackWithRespectTargaryenIsAlwaysLast(track: House[]): House[] {
-        if (!this.game.targaryen) {
-            return track;
-        }
-
-        return _.concat(_.without(track, this.game.targaryen), this.game.targaryen);
+        return _.concat(shuffleInPlace(playerHouses), shuffleInPlace(vassalHouses));
     }
 
     proceedDraftingInfluencePositions(vassalsOnInfluenceTracks: House[][]): void {

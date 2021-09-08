@@ -134,7 +134,8 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
             this.game.houseCardsForDrafting = new BetterMap();
             // Append vassals back to the tracks:
             for(let i=0; i<this.vassalsOnInfluenceTracks.length; i++) {
-                this.game.influenceTracks[i].push(...this.vassalsOnInfluenceTracks[i]);
+                const newInfluenceTrack = _.concat(this.game.influenceTracks[i], this.vassalsOnInfluenceTracks[i]);
+                this.game.setInfluenceTrack(i, newInfluenceTrack);
                 this.entireGame.broadcastToClients({
                     type: "change-tracker",
                     tracker: this.game.influenceTracks[i].map(h => h.id),
@@ -155,12 +156,17 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
             return;
         }
 
+        if (houseHasFullHand && houseToResolve == this.game.targaryen) {
+            this.proceedNextHouse();
+            return;
+        }
+
         if (houseHasFullHand) {
             this.proceedChooseInfluencePosition(houseToResolve);
             return;
         }
 
-        if (houseHasPositionOnAllInfluenceTracks) {
+        if (houseHasPositionOnAllInfluenceTracks || houseToResolve == this.game.targaryen) {
             this.proceedSelectHouseCard(houseToResolve);
             return;
         }
@@ -218,8 +224,9 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
 
     getNextHouse(): House | null {
         // If all houses have 7 house cards and all houses have positions in all 3 influence tracks return null
+        const housesWithoutTargaryen = this.game.targaryen ? _.without(this.houses, this.game.targaryen) : this.houses;
         if (this.houses.every(h => h.houseCards.size == 7) &&
-            this.game.influenceTracks.every(track => _.intersection(track, this.houses).length == this.houses.length)) {
+            this.game.influenceTracks.every(track => _.intersection(track, housesWithoutTargaryen).length == housesWithoutTargaryen.length)) {
             return null;
         }
 

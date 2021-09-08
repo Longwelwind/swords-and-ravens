@@ -38,6 +38,9 @@ export default class DraftInfluencePositionsGameState extends GameState<IngameGa
 
     firstStart(vassalsOnInfluenceTracks: House[][]): void {
         this.houses = shuffleInPlace(this.ingame.players.values.map(p => p.house));
+        if (this.game.targaryen) {
+            this.houses = _.without(this.houses, this.game.targaryen);
+        }
         this.draftOrder = draftOrders[this.houses.length - 1];
         this.currentRowIndex = 0;
         this.currentColumnIndex = -1;
@@ -53,7 +56,8 @@ export default class DraftInfluencePositionsGameState extends GameState<IngameGa
             this.game.houseCardsForDrafting = new BetterMap();
             // Append vassals back to the tracks:
             for(let i=0; i<this.vassalsOnInfluenceTracks.length; i++) {
-                this.game.influenceTracks[i].push(...this.vassalsOnInfluenceTracks[i]);
+                const newInfluenceTrack = _.concat(this.game.influenceTracks[i], this.vassalsOnInfluenceTracks[i]);
+                this.game.setInfluenceTrack(i, newInfluenceTrack);
                 this.entireGame.broadcastToClients({
                     type: "change-tracker",
                     tracker: this.game.influenceTracks[i].map(h => h.id),

@@ -100,7 +100,7 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
     }
 
     onResolveTiesGameState(_biddingResults: [number, House[]][], finalOrdering: House[]): void {
-        finalOrdering = this.ingame.getInfluenceTrackWithRespectTargaryenIsAlwaysLast(finalOrdering);
+        finalOrdering = this.game.getFixedInfluenceTrack(finalOrdering);
 
         this.parentGameState.ingame.log({
             type: "clash-of-kings-final-ordering",
