@@ -154,7 +154,9 @@ export default class MapComponent extends Component<MapComponentProps> {
                                 "clickable": true,
                                 // Whatever the strength of the highlight defined, show the same
                                 // highlightness
-                                "highlighted-region-area": true
+                                "highlighted-region-area": true,
+                                "highlighted-region-area-light": properties.highlight.light,
+                                "highlighted-region-area-strong": properties.highlight.strong
                             }
                         )}
                         onClick={properties.onClick != null ? properties.onClick : undefined} />

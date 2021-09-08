@@ -338,6 +338,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 gameClient={this.props.gameClient}
                                                 ingame={this.props.gameState}
                                                 house={h}
+                                                mapControls={this.mapControls}
                                             />
                                         ))}
                                         <ListGroupItem className="text-center font-italic">

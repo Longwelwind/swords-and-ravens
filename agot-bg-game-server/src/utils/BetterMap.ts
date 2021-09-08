@@ -79,4 +79,8 @@ export default class BetterMap<K, V> {
     has(key: K): boolean {
         return this._map.has(key);
     }
+
+    clear(): void {
+        this._map.clear();
+    }
 }

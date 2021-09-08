@@ -26,50 +26,70 @@ import GiftPowerTokensComponent from "./GiftPowerTokensComponent";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
 import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
-
-
+import MapControls, { RegionOnMapProperties } from "./MapControls";
+import Region from "../common/ingame-game-state/game-data-structure/Region";
+import PartialRecursive from "../utils/PartialRecursive";
+import BetterMap from "../utils/BetterMap";
+import { observable } from "mobx";
+import User from "../server/User";
 
 interface HouseRowComponentProps {
     house: House;
     gameClient: GameClient;
     ingame: IngameGameState;
+    mapControls: MapControls;
 }
 
 @observer
 export default class HouseRowComponent extends Component<HouseRowComponentProps> {
+    modifyRegionsOnMapCallback: any;
+    @observable highlightedRegions = new BetterMap<Region, PartialRecursive<RegionOnMapProperties>>();
+
     get house(): House {
         return this.props.house;
     }
 
+    get ingame(): IngameGameState {
+        return this.props.ingame;
+    }
+
     get game(): Game {
-        return this.props.ingame.game;
+        return this.ingame.game;
     }
 
     get isVassal(): boolean {
-        return this.props.ingame.isVassalHouse(this.house);
+        return this.ingame.isVassalHouse(this.house);
     }
 
     get player(): Player {
-        return this.props.ingame.getControllerOfHouse(this.house);
+        return this.ingame.getControllerOfHouse(this.house);
     }
 
     get suzerainHouse(): House | null {
-        return this.props.ingame.game.vassalRelations.tryGet(this.house, null);
+        return this.game.vassalRelations.tryGet(this.house, null);
     }
 
     render(): ReactNode {
-        const gameRunning = !(this.props.ingame.leafState instanceof GameEndedGameState) && !(this.props.ingame.leafState instanceof CancelledGameState);
+        const gameRunning = !(this.ingame.leafState instanceof GameEndedGameState) && !(this.ingame.leafState instanceof CancelledGameState);
         const victoryPoints = this.game.getVictoryPoints(this.house);
         const victoryPointsWarning = gameRunning && (this.game.structuresCountNeededToWin - 2 == victoryPoints);
         const victoryPointsCritical = gameRunning && (this.game.structuresCountNeededToWin - 1 == victoryPoints);
-        return this.props.ingame.rerender >= 0 && <>
-            <ListGroupItem style={{paddingLeft: "8px", paddingRight: "10px"}}>
+        let controller: User | null = null;
+        try {
+            controller = this.ingame.getControllerOfHouse(this.house).user
+        } catch {
+            // Just swallow this
+        }
+        const isWaitedFor = controller && !this.isVassal ? this.ingame.getWaitedUsers().includes(controller) : false;
+        return this.ingame.rerender >= 0 && <>
+            <ListGroupItem style={{padding: 0, margin: 0}}>
+                <div className={isWaitedFor ? "new-event" : ""} style={{paddingLeft: "8px", paddingRight: "10px", paddingTop: "12px", paddingBottom: "12px"}}>
                 <Row className="align-items-center">
-                    <Col xs="auto" className="pr-0" style={{width: "32px"}}>
+                    <Col xs="auto" className="pr-0" style={{ width: "32px" }} onMouseEnter={() => this.setHighlightedRegions()} onMouseLeave={() => this.highlightedRegions.clear()}>
                         {!this.isVassal ? (
                             <FontAwesomeIcon
-                                className={classNames({"invisible": !this.props.gameClient.isAuthenticatedUser(this.player.user)})}
-                                style={{color: this.house.color}}
+                                className={classNames({ "invisible": !this.props.gameClient.isAuthenticatedUser(this.player.user) })}
+                                style={{ color: this.house.color }}
                                 icon={faStar}
                                 size="lg"
                             />
@@ -84,18 +104,18 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                     </Tooltip>
                                 }
                             >
-                                <img src={battleGearImage} width={32} style={{margin: "-4px"}} />
+                                <img src={battleGearImage} width={32} style={{ margin: "-4px" }} />
                             </OverlayTrigger>
                         )}
                     </Col>
-                    <Col>
-                        <h5 style={{margin: 0, padding: 0}}><b style={{"color": this.house.color}}>{this.house.name}</b><br/></h5>
+                    <Col onMouseEnter={() => this.setHighlightedRegions()} onMouseLeave={() => this.highlightedRegions.clear()}>
+                        <h5 style={{ margin: 0, padding: 0 }}><b style={{ "color": this.house.color }}>{this.house.name}</b><br /></h5>
                         {!this.isVassal ? (
                             <>
                                 {" "}
                                 <UserLabel
                                     user={this.player.user}
-                                    gameState={this.props.ingame}
+                                    gameState={this.ingame}
                                     gameClient={this.props.gameClient}
                                 />
                             </>
@@ -108,7 +128,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         )}
                     </Col>
                     <Col xs="auto">
-                        <Row className="justify-content-center align-items-center" style={{width: 110}}>
+                        <Row className="justify-content-center align-items-center" style={{ width: 110 }}>
                             {unitTypes.values.map(type =>
                                 (this.game.getUnitLimitOfType(this.house, type) > 0) && (
                                     <Col xs={6} key={type.id}>
@@ -120,8 +140,8 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                                 <OverlayTrigger
                                                     overlay={this.renderUnitTypeTooltip(type)}
                                                     delay={{ show: 250, hide: 100 }}
-                                                    placement="auto">
-                                                    <div className="unit-icon small hover-weak-outline"
+                                                    placement="top">
+                                                    <div className="unit-icon small hover-weak-outline" onMouseEnter={() => this.setHighlightedRegions(type.id)} onMouseLeave={() => this.highlightedRegions.clear()}
                                                         style={{
                                                             backgroundImage: `url(${unitImages.get(this.house.id).get(type.id)})`,
                                                         }}
@@ -136,25 +156,30 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     {!this.isVassal && (<OverlayTrigger
                         overlay={this.renderTotalLandRegionsTooltip(this.house)}
                         delay={{ show: 250, hide: 100 }}
-                        placement="auto"
+                        placement="top"
                     >
-                        <Col xs="auto" className="d-flex align-items-center">
-                            <div style={{fontSize: "20px", color: victoryPointsWarning ? "#F39C12" : victoryPointsCritical ? "#FF0000" : undefined}}><b>{victoryPoints}</b></div>
+                        <Col xs="auto" className="d-flex align-items-center"
+                            onMouseEnter={() => this.setHighlightedRegions(this.house.id == "targaryen" ? "with-loyalty-tokens-only" : "with-castles-only")}
+                            onMouseLeave={() => this.highlightedRegions.clear()}>
+                            <div style={{ fontSize: "20px", color: victoryPointsWarning ? "#F39C12" : victoryPointsCritical ? "#FF0000" : undefined }}><b>{victoryPoints}</b></div>
                             <img
                                 className={classNames(
                                     "hover-weak-outline",
-                                    {"dye-warning": victoryPointsWarning},
-                                    {"dye-critical": victoryPointsCritical})}
+                                    { "dye-warning": victoryPointsWarning },
+                                    { "dye-critical": victoryPointsCritical })}
                                 src={this.house.id == "targaryen" ? verticalBanner : castleImage} width={40}
-                                style={{marginLeft: "10px"}}
+                                style={{ marginLeft: "10px" }}
                             />
-                    </Col>
+                        </Col>
                     </OverlayTrigger>)}
-                    <Col xs="auto" className={classNames("d-flex align-items-center", {"invisible": this.isVassal})}>
-                        <div style={{fontSize: "18px"}}>{this.house.powerTokens}</div>
+                    <Col xs="auto" className={classNames("d-flex align-items-center", { "invisible": this.isVassal })}
+                        onMouseEnter={() => this.setHighlightedRegions("with-power-tokens-only")}
+                        onMouseLeave={() => this.highlightedRegions.clear()}
+                    >
+                        <div style={{ fontSize: "18px" }}>{this.house.powerTokens}</div>
                         <OverlayTrigger
                             overlay={this.renderPowerPopover(this.house)}
-                            placement="auto"
+                            placement="right"
                             trigger="click"
                             rootClose
                         >
@@ -169,7 +194,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     </Col>
                 </Row>
                 <Row className="justify-content-center">
-                    {!this.props.ingame.isVassalHouse(this.house) ?
+                    {!this.isVassal ?
                         _.sortBy(this.house.houseCards.values, hc => hc.combatStrength).map(hc => (
                         <Col xs="auto" key={hc.id}>
                             {hc.state == HouseCardState.AVAILABLE ? (
@@ -195,8 +220,35 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         </Col>
                     ))}
                 </Row>
+                </div>
             </ListGroupItem>
         </>;
+    }
+
+    setHighlightedRegions(filter = ""): void {
+        let regions = this.ingame.world.getControlledRegions(this.house);
+        if (filter == "with-castles-only") {
+            regions = regions.filter(r => r.castleLevel > 0);
+        } else if (filter == "with-power-tokens-only") {
+            regions = regions.filter(r => r.controlPowerToken == this.house);
+        } else if (filter == "with-loyalty-tokens-only") {
+            regions = this.ingame.world.regions.values.filter(r => r.loyaltyTokens > 0);
+        } else if (filter != "") { // This is the unit type
+            regions = regions.filter(r => r.units.values.some(u => u.type.id == filter));
+        }
+
+        this.highlightedRegions.clear();
+
+        regions.forEach(r => {
+            this.highlightedRegions.set(r, {
+                highlight: {
+                    active: true,
+                    color: this.house.id != "greyjoy" ? this.house.color : "black",
+                    light: r.type.id == "sea",
+                    strong: r.type.id == "land"
+                }
+            });
+        })
     }
 
     private renderUnitTypeTooltip(unitType: UnitType): OverlayChildren {
@@ -222,16 +274,28 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
             <small>Available: </small><b>{availablePower}</b><br/>
             <small>On the board: </small><b>{powerTokensOnBoard}</b><br/>
             <small>Power Pool: </small><b>{powerInPool}</b>
-            {this.props.ingame.entireGame.gameSettings.allowGiftingPowerTokens &&
+            {this.ingame.entireGame.gameSettings.allowGiftingPowerTokens &&
                 this.props.gameClient.authenticatedPlayer &&
                 this.props.gameClient.authenticatedPlayer.house != house &&
                 <div className="mt-1" ><br/>
                     <GiftPowerTokensComponent
                         toHouse={this.house}
                         authenticatedPlayer={this.props.gameClient.authenticatedPlayer}
-                        ingame={this.props.ingame}/>
+                        ingame={this.ingame}/>
                 </div>
             }
         </Popover>;
+    }
+
+    modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
+        return this.highlightedRegions.entries;
+    }
+
+    componentDidMount(): void {
+        this.props.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
+    }
+
+    componentWillUnmount(): void {
+        _.pull(this.props.mapControls.modifyRegionsOnMap, this.modifyRegionsOnMapCallback);
     }
 }
