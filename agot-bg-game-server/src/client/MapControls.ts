@@ -6,7 +6,9 @@ import { ReactElement } from "react";
 
 interface HighlightProperties {
     active: boolean;
-    color: "white" | "yellow" | "red" | "green";
+    color: string;
+    light?: boolean;
+    strong?: boolean;
 }
 
 export interface RegionOnMapProperties {

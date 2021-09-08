@@ -304,13 +304,21 @@ export default class Game {
         }
     }
 
+    getFixedInfluenceTrack(track: House[]): House[] {
+        if (!this.targaryen) {
+            return track;
+        }
+
+        return _.concat(_.without(track, this.targaryen), this.targaryen);
+    }
+
     setInfluenceTrack(i: number, track: House[]): void {
         if (i == 0) {
-            this.ironThroneTrack = track;
+            this.ironThroneTrack = this.getFixedInfluenceTrack(track);
         } else if (i == 1) {
-            this.fiefdomsTrack = track;
+            this.fiefdomsTrack = this.getFixedInfluenceTrack(track);
         } else if (i == 2) {
-            this.kingsCourtTrack = track;
+            this.kingsCourtTrack = this.getFixedInfluenceTrack(track);
         } else {
             throw new Error();
         }

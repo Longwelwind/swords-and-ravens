@@ -13,6 +13,7 @@ import {observable} from "mobx";
 import {observer} from "mobx-react";
 import {UnitOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
+import joinReactNodes from "../utils/joinReactNodes";
 
 @observer
 export default class SelectUnitsComponent extends Component<GameStateComponentProps<SelectUnitsGameState<any>>> {
@@ -25,18 +26,32 @@ export default class SelectUnitsComponent extends Component<GameStateComponentPr
             <>
                 <Col xs={12}>
                     {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
-                        <Row className="justify-content-center">
-                            <Col xs="auto">
-                                <Button onClick={() => this.reset()} variant="danger" disabled={this.countSelectedUnits() == 0}>
-                                    Reset
-                                </Button>
-                            </Col>
-                            <Col xs="auto">
-                                <Button onClick={() => this.confirm()} disabled={!this.props.gameState.selectedCountMatchesExpectedCount(this.selectedUnits.entries)}>
-                                    Confirm
-                                </Button>
-                            </Col>
-                        </Row>
+                        <>
+                            {this.selectedUnits.size > 0 && (
+                                <Row className="mx-2">
+                                    <div>
+                                        <div className="mb-2">Selected units:</div>
+                                        <ul>
+                                            {this.selectedUnits.entries.map(([region, units]) => (
+                                                <li key={`select_units_${region.id}`}>{joinReactNodes(units.map((u, i) => <b key={`${region.id}_${u.id}_${i}`}>{u.type.name}</b>), ", ")} in <b>{region.name}</b></li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </Row>
+                            )}
+                            <Row className="justify-content-center">
+                                <Col xs="auto">
+                                    <Button onClick={() => this.reset()} variant="danger" disabled={this.countSelectedUnits() == 0}>
+                                        Reset
+                                    </Button>
+                                </Col>
+                                <Col xs="auto">
+                                    <Button onClick={() => this.confirm()} disabled={!this.props.gameState.selectedCountMatchesExpectedCount(this.selectedUnits.entries)}>
+                                        Confirm
+                                    </Button>
+                                </Col>
+                            </Row>
+                        </>
                     ) : (
                         <div className="text-center">
                             Waiting for {this.props.gameState.house.name}...
