@@ -3,7 +3,7 @@ import { Component, ReactNode } from "react";
 import React from "react";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import House from "../common/ingame-game-state/game-data-structure/House";
-import { ListGroupItem, Row, Col, OverlayTrigger, Tooltip, Popover } from "react-bootstrap";
+import { ListGroupItem, Row, Col, OverlayTrigger, Tooltip, Popover, Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
 import { faStar } from "@fortawesome/free-solid-svg-icons/faStar";
@@ -274,15 +274,30 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
             <small>Available: </small><b>{availablePower}</b><br/>
             <small>On the board: </small><b>{powerTokensOnBoard}</b><br/>
             <small>Power Pool: </small><b>{powerInPool}</b>
-            {this.ingame.entireGame.gameSettings.allowGiftingPowerTokens &&
-                this.props.gameClient.authenticatedPlayer &&
-                this.props.gameClient.authenticatedPlayer.house != house &&
+            {this.props.gameClient.authenticatedPlayer &&
+            this.props.gameClient.authenticatedPlayer.house != house &&
+            this.ingame.canGiftPowerTokens(this.props.gameClient.authenticatedPlayer.house) &&
                 <div className="mt-1" ><br/>
                     <GiftPowerTokensComponent
                         toHouse={this.house}
                         authenticatedPlayer={this.props.gameClient.authenticatedPlayer}
                         ingame={this.ingame}/>
                 </div>
+            }
+            {this.props.gameClient.authenticatedPlayer?.house == this.ingame.game.targaryen && house == this.ingame.game.targaryen &&
+            <div className="mt-3">
+                <Button
+                    onClick={() => {
+                        if (window.confirm("Are you sure you want to return all your power tokens to your pool?")) {
+                            this.props.ingame.dropPowerTokens(house);
+                            document.body.click();
+                        }
+                    }}
+                    disabled={house.powerTokens <= 0}
+                >
+                    Drop all available Power tokens
+                </Button>
+            </div>
             }
         </Popover>;
     }
