@@ -18,13 +18,7 @@ export default class AKingBeyondTheWallWildlingVictoryGameState extends Wildling
     executeForLowestBidder(house: House): void {
         this.game.influenceTracks.forEach((t, i) => {
             const newTrack = _.concat(_.without(t, house), house);
-            this.ingame.game.setInfluenceTrack(i, newTrack);
-
-            this.entireGame.broadcastToClients({
-                type: "change-tracker",
-                trackerI: i,
-                tracker: newTrack.map(h => h.id)
-            });
+            this.ingame.setInfluenceTrack(i, newTrack);
         });
 
         this.ingame.log({
@@ -47,13 +41,7 @@ export default class AKingBeyondTheWallWildlingVictoryGameState extends Wildling
         const track = this.game.getInfluenceTrackByI(trackIndex);
 
         const newTrack = _.concat(_.without(track, house), house);
-        this.game.setInfluenceTrack(trackIndex, newTrack);
-
-        this.entireGame.broadcastToClients({
-            type: "change-tracker",
-            trackerI: trackIndex,
-            tracker: newTrack.map(h => h.id)
-        });
+        this.ingame.setInfluenceTrack(trackIndex, newTrack);
 
         this.ingame.log({
             type: "a-king-beyond-the-wall-house-reduce-track",

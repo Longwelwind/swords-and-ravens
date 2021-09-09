@@ -10,17 +10,11 @@ export default class VarysHouseCardAbility extends HouseCardAbility {
         // Put the vassal at the top of the influence track
         const fiefdoms = _.without(afterCombat.game.fiefdomsTrack, house);
         fiefdoms.unshift(house);
-        afterCombat.game.setInfluenceTrack(1, fiefdoms);
+        afterCombat.combatGameState.ingameGameState.setInfluenceTrack(1, fiefdoms);
 
         afterCombat.combatGameState.ingameGameState.log({
             type: "varys-used",
             house: house.id
-        });
-
-        afterCombat.combatGameState.ingameGameState.entireGame.broadcastToClients({
-            type: "change-tracker",
-            trackerI: 1,
-            tracker: fiefdoms.map(h => h.id)
         });
 
         afterCombat.childGameState.onHouseCardResolutionFinish(house);

@@ -32,19 +32,13 @@ export default class DoranMartellAbilityGameState extends GameState<
         // Put the enemy at the end of the influence track
         const influenceTrack = this.game.getInfluenceTrackByI(choice);
         const newInfluenceTrack = _.concat(_.without(influenceTrack, enemy), enemy);
-        this.game.setInfluenceTrack(choice, newInfluenceTrack);
+        this.ingame.setInfluenceTrack(choice, newInfluenceTrack);
 
         this.ingame.log({
             type: "doran-used",
             house: this.childGameState.house.id,
             affectedHouse: enemy.id,
             influenceTrack: choice
-        });
-
-        this.parentGameState.entireGame.broadcastToClients({
-            type: "change-tracker",
-            trackerI: choice,
-            tracker: newInfluenceTrack.map(h => h.id)
         });
 
         this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);

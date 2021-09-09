@@ -29,21 +29,14 @@ export default class AKingBeyondTheWallNightsWatchVictoryGameState extends GameS
 
     onSimpleChoiceGameStateEnd(choice: number): void {
         const house = this.parentGameState.highestBidder;
-        const track = this.game.influenceTracks[choice];
 
-        _.pull(track, house);
-        track.unshift(house);
+        const newTrack = _.concat(house, _.without(this.game.getInfluenceTrackByI(choice), house));
+        this.ingame.setInfluenceTrack(choice, newTrack);
 
         this.ingame.log({
             type: "a-king-beyond-the-wall-highest-top-track",
             house: house.id,
             trackI: choice
-        });
-
-        this.entireGame.broadcastToClients({
-            type: "change-tracker",
-            trackerI: choice,
-            tracker: track.map(h => h.id)
         });
 
         this.parentGameState.onWildlingCardExecuteEnd();
