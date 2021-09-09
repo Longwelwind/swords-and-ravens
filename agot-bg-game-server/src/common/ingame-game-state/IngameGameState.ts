@@ -312,7 +312,7 @@ export default class IngameGameState extends GameState<
 
             this.createVote(player.user, new ReplacePlayerByVassal(playerToReplace.user, playerToReplace.house));
         } else if (message.type == "gift-power-tokens") {
-            if (!this.canGiftPowerTokens()) {
+            if (!this.canGiftPowerTokens(player.house)) {
                 return;
             }
 
@@ -331,6 +331,13 @@ export default class IngameGameState extends GameState<
                     powerTokens: message.powerTokens
                 });
             }
+        } else if (message.type == "drop-power-tokens") {
+            // Only allow Targ to drop their Power tokens
+            if (player.house != this.game.targaryen) {
+                return;
+            }
+
+            this.changePowerTokens(player.house, -player.house.powerTokens);
         } else {
             this.childGameState.onPlayerMessage(player, message);
         }
@@ -831,9 +838,12 @@ export default class IngameGameState extends GameState<
         });
     }
 
-    canGiftPowerTokens(): boolean {
+    canGiftPowerTokens(house: House): boolean {
         if (!this.entireGame.gameSettings.allowGiftingPowerTokens) {
-            return false;
+            // Targaryen always must be able to gift their tokens, so they can leave the game when defeated
+            if (house != this.game.targaryen) {
+                return false;
+            }
         }
 
         if (this.entireGame.hasChildGameState(CombatGameState) &&
@@ -842,6 +852,13 @@ export default class IngameGameState extends GameState<
         }
 
         return true;
+    }
+
+    dropPowerTokens(house: House): void {
+        this.entireGame.sendMessageToServer({
+            type: "drop-power-tokens",
+            house: house.id
+        });
     }
 
     serializeToClient(admin: boolean, user: User | null): SerializedIngameGameState {

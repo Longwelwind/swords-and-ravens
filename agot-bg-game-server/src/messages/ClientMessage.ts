@@ -5,7 +5,7 @@ export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | Unready |
     | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings | CreatePrivateChatRoom | ChangeGameSettings
     | CancelGame | Vote | LaunchCancelGameVote | CancelVote | LaunchReplacePlayerVote | UpdateNote | SelectWesterosCard
     | ClaimVassal | LaunchReplacePlayerByVassalVote | GiftPowerTokens | LaunchEndGameVote | SetPassword
-    | DistributePowerTokens;
+    | DistributePowerTokens | DropPowerTokens;
 
 interface Ping {
     type: "ping";
@@ -253,4 +253,9 @@ interface SetPassword {
 interface DistributePowerTokens {
     type: "distribute-power-tokens";
     powerTokensForHouses: [string, number][];
+}
+
+interface DropPowerTokens {
+    type: "drop-power-tokens";
+    house: string;
 }

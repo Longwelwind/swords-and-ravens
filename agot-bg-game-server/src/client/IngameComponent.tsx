@@ -126,18 +126,18 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         return this.props.gameClient.authenticatedPlayer;
     }
 
-    get tracks(): {name: string; tracker: House[]; stars: boolean}[] {
-        const influenceTracks = this.game.influenceTracks;
+    get tracks(): {name: string; trackToShow: (House | null)[]; realTrack: House[]; stars: boolean}[] {
+        const influenceTracks: (House | null)[][] = this.game.influenceTracks.map(track => Array.from(track));
         if (this.ingame.hasChildGameState(ClashOfKingsGameState)) {
             const cok = this.ingame.getChildGameState(ClashOfKingsGameState) as ClashOfKingsGameState;
             for (let i = cok.currentTrackI; i < influenceTracks.length; i++) {
-                influenceTracks[i] = i == 0 ? [this.game.ironThroneHolder] : [];
+                influenceTracks[i] = influenceTracks[i].map((h, j) => i == 0 && j == 0 ? h : null)
             }
         }
         return [
-            {name: "Iron Throne", tracker: influenceTracks[0], stars: false},
-            {name: "Fiefdoms", tracker: influenceTracks[1], stars: false},
-            {name: "King's Court", tracker: influenceTracks[2], stars: true},
+            {name: "Iron Throne", trackToShow: influenceTracks[0], realTrack: this.game.influenceTracks[0], stars: false},
+            {name: "Fiefdoms", trackToShow: influenceTracks[1], realTrack: this.game.influenceTracks[1], stars: false},
+            {name: "King's Court", trackToShow: influenceTracks[2], realTrack: this.game.influenceTracks[2], stars: true},
         ]
     }
 
@@ -249,7 +249,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     <Col>
                         <Card>
                             <ListGroup variant="flush">
-                                {this.tracks.map(({ name, tracker, stars }, i) => (
+                                {this.tracks.map(({ name, trackToShow, realTrack, stars }, i) => (
                                     <ListGroupItem key={`influence-track-${i}`} style={{ minHeight: "61px" }}>
                                         <Row className="align-items-center">
                                             <Col xs="auto" className="text-center" style={{ width: "46px" }}>
@@ -292,18 +292,18 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     <img src={i == 0 ? stoneThroneImage : i == 1 ? this.game.valyrianSteelBladeUsed ? diamondHiltUsedImage : diamondHiltImage : ravenImage} width={32} />
                                                 </OverlayTrigger>
                                             </Col>
-                                            {tracker.map((h, j) => (
-                                                <Col xs="auto" key={`track_${i}_${h.id}`}>
+                                            {trackToShow.map((h, j) => (
+                                                <Col xs="auto" key={`track_${i}_${h?.id ?? j}`}>
                                                     <InfluenceIconComponent
                                                         house={h}
                                                         ingame={this.props.gameState}
-                                                        track={tracker}
+                                                        track={realTrack}
                                                         name={name}
                                                     />
                                                     <div className="tracker-star-container">
                                                         {stars && i < this.game.starredOrderRestrictions.length && (
                                                             _.range(0, this.game.starredOrderRestrictions[j]).map(k => (
-                                                                <div key={`stars_${h.id}_${k}`}>
+                                                                <div key={`stars_${h?.id ?? j}_${k}`}>
                                                                     <FontAwesomeIcon
                                                                         style={{ color: "#ffc107", fontSize: "9px" }}
                                                                         icon={faStar} />

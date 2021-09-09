@@ -86,6 +86,6 @@ export default class GiftPowerTokensComponent extends Component<GiftPowerTokensC
     }
 
     canGiftPowerTokens(): boolean {
-        return this.house.powerTokens > 0 && this.receivablePowerTokens > 0 && this.props.ingame.canGiftPowerTokens();
+        return this.house.powerTokens > 0 && this.receivablePowerTokens > 0 && this.props.ingame.canGiftPowerTokens(this.house);
     }
 }
