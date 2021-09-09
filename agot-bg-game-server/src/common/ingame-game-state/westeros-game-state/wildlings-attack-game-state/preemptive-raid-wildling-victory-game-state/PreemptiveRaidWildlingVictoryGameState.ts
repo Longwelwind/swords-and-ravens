@@ -141,7 +141,7 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
         // "currentPosition + 2" to be tracker.length (and thus not changing anything).
         newTrack.splice(currentPosition + 2, 0, this.parentGameState.lowestBidder);
 
-        this.game.setInfluenceTrack(influenceTrackI, newTrack);
+        this.ingame.setInfluenceTrack(influenceTrackI, newTrack);
 
         this.ingame.log({
             type: "preemptive-raid-track-reduced",
@@ -149,12 +149,6 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
             chooser: chooser ? chooser.id : null,
             trackI: influenceTrackI
         });
-
-        this.parentGameState.entireGame.broadcastToClients({
-            type: "change-tracker",
-            trackerI: influenceTrackI,
-            tracker: newTrack.map(h => h.id)
-        })
 
         this.parentGameState.onWildlingCardExecuteEnd();
     }

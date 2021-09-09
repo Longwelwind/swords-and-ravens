@@ -135,12 +135,7 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
             // Append vassals back to the tracks:
             for(let i=0; i<this.vassalsOnInfluenceTracks.length; i++) {
                 const newInfluenceTrack = _.concat(this.game.influenceTracks[i], this.vassalsOnInfluenceTracks[i]);
-                this.game.setInfluenceTrack(i, newInfluenceTrack);
-                this.entireGame.broadcastToClients({
-                    type: "change-tracker",
-                    tracker: this.game.influenceTracks[i].map(h => h.id),
-                    trackerI: i
-                });
+                this.ingame.setInfluenceTrack(i, newInfluenceTrack);
             }
 
             this.ingame.beginNewTurn();
@@ -267,20 +262,16 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
             }
         } else if (this.draftStep == DraftStep.INFLUENCE_TRACK) {
             const trackIndex = this.getInfluenceChoicesForHouse(house).keys[choice];
-            const track = this.game.influenceTracks[trackIndex];
-            track.push(house);
-            this.entireGame.broadcastToClients({
-                type: "change-tracker",
-                tracker: track.map(h => h.id),
-                trackerI: trackIndex
-            });
+            const newTrack = _.concat(this.game.getInfluenceTrackByI(trackIndex), house);
 
             this.ingame.log({
                 type: "influence-track-position-chosen",
                 house: house.id,
                 trackerI: trackIndex,
-                position: track.length
+                position: newTrack.length
             });
+
+            this.ingame.setInfluenceTrack(trackIndex, newTrack);
 
             this.proceedNextHouse();
         } else {

@@ -100,7 +100,7 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
     }
 
     onResolveTiesGameState(_biddingResults: [number, House[]][], finalOrdering: House[]): void {
-        finalOrdering = this.game.getFixedInfluenceTrack(finalOrdering);
+        finalOrdering = this.ingame.getFixedInfluenceTrack(finalOrdering);
 
         this.parentGameState.ingame.log({
             type: "clash-of-kings-final-ordering",
@@ -108,13 +108,7 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
             finalOrder: finalOrdering.map(h => h.id)
         });
 
-        this.game.setInfluenceTrack(this.currentTrackI, finalOrdering);
-
-        this.entireGame.broadcastToClients({
-            type: "change-tracker",
-            trackerI: this.currentTrackI,
-            tracker: finalOrdering.map(h => h.id)
-        });
+        this.ingame.setInfluenceTrack(this.currentTrackI, finalOrdering);
 
         if (this.currentTrackI < 2) {
             this.proceedNextTrack();

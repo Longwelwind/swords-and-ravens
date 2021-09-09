@@ -99,14 +99,44 @@ export default class IngameGameState extends GameState<
 
             this.game.houseCardsForDrafting = new BetterMap();
 
-            this.game.setInfluenceTrack(0, this.getRandomTrackOrder());
-            this.game.setInfluenceTrack(1, this.getRandomTrackOrder());
-            this.game.setInfluenceTrack(2, this.getRandomTrackOrder());
+            this.setInfluenceTrack(0, this.getRandomTrackOrder());
+            this.setInfluenceTrack(1, this.getRandomTrackOrder());
+            this.setInfluenceTrack(2, this.getRandomTrackOrder());
 
             this.beginNewTurn();
         } else {
             this.setChildGameState(new DraftHouseCardsGameState(this)).firstStart();
         }
+    }
+
+    setInfluenceTrack(i: number, track: House[]): void {
+        let newTrack: House[];
+        if (i == 0) {
+            this.game.ironThroneTrack = this.getFixedInfluenceTrack(track);
+            newTrack = this.game.ironThroneTrack;
+        } else if (i == 1) {
+            this.game.fiefdomsTrack = this.getFixedInfluenceTrack(track);
+            newTrack = this.game.fiefdomsTrack;
+        } else if (i == 2) {
+            this.game.kingsCourtTrack = this.getFixedInfluenceTrack(track);
+            newTrack = this.game.kingsCourtTrack;
+        } else {
+            throw new Error();
+        }
+
+        this.entireGame.broadcastToClients({
+            type: "change-tracker",
+            trackerI: i,
+            tracker: newTrack.map(h => h.id)
+        });
+    }
+
+    getFixedInfluenceTrack(track: House[]): House[] {
+        if (!this.game.targaryen) {
+            return track;
+        }
+
+        return _.concat(_.without(track, this.game.targaryen), this.game.targaryen);
     }
 
     getRandomTrackOrder(): House[] {

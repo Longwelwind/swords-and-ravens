@@ -304,26 +304,6 @@ export default class Game {
         }
     }
 
-    getFixedInfluenceTrack(track: House[]): House[] {
-        if (!this.targaryen) {
-            return track;
-        }
-
-        return _.concat(_.without(track, this.targaryen), this.targaryen);
-    }
-
-    setInfluenceTrack(i: number, track: House[]): void {
-        if (i == 0) {
-            this.ironThroneTrack = this.getFixedInfluenceTrack(track);
-        } else if (i == 1) {
-            this.fiefdomsTrack = this.getFixedInfluenceTrack(track);
-        } else if (i == 2) {
-            this.kingsCourtTrack = this.getFixedInfluenceTrack(track);
-        } else {
-            throw new Error();
-        }
-    }
-
     getArmySizes(house: House, addedUnits: BetterMap<Region, UnitType[]> = new BetterMap(), removedUnits: BetterMap<Region, Unit[]> = new BetterMap()): number[] {
         // Create a map containing, for each region with an army, the size of this army
         const armySizes = new BetterMap(
