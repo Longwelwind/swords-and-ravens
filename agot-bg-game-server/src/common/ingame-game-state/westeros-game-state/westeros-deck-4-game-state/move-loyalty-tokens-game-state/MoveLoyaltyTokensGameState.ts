@@ -7,18 +7,21 @@ import {ServerMessage} from "../../../../../messages/ServerMessage";
 import IngameGameState from "../../../IngameGameState";
 import House from "../../../game-data-structure/House";
 import Region from "../../../game-data-structure/Region";
-import SelectRegionGameState, { SerializedSelectRegionGameState } from "../../../select-region-game-state/SelectRegionGameState";
 import WesterosDeck4GameState from "../WesterosDeck4GameState";
 import WesterosGameState from "../../WesterosGameState";
+import ResolveMoveLoyaltyTokenGameState, { SerializedResolveMoveLoyaltyTokenGameState } from "./resolve-move-loyalty-token-game-state/ResolveMoveLoyaltyTokenGameState";
 import { land } from "../../../../../common/ingame-game-state/game-data-structure/regionTypes";
-import { observable } from "mobx";
 
-export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4GameState,
-    SelectRegionGameState<MoveLoyaltyTokensGameState> | SimpleChoiceGameState> {
+interface PreviousMovement {
+    house: House;
+    from: Region;
+    to: Region;
+}
+
+export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4GameState, SimpleChoiceGameState | ResolveMoveLoyaltyTokenGameState> {
     resolveOrder: House[];
-    costsToDiscardChoice: number;
-    @observable regionFrom: Region | null;
-    @observable regionTo: Region | null;
+    costsToCancelPreviousMovement: number;
+    previousMovement: PreviousMovement | null;
 
     get game(): Game {
         return this.parentGameState.game;
@@ -32,13 +35,18 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
         return this.parentGameState.parentGameState;
     }
 
-    get regionsWithLoyaltyTokens(): Region[] {
-        return this.game.world.regions.values.filter(r => r.loyaltyTokens > 0);
+    get validFromRegions(): Region[] {
+        return this.game.world.regions.values.filter(r => r.loyaltyTokens > 0).filter(r => this.getValidTargetRegions(r).length > 0);
     }
 
-    firstStart(resolveOrder: House[], costsToDiscardChoice: number): void {
-        this.costsToDiscardChoice = costsToDiscardChoice;
+    get house(): House {
+        return this.resolveOrder[0];
+    }
+
+    firstStart(resolveOrder: House[], costsToCancelPreviousMovement: number, previousMovement: PreviousMovement | null): void {
         this.resolveOrder = resolveOrder;
+        this.costsToCancelPreviousMovement = costsToCancelPreviousMovement;
+        this.previousMovement = previousMovement;
         this.proceedNextResolve();
     }
 
@@ -50,41 +58,35 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
             return;
         }
 
-        this.regionFrom = null;
-        this.regionTo = null;
-        this.broadcastRegionFromAndRegionTo();
-        this.setChildGameState(new SelectRegionGameState(this)).firstStart(nextHouse, this.regionsWithLoyaltyTokens);
+        this.setChildGameState(new ResolveMoveLoyaltyTokenGameState(this)).firstStart(nextHouse);
     }
 
-    broadcastRegionFromAndRegionTo(): void {
-        this.entireGame.broadcastToClients({
-            type: "update-move-loyalty-token-game-state",
-            regionFrom: this.regionFrom?.id ?? null,
-            regionTo: this.regionTo?.id ?? null
-        });
-    }
-
-    getNextHouseToResolve(): House | null {
-        if (this.resolveOrder.length == 0 || this.regionsWithLoyaltyTokens.length == 0) {
-            return null;
+    getNextHouseToResolve(): House | undefined {
+        if (this.resolveOrder.length == 0 || this.validFromRegions.length == 0) {
+            return undefined;
         }
 
-        return this.resolveOrder.shift() as House;
+        return this.resolveOrder.shift();
+    }
+
+    getValidTargetRegions(regionFrom: Region): Region[] {
+        return this.game.world.getNeighbouringRegions(regionFrom).filter(r => r.type == land);
     }
 
     getChoices(house: House): string[] {
         const result = [];
         result.push("Ignore");
-        if (house.powerTokens < this.costsToDiscardChoice) {
+        if (house.powerTokens < this.costsToCancelPreviousMovement) {
             return result;
         }
 
-        result.push(`Discard ${this.costsToDiscardChoice} power tokens to cancel the previous movement`);
+        result.push(`Discard ${this.costsToCancelPreviousMovement} power tokens to cancel the previous movement`);
         return result;
     }
 
     onSimpleChoiceGameStateEnd(choice: number): void {
         const house = this.childGameState.house;
+
         if (choice == 0) {
             this.ingame.log({
                 type: "move-loyalty-token-choice",
@@ -92,30 +94,29 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
                 powerTokensDiscardedToCancelMovement: 0
             });
         } else if (choice == 1) {
-            if (!this.regionFrom) {
-                throw new Error("regionFrom must be available here!");
-            }
-
-            if (!this.regionTo) {
-                throw new Error("regionTo must be available here!");
-            }
-
             this.ingame.log({
                 type: "move-loyalty-token-choice",
                 house: house.id,
-                powerTokensDiscardedToCancelMovement: this.costsToDiscardChoice
+                powerTokensDiscardedToCancelMovement: this.costsToCancelPreviousMovement
             });
 
+            if (this.previousMovement == null) {
+                throw new Error();
+            }
+
             // Remove the power token
-            this.ingame.changePowerTokens(this.childGameState.house, -this.costsToDiscardChoice);
-            this.movePowerTokens(this.regionTo, this.regionFrom);
+            this.ingame.changePowerTokens(house, -this.costsToCancelPreviousMovement);
+
+            // Undo the last move
+            this.moveLoyaltyToken(this.previousMovement.to, this.previousMovement.from);
         }
 
+        this.previousMovement = null;
         this.proceedNextResolve();
     }
 
-    movePowerTokens(regionFrom: Region, regionTo: Region): void {
-        if (regionFrom.loyaltyTokens == 0) {
+    moveLoyaltyToken(regionFrom: Region, regionTo: Region): void {
+        if (regionFrom.loyaltyTokens < 1) {
             throw new Error("Tried to move a loyalty token which doesn't exist!");
         }
 
@@ -123,66 +124,37 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
         regionTo.loyaltyTokens += 1;
 
         this.entireGame.broadcastToClients({
-            type: "move-loyalty-token",
-            regionFrom: regionFrom.id,
-            regionTo: regionTo.id
+            type: "loyalty-token-placed",
+            region: regionFrom.id,
+            newLoyaltyTokenCount: regionFrom.loyaltyTokens
+        });
+
+        this.entireGame.broadcastToClients({
+            type: "loyalty-token-placed",
+            region: regionTo.id,
+            newLoyaltyTokenCount: regionTo.loyaltyTokens
         });
     }
 
-    setCancelMoveGameState(houseWhichMovedLoyaltyTokens: House): void {
+    setChooseCancelLastMoveGameState(houseWhichMovedLoyaltyTokens: House): void {
         if (!this.game.targaryen) {
             throw new Error("Targaryen must be available here!");
         }
 
-        if (!this.regionFrom) {
-            throw new Error("regionFrom must be available here!");
+        if (!this.previousMovement) {
+            throw new Error("Previous movement must be set here");
         }
-
-        if (!this.regionTo) {
-            throw new Error("regionTo must be available here!");
-        }
-
-        this.broadcastRegionFromAndRegionTo();
 
         this.ingame.log({
             type: "move-loyalty-token-choice",
             house: houseWhichMovedLoyaltyTokens.id,
-            regionFrom: this.regionFrom.id,
-            regionTo: this.regionTo.id
+            regionFrom: this.previousMovement.from.id,
+            regionTo: this.previousMovement.to.id
         });
 
-        this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(this.game.targaryen, `House Targaryen may discard ${this.costsToDiscardChoice} power token${this.costsToDiscardChoice > 1 ? "s" : ""} to move the loyalty token back to ${this.regionFrom.name}.`, this.getChoices(this.game.targaryen));
-    }
-
-    onSelectRegionFinish(house: House, region: Region): void {
-        if (this.regionFrom == null) {
-            if (region.loyaltyTokens == 0) {
-                // This should never happen!
-                return;
-            }
-
-            this.regionFrom = region;
-            const adjacentRegions = this.game.world.getNeighbouringRegions(region).filter(r => r.type == land)
-            if (adjacentRegions.length == 0) {
-                this.regionTo = region;
-                this.setCancelMoveGameState(house);
-                return;
-            }
-
-            this.broadcastRegionFromAndRegionTo();
-
-            this.setChildGameState(new SelectRegionGameState(this)).firstStart(house, adjacentRegions);
-            return;
-        } else if (this.regionFrom != null && this.regionTo == null) {
-            this.regionTo = region;
-
-            this.movePowerTokens(this.regionFrom, this.regionTo);
-
-            this.setCancelMoveGameState(house);
-            return;
-        }
-
-        throw new Error("MoveLoyaltyTokenGameState: We must never reach this line!");
+        this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(this.game.targaryen,
+            `House Targaryen may discard ${this.costsToCancelPreviousMovement} power token${this.costsToCancelPreviousMovement > 1 ? "s" : ""} to move the loyalty token from ${this.previousMovement.to.name} back to ${this.previousMovement.from.name}.`,
+            this.getChoices(this.game.targaryen));
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -190,22 +162,20 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
     }
 
     onServerMessage(message: ServerMessage): void {
-        if (message.type == "update-move-loyalty-token-game-state") {
-            this.regionFrom = message.regionFrom ? this.game.world.regions.get(message.regionFrom) : null;
-            this.regionTo = message.regionTo ? this.game.world.regions.get(message.regionTo) : null;
-        } else {
-            this.childGameState.onServerMessage(message);
-        }
+        this.childGameState.onServerMessage(message);
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedMoveLoyaltyTokensGameState {
         return {
             type: "move-loyalty-tokens",
             resolveOrder: this.resolveOrder.map(h => h.id),
-            costsToDiscardChoice: this.costsToDiscardChoice,
-            regionFrom: this.regionFrom?.id ?? null,
-            regionTo: this.regionTo?.id ?? null,
-            childGameState: this.childGameState.serializeToClient(admin, player)
+            costsToCancelPreviousMovement: this.costsToCancelPreviousMovement,
+            previousMovement: this.previousMovement ? {
+                house: this.previousMovement.house.id,
+                from: this.previousMovement.from.id,
+                to: this.previousMovement.to.id
+            } : null,
+            childGameState: this.childGameState.serializeToClient(admin, player) ?? null
         };
     }
 
@@ -213,9 +183,12 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
         const gameState = new MoveLoyaltyTokensGameState(westerosDeck4);
 
         gameState.resolveOrder = data.resolveOrder.map(hid => westerosDeck4.game.houses.get(hid));
-        gameState.costsToDiscardChoice = data.costsToDiscardChoice;
-        gameState.regionFrom = data.regionFrom ? westerosDeck4.game.world.regions.get(data.regionFrom) : null;
-        gameState.regionTo = data.regionTo ? westerosDeck4.game.world.regions.get(data.regionTo) : null;
+        gameState.costsToCancelPreviousMovement = data.costsToCancelPreviousMovement;
+        gameState.previousMovement = data.previousMovement ? {
+            house: westerosDeck4.game.houses.get(data.previousMovement.house),
+            from: westerosDeck4.game.world.regions.get(data.previousMovement.from),
+            to: westerosDeck4.game.world.regions.get(data.previousMovement.to)
+        } : null;
         gameState.childGameState = gameState.deserializeChildGameState(data.childGameState);
 
         return gameState;
@@ -224,8 +197,8 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
     deserializeChildGameState(data: SerializedMoveLoyaltyTokensGameState["childGameState"]): MoveLoyaltyTokensGameState["childGameState"] {
         if (data.type == "simple-choice") {
             return SimpleChoiceGameState.deserializeFromServer(this, data);
-        } else if (data.type == "select-region") {
-            return SelectRegionGameState.deserializeFromServer(this, data);
+        } else if (data.type == "resolve-move-loyalty-token"){
+            return ResolveMoveLoyaltyTokenGameState.deserializeFromServer(this, data);
         } else {
             throw new Error();
         }
@@ -235,8 +208,11 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
 export interface SerializedMoveLoyaltyTokensGameState {
     type: "move-loyalty-tokens";
     resolveOrder: string[];
-    costsToDiscardChoice: number;
-    regionFrom: string | null;
-    regionTo: string | null;
-    childGameState: SerializedSimpleChoiceGameState | SerializedSelectRegionGameState;
+    costsToCancelPreviousMovement: number;
+    previousMovement: {
+        house: string;
+        from: string;
+        to: string;
+    } | null;
+    childGameState: SerializedSimpleChoiceGameState | SerializedResolveMoveLoyaltyTokenGameState;
 }

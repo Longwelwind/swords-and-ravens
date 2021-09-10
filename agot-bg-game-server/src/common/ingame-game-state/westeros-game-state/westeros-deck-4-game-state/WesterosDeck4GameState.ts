@@ -49,12 +49,18 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
             }
             case domesticDisputes.id: {
                 const regions = this.game.world.westerosLandRegions.filter(r => r.superControlPowerToken != null);
-                this.setChildGameState(new ChooseMultipleRegionsForLoyaltyTokenGameState(this)).firstStart(this.game.targaryen, 1, regions, 4, "House Targaryen may place loyalty tokens in up to 4 capitals.");
+                this.setChildGameState(new ChooseMultipleRegionsForLoyaltyTokenGameState(this)).firstStart(
+                    this.game.targaryen, 1, regions, 4, "House Targaryen may place loyalty tokens in up to 4 capitals.");
                 break;
             }
             case wateringTheSeed.id: {
                 const regions = this.game.world.regionsAdjacentToARiver.filter(r => r.getController() != this.game.targaryen);
-                this.setChildGameState(new ChooseMultipleRegionsForLoyaltyTokenGameState(this)).firstStart(this.game.targaryen, this.game.getVictoryPoints(this.game.targaryen), regions, 2, "House Targaryen may place up to 2 loyalty tokens in regions adjacent to a river.");
+                this.setChildGameState(new ChooseMultipleRegionsForLoyaltyTokenGameState(this)).firstStart(
+                    this.game.targaryen,
+                    this.game.getVictoryPoints(this.game.targaryen),
+                    regions,
+                    2,
+                    "House Targaryen may place up to 2 loyalty tokens in regions adjacent to a river.");
                 break;
             }
             case fireMadeFlesh.id: {
@@ -71,12 +77,12 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
             }
             case wordSpreadsQuickly.id: {
                 const resolveOrder = this.game.getTurnOrder().filter(h => !this.ingame.isVassalHouse(h));
-                this.setChildGameState(new MoveLoyaltyTokensGameState(this)).firstStart(resolveOrder, 2);
+                this.setChildGameState(new MoveLoyaltyTokensGameState(this)).firstStart(resolveOrder, 2, null);
                 break;
             }
             case scatteringDissent.id: {
                 const resolveOrder = this.game.getTurnOrder().filter(h => !this.ingame.isVassalHouse(h)).reverse();
-                this.setChildGameState(new MoveLoyaltyTokensGameState(this)).firstStart(resolveOrder, 1);
+                this.setChildGameState(new MoveLoyaltyTokensGameState(this)).firstStart(resolveOrder, 1, null);
                 break;
             }
             default:

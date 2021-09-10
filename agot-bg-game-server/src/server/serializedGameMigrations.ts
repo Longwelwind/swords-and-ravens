@@ -1096,6 +1096,40 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             serializedGame.users.forEach((u: any) => u.settings.responsiveLayout = false);
             return serializedGame;
         }
+    },
+    {
+        version: "47",
+        migrate: (serializedGame: any) => {
+            // Migrate "Make Move Loyalty tokens more user-friendly"
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                if (ingame.childGameState.type == "westeros"
+                    && ingame.childGameState.childGameState.type == "westeros-deck-4"
+                    && ingame.childGameState.childGameState.childGameState.type == "move-loyalty-tokens") {
+
+                    const moveLoyaltyTokens = ingame.childGameState.childGameState.childGameState;
+                    moveLoyaltyTokens.costsToCancelPreviousMovement = moveLoyaltyTokens.costsToDiscardChoice;
+
+                    if (moveLoyaltyTokens.regionFrom && moveLoyaltyTokens.regionTo) {
+                        moveLoyaltyTokens.previousMovement = {
+                            house: moveLoyaltyTokens.resolveOrder[0],
+                            from: moveLoyaltyTokens.regionFrom,
+                            to: moveLoyaltyTokens.regionTo
+                        }
+                    } else {
+                        moveLoyaltyTokens.previousMovement = null;
+                    }
+
+                    if (moveLoyaltyTokens.childGameState.type == "select-region") {
+                        moveLoyaltyTokens.childGameState.type = "resolve-move-loyalty-token";
+                        moveLoyaltyTokens.childGameState.regions = undefined;
+                    }
+                }
+            }
+
+            return serializedGame;
+        }
     }
 ];
 
