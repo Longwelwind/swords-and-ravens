@@ -5,7 +5,7 @@ export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | Unready |
     | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings | CreatePrivateChatRoom | ChangeGameSettings
     | CancelGame | Vote | LaunchCancelGameVote | CancelVote | LaunchReplacePlayerVote | UpdateNote | SelectWesterosCard
     | ClaimVassal | LaunchReplacePlayerByVassalVote | GiftPowerTokens | LaunchEndGameVote | SetPassword
-    | DistributePowerTokens | DropPowerTokens;
+    | DistributePowerTokens | DropPowerTokens | MoveLoyaltyToken;
 
 interface Ping {
     type: "ping";
@@ -258,4 +258,10 @@ interface DistributePowerTokens {
 interface DropPowerTokens {
     type: "drop-power-tokens";
     house: string;
+}
+
+interface MoveLoyaltyToken {
+    type: "move-loyalty-token";
+    from: string;
+    to: string;
 }
