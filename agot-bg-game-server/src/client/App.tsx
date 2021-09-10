@@ -52,7 +52,8 @@ export default class App extends Component<AppProps> {
                 paddingRight: "3rem",
                 paddingLeft: "3rem",
                 maxWidth: "2800px",
-                minWidth: minWidth }}>
+                minWidth: minWidth,
+                overflowX: "hidden" }}>
                 <Row className="justify-content-center">
                     {this.props.gameClient.connectionState == ConnectionState.INITIALIZING ? (
                         <Col xs={3}>

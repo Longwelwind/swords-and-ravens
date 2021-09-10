@@ -1089,6 +1089,12 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "46",
+        migrate: (serializedGame: any) => {
+            serializedGame.users.forEach((u: any) => u.settings.responsiveLayout = false);
+        }
     }
 ];
 

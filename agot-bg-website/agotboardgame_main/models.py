@@ -44,7 +44,7 @@ class User(AbstractUser):
     mute_games = models.BooleanField(default=False)
     use_house_names_for_chat = models.BooleanField(default=True)
     use_map_scrollbar = models.BooleanField(default=True)
-    use_responsive_layout_on_mobile = models.BooleanField(default=False)
+    use_responsive_layout_on_mobile = models.BooleanField(default=False) #Now reused for "Align the game state column on the right"
 
     def is_in_group(self, group_name):
         return self.groups.filter(name=group_name).exists()
