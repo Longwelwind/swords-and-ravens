@@ -85,7 +85,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                             )}
                             {r.loyaltyTokens > 0 && (
                                 <div
-                                    className="loyalty-token"
+                                    className={classNames("loyalty-token", {"strong-outline": r.loyaltyTokens > 1})}
                                     style={{
                                         left: r.unitSlot.point.x,
                                         top: r.unitSlot.point.y,
