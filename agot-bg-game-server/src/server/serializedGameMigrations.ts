@@ -1094,6 +1094,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
         version: "46",
         migrate: (serializedGame: any) => {
             serializedGame.users.forEach((u: any) => u.settings.responsiveLayout = false);
+            return serializedGame;
         }
     }
 ];
