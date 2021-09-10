@@ -9,6 +9,7 @@ import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import { observable } from "mobx";
 import { observer } from "mobx-react";
 import IngameComponent from "./IngameComponent";
+import { isMobile } from "react-device-detect";
 
 interface UserSettingsComponentProps {
     entireGame: EntireGame;
@@ -27,6 +28,26 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
             <>
                 {this.props.user && this.props.entireGame.childGameState instanceof IngameGameState && (
                     <div className="mt-3">
+                        <Row>
+                            <Col xs="auto">
+                                <FormCheck
+                                    id="chat-house-names-setting"
+                                    type="checkbox"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="chat-house-names-tooltip">
+                                                Show house names instead of user names in chat windows.
+                                            </Tooltip>}>
+                                            <label htmlFor="chat-house-names-setting">House names for chat</label>
+                                        </OverlayTrigger>}
+                                    checked={this.chatHouseNames}
+                                    onChange={() => {
+                                        this.chatHouseNames = !this.chatHouseNames;
+                                        this.changeUserSettings();
+                                    }}
+                                />
+                            </Col>
+                        </Row>
                         <Row>
                             <Col xs="auto">
                                 <FormCheck
@@ -51,42 +72,23 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                         <Row>
                             <Col xs="auto">
                                 <FormCheck
-                                    id="chat-house-names-setting"
+                                    id="game-state-column-right-setting"
                                     type="checkbox"
                                     label={
                                         <OverlayTrigger overlay={
-                                            <Tooltip id="chat-house-names-tooltip">
-                                                Will show house names instead of user names in chat windows.
+                                            <Tooltip id="game-state-column-right-setting-tooltip">
+                                                This setting swaps the houses column with the game state column, so that the game state column is displayed to the right of the map.
                                             </Tooltip>}>
-                                            <label htmlFor="chat-house-names-setting">House names for chat</label>
+                                            <label htmlFor="game-state-column-right-setting">Align the game state column on the right (Desktop only)</label>
                                         </OverlayTrigger>}
-                                    checked={this.chatHouseNames}
+                                    checked={this.responsiveLayout}
                                     onChange={() => {
-                                        this.chatHouseNames = !this.chatHouseNames;
+                                        this.responsiveLayout = !this.responsiveLayout;
                                         this.changeUserSettings();
                                     }}
                                 />
                             </Col>
                         </Row>
-                        {false && <Row>
-                            <Col xs="auto">
-                                <FormCheck
-                                    id="responsive-layout-setting"
-                                    type="checkbox"
-                                    label={
-                                        <OverlayTrigger overlay={
-                                            <Tooltip id="responsive-layout-setting-tooltip">
-                                                Enables a responsive layout on devices with a small screen. (No longer supported)
-                                            </Tooltip>}>
-                                            <label htmlFor="responsive-layout-setting">Responsive layout</label>
-                                        </OverlayTrigger>}
-                                    checked={this.responsiveLayout}
-                                    onChange={() => {
-                                        this.responsiveLayout = !this.responsiveLayout;
-                                    }}
-                                />
-                            </Col>
-                        </Row>}
                         <Row className="justify-content-center mt-2 mb-1">
                             <a href="https://faq.swordsandravens.net" target="_blank" rel="noopener noreferrer">FAQ</a>
                         </Row>
@@ -107,16 +109,17 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
     changeUserSettings(): void {
         let triggerResize = false;
         if (this.props.user) {
-            if (this.props.user.settings.mapScrollbar != this.mapScrollbar) {
+            if (this.props.user.settings.mapScrollbar != this.mapScrollbar || this.props.user.settings.responsiveLayout != this.responsiveLayout) {
                 triggerResize = true;
             }
+
             this.props.user.settings.mapScrollbar = this.mapScrollbar;
             this.props.user.settings.chatHouseNames = this.chatHouseNames;
             this.props.user.settings.responsiveLayout = this.responsiveLayout;
             this.props.user.syncSettings();
         }
 
-        if (triggerResize && this.props.parent) {
+        if (!isMobile && triggerResize && this.props.parent) {
             this.props.parent.onWindowResize();
         }
     }

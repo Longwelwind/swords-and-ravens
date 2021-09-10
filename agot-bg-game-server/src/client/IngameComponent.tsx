@@ -82,6 +82,13 @@ import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import { faChevronCircleLeft, faChevronCircleRight } from "@fortawesome/free-solid-svg-icons";
 import sleep from "../utils/sleep";
 
+interface ColumnOrders {
+    gameStateColumn: number;
+    mapColumn: number;
+    housesInfoColumn: number;
+    collapseButtonColumn: number;
+}
+
 interface IngameComponentProps {
     gameClient: GameClient;
     gameState: IngameGameState;
@@ -91,7 +98,6 @@ const BOTTOM_MARGIN_PX = 35;
 const GAME_STATE_GAME_LOG_RATIO = 0.65;
 const GAME_LOG_MIN_HEIGHT = 240;
 const HOUSES_PANEL_MIN_HEIGHT = 430;
-const GAME_STATE_PANEL_MIN_WIDTH = 430;
 const MAP_MIN_HEIGHT = Math.trunc(MAP_HEIGHT / 2);
 
 @observer
@@ -185,8 +191,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const mobileDevice = isMobile;
         const draftHouseCards = this.props.gameState.childGameState instanceof DraftHouseCardsGameState;
 
-        const columnOrders = this.getColumnOrders(mobileDevice);
-        const gameStateColumnSpan = this.getGameStateColumnSpan(mobileDevice);
+        const columnOrders = this.getColumnOrders(mobileDevice, this.user?.settings.responsiveLayout ?? false);
 
         const mapStyle = {
             height: (this.windowHeight != null && this.mapComponent != null) ? (this.windowHeight - this.mapComponent.getBoundingClientRect().top - BOTTOM_MARGIN_PX) : "auto",
@@ -195,26 +200,15 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             minHeight: MAP_MIN_HEIGHT
         };
 
+        const collapseIcon = columnOrders.collapseButtonColumn == 1 ?
+            this.tracksColumnCollapsed ? faChevronCircleLeft : faChevronCircleRight
+            : this.tracksColumnCollapsed ? faChevronCircleRight : faChevronCircleLeft;
+
         return (
             <>
-                {!mobileDevice &&
-                    <Col xs="auto" className="pr-0">
-                        <button className="btn btn-sm p-0" onClick={async() => {
-                            this.tracksColumnCollapsed = !this.tracksColumnCollapsed;
-                            if (this.props.gameClient.authenticatedUser) {
-                                this.props.gameClient.authenticatedUser.settings.tracksColumnCollapsed = this.tracksColumnCollapsed;
-                                this.props.gameClient.authenticatedUser.syncSettings();
-                            }
-                            await sleep(750);
-                            this.onWindowResize();
-                        }}>
-                            <FontAwesomeIcon icon={this.tracksColumnCollapsed ? faChevronCircleLeft : faChevronCircleRight} />
-                        </button>
-                    </Col>}
-                    {(!this.tracksColumnCollapsed || mobileDevice) && (
-                    <Col xs={{ span: "auto", order: columnOrders.tracksColumn }} id="tracks-houses-column">
-                        {this.renderHousesColumn(mobileDevice)}
-                    </Col>)}
+                <Col xs={{order: columnOrders.gameStateColumn}}>
+                    {this.renderGameStateColumn()}
+                </Col>
                 {!draftHouseCards && <Col xs={{span: "auto", order: columnOrders.mapColumn}}>
                     <div id="map-component" style={mapStyle}>
                         <MapComponent
@@ -224,9 +218,24 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         />
                     </div>
                 </Col>}
-                <Col xs={{span: gameStateColumnSpan, order: columnOrders.gameStateColumn}}>
-                    {this.renderGameStateColumn()}
-                </Col>
+                {(!this.tracksColumnCollapsed || mobileDevice) && (
+                <Col xs={{ span: "auto", order: columnOrders.housesInfoColumn }} id="tracks-houses-column">
+                    {this.renderHousesColumn(mobileDevice)}
+                </Col>)}
+                {!mobileDevice &&
+                <Col xs={{span: "auto", order: columnOrders.collapseButtonColumn}} className="pr-0">
+                    <button className="btn btn-sm p-0" onClick={async() => {
+                        this.tracksColumnCollapsed = !this.tracksColumnCollapsed;
+                        if (this.props.gameClient.authenticatedUser) {
+                            this.props.gameClient.authenticatedUser.settings.tracksColumnCollapsed = this.tracksColumnCollapsed;
+                            this.props.gameClient.authenticatedUser.syncSettings();
+                        }
+                        await sleep(750);
+                        this.onWindowResize();
+                    }}>
+                        <FontAwesomeIcon icon={collapseIcon} />
+                    </button>
+                </Col>}
             </>
         );
     }
@@ -468,14 +477,16 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const gameStatePanelStyle = {
             maxHeight: this.gameStatePanelMaxHeight == null ? "none" : `${this.gameStatePanelMaxHeight}px`,
             overflowY: (this.gameStatePanelMaxHeight == null ? "visible" : "scroll") as any,
-            paddingRight: "10px",
-            minWidth: `${GAME_STATE_PANEL_MIN_WIDTH}px`
+            paddingRight: "10px"
         };
 
-        return <Row className="mt-0"> {/* This row is necessary to make child column ordering work */}
+        const border = this.props.gameClient.isOwnTurn() ?
+            "warning" : this.props.gameState.childGameState instanceof CancelledGameState ?
+            "danger" : undefined;
+
+        return <Row className="mt-0" style={{minWidth: "565px"}}>
             <Col xs={"12"} className="pt-0">
-                <Card id="game-state-panel" border={this.props.gameClient.isOwnTurn() ? "warning" : undefined} bg={this.props.gameState.childGameState instanceof CancelledGameState ? "danger" : undefined}
-                    style={gameStatePanelStyle}>
+                <Card id="game-state-panel" border={border} style={gameStatePanelStyle}>
                     <Row>
                         <Col>
                             <ListGroup variant="flush">
@@ -691,20 +702,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         </Row>
     }
 
-    getGameStateColumnSpan(mobileDevice: boolean): any {
-        if (mobileDevice) {
-            return "3";
-        }
+    getColumnOrders(mobileDevice: boolean, alignGameStateToTheRight: boolean): ColumnOrders {
+        const result = { gameStateColumn: 1, mapColumn: 2, collapseButtonColumn: 3, housesInfoColumn: 4 };
 
-        return undefined;
-    }
-
-    getColumnOrders(mobileDevice: boolean): { tracksColumn: number; mapColumn: number; gameStateColumn: number } {
-        const result = { tracksColumn: 1, mapColumn: 2, gameStateColumn: 3};
-
-        if (mobileDevice) {
-            result.tracksColumn = 3;
-            result.gameStateColumn = 1;
+        if (!mobileDevice && alignGameStateToTheRight) {
+            return { collapseButtonColumn: 1, housesInfoColumn: 2, mapColumn: 3, gameStateColumn: 4 };
         }
 
         return result;

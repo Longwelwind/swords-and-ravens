@@ -8,6 +8,7 @@ class UpdateUsernameForm(ModelForm):
         model = User
         fields = ["username"]
 
+# As use_responsive_layout_on_mobile became obsolete with the Essos map, we reuse it now for "Align the game state column on the right"
 
 class UpdateSettingsForm(ModelForm):
     class Meta:
@@ -18,5 +19,5 @@ class UpdateSettingsForm(ModelForm):
             "mute_games": "Join games in the muted state",
             "use_house_names_for_chat": "Use house names for ingame chat",
             "use_map_scrollbar": "Join games by using the map scrollbar",
-            "use_responsive_layout_on_mobile": "Use a responsive layout on mobile devices"
+            "use_responsive_layout_on_mobile": "Align the game state column on the right (Desktop only)"
         }

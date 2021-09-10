@@ -44,7 +44,7 @@ export default class App extends Component<AppProps> {
     }
 
     render(): ReactNode {
-        const minWidth = isMobile && this.isGameRunning ? this.is8pGame ? "2400px" : "2000px" : "auto";
+        const minWidth = isMobile && this.isGameRunning ? this.is8pGame ? "2500px" : "2000px" : "auto";
         return (
             <Container fluid={false} style={{
                 paddingTop: "0.5rem",
@@ -52,7 +52,8 @@ export default class App extends Component<AppProps> {
                 paddingRight: "3rem",
                 paddingLeft: "3rem",
                 maxWidth: "2800px",
-                minWidth: minWidth }}>
+                minWidth: minWidth,
+                overflowX: "hidden" }}>
                 <Row className="justify-content-center">
                     {this.props.gameClient.connectionState == ConnectionState.INITIALIZING ? (
                         <Col xs={3}>
