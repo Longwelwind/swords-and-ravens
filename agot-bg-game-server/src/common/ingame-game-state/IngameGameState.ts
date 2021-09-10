@@ -110,16 +110,13 @@ export default class IngameGameState extends GameState<
     }
 
     setInfluenceTrack(i: number, track: House[]): void {
-        let newTrack: House[];
+        const fixedTrack = this.getFixedInfluenceTrack(track);
         if (i == 0) {
-            this.game.ironThroneTrack = this.getFixedInfluenceTrack(track);
-            newTrack = this.game.ironThroneTrack;
+            this.game.ironThroneTrack = fixedTrack;
         } else if (i == 1) {
-            this.game.fiefdomsTrack = this.getFixedInfluenceTrack(track);
-            newTrack = this.game.fiefdomsTrack;
+            this.game.fiefdomsTrack = fixedTrack;
         } else if (i == 2) {
-            this.game.kingsCourtTrack = this.getFixedInfluenceTrack(track);
-            newTrack = this.game.kingsCourtTrack;
+            this.game.kingsCourtTrack = fixedTrack;
         } else {
             throw new Error();
         }
@@ -127,7 +124,7 @@ export default class IngameGameState extends GameState<
         this.entireGame.broadcastToClients({
             type: "change-tracker",
             trackerI: i,
-            tracker: newTrack.map(h => h.id)
+            tracker: fixedTrack.map(h => h.id)
         });
     }
 
