@@ -252,9 +252,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             minHeight: mobileDevice ? "auto" : `${HOUSES_PANEL_MIN_HEIGHT}px`
         };
 
+        const maxWidth = this.props.gameState.game.targaryen ? "none" : "460px";
+
         return (
             <>
-                <Row className="stackable">
+                <Row className="stackable" style={{maxWidth: maxWidth}}>
                     <Col>
                         <Card>
                             <ListGroup variant="flush">
