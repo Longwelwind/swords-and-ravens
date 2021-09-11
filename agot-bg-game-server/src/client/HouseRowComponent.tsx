@@ -108,7 +108,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                             </OverlayTrigger>
                         )}
                     </Col>
-                    <Col onMouseEnter={() => this.setHighlightedRegions()} onMouseLeave={() => this.highlightedRegions.clear()}>
+                    <Col onMouseEnter={() => this.setHighlightedRegions()} onMouseLeave={() => this.highlightedRegions.clear()} className="pr-0">
                         <h5 style={{ margin: 0, padding: 0 }}><b style={{ "color": this.house.color }}>{this.house.name}</b><br /></h5>
                         {!this.isVassal ? (
                             <>

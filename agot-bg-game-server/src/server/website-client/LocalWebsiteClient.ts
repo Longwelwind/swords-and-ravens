@@ -19,7 +19,7 @@ export default class LocalWebsiteClient implements WebsiteClient {
     async getUser(userId: string): Promise<StoredUserData> {
         return {
             id: userId,
-            name: `Player #${userId}`,
+            name: `Super Long Player Name #${userId}`,
             token: userId,
             profileSettings: {
                 muted: true,
