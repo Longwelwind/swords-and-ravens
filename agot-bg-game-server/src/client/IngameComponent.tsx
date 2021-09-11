@@ -85,7 +85,7 @@ import sleep from "../utils/sleep";
 interface ColumnOrders {
     gameStateColumn: number;
     mapColumn: number;
-    housesInfoColumn: number;
+    housesInfosColumn: number;
     collapseButtonColumn: number;
 }
 
@@ -109,7 +109,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     @observable gameLogHeight: number = GAME_LOG_MIN_HEIGHT;
     @observable gameLogMinHeight: number = GAME_LOG_MIN_HEIGHT;
     @observable housesMaxHeight: number | null = null;
-    @observable tracksColumnCollapsed = this.props.gameClient.authenticatedUser?.settings.tracksColumnCollapsed ?? false;
+    @observable housesInfosCollapsed = this.props.gameClient.authenticatedUser?.settings.tracksColumnCollapsed ?? false;
     resizeObserver: ResizeObserver | null = null;
 
     get game(): Game {
@@ -201,12 +201,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         };
 
         const collapseIcon = columnOrders.collapseButtonColumn == 1 ?
-            this.tracksColumnCollapsed ? faChevronCircleLeft : faChevronCircleRight
-            : this.tracksColumnCollapsed ? faChevronCircleRight : faChevronCircleLeft;
+            this.housesInfosCollapsed ? faChevronCircleLeft : faChevronCircleRight
+            : this.housesInfosCollapsed ? faChevronCircleRight : faChevronCircleLeft;
 
         return (
             <>
-                <Col xs={{order: columnOrders.gameStateColumn}}>
+                <Col xs={{order: columnOrders.gameStateColumn}} style={{minWidth: "470px"}}>
                     {this.renderGameStateColumn()}
                 </Col>
                 {!draftHouseCards && <Col xs={{span: "auto", order: columnOrders.mapColumn}}>
@@ -218,16 +218,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         />
                     </div>
                 </Col>}
-                {(!this.tracksColumnCollapsed || mobileDevice) && (
-                <Col xs={{ span: "auto", order: columnOrders.housesInfoColumn }} id="tracks-houses-column">
-                    {this.renderHousesColumn(mobileDevice)}
-                </Col>)}
                 {!mobileDevice &&
-                <Col xs={{span: "auto", order: columnOrders.collapseButtonColumn}} className="pr-0">
+                <Col xs={{span: "auto", order: columnOrders.collapseButtonColumn}} className="px-0">
                     <button className="btn btn-sm p-0" onClick={async() => {
-                        this.tracksColumnCollapsed = !this.tracksColumnCollapsed;
+                        this.housesInfosCollapsed = !this.housesInfosCollapsed;
                         if (this.props.gameClient.authenticatedUser) {
-                            this.props.gameClient.authenticatedUser.settings.tracksColumnCollapsed = this.tracksColumnCollapsed;
+                            this.props.gameClient.authenticatedUser.settings.tracksColumnCollapsed = this.housesInfosCollapsed;
                             this.props.gameClient.authenticatedUser.syncSettings();
                         }
                         await sleep(750);
@@ -236,6 +232,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         <FontAwesomeIcon icon={collapseIcon} />
                     </button>
                 </Col>}
+                {(!this.housesInfosCollapsed || mobileDevice) && (
+                <Col xs={{ span: "auto", order: columnOrders.housesInfosColumn }} id="tracks-houses-column">
+                    {this.renderHousesColumn(mobileDevice)}
+                </Col>)}
             </>
         );
     }
@@ -252,11 +252,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             minHeight: mobileDevice ? "auto" : `${HOUSES_PANEL_MIN_HEIGHT}px`
         };
 
-        const maxWidth = this.props.gameState.game.targaryen ? "none" : "460px";
-
         return (
             <>
-                <Row className="stackable" style={{maxWidth: maxWidth}}>
+                <Row className="stackable">
                     <Col>
                         <Card>
                             <ListGroup variant="flush">
@@ -486,7 +484,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             "warning" : this.props.gameState.childGameState instanceof CancelledGameState ?
             "danger" : undefined;
 
-        return <Row className="mt-0" style={{minWidth: "565px"}}>
+        return <Row className="mt-0">
             <Col xs={"12"} className="pt-0">
                 <Card id="game-state-panel" border={border} style={gameStatePanelStyle}>
                     <Row>
@@ -705,10 +703,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     getColumnOrders(mobileDevice: boolean, alignGameStateToTheRight: boolean): ColumnOrders {
-        const result = { gameStateColumn: 1, mapColumn: 2, collapseButtonColumn: 3, housesInfoColumn: 4 };
+        const result = { gameStateColumn: 1, mapColumn: 2, collapseButtonColumn: 3, housesInfosColumn: 4 };
 
         if (!mobileDevice && alignGameStateToTheRight) {
-            return { collapseButtonColumn: 1, housesInfoColumn: 2, mapColumn: 3, gameStateColumn: 4 };
+            return { collapseButtonColumn: 1, housesInfosColumn: 2, mapColumn: 3, gameStateColumn: 4 };
         }
 
         return result;
