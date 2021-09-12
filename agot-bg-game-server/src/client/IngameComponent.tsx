@@ -81,6 +81,7 @@ import { preventOverflow } from "@popperjs/core";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import { faChevronCircleLeft, faChevronCircleRight } from "@fortawesome/free-solid-svg-icons";
 import sleep from "../utils/sleep";
+import joinNaturalLanguage from "./utils/joinNaturalLanguage";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -532,7 +533,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 <Row className="mb-3 mx-0">
                                     <OverlayTrigger overlay={
                                         <Tooltip id="round-tooltip">
-                                            <b>Round {this.game.turn} / {this.game.maxTurns}</b>
+                                            <h6>Round {this.game.turn} / {this.game.maxTurns}</h6>
                                         </Tooltip>
                                     }
                                         placement="auto">
@@ -548,7 +549,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 <Row className="mx-0">
                                     <OverlayTrigger overlay={
                                         <Tooltip id="wildling-threat-tooltip">
-                                            <b>Wildling Threat</b>{knowsWildlingCard && nextWildlingCard ?
+                                            <h6>Wildling Threat</h6>{knowsWildlingCard && nextWildlingCard ?
                                                 <><br /><br /><strong><u>{nextWildlingCard.type.name}</u></strong><br />
                                                     <strong>Lowest Bidder:</strong> {nextWildlingCard.type.wildlingVictoryLowestBidderDescription}<br />
                                                     <strong>Everyone Else:</strong> {nextWildlingCard.type.wildlingVictoryEverybodyElseDescription}<br /><br />
@@ -573,11 +574,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     </OverlayTrigger>
                                 </Row>
                                 {this.props.gameState.entireGame.gameSettings.playerCount >= 8 && <Row className="mx-0 mt-3">
-                                    <OverlayTrigger overlay={
-                                        <Tooltip id="dragon-strength-tooltip">
-                                            <b>Current Dragon Strength</b>
-                                        </Tooltip>
-                                    }
+                                    <OverlayTrigger overlay={this.renderDragonStrengthTooltip()}
                                         placement="auto">
                                         <div>
                                             <img src={spikedDragonHeadImage} width={28}/>
@@ -700,6 +697,22 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 </Card>
             </Col>
         </Row>
+    }
+
+    renderDragonStrengthTooltip(): OverlayChildren {
+        const roundsWhenIncreased: number[] = [];
+        for(let i = this.game.turn + 1; i <= 10; i++) {
+            if (i % 2 == 0) {
+                roundsWhenIncreased.push(i);
+            }
+        }
+        _.pull(roundsWhenIncreased, this.game.removedDragonStrengthToken);
+        return <Tooltip id="dragon-strength-tooltip">
+            <div className="m-1 text-center">
+                <h6>Current Dragon Strength</h6>
+                {roundsWhenIncreased.length > 0 && <p>Will increase in round<br/>{joinNaturalLanguage(roundsWhenIncreased)}</p>}
+            </div>
+        </Tooltip>
     }
 
     getColumnOrders(mobileDevice: boolean, alignGameStateToTheRight: boolean): ColumnOrders {

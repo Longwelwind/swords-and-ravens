@@ -342,6 +342,7 @@ export default class IngameGameState extends GameState<
 
     createVote(initiator: User, type: VoteType): Vote {
         const vote = new Vote(this, v4(), this.players.values.map(p => p.house), initiator, type);
+        vote.type.onVoteCreated(vote);
 
         this.votes.set(vote.id, vote);
 
