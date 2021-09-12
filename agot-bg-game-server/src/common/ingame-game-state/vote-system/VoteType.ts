@@ -16,6 +16,9 @@ export default abstract class VoteType {
     abstract verb(): string;
     abstract executeAccepted(vote: Vote): void;
 
+    onVoteCreated(_vote: Vote): void {
+    }
+
     static deserializeFromServer(ingame: IngameGameState, data: SerializedVoteType): VoteType {
         switch (data.type) {
             case "cancel-game":
@@ -103,6 +106,13 @@ export class ReplacePlayer extends VoteType {
         this.forHouse = forHouse;
     }
 
+    onVoteCreated(vote: Vote): void {
+        if (!this.replaced.connected) {
+            vote.votes.set(this.forHouse, true);
+            vote.checkVoteFinished();
+        }
+    }
+
     verb(): string {
         return `replace ${this.replaced.name} (${this.forHouse.name})`;
     }
@@ -167,6 +177,13 @@ export class ReplacePlayerByVassal extends VoteType {
         super();
         this.replaced = replaced;
         this.forHouse = forHouse;
+    }
+
+    onVoteCreated(vote: Vote): void {
+        if (!this.replaced.connected) {
+            vote.votes.set(this.forHouse, true);
+            vote.checkVoteFinished();
+        }
     }
 
     verb(): string {

@@ -74,13 +74,14 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         const victoryPoints = this.game.getVictoryPoints(this.house);
         const victoryPointsWarning = gameRunning && (this.game.structuresCountNeededToWin - 2 == victoryPoints);
         const victoryPointsCritical = gameRunning && (this.game.structuresCountNeededToWin - 1 == victoryPoints);
-        let controller: User | null = null;
+        let controller: User;
+        let isWaitedFor = false;
         try {
-            controller = this.ingame.getControllerOfHouse(this.house).user
+            controller = this.ingame.getControllerOfHouse(this.house).user;
+            isWaitedFor = !this.isVassal ? this.ingame.getWaitedUsers().includes(controller) : false;
         } catch {
             // Just swallow this
         }
-        const isWaitedFor = controller && !this.isVassal ? this.ingame.getWaitedUsers().includes(controller) : false;
         return this.ingame.rerender >= 0 && <>
             <ListGroupItem style={{padding: 0, margin: 0}}>
                 <div className={isWaitedFor ? "new-event" : ""} style={{paddingLeft: "8px", paddingRight: "10px", paddingTop: "12px", paddingBottom: "12px"}}>
