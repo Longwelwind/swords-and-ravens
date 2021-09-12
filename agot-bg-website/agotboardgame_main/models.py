@@ -71,9 +71,9 @@ def generate_default_view_of_game():
     # display on the Games page. A default value is created here, which will be replaced by the game server
     # when the game is loaded there.
     return {
-        "maxPlayerCount": 6,
+        "maxPlayerCount": 8,
         "settings": {
-            "pbem": False
+            "pbem": True
         }
     }
 
