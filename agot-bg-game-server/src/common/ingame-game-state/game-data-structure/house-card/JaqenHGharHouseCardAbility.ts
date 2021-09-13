@@ -3,7 +3,7 @@ import CancelHouseCardAbilitiesGameState
     from "../../action-game-state/resolve-march-order-game-state/combat-game-state/cancel-house-card-abilities-game-state/CancelHouseCardAbilitiesGameState";
 import House from "../House";
 import HouseCard, { HouseCardState } from "./HouseCard";
-import shuffleInPlace from "../../../../utils/shuffle";
+import shuffleInPlace from "../../../../utils/shuffleInPlace";
 
 export default class JaqenHGharHouseCardAbility extends HouseCardAbility {
     cancel(cancelResolutionState: CancelHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {

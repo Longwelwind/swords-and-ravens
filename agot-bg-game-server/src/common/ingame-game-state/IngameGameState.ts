@@ -33,7 +33,8 @@ import CombatGameState from "./action-game-state/resolve-march-order-game-state/
 import DeclareSupportGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/declare-support-game-state/DeclareSupportGameState";
 import ThematicDraftHouseCardsGameState, { SerializedThematicDraftHouseCardsGameState } from "./thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 import DraftInfluencePositionsGameState, { SerializedDraftInfluencePositionsGameState } from "./draft-influence-positions-game-state/DraftInfluencePositionsGameState";
-import shuffleInPlace, { shuffle } from "../../utils/shuffle";
+import shuffleInPlace from "../../utils/shuffleInPlace";
+import shuffle from "../../utils/shuffle";
 import popRandom from "../../utils/popRandom";
 
 export const NOTE_MAX_LENGTH = 5000;

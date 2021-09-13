@@ -15,7 +15,7 @@ import houseCardAbilities from "./house-card/houseCardAbilities";
 import IngameGameState from "../IngameGameState";
 import { vassalHouseCards } from "./static-data-structure/vassalHouseCards";
 import getStaticWorld from "./static-data-structure/getStaticWorld";
-import shuffleInPlace from "../../../utils/shuffle";
+import shuffleInPlace from "../../../utils/shuffleInPlace";
 
 const MAX_POWER_TOKENS = 20;
 
