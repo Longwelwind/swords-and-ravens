@@ -12,7 +12,7 @@ import IngameGameState from "../../../../IngameGameState";
 import _ from "lodash";
 import User from "../../../../../../server/User";
 import { PlayerActionType } from "../../../../../ingame-game-state/game-data-structure/GameLog";
-import shuffleInPlace from "../../../../../../utils/shuffle";
+import shuffleInPlace from "../../../../../../utils/shuffleInPlace";
 
 export default class ChooseHouseCardGameState extends GameState<CombatGameState> {
     choosableHouseCards: BetterMap<House, HouseCard[]>;

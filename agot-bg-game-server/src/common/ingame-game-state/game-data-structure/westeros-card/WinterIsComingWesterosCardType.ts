@@ -1,7 +1,7 @@
 import WesterosCardType from "./WesterosCardType";
 import WesterosGameState from "../../westeros-game-state/WesterosGameState";
 import WesterosCard from "./WesterosCard";
-import shuffleInPlace from "../../../../utils/shuffle";
+import shuffleInPlace from "../../../../utils/shuffleInPlace";
 import { winterIsComing } from "./westerosCardTypes";
 
 export default class WinterIsComingWesterosCardType extends WesterosCardType {

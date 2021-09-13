@@ -8,7 +8,7 @@ import { HouseCardState } from "../common/ingame-game-state/game-data-structure/
 import { vassalHouseCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/vassalHouseCards";
 import { DraftStep } from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import _ from "lodash";
-import shuffleInPlace from "../utils/shuffle";
+import shuffleInPlace from "../utils/shuffleInPlace";
 //import { SerializedEntireGame } from "../common/EntireGame";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [

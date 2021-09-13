@@ -12,7 +12,7 @@ import HouseCard from "../game-data-structure/house-card/HouseCard";
 import _ from "lodash";
 import { observable } from "mobx";
 import SimpleChoiceGameState, { SerializedSimpleChoiceGameState } from "../simple-choice-game-state/SimpleChoiceGameState";
-import shuffleInPlace from "../../../utils/shuffle";
+import shuffleInPlace from "../../../utils/shuffleInPlace";
 
 export const draftOrders: number[][][] = [
         [
