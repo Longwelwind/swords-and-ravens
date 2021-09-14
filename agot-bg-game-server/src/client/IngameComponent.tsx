@@ -141,7 +141,17 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         if (this.ingame.hasChildGameState(ClashOfKingsGameState)) {
             const cok = this.ingame.getChildGameState(ClashOfKingsGameState) as ClashOfKingsGameState;
             for (let i = cok.currentTrackI; i < influenceTracks.length; i++) {
-                influenceTracks[i] = influenceTracks[i].map((h, j) => i == 0 && j == 0 ? h : null)
+                influenceTracks[i] = this.clientGetFixedInfluenceTrack(influenceTracks[i].map((h, j) => (i == 0 && j == 0) || h == this.game.targaryen ? h : null));
+            }
+        } else if(this.ingame.hasChildGameState(DraftHouseCardsGameState) || this.ingame.hasChildGameState(DraftInfluencePositionsGameState)) {
+            for (let i = 0; i < influenceTracks.length; i++) {
+                while (influenceTracks[i].length < this.game.houses.size) {
+                    influenceTracks[i].push(null);
+                }
+                if (this.game.targaryen && !influenceTracks[i].includes(this.game.targaryen)) {
+                    influenceTracks[i][influenceTracks[i].length - 1] = this.game.targaryen;
+                }
+                influenceTracks[i] = this.clientGetFixedInfluenceTrack(influenceTracks[i]);
             }
         }
         return [
@@ -189,6 +199,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 boltons.color = "#c59699"
             }
         }
+    }
+
+    clientGetFixedInfluenceTrack(track: (House | null)[]): (House | null)[] {
+        if (!this.game.targaryen) {
+            return track;
+        }
+
+        return _.concat(_.without(track, this.game.targaryen), this.game.targaryen);
     }
 
     render(): ReactNode {
