@@ -22,7 +22,11 @@ import * as _ from "lodash";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faStar} from "@fortawesome/free-solid-svg-icons/faStar";
-import {faStickyNote} from "@fortawesome/free-solid-svg-icons/faStickyNote";
+import {faEdit} from "@fortawesome/free-solid-svg-icons/faEdit";
+import {faHistory} from "@fortawesome/free-solid-svg-icons/faHistory";
+import {faCog} from "@fortawesome/free-solid-svg-icons/faCog";
+import {faComments} from "@fortawesome/free-solid-svg-icons/faComments";
+import {faComment} from "@fortawesome/free-solid-svg-icons/faComment";
 import Tooltip from "react-bootstrap/Tooltip";
 import stoneThroneImage from "../../public/images/icons/stone-throne.svg";
 import cancelImage from "../../public/images/icons/cancel.svg";
@@ -33,7 +37,6 @@ import diamondHiltUsedImage from "../../public/images/icons/diamond-hilt-used.sv
 import hourglassImage from "../../public/images/icons/hourglass.svg";
 import mammothImage from "../../public/images/icons/mammoth.svg";
 import spikedDragonHeadImage from "../../public/images/icons/spiked-dragon-head.svg";
-import chatBubble from "../../public/images/icons/chat-bubble.svg";
 import speaker from "../../public/images/icons/speaker.svg";
 import speakerOff from "../../public/images/icons/speaker-off.svg";
 import House from "../common/ingame-game-state/game-data-structure/House";
@@ -602,12 +605,35 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         <Card.Header>
                             <Nav variant="tabs">
                                 <Nav.Item>
-                                    <Nav.Link eventKey="game-logs">Game Logs</Nav.Link>
+                                    <Nav.Link eventKey="game-logs">
+                                        <OverlayTrigger
+                                            overlay={<Tooltip id="logs-tooltip">Game Logs</Tooltip>}
+                                            placement="top"
+                                        >
+                                            <span>
+                                                <FontAwesomeIcon
+                                                    style={{ color: "white" }}
+                                                    icon={faHistory} />
+                                                {/* &nbsp;Logs */}
+                                            </span>
+                                        </OverlayTrigger>
+                                    </Nav.Link>
                                 </Nav.Item>
                                 <Nav.Item>
                                     <div className={classNames({ "new-event": this.publicChatRoom.areThereNewMessage })}>
                                         <Nav.Link eventKey="chat">
-                                            Chat
+                                            <OverlayTrigger
+                                                overlay={<Tooltip id="chat-tooltip">Game Chat</Tooltip>}
+                                                placement="top"
+                                            >
+                                                <span>
+                                                    <FontAwesomeIcon
+                                                        style={{ color: "white" }}
+                                                        icon={faComments} />
+
+                                                    {/* &nbsp;Chat */}
+                                                </span>
+                                            </OverlayTrigger>
                                         </Nav.Link>
                                     </div>
                                 </Nav.Item>
@@ -615,19 +641,33 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     <Nav.Item>
                                         <Nav.Link eventKey="note">
                                             <OverlayTrigger
-                                                overlay={<Tooltip id="note">Personal note</Tooltip>}
-                                                placement="auto"
+                                                overlay={<Tooltip id="note-tooltip">Personal note</Tooltip>}
+                                                placement="top"
                                             >
-                                                <FontAwesomeIcon
-                                                    style={{ color: "white" }}
-                                                    icon={faStickyNote} />
+                                                <span>
+                                                    <FontAwesomeIcon
+                                                        style={{ color: "white" }}
+                                                        icon={faEdit} />
+                                                    {/* &nbsp;Notes */}
+                                                </span>
                                             </OverlayTrigger>
                                         </Nav.Link>
                                     </Nav.Item>
                                 )}
                                 <Nav.Item>
                                     <Nav.Link eventKey="settings">
-                                        Settings
+                                        <OverlayTrigger
+                                            overlay={<Tooltip id="settings-tooltip">Settings</Tooltip>}
+                                            placement="top"
+                                        >
+                                            <span>
+                                                <FontAwesomeIcon
+                                                    style={{ color: "white" }}
+                                                    icon={faCog} />
+
+                                                {/* &nbsp;Settings */}
+                                            </span>
+                                        </OverlayTrigger>
                                     </Nav.Link>
                                 </Nav.Item>
                                 {this.getPrivateChatRooms().map(({ user, roomId }) => (
@@ -642,7 +682,15 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 {this.authenticatedPlayer && <Nav.Item>
                                     <Dropdown>
                                         <Dropdown.Toggle id="private-chat-room-dropdown" variant="link">
-                                            <img src={chatBubble} width={16} />
+                                            <OverlayTrigger
+                                                overlay={<Tooltip id="private-chat-tooltip">Private Chat</Tooltip>}
+                                                placement="top"
+                                            >
+                                                <FontAwesomeIcon
+                                                    style={{ color: "white" }}
+                                                    icon={faComment} />
+                                                {/* &nbsp;Private Chat */}
+                                            </OverlayTrigger>
                                         </Dropdown.Toggle>
                                         <Dropdown.Menu>
                                             {this.getOtherPlayers().map(p => (
