@@ -670,15 +670,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         </OverlayTrigger>
                                     </Nav.Link>
                                 </Nav.Item>
-                                {this.getPrivateChatRooms().map(({ user, roomId }) => (
-                                    <Nav.Item key={roomId}>
-                                        <div className={classNames({ "new-event": this.getPrivateChatRoomForPlayer(user).areThereNewMessage })}>
-                                            <Nav.Link eventKey={roomId}>
-                                                {this.getUserDisplayName(user)}
-                                            </Nav.Link>
-                                        </div>
-                                    </Nav.Item>
-                                ))}
                                 {this.authenticatedPlayer && <Nav.Item>
                                     <Dropdown>
                                         <Dropdown.Toggle id="private-chat-room-dropdown" variant="link">
@@ -701,6 +692,15 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         </Dropdown.Menu>
                                     </Dropdown>
                                 </Nav.Item>}
+                                {this.getPrivateChatRooms().map(({ user, roomId }) => (
+                                    <Nav.Item key={roomId}>
+                                        <div className={classNames({ "new-event": this.getPrivateChatRoomForPlayer(user).areThereNewMessage })}>
+                                            <Nav.Link eventKey={roomId}>
+                                                {this.getUserDisplayName(user)}
+                                            </Nav.Link>
+                                        </div>
+                                    </Nav.Item>
+                                ))}
                             </Nav>
                         </Card.Header>
                         <Card.Body id="game-log-panel" style={{ minHeight: this.gameLogMinHeight, height: this.gameLogHeight }} >
