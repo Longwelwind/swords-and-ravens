@@ -14,6 +14,8 @@ import PyromancerComponent from "../PyromancerComponent";
 import House from "../../../common/ingame-game-state/game-data-structure/House";
 import ExpertArtificerGameState from "../../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/execute-loan-game-state/expert-artificer-game-state/ExpertArtificerGameState";
 import ExpertArtificerComponent from "../ExpertArtificerComponent";
+import LoyalMaesterGameState from "../../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/execute-loan-game-state/loyal-maester-game-state/LoyalMaesterGameState";
+import LoyalMaesterComponent from "../LoyalMaesterComponent";
 
 @observer
 export default class ExecuteLoanComponent extends Component<GameStateComponentProps<ExecuteLoanGameState>> {
@@ -43,7 +45,8 @@ export default class ExecuteLoanComponent extends Component<GameStateComponentPr
                     [PlaceSellswordsGameState, PlaceSellswordsComponent],
                     [TheFacelessMenGameState, TheFacelessMenComponent],
                     [PyromancerGameState, PyromancerComponent],
-                    [ExpertArtificerGameState, ExpertArtificerComponent]
+                    [ExpertArtificerGameState, ExpertArtificerComponent],
+                    [LoyalMaesterGameState, LoyalMaesterComponent]
                 ])}
             </Row>
         </Col>;

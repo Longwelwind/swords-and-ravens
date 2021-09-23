@@ -7,15 +7,16 @@ import House from "../../../../../common/ingame-game-state/game-data-structure/H
 import Player from "../../../../../common/ingame-game-state/Player";
 import { ClientMessage } from "../../../../../messages/ClientMessage";
 import { ServerMessage } from "../../../../../messages/ServerMessage";
-import loanCardTypes, { expertArtificer, fullHost, pyromancer, seaRaiders, siegeEngineers, theFacelessMen, vanguardCavalry } from "../../../../../common/ingame-game-state/game-data-structure/loan-card/loanCardTypes";
+import loanCardTypes, { expertArtificer, fullHost, loyalMaester, pyromancer, seaRaiders, siegeEngineers, theFacelessMen, vanguardCavalry } from "../../../../../common/ingame-game-state/game-data-structure/loan-card/loanCardTypes";
 import { footman, knight, ship, siegeEngine } from "../../../../../common/ingame-game-state/game-data-structure/unitTypes";
 import PlaceSellswordsGameState, { SerializedPlaceSellswordsGameState } from "./place-sellwords-game-state/PlaceSellswordsGameState";
 import TheFacelessMenGameState, { SerializedTheFacelessMenGameState } from "./the-faceless-men-game-state/TheFacelessMenGameState";
 import PyromancerGameState, { SerializedPyromancerGameState } from "./pyromancer-game-state/PyromancerGameState";
 import ExpertArtificerGameState, { SerializedExpertArtificerGameState } from "./expert-artificer-game-state/ExpertArtificerGameState";
+import LoyalMaesterGameState, { SerializedLoyalMaesterGameState } from "./loyal-maester-game-state/LoyalMaesterGameState";
 
 export default class ExecuteLoanGameState extends GameState<ResolveConsolidatePowerGameState,
-    PlaceSellswordsGameState | TheFacelessMenGameState | PyromancerGameState | ExpertArtificerGameState> {
+    PlaceSellswordsGameState | TheFacelessMenGameState | PyromancerGameState | ExpertArtificerGameState | LoyalMaesterGameState> {
     loanCardType: LoanCardType;
 
     get ingame(): IngameGameState {
@@ -55,6 +56,9 @@ export default class ExecuteLoanGameState extends GameState<ResolveConsolidatePo
                 break;
             case expertArtificer.id:
                 this.setChildGameState(new ExpertArtificerGameState(this)).firstStart(house);
+                break;
+            case loyalMaester.id:
+                this.setChildGameState(new LoyalMaesterGameState(this)).firstStart(house);
                 break;
             default:
                 this.onExecuteLoanFinish(house);
@@ -99,6 +103,8 @@ export default class ExecuteLoanGameState extends GameState<ResolveConsolidatePo
             return PyromancerGameState.deserializeFromServer(this, data);
         } else if (data.type == "expert-artificer") {
             return ExpertArtificerGameState.deserializeFromServer(this, data);
+        } else if (data.type == "loyal-maester") {
+            return LoyalMaesterGameState.deserializeFromServer(this, data);
         } else {
             throw new Error();
         }
@@ -109,5 +115,5 @@ export interface SerializedExecuteLoanGameState {
     type: "execute-loan";
     loanCardType: string;
     childGameState: SerializedPlaceSellswordsGameState | SerializedTheFacelessMenGameState | SerializedPyromancerGameState
-        | SerializedExpertArtificerGameState;
+        | SerializedExpertArtificerGameState | SerializedLoyalMaesterGameState;
 }
