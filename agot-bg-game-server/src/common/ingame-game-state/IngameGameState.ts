@@ -33,9 +33,10 @@ import CombatGameState from "./action-game-state/resolve-march-order-game-state/
 import DeclareSupportGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/declare-support-game-state/DeclareSupportGameState";
 import ThematicDraftHouseCardsGameState, { SerializedThematicDraftHouseCardsGameState } from "./thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 import DraftInfluencePositionsGameState, { SerializedDraftInfluencePositionsGameState } from "./draft-influence-positions-game-state/DraftInfluencePositionsGameState";
-import shuffleInPlace from "../../utils/shuffleInPlace";
 import shuffle from "../../utils/shuffle";
+import shuffleInPlace from "../../utils/shuffleInPlace";
 import popRandom from "../../utils/popRandom";
+import LoanCard from "./game-data-structure/loan-card/LoanCard";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -188,6 +189,10 @@ export default class IngameGameState extends GameState<
             return;
         }
 
+        if (this.game.ironBank) {
+            this.game.ironBank.drawNewLoanCard();
+        }
+
         if (this.game.turn != 0 && this.game.turn % 10 == 0) {
             // Refresh Westeros deck 3 after every 10th round
             const deck3 = this.game.westerosDecks[2];
@@ -200,6 +205,13 @@ export default class IngameGameState extends GameState<
             this.game.wildlingDeck = shuffle(this.game.wildlingDeck);
             this.game.houses.forEach(h => h.knowsNextWildlingCard = false);
             this.entireGame.broadcastToClients({type: "hide-top-wildling-card"});
+
+            // Reshuffle the loan deck
+            if (this.game.ironBank) {
+                shuffleInPlace(this.game.ironBank.loanCardDeck);
+                this.game.ironBank.loanCardDeck.forEach(lc => lc.discarded = false);
+                this.game.ironBank.sendUpdateLoanCards();
+            }
         }
 
         this.game.turn++;
@@ -213,6 +225,7 @@ export default class IngameGameState extends GameState<
         this.entireGame.broadcastToClients({
             type: "new-turn"
         });
+
 
         if (this.game.turn > 1) {
             this.setChildGameState(new WesterosGameState(this)).firstStart();
@@ -588,6 +601,10 @@ export default class IngameGameState extends GameState<
             region.loyaltyTokens = message.newLoyaltyTokenCount;
         } else if (message.type == "dragon-strength-token-removed") {
             this.game.removedDragonStrengthToken = message.fromRound;
+        } else if (message.type == "update-loan-cards") {
+            this.game.theIronBank.loanCardDeck = message.loanCardDeck.map(lc => LoanCard.deserializeFromServer(this.game, lc));
+            this.game.theIronBank.purchasedLoans = message.purchasedLoans.map(lc => LoanCard.deserializeFromServer(this.game, lc));
+            this.game.theIronBank.loanSlots = message.loanSlots.map(lc => lc ? LoanCard.deserializeFromServer(this.game, lc) : null);
         } else {
             this.childGameState.onServerMessage(message);
         }

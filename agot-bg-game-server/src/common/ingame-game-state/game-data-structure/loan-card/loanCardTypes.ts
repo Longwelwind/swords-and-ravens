@@ -24,11 +24,11 @@ export const expertArtificer = new ExpertArtificerLoanCardType(
 
 export const fullHost = new FullHostLoanCardType(
     "full-host", "Full Host", "Place a Footman, a Knight, a Siege Engine and a Ship in areas you control " +
-    "or already have units (obeying supply). Ship units shown may also be placed at ports you control."
+    "or already have units."
 );
 
 export const loyalMaester = new LoyalMaesterLoanCardType(
-    "loyal-maester", "Loyal Maester", ": Choose any two land areas and place one supply improvement on each."
+    "loyal-maester", "Loyal Maester", "Choose any two land areas and place one supply improvement on each."
 );
 
 export const masterAtArms = new MasterAtArmsLoanCardType(
@@ -48,12 +48,12 @@ export const savvySteward = new SavvyStewardLoanCardType(
 
 export const seaRaiders = new SeaRaidersLoanCardType(
     "sea-raiders", "Sea Raiders", "Place a Footman and 3 Ships in areas you control " +
-    "or already have units (obeying supply). Ship units shown may also be placed at ports you control."
+    "or already have units."
 );
 
 export const siegeEngineers = new SiegeEngineersLoanCardType(
     "siege-engineers", "Siege Engineers", "Place a Footman and 2 Siege Engines in areas you control " +
-    "or already have units (obeying supply). Ship units shown may also be placed at ports you control."
+    "or already have units."
 );
 
 export const spymaster = new SpymasterLoanCardType(
@@ -69,7 +69,7 @@ export const theFacelessMen = new TheFacelessMenLoanCardType(
 
 export const vanguardCavalry = new VanguardCavalryLoanCardType(
     "vanguard-cavalry", "Vanguard Cavalry", "Place 3 Knights in areas you control " +
-    "or already have units (obeying supply). Ship units shown may also be placed at ports you control."
+    "or already have units."
 );
 
 const loanCardTypes = new BetterMap<string, LoanCardType>([

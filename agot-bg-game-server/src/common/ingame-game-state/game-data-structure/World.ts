@@ -12,6 +12,7 @@ import RegionKind from "./RegionKind";
 import getStaticWorld from "./static-data-structure/getStaticWorld";
 import { dragon } from "./unitTypes";
 import staticWorld7p from "./static-data-structure/globalStaticWorld7p";
+import StaticIronBankView from "./static-data-structure/StaticIronBankView";
 
 export default class World {
     playerCount: number;
@@ -38,6 +39,10 @@ export default class World {
         const riverRegionsIds = [ "winterfell", "moat-cailin", "greywater-watch", "seagard", "the-twins", "riverrun", "the-mountains-of-the-moon", "harrenhal", "crackclaw-point",
             "three-towers", "princes-pass", "starfall" ];
         return this.regions.values.filter(r => riverRegionsIds.includes(r.id));
+    }
+
+    get ironBankView(): StaticIronBankView | null {
+        return getStaticWorld(this.playerCount).ironBankView;
     }
 
     constructor(regions: BetterMap<string, Region>, playerCount: number) {

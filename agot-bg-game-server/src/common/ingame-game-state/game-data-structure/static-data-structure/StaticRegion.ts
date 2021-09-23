@@ -19,12 +19,15 @@ export default class StaticRegion {
     unitSlot: UnitSlot;
     orderSlot: Point;
     powerTokenSlot: Point;
+    improvementSlot: Point;
+    castleSlot: Point;
 
     constructor(
         id: string, name: string, nameSlot: Point, type: RegionType,
         unitSlot: UnitSlot, orderSlot: Point, powerTokenSlot: Point,
         crownIcons: number, supplyIcons: number, castleLevel: number,
-        startingGarrison: number, superControlPowerToken: string | null, superLoyaltyToken = false, canRegainGarrison = false
+        startingGarrison: number, superControlPowerToken: string | null, superLoyaltyToken = false, canRegainGarrison = false,
+        improvementSlot = {x: 50, y: 50}, castleSlot = {x: 50, y: 50}
     ) {
         this.id = id;
         this.nameSlot = nameSlot;
@@ -40,6 +43,8 @@ export default class StaticRegion {
         this.superControlPowerToken = superControlPowerToken;
         this.superLoyaltyToken = superLoyaltyToken;
         this.canRegainGarrison = canRegainGarrison;
+        this.improvementSlot = improvementSlot;
+        this.castleSlot = castleSlot;
     }
 
     get hasStructure(): boolean {

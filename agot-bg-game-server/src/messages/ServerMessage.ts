@@ -11,6 +11,7 @@ import { CrowKillersStep } from "../common/ingame-game-state/westeros-game-state
 import HouseCardModifier from "../common/ingame-game-state/game-data-structure/house-card/HouseCardModifier";
 import { CombatStats } from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import { DraftStep } from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
+import { SerializedLoanCard } from "../common/ingame-game-state/game-data-structure/loan-card/LoanCard";
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady | PlayerUnready
     | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | SupportRefused | NewTurn | RemovePlacedOrder
@@ -25,7 +26,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | CrowKillersStepChanged | ManipulateCombatHouseCard | ChangeCombatTidesOfBattleCard
     | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting | UpdateCombatStats
     | UpdateDraftState | RevealBids | UpdateMaxTurns | PasswordResponse | ReplacedByVassal | UpdateDeletedHouseCards
-    | LoyaltyTokenGained | LoyaltyTokenPlaced | DrangonStrengthTokenRemoved;
+    | LoyaltyTokenGained | LoyaltyTokenPlaced | DrangonStrengthTokenRemoved | UpdateLoanCards;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -378,4 +379,11 @@ interface LoyaltyTokenPlaced {
 interface DrangonStrengthTokenRemoved {
     type: "dragon-strength-token-removed";
     fromRound: number;
+}
+
+interface UpdateLoanCards {
+    type: "update-loan-cards";
+    loanCardDeck: SerializedLoanCard[];
+    purchasedLoans: SerializedLoanCard[];
+    loanSlots: (SerializedLoanCard | null)[];
 }

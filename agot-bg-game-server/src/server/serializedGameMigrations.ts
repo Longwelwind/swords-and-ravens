@@ -1147,12 +1147,22 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                 "master-at-arms", "pyromancer", "savvy-steward", "sea-raiders",
                 "siege-engineers", "spymaster", "the-faceless-men", "vanguard-cavalry" ];
 
+                const loanDeck = shuffleInPlace(loanCardIds.map((id, i) => ({
+                    id: i,
+                    type: id,
+                    purchasedBy: null
+                })));
+                const loanSlots = [];
+
+                if (ingame.childGameState.type == "planning" && ingame.childGameState.childGameState.type == "place-orders" && !ingame.childGameState.childGameState.forVassals) {
+                    // Reveal the top loan card
+                    loanSlots.push(loanDeck.shift());
+                }
+
                 ingame.game.ironBank = {
-                    loanCardDeck: shuffleInPlace(loanCardIds.map((id, i) => ({
-                        id: i,
-                        type: id,
-                        purchasedBy: null
-                    })))
+                    loanCardDeck: loanDeck,
+                    loanSlots: loanSlots,
+                    purchasedLoans: []
                 };
             }
 
