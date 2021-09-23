@@ -39,7 +39,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained | DaenerysTargaryenPowerTokensDiscarded | MissandeiUsed
     | PowerTokensGifted | InfluenceTrackPositionChosen | TiesDecided | PlaceLoyaltyChoice | LoyaltyTokenPlaced | LoyaltyTokenGained
     | FireMadeFleshChoice | PlayWithFireChoice | TheLongPlanChoice | MoveLoyaltyTokenChoice | LoanPurchased | OrderRemoved | InterestPaid
-    | DebtPaid | CustomsOfficerPowerTokensGained | SellswordsPlaced | TheFacelessMenUnitsDestroyed | Pyromancer;
+    | DebtPaid | CustomsOfficerPowerTokensGained | SellswordsPlaced | TheFacelessMenUnitsDestroyed | Pyromancer | ExpertArtificer;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -878,4 +878,11 @@ interface Pyromancer {
     house: string;
     region: string;
     upgradeType: string;
+}
+
+interface ExpertArtificer {
+    type: "expert-artificer";
+    house: string;
+    region: string;
+    gainedPowerTokens: number;
 }

@@ -9,10 +9,9 @@ import SimpleChoiceGameState, { SerializedSimpleChoiceGameState } from "../../..
 import { ServerMessage } from "../../../../../../messages/ServerMessage";
 import { ClientMessage } from "../../../../../../messages/ClientMessage";
 import Player from "../../../../Player";
-import { observable } from "mobx";
 
 export default class PyromancerGameState extends GameState<ExecuteLoanGameState, SelectRegionGameState<PyromancerGameState> | SimpleChoiceGameState> {
-    @observable chosenRegion: Region | null = null;
+    chosenRegion: Region | null = null;
 
     get game(): Game {
         return this.parentGameState.game;

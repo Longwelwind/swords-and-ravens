@@ -1513,6 +1513,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Pyromancer</b>: House <b>{house.name}</b> chose to degrade <b>{region.name}</b> and place a <b>{data.upgradeType}</b> there.
                 </p>;
             }
+            case "expert-artificer": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
+                return <p>
+                    <b>Expert Artificer</b>: House <b>{house.name}</b> chose to place a Crown in <b>{region.name}</b> and gained {data.gainedPowerTokens} Power token{data.gainedPowerTokens != 1 ? "s" : ""}.
+                </p>;
+            }
         }
     }
 }
