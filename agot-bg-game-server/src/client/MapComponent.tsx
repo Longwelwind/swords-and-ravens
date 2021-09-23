@@ -73,6 +73,7 @@ export default class MapComponent extends Component<MapComponentProps> {
             .values.filter(r => r.garrison > 0 && r.garrison != BLOCKED_REGION_BY_INFINITE_GARRISON)
             .map(r => [r.id, getGarrisonToken(r.id, r.garrison)]));
         const ironBankView = this.ingame.world.ironBankView;
+        const ironBank = this.ingame.game.ironBank;
         return (
             <div className="map"
                 style={{ backgroundImage: `url(${this.backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem" }}>
@@ -117,7 +118,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                     ))}
                     {this.renderUnits()}
                     {this.renderOrders()}
-                    {this.renderIronBankInfos(ironBankView)}
+                    {ironBank && (ironBank.controllerOfBraavos || ironBank.purchasedLoans.length > 0) && this.renderIronBankInfos(ironBankView)}
                     {this.renderLoanCardDeck(ironBankView)}
                     {this.renderLoanCardSlots(ironBankView)}
                 </div>
