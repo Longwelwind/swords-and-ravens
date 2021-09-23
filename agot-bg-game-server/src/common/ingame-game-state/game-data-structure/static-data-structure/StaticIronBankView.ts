@@ -1,8 +1,8 @@
-import Slot from "../../../../utils/Slot";
+import IronBankSlot from "../../../../utils/IronBankSlot";
 
 export default class StaticIronBankView {
     // Display attributes
-    deckSlot: Slot;
-    loanSlots = new Array<Slot>(3);
-    infoComponentSlot: Slot;
+    deckSlot: IronBankSlot;
+    loanSlots = new Array<IronBankSlot>(3);
+    infoComponentSlot: IronBankSlot;
 }

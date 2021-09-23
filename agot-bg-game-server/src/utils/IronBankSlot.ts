@@ -1,6 +1,6 @@
 import Point from "./Point";
 
-export default interface Slot {
+export default interface IronBankSlot {
     point: Point;
     width: number;
     height: number;

@@ -141,8 +141,8 @@ def about(request):
         {"name": "Mother of Dragons", "children": [
             {"name": "Vassals", "done": True},
             {"name": "House Arryn", "done": True},
-            {"name": "Iron Bank"},
-            {"name": "Essos and House Targaryen"}
+            {"name": "Iron Bank", "done": True},
+            {"name": "Essos and House Targaryen", "done": True}
         ]}
     ]
 

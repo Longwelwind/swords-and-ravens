@@ -7,7 +7,6 @@ import IngameGameState from "../IngameGameState";
 import BetterMap from "../../../utils/BetterMap";
 import ResolveSinglePayDebtGameState, { SerializedResolveSinglePayDebtGameState } from "./resolve-single-pay-debt-game-state/ResolveSinglePayDebtGameState";
 
-// Todo: Create corresponding component
 export default class PayDebtsGameState extends GameState<IngameGameState, ResolveSinglePayDebtGameState> {
     unpaidDepts: BetterMap<House, number>;
     get ingame(): IngameGameState {

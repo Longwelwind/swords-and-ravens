@@ -44,9 +44,10 @@ export default class IronBankInfosComponent extends Component<IronBankInfosCompo
                                 {interestCosts.length > 0 &&
                                     <Row className="justify-content-center">
                                         <OverlayTrigger overlay={
-                                            <Tooltip id="interests-costs-tooltip">At the beginning of the Westeros Phase, in turn order, each player with a loan must discard one of their available power tokens for each loan they have purchased.
-                                                If that player is not able to discard the requisite number of power, for each power they are short, the player who holds the Valyrian Steel Blade chooses one of that player’s units anywhere and destroys it.
-                                                If the player who cannot pay their interest is the holder of the Blade, the next highest player on that track makes this choice.
+                                            <Tooltip id="interests-costs-tooltip">At the beginning of the Westeros Phase, any player having received loans must pay one power token
+                                            per loan as interest, resolving in turn order.<br/>For every token the player cannot pay, the Valyrian Steel Blade holder destroys
+                                            one of that player&apos;s units anywhere on the map. If the player holds the Valyrian Steel Blade, the next highest player on the Fiefdoms track
+                                            will make this choice instead.
                                             </Tooltip>}
                                             placement="auto"
                                             popperConfig={{ modifiers: [preventOverflow] }}
