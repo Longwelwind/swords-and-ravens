@@ -12,6 +12,10 @@ import Order from "../common/ingame-game-state/game-data-structure/Order";
 import westerosImage from "../../public/images/westeros.jpg";
 import westeros7pImage from "../../public/images/westeros-7p.jpg";
 import westerosWithEssosImage from "../../public/images/westeros-with-essos.jpg";
+import castleDegradeImage from "../../public/images/region-modifications/CastleDegrade.png"
+import castleUpgradeImage from "../../public/images/region-modifications/CastleUpgrade.png"
+import barrelImage from "../../public/images/region-modifications/Barrel.png"
+import crownImage from "../../public/images/region-modifications/Crown.png"
 import houseOrderImages from "./houseOrderImages";
 import orderImages from "./orderImages";
 import unitImages from "./unitImages";
@@ -69,9 +73,28 @@ export default class MapComponent extends Component<MapComponentProps> {
     }
 
     render(): ReactNode {
-        const garrisons = new BetterMap(this.props.ingameGameState.world.regions
-            .values.filter(r => r.garrison > 0 && r.garrison != BLOCKED_REGION_BY_INFINITE_GARRISON)
-            .map(r => [r.id, getGarrisonToken(r.id, r.garrison)]));
+        const garrisons = new BetterMap<string, string | null>();
+        const castleModifiers = new BetterMap<string, number>();
+        const barrelModifiers = new BetterMap<string, number>();
+        const crownModifiers = new BetterMap<string, number>();
+
+        for (const region of this.props.ingameGameState.world.regions.values) {
+            if (region.garrison > 0 && region.garrison != BLOCKED_REGION_BY_INFINITE_GARRISON) {
+                garrisons.set(region.id, getGarrisonToken(region.id, region.garrison));
+            }
+
+            if (region.castleModifier != 0) {
+                castleModifiers.set(region.id, region.castleModifier);
+            }
+
+            if (region.barrelModifier != 0) {
+                barrelModifiers.set(region.id, region.barrelModifier);
+            }
+
+            if (region.crownModifier != 0) {
+                crownModifiers.set(region.id, region.crownModifier);
+            }
+        }
         const ironBankView = this.ingame.world.ironBankView;
         const ironBank = this.ingame.game.ironBank;
         return (
@@ -80,7 +103,24 @@ export default class MapComponent extends Component<MapComponentProps> {
                 <div style={{ position: "relative" }}>
                     {this.props.ingameGameState.world.regions.values.map(r => (
                         <div key={r.id}>
-                            {garrisons.tryGet(r.id, null) && (
+                            {castleModifiers.has(r.id) && (
+                                <OverlayTrigger
+                                    overlay={renderRegionTooltip(r)}
+                                    delay={{ show: 500, hide: 100 }}
+                                    placement="auto"
+                                    rootClose
+                                >
+                                    <div
+                                        className="garrison-token"
+                                        style={{
+                                            backgroundImage: castleModifiers.get(r.id) > 0 ? `url(${castleUpgradeImage})` : `url(${castleDegradeImage})`,
+                                            left: r.castleSlot.x, top: r.castleSlot.y
+                                        }}
+                                    />
+                                </OverlayTrigger>
+                            )}
+                            {(barrelModifiers.has(r.id) || crownModifiers.has(r.id)) && this.renderImprovements(r)}
+                            {garrisons.has(r.id) && (
                                 <div
                                     className="garrison-token hover-weak-outline"
                                     style={{
@@ -244,7 +284,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                     wrap={wrap ? wrap : child =>
                         <OverlayTrigger
                             overlay={renderRegionTooltip(region)}
-                            delay={{ show: 750, hide: 100 }}
+                            delay={{ show: 500, hide: 100 }}
                             placement="auto"
                             rootClose
                         >
@@ -307,7 +347,7 @@ export default class MapComponent extends Component<MapComponentProps> {
 
                     return <OverlayTrigger
                         key={"unit-overlay-" + u.id}
-                        delay={{ show: 750, hide: 100 }}
+                        delay={{ show: 250, hide: 100 }}
                         placement="auto"
                         overlay={<Tooltip id={"unit-tooltip-" + u.id}>
                             <b>{u.type.name}</b>{controller != null && <small> of <b>{controller.name}</b></small>}
@@ -339,6 +379,46 @@ export default class MapComponent extends Component<MapComponentProps> {
                 })}
             </div>
         });
+    }
+
+    renderImprovements(region: Region): ReactNode {
+        return <div id={`improvement-${region.id}`}
+            className="units-container"
+            style={{ left: region.improvementSlot.point.x, top: region.improvementSlot.point.y, width: region.improvementSlot.width, flexWrap: "wrap" }}
+        >
+            {[...Array(region.barrelModifier)].map((_, i) => {
+                return <OverlayTrigger
+                    key={`barrel-${region.id}-${i}`}
+                    overlay={renderRegionTooltip(region)}
+                    delay={{ show: 500, hide: 100 }}
+                    placement="auto"
+                    rootClose
+                >
+                    <div key={`barrel-${region.id}-${i}`}
+                        className="unit-icon medium"
+                        style={{
+                            backgroundImage: `url(${barrelImage})`,
+                        }}
+                    />
+                </OverlayTrigger>
+            })}
+            {[...Array(region.crownModifier)].map((_, i) => {
+                return <OverlayTrigger
+                    key={`crown-${region.id}-${i}`}
+                    overlay={renderRegionTooltip(region)}
+                    delay={{ show: 500, hide: 100 }}
+                    placement="auto"
+                    rootClose
+                >
+                    <div key={`crown-${region.id}-${i}`}
+                        className="unit-icon medium"
+                        style={{
+                            backgroundImage: `url(${crownImage})`,
+                        }}
+                    />
+                </OverlayTrigger>
+            })}
+        </div>
     }
 
     renderOrders(): ReactNode {
@@ -432,7 +512,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                 key={"region-" + region.id}
             >
                 <OverlayTrigger overlay={this.renderOrderTooltip(order, region)}
-                    delay={{ show: 750, hide: 100 }}>
+                    delay={{ show: 250, hide: 100 }}>
                     <div className="order-icon" style={{ backgroundImage: `url(${backgroundUrl})` }} />
                 </OverlayTrigger>
             </div>

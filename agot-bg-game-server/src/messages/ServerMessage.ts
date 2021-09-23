@@ -26,7 +26,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | CrowKillersStepChanged | ManipulateCombatHouseCard | ChangeCombatTidesOfBattleCard
     | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting | UpdateCombatStats
     | UpdateDraftState | RevealBids | UpdateMaxTurns | PasswordResponse | ReplacedByVassal | UpdateDeletedHouseCards
-    | LoyaltyTokenGained | LoyaltyTokenPlaced | DrangonStrengthTokenRemoved | UpdateLoanCards;
+    | LoyaltyTokenGained | LoyaltyTokenPlaced | DrangonStrengthTokenRemoved | UpdateLoanCards | UpdateRegionModifiers;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -387,4 +387,12 @@ interface UpdateLoanCards {
     loanCardDeck: SerializedLoanCard[];
     purchasedLoans: SerializedLoanCard[];
     loanSlots: (SerializedLoanCard | null)[];
+}
+
+interface UpdateRegionModifiers {
+    type: "update-region-modifiers";
+    region: string;
+    castleModifier?: number;
+    barrelModifier?: number;
+    crownModifier?: number;
 }

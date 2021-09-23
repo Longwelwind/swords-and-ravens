@@ -9,9 +9,20 @@ import renderChildGameState from "../../../client/utils/renderChildGameState";
 import PlaceSellswordsComponent from "./PlaceSellswordsComponent";
 import TheFacelessMenGameState from "../../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/execute-loan-game-state/the-faceless-men-game-state/TheFacelessMenGameState";
 import TheFacelessMenComponent from "../TheFacelessMenComponent";
+import PyromancerGameState from "../../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/execute-loan-game-state/pyromancer-game-state/PyromancerGameState";
+import PyromancerComponent from "../PyromancerComponent";
+import House from "../../../common/ingame-game-state/game-data-structure/House";
 
 @observer
 export default class ExecuteLoanComponent extends Component<GameStateComponentProps<ExecuteLoanGameState>> {
+    get house(): House {
+        if (this.props.gameState.childGameState instanceof PlaceSellswordsGameState ||
+            this.props.gameState.childGameState instanceof TheFacelessMenGameState) {
+                return this.props.gameState.childGameState.house;
+        } else {
+            return this.props.gameState.childGameState.childGameState.house;
+        }
+    }
     render(): ReactNode {
         return <Col xs={12}>
             <Row className="justify-content-center">
@@ -19,7 +30,7 @@ export default class ExecuteLoanComponent extends Component<GameStateComponentPr
                     <LoanCardComponent loanCard={this.props.gameState.loanCardType} />
                 </Col>
             </Row>
-            {this.props.gameClient.doesControlHouse(this.props.gameState.childGameState.house) &&
+            {this.props.gameClient.doesControlHouse(this.house) &&
             <Row className="justify-content-center">
                 <Col xs="auto" className="text-center">
                     {this.props.gameState.loanCardType.description}
@@ -28,7 +39,8 @@ export default class ExecuteLoanComponent extends Component<GameStateComponentPr
             <Row>
                 {renderChildGameState<ExecuteLoanGameState>(this.props, [
                     [PlaceSellswordsGameState, PlaceSellswordsComponent],
-                    [TheFacelessMenGameState, TheFacelessMenComponent]
+                    [TheFacelessMenGameState, TheFacelessMenComponent],
+                    [PyromancerGameState, PyromancerComponent]
                 ])}
             </Row>
         </Col>;

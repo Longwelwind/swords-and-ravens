@@ -19,7 +19,7 @@ export default class StaticRegion {
     unitSlot: UnitSlot;
     orderSlot: Point;
     powerTokenSlot: Point;
-    improvementSlot: Point;
+    improvementSlot: UnitSlot;
     castleSlot: Point;
 
     constructor(
@@ -27,7 +27,7 @@ export default class StaticRegion {
         unitSlot: UnitSlot, orderSlot: Point, powerTokenSlot: Point,
         crownIcons: number, supplyIcons: number, castleLevel: number,
         startingGarrison: number, superControlPowerToken: string | null, superLoyaltyToken = false, canRegainGarrison = false,
-        improvementSlot = {x: 50, y: 50}, castleSlot = {x: 50, y: 50}
+        improvementSlot = {point: {x: 50, y: 50}, width: 100}, castleSlot = {x: 50, y: 50}
     ) {
         this.id = id;
         this.nameSlot = nameSlot;

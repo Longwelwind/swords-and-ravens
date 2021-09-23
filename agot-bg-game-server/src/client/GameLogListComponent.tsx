@@ -1506,6 +1506,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         : <>not to destroy any units.</>}
                 </p>;
             }
+            case "pyromancer": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
+                return <p>
+                    <b>Pyromancer</b>: House <b>{house.name}</b> chose to degrade <b>{region.name}</b> and place a <b>{data.upgradeType}</b> there.
+                </p>;
+            }
         }
     }
 }

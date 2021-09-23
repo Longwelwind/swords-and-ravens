@@ -615,6 +615,18 @@ export default class IngameGameState extends GameState<
             this.game.theIronBank.loanCardDeck = message.loanCardDeck.map(lc => LoanCard.deserializeFromServer(this.game, lc));
             this.game.theIronBank.purchasedLoans = message.purchasedLoans.map(lc => LoanCard.deserializeFromServer(this.game, lc));
             this.game.theIronBank.loanSlots = message.loanSlots.map(lc => lc ? LoanCard.deserializeFromServer(this.game, lc) : null);
+        } else if (message.type == "update-region-modifiers") {
+            const region = this.game.world.regions.get(message.region);
+
+            if (message.castleModifier) {
+                region.castleModifier = message.castleModifier;
+            }
+            if (message.barrelModifier) {
+                region.barrelModifier = message.barrelModifier;
+            }
+            if (message.crownModifier) {
+                region.crownModifier = message.crownModifier;
+            }
         } else {
             this.childGameState.onServerMessage(message);
         }

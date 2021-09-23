@@ -87,7 +87,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<Ga
                                         </Col>
                                     </>}
                                     {this.selectedOrderType instanceof ConsolidatePowerOrderType && <>
-                                        {this.selectedOrderType.starred && <Col xs="auto">
+                                        {this.selectedOrderType.starred && this.selectedOrderRegion.castleLevel > 0 && <Col xs="auto">
                                             <Button onClick={() => {
                                                 this.gameState.chooseMustering(this.selectedOrderRegion as Region);
                                                 this.reset();

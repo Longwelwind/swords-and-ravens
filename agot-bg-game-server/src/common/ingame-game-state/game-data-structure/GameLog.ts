@@ -39,7 +39,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained | DaenerysTargaryenPowerTokensDiscarded | MissandeiUsed
     | PowerTokensGifted | InfluenceTrackPositionChosen | TiesDecided | PlaceLoyaltyChoice | LoyaltyTokenPlaced | LoyaltyTokenGained
     | FireMadeFleshChoice | PlayWithFireChoice | TheLongPlanChoice | MoveLoyaltyTokenChoice | LoanPurchased | OrderRemoved | InterestPaid
-    | DebtPaid | CustomsOfficerPowerTokensGained | SellswordsPlaced | TheFacelessMenUnitsDestroyed;
+    | DebtPaid | CustomsOfficerPowerTokensGained | SellswordsPlaced | TheFacelessMenUnitsDestroyed | Pyromancer;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -871,4 +871,11 @@ interface TheFacelessMenUnitsDestroyed {
     type: "the-faceless-men-units-destroyed";
     house: string;
     units: [string, string[]][];
+}
+
+interface Pyromancer {
+    type: "pyromancer";
+    house: string;
+    region: string;
+    upgradeType: string;
 }

@@ -1138,6 +1138,12 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
 
+                ingame.game.world.regions.forEach((r: any) => {
+                    r.castleModifier = 0;
+                    r.barrelModifier = 0;
+                    r.crownModifier = 0;
+                });
+
                 if (ingame.childGameState.type == "action" && ingame.childGameState.childGameState.type == "resolve-consolidate-power" && ingame.childGameState.childGameState.childGameState.type == "player-mustering") {
                     const resolveConsolidatePower = ingame.childGameState.childGameState;
                     const house = resolveConsolidatePower.childGameState.house;
@@ -1179,6 +1185,11 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                 // Don't do it when we are in planning, as some users might not have realized the new loan card
                 if (ingame.childGameState.type == "westeros") {
                     // Reveal the top loan card
+                    loanSlots.push(loanDeck.shift());
+                }
+
+                if (ingame.childGameState.type != "planning" && ingame.game.turn >= 5) {
+                    // Reveal another loan card
                     loanSlots.push(loanDeck.shift());
                 }
 

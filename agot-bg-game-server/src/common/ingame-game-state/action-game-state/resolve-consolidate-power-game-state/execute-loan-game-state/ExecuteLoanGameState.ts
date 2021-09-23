@@ -7,13 +7,14 @@ import House from "../../../../../common/ingame-game-state/game-data-structure/H
 import Player from "../../../../../common/ingame-game-state/Player";
 import { ClientMessage } from "../../../../../messages/ClientMessage";
 import { ServerMessage } from "../../../../../messages/ServerMessage";
-import loanCardTypes, { fullHost, seaRaiders, siegeEngineers, theFacelessMen, vanguardCavalry } from "../../../../../common/ingame-game-state/game-data-structure/loan-card/loanCardTypes";
+import loanCardTypes, { fullHost, pyromancer, seaRaiders, siegeEngineers, theFacelessMen, vanguardCavalry } from "../../../../../common/ingame-game-state/game-data-structure/loan-card/loanCardTypes";
 import { footman, knight, ship, siegeEngine } from "../../../../../common/ingame-game-state/game-data-structure/unitTypes";
 import PlaceSellswordsGameState, { SerializedPlaceSellswordsGameState } from "./place-sellwords-game-state/PlaceSellswordsGameState";
 import TheFacelessMenGameState, { SerializedTheFacelessMenGameState } from "./the-faceless-men-game-state/TheFacelessMenGameState";
+import PyromancerGameState, { SerializedPyromancerGameState } from "./pyromancer-game-state/PyromancerGameState";
 
 export default class ExecuteLoanGameState extends GameState<ResolveConsolidatePowerGameState,
-    PlaceSellswordsGameState | TheFacelessMenGameState> {
+    PlaceSellswordsGameState | TheFacelessMenGameState | PyromancerGameState> {
     loanCardType: LoanCardType;
 
     get ingame(): IngameGameState {
@@ -47,6 +48,9 @@ export default class ExecuteLoanGameState extends GameState<ResolveConsolidatePo
                 break;
             case theFacelessMen.id:
                 this.setChildGameState(new TheFacelessMenGameState(this)).firstStart(house);
+                break;
+            case pyromancer.id:
+                this.setChildGameState(new PyromancerGameState(this)).firstStart(house);
                 break;
             default:
                 this.onExecuteLoanFinish(house);
@@ -87,6 +91,8 @@ export default class ExecuteLoanGameState extends GameState<ResolveConsolidatePo
             return PlaceSellswordsGameState.deserializeFromServer(this, data);
         } else if (data.type == "the-faceless-men") {
             return TheFacelessMenGameState.deserializeFromServer(this, data);
+        } else if (data.type == "pyromancer") {
+            return PyromancerGameState.deserializeFromServer(this, data);
         } else {
             throw new Error();
         }
@@ -96,5 +102,5 @@ export default class ExecuteLoanGameState extends GameState<ResolveConsolidatePo
 export interface SerializedExecuteLoanGameState {
     type: "execute-loan";
     loanCardType: string;
-    childGameState: SerializedPlaceSellswordsGameState | SerializedTheFacelessMenGameState;
+    childGameState: SerializedPlaceSellswordsGameState | SerializedTheFacelessMenGameState | SerializedPyromancerGameState;
 }
