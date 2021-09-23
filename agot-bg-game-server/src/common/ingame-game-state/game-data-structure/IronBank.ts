@@ -4,6 +4,7 @@ import shuffleInPlace from "../../../utils/shuffleInPlace";
 import Game from "./Game";
 import House from "./House";
 import LoanCard, { SerializedLoanCard } from "./loan-card/LoanCard";
+import LoanCardType from "./loan-card/LoanCardType";
 
 export default class IronBank {
     game: Game;
@@ -20,6 +21,10 @@ export default class IronBank {
 
     constructor(game: Game) {
         this.game = game;
+    }
+
+    getLoanCostsForHouse(house: House): number[] {
+        return house == this.controllerOfBraavos ? this.loanCosts.map(cost => cost - 1) : this.loanCosts;
     }
 
     drawNewLoanCard(): void {
@@ -40,6 +45,36 @@ export default class IronBank {
         }
 
         this.sendUpdateLoanCards();
+    }
+
+    purchaseLoan(house: House, loanIndex: number, regionOfOrderId: string): LoanCardType | null{
+        if (loanIndex >= this.loanSlots.length) {
+            return null;
+        }
+
+        const loan = this.loanSlots[loanIndex];
+        const costs = this.getLoanCostsForHouse(house)[loanIndex];
+        if (!loan || house.powerTokens < costs) {
+            return null;
+        }
+
+        this.game.ingame.changePowerTokens(house, -costs);
+
+        loan.purchasedBy = house;
+        this.purchasedLoans.push(loan);
+        this.loanSlots[loanIndex] = null;
+
+        this.game.ingame.log({
+            type: "loan-purchased",
+            house: house.id,
+            loanType: loan.type.id,
+            payed: costs,
+            region: regionOfOrderId
+        });
+
+        this.sendUpdateLoanCards();
+
+        return loan.type;
     }
 
     sendUpdateLoanCards(): void {

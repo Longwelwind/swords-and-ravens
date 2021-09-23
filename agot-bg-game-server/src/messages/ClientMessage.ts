@@ -5,7 +5,7 @@ export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | Unready |
     | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings | CreatePrivateChatRoom | ChangeGameSettings
     | CancelGame | Vote | LaunchCancelGameVote | CancelVote | LaunchReplacePlayerVote | UpdateNote | SelectWesterosCard
     | ClaimVassal | LaunchReplacePlayerByVassalVote | GiftPowerTokens | LaunchEndGameVote | SetPassword
-    | DistributePowerTokens | DropPowerTokens | MoveLoyaltyToken;
+    | DistributePowerTokens | DropPowerTokens | MoveLoyaltyToken | ResolveConsolidatePowerChoice;
 
 interface Ping {
     type: "ping";
@@ -264,4 +264,13 @@ interface MoveLoyaltyToken {
     type: "move-loyalty-token";
     from: string;
     to: string;
+}
+
+interface ResolveConsolidatePowerChoice {
+    type: "resolve-consolidate-power-choice";
+    region: string;
+    gainPowerTokens?: boolean;
+    musterUnits?: boolean;
+    purchaseLoan?: number;
+    ignoreAndRemoveOrder?: boolean;
 }

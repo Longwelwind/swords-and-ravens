@@ -201,6 +201,14 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.startWithSevenPowerTokens = true;
             }
 
+            // Lock MoD settings for 8p
+            if (settings.setupId == "mother-of-dragons" && settings.playerCount == 8) {
+                settings.vassals = true;
+                settings.seaOrderTokens = true;
+                settings.allowGiftingPowerTokens = true;
+                settings.startWithSevenPowerTokens = true;
+            }
+
             // Reset the MoD settings
             if (this.entireGame.gameSettings.setupId == "mother-of-dragons" && settings.setupId != "mother-of-dragons") {
                 settings.vassals = false;

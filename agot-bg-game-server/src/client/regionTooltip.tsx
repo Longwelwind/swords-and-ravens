@@ -6,6 +6,7 @@ import Region from "../common/ingame-game-state/game-data-structure/Region";
 
 export function renderRegionTooltip(region: Region): OverlayChildren {
     const controller =  region.getController();
+    const loyaltyTokenCount = region.loyaltyTokens || region.superLoyaltyToken ? 1 : 0;
 
     return <Tooltip id={`region-${region.id}-details`}>
         <div className="text-center mb-2">
@@ -27,8 +28,8 @@ export function renderRegionTooltip(region: Region): OverlayChildren {
             {region.controlPowerToken && (
                 <><br/><small>Power token</small></>
             )}
-            {region.loyaltyTokens >0 && (
-                <><br/><small>{region.loyaltyTokens} Loyalty token{region.loyaltyTokens > 1 && "s"}</small></>
+            {loyaltyTokenCount > 0 && (
+                <><br/><small>{loyaltyTokenCount} Loyalty token{loyaltyTokenCount > 1 && "s"}</small></>
             )}
             {/* {region.units.size > 0 && (
                 <><br/>{joinReactNodes(region.units.values.map(u => u.wounded ? <s key={u.id}>{u.type.name}</s> : <b key={u.id}>{u.type.name}</b>), ", ")}</>

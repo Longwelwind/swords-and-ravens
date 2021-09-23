@@ -37,7 +37,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | LittlefingerPowerTokensGained | AlayneStoneUsed | LysaArrynFfcPowerTokensGained | AnyaWaynwoodPowerTokensGained | RobertArrynUsed
     | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained | DaenerysTargaryenPowerTokensDiscarded | MissandeiUsed
     | PowerTokensGifted | InfluenceTrackPositionChosen | TiesDecided | PlaceLoyaltyChoice | LoyaltyTokenPlaced | LoyaltyTokenGained
-    | FireMadeFleshChoice | PlayWithFireChoice | TheLongPlanChoice | MoveLoyaltyTokenChoice;
+    | FireMadeFleshChoice | PlayWithFireChoice | TheLongPlanChoice | MoveLoyaltyTokenChoice | LoanPurchased | OrderRemoved;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -821,4 +821,19 @@ interface MoveLoyaltyTokenChoice {
     regionFrom?: string;
     regionTo?: string;
     powerTokensDiscardedToCancelMovement?: number;
+}
+
+interface LoanPurchased {
+    type: "loan-purchased";
+    house: string;
+    region: string;
+    loanType: string;
+    payed: number;
+}
+
+interface OrderRemoved {
+    type: "order-removed";
+    house?: string;
+    region: string;
+    order: string;
 }

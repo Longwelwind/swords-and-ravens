@@ -1,3 +1,4 @@
+import ResolveSingleConsolidatePowerGameState from "../../action-game-state/resolve-single-consolidate-power-game-state/ResolveSingleConsolidatePowerGameState";
 import House from "../House";
 
 export default abstract class LoanCardType {
@@ -11,5 +12,5 @@ export default abstract class LoanCardType {
         this.description = description;
     }
 
-    abstract execute(resolveIronBankOrder: any, house: House): void; // Todo: Create ResolveIronBankOrderGameState
+    abstract execute(resolveSingleConsolidate: ResolveSingleConsolidatePowerGameState, house: House): void; // Todo: Create ResolveIronBankOrderGameState
 }

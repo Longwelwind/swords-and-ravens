@@ -50,7 +50,7 @@ export default class IronBankInfosComponent extends Component<IronBankInfosCompo
                                         placement="auto"
                                         popperConfig={{ modifiers: [preventOverflow] }}
                                     >
-                                        <h5 className="text-center">Interest costs</h5>
+                                        <h5 className="text-center">Interest per round</h5>
                                     </OverlayTrigger>
                                     <HouseNumberResultsComponent results={interestCosts} />
                                 </Row>

@@ -180,7 +180,7 @@ export default class Game {
         return planningRestrictions.some(restriction => restriction.restriction(order.type))
             || (this.getAllowedCountOfStarredOrders(controller) == 0 && order.type.starred)
             || (order.type.restrictedTo != null && order.type.restrictedTo != region.type.kind)
-            || order.type.id == "sea-iron-bank";
+            || (order.type.id == "sea-iron-bank" && !this.targaryen);
     }
 
     getRestrictedOrders(region: Region, planningRestrictions: PlanningRestriction[]): Order[] {

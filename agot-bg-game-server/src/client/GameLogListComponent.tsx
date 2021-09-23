@@ -29,6 +29,8 @@ import { tidesOfBattleCards } from "../common/ingame-game-state/game-data-struct
 import HouseNumberResultsComponent from "./HouseNumberResultsComponent";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
 import { preventOverflow } from "@popperjs/core";
+import loanCardTypes from "../common/ingame-game-state/game-data-structure/loan-card/loanCardTypes";
+import orderTypes from "../common/ingame-game-state/game-data-structure/order-types/orderTypes";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -1413,6 +1415,30 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 } else {
                     return <></>;
                 }
+            }
+            case "loan-purchased": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
+                const loan = loanCardTypes.get(data.loanType);
+
+                return <p>
+                    House <b>{house.name}</b> resolved a Iron Bank order in <b>
+                        {region.name}</b>, payed {data.payed} Power token{data.payed != 1 ? "s" : ""} and purchased the loan <b>{loan.name}</b>.
+                </p>
+            }
+            case "order-removed": {
+                const house = data.house ? this.game.houses.get(data.house) : null;
+                const region = this.world.regions.get(data.region);
+                const orderType = orderTypes.get(data.order);
+
+                return house ?
+                    <p>
+                        House <b>{house.name}</b> removed their <b>{orderType.name}</b> order token in <b>{region.name}</b>
+                    </p>
+                    :
+                    <p>
+                        A <b>{orderType.name}</b> has been removed from <b>{region.name}</b>
+                    </p>
             }
         }
     }

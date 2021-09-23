@@ -13,13 +13,10 @@ import * as _ from "lodash";
 import EntireGame from "../../../../EntireGame";
 import ResolveConsolidatePowerGameState
     from "../../../action-game-state/resolve-consolidate-power-game-state/ResolveConsolidatePowerGameState";
-import ConsolidatePowerOrderType from "../../../game-data-structure/order-types/ConsolidatePowerOrderType";
 import {ServerMessage} from "../../../../../messages/ServerMessage";
 import RegionKind from "../../../game-data-structure/RegionKind";
 import IngameGameState from "../../../IngameGameState";
 import User from "../../../../../server/User";
-import Order from "../../../game-data-structure/Order";
-import DefenseMusterOrderType from "../../../../../common/ingame-game-state/game-data-structure/order-types/DefenseMusterOrderType";
 import { observable } from "mobx";
 
 type MusteringRule = (Mustering & {cost: number});
@@ -37,12 +34,12 @@ interface ParentGameState extends GameState<any, any> {
     game: Game;
     entireGame: EntireGame;
     ingame: IngameGameState;
-    onPlayerMusteringEnd(house: House, musterings: Region[]): void;
+    onPlayerMusteringEnd(house: House, regions: Region[]): void;
 }
 
 /**
  * This GameState handles mustering for the Westeros card "Mustering", a mustering from a consolidated power
- * token and a mustering from the Wildling card "The Horde Descends".
+ * token, a mustering from defense/muster token and a mustering from the Wildling card "The Horde Descends".
  */
 export default class PlayerMusteringGameState extends GameState<ParentGameState> {
     house: House;
@@ -72,24 +69,39 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         return this.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER;
     }
 
+    get regions(): Region[] {
+        switch (this.type) {
+            case PlayerMusteringType.MUSTERING_WESTEROS_CARD:
+            case PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD:
+                const regionsWithCastles = this.ingame.world.getControlledRegions(this.house).filter(r => r.castleLevel > 0);
+                return this.ingame.isVassalHouse(this.house) ? regionsWithCastles.filter(r => r.superControlPowerToken == this.house) : regionsWithCastles;
+            case PlayerMusteringType.DEFENSE_MUSTER_ORDER:
+                return this.resolveConsolidatePowerGameState.actionGameState.getRegionsWithDefenseMusterOrderOfHouse(this.house).map(([r, _ot]) => r);
+            case PlayerMusteringType.STARRED_CONSOLIDATE_POWER:
+                return this.resolveConsolidatePowerGameState.actionGameState.getRegionsWithConsolidatePowerOrderOfHouse(this.house).filter(([_r, ot]) => ot.starred).map(([r, _ot]) => r);
+            default:
+                throw new Error();
+        }
+    }
+
     firstStart(house: House, type: PlayerMusteringType): void {
         this.house = house;
         this.type = type;
 
-        if (!this.canMuster()) {
-            this.parentGameState.ingame.log({
-                type: "player-mustered",
-                house: house.id,
-                musterings: []
-            });
+        if (!this.anyUsablePointsLeft(new BetterMap())) {
+            if (type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
+                // Resolve the CP for PT then
+                this.resolveConsolidatePowerGameState.resolveConsolidatePowerOrderForPt(this.regions[0], this.house);
+            } else {
+                this.parentGameState.ingame.log({
+                    type: "player-mustered",
+                    house: house.id,
+                    musterings: []
+                });
+            }
 
-            this.proceedToParentGameState(new BetterMap());
+            this.proceedToParentGameState(this.regions);
         }
-    }
-
-    canMuster(): boolean {
-        // canMuster is always true when isStarredConsolidatePowerMusteringType to allow resolving a CP* for Power tokens even when it can't be used for mustering
-        return this.isStarredConsolidatePowerMusteringType || this.anyUsablePointsLeft(new BetterMap());
     }
 
     onServerMessage(_: ServerMessage): void {
@@ -144,32 +156,6 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                     return;
                 }
 
-                if (this.isStarredConsolidatePowerMusteringType) {
-                    // If the mustering is from a starred consolidate power, then there
-                    // must be a starred consolidate power in the region
-                    if (!this.resolveConsolidatePowerGameState) {
-                        return;
-                    }
-
-                    const order = this.getConsolidatePowerOrder(originatingRegion);
-                    if (!order) {
-                        return;
-                    }
-
-                    if (musterings.size > 0 && musterings.values[0].length > 0 && !order.type.starred) {
-                        return;
-                    }
-                } else if (this.type == PlayerMusteringType.DEFENSE_MUSTER_ORDER) {
-                    if (!this.resolveConsolidatePowerGameState) {
-                        return;
-                    }
-
-                    const order = this.getDefenseMusterOrder(originatingRegion);
-                    if (!order) {
-                        return;
-                    }
-                }
-
                 // A unit has not been twiced used for transformation
                 const transformedUnits = recruitements.filter(({from}) => from).map(({from}) => from);
                 if (_.uniq(transformedUnits).length != transformedUnits.length) {
@@ -194,19 +180,6 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 });
             });
 
-            if (this.isStarredConsolidatePowerMusteringType) {
-                if (musterings.size == 1) {
-                    const startingRegion = musterings.keys[0];
-                    const recruitments = musterings.values[0];
-                    if (recruitments.length == 0) {
-                        // The CP was resolved to get Power tokens
-                        this.resolveConsolidatePowerGameState.resolveConsolidatePowerOrderForPt(startingRegion, this.house);
-                        this.proceedToParentGameState(musterings);
-                        return;
-                    }
-                }
-            }
-
             this.parentGameState.ingame.log({
                 type: "player-mustered",
                 house: this.house.id,
@@ -215,17 +188,12 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 )
             });
 
-            this.proceedToParentGameState(musterings);
+            this.proceedToParentGameState(musterings.keys);
         }
     }
 
-    proceedToParentGameState(musterings: BetterMap<Region, Mustering[]>): void {
-        if (this.type == PlayerMusteringType.DEFENSE_MUSTER_ORDER && musterings.size == 0) {
-            this.parentGameState.onPlayerMusteringEnd(this.house, this.resolveConsolidatePowerGameState.actionGameState.getRegionsWithDefenseMusterOrderOfHouse(this.house));
-            return;
-        }
-
-        this.parentGameState.onPlayerMusteringEnd(this.house, musterings.entries.map(([region, _]) => region));
+    proceedToParentGameState(musteringRegions: Region[]): void {
+        this.parentGameState.onPlayerMusteringEnd(this.house, musteringRegions);
     }
 
     muster(musterings: BetterMap<Region, Mustering[]>): void {
@@ -236,40 +204,6 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 recruitements.map(({from, to, region}) => ({from: from ? from.id : null, to: to.id, region: region.id}))
             ])
         });
-    }
-
-    getConsolidatePowerOrder(region: Region): Order | null {
-        if (!this.isStarredConsolidatePowerMusteringType) {
-            throw new Error("getConsolidatePowerOrder() called but type != STARRED_CONSOLIDATE_POWER");
-        }
-
-        const order = this.resolveConsolidatePowerGameState.actionGameState.ordersOnBoard.tryGet(region, null);
-        if(!order) {
-            return null;
-        }
-
-        if(order.type instanceof ConsolidatePowerOrderType) {
-            return order;
-        }
-
-        return null;
-    }
-
-    getDefenseMusterOrder(region: Region): Order | null {
-        if (this.type != PlayerMusteringType.DEFENSE_MUSTER_ORDER) {
-            throw new Error("getDefenseMusterOrder() called but type != DEFENSE_MUSTER_ORDER");
-        }
-
-        const order = this.resolveConsolidatePowerGameState.actionGameState.ordersOnBoard.tryGet(region, null);
-        if(!order) {
-            return null;
-        }
-
-        if(order.type instanceof DefenseMusterOrderType) {
-            return order;
-        }
-
-        return null;
     }
 
     getWaitedUsers(): User[] {
@@ -391,51 +325,17 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
     anyUsablePointsLeft(musterings: BetterMap<Region, Mustering[]>): boolean {
         switch(this.type) {
             case PlayerMusteringType.MUSTERING_WESTEROS_CARD:
-                // Return true if there is any valid mustering rule for any controlled castle unused
-                let controlledCastles = this.game.world.getControlledRegions(this.house).filter(r => r.castleLevel > 0);
-                if (this.ingame.isVassalHouse(this.house)) {
-                    controlledCastles = controlledCastles.filter(r => r.superControlPowerToken == this.house);
-                }
-
-                return _.flatMap(controlledCastles.map(c => this.getValidMusteringRulesForRegion(c, musterings))).length > 0;
-            case PlayerMusteringType.STARRED_CONSOLIDATE_POWER: {
-                const parentResolveConsolidatePowerGameState: ResolveConsolidatePowerGameState | null = this.parentGameState instanceof ResolveConsolidatePowerGameState ? this.parentGameState : null;
-                if(!parentResolveConsolidatePowerGameState) {
-                    return false;
-                }
-
-                const regions = parentResolveConsolidatePowerGameState.actionGameState.getRegionsWithStarredConsolidatePowerOrderOfHouse(this.house);
-                const region = regions.length > 0 ? regions[0] : null;
-                if(region) {
-                    // Return true if there are valid mustering rules left for the starred CP region
-                    return this.getValidMusteringRulesForRegion(region, musterings).length > 0;
-                }
-
-                return false;
-            }
+            case PlayerMusteringType.STARRED_CONSOLIDATE_POWER:
+            case PlayerMusteringType.DEFENSE_MUSTER_ORDER:
+                // Return true if there is any valid mustering rule for any unused region
+                return _.flatMap(this.regions.map(c => this.getValidMusteringRulesForRegion(c, musterings))).length > 0;
             case PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD:
                 if (musterings.size == 0) {
                     // Return true if there is any valid mustering rule for any controlled castle unused
-                    const controlledCastles = this.game.world.getControlledRegions(this.house).filter(r => r.castleLevel > 0);
-                    return _.flatMap(controlledCastles.map(c => this.getValidMusteringRulesForRegion(c, musterings))).length > 0;
+                    return _.flatMap(this.regions.map(c => this.getValidMusteringRulesForRegion(c, musterings))).length > 0;
                 } else {
                     return this.getValidMusteringRulesForRegion(musterings.keys[0], musterings).length > 0;
                 }
-            case PlayerMusteringType.DEFENSE_MUSTER_ORDER: {
-                const parentResolveConsolidatePowerGameState: ResolveConsolidatePowerGameState | null = this.parentGameState instanceof ResolveConsolidatePowerGameState ? this.parentGameState : null;
-                if(!parentResolveConsolidatePowerGameState) {
-                    return false;
-                }
-
-                const regions = parentResolveConsolidatePowerGameState.actionGameState.getRegionsWithDefenseMusterOrderOfHouse(this.house);
-                const region = regions.length > 0 ? regions[0] : null;
-                if (region) {
-                    // Return true if there are valid mustering rules left for the muster order region
-                    return this.getValidMusteringRulesForRegion(region, musterings).length > 0;
-                }
-
-                return false;
-            }
         }
     }
 

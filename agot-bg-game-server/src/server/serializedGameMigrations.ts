@@ -1143,6 +1143,9 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                     return serializedGame;
                 }
 
+                serializedGame.gameSettings.seaOrderTokens = true;
+                serializedGame.gameSettings.allowGiftingPowerTokens = true;
+
                 const loanCardIds = [ "customs-officer", "expert-artificer", "full-host", "loyal-maester",
                 "master-at-arms", "pyromancer", "savvy-steward", "sea-raiders",
                 "siege-engineers", "spymaster", "the-faceless-men", "vanguard-cavalry" ];
@@ -1150,11 +1153,15 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                 const loanDeck = shuffleInPlace(loanCardIds.map((id, i) => ({
                     id: i,
                     type: id,
-                    purchasedBy: null
+                    purchasedBy: null,
+                    discarded: false
                 })));
                 const loanSlots = [];
 
-                if (ingame.childGameState.type == "planning" && ingame.childGameState.childGameState.type == "place-orders" && !ingame.childGameState.childGameState.forVassals) {
+                // Usually before everye westeros phase begins a loan card is drawn
+                // So when we are in any Westeros state we can reveal the top card now
+                // Don't do it when we are in planning, as some users might not have realized the new loan card
+                if (ingame.childGameState.type == "westeros") {
                     // Reveal the top loan card
                     loanSlots.push(loanDeck.shift());
                 }
@@ -1164,6 +1171,17 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                     loanSlots: loanSlots,
                     purchasedLoans: []
                 };
+
+                if (ingame.childGameState.type == "action" && ingame.childGameState.childGameState.type == "resolve-consolidate-power" && ingame.childGameState.childGameState.childGameState.type == "player-mustering") {
+                    const resolveConsolidatePower = ingame.childGameState.childGameState;
+                    const house = resolveConsolidatePower.childGameState.house;
+
+                    // Set the new child game state to resolve a CP*
+                    resolveConsolidatePower.childGameState = {
+                        type: "resolve-single-consolidate-power",
+                        house: house
+                    };
+                }
             }
 
             return serializedGame;

@@ -180,7 +180,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         <div style={{ fontSize: "18px" }}>{this.house.powerTokens}</div>
                         <OverlayTrigger
                             overlay={this.renderPowerPopover(this.house)}
-                            placement="right"
+                            placement="auto"
                             trigger="click"
                             rootClose
                         >
