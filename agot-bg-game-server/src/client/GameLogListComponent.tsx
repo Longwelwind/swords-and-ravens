@@ -33,6 +33,7 @@ import loanCardTypes from "../common/ingame-game-state/game-data-structure/loan-
 import orderTypes from "../common/ingame-game-state/game-data-structure/order-types/orderTypes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFastForward } from "@fortawesome/free-solid-svg-icons";
+import LoanCardComponent from "./game-state-panel/utils/LoanCardComponent";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -1436,10 +1437,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const region = this.world.regions.get(data.region);
                 const loan = loanCardTypes.get(data.loanType);
 
-                return <p>
-                    House <b>{house.name}</b> resolved a Iron Bank order in <b>
-                        {region.name}</b>, paid {data.paid} Power token{data.paid != 1 ? "s" : ""} and purchased the loan <b>{loan.name}</b>.
-                </p>
+                return <>
+                    <p>
+                        House <b>{house.name}</b> resolved a Iron Bank order in <b>
+                            {region.name}</b> and paid {data.paid} Power token{data.paid != 1 ? "s" : ""} for
+                    </p>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <LoanCardComponent loanCard={loan}/>
+                    </div>
+                </>
             }
             case "order-removed": {
                 const house = data.house ? this.game.houses.get(data.house) : null;
@@ -1472,6 +1478,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     ? (<>House <b>{resolver.name}</b> chose to destroy {joinReactNodes(units.map(([region, unitTypes]) =>
                             <span key={`pay-debt_${region.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`pay-debt_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), ", ")} of House <b>{house.name}</b>.</>)
                     : <> House <b>{house.name} </b> had no units to destroy.</>}
+                </p>;
+            }
+            case "customs-officer-power-tokens-gained": {
+                const house = this.game.houses.get(data.house);
+                return <p>
+                    <b>Customs Officer</b>: House <b>{house.name}</b> gained {data.gained} Power token{data.gained != 1 ? "s" : ""}.
                 </p>;
             }
         }
