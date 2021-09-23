@@ -1527,6 +1527,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Loyal Maester</b>: House <b>{house.name}</b> chose to place a Barrel in {joinReactNodes(regions.map(r => <b key={`loyal_maester_${r.id}`}>{r.name}</b>), ' and in ')}.
                 </p>;
             }
+            case "master-at-arms": {
+                const house = this.game.houses.get(data.house);
+                const regions = data.regions.map(rid => this.world.regions.get(rid));
+                return <p>
+                    <b>Master-at-Arms</b>: House <b>{house.name}</b> chose to upgrade the castles in {joinReactNodes(regions.map(r => <b key={`master-at-arms_${r.id}`}>{r.name}</b>), ' and in ')}.
+                </p>;
+            }
         }
     }
 }
