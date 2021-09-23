@@ -153,7 +153,7 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
         });
 
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(this.game.targaryen,
-            `House Targaryen may discard ${this.costsToCancelPreviousMovement} power token${this.costsToCancelPreviousMovement > 1 ? "s" : ""} to move the loyalty token from ${this.previousMovement.to.name} back to ${this.previousMovement.from.name}.`,
+            `House Targaryen may discard ${this.costsToCancelPreviousMovement} power token${this.costsToCancelPreviousMovement > 1 ? "s" : ""} to move the loyalty\xa0token from ${this.previousMovement.to.name} back to ${this.previousMovement.from.name}.`,
             this.getChoices(this.game.targaryen));
     }
 

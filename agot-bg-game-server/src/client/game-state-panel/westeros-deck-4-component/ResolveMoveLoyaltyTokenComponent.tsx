@@ -24,18 +24,14 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<GameStat
     render(): ReactNode {
         return (
             <>
-                {/* {this.gameState.previousMovement != null &&
                 <Col xs={12} className="text-center">
-                    <p>House <b>{this.gameState.previousMovement.house.name}</b> moved a loyalty token from <b>{this.gameState.previousMovement.from.name}</b> to <b>{this.gameState.previousMovement.to.name}</b>.</p>
-                </Col>} */}
-                <Col xs={12} className="text-center">
-                    <p>House <b>{this.gameState.house.name}</b> must move a loyalty token to an adjacent land area.</p>
+                    <p>House <b>{this.gameState.house.name}</b> must move a loyalty&nbsp;token to an adjacent land area.</p>
                 </Col>
                 <Col xs={12} className="mt-2">
                     {this.props.gameClient.doesControlHouse(this.gameState.house) ? (
                         <>
                             <p className="text-center">
-                                Move a loyalty token from {this.from ? <><b>{this.from.name}</b> to </> : ""}{this.to ? <b>{this.to.name}</b> : ""}
+                                Move a loyalty&nbsp;token from {this.from ? <><b>{this.from.name}</b> to </> : ""}{this.to ? <b>{this.to.name}</b> : ""}
                             </p>
                             <Row className="justify-content-center">
                                 <Col xs="auto">

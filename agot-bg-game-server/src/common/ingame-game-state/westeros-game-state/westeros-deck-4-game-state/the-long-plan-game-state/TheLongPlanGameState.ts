@@ -31,7 +31,7 @@ export default class TheLongPlanGameState extends GameState<WesterosDeck4GameSta
 
     firstStart(house: House): void {
         this.regions = [];
-        this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(house, `House ${house.name} may discard 1 Power token to choose one other player who places 2 loyalty tokens in 2 different land areas in Westeros.`, this.getChoices(house).keys);
+        this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(house, `House ${house.name} may discard 1 Power\xa0token to choose one other player who places 2 loyalty\xa0tokens in 2 different land areas in Westeros.`, this.getChoices(house).keys);
     }
 
     getChoices(house: House): BetterMap<string, string> {

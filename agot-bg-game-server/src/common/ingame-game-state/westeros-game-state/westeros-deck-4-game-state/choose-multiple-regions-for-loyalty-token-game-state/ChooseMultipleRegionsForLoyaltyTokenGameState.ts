@@ -92,7 +92,7 @@ export default class ChooseMultipleRegionsForLoyaltyTokenGameState extends GameS
         this.regions = _.without(this.regions, region);
 
         if (this.game.isLoyaltyTokenAvailable && this.placedCount < this.count && this.regions.length > 0) {
-            this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(house, `House ${house.name} can choose to place another loyalty token.`, ["Place another loyalty token", "Finish"]);
+            this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(house, `House ${house.name} can choose to place another loyalty\xa0token.`, ["Place another loyalty token", "Finish"]);
         } else {
             this.westeros.onWesterosCardEnd();
         }
