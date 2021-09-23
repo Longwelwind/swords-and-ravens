@@ -1454,11 +1454,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return house ?
                     <p>
-                        House <b>{house.name}</b> removed their <b>{orderType.name}</b> order token in <b>{region.name}</b>.
+                        House <b>{house.name}</b> removed their <b>{orderType.name}</b> order in <b>{region.name}</b>.
                     </p>
                     :
                     <p>
-                        A <b>{orderType.name}</b> has been removed from <b>{region.name}</b>.
+                        A <b>{orderType.name}</b> order has been removed from <b>{region.name}</b>.
                     </p>
             }
             case "interest-paid": {
@@ -1495,6 +1495,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         place {joinReactNodes(placedSellswords.map(([region, unitTypes]) => <span key={`place_sellsword_${region.id}`}>
                             {joinReactNodes(unitTypes.map((ut, i) => <b key={`place_sellsword${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), " and ")}.</>)
                         : <> placed no sellswords.</>}
+                </p>;
+            }
+            case "the-faceless-men-units-destroyed": {
+                const house = this.game.houses.get(data.house);
+                const destroyedUnits = data.units.map(([regionId, units]) => [this.world.regions.get(regionId), units.map(ut => unitTypes.get(ut))[0]] as [Region, UnitType]);
+                return <p>
+                    <b>The Faceless Men</b>: House <b>{house.name}</b> chose {destroyedUnits.length > 0 ? (<>to destroy {joinReactNodes(
+                        destroyedUnits.map(([region, unitType]) => <span key={`the-faceless-men_${region.id}`}>a <b>{unitType.name}</b> in <b>{region.name}</b></span>), " and ")}.</>)
+                        : <>not to destroy any units.</>}
                 </p>;
             }
         }

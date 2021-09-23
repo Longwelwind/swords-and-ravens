@@ -76,6 +76,14 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
         this.setChildGameState(new ResolveMarchOrderGameState(this)).firstStart();
     }
 
+    findOrphanedOrdersAndRemoveThem(): void {
+        const orphanedOrders = this.ordersOnBoard.entries.filter(([region, _]) => region.units.size == 0);
+
+        orphanedOrders.forEach(([region, _]) => {
+            this.removeOrderFromRegion(region, true);
+        });
+    }
+
     removeOrderFromRegion(region: Region, log = false, house: (House | undefined) = undefined, resolvedAutomatically = false): Order | null {
         if (this.ordersOnBoard.has(region)) {
             const order = this.ordersOnBoard.get(region);

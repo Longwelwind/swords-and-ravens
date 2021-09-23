@@ -7,6 +7,8 @@ import LoanCardComponent from "../utils/LoanCardComponent";
 import PlaceSellswordsGameState from "../../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/execute-loan-game-state/place-sellwords-game-state/PlaceSellswordsGameState";
 import renderChildGameState from "../../../client/utils/renderChildGameState";
 import PlaceSellswordsComponent from "./PlaceSellswordsComponent";
+import TheFacelessMenGameState from "../../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/execute-loan-game-state/the-faceless-men-game-state/TheFacelessMenGameState";
+import TheFacelessMenComponent from "../TheFacelessMenComponent";
 
 @observer
 export default class ExecuteLoanComponent extends Component<GameStateComponentProps<ExecuteLoanGameState>> {
@@ -14,18 +16,19 @@ export default class ExecuteLoanComponent extends Component<GameStateComponentPr
         return <Col xs={12}>
             <Row className="justify-content-center">
                 <Col xs="auto">
-                    <LoanCardComponent loanCard={this.props.gameState.childGameState.loanCardType} />
+                    <LoanCardComponent loanCard={this.props.gameState.loanCardType} />
                 </Col>
             </Row>
             {this.props.gameClient.doesControlHouse(this.props.gameState.childGameState.house) &&
             <Row className="justify-content-center">
                 <Col xs="auto" className="text-center">
-                    {this.props.gameState.childGameState.loanCardType.description}
+                    {this.props.gameState.loanCardType.description}
                 </Col>
             </Row>}
             <Row>
                 {renderChildGameState<ExecuteLoanGameState>(this.props, [
-                    [PlaceSellswordsGameState, PlaceSellswordsComponent]
+                    [PlaceSellswordsGameState, PlaceSellswordsComponent],
+                    [TheFacelessMenGameState, TheFacelessMenComponent]
                 ])}
             </Row>
         </Col>;

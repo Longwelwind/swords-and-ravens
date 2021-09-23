@@ -6,7 +6,6 @@ import House from "../../../../game-data-structure/House";
 import Game from "../../../../game-data-structure/Game";
 import IngameGameState from "../../../../IngameGameState";
 import BetterMap from "../../../../../../utils/BetterMap";
-import LoanCardType from "../../../../game-data-structure/loan-card/LoanCardType";
 import { ServerMessage } from "../../../../../../messages/ServerMessage";
 import { ClientMessage } from "../../../../../../messages/ClientMessage";
 import Player from "../../../../Player";
@@ -14,12 +13,10 @@ import User from "../../../../../../server/User";
 import _ from "lodash";
 import { observable } from "mobx";
 import unitTypes from "../../../../game-data-structure/unitTypes";
-import loanCardTypes from "../../../../game-data-structure/loan-card/loanCardTypes";
 
 export default class PlaceSellswordsGameState extends GameState<ExecuteLoanGameState> {
     @observable house: House;
     @observable sellswords: UnitType[];
-    loanCardType: LoanCardType;
 
     get game(): Game {
         return this.parentGameState.game;
@@ -37,17 +34,16 @@ export default class PlaceSellswordsGameState extends GameState<ExecuteLoanGameS
         return this.ingame.world.getControlledRegions(this.house);
     }
 
-    firstStart(house: House, sellswords: UnitType[], type: LoanCardType): void {
+    firstStart(house: House, sellswords: UnitType[]): void {
         this.house = house;
         this.sellswords = sellswords;
-        this.loanCardType = type;
 
         if (!this.anyPlacementPossible(new BetterMap())) {
             this.ingame.log({
                 type: "sellswords-placed",
                 house: house.id,
                 units: [],
-                loanType: type.id
+                loanType: this.executeLoanGameState.loanCardType.id
             }, true);
 
             this.parentGameState.onExecuteLoanFinish(house);
@@ -86,7 +82,7 @@ export default class PlaceSellswordsGameState extends GameState<ExecuteLoanGameS
                 type: "sellswords-placed",
                 house: this.house.id,
                 units: message.units,
-                loanType: this.loanCardType.id
+                loanType: this.executeLoanGameState.loanCardType.id
             });
 
             this.parentGameState.onExecuteLoanFinish(this.house);
@@ -158,8 +154,7 @@ export default class PlaceSellswordsGameState extends GameState<ExecuteLoanGameS
         return {
             type: "place-sellswords",
             house: this.house.id,
-            sellswords: this.sellswords.map(ut => ut.id),
-            loanCardType: this.loanCardType.id
+            sellswords: this.sellswords.map(ut => ut.id)
         }
     }
 
@@ -168,7 +163,6 @@ export default class PlaceSellswordsGameState extends GameState<ExecuteLoanGameS
 
         gameState.house = parent.game.houses.get(data.house);
         gameState.sellswords = data.sellswords.map(ut => unitTypes.get(ut));
-        gameState.loanCardType = loanCardTypes.get(data.loanCardType);
 
         return gameState;
     }
@@ -178,5 +172,4 @@ export interface SerializedPlaceSellswordsGameState {
     type: "place-sellswords";
     house: string;
     sellswords: string[];
-    loanCardType: string;
 }
