@@ -1,4 +1,4 @@
-import ResolveSingleConsolidatePowerGameState from "../../action-game-state/resolve-single-consolidate-power-game-state/ResolveSingleConsolidatePowerGameState";
+import ResolveSingleConsolidatePowerGameState from "../../action-game-state/resolve-consolidate-power-game-state/resolve-single-consolidate-power-game-state/ResolveSingleConsolidatePowerGameState";
 import House from "../House";
 
 export default abstract class LoanCardType {

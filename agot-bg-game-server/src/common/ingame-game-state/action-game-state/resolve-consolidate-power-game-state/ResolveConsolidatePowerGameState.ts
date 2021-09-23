@@ -13,12 +13,13 @@ import PlayerMusteringGameState, {
 import Region from "../../game-data-structure/Region";
 import IngameGameState from "../../IngameGameState";
 import IronBankOrderType from "../../game-data-structure/order-types/IronBankOrderType";
-import ResolveSingleConsolidatePowerGameState, { SerializedResolveSingleConsolidatePowerGameState } from "../resolve-single-consolidate-power-game-state/ResolveSingleConsolidatePowerGameState";
+import ResolveSingleConsolidatePowerGameState, { SerializedResolveSingleConsolidatePowerGameState } from "./resolve-single-consolidate-power-game-state/ResolveSingleConsolidatePowerGameState";
 import ConsolidatePowerOrderType from "../../game-data-structure/order-types/ConsolidatePowerOrderType";
 import BetterMap from "../../../../utils/BetterMap";
 import DefenseMusterOrderType from "../../game-data-structure/order-types/DefenseMusterOrderType";
+import ExecuteLoanGameState, { SerializedExecuteLoanGameState } from "./execute-loan-game-state/ExecuteLoanGameState";
 
-export default class ResolveConsolidatePowerGameState extends GameState<ActionGameState, ResolveSingleConsolidatePowerGameState | PlayerMusteringGameState> {
+export default class ResolveConsolidatePowerGameState extends GameState<ActionGameState, ResolveSingleConsolidatePowerGameState | PlayerMusteringGameState | ExecuteLoanGameState> {
     get game(): Game {
         return this.actionGameState.game;
     }
@@ -153,6 +154,8 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
             return PlayerMusteringGameState.deserializeFromServer(this, data);
         } else if (data.type == "resolve-single-consolidate-power") {
             return ResolveSingleConsolidatePowerGameState.deserializeFromServer(this, data);
+        } else if (data.type == "execute-loan") {
+            return ExecuteLoanGameState.deserializeFromServer(this, data);
         } else {
             throw new Error("");
         }
@@ -161,5 +164,5 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
 
 export interface SerializedResolveConsolidatePowerGameState {
     type: "resolve-consolidate-power";
-    childGameState: SerializedPlayerMusteringGameState | SerializedResolveSingleConsolidatePowerGameState;
+    childGameState: SerializedPlayerMusteringGameState | SerializedResolveSingleConsolidatePowerGameState | SerializedExecuteLoanGameState;
 }

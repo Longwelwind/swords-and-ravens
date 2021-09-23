@@ -5,7 +5,7 @@ export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | Unready |
     | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings | CreatePrivateChatRoom | ChangeGameSettings
     | CancelGame | Vote | LaunchCancelGameVote | CancelVote | LaunchReplacePlayerVote | UpdateNote | SelectWesterosCard
     | ClaimVassal | LaunchReplacePlayerByVassalVote | GiftPowerTokens | LaunchEndGameVote | SetPassword
-    | DistributePowerTokens | DropPowerTokens | MoveLoyaltyToken | ResolveConsolidatePowerChoice;
+    | DistributePowerTokens | DropPowerTokens | MoveLoyaltyToken | ResolveConsolidatePowerChoice | PlaceSellswords;
 
 interface Ping {
     type: "ping";
@@ -273,4 +273,9 @@ interface ResolveConsolidatePowerChoice {
     musterUnits?: boolean;
     purchaseLoan?: number;
     ignoreAndRemoveOrder?: boolean;
+}
+
+interface PlaceSellswords {
+    type: "place-sellswords";
+    units: [string, string[]][];
 }

@@ -1486,6 +1486,17 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Customs Officer</b>: House <b>{house.name}</b> gained {data.gained} Power token{data.gained != 1 ? "s" : ""}.
                 </p>;
             }
+            case "sellswords-placed": {
+                const house = this.game.houses.get(data.house);
+                const placedSellswords = data.units.map(([regionId, units]) => [this.world.regions.get(regionId), units.map(ut => unitTypes.get(ut))] as [Region, UnitType[]]);
+                const loan = loanCardTypes.get(data.loanType);
+                return <p>
+                    <b>{loan.name}</b>: House <b>{house.name}</b>{placedSellswords.length > 0 ? (<> chose to
+                        place {joinReactNodes(placedSellswords.map(([region, unitTypes]) => <span key={`place_sellsword_${region.id}`}>
+                            {joinReactNodes(unitTypes.map((ut, i) => <b key={`place_sellsword${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), " and ")}.</>)
+                        : <> placed no sellswords.</>}
+                </p>;
+            }
         }
     }
 }

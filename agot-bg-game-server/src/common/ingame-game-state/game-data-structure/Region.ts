@@ -9,6 +9,7 @@ import Point from "../../../utils/Point";
 import UnitSlot from "../../../utils/unitSlot";
 import _ from "lodash";
 import getStaticWorld from "./static-data-structure/getStaticWorld";
+import { port } from "./regionTypes";
 
 export default class Region {
     game: Game;
@@ -104,6 +105,9 @@ export default class Region {
             }
 
             return possibleController;
+        } else if (this.type == port) {
+            // A port is controlled by the controller of the adjacent castle
+            return this.game.world.getAdjacentLandOfPort(this).getController();
         } else {
             // controlPowerToken supersedes a superControlPowerToken
             if (this.controlPowerToken) {

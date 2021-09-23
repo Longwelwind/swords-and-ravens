@@ -9,7 +9,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { OrderOnMapProperties } from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
-import ResolveSingleConsolidatePowerGameState from "../../common/ingame-game-state/action-game-state/resolve-single-consolidate-power-game-state/ResolveSingleConsolidatePowerGameState";
+import ResolveSingleConsolidatePowerGameState from "../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/resolve-single-consolidate-power-game-state/ResolveSingleConsolidatePowerGameState";
 import ConsolidatePowerOrderType from "../../common/ingame-game-state/game-data-structure/order-types/ConsolidatePowerOrderType";
 import IronBankOrderType from "../../common/ingame-game-state/game-data-structure/order-types/IronBankOrderType";
 import DefenseMusterOrderType from "../../common/ingame-game-state/game-data-structure/order-types/DefenseMusterOrderType";

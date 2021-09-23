@@ -1,4 +1,3 @@
-import _ from "lodash";
 import { observable } from "mobx";
 import groupBy from "../../../utils/groupBy";
 import BetterMap from "../../../utils/BetterMap";
@@ -66,10 +65,6 @@ export default class IronBank {
         }
 
         if (this.loanSlots.length != 3) {
-            throw new Error();
-        }
-
-        if (_.concat(this.loanCardDeck, this.purchasedLoans, this.loanSlots.filter(lc => lc != null)).length != 12) {
             throw new Error();
         }
 

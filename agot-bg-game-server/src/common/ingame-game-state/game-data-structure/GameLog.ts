@@ -39,7 +39,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained | DaenerysTargaryenPowerTokensDiscarded | MissandeiUsed
     | PowerTokensGifted | InfluenceTrackPositionChosen | TiesDecided | PlaceLoyaltyChoice | LoyaltyTokenPlaced | LoyaltyTokenGained
     | FireMadeFleshChoice | PlayWithFireChoice | TheLongPlanChoice | MoveLoyaltyTokenChoice | LoanPurchased | OrderRemoved | InterestPaid
-    | DebtPaid | CustomsOfficerPowerTokensGained;
+    | DebtPaid | CustomsOfficerPowerTokensGained | SellswordsPlaced;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -858,4 +858,11 @@ interface CustomsOfficerPowerTokensGained {
     type: "customs-officer-power-tokens-gained";
     house: string;
     gained: number;
+}
+
+interface SellswordsPlaced {
+    type: "sellswords-placed";
+    house: string;
+    units: [string, string[]][];
+    loanType: string;
 }
