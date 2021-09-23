@@ -15,12 +15,31 @@ export default class IronBank {
     loanCosts = [7, 4, 1];
 
     get controllerOfBraavos(): House | null {
-        const pentos = this.game.world.regions.tryGet("braavos", null);
-        return pentos?.getController() ?? null;
+        const braavos = this.game.world.regions.tryGet("braavos", null);
+        return braavos?.getController() ?? null;
     }
 
     constructor(game: Game) {
         this.game = game;
+    }
+
+    getPurchasableLoans(house: House): {loan: LoanCardType, slotIndex: number, costs: number}[] {
+        const costsForHouse = this.getLoanCostsForHouse(house);
+
+        const result: {loan: LoanCardType, slotIndex: number, costs: number}[] = [];
+
+        for (let i=0; i < costsForHouse.length; i++) {
+            const loan = this.loanSlots[i];
+            if (loan && house.powerTokens >= costsForHouse[i]) {
+                result.push({
+                    loan: loan.type,
+                    costs: costsForHouse[i],
+                    slotIndex: i
+                });
+            }
+        }
+
+        return result;
     }
 
     getLoanCostsForHouse(house: House): number[] {

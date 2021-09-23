@@ -19,8 +19,7 @@ import IronBank from "../../game-data-structure/IronBank";
 import { observable } from "mobx";
 
 export default class ResolveSingleConsolidatePowerGameState extends GameState<ResolveConsolidatePowerGameState> {
-    house: House;
-    @observable rerender = 0;
+    @observable house: House;
 
     get game(): Game {
         return this.actionGameState.game;
@@ -82,6 +81,24 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
 
             // Proceed to the next house
             this.onResolveSingleConsolidatePowerFinish();
+            return;
+        }
+
+        // Check if Iron Bank order can be fast-tracked because there might be no purchasable loan
+        if (ironBankOrders.length == 1 && this.ironBank && consolidatePowerOrders.every(([r, ot]) => !ot.starred || (ot.starred && !r.hasStructure))) {
+            if (this.ironBank.getPurchasableLoans(this.house).length == 0) {
+                const region = ironBankOrders[0][0];
+                const order = ironBankOrders[0][1] as IronBankOrderType;
+                // Remove the order from the board
+                this.ingame.log({
+                    type: "order-removed",
+                    house: this.house.id,
+                    order: order.id,
+                    region: region.id
+                });
+                this.actionGameState.removeOrderFromRegion(region);
+                this.onResolveSingleConsolidatePowerFinish();
+            }
         }
     }
 

@@ -105,18 +105,16 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<Ga
                                         </Col>
                                     </>}
                                     {this.selectedOrderType instanceof IronBankOrderType && this.ironBank && <>
-                                        {this.ironBank.getLoanCostsForHouse(this.house).map((cost, i) => {
-                                            return this.house.powerTokens >= cost && this.theIronBank.loanSlots[i] != null
-                                                ? <Col xs="auto" key={`loan-button-${cost}`}>
-                                                    <Button onClick={() => {
-                                                        this.gameState.choosePurchaseLoan(i, this.selectedOrderRegion as Region);
-                                                        this.reset();
-                                                    }}>
-                                                        Pay {cost} Power tokens to purchase {this.theIronBank.loanSlots[i]?.type.name ?? "ERROR"}
-                                                    </Button>
-                                                </Col>
-                                                : <div key={`loan-dummy-${cost}`}></div>
-                                        })}
+                                        {this.ironBank.getPurchasableLoans(this.house).map(purchasable =>
+                                            <Col xs="auto" key={`loan-button-${purchasable.loan.id}`}>
+                                                <Button onClick={() => {
+                                                    this.gameState.choosePurchaseLoan(purchasable.slotIndex, this.selectedOrderRegion as Region);
+                                                    this.reset();
+                                                }}>
+                                                    Pay {purchasable.costs} Power tokens to purchase {purchasable.loan.name}
+                                                </Button>
+                                            </Col>
+                                        )}
                                         <Col xs="auto">
                                             <Button onClick={() => {
                                                 this.gameState.chooseRemoveOrder(this.selectedOrderRegion as Region);
