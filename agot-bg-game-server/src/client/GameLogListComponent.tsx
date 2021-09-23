@@ -31,6 +31,8 @@ import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluen
 import { preventOverflow } from "@popperjs/core";
 import loanCardTypes from "../common/ingame-game-state/game-data-structure/loan-card/loanCardTypes";
 import orderTypes from "../common/ingame-game-state/game-data-structure/order-types/orderTypes";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFastForward } from "@fortawesome/free-solid-svg-icons";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -88,6 +90,19 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         </small>
                     </OverlayTrigger>
                 </Col>
+                {l.resolvedAutomatically && <Col xs="auto">
+                    <OverlayTrigger
+                        overlay={<Tooltip id="logs-tooltip">This action has been resolved automatically.</Tooltip>}
+                        placement="auto"
+                        popperConfig={{modifiers: [preventOverflow]}}
+                    >
+                        <span>
+                            <FontAwesomeIcon
+                                style={{ color: "white" }}
+                                icon={faFastForward} />
+                        </span>
+                    </OverlayTrigger>
+                </Col>}
                 <Col>
                     <div className="game-log-content">
                         {this.renderGameLogData(l.data)}
@@ -1423,7 +1438,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     House <b>{house.name}</b> resolved a Iron Bank order in <b>
-                        {region.name}</b>, payed {data.payed} Power token{data.payed != 1 ? "s" : ""} and purchased the loan <b>{loan.name}</b>.
+                        {region.name}</b>, paid {data.paid} Power token{data.paid != 1 ? "s" : ""} and purchased the loan <b>{loan.name}</b>.
                 </p>
             }
             case "order-removed": {
@@ -1433,12 +1448,31 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return house ?
                     <p>
-                        House <b>{house.name}</b> removed their <b>{orderType.name}</b> order token in <b>{region.name}</b>
+                        House <b>{house.name}</b> removed their <b>{orderType.name}</b> order token in <b>{region.name}</b>.
                     </p>
                     :
                     <p>
-                        A <b>{orderType.name}</b> has been removed from <b>{region.name}</b>
+                        A <b>{orderType.name}</b> has been removed from <b>{region.name}</b>.
                     </p>
+            }
+            case "interest-paid": {
+                const house = this.game.houses.get(data.house);
+                const debt = data.cost + data.paid;
+                return <p>
+                    House <b>{house.name}</b> paid an interest debt of {Math.abs(data.paid)}.{debt > 0 ? ` ${debt} interest debt could not be paid.` : ""}
+                </p>
+            }
+            case "debt-paid": {
+                const house = this.game.houses.get(data.house);
+                const resolver = this.game.houses.get(data.resolver);
+                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]) as [Region, UnitType[]][];
+
+                return <p>
+                    {units.length > 0
+                    ? (<>House <b>{resolver.name}</b> chose to destroy {joinReactNodes(units.map(([region, unitTypes]) =>
+                            <span key={`pay-debt_${region.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`pay-debt_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), ", ")} of House <b>{house.name}</b>.</>)
+                    : <> House <b>{house.name} </b> had no units to destroy.</>}
+                </p>;
             }
         }
     }

@@ -18,7 +18,7 @@ export default class ChooseMultipleRegionsForLoyaltyTokenGameState extends GameS
     regions: Region[];
     count: number;
     placedCount: number;
-    hasAlreadyPayed: boolean;
+    hasAlreadyPaid: boolean;
 
     get game(): Game {
         return this.parentGameState.game;
@@ -37,7 +37,7 @@ export default class ChooseMultipleRegionsForLoyaltyTokenGameState extends GameS
         this.costs = costs;
         this.count = count;
         this.placedCount = 0;
-        this.hasAlreadyPayed = false;
+        this.hasAlreadyPaid = false;
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(house, description, this.getChoices(house));
     }
 
@@ -52,10 +52,10 @@ export default class ChooseMultipleRegionsForLoyaltyTokenGameState extends GameS
         return result;
     }
 
-    onSimpleChoiceGameStateEnd(choice: number): void {
+    onSimpleChoiceGameStateEnd(choice: number, resolvedAutomatically: boolean): void {
         const house = this.childGameState.house;
 
-        if (this.hasAlreadyPayed) {
+        if (this.hasAlreadyPaid) {
             if (choice == 0) {
                 this.setChildGameState(new SelectRegionGameState(this)).firstStart(house, this.regions);
             } else {
@@ -68,7 +68,7 @@ export default class ChooseMultipleRegionsForLoyaltyTokenGameState extends GameS
                     house: this.childGameState.house.id,
                     discardedPowerTokens: 0,
                     loyaltyTokenCount: 0
-                });
+                }, resolvedAutomatically);
                 this.westeros.onWesterosCardEnd();
             } else if (choice == 1) {
                 this.ingame.log({
@@ -80,7 +80,7 @@ export default class ChooseMultipleRegionsForLoyaltyTokenGameState extends GameS
 
                 // Remove the power token
                 this.ingame.changePowerTokens(this.childGameState.house, -this.costs);
-                this.hasAlreadyPayed = true;
+                this.hasAlreadyPaid = true;
                 this.setChildGameState(new SelectRegionGameState(this)).firstStart(house, this.regions);
             }
         }
@@ -113,7 +113,7 @@ export default class ChooseMultipleRegionsForLoyaltyTokenGameState extends GameS
             regions: this.regions.map(r => r.id),
             count: this.count,
             placedCount: this.placedCount,
-            hasAlreadyPayed: this.hasAlreadyPayed,
+            hasAlreadyPaid: this.hasAlreadyPaid,
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -125,7 +125,7 @@ export default class ChooseMultipleRegionsForLoyaltyTokenGameState extends GameS
         gameState.regions = data.regions.map(r => westerosDeck4.parentGameState.world.regions.get(r));
         gameState.count = data.count;
         gameState.placedCount = data.count;
-        gameState.hasAlreadyPayed = data.hasAlreadyPayed;
+        gameState.hasAlreadyPaid = data.hasAlreadyPaid;
         gameState.childGameState = gameState.deserializeChildGameState(data.childGameState);
 
         return gameState;
@@ -148,6 +148,6 @@ export interface SerializedChooseMultipleRegionsForLoyaltyTokenGameState {
     regions: string[];
     count: number;
     placedCount: number;
-    hasAlreadyPayed: boolean;
+    hasAlreadyPaid: boolean;
     childGameState: SerializedSimpleChoiceGameState | SerializedSelectRegionGameState;
 }

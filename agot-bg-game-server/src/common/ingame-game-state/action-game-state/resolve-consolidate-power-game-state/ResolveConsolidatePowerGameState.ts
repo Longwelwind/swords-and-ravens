@@ -75,7 +75,7 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
         return 0;
     }
 
-    resolveConsolidatePowerOrderForPt(region: Region, house: House): void {
+    resolveConsolidatePowerOrderForPt(region: Region, house: House, resolvedAutomatically = false): void {
         let gains: number = this.getPotentialGainedPowerTokens(region, house);
 
         if(gains > 0) {
@@ -88,7 +88,7 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
             region: region.id,
             starred: this.actionGameState.ordersOnBoard.get(region).type.starred,
             powerTokenCount: gains
-        });
+        }, resolvedAutomatically);
     }
 
     proceedNextResolve(lastHouseToResolve: House | null): void {
@@ -104,6 +104,7 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
 
     onPlayerMusteringEnd(house: House, regions: Region[]): void {
         // Remove ConsolidatePower/IronBank/Muster order token
+        // Todo: probably not necessary anymore
         regions.forEach(r => this.actionGameState.removeOrderFromRegion(r));
         this.proceedNextResolve(house);
     }

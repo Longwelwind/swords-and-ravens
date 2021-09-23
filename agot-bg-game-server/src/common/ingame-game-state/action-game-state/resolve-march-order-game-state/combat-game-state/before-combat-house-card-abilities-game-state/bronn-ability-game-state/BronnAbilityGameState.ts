@@ -43,7 +43,7 @@ export default class BronnAbilityGameState extends GameState<
                 type: "house-card-ability-not-used",
                 house: this.enemy.id,
                 houseCard: bronn.id
-            });
+            }, true);
             this.parentGameState.onHouseCardResolutionFinish(house);
             return;
         }

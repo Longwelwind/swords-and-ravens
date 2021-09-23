@@ -12,5 +12,5 @@ export default abstract class LoanCardType {
         this.description = description;
     }
 
-    abstract execute(resolveSingleConsolidate: ResolveSingleConsolidatePowerGameState, house: House): void; // Todo: Create ResolveIronBankOrderGameState
+    abstract execute(resolveSingleConsolidate: ResolveSingleConsolidatePowerGameState, house: House): void;
 }

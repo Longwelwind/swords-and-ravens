@@ -39,7 +39,7 @@ export default class CrowKillersNightsWatchVictoryGameState extends GameState<Wi
                 type: "crow-killers-footman-upgraded",
                 house: house.id,
                 units: []
-            });
+            }, true);
 
             this.parentGameState.onWildlingCardExecuteEnd();
             return;

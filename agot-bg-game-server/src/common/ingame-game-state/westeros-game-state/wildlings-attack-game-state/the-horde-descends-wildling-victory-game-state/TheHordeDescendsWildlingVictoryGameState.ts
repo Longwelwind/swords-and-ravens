@@ -43,7 +43,7 @@ export default class TheHordeDescendsWildlingVictoryGameState extends WildlingCa
                     type: "the-horde-descends-units-killed",
                     house: house.id,
                     units: []
-                });
+                }, true);
 
                 this.proceedNextHouse(house);
                 return;
@@ -61,7 +61,7 @@ export default class TheHordeDescendsWildlingVictoryGameState extends WildlingCa
                 type: "the-horde-descends-units-killed",
                 house: house.id,
                 units: []
-            });
+            }, true);
 
             this.proceedNextHouse(house);
             return;
@@ -78,7 +78,7 @@ export default class TheHordeDescendsWildlingVictoryGameState extends WildlingCa
         this.childGameState.onServerMessage(message);
     }
 
-    onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][]): void {
+    onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][], resolvedAutomatically: boolean): void {
         selectedUnits.forEach(([region, units]) => {
             units.forEach(u => region.units.delete(u.id));
 
@@ -93,7 +93,7 @@ export default class TheHordeDescendsWildlingVictoryGameState extends WildlingCa
             type: "the-horde-descends-units-killed",
             house: house.id,
             units: selectedUnits.map(([region, units]) => [region.id, units.map(u => u.type.id)])
-        });
+        }, resolvedAutomatically);
 
         this.proceedNextHouse(house);
     }

@@ -80,12 +80,12 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
             : this.getPossibleRegionsForOrders(p.house).length;
 
             if (availableRegionsForOrders == 0) {
-                this.setReady(p);
+                this.setReady(p, true);
             }
         });
     }
 
-    private setReady(player: Player): void {
+    private setReady(player: Player, resolvedAutomatically = false): void {
         if (!this.canReady(player).status) {
             return;
         }
@@ -105,7 +105,7 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
                 type: "player-action",
                 house: player.house.id,
                 action: PlayerActionType.ORDERS_PLACED
-            });
+            }, resolvedAutomatically);
         }
 
         this.entireGame.broadcastToClients({

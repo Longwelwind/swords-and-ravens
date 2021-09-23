@@ -52,7 +52,7 @@ export default class MaceTyrellAbilityGameState extends GameState<
             if (availableFootmen.every(fm => !fm.wounded) || availableFootmen.every(fm => fm.wounded)) {
                 // Automatically kill one of the footmen if all are wounded or all are not wounded
                 const selectedFootman = Array.of(availableFootmen[0]);
-                this.onSelectUnitsEnd(house, groupBy(selectedFootman, u => u.region).entries);
+                this.onSelectUnitsEnd(house, groupBy(selectedFootman, u => u.region).entries, true);
             } else {
                 // In case there are non-wounded and wounded footmen let the user decide which one to kill
                 this.setChildGameState(new SelectUnitsGameState(this)).firstStart(
@@ -64,7 +64,7 @@ export default class MaceTyrellAbilityGameState extends GameState<
         }
     }
 
-    onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][]): void {
+    onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][], resolvedAutomatically: boolean): void {
         const enemy = this.combatGameState.getEnemy(house);
         // There will only be one footman in "selectedUnit",
         // but the following code deals with the multiple units present.
@@ -94,7 +94,7 @@ export default class MaceTyrellAbilityGameState extends GameState<
                 type: "mace-tyrell-footman-killed",
                 house: house.id,
                 region: region.id
-            });
+            }, resolvedAutomatically);
         });
 
         this.parentGameState.onHouseCardResolutionFinish(house);

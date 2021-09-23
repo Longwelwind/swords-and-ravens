@@ -138,7 +138,7 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
                         type: "player-action",
                         house: h.id,
                         action: PlayerActionType.BID_MADE
-                    });
+                    }, true);
                 }
             }
         });

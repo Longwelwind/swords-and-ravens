@@ -3,6 +3,7 @@ import { CombatStats } from "../action-game-state/resolve-march-order-game-state
 export default interface GameLog {
     time: Date;
     data: GameLogData;
+    resolvedAutomatically?: boolean;
 }
 
 export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack | MarchResolved
@@ -37,7 +38,8 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | LittlefingerPowerTokensGained | AlayneStoneUsed | LysaArrynFfcPowerTokensGained | AnyaWaynwoodPowerTokensGained | RobertArrynUsed
     | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained | DaenerysTargaryenPowerTokensDiscarded | MissandeiUsed
     | PowerTokensGifted | InfluenceTrackPositionChosen | TiesDecided | PlaceLoyaltyChoice | LoyaltyTokenPlaced | LoyaltyTokenGained
-    | FireMadeFleshChoice | PlayWithFireChoice | TheLongPlanChoice | MoveLoyaltyTokenChoice | LoanPurchased | OrderRemoved;
+    | FireMadeFleshChoice | PlayWithFireChoice | TheLongPlanChoice | MoveLoyaltyTokenChoice | LoanPurchased | OrderRemoved | InterestPaid
+    | DebtPaid;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -828,7 +830,7 @@ interface LoanPurchased {
     house: string;
     region: string;
     loanType: string;
-    payed: number;
+    paid: number;
 }
 
 interface OrderRemoved {
@@ -836,4 +838,18 @@ interface OrderRemoved {
     house?: string;
     region: string;
     order: string;
+}
+
+interface InterestPaid {
+    type: "interest-paid";
+    house: string;
+    cost: number;
+    paid: number;
+}
+
+interface DebtPaid {
+    type: "debt-paid";
+    house: string;
+    resolver: string;
+    units: [string, string[]][];
 }

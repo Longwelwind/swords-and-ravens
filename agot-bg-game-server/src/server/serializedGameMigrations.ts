@@ -1138,6 +1138,22 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
 
+                if (ingame.childGameState.type == "action" && ingame.childGameState.childGameState.type == "resolve-consolidate-power" && ingame.childGameState.childGameState.childGameState.type == "player-mustering") {
+                    const resolveConsolidatePower = ingame.childGameState.childGameState;
+                    const house = resolveConsolidatePower.childGameState.house;
+
+                    // Set the new child game state to resolve a CP*
+                    resolveConsolidatePower.childGameState = {
+                        type: "resolve-single-consolidate-power",
+                        house: house
+                    };
+                }
+
+                if (ingame.childGameState.type == "westeros" && ingame.childGameState.childGameState.type == "westeros-deck-4" && ingame.childGameState.childGameState.childGameState.type == "choose-multiple-regions-for-loyalty-token") {
+                    const state = ingame.childGameState.childGameState.childGameState;
+                    state.hasAlreadyPaid = state.hasAlreadyPayed;
+                }
+
                 if (ingame.game.houses.length != 8) {
                     ingame.game.ironBank = null;
                     return serializedGame;
@@ -1171,17 +1187,6 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                     loanSlots: loanSlots,
                     purchasedLoans: []
                 };
-
-                if (ingame.childGameState.type == "action" && ingame.childGameState.childGameState.type == "resolve-consolidate-power" && ingame.childGameState.childGameState.childGameState.type == "player-mustering") {
-                    const resolveConsolidatePower = ingame.childGameState.childGameState;
-                    const house = resolveConsolidatePower.childGameState.house;
-
-                    // Set the new child game state to resolve a CP*
-                    resolveConsolidatePower.childGameState = {
-                        type: "resolve-single-consolidate-power",
-                        house: house
-                    };
-                }
             }
 
             return serializedGame;

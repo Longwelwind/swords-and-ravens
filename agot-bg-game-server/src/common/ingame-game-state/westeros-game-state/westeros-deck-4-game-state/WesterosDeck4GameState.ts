@@ -114,7 +114,7 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
         return result;
     }
 
-    onSimpleChoiceGameStateEnd(choice: number): void {
+    onSimpleChoiceGameStateEnd(choice: number, resolvedAutomatically: boolean): void {
         const simpleChoice = this.childGameState as SimpleChoiceGameState;
         const discardedPowerTokens = this.getChoices(simpleChoice.house).values[choice];
 
@@ -146,7 +146,7 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
             house: simpleChoice.house.id,
             discardedPowerTokens: discardedPowerTokens,
             loyaltyTokenCount: loyaltyTokenCount
-        });
+        }, resolvedAutomatically);
 
         regionsToPlaceNewLoyaltyTokens.forEach(r => this.parentGameState.placeLoyaltyToken(r));
 

@@ -53,7 +53,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
             // If yes, fast-track the game by resolving one
             const regionToResolve = regionsWithRaidOrders[0];
 
-            this.resolveRaidOrder(regionToResolve[0], null);
+            this.resolveRaidOrder(regionToResolve[0], null, true);
         }
     }
 
@@ -80,7 +80,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
         }
     }
 
-    resolveRaidOrder(orderRegion: Region, targetRegion: Region | null): void {
+    resolveRaidOrder(orderRegion: Region, targetRegion: Region | null, resolvedAutomatically = false): void {
         const order = this.actionGameState.ordersOnBoard.get(orderRegion);
         const orderType = order.type instanceof RaidOrderType
             ? order.type as RaidOrderType
@@ -120,7 +120,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
                 orderRaided: orderTarget.id,
                 raiderGainedPowerToken: raiderGainedPowerToken,
                 raidedHouseLostPowerToken: raidedHouseLostPowerToken
-            });
+            }, resolvedAutomatically);
         } else {
             this.ingameGameState.log({
                 type: "raid-done",
@@ -131,7 +131,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
                 orderRaided: null,
                 raiderGainedPowerToken: null,
                 raidedHouseLostPowerToken: null
-            });
+            }, resolvedAutomatically);
         }
 
         // Keep an unresolved RaidSupportOrder to use it as support later

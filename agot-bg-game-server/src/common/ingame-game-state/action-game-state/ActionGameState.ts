@@ -76,7 +76,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
         this.setChildGameState(new ResolveMarchOrderGameState(this)).firstStart();
     }
 
-    removeOrderFromRegion(region: Region, log = false): Order | null {
+    removeOrderFromRegion(region: Region, log = false, house: (House | undefined) = undefined, resolvedAutomatically = false): Order | null {
         if (this.ordersOnBoard.has(region)) {
             const order = this.ordersOnBoard.get(region);
             this.ordersOnBoard.delete(region);
@@ -90,8 +90,9 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
                 this.ingameGameState.log({
                     type: "order-removed",
                     region: region.id,
+                    house: house?.id,
                     order: order.type.id
-                });
+                }, resolvedAutomatically);
             }
 
             return order;

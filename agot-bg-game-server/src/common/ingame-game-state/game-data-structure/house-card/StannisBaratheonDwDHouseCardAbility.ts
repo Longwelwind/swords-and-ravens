@@ -22,7 +22,6 @@ export default class StannisBaratheonDwDHouseCardAbility extends HouseCardAbilit
             combatGameState.supporters = new BetterMap();
         }
 
-        // Todo: Log which orders have been removed by Stannis
         beforeCombatResolutionState.childGameState.onHouseCardResolutionFinish(house);
     }
 }

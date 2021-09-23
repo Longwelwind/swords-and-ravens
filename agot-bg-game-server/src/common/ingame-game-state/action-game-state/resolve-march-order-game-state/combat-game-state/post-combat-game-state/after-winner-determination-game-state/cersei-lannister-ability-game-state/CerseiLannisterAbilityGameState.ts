@@ -79,7 +79,7 @@ export default class CerseiLannisterAbilityGameState extends GameState<
             .map(([region, _]) => region);
     }
 
-    onSelectOrdersFinish(regions: Region[]): void {
+    onSelectOrdersFinish(regions: Region[], resolvedAutomatically: boolean): void {
         // Remove the order
         regions.forEach(r => {
             const order = this.actionGameState.removeOrderFromRegion(r) as Order;
@@ -90,7 +90,7 @@ export default class CerseiLannisterAbilityGameState extends GameState<
                 affectedHouse: this.combatGameState.getEnemy(this.childGameState.house).id,
                 region: r.id,
                 order: order.id
-            });
+            }, resolvedAutomatically);
         });
 
         this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);

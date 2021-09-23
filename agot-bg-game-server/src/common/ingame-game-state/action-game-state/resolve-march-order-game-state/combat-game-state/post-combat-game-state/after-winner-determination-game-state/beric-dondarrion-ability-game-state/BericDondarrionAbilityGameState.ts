@@ -44,7 +44,7 @@ export default class BericDondarrionAbilityGameState extends GameState<
         }
     }
 
-    onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][]): void {
+    onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][], resolvedAutomatically: boolean): void {
         const selectedRegion = selectedUnits[0][0];
         const selectedUnit = selectedUnits[0][1][0];
 
@@ -53,8 +53,7 @@ export default class BericDondarrionAbilityGameState extends GameState<
                 type: "beric-dondarrion-used",
                 house: house.id,
                 casualty: selectedUnit.type.id
-            }
-        );
+            }, resolvedAutomatically);
 
         // Remove the selected casualties
         selectedRegion.units.delete(selectedUnit.id);

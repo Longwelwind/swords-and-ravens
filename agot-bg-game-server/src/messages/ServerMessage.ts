@@ -48,6 +48,7 @@ interface AddGameLog {
     type: "add-game-log";
     data: GameLogData;
     time: number;
+    resolvedAutomatically?: boolean;
 }
 
 interface OrderPlaced {

@@ -24,7 +24,7 @@ export default class MassingOnTheMilkwaterWildlingVictoryGameState extends Wildl
                 type: "massing-on-the-milkwater-house-cards-removed",
                 house: house.id,
                 houseCardsUsed: []
-            });
+            }, true);
 
             this.proceedNextHouse(house);
             return;
@@ -41,7 +41,7 @@ export default class MassingOnTheMilkwaterWildlingVictoryGameState extends Wildl
                 type: "massing-on-the-milkwater-house-cards-removed",
                 house: house.id,
                 houseCardsUsed: []
-            });
+            }, true);
 
             this.proceedNextHouse(house);
             return;
@@ -73,7 +73,7 @@ export default class MassingOnTheMilkwaterWildlingVictoryGameState extends Wildl
                 type: "massing-on-the-milkwater-house-cards-removed",
                 house: house.id,
                 houseCardsUsed: []
-            });
+            }, true);
 
             this.proceedNextHouse(house);
             return;
@@ -82,7 +82,7 @@ export default class MassingOnTheMilkwaterWildlingVictoryGameState extends Wildl
         this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(house, availableHouseCards);
     }
 
-    onSelectHouseCardFinish(house: House, houseCard: HouseCard): void {
+    onSelectHouseCardFinish(house: House, houseCard: HouseCard, resolvedAutomatically: boolean): void {
         houseCard.state = HouseCardState.USED;
 
         this.parentGameState.entireGame.broadcastToClients({
@@ -96,7 +96,7 @@ export default class MassingOnTheMilkwaterWildlingVictoryGameState extends Wildl
             type: "massing-on-the-milkwater-house-cards-removed",
             house: house.id,
             houseCardsUsed: [houseCard.id]
-        });
+        }, resolvedAutomatically);
 
         this.proceedNextHouse(house);
     }

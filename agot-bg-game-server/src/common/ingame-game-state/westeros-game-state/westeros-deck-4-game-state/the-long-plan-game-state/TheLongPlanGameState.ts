@@ -48,7 +48,7 @@ export default class TheLongPlanGameState extends GameState<WesterosDeck4GameSta
         return result;
     }
 
-    onSimpleChoiceGameStateEnd(choice: number): void {
+    onSimpleChoiceGameStateEnd(choice: number, resolvedAutomatically: boolean): void {
         const house = this.childGameState.house;
 
         if (choice == 0) {
@@ -57,7 +57,7 @@ export default class TheLongPlanGameState extends GameState<WesterosDeck4GameSta
                 house: house.id,
                 discardedPowerTokens: 0,
                 loyaltyTokenCount: 0
-            });
+            }, resolvedAutomatically);
             this.westeros.onWesterosCardEnd();
         } else {
             this.ingame.log({

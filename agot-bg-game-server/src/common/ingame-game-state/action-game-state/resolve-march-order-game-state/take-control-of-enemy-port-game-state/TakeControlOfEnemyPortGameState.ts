@@ -68,7 +68,7 @@ export default class TakeControlOfEnemyPortGameState extends GameState<ResolveMa
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(newController, "", choices);
     }
 
-    onSimpleChoiceGameStateEnd(choice: number): void {
+    onSimpleChoiceGameStateEnd(choice: number, resolvedAutomatically: boolean): void {
         // Remove ships from old controller
         const oldController = this.port.units.values[0].allegiance;
         destroyAllShipsInPort(this.port, this.entireGame, this.parentGameState.actionGameState);
@@ -93,8 +93,8 @@ export default class TakeControlOfEnemyPortGameState extends GameState<ResolveMa
             oldController: oldController.id,
             newController: this.newController.id,
             shipCount: choice,
-            port: this.port.id
-        });
+            port: this.port.id,
+        }, resolvedAutomatically);
 
         this.parentGameState.onTakeControlOfEnemyPortFinish(this.lastHouseThatResolvedMarchOrder);
     }

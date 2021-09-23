@@ -75,7 +75,7 @@ export default class PlayingWithFireGameState extends GameState<WesterosDeck4Gam
         return result;
     }
 
-    onSimpleChoiceGameStateEnd(choice: number): void {
+    onSimpleChoiceGameStateEnd(choice: number, resolvedAutomatically: boolean): void {
         const house = this.childGameState.house;
 
         if (this.step == PLAYING_WITH_FIRE_STEP.CHOOSE_ACTIVATE) {
@@ -85,7 +85,7 @@ export default class PlayingWithFireGameState extends GameState<WesterosDeck4Gam
                     house: this.childGameState.house.id,
                     discardedPowerTokens: 0,
                     loyaltyTokenCount: 0
-                });
+                }, resolvedAutomatically);
                 this.westeros.onWesterosCardEnd();
             } else if (choice == 1) {
                 this.ingame.log({

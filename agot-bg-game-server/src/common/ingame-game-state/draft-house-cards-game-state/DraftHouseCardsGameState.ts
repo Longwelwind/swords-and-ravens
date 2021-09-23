@@ -249,7 +249,7 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
         });
     }
 
-    onSimpleChoiceGameStateEnd(choice: number): void {
+    onSimpleChoiceGameStateEnd(choice: number, resolvedAutomatically: boolean): void {
         const house = this.childGameState.house;
 
         if (this.draftStep == DraftStep.DECIDE) {
@@ -269,7 +269,7 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
                 house: house.id,
                 trackerI: trackIndex,
                 position: newTrack.length
-            });
+            }, resolvedAutomatically);
 
             this.ingame.setInfluenceTrack(trackIndex, newTrack);
 
@@ -279,7 +279,7 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
         }
     }
 
-    onSelectHouseCardFinish(house: House, houseCard: HouseCard): void {
+    onSelectHouseCardFinish(house: House, houseCard: HouseCard, resolvedAutomatically: boolean): void {
         house.houseCards.set(houseCard.id, houseCard);
         this.game.houseCardsForDrafting.delete(houseCard.id);
 
@@ -298,7 +298,7 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
             type: "house-card-picked",
             house: house.id,
             houseCard: houseCard.id
-        });
+        }, resolvedAutomatically);
 
         this.proceedNextHouse();
     }

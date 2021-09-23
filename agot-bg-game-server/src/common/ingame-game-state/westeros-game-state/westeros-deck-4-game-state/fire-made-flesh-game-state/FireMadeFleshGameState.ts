@@ -84,7 +84,7 @@ export default class FireMadeFleshGameState extends GameState<WesterosDeck4GameS
         return result;
     }
 
-    onSimpleChoiceGameStateEnd(choice: number): void {
+    onSimpleChoiceGameStateEnd(choice: number, resolvedAutomatically: boolean): void {
         const house = this.childGameState.house;
         const decision = this.getChoices(house).values[choice];
 
@@ -94,7 +94,7 @@ export default class FireMadeFleshGameState extends GameState<WesterosDeck4GameS
                     type: "fire-made-flesh-choice",
                     house: house.id,
                     ignored: true
-                });
+                }, resolvedAutomatically);
                 this.westeros.onWesterosCardEnd();
                 return;
             } else if (decision == FIRE_MADE_FLESH_EFFECT.KILL_DRAGON) {
@@ -125,7 +125,7 @@ export default class FireMadeFleshGameState extends GameState<WesterosDeck4GameS
                 type: "fire-made-flesh-choice",
                 house: house.id,
                 removedDragonStrengthToken: decision
-            });
+            }, resolvedAutomatically);
 
             this.game.removedDragonStrengthToken = decision;
             this.entireGame.broadcastToClients({
@@ -137,7 +137,7 @@ export default class FireMadeFleshGameState extends GameState<WesterosDeck4GameS
         }
     }
 
-    onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][]): void {
+    onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][], resolvedAutomatically: boolean): void {
         const selectedRegion = selectedUnits[0][0];
         const selectedUnit = selectedUnits[0][1][0];
 
@@ -145,7 +145,7 @@ export default class FireMadeFleshGameState extends GameState<WesterosDeck4GameS
             type: "fire-made-flesh-choice",
             house: house.id,
             dragonKilledInRegion: selectedRegion.id
-        });
+        }, resolvedAutomatically);
 
         // Remove the dragon
         selectedRegion.units.delete(selectedUnit.id);

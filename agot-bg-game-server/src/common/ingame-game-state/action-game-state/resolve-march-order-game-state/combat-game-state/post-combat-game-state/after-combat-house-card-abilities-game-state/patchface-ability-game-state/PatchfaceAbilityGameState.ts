@@ -34,7 +34,7 @@ export default class PatchfaceAbilityGameState extends GameState<
                 type: "house-card-ability-not-used",
                 house: house.id,
                 houseCard: patchface.id
-            });
+            }, true);
 
             this.parentGameState.onHouseCardResolutionFinish(house);
             return;
@@ -66,7 +66,7 @@ export default class PatchfaceAbilityGameState extends GameState<
         }
     }
 
-    onSelectHouseCardFinish(house: House, houseCard: HouseCard): void {
+    onSelectHouseCardFinish(house: House, houseCard: HouseCard, resolvedAutomatically: boolean): void {
         houseCard.state = HouseCardState.USED;
 
         const affectedHouse = this.game.houses.values.find(h => h.houseCards.values.includes(houseCard)) as House;
@@ -75,7 +75,7 @@ export default class PatchfaceAbilityGameState extends GameState<
             house: house.id,
             affectedHouse: affectedHouse.id,
             houseCard: houseCard.id
-        });
+        }, resolvedAutomatically);
 
         this.combat.entireGame.broadcastToClients({
             type: "change-state-house-card",

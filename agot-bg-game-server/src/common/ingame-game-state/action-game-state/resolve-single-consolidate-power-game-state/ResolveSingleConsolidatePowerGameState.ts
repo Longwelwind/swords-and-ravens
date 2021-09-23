@@ -74,7 +74,7 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
             // Take one of the CP order and resolve it
             const region = consolidatePowerOrders[0][0];
 
-            this.parentGameState.resolveConsolidatePowerOrderForPt(region, house);
+            this.parentGameState.resolveConsolidatePowerOrderForPt(region, house, true);
 
             // Remove the order from the board
             this.actionGameState.removeOrderFromRegion(region);
@@ -85,20 +85,11 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
         }
 
         // Check if Iron Bank order can be fast-tracked because there might be no purchasable loan
-        if (ironBankOrders.length == 1 && this.ironBank && consolidatePowerOrders.every(([r, ot]) => !ot.starred || (ot.starred && !r.hasStructure))) {
-            if (this.ironBank.getPurchasableLoans(this.house).length == 0) {
-                const region = ironBankOrders[0][0];
-                const order = ironBankOrders[0][1] as IronBankOrderType;
-                // Remove the order from the board
-                this.ingame.log({
-                    type: "order-removed",
-                    house: this.house.id,
-                    order: order.id,
-                    region: region.id
-                });
-                this.actionGameState.removeOrderFromRegion(region);
-                this.onResolveSingleConsolidatePowerFinish();
-            }
+        if ((ironBankOrders.length == 1 && consolidatePowerOrders.length == 0 && this.ironBank && this.ironBank.getPurchasableLoans(this.house).length == 0) ||
+            (ironBankOrders.length == 1 && this.ironBank && this.ironBank.loanSlots.every(lc => lc == null))) {
+            const region = ironBankOrders[0][0];
+            this.actionGameState.removeOrderFromRegion(region, true, this.house, true);
+            this.onResolveSingleConsolidatePowerFinish();
         }
     }
 

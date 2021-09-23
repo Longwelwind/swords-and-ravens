@@ -25,7 +25,7 @@ export default class AlayneStoneHouseCardAbility extends HouseCardAbility {
             type: "house-card-ability-not-used",
             house: house.id,
             houseCard: alayneStone.id
-        });
+        }, true);
         afterWinnerDetermination.childGameState.onHouseCardResolutionFinish(house);
     }
 }

@@ -1,5 +1,7 @@
 import _ from "lodash";
 import { observable } from "mobx";
+import groupBy from "../../../utils/groupBy";
+import BetterMap from "../../../utils/BetterMap";
 import shuffleInPlace from "../../../utils/shuffleInPlace";
 import Game from "./Game";
 import House from "./House";
@@ -17,6 +19,14 @@ export default class IronBank {
     get controllerOfBraavos(): House | null {
         const braavos = this.game.world.regions.tryGet("braavos", null);
         return braavos?.getController() ?? null;
+    }
+
+    get purchasedLoansPerHouse(): BetterMap<House, LoanCard[]> {
+        return groupBy(this.purchasedLoans, lc => lc.purchasedBy) as BetterMap<House, LoanCard[]>;
+    }
+
+    get interestCost(): [House, number][] {
+        return this.purchasedLoansPerHouse.entries.map(([house, lcs]) => [house, lcs.length]);
     }
 
     constructor(game: Game) {
@@ -87,7 +97,7 @@ export default class IronBank {
             type: "loan-purchased",
             house: house.id,
             loanType: loan.type.id,
-            payed: costs,
+            paid: costs,
             region: regionOfOrderId
         });
 
@@ -103,6 +113,34 @@ export default class IronBank {
             purchasedLoans: this.purchasedLoans.map(lc => lc.serializeToClient()),
             loanSlots: this.loanSlots.map(lc => lc?.serializeToClient() ?? null)
         });
+    }
+
+    // Returns the amount of unpaid interest
+    payInterest(): [House, number][] {
+        const result = new BetterMap<House, number>();
+        this.interestCost.forEach(([house, cost]) => {
+            const reallyPaid = this.game.ingame.changePowerTokens(house, -cost);
+
+            const delta = cost + reallyPaid;
+            if (delta > 0) {
+                result.set(house, delta);
+            }
+
+            this.game.ingame.log({
+                type: "interest-paid",
+                house: house.id,
+                cost: cost,
+                paid: reallyPaid
+            });
+        });
+
+        const sortedByTurnOrder = new BetterMap<House, number>();
+        this.game.getTurnOrder().forEach(h => {
+            if (result.has(h)) {
+                sortedByTurnOrder.set(h, result.get(h));
+            }
+        })
+        return sortedByTurnOrder.entries;
     }
 
     serializeToClient(admin: boolean): SerializedIronBank {

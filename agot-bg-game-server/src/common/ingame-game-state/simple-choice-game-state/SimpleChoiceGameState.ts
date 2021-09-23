@@ -11,7 +11,7 @@ import _ from "lodash";
 interface ParentGameState extends GameState<any, any> {
     game: Game;
     ingame: IngameGameState;
-    onSimpleChoiceGameStateEnd: (choice: number) => void;
+    onSimpleChoiceGameStateEnd: (choice: number, resolvedAutomatically: boolean) => void;
 }
 
 export default class SimpleChoiceGameState extends GameState<ParentGameState> {
@@ -31,7 +31,7 @@ export default class SimpleChoiceGameState extends GameState<ParentGameState> {
         if (choices.length == 1) {
             // In case there is just one possible choice, e.g. when you can't convert a ship
             // but just delete it in TakeControlOfEnemyPortGameState, automatically resolve this choice.
-            this.parentGameState.onSimpleChoiceGameStateEnd(0);
+            this.parentGameState.onSimpleChoiceGameStateEnd(0, true);
         }
     }
 
@@ -56,7 +56,7 @@ export default class SimpleChoiceGameState extends GameState<ParentGameState> {
                 return;
             }
 
-            this.parentGameState.onSimpleChoiceGameStateEnd(choice);
+            this.parentGameState.onSimpleChoiceGameStateEnd(choice, false);
         }
     }
 

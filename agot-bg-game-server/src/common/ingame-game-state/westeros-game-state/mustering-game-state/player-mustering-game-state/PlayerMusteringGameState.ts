@@ -91,13 +91,13 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         if (!this.anyUsablePointsLeft(new BetterMap())) {
             if (type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER) {
                 // Resolve the CP for PT then
-                this.resolveConsolidatePowerGameState.resolveConsolidatePowerOrderForPt(this.regions[0], this.house);
+                this.resolveConsolidatePowerGameState.resolveConsolidatePowerOrderForPt(this.regions[0], this.house, true);
             } else {
                 this.parentGameState.ingame.log({
                     type: "player-mustered",
                     house: house.id,
                     musterings: []
-                });
+                }, true);
             }
 
             this.proceedToParentGameState(this.regions);

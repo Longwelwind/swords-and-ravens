@@ -42,7 +42,7 @@ export default class QueenOfThornsAbilityGameState extends GameState<
                 type: "queen-of-thorns-no-order-available",
                 house: house.id,
                 affectedHouse: this.combatGameState.getEnemy(house).id
-            });
+            }, true);
 
             this.parentGameState.onHouseCardResolutionFinish(house);
         }
@@ -77,7 +77,7 @@ export default class QueenOfThornsAbilityGameState extends GameState<
         };
     }
 
-    onSelectOrdersFinish(regions: Region[]): void {
+    onSelectOrdersFinish(regions: Region[], resolvedAutomatically: boolean): void {
         regions.forEach(region => {
             const removedOrder = this.actionGameState.removeOrderFromRegion(region) as Order;
 
@@ -87,7 +87,7 @@ export default class QueenOfThornsAbilityGameState extends GameState<
                 affectedHouse: this.combatGameState.getEnemy(this.childGameState.house).id,
                 orderRemoved: removedOrder.id,
                 region: region.id
-            });
+            }, resolvedAutomatically);
         });
 
         this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);

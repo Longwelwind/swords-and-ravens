@@ -273,7 +273,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                 type: "player-action",
                 house: house.id,
                 action: PlayerActionType.HOUSE_CARD_CHOSEN
-            });
+            }, true);
         }
     }
 

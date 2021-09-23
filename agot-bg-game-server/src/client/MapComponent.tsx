@@ -36,9 +36,6 @@ import StaticIronBankView from "../common/ingame-game-state/game-data-structure/
 import ImagePopover from "./game-state-panel/utils/ImagePopover";
 import preventOverflow from "@popperjs/core/lib/modifiers/preventOverflow";
 import IronBankInfosComponent from "./IronBankInfosComponent";
-import groupBy from "../utils/groupBy";
-import House from "../common/ingame-game-state/game-data-structure/House";
-import LoanCard from "../common/ingame-game-state/game-data-structure/loan-card/LoanCard";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -171,7 +168,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         const ironBank = this.ingame.game.theIronBank;
         const loanSlots = ironBank.loanSlots.filter(lc => lc != null);
         const loanDeck = _.orderBy(ironBank.loanCardDeck.filter(lc => !lc.discarded), lc => lc.type.name);
-        const purchasedLoans = groupBy(ironBank.purchasedLoans, lc => lc.purchasedBy) as BetterMap<House, LoanCard[]>;
+        const purchasedLoans = ironBank.purchasedLoansPerHouse;
 
         return <Tooltip id={"loan-cards-tooltip"} className="westeros-tooltip">
             <Col>

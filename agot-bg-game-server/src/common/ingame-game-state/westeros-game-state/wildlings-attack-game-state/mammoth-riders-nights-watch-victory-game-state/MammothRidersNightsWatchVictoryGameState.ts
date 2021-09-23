@@ -27,6 +27,7 @@ export default class MammothRidersNightsWatchVictoryGameState extends GameState<
 
         const usedHouseCards = this.getUsedHouseCards(house);
         if (usedHouseCards.length == 0) {
+            // Todo log
             this.parentGameState.onWildlingCardExecuteEnd();
             return;
         }
@@ -49,7 +50,7 @@ export default class MammothRidersNightsWatchVictoryGameState extends GameState<
         }
     }
 
-    onSelectHouseCardFinish(house: House, houseCard: HouseCard): void {
+    onSelectHouseCardFinish(house: House, houseCard: HouseCard, resolvedAutomatically: boolean): void {
         houseCard.state = HouseCardState.AVAILABLE;
 
         this.entireGame.broadcastToClients({
@@ -63,7 +64,7 @@ export default class MammothRidersNightsWatchVictoryGameState extends GameState<
             type: "mammoth-riders-return-card",
             house: house.id,
             houseCard: houseCard.id
-        });
+        }, resolvedAutomatically);
 
         this.parentGameState.onWildlingCardExecuteEnd();
     }

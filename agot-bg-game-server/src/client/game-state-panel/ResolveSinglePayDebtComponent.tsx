@@ -1,5 +1,3 @@
-import PlayerReconcileArmiesGameState
-    from "../../common/ingame-game-state/westeros-game-state/reconcile-armies-game-state/player-reconcile-armies-game-state/PlayerReconcileArmiesGameState";
 import {Component, ReactNode} from "react";
 import React from "react";
 import BetterMap from "../../utils/BetterMap";
@@ -16,10 +14,10 @@ import Row from "react-bootstrap/Row";
 import {UnitOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
 import { ListGroupItem } from "react-bootstrap";
-import { union } from "lodash";
+import ResolveSinglePayDebtGameState from "../../common/ingame-game-state/pay-debts-game-state/resolve-single-pay-debt-game-state/ResolveSinglePayDebtGameState";
 
 @observer
-export default class PlayerReconcileArmiesComponent extends Component<GameStateComponentProps<PlayerReconcileArmiesGameState>> {
+export default class ResolveSinglePayDebtComponent extends Component<GameStateComponentProps<ResolveSinglePayDebtGameState>> {
     @observable unitsToRemove: BetterMap<Region, Unit[]> = new BetterMap();
 
     modifyUnitsOnMapCallback: any;
@@ -28,46 +26,39 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
         return this.props.gameState.house;
     }
 
+    get resolver(): House {
+        return this.props.gameState.resolver;
+    }
+
     get selectedUnits(): Unit[] {
         return _.flatMap(this.unitsToRemove.values);
     }
 
     get selectableUnits(): Unit[] {
-        let result = this.selectedUnits;
-
-        if (!this.enoughReconciled) {
-            result = union(result, this.props.gameState.getAllArmyUnitsOfHouse(this.house));
-
-            // Remove the last unit from an area from selectable units
-            for (const region of this.unitsToRemove.keys) {
-                const remainingUnits = _.difference(region.units.values, this.unitsToRemove.get(region));
-                if (remainingUnits.length == 1) {
-                    result = result.filter(u => u != remainingUnits[0]);
-                }
-            }
+        const selected = this.selectedUnits;
+        if (this.props.gameState.debt > selected.length) {
+            return this.props.gameState.availableUnitsOfHouse;
         }
-
-        return result;
-    }
-
-    get enoughReconciled(): boolean {
-        return this.props.gameState.isEnoughToReconcile(this.unitsToRemove);
-    }
-
-    get tooMuchReconciled(): boolean {
-        return this.props.gameState.isTooMuchReconciled(this.unitsToRemove);
+        else {
+            return selected;
+        }
     }
 
     render(): ReactNode {
-        const tooMuch = this.tooMuchReconciled;
-        const notEnough = !this.enoughReconciled;
+        const selected = this.selectedUnits;
+        const notEnough = selected.length < this.props.gameState.debt;
         return (
             <ListGroupItem className="px-2">
                 <Row>
                     <Col xs={12} className="text-center">
-                        <b>{this.props.gameState.house.name}</b> must reconcile their armies according to their supply limits.
+                        <p>
+                            The holder of the Valyrian Steel Blade destroys one unit for each unpaid interest power&nbsp;token.
+                        </p>
+                        <p>
+                            <b>{this.resolver.name}</b> must destroy {this.props.gameState.debt} units of house <b>{this.house.name}</b>.
+                        </p>
                     </Col>
-                    {this.props.gameClient.doesControlHouse(this.house) ? (
+                    {this.props.gameClient.doesControlHouse(this.resolver) ? (
                         <>
                             <Col xs={12}>
                                 {this.unitsToRemove.entries.map(([region, units]) => (
@@ -77,17 +68,16 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
                                 ))}
                                 <Row className="justify-content-center">
                                     <Col xs="auto">
-                                        <Button disabled={notEnough || tooMuch} onClick={() => this.confirm()}>Confirm</Button>
+                                        <Button disabled={notEnough} onClick={() => this.confirm()}>Confirm</Button>
                                     </Col>
                                     <Col xs="auto">
                                         <Button disabled={this.unitsToRemove.size == 0} onClick={() => this.reset()}>Reset</Button>
                                     </Col>
                                 </Row>
-                                {tooMuch && <Row className="mt-1 justify-content-center">You removed too much units!</Row>}
                             </Col>
                         </>
                     ) : (
-                            <Col xs={12} className="text-center">Waiting for {this.house.name}...</Col>
+                            <Col xs={12} className="text-center">Waiting for {this.resolver.name}...</Col>
                         )}
                 </Row>
             </ListGroupItem>
@@ -115,7 +105,7 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
     }
 
     confirm(): void {
-        this.props.gameState.reconcileArmies(this.unitsToRemove);
+        this.props.gameState.sendPayDebt(this.unitsToRemove.entries);
         this.reset();
     }
 
@@ -124,7 +114,7 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
     }
 
     modifyUnitsOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {
-        if (this.props.gameClient.doesControlHouse(this.house)) {
+        if (this.props.gameClient.doesControlHouse(this.resolver)) {
             const selected = this.selectedUnits;
             return this.selectableUnits.map(u => [
                 u,

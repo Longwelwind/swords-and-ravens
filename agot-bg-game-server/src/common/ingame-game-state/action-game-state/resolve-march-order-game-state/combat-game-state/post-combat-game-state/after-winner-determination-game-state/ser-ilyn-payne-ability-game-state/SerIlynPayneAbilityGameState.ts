@@ -114,7 +114,7 @@ export default class SerIlynPayneAbilityGameState extends GameState<
                     type: "house-card-ability-not-used",
                     house: this.house.id,
                     houseCard: serIlynPayne.id
-                });
+                }, true);
                 this.parentGameState.onHouseCardResolutionFinish(this.house);
                 return;
             }

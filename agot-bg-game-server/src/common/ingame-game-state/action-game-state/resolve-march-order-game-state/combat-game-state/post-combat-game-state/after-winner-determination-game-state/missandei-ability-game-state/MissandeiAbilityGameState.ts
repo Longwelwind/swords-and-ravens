@@ -34,7 +34,7 @@ export default class MissandeiAbilityGameState extends GameState<
                 type: "house-card-ability-not-used",
                 house: house.id,
                 houseCard: missandei.id
-            });
+            }, true);
             this.parentGameState.onHouseCardResolutionFinish(house);
             return;
         }
@@ -60,7 +60,7 @@ export default class MissandeiAbilityGameState extends GameState<
         }
     }
 
-    onSelectHouseCardFinish(house: House, houseCard: HouseCard | null): void {
+    onSelectHouseCardFinish(house: House, houseCard: HouseCard | null, resolvedAutomatically: boolean): void {
         if (houseCard == null || !this.getChoosableHouseCards(house).includes(houseCard)) {
             return;
         }
@@ -78,7 +78,7 @@ export default class MissandeiAbilityGameState extends GameState<
             type: "missandei-used",
             house: house.id,
             houseCard: houseCard.id
-        });
+        }, resolvedAutomatically);
 
         this.parentGameState.onHouseCardResolutionFinish(house);
     }
