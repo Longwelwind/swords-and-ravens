@@ -20,6 +20,8 @@ import MasterAtArmsGameState from "../../../common/ingame-game-state/action-game
 import MasterAtArmsComponent from "../MasterAtArmsComponent";
 import SavvyStewardGameState from "../../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/execute-loan-game-state/savvy-steward-game-state/SavvyStewardGameState";
 import SavvyStewardComponent from "../SavvyStewardComponent";
+import SpymasterGameState from "../../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/execute-loan-game-state/spymaster-game-state/SpymasterGameState";
+import SpymasterComponent from "../SpymasterComponent";
 
 @observer
 export default class ExecuteLoanComponent extends Component<GameStateComponentProps<ExecuteLoanGameState>> {
@@ -52,7 +54,8 @@ export default class ExecuteLoanComponent extends Component<GameStateComponentPr
                     [ExpertArtificerGameState, ExpertArtificerComponent],
                     [LoyalMaesterGameState, LoyalMaesterComponent],
                     [MasterAtArmsGameState, MasterAtArmsComponent],
-                    [SavvyStewardGameState, SavvyStewardComponent]
+                    [SavvyStewardGameState, SavvyStewardComponent],
+                    [SpymasterGameState, SpymasterComponent]
                 ])}
             </Row>
         </Col>;

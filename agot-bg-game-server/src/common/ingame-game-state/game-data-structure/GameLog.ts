@@ -40,7 +40,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | PowerTokensGifted | InfluenceTrackPositionChosen | TiesDecided | PlaceLoyaltyChoice | LoyaltyTokenPlaced | LoyaltyTokenGained
     | FireMadeFleshChoice | PlayWithFireChoice | TheLongPlanChoice | MoveLoyaltyTokenChoice | LoanPurchased | OrderRemoved | InterestPaid
     | DebtPaid | CustomsOfficerPowerTokensGained | SellswordsPlaced | TheFacelessMenUnitsDestroyed | PyromancerExecuted | ExpertArtificerExecuted
-    | LoyalMaesterExecuted | MasterAtArmsExecuted | SavvyStewardExecuted;
+    | LoyalMaesterExecuted | MasterAtArmsExecuted | SavvyStewardExecuted | SpymasterExecuted;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -905,4 +905,12 @@ interface SavvyStewardExecuted {
     house: string;
     region: string;
     newSupply: number;
+}
+
+interface SpymasterExecuted {
+    type: "spymaster-executed";
+    house: string;
+    westerosDeckI: number;
+    westerosCardsCountForTopOfDeck: number;
+    westerosCardsCountForBottomOfDeck: number;
 }
