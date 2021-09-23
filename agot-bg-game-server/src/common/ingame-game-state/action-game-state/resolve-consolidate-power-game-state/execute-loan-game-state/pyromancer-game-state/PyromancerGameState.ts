@@ -64,7 +64,7 @@ export default class PyromancerGameState extends GameState<ExecuteLoanGameState,
         });
 
         this.ingame.log({
-            type: "pyromancer",
+            type: "pyromancer-executed",
             house: this.childGameState.house.id,
             region: this.chosenRegion.id,
             upgradeType: choice == 0 ? "Barrel" : "Crown"

@@ -8,9 +8,9 @@ import SelectRegionGameState, { SerializedSelectRegionGameState } from "../../..
 import { ServerMessage } from "../../../../../../messages/ServerMessage";
 import { ClientMessage } from "../../../../../../messages/ClientMessage";
 import Player from "../../../../Player";
+import { land } from "../../../../game-data-structure/regionTypes";
 
-export default class MasterAtArmsGameState extends GameState<ExecuteLoanGameState, SelectRegionGameState<MasterAtArmsGameState>> {
-    selectedRegions: Region[];
+export default class SavvyStewardGameState extends GameState<ExecuteLoanGameState, SelectRegionGameState<SavvyStewardGameState>> {
     get game(): Game {
         return this.parentGameState.game;
     }
@@ -24,36 +24,35 @@ export default class MasterAtArmsGameState extends GameState<ExecuteLoanGameStat
     }
 
     get selectableRegions(): Region[] {
-        // No need to filter for selected Regions as after Upgrade the castle wont be available for selection anymore
-        return this.game.world.regions.values.filter(r => r.castleLevel == 1);
+        return this.game.world.regions.values.filter(r => r.type == land);
     }
 
     firstStart(house: House): void {
-        this.selectedRegions = [];
         this.setChildGameState(new SelectRegionGameState(this)).firstStart(house, this.selectableRegions);
     }
 
     onSelectRegionFinish(house: House, region: Region): void {
-        region.castleModifier = 1;
+        region.barrelModifier += 1;
         this.entireGame.broadcastToClients({
             type: "update-region-modifiers",
             region: region.id,
-            castleModifier: region.castleModifier
+            barrelModifier: region.barrelModifier
         });
 
-        this.selectedRegions.push(region);
+        this.game.changeSupply(house, 1);
+        this.entireGame.broadcastToClients({
+            type: "supply-adjusted",
+            supplies: [[house.id, house.supplyLevel]]
+        })
 
-        if (this.selectedRegions.length == 2) {
-            this.ingame.log({
-                type: "master-at-arms-executed",
-                house: house.id,
-                regions: this.selectedRegions.map(r => r.id)
-            });
+        this.ingame.log({
+            type: "savvy-steward-executed",
+            house: this.childGameState.house.id,
+            region: region.id,
+            newSupply: house.supplyLevel
+        });
 
-            this.executeLoanGameState.onExecuteLoanFinish(this.childGameState.house);
-        } else {
-            this.setChildGameState(new SelectRegionGameState(this)).firstStart(house, this.selectableRegions);
-        }
+        this.executeLoanGameState.onExecuteLoanFinish(house);
     }
 
     onServerMessage(message: ServerMessage): void {
@@ -64,30 +63,26 @@ export default class MasterAtArmsGameState extends GameState<ExecuteLoanGameStat
         this.childGameState.onPlayerMessage(player, message);
     }
 
-    serializeToClient(admin: boolean, player: Player | null): SerializedMasterAtArmsGameState {
+    serializeToClient(admin: boolean, player: Player | null): SerializedSavvyStewardGameState {
         return {
-            type: "master-at-arms",
-            selectedRegions: this.selectedRegions.map(r => r.id),
+            type: "savvy-steward",
             childGameState: this.childGameState.serializeToClient(admin, player)
         }
     }
 
-    static deserializeFromServer(parent: ExecuteLoanGameState, data: SerializedMasterAtArmsGameState): MasterAtArmsGameState {
-        const gameState = new MasterAtArmsGameState(parent);
+    static deserializeFromServer(parent: ExecuteLoanGameState, data: SerializedSavvyStewardGameState): SavvyStewardGameState {
+        const gameState = new SavvyStewardGameState(parent);
 
-        gameState.selectedRegions = data.selectedRegions.map(rid => parent.ingame.world.regions.get(rid));
         gameState.childGameState = gameState.deserializeChildGameState(data.childGameState);
 
         return gameState;
     }
 
-    deserializeChildGameState(data: SerializedMasterAtArmsGameState["childGameState"]): MasterAtArmsGameState["childGameState"] {
-        return SelectRegionGameState.deserializeFromServer(this, data);
+    deserializeChildGameState(data: SerializedSavvyStewardGameState["childGameState"]): SavvyStewardGameState["childGameState"] {
+        return SelectRegionGameState.deserializeFromServer(this, data);    }
     }
-}
 
-export interface SerializedMasterAtArmsGameState {
-    type: "master-at-arms";
-    selectedRegions: string[];
+export interface SerializedSavvyStewardGameState {
+    type: "savvy-steward";
     childGameState: SerializedSelectRegionGameState
 }

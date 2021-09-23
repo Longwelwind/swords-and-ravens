@@ -42,7 +42,7 @@ export default class ExpertArtificerGameState extends GameState<ExecuteLoanGameS
         const gained = this.ingame.changePowerTokens(house, 8);
 
         this.ingame.log({
-            type: "expert-artificer",
+            type: "expert-artificer-executed",
             house: house.id,
             region: region.id,
             gainedPowerTokens: gained

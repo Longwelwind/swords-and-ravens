@@ -39,8 +39,8 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained | DaenerysTargaryenPowerTokensDiscarded | MissandeiUsed
     | PowerTokensGifted | InfluenceTrackPositionChosen | TiesDecided | PlaceLoyaltyChoice | LoyaltyTokenPlaced | LoyaltyTokenGained
     | FireMadeFleshChoice | PlayWithFireChoice | TheLongPlanChoice | MoveLoyaltyTokenChoice | LoanPurchased | OrderRemoved | InterestPaid
-    | DebtPaid | CustomsOfficerPowerTokensGained | SellswordsPlaced | TheFacelessMenUnitsDestroyed | Pyromancer | ExpertArtificer
-    | LoyalMaester | MasterAtArms;
+    | DebtPaid | CustomsOfficerPowerTokensGained | SellswordsPlaced | TheFacelessMenUnitsDestroyed | PyromancerExecuted | ExpertArtificerExecuted
+    | LoyalMaesterExecuted | MasterAtArmsExecuted | SavvyStewardExecuted;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -874,28 +874,35 @@ interface TheFacelessMenUnitsDestroyed {
     units: [string, string[]][];
 }
 
-interface Pyromancer {
-    type: "pyromancer";
+interface PyromancerExecuted {
+    type: "pyromancer-executed";
     house: string;
     region: string;
     upgradeType: string;
 }
 
-interface ExpertArtificer {
-    type: "expert-artificer";
+interface ExpertArtificerExecuted {
+    type: "expert-artificer-executed";
     house: string;
     region: string;
     gainedPowerTokens: number;
 }
 
-interface LoyalMaester {
-    type: "loyal-maester";
+interface LoyalMaesterExecuted {
+    type: "loyal-maester-executed";
     house: string;
     regions: string[];
 }
 
-interface MasterAtArms {
-    type: "master-at-arms";
+interface MasterAtArmsExecuted {
+    type: "master-at-arms-executed";
     house: string;
     regions: string[];
+}
+
+interface SavvyStewardExecuted {
+    type: "savvy-steward-executed";
+    house: string;
+    region: string;
+    newSupply: number;
 }

@@ -46,7 +46,7 @@ export default class LoyalMaesterGameState extends GameState<ExecuteLoanGameStat
 
         if (this.selectedRegions.length == 2) {
             this.ingame.log({
-                type: "loyal-maester",
+                type: "loyal-maester-executed",
                 house: house.id,
                 regions: this.selectedRegions.map(r => r.id)
             });
