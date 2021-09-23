@@ -1130,6 +1130,34 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "48",
+        migrate: (serializedGame: any) => {
+            // Add the Iron Bank to running 8p games
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                if (ingame.game.houses.length != 8) {
+                    ingame.game.ironBank = null;
+                    return serializedGame;
+                }
+
+                const loanCardIds = [ "customs-officer", "expert-artificer", "full-host", "loyal-maester",
+                "master-at-arms", "pyromancer", "savvy-steward", "sea-raiders",
+                "siege-engineers", "spymaster", "the-faceless-men", "vanguard-cavalry" ];
+
+                ingame.game.ironBank = {
+                    loanCardDeck: shuffleInPlace(loanCardIds.map((id, i) => ({
+                        id: i,
+                        type: id,
+                        purchasedBy: null
+                    })))
+                };
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

@@ -16,6 +16,9 @@ import IngameGameState from "../IngameGameState";
 import { vassalHouseCards } from "./static-data-structure/vassalHouseCards";
 import getStaticWorld from "./static-data-structure/getStaticWorld";
 import shuffleInPlace from "../../../utils/shuffleInPlace";
+import IronBank from "./IronBank";
+import loanCardTypes from "./loan-card/loanCardTypes";
+import LoanCard from "./loan-card/LoanCard";
 
 const MAX_POWER_TOKENS = 20;
 
@@ -401,6 +404,16 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
 
     // Init the vassal house cards
     game.vassalHouseCards = new BetterMap(vassalHouseCards.map(hc => [hc.id, hc]));
+
+    // Init the Iron Bank
+    if (gameSettings.playerCount == 8) {
+        game.ironBank = new IronBank(game);
+
+        // Load the Loan card deck
+        game.ironBank.loanCardDeck = shuffleInPlace(loanCardTypes.values.map((lct, i) => new LoanCard(i, lct)));
+    } else {
+        game.ironBank = null;
+    }
 
     return game;
 }
