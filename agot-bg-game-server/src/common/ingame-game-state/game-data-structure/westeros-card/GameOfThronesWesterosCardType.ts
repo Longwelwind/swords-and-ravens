@@ -16,7 +16,7 @@ export default class GameOfThronesWesterosCardType extends WesterosCardType {
                 _.sum(world.getControlledRegions(house).map(r => r.crownIcons))
                 // Counter number of controlled ports where the adjacent sea area is un-constested
                 + world.getControlledRegions(house)
-                    .filter(r => r.type == port)
+                    .filter(r => r.type == port && r.units.size > 0)
                     .filter(r =>
                         world.getAdjacentSeaOfPort(r).getController() == null
                         || world.getAdjacentSeaOfPort(r).getController() == house
