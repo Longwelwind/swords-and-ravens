@@ -46,7 +46,7 @@ export default class ChooseCasualtiesGameState extends GameState<PostCombatGameS
 
         if (possibleCasualties.every(u => u.type == possibleCasualties[0].type)) {
             // In case all units have the same type process casualties automatically
-            this.onSelectUnitsEnd(house, groupBy(possibleCasualties.slice(0, casualtiesCount), u => u.region).entries);
+            this.onSelectUnitsEnd(house, groupBy(possibleCasualties.slice(0, casualtiesCount), u => u.region).entries, true);
         } else {
             // Otherwise let the user decide which units to sacrifice
             this.setChildGameState(new SelectUnitsGameState(this)).firstStart(house, possibleCasualties, casualtiesCount);
@@ -64,10 +64,10 @@ export default class ChooseCasualtiesGameState extends GameState<PostCombatGameS
         this.childGameState.onPlayerMessage(player, message);
     }
 
-    onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][]): void {
+    onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][], resolvedAutomatically: boolean): void {
         const [region, units] = selectedUnits[0];
 
-        this.postCombatGameState.onChooseCasualtiesGameStateEnd(house, region, units);
+        this.postCombatGameState.onChooseCasualtiesGameStateEnd(house, region, units, resolvedAutomatically);
     }
 
     onServerMessage(_message: ServerMessage): void {

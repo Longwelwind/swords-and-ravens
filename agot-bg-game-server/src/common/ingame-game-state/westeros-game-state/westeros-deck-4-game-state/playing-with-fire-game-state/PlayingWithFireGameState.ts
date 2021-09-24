@@ -39,7 +39,7 @@ export default class PlayingWithFireGameState extends GameState<WesterosDeck4Gam
 
     firstStart(house: House): void {
         this.step = PLAYING_WITH_FIRE_STEP.CHOOSE_ACTIVATE;
-        this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(house, `House ${house.name} may discard 1 Power token to place a loyalty token and an enemy unit in an uncontrolled land area.`, this.getChoices(house).keys);
+        this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(house, `House ${house.name} may discard 1 Power token to place a loyalty\xa0token and an enemy unit in an uncontrolled land area.`, this.getChoices(house).keys);
     }
 
     getEnemiesWithAtLeastOneAvailableUnit(house: House): House[] {
@@ -75,7 +75,7 @@ export default class PlayingWithFireGameState extends GameState<WesterosDeck4Gam
         return result;
     }
 
-    onSimpleChoiceGameStateEnd(choice: number): void {
+    onSimpleChoiceGameStateEnd(choice: number, resolvedAutomatically: boolean): void {
         const house = this.childGameState.house;
 
         if (this.step == PLAYING_WITH_FIRE_STEP.CHOOSE_ACTIVATE) {
@@ -85,7 +85,7 @@ export default class PlayingWithFireGameState extends GameState<WesterosDeck4Gam
                     house: this.childGameState.house.id,
                     discardedPowerTokens: 0,
                     loyaltyTokenCount: 0
-                });
+                }, resolvedAutomatically);
                 this.westeros.onWesterosCardEnd();
             } else if (choice == 1) {
                 this.ingame.log({

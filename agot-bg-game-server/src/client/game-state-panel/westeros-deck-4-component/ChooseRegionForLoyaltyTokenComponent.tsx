@@ -16,7 +16,7 @@ export default class ChooseRegionForLoyaltyTokenComponent extends Component<Game
         return (
             <>
                 {this.props.gameState.childGameState instanceof SelectRegionGameState && <Col className="text-center">
-                    House <b>{this.props.gameState.childGameState.house.name}</b> must choose a region to place a loyalty token.
+                    House <b>{this.props.gameState.childGameState.house.name}</b> must choose a region to place a loyalty&nbsp;token.
                 </Col>}
                 {renderChildGameState(this.props, [
                     [SimpleChoiceGameState, SimpleChoiceComponent],

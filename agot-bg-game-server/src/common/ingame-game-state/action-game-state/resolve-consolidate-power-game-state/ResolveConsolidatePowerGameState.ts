@@ -8,15 +8,18 @@ import House from "../../game-data-structure/House";
 import EntireGame from "../../../EntireGame";
 import {land, port, sea} from "../../game-data-structure/regionTypes";
 import PlayerMusteringGameState, {
-    PlayerMusteringType,
     SerializedPlayerMusteringGameState
 } from "../../westeros-game-state/mustering-game-state/player-mustering-game-state/PlayerMusteringGameState";
 import Region from "../../game-data-structure/Region";
 import IngameGameState from "../../IngameGameState";
-import _ from "lodash";
 import IronBankOrderType from "../../game-data-structure/order-types/IronBankOrderType";
+import ResolveSingleConsolidatePowerGameState, { SerializedResolveSingleConsolidatePowerGameState } from "./resolve-single-consolidate-power-game-state/ResolveSingleConsolidatePowerGameState";
+import ConsolidatePowerOrderType from "../../game-data-structure/order-types/ConsolidatePowerOrderType";
+import BetterMap from "../../../../utils/BetterMap";
+import DefenseMusterOrderType from "../../game-data-structure/order-types/DefenseMusterOrderType";
+import ExecuteLoanGameState, { SerializedExecuteLoanGameState } from "./execute-loan-game-state/ExecuteLoanGameState";
 
-export default class ResolveConsolidatePowerGameState extends GameState<ActionGameState, PlayerMusteringGameState> {
+export default class ResolveConsolidatePowerGameState extends GameState<ActionGameState, ResolveSingleConsolidatePowerGameState | PlayerMusteringGameState | ExecuteLoanGameState> {
     get game(): Game {
         return this.actionGameState.game;
     }
@@ -38,6 +41,14 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
             type: "action-phase-resolve-consolidate-power-began"
         });
         this.proceedNextResolve(null);
+    }
+
+    getAvailableOrdersOfHouse(house: House): BetterMap<Region, ConsolidatePowerOrderType | IronBankOrderType | DefenseMusterOrderType> {
+        const result: BetterMap<Region, ConsolidatePowerOrderType | IronBankOrderType | DefenseMusterOrderType> = new BetterMap();
+        this.actionGameState.getRegionsWithConsolidatePowerOrderOfHouse(house).forEach(([r, ot]) => result.set(r, ot));
+        this.actionGameState.getRegionsWithIronBankOrderOfHouse(house).forEach(([r, ot]) => result.set(r, ot));
+        this.actionGameState.getRegionsWithDefenseMusterOrderOfHouse(house).forEach(([r, ot]) => result.set(r, ot));
+        return result;
     }
 
     getPotentialGainedPowerTokens(region: Region, house: House): number {
@@ -65,7 +76,7 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
         return 0;
     }
 
-    resolveConsolidatePowerOrderForPt(region: Region, house: House): void {
+    resolveConsolidatePowerOrderForPt(region: Region, house: House, resolvedAutomatically = false): void {
         let gains: number = this.getPotentialGainedPowerTokens(region, house);
 
         if(gains > 0) {
@@ -78,7 +89,7 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
             region: region.id,
             starred: this.actionGameState.ordersOnBoard.get(region).type.starred,
             powerTokenCount: gains
-        });
+        }, resolvedAutomatically);
     }
 
     proceedNextResolve(lastHouseToResolve: House | null): void {
@@ -89,77 +100,29 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
             return;
         }
 
-        const consolidatePowerOrders = this.actionGameState.getRegionsWithConsolidatePowerOrderOfHouse(nextToResolve);
-
-        if (consolidatePowerOrders.length == 0 && this.ingame.isVassalHouse(nextToResolve)) {
-            const regions = this.actionGameState.getRegionsWithDefenseMusterOrderOfHouse(nextToResolve);
-            if (regions.length > 0) {
-                this.setChildGameState(new PlayerMusteringGameState(this)).firstStart(nextToResolve, PlayerMusteringType.DEFENSE_MUSTER_ORDER);
-            } else {
-                // Proceed to the next house
-                this.proceedNextResolve(nextToResolve);
-            }
-
-            return;
-        }
-
-        // Before asking the player to resolve a Consolidate Power token,
-        // check if they only have non-starred Consolidate Power tokens, or
-        // if the starred ones are present on regions with no structure.
-        // In that case, fast-track the process and simply resolve one of those.
-
-        if (consolidatePowerOrders.length == 0) {
-            // This should never happen but for safety we check again
-            // If it really happens we proceed with the next house
-            this.proceedNextResolve(nextToResolve);
-            return;
-        }
-
-        if (consolidatePowerOrders.every(([r, ot]) => !ot.starred || (ot.starred && !r.hasStructure))) {
-            // Take one of the CP order and resolve it
-            const [region] = consolidatePowerOrders[0];
-
-            this.resolveConsolidatePowerOrderForPt(region, nextToResolve);
-
-            // Remove the order from the board
-            this.actionGameState.removeOrderFromRegion(region);
-
-            // Proceed to the next house
-            this.proceedNextResolve(nextToResolve);
-        } else {
-            this.setChildGameState(new PlayerMusteringGameState(this)).firstStart(nextToResolve, PlayerMusteringType.STARRED_CONSOLIDATE_POWER);
-        }
+        this.setChildGameState(new ResolveSingleConsolidatePowerGameState(this)).firstStart(nextToResolve);
     }
 
     onPlayerMusteringEnd(house: House, regions: Region[]): void {
-        const region = regions[0];
-
-        if (!region) {
-            throw new Error();
-        }
-
         // Remove ConsolidatePower/IronBank/Muster order token
-        this.actionGameState.removeOrderFromRegion(region);
+        // Todo: probably not necessary anymore
+        regions.forEach(r => this.actionGameState.removeOrderFromRegion(r));
         this.proceedNextResolve(house);
     }
 
     getNextHouseToResolveOrder(lastHouseToResolve: House | null): House | null {
         let currentHouseToCheck = lastHouseToResolve ? this.ingame.getNextInTurnOrder(lastHouseToResolve) : this.game.getTurnOrder()[0];
 
-        // Check each house in order to find one that has a consolidate power
+        // Check each house in order to find one that has a consolidate power / defense muster order or iron bank order
         for (let i = 0;i < this.game.houses.size;i++) {
-            const regions = _.concat(
-                    this.actionGameState.getRegionsWithConsolidatePowerOrderOfHouse(currentHouseToCheck).map(([r, _ot]) => r),
-                    this.actionGameState.getRegionsWithDefenseMusterOrderOfHouse(currentHouseToCheck));
-
-            if (regions.length > 0) {
+            if (this.getAvailableOrdersOfHouse(currentHouseToCheck).size > 0) {
                 return currentHouseToCheck;
             }
 
             currentHouseToCheck = this.ingame.getNextInTurnOrder(currentHouseToCheck);
         }
 
-        // If no house has any CP* order available, return null
+        // If no house has any CP, Iron Bank or Defense/Muster order available, return null
         return null;
     }
 
@@ -186,12 +149,20 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
         return resolveConsolidatePower;
     }
 
-    deserializeChildGameState(data: SerializedResolveConsolidatePowerGameState["childGameState"]): PlayerMusteringGameState {
-        return PlayerMusteringGameState.deserializeFromServer(this, data);
+    deserializeChildGameState(data: SerializedResolveConsolidatePowerGameState["childGameState"]): ResolveConsolidatePowerGameState["childGameState"] {
+        if (data.type == "player-mustering") {
+            return PlayerMusteringGameState.deserializeFromServer(this, data);
+        } else if (data.type == "resolve-single-consolidate-power") {
+            return ResolveSingleConsolidatePowerGameState.deserializeFromServer(this, data);
+        } else if (data.type == "execute-loan") {
+            return ExecuteLoanGameState.deserializeFromServer(this, data);
+        } else {
+            throw new Error("");
+        }
     }
 }
 
 export interface SerializedResolveConsolidatePowerGameState {
     type: "resolve-consolidate-power";
-    childGameState: SerializedPlayerMusteringGameState;
+    childGameState: SerializedPlayerMusteringGameState | SerializedResolveSingleConsolidatePowerGameState | SerializedExecuteLoanGameState;
 }

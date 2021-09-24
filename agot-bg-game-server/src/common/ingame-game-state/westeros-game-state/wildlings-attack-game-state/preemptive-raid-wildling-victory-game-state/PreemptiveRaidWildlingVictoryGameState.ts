@@ -107,7 +107,7 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
         }
     }
 
-    onSelectUnitsEnd(house: House, units: [Region, Unit[]][]): void {
+    onSelectUnitsEnd(house: House, units: [Region, Unit[]][], resolvedAutomatically: boolean): void {
         // Kill those 2 units
         units.forEach(([region, units]) => {
             units.forEach(u => region.units.delete(u.id));
@@ -123,7 +123,7 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
             type: "preemptive-raid-units-killed",
             house: house.id,
             units: units.map(([region, units]) => [region.id, units.map(u => u.type.id)])
-        });
+        }, resolvedAutomatically);
 
         // After destroying an unit an orphaned ship may be present here, so try to find it and destroy it in that case
         findOrphanedShipsAndDestroyThem(this.game.world, this.ingame, null);

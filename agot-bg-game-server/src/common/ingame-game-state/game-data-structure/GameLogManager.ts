@@ -10,32 +10,33 @@ export default class GameLogManager {
         this.ingameGameState = ingameGameState;
     }
 
-    log(data: GameLogData): void {
+    log(data: GameLogData, resolvedAutomatically = false): void {
         const time = new Date();
-        this.logs.push({data, time});
+        this.logs.push({data, time, resolvedAutomatically});
 
         this.ingameGameState.entireGame.broadcastToClients({
             type: "add-game-log",
             data: data,
-            time: time.getTime() / 1000
+            time: time.getTime() / 1000,
+            resolvedAutomatically: resolvedAutomatically
         });
     }
 
     serializeToClient(): SerializedGameLogManager {
         return {
-            logs: this.logs.map(l => ({time: l.time.getTime() / 1000, data: l.data}))
+            logs: this.logs.map(l => ({time: l.time.getTime() / 1000, data: l.data, resolvedAutomatically: l.resolvedAutomatically}))
         };
     }
 
     static deserializeFromServer(ingameGameState: IngameGameState, data: SerializedGameLogManager): GameLogManager {
         const gameLogManager = new GameLogManager(ingameGameState);
 
-        gameLogManager.logs = data.logs.map(l => ({time: new Date(l.time * 1000), data: l.data}));
+        gameLogManager.logs = data.logs.map(l => ({time: new Date(l.time * 1000), data: l.data, resolvedAutomatically: l.resolvedAutomatically}));
 
         return gameLogManager;
     }
 }
 
 export interface SerializedGameLogManager {
-    logs: {time: number; data: GameLogData}[];
+    logs: {time: number; data: GameLogData, resolvedAutomatically?: boolean}[];
 }

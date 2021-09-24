@@ -7,8 +7,8 @@ import {observable} from "mobx";
 import BetterMap from "../../utils/BetterMap";
 import baseGameData from "../../../data/baseGameData.json";
 import CancelledGameState from "../cancelled-game-state/CancelledGameState";
-import shuffleInPlace from "../../utils/shuffleInPlace";
 import shuffle from "../../utils/shuffle";
+import shuffleInPlace from "../../utils/shuffleInPlace";
 import _ from "lodash";
 import { MIN_PLAYER_COUNT_WITH_VASSALS, MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN } from "../ingame-game-state/game-data-structure/Game";
 import { v4 } from "uuid";
@@ -195,6 +195,14 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
             // Allow disabling MoD options but enable them when switching to this setup
             if (this.entireGame.gameSettings.setupId != "mother-of-dragons" && settings.setupId == "mother-of-dragons") {
+                settings.vassals = true;
+                settings.seaOrderTokens = true;
+                settings.allowGiftingPowerTokens = true;
+                settings.startWithSevenPowerTokens = true;
+            }
+
+            // Lock MoD settings for 8p
+            if (settings.setupId == "mother-of-dragons" && settings.playerCount == 8) {
                 settings.vassals = true;
                 settings.seaOrderTokens = true;
                 settings.allowGiftingPowerTokens = true;

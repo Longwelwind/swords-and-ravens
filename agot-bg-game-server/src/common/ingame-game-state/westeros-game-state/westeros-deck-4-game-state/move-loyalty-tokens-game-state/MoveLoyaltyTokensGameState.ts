@@ -52,7 +52,7 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
 
     proceedNextResolve(): void {
         this.ingame.gainLoyaltyTokens();
-        const nextHouse = this.getNextHouseToResolve();
+        const nextHouse = this.pullNextHouseToResolve();
         if (!nextHouse) {
             this.westeros.onWesterosCardEnd();
             return;
@@ -61,7 +61,7 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
         this.setChildGameState(new ResolveMoveLoyaltyTokenGameState(this)).firstStart(nextHouse);
     }
 
-    getNextHouseToResolve(): House | undefined {
+    pullNextHouseToResolve(): House | undefined {
         if (this.resolveOrder.length == 0 || this.validFromRegions.length == 0) {
             return undefined;
         }
@@ -84,7 +84,7 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
         return result;
     }
 
-    onSimpleChoiceGameStateEnd(choice: number): void {
+    onSimpleChoiceGameStateEnd(choice: number, resolvedAutomatically: boolean): void {
         const house = this.childGameState.house;
 
         if (choice == 0) {
@@ -92,7 +92,7 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
                 type: "move-loyalty-token-choice",
                 house: house.id,
                 powerTokensDiscardedToCancelMovement: 0
-            });
+            }, resolvedAutomatically);
         } else if (choice == 1) {
             this.ingame.log({
                 type: "move-loyalty-token-choice",
@@ -153,7 +153,7 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
         });
 
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(this.game.targaryen,
-            `House Targaryen may discard ${this.costsToCancelPreviousMovement} power token${this.costsToCancelPreviousMovement > 1 ? "s" : ""} to move the loyalty token from ${this.previousMovement.to.name} back to ${this.previousMovement.from.name}.`,
+            `House Targaryen may discard ${this.costsToCancelPreviousMovement} power token${this.costsToCancelPreviousMovement > 1 ? "s" : ""} to move the loyalty\xa0token from ${this.previousMovement.to.name} back to ${this.previousMovement.from.name}.`,
             this.getChoices(this.game.targaryen));
     }
 

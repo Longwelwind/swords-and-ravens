@@ -14,7 +14,7 @@ export interface ParentGameState extends GameState<any, any> {
     ingame: IngameGameState;
     game: Game;
 
-    onSelectOrdersFinish(selectedOrders: Region[]): void;
+    onSelectOrdersFinish(selectedOrders: Region[], resolvedAutomatically: boolean): void;
 }
 
 export default class SelectOrdersGameState<P extends ParentGameState> extends GameState<P> {
@@ -38,7 +38,7 @@ export default class SelectOrdersGameState<P extends ParentGameState> extends Ga
         // If possible regions count equals to the amount of orders to select
         // we can fast-track this state
         if (possibleRegions.length == count) {
-            this.parentGameState.onSelectOrdersFinish(possibleRegions);
+            this.parentGameState.onSelectOrdersFinish(possibleRegions, true);
         }
     }
 
@@ -54,7 +54,7 @@ export default class SelectOrdersGameState<P extends ParentGameState> extends Ga
                 return;
             }
 
-            this.parentGameState.onSelectOrdersFinish(regions);
+            this.parentGameState.onSelectOrdersFinish(regions, false);
         }
     }
 

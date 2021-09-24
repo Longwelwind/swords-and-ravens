@@ -130,6 +130,13 @@ strong
   filter: none;
 }
 
+.iron-bank-content {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: none;
+}
+
 .unit-icon {
   width: 32px;
   height: 32px;
@@ -141,6 +148,11 @@ strong
 .unit-icon.small {
   width: 16px;
   height: 16px;
+}
+
+.unit-icon.medium {
+  width: 28px;
+  height: 28px;
 }
 
 .house-card-icon {
@@ -181,6 +193,7 @@ strong
 $game-card-width: 270px;
 $game-card-height: 1.57 * $game-card-width;
 $medium-scale: 0.5;
+$smedium-scale: 0.35;
 $small-scale: 0.2;
 $tiny-scale: 0.12;
 
@@ -194,6 +207,11 @@ $tiny-scale: 0.12;
 .vertical-game-card.medium {
   width: $game-card-width * $medium-scale;
   height: $game-card-height * $medium-scale;
+}
+
+.vertical-game-card.smedium {
+  width: $game-card-width * $smedium-scale;
+  height: $game-card-height * $smedium-scale;
 }
 
 .vertical-game-card.small {

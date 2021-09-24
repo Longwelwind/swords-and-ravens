@@ -16,7 +16,7 @@ export default class ChooseMultipleRegionsForLoyaltyTokenComponent extends Compo
         return (
             <>
                 {this.props.gameState.childGameState instanceof SelectRegionGameState && <Col className="text-center">
-                    House <b>{this.props.gameState.childGameState.house.name}</b> must choose regions to place loyalty tokens.
+                    House <b>{this.props.gameState.childGameState.house.name}</b> must choose regions to place loyalty&nbsp;tokens.
                 </Col>}
                 {renderChildGameState(this.props, [
                     [SimpleChoiceGameState, SimpleChoiceComponent],

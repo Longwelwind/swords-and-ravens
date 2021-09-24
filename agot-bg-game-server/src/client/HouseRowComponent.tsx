@@ -180,7 +180,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         <div style={{ fontSize: "18px" }}>{this.house.powerTokens}</div>
                         <OverlayTrigger
                             overlay={this.renderPowerPopover(this.house)}
-                            placement="right"
+                            placement="auto"
                             trigger="click"
                             rootClose
                         >
@@ -285,7 +285,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         ingame={this.ingame}/>
                 </div>
             }
-            {this.props.gameClient.authenticatedPlayer?.house == this.ingame.game.targaryen && house == this.ingame.game.targaryen &&
+            {this.ingame.game.targaryen && this.props.gameClient.authenticatedPlayer?.house && this.ingame.world.getUnitsOfHouse(this.ingame.game.targaryen).length == 0 &&
             <div className="mt-3">
                 <Button
                     onClick={() => {

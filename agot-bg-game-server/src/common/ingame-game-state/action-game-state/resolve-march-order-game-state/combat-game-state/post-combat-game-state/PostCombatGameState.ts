@@ -104,14 +104,13 @@ export default class PostCombatGameState extends GameState<
         this.proceedCasualties();
     }
 
-    onChooseCasualtiesGameStateEnd(house: House, region: Region, selectedCasualties: Unit[]): void {
+    onChooseCasualtiesGameStateEnd(house: House, region: Region, selectedCasualties: Unit[], resolvedAutomatically: boolean): void {
         this.combat.ingameGameState.log(
             {
                 type: "killed-after-combat",
                 house: house.id,
                 killed: selectedCasualties.map(u => u.type.id)
-            }
-        );
+            }, resolvedAutomatically);
 
         // Remove the selected casualties
         selectedCasualties.forEach(u => region.units.delete(u.id));
@@ -205,7 +204,7 @@ export default class PostCombatGameState extends GameState<
                 } else {
                     // If the count of casualties is bigger or equal than the remaining army, a ChooseCasualtiesGameSTate
                     // is not needed. The army left can be exterminated.
-                    this.onChooseCasualtiesGameStateEnd(this.loser, locationLoserArmy, loserArmyLeft);
+                    this.onChooseCasualtiesGameStateEnd(this.loser, locationLoserArmy, loserArmyLeft, true);
                 }
                 return;
             }
@@ -231,7 +230,7 @@ export default class PostCombatGameState extends GameState<
                 } else {
                     // If the count of casualties is bigger or equal than the remaining army, a ChooseCasualtiesGameSTate
                     // is not needed. The army left can be exterminated.
-                    this.onChooseCasualtiesGameStateEnd(enemy, enemyCombatData.region, enemyCombatData.army);
+                    this.onChooseCasualtiesGameStateEnd(enemy, enemyCombatData.region, enemyCombatData.army, true);
                 }
                 return;
             } else {

@@ -15,7 +15,7 @@ import groupBy from "../../../utils/groupBy";
 interface SelectUnitsParentGameState extends GameState<any, any> {
     game: Game;
     ingame: IngameGameState;
-    onSelectUnitsEnd: (house: House, selectedUnit: [Region, Unit[]][]) => void;
+    onSelectUnitsEnd: (house: House, selectedUnit: [Region, Unit[]][], resolvedAutomatically: boolean) => void;
 }
 
 export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> extends GameState<P> {
@@ -47,15 +47,16 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
         if (!canBeSkipped) {
             // If possible units count equals to select units count this state can be fast-tracked
             if (possibleUnits.length == count) {
-                this.parentGameState.onSelectUnitsEnd(house, groupBy(possibleUnits, u => u.region).entries);
+                this.parentGameState.onSelectUnitsEnd(house, groupBy(possibleUnits, u => u.region).entries, true);
             } else {
                 const region = possibleUnits[0].region;
                 const type = possibleUnits[0].type;
+                const wounded = possibleUnits[0].wounded;
 
                 // If all units are of same type and of same region this state can be fast-tracked
-                if (possibleUnits.every(u => u.region == region && u.type == type)) {
+                if (possibleUnits.every(u => u.region == region && u.type == type && u.wounded == wounded)) {
                     const selectedUnits = possibleUnits.slice(possibleUnits.length - count);
-                    this.parentGameState.onSelectUnitsEnd(house, groupBy(selectedUnits, u => u.region).entries);
+                    this.parentGameState.onSelectUnitsEnd(house, groupBy(selectedUnits, u => u.region).entries, true);
                 }
             }
         }
@@ -90,7 +91,7 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
                 }
             }
 
-            this.parentGameState.onSelectUnitsEnd(this.house, units);
+            this.parentGameState.onSelectUnitsEnd(this.house, units, false);
         }
     }
 

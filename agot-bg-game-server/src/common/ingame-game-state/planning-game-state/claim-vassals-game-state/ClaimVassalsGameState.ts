@@ -42,7 +42,7 @@ export default class ClaimVassalsGameState extends GameState<PlanningGameState, 
         // If it is the last house to claim vassals,
         // attribute all of them to him
         if (nextHouseToClaim == _.last(this.ingame.getTurnOrderWithoutVassals())) {
-            this.assignVassals(nextHouseToClaim, vassalsToClaim);
+            this.assignVassals(nextHouseToClaim, vassalsToClaim, true);
 
             this.parentGameState.onClaimVassalsFinished();
             return;
@@ -63,7 +63,7 @@ export default class ClaimVassalsGameState extends GameState<PlanningGameState, 
         this.proceedNextVassal(house);
     }
 
-    assignVassals(house: House, vassals: House[]): void {
+    assignVassals(house: House, vassals: House[], resolvedAutomatically = false): void {
         vassals.forEach(v => this.game.vassalRelations.set(v, house));
 
         this.ingame.broadcastVassalRelations();
@@ -72,7 +72,7 @@ export default class ClaimVassalsGameState extends GameState<PlanningGameState, 
             type: "vassals-claimed",
             house: house.id,
             vassals: vassals.map(v => v.id)
-        });
+        }, resolvedAutomatically);
     }
 
     onServerMessage(_message: ServerMessage): void {

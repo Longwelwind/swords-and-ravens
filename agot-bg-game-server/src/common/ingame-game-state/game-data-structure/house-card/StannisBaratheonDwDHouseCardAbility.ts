@@ -18,11 +18,10 @@ export default class StannisBaratheonDwDHouseCardAbility extends HouseCardAbilit
                                 .filter(({o}) => o.type instanceof SupportOrderType || o.type instanceof RaidSupportOrderType)
                                 .map(({r}) => r);
 
-            regions.forEach(r => beforeCombatResolutionState.combatGameState.actionGameState.removeOrderFromRegion(r));
+            regions.forEach(r => beforeCombatResolutionState.combatGameState.actionGameState.removeOrderFromRegion(r, true));
             combatGameState.supporters = new BetterMap();
         }
 
-        // Todo: Log which orders have been removed by Stannis
         beforeCombatResolutionState.childGameState.onHouseCardResolutionFinish(house);
     }
 }

@@ -55,7 +55,7 @@ export default class AeronDamphairAbilityGameState extends GameState<
                 type: "house-card-ability-not-used",
                 house: house.id,
                 houseCard: aeronDamphair.id
-            });
+            }, true);
 
             this.parentGameState.onHouseCardResolutionFinish(house);
         }

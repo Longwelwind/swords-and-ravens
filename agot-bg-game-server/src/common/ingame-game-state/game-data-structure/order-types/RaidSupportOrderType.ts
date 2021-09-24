@@ -4,6 +4,7 @@ import ConsolidatePowerOrderType from "./ConsolidatePowerOrderType";
 import Order from "../Order";
 import SupportOrderType from "./SupportOrderType";
 import RaidOrderType from "./RaidOrderType";
+import IronBankOrderType from "./IronBankOrderType";
 
 export default class RaidSupportOrderType extends OrderType {
     supportModifier: number;
@@ -15,7 +16,7 @@ export default class RaidSupportOrderType extends OrderType {
 
     getRaidableOrderTypes(): any[] {
         return _.concat(
-            [RaidOrderType, ConsolidatePowerOrderType, SupportOrderType, RaidSupportOrderType]
+            [RaidOrderType, ConsolidatePowerOrderType, SupportOrderType, RaidSupportOrderType, IronBankOrderType]
         );
     }
 

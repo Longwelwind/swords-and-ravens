@@ -38,7 +38,7 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
         const availableFootmanCount = this.game.getAvailableUnitsOfType(house, footman);
 
         if (flattenedKnights.length <= availableFootmanCount) {
-            this.transformSelection(house, knightsToTransform);
+            this.transformSelection(house, knightsToTransform, true);
         } else {
             this.step = CrowKillersStep.DESTROYING_KNIGHTS;
             this.setChildGameState(new SelectUnitsGameState(this)).firstStart(house, flattenedKnights, flattenedKnights.length - availableFootmanCount);
@@ -64,7 +64,7 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
                 type: "crow-killers-knights-replaced",
                 house: house.id,
                 units: []
-            });
+            }, true);
 
             this.proceedNextHouse(house);
         }
@@ -80,7 +80,7 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
         }
     }
 
-    onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][]): void {
+    onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][], resolvedAutomatically: boolean): void {
         if (this.step == CrowKillersStep.DESTROYING_KNIGHTS) {
             const killedUnitCount = this.destroySelection(house, selectedUnits);
 
@@ -104,13 +104,13 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
                         type: "crow-killers-knights-replaced",
                         house: house.id,
                         units: []
-                    });
+                    }, true);
 
                     this.proceedNextHouse(house);
                 }
             }
         } else if (this.step == CrowKillersStep.DEGRADING_KNIGHTS) {
-            this.transformSelection(house, selectedUnits);
+            this.transformSelection(house, selectedUnits, resolvedAutomatically);
         } else {
             throw new Error("Invalid CrowKillersStep received.");
         }
@@ -151,7 +151,7 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
         return count;
     }
 
-    transformSelection(house: House, selectedUnits: [Region, Unit[]][]): void {
+    transformSelection(house: House, selectedUnits: [Region, Unit[]][], resolvedAutomatically: boolean): void {
         const unitCount = _.flatMap(selectedUnits, ([_region, units]) => units).length;
 
         if (unitCount > this.game.getAvailableUnitsOfType(house, footman)) {
@@ -164,7 +164,7 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
             type: "crow-killers-knights-replaced",
             house: house.id,
             units: selectedUnits.map(([region, knights]) => [region.id, knights.map(k => k.type.id)])
-        });
+        }, resolvedAutomatically);
 
         this.proceedNextHouse(house);
     }

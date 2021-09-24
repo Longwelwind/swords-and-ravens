@@ -37,14 +37,14 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
             this.ingame.log({
                 type: "renly-baratheon-no-knight-available",
                 house: house.id
-            });
+            }, true);
 
             this.parentGameState.onHouseCardResolutionFinish(house);
         } else if (upgradableFootmen.length == 0) {
             this.ingame.log({
                 type: "renly-baratheon-no-footman-available",
                 house: house.id
-            });
+            }, true);
 
             this.parentGameState.onHouseCardResolutionFinish(house);
         } else {

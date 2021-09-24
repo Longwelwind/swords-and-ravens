@@ -13,27 +13,33 @@ import { rodrikTheReader } from "../../../../../../game-data-structure/house-car
 import AfterWinnerDeterminationGameState from "../AfterWinnerDeterminationGameState";
 import _ from "lodash";
 import shuffleInPlace from "../../../../../../../../utils/shuffle";
+import BetterMap from "../../../../../../../../utils/BetterMap";
 
 export default class RodrikTheReaderAbilityGameState extends GameState<
     AfterWinnerDeterminationGameState["childGameState"],
     SimpleChoiceGameState | SelectWesterosCardGameState<RodrikTheReaderAbilityGameState>
 > {
     get game(): Game {
-        return this.combat().game;
+        return this.combat.game;
     }
 
     get ingame(): IngameGameState {
         return this.parentGameState.parentGameState.parentGameState.parentGameState.ingameGameState;
     }
 
-    combat(): CombatGameState {
+    get combat(): CombatGameState {
         return this.parentGameState.combatGameState;
     }
 
-    getChoices(): string[] {
-        const choices = ["Ignore", "First", "Second", "Third"];
-        if (this.game.westerosDecks.length == 4) {
-            choices.push("Fourth");
+    get choices(): BetterMap<string, number> {
+        const choices = new BetterMap<string, number>();
+        choices.set("Ignore", -1);
+        const deckNames = [ "First", "Second", "Third", "Fourth" ];
+        for (let i = 0; i < this.game.westerosDecks.length; i++) {
+            const deck = this.game.westerosDecks[i];
+            if (deck.filter(wc => !wc.discarded).length > 0) {
+                choices.set(deckNames[i], i);
+            }
         }
         return choices;
     }
@@ -42,7 +48,7 @@ export default class RodrikTheReaderAbilityGameState extends GameState<
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
             house,
             "",
-            this.getChoices()
+            this.choices.keys
         );
     }
 
@@ -57,7 +63,7 @@ export default class RodrikTheReaderAbilityGameState extends GameState<
             this.parentGameState.onHouseCardResolutionFinish(house);
         }
         else {
-            this.setChildGameState(new SelectWesterosCardGameState(this)).firstStart(house, choice-1);
+            this.setChildGameState(new SelectWesterosCardGameState(this)).firstStart(house, this.choices.values[choice]);
         }
     }
 
@@ -67,7 +73,7 @@ export default class RodrikTheReaderAbilityGameState extends GameState<
                 type: "house-card-ability-not-used",
                 house: house.id,
                 houseCard: rodrikTheReader.id
-            });
+            }, true);
 
             this.parentGameState.onHouseCardResolutionFinish(house);
             return;

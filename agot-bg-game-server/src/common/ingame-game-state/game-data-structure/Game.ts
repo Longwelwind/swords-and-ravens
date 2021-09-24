@@ -17,6 +17,7 @@ import PlanningRestriction from "./westeros-card/planning-restriction/PlanningRe
 import WesterosCardType from "./westeros-card/WesterosCardType";
 import IngameGameState from "../IngameGameState";
 import { vassalHousesOrders, playerHousesOrders, seaOrders } from "./orders";
+import IronBank, { SerializedIronBank } from "./IronBank";
 
 export const MAX_WILDLING_STRENGTH = 12;
 export const MAX_LOYALTY_TOKEN_COUNT = 20;
@@ -49,6 +50,7 @@ export default class Game {
     @observable houseCardsForDrafting: BetterMap<string, HouseCard> = new BetterMap();
     deletedHouseCards: BetterMap<string, HouseCard> = new BetterMap();
     @observable removedDragonStrengthToken = 0;
+    ironBank: IronBank | null;
 
     /**
      * Contains the vassal relations of the game.
@@ -69,16 +71,24 @@ export default class Game {
         return this.getTokenHolder(this.kingsCourtTrack);
     }
 
-    get targaryen(): House | null {
-        return this.houses.tryGet("targaryen", null);
-    }
-
     get influenceTracks(): House[][] {
         return [
             this.ironThroneTrack,
             this.fiefdomsTrack,
             this.kingsCourtTrack
         ];
+    }
+
+    get targaryen(): House | null {
+        return this.houses.tryGet("targaryen", null);
+    }
+
+    get theIronBank(): IronBank {
+        if (this.ironBank == null) {
+            throw new Error("Iron Bank must be initalized when this is called!");
+        }
+
+        return this.ironBank;
     }
 
     get remainingWesterosCardTypes(): BetterMap<WesterosCardType, number>[] {
@@ -170,7 +180,7 @@ export default class Game {
         return planningRestrictions.some(restriction => restriction.restriction(order.type))
             || (this.getAllowedCountOfStarredOrders(controller) == 0 && order.type.starred)
             || (order.type.restrictedTo != null && order.type.restrictedTo != region.type.kind)
-            || order.type.id == "sea-iron-bank";
+            || (order.type.id == "sea-iron-bank" && !this.targaryen);
     }
 
     getRestrictedOrders(region: Region, planningRestrictions: PlanningRestriction[]): Order[] {
@@ -467,7 +477,8 @@ export default class Game {
             vassalHouseCards: this.vassalHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
             houseCardsForDrafting: this.houseCardsForDrafting.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
             deletedHouseCards: this.deletedHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
-            removedDragonStrengthToken: this.removedDragonStrengthToken
+            removedDragonStrengthToken: this.removedDragonStrengthToken,
+            ironBank: this.ironBank ? this.ironBank.serializeToClient(admin) : null
         };
     }
 
@@ -497,6 +508,7 @@ export default class Game {
         game.houseCardsForDrafting = new BetterMap(data.houseCardsForDrafting.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
         game.deletedHouseCards = new BetterMap(data.deletedHouseCards.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
         game.removedDragonStrengthToken = data.removedDragonStrengthToken;
+        game.ironBank = data.ironBank ? IronBank.deserializeFromServer(game, data.ironBank) : null;
 
         return game;
     }
@@ -526,4 +538,5 @@ export interface SerializedGame {
     houseCardsForDrafting: [string, SerializedHouseCard][];
     deletedHouseCards: [string, SerializedHouseCard][];
     removedDragonStrengthToken: number;
+    ironBank: SerializedIronBank | null;
 }

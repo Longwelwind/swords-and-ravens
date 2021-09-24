@@ -46,7 +46,7 @@ export default class JonConningtonAbilityGameState extends GameState<
                 type: "house-card-ability-not-used",
                 house: house.id,
                 houseCard: jonConnington.id
-            });
+            }, true);
             this.parentGameState.onHouseCardResolutionFinish(house);
             return;
         }
@@ -91,14 +91,14 @@ export default class JonConningtonAbilityGameState extends GameState<
         return result;
     }
 
-    onSimpleChoiceGameStateEnd(choice: number): void {
+    onSimpleChoiceGameStateEnd(choice: number, resolvedAutomatically: boolean): void {
         const house = this.childGameState.house;
         if (choice == 0) {
             this.ingame.log({
                 type: "house-card-ability-not-used",
                 house: house.id,
                 houseCard: jonConnington.id
-            });
+            }, resolvedAutomatically);
             this.parentGameState.onHouseCardResolutionFinish(house);
             return;
         } else {

@@ -54,7 +54,7 @@ export default class JonSnowBaratheonAbilityGameState extends GameState<
                 type: "house-card-ability-not-used",
                 house: house.id,
                 houseCard: jonSnow.id
-            });
+            }, true);
 
             this.parentGameState.onHouseCardResolutionFinish(house);
             return;

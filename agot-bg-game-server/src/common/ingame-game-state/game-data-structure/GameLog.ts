@@ -3,6 +3,7 @@ import { CombatStats } from "../action-game-state/resolve-march-order-game-state
 export default interface GameLog {
     time: Date;
     data: GameLogData;
+    resolvedAutomatically?: boolean;
 }
 
 export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack | MarchResolved
@@ -37,7 +38,9 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | LittlefingerPowerTokensGained | AlayneStoneUsed | LysaArrynFfcPowerTokensGained | AnyaWaynwoodPowerTokensGained | RobertArrynUsed
     | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained | DaenerysTargaryenPowerTokensDiscarded | MissandeiUsed
     | PowerTokensGifted | InfluenceTrackPositionChosen | TiesDecided | PlaceLoyaltyChoice | LoyaltyTokenPlaced | LoyaltyTokenGained
-    | FireMadeFleshChoice | PlayWithFireChoice | TheLongPlanChoice | MoveLoyaltyTokenChoice;
+    | FireMadeFleshChoice | PlayWithFireChoice | TheLongPlanChoice | MoveLoyaltyTokenChoice | LoanPurchased | OrderRemoved | InterestPaid
+    | DebtPaid | CustomsOfficerPowerTokensGained | SellswordsPlaced | TheFacelessMenUnitsDestroyed | PyromancerExecuted | ExpertArtificerExecuted
+    | LoyalMaesterExecuted | MasterAtArmsExecuted | SavvyStewardExecuted | SpymasterExecuted;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -821,4 +824,93 @@ interface MoveLoyaltyTokenChoice {
     regionFrom?: string;
     regionTo?: string;
     powerTokensDiscardedToCancelMovement?: number;
+}
+
+interface LoanPurchased {
+    type: "loan-purchased";
+    house: string;
+    region: string;
+    loanType: string;
+    paid: number;
+}
+
+interface OrderRemoved {
+    type: "order-removed";
+    house?: string;
+    region: string;
+    order: string;
+}
+
+interface InterestPaid {
+    type: "interest-paid";
+    house: string;
+    cost: number;
+    paid: number;
+}
+
+interface DebtPaid {
+    type: "debt-paid";
+    house: string;
+    resolver: string;
+    units: [string, string[]][];
+}
+
+interface CustomsOfficerPowerTokensGained {
+    type: "customs-officer-power-tokens-gained";
+    house: string;
+    gained: number;
+}
+
+interface SellswordsPlaced {
+    type: "sellswords-placed";
+    house: string;
+    units: [string, string[]][];
+    loanType: string;
+}
+
+interface TheFacelessMenUnitsDestroyed {
+    type: "the-faceless-men-units-destroyed";
+    house: string;
+    units: [string, string[]][];
+}
+
+interface PyromancerExecuted {
+    type: "pyromancer-executed";
+    house: string;
+    region: string;
+    upgradeType: string;
+}
+
+interface ExpertArtificerExecuted {
+    type: "expert-artificer-executed";
+    house: string;
+    region: string;
+    gainedPowerTokens: number;
+}
+
+interface LoyalMaesterExecuted {
+    type: "loyal-maester-executed";
+    house: string;
+    regions: string[];
+}
+
+interface MasterAtArmsExecuted {
+    type: "master-at-arms-executed";
+    house: string;
+    regions: string[];
+}
+
+interface SavvyStewardExecuted {
+    type: "savvy-steward-executed";
+    house: string;
+    region: string;
+    newSupply: number;
+}
+
+interface SpymasterExecuted {
+    type: "spymaster-executed";
+    house: string;
+    westerosDeckI: number;
+    westerosCardsCountForTopOfDeck: number;
+    westerosCardsCountForBottomOfDeck: number;
 }

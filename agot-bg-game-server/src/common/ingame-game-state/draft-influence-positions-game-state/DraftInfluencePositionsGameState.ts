@@ -119,7 +119,7 @@ export default class DraftInfluencePositionsGameState extends GameState<IngameGa
         return this.houses[this.draftOrder[this.currentRowIndex][this.currentColumnIndex]];
     }
 
-    onSimpleChoiceGameStateEnd(choice: number): void {
+    onSimpleChoiceGameStateEnd(choice: number, resolvedAutomatically: boolean): void {
         const house = this.childGameState.house;
 
         const trackIndex = this.getInfluenceChoicesForHouse(house).keys[choice];
@@ -130,7 +130,7 @@ export default class DraftInfluencePositionsGameState extends GameState<IngameGa
             house: house.id,
             trackerI: trackIndex,
             position: newTrack.length
-        });
+        }, resolvedAutomatically);
 
         this.ingame.setInfluenceTrack(trackIndex, newTrack);
 

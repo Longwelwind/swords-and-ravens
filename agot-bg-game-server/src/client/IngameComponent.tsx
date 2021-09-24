@@ -85,6 +85,8 @@ import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import { faChevronCircleLeft, faChevronCircleRight } from "@fortawesome/free-solid-svg-icons";
 import sleep from "../utils/sleep";
 import joinNaturalLanguage from "./utils/joinNaturalLanguage";
+import PayDebtsGameState from "../common/ingame-game-state/pay-debts-game-state/PayDebtsGameState";
+import PayDebtsComponent from "./game-state-panel/PayDebtsComponent";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -544,7 +546,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         [[DraftHouseCardsGameState, DraftHouseCardsComponent]],
                                         [[DraftInfluencePositionsGameState, DraftInfluencePositionsComponent]],
                                         [[GameEndedGameState, GameEndedComponent]],
-                                        [[CancelledGameState, IngameCancelledComponent]]
+                                        [[CancelledGameState, IngameCancelledComponent]],
+                                        [[PayDebtsGameState, PayDebtsComponent]]
                                     )
                                 )}
                             </ListGroup>

@@ -57,7 +57,7 @@ export default class TyrionLannisterAbilityGameState extends GameState<
 
             // The enemy may not have any available house cards
             if (choosableHouseCards.length == 0) {
-                this.onSelectHouseCardFinish(enemy, null);
+                this.onSelectHouseCardFinish(enemy, null, false);
                 return;
             }
 
@@ -92,7 +92,7 @@ export default class TyrionLannisterAbilityGameState extends GameState<
         };
     }
 
-    onSelectHouseCardFinish(enemy: House, houseCard: HouseCard | null): void {
+    onSelectHouseCardFinish(enemy: House, houseCard: HouseCard | null, resolvedAutomatically: boolean): void {
         const house = this.combatGameState.getEnemy(enemy);
         const oldHouseCard = this.combatGameState.houseCombatDatas.get(enemy).houseCard;
 
@@ -110,7 +110,7 @@ export default class TyrionLannisterAbilityGameState extends GameState<
             affectedHouse: enemy.id,
             oldHouseCard: oldHouseCard.id,
             newHouseCard: houseCard ? houseCard.id : null
-        });
+        }, resolvedAutomatically);
 
         this.parentGameState.onHouseCardResolutionFinish(house);
     }

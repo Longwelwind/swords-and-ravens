@@ -91,7 +91,7 @@ export default class SerIlynPayneAbilityGameState extends GameState<
 
             // Ilyn Payne may cause an orphaned order. We have to delete it now as a unit may retreat to the region
             // which would cause the order to stay!
-            this.combatGameState.parentGameState.findOrphanedOrdersAndRemoveThem();
+            this.combatGameState.parentGameState.actionGameState.findOrphanedOrdersAndRemoveThem();
         });
 
         if (selectedUnits.length == 0) {
@@ -114,7 +114,7 @@ export default class SerIlynPayneAbilityGameState extends GameState<
                     type: "house-card-ability-not-used",
                     house: this.house.id,
                     houseCard: serIlynPayne.id
-                });
+                }, true);
                 this.parentGameState.onHouseCardResolutionFinish(this.house);
                 return;
             }

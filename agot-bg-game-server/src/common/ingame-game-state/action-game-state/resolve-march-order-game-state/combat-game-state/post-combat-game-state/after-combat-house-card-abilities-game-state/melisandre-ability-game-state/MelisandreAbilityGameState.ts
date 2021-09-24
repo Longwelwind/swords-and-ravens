@@ -34,7 +34,7 @@ export default class MelisandreAbilityGameState extends GameState<
                 type: "house-card-ability-not-used",
                 house: house.id,
                 houseCard: melisandreDwd.id
-            });
+            }, true);
             this.parentGameState.onHouseCardResolutionFinish(house);
             return;
         }
@@ -60,7 +60,7 @@ export default class MelisandreAbilityGameState extends GameState<
         }
     }
 
-    onSelectHouseCardFinish(house: House, houseCard: HouseCard | null): void {
+    onSelectHouseCardFinish(house: House, houseCard: HouseCard | null, resolvedAutomatically: boolean): void {
         if (houseCard == null || !this.getChoosableHouseCards(house).includes(houseCard)) {
             return;
         }
@@ -85,7 +85,7 @@ export default class MelisandreAbilityGameState extends GameState<
             type: "melisandre-dwd-used",
             house: house.id,
             houseCard: houseCard.id
-        });
+        }, resolvedAutomatically);
 
         this.parentGameState.onHouseCardResolutionFinish(house);
     }

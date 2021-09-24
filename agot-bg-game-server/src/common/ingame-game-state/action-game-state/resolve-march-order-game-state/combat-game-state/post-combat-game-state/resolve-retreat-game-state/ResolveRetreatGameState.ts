@@ -110,13 +110,13 @@ export default class ResolveRetreatGameState extends GameState<
             house: affectedHouse.id,
             isAttacker: affectedHouse == this.combat.attacker,
             region: region.id
-        });
+        }, true);
 
         this.ingame.log({
             type: "retreat-casualties-suffered",
             house: affectedHouse.id,
             units: unitsToKill.map(u => u.type.id)
-        });
+        }, true);
     }
 
     onSelectRegionFinish(_house: House, retreatRegion: Region): void {
@@ -136,7 +136,7 @@ export default class ResolveRetreatGameState extends GameState<
         if (casualtiesCount > 0) {
             if (army.every(u => u.type == army[0].type)) {
                 // In case all units have the same type automatically process the casualties
-                this.onSelectUnitsEnd(this.postCombat.loser, groupBy(army.slice(0, casualtiesCount), u => u.region).entries);
+                this.onSelectUnitsEnd(this.postCombat.loser, groupBy(army.slice(0, casualtiesCount), u => u.region).entries, true);
             } else {
                 // Otherwise let the loser decide which unit to sacrifice
                 this.setChildGameState(new SelectUnitsGameState(this)).firstStart(this.postCombat.loser, army, casualtiesCount);
@@ -146,10 +146,10 @@ export default class ResolveRetreatGameState extends GameState<
         }
 
         // Otherwise, proceed with no casualties
-        this.onSelectUnitsEnd(this.postCombat.loser, []);
+        this.onSelectUnitsEnd(this.postCombat.loser, [], false);
     }
 
-    onSelectUnitsEnd(loser: House, selectedUnits: [Region, Unit[]][]): void {
+    onSelectUnitsEnd(loser: House, selectedUnits: [Region, Unit[]][], resolvedAutomatically: boolean): void {
         // Kill the casualties of the retreat selected by the loser
         selectedUnits.forEach(([region, units]) => {
             units.forEach(u => region.units.delete(u.id));
@@ -172,7 +172,7 @@ export default class ResolveRetreatGameState extends GameState<
                 type: "retreat-casualties-suffered",
                 house: this.postCombat.loser.id,
                 units: units.map(u => u.type.id)
-            });
+            }, resolvedAutomatically);
         });
 
         const armyLeft = this.postCombat.loserCombatData.army;

@@ -14,7 +14,7 @@ function removePossibleOrdersInPort(portRegion: Region, actionGameState: ActionG
         return;
     }
 
-    actionGameState.removeOrderFromRegion(portRegion);
+    actionGameState.removeOrderFromRegion(portRegion, true);
 }
 
 export function destroyAllShipsInPort(portRegion: Region, entireGame: EntireGame, actionGameState: ActionGameState | null): number {

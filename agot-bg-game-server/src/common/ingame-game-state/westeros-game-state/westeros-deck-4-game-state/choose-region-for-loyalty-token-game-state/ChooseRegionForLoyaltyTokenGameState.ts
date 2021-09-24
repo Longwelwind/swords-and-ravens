@@ -42,7 +42,7 @@ export default class ChooseRegionForLoyaltyTokenGameState extends GameState<West
         return result;
     }
 
-    onSimpleChoiceGameStateEnd(choice: number): void {
+    onSimpleChoiceGameStateEnd(choice: number, resolvedAutomatically: boolean): void {
         const house = this.childGameState.house;
         if (choice == 0) {
             this.ingame.log({
@@ -50,7 +50,7 @@ export default class ChooseRegionForLoyaltyTokenGameState extends GameState<West
                 house: this.childGameState.house.id,
                 discardedPowerTokens: 0,
                 loyaltyTokenCount: 0
-            });
+            }, resolvedAutomatically);
             this.westeros.onWesterosCardEnd();
         } else if (choice == 1) {
             this.ingame.log({

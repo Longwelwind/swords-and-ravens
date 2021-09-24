@@ -13,7 +13,7 @@ export default class HouseNumberResultsComponent extends Component<HouseNumberRe
     render(): ReactNode {
         return <Row>
             {this.props.results.map(([house, result]) => (
-            <Col xs="auto" key={`house-number-result-for-${house.id}`} className="d-flex flex-md-column align-items-center">
+            <Col xs="auto" key={`house-number-result-for-${house.id}`} className="d-flex flex-md-column align-items-center p-1">
                 <div className="mb-2">
                     <SimpleInfluenceIconComponent house={house}/>
                 </div>

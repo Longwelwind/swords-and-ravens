@@ -39,7 +39,7 @@ BeforeCombatHouseCardAbilitiesGameState["childGameState"],
                 type: "house-card-ability-not-used",
                 house: house.id,
                 houseCard: qyburn.id
-            });
+            }, true);
 
             this.parentGameState.onHouseCardResolutionFinish(house);
             return;
@@ -69,12 +69,12 @@ BeforeCombatHouseCardAbilitiesGameState["childGameState"],
         }
     }
 
-    onSelectHouseCardFinish(house: House, houseCard: HouseCard): void {
+    onSelectHouseCardFinish(house: House, houseCard: HouseCard, resolvedAutomatically: boolean): void {
         this.ingame.log({
             type: "qyburn-used",
             house: house.id,
             houseCard: houseCard.id
-        });
+        }, resolvedAutomatically);
 
         const houseCardModifier = new HouseCardModifier();
         houseCardModifier.combatStrength = houseCard.combatStrength;

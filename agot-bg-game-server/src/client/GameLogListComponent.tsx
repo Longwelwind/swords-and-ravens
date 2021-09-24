@@ -29,6 +29,11 @@ import { tidesOfBattleCards } from "../common/ingame-game-state/game-data-struct
 import HouseNumberResultsComponent from "./HouseNumberResultsComponent";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
 import { preventOverflow } from "@popperjs/core";
+import loanCardTypes from "../common/ingame-game-state/game-data-structure/loan-card/loanCardTypes";
+import orderTypes from "../common/ingame-game-state/game-data-structure/order-types/orderTypes";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFastForward } from "@fortawesome/free-solid-svg-icons";
+import LoanCardComponent from "./game-state-panel/utils/LoanCardComponent";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -86,6 +91,19 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         </small>
                     </OverlayTrigger>
                 </Col>
+                {l.resolvedAutomatically && <Col xs="auto">
+                    <OverlayTrigger
+                        overlay={<Tooltip id="logs-tooltip">This action has been resolved automatically.</Tooltip>}
+                        placement="auto"
+                        popperConfig={{modifiers: [preventOverflow]}}
+                    >
+                        <span>
+                            <FontAwesomeIcon
+                                style={{ color: "white" }}
+                                icon={faFastForward} />
+                        </span>
+                    </OverlayTrigger>
+                </Col>}
                 <Col>
                     <div className="game-log-content">
                         {this.renderGameLogData(l.data)}
@@ -175,7 +193,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <>
                         <p>
                             <b>{house.name}</b> marched from <b>{startingRegion.name}</b>{
-                                data.leftPowerToken != null && <> and left {data.leftPowerToken ? "a" : "no"} Power Token</>}{moves.length > 0 ? ":" : "."}
+                                data.leftPowerToken != null && <> and left {data.leftPowerToken ? "a" : "no"} Power&nbsp;token behind</>}{moves.length > 0 ? ":" : "."}
                         </p>
                         {moves.length > 0 &&
                         <ul>
@@ -400,10 +418,10 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                                 </b> in <b>{raidedRegion.name}</b> from <b>{raiderRegion.name}</b>.
                             </p>
                             {data.raiderGainedPowerToken &&
-                                <p><b>{raider.name}</b> gained {data.raiderGainedPowerToken ? "a" : "no"} Power Token
+                                <p><b>{raider.name}</b> gained {data.raiderGainedPowerToken ? "a" : "no"} Power&nbsp;token
                                     from this raid.</p>}
                             {data.raidedHouseLostPowerToken != null
-                                && <p><b>{raidee.name}</b> lost {data.raidedHouseLostPowerToken ? "a" : "no"} Power Token
+                                && <p><b>{raidee.name}</b> lost {data.raidedHouseLostPowerToken ? "a" : "no"} Power&nbsp;token
                                     from this raid.</p>}
                         </>
                     );
@@ -608,8 +626,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const countPowerToken = data.powerTokenCount;
 
                 return <p>
-                    <b>{house.name}</b> resolved a {data.starred && "Special "}Consolidate Power Order
-                    in <b>{region.name}</b> to gain <b>{countPowerToken}</b> Power token{countPowerToken > 1 && "s"}.
+                    <b>{house.name}</b> resolved a <b>{data.starred && "Special "}Consolidate Power</b> order
+                    in <b>{region.name}</b> to gain <b>{countPowerToken}</b> Power&nbsp;token{countPowerToken > 1 && "s"}.
                 </p>;
             }
             case "armies-reconciled": {
@@ -785,7 +803,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const powerTokensGained = data.powerTokensGained;
 
                 return <p>
-                    <b>Qarl the Maid</b>: <b>{house.name}</b> gained {powerTokensGained} Power tokens.
+                    <b>Qarl the Maid</b>: <b>{house.name}</b> gained {powerTokensGained} Power&nbsp;tokens.
                 </p>;
             }
             case "renly-baratheon-no-knight-available": {
@@ -1084,7 +1102,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     <b>Skinchanger Scout</b>: <b>{house.name}</b> gets
-                    back <b>{data.powerToken}</b> Power tokens.
+                    back <b>{data.powerToken}</b> Power&nbsp;tokens.
                 </p>;
             }
             case "skinchanger-scout-wildling-victory": {
@@ -1093,12 +1111,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <p>
-                        <b>Skinchanger Scout</b>: <b>{house.name}</b> lost all of their Power
-                        tokens, all other houses lost 2 Power tokens.
+                        <b>Skinchanger Scout</b>: <b>{house.name}</b> lost all of their Power&nbsp;tokens, all
+                        other houses lost 2 Power&nbsp;tokens.
                     </p>
                     <ul>
                         {powerTokensLost.map(([house, amount]) => (
-                            <li key={`skinchanger-scout_${house.id}`}><b>{house.name}</b> lost <b>{amount}</b> Power tokens.</li>
+                            <li key={`skinchanger-scout_${house.id}`}><b>{house.name}</b> lost <b>{amount}</b> Power&nbsp;tokens.</li>
                         ))}
                     </ul>
                 </>;
@@ -1131,7 +1149,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <>
                     <ul>
                         {gains.map(([house, gain]) => (
-                            <li key={`got-${house.id}`}><b>{house.name}</b> gained <b>{gain}</b> Power token{gain > 1 ? "s" : ""}.</li>
+                            <li key={`got-${house.id}`}><b>{house.name}</b> gained <b>{gain}</b> Power&nbsp;token{gain > 1 ? "s" : ""}.</li>
                         ))}
                     </ul>
                 </>;
@@ -1186,7 +1204,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "commander-power-token-gained": {
                     const house = this.game.houses.get(data.house);
                     return <p>
-                        Commander <b>{house.name}</b> gained a Power token for this battle.
+                        Commander <b>{house.name}</b> gained a Power&nbsp;token for this battle.
                     </p>;
                 }
             case "beric-dondarrion-used": {
@@ -1222,26 +1240,26 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "bronn-used": {
                 const house = this.game.houses.get(data.house);
                 return <p>
-                    <b>Bronn</b>: <b>{house.name}</b> chose to discard 2 Power tokens to reduce Bron&apos;s combat strength to 0.
+                    <b>Bronn</b>: <b>{house.name}</b> chose to discard 2 Power&nbsp;tokens to reduce Bron&apos;s combat strength to 0.
                 </p>;
             }
             case "littlefinger-power-tokens-gained": {
                 const house = this.game.houses.get(data.house);
                 return <p>
-                    <b>Littlefinger</b>: <b>{house.name}</b> gained {data.powerTokens} Power tokens.
+                    <b>Littlefinger</b>: <b>{house.name}</b> gained {data.powerTokens} Power&nbsp;tokens.
                 </p>;
             }
             case "alayne-stone-used": {
                 const house = this.game.houses.get(data.house);
                 const affectedHouse = this.game.houses.get(data.affectedHouse);
                 return <p>
-                    <b>Alayne Stone</b>: <b>{house.name}</b> forced <b>{affectedHouse.name}</b> to discard all his {data.lostPowerTokens} available Power tokens.
+                    <b>Alayne Stone</b>: <b>{house.name}</b> forced <b>{affectedHouse.name}</b> to discard all his {data.lostPowerTokens} available Power&nbsp;tokens.
                 </p>;
             }
             case "lysa-arryn-ffc-power-tokens-gained": {
                 const house = this.game.houses.get(data.house);
                 return <p>
-                    <b>Lysa Arryn</b>: <b>{house.name}</b> gained {data.powerTokens} Power tokens.
+                    <b>Lysa Arryn</b>: <b>{house.name}</b> gained {data.powerTokens} Power&nbsp;tokens.
                 </p>;
             }
             case "anya-waynwood-power-tokens-gained": {
@@ -1251,7 +1269,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <p><b>Anya Waynwood</b>:</p>
                     <ul>
                         {gains.map(([house, gain]) => (
-                            <li key={`anya-waynwood-${house.id}`}><b>{house.name}</b> gained <b>{gain}</b> Power tokens.</li>
+                            <li key={`anya-waynwood-${house.id}`}><b>{house.name}</b> gained <b>{gain}</b> Power&nbsp;tokens.</li>
                         ))}
                     </ul>
                 </p>;
@@ -1287,7 +1305,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const powerTokensGained = data.powerTokensGained;
 
                 return <p>
-                    <b>Illyrio Mopatis</b>: <b>{house.name}</b> gained {powerTokensGained} Power tokens.
+                    <b>Illyrio Mopatis</b>: <b>{house.name}</b> gained {powerTokensGained} Power&nbsp;tokens.
                 </p>;
             }
             case "daenerys-targaryen-b-power-tokens-discarded": {
@@ -1296,7 +1314,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     <b>Daenerys Targaryen</b>: <b>{house.name}</b> forced house <b>{affectedHouse.name}</b> to
-                    discard {data.powerTokensDiscarded} Power token{data.powerTokensDiscarded != 1 && "s"}.
+                    discard {data.powerTokensDiscarded} Power&nbsp;token{data.powerTokensDiscarded != 1 && "s"}.
                 </p>;
             }
             case "missandei-used": {
@@ -1310,7 +1328,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const affectedHouse = this.game.houses.get(data.affectedHouse);
                 return <p>
-                    House <b>{house.name}</b> gifted {data.powerTokens} Power token{data.powerTokens > 1 && "s"} to house <b>{affectedHouse.name}</b>.
+                    House <b>{house.name}</b> gifted {data.powerTokens} Power&nbsp;token{data.powerTokens > 1 && "s"} to house <b>{affectedHouse.name}</b>.
                 </p>;
             }
             case "influence-track-position-chosen": {
@@ -1329,25 +1347,25 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "place-loyalty-choice": {
                 const house = this.game.houses.get(data.house);
                 const verb = data.discardedPowerTokens == 0
-                    ? "place no loyalty token"
+                    ? "place no loyalty\xa0token"
                     : data.discardedPowerTokens == 1
-                    ? `place ${data.loyaltyTokenCount > 1 ? "loyalty tokens" : "a loyalty token"}`
+                    ? `place ${data.loyaltyTokenCount > 1 ? "loyalty\xa0tokens" : "a loyalty\xa0token"}`
                     : null;
                 return <p>
-                    House <b>{house.name}</b> decided to discard {data.discardedPowerTokens} Power token{data.discardedPowerTokens != 1 &&"s"}{verb && ` and ${verb}`}.
+                    House <b>{house.name}</b> decided to discard <b>{data.discardedPowerTokens}</b> Power&nbsp;token{data.discardedPowerTokens != 1 &&"s"}{verb && ` and ${verb}`}.
                 </p>;
             }
             case "loyalty-token-placed": {
                 const region = this.world.regions.get(data.region);
                 return <p>
-                    A loyalty token has been placed in <b>{region.name}</b>.
+                    A loyalty&nbsp;token has been placed in <b>{region.name}</b>.
                 </p>;
             }
             case "loyalty-token-gained": {
                 const house = this.game.houses.get(data.house);
                 const region = this.world.regions.get(data.region);
                 return <p>
-                    House <b>{house.name}</b> gained {data.count} Loyalty token{data.count > 1 && "s"} in <b>{region.name}</b>.
+                    House <b>{house.name}</b> gained {data.count} Loyalty&nbsp;token{data.count > 1 && "s"} in <b>{region.name}</b>.
                 </p>
             }
             case "fire-made-flesh-choice": {
@@ -1389,7 +1407,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const affectedHouse = this.game.houses.get(data.affectedHouse);
 
                 return <p>
-                    <b>The Long Plan</b>: House <b>{house.name}</b> chose house <b>{affectedHouse.name}</b> to place 2 loyalty tokens.
+                    <b>The Long Plan</b>: House <b>{house.name}</b> chose house <b>{affectedHouse.name}</b> to place 2 loyalty&nbsp;tokens.
                 </p>
             }
             case "move-loyalty-token-choice": {
@@ -1401,18 +1419,136 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>
                 } else if (data.powerTokensDiscardedToCancelMovement &&  data.powerTokensDiscardedToCancelMovement > 0) {
                     return <p>
-                        House <b>{house.name}</b> discarded {data.powerTokensDiscardedToCancelMovement} Power token{data.powerTokensDiscardedToCancelMovement > 1 ? "s" : ""} to cancel the previous movement.
+                        House <b>{house.name}</b> discarded <b>{data.powerTokensDiscardedToCancelMovement}</b> Power&nbsp;token{data.powerTokensDiscardedToCancelMovement > 1 ? "s" : ""} to cancel the previous movement.
                     </p>
                 } else if (data.regionFrom && data.regionTo) {
                     const regionFrom = this.world.regions.get(data.regionFrom);
                     const regionTo = this.world.regions.get(data.regionTo);
 
                     return <p>
-                        House <b>{house.name}</b> moved a loyalty token from <b>{regionFrom.name}</b> to <b>{regionTo.name}</b>.
+                        House <b>{house.name}</b> moved a loyalty&nbsp;token from <b>{regionFrom.name}</b> to <b>{regionTo.name}</b>.
                     </p>
                 } else {
                     return <></>;
                 }
+            }
+            case "loan-purchased": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
+                const loan = loanCardTypes.get(data.loanType);
+
+                return <>
+                    <p>
+                        House <b>{house.name}</b> resolved a <b>Iron Bank</b> order in <b>
+                            {region.name}</b> and paid <b>{data.paid}</b> Power&nbsp;token{data.paid != 1 ? "s" : ""} for
+                    </p>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <LoanCardComponent loanCard={loan}/>
+                    </div>
+                </>
+            }
+            case "order-removed": {
+                const house = data.house ? this.game.houses.get(data.house) : null;
+                const region = this.world.regions.get(data.region);
+                const orderType = orderTypes.get(data.order);
+
+                return house ?
+                    <p>
+                        House <b>{house.name}</b> removed their <b>{orderType.name}</b> order in <b>{region.name}</b>.
+                    </p>
+                    :
+                    <p>
+                        A <b>{orderType.name}</b> order has been removed from <b>{region.name}</b>.
+                    </p>
+            }
+            case "interest-paid": {
+                const house = this.game.houses.get(data.house);
+                const debt = data.cost + data.paid;
+                return <p>
+                    House <b>{house.name}</b> paid an interest of <b>{Math.abs(data.paid)}</b> Power token{Math.abs(data.paid) > 1 ? "s" : ""} to the Iron Bank.{debt > 0 ? <>&nbsp;<b>{debt}</b> interest debt could not be paid.</> : ""}
+                </p>
+            }
+            case "debt-paid": {
+                const house = this.game.houses.get(data.house);
+                const resolver = this.game.houses.get(data.resolver);
+                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]) as [Region, UnitType[]][];
+
+                return <p>
+                    <b>Debts to the Iron Bank</b>: {units.length > 0
+                    ? (<>House <b>{resolver.name}</b> chose to destroy {joinReactNodes(units.map(([region, unitTypes]) =>
+                            <span key={`pay-debt_${region.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`pay-debt_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), ", ")} of House <b>{house.name}</b>.</>)
+                    : <>House <b>{house.name} </b> had no units to destroy.</>}
+                </p>;
+            }
+            case "customs-officer-power-tokens-gained": {
+                const house = this.game.houses.get(data.house);
+                return <p>
+                    <b>Customs Officer</b>: House <b>{house.name}</b> gained <b>{data.gained}</b> Power&nbsp;token{data.gained != 1 ? "s" : ""}.
+                </p>;
+            }
+            case "sellswords-placed": {
+                const house = this.game.houses.get(data.house);
+                const placedSellswords = data.units.map(([regionId, units]) => [this.world.regions.get(regionId), units.map(ut => unitTypes.get(ut))] as [Region, UnitType[]]);
+                const loan = loanCardTypes.get(data.loanType);
+                return <p>
+                    <b>{loan.name}</b>: House <b>{house.name}</b>{placedSellswords.length > 0 ? (<> chose to
+                        place {joinReactNodes(placedSellswords.map(([region, unitTypes]) => <span key={`place_sellsword_${region.id}`}>
+                            {joinReactNodes(unitTypes.map((ut, i) => <b key={`place_sellsword${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), " and ")}.</>)
+                        : <> placed no sellswords.</>}
+                </p>;
+            }
+            case "the-faceless-men-units-destroyed": {
+                const house = this.game.houses.get(data.house);
+                const destroyedUnits = data.units.map(([regionId, units]) => [this.world.regions.get(regionId), units.map(ut => unitTypes.get(ut))[0]] as [Region, UnitType]);
+                return <p>
+                    <b>The Faceless Men</b>: House <b>{house.name}</b> chose {destroyedUnits.length > 0 ? (<>to destroy {joinReactNodes(
+                        destroyedUnits.map(([region, unitType]) => <span key={`the-faceless-men_${region.id}`}>a <b>{unitType.name}</b> in <b>{region.name}</b></span>), " and ")}.</>)
+                        : <>not to destroy any units.</>}
+                </p>;
+            }
+            case "pyromancer-executed": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
+                return <p>
+                    <b>Pyromancer</b>: House <b>{house.name}</b> chose to degrade <b>{region.name}</b> and place a <b>{data.upgradeType}</b> there.
+                </p>;
+            }
+            case "expert-artificer-executed": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
+                return <p>
+                    <b>Expert Artificer</b>: House <b>{house.name}</b> chose to place a <b>Crown</b> in <b>{region.name}</b> and gained <b>{data.gainedPowerTokens}</b> Power token{data.gainedPowerTokens != 1 ? "s" : ""}.
+                </p>;
+            }
+            case "loyal-maester-executed": {
+                const house = this.game.houses.get(data.house);
+                const regions = data.regions.map(rid => this.world.regions.get(rid));
+                return <p>
+                    <b>Loyal Maester</b>: House <b>{house.name}</b> chose to place a <b>Barrel</b> in {joinReactNodes(regions.map(r => <b key={`loyal_maester_${r.id}`}>{r.name}</b>), ' and in ')}.
+                </p>;
+            }
+            case "master-at-arms-executed": {
+                const house = this.game.houses.get(data.house);
+                const regions = data.regions.map(rid => this.world.regions.get(rid));
+                return <p>
+                    <b>Master-at-Arms</b>: House <b>{house.name}</b> chose to upgrade the castles in {joinReactNodes(regions.map(r => <b key={`master-at-arms_${r.id}`}>{r.name}</b>), ' and in ')}.
+                </p>;
+            }
+            case "savvy-steward-executed": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
+                return <p>
+                    <b>Savvy Steward</b>: House <b>{house.name}</b> chose to place a <b>Barrel</b> in <b>{region.name}</b>. Their new supply level is <b>{data.newSupply}</b>.
+                </p>;
+            }
+            case "spymaster-executed": {
+                const house = this.game.houses.get(data.house);
+
+                return <p>
+                    <b>Spymaster</b>: <b>{house.name}</b> chose Westeros deck <b>{data.westerosDeckI}</b> and put <b>{data.westerosCardsCountForTopOfDeck}
+                        </b> card{data.westerosCardsCountForTopOfDeck != 1 ? "s" : ""} on top of the deck and <b>{data.westerosCardsCountForBottomOfDeck}
+                        </b> card{data.westerosCardsCountForBottomOfDeck != 1 ? "s" : ""} to the bottom of the deck.
+                </p>;
             }
         }
     }

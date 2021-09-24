@@ -33,16 +33,18 @@ import CombatGameState from "./action-game-state/resolve-march-order-game-state/
 import DeclareSupportGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/declare-support-game-state/DeclareSupportGameState";
 import ThematicDraftHouseCardsGameState, { SerializedThematicDraftHouseCardsGameState } from "./thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 import DraftInfluencePositionsGameState, { SerializedDraftInfluencePositionsGameState } from "./draft-influence-positions-game-state/DraftInfluencePositionsGameState";
-import shuffleInPlace from "../../utils/shuffleInPlace";
 import shuffle from "../../utils/shuffle";
+import shuffleInPlace from "../../utils/shuffleInPlace";
 import popRandom from "../../utils/popRandom";
+import LoanCard from "./game-data-structure/loan-card/LoanCard";
+import PayDebtsGameState, { SerializedPayDebtsGameState } from "./pay-debts-game-state/PayDebtsGameState";
 
 export const NOTE_MAX_LENGTH = 5000;
 
 export default class IngameGameState extends GameState<
     EntireGame,
     WesterosGameState | PlanningGameState | ActionGameState | CancelledGameState | GameEndedGameState
-    | DraftHouseCardsGameState | ThematicDraftHouseCardsGameState | DraftInfluencePositionsGameState
+    | DraftHouseCardsGameState | ThematicDraftHouseCardsGameState | DraftInfluencePositionsGameState | PayDebtsGameState
 > {
     players: BetterMap<User, Player> = new BetterMap<User, Player>();
     game: Game;
@@ -148,8 +150,8 @@ export default class IngameGameState extends GameState<
         this.setChildGameState(new DraftInfluencePositionsGameState(this)).firstStart(vassalsOnInfluenceTracks);
     }
 
-    log(data: GameLogData): void {
-        this.gameLogManager.log(data);
+    log(data: GameLogData, resolvedAutomatically = false): void {
+        this.gameLogManager.log(data, resolvedAutomatically);
     }
 
     onActionGameStateFinish(): void {
@@ -188,6 +190,10 @@ export default class IngameGameState extends GameState<
             return;
         }
 
+        if (this.game.ironBank) {
+            this.game.ironBank.drawNewLoanCard();
+        }
+
         if (this.game.turn != 0 && this.game.turn % 10 == 0) {
             // Refresh Westeros deck 3 after every 10th round
             const deck3 = this.game.westerosDecks[2];
@@ -200,6 +206,13 @@ export default class IngameGameState extends GameState<
             this.game.wildlingDeck = shuffle(this.game.wildlingDeck);
             this.game.houses.forEach(h => h.knowsNextWildlingCard = false);
             this.entireGame.broadcastToClients({type: "hide-top-wildling-card"});
+
+            // Reshuffle the loan deck
+            if (this.game.ironBank) {
+                shuffleInPlace(this.game.ironBank.loanCardDeck);
+                this.game.ironBank.loanCardDeck.forEach(lc => lc.discarded = false);
+                this.game.ironBank.sendUpdateLoanCards();
+            }
         }
 
         this.game.turn++;
@@ -214,12 +227,22 @@ export default class IngameGameState extends GameState<
             type: "new-turn"
         });
 
+
         if (this.game.turn > 1) {
-            this.setChildGameState(new WesterosGameState(this)).firstStart();
+            const unpaidInterest = this.game.ironBank?.payInterest() ?? []
+            if (unpaidInterest.length == 0) {
+                this.setChildGameState(new WesterosGameState(this)).firstStart();
+            } else {
+                this.setChildGameState(new PayDebtsGameState(this)).firstStart(unpaidInterest);
+            }
         } else {
             // No Westeros phase during the first turn
             this.proceedPlanningGameState();
         }
+    }
+
+    onPayDebtsGameStateFinish(): void {
+        this.setChildGameState(new WesterosGameState(this)).firstStart();
     }
 
     gainLoyaltyTokens(): void {
@@ -331,7 +354,7 @@ export default class IngameGameState extends GameState<
             }
         } else if (message.type == "drop-power-tokens") {
             // Only allow Targ to drop their Power tokens
-            if (player.house != this.game.targaryen) {
+            if (player.house != this.game.targaryen || this.world.getUnitsOfHouse(player.house).length > 0) {
                 return;
             }
 
@@ -524,7 +547,7 @@ export default class IngameGameState extends GameState<
             this.game.valyrianSteelBladeUsed = false;
             this.world.regions.forEach(r => r.units.forEach(u => u.wounded = false));
         } else if (message.type == "add-game-log") {
-            this.gameLogManager.logs.push({data: message.data, time: new Date(message.time * 1000)});
+            this.gameLogManager.logs.push({data: message.data, time: new Date(message.time * 1000), resolvedAutomatically: message.resolvedAutomatically});
         } else if (message.type == "change-tracker") {
             const newOrder = message.tracker.map(hid => this.game.houses.get(hid));
 
@@ -588,6 +611,22 @@ export default class IngameGameState extends GameState<
             region.loyaltyTokens = message.newLoyaltyTokenCount;
         } else if (message.type == "dragon-strength-token-removed") {
             this.game.removedDragonStrengthToken = message.fromRound;
+        } else if (message.type == "update-loan-cards") {
+            this.game.theIronBank.loanCardDeck = message.loanCardDeck.map(lc => LoanCard.deserializeFromServer(this.game, lc));
+            this.game.theIronBank.purchasedLoans = message.purchasedLoans.map(lc => LoanCard.deserializeFromServer(this.game, lc));
+            this.game.theIronBank.loanSlots = message.loanSlots.map(lc => lc ? LoanCard.deserializeFromServer(this.game, lc) : null);
+        } else if (message.type == "update-region-modifiers") {
+            const region = this.game.world.regions.get(message.region);
+
+            if (message.castleModifier) {
+                region.castleModifier = message.castleModifier;
+            }
+            if (message.barrelModifier) {
+                region.barrelModifier = message.barrelModifier;
+            }
+            if (message.crownModifier) {
+                region.crownModifier = message.crownModifier;
+            }
         } else {
             this.childGameState.onServerMessage(message);
         }
@@ -907,6 +946,8 @@ export default class IngameGameState extends GameState<
                 return ThematicDraftHouseCardsGameState.deserializeFromServer(this, data);
             case "draft-influence-positions":
                 return DraftInfluencePositionsGameState.deserializeFromServer(this, data);
+            case "pay-debts":
+                return PayDebtsGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -919,5 +960,5 @@ export interface SerializedIngameGameState {
     gameLogManager: SerializedGameLogManager;
     childGameState: SerializedPlanningGameState | SerializedActionGameState | SerializedWesterosGameState
         | SerializedGameEndedGameState | SerializedCancelledGameState | SerializedDraftHouseCardsGameState
-        | SerializedThematicDraftHouseCardsGameState | SerializedDraftInfluencePositionsGameState;
+        | SerializedThematicDraftHouseCardsGameState | SerializedDraftInfluencePositionsGameState | SerializedPayDebtsGameState;
 }

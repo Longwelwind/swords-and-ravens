@@ -9,6 +9,7 @@ import Point from "../../../utils/Point";
 import UnitSlot from "../../../utils/unitSlot";
 import _ from "lodash";
 import getStaticWorld from "./static-data-structure/getStaticWorld";
+import { port } from "./regionTypes";
 
 export default class Region {
     game: Game;
@@ -18,6 +19,9 @@ export default class Region {
     @observable garrison: number;
     @observable controlPowerToken: House | null;
     @observable loyaltyTokens: number;
+    @observable castleModifier: number;
+    @observable barrelModifier: number;
+    @observable crownModifier: number;
 
     // Client-side only to support live update of planned musterings
     @observable newUnits: Unit[];
@@ -43,11 +47,11 @@ export default class Region {
     }
 
     get castleLevel(): number {
-        return this.staticRegion.castleLevel;
+        return this.staticRegion.castleLevel + this.castleModifier;
     }
 
     get crownIcons(): number {
-        return this.staticRegion.crownIcons;
+        return this.staticRegion.crownIcons + this.crownModifier;
     }
 
     get type(): RegionType {
@@ -55,7 +59,7 @@ export default class Region {
     }
 
     get supplyIcons(): number {
-        return this.staticRegion.supplyIcons;
+        return this.staticRegion.supplyIcons + this.barrelModifier;
     }
 
     get unitSlot(): UnitSlot {
@@ -70,6 +74,14 @@ export default class Region {
         return this.staticRegion.powerTokenSlot;
     }
 
+    get castleSlot(): Point {
+        return this.staticRegion.castleSlot
+    }
+
+    get improvementSlot(): UnitSlot {
+        return this.staticRegion.improvementSlot;
+    }
+
     get superLoyaltyToken(): boolean {
         return this.staticRegion.superLoyaltyToken;
     }
@@ -79,14 +91,17 @@ export default class Region {
     }
 
     constructor(
-        game: Game, id: string, garrison: number, controlPowerToken: House | null = null, units: BetterMap<number, Unit> = new BetterMap<number, Unit>(), loyaltyTokens = 0
-    ) {
+        game: Game, id: string, garrison: number, controlPowerToken: House | null = null, units: BetterMap<number, Unit> = new BetterMap<number, Unit>(),
+        loyaltyTokens = 0, castleModifier = 0, barrelModifier = 0, crownModifier = 0) {
         this.game = game;
         this.id = id;
         this.units = units;
         this.garrison = garrison;
         this.controlPowerToken = controlPowerToken;
         this.loyaltyTokens = loyaltyTokens;
+        this.castleModifier = castleModifier;
+        this.barrelModifier = barrelModifier;
+        this.crownModifier = crownModifier;
         this.newUnits = [];
         this.removedUnits = [];
     }
@@ -104,6 +119,9 @@ export default class Region {
             }
 
             return possibleController;
+        } else if (this.type == port) {
+            // A port is controlled by the controller of the adjacent castle
+            return this.game.world.getAdjacentLandOfPort(this).getController();
         } else {
             // controlPowerToken supersedes a superControlPowerToken
             if (this.controlPowerToken) {
@@ -120,7 +138,10 @@ export default class Region {
             units: this.units.values.map(u => u.serializeToClient()),
             garrison: this.garrison,
             controlPowerToken: this.controlPowerToken ? this.controlPowerToken.id : null,
-            loyaltyTokens: this.loyaltyTokens
+            loyaltyTokens: this.loyaltyTokens,
+            castleModifier: this.castleModifier,
+            barrelModifier: this.barrelModifier,
+            crownModifier: this.crownModifier
         }
     }
 
@@ -131,7 +152,10 @@ export default class Region {
             game, data.id, data.garrison,
             data.controlPowerToken ? game.houses.get(data.controlPowerToken) : null,
             units,
-            data.loyaltyTokens
+            data.loyaltyTokens,
+            data.castleModifier,
+            data.barrelModifier,
+            data.crownModifier
         );
 
         units.values.forEach(u => u.region = region);
@@ -146,4 +170,7 @@ export interface SerializedRegion {
     garrison: number;
     controlPowerToken: string | null;
     loyaltyTokens: number;
+    castleModifier: number;
+    barrelModifier: number;
+    crownModifier: number;
 }

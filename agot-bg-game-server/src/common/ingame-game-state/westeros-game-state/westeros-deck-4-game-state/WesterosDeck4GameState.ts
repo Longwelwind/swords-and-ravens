@@ -50,7 +50,7 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
             case domesticDisputes.id: {
                 const regions = this.game.world.westerosLandRegions.filter(r => r.superControlPowerToken != null);
                 this.setChildGameState(new ChooseMultipleRegionsForLoyaltyTokenGameState(this)).firstStart(
-                    this.game.targaryen, 1, regions, 4, "House Targaryen may place loyalty tokens in up to 4 capitals.");
+                    this.game.targaryen, 1, regions, 4, "House Targaryen may place loyalty\xa0tokens in up to 4 capitals.");
                 break;
             }
             case wateringTheSeed.id: {
@@ -60,7 +60,7 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
                     this.game.getVictoryPoints(this.game.targaryen),
                     regions,
                     2,
-                    "House Targaryen may place up to 2 loyalty tokens in regions adjacent to a river.");
+                    "House Targaryen may place up to 2 loyalty\xa0tokens in regions adjacent to a river.");
                 break;
             }
             case fireMadeFlesh.id: {
@@ -100,21 +100,21 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
         const available = this.ingame.game.isLoyaltyTokenAvailable;
 
         if (this.possbileRegionForLoyaltyToken && available) {
-            result.set(`Discard 1 Power token to place a loyalty token in ${this.possbileRegionForLoyaltyToken.name}`, 1);
+            result.set(`Discard 1 Power token to place a loyalty\xa0token in ${this.possbileRegionForLoyaltyToken.name}`, 1);
         }
 
         if (house.powerTokens >= 2 && available) {
-            result.set(`Discard 2 Power tokens to place a loyalty token in a random region`, 2);
+            result.set(`Discard 2 Power tokens to place a loyalty\xa0token in a random region`, 2);
         }
 
         if (this.game.turn % 2 == 0 && house.powerTokens >= 4 && available) {
-            result.set(`Discard 4 Power tokens to place two loyalty tokens in random regions`, 4);
+            result.set(`Discard 4 Power tokens to place two loyalty\xa0tokens in random regions`, 4);
         }
 
         return result;
     }
 
-    onSimpleChoiceGameStateEnd(choice: number): void {
+    onSimpleChoiceGameStateEnd(choice: number, resolvedAutomatically: boolean): void {
         const simpleChoice = this.childGameState as SimpleChoiceGameState;
         const discardedPowerTokens = this.getChoices(simpleChoice.house).values[choice];
 
@@ -146,7 +146,7 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
             house: simpleChoice.house.id,
             discardedPowerTokens: discardedPowerTokens,
             loyaltyTokenCount: loyaltyTokenCount
-        });
+        }, resolvedAutomatically);
 
         regionsToPlaceNewLoyaltyTokens.forEach(r => this.parentGameState.placeLoyaltyToken(r));
 

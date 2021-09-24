@@ -65,7 +65,7 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
             <ListGroupItem className="px-2">
                 <Row>
                     <Col xs={12} className="text-center">
-                        <strong>{this.props.gameState.house.name}</strong> must reconcile their armies according to their supply limits.
+                        <b>{this.props.gameState.house.name}</b> must reconcile their armies according to their supply limits.
                     </Col>
                     {this.props.gameClient.doesControlHouse(this.house) ? (
                         <>

@@ -74,12 +74,12 @@ export default class SelectWesterosCardGameState<P extends ParentGameState> exte
     }
 
     static deserializeFromServer<P extends ParentGameState>(parent: P, data: SerializedSelectWesterosCardGameState): SelectWesterosCardGameState<P> {
-        const selectHouseCardGameState = new SelectWesterosCardGameState(parent);
+        const gameState = new SelectWesterosCardGameState(parent);
 
-        selectHouseCardGameState.house = parent.game.houses.get(data.house);
-        selectHouseCardGameState.deckId = data.deckId;
+        gameState.house = parent.game.houses.get(data.house);
+        gameState.deckId = data.deckId;
 
-        return selectHouseCardGameState;
+        return gameState;
     }
 }
 

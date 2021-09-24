@@ -56,7 +56,7 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         // Last march is completely handled
         // Now is the time to ...
         //   ... remove orphaned orders (e.g. caused by Mace Tyrell or Ilyn Payne)
-        this.findOrphanedOrdersAndRemoveThem();
+        this.actionGameState.findOrphanedOrdersAndRemoveThem();
 
         // Reset all card abilities (e.g. due to DWD Queen of Thorns)
         const allHouseCards = _.concat(_.flatMap(this.game.houses.values.map(h => h.houseCards.values)), this.game.vassalHouseCards.values);
@@ -107,14 +107,6 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         this.proceedNextResolveSingleMarchOrder();
     }
 
-    findOrphanedOrdersAndRemoveThem(): void {
-        const orphanedOrders = this.actionGameState.ordersOnBoard.entries.filter(([region, _]) => region.units.size == 0);
-
-        orphanedOrders.forEach(([region, _]) => {
-            this.actionGameState.removeOrderFromRegion(region);
-        });
-    }
-
     onTakeControlOfEnemyPortFinish(lastHouseThatResolvedMarchOrder: House): void {
         // Check if an other march order can be resolved
         this.onResolveSingleMarchOrderGameStateFinish(lastHouseThatResolvedMarchOrder);
@@ -162,7 +154,7 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
 
         if (controllerToRegion != units[0].allegiance) {
             // If there was an order from an other house, remove it
-            this.actionGameState.removeOrderFromRegion(to);
+            this.actionGameState.removeOrderFromRegion(to, true);
 
             // If there was a power token from an other house, remove it
             if (to.controlPowerToken) {

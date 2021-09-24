@@ -5,7 +5,8 @@ export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | Unready |
     | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings | CreatePrivateChatRoom | ChangeGameSettings
     | CancelGame | Vote | LaunchCancelGameVote | CancelVote | LaunchReplacePlayerVote | UpdateNote | SelectWesterosCard
     | ClaimVassal | LaunchReplacePlayerByVassalVote | GiftPowerTokens | LaunchEndGameVote | SetPassword
-    | DistributePowerTokens | DropPowerTokens | MoveLoyaltyToken;
+    | DistributePowerTokens | DropPowerTokens | MoveLoyaltyToken | ResolveConsolidatePowerChoice | PlaceSellswords
+    | ResolveSpymaster;
 
 interface Ping {
     type: "ping";
@@ -162,9 +163,10 @@ interface SelectHouseCard {
 
 interface SelectWesterosCard {
     type: "select-westeros-card";
-    westerosCardId: number;
     deckId: number;
+    westerosCardId: number;
 }
+
 interface SelectRegion {
     type: "select-region";
     region: string;
@@ -264,4 +266,24 @@ interface MoveLoyaltyToken {
     type: "move-loyalty-token";
     from: string;
     to: string;
+}
+
+interface ResolveConsolidatePowerChoice {
+    type: "resolve-consolidate-power-choice";
+    region: string;
+    gainPowerTokens?: boolean;
+    musterUnits?: boolean;
+    purchaseLoan?: number;
+    ignoreAndRemoveOrder?: boolean;
+}
+
+interface PlaceSellswords {
+    type: "place-sellswords";
+    units: [string, string[]][];
+}
+
+interface ResolveSpymaster {
+    type: "resolve-spymaster";
+    westerosCardIdsForTopOfDeck: number[];
+    westerosCardIdsForBottomOfDeck: number[];
 }

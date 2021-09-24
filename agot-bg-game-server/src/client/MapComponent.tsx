@@ -1,23 +1,27 @@
-import {Component, ReactNode} from "react";
+import { Component, ReactNode } from "react";
 import GameClient from "./GameClient";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import * as React from "react";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
 import Unit from "../common/ingame-game-state/game-data-structure/Unit";
 import PlanningGameState from "../common/ingame-game-state/planning-game-state/PlanningGameState";
-import MapControls, {OrderOnMapProperties, RegionOnMapProperties, UnitOnMapProperties} from "./MapControls";
-import {observer} from "mobx-react";
+import MapControls, { OrderOnMapProperties, RegionOnMapProperties, UnitOnMapProperties } from "./MapControls";
+import { observer } from "mobx-react";
 import ActionGameState from "../common/ingame-game-state/action-game-state/ActionGameState";
 import Order from "../common/ingame-game-state/game-data-structure/Order";
 import westerosImage from "../../public/images/westeros.jpg";
 import westeros7pImage from "../../public/images/westeros-7p.jpg";
 import westerosWithEssosImage from "../../public/images/westeros-with-essos.jpg";
+import castleDegradeImage from "../../public/images/region-modifications/CastleDegrade.png"
+import castleUpgradeImage from "../../public/images/region-modifications/CastleUpgrade.png"
+import barrelImage from "../../public/images/region-modifications/Barrel.png"
+import crownImage from "../../public/images/region-modifications/Crown.png"
 import houseOrderImages from "./houseOrderImages";
 import orderImages from "./orderImages";
 import unitImages from "./unitImages";
 import classNames from "classnames";
 import housePowerTokensImages from "./housePowerTokensImages";
-import {OverlayTrigger, Tooltip} from "react-bootstrap";
+import { Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import BetterMap from "../utils/BetterMap";
 import _ from "lodash";
@@ -31,6 +35,11 @@ import getGarrisonToken from "./garrisonTokens";
 import { ship } from "../common/ingame-game-state/game-data-structure/unitTypes";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import loyaltyTokenImage from "../../public/images/power-tokens/Loyalty.png"
+import loanCardImages from "./loanCardImages";
+import StaticIronBankView from "../common/ingame-game-state/game-data-structure/static-data-structure/StaticIronBankView";
+import ImagePopover from "./game-state-panel/utils/ImagePopover";
+import preventOverflow from "@popperjs/core/lib/modifiers/preventOverflow";
+import IronBankInfosComponent from "./IronBankInfosComponent";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -56,24 +65,62 @@ export default class MapComponent extends Component<MapComponentProps> {
         super(props);
 
         this.backgroundImage = this.ingame.entireGame.gameSettings.playerCount == 7
-        ? westeros7pImage
-        : this.ingame.entireGame.gameSettings.playerCount >= 8 ? westerosWithEssosImage
-        : westerosImage;
+            ? westeros7pImage
+            : this.ingame.entireGame.gameSettings.playerCount >= 8 ? westerosWithEssosImage
+                : westerosImage;
 
         this.mapWidth = this.ingame.entireGame.gameSettings.playerCount >= 8 ? DELUXE_MAT_WIDTH : MAP_WIDTH;
     }
 
     render(): ReactNode {
-        const garrisons = new BetterMap(this.props.ingameGameState.world.regions
-            .values.filter(r => r.garrison > 0 && r.garrison != BLOCKED_REGION_BY_INFINITE_GARRISON)
-            .map(r => [r.id, getGarrisonToken(r.id, r.garrison)]));
+        const garrisons = new BetterMap<string, string | null>();
+        const castleModifiers = new BetterMap<string, number>();
+        const barrelModifiers = new BetterMap<string, number>();
+        const crownModifiers = new BetterMap<string, number>();
+
+        for (const region of this.props.ingameGameState.world.regions.values) {
+            if (region.garrison > 0 && region.garrison != BLOCKED_REGION_BY_INFINITE_GARRISON) {
+                garrisons.set(region.id, getGarrisonToken(region.id, region.garrison));
+            }
+
+            if (region.castleModifier != 0) {
+                castleModifiers.set(region.id, region.castleModifier);
+            }
+
+            if (region.barrelModifier != 0) {
+                barrelModifiers.set(region.id, region.barrelModifier);
+            }
+
+            if (region.crownModifier != 0) {
+                crownModifiers.set(region.id, region.crownModifier);
+            }
+        }
+        const ironBankView = this.ingame.world.ironBankView;
+        const ironBank = this.ingame.game.ironBank;
         return (
             <div className="map"
-                 style={{backgroundImage: `url(${this.backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem"}}>
-                <div style={{position: "relative"}}>
+                style={{ backgroundImage: `url(${this.backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem" }}>
+                <div style={{ position: "relative" }}>
                     {this.props.ingameGameState.world.regions.values.map(r => (
                         <div key={r.id}>
-                            {garrisons.tryGet(r.id, null) && (
+                            {castleModifiers.has(r.id) && (
+                                <OverlayTrigger
+                                    overlay={renderRegionTooltip(r)}
+                                    delay={{ show: 500, hide: 100 }}
+                                    placement="auto"
+                                    rootClose
+                                >
+                                    <div
+                                        className="garrison-token"
+                                        style={{
+                                            backgroundImage: castleModifiers.get(r.id) > 0 ? `url(${castleUpgradeImage})` : `url(${castleDegradeImage})`,
+                                            left: r.castleSlot.x, top: r.castleSlot.y
+                                        }}
+                                    />
+                                </OverlayTrigger>
+                            )}
+                            {(barrelModifiers.has(r.id) || crownModifiers.has(r.id)) && this.renderImprovements(r)}
+                            {garrisons.has(r.id) && (
                                 <div
                                     className="garrison-token hover-weak-outline"
                                     style={{
@@ -85,7 +132,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                             )}
                             {r.loyaltyTokens > 0 && (
                                 <div
-                                    className={classNames("loyalty-token", {"strong-outline": r.loyaltyTokens > 1})}
+                                    className={classNames("loyalty-token", { "strong-outline": r.loyaltyTokens > 1 })}
                                     style={{
                                         left: r.unitSlot.point.x,
                                         top: r.unitSlot.point.y,
@@ -111,19 +158,120 @@ export default class MapComponent extends Component<MapComponentProps> {
                     ))}
                     {this.renderUnits()}
                     {this.renderOrders()}
+                    {ironBank && (ironBank.controllerOfBraavos || ironBank.purchasedLoans.length > 0) && this.renderIronBankInfos(ironBankView)}
+                    {this.renderLoanCardDeck(ironBankView)}
+                    {this.renderLoanCardSlots(ironBankView)}
                 </div>
-                <svg style={{width: `${this.mapWidth}px`, height: `${MAP_HEIGHT}px`}}>
+                <svg style={{ width: `${this.mapWidth}px`, height: `${MAP_HEIGHT}px` }}>
                     {this.renderRegions()}
                 </svg>
             </div>
         )
     }
 
+    private renderLoanCardSlots(ironBankView: StaticIronBankView | null): ReactNode {
+        return ironBankView && this.ingame.game.ironBank && this.ingame.game.ironBank.loanSlots.map((lc, i) => (
+            <OverlayTrigger
+                key={`loan-slot-${i}`}
+                overlay={<ImagePopover className="vertical-game-card" style={{ backgroundImage: lc ? `url(${loanCardImages.get(lc.type.id)})` : "none" }} />}
+                popperConfig={{ modifiers: [preventOverflow] }}
+                delay={{ show: 120, hide: 0 }}
+                placement="auto"
+            >
+                <div className="order-container" style={{
+                    left: ironBankView.loanSlots[i].point.x,
+                    top: ironBankView.loanSlots[i].point.y
+                }}
+                >
+                    <div className="iron-bank-content hover-weak-outline" style={{ backgroundImage: lc ? `url(${loanCardImages.get(lc.type.id)})` : "none", width: ironBankView.loanSlots[i].width, height: ironBankView.loanSlots[i].height }} />
+                </div>
+            </OverlayTrigger>
+        ));
+    }
+
+    private renderLoanCardDeck(ironBankView: StaticIronBankView | null): ReactNode {
+        return ironBankView && <OverlayTrigger
+            overlay={this.renderLoanCardsToolTip()}
+            popperConfig={{ modifiers: [preventOverflow] }}
+            delay={{ show: 120, hide: 0 }}
+            placement="auto"
+        >
+            <div id="loan-card-deck" className="order-container" style={{
+                left: ironBankView.deckSlot.point.x,
+                top: ironBankView.deckSlot.point.y
+            }}>
+                <div className="iron-bank-content hover-weak-outline" style={{ backgroundImage: `url(${loanCardImages.get("back")})`, width: ironBankView.deckSlot.width, height: ironBankView.deckSlot.height }} />
+            </div>
+        </OverlayTrigger>;
+    }
+
+    renderLoanCardsToolTip(): OverlayChildren {
+        const ironBank = this.ingame.game.theIronBank;
+        const loanSlots = ironBank.loanSlots.filter(lc => lc != null);
+        const loanDeck = _.orderBy(ironBank.loanCardDeck.filter(lc => !lc.discarded), lc => lc.type.name);
+        const purchasedLoans = ironBank.purchasedLoansPerHouse;
+
+        return <Tooltip id={"loan-cards-tooltip"} className="westeros-tooltip">
+            <Col>
+                {loanSlots.length > 0 &&
+                    <Col xs={12} className="mb-3">
+                        <Row className="justify-content-center mb-2">
+                            <h5 className='text-center'>Loan slots</h5>
+                        </Row>
+                        {loanSlots.map((lc, i) => <Row key={`loan-${lc?.id}-${i}`}>
+                            <h6>{lc?.type.name}:&nbsp;</h6><p>{lc?.type.description}</p>
+                        </Row>)}
+                    </Col>}
+                {loanDeck.length > 0 &&
+                    <Col xs={12} className="mb-3">
+                        <Row className="justify-content-center mb-2">
+                            <h5 className='text-center'>Available loans</h5>
+                        </Row>
+                        {loanDeck.map((lc, i) => <Row key={`loan-${lc.id}-${i}`}>
+                            <h6>{lc.type.name}:&nbsp;</h6><p>{lc.type.description}</p>
+                        </Row>)}
+                    </Col>}
+                {purchasedLoans.size > 0 &&
+                    <Col xs={12}>
+                        <Row className="justify-content-center mb-2">
+                            <h5 className='text-center'>Purchased loans</h5>
+                        </Row>
+                        {purchasedLoans.map((house, loans) => <Col xs={12} key={`purchased-loans-${house.id}`}>
+                            <Row className="justify-content-center mb-2">
+                                <h6>{house.name}</h6>
+                            </Row>
+                            {loans.map((lc, i) => <Row key={`loan-${lc.type.id}-${i}`}>
+                                <h6>{lc.type.name}:&nbsp;</h6><p>{lc.type.description}</p>
+                            </Row>)}
+                        </Col>)}
+                    </Col>}
+            </Col>
+        </Tooltip>;
+    }
+
+    private renderIronBankInfos(ironBankView: StaticIronBankView | null): ReactNode {
+        return ironBankView && <div id="iron-bank-info" style={{
+            position: "absolute",
+            left: ironBankView.infoComponentSlot.point.x,
+            top: ironBankView.infoComponentSlot.point.y,
+            height: ironBankView.infoComponentSlot.height,
+            width: ironBankView.infoComponentSlot.width
+        }}
+        >
+            {/* <div className="iron-bank-content" style={{
+                width: ironBankView.infoComponentSlot.width,
+                height: ironBankView.infoComponentSlot.height,
+                backgroundImage: `url(${loanCardImages.get("back")})`
+            }} /> */}
+            <IronBankInfosComponent ingame={this.ingame} ironBank={this.ingame.game.theIronBank} />
+        </div>;
+    }
+
     renderRegions(): ReactNode {
         const propertiesForRegions = this.getModifiedPropertiesForEntities<Region, RegionOnMapProperties>(
             this.props.ingameGameState.world.regions.values,
             this.props.mapControls.modifyRegionsOnMap,
-            {highlight: {active: false, color: "white"}, onClick: null, wrap: null}
+            { highlight: { active: false, color: "white" }, onClick: null, wrap: null }
         );
 
         return propertiesForRegions.entries.map(([region, properties]) => {
@@ -136,7 +284,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                     wrap={wrap ? wrap : child =>
                         <OverlayTrigger
                             overlay={renderRegionTooltip(region)}
-                            delay={{ show: 750, hide: 100 }}
+                            delay={{ show: 500, hide: 100 }}
                             placement="auto"
                             rootClose
                         >
@@ -169,7 +317,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         const propertiesForUnits = this.getModifiedPropertiesForEntities<Unit, UnitOnMapProperties>(
             _.flatMap(this.props.ingameGameState.world.regions.values.map(r => r.allUnits)),
             this.props.mapControls.modifyUnitsOnMap,
-            {highlight: {active: false, color: "white"}, onClick: null}
+            { highlight: { active: false, color: "white" }, onClick: null }
         );
 
         return this.props.ingameGameState.world.regions.values.map(r => {
@@ -177,7 +325,7 @@ export default class MapComponent extends Component<MapComponentProps> {
             return <div
                 key={r.id}
                 className="units-container"
-                style={{left: r.unitSlot.point.x, top: r.unitSlot.point.y, width: r.unitSlot.width, flexWrap: r.type == land ? "wrap-reverse" : "wrap"}}
+                style={{ left: r.unitSlot.point.x, top: r.unitSlot.point.y, width: r.unitSlot.width, flexWrap: r.type == land ? "wrap-reverse" : "wrap" }}
             >
                 {r.allUnits.map(u => {
                     const property = propertiesForUnits.get(u);
@@ -197,47 +345,87 @@ export default class MapComponent extends Component<MapComponentProps> {
                         transform = `rotate(90deg)`;
                     }
 
-                return <OverlayTrigger
-                            key={"unit-overlay-" + u.id}
-                            delay={{ show: 750, hide: 100 }}
-                            placement="auto"
-                            overlay={<Tooltip id={"unit-tooltip-" + u.id}>
-                                <b>{u.type.name}</b>{controller != null && <small> of <b>{controller.name}</b></small>}
-                            </Tooltip>}
-                        >
-                            <div onClick={property.onClick ? property.onClick : undefined}
-                                className={classNames(
-                                    "unit-icon hover-weak-outline",
-                                    {
-                                        "medium-outline hover-strong-outline": property.highlight.active
-                                    },
-                                    {
-                                        "attacking-army-highlight": property.highlight.color == "red"
-                                    },
-                                    {
-                                        "unit-highlight-yellow": property.highlight.color == "yellow"
-                                    },
-                                    {
-                                        "unit-highlight-green": property.highlight.color == "green"
-                                    }
-                                )}
-                                style={{
-                                    backgroundImage: `url(${unitImages.get(u.allegiance.id).get(u.upgradedType ? u.upgradedType.id : u.type.id)})`,
-                                    opacity: opacity,
-                                    transform: transform
-                                }}
-                            />
-                        </OverlayTrigger>
+                    return <OverlayTrigger
+                        key={"unit-overlay-" + u.id}
+                        delay={{ show: 250, hide: 100 }}
+                        placement="auto"
+                        overlay={<Tooltip id={"unit-tooltip-" + u.id}>
+                            <b>{u.type.name}</b>{controller != null && <small> of <b>{controller.name}</b></small>}
+                        </Tooltip>}
+                    >
+                        <div onClick={property.onClick ? property.onClick : undefined}
+                            className={classNames(
+                                "unit-icon hover-weak-outline",
+                                {
+                                    "medium-outline hover-strong-outline": property.highlight.active
+                                },
+                                {
+                                    "attacking-army-highlight": property.highlight.color == "red"
+                                },
+                                {
+                                    "unit-highlight-yellow": property.highlight.color == "yellow"
+                                },
+                                {
+                                    "unit-highlight-green": property.highlight.color == "green"
+                                }
+                            )}
+                            style={{
+                                backgroundImage: `url(${unitImages.get(u.allegiance.id).get(u.upgradedType ? u.upgradedType.id : u.type.id)})`,
+                                opacity: opacity,
+                                transform: transform
+                            }}
+                        />
+                    </OverlayTrigger>
                 })}
             </div>
         });
+    }
+
+    renderImprovements(region: Region): ReactNode {
+        return <div id={`improvement-${region.id}`}
+            className="units-container"
+            style={{ left: region.improvementSlot.point.x, top: region.improvementSlot.point.y, width: region.improvementSlot.width, flexWrap: "wrap" }}
+        >
+            {[...Array(region.barrelModifier)].map((_, i) => {
+                return <OverlayTrigger
+                    key={`barrel-${region.id}-${i}`}
+                    overlay={renderRegionTooltip(region)}
+                    delay={{ show: 500, hide: 100 }}
+                    placement="auto"
+                    rootClose
+                >
+                    <div key={`barrel-${region.id}-${i}`}
+                        className="unit-icon medium"
+                        style={{
+                            backgroundImage: `url(${barrelImage})`,
+                        }}
+                    />
+                </OverlayTrigger>
+            })}
+            {[...Array(region.crownModifier)].map((_, i) => {
+                return <OverlayTrigger
+                    key={`crown-${region.id}-${i}`}
+                    overlay={renderRegionTooltip(region)}
+                    delay={{ show: 500, hide: 100 }}
+                    placement="auto"
+                    rootClose
+                >
+                    <div key={`crown-${region.id}-${i}`}
+                        className="unit-icon medium"
+                        style={{
+                            backgroundImage: `url(${crownImage})`,
+                        }}
+                    />
+                </OverlayTrigger>
+            })}
+        </div>
     }
 
     renderOrders(): ReactNode {
         const propertiesForOrders = this.getModifiedPropertiesForEntities<Region, OrderOnMapProperties>(
             _.flatMap(this.props.ingameGameState.world.regions.values),
             this.props.mapControls.modifyOrdersOnMap,
-            {highlight: {active: false, color: "white"}, onClick: null}
+            { highlight: { active: false, color: "white" }, onClick: null }
         );
 
         return propertiesForOrders.map((region, properties) => {
@@ -312,20 +500,20 @@ export default class MapComponent extends Component<MapComponentProps> {
 
         return (
             <div className={classNames(
-                    "order-container",
-                    {
-                        "hover-weak-outline" : order != null,
-                        "medium-outline hover-strong-outline clickable": order && properties.highlight.active,
-                        "restricted-order": planningOrAction && order && this.ingame.game.isOrderRestricted(region, order, planningOrAction.planningRestrictions)
-                    }
-                )}
-                 style={{left: region.orderSlot.x, top: region.orderSlot.y}}
-                 onClick={properties.onClick ? properties.onClick : undefined}
-                 key={"region-" + region.id}
+                "order-container",
+                {
+                    "hover-weak-outline": order != null,
+                    "medium-outline hover-strong-outline clickable": order && properties.highlight.active,
+                    "restricted-order": planningOrAction && order && this.ingame.game.isOrderRestricted(region, order, planningOrAction.planningRestrictions)
+                }
+            )}
+                style={{ left: region.orderSlot.x, top: region.orderSlot.y }}
+                onClick={properties.onClick ? properties.onClick : undefined}
+                key={"region-" + region.id}
             >
                 <OverlayTrigger overlay={this.renderOrderTooltip(order, region)}
-                    delay={{show: 750, hide: 100}}>
-                    <div className="order-icon" style={{backgroundImage: `url(${backgroundUrl})`}}/>
+                    delay={{ show: 250, hide: 100 }}>
+                    <div className="order-icon" style={{ backgroundImage: `url(${backgroundUrl})` }} />
                 </OverlayTrigger>
             </div>
         );
@@ -333,7 +521,7 @@ export default class MapComponent extends Component<MapComponentProps> {
 
     private renderOrderTooltip(order: Order | null, region: Region): OverlayChildren {
         return <Tooltip id={"order-info"}>
-            <b>{order ? order.type.name : "Order token"}</b><small> of <b>{region.getController()?.name ?? "Unknown"}</b><br/><b>{region.name}</b></small>
+            <b>{order ? order.type.name : "Order token"}</b><small> of <b>{region.getController()?.name ?? "Unknown"}</b><br /><b>{region.name}</b></small>
         </Tooltip>;
     }
 

@@ -52,7 +52,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     getBetaWarning(): ReactNode {
-        return <h6 style={{display: "inline", fontWeight: "normal"}}>(BETA! The Iron Bank is not yet available!)</h6>
+        return <h6 style={{display: "inline", fontWeight: "normal"}}>BETA!</h6>
     }
 
     componentDidMount(): void {

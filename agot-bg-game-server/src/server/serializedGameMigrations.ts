@@ -1130,6 +1130,78 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "48",
+        migrate: (serializedGame: any) => {
+            // Add the Iron Bank to running 8p games
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                ingame.game.world.regions.forEach((r: any) => {
+                    r.castleModifier = 0;
+                    r.barrelModifier = 0;
+                    r.crownModifier = 0;
+                });
+
+                if (ingame.childGameState.type == "action" && ingame.childGameState.childGameState.type == "resolve-consolidate-power" && ingame.childGameState.childGameState.childGameState.type == "player-mustering") {
+                    const resolveConsolidatePower = ingame.childGameState.childGameState;
+                    const house = resolveConsolidatePower.childGameState.house;
+
+                    // Set the new child game state to resolve a CP*
+                    resolveConsolidatePower.childGameState = {
+                        type: "resolve-single-consolidate-power",
+                        house: house
+                    };
+                }
+
+                if (ingame.childGameState.type == "westeros" && ingame.childGameState.childGameState.type == "westeros-deck-4" && ingame.childGameState.childGameState.childGameState.type == "choose-multiple-regions-for-loyalty-token") {
+                    const state = ingame.childGameState.childGameState.childGameState;
+                    state.hasAlreadyPaid = state.hasAlreadyPayed;
+                }
+
+                if (ingame.game.houses.length != 8) {
+                    ingame.game.ironBank = null;
+                    return serializedGame;
+                }
+
+                serializedGame.gameSettings.seaOrderTokens = true;
+                serializedGame.gameSettings.allowGiftingPowerTokens = true;
+
+                const loanCardIds = [ "customs-officer", "expert-artificer", "full-host", "loyal-maester",
+                "master-at-arms", "pyromancer", "savvy-steward", "sea-raiders",
+                "siege-engineers", "spymaster", "the-faceless-men", "vanguard-cavalry" ];
+
+                const loanDeck = shuffleInPlace(loanCardIds.map((id, i) => ({
+                    id: i,
+                    type: id,
+                    purchasedBy: null,
+                    discarded: false
+                })));
+                const loanSlots = [];
+
+                // Usually before everye westeros phase begins a loan card is drawn
+                // So when we are in any Westeros state we can reveal the top card now
+                // Don't do it when we are in planning, as some users might not have realized the new loan card
+                if (ingame.childGameState.type == "westeros") {
+                    // Reveal the top loan card
+                    loanSlots.push(loanDeck.shift());
+                }
+
+                if (ingame.childGameState.type != "planning" && ingame.game.turn >= 5) {
+                    // Reveal another loan card
+                    loanSlots.push(loanDeck.shift());
+                }
+
+                ingame.game.ironBank = {
+                    loanCardDeck: loanDeck,
+                    loanSlots: loanSlots,
+                    purchasedLoans: []
+                };
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

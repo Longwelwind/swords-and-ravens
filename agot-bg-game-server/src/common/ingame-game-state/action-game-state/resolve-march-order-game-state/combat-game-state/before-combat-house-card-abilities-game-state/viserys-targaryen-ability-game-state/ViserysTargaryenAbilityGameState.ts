@@ -35,7 +35,7 @@ BeforeCombatHouseCardAbilitiesGameState["childGameState"],
                 type: "house-card-ability-not-used",
                 house: house.id,
                 houseCard: viserysTargaryen.id
-            });
+            }, true);
 
             this.parentGameState.onHouseCardResolutionFinish(house);
             return;
@@ -63,13 +63,12 @@ BeforeCombatHouseCardAbilitiesGameState["childGameState"],
         }
     }
 
-    onSelectHouseCardFinish(house: House, houseCard: HouseCard): void {
-        // todo:
+    onSelectHouseCardFinish(house: House, houseCard: HouseCard, resolvedAutomatically: boolean): void {
         this.ingame.log({
             type: "viserys-targaryen-used",
             house: house.id,
             houseCard: houseCard.id
-        });
+        }, resolvedAutomatically);
 
         houseCard.state = HouseCardState.USED;
 

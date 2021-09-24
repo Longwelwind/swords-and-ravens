@@ -13,7 +13,7 @@ interface ParentGameState extends GameState<any, any> {
     game: Game;
     ingame: IngameGameState;
 
-    onSelectHouseCardFinish(house: House, houseCard: HouseCard): void;
+    onSelectHouseCardFinish(house: House, houseCard: HouseCard, resolvedAutomatically: boolean): void;
 }
 
 export default class SelectHouseCardGameState<P extends ParentGameState> extends GameState<P> {
@@ -30,7 +30,7 @@ export default class SelectHouseCardGameState<P extends ParentGameState> extends
 
         // Automatically resolve this state in case there is just one house card to select
         if (houseCards.length == 1) {
-            this.parentGameState.onSelectHouseCardFinish(house, houseCards[0]);
+            this.parentGameState.onSelectHouseCardFinish(house, houseCards[0], true);
         }
     }
 
@@ -53,7 +53,7 @@ export default class SelectHouseCardGameState<P extends ParentGameState> extends
                 return;
             }
 
-            this.parentGameState.onSelectHouseCardFinish(this.house, houseCard);
+            this.parentGameState.onSelectHouseCardFinish(this.house, houseCard, false);
         }
     }
 
