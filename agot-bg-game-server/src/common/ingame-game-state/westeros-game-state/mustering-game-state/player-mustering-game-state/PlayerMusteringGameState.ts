@@ -100,7 +100,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 }, true);
             }
 
-            this.proceedToParentGameState(this.regions);
+            this.proceedToParentGameState();
         }
     }
 
@@ -180,20 +180,29 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 });
             });
 
-            this.parentGameState.ingame.log({
-                type: "player-mustered",
-                house: this.house.id,
-                musterings: musterings.map((region, musterings) =>
-                    [region.id, musterings.map(m => ({region: m.region.id, from: m.from ? m.from.type.id : null, to: m.to.id}))]
-                )
-            });
+            if (this.isStarredConsolidatePowerMusteringType && musterings.size == 0) {
+                this.resolveConsolidatePowerGameState.resolveConsolidatePowerOrderForPt(this.regions[0], this.house);
+            } else  {
+                this.parentGameState.ingame.log({
+                    type: "player-mustered",
+                    house: this.house.id,
+                    musterings: musterings.map((region, musterings) =>
+                        [region.id, musterings.map(m => ({region: m.region.id, from: m.from ? m.from.type.id : null, to: m.to.id}))]
+                    )
+                });
+            }
 
-            this.proceedToParentGameState(musterings.keys);
+            this.proceedToParentGameState();
         }
     }
 
-    proceedToParentGameState(musteringRegions: Region[]): void {
-        this.parentGameState.onPlayerMusteringEnd(this.house, musteringRegions);
+    proceedToParentGameState(): void {
+        if (this.parentGameState instanceof ResolveConsolidatePowerGameState) {
+            this.parentGameState.onPlayerMusteringEnd(this.house, this.regions);
+            return;
+        }
+
+        this.parentGameState.onPlayerMusteringEnd(this.house, []);
     }
 
     muster(musterings: BetterMap<Region, Mustering[]>): void {
