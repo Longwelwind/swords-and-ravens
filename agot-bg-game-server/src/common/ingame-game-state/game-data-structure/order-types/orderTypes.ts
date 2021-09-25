@@ -39,6 +39,7 @@ const orderTypes = new BetterMap<string, OrderType>([
     [march.id, march],
     [defensePlusOne.id, defensePlusOne],
     [defensePlusTwo.id, defensePlusTwo],
+    [defensePlusThree.id, defensePlusThree],
     [marchPlusOne.id, marchPlusOne],
     [support.id, support],
     [supportPlusOne.id, supportPlusOne],
