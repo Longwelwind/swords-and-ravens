@@ -105,31 +105,34 @@ export default class PostCombatGameState extends GameState<
     }
 
     onChooseCasualtiesGameStateEnd(house: House, region: Region, selectedCasualties: Unit[], resolvedAutomatically: boolean): void {
-        this.combat.ingameGameState.log(
-            {
-                type: "killed-after-combat",
+        // If there is just a garrison, the selectedCasualties might be an empty array here
+        if (selectedCasualties.length > 0) {
+            this.combat.ingameGameState.log(
+                {
+                    type: "killed-after-combat",
+                    house: house.id,
+                    killed: selectedCasualties.map(u => u.type.id)
+                }, resolvedAutomatically);
+
+            // Remove the selected casualties
+            selectedCasualties.forEach(u => region.units.delete(u.id));
+            // Remove them from the house combat datas
+            const hcd = this.combat.houseCombatDatas.get(house);
+            hcd.army = _.without(hcd.army, ...selectedCasualties);
+
+            this.entireGame.broadcastToClients({
+                type: "combat-change-army",
+                region: region.id,
                 house: house.id,
-                killed: selectedCasualties.map(u => u.type.id)
-            }, resolvedAutomatically);
+                army: hcd.army.map(u => u.id)
+            });
 
-        // Remove the selected casualties
-        selectedCasualties.forEach(u => region.units.delete(u.id));
-        // Remove them from the house combat datas
-        const hcd = this.combat.houseCombatDatas.get(house);
-        hcd.army = _.without(hcd.army, ...selectedCasualties);
-
-        this.entireGame.broadcastToClients({
-            type: "combat-change-army",
-            region: region.id,
-            house: house.id,
-            army: hcd.army.map(u => u.id)
-        });
-
-        this.entireGame.broadcastToClients({
-            type: "remove-units",
-            regionId: region.id,
-            unitIds: selectedCasualties.map(u => u.id)
-        });
+            this.entireGame.broadcastToClients({
+                type: "remove-units",
+                regionId: region.id,
+                unitIds: selectedCasualties.map(u => u.id)
+            });
+        }
 
         this.proceedSkullIconHandling();
     }

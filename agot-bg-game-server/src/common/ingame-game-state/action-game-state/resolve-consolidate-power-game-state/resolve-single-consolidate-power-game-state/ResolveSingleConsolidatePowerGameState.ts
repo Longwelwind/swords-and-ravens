@@ -60,8 +60,8 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
             throw new Error("Too much Defense / Muster orders placed or Defense / Muster together with player CP/IB orders placed!");
         }
 
-        if (defenseMusterOrders.length == 1) {
-            this.parentGameState.setChildGameState(new PlayerMusteringGameState(this.parentGameState)).firstStart(house, PlayerMusteringType.DEFENSE_MUSTER_ORDER);
+        if (defenseMusterOrders.length > 0) {
+            // There is nothing to fast-track
             return;
         }
 
@@ -146,8 +146,8 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
                     return;
                 }
             } else if (order.type instanceof DefenseMusterOrderType && message.musterUnits) {
-                // Should not happen, but we handle it
-                this.parentGameState.setChildGameState(new PlayerMusteringGameState(this.parentGameState)).firstStart(this.house, PlayerMusteringType.STARRED_CONSOLIDATE_POWER);
+                this.parentGameState.setChildGameState(new PlayerMusteringGameState(this.parentGameState)).firstStart(this.house, PlayerMusteringType.DEFENSE_MUSTER_ORDER);
+                return;
             } else if (order.type instanceof IronBankOrderType && this.ironBank && message.purchaseLoan !== undefined) {
                 const loan = this.ironBank.purchaseLoan(this.house, message.purchaseLoan, regionOfOrder.id);
                 if (!loan) {

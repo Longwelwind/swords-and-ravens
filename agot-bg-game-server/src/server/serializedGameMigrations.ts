@@ -1202,6 +1202,25 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "49",
+        migrate: (serializedGame: any) => {
+            // Fix missing loan slots
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                if (!ingame.game.ironBank) {
+                    return serializedGame;
+                }
+
+                while (ingame.game.ironBank.loanSlots.length != 3) {
+                    ingame.game.ironBank.loanSlots.push(null);
+                }
+            }
+
+            return serializedGame;
+        }
     }
 ];
 
