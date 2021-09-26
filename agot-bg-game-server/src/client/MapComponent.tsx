@@ -27,7 +27,7 @@ import BetterMap from "../utils/BetterMap";
 import _ from "lodash";
 import PartialRecursive from "../utils/PartialRecursive";
 import StaticBorder from "../common/ingame-game-state/game-data-structure/static-data-structure/StaticBorder";
-import { land } from "../common/ingame-game-state/game-data-structure/regionTypes";
+import { land, sea } from "../common/ingame-game-state/game-data-structure/regionTypes";
 import PlaceOrdersGameState from "../common/ingame-game-state/planning-game-state/place-orders-game-state/PlaceOrdersGameState";
 import UseRavenGameState from "../common/ingame-game-state/action-game-state/use-raven-game-state/UseRavenGameState";
 import { renderRegionTooltip } from "./regionTooltip";
@@ -125,7 +125,8 @@ export default class MapComponent extends Component<MapComponentProps> {
                                     className="garrison-token hover-weak-outline"
                                     style={{
                                         backgroundImage: `url(${garrisons.get(r.id)})`,
-                                        left: r.unitSlot.point.x, top: r.unitSlot.point.y
+                                        left: r.unitSlot.point.x, top: r.unitSlot.point.y,
+                                        opacity: 0.7
                                     }}
                                 >
                                 </div>
@@ -498,6 +499,10 @@ export default class MapComponent extends Component<MapComponentProps> {
             planningOrAction = null;
         }
 
+        const drawBorder = order?.type.restrictedTo == sea.kind;
+        const controller = drawBorder ? region.getController() : null;
+        const color = drawBorder ? controller ? controller.id != "greyjoy" ? controller.color : "black" : undefined : undefined;
+
         return (
             <div className={classNames(
                 "order-container",
@@ -507,13 +512,14 @@ export default class MapComponent extends Component<MapComponentProps> {
                     "restricted-order": planningOrAction && order && this.ingame.game.isOrderRestricted(region, order, planningOrAction.planningRestrictions)
                 }
             )}
-                style={{ left: region.orderSlot.x, top: region.orderSlot.y }}
+                style={{ left: region.orderSlot.x, top: region.orderSlot.y}}
                 onClick={properties.onClick ? properties.onClick : undefined}
                 key={"region-" + region.id}
             >
                 <OverlayTrigger overlay={this.renderOrderTooltip(order, region)}
                     delay={{ show: 250, hide: 100 }}>
-                    <div className="order-icon" style={{ backgroundImage: `url(${backgroundUrl})` }} />
+                    <div className={classNames("order-icon", { "order-border": drawBorder } )}
+                        style={{ backgroundImage: `url(${backgroundUrl})`, borderColor: color }} />
                 </OverlayTrigger>
             </div>
         );

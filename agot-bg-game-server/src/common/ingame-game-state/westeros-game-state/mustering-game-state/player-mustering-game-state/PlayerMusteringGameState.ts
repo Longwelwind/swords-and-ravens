@@ -180,7 +180,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 });
             });
 
-            if (this.isStarredConsolidatePowerMusteringType && musterings.size == 0) {
+            if (this.isStarredConsolidatePowerMusteringType && musterings.size == 0 && this.regions.length > 0) {
                 this.resolveConsolidatePowerGameState.resolveConsolidatePowerOrderForPt(this.regions[0], this.house);
             } else  {
                 this.parentGameState.ingame.log({

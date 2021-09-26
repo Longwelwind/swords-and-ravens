@@ -72,6 +72,11 @@ strong
   transform: translate(-50%, -50%);
 }
 
+.map .order-border {
+  border-radius: 50%;
+  border: 3px solid;
+}
+
 .map .units-container {
   position: absolute;
   display: flex;
@@ -104,13 +109,14 @@ strong
 
 .map .loyalty-token {
   position: absolute;
-  width: 34px;
-  height: 55px;
+  width: 30px;
+  height: 50px;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
- // This allows the power token to be center on the position-absolute reference points
+ // This allows the loyalty token to be center on the position-absolute reference points
  transform: translate(-50%, -50%);
+ opacity: 0.8;
 }
 
 .house-power-token {
