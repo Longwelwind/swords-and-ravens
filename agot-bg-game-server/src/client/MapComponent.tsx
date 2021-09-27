@@ -80,7 +80,7 @@ export default class MapComponent extends Component<MapComponentProps> {
 
         for (const region of this.props.ingameGameState.world.regions.values) {
             if (region.garrison > 0 && region.garrison != BLOCKED_REGION_BY_INFINITE_GARRISON) {
-                garrisons.set(region.id, getGarrisonToken(region.id, region.garrison));
+                garrisons.set(region.id, getGarrisonToken(region.garrison));
             }
 
             if (region.castleModifier != 0) {
@@ -111,7 +111,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                                     rootClose
                                 >
                                     <div
-                                        className="garrison-token"
+                                        className="castle-modification"
                                         style={{
                                             backgroundImage: castleModifiers.get(r.id) > 0 ? `url(${castleUpgradeImage})` : `url(${castleDegradeImage})`,
                                             left: r.castleSlot.x, top: r.castleSlot.y
@@ -120,44 +120,29 @@ export default class MapComponent extends Component<MapComponentProps> {
                                 </OverlayTrigger>
                             )}
                             {(barrelModifiers.has(r.id) || crownModifiers.has(r.id)) && this.renderImprovements(r)}
-                            {garrisons.has(r.id) && (
-                                <div
-                                    className="garrison-token hover-weak-outline"
-                                    style={{
-                                        backgroundImage: `url(${garrisons.get(r.id)})`,
-                                        left: r.unitSlot.point.x, top: r.unitSlot.point.y,
-                                        opacity: 0.7
-                                    }}
-                                >
-                                </div>
-                            )}
-                            {r.loyaltyTokens > 0 && (
-                                <div
-                                    className={classNames("loyalty-token", { "strong-outline": r.loyaltyTokens > 1 })}
-                                    style={{
-                                        left: r.unitSlot.point.x,
-                                        top: r.unitSlot.point.y,
-                                        backgroundImage: `url(${loyaltyTokenImage})`,
-                                        textAlign: "center",
-                                        color: "white"
-                                    }}
-                                >{r.loyaltyTokens > 1 ? r.loyaltyTokens : ""}
-                                </div>
-                            )}
                             {r.controlPowerToken && (
-                                <div
-                                    className="power-token hover-weak-outline"
-                                    style={{
-                                        left: r.powerTokenSlot.x,
-                                        top: r.powerTokenSlot.y,
-                                        backgroundImage: `url(${housePowerTokensImages.get(r.controlPowerToken.id)})`
-                                    }}
+                                <OverlayTrigger
+                                    key={"power-token-overlay-" + r.id}
+                                    delay={{ show: 250, hide: 100 }}
+                                    placement="auto"
+                                    overlay={<Tooltip id={"power-token-" + r.id}>
+                                        <><b>Power token</b><small> of <b>{r.getController()?.name ?? "Unknown"}</b></small></>
+                                    </Tooltip>}
                                 >
-                                </div>
+                                    <div
+                                        className="power-token hover-weak-outline"
+                                        style={{
+                                            left: r.powerTokenSlot.x,
+                                            top: r.powerTokenSlot.y,
+                                            backgroundImage: `url(${housePowerTokensImages.get(r.controlPowerToken.id)})`
+                                        }}
+                                    >
+                                    </div>
+                                </OverlayTrigger>
                             )}
                         </div>
                     ))}
-                    {this.renderUnits()}
+                    {this.renderUnits(garrisons)}
                     {this.renderOrders()}
                     {ironBank && (ironBank.controllerOfBraavos || ironBank.purchasedLoans.length > 0) && this.renderIronBankInfos(ironBankView)}
                     {this.renderLoanCardDeck(ironBankView)}
@@ -314,12 +299,14 @@ export default class MapComponent extends Component<MapComponentProps> {
         });
     }
 
-    renderUnits(): ReactNode {
+    renderUnits(garrisons: BetterMap<string, string | null>): ReactNode {
         const propertiesForUnits = this.getModifiedPropertiesForEntities<Unit, UnitOnMapProperties>(
             _.flatMap(this.props.ingameGameState.world.regions.values.map(r => r.allUnits)),
             this.props.mapControls.modifyUnitsOnMap,
             { highlight: { active: false, color: "white" }, onClick: null }
         );
+
+        const garrisonControllers = new BetterMap(garrisons.keys.map(rid => [rid, this.props.ingameGameState.world.regions.get(rid).getController()]));
 
         return this.props.ingameGameState.world.regions.values.map(r => {
             const controller = r.getController();
@@ -378,6 +365,50 @@ export default class MapComponent extends Component<MapComponentProps> {
                         />
                     </OverlayTrigger>
                 })}
+                {garrisons.has(r.id) && (
+                    <OverlayTrigger
+                        key={"garrison-overlay-" + r.id}
+                        delay={{ show: 250, hide: 100 }}
+                        placement="auto"
+                        overlay={<Tooltip id={"garrison-tooltip-" + r.id}>
+                            {garrisonControllers.get(r.id) == null ? <b>Neutral Force token</b> : <><b>Garrison</b> <small>of <b>{garrisonControllers.get(r.id)?.name ?? "Unknown"}</b></small></>}
+                        </Tooltip>}
+                    >
+                        <div
+                            className="garrison-icon hover-weak-outline"
+                            style={{
+                                backgroundImage: `url(${garrisons.get(r.id)})`,
+                                left: r.unitSlot.point.x, top: r.unitSlot.point.y
+                            }}
+                        >
+                        </div>
+                    </OverlayTrigger>
+                )}
+                {r.loyaltyTokens > 0 && (
+                    <OverlayTrigger
+                        key={"loyalty-overlay-" + r.id}
+                        delay={{ show: 250, hide: 100 }}
+                        placement="auto"
+                        overlay={<Tooltip id={"loyalty-tooltip-" + r.id}>
+                            <b>Loyalty token</b>
+                        </Tooltip>}
+                    >
+                        <div
+                            className="loyalty-icon hover-weak-outline"
+                            style={{
+                                left: r.unitSlot.point.x,
+                                top: r.unitSlot.point.y,
+                                backgroundImage: `url(${loyaltyTokenImage})`,
+                                textAlign: "center",
+                                fontWeight: "bold",
+                                fontFamily: "serif",
+                                fontSize: "1.5rem",
+                                color: "white"
+                            }}
+                        >{r.loyaltyTokens > 1 ? r.loyaltyTokens : ""}
+                        </div>
+                    </OverlayTrigger>
+                )}
             </div>
         });
     }

@@ -57,7 +57,7 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
                                         <Button onClick={() => this.confirm()}>Confirm</Button>
                                     </Col>
                                     <Col xs="auto">
-                                        <Button onClick={() => this.reset()}>Reset</Button>
+                                        <Button variant="danger" onClick={() => this.reset()}>Reset</Button>
                                     </Col>
                                 </Row>
                             </Col>

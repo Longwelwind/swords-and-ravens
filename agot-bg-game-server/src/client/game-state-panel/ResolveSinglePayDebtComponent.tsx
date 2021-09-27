@@ -71,7 +71,7 @@ export default class ResolveSinglePayDebtComponent extends Component<GameStateCo
                                         <Button disabled={notEnough} onClick={() => this.confirm()}>Confirm</Button>
                                     </Col>
                                     <Col xs="auto">
-                                        <Button disabled={this.unitsToRemove.size == 0} onClick={() => this.reset()}>Reset</Button>
+                                        <Button variant="danger" disabled={this.unitsToRemove.size == 0} onClick={() => this.reset()}>Reset</Button>
                                     </Col>
                                 </Row>
                             </Col>

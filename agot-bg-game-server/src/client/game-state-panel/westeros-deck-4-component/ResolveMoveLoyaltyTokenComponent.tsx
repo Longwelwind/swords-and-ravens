@@ -40,7 +40,7 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<GameStat
                                     </Button>
                                 </Col>
                                 <Col xs="auto">
-                                    <Button onClick={() => this.reset()} disabled={this.from == null && this.to == null}>
+                                    <Button variant="danger" onClick={() => this.reset()} disabled={this.from == null && this.to == null}>
                                         Reset
                                     </Button>
                                 </Col>
