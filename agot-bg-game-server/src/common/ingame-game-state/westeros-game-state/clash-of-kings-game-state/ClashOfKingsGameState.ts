@@ -89,7 +89,11 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
                 }
             });
 
-            // Ask the iron throne holder to resolve them
+            // Due to the possible previous splice a bid result may have an empty houses list now (if Targaryen was the only bidder with that value)
+            // So we filter for houses.length > 0 here
+            results = results.filter(([_, houses]) => houses.length > 0);
+
+            // Ask the Iron Throne holder to resolve them
             this.setChildGameState(new ResolveTiesGameState(this)).firstStart(results);
         } else {
             // No ties, simply proceed
