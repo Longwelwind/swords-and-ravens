@@ -11,10 +11,15 @@ import stormsend from "../../public/images/garrisons/storms-end.png";
 import oldtown from "../../public/images/garrisons/oldtown.png";
 import braavos from "../../public/images/garrisons/braavos-5.png";
 import pentos from "../../public/images/garrisons/pentos-2.png";
+import garrison2 from "../../public/images/garrisons/garrison-2.svg";
+import garrison3 from "../../public/images/garrisons/garrison-3.svg";
+import garrison4 from "../../public/images/garrisons/garrison-4.svg";
+import garrison5 from "../../public/images/garrisons/garrison-5.svg";
+import garrison6 from "../../public/images/garrisons/garrison-6.svg";
 
 import BetterMap from "../utils/BetterMap";
 
-const garrisonTokens = new BetterMap([
+const garrisonTokensByRegion = new BetterMap([
     ["the-eyrie", new BetterMap([[4, theEyrie4], [6, theEyrie6]])],
     ["kings-landing", new BetterMap([[5, kingsLanding]])],
     ["pyke", new BetterMap([[2, pyke]])],
@@ -29,22 +34,28 @@ const garrisonTokens = new BetterMap([
     ["pentos", new BetterMap([[2, pentos]])]
 ]);
 
-export default function getGarrisonToken(regionId: string, garrisonValue: number): string | null {
-    if (!garrisonTokens.has(regionId)) {
-        console.warn(`Garrison for ${regionId} with value ${garrisonValue} is not defined!`);
-        return null;
+const garrisonByValue = new BetterMap(
+    [
+        [2, garrison2],
+        [3, garrison3],
+        [4, garrison4],
+        [5, garrison5],
+        [6, garrison6]
+    ]
+)
+
+export default function getGarrisonToken(garrisonValue: number, regionId: string | null = null): string | null {
+    if (regionId && garrisonTokensByRegion.has(regionId)) {
+        const garrisons = garrisonTokensByRegion.get(regionId);
+
+        if (garrisons.size == 1) {
+            return garrisons.values[0];
+        }
+
+        if (garrisons.has(garrisonValue)) {
+            return garrisons.get(garrisonValue);
+        }
     }
 
-    const garrisons = garrisonTokens.get(regionId);
-
-    if (garrisons.size == 1) {
-        return garrisons.values[0];
-    }
-
-    if (garrisons.has(garrisonValue)) {
-        return garrisons.get(garrisonValue);
-    }
-
-    console.warn(`Garrison for ${regionId} with value ${garrisonValue} is not defined!`);
-    return null;
+    return garrisonByValue.get(garrisonValue);
 }

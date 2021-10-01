@@ -56,7 +56,7 @@ export default class TheFacelessMenComponent extends Component<GameStateComponen
                                 <Button onClick={() => this.confirm()}>Confirm</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button disabled={this.unitsToRemove.size == 0} onClick={() => this.reset()}>Reset</Button>
+                                <Button variant="danger" disabled={this.unitsToRemove.size == 0} onClick={() => this.reset()}>Reset</Button>
                             </Col>
                         </Row>
                     </Col>

@@ -34,7 +34,7 @@ export default class SelectRegionComponent extends Component<GameStateComponentP
                                     </Button>
                                 </Col>
                                 <Col xs="auto">
-                                    <Button onClick={() => this.reset()} disabled={this.selectedRegion == null}>
+                                    <Button variant="danger" onClick={() => this.reset()} disabled={this.selectedRegion == null}>
                                         Reset
                                     </Button>
                                 </Col>

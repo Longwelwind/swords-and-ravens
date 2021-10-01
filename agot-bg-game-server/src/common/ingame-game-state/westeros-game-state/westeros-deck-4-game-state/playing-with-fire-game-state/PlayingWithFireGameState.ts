@@ -107,7 +107,7 @@ export default class PlayingWithFireGameState extends GameState<WesterosDeck4Gam
 
             const chosenHouse = this.game.houses.get(this.getChoices(house).values[choice]);
             this.step = PLAYING_WITH_FIRE_STEP.CHOOSE_UNIT;
-            this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(chosenHouse, `House ${chosenHouse.name} must choose an unit to place in ${this.region.name}.`, this.getChoices(chosenHouse).keys);
+            this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(chosenHouse, `House ${chosenHouse.name} must choose a unit to place in ${this.region.name}.`, this.getChoices(chosenHouse).keys);
         } else if (this.step == PLAYING_WITH_FIRE_STEP.CHOOSE_UNIT) {
             if (!this.region) {
                 throw new Error("Region must be set at this point!");
@@ -135,7 +135,7 @@ export default class PlayingWithFireGameState extends GameState<WesterosDeck4Gam
         this.westeros.placeLoyaltyToken(region);
         this.region = region;
         this.step = PLAYING_WITH_FIRE_STEP.CHOOSE_HOUSE;
-        this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(house, `House ${house.name} must choose an enemy which places an unit in ${region.name}.`, this.getChoices(house).keys);
+        this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(house, `House ${house.name} must choose an enemy which places a unit in ${region.name}.`, this.getChoices(house).keys);
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {

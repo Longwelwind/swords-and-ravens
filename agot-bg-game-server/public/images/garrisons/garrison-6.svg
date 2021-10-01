@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 512 512"
+   style="height: 512px; width: 512px;"
+   version="1.1"
+   id="svg477"
+   sodipodi:docname="garrison-6.svg"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview479"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="1.7050781"
+     inkscape:cx="341.04009"
+     inkscape:cy="319.92669"
+     inkscape:window-width="2560"
+     inkscape:window-height="1377"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg477" />
+  <defs
+     id="defs455">
+    <linearGradient
+       id="lorc-black-hand-shield-gradient-2">
+      <stop
+         offset="0%"
+         stop-color="#9b9b9b"
+         stop-opacity="1"
+         id="stop450" />
+      <stop
+         offset="100%"
+         stop-color="#000000"
+         stop-opacity="1"
+         id="stop452" />
+    </linearGradient>
+  </defs>
+  <g
+     class=""
+     transform="translate(0,0)"
+     style=""
+     id="g463">
+    <g
+       id="g461">
+      <path
+         d="M51.67 24.377C51.67 240.137 96.102 453.695 260.88 499.007C442.274 460.307 470.326 240.731 470.326 24.377L51.67 24.377Z"
+         class="selected"
+         fill="url(#lorc-black-hand-shield-gradient-2)"
+         stroke="#ccc"
+         stroke-opacity="1"
+         stroke-width="20"
+         id="path457" />
+    </g>
+  </g>
+  <g
+     font-family="&quot;Times New Roman&quot;, Times, serif"
+     font-size="420"
+     font-style="normal"
+     font-weight="bold"
+     text-anchor="middle"
+     text-decoration=" rgba(255, 255, 255, 1)"
+     class=""
+     transform="translate(260,389)"
+     style=""
+     id="g475">
+    <g
+       id="g473">
+      <text
+         stroke="rgba(255, 255, 255, 0)"
+         stroke-width="105"
+         id="text467"><tspan
+           x="0"
+           y="0"
+           id="tspan465">6</tspan></text>
+      <text
+         fill="rgba(255, 255, 255, 1)"
+         id="text471"
+         style="fill:#ffffff"><tspan
+           x="0"
+           y="0"
+           id="tspan469"
+           style="fill:#ffffff">6</tspan></text>
+    </g>
+  </g>
+</svg>

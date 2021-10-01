@@ -85,7 +85,7 @@ strong
   transform: translate(-50%, -50%);
 }
 
-.map .garrison-token {
+.map .castle-modification {
   width: 69px;
   height: 40px;
   background-size: contain;
@@ -141,6 +141,22 @@ strong
   background-position: center;
   background-repeat: no-repeat;
   filter: none;
+}
+
+.garrison-icon {
+  width: 32px;
+  height: 32px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.loyalty-icon {
+  width: 32px;
+  height: 40px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .unit-icon {
