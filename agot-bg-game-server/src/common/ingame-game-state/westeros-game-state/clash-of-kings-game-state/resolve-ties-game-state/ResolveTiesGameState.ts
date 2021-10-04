@@ -13,6 +13,10 @@ export default class ResolveTiesGameState extends GameState<ClashOfKingsGameStat
     // Sorted in descending order of bid.
     bidResults: [number, House[]][];
 
+    get stars(): boolean {
+        return this.parentGameState.currentTrackI == 2;
+    }
+
     get entireGame(): EntireGame {
         return this.parentGameState.entireGame;
     }

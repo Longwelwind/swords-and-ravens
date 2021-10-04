@@ -334,7 +334,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                         name={name}
                                                     />
                                                     <div className="tracker-star-container">
-                                                        {stars && i < this.game.starredOrderRestrictions.length && (
+                                                        {stars && (
                                                             _.range(0, this.game.starredOrderRestrictions[j]).map(k => (
                                                                 <div key={`stars_${h?.id ?? j}_${k}`}>
                                                                     <FontAwesomeIcon

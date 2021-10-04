@@ -290,12 +290,20 @@ $tiny-scale: 0.12;
 
 .tracker-star-container {
   position: absolute;
-  // This width is a hack to make sure the elements don't wrap
-  width: 1000px;
   display: flex;
+  flex-wrap: nowrap;
   bottom: -3px;
   left: auto;
   right: auto;
+}
+
+.resolve-ties-tracker-star-container {
+  position: absolute;
+  display: flex;
+  flex-wrap: nowrap;
+  left: auto;
+  right: auto;
+  top: 35px;
 }
 
 .tracker-star-container > * {
