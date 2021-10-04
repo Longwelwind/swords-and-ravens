@@ -205,7 +205,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                             <h5 className='text-center'>Loan slots</h5>
                         </Row>
                         {loanSlots.map((lc, i) => <Row key={`loan-${lc?.id}-${i}`}>
-                            <h6>{lc?.type.name}:&nbsp;</h6><p>{lc?.type.description}</p>
+                            <h6>{lc?.type.name}:&nbsp;</h6><p className="white-space-pre-line">{lc?.type.description}</p>
                         </Row>)}
                     </Col>}
                 {loanDeck.length > 0 &&
@@ -214,7 +214,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                             <h5 className='text-center'>Available loans</h5>
                         </Row>
                         {loanDeck.map((lc, i) => <Row key={`loan-${lc.id}-${i}`}>
-                            <h6>{lc.type.name}:&nbsp;</h6><p>{lc.type.description}</p>
+                            <h6>{lc.type.name}:&nbsp;</h6><p className="white-space-pre-line">{lc.type.description}</p>
                         </Row>)}
                     </Col>}
                 {purchasedLoans.size > 0 &&
@@ -227,7 +227,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                                 <h6>{house.name}</h6>
                             </Row>
                             {loans.map((lc, i) => <Row key={`loan-${lc.type.id}-${i}`}>
-                                <h6>{lc.type.name}:&nbsp;</h6><p>{lc.type.description}</p>
+                                <h6>{lc.type.name}:&nbsp;</h6><p className="white-space-pre-line">{lc.type.description}</p>
                             </Row>)}
                         </Col>)}
                     </Col>}

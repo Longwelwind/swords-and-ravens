@@ -18,58 +18,66 @@ export const customsOfficer = new CustomsOfficerLoanCardType(
 );
 
 export const expertArtificer = new ExpertArtificerLoanCardType(
-    "expert-artificer", "Expert Artificer", "Choose any land area and place a power improvement there." +
-    " Then, gain 8 power tokens."
+    "expert-artificer", "Expert Artificer",
+    "Choose any land area and place a power improvement there.\n" +
+        "Then, gain 8 power tokens."
 );
 
 export const fullHost = new FullHostLoanCardType(
-    "full-host", "Full Host", "Place a Footman, a Knight, a Siege Engine and a Ship in areas you control " +
-    "or already have units."
+    "full-host", "Full Host",
+    "Place a Footman, a Knight, a Siege Engine and a Ship in areas you control\n" +
+        "or already have units."
 );
 
 export const loyalMaester = new LoyalMaesterLoanCardType(
-    "loyal-maester", "Loyal Maester", "Choose any two land areas and place one supply improvement on each."
+    "loyal-maester", "Loyal Maester",
+    "Choose any two land areas and place one supply improvement on each."
 );
 
 export const masterAtArms = new MasterAtArmsLoanCardType(
-    "master-at-arms", "Master-at-Arms", "Choose any two areas that contain a castle. " +
-    "Improve those castles to strongholds."
+    "master-at-arms", "Master-at-Arms",
+    "Choose any two areas that contain a castle.\n" +
+        "Improve those castles to strongholds."
 );
 
 export const pyromancer = new PyromancerLoanCardType(
-    "pyromancer", "Pyromancer", "Choose any area that contains a castle and degrade it. " +
-    "Then place either a power improvement or a supply improvement in that area."
+    "pyromancer", "Pyromancer",
+    "Choose any area that contains a castle and degrade it.\n" +
+        "Then place either a power improvement or a supply improvement in that area."
 );
 
 export const savvySteward = new SavvyStewardLoanCardType(
-    "savvy-steward", "Savvy Steward", "Choose any land area and place a supply improvement there. " +
-    "Then, move up one position on the supply track."
+    "savvy-steward", "Savvy Steward",
+    "Choose any land area and place a supply improvement there.\n" +
+        "Then, move up one position on the supply track."
 );
 
 export const seaRaiders = new SeaRaidersLoanCardType(
-    "sea-raiders", "Sea Raiders", "Place a Footman and 3 Ships in areas you control " +
-    "or already have units."
+    "sea-raiders", "Sea Raiders",
+        "Place a Footman and 3 Ships in areas you control or already have units."
 );
 
 export const siegeEngineers = new SiegeEngineersLoanCardType(
-    "siege-engineers", "Siege Engineers", "Place a Footman and 2 Siege Engines in areas you control " +
-    "or already have units."
+    "siege-engineers", "Siege Engineers",
+    "Place a Footman and 2 Siege Engines in areas you control or already have units."
 );
 
 export const spymaster = new SpymasterLoanCardType(
-    "spymaster", "Spymaster", "Draw the top two cards of any one Westeros deck. " +
-    "After secretly reading them, put any number of them on the bottom of the deck " +
-    "in any order and the rest on top of the deck in any order."
+    "spymaster", "Spymaster",
+    "Draw the top two cards of any one Westeros deck. After secretly reading them,\n" +
+        "put any number of them on the bottom of the deck in any order\n" +
+        "and the rest on top of the deck in any order."
 );
 
 export const theFacelessMen = new TheFacelessMenLoanCardType(
-    "the-faceless-men", "The Faceless Men", "Destroy one Knight in any one area " +
-    "and one Footman in any one other area. The units may belong to any player or vassal."
+    "the-faceless-men", "The Faceless Men",
+    "Destroy one Knight in any one area  and one Footman in any one other area.\n" +
+        "The units may belong to any player or vassal."
 );
 
 export const vanguardCavalry = new VanguardCavalryLoanCardType(
-    "vanguard-cavalry", "Vanguard Cavalry", "Place 3 Knights in areas you control " +
-    "or already have units."
+    "vanguard-cavalry", "Vanguard Cavalry",
+    "Place 3 Knights in areas you control or already have units."
 );
 
 const loanCardTypes = new BetterMap<string, LoanCardType>([
