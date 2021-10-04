@@ -143,9 +143,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         if (this.ingame.hasChildGameState(ClashOfKingsGameState)) {
             const cok = this.ingame.getChildGameState(ClashOfKingsGameState) as ClashOfKingsGameState;
             for (let i = cok.currentTrackI; i < influenceTracks.length; i++) {
-                influenceTracks[i] = this.clientGetFixedInfluenceTrack(influenceTracks[i].map((h, j) => (i == 0 && j == 0) || h == this.game.targaryen ? h : null));
+                influenceTracks[i] = this.clientGetFixedInfluenceTrack(influenceTracks[i].map(h => (i == 0 && h == this.game.ironThroneHolder) || h == this.game.targaryen ? h : null));
             }
-        } else if(this.ingame.hasChildGameState(DraftHouseCardsGameState) || this.ingame.hasChildGameState(DraftInfluencePositionsGameState)) {
+        } else if(this.ingame.hasChildGameState(DraftHouseCardsGameState) || this.ingame.hasChildGameState(DraftInfluencePositionsGameState) || this.ingame.hasChildGameState(ThematicDraftHouseCardsGameState)) {
             for (let i = 0; i < influenceTracks.length; i++) {
                 while (influenceTracks[i].length < this.game.houses.size) {
                     influenceTracks[i].push(null);
