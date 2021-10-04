@@ -78,6 +78,7 @@ export default class GiftPowerTokensComponent extends Component<GiftPowerTokensC
                         document.body.click();
                     }}
                     disabled={!this.canGiftPowerTokens()}
+                    variant="success"
                 >
                     Confirm
                 </Button>

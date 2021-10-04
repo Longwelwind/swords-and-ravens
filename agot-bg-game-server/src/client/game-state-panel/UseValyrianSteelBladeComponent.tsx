@@ -30,10 +30,10 @@ export default class UseValyrianSteelBladeComponent extends Component<GameStateC
                     {this.props.gameClient.doesControlHouse(this.house) ? (
                         <Row className="justify-content-center">
                             <Col xs="auto">
-                                <Button onClick={() => this.choose(true)}>Use it</Button>
+                                <Button variant="success" onClick={() => this.choose(true)}>Use it</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button onClick={() => this.choose(false)}>Don&apos;t use it</Button>
+                                <Button variant="danger" onClick={() => this.choose(false)}>Don&apos;t use it</Button>
                             </Col>
                         </Row>
                     ) : (

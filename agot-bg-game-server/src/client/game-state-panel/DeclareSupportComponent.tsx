@@ -49,7 +49,7 @@ export default class DeclareSupportComponent extends Component<GameStateComponen
                                 </Col>
                             ))}
                             <Col xs="auto">
-                                <Button onClick={() => this.choose(null)}>
+                                <Button variant="danger" onClick={() => this.choose(null)}>
                                     None
                                 </Button>
                             </Col>

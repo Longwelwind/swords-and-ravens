@@ -41,13 +41,13 @@ export default class SelectUnitsComponent extends Component<GameStateComponentPr
                             )}
                             <Row className="justify-content-center">
                                 <Col xs="auto">
-                                    <Button onClick={() => this.reset()} variant="danger" disabled={this.countSelectedUnits() == 0}>
-                                        Reset
+                                    <Button variant="success" onClick={() => this.confirm()} disabled={!this.props.gameState.selectedCountMatchesExpectedCount(this.selectedUnits.entries)}>
+                                        Confirm
                                     </Button>
                                 </Col>
                                 <Col xs="auto">
-                                    <Button onClick={() => this.confirm()} disabled={!this.props.gameState.selectedCountMatchesExpectedCount(this.selectedUnits.entries)}>
-                                        Confirm
+                                    <Button onClick={() => this.reset()} variant="danger" disabled={this.countSelectedUnits() == 0}>
+                                        Reset
                                     </Button>
                                 </Col>
                             </Row>

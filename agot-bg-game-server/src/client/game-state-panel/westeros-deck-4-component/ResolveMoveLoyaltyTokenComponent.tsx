@@ -35,7 +35,7 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<GameStat
                             </p>
                             <Row className="justify-content-center">
                                 <Col xs="auto">
-                                    <Button onClick={() => this.confirm()} disabled={this.from == null || this.to == null}>
+                                    <Button variant="success" onClick={() => this.confirm()} disabled={this.from == null || this.to == null}>
                                         Confirm
                                     </Button>
                                 </Col>

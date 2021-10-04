@@ -82,6 +82,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                     <Row className="justify-content-center">
                                         <Col xs="auto">
                                             <Button
+                                                variant="success"
                                                 onClick={() => this.confirm()}
                                                 disabled={this.leavePowerToken == undefined}
                                             >

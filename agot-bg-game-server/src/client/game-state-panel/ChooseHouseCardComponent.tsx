@@ -109,13 +109,13 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
                             </Row>}
                             <Row className="justify-content-center">
                                 <Col xs="auto">
-                                    <Button onClick={() => this.chooseHouseCard()} disabled={!this.dirty || this.selectedHouseCard == null}>
+                                    <Button variant="success" onClick={() => this.chooseHouseCard()} disabled={!this.dirty || this.selectedHouseCard == null}>
                                         Confirm
                                     </Button>
                                 </Col>
                                 {this.props.gameClient.authenticatedPlayer &&
                                 <Col xs="auto">
-                                    <Button onClick={() => {
+                                    <Button variant="warning" onClick={() => {
                                             if (window.confirm("Are you sure you want to refuse all the support you have received?")) {
                                                 this.props.gameState.refuseSupport();
                                             }

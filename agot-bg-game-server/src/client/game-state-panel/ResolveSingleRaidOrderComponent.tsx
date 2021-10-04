@@ -54,7 +54,7 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
                             <Col xs={12}>
                                 <Row className="justify-content-center">
                                     <Col xs="auto">
-                                        <Button onClick={() => this.confirm()}>Confirm</Button>
+                                        <Button variant="success" onClick={() => this.confirm()}>Confirm</Button>
                                     </Col>
                                     <Col xs="auto">
                                         <Button variant="danger" onClick={() => this.reset()}>Reset</Button>

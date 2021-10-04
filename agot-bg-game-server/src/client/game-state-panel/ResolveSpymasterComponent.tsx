@@ -59,9 +59,9 @@ export default class ResolveSpymasterComponent extends Component<GameStateCompon
                                 </Row>
                                 <Row className="justify-content-center mt-4">
                                     <Col xs="auto">
-                                    <Button onClick={() => this.confirm()}>
-                                    Put selected cards to bottom of the deck
-                                </Button>
+                                        <Button variant="success" onClick={() => this.confirm()}>
+                                            Put selected cards to bottom of the deck
+                                        </Button>
                                     </Col>
                                 </Row>
                             </Col>

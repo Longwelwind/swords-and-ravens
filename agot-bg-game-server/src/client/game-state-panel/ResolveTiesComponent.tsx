@@ -64,7 +64,7 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
                             </Row>
                         </Col>
                         <Col xs={12}>
-                            <Button onClick={() => this.submit()}>Resolve</Button>
+                            <Button variant="success" onClick={() => this.submit()}>Resolve</Button>
                         </Col>
                     </>
                 ) : <>

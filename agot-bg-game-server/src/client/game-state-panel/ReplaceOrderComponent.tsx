@@ -46,13 +46,13 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
                         <Col xs={12}>
                             <Row className="justify-content-center">
                                 <Col xs="auto">
-                                    <Button onClick={() => this.replaceOrder()} disabled={this.selectedOrder == null || this.selectedRegion == null}>Confirm Order Token replacement</Button>
+                                    <Button variant="success" onClick={() => this.replaceOrder()} disabled={this.selectedOrder == null || this.selectedRegion == null}>Confirm Order Token replacement</Button>
                                 </Col>
                                 <Col xs="auto">
                                     <Button onClick={() => this.seeTopWildlingCardInstead()} disabled={this.selectedRegion != null || this.selectedOrder != null}>Look at the Top Wildling Card instead</Button>
                                 </Col>
                                 <Col xs="auto">
-                                    <Button onClick={() => this.skip()}>Skip Raven Phase</Button>
+                                    <Button variant="danger" onClick={() => this.skip()}>Skip Raven Phase</Button>
                                 </Col>
                             </Row>
                         </Col>
