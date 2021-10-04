@@ -66,9 +66,11 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
                                     </Col>
                                 ))}
                             </Row>
-                        </Col>
-                        <Col xs={12}>
-                            <Button onClick={() => this.submit()}>Submit</Button>
+                            <Row className="justify-content-center mt-3">
+                                <Col xs="auto">
+                                    <Button variant="success" onClick={() => this.submit()}>Submit</Button>
+                                </Col>
+                            </Row>
                         </Col>
                     </>
                 ) : <>

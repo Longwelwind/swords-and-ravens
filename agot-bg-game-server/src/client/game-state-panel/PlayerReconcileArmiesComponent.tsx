@@ -77,7 +77,7 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
                                 ))}
                                 <Row className="justify-content-center">
                                     <Col xs="auto">
-                                        <Button disabled={notEnough || tooMuch} onClick={() => this.confirm()}>Confirm</Button>
+                                        <Button variant="success" disabled={notEnough || tooMuch} onClick={() => this.confirm()}>Confirm</Button>
                                     </Col>
                                     <Col xs="auto">
                                         <Button variant="danger" disabled={this.unitsToRemove.size == 0} onClick={() => this.reset()}>Reset</Button>

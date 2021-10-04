@@ -295,6 +295,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         }
                     }}
                     disabled={house.powerTokens <= 0}
+                    variant="warning"
                 >
                     Drop all available Power tokens
                 </Button>

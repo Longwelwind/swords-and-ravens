@@ -11,11 +11,11 @@ import stormsend from "../../public/images/garrisons/storms-end.png";
 import oldtown from "../../public/images/garrisons/oldtown.png";
 import braavos from "../../public/images/garrisons/braavos-5.png";
 import pentos from "../../public/images/garrisons/pentos-2.png";
-import garrison2 from "../../public/images/garrisons/garrison-2.svg";
-import garrison3 from "../../public/images/garrisons/garrison-3.svg";
-import garrison4 from "../../public/images/garrisons/garrison-4.svg";
-import garrison5 from "../../public/images/garrisons/garrison-5.svg";
-import garrison6 from "../../public/images/garrisons/garrison-6.svg";
+import garrison2 from "../../public/images/garrisons/garrison-2.png";
+import garrison3 from "../../public/images/garrisons/garrison-3.png";
+import garrison4 from "../../public/images/garrisons/garrison-4.png";
+import garrison5 from "../../public/images/garrisons/garrison-5.png";
+import garrison6 from "../../public/images/garrisons/garrison-6.png";
 
 import BetterMap from "../utils/BetterMap";
 

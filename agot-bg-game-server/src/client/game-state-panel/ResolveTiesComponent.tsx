@@ -12,6 +12,7 @@ import Row from "react-bootstrap/Row";
 import Button from "react-bootstrap/Button";
 import {faAngleLeft} from "@fortawesome/free-solid-svg-icons/faAngleLeft";
 import {faAngleRight} from "@fortawesome/free-solid-svg-icons/faAngleRight";
+import { faStar } from "@fortawesome/free-solid-svg-icons/faStar";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import SimpleInfluenceIconComponent from "./utils/SimpleInfluenceIconComponent";
 import HouseNumberResultsComponent from "../HouseNumberResultsComponent";
@@ -34,11 +35,20 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
                     The holder of the Iron Throne can resolve the ties of the bidding.
                 </Col>
                 {this.props.gameClient.doesControlHouse(this.props.gameState.decider) ? (
-                    <>
                         <Col xs={12}>
-                            <Row className="justify-content-center">
+                            <Row className="justify-content-center align-items-center">
                                 {this.currentOrdering.map((h, i) => (
-                                    <Col xs="auto" key={h.id} className="d-flex flex-md-column align-items-center">
+                                    <Col xs="auto" key={h.id}>
+                                        {this.props.gameState.stars && (
+                                            <div className="resolve-ties-tracker-star-container">
+                                                {_.range(0, this.props.gameState.game.starredOrderRestrictions[i]).map(j => (
+                                                    <div key={`stars_${h?.id ?? i}_${j}`}>
+                                                        <FontAwesomeIcon
+                                                            style={{ color: "#ffc107", fontSize: "9px" }}
+                                                            icon={faStar} />
+                                                    </div>))}
+                                            </div>
+                                        )}
                                         <div className="mb-2">
                                             <SimpleInfluenceIconComponent house={h}/>
                                         </div>
@@ -62,11 +72,12 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
                                     </Col>
                                 ))}
                             </Row>
+                            <Row className="justify-content-center mt-3">
+                                <Col xs="auto">
+                                    <Button variant="success" onClick={() => this.submit()}>Resolve</Button>
+                                </Col>
+                            </Row>
                         </Col>
-                        <Col xs={12}>
-                            <Button onClick={() => this.submit()}>Resolve</Button>
-                        </Col>
-                    </>
                 ) : <>
                     <Col xs={12}>
                         <p>Bidding results:</p>

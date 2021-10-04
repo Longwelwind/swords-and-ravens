@@ -69,6 +69,7 @@ export default class BiddingComponent<ParentGameState extends BiddingGameStatePa
                             <Button
                                 onClick={() => this.bid(this.powerTokensToBid)}
                                 disabled={!this.dirty}
+                                variant="success"
                             >
                                 Confirm
                             </Button>

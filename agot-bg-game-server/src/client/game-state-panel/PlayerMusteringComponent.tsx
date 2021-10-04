@@ -82,7 +82,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                         <Col xs={12}>
                             <Row className="justify-content-center">
                                 <Col xs="auto">
-                                    <Button disabled={!this.canSubmit()} onClick={() => this.submit()}>Submit</Button>
+                                    <Button variant="success" disabled={!this.canSubmit()} onClick={() => this.submit()}>Submit</Button>
                                 </Col>
                                 <Col xs="auto">
                                     <Button

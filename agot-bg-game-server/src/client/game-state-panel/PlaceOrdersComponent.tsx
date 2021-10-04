@@ -83,6 +83,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                                         <Button
                                             disabled={!this.placeOrders.canReady(this.props.gameClient.authenticatedPlayer).status}
                                             onClick={() => this.onReadyClick()}
+                                            variant="success"
                                         >
                                             Ready
                                         </Button>
@@ -91,6 +92,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                                         <Button
                                             disabled={!this.placeOrders.canUnready(this.props.gameClient.authenticatedPlayer).status}
                                             onClick={() => this.onUnreadyClick()}
+                                            variant="danger"
                                         >
                                             Unready
                                         </Button>

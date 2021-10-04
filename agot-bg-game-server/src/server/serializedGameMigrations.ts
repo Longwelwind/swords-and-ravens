@@ -1221,6 +1221,26 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "50",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.gameLogManager.logs.forEach((l: any) => {
+                    if (l.data.type == "the-faceless-men-units-destroyed") {
+                        const oldUnits = l.data.units as [string, string[]][];
+                        l.data.units = oldUnits.map(([regionId, unitTypeIds]) => ({
+                            houseId: undefined,
+                            regionId: regionId,
+                            unitTypeId: unitTypeIds[0]
+                        }))
+                    }
+                });
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

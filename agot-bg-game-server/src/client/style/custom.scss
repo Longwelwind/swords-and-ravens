@@ -145,7 +145,7 @@ strong
 
 .garrison-icon {
   width: 32px;
-  height: 32px;
+  height: 40px;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -290,12 +290,20 @@ $tiny-scale: 0.12;
 
 .tracker-star-container {
   position: absolute;
-  // This width is a hack to make sure the elements don't wrap
-  width: 1000px;
   display: flex;
+  flex-wrap: nowrap;
   bottom: -3px;
   left: auto;
   right: auto;
+}
+
+.resolve-ties-tracker-star-container {
+  position: absolute;
+  display: flex;
+  flex-wrap: nowrap;
+  left: auto;
+  right: auto;
+  top: 35px;
 }
 
 .tracker-star-container > * {
@@ -549,4 +557,8 @@ div.new-event {
 .userlabel:hover {
   color: white;
   text-decoration: underline;
+}
+
+.white-space-pre-line {
+  white-space: pre-line;
 }

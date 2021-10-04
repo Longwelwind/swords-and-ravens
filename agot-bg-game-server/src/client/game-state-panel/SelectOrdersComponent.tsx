@@ -31,7 +31,7 @@ export default class SelectOrdersComponent extends Component<GameStateComponentP
                             </Row>}
                             <Row className="justify-content-center">
                                 <Col xs="auto">
-                                    <Button onClick={() => this.confirm()} disabled={this.selectedRegions.length != this.props.gameState.count}>
+                                    <Button variant="success" onClick={() => this.confirm()} disabled={this.selectedRegions.length != this.props.gameState.count}>
                                         Confirm
                                     </Button>
                                 </Col>
