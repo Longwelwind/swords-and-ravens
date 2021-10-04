@@ -1499,10 +1499,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             }
             case "the-faceless-men-units-destroyed": {
                 const house = this.game.houses.get(data.house);
-                const destroyedUnits = data.units.map(([regionId, units]) => [this.world.regions.get(regionId), units.map(ut => unitTypes.get(ut))[0]] as [Region, UnitType]);
+                const destroyedUnits = data.units.map(unitInfo => ({
+                    region: this.world.regions.get(unitInfo.regionId),
+                    house: unitInfo.houseId ? this.game.houses.get(unitInfo.houseId) : null,
+                    unitType: unitTypes.get(unitInfo.unitTypeId)
+                }));
                 return <p>
                     <b>The Faceless Men</b>: House <b>{house.name}</b> chose {destroyedUnits.length > 0 ? (<>to destroy {joinReactNodes(
-                        destroyedUnits.map(([region, unitType]) => <span key={`the-faceless-men_${region.id}`}>a <b>{unitType.name}</b> in <b>{region.name}</b></span>), " and ")}.</>)
+                        destroyedUnits.map(unitInfo => <span key={`the-faceless-men_${unitInfo.region.id}`}>a <b>{unitInfo.unitType.name}</b> of <b>{unitInfo.house?.name ?? "Unknown"}</b> in <b>{unitInfo.region.name}</b></span>), " and ")}.</>)
                         : <>not to destroy any units.</>}
                 </p>;
             }

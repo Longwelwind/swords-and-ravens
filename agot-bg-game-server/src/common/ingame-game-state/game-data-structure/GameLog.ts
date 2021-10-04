@@ -871,7 +871,11 @@ interface SellswordsPlaced {
 interface TheFacelessMenUnitsDestroyed {
     type: "the-faceless-men-units-destroyed";
     house: string;
-    units: [string, string[]][];
+    units: {
+        regionId: string;
+        houseId?: string;
+        unitTypeId: string;
+    }[];
 }
 
 interface PyromancerExecuted {

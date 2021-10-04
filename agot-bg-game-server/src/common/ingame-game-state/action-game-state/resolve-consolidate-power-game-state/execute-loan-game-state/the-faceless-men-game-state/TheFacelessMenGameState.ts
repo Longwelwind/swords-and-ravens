@@ -66,7 +66,7 @@ export default class TheFacelessMenGameState extends GameState<ExecuteLoanGameSt
             // Check there is a maximum of 1 footman and 1 knight
             if (flatUnits.filter(u => u.type == footman).length > 1
                 || flatUnits.filter(u => u.type == knight).length > 1
-                || destroyedUnits.values.some(units => units.length > 1)) {
+                || destroyedUnits.values.some(units => units.length != 1)) {
                 return;
             }
 
@@ -85,7 +85,11 @@ export default class TheFacelessMenGameState extends GameState<ExecuteLoanGameSt
             this.ingame.log({
                 type: "the-faceless-men-units-destroyed",
                 house: this.house.id,
-                units: destroyedUnits.entries.map(([region, units]) => [region.id, units.map(u => u.type.id)])
+                units: destroyedUnits.entries.map(([region, units]) => ({
+                    regionId: region.id,
+                    houseId: units[0].allegiance.id,
+                    unitTypeId: units[0].type.id
+                }))
             });
 
             // There might be orphaned CP* orders now so we remove them.
