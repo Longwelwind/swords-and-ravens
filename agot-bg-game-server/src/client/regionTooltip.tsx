@@ -6,7 +6,7 @@ import Region from "../common/ingame-game-state/game-data-structure/Region";
 
 export function renderRegionTooltip(region: Region): OverlayChildren {
     const controller =  region.getController();
-    const loyaltyTokenCount = region.loyaltyTokens || region.superLoyaltyToken ? 1 : 0;
+    const loyaltyTokenCount = region.loyaltyTokens > 0 ? region.loyaltyTokens : region.superLoyaltyToken ? 1 : 0;
 
     return <Tooltip id={`region-${region.id}-details`}>
         <div className="text-center mb-2">

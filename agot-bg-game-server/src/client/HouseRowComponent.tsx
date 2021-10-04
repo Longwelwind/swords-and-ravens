@@ -249,7 +249,13 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     strong: r.type.id == "land"
                 }
             });
-        })
+        });
+
+        this.ingame.world.regions.values.forEach(r => {
+            if (!this.highlightedRegions.has(r)) {
+                this.highlightedRegions.set(r, { highlight: { active: false } } );
+            }
+        });
     }
 
     private renderUnitTypeTooltip(unitType: UnitType): OverlayChildren {
