@@ -126,7 +126,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                                     delay={{ show: 250, hide: 100 }}
                                     placement="auto"
                                     overlay={<Tooltip id={"power-token-" + r.id}>
-                                        <><b>Power token</b><small> of <b>{r.getController()?.name ?? "Unknown"}</b></small></>
+                                        <b>Power token</b><small> of <b>{r.getController()?.name ?? "Unknown"}</b><br/><b>{r.name}</b></small>
                                     </Tooltip>}
                                 >
                                     <div
@@ -338,7 +338,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                         delay={{ show: 250, hide: 100 }}
                         placement="auto"
                         overlay={<Tooltip id={"unit-tooltip-" + u.id}>
-                            <b>{u.type.name}</b>{controller != null && <small> of <b>{controller.name}</b></small>}
+                            <b>{u.type.name}</b><small> of <b>{controller?.name ?? "Unknown"}</b><br /><b>{r.name}</b></small>
                         </Tooltip>}
                     >
                         <div onClick={property.onClick ? property.onClick : undefined}
@@ -372,6 +372,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                         placement="auto"
                         overlay={<Tooltip id={"garrison-tooltip-" + r.id}>
                             {garrisonControllers.get(r.id) == null ? <b>Neutral Force token</b> : <><b>Garrison</b> <small>of <b>{garrisonControllers.get(r.id)?.name ?? "Unknown"}</b></small></>}
+                            <br/><small><b>{r.name}</b></small>
                         </Tooltip>}
                     >
                         <div
@@ -390,7 +391,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                         delay={{ show: 250, hide: 100 }}
                         placement="auto"
                         overlay={<Tooltip id={"loyalty-tooltip-" + r.id}>
-                            <b>Loyalty token</b>
+                            <b>Loyalty token</b><br/><small><b>{r.name}</b></small>
                         </Tooltip>}
                     >
                         <div
