@@ -244,11 +244,6 @@ export default class MapComponent extends Component<MapComponentProps> {
             width: ironBankView.infoComponentSlot.width
         }}
         >
-            {/* <div className="iron-bank-content" style={{
-                width: ironBankView.infoComponentSlot.width,
-                height: ironBankView.infoComponentSlot.height,
-                backgroundImage: `url(${loanCardImages.get("back")})`
-            }} /> */}
             <IronBankInfosComponent ingame={this.ingame} ironBank={this.ingame.game.theIronBank} />
         </div>;
     }
