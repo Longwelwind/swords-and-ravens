@@ -9,14 +9,25 @@ import houseInfluenceImages from "../../houseInfluenceImages";
 import House from "../../../common/ingame-game-state/game-data-structure/House";
 import BetterMap from "../../../utils/BetterMap";
 import barrelImage from "../../../../public/images/icons/barrel.svg";
+import Region from "../../../common/ingame-game-state/game-data-structure/Region";
+import PartialRecursive from "../../../utils/PartialRecursive";
+import MapControls, { RegionOnMapProperties } from "../../../client/MapControls";
+import IngameGameState from "../../../common/ingame-game-state/IngameGameState";
+import { observable } from "mobx";
+import _ from "lodash";
 
 interface SupplyTrackComponentProps {
     supplyRestrictions: number[][];
     houses: BetterMap<string, House>;
+    ingame: IngameGameState;
+    mapControls: MapControls;
 }
 
 @observer
 export default class SupplyTrackComponent extends Component<SupplyTrackComponentProps> {
+    modifyRegionsOnMapCallback: any;
+    @observable highlightedRegions = new BetterMap<Region, PartialRecursive<RegionOnMapProperties>>();
+
     render(): ReactNode {
         return (
             <Row>
@@ -84,7 +95,7 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
                                                 )}
                                             </Tooltip>
                                         }
-                                        placement="right"
+                                        placement="auto"
                                     >
                                         <Badge variant="secondary" style={{fontSize: "14px"}}>
                                             {i}
@@ -101,7 +112,7 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
                                                         {h.name}
                                                     </Tooltip>
                                                 }
-                                                placement="right">
+                                                placement="auto">
                                                     <div
                                                         key={h.id}
                                                         className="supply-icon hover-weak-outline"
@@ -109,6 +120,7 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
                                                             backgroundImage: `url(${houseInfluenceImages.get(h.id)})`,
                                                             marginTop: "-5px"
                                                         }}
+                                                        onMouseEnter={() => this.setHighlightedRegions(h)} onMouseLeave={() => this.highlightedRegions.clear()}
                                                     >
                                                     </div>
                                             </OverlayTrigger>
@@ -130,7 +142,41 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
         );
     }
 
+    setHighlightedRegions(house: House): void {
+        const regions = this.props.ingame.world.getControlledRegions(house).filter(r => r.supplyIcons > 0);
+        this.highlightedRegions.clear();
+
+        regions.forEach(r => {
+            this.highlightedRegions.set(r, {
+                highlight: {
+                    active: true,
+                    color: house.id != "greyjoy" ? house.color : "black",
+                    light: r.type.id == "sea",
+                    strong: r.type.id == "land"
+                }
+            });
+        });
+
+        this.props.ingame.world.regions.values.forEach(r => {
+            if (!this.highlightedRegions.has(r)) {
+                this.highlightedRegions.set(r, { highlight: { active: false } } );
+            }
+        });
+    }
+
     getHousesAtSupplyLevel(supplyLevel: number): House[] {
         return this.props.houses.values.filter(h => h.supplyLevel == supplyLevel);
+    }
+
+    modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
+        return this.highlightedRegions.entries;
+    }
+
+    componentDidMount(): void {
+        this.props.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
+    }
+
+    componentWillUnmount(): void {
+        _.pull(this.props.mapControls.modifyRegionsOnMap, this.modifyRegionsOnMapCallback);
     }
 }
