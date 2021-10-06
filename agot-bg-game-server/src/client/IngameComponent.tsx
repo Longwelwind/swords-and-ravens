@@ -353,6 +353,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     <SupplyTrackComponent
                                         supplyRestrictions={this.game.supplyRestrictions}
                                         houses={this.game.houses}
+                                        ingame={this.props.gameState}
+                                        mapControls={this.mapControls}
                                     />
                                 </ListGroupItem>
                             </ListGroup>
