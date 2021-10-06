@@ -414,7 +414,7 @@ export default class MapComponent extends Component<MapComponentProps> {
             className="units-container"
             style={{ left: region.improvementSlot.point.x, top: region.improvementSlot.point.y, width: region.improvementSlot.width, flexWrap: "wrap" }}
         >
-            {[...Array(region.barrelModifier)].map((_, i) => {
+            {_.range(0, region.barrelModifier).map((_, i) => {
                 return <OverlayTrigger
                     key={`barrel-${region.id}-${i}`}
                     overlay={renderRegionTooltip(region)}
@@ -430,7 +430,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                     />
                 </OverlayTrigger>
             })}
-            {[...Array(region.crownModifier)].map((_, i) => {
+            {_.range(0, region.crownModifier).map((_, i) => {
                 return <OverlayTrigger
                     key={`crown-${region.id}-${i}`}
                     overlay={renderRegionTooltip(region)}
@@ -453,7 +453,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         const propertiesForOrders = this.getModifiedPropertiesForEntities<Region, OrderOnMapProperties>(
             _.flatMap(this.props.ingameGameState.world.regions.values),
             this.props.mapControls.modifyOrdersOnMap,
-            { highlight: { active: false, color: "white" }, onClick: null }
+            { highlight: { active: false, color: "white" }, onClick: null, wrap: null }
         );
 
         return propertiesForOrders.map((region, properties) => {
@@ -530,30 +530,42 @@ export default class MapComponent extends Component<MapComponentProps> {
         const controller = drawBorder ? region.getController() : null;
         const color = drawBorder ? controller ? controller.id != "greyjoy" ? controller.color : "black" : undefined : undefined;
 
+        const wrap = properties.wrap;
+
         return (
-            <div className={classNames(
-                "order-container",
-                {
-                    "hover-weak-outline": order != null,
-                    "medium-outline hover-strong-outline clickable": order && properties.highlight.active,
-                    "restricted-order": planningOrAction && order && this.ingame.game.isOrderRestricted(region, order, planningOrAction.planningRestrictions)
-                }
-            )}
-                style={{ left: region.orderSlot.x, top: region.orderSlot.y}}
-                onClick={properties.onClick ? properties.onClick : undefined}
-                key={"region-" + region.id}
-            >
-                <OverlayTrigger overlay={this.renderOrderTooltip(order, region)}
-                    delay={{ show: 250, hide: 100 }}>
-                    <div className={classNames("order-icon", { "order-border": drawBorder } )}
-                        style={{ backgroundImage: `url(${backgroundUrl})`, borderColor: color }} />
-                </OverlayTrigger>
-            </div>
+            <ConditionalWrap condition={true}
+                    key={region.id}
+                    wrap={wrap ? wrap : child =>
+                        <OverlayTrigger overlay={this.renderOrderTooltip(order, region)}
+                            delay={{ show: 250, hide: 100 }}
+                            placement="auto"
+                            rootClose
+                        >
+                            {child}
+                        </OverlayTrigger>
+                    }
+                >
+                    <div className={classNames(
+                        "order-container",
+                        {
+                            "hover-weak-outline": order != null,
+                            "medium-outline hover-strong-outline clickable": order && properties.highlight.active,
+                            "restricted-order": planningOrAction && order && this.ingame.game.isOrderRestricted(region, order, planningOrAction.planningRestrictions)
+                        }
+                    )}
+                        style={{ left: region.orderSlot.x, top: region.orderSlot.y}}
+                        onClick={properties.onClick ? properties.onClick : undefined}
+                        key={"region-" + region.id}
+                    >
+                        <div className={classNames("order-icon", { "order-border": drawBorder } )}
+                            style={{ backgroundImage: `url(${backgroundUrl})`, borderColor: color }} />
+                    </div>
+                </ConditionalWrap>
         );
     }
 
     private renderOrderTooltip(order: Order | null, region: Region): OverlayChildren {
-        return <Tooltip id={"order-info"}>
+        return <Tooltip id={"order-info"} className="westeros-tooltip">
             <b>{order ? order.type.name : "Order token"}</b><small> of <b>{region.getController()?.name ?? "Unknown"}</b><br /><b>{region.name}</b></small>
         </Tooltip>;
     }
