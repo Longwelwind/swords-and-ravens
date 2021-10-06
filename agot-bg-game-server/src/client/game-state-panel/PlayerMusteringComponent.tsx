@@ -16,6 +16,7 @@ import Col from "react-bootstrap/Col";
 import {OrderOnMapProperties, RegionOnMapProperties, UnitOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
 import Unit from "../../common/ingame-game-state/game-data-structure/Unit";
+import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 
 @observer
 export default class PlayerMusteringComponent extends Component<GameStateComponentProps<PlayerMusteringGameState>> {
@@ -42,7 +43,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
             <>
                 <Col xs={12} className="text-center">
                     {this.isStarredConsolidatePowerMusteringType ? (
-                        <>House <b>{this.house.name}</b> can muster units to {this.props.gameState.regions[0]?.name ?? "Unknown"}.</>
+                        <>House <b>{this.house.name}</b> can resolve their Special Consolidate Power order in {this.props.gameState.regions[0]?.name ?? "Unknown"}.</>
                     ) : this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD ? (
                         <>Players can muster units in their controlled castles and fortresses.</>
                     ) : this.props.gameState.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD ? (
@@ -75,7 +76,8 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                         {(this.musterings.size == 0 || (this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD && this.props.gameState.anyUsablePointsLeft(this.musterings))) && (
                             <Col xs={12} className="text-center">
                                 {this.props.gameState.regions.length == 1 ?
-                                    <>Click into <b>{this.props.gameState.regions[0].name}</b> to initiate a recruitment from there.</>
+                                    <>Click {this.isStarredConsolidatePowerMusteringType ? <>the <b>Special Consolidate Power</b> order or </> : this.props.gameState.type == PlayerMusteringType.DEFENSE_MUSTER_ORDER ? <>the <b>Defense/Muster</b> order or </> : <></>}
+                                    into <b>{this.props.gameState.regions[0].name}</b> to initiate a recruitment from there.</>
                                   : <>Click on a region to initiate a recruitment from there.</>}
                             </Col>
                         )}
@@ -203,24 +205,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                                     trigger="click"
                                     rootClose
                                     overlay={
-                                        <Popover id={"region-popover-" + modifiedRegion.id} className="p-2">
-                                            <h5 style={{textAlign: "center"}}>{modifiedRegion.name} <small>({this.props.gameState.getUsedPointsForRegion(modifiedRegion, this.musterings)} / {modifiedRegion.castleLevel})</small></h5>
-                                            <>
-                                                {this.props.gameState.getValidMusteringRulesForRegion(modifiedRegion, this.musterings).length > 0 && (
-                                                    <>
-                                                        {this.props.gameState.getValidMusteringRules(modifiedRegion, this.musterings).map(({region, rules}) => (
-                                                            rules.map((rule, i) => (
-                                                                <Col key={modifiedRegion.id + "_muster-rule_" + i}>
-                                                                    <Button onClick={() => this.addMustering(modifiedRegion, rule)}>
-                                                                        {rule.from ? "Upgrade to " : "Recruit "} a {rule.to.name}{region != modifiedRegion && (" in " + region.name)} [{rule.cost}]
-                                                                    </Button>
-                                                                </Col>
-                                                            ))
-                                                        ))}
-                                                    </>
-                                                )}
-                                            </>
-                                        </Popover>
+                                        this.renderMusteringPopover(modifiedRegion)
                                     }
                                 >
                                     {child}
@@ -233,13 +218,46 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         return [];
     }
 
+    private renderMusteringPopover(modifiedRegion: Region): OverlayChildren {
+        return <Popover id={"region-popover-" + modifiedRegion.id} className="p-2">
+            <h5 style={{ textAlign: "center" }}>{modifiedRegion.name} <small>({this.props.gameState.getUsedPointsForRegion(modifiedRegion, this.musterings)} / {modifiedRegion.castleLevel})</small></h5>
+            <>
+                {this.props.gameState.getValidMusteringRulesForRegion(modifiedRegion, this.musterings).length > 0 && (
+                    <>
+                        {this.props.gameState.getValidMusteringRules(modifiedRegion, this.musterings).map(({ region, rules }) => (
+                            rules.map((rule, i) => (
+                                <Col key={modifiedRegion.id + "_muster-rule_" + i}>
+                                    <Button onClick={() => this.addMustering(modifiedRegion, rule)}>
+                                        {rule.from ? "Upgrade to " : "Recruit "} a {rule.to.name}{region != modifiedRegion && (" in " + region.name)} [{rule.cost}]
+                                    </Button>
+                                </Col>
+                            ))
+                        ))}
+                    </>
+                )}
+            </>
+        </Popover>;
+    }
+
     private modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
         if (this.doesControlCurrentHouse) {
             if (this.isStarredConsolidatePowerMusteringType || this.props.gameState.type == PlayerMusteringType.DEFENSE_MUSTER_ORDER) {
                 return this.props.gameState.regions.map(r => [
                     r,
                     {
-                        highlight: {active: true}
+                        highlight: {active: true},
+                        wrap: (child: ReactElement) => (
+                            <OverlayTrigger
+                                placement="auto"
+                                trigger="click"
+                                rootClose
+                                overlay={
+                                    this.renderMusteringPopover(r)
+                                }
+                            >
+                                {child}
+                            </OverlayTrigger>
+                        )
                     }
                 ]);
             }

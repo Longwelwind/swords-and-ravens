@@ -985,8 +985,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const houseCardsReturned = data.houseCardsReturned.map(hcid => this.allHouseCards.get(hcid));
 
                 return <p>
-                    <b>Massing on the Milkwater</b>: <b>{house.name}</b> took
-                    back {joinReactNodes(houseCardsReturned.map(hc => <b key={`massing-on-the-milkwater-cards-back_${hc.id}`}>{hc.name}</b>), ", ")}
+                    <b>Massing on the Milkwater</b>: <b>{house.name}</b> {houseCardsReturned.length > 0 ? <>took
+                    back {joinReactNodes(houseCardsReturned.map(hc => <b key={`massing-on-the-milkwater-cards-back_${hc.id}`}>{hc.name}</b>), ", ")}</>
+                    : <>had no house cards on their discard pile.</>}
                 </p>;
             }
             case "massing-on-the-milkwater-wildling-victory": {

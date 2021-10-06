@@ -25,6 +25,7 @@ export interface UnitOnMapProperties {
 export interface OrderOnMapProperties {
     highlight: HighlightProperties;
     onClick: (() => void) | null;
+    wrap: ((child: ReactElement) => ReactElement) | null;
 }
 
 export default class MapControls {
