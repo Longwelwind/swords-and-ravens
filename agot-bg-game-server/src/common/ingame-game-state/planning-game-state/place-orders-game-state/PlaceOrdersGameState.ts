@@ -403,7 +403,7 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
                 ]
             )
         );
-        placeOrder.readyHouses = data.readyHouses.map(hid => planning.ingameGameState.game.houses.get(hid));
+        placeOrder.readyHouses = data.readyHouses.map(hid => planning.ingame.game.houses.get(hid));
         placeOrder.forVassals = data.forVassals;
 
         return placeOrder;
