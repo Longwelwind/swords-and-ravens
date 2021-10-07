@@ -371,7 +371,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             const quantity = (!playerHouses.includes(house.id) || gameSettings.useVassalPositions) ? (unitData.quantityVassal ?? 0) : unitData.quantity;
 
             // Check if the game setup removed units off this region
-            if (entireGame.selectedGameSetup.removedUnits && entireGame.selectedGameSetup.removedUnits.includes(region.id)) {
+            if (entireGame.selectedGameSetup.removedUnits?.includes(region.id) || region.garrison == 1000) {
                 return;
             }
 
