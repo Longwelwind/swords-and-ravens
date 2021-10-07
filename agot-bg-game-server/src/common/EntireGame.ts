@@ -33,7 +33,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         randomHouses: false, randomChosenHouses: false, adwdHouseCards: false,  tidesOfBattle: false,
         vassals: true, seaOrderTokens: true, startWithSevenPowerTokens: true, allowGiftingPowerTokens: true,
         draftHouseCards: false, thematicDraft: false, limitedDraft: false, blindDraft: false,
-        cokWesterosPhase: false, endless: false };
+        cokWesterosPhase: false, endless: false, useVassalPositions: false, precedingMustering: false };
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -487,4 +487,6 @@ export interface GameSettings {
     limitedDraft: boolean;
     blindDraft: boolean;
     endless: boolean;
+    useVassalPositions: boolean;
+    precedingMustering: boolean;
 }

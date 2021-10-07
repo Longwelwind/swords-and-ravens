@@ -87,6 +87,8 @@ import sleep from "../utils/sleep";
 import joinNaturalLanguage from "./utils/joinNaturalLanguage";
 import PayDebtsGameState from "../common/ingame-game-state/pay-debts-game-state/PayDebtsGameState";
 import PayDebtsComponent from "./game-state-panel/PayDebtsComponent";
+import MusteringComponent from "./game-state-panel/MusteringComponent";
+import MusteringGameState from "../common/ingame-game-state/westeros-game-state/mustering-game-state/MusteringGameState";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -549,7 +551,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         [[DraftInfluencePositionsGameState, DraftInfluencePositionsComponent]],
                                         [[GameEndedGameState, GameEndedComponent]],
                                         [[CancelledGameState, IngameCancelledComponent]],
-                                        [[PayDebtsGameState, PayDebtsComponent]]
+                                        [[PayDebtsGameState, PayDebtsComponent]],
+                                        [[MusteringGameState, MusteringComponent]]
                                     )
                                 )}
                             </ListGroup>

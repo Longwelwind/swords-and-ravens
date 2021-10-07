@@ -368,7 +368,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             const region = game.world.regions.get(regionId);
             const house = game.houses.get(unitData.house);
             const unitType = unitTypes.get(unitData.unitType);
-            const quantity = playerHouses.includes(house.id) ? unitData.quantity : (unitData.quantityVassal ? unitData.quantityVassal : 0);
+            const quantity = (!playerHouses.includes(house.id) || gameSettings.useVassalPositions) ? (unitData.quantityVassal ?? 0) : unitData.quantity;
 
             // Check if the game setup removed units off this region
             if (entireGame.selectedGameSetup.removedUnits && entireGame.selectedGameSetup.removedUnits.includes(region.id)) {

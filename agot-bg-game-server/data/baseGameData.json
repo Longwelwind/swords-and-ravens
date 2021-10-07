@@ -921,13 +921,13 @@
         "unitType": "knight",
         "house": "targaryen",
         "quantity": 1,
-        "quantityVassal": 0
+        "quantityVassal": 1
       },
       {
         "unitType": "footman",
         "house": "targaryen",
         "quantity": 1,
-        "quantityVassal": 0
+        "quantityVassal": 2
       }
     ],
     "port-of-pentos": [
@@ -935,7 +935,7 @@
         "unitType": "ship",
         "house": "targaryen",
         "quantity": 1,
-        "quantityVassal": 0
+        "quantityVassal": 1
       }
     ],
     "bay-of-pentos": [
@@ -943,7 +943,7 @@
         "unitType": "ship",
         "house": "targaryen",
         "quantity": 2,
-        "quantityVassal": 0
+        "quantityVassal": 2
       }
     ],
     "myr": [
@@ -951,7 +951,7 @@
         "unitType": "knight",
         "house": "targaryen",
         "quantity": 1,
-        "quantityVassal": 0
+        "quantityVassal": 1
       }
     ],
     "norvos": [
@@ -959,7 +959,7 @@
         "unitType": "dragon",
         "house": "targaryen",
         "quantity": 1,
-        "quantityVassal": 0
+        "quantityVassal": 1
       }
     ],
     "the-rhoyne": [
@@ -967,7 +967,31 @@
         "unitType": "dragon",
         "house": "targaryen",
         "quantity": 2,
-        "quantityVassal": 0
+        "quantityVassal": 2
+      }
+    ],
+    "sea-of-myrth": [
+      {
+        "unitType": "ship",
+        "house": "targaryen",
+        "quantity": 0,
+        "quantityVassal": 1
+      }
+    ],
+    "braavosian-coastlands": [
+      {
+        "unitType": "ship",
+        "house": "targaryen",
+        "quantity": 0,
+        "quantityVassal": 1
+      }
+    ],
+    "volantis": [
+      {
+        "unitType": "knight",
+        "house": "targaryen",
+        "quantity": 0,
+        "quantityVassal": 1
       }
     ]
   },
