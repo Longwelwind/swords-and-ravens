@@ -378,7 +378,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 mapControls={this.mapControls}
                                             />
                                         ))}
-                                        <ListGroupItem className="text-center font-italic">
+                                        <ListGroupItem className="text-center font-italic" style={{maxWidth: 500}}>
                                             <small>
                                                 {connectedSpectators.length > 0 ? (
                                                     <>Spectators: {joinReactNodes(this.getConnectedSpectators().map(u => <strong key={u.id}>{u.name}</strong>), ", ")}</>
