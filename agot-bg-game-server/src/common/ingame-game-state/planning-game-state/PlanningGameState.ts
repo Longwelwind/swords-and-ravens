@@ -13,16 +13,17 @@ import PlanningRestriction from "../game-data-structure/westeros-card/planning-r
 import PlaceOrdersGameState, { SerializedPlaceOrdersGameState } from "./place-orders-game-state/PlaceOrdersGameState";
 import ClaimVassalsGameState, { SerializedClaimVassalsGameState } from "./claim-vassals-game-state/ClaimVassalsGameState";
 import planningRestrictions from "../game-data-structure/westeros-card/planning-restriction/planningRestrictions";
+import MusteringGameState, { SerializedMusteringGameState } from "../westeros-game-state/mustering-game-state/MusteringGameState";
 
-export default class PlanningGameState extends GameState<IngameGameState, PlaceOrdersGameState | ClaimVassalsGameState> {
+export default class PlanningGameState extends GameState<IngameGameState, PlaceOrdersGameState | ClaimVassalsGameState | MusteringGameState> {
     planningRestrictions: PlanningRestriction[];
 
-    get ingameGameState(): IngameGameState {
+    get ingame(): IngameGameState {
         return this.parentGameState;
     }
 
     get game(): Game {
-        return this.ingameGameState.game;
+        return this.ingame.game;
     }
 
     get world(): World {
@@ -30,7 +31,7 @@ export default class PlanningGameState extends GameState<IngameGameState, PlaceO
     }
 
     get entireGame(): EntireGame {
-        return this.ingameGameState.entireGame;
+        return this.ingame.entireGame;
     }
 
     firstStart(planningRestrictions: PlanningRestriction[]): void {
@@ -47,15 +48,28 @@ export default class PlanningGameState extends GameState<IngameGameState, PlaceO
     }
 
     onClaimVassalsFinished(): void {
-        this.setChildGameState(new PlaceOrdersGameState(this)).firstStart();
+        if (this.entireGame.gameSettings.precedingMustering && this.game.turn == 1) {
+            this.ingame.log({
+                type: "westeros-card-executed",
+                westerosCardType: "mustering",
+                westerosDeckI: 0
+            });
+            this.setChildGameState(new MusteringGameState(this)).firstStart();
+        } else {
+            this.setChildGameState(new PlaceOrdersGameState(this)).firstStart();
+        }
     }
 
     onPlaceOrderFinish(forVassals: boolean, orders: BetterMap<Region, Order>): void {
         if (!forVassals) {
             this.setChildGameState(new PlaceOrdersGameState(this)).firstStart(orders, true);
         } else {
-            this.ingameGameState.proceedToActionGameState(orders, this.planningRestrictions);
+            this.ingame.proceedToActionGameState(orders, this.planningRestrictions);
         }
+    }
+
+    onMusteringGameStateEnd(): void {
+        this.setChildGameState(new PlaceOrdersGameState(this)).firstStart();
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedPlanningGameState {
@@ -81,6 +95,8 @@ export default class PlanningGameState extends GameState<IngameGameState, PlaceO
                 return PlaceOrdersGameState.deserializeFromServer(this, data);
             case "claim-vassals":
                 return ClaimVassalsGameState.deserializeFromServer(this, data);
+            case "mustering":
+                return MusteringGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -88,5 +104,5 @@ export default class PlanningGameState extends GameState<IngameGameState, PlaceO
 export interface SerializedPlanningGameState {
     type: "planning";
     planningRestrictions: string[];
-    childGameState: SerializedPlaceOrdersGameState | SerializedClaimVassalsGameState;
+    childGameState: SerializedPlaceOrdersGameState | SerializedClaimVassalsGameState | SerializedMusteringGameState;
 }

@@ -10,6 +10,8 @@ import PlaceOrdersGameState from "../../common/ingame-game-state/planning-game-s
 import renderChildGameState from "../utils/renderChildGameState";
 import ClaimVassalsComponent from "./ClaimVassalsComponent";
 import PlaceOrdersComponent from "./PlaceOrdersComponent";
+import MusteringGameState from "../../common/ingame-game-state/westeros-game-state/mustering-game-state/MusteringGameState";
+import MusteringComponent from "./MusteringComponent";
 
 @observer
 export default class PlanningComponent extends Component<GameStateComponentProps<PlanningGameState>> {
@@ -24,6 +26,7 @@ export default class PlanningComponent extends Component<GameStateComponentProps
                         {renderChildGameState(this.props, [
                             [PlaceOrdersGameState, PlaceOrdersComponent],
                             [ClaimVassalsGameState, ClaimVassalsComponent],
+                            [MusteringGameState, MusteringComponent]
                         ])}
                     </Row>
                 </ListGroupItem>

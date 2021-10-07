@@ -13,7 +13,7 @@ export default class ClaimVassalsGameState extends GameState<PlanningGameState, 
     passedVassalsCount = 0;
 
     get ingame(): IngameGameState {
-        return this.parentGameState.ingameGameState;
+        return this.parentGameState.ingame;
     }
 
     get game(): Game {

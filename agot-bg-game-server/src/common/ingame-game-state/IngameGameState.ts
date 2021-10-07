@@ -38,14 +38,13 @@ import shuffleInPlace from "../../utils/shuffleInPlace";
 import popRandom from "../../utils/popRandom";
 import LoanCard from "./game-data-structure/loan-card/LoanCard";
 import PayDebtsGameState, { SerializedPayDebtsGameState } from "./pay-debts-game-state/PayDebtsGameState";
-import MusteringGameState, { SerializedMusteringGameState } from "./westeros-game-state/mustering-game-state/MusteringGameState";
 
 export const NOTE_MAX_LENGTH = 5000;
 
 export default class IngameGameState extends GameState<
     EntireGame,
     WesterosGameState | PlanningGameState | ActionGameState | CancelledGameState | GameEndedGameState
-    | DraftHouseCardsGameState | ThematicDraftHouseCardsGameState | DraftInfluencePositionsGameState | PayDebtsGameState | MusteringGameState
+    | DraftHouseCardsGameState | ThematicDraftHouseCardsGameState | DraftInfluencePositionsGameState | PayDebtsGameState
 > {
     players: BetterMap<User, Player> = new BetterMap<User, Player>();
     game: Game;
@@ -55,10 +54,6 @@ export default class IngameGameState extends GameState<
 
     get entireGame(): EntireGame {
         return this.parentGameState;
-    }
-
-    get ingame(): IngameGameState {
-        return this;
     }
 
     get world(): World {
@@ -115,10 +110,6 @@ export default class IngameGameState extends GameState<
         } else {
             this.setChildGameState(new DraftHouseCardsGameState(this)).firstStart();
         }
-    }
-
-    onMusteringGameStateEnd(): void {
-        this.proceedPlanningGameState();
     }
 
     setInfluenceTrack(i: number, track: House[]): void {
@@ -257,17 +248,8 @@ export default class IngameGameState extends GameState<
                 });
             }
 
-            if (this.entireGame.gameSettings.precedingMustering) {
-                this.log({
-                    type: "westeros-card-executed",
-                    westerosCardType: "mustering",
-                    westerosDeckI: 0
-                });
-                this.setChildGameState(new MusteringGameState(this)).firstStart();
-            } else {
-                // No Westeros phase during the first turn
-                this.proceedPlanningGameState();
-            }
+            // No Westeros phase during the first turn
+            this.proceedPlanningGameState();
         }
     }
 
@@ -978,8 +960,6 @@ export default class IngameGameState extends GameState<
                 return DraftInfluencePositionsGameState.deserializeFromServer(this, data);
             case "pay-debts":
                 return PayDebtsGameState.deserializeFromServer(this, data);
-            case "mustering":
-                return MusteringGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -992,5 +972,5 @@ export interface SerializedIngameGameState {
     gameLogManager: SerializedGameLogManager;
     childGameState: SerializedPlanningGameState | SerializedActionGameState | SerializedWesterosGameState
         | SerializedGameEndedGameState | SerializedCancelledGameState | SerializedDraftHouseCardsGameState
-        | SerializedThematicDraftHouseCardsGameState | SerializedDraftInfluencePositionsGameState | SerializedPayDebtsGameState | SerializedMusteringGameState;
+        | SerializedThematicDraftHouseCardsGameState | SerializedDraftInfluencePositionsGameState | SerializedPayDebtsGameState;
 }
