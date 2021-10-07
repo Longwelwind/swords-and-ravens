@@ -744,12 +744,12 @@ export default class IngameGameState extends GameState<
                 return {result: false, reason: "only-players-can-vote"};
             }
 
-            if (this.game.houses.keys.includes("targaryen")) {
-                if (this.players.size - 1 < MIN_PLAYER_COUNT_WITH_VASSALS) {
+            if (this.game.targaryen) {
+                if (this.players.size - 1 < MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN) {
                     return {result: false, reason: "min-player-count-reached"};
                 }
             } else {
-                if (this.players.size - 1 < MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN) {
+                if (this.players.size - 1 < MIN_PLAYER_COUNT_WITH_VASSALS) {
                     return {result: false, reason: "min-player-count-reached"};
                 }
             }
