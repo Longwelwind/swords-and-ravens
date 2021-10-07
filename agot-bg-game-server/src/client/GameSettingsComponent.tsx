@@ -74,7 +74,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
     }
     renderLobbySettings(): ReactNode {
         return <Row className="mt-2">
-            <Col md="auto" id="base-settings-col" className="no-gutters">
+            <Col md="12" lg="auto" id="base-settings-col" className="no-gutters">
                 <Col xs="12">
                     <select id="setups" name="setups"
                         value={this.gameSettings.setupId}
@@ -156,7 +156,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     />
                 </Col>
             </Col>
-            <Col md={3} lg="auto" id="mod-settings-col" className="no-gutters">
+            <Col md="12" lg="auto" id="mod-settings-col" className="no-gutters">
                 <Col xs="12">
                     <FormCheck
                         id="vassals-setting"
@@ -218,22 +218,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     />
                 </Col>
             </Col>
-            <Col md={3} lg="auto" id="custom-settings-col" className="no-gutters">
-                <Col xs="12">
-                    <FormCheck
-                        id="westeros-phase-variant-setting"
-                        type="checkbox"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="westeros-phase-variant-tooltip">
-                                    Players may look at the next 3 Westeros cards from each deck at any time.
-                                </Tooltip>}>
-                                <label htmlFor="westeros-phase-variant-setting">CoK Westeros Phase Variant</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.cokWesterosPhase}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.cokWesterosPhase = !this.gameSettings.cokWesterosPhase)}
-                    />
-                </Col>
+            <Col md="12" lg="auto" id="draft-settings-col" className="no-gutters">
                 <Col xs="12">
                     <FormCheck
                         id="draft-house-cards-settings"
@@ -295,6 +280,53 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             </OverlayTrigger>}
                         checked={this.gameSettings.blindDraft}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.blindDraft = !this.gameSettings.blindDraft)}
+                    />
+                </Col>
+            </Col>
+            <Col md="12" lg="auto" id="custom-settings-col" className="no-gutters">
+                <Col xs="12">
+                    <FormCheck
+                        id="westeros-phase-variant-setting"
+                        type="checkbox"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="westeros-phase-variant-tooltip">
+                                    Players may look at the next 3 Westeros cards from each deck at any time.
+                                </Tooltip>}>
+                                <label htmlFor="westeros-phase-variant-setting">CoK Westeros Phase Variant</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.cokWesterosPhase}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.cokWesterosPhase = !this.gameSettings.cokWesterosPhase)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="use-vassal-positions-setting"
+                        type="checkbox"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="use-vassal-positions-tooltip">
+                                    Player houses will as well start with their vassal starting positions.
+                                </Tooltip>}>
+                                <label htmlFor="use-vassal-positions-setting">Use vassal starting positions</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.useVassalPositions}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.useVassalPositions = !this.gameSettings.useVassalPositions)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="preceding-mustering-setting"
+                        type="checkbox"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="preceding-mustering-tooltip">
+                                    All players can recruit units like during a mustering event in their castles before the game starts.
+                                </Tooltip>}>
+                                <label htmlFor="preceding-mustering-setting">Preceding mustering</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.precedingMustering}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.precedingMustering = !this.gameSettings.precedingMustering)}
                     />
                 </Col>
                 <Col xs="12">

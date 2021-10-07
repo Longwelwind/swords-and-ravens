@@ -58,7 +58,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
         const {success: canCancelGame, reason: canCancelGameReason} = this.lobby.canCancel(this.authenticatedUser);
 
         return <>
-                <Col xs={10} lg={4} className="mb-3">
+                <Col xs={10} xl={4} className="mb-3">
                     <Card>
                         <Card.Body id="lobby-houses-list" className="no-space-around">
                             <ListGroup variant="flush">
@@ -87,7 +87,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col xs={10} lg={6} className="mb-3">
+                <Col xs={10} xl={6} className="mb-3">
                     <Card>
                         <Card.Body style={{height: this.chatHeight}}>
                             <ChatComponent gameClient={this.props.gameClient}
@@ -97,7 +97,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col xs={10} xl={5}>
+                <Col xs={10} xl={8}>
                     <Card>
                         <Card.Body style={{paddingTop: "10px", paddingBottom: "10px"}}>
                             <Row>

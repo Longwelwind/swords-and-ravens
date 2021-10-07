@@ -1,5 +1,4 @@
 import GameState from "../../../GameState";
-import WesterosGameState from "../WesterosGameState";
 import PlayerMusteringGameState, {
     PlayerMusteringType,
     SerializedPlayerMusteringGameState
@@ -11,7 +10,14 @@ import {ServerMessage} from "../../../../messages/ServerMessage";
 import IngameGameState from "../../IngameGameState";
 import Game from "../../game-data-structure/Game";
 
-export default class MusteringGameState extends GameState<WesterosGameState, PlayerMusteringGameState> {
+interface ParentGameState extends GameState<any, any> {
+    game: Game;
+    ingame: IngameGameState;
+
+    onMusteringGameStateEnd(): void;
+}
+
+export default class MusteringGameState extends GameState<ParentGameState, PlayerMusteringGameState> {
 
     get game(): Game {
         return this.parentGameState.game;
@@ -58,8 +64,8 @@ export default class MusteringGameState extends GameState<WesterosGameState, Pla
         };
     }
 
-    static deserializeFromServer(westeros: WesterosGameState, data: SerializedMusteringGameState): MusteringGameState {
-        const mustering = new MusteringGameState(westeros);
+    static deserializeFromServer(parent: ParentGameState, data: SerializedMusteringGameState): MusteringGameState {
+        const mustering = new MusteringGameState(parent);
 
         mustering.childGameState = mustering.deserializeChildGameState(data.childGameState);
 
