@@ -150,9 +150,10 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
             this.highlightedRegions.set(r, {
                 highlight: {
                     active: true,
-                    color: house.id != "greyjoy" ? house.color : "black",
+                    color: house.id != "greyjoy" ? house.color : "#000000",
                     light: r.type.id == "sea",
-                    strong: r.type.id == "land"
+                    strong: r.type.id == "land",
+                    text: r.supplyIcons > 1 ? r.supplyIcons.toString(): undefined
                 }
             });
         });

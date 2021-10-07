@@ -9,6 +9,7 @@ interface HighlightProperties {
     color: string;
     light?: boolean;
     strong?: boolean;
+    text?: string;
 }
 
 export interface RegionOnMapProperties {

@@ -40,6 +40,7 @@ import StaticIronBankView from "../common/ingame-game-state/game-data-structure/
 import ImagePopover from "./game-state-panel/utils/ImagePopover";
 import preventOverflow from "@popperjs/core/lib/modifiers/preventOverflow";
 import IronBankInfosComponent from "./IronBankInfosComponent";
+import invertColor from "./utils/invertColor";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -97,6 +98,13 @@ export default class MapComponent extends Component<MapComponentProps> {
         }
         const ironBankView = this.ingame.world.ironBankView;
         const ironBank = this.ingame.game.ironBank;
+
+        const propertiesForRegions = this.getModifiedPropertiesForEntities<Region, RegionOnMapProperties>(
+            this.props.ingameGameState.world.regions.values,
+            this.props.mapControls.modifyRegionsOnMap,
+            { highlight: { active: false, color: "white" }, onClick: null, wrap: null }
+        );
+
         return (
             <div className="map"
                 style={{ backgroundImage: `url(${this.backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem" }}>
@@ -144,12 +152,13 @@ export default class MapComponent extends Component<MapComponentProps> {
                     ))}
                     {this.renderUnits(garrisons)}
                     {this.renderOrders()}
+                    {this.renderRegionTexts(propertiesForRegions)}
                     {ironBank && (ironBank.controllerOfBraavos || ironBank.purchasedLoans.length > 0) && this.renderIronBankInfos(ironBankView)}
                     {this.renderLoanCardDeck(ironBankView)}
                     {this.renderLoanCardSlots(ironBankView)}
                 </div>
                 <svg style={{ width: `${this.mapWidth}px`, height: `${MAP_HEIGHT}px` }}>
-                    {this.renderRegions()}
+                    {this.renderRegions(propertiesForRegions)}
                 </svg>
             </div>
         )
@@ -248,13 +257,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         </div>;
     }
 
-    renderRegions(): ReactNode {
-        const propertiesForRegions = this.getModifiedPropertiesForEntities<Region, RegionOnMapProperties>(
-            this.props.ingameGameState.world.regions.values,
-            this.props.mapControls.modifyRegionsOnMap,
-            { highlight: { active: false, color: "white" }, onClick: null, wrap: null }
-        );
-
+    renderRegions(propertiesForRegions: BetterMap<Region, RegionOnMapProperties>): ReactNode {
         return propertiesForRegions.entries.map(([region, properties]) => {
             const blocked = region.garrison == BLOCKED_REGION_BY_INFINITE_GARRISON;
             const wrap = properties.wrap;
@@ -294,6 +297,25 @@ export default class MapComponent extends Component<MapComponentProps> {
         });
     }
 
+    renderRegionTexts(propertiesForRegions: BetterMap<Region, RegionOnMapProperties>): ReactNode {
+        return propertiesForRegions.entries.filter(([_region, properties]) => properties.highlight.text).map(([region, properties]) => {
+            const nameSlot = region.staticRegion.nameSlot;
+            return <div key={`region_text_${region.id}`}
+                className="units-container"
+                style={{
+                    left: nameSlot.x,
+                    top: nameSlot.y,
+                    textAlign: "center",
+                    fontWeight: "bold",
+                    fontFamily: "serif",
+                    fontSize: "4rem",
+                    color: invertColor(properties.highlight.color)
+                }}
+            >
+                {properties.highlight.text ?? ""}
+            </div>;
+        });
+    }
     renderUnits(garrisons: BetterMap<string, string | null>): ReactNode {
         const propertiesForUnits = this.getModifiedPropertiesForEntities<Unit, UnitOnMapProperties>(
             _.flatMap(this.props.ingameGameState.world.regions.values.map(r => r.allUnits)),

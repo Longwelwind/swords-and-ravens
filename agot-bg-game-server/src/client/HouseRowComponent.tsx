@@ -227,26 +227,34 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     }
 
     setHighlightedRegions(filter = ""): void {
-        let regions = this.ingame.world.getControlledRegions(this.house);
+        const regions = new BetterMap(this.ingame.world.getControlledRegions(this.house).map(r => [r, undefined] as [Region, string | undefined]));
         if (filter == "with-castles-only") {
-            regions = regions.filter(r => r.castleLevel > 0);
+            regions.keys.filter(r => r.castleLevel == 0).forEach(r => regions.delete(r));
         } else if (filter == "with-power-tokens-only") {
-            regions = regions.filter(r => r.controlPowerToken == this.house);
+            regions.keys.filter(r => r.controlPowerToken != this.house).forEach(r => regions.delete(r));
         } else if (filter == "with-loyalty-tokens-only") {
-            regions = this.ingame.world.regions.values.filter(r => r.loyaltyTokens > 0);
+            regions.clear();
+            // Todo: We could show the loyalty count as region text here
+            this.ingame.world.regions.values.filter(r => r.loyaltyTokens > 0).forEach(r => regions.set(r, undefined));
         } else if (filter != "") { // This is the unit type
-            regions = regions.filter(r => r.units.values.some(u => u.type.id == filter));
+            regions.keys.forEach(r => {
+                if (r.units.values.filter(u => u.type.id == filter).length == 0) {
+                    regions.delete(r);
+                }
+            });
+            // Todo: We could show the unit count as region text here
         }
 
         this.highlightedRegions.clear();
 
-        regions.forEach(r => {
+        regions.entries.forEach(([r, text]) => {
             this.highlightedRegions.set(r, {
                 highlight: {
                     active: true,
-                    color: this.house.id != "greyjoy" ? this.house.color : "black",
+                    color: this.house.id != "greyjoy" ? this.house.color : "#000000",
                     light: r.type.id == "sea",
-                    strong: r.type.id == "land"
+                    strong: r.type.id == "land",
+                    text: text
                 }
             });
         });
