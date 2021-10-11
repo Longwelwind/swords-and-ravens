@@ -22,8 +22,9 @@ import { noMarchPlusOneOrder, noDefenseOrder, noSupportOrder, noRaidOrder, noCon
 import WesterosCardType from "../../common/ingame-game-state/game-data-structure/westeros-card/WesterosCardType";
 import { rainsOfAutumn, stormOfSwords, webOfLies, seaOfStorms, feastForCrows } from "../../common/ingame-game-state/game-data-structure/westeros-card/westerosCardTypes";
 import { renderRegionTooltip } from "../regionTooltip";
-import info from "../../../public/images/icons/info.svg"
 import { preventOverflow } from "@popperjs/core";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons/faInfoCircle";
 
 @observer
 export default class PlaceOrdersComponent extends Component<GameStateComponentProps<PlaceOrdersGameState>> {
@@ -142,12 +143,14 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                                 overlay={
                                     <Popover id={"region" + r.id}>
                                         <Row className="justify-content-center align-items-center mt-2">
-                                            <Col xs="auto"><b>{r.name}</b></Col>
+                                            <Col xs="auto"><h6>{r.name}</h6></Col>
                                             <Col xs="auto">
                                                 <OverlayTrigger overlay={renderRegionTooltip(r)}
-                                                    popperConfig={{modifiers: [preventOverflow]}}
+                                                    popperConfig={{ modifiers: [preventOverflow] }}
                                                     placement="auto">
-                                                <div style={{backgroundImage: `url(${info})`, width: 16, height: 16, backgroundSize: "contain", backgroundPosition: "center", backgroundRepeat: "no-repeat"}}/>
+                                                    <FontAwesomeIcon
+                                                        style={{ fontSize: "24px" }}
+                                                        icon={faInfoCircle} />
                                                 </OverlayTrigger>
                                             </Col>
                                         </Row>
