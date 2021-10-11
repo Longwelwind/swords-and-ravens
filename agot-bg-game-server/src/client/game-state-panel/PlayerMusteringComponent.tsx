@@ -17,6 +17,10 @@ import {OrderOnMapProperties, RegionOnMapProperties, UnitOnMapProperties} from "
 import PartialRecursive from "../../utils/PartialRecursive";
 import Unit from "../../common/ingame-game-state/game-data-structure/Unit";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { renderRegionTooltip } from "../regionTooltip";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons/faInfoCircle";
+import { preventOverflow } from "@popperjs/core";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 @observer
 export default class PlayerMusteringComponent extends Component<GameStateComponentProps<PlayerMusteringGameState>> {
@@ -219,23 +223,36 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
     }
 
     private renderMusteringPopover(modifiedRegion: Region): OverlayChildren {
-        return <Popover id={"region-popover-" + modifiedRegion.id} className="p-2">
-            <h5 style={{ textAlign: "center" }}>{modifiedRegion.name} <small>({this.props.gameState.getUsedPointsForRegion(modifiedRegion, this.musterings)} / {modifiedRegion.castleLevel})</small></h5>
-            <>
-                {this.props.gameState.getValidMusteringRulesForRegion(modifiedRegion, this.musterings).length > 0 && (
-                    <>
-                        {this.props.gameState.getValidMusteringRules(modifiedRegion, this.musterings).map(({ region, rules }) => (
-                            rules.map((rule, i) => (
-                                <Col key={modifiedRegion.id + "_muster-rule_" + i}>
-                                    <Button onClick={() => this.addMustering(modifiedRegion, rule)}>
-                                        {rule.from ? "Upgrade to " : "Recruit "} a {rule.to.name}{region != modifiedRegion && (" in " + region.name)} [{rule.cost}]
-                                    </Button>
-                                </Col>
-                            ))
-                        ))}
-                    </>
-                )}
-            </>
+        return <Popover id={"region-mustring-popover-" + modifiedRegion.id} className="p-3">
+            <Row className="justify-content-center align-items-center">
+                <Col xs="auto"><h5><b>{modifiedRegion.name}</b><small> ({this.props.gameState.getUsedPointsForRegion(modifiedRegion, this.musterings)} / {modifiedRegion.castleLevel})</small></h5></Col>
+                <Col xs="auto">
+                    <OverlayTrigger overlay={renderRegionTooltip(modifiedRegion)}
+                        popperConfig={{ modifiers: [preventOverflow] }}
+                        placement="auto">
+                        <FontAwesomeIcon
+                            style={{ fontSize: "24px" }}
+                            icon={faInfoCircle} />
+                    </OverlayTrigger>
+                </Col>
+            </Row>
+            <Row>
+                <>
+                    {this.props.gameState.getValidMusteringRulesForRegion(modifiedRegion, this.musterings).length > 0 && (
+                        <>
+                            {this.props.gameState.getValidMusteringRules(modifiedRegion, this.musterings).map(({ region, rules }) => (
+                                rules.map((rule, i) => (
+                                    <Col xs={12} key={modifiedRegion.id + "_muster-rule_" + i}>
+                                        <Button onClick={() => this.addMustering(modifiedRegion, rule)}>
+                                            {rule.from ? "Upgrade to " : "Recruit "} a {rule.to.name}{region != modifiedRegion && (" in " + region.name)} [{rule.cost}]
+                                        </Button>
+                                    </Col>
+                                ))
+                            ))}
+                        </>
+                    )}
+                </>
+            </Row>
         </Popover>;
     }
 

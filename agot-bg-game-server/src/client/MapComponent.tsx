@@ -116,7 +116,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                                     overlay={renderRegionTooltip(r)}
                                     delay={{ show: 500, hide: 100 }}
                                     placement="auto"
-                                    rootClose
+                                    popperConfig={{ modifiers: [preventOverflow] }}
                                 >
                                     <div
                                         className="castle-modification"
@@ -130,12 +130,13 @@ export default class MapComponent extends Component<MapComponentProps> {
                             {(barrelModifiers.has(r.id) || crownModifiers.has(r.id)) && this.renderImprovements(r)}
                             {r.controlPowerToken && (
                                 <OverlayTrigger
+                                    overlay={<Tooltip id={"power-token-" + r.id}>
+                                        <b>Power token</b><small> of <b>{r.getController()?.name ?? "Unknown"}</b><br /><b>{r.name}</b></small>
+                                    </Tooltip>}
                                     key={"power-token-overlay-" + r.id}
                                     delay={{ show: 250, hide: 100 }}
                                     placement="auto"
-                                    overlay={<Tooltip id={"power-token-" + r.id}>
-                                        <b>Power token</b><small> of <b>{r.getController()?.name ?? "Unknown"}</b><br/><b>{r.name}</b></small>
-                                    </Tooltip>}
+                                    popperConfig={{ modifiers: [preventOverflow] }}
                                 >
                                     <div
                                         className="power-token hover-weak-outline"
@@ -270,7 +271,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                             overlay={renderRegionTooltip(region)}
                             delay={{ show: 500, hide: 100 }}
                             placement="auto"
-                            rootClose
+                            popperConfig={{ modifiers: [preventOverflow] }}
                         >
                             {child}
                         </OverlayTrigger>
@@ -351,12 +352,13 @@ export default class MapComponent extends Component<MapComponentProps> {
                     }
 
                     return <OverlayTrigger
-                        key={"unit-overlay-" + u.id}
-                        delay={{ show: 250, hide: 100 }}
-                        placement="auto"
                         overlay={<Tooltip id={"unit-tooltip-" + u.id}>
                             <b>{u.type.name}</b><small> of <b>{controller?.name ?? "Unknown"}</b><br /><b>{r.name}</b></small>
                         </Tooltip>}
+                        key={"unit-overlay-" + u.id}
+                        delay={{ show: 250, hide: 100 }}
+                        placement="auto"
+                        popperConfig={{ modifiers: [preventOverflow] }}
                     >
                         <div onClick={property.onClick ? property.onClick : undefined}
                             className={classNames(
@@ -384,13 +386,14 @@ export default class MapComponent extends Component<MapComponentProps> {
                 })}
                 {garrisons.has(r.id) && (
                     <OverlayTrigger
+                        overlay={<Tooltip id={"garrison-tooltip-" + r.id}>
+                            {garrisonControllers.get(r.id) == null ? <b>Neutral Force token</b> : <><b>Garrison</b> <small>of <b>{garrisonControllers.get(r.id)?.name ?? "Unknown"}</b></small></>}
+                            <br /><small><b>{r.name}</b></small>
+                        </Tooltip>}
                         key={"garrison-overlay-" + r.id}
                         delay={{ show: 250, hide: 100 }}
                         placement="auto"
-                        overlay={<Tooltip id={"garrison-tooltip-" + r.id}>
-                            {garrisonControllers.get(r.id) == null ? <b>Neutral Force token</b> : <><b>Garrison</b> <small>of <b>{garrisonControllers.get(r.id)?.name ?? "Unknown"}</b></small></>}
-                            <br/><small><b>{r.name}</b></small>
-                        </Tooltip>}
+                        popperConfig={{ modifiers: [preventOverflow] }}
                     >
                         <div
                             className="garrison-icon hover-weak-outline"
@@ -404,12 +407,13 @@ export default class MapComponent extends Component<MapComponentProps> {
                 )}
                 {r.loyaltyTokens > 0 && (
                     <OverlayTrigger
+                        overlay={<Tooltip id={"loyalty-tooltip-" + r.id}>
+                            <b>Loyalty token</b><br /><small><b>{r.name}</b></small>
+                        </Tooltip>}
                         key={"loyalty-overlay-" + r.id}
                         delay={{ show: 250, hide: 100 }}
                         placement="auto"
-                        overlay={<Tooltip id={"loyalty-tooltip-" + r.id}>
-                            <b>Loyalty token</b><br/><small><b>{r.name}</b></small>
-                        </Tooltip>}
+                        popperConfig={{ modifiers: [preventOverflow] }}
                     >
                         <div
                             className="loyalty-icon hover-weak-outline"
@@ -442,7 +446,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                     overlay={renderRegionTooltip(region)}
                     delay={{ show: 500, hide: 100 }}
                     placement="auto"
-                    rootClose
+                    popperConfig={{ modifiers: [preventOverflow] }}
                 >
                     <div key={`barrel-${region.id}-${i}`}
                         className="unit-icon medium"
@@ -458,7 +462,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                     overlay={renderRegionTooltip(region)}
                     delay={{ show: 500, hide: 100 }}
                     placement="auto"
-                    rootClose
+                    popperConfig={{ modifiers: [preventOverflow] }}
                 >
                     <div key={`crown-${region.id}-${i}`}
                         className="unit-icon medium"
@@ -561,7 +565,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                         <OverlayTrigger overlay={this.renderOrderTooltip(order, region)}
                             delay={{ show: 250, hide: 100 }}
                             placement="auto"
-                            rootClose
+                            popperConfig={{ modifiers: [preventOverflow] }}
                         >
                             {child}
                         </OverlayTrigger>
