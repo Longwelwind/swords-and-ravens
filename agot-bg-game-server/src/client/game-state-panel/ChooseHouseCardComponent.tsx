@@ -94,11 +94,12 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
                                 <Col xs="auto">
                                     <FormCheck
                                         id="burn-vsb"
-                                        type="checkbox"
+                                        type="switch"
                                         label={
                                             <OverlayTrigger overlay={
                                                 <Tooltip id="burn-vsb-tooltip">
-                                                    By selecting this option you will use the Valyrian Steel Blade independent from the outcome of the battle.
+                                                    If you choose this option, the Valyrian Steel Blade will be used to increase the final combat strength by 1 regardless of the outcome of the battle.<br/>
+                                                    <small>(Otherwise you will of course be asked later if you want to use the blade, if the use makes a difference.)</small>
                                                 </Tooltip>}>
                                                 <label htmlFor="burn-vsb">Burn Valyrian Steel Blade</label>
                                             </OverlayTrigger>}

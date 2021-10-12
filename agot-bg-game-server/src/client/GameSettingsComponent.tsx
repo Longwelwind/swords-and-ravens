@@ -96,7 +96,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <Col xs="12">
                     <FormCheck
                         id="adwd-house-cards"
-                        type="checkbox"
+                        type="switch"
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="adwd-house-cards-tooltip">
@@ -112,7 +112,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <Col xs="12">
                     <FormCheck
                         id="tides-of-battle-setting"
-                        type="checkbox"
+                        type="switch"
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="tides-of-battle-tooltip">
@@ -127,7 +127,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <Col xs="12">
                     <FormCheck
                         id="random-houses-setting"
-                        type="checkbox"
+                        type="switch"
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="random-houses-tooltip">
@@ -142,7 +142,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <Col xs="12">
                     <FormCheck
                         id="random-chosen-houses-setting"
-                        type="checkbox"
+                        type="switch"
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="random-chosen-houses-tooltip">
@@ -160,7 +160,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <Col xs="12">
                     <FormCheck
                         id="vassals-setting"
-                        type="checkbox"
+                        type="switch"
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="vassals-tooltip">
@@ -175,7 +175,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <Col xs="12">
                     <FormCheck
                         id="sea-orders-setting"
-                        type="checkbox"
+                        type="switch"
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="sea-orders-tooltip">
@@ -190,7 +190,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <Col xs="12">
                     <FormCheck
                         id="seven-pt-setting"
-                        type="checkbox"
+                        type="switch"
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="seven-pt-tooltip">
@@ -205,7 +205,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <Col xs="12">
                     <FormCheck
                         id="gift-power-tokens-setting"
-                        type="checkbox"
+                        type="switch"
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="gift-power-tokens-tooltip">
@@ -222,7 +222,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <Col xs="12">
                     <FormCheck
                         id="draft-house-cards-settings"
-                        type="checkbox"
+                        type="switch"
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="draft-house-cards-tooltip">
@@ -239,7 +239,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <Col xs="12">
                     <FormCheck
                         id="limited-draft-setting"
-                        type="checkbox"
+                        type="switch"
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="limited-draft-tooltip">
@@ -254,7 +254,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <Col xs="12">
                     <FormCheck
                         id="thematic-draft-setting"
-                        type="checkbox"
+                        type="switch"
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="thematic-draft-tooltip">
@@ -270,7 +270,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <Col xs="12">
                     <FormCheck
                         id="blind-draft-setting"
-                        type="checkbox"
+                        type="switch"
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="blind-draft-tooltip">
@@ -287,7 +287,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <Col xs="12">
                     <FormCheck
                         id="westeros-phase-variant-setting"
-                        type="checkbox"
+                        type="switch"
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="westeros-phase-variant-tooltip">
@@ -302,7 +302,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <Col xs="12">
                     <FormCheck
                         id="use-vassal-positions-setting"
-                        type="checkbox"
+                        type="switch"
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="use-vassal-positions-tooltip">
@@ -317,7 +317,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <Col xs="12">
                     <FormCheck
                         id="preceding-mustering-setting"
-                        type="checkbox"
+                        type="switch"
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="preceding-mustering-tooltip">
@@ -332,7 +332,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <Col xs="12">
                     <FormCheck
                         id="endless-setting"
-                        type="checkbox"
+                        type="switch"
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="endless-setting-tooltip">
