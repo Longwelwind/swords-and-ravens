@@ -32,7 +32,7 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                             <Col xs="auto">
                                 <FormCheck
                                     id="chat-house-names-setting"
-                                    type="checkbox"
+                                    type="switch"
                                     label={
                                         <OverlayTrigger overlay={
                                             <Tooltip id="chat-house-names-tooltip">
@@ -52,7 +52,7 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                             <Col xs="auto">
                                 <FormCheck
                                     id="map-scrollbar-setting"
-                                    type="checkbox"
+                                    type="switch"
                                     label={
                                         <OverlayTrigger overlay={
                                             <Tooltip id="map-scrollbar-tooltip">
@@ -73,7 +73,7 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                             <Col xs="auto">
                                 <FormCheck
                                     id="game-state-column-right-setting"
-                                    type="checkbox"
+                                    type="switch"
                                     label={
                                         <OverlayTrigger overlay={
                                             <Tooltip id="game-state-column-right-setting-tooltip">
