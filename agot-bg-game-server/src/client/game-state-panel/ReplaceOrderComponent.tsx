@@ -9,7 +9,6 @@ import Order from "../../common/ingame-game-state/game-data-structure/Order";
 import * as _ from "lodash";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Button from "react-bootstrap/Button";
-import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import OrderGridComponent from "./utils/OrderGridComponent";
 import {OrderOnMapProperties} from "../MapControls";
@@ -32,10 +31,10 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
                 {this.props.gameClient.doesControlHouse(this.props.gameState.ravenHolder) ? (
                     <>
                         {this.selectedRegion == null ? (
-                            <Col xs={12} className="text-center">Click on the order you want to replace on the map.</Col>
+                            <Col xs={12} className="text-center">Click the Order token on the map you want to replace.</Col>
                         ) : (
                             <Col xs={12} className="text-center">
-                                Choose which order to place on <strong>{this.selectedRegion.name}</strong> or reset your selection by clicking it on the map again.<br/><br/>
+                                Choose which Order token to place on <b>{this.selectedRegion.name}</b>:<br/>
                                 <OrderGridComponent orders={this.props.gameState.ingameGameState.game.getOrdersListForHouse(this.props.gameState.ravenHolder)}
                                                     selectedOrder={this.selectedOrder}
                                                     availableOrders={this.props.gameState.getAvailableOrders(this.selectedRegion)}
@@ -44,17 +43,15 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
                             </Col>
                         )}
                         <Col xs={12}>
-                            <Row className="justify-content-center">
-                                <Col xs="auto">
-                                    <Button variant="success" onClick={() => this.replaceOrder()} disabled={this.selectedOrder == null || this.selectedRegion == null}>Confirm Order Token replacement</Button>
-                                </Col>
-                                <Col xs="auto">
-                                    <Button onClick={() => this.seeTopWildlingCardInstead()} disabled={this.selectedRegion != null || this.selectedOrder != null}>Look at the Top Wildling Card instead</Button>
-                                </Col>
-                                <Col xs="auto">
-                                    <Button variant="danger" onClick={() => this.skip()}>Skip Raven Phase</Button>
-                                </Col>
-                            </Row>
+                            <Col xs={12} className="d-flex justify-content-center">
+                                <Button variant="success" onClick={() => this.replaceOrder()} disabled={this.selectedOrder == null || this.selectedRegion == null}>Confirm Order token replacement</Button>
+                            </Col>
+                            <Col xs={12} className="d-flex justify-content-center">
+                                <Button onClick={() => this.seeTopWildlingCardInstead()} disabled={this.selectedOrder != null}>Look at the Top Wildling Card instead</Button>
+                            </Col>
+                            <Col xs={12} className="d-flex justify-content-center">
+                                <Button variant="danger" disabled={this.selectedOrder == null && this.selectedRegion == null} onClick={() => this.reset()}>Reset selection</Button>
+                            </Col>
                         </Col>
                     </>
                 ) : (
@@ -123,7 +120,8 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
         _.pull(this.props.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
     }
 
-    private skip(): void {
-        this.props.gameState.skip();
+    private reset(): void {
+        this.selectedRegion = null;
+        this.selectedOrder = null;
     }
 }

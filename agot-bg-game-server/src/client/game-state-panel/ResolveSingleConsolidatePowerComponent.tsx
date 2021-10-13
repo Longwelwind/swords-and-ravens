@@ -70,7 +70,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<Ga
                             <Col xs={12}>
                                 <Row className="justify-content-center">
                                     {this.selectedOrderType instanceof DefenseMusterOrderType && <>
-                                        <Col xs="auto">
+                                        <Col xs={12} className="d-flex justify-content-center">
                                             <Button variant="success" onClick={() => {
                                                 this.gameState.chooseMustering(this.selectedOrderRegion as Region);
                                                 this.reset();
@@ -78,7 +78,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<Ga
                                                 Muster in {this.selectedOrderRegion.name}
                                             </Button>
                                         </Col>
-                                        <Col xs="auto">
+                                        <Col xs={12} className="d-flex justify-content-center">
                                             <Button variant="warning" onClick={() => {
                                                 this.gameState.chooseRemoveOrder(this.selectedOrderRegion as Region);
                                                 this.reset();
@@ -88,7 +88,8 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<Ga
                                         </Col>
                                     </>}
                                     {this.selectedOrderType instanceof ConsolidatePowerOrderType && <>
-                                        {this.selectedOrderType.starred && this.selectedOrderRegion.castleLevel > 0 && <Col xs="auto">
+                                        {this.selectedOrderType.starred && this.selectedOrderRegion.castleLevel > 0 &&
+                                        <Col xs="auto">
                                             <Button variant="success" onClick={() => {
                                                 this.gameState.chooseMustering(this.selectedOrderRegion as Region);
                                                 this.reset();
@@ -107,16 +108,16 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<Ga
                                     </>}
                                     {this.selectedOrderType instanceof IronBankOrderType && this.ironBank && <>
                                         {this.ironBank.getPurchasableLoans(this.house).map(purchasable =>
-                                            <Col xs="auto" key={`loan-button-${purchasable.loan.id}`}>
+                                            <Col xs={12} className="d-flex justify-content-center" key={`loan-button-${purchasable.loan.id}`}>
                                                 <Button variant="success" onClick={() => {
                                                     this.gameState.choosePurchaseLoan(purchasable.slotIndex, this.selectedOrderRegion as Region);
                                                     this.reset();
                                                 }}>
-                                                    Pay {purchasable.costs} Power tokens to purchase {purchasable.loan.name}
+                                                    Pay {purchasable.costs} Power token{purchasable.costs > 1 ? "s" : ""} to purchase {purchasable.loan.name}
                                                 </Button>
                                             </Col>
                                         )}
-                                        <Col xs="auto">
+                                        <Col xs={12} className="d-flex justify-content-center">
                                             <Button variant="warning" onClick={() => {
                                                 this.gameState.chooseRemoveOrder(this.selectedOrderRegion as Region);
                                                 this.reset();
@@ -125,7 +126,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<Ga
                                             </Button>
                                         </Col>
                                     </>}
-                                    <Col xs="auto">
+                                    <Col xs={12} className="d-flex justify-content-center">
                                         <Button
                                             variant="danger"
                                             onClick={() => this.reset()}

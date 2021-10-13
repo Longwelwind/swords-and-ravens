@@ -299,7 +299,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         ingame={this.ingame}/>
                 </div>
             }
-            {this.ingame.game.targaryen && this.props.gameClient.authenticatedPlayer?.house && this.ingame.world.getUnitsOfHouse(this.ingame.game.targaryen).length == 0 &&
+            {house == this.ingame.game.targaryen && this.props.gameClient.authenticatedPlayer?.house == this.ingame.game.targaryen && this.ingame.isHouseDefeated(house) &&
             <div className="mt-3">
                 <Button
                     onClick={() => {
@@ -309,7 +309,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         }
                     }}
                     disabled={house.powerTokens <= 0}
-                    variant="warning"
+                    variant="danger"
                 >
                     Drop all available Power tokens
                 </Button>

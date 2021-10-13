@@ -366,7 +366,7 @@ export default class IngameGameState extends GameState<
             }
         } else if (message.type == "drop-power-tokens") {
             // Only allow Targ to drop their Power tokens
-            if (player.house != this.game.targaryen || this.world.getUnitsOfHouse(player.house).length > 0) {
+            if (player.house != this.game.targaryen || !this.isHouseDefeated(player.house)) {
                 return;
             }
 
@@ -744,7 +744,7 @@ export default class IngameGameState extends GameState<
                 return {result: false, reason: "ongoing-house-card-drafting"}
             }
 
-            if (forHouse?.id == "targaryen") {
+            if (forHouse?.id == "targaryen" && !this.isHouseDefeated(forHouse)) {
                 return {result: false, reason: "targaryen-must-be-a-player-controlled-house"}
             }
         }
@@ -765,12 +765,13 @@ export default class IngameGameState extends GameState<
         return {result: true, reason: ""};
     }
 
-    getAssociatedHouseCards(house: House): BetterMap<string, HouseCard> {
-        if (!this.isVassalHouse(house)) {
-            return house.houseCards;
-        } else {
-            return this.game.vassalHouseCards;
+    isHouseDefeated(house: House | null): boolean {
+        if (!house) {
+            return true;
         }
+
+        // Targaryen is considered defeated when they have no castle areas and no units anymore
+        return this.world.getControlledRegions(house).filter(r => r.castleLevel > 0).length == 0 && this.world.getUnitsOfHouse(house).length == 0;
     }
 
     launchReplacePlayerVote(player: Player): void {
@@ -895,7 +896,7 @@ export default class IngameGameState extends GameState<
             return false;
         }
 
-        return true;
+        return !this.isVassalHouse(house);
     }
 
     dropPowerTokens(house: House): void {
