@@ -15,6 +15,7 @@ import {UnitOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
 import { ListGroupItem } from "react-bootstrap";
 import ResolveSinglePayDebtGameState from "../../common/ingame-game-state/pay-debts-game-state/resolve-single-pay-debt-game-state/ResolveSinglePayDebtGameState";
+import joinReactNodes from "../utils/joinReactNodes";
 
 @observer
 export default class ResolveSinglePayDebtComponent extends Component<GameStateComponentProps<ResolveSinglePayDebtGameState>> {
@@ -61,11 +62,13 @@ export default class ResolveSinglePayDebtComponent extends Component<GameStateCo
                     {this.props.gameClient.doesControlHouse(this.resolver) ? (
                         <>
                             <Col xs={12}>
-                                {this.unitsToRemove.entries.map(([region, units]) => (
-                                    <Row key={region.id} className="justify-content-center" style={{paddingBottom: 10}}>
-                                        <div>{region.name}: {units.map(u => u.type.name).join(", ")}</div>
-                                    </Row>
-                                ))}
+                                <Row className="justify-content-center" style={{paddingBottom: 10}}>
+                                    <ul>
+                                        {this.unitsToRemove.entries.map(([region, units]) => (
+                                            <li key={`pay-single-debt_${region.id}`}>{joinReactNodes(units.map((u, i) => <b key={`${region.id}_${u.id}_${i}`}>{u.type.name}</b>), ", ")} in <b>{region.name}</b></li>
+                                        ))}
+                                    </ul>
+                                </Row>
                                 <Row className="justify-content-center">
                                     <Col xs="auto">
                                         <Button variant="success" disabled={notEnough} onClick={() => this.confirm()}>Confirm</Button>
