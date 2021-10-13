@@ -15,8 +15,8 @@ import {observable} from "mobx";
 import Row from "react-bootstrap/Row";
 import {UnitOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
-import { ListGroupItem } from "react-bootstrap";
 import { union } from "lodash";
+import joinReactNodes from "../utils/joinReactNodes";
 
 @observer
 export default class PlayerReconcileArmiesComponent extends Component<GameStateComponentProps<PlayerReconcileArmiesGameState>> {
@@ -62,19 +62,20 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
         const tooMuch = this.tooMuchReconciled;
         const notEnough = !this.enoughReconciled;
         return (
-            <ListGroupItem className="px-2">
-                <Row>
+                <Row className="p-2">
                     <Col xs={12} className="text-center">
                         <b>{this.props.gameState.house.name}</b> must reconcile their armies according to their supply limits.
                     </Col>
                     {this.props.gameClient.doesControlHouse(this.house) ? (
                         <>
                             <Col xs={12}>
-                                {this.unitsToRemove.entries.map(([region, units]) => (
-                                    <Row key={region.id} className="justify-content-center" style={{paddingBottom: 10}}>
-                                        <div>{region.name}: {units.map(u => u.type.name).join(", ")}</div>
-                                    </Row>
-                                ))}
+                                <Row className="justify-content-center" style={{paddingBottom: 10}}>
+                                    <ul>
+                                        {this.unitsToRemove.entries.map(([region, units]) => (
+                                            <li key={`player-reconcile-armies_${region.id}`}>{joinReactNodes(units.map((u, i) => <b key={`${region.id}_${u.id}_${i}`}>{u.type.name}</b>), ", ")} in <b>{region.name}</b></li>
+                                        ))}
+                                    </ul>
+                                </Row>
                                 <Row className="justify-content-center">
                                     <Col xs="auto">
                                         <Button variant="success" disabled={notEnough || tooMuch} onClick={() => this.confirm()}>Confirm</Button>
@@ -90,7 +91,6 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
                             <Col xs={12} className="text-center">Waiting for {this.house.name}...</Col>
                         )}
                 </Row>
-            </ListGroupItem>
         );
     }
 
