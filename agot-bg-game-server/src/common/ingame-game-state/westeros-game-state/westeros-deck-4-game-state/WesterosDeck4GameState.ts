@@ -34,7 +34,7 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
     }
 
     firstStart(type: WesterosCardType): void {
-        if (!this.game.targaryen) {
+        if (this.ingame.isHouseDefeated(this.game.targaryen) || !this.game.targaryen || this.ingame.isVassalHouse(this.game.targaryen)) {
             this.parentGameState.onWesterosCardEnd();
             return;
         }
