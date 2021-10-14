@@ -1550,7 +1550,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
 
                 return <p>
-                    <b>Spymaster</b>: <b>{house.name}</b> chose Westeros deck <b>{data.westerosDeckI}</b> and put <b>{data.westerosCardsCountForTopOfDeck}
+                    <b>Spymaster</b>: <b>{house.name}</b> chose Westeros deck <b>{data.westerosDeckI + 1}</b> and put <b>{data.westerosCardsCountForTopOfDeck}
                         </b> card{data.westerosCardsCountForTopOfDeck != 1 ? "s" : ""} on top of the deck and <b>{data.westerosCardsCountForBottomOfDeck}
                         </b> card{data.westerosCardsCountForBottomOfDeck != 1 ? "s" : ""} to the bottom of the deck.
                 </p>;
