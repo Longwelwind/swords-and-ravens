@@ -49,7 +49,7 @@ export default class PlayingWithFireGameState extends GameState<WesterosDeck4Gam
     }
 
     getUncontrolledLandAreas(): Region[] {
-        return this.game.world.westerosLandRegions.filter(r => r.getController() == null);
+        return this.game.world.westerosLandRegions.filter(r => r.getController() == null && r.garrison == 0);
     }
 
     getChoices(house: House): BetterMap<string, string> {
