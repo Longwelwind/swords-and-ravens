@@ -70,7 +70,7 @@ export default class CombatGameState extends GameState<
     attacker: House;
     defender: House;
     houseCombatDatas: BetterMap<House, HouseCombatData>;
-    valyrianSteelBladeUser: House | null;
+    @observable valyrianSteelBladeUser: House | null;
     revealTidesOfBattleCards: boolean;
     tidesOfBattleDeck: TidesOfBattleCard[] = this.isTidesOfBattleCardsActive ? getShuffledTidesOfBattleDeck() : [];
 
@@ -407,7 +407,8 @@ export default class CombatGameState extends GameState<
         if (!this.game.valyrianSteelBladeUsed) {
             // Check if VSB holder already decided to use (burn) the VSB during choose house card game state
             // And check as well the blade user is still the VSB holder (Doran!)
-            if (this.valyrianSteelBladeUser == this.game.valyrianSteelBladeHolder) {
+            const vsbHolderAndVassals = [this.game.valyrianSteelBladeHolder, ...this.ingameGameState.getVassalsControlledByPlayer(this.ingameGameState.getControllerOfHouse(this.game.valyrianSteelBladeHolder))];
+            if (this.valyrianSteelBladeUser && vsbHolderAndVassals.includes(this.valyrianSteelBladeUser)) {
                 this.game.valyrianSteelBladeUsed = true;
                 this.ingameGameState.log({
                     type: "combat-valyrian-sword-used",
@@ -690,6 +691,7 @@ export default class CombatGameState extends GameState<
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedCombatGameState {
+        const playerIsVsbUser = this.valyrianSteelBladeUser != null && this.ingameGameState.getControllerOfHouse(this.valyrianSteelBladeUser) == player;
         return {
             type: "combat",
             order: this.order.id,
@@ -713,6 +715,7 @@ export default class CombatGameState extends GameState<
             }),
             supporters: this.supporters.entries.map(([house, supportedHouse]) => [house.id, supportedHouse ? supportedHouse.id : null]),
             houseCardModifiers: this.houseCardModifiers.entries,
+            valyrianSteelBladeUser: admin || playerIsVsbUser ? this.valyrianSteelBladeUser?.id ?? null : null,
             stats: this.stats,
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
@@ -747,6 +750,7 @@ export default class CombatGameState extends GameState<
             ])
         );
         combatGameState.houseCardModifiers = new BetterMap(data.houseCardModifiers);
+        combatGameState.valyrianSteelBladeUser = data.valyrianSteelBladeUser ? resolveMarchOrderGameState.game.houses.get(data.valyrianSteelBladeUser) : null;
         combatGameState.stats = data.stats;
         combatGameState.childGameState = combatGameState.deserializeChildGameState(data.childGameState);
 
@@ -783,6 +787,7 @@ export interface SerializedCombatGameState {
     supporters: [string, string | null][];
     houseCombatDatas: [string, {houseCardId: string | null; army: number[]; regionId: string; tidesOfBattleCardId?: string | null}][];
     houseCardModifiers: [string, HouseCardModifier][];
+    valyrianSteelBladeUser: string | null;
     stats: CombatStats[];
     childGameState: SerializedDeclareSupportGameState | SerializedChooseHouseCardGameState
         | SerializedUseValyrianSteelBladeGameState | SerializedPostCombatGameState
