@@ -15,7 +15,6 @@ import Game from "../../../../../game-data-structure/Game";
 import IngameGameState from "../../../../../IngameGameState";
 import BetterMap from "../../../../../../../utils/BetterMap";
 import _ from "lodash";
-import groupBy from "../../../../../../../utils/groupBy";
 
 export default class ResolveRetreatGameState extends GameState<
     PostCombatGameState,
@@ -75,9 +74,6 @@ export default class ResolveRetreatGameState extends GameState<
 
             this.postCombat.onResolveRetreatFinish();
             return;
-        } else if (possibleRetreatRegions.length == 1) {
-            // The units can retreat automatically
-            this.onSelectRegionFinish(finalChooser, possibleRetreatRegions[0]);
         } else {
             this.setChildGameState(new SelectRegionGameState(this))
                     .firstStart(finalChooser, possibleRetreatRegions);
@@ -119,7 +115,7 @@ export default class ResolveRetreatGameState extends GameState<
         }, true);
     }
 
-    onSelectRegionFinish(_house: House, retreatRegion: Region): void {
+    onSelectRegionFinish(_house: House, retreatRegion: Region, resolvedAutomatically: boolean): void {
         const loserCombatData = this.postCombat.loserCombatData;
         const army = loserCombatData.army;
         this.retreatRegion = retreatRegion;
@@ -129,19 +125,12 @@ export default class ResolveRetreatGameState extends GameState<
             house: this.postCombat.loser.id,
             regionFrom: this.combat.defendingRegion.id,
             regionTo: retreatRegion.id
-        });
+        }, resolvedAutomatically);
 
         // Check if this retreat region require casualties
         const casualtiesCount = this.getCasualtiesOfRetreatRegion(retreatRegion);
         if (casualtiesCount > 0) {
-            if (army.every(u => u.type == army[0].type)) {
-                // In case all units have the same type automatically process the casualties
-                this.onSelectUnitsEnd(this.postCombat.loser, groupBy(army.slice(0, casualtiesCount), u => u.region).entries, true);
-            } else {
-                // Otherwise let the loser decide which unit to sacrifice
-                this.setChildGameState(new SelectUnitsGameState(this)).firstStart(this.postCombat.loser, army, casualtiesCount);
-            }
-
+            this.setChildGameState(new SelectUnitsGameState(this)).firstStart(this.postCombat.loser, army, casualtiesCount);
             return;
         }
 

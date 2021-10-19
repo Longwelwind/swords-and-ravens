@@ -77,6 +77,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                 : null);
 
             this.combatGameState.houseCombatDatas.get(house).houseCardChosen = true;
+            this.combatGameState.valyrianSteelBladeUser = message.valyrianSteelBladeUser ? this.combatGameState.game.houses.get(message.valyrianSteelBladeUser) : null;
             this.combatGameState.rerender++;
         } else if (message.type == "support-refused") {
             const house = this.combatGameState.game.houses.get(message.houseId);
@@ -112,6 +113,17 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
             this.houseCards.set(commandedHouse, houseCard);
 
+            if (message.burnValyrianSteelBlade &&
+                player.house == this.combatGameState.game.valyrianSteelBladeHolder &&
+                !this.combatGameState.game.valyrianSteelBladeUsed) {
+                this.combatGameState.valyrianSteelBladeUser = commandedHouse;
+            }
+
+            if (!message.burnValyrianSteelBlade &&
+                player.house == this.combatGameState.game.valyrianSteelBladeHolder) {
+                this.combatGameState.valyrianSteelBladeUser = null;
+            }
+
             this.entireGame.sendMessageToClients(_.without(this.entireGame.users.values, player.user), {
                 type: "house-card-chosen",
                 houseId: commandedHouse.id,
@@ -121,7 +133,10 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
             this.entireGame.sendMessageToClients([player.user], {
                 type: "house-card-chosen",
                 houseId: commandedHouse.id,
-                houseCardId: houseCard.id
+                houseCardId: houseCard.id,
+                valyrianSteelBladeUser: this.ingameGameState.getControllerOfHouse(this.ingameGameState.game.valyrianSteelBladeHolder) == player
+                    ? this.combatGameState.valyrianSteelBladeUser?.id ?? null
+                    : null
             });
 
             this.ingameGameState.log({
@@ -130,9 +145,6 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                 action: PlayerActionType.HOUSE_CARD_CHOSEN
             });
 
-            if (message.burnValyrianSteelBlade && player.house == this.combatGameState.game.valyrianSteelBladeHolder) {
-                this.combatGameState.valyrianSteelBladeUser = player.house;
-            }
 
             this.checkAndProceedEndOfChooseHouseCardGameState();
         } else if(message.type == "refuse-support") {
@@ -264,10 +276,16 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
     private tryAutomaticallyChooseLastHouseCard(house: House): void {
         const choosableCards = this.getChoosableCards(house);
+        const ingame = this.ingameGameState;
 
-        // We can only fast-track the last house card if house received no support to allow refusing it here
+        const houseCanBurnTheVsb = !ingame.game.valyrianSteelBladeUsed &&
+            (ingame.game.valyrianSteelBladeHolder == house || ingame.getVassalsControlledByPlayer(ingame.getControllerOfHouse(ingame.game.valyrianSteelBladeHolder)).includes(house));
+
+        // We can only fast-track the last house card if house received no support and house cannot burn the VSB
+        // (To allow refusing support or burning the VSB we cannot simply choose the last card automatically all the time...)
         if (choosableCards.length == 1 &&
-            !this.combatGameState.supporters.values.includes(house)) {
+            !this.combatGameState.supporters.values.includes(house) &&
+            !houseCanBurnTheVsb) {
             this.houseCards.set(house, choosableCards[0]);
             this.ingameGameState.log({
                 type: "player-action",

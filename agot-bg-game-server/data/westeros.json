@@ -1,11 +1,4 @@
 { "compressionlevel":0,
- "editorsettings":
-    {
-     "export":
-        {
-         "target":"."
-        }
-    },
  "height":100,
  "infinite":false,
  "layers":[
@@ -816,8 +809,8 @@
                  "type":"",
                  "visible":true,
                  "width":65,
-                 "x":482.53329832852,
-                 "y":1111.32213179312
+                 "x":466.866631661853,
+                 "y":1105.65546512645
                 }, 
                 {
                  "height":32,
@@ -866,9 +859,9 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":65,
-                 "x":569.109955463103,
-                 "y":1183.56284502761
+                 "width":96,
+                 "x":535.443288796436,
+                 "y":1168.22951169428
                 }, 
                 {
                  "height":65,
@@ -1818,8 +1811,8 @@
                  "type":"",
                  "visible":true,
                  "width":42,
-                 "x":554.379185389187,
-                 "y":1124.93559453062
+                 "x":542.379185389187,
+                 "y":1118.93559453062
                 }, 
                 {
                  "height":42,
@@ -1971,8 +1964,8 @@
                  "type":"",
                  "visible":true,
                  "width":42,
-                 "x":516.104801411339,
-                 "y":1189.82320125876
+                 "x":497.771468078006,
+                 "y":1182.15653459209
                 }, 
                 {
                  "height":42,
@@ -16523,7 +16516,7 @@
  "nextobjectid":433,
  "orientation":"orthogonal",
  "renderorder":"right-down",
- "tiledversion":"1.3.2",
+ "tiledversion":"1.7.2",
  "tileheight":32,
  "tilesets":[
         {
@@ -16551,6 +16544,6 @@
         }],
  "tilewidth":32,
  "type":"map",
- "version":1.2,
+ "version":"1.6",
  "width":100
 }
