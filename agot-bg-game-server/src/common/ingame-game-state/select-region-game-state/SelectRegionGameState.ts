@@ -13,7 +13,7 @@ interface ParentGameState extends GameState<any, any> {
     game: Game;
     ingame: IngameGameState;
 
-    onSelectRegionFinish(house: House, region: Region): void;
+    onSelectRegionFinish(house: House, region: Region, resolvedAutomatically: boolean): void;
 }
 
 export default class SelectRegionGameState<P extends ParentGameState> extends GameState<P> {
@@ -27,28 +27,36 @@ export default class SelectRegionGameState<P extends ParentGameState> extends Ga
     firstStart(house: House, regions: Region[]): void {
         this.house = house;
         this.regions = regions;
+
+        if (regions.length == 0) {
+            throw new Error("SelectRegionGameState created with regions.length == 0!");
+        }
+
+        if (regions.length == 1) {
+            this.parentGameState.onSelectRegionFinish(this.house, regions[0], true);
+        }
     }
 
     select(region: Region): void {
         this.parentGameState.entireGame.sendMessageToServer({
             type: "select-region",
             region: region.id
-        })
+        });
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "select-region") {
-            const region = this.game.world.regions.get(message.region);
-
             if (this.parentGameState.ingame.getControllerOfHouse(this.house) != player) {
                 return;
             }
+
+            const region = this.game.world.regions.get(message.region);
 
             if (!this.regions.includes(region)) {
                 return;
             }
 
-            this.parentGameState.onSelectRegionFinish(this.house, region);
+            this.parentGameState.onSelectRegionFinish(this.house, region, false);
         }
     }
 
