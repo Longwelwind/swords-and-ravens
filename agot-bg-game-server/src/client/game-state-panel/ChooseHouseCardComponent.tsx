@@ -123,6 +123,7 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
                                             </OverlayTrigger>}
                                         checked={this.burnValyrianSteelBlade}
                                         onChange={() => this.burnValyrianSteelBlade = !this.burnValyrianSteelBlade}
+                                        style={{zIndex: "auto"}}
                                     />
                                 </Col>
                             </Row>}
