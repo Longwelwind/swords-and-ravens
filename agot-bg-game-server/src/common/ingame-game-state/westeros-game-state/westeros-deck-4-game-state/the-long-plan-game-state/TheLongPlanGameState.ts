@@ -67,9 +67,11 @@ export default class TheLongPlanGameState extends GameState<WesterosDeck4GameSta
                 loyaltyTokenCount: 2
             });
 
-            // Remove the power token
-            this.ingame.changePowerTokens(this.childGameState.house, -1);
+            // First get the chosen house because when we remove the Power token first, getChoices may return a different result
             const chosenHouse = this.game.houses.get(this.getChoices(house).values[choice]);
+
+            // Remove the power token
+            this.ingame.changePowerTokens(house, -1);
             this.ingame.log({
                 type: "the-long-plan-choice",
                 house: house.id,
