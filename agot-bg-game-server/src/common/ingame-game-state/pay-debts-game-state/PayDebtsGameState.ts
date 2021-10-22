@@ -19,7 +19,6 @@ export default class PayDebtsGameState extends GameState<IngameGameState, Resolv
     }
 
     proceedNextResolve(): void {
-        this.ingame.gainLoyaltyTokens();
         const nextHouse = this.pullNextHouseToResolve();
         if (!nextHouse) {
             this.ingame.onPayDebtsGameStateFinish();

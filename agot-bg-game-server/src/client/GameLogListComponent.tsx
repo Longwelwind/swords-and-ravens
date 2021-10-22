@@ -357,11 +357,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </>
                 );
             }
-            case "winner-declared":
+            case "winner-declared": {
+                const winner = this.game.houses.get(data.winner);
                 return (
-                    <p>Game ended.</p>
+                    <h5 style={{textAlign: "center"}}>Game has ended.<br/>House <b style={{color: winner.color}}>{winner.name}</b> wins this Game of Thrones!</h5>
                 );
-
+            }
             case "raven-holder-wildling-card-put-bottom": {
                 const house = this.game.houses.get(data.ravenHolder);
 
