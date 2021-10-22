@@ -1241,6 +1241,28 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "51",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame" && serializedGame.childGameState.childGameState.type == "game-ended") {
+                const ingame = serializedGame.childGameState;
+                const gameEnded = serializedGame.childGameState.childGameState;
+                const lastLog: any = _.last(ingame.gameLogManager.logs);
+
+                if (!lastLog || lastLog.data.type == "winner-declared") {
+                    return serializedGame;
+                }
+
+                ingame.gameLogManager.logs.push({
+                    time: lastLog.time,
+                    data: { type: "winner-declared", winner: gameEnded.winner },
+                    resolvedAutomatically: false
+                });
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

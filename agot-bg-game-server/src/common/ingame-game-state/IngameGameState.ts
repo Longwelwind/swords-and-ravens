@@ -487,15 +487,7 @@ export default class IngameGameState extends GameState<
     checkVictoryConditions(): boolean {
         if (this.game.areVictoryConditionsFulfilled()) {
             // Game is finished
-            const winner = this.game.getPotentialWinner();
-
-            this.log({
-                type: "winner-declared",
-                winner: winner.id
-            });
-
-            this.setChildGameState(new GameEndedGameState(this)).firstStart(winner);
-
+            this.setChildGameState(new GameEndedGameState(this)).firstStart(this.game.getPotentialWinner());
             return true;
         } else {
             return false;

@@ -52,6 +52,11 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
 
     proceedNextResolve(): void {
         this.ingame.gainLoyaltyTokens();
+
+        if (this.ingame.checkVictoryConditions()) {
+            return;
+        }
+
         const nextHouse = this.pullNextHouseToResolve();
         if (!nextHouse) {
             this.westeros.onWesterosCardEnd();
