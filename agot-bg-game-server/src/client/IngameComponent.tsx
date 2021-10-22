@@ -5,7 +5,7 @@ import GameClient from "./GameClient";
 import {observer} from "mobx-react";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import MapComponent, { MAP_HEIGHT } from "./MapComponent";
-import MapControls from "./MapControls";
+import MapControls, { RegionOnMapProperties } from "./MapControls";
 import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import Card from "react-bootstrap/Card";
@@ -87,6 +87,9 @@ import sleep from "../utils/sleep";
 import joinNaturalLanguage from "./utils/joinNaturalLanguage";
 import PayDebtsGameState from "../common/ingame-game-state/pay-debts-game-state/PayDebtsGameState";
 import PayDebtsComponent from "./game-state-panel/PayDebtsComponent";
+import BetterMap from "../utils/BetterMap";
+import Region from "../common/ingame-game-state/game-data-structure/Region";
+import PartialRecursive from "../utils/PartialRecursive";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -116,6 +119,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     @observable gameLogMinHeight: number = GAME_LOG_MIN_HEIGHT;
     @observable housesMaxHeight: number | null = null;
     @observable housesInfosCollapsed = this.props.gameClient.authenticatedUser?.settings.tracksColumnCollapsed ?? false;
+    @observable highlightedRegions = new BetterMap<Region, PartialRecursive<RegionOnMapProperties>>();
+    modifyRegionsOnMapCallback: any;
     resizeObserver: ResizeObserver | null = null;
 
     get game(): Game {
@@ -556,7 +561,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         </Col>
                         <Col xs="auto" className="mx-1 px-0">
                             <Col style={{ width: "28px", fontSize: "22px", textAlign: "center" }} className="px-0">
-                                <Row className="mb-3 mx-0">
+                                <Row className="mb-3 mx-0" onMouseEnter={() => this.highlightRegionsOfHouses()} onMouseLeave={() => this.highlightedRegions.clear()}>
                                     <OverlayTrigger overlay={
                                         <Tooltip id="round-tooltip">
                                             <h6>Round {this.game.turn} / {this.game.maxTurns}</h6>
@@ -770,6 +775,22 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         </Row>
     }
 
+    highlightRegionsOfHouses(): void {
+        const regions = new BetterMap(this.ingame.world.regions.values.map(r => [r, r.getController()]));
+        this.highlightedRegions.clear();
+
+        regions.entries.forEach(([r, controller]) => {
+            this.highlightedRegions.set(r, {
+                highlight: {
+                    active: controller != null ? true : false,
+                    color: controller?.id != "greyjoy" ? controller?.color ?? "#000000" : "#000000",
+                    light: r.type.id == "sea",
+                    strong: r.type.id == "land"
+                }
+            });
+        });
+    }
+
     renderDragonStrengthTooltip(): OverlayChildren {
         const roundsWhenIncreased: number[] = [];
         for(let i = this.game.turn + 1; i <= 10; i++) {
@@ -945,6 +966,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     componentDidMount(): void {
+        this.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
         this.props.gameState.entireGame.onNewPrivateChatRoomCreated = (roomId: string) => this.onNewPrivateChatRoomCreated(roomId);
         if (!isMobile) {
             window.addEventListener('resize', () => {
@@ -961,6 +983,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     componentWillUnmount(): void {
         this.props.gameState.entireGame.onNewPrivateChatRoomCreated = null;
+        _.pull(this.mapControls.modifyRegionsOnMap, this.modifyRegionsOnMapCallback);
 
         if (!isMobile) {
             window.removeEventListener('resize', () => {
@@ -972,5 +995,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         if (this.resizeObserver) {
             this.resizeObserver.disconnect();
         }
+    }
+
+    modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
+        return this.highlightedRegions.entries;
     }
 }
