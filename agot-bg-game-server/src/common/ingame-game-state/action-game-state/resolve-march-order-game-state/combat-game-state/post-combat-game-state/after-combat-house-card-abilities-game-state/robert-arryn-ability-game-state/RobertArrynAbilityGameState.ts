@@ -60,9 +60,8 @@ export default class RobertArrynAbilityGameState extends GameState<
             } else if (possibleEnemyHouseCards.length == 1) {
                 this.executeRobertsAbility(possibleEnemyHouseCards[0]);
             } else {
-                // Iron Throne holder has to decide which card to remove
                 this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(
-                    this.game.ironThroneHolder,
+                    this.house,
                     possibleEnemyHouseCards);
                 return;
             }
