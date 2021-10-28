@@ -126,7 +126,7 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
         }, resolvedAutomatically);
 
         // After destroying a unit an orphaned ship may be present here, so try to find it and destroy it in that case
-        findOrphanedShipsAndDestroyThem(this.game.world, this.ingame, null);
+        findOrphanedShipsAndDestroyThem(this.ingame);
 
         this.parentGameState.onWildlingCardExecuteEnd();
     }

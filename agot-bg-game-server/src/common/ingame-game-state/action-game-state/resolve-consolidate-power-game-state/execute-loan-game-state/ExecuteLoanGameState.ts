@@ -17,6 +17,7 @@ import LoyalMaesterGameState, { SerializedLoyalMaesterGameState } from "./loyal-
 import MasterAtArmsGameState, { SerializedMasterAtArmsGameState } from "./master-at-arms-game-state/MasterAtArmsGameState";
 import SavvyStewardGameState, { SerializedSavvyStewardGameState } from "./savvy-steward-game-state/SavvyStewardGameState";
 import SpymasterGameState, { SerializedSpymasterGameState } from "./spymaster-game-state/SpymasterGameState";
+import { findOrphanedShipsAndDestroyThem } from "../../../../../common/ingame-game-state/port-helper/PortHelper";
 
 export default class ExecuteLoanGameState extends GameState<ResolveConsolidatePowerGameState,
     PlaceSellswordsGameState | TheFacelessMenGameState | PyromancerGameState | ExpertArtificerGameState | LoyalMaesterGameState
@@ -79,6 +80,7 @@ export default class ExecuteLoanGameState extends GameState<ResolveConsolidatePo
     }
 
     onExecuteLoanFinish(house: House): void {
+        findOrphanedShipsAndDestroyThem(this.ingame, this.parentGameState.actionGameState);
         this.parentGameState.proceedNextResolve(house);
     }
 

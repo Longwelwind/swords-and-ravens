@@ -32,7 +32,7 @@ export default abstract class WildlingCardEffectInTurnOrderGameState<C extends G
     proceedNextHouse(previousHouse: House | null): void {
         // Some wildlings effects may cause units to be killed.
         // Therefore an orphaned ship may be present here. Try to find it and destroy it in that case
-        findOrphanedShipsAndDestroyThem(this.game.world, this.parentGameState.ingame, null);
+        findOrphanedShipsAndDestroyThem(this.parentGameState.ingame);
 
         if (previousHouse == null) {
             this.executeForLowestBidder(this.parentGameState.lowestBidder);
