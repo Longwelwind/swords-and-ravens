@@ -11,6 +11,7 @@ import groupBy from "../../../../utils/groupBy";
 import BetterMap from "../../../../utils/BetterMap";
 import Region from "../../game-data-structure/Region";
 import _ from "lodash";
+import { findOrphanedShipsAndDestroyThem } from "../../port-helper/PortHelper";
 
 export default class ResolveSinglePayDebtGameState extends GameState<PayDebtsGameState> {
     house: House;
@@ -35,13 +36,13 @@ export default class ResolveSinglePayDebtGameState extends GameState<PayDebtsGam
 
         const availableUnits = this.availableUnitsOfHouse;
         if (availableUnits.length <= debt) {
-            this.removeUnits(availableUnits, true);
+            this.removeUnitsAndProceedNextResolve(availableUnits, true);
         } else if (availableUnits.every(u => u.region == availableUnits[0].region && u.type == availableUnits[0].type)) {
-            this.removeUnits(_.take(availableUnits, debt), true);
+            this.removeUnitsAndProceedNextResolve(_.take(availableUnits, debt), true);
         }
     }
 
-    removeUnits(units: Unit[], resolvedAutomatically = false): void {
+    removeUnitsAndProceedNextResolve(units: Unit[], resolvedAutomatically = false): void {
         const unitsPerRegion = groupBy(units, unit => unit.region);
 
         unitsPerRegion.forEach((units, region) => {
@@ -61,7 +62,8 @@ export default class ResolveSinglePayDebtGameState extends GameState<PayDebtsGam
             units: unitsPerRegion.map((r, us) => [r.id, us.map(u => u.type.id)])
         }, resolvedAutomatically);
 
-        this.onResolveSinglePayDebtGameStateEnd();
+        findOrphanedShipsAndDestroyThem(this.ingame);
+        this.parentGameState.proceedNextResolve();
     }
 
     sendPayDebt(unitsToRemove: [Region, Unit[]][]): void {
@@ -89,15 +91,11 @@ export default class ResolveSinglePayDebtGameState extends GameState<PayDebtsGam
                 return;
             }
 
-            this.removeUnits(flatRemovedUnits);
+            this.removeUnitsAndProceedNextResolve(flatRemovedUnits);
         }
     }
 
     onServerMessage(_message: ServerMessage): void {
-    }
-
-    onResolveSinglePayDebtGameStateEnd(): void {
-        this.parentGameState.proceedNextResolve();
     }
 
     getWaitedUsers(): User[] {

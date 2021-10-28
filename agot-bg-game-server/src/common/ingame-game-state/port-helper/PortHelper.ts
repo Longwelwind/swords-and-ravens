@@ -1,4 +1,3 @@
-import World from "../game-data-structure/World";
 import { port } from "../game-data-structure/regionTypes";
 import Region from "../game-data-structure/Region";
 import ActionGameState from "../action-game-state/ActionGameState";
@@ -46,15 +45,16 @@ export function destroyAllShipsInPort(portRegion: Region, entireGame: EntireGame
     return shipsToDestroy.length;
 }
 
-export function findOrphanedShipsAndDestroyThem(world: World, ingameGameState: IngameGameState, actionGameState: ActionGameState | null): void {
+export function findOrphanedShipsAndDestroyThem(ingame: IngameGameState, actionGameState: ActionGameState | null = null): void {
+    const world = ingame.world;
     const portsWithOrphanedShips = world.regions.values.filter(r => r.type == port
         && r.units.size > 0
         && !world.getAdjacentLandOfPort(r).getController());
 
     portsWithOrphanedShips.forEach(portRegion => {
         const houseThatLostShips = portRegion.units.values[0].allegiance;
-        const destroyedShipCount = destroyAllShipsInPort(portRegion, ingameGameState.entireGame, actionGameState);
-        ingameGameState.log({
+        const destroyedShipCount = destroyAllShipsInPort(portRegion, ingame.entireGame, actionGameState);
+        ingame.log({
             type: "ships-destroyed-by-empty-castle",
             castle: world.getAdjacentLandOfPort(portRegion).id,
             house: houseThatLostShips.id,
