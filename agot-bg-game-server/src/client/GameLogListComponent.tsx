@@ -264,7 +264,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         <div style={{ display: 'flex', justifyContent: 'center' }}>
                             <CombatInfoComponent housesCombatData={houseCombatDatas} />
                         </div>
-                        <p className="text-center mt-4"><b style={{color: winner.color}}>{winner.name}</b> won the battle!</p>
+                        <p className="text-center mt-4"><b style={{color: winner.color, fontSize: "1.25rem"}}>{winner.name}</b> won the battle!</p>
                     </>
                 );
             case "wildling-card-revealed":

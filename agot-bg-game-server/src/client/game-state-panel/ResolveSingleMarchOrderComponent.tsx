@@ -15,6 +15,7 @@ import Col from "react-bootstrap/Col";
 import {OrderOnMapProperties, RegionOnMapProperties, UnitOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
 import House from "../../common/ingame-game-state/game-data-structure/House";
+import unitImages from "../unitImages";
 
 @observer
 export default class ResolveSingleMarchOrderComponent extends Component<GameStateComponentProps<ResolveSingleMarchOrderGameState>> {
@@ -67,8 +68,13 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                     Planned moves from <b>{this.selectedMarchOrderRegion.name}</b>:
                                     <ul>
                                         {this.plannedMoves.entries.map(([region, units]) => (
-                                            <li key={`planned-move_${region.id}`}>
-                                                {units.map(u => u.type.name).join(", ")} =&gt; {region.name}
+                                            <li key={`planned-moves_${region.id}`} style={{listStyleType: "none"}}>
+                                                {units.map((ut, i) =>
+                                                    <div key={`planned_units_${this.house.id}_${i}`} className="unit-icon smedium" style={{
+                                                        backgroundImage: `url(${unitImages.get(this.house.id).get(ut.type.id)})`,
+                                                        display: "inline-block"
+                                                    }}/>
+                                                )} =&gt; {region.name}
                                             </li>
                                         ))}
                                     </ul>
