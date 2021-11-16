@@ -7,8 +7,8 @@ import {knight} from "../unitTypes";
 import AfterCombatHouseCardAbilitiesGameState from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-combat-house-card-abilities-game-state/AfterCombatHouseCardAbilitiesGameState";
 
 export default class KhalDrogoHouseCardAbility extends HouseCardAbility {
-    modifyUnitCombatStrength(_combat: CombatGameState, house: House, _houseCard: HouseCard, _houseSide: House, affectedUnit: Unit, _support: boolean, _currentStrength: number): number {
-        return affectedUnit.allegiance == house && affectedUnit.type == knight ? 1 : 0;
+    modifyUnitCombatStrength(_combat: CombatGameState, house: House, _houseCard: HouseCard, _houseSide: House, affectedUnit: Unit, support: boolean, _currentStrength: number): number {
+        return !support && affectedUnit.allegiance == house && affectedUnit.type == knight ? 1 : 0;
     }
 
     modifySwordIcons(combat: CombatGameState, house: House, houseCard: HouseCard, affectedHouseCard: HouseCard): number {

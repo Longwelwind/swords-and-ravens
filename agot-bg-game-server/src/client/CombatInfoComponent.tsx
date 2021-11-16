@@ -10,6 +10,7 @@ import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
 import houseCardsBackImages from "./houseCardsBackImages";
 import { TidesOfBattleCard } from "../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
 import TidesOfBattleCardComponent from "./game-state-panel/utils/TidesOfBattleCardComponent";
+import unitImages from "./unitImages";
 
 interface HouseCombatData {
     house: House;
@@ -51,18 +52,32 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
             <div style={{display: "grid", gridGap: "5px", gridTemplateColumns: "auto 1fr auto 1fr auto", justifyItems: "center", alignItems: "center"}} className="text-center">
                 <div style={{gridRow: "1", gridColumn: "1 / span 2"}}>
                     <img src={knightBannerImage} width="24" style={{"display": this.attacker.isWinner ? "inline" : "none", marginLeft: this.attacker.isWinner ? 3 : 0}}/>
-                    <b style={{"color": this.attacker.house.color}}>{this.attacker.house.name}</b><br/>
-                    <small>{this.attacker.region.name}</small><br/>
-                    <small>{this.attacker.armyUnits.map(ut => ut.name).join(", ")}</small>
+                    <b style={{"color": this.attacker.house.color, fontSize: "1.25rem"}}>{this.attacker.house.name}</b><br/>
+                    {this.attacker.region.name}<br/>
+                    <div>
+                        {this.attacker.armyUnits.map((ut, i) =>
+                            <div key={`combat_info_units_${this.attacker.house.id}_${i}`} className="unit-icon smedium" style={{
+                                backgroundImage: `url(${unitImages.get(this.attacker.house.id).get(ut.id)})`,
+                                display: "inline-block"
+                            }}/>
+                        )}
+                    </div>
                 </div>
                 <div style={{gridRow: "1", gridColumn: "3"}}>
                     <img src={crossedSwordsImage} width={this.SIZE_MIDDLE_COLUMN}/>
                 </div>
                 <div style={{gridRow: "1", gridColumn: "4 / span 2"}}>
                     <img src={knightBannerImage} width="24" style={{"display": this.defender.isWinner ? "inline" : "none", marginLeft: this.attacker.isWinner ? 3 : 0}}/>
-                    <b style={{"color": this.defender.house.color}}>{this.defender.house.name}</b><br/>
-                    <small>{this.defender.region.name}</small><br/>
-                    <small>{this.defender.armyUnits.map(ut => ut.name).join(", ")}</small>
+                    <b style={{"color": this.defender.house.color, fontSize: "1.25rem"}}>{this.defender.house.name}</b><br/>
+                    {this.defender.region.name}<br/>
+                    <div>
+                        {this.defender.armyUnits.map((ut, i) =>
+                            <div key={`combat_info_units_${this.defender.house.id}_${i}`} className="unit-icon smedium" style={{
+                                backgroundImage: `url(${unitImages.get(this.defender.house.id).get(ut.id)})`,
+                                display: "inline-block"
+                            }}/>
+                        )}
+                    </div>
                 </div>
 
                 <div style={{gridRow: "2 / span 4", gridColumn: "1"}}>

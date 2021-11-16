@@ -55,11 +55,12 @@ export default class RenlyBaratheonAbilityGameState extends GameState<
 
     getUpgradableFootmen(house: House): Unit[] {
         // Assemble a list of all units belonging to the house (supporting or not), and then take the footmen among them
-        const upgradableFootmen = this.combatGameState.houseCombatDatas.get(house).army
-            .concat(_.flatMap(this.combatGameState.getPossibleSupportingRegions().map(({region}) => region).filter(region => region.getController() == house).map(r => r.units.values)))
-            .filter(u => u.type == footman);
+        const units = this.combatGameState.houseCombatDatas.get(house).army;
+        if (this.combatGameState.supporters.tryGet(house, null) == house) {
+            units.push(..._.flatMap(this.combatGameState.getPossibleSupportingRegions().map(({region}) => region).filter(region => region.getController() == house).map(r => r.units.values)))
+        }
 
-        return upgradableFootmen;
+        return units.filter(u => u.type == footman);
     }
 
     onSelectUnitsEnd(house: House, selectedUnit: [Region, Unit[]][]): void {
