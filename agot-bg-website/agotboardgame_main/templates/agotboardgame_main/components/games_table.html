@@ -25,6 +25,9 @@
                     {% if game.state == "ONGOING" %}
                         <p>
                             Turn: <b>{{ game.view_of_game.turn }}</b>
+                            {% if game.view_of_game.waitingFor %}
+                                <br/>Waiting for: {{ game.view_of_game.waitingFor }}
+                            {% endif %}
                         </p>
                         <div class='text-small text-muted'>
                             Last active {{ game.updated_at|naturaltime }}
