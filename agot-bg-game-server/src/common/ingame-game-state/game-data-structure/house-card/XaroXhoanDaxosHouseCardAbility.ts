@@ -6,7 +6,8 @@ import Unit from "../Unit";
 import {ship} from "../unitTypes";
 
 export default class XaroXhoanDaxosHouseCardAbility extends HouseCardAbility {
-    modifyUnitCombatStrength(combat: CombatGameState, house: House, _houseCard: HouseCard, _houseSide: House, affectedUnit: Unit, _support: boolean, _currentStrength: number): number {
+    modifyUnitCombatStrength(combat: CombatGameState, house: House, _houseCard: HouseCard, _houseSide: House, affectedUnit: Unit, support: boolean, _currentStrength: number): number {
+        if (support) return 0;
         const enemy = combat.getEnemy(house);
         const ships = combat.houseCombatDatas.get(house).army.filter(u => u.type == ship);
         const enemyShips = combat.houseCombatDatas.get(enemy).army.filter(u => u.type == ship);
