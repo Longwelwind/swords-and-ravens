@@ -30,7 +30,6 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             <Col xs={12} className={this.props.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
                 <div style={{ marginLeft: "1rem", marginBottom: "0rem", textAlign: "center"}}>
                     <h4 style={{ display: "inline" }}>{this.props.entireGame.name} {this.getGameTypeBadge()}</h4>
-                    {this.props.entireGame.gameSettings.playerCount == 8 && this.getBetaWarning()}
                 </div>
             </Col>
             {
