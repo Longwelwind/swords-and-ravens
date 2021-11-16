@@ -74,7 +74,8 @@ def generate_default_view_of_game():
         "maxPlayerCount": 8,
         "settings": {
             "pbem": True
-        }
+        },
+        "waitingFor": ""
     }
 
 

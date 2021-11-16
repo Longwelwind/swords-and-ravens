@@ -15,6 +15,7 @@ import CombatGameState from "./ingame-game-state/action-game-state/resolve-march
 import sleep from "../utils/sleep";
 import PostCombatGameState from "./ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState";
 import { StoredProfileSettings } from "../server/website-client/WebsiteClient";
+import Player from "./ingame-game-state/Player";
 
 export enum NotificationType {
     READY_TO_START,
@@ -343,8 +344,16 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             : -1;
         const maxPlayerCount = this.gameSettings.playerCount;
         const settings = this.gameSettings;
+        const _waitingFor = (this.ingameGameState
+            ? this.leafState.getWaitedUsers().map(u => this.ingameGameState?.players.tryGet(u, null) ?? null)
+                .filter(p => p != null).map((p: Player) => ({
+                    house: p.house.name,
+                    user: p.user.name
+                }))
+            : []);
+        const waitingFor = _waitingFor.map(wf => `${wf.house} (${wf.user})`).join(", ");
 
-        return {turn, maxPlayerCount, settings};
+        return {turn, maxPlayerCount, settings, waitingFor};
     }
 
     // eslint-disable-next-line @typescript-eslint/ban-types

@@ -14,7 +14,7 @@ export default class TakeControlOfEnemyPortComponent extends Component<GameState
         return (
             <>
                 <Col xs={12} className="text-center">
-                    <p><strong>{this.props.gameState.newController.name}</strong> has to choose the amount of ships to convert.</p>
+                    <p>House <b>{this.props.gameState.newController.name}</b> has to choose the amount of ships to convert in <b>{this.props.gameState.port.name}</b>.</p>
                 </Col>
                 {renderChildGameState(this.props, [
                     [SimpleChoiceGameState, SimpleChoiceComponent]
