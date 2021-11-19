@@ -10,7 +10,7 @@ import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
 import houseCardsBackImages from "./houseCardsBackImages";
 import { TidesOfBattleCard } from "../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
 import TidesOfBattleCardComponent from "./game-state-panel/utils/TidesOfBattleCardComponent";
-import unitImages from "./unitImages";
+import UnitIconComponent from "./UnitIconComponent";
 
 interface HouseCombatData {
     house: House;
@@ -56,10 +56,12 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                     {this.attacker.region.name}<br/>
                     <div>
                         {this.attacker.armyUnits.map((ut, i) =>
-                            <div key={`combat_info_units_${this.attacker.house.id}_${i}`} className="unit-icon smedium" style={{
-                                backgroundImage: `url(${unitImages.get(this.attacker.house.id).get(ut.id)})`,
-                                display: "inline-block"
-                            }}/>
+                            <UnitIconComponent key={`combat_info_units_${this.attacker.house.id}_${i}`}
+                                house={this.attacker.house}
+                                unitType={ut}
+                                size="smedium"
+                                makeGreyjoyUnitsBlack={true}
+                            />
                         )}
                     </div>
                 </div>
@@ -72,10 +74,12 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                     {this.defender.region.name}<br/>
                     <div>
                         {this.defender.armyUnits.map((ut, i) =>
-                            <div key={`combat_info_units_${this.defender.house.id}_${i}`} className="unit-icon smedium" style={{
-                                backgroundImage: `url(${unitImages.get(this.defender.house.id).get(ut.id)})`,
-                                display: "inline-block"
-                            }}/>
+                            <UnitIconComponent key={`combat_info_units_${this.defender.house.id}_${i}`}
+                                house={this.defender.house}
+                                unitType={ut}
+                                size="smedium"
+                                makeGreyjoyUnitsBlack={true}
+                            />
                         )}
                     </div>
                 </div>
