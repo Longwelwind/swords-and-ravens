@@ -345,6 +345,13 @@ export default class PostCombatGameState extends GameState<
         // Notify combatans about end of combat
         this.combat.entireGame.notifyUsers(this.combat.houseCombatDatas.keys.map(h =>
             this.combat.ingameGameState.getControllerOfHouse(h).user), NotificationType.BATTLE_RESULTS);
+
+        this.combat.houseCombatDatas.keys.forEach(house => {
+            // Reset vassal house cards again in case an ingame vassal replacement prevented the reset
+            if (this.combat.ingameGameState.isVassalHouse(house)) {
+                house.houseCards = new BetterMap();
+            }
+        });
         this.combat.resolveMarchOrderGameState.onResolveSingleMarchOrderGameStateFinish(this.attacker);
     }
 

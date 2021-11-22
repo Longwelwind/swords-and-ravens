@@ -8,6 +8,7 @@ import CombatGameState from "../action-game-state/resolve-march-order-game-state
 import WildlingCardEffectInTurnOrderGameState from "../westeros-game-state/wildlings-attack-game-state/WildlingCardEffectInTurnOrderGameState";
 import GameState from "../../../common/GameState";
 import BetterMap from "../../../utils/BetterMap";
+import HouseCardResolutionGameState from "../action-game-state/resolve-march-order-game-state/combat-game-state/house-card-resolution-game-state/HouseCardResolutionGameState";
 
 export type SerializedVoteType = SerializedCancelGame | SerializedEndGame | SerializedReplacePlayer | SerializedReplacePlayerByVassal;
 
@@ -249,7 +250,12 @@ export class ReplacePlayerByVassal extends VoteType {
 
         // Remove house cards from new vassal house so abilities like Qyburn cannot use this cards anymore
         newVassalHouse.houseCards.forEach(hc => vote.ingame.game.deletedHouseCards.set(hc.id, hc));
-        newVassalHouse.houseCards = new BetterMap();
+
+        // Only clear house cards now, when game is not in HouseCardResolutionGameState as some abilities like Viserys
+        // require a hand and will result in SelectHouseCardGameState with 0 cards for selection
+        if (!vote.ingame.hasChildGameState(HouseCardResolutionGameState)) {
+            newVassalHouse.houseCards = new BetterMap();
+        }
 
         vote.ingame.entireGame.broadcastToClients({
             type: "update-deleted-house-cards",
