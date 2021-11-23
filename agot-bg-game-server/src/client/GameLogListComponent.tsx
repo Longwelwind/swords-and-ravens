@@ -286,7 +286,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <>
                         <p>Wildling bidding results for Wildling Threat <b>{data.wildlingStrength}</b>:</p>
-                        <div className="mt-1"><HouseNumberResultsComponent results={bids} key="wildlings"></HouseNumberResultsComponent></div>
+                        <div className="mt-1"><HouseNumberResultsComponent results={bids} key="wildlings-log"></HouseNumberResultsComponent></div>
                         {data.nightsWatchVictory ? (
                             <p>The <b>Night&apos;s Watch</b> won!</p>
                         ) : (

@@ -154,7 +154,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                     {this.renderUnits(garrisons)}
                     {this.renderOrders()}
                     {this.renderRegionTexts(propertiesForRegions)}
-                    {ironBank && (ironBank.controllerOfBraavos || ironBank.purchasedLoans.length > 0) && this.renderIronBankInfos(ironBankView)}
+                    {ironBank && this.renderIronBankInfos(ironBankView)}
                     {this.renderLoanCardDeck(ironBankView)}
                     {this.renderLoanCardSlots(ironBankView)}
                 </div>

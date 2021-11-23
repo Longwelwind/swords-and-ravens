@@ -7,7 +7,8 @@ import IronBank from "../common/ingame-game-state/game-data-structure/IronBank";
 import HouseNumberResultsComponent from "./HouseNumberResultsComponent";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import preventOverflow from "@popperjs/core/lib/modifiers/preventOverflow";
-import braavosInitialLoanCostReduce from "../../public/images/garrisons/braavos-initial-loan-cost-reduce.png"
+import braavosInitialLoanCostReduceImage from "../../public/images/garrisons/braavos-initial-loan-cost-reduce.png"
+import ironBankImage from "../../public/images/ironBank.jpg"
 
 interface IronBankInfosComponentProps {
     ingame: IngameGameState;
@@ -19,10 +20,12 @@ export default class IronBankInfosComponent extends Component<IronBankInfosCompo
     render(): ReactNode {
         const braavosController = this.props.ironBank.controllerOfBraavos;
         const interestCosts = this.props.ingame.game.houses.values.map(h => [h, this.props.ironBank.purchasedLoans.filter(lc => lc.purchasedBy == h).length] as [House, number]).filter(([_h, costs]) => costs > 0);
+        const backgroundOpacity = braavosController || interestCosts.length > 0 ? 0.5 : 1;
         return (
             <>
                 <Card style={{ height: "100%" }}>
-                    <Card.Body style={{ padding: 16, paddingBottom: 8 }}>
+                    <Card.Img variant="top" src={ironBankImage} style={{opacity: backgroundOpacity, height: "100%", width: "auto"}}/>
+                    <Card.ImgOverlay style={{ padding: 16, paddingBottom: 8 }}>
                         <Row style={{height: "100%"}} className="align-items-center">
                             <Col xs={12}>
                                 {braavosController &&
@@ -33,10 +36,10 @@ export default class IronBankInfosComponent extends Component<IronBankInfosCompo
                                             popperConfig={{ modifiers: [preventOverflow] }}>
                                             <Row className="align-items-center justify-content-cener">
                                                 <Col xs="auto" className="p-1">
-                                                    <img src={braavosInitialLoanCostReduce} width={120} />
+                                                    <img src={braavosInitialLoanCostReduceImage} width={120} />
                                                 </Col>
                                                 <Col className="p-1">
-                                                    <h5 style={{ display: "inline", color: braavosController.color }}><b>&nbsp;{braavosController.name}</b></h5>
+                                                    <h5 style={{ display: "inline" }}><b>&nbsp;{braavosController.name}</b></h5>
                                                 </Col>
                                             </Row>
                                         </OverlayTrigger>
@@ -52,17 +55,17 @@ export default class IronBankInfosComponent extends Component<IronBankInfosCompo
                                             placement="auto"
                                             popperConfig={{ modifiers: [preventOverflow] }}
                                         >
-                                            <Col xs={12} className="py-0">
+                                            <Col xs={12} className="py-1">
                                                 <h5 className="text-center">Interest per round</h5>
                                             </Col>
                                         </OverlayTrigger>
                                         <Col xs="auto" className="py-0">
-                                            <HouseNumberResultsComponent results={interestCosts} />
+                                            <HouseNumberResultsComponent results={interestCosts} key="iron-bank-interests-costs" bold={true}/>
                                         </Col>
                                     </Row>}
                             </Col>
                         </Row>
-                    </Card.Body>
+                    </Card.ImgOverlay>
                 </Card>
             </>
         );
