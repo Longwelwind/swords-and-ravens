@@ -80,6 +80,10 @@ export default class HouseCardAbility {
         return strength;
     }
 
+    doesOverwriteFinalCombatStrength(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _affectedHouseCard: HouseCard): boolean {
+        return false;
+    }
+
     forcesValyrianSteelBladeDecision(_combat: CombatGameState, _valyrianSteelBladeHolder: House): boolean {
         return false;
     }
