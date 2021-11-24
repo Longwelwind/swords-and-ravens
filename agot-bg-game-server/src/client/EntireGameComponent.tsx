@@ -13,7 +13,10 @@ import Badge from "react-bootstrap/Badge";
 import notificationSound from "../../public/sounds/notification.ogg";
 import faviconNormal from "../../public/images/favicon.ico";
 import faviconAlert from "../../public/images/favicon-alert.ico";
+import rollingDicesImage from "../../public/images/icons/rolling-dices.svg";
 import {Helmet} from "react-helmet";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { preventOverflow } from "@popperjs/core";
 
 interface EntireGameComponentProps {
     entireGame: EntireGame;
@@ -29,7 +32,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             </Helmet>
             <Col xs={12} className={this.props.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
                 <div style={{ marginLeft: "1rem", marginBottom: "0rem", textAlign: "center"}}>
-                    <h4 style={{ display: "inline" }}>{this.props.entireGame.name} {this.getGameTypeBadge()}</h4>
+                    <h4 style={{ display: "inline" }}>{this.props.entireGame.name} {this.getTidesOfBattleImage()} {this.getGameTypeBadge()}</h4>
                 </div>
             </Col>
             {
@@ -42,6 +45,16 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 )
             }
         </>;
+    }
+
+    getTidesOfBattleImage(): ReactNode {
+        return <OverlayTrigger
+            placement="auto"
+            overlay={<Tooltip id="tob-active-tooltip">Tides of Battle</Tooltip>}
+            popperConfig={{ modifiers: [preventOverflow] }}
+        >
+            <img src={rollingDicesImage} width="30" style={{ "display": this.props.entireGame.gameSettings.tidesOfBattle ? "inline" : "none", marginTop: "-6px", paddingLeft: "5px" }} />
+        </OverlayTrigger>
     }
 
     getGameTypeBadge(): ReactNode {
