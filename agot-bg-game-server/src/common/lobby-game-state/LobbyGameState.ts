@@ -244,10 +244,10 @@ export default class LobbyGameState extends GameState<EntireGame> {
             players: this.players.entries.map(([house, user]) => [house.id, user.id])
         });
 
-        this.notifyOwnerWhenGameCanBestarted();
+        this.notifyOwnerWhenGameCanBeStarted();
     }
 
-    notifyOwnerWhenGameCanBestarted(): void {
+    notifyOwnerWhenGameCanBeStarted(): void {
         if (!this.entireGame.users.has(this.entireGame.ownerUserId)) {
             return;
         }
@@ -255,7 +255,21 @@ export default class LobbyGameState extends GameState<EntireGame> {
         const owner = this.entireGame.users.get(this.entireGame.ownerUserId);
 
         if (this.canStartGame(owner).success) {
-            this.entireGame.notifyUsers([owner], NotificationType.READY_TO_START);
+            // Only notify when min count is reached and when game is full to avoid many messages in between
+            let minCountReached = false;
+            if (this.entireGame.gameSettings.vassals) {
+                if (this.entireGame.selectedGameSetup.playerCount >= 8) {
+                    minCountReached = this.players.size == MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN;
+                } else {
+                    minCountReached = this.players.size == MIN_PLAYER_COUNT_WITH_VASSALS;
+                }
+            }
+
+            const maxCountReached = this.players.size == this.entireGame.selectedGameSetup.playerCount;
+
+            if (minCountReached || maxCountReached) {
+                this.entireGame.notifyUsers([owner], NotificationType.READY_TO_START);
+            }
         }
     }
 
