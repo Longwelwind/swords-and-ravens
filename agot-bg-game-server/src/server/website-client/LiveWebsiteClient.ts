@@ -88,7 +88,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
     }
 
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/ban-types
-    async saveGame(gameId: string, serializedGame: any, viewOfGame: any, players: {userId: string; data: object}[], state: string, version: string): Promise<void> {
+    async saveGame(gameId: string, serializedGame: any, viewOfGame: any, players: {userId: string; data: object}[], state: string, version: string, updateLastActive: boolean): Promise<void> {
         await this.request.patch(`${this.masterApiBaseUrl}/game/${gameId}`, {
             body: {
                 serialized_game: serializedGame,
@@ -96,6 +96,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
                 version,
                 view_of_game: viewOfGame,
                 players: players.map(p => ({user: p.userId, data: p.data})),
+                update_last_active: updateLastActive
             }
         });
     }

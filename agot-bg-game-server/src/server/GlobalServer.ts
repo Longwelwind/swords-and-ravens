@@ -169,6 +169,7 @@ export default class GlobalServer {
             // Do nothing.
         } else {
             const user = this.clientToUser.get(client);
+            let updateLastActive = false;
 
             if (!user) {
                 console.error("Client sent a message other than \"authenticate\" but is not authenticated");
@@ -207,14 +208,14 @@ export default class GlobalServer {
                     });
                 });
             } else {
-                entireGame.onClientMessage(user, message);
+                updateLastActive = entireGame.onClientMessage(user, message);
             }
 
-            this.saveGame(entireGame);
+            this.saveGame(entireGame, updateLastActive);
         }
     }
 
-    saveGame(entireGame: EntireGame): void {
+    saveGame(entireGame: EntireGame, updateLastActive: boolean): void {
         const state = entireGame.getStateOfGame();
         const viewOfGame = entireGame.getViewOfGame();
         const players = entireGame.getPlayersInGame();
@@ -223,7 +224,7 @@ export default class GlobalServer {
         // since they have been migrated when loaded.
         const version = this.latestSerializedGameVersion;
 
-        this.websiteClient.saveGame(entireGame.id, serializedGame, viewOfGame, players, state, version);
+        this.websiteClient.saveGame(entireGame.id, serializedGame, viewOfGame, players, state, version, updateLastActive);
     }
 
     async getEntireGame(gameId: string): Promise<EntireGame | null> {

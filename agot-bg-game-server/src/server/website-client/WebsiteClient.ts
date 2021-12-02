@@ -26,7 +26,7 @@ export interface StoredUserData {
 export default interface WebsiteClient {
     getUser(userId: string): Promise<StoredUserData | null>;
     getGame(gameId: string): Promise<StoredGameData | null>;
-    saveGame(gameId: string, serializedGame: object, viewOfGame: object, players: {userId: string; data: object}[], state: string, version: string): Promise<void>;
+    saveGame(gameId: string, serializedGame: object, viewOfGame: object, players: {userId: string; data: object}[], state: string, version: string, updateLastActive: boolean): Promise<void>;
     notifyReadyToStart(gameId: string, userIds: string[]): Promise<void>;
     notifyYourTurn(gameId: string, userIds: string[]): Promise<void>;
     notifyBattleResults(gameId: string, userIds: string[]): Promise<void>;

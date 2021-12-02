@@ -17,7 +17,8 @@ export default class CancelledGameState extends GameState<EntireGame | IngameGam
         }
     }
 
-    onClientMessage(_user: User, _message: ClientMessage): void {
+    onClientMessage(_user: User, _message: ClientMessage): boolean {
+        return false;
     }
 
     onPlayerMessage(_player: Player, _message: ClientMessage): void {
