@@ -41,6 +41,7 @@ export interface CombatStats {
     region: string;
     army: number;
     armyUnits: string[];
+    woundedUnits: string[];
     orderBonus: number;
     support: number;
     garrison: number;

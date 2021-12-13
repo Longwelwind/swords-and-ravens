@@ -17,6 +17,7 @@ interface HouseCombatData {
     region: Region;
     army: number;
     armyUnits: UnitType[];
+    woundedUnits: UnitType[];
     orderBonus: number;
     garrison: number;
     support: number;
@@ -79,6 +80,15 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                                 unitType={ut}
                                 size="smedium"
                                 makeGreyjoyUnitsBlack={true}
+                            />
+                        )}
+                        {this.defender.woundedUnits.map((ut, i) =>
+                            <UnitIconComponent key={`combat_info_units_${this.defender.house.id}_${i}`}
+                                house={this.defender.house}
+                                unitType={ut}
+                                size="smedium"
+                                makeGreyjoyUnitsBlack={true}
+                                wounded={true}
                             />
                         )}
                     </div>
