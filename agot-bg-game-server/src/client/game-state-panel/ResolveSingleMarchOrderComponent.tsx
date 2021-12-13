@@ -75,6 +75,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                                         unitType={unit.type}
                                                         size="smedium"
                                                         makeGreyjoyUnitsBlack={true}
+                                                        /* Moving units never can be wounded so we don't need to set it here */
                                                     />
                                                 )} =&gt; {region.name}
                                             </li>

@@ -22,6 +22,10 @@ export default class Unit {
     }
 
     getCombatStrength(attackingAStructure: boolean): number {
+        if (this.wounded) {
+            return 0;
+        }
+
         if (this.type.combatStrength > 0) {
             return this.type.combatStrength;
         }

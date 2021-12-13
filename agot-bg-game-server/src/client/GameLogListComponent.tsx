@@ -253,6 +253,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         region: this.world.regions.get(stat.region),
                         houseCard: houseCard,
                         armyUnits: stat.armyUnits.map(ut => unitTypes.get(ut)),
+                        woundedUnits: stat.woundedUnits.map(ut => unitTypes.get(ut)),
                         tidesOfBattleCard: tidesOfBattleCard,
                         isWinner: house == winner
                     };

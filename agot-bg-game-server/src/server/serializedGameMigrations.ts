@@ -1263,6 +1263,25 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "52",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                ingame.gameLogManager.logs
+                    .filter((log: any) => log.data.type == "combat-result")
+                    .forEach((log: any) => log.data.stats.forEach((s: any) => s.woundedUnits = []));
+
+                if (ingame.childGameState.type == "action" && ingame.childGameState.childGameState.type == "resolve-march-order" && ingame.childGameState.childGameState.childGameState.type == "combat") {
+                    const combat = ingame.childGameState.childGameState.childGameState;
+                    combat.stats.forEach((s: any) => s.woundedUnits = []);
+                }
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

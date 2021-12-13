@@ -41,6 +41,7 @@ export interface CombatStats {
     region: string;
     army: number;
     armyUnits: string[];
+    woundedUnits: string[];
     orderBonus: number;
     support: number;
     garrison: number;
@@ -246,7 +247,6 @@ export default class CombatGameState extends GameState<
 
     getCombatStrengthOfArmy(houseSide: House, army: Unit[], support: boolean): number {
         return army
-            .filter(u => !u.wounded)
             .map(u => this.getCombatStrengthOfUnit(houseSide, u, support))
             .reduce(_.add, 0);
     }

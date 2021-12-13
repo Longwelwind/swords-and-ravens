@@ -76,6 +76,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                 region: this.combat.world.regions.get(stat.region),
                 houseCard: houseCard,
                 armyUnits: stat.armyUnits.map(ut => unitTypes.get(ut)),
+                woundedUnits: stat.woundedUnits.map(ut => unitTypes.get(ut)),
                 tidesOfBattleCard: tidesOfBattleCard};
             })
             : [
@@ -85,6 +86,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                     region: this.props.gameState.attackingRegion,
                     army: this.combat.getBaseCombatStrength(this.attacker),
                     armyUnits: this.combat.attackingArmy.map(u => u.type),
+                    woundedUnits: [], // Attacking units can never be wounded, so we don't need to filter here
                     orderBonus: this.combat.getOrderBonus(this.attacker),
                     garrison: this.combat.getGarrisonCombatStrength(this.attacker),
                     support: this.combat.getSupportStrengthForSide(this.attacker),
@@ -99,7 +101,8 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                     houseCard: this.props.gameState.defenderHouseCard,
                     region: this.props.gameState.defendingRegion,
                     army: this.combat.getBaseCombatStrength(this.defender),
-                    armyUnits: this.combat.defendingArmy.map(u => u.type),
+                    armyUnits: this.combat.defendingArmy.filter(u => !u.wounded).map(u => u.type),
+                    woundedUnits: this.combat.defendingArmy.filter(u => u.wounded).map(u => u.type),
                     orderBonus: this.combat.getOrderBonus(this.defender),
                     garrison: this.combat.getGarrisonCombatStrength(this.defender),
                     support: this.combat.getSupportStrengthForSide(this.defender),
