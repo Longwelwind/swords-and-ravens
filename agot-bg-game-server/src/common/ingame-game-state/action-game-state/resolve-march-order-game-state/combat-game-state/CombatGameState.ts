@@ -246,7 +246,6 @@ export default class CombatGameState extends GameState<
 
     getCombatStrengthOfArmy(houseSide: House, army: Unit[], support: boolean): number {
         return army
-            .filter(u => !u.wounded)
             .map(u => this.getCombatStrengthOfUnit(houseSide, u, support))
             .reduce(_.add, 0);
     }

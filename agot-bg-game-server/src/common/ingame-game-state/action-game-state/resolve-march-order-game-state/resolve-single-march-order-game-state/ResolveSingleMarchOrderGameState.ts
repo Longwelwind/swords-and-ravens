@@ -357,12 +357,10 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
 
     private getCombatStrengthOfArmyAgainstNeutralForce(army: Unit[], attackingAStructure: boolean, additionalSupportingUnits: Unit[] | null = null): number {
         let strength = army
-            .filter(u => !u.wounded)
             .map(u => u.getCombatStrength(attackingAStructure))
             .reduce(_.add, 0);
 
         if (additionalSupportingUnits) {
-            // Additional supporting units can't be wounded so we don't need that filter here
             strength += additionalSupportingUnits.map(u => u.getCombatStrength(attackingAStructure)).reduce(_.add, 0);
         }
 
