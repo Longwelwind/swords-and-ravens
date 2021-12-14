@@ -505,11 +505,6 @@ export default class CombatGameState extends GameState<
             const killedUnits = message.unitIds.map(uid => region.units.get(uid));
 
             killedUnits.forEach(u => region.units.delete(u.id));
-        } else if (message.type == "units-wounded") {
-            const region = this.world.regions.get(message.regionId);
-            const units = message.unitIds.map(uid => region.units.get(uid));
-
-            units.forEach(u => u.wounded = true);
         } else if (message.type == "change-combat-house-card") {
             const houseCards: [House, HouseCard | null][] = message.houseCardIds.map(([houseId, houseCardId]) => [
                 this.game.houses.get(houseId),
