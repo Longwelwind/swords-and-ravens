@@ -63,6 +63,18 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         }));
 
         // In case users just have one house card it can be selected automatically
+        if (this.canAutomaticallyChooseLastHouseCard(this.combatGameState.attacker) &&
+            this.canAutomaticallyChooseLastHouseCard(this.combatGameState.defender) &&
+            !this.entireGame.gameSettings.pbem) {
+            // We have to stop during live games here and let the last cards be confirmed by all combatants
+            // to force all clients to update their tree to CombatGameState. Otherwise it might happen, that CombatGameState
+            // is completely fast-tracked (when VSB is not involved, no house card with special abilities is involved
+            // and casualties/retreat can be fast-tracked) and therefore the CombatInfoDialog is never
+            // displayed at the GameState panel and even worse: packets like "units-wounded" are not received by the clients
+            // which leads to desynchronization.
+            return;
+        }
+
         this.tryAutomaticallyChooseLastHouseCard(this.combatGameState.attacker);
         this.tryAutomaticallyChooseLastHouseCard(this.combatGameState.defender);
 
@@ -275,6 +287,17 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
     }
 
     private tryAutomaticallyChooseLastHouseCard(house: House): void {
+        if (this.canAutomaticallyChooseLastHouseCard(house)) {
+            this.houseCards.set(house, this.getChoosableCards(house)[0]);
+            this.ingameGameState.log({
+                type: "player-action",
+                house: house.id,
+                action: PlayerActionType.HOUSE_CARD_CHOSEN
+            }, true);
+        }
+    }
+
+    private canAutomaticallyChooseLastHouseCard(house: House): boolean {
         const choosableCards = this.getChoosableCards(house);
         const ingame = this.ingameGameState;
 
@@ -283,16 +306,9 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
         // We can only fast-track the last house card if house received no support and house cannot burn the VSB
         // (To allow refusing support or burning the VSB we cannot simply choose the last card automatically all the time...)
-        if (choosableCards.length == 1 &&
+        return choosableCards.length == 1 &&
             !this.combatGameState.supporters.values.includes(house) &&
-            !houseCanBurnTheVsb) {
-            this.houseCards.set(house, choosableCards[0]);
-            this.ingameGameState.log({
-                type: "player-action",
-                house: house.id,
-                action: PlayerActionType.HOUSE_CARD_CHOSEN
-            }, true);
-        }
+            !houseCanBurnTheVsb;
     }
 
     static deserializeFromServer(combatGameState: CombatGameState, data: SerializedChooseHouseCardGameState): ChooseHouseCardGameState {
