@@ -542,6 +542,11 @@ export default class IngameGameState extends GameState<
                 to.units.set(u.id, u);
                 u.region = to;
             });
+        } else if (message.type == "units-wounded") {
+            const region = this.world.regions.get(message.regionId);
+            const units = message.unitIds.map(uid => region.units.get(uid));
+
+            units.forEach(u => u.wounded = true);
         } else if (message.type == "change-power-token") {
             const house = this.game.houses.get(message.houseId);
 
