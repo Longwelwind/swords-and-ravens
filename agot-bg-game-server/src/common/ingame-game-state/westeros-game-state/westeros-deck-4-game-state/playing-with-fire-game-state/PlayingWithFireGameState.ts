@@ -125,7 +125,7 @@ export default class PlayingWithFireGameState extends GameState<WesterosDeck4Gam
                 house: house.id,
                 unitType: chosenUnitType.id,
                 region: this.region.id
-            });
+            }, resolvedAutomatically);
 
             this.westeros.onWesterosCardEnd();
         }
