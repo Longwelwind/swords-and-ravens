@@ -13,6 +13,8 @@ import {faBan} from "@fortawesome/free-solid-svg-icons/faBan";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { preventOverflow } from "@popperjs/core";
 
 interface VoteComponentProps {
     vote: Vote;
@@ -31,7 +33,13 @@ export default class VoteComponent extends Component<VoteComponentProps> {
         return (
             <Row key={this.vote.id} className="flex-row">
                 <Col xs={"auto"}>
-                    <img src={voteImage} width={32}/>
+                    <OverlayTrigger
+                        placement="auto"
+                        overlay={<Tooltip id={"vote-date-" + this.vote.id}>{this.vote.createdAt.toLocaleString()}</Tooltip>}
+                        popperConfig={{modifiers: [preventOverflow]}}
+                    >
+                        <img src={voteImage} width={32}/>
+                    </OverlayTrigger>
                 </Col>
                 <Col>
                     <b>{this.vote.initiator.name}</b> initiated a vote to <b>{this.vote.type.verb()}</b>. <b>{this.vote.positiveCountToPass} players must accept to pass the vote.</b>
