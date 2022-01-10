@@ -19,12 +19,4 @@ export default class SilenceAtTheWall extends WildlingCardType {
 
         wildlingsAttackGameState.onWildlingCardExecuteEnd();
     }
-
-    highestBidderChoiceCanBeSkipped(_wildlingsAttackGameState: WildlingsAttackGameState): boolean {
-        return true;
-    }
-
-    lowestBidderChoiceCanBeSkipped(_wildlingsAttackGameState: WildlingsAttackGameState): boolean {
-        return true;
-    }
 }
