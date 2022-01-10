@@ -8,12 +8,14 @@ import MassingOnTheMilkwaterWildlingVictoryGameState
 import SelectHouseCardComponent from "../SelectHouseCardComponent";
 import SelectHouseCardGameState
     from "../../../common/ingame-game-state/select-house-card-game-state/SelectHouseCardGameState";
+import { Col } from "react-bootstrap";
 
 @observer
 export default class MassingOnTheMilkwaterWildlingVictoryComponent extends Component<GameStateComponentProps<MassingOnTheMilkwaterWildlingVictoryGameState>> {
     render(): ReactNode {
         return (
             <>
+                <Col xs={12} className="text-center">Houses choose their house cards to discard.</Col>
                 {renderChildGameState(this.props, [
                     [SelectHouseCardGameState, SelectHouseCardComponent]
                 ])}
