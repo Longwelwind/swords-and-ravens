@@ -1282,6 +1282,13 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "53",
+        migrate: (serializedGame: any) => {
+            serializedGame.users.forEach((u: any) => u.otherUsersFromSameNetwork = []);
+            return serializedGame;
+        }
     }
 ];
 

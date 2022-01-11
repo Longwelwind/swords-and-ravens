@@ -1,6 +1,6 @@
 import {ReactNode} from "react";
 
-export default function joinReactNodes(elements: ReactNode[], separator: string): ReactNode {
+export default function joinReactNodes(elements: ReactNode[], separator: string | ReactNode): ReactNode {
     if (elements.length == 0) {
         return null;
     }

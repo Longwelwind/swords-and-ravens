@@ -13,7 +13,6 @@ import schema from "./ClientMessage.json";
 import Ajv, {ValidateFunction} from "ajv";
 import _ from "lodash";
 import serializedGameMigrations from "./serializedGameMigrations";
-import * as Sentry from "@sentry/node"
 import { v4 } from "uuid";
 import sleep from "../utils/sleep";
 
@@ -133,17 +132,21 @@ export default class GlobalServer {
                 return;
             }
 
-            if (this.checkIfThereAreOtherUsersWithSameIpInSameGame(entireGame, userData, socketId, clientIp)) {
-                // return;
-                // We could return here and disallow the connection.
-                // For now we silently continue and log the possible cheaters.
-                // This way they don't recognize we caught them and we can check their ingame actions.
-            }
-
             // Check if the game already contains this user
             const user = entireGame.users.has(userData.id)
                 ? entireGame.users.get(userData.id)
                 : entireGame.addUser(userData.id, userData.name, userData.profileSettings);
+
+            const oldOtherUsersFromSameNetworkLength = user.otherUsersFromSameNetwork.length;
+            user.otherUsersFromSameNetwork = _.union(user.otherUsersFromSameNetwork, this.getOtherUsersFromSameNetworkInSameGame(entireGame, userData, socketId, clientIp));
+
+            if (oldOtherUsersFromSameNetworkLength < user.otherUsersFromSameNetwork.length) {
+                entireGame.broadcastToClients({
+                    type: "update-other-users-with-same-ip",
+                    user: user.id,
+                    otherUsers: user.otherUsersFromSameNetwork
+                });
+            }
 
             this.clientToUser.set(client, user);
             user.connectedClients.push(client);
@@ -366,7 +369,7 @@ export default class GlobalServer {
                     const userConnectionInfos = this.multiAccountingProtection.get(user.entireGame.id);
                     if (userConnectionInfos.has(socketId)) {
                         const date = new Date();
-                        date.setHours(date.getHours() + 3);
+                        date.setHours(date.getHours() + 16);
                         userConnectionInfos.get(socketId).invalidatesAt = date;
                     }
                 }
@@ -375,7 +378,7 @@ export default class GlobalServer {
         }
     }
 
-    checkIfThereAreOtherUsersWithSameIpInSameGame(entireGame: EntireGame, userData: StoredUserData, socketId: string, clientIp: string): boolean {
+    getOtherUsersFromSameNetworkInSameGame(entireGame: EntireGame, userData: StoredUserData, socketId: string, clientIp: string): string[] {
         if (!this.multiAccountingProtection.has(entireGame.id)) {
             this.multiAccountingProtection.set(entireGame.id, new BetterMap());
         }
@@ -391,24 +394,7 @@ export default class GlobalServer {
             uci => uci.userId != userData.id && uci.userIp == clientIp
         );
 
-        if (otherUsersWithSameIp.length > 0) {
-            const message = {
-                type: "multi-account-warning",
-                game: entireGame.id,
-                userName: userData.name,
-                userId: userData.id,
-                userIp: clientIp,
-                otherUsersWithSameIp: otherUsersWithSameIp.map(uci => ({
-                    userName: uci.userName,
-                    userId: uci.userId
-                }))
-            }
-            console.warn(JSON.stringify(message));
-            Sentry.captureMessage(JSON.stringify(message), Sentry.Severity.Info);
-            return true;
-        }
-
-        return false;
+        return otherUsersWithSameIp.map(uci => uci.userName);
     }
 
     async invalidateOutdatedIpEntries(): Promise<void> {

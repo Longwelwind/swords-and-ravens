@@ -13,6 +13,9 @@ import { Dropdown, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import Player from "../common/ingame-game-state/Player";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import clonesImage from "../../public/images/icons/clones.svg"
+import joinReactNodes from "./utils/joinReactNodes";
 
 interface UserLabelProps {
     gameClient: GameClient;
@@ -42,15 +45,17 @@ export default class UserLabel extends Component<UserLabelProps> {
                 <Navbar.Brand className="no-space-around">
                     <small>
                         {isOwner &&
-                                <><OverlayTrigger overlay={<Tooltip id ={`${this.user.id}-owner-tooltip`}>Owner</Tooltip>}>
+                                <><OverlayTrigger overlay={<Tooltip id={`${this.user.id}-owner-tooltip`}>Owner</Tooltip>}>
                                     <FontAwesomeIcon icon={faUser}/>
                                 </OverlayTrigger>&nbsp;&nbsp;</>}
-                        <OverlayTrigger overlay={<Tooltip id ={`${this.user.id}-connected`}>{this.user.connected ? "Connected" : "Disconnected"}</Tooltip>}>
+                        <OverlayTrigger overlay={<Tooltip id={`${this.user.id}-connection-tooltip`}>{this.user.connected ? "Connected" : "Disconnected"}</Tooltip>}>
                             <FontAwesomeIcon icon={faWifi} className={this.user.connected ? "text-success" : "text-danger"} />
                         </OverlayTrigger>
+                        {this.user.otherUsersFromSameNetwork.length > 0 && <OverlayTrigger placement="auto" overlay={this.renderOtherUsersFromSameNetworkTooltip()}>
+                            <img src={clonesImage} width="18" style={{marginLeft: 5, marginTop: -3}}/>
+                        </OverlayTrigger>}
                     </small>
                 </Navbar.Brand>
-                <Navbar.Toggle aria-controls={`navbar-${this.user.id}`} className="no-space-around"/>
                 <Navbar.Collapse id={`navbar-${this.user.id}`} className="no-space-around">
                     <Nav className="no-space-around">
                         <NavDropdown id={`nav-dropdown-${this.user.id}`} title={<span className="userlabel">{this.user.name}</span>} className="no-gutters">
@@ -61,6 +66,13 @@ export default class UserLabel extends Component<UserLabelProps> {
                 </Navbar.Collapse>
             </Navbar>
         );
+    }
+
+    renderOtherUsersFromSameNetworkTooltip(): OverlayChildren {
+        return <Tooltip id={`${this.user.id}-other-users-with-same-ip-tooltip`}>
+            These users {this.props.gameState instanceof IngameGameState ? "play" : "joined"} from the same network as {this.user.name}:
+            <br/><br/>{joinReactNodes(this.user.otherUsersFromSameNetwork, <br/>)}
+        </Tooltip>
     }
 
     renderIngameDropdownItems(ingame: IngameGameState): ReactNode {

@@ -10,14 +10,16 @@ export default class User {
     @observable settings: UserSettings;
     entireGame: EntireGame;
     connectedClients: WebSocket[] = [];
+    @observable otherUsersFromSameNetwork: string[] = [];
     @observable connected: boolean;
 
-    constructor(id: string, name: string, game: EntireGame, settings: UserSettings, connected = false) {
+    constructor(id: string, name: string, game: EntireGame, settings: UserSettings, connected = false, otherUsersFromSameNetwork: string[] = []) {
         this.id = id;
         this.name = name;
         this.settings = settings;
         this.entireGame = game;
         this.connected = connected;
+        this.otherUsersFromSameNetwork = otherUsersFromSameNetwork;
     }
 
     send(message: ServerMessage): void {
@@ -50,12 +52,13 @@ export default class User {
             id: this.id,
             name: this.name,
             settings: this.settings,
-            connected: this.connected
+            connected: this.connected,
+            otherUsersFromSameNetwork: this.otherUsersFromSameNetwork
         }
     }
 
     static deserializeFromServer(game: EntireGame, data: SerializedUser): User {
-        return new User(data.id, data.name, game, data.settings, data.connected);
+        return new User(data.id, data.name, game, data.settings, data.connected, data.otherUsersFromSameNetwork);
     }
 }
 
@@ -64,4 +67,5 @@ export interface SerializedUser {
     name: string;
     settings: UserSettings;
     connected: boolean;
+    otherUsersFromSameNetwork: string[];
 }
