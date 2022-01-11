@@ -287,6 +287,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         } else if (message.type == "update-connection-status") {
             const user = this.users.get(message.user);
             user.connected = message.status;
+        } else if (message.type == "update-other-users-with-same-ip") {
+            const user = this.users.get(message.user);
+            user.otherUsersFromSameNetwork = message.otherUsers;
         } else {
             this.childGameState.onServerMessage(message);
         }

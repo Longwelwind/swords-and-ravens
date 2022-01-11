@@ -22,7 +22,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | ChangeControlPowerToken | ChangePowerToken | ChangeWildlingStrength | AddGameLog | RevealWildlingCard
     | RemoveUnits | AddUnits | ChangeTracker | ActionPhaseChangeOrder | ChangeStateHouseCard
     | SettingsChanged | ChangeValyrianSteelBladeUse |  NewPrivateChatRoom | GameSettingsChanged
-    | UpdateWesterosDecks | UpdateConnectionStatus | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced
+    | UpdateWesterosDecks | UpdateConnectionStatus | UpdateOtherUsersFromSameNetwork | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced
     | CrowKillersStepChanged | ManipulateCombatHouseCard | ChangeCombatTidesOfBattleCard
     | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting | UpdateCombatStats
     | UpdateDraftState | RevealBids | UpdateMaxTurns | PasswordResponse | ReplacedByVassal | UpdateDeletedHouseCards
@@ -277,6 +277,12 @@ interface UpdateConnectionStatus {
     type: "update-connection-status";
     user: string;
     status: boolean;
+}
+
+interface UpdateOtherUsersFromSameNetwork {
+    type: "update-other-users-with-same-ip";
+    user: string;
+    otherUsers: string[];
 }
 
 interface VoteStarted {
