@@ -163,20 +163,6 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
             nightsWatchVictory: this.nightsWatchWon
         });
 
-        // hide wildling card
-        this.game.houses.forEach(h => h.knowsNextWildlingCard = false);
-        this.entireGame.broadcastToClients({type: "hide-top-wildling-card"});
-
-        // Draw and bury the first card from the wildling deck
-        // Before solving issue #675, wildling cards were drawn at the beginning of the wildling attack,
-        // they are now drawn after bidding phase is over. To successfuly migrate the games, if wildlingCard
-        // is already present, don't redraw one at the bidding phase, and keep the one drawn from the beginning
-        // of the wildling attack.
-        if (!this.wildlingCard) {
-            this.wildlingCard = this.game.wildlingDeck.shift() as WildlingCard;
-            this.game.wildlingDeck.push(this.wildlingCard);
-        }
-
         if (this.nightsWatchWon) {
             // Wildlings attack has been rebuffed
             // Check if there a single highest bidder or if there needs to be a decision from the iron throne holder
@@ -234,9 +220,18 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
         }
     }
 
-    proceedNightsWatchWon(highestBidder: House): void {
+    revealTopWildlingCard(): WildlingCard {
+        // Reset knowsNextWildlingCard
+        this.game.houses.forEach(h => h.knowsNextWildlingCard = false);
+        this.entireGame.broadcastToClients({type: "hide-top-wildling-card"});
+
+        // Draw and bury the first card from the wildling deck
+        // Before solving issue #1261, wildling cards were drawn after the bidding phase is over.
+        // They are now drawn after highest/lowest bidder decision was done, immediately before they are executed.
+        // To successfuly migrate the games, if wildlingCard is already present, don't redraw a new one.
         if (!this.wildlingCard) {
-            throw new Error();
+            this.wildlingCard = this.game.wildlingDeck.shift() as WildlingCard;
+            this.game.wildlingDeck.push(this.wildlingCard);
         }
 
         // Reveal the wildling card to the players
@@ -249,6 +244,12 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
             type: "wildling-card-revealed",
             wildlingCard: this.wildlingCard.id
         });
+
+        return this.wildlingCard;
+    }
+
+    proceedNightsWatchWon(highestBidder: House): void {
+        this.wildlingCard = this.revealTopWildlingCard();
 
         this._highestBidder = highestBidder;
 
@@ -256,20 +257,7 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
     }
 
     proceedWildlingWon(lowestBidder: House): void {
-        if (!this.wildlingCard) {
-            throw new Error();
-        }
-
-        // Reveal the wildling card to the players
-        this.entireGame.broadcastToClients({
-            type: "reveal-wildling-card",
-            wildlingCard: this.wildlingCard.id
-        });
-
-        this.westerosGameState.ingame.log({
-            type: "wildling-card-revealed",
-            wildlingCard: this.wildlingCard.id
-        });
+        this.wildlingCard = this.revealTopWildlingCard();
 
         this._lowestBidder = lowestBidder;
 
