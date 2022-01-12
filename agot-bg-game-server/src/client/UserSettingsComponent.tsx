@@ -79,7 +79,7 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                                             <Tooltip id="game-state-column-right-setting-tooltip">
                                                 This setting swaps the houses column with the game state column, so that the game state column is displayed to the right of the map.
                                             </Tooltip>}>
-                                            <label htmlFor="game-state-column-right-setting">Align the game state column on the right (Desktop only)</label>
+                                            <label htmlFor="game-state-column-right-setting">Game state column on the right (Desktop only)</label>
                                         </OverlayTrigger>}
                                     checked={this.responsiveLayout}
                                     onChange={() => {
@@ -89,7 +89,7 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                                 />
                             </Col>
                         </Row>
-                        <Row className="justify-content-center mt-2 mb-1">
+                        <Row className="justify-content-center mt-1 mb-1">
                             <a href="https://faq.swordsandravens.net" target="_blank" rel="noopener noreferrer">FAQ</a>
                         </Row>
                     </div>
