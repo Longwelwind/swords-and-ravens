@@ -45,7 +45,7 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
                                 {this.selectedTargetRegion == null ? (
                                     <>
                                         <p>Chosen Raid order: <b>{this.selectedOrderRegion.name}</b></p>
-                                        <p>Select a target region to raid, or click on <b>Confirm</b> for not using the Raid order.</p>
+                                        <p>Click the target order to raid it, or click on <b>Confirm</b> to remove your Raid order.</p>
                                     </>
                                 ) : (
                                     <>Target: {this.selectedTargetRegion.name}</>
