@@ -1194,6 +1194,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </>
                 );
             }
+            case "vassal-replaced": {
+                const user = this.props.ingameGameState.entireGame.users.get(data.user);
+                const house = this.game.houses.get(data.house);
+
+                return (
+                    <>
+                        Vassal house <b>{house.name}</b> was replaced by <b>{user.name}</b>.
+                    </>
+                );
+            }
             case "vassals-claimed": {
                     const vassals = data.vassals.map(hid => this.game.houses.get(hid));
                     const house = this.game.houses.get(data.house);

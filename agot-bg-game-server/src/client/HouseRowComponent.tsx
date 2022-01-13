@@ -3,7 +3,7 @@ import { Component, ReactNode } from "react";
 import React from "react";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import House from "../common/ingame-game-state/game-data-structure/House";
-import { ListGroupItem, Row, Col, OverlayTrigger, Tooltip, Popover, Button } from "react-bootstrap";
+import { ListGroupItem, Row, Col, OverlayTrigger, Tooltip, Popover, Button, Navbar, Nav, NavDropdown } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
 import { faStar } from "@fortawesome/free-solid-svg-icons/faStar";
@@ -32,6 +32,7 @@ import PartialRecursive from "../utils/PartialRecursive";
 import BetterMap from "../utils/BetterMap";
 import { observable } from "mobx";
 import User from "../server/User";
+import ConditionalWrap from "./utils/ConditionalWrap";
 
 interface HouseRowComponentProps {
     house: House;
@@ -76,6 +77,13 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         const victoryPointsCritical = gameRunning && (this.game.structuresCountNeededToWin - 1 == victoryPoints);
         let controller: User;
         let isWaitedFor = false;
+
+        const vassalTitle = <span className="userlabel">
+            {this.suzerainHouse
+                ? `Commanded by ${this.suzerainHouse.name}`
+                : "Up for grab"}
+        </span>;
+
         try {
             controller = this.ingame.getControllerOfHouse(this.house).user;
             isWaitedFor = !this.isVassal ? this.ingame.getWaitedUsers().includes(controller) : false;
@@ -121,10 +129,21 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                 />
                             </>
                         ) : (
-                            this.suzerainHouse ? (
-                                <>Commanded by {this.suzerainHouse.name}</>
-                            ) : (
-                                <>Up for grab</>
+                            this.house.hasBeenReplacedByVassal ?
+                                <Navbar variant="dark" className="no-space-around">
+                                    <Navbar.Collapse id={`vassal-navbar-${this.house.id}`} className="no-space-around">
+                                        <Nav className="no-space-around">
+                                            <NavDropdown id={`vassal-nav-dropdown-${this.house.id}`} className="no-gutters" title={vassalTitle}>
+                                                {this.renderVassalDropDownItems()}
+                                            </NavDropdown>
+                                        </Nav>
+                                    </Navbar.Collapse>
+                                </Navbar>
+                            : (
+                                this.suzerainHouse ?
+                                    <>Commanded by {this.suzerainHouse.name}</>
+                                :
+                                    <>Up for grab</>
                             )
                         )}
                     </Col>
@@ -224,6 +243,60 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                 </div>
             </ListGroupItem>
         </>;
+    }
+
+    renderVassalDropDownItems(): ReactNode {
+        const ingame = this.props.ingame;
+        const {result, reason} = ingame.canLaunchReplaceVassalVote(this.props.gameClient.authenticatedUser, this.house);
+        return (
+            <>
+                <ConditionalWrap
+                    condition={!result}
+                    wrap={children =>
+                        <OverlayTrigger
+                            overlay={
+                                <Tooltip id="replace-player-tooltip">
+                                    {reason == "already-playing" ?
+                                        "You are already playing in this game"
+                                        : reason == "ongoing-vote" ?
+                                        "A vote is already ongoing"
+                                        : reason == "game-cancelled" ?
+                                        "The game has been cancelled"
+                                        : reason == "game-ended" ?
+                                        "The game has ended"
+                                        : reason == "ongoing-combat" ?
+                                        "A vassal can only be replaced by a player outside of combat"
+                                        : reason == "ongoing-claim-vassals" ?
+                                        "A vassal can only be replaced by a player outside of claim vassals phase"
+                                        : reason == "not-a-vassal" || "not-a-replaced-vassal" ?
+                                        "Only vassals who have replaced a player can be replaced by a player again"
+                                        : "Vote not possible"
+                                    }
+                                </Tooltip>
+                            }
+                            placement="auto"
+                        >
+                            {children}
+                        </OverlayTrigger>
+                    }
+                >
+                    <div id="replace-player-tooltip-wrapper">
+                        <NavDropdown.Item
+                            onClick={() => this.onLaunchReplaceVassalVoteClick()}
+                            disabled={!result}
+                        >
+                            Offer to replace this vassal
+                        </NavDropdown.Item>
+                    </div>
+                </ConditionalWrap>
+            </>
+        );
+    }
+
+    onLaunchReplaceVassalVoteClick(): void {
+        if (window.confirm(`Do you want to launch a vote to replace vassal house ${this.house.name}?`)) {
+            this.props.ingame.launchReplaceVassalByPlayerVote(this.house);
+        }
     }
 
     setHighlightedRegions(filter = ""): void {
