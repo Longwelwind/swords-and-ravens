@@ -262,16 +262,16 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
             }
         } else if (this.draftStep == DraftStep.INFLUENCE_TRACK) {
             const trackIndex = this.getInfluenceChoicesForHouse(house).keys[choice];
-            const newTrack = _.concat(this.game.getInfluenceTrackByI(trackIndex), house);
+            let newTrack = _.concat(this.game.getInfluenceTrackByI(trackIndex), house);
+            newTrack = this.ingame.setInfluenceTrack(trackIndex, newTrack);
+            const position = newTrack.findIndex(h => h == house);
 
             this.ingame.log({
                 type: "influence-track-position-chosen",
                 house: house.id,
                 trackerI: trackIndex,
-                position: newTrack.length
+                position: position + 1
             }, resolvedAutomatically);
-
-            this.ingame.setInfluenceTrack(trackIndex, newTrack);
 
             this.proceedNextHouse();
         } else {
