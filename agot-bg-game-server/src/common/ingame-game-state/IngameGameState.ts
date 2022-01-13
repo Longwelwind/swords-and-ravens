@@ -112,7 +112,7 @@ export default class IngameGameState extends GameState<
         }
     }
 
-    setInfluenceTrack(i: number, track: House[]): void {
+    setInfluenceTrack(i: number, track: House[]): House[] {
         const fixedTrack = this.getFixedInfluenceTrack(track);
         if (i == 0) {
             this.game.ironThroneTrack = fixedTrack;
@@ -129,6 +129,8 @@ export default class IngameGameState extends GameState<
             trackerI: i,
             tracker: fixedTrack.map(h => h.id)
         });
+
+        return fixedTrack;
     }
 
     getFixedInfluenceTrack(track: House[]): House[] {
