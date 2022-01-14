@@ -10,7 +10,8 @@ import GameState from "../../../common/GameState";
 import BetterMap from "../../../utils/BetterMap";
 import HouseCardResolutionGameState from "../action-game-state/resolve-march-order-game-state/combat-game-state/house-card-resolution-game-state/HouseCardResolutionGameState";
 
-export type SerializedVoteType = SerializedCancelGame | SerializedEndGame | SerializedReplacePlayer | SerializedReplacePlayerByVassal;
+export type SerializedVoteType = SerializedCancelGame | SerializedEndGame
+    | SerializedReplacePlayer | SerializedReplacePlayerByVassal | SerializedReplaceVassalByPlayer;
 
 export default abstract class VoteType {
     abstract serializeToClient(): SerializedVoteType;
@@ -35,6 +36,10 @@ export default abstract class VoteType {
                 // Same than above
                 // eslint-disable-next-line @typescript-eslint/no-use-before-define
                 return ReplacePlayerByVassal.deserializeFromServer(ingame, data);
+            case "replace-vassal-by-player":
+                // Same than above
+                // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                return ReplaceVassalByPlayer.deserializeFromServer(ingame, data);
             case "end-game":
                 // Same than above
                 // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -237,6 +242,8 @@ export class ReplacePlayerByVassal extends VoteType {
         // Broadcast new vassal relations before deletion of player!
         vote.ingame.broadcastVassalRelations();
 
+        newVassalHouse.hasBeenReplacedByVassal = true;
+
         vote.ingame.entireGame.broadcastToClients({
             type: "player-replaced",
             oldUser: oldPlayer.user.id
@@ -249,7 +256,7 @@ export class ReplacePlayerByVassal extends VoteType {
         });
 
         // Remove house cards from new vassal house so abilities like Qyburn cannot use this cards anymore
-        newVassalHouse.houseCards.forEach(hc => vote.ingame.game.deletedHouseCards.set(hc.id, hc));
+        vote.ingame.game.oldPlayerHouseCards.set(newVassalHouse, newVassalHouse.houseCards);
 
         // Only clear house cards now, when game is not in HouseCardResolutionGameState as some abilities like Viserys
         // require a hand and will result in SelectHouseCardGameState with 0 cards for selection
@@ -258,8 +265,8 @@ export class ReplacePlayerByVassal extends VoteType {
         }
 
         vote.ingame.entireGame.broadcastToClients({
-            type: "update-deleted-house-cards",
-            houseCards: vote.ingame.game.deletedHouseCards.values.map(hc => hc.serializeToClient())
+            type: "update-old-player-house-cards",
+            houseCards: vote.ingame.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.serializeToClient())])
         });
 
         vote.ingame.entireGame.broadcastToClients({
@@ -278,6 +285,12 @@ export class ReplacePlayerByVassal extends VoteType {
             if (leaf.house && leaf.house == newVassalHouse) {
                 wildlingEffect.proceedNextHouse(newVassalHouse);
             }
+        }
+
+        const newCommanderPlayer = vote.ingame.players.values.find(p => p.house == newCommander);
+        // If we are waiting for the new commander, notify them about their turn
+        if (newCommanderPlayer && vote.ingame.leafState.getWaitedUsers().includes(newCommanderPlayer.user)) {
+            vote.ingame.entireGame.notifyWaitedUsers([newCommanderPlayer.user]);
         }
     }
 
@@ -300,5 +313,88 @@ export class ReplacePlayerByVassal extends VoteType {
 export interface SerializedReplacePlayerByVassal {
     type: "replace-player-by-vassal";
     replaced: string;
+    forHouse: string;
+}
+
+export class ReplaceVassalByPlayer extends VoteType {
+    replacer: User;
+    forHouse: House;
+
+    constructor(replacer: User, forHouse: House) {
+        super();
+        this.replacer = replacer
+        this.forHouse = forHouse;
+    }
+
+    verb(): string {
+        return `replace vassal house ${this.forHouse.name}`;
+    }
+
+    executeAccepted(vote: Vote): void {
+        // Create a new player to replace the vassal
+        const newPlayer = new Player(this.replacer, this.forHouse);
+
+        this.forHouse.hasBeenReplacedByVassal = false;
+
+        vote.ingame.players.set(newPlayer.user, newPlayer);
+
+        // Remove house from vassal relations
+        vote.ingame.game.vassalRelations.delete(this.forHouse)
+
+        // Broadcast new vassal relations
+        vote.ingame.broadcastVassalRelations();
+
+        vote.ingame.entireGame.broadcastToClients({
+            type: "vassal-replaced",
+            house: this.forHouse.id,
+            user: newPlayer.user.id
+        });
+
+        vote.ingame.log({
+            type: "vassal-replaced",
+            house: this.forHouse.id,
+            user: this.replacer.id
+        });
+
+        // Reset original house cards
+        this.forHouse.houseCards = vote.ingame.game.oldPlayerHouseCards.get(this.forHouse);
+        vote.ingame.game.oldPlayerHouseCards.delete(this.forHouse);
+
+        vote.ingame.entireGame.broadcastToClients({
+            type: "update-old-player-house-cards",
+            houseCards: vote.ingame.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.serializeToClient())])
+        });
+
+        vote.ingame.entireGame.broadcastToClients({
+            type: "update-house-cards",
+            house: this.forHouse.id,
+            houseCards: this.forHouse.houseCards.values.map(hc => hc.serializeToClient())
+        });
+
+        // If we are waiting for the newPlayer, notify them about their turn
+        if (vote.ingame.leafState.getWaitedUsers().includes(newPlayer.user)) {
+            vote.ingame.entireGame.notifyWaitedUsers([newPlayer.user]);
+        }
+    }
+
+    serializeToClient(): SerializedReplaceVassalByPlayer {
+        return {
+            type: "replace-vassal-by-player",
+            replacer: this.replacer.id,
+            forHouse: this.forHouse.id
+        };
+    }
+
+    static deserializeFromServer(ingame: IngameGameState, data: SerializedReplaceVassalByPlayer): ReplaceVassalByPlayer {
+        const replacer = ingame.entireGame.users.get(data.replacer);
+        const forHouse = ingame.game.houses.get(data.forHouse);
+
+        return new ReplaceVassalByPlayer(replacer, forHouse);
+    }
+}
+
+export interface SerializedReplaceVassalByPlayer {
+    type: "replace-vassal-by-player";
+    replacer: string;
     forHouse: string;
 }

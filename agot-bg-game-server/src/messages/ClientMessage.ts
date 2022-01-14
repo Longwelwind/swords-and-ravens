@@ -1,10 +1,11 @@
 export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | Unready | ResolveMarchOrder | DeclareSupport
     | RefuseSupport | UseValyrianSteelBlade | ChooseHouseCard | ChooseCasualties | ChooseSeeTopWildlingCard | KickPlayer
     | ChooseTopWildlingCardAction | ReplaceOrder | SkipReplaceOrder | ResolveRaid | Bid | ChooseChoice
-    | DecideBiggest | ReconcileArmies | Muster | ResolveTies | SelectUnits | LaunchGame | ChooseHouse
+    | ReconcileArmies | Muster | ResolveTies | SelectUnits | LaunchGame | ChooseHouse
     | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings | CreatePrivateChatRoom | ChangeGameSettings
-    | CancelGame | Vote | LaunchCancelGameVote | CancelVote | LaunchReplacePlayerVote | UpdateNote | SelectWesterosCard
-    | ClaimVassal | LaunchReplacePlayerByVassalVote | GiftPowerTokens | LaunchEndGameVote | SetPassword
+    | CancelGame | Vote | LaunchCancelGameVote | CancelVote | UpdateNote | SelectWesterosCard
+    | LaunchReplacePlayerVote | LaunchReplacePlayerByVassalVote | LaunchReplaceVassalByPlayerVote
+    | ClaimVassal | GiftPowerTokens | LaunchEndGameVote | SetPassword
     | DistributePowerTokens | DropPowerTokens | MoveLoyaltyToken | ResolveConsolidatePowerChoice | PlaceSellswords
     | ResolveSpymaster;
 
@@ -126,11 +127,6 @@ interface ChooseChoice {
     choice: number;
 }
 
-interface DecideBiggest {
-    type: "decide-biggest";
-    house: string;
-}
-
 interface ReconcileArmies {
     type: "reconcile-armies";
     unitsToRemove: [string, number[]][];
@@ -222,6 +218,16 @@ interface LaunchReplacePlayerVote {
     player: string;
 }
 
+interface LaunchReplacePlayerByVassalVote {
+    type: "launch-replace-player-by-vassal-vote";
+    player: string;
+}
+
+interface LaunchReplaceVassalByPlayerVote {
+    type: "launch-replace-vassal-by-player-vote";
+    house: string;
+}
+
 interface UpdateNote {
     type: "update-note";
     note: string;
@@ -230,11 +236,6 @@ interface UpdateNote {
 interface ClaimVassal {
     type: "claim-vassal";
     houses: string[];
-}
-
-interface LaunchReplacePlayerByVassalVote {
-    type: "launch-replace-player-by-vassal-vote";
-    player: string;
 }
 
 interface GiftPowerTokens {

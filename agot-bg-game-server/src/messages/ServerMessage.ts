@@ -22,10 +22,11 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | ChangeControlPowerToken | ChangePowerToken | ChangeWildlingStrength | AddGameLog | RevealWildlingCard
     | RemoveUnits | AddUnits | ChangeTracker | ActionPhaseChangeOrder | ChangeStateHouseCard
     | SettingsChanged | ChangeValyrianSteelBladeUse |  NewPrivateChatRoom | GameSettingsChanged
-    | UpdateWesterosDecks | UpdateConnectionStatus | UpdateOtherUsersFromSameNetwork | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced
+    | UpdateWesterosDecks | UpdateConnectionStatus | UpdateOtherUsersFromSameNetwork
+    | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced | VassalReplaced
     | CrowKillersStepChanged | ManipulateCombatHouseCard | ChangeCombatTidesOfBattleCard
     | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting | UpdateCombatStats
-    | UpdateDraftState | RevealBids | UpdateMaxTurns | PasswordResponse | ReplacedByVassal | UpdateDeletedHouseCards
+    | UpdateDraftState | RevealBids | UpdateMaxTurns | PasswordResponse | ReplacedByVassal | UpdateDeletedHouseCards | UpdateOldPlayerHouseCards
     | LoyaltyTokenGained | LoyaltyTokenPlaced | DrangonStrengthTokenRemoved | UpdateLoanCards | UpdateRegionModifiers;
 
 interface AuthenticationResponse {
@@ -305,7 +306,13 @@ interface VoteDone {
 interface PlayerReplaced {
     type: "player-replaced";
     oldUser: string;
-    newUser?: string ;
+    newUser?: string;
+}
+
+interface VassalReplaced {
+    type: "vassal-replaced";
+    house: string;
+    user: string;
 }
 
 interface CrowKillersStepChanged {
@@ -369,6 +376,11 @@ interface ReplacedByVassal {
 interface UpdateDeletedHouseCards {
     type: "update-deleted-house-cards";
     houseCards: SerializedHouseCard[];
+}
+
+interface UpdateOldPlayerHouseCards {
+    type: "update-old-player-house-cards";
+    houseCards: [string, SerializedHouseCard[]][];
 }
 
 interface LoyaltyTokenGained {

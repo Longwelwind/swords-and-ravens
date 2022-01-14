@@ -1289,6 +1289,20 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             serializedGame.users.forEach((u: any) => u.otherUsersFromSameNetwork = []);
             return serializedGame;
         }
+    },
+    {
+        version: "54",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                ingame.game.houses.forEach((h: any) => h.hasBeenReplacedByVassal = false);
+
+                ingame.game.oldPlayerHouseCards = [];
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

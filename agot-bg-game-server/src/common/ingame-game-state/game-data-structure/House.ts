@@ -15,8 +15,10 @@ export default class House {
     @observable powerTokens: number;
     @observable supplyLevel: number;
     @observable gainedLoyaltyTokens: number;
+    @observable hasBeenReplacedByVassal: boolean;
 
-    constructor(id: string, name: string, color: string, houseCards: BetterMap<string, HouseCard>, unitLimits: BetterMap<UnitType, number>, powerTokens: number, supplyLevel: number, gainedLoyaltyTokens: number) {
+    constructor(id: string, name: string, color: string, houseCards: BetterMap<string, HouseCard>, unitLimits: BetterMap<UnitType, number>,
+        powerTokens: number, supplyLevel: number, gainedLoyaltyTokens: number, hasBeenReplacedByVassal: boolean) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -26,6 +28,7 @@ export default class House {
         this.powerTokens = powerTokens;
         this.supplyLevel = supplyLevel;
         this.gainedLoyaltyTokens = gainedLoyaltyTokens;
+        this.hasBeenReplacedByVassal = hasBeenReplacedByVassal;
     }
 
     serializeToClient(admin: boolean, isVassalHouse: boolean): SerializedHouse {
@@ -38,7 +41,8 @@ export default class House {
             unitLimits: this.unitLimits.map((unitType, limit) => [unitType.id, limit]),
             powerTokens: this.powerTokens,
             supplyLevel: this.supplyLevel,
-            gainedLoyaltyTokens: this.gainedLoyaltyTokens
+            gainedLoyaltyTokens: this.gainedLoyaltyTokens,
+            hasBeenReplacedByVassal: this.hasBeenReplacedByVassal
         };
     }
 
@@ -55,7 +59,8 @@ export default class House {
             ),
             data.powerTokens,
             data.supplyLevel,
-            data.gainedLoyaltyTokens
+            data.gainedLoyaltyTokens,
+            data.hasBeenReplacedByVassal
         );
 
         house.knowsNextWildlingCard = data.knowsNextWildlingCard;
@@ -73,4 +78,5 @@ export interface SerializedHouse {
     powerTokens: number;
     supplyLevel: number;
     gainedLoyaltyTokens: number;
+    hasBeenReplacedByVassal: boolean;
 }

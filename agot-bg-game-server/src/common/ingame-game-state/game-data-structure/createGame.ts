@@ -203,7 +203,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             // Vassals always start with a supply of 4
             const supplyLevel = playerHouses.includes(hid) ? houseData.supplyLevel : 4;
 
-            const house = new House(hid, houseData.name, houseData.color, houseCards, unitLimits, gameSettings.startWithSevenPowerTokens ? 7 : 5, supplyLevel, 0);
+            const house = new House(hid, houseData.name, houseData.color, houseCards, unitLimits, gameSettings.startWithSevenPowerTokens ? 7 : 5, supplyLevel, 0, false);
 
             return [hid, house];
         })

@@ -96,16 +96,19 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             // Check if the player was capable of placing a power token
             let leftPowerToken: boolean | null = null;
             const canLeavePowerToken = this.canLeavePowerToken(startingRegion, new BetterMap(moves)).success;
+            const isVassal = this.ingame.isVassalHouse(this.house);
 
-            if ((message.leavePowerToken && canLeavePowerToken) || (this.ingame.isVassalHouse(this.house) && canLeavePowerToken)) {
+            if ((message.leavePowerToken && canLeavePowerToken) || (isVassal && canLeavePowerToken)) {
                 startingRegion.controlPowerToken = this.house;
-                this.house.powerTokens -= 1;
+                if (!isVassal) {
+                    this.house.powerTokens -= 1;
 
-                this.entireGame.broadcastToClients({
-                    type: "change-power-token",
-                    houseId: this.house.id,
-                    powerTokenCount: this.house.powerTokens
-                });
+                    this.entireGame.broadcastToClients({
+                        type: "change-power-token",
+                        houseId: this.house.id,
+                        powerTokenCount: this.house.powerTokens
+                    });
+                }
 
                 this.entireGame.broadcastToClients({
                     type: "change-control-power-token",

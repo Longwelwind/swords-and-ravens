@@ -22,7 +22,7 @@ import GameEndedGameState, {SerializedGameEndedGameState} from "./game-ended-gam
 import UnitType from "./game-data-structure/UnitType";
 import WesterosCard from "./game-data-structure/westeros-card/WesterosCard";
 import Vote, { SerializedVote, VoteState } from "./vote-system/Vote";
-import VoteType, { CancelGame, EndGame, ReplacePlayer, ReplacePlayerByVassal } from "./vote-system/VoteType";
+import VoteType, { CancelGame, EndGame, ReplacePlayer, ReplacePlayerByVassal, ReplaceVassalByPlayer } from "./vote-system/VoteType";
 import { v4 } from "uuid";
 import CancelledGameState, { SerializedCancelledGameState } from "../cancelled-game-state/CancelledGameState";
 import HouseCard from "./game-data-structure/house-card/HouseCard";
@@ -38,6 +38,7 @@ import shuffleInPlace from "../../utils/shuffleInPlace";
 import popRandom from "../../utils/popRandom";
 import LoanCard from "./game-data-structure/loan-card/LoanCard";
 import PayDebtsGameState, { SerializedPayDebtsGameState } from "./pay-debts-game-state/PayDebtsGameState";
+import ClaimVassalsGameState from "./planning-game-state/claim-vassals-game-state/ClaimVassalsGameState";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -297,6 +298,14 @@ export default class IngameGameState extends GameState<
             }
 
             this.createVote(user, new ReplacePlayer(user, player.user, player.house));
+        } else if (message.type == "launch-replace-vassal-by-player-vote") {
+            const house = this.game.houses.get(message.house);
+
+            if (!this.canLaunchReplaceVassalVote(user, house).result) {
+                return;
+            }
+
+            this.createVote(user, new ReplaceVassalByPlayer(user, house));
         } else if (this.players.has(user)) {
             const player = this.players.get(user);
 
@@ -595,9 +604,20 @@ export default class IngameGameState extends GameState<
 
             if (newUser && newPlayer) {
                 this.players.set(newUser, newPlayer);
+            } else {
+                oldPlayer.house.hasBeenReplacedByVassal = true;
             }
 
             this.players.delete(oldPlayer.user);
+
+            this.rerender++;
+        } else if (message.type == "vassal-replaced") {
+            const house = this.game.houses.get(message.house);
+            house.hasBeenReplacedByVassal = false;
+            const user = this.entireGame.users.get(message.user);
+            const newPlayer = new Player(user, house);
+
+            this.players.set(user, newPlayer);
 
             this.rerender++;
         } else if (message.type == "vassal-relations") {
@@ -610,6 +630,8 @@ export default class IngameGameState extends GameState<
             this.game.houseCardsForDrafting = new BetterMap(message.houseCards.map(hc => [hc.id, HouseCard.deserializeFromServer(hc)]));
         } else if (message.type == "update-deleted-house-cards") {
             this.game.deletedHouseCards = new BetterMap(message.houseCards.map(hc => [hc.id, HouseCard.deserializeFromServer(hc)]));
+        } else if (message.type == "update-old-player-house-cards") {
+            this.game.oldPlayerHouseCards = new BetterMap(message.houseCards.map(([hid, hcs]) => [this.game.houses.get(hid), new BetterMap(hcs.map(hc => [hc.id, HouseCard.deserializeFromServer(hc)]))]));
         } else if (message.type == "update-max-turns") {
             this.game.maxTurns = message.maxTurns;
         } else if (message.type == "loyalty-token-gained") {
@@ -764,12 +786,53 @@ export default class IngameGameState extends GameState<
         return {result: true, reason: ""};
     }
 
+    canLaunchReplaceVassalVote(fromUser: User | null, forHouse: House): {result: boolean; reason: string} {
+        if (!fromUser) {
+            return {result: false, reason: "only-authenticated-users-can-vote"};
+        }
+
+        if (this.players.keys.includes(fromUser)) {
+            return {result: false, reason: "already-playing"};
+        }
+
+        if (this.childGameState.hasChildGameState(CombatGameState)) {
+            return {result: false, reason: "ongoing-combat"};
+        }
+
+        if (this.childGameState.hasChildGameState(ClaimVassalsGameState)) {
+            return {result: false, reason: "ongoing-claim-vassals"};
+        }
+
+        if (_.some(this.players.values, p => p.house == forHouse)) {
+            return {result: false, reason: "not-a-vassal"};
+        }
+
+        if (!forHouse.hasBeenReplacedByVassal) {
+            return {result: false, reason: "not-a-replaced-vassal"};
+        }
+
+        const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof ReplaceVassalByPlayer);
+        if (existingVotes.length > 0) {
+            return {result: false, reason: "ongoing-vote"};
+        }
+
+        if (this.childGameState instanceof CancelledGameState) {
+            return {result: false, reason: "game-cancelled"};
+        }
+
+        if (this.childGameState instanceof GameEndedGameState) {
+            return {result: false, reason: "game-ended"};
+        }
+
+        return {result: true, reason: ""};
+    }
+
     isHouseDefeated(house: House | null): boolean {
         if (!house) {
             return true;
         }
 
-        // Targaryen is considered defeated when they have no castle areas and no units anymore
+        // A house is considered defeated when it has no castle areas and no units anymore
         return this.world.getControlledRegions(house).filter(r => r.castleLevel > 0).length == 0 && this.world.getUnitsOfHouse(house).length == 0;
     }
 
@@ -784,6 +847,13 @@ export default class IngameGameState extends GameState<
         this.entireGame.sendMessageToServer({
             type: "launch-replace-player-by-vassal-vote",
             player: player.user.id
+        });
+    }
+
+    launchReplaceVassalByPlayerVote(house: House): void {
+        this.entireGame.sendMessageToServer({
+            type: "launch-replace-vassal-by-player-vote",
+            house: house.id
         });
     }
 
