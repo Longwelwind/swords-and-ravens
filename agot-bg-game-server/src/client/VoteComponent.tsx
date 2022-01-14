@@ -1,4 +1,4 @@
-import { Component, ReactNode } from "react";
+import { Component, ReactElement, ReactNode } from "react";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import GameClient from "./GameClient";
 import Vote, { VoteState } from "../common/ingame-game-state/vote-system/Vote";
@@ -15,6 +15,7 @@ import classNames from "classnames";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { preventOverflow } from "@popperjs/core";
+import ConditionalWrap from "./utils/ConditionalWrap";
 
 interface VoteComponentProps {
     vote: Vote;
@@ -29,6 +30,8 @@ export default class VoteComponent extends Component<VoteComponentProps> {
 
     render(): ReactNode {
         const state = this.vote.state;
+        const {result: canVote, reason } = this.props.vote.canVote;
+        const disabled = !canVote;
 
         return (
             <Row key={this.vote.id} className="flex-row">
@@ -42,11 +45,11 @@ export default class VoteComponent extends Component<VoteComponentProps> {
                     </OverlayTrigger>
                 </Col>
                 <Col>
-                    <b>{this.vote.initiator.name}</b> initiated a vote to <b>{this.vote.type.verb()}</b>. <b>{this.vote.positiveCountToPass} players must accept to pass the vote.</b>
+                    <b>{this.vote.initiator.name}</b> initiated a vote to <b>{this.vote.type.verb()}</b>. {this.vote.positiveCountToPass} player{this.vote.positiveCountToPass > 1 ? "s" : ""} must accept to pass the vote.
                     <Row className="mt-1">
                         <Col xs="auto" className={classNames({"display-none": state != VoteState.ONGOING || this.props.gameClient.authenticatedPlayer == null})}>
-                            <Button className="mb-1" variant="success" size="sm" onClick={() => this.vote.vote(true)}>Accept</Button><br/>
-                            <Button variant="danger" size="sm" onClick={() => this.vote.vote(false)}>Refuse</Button>
+                            <Button className="mb-1" variant="success" size="sm" style={{minWidth: "60px"}} disabled={disabled} onClick={() => this.vote.vote(true)}>{this.wrapVoteButtons(<>Accept</>, disabled, reason)}</Button><br/>
+                            <Button variant="danger" size="sm" style={{minWidth: "60px"}} disabled={disabled} onClick={() => this.vote.vote(false)}>{this.wrapVoteButtons(<>Refuse</>, disabled, reason)}</Button>
                         </Col>
                         <Col>
                             <Row>
@@ -76,5 +79,30 @@ export default class VoteComponent extends Component<VoteComponentProps> {
                 </Col>
             </Row>
         );
+    }
+
+    wrapVoteButtons(button: ReactElement, disabled: boolean, reason: string): ReactNode {
+        return <ConditionalWrap
+            condition={disabled}
+            wrap={children =>
+                <OverlayTrigger
+                    overlay={
+                        <Tooltip id="voting-currently-disabled">
+                            {reason == "ongoing-combat" ?
+                                "You cannot vote during combat phase"
+                                : reason == "ongoing-claim-vassals" ?
+                                "You cannot vote during claim vassals phase"
+                                : "Voting is currently not possible"
+                            }
+                        </Tooltip>
+                    }
+                    placement="auto"
+                >
+                    {children}
+                </OverlayTrigger>
+            }
+        >
+            <span>{button}</span>
+        </ConditionalWrap>
     }
 }

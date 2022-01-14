@@ -235,7 +235,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         return (
             <>
-                <Col xs={{order: columnOrders.gameStateColumn}} style={{minWidth: this.gameSettings.playerCount == 8 ? "470px" : "450px"}}>
+                <Col xs={{order: columnOrders.gameStateColumn}} style={{minWidth: this.gameSettings.playerCount == 8 ? "470px" : "450px", maxWidth: "800px"}}>
                     {this.renderGameStateColumn()}
                 </Col>
                 {!draftHouseCards && <Col xs={{span: "auto", order: columnOrders.mapColumn}}>
