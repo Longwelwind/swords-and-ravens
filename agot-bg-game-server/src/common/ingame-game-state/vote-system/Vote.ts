@@ -1,10 +1,12 @@
 import User from "../../../server/User";
 import BetterMap from "../../../utils/BetterMap";
-import VoteType, { SerializedVoteType } from "./VoteType";
+import VoteType, { ReplaceVassalByPlayer, SerializedVoteType } from "./VoteType";
 import IngameGameState from "../IngameGameState";
 import { observable } from "mobx";
 import House from "../game-data-structure/House";
 import Player from "../Player";
+import CombatGameState from "../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
+import ClaimVassalsGameState from "../planning-game-state/claim-vassals-game-state/ClaimVassalsGameState";
 
 export enum VoteState {
     ONGOING,
@@ -43,6 +45,20 @@ export default class Vote {
         } else {
             return VoteState.ONGOING;
         }
+    }
+
+    get canVote(): {result: boolean, reason: string } {
+        if (this.type instanceof ReplaceVassalByPlayer) {
+            if (this.ingame.hasChildGameState(CombatGameState)) {
+                return { result: false, reason: "ongoing-combat" };
+            }
+
+            if (this.ingame.hasChildGameState(ClaimVassalsGameState)) {
+                return { result: false, reason: "ongoing-claim-vassals" };
+            }
+        }
+
+        return { result: true, reason: "ok" };
     }
 
     constructor(

@@ -264,10 +264,6 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                         "The game has been cancelled"
                                         : reason == "game-ended" ?
                                         "The game has ended"
-                                        : reason == "ongoing-combat" ?
-                                        "A vassal can only be replaced by a player outside of combat"
-                                        : reason == "ongoing-claim-vassals" ?
-                                        "A vassal can only be replaced by a player outside of claim vassals phase"
                                         : reason == "not-a-vassal" || "not-a-replaced-vassal" ?
                                         "Only vassals who have replaced a player can be replaced by a player again"
                                         : "Vote not possible"

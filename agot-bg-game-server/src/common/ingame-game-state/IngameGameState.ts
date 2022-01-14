@@ -38,7 +38,6 @@ import shuffleInPlace from "../../utils/shuffleInPlace";
 import popRandom from "../../utils/popRandom";
 import LoanCard from "./game-data-structure/loan-card/LoanCard";
 import PayDebtsGameState, { SerializedPayDebtsGameState } from "./pay-debts-game-state/PayDebtsGameState";
-import ClaimVassalsGameState from "./planning-game-state/claim-vassals-game-state/ClaimVassalsGameState";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -317,7 +316,9 @@ export default class IngameGameState extends GameState<
         if (message.type == "vote") {
             const vote = this.votes.get(message.vote);
 
-            if (vote.state != VoteState.ONGOING || !vote.participatingHouses.includes(player.house)) {
+            if (vote.state != VoteState.ONGOING ||
+                !vote.participatingHouses.includes(player.house) ||
+                !vote.canVote.result) {
                 return;
             }
 
@@ -793,14 +794,6 @@ export default class IngameGameState extends GameState<
 
         if (this.players.keys.includes(fromUser)) {
             return {result: false, reason: "already-playing"};
-        }
-
-        if (this.childGameState.hasChildGameState(CombatGameState)) {
-            return {result: false, reason: "ongoing-combat"};
-        }
-
-        if (this.childGameState.hasChildGameState(ClaimVassalsGameState)) {
-            return {result: false, reason: "ongoing-claim-vassals"};
         }
 
         if (_.some(this.players.values, p => p.house == forHouse)) {
