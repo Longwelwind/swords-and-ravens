@@ -15,7 +15,6 @@ import ConditionalWrap from "./utils/ConditionalWrap";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import clonesImage from "../../public/images/icons/clones.svg"
-import joinReactNodes from "./utils/joinReactNodes";
 
 interface UserLabelProps {
     gameClient: GameClient;
@@ -71,7 +70,7 @@ export default class UserLabel extends Component<UserLabelProps> {
     renderOtherUsersFromSameNetworkTooltip(): OverlayChildren {
         return <Tooltip id={`${this.user.id}-other-users-with-same-ip-tooltip`}>
             These users {this.props.gameState instanceof IngameGameState ? "play" : "joined"} from the same network as {this.user.name}:
-            <br/><br/>{joinReactNodes(this.user.otherUsersFromSameNetwork, <br/>)}
+            <br/><br/>{this.user.otherUsersFromSameNetwork.map(usr => <div key={usr}>{usr}</div>)}
         </Tooltip>
     }
 
