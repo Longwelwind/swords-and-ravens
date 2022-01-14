@@ -453,6 +453,10 @@ export default class IngameGameState extends GameState<
     }
 
     changePowerTokens(house: House, delta: number): number {
+        if (this.isVassalHouse(house)) {
+            return 0;
+        }
+
         const originalValue = house.powerTokens;
 
         const powerTokensOnBoardCount = this.game.countPowerTokensOnBoard(house);
