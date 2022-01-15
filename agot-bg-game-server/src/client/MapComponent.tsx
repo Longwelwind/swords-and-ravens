@@ -128,6 +128,27 @@ export default class MapComponent extends Component<MapComponentProps> {
                                 </OverlayTrigger>
                             )}
                             {(barrelModifiers.has(r.id) || crownModifiers.has(r.id)) && this.renderImprovements(r)}
+                            {r.overwrittenSupoerControlPowerToken &&
+                                <OverlayTrigger
+                                    overlay={<Tooltip id={"power-token-" + r.id}>
+                                        <b>Printed Power token</b><small> of <b>{r.getController()?.name ?? "Unknown"}</b><br /><b>{r.name}</b></small>
+                                    </Tooltip>}
+                                    key={"super-power-token-overlay-" + r.id}
+                                    delay={{ show: 250, hide: 100 }}
+                                    placement="auto"
+                                    popperConfig={{ modifiers: [preventOverflow] }}
+                                >
+                                    <div
+                                        className="power-token hover-weak-outline"
+                                        style={{
+                                            left: r.powerTokenSlot.x,
+                                            top: r.powerTokenSlot.y,
+                                            backgroundImage: `url(${housePowerTokensImages.get(r.overwrittenSupoerControlPowerToken.id)})`
+                                        }}
+                                    >
+                                    </div>
+                                </OverlayTrigger>
+                            }
                             {r.controlPowerToken && (
                                 <OverlayTrigger
                                     overlay={<Tooltip id={"power-token-" + r.id}>

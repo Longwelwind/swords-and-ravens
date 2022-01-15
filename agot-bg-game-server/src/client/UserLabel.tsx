@@ -136,6 +136,8 @@ export default class UserLabel extends Component<UserLabelProps> {
                                             "Targaryen cannot be replaced by a vassal"
                                         : canLaunchReplacePlayerByVassalVoteReason == "ongoing-house-card-drafting" ?
                                             "During drafting houses cannot be replaced by vassals"
+                                        : canLaunchReplacePlayerByVassalVoteReason == "game-variant-incompatible" ?
+                                            "Vassals are not compatible with the current game variant"
                                         : "Vote not possible"
                                     }
                                 </Tooltip>

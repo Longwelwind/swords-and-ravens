@@ -45,7 +45,6 @@ export default class Game {
     westerosDecks: WesterosCard[][];
     structuresCountNeededToWin: number;
     @observable maxTurns: number;
-    maxPowerTokens: number;
     vassalHouseCards: BetterMap<string, HouseCard> = new BetterMap<string, HouseCard>();
     @observable houseCardsForDrafting: BetterMap<string, HouseCard> = new BetterMap();
     deletedHouseCards: BetterMap<string, HouseCard> = new BetterMap();
@@ -480,7 +479,6 @@ export default class Game {
             starredOrderRestrictions: this.starredOrderRestrictions,
             structuresCountNeededToWin: this.structuresCountNeededToWin,
             maxTurns: this.maxTurns,
-            maxPowerTokens: this.maxPowerTokens,
             clientNextWildlingCardId: (admin || knowsNextWildlingCard) ? this.wildlingDeck[0].id : null,
             revealedWesterosCards: this.revealedWesterosCards,
             vassalRelations: this.vassalRelations.map((key, value) => [key.id, value.id]),
@@ -511,7 +509,6 @@ export default class Game {
         game.starredOrderRestrictions = data.starredOrderRestrictions;
         game.structuresCountNeededToWin = data.structuresCountNeededToWin;
         game.maxTurns = data.maxTurns;
-        game.maxPowerTokens = data.maxPowerTokens;
         game.revealedWesterosCards = data.revealedWesterosCards;
         game.clientNextWildlingCardId = data.clientNextWildlingCardId;
         game.vassalRelations = new BetterMap(data.vassalRelations.map(([vid, hid]) => [game.houses.get(vid), game.houses.get(hid)]));
@@ -544,7 +541,6 @@ export interface SerializedGame {
     supplyRestrictions: number[][];
     structuresCountNeededToWin: number;
     maxTurns: number;
-    maxPowerTokens: number;
     revealedWesterosCards: number;
     clientNextWildlingCardId: number | null;
     vassalRelations: [string, string][];

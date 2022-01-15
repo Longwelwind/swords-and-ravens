@@ -33,7 +33,7 @@ export default class GiftPowerTokensComponent extends Component<GiftPowerTokensC
     }
 
     get receivablePowerTokens(): number {
-        return this.props.ingame.game.maxPowerTokens - this.toHouse.powerTokens - this.props.ingame.game.countPowerTokensOnBoard(this.toHouse);
+        return this.toHouse.maxPowerTokens - this.toHouse.powerTokens - this.props.ingame.game.countPowerTokensOnBoard(this.toHouse);
     }
 
     render(): ReactNode {

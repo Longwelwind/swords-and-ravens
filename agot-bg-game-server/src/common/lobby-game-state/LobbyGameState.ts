@@ -171,6 +171,10 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
             if (settings.setupId == "a-dance-with-dragons") {
                 settings.adwdHouseCards = true;
+            } else if (settings.setupId == "a-feast-for-crows") {
+                settings.adwdHouseCards = false;
+                settings.vassals = false;
+                settings.useVassalPositions = false;
             }
 
             if (settings.thematicDraft) {

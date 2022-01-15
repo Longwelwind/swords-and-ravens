@@ -136,7 +136,7 @@ def about(request):
         {"name": "Base Game Second Edition", "done": True, "children": [
             {"name": "Tides of Battle", "done": True}
         ]},
-        {"name": "A Feast for Crows"},
+        {"name": "A Feast for Crows", "done": True},
         {"name": "A Dance with Dragons", "done": True},
         {"name": "Mother of Dragons", "done": True, "children": [
             {"name": "Vassals", "done": True},

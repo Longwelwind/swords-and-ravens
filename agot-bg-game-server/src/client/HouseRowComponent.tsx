@@ -351,7 +351,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     private renderPowerPopover(house: House): OverlayChildren {
         const availablePower =  house.powerTokens;
         const powerTokensOnBoard = this.game.countPowerTokensOnBoard(house);
-        const powerInPool = this.game.maxPowerTokens - availablePower - powerTokensOnBoard;
+        const powerInPool = house.maxPowerTokens - availablePower - powerTokensOnBoard;
 
         return <Popover id={house.id + "-power-tooltip"} className="p-2">
             <b>{house.name}</b><br/>

@@ -20,8 +20,6 @@ import IronBank from "./IronBank";
 import loanCardTypes from "./loan-card/loanCardTypes";
 import LoanCard from "./loan-card/LoanCard";
 
-const MAX_POWER_TOKENS = 20;
-
 interface HouseCardContainer {
     houseCards: {[key: string]: HouseCardData};
 }
@@ -70,6 +68,8 @@ export interface GameSetup {
     garrisons?: {[key: string]: number};
     loyaltyTokens?: {[key: string]: number};
     westerosCards?: WesterosCardData[][];
+    maxPowerTokens?: {[key: string]: number};
+    superPowerTokens?: {[key: string]: string};
 }
 
 export interface GameSetupContainer {
@@ -141,6 +141,8 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     const entireGame = ingame.entireGame;
     const gameSettings = entireGame.gameSettings;
 
+    const selectedGameSetup = entireGame.selectedGameSetup;
+
     const game = new Game(ingame);
 
     const baseGameHousesToCreate = new BetterMap(
@@ -168,11 +170,18 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
            newHouseData.houseCards = newHouseCards.get(hid).houseCards;
            baseGameHousesToCreate.set(hid, newHouseData);
         });
+    } else if (gameSettings.setupId == "a-feast-for-crows") {
+        const ffcHouseCards = new BetterMap(Object.entries(baseGameData.ffcHouseCards as {[key: string]: HouseCardContainer}));
+        ffcHouseCards.keys.forEach(hid => {
+           const newHouseData = baseGameHousesToCreate.get(hid);
+           newHouseData.houseCards = ffcHouseCards.get(hid).houseCards;
+           baseGameHousesToCreate.set(hid, newHouseData);
+        });
     }
 
     // Overwrite supply levels
-    if (entireGame.selectedGameSetup.supplyLevels != undefined) {
-        Object.entries(entireGame.selectedGameSetup.supplyLevels)
+    if (selectedGameSetup.supplyLevels != undefined) {
+        Object.entries(selectedGameSetup.supplyLevels)
             .filter(([hid, _]) => housesToCreate.includes(hid))
             .forEach(([hid, level]) => {
                 const newHouseData = baseGameHousesToCreate.get(hid);
@@ -180,6 +189,16 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
                 baseGameHousesToCreate.set(hid, newHouseData);
         });
     }
+
+    // Another very strange behavior I cannot explain:
+    // I tried to allow defining maxPowerTokens in a generic way like I do with the overwritten super control power token
+    // But for max power tokens it just doesn't work though I verified selectedGameSetup contains the maxPowerTokens node with
+    // console.log(JSON.stringify(selectedGameSetup, null, 2));
+
+    // const maxPowerTokensPerHouse = new BetterMap(selectedGameSetup.maxPowerTokens != undefined ? Object.entries(selectedGameSetup.maxPowerTokens) : []);
+
+    // So for now the only work around is to hard code it:
+    const maxPowerTokensPerHouse = new BetterMap(entireGame.gameSettings.setupId == "a-feast-for-crows" ? [["arryn", 19]] : []);
 
     game.houses = new BetterMap(
         baseGameHousesToCreate.entries
@@ -203,38 +222,39 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             // Vassals always start with a supply of 4
             const supplyLevel = playerHouses.includes(hid) ? houseData.supplyLevel : 4;
 
-            const house = new House(hid, houseData.name, houseData.color, houseCards, unitLimits, gameSettings.startWithSevenPowerTokens ? 7 : 5, supplyLevel, 0, false);
+            const maxPowerTokens = maxPowerTokensPerHouse.has(hid) ? maxPowerTokensPerHouse.get(hid) : baseGameData.maxPowerTokens;
+
+            const house = new House(hid, houseData.name, houseData.color, houseCards, unitLimits, gameSettings.startWithSevenPowerTokens ? 7 : 5, maxPowerTokens, supplyLevel, 0, false);
 
             return [hid, house];
         })
     );
 
-    game.maxTurns = entireGame.selectedGameSetup.maxTurns ? entireGame.selectedGameSetup.maxTurns : baseGameData.maxTurns;
+    game.maxTurns = selectedGameSetup.maxTurns ? selectedGameSetup.maxTurns : baseGameData.maxTurns;
 
     if (gameSettings.endless) {
         game.maxTurns = 1000;
     }
 
-    game.structuresCountNeededToWin = entireGame.selectedGameSetup.structuresCountNeededToWin != undefined ? entireGame.selectedGameSetup.structuresCountNeededToWin : baseGameData.structuresCountNeededToWin;
+    game.structuresCountNeededToWin = selectedGameSetup.structuresCountNeededToWin != undefined ? selectedGameSetup.structuresCountNeededToWin : baseGameData.structuresCountNeededToWin;
     game.supplyRestrictions = baseGameData.supplyRestrictions;
-    game.maxPowerTokens = MAX_POWER_TOKENS;
     game.revealedWesterosCards = gameSettings.cokWesterosPhase ? 3 : 0;
 
     // Load tracks starting positions
-    if (entireGame.selectedGameSetup.tracks != undefined && entireGame.selectedGameSetup.tracks.ironThrone != undefined) {
-        game.ironThroneTrack = entireGame.selectedGameSetup.tracks.ironThrone.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
+    if (selectedGameSetup.tracks != undefined && selectedGameSetup.tracks.ironThrone != undefined) {
+        game.ironThroneTrack = selectedGameSetup.tracks.ironThrone.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     } else {
         game.ironThroneTrack = baseGameData.tracks.ironThrone.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     }
 
-    if (entireGame.selectedGameSetup.tracks != undefined && entireGame.selectedGameSetup.tracks.fiefdoms != undefined) {
-        game.fiefdomsTrack = entireGame.selectedGameSetup.tracks.fiefdoms.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
+    if (selectedGameSetup.tracks != undefined && selectedGameSetup.tracks.fiefdoms != undefined) {
+        game.fiefdomsTrack = selectedGameSetup.tracks.fiefdoms.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     } else {
         game.fiefdomsTrack = baseGameData.tracks.fiefdoms.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     }
 
-    if (entireGame.selectedGameSetup.tracks != undefined && entireGame.selectedGameSetup.tracks.kingsCourt != undefined) {
-        game.kingsCourtTrack = entireGame.selectedGameSetup.tracks.kingsCourt.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
+    if (selectedGameSetup.tracks != undefined && selectedGameSetup.tracks.kingsCourt != undefined) {
+        game.kingsCourtTrack = selectedGameSetup.tracks.kingsCourt.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     } else {
         game.kingsCourtTrack = baseGameData.tracks.kingsCourt.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     }
@@ -285,8 +305,10 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     }
 
     // Loading Tiled map
-    const garrisonsFromGameSetup = entireGame.selectedGameSetup.garrisons ? new BetterMap(Object.entries(entireGame.selectedGameSetup.garrisons)) : null;
-    const blockedRegions = entireGame.selectedGameSetup.blockedRegions;
+    const garrisonsFromGameSetup = selectedGameSetup.garrisons ? new BetterMap(Object.entries(selectedGameSetup.garrisons)) : null;
+    const blockedRegions = selectedGameSetup.blockedRegions;
+
+    const overwrittenSuperControlPowerToken = new BetterMap(selectedGameSetup.superPowerTokens != undefined ? Object.entries(selectedGameSetup.superPowerTokens) : []);
 
     const regions = new BetterMap(getStaticWorld(entireGame.gameSettings.playerCount).staticRegions.values.map(staticRegion => {
         const blocked = blockedRegions ? blockedRegions.includes(staticRegion.id) : false;
@@ -294,12 +316,15 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         : staticRegion.startingGarrison
         : staticRegion.startingGarrison;
 
+        const superPowerToken = overwrittenSuperControlPowerToken.has(staticRegion.id) ? game.houses.get(overwrittenSuperControlPowerToken.get(staticRegion.id)) : null;
+
         return [
             staticRegion.id,
             new Region(
                 game,
                 staticRegion.id,
-                blocked ? 1000 : garrisonValue
+                blocked ? 1000 : garrisonValue,
+                superPowerToken
             )
         ];
     }));
@@ -325,8 +350,8 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     });
 
     // Apply Westeros deck changes
-    if (entireGame.selectedGameSetup.westerosCards != undefined) {
-        const westerosCards = entireGame.selectedGameSetup.westerosCards;
+    if (selectedGameSetup.westerosCards != undefined) {
+        const westerosCards = selectedGameSetup.westerosCards;
 
         for (let i=0; i< westerosCards.length; i++) {
             if (westerosCards[i] != undefined) {
@@ -360,7 +385,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     // Shuffle the deck
     game.wildlingDeck = shuffleInPlace(game.wildlingDeck);
 
-    const units = entireGame.selectedGameSetup.units != undefined ? entireGame.selectedGameSetup.units : baseGameData.units;
+    const units = selectedGameSetup.units != undefined ? selectedGameSetup.units : baseGameData.units;
 
     // Initialize the starting positions
     Object.entries(units).forEach(([regionId, data]) => {
@@ -371,7 +396,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             const quantity = (!playerHouses.includes(house.id) || gameSettings.useVassalPositions) ? (unitData.quantityVassal ?? 0) : unitData.quantity;
 
             // Check if the game setup removed units off this region
-            if (entireGame.selectedGameSetup.removedUnits?.includes(region.id) || region.garrison == 1000) {
+            if (selectedGameSetup.removedUnits?.includes(region.id) || region.garrison == 1000) {
                 return;
             }
 
@@ -387,16 +412,16 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         restrictions => game.houses.size <= restrictions.length)];
 
     // Apply Power tokens from game setup
-    if (entireGame.selectedGameSetup.powerTokensOnBoard != undefined) {
-        Object.entries(entireGame.selectedGameSetup.powerTokensOnBoard).forEach(([houseId, regions]) => {
+    if (selectedGameSetup.powerTokensOnBoard != undefined) {
+        Object.entries(selectedGameSetup.powerTokensOnBoard).forEach(([houseId, regions]) => {
             const house = game.houses.tryGet(houseId, null);
             regions.forEach(r => game.world.regions.get(r).controlPowerToken = house);
         });
     }
 
     // Apply loyalty tokens
-    if (entireGame.selectedGameSetup.loyaltyTokens != undefined) {
-        const loyaltyTokens = new BetterMap(Object.entries(entireGame.selectedGameSetup.loyaltyTokens));
+    if (selectedGameSetup.loyaltyTokens != undefined) {
+        const loyaltyTokens = new BetterMap(Object.entries(selectedGameSetup.loyaltyTokens));
         loyaltyTokens.entries.forEach(([regionId, count]) => {
             regions.get(regionId).loyaltyTokens = count;
         });

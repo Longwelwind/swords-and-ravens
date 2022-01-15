@@ -460,7 +460,7 @@ export default class IngameGameState extends GameState<
         const originalValue = house.powerTokens;
 
         const powerTokensOnBoardCount = this.game.countPowerTokensOnBoard(house);
-        const maxPowerTokenCount = this.game.maxPowerTokens - powerTokensOnBoardCount;
+        const maxPowerTokenCount = house.maxPowerTokens - powerTokensOnBoardCount;
 
         house.powerTokens += delta;
         house.powerTokens = Math.max(0, Math.min(house.powerTokens, maxPowerTokenCount));
@@ -772,6 +772,10 @@ export default class IngameGameState extends GameState<
 
             if (forHouse?.id == "targaryen" && !this.isHouseDefeated(forHouse)) {
                 return {result: false, reason: "targaryen-must-be-a-player-controlled-house"}
+            }
+
+            if (this.entireGame.gameSettings.setupId == "a-feast-for-crows") {
+                return {result: false, reason: "game-variant-incompatible"}
             }
         }
 

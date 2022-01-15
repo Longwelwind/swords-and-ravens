@@ -16,9 +16,10 @@ export default class House {
     @observable supplyLevel: number;
     @observable gainedLoyaltyTokens: number;
     @observable hasBeenReplacedByVassal: boolean;
+    maxPowerTokens: number;
 
     constructor(id: string, name: string, color: string, houseCards: BetterMap<string, HouseCard>, unitLimits: BetterMap<UnitType, number>,
-        powerTokens: number, supplyLevel: number, gainedLoyaltyTokens: number, hasBeenReplacedByVassal: boolean) {
+        powerTokens: number, maxPowerTokens: number, supplyLevel: number, gainedLoyaltyTokens: number, hasBeenReplacedByVassal: boolean) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -29,6 +30,7 @@ export default class House {
         this.supplyLevel = supplyLevel;
         this.gainedLoyaltyTokens = gainedLoyaltyTokens;
         this.hasBeenReplacedByVassal = hasBeenReplacedByVassal;
+        this.maxPowerTokens = maxPowerTokens;
     }
 
     serializeToClient(admin: boolean, isVassalHouse: boolean): SerializedHouse {
@@ -40,6 +42,7 @@ export default class House {
             houseCards: (admin || !isVassalHouse) ? this.houseCards.entries.map(([houseCardId, houseCard]) => [houseCardId, houseCard.serializeToClient()]) : [],
             unitLimits: this.unitLimits.map((unitType, limit) => [unitType.id, limit]),
             powerTokens: this.powerTokens,
+            maxPowerTokens: this.maxPowerTokens,
             supplyLevel: this.supplyLevel,
             gainedLoyaltyTokens: this.gainedLoyaltyTokens,
             hasBeenReplacedByVassal: this.hasBeenReplacedByVassal
@@ -58,6 +61,7 @@ export default class House {
                 data.unitLimits.map(([utid, limit]) => [unitTypes.get(utid), limit])
             ),
             data.powerTokens,
+            data.maxPowerTokens,
             data.supplyLevel,
             data.gainedLoyaltyTokens,
             data.hasBeenReplacedByVassal
@@ -76,6 +80,7 @@ export interface SerializedHouse {
     houseCards: [string, SerializedHouseCard][];
     unitLimits: [string, number][];
     powerTokens: number;
+    maxPowerTokens: number;
     supplyLevel: number;
     gainedLoyaltyTokens: number;
     hasBeenReplacedByVassal: boolean;
