@@ -9,17 +9,18 @@ export default class House {
     id: string;
     name: string;
     color: string;
-    knowsNextWildlingCard: boolean;
-    @observable houseCards: BetterMap<string, HouseCard>;
     unitLimits: BetterMap<UnitType, number>;
+    maxPowerTokens: number;
+    @observable houseCards: BetterMap<string, HouseCard>;
     @observable powerTokens: number;
     @observable supplyLevel: number;
+    @observable knowsNextWildlingCard: boolean;
     @observable gainedLoyaltyTokens: number;
     @observable hasBeenReplacedByVassal: boolean;
-    maxPowerTokens: number;
+    @observable completedObjectives: number;
 
     constructor(id: string, name: string, color: string, houseCards: BetterMap<string, HouseCard>, unitLimits: BetterMap<UnitType, number>,
-        powerTokens: number, maxPowerTokens: number, supplyLevel: number, gainedLoyaltyTokens: number, hasBeenReplacedByVassal: boolean) {
+        powerTokens: number, maxPowerTokens: number, supplyLevel: number, gainedLoyaltyTokens: number, hasBeenReplacedByVassal: boolean, completedObjectives: number) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -31,6 +32,7 @@ export default class House {
         this.gainedLoyaltyTokens = gainedLoyaltyTokens;
         this.hasBeenReplacedByVassal = hasBeenReplacedByVassal;
         this.maxPowerTokens = maxPowerTokens;
+        this.completedObjectives = completedObjectives;
     }
 
     serializeToClient(admin: boolean, isVassalHouse: boolean): SerializedHouse {
@@ -45,7 +47,8 @@ export default class House {
             maxPowerTokens: this.maxPowerTokens,
             supplyLevel: this.supplyLevel,
             gainedLoyaltyTokens: this.gainedLoyaltyTokens,
-            hasBeenReplacedByVassal: this.hasBeenReplacedByVassal
+            hasBeenReplacedByVassal: this.hasBeenReplacedByVassal,
+            completedObjectives: this.completedObjectives
         };
     }
 
@@ -64,7 +67,8 @@ export default class House {
             data.maxPowerTokens,
             data.supplyLevel,
             data.gainedLoyaltyTokens,
-            data.hasBeenReplacedByVassal
+            data.hasBeenReplacedByVassal,
+            data.completedObjectives
         );
 
         house.knowsNextWildlingCard = data.knowsNextWildlingCard;
@@ -84,4 +88,5 @@ export interface SerializedHouse {
     supplyLevel: number;
     gainedLoyaltyTokens: number;
     hasBeenReplacedByVassal: boolean;
+    completedObjectives: number;
 }

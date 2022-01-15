@@ -1311,7 +1311,10 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
 
-                ingame.game.houses.forEach((h) => h.maxPowerTokens = 20);
+                ingame.game.houses.forEach((h) => {
+                    h.maxPowerTokens = 20;
+                    h.completedObjectives = 0;
+                });
                 ingame.game.world.regions.forEach((r) => r.overwrittenSuperControlPowerToken = null);
             }
 

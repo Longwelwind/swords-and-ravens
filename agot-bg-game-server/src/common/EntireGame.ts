@@ -73,6 +73,18 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         return gameSetup;
     }
 
+    get isDanceWithDragons(): boolean {
+        return this.gameSettings.setupId == "a-dance-with-dragons";
+    }
+
+    get isFeastForCrows(): boolean {
+        return this.gameSettings.setupId == "a-feast-for-crows";
+    }
+
+    get isMotherOfDragons(): boolean {
+        return this.gameSettings.setupId == "mother-of-dragons";
+    }
+
     constructor(id: string, ownerId: string, name: string) {
         super(null);
         this.id = id;

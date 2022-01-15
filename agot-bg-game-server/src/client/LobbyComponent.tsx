@@ -238,7 +238,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
     }
 
     UNSAFE_componentWillUpdate(): void {
-        if (this.entireGame.gameSettings.adwdHouseCards || this.entireGame.gameSettings.setupId == "a-dance-with-dragons") {
+        if (this.entireGame.gameSettings.adwdHouseCards || this.entireGame.isDanceWithDragons) {
             setBoltonInfluenceImage();
             this.lobby.lobbyHouses.get("stark").name = "Bolton";
         } else {

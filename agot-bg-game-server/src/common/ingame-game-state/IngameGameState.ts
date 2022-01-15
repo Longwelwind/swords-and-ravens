@@ -187,7 +187,7 @@ export default class IngameGameState extends GameState<
 
     beginNewTurn(): void {
         if (this.game.turn == this.game.maxTurns) {
-            const winner = this.game.getPotentialWinner();
+            const winner = this.game.getPotentialWinner(true);
             this.setChildGameState(new GameEndedGameState(this)).firstStart(winner);
             return;
         }
@@ -774,7 +774,7 @@ export default class IngameGameState extends GameState<
                 return {result: false, reason: "targaryen-must-be-a-player-controlled-house"}
             }
 
-            if (this.entireGame.gameSettings.setupId == "a-feast-for-crows") {
+            if (this.entireGame.isFeastForCrows) {
                 return {result: false, reason: "game-variant-incompatible"}
             }
         }

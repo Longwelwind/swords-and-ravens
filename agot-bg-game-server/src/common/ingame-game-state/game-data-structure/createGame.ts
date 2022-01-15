@@ -170,7 +170,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
            newHouseData.houseCards = newHouseCards.get(hid).houseCards;
            baseGameHousesToCreate.set(hid, newHouseData);
         });
-    } else if (gameSettings.setupId == "a-feast-for-crows") {
+    } else if (entireGame.isFeastForCrows) {
         const ffcHouseCards = new BetterMap(Object.entries(baseGameData.ffcHouseCards as {[key: string]: HouseCardContainer}));
         ffcHouseCards.keys.forEach(hid => {
            const newHouseData = baseGameHousesToCreate.get(hid);
@@ -198,7 +198,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     // const maxPowerTokensPerHouse = new BetterMap(selectedGameSetup.maxPowerTokens != undefined ? Object.entries(selectedGameSetup.maxPowerTokens) : []);
 
     // So for now the only work around is to hard code it:
-    const maxPowerTokensPerHouse = new BetterMap(entireGame.gameSettings.setupId == "a-feast-for-crows" ? [["arryn", 19]] : []);
+    const maxPowerTokensPerHouse = new BetterMap(entireGame.isFeastForCrows ? [["arryn", 19]] : []);
 
     game.houses = new BetterMap(
         baseGameHousesToCreate.entries
@@ -224,7 +224,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
 
             const maxPowerTokens = maxPowerTokensPerHouse.has(hid) ? maxPowerTokensPerHouse.get(hid) : baseGameData.maxPowerTokens;
 
-            const house = new House(hid, houseData.name, houseData.color, houseCards, unitLimits, gameSettings.startWithSevenPowerTokens ? 7 : 5, maxPowerTokens, supplyLevel, 0, false);
+            const house = new House(hid, houseData.name, houseData.color, houseCards, unitLimits, gameSettings.startWithSevenPowerTokens ? 7 : 5, maxPowerTokens, supplyLevel, 0, false, 0);
 
             return [hid, house];
         })

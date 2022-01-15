@@ -37,8 +37,9 @@ import diamondHiltUsedImage from "../../public/images/icons/diamond-hilt-used.sv
 import hourglassImage from "../../public/images/icons/hourglass.svg";
 import mammothImage from "../../public/images/icons/mammoth.svg";
 import spikedDragonHeadImage from "../../public/images/icons/spiked-dragon-head.svg";
-import speaker from "../../public/images/icons/speaker.svg";
-import speakerOff from "../../public/images/icons/speaker-off.svg";
+import speakerImage from "../../public/images/icons/speaker.svg";
+import speakerOffImage from "../../public/images/icons/speaker-off.svg";
+import cardRandomImage from "../../public/images/icons/card-random.svg";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import marked from "marked";
 import GameLogListComponent from "./GameLogListComponent";
@@ -192,7 +193,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         super(props);
         // Check for Dance with Dragons house cards
         if (props.gameState.entireGame.gameSettings.adwdHouseCards ||
-            props.gameState.entireGame.gameSettings.setupId == "a-dance-with-dragons") {
+            props.gameState.entireGame.isDanceWithDragons) {
             // Replace Stark images with Bolton images for DwD
             houseCardsBackImages.set("stark", houseCardsBackImages.get("bolton"));
             houseInfluenceImages.set("stark", houseInfluenceImages.get("bolton"));
@@ -409,7 +410,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         </Tooltip>
                                     }
                                 >
-                                    <img src={this.props.gameClient.muted ? speakerOff : speaker} width={32} />
+                                    <img src={this.props.gameClient.muted ? speakerOffImage : speakerImage} width={32} />
                                 </OverlayTrigger>
                             </button>
                         </Col>
@@ -642,7 +643,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 <FontAwesomeIcon
                                                     style={{ color: "white" }}
                                                     icon={faHistory} />
-                                                {/* &nbsp;Logs */}
                                             </span>
                                         </OverlayTrigger>
                                     </Nav.Link>
@@ -658,13 +658,25 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                     <FontAwesomeIcon
                                                         style={{ color: "white" }}
                                                         icon={faComments} />
-
-                                                    {/* &nbsp;Chat */}
                                                 </span>
                                             </OverlayTrigger>
                                         </Nav.Link>
                                     </div>
                                 </Nav.Item>
+                                {this.authenticatedPlayer && this.ingame.entireGame.isFeastForCrows && (
+                                    <Nav.Item>
+                                        <Nav.Link eventKey="objectives">
+                                            <OverlayTrigger
+                                                overlay={<Tooltip id="objectives-tooltip">Objectives</Tooltip>}
+                                                placement="top"
+                                            >
+                                                <span>
+                                                    <img src={cardRandomImage} width={20} />
+                                                </span>
+                                            </OverlayTrigger>
+                                        </Nav.Link>
+                                    </Nav.Item>
+                                )}
                                 {this.authenticatedPlayer && (
                                     <Nav.Item>
                                         <Nav.Link eventKey="note">

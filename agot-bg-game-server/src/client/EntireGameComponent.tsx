@@ -32,7 +32,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             </Helmet>
             <Col xs={12} className={this.props.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
                 <div style={{ marginLeft: "1rem", marginBottom: "0rem", textAlign: "center"}}>
-                    <h4 style={{ display: "inline" }}>{this.props.entireGame.name} {this.getTidesOfBattleImage()} {this.getGameTypeBadge()}{this.props.entireGame.gameSettings.setupId == "a-feast-for-crows" && this.getBetaWarning()}</h4>
+                    <h4 style={{ display: "inline" }}>{this.props.entireGame.name} {this.getTidesOfBattleImage()} {this.getGameTypeBadge()}{this.props.entireGame.isFeastForCrows && this.getBetaWarning()}</h4>
                 </div>
             </Col>
             {

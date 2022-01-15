@@ -239,14 +239,31 @@ export default class Game {
         return numberStructuresPerHouse.some(n => n >= this.structuresCountNeededToWin);
     }
 
-    getPotentialWinners(): House[] {
-        const victoryConditions: ((h: House) => number)[] = [
-            (h: House) => this.ingame.isVassalHouse(h) ? 1 : -1,
-            (h: House) => -this.getVictoryPoints(h),
-            (h: House) => -this.getTotalControlledLandRegions(h),
-            (h: House) => -h.supplyLevel,
-            (h: House) => this.ironThroneTrack.indexOf(h)
-        ];
+    getPotentialWinners(lastRound = false): House[] {
+        let victoryConditions: ((h: House) => number)[] = [];
+
+        if (!this.ingame.entireGame.isFeastForCrows) {
+            victoryConditions = [
+                (h: House) => this.ingame.isVassalHouse(h) ? 1 : -1,
+                (h: House) => -this.getVictoryPoints(h),
+                (h: House) => -this.getTotalControlledLandRegions(h),
+                (h: House) => -h.supplyLevel,
+                (h: House) => this.ironThroneTrack.indexOf(h)
+            ];
+        } else if (!lastRound) {
+            victoryConditions = [
+                (h: House) => this.ingame.isVassalHouse(h) ? 1 : -1,
+                (h: House) => -this.getVictoryPoints(h),
+                (h: House) => -this.getTotalControlledLandRegions(h),
+                (h: House) => this.ironThroneTrack.indexOf(h)
+            ]
+        } else {
+            victoryConditions = [
+                (h: House) => this.ingame.isVassalHouse(h) ? 1 : -1,
+                (h: House) => -this.getVictoryPoints(h),
+                (h: House) => this.ironThroneTrack.indexOf(h)
+            ]
+        }
 
         return _.sortBy(this.houses.values, victoryConditions);
     }
@@ -255,8 +272,8 @@ export default class Game {
         return this.world.regions.values.filter(r => r.getController() == h).filter(r => r.type == land).length;
     }
 
-    getPotentialWinner(): House {
-        return this.getPotentialWinners()[0];
+    getPotentialWinner(lastRound = false): House {
+        return this.getPotentialWinners(lastRound)[0];
     }
 
     getCountUnitsOfType(house: House, unitType: UnitType): number {
@@ -398,9 +415,13 @@ export default class Game {
     }
 
     getVictoryPoints(house: House): number {
-        return house.id == "targaryen"
+        if (!this.ingame.entireGame.isFeastForCrows) {
+            return house.id == "targaryen"
             ? this.getTotalLoyaltyTokenCount(house)
             : _.sum(this.getCountHeldStructures(house).values);
+        }
+
+        return house.completedObjectives;
     }
 
     getTotalLoyaltyTokenCount(house: House): number {

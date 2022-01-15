@@ -18,6 +18,7 @@ import Game from "../common/ingame-game-state/game-data-structure/Game";
 import castleImage from "../../public/images/icons/castle.svg";
 import battleGearImage from "../../public/images/icons/battle-gear.svg";
 import verticalBanner from "../../public/images/icons/vertical-banner.svg"
+import laurelCrownImage from "../../public/images/icons/laurel-crown.svg";
 import Player from "../common/ingame-game-state/Player";
 import UserLabel from "./UserLabel";
 import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
@@ -83,6 +84,12 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                 ? `Commanded by ${this.suzerainHouse.name}`
                 : "Up for grab"}
         </span>;
+
+        const victoryImage = this.props.ingame.entireGame.isFeastForCrows
+            ? laurelCrownImage :
+                this.house.id == "targaryen"
+                    ? verticalBanner
+                    : castleImage;
 
         try {
             controller = this.ingame.getControllerOfHouse(this.house).user;
@@ -187,7 +194,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                     "hover-weak-outline",
                                     { "dye-warning": victoryPointsWarning },
                                     { "dye-critical": victoryPointsCritical })}
-                                src={this.house.id == "targaryen" ? verticalBanner : castleImage} width={40}
+                                src={victoryImage} width={40}
                                 style={{ marginLeft: "10px" }}
                             />
                         </Col>
@@ -298,13 +305,19 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     setHighlightedRegions(filter = ""): void {
         const regions = new BetterMap(this.ingame.world.getControlledRegions(this.house).map(r => [r, undefined] as [Region, string | undefined]));
         if (filter == "with-castles-only") {
-            regions.keys.filter(r => r.castleLevel == 0).forEach(r => regions.delete(r));
+            if (!this.props.ingame.entireGame.isFeastForCrows) {
+                regions.keys.filter(r => r.castleLevel == 0).forEach(r => regions.delete(r));
+            } else {
+                regions.clear();
+            }
         } else if (filter == "with-power-tokens-only") {
             regions.keys.filter(r => r.controlPowerToken != this.house).forEach(r => regions.delete(r));
         } else if (filter == "with-loyalty-tokens-only") {
             regions.clear();
             // Todo: We could show the loyalty count as region text here
-            this.ingame.world.regions.values.filter(r => r.loyaltyTokens > 0).forEach(r => regions.set(r, undefined));
+            if (!this.props.ingame.entireGame.isFeastForCrows) {
+                this.ingame.world.regions.values.filter(r => r.loyaltyTokens > 0).forEach(r => regions.set(r, undefined));
+            }
         } else if (filter != "") { // This is the unit type
             regions.keys.forEach(r => {
                 if (r.units.values.filter(u => u.type.id == filter).length == 0) {
