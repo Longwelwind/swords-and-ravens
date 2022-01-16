@@ -3,6 +3,7 @@ import WesterosGameState from "../../westeros-game-state/WesterosGameState";
 import House from "../House";
 import * as _ from "lodash";
 import {port} from "../regionTypes";
+import BetterMap from "../../../../utils/BetterMap";
 
 export default class GameOfThronesWesterosCardType extends WesterosCardType {
     execute(westeros: WesterosGameState): void {
@@ -10,7 +11,7 @@ export default class GameOfThronesWesterosCardType extends WesterosCardType {
 
         // Make each player wins a power tokens for each region with crown icons,
         // plus one for each controlled port adjacent to a controlled or a free sea.
-        const gains = westeros.game.houses.values.filter(h => !westeros.ingame.isVassalHouse(h)).map<[House, number]>(house => ([
+        const gains = new BetterMap(westeros.game.houses.values.filter(h => !westeros.ingame.isVassalHouse(h)).map<[House, number]>(house => ([
                 house,
                 // Counter number of controlled crows
                 _.sum(world.getControlledRegions(house).map(r => r.crownIcons))
@@ -22,15 +23,16 @@ export default class GameOfThronesWesterosCardType extends WesterosCardType {
                         || world.getAdjacentSeaOfPort(r).getController() == house
                     ).length
             ])
-        ).filter(([_house, gain]) => gain > 0);
+        ).filter(([_house, gain]) => gain > 0));
 
-        gains.forEach(([house, gain]) => {
-            westeros.ingame.changePowerTokens(house, gain);
+        gains.entries.forEach(([house, gain]) => {
+            const delta = westeros.ingame.changePowerTokens(house, gain);
+            gains.set(house, delta);
         });
 
         westeros.ingame.log({
             type: "game-of-thrones-power-tokens-gained",
-            gains: gains.filter(([house, _gain]) => !westeros.ingame.isVassalHouse(house)).map(([house, gain]) => [house.id, gain])
+            gains: gains.entries.map(([house, gain]) => [house.id, gain])
         });
 
         westeros.onWesterosCardEnd();
