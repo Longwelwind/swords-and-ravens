@@ -65,22 +65,22 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                         {this.selectedMarchOrderRegion && this.plannedMoves.size > 0 && (
                             <Col xs={12} className="mt-2">
                                 <div>
-                                    Planned moves from <b>{this.selectedMarchOrderRegion.name}</b>:
-                                    <ul>
-                                        {this.plannedMoves.entries.map(([region, units]) => (
-                                            <li key={`planned-moves_${region.id}`} style={{listStyleType: "none"}}>
-                                                {units.map((unit, i) =>
-                                                    <UnitIconComponent key={`planned_units_${this.house.id}_${i}`}
+                                    <div style={{marginBottom: "20px"}}>Planned moves from <b>{this.selectedMarchOrderRegion.name}</b>:</div>
+                                    {this.plannedMoves.entries.map(([region, units]) => (
+                                        <div key={`planned-moves_${region.id}`} style={{marginLeft: "20px"}}>
+                                            {units.map((unit, i) =>
+                                                <div key={`planned_units_${this.house.id}_${i}`} style={{display: "inline"}}>
+                                                    <UnitIconComponent
                                                         house={this.house}
                                                         unitType={unit.type}
                                                         size="smedium"
                                                         makeGreyjoyUnitsBlack={true}
                                                         /* Moving units never can be wounded so we don't need to set it here */
                                                     />
-                                                )} =&gt; {region.name}
-                                            </li>
-                                        ))}
-                                    </ul>
+                                                </div>
+                                            )}<div style={{display: "inline", verticalAlign: "top"}}>&nbsp;=&gt;&nbsp;{region.name}</div>
+                                        </div>
+                                    ))}
                                 </div>
                             </Col>
                         )}
