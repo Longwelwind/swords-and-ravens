@@ -34,6 +34,7 @@ import BetterMap from "../utils/BetterMap";
 import { observable } from "mobx";
 import User from "../server/User";
 import ConditionalWrap from "./utils/ConditionalWrap";
+import { sea } from "../common/ingame-game-state/game-data-structure/regionTypes";
 
 interface HouseRowComponentProps {
     house: House;
@@ -361,9 +362,12 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
             <h4 style={{textAlign: "center"}}><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
             {this.ingame.entireGame.isFeastForCrows && <>
                 <br/>
-                <h5 style={{textAlign: "center"}}>Castles</h5>
-                <h4 style={{textAlign: "center"}}><b>{_.sum(this.ingame.game.getCountHeldStructures(house).values)}</b>
-                <br/><small>(Don&apos;t count in case of a tie)</small></h4>
+                <br/>
+                <h5 style={{textAlign: "center"}}>Additional Information<br/><small>&nbsp;&nbsp;(Does not count in case of a tie)&nbsp;&nbsp;</small></h5>
+                <br/>
+                <h5 style={{textAlign: "center"}}>Castles:&nbsp;<b>{this.ingame.world.regions.values.filter(r => r.castleLevel == 1 && r.getController() == house).length}</b></h5>
+                <h5 style={{textAlign: "center"}}>Strongholds:&nbsp;<b>{this.ingame.world.regions.values.filter(r => r.castleLevel == 2 && r.getController() == house).length}</b></h5>
+                <h5 style={{textAlign: "center"}}>Sea Areas:&nbsp;<b>{this.ingame.world.regions.values.filter(r => r.type == sea && r.getController() == house).length}</b></h5>
             </>}
         </Tooltip>;
     }
