@@ -771,11 +771,11 @@ export default class IngameGameState extends GameState<
             }
 
             if (forHouse?.id == "targaryen" && !this.isHouseDefeated(forHouse)) {
-                return {result: false, reason: "targaryen-must-be-a-player-controlled-house"}
+                return {result: false, reason: "only-possible-when-defeated"}
             }
 
-            if (this.entireGame.isFeastForCrows) {
-                return {result: false, reason: "game-variant-incompatible"}
+            if (this.entireGame.isFeastForCrows && !this.isHouseDefeated(forHouse)) {
+                return {result: false, reason: "only-possible-when-defeated"}
             }
         }
 
@@ -833,8 +833,9 @@ export default class IngameGameState extends GameState<
             return true;
         }
 
-        // A house is considered defeated when it has no castle areas and no units anymore
-        return this.world.getControlledRegions(house).filter(r => r.castleLevel > 0).length == 0 && this.world.getUnitsOfHouse(house).length == 0;
+        // A house is considered defeated when it has no castle areas and no land units anymore
+        return this.world.getControlledRegions(house).filter(r => r.castleLevel > 0).length == 0 &&
+            this.world.getUnitsOfHouse(house).filter(u => u.type.id != "ship").length == 0;
     }
 
     launchReplacePlayerVote(player: Player): void {

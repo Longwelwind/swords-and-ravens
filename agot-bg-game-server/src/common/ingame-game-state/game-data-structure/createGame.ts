@@ -156,7 +156,17 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         which hopefully solves the issues (#792 #796).
      */
 
-     // Overwrite house cards
+    // Overwrite house cards
+    if (entireGame.isFeastForCrows) {
+        const ffcHouseCards = new BetterMap(Object.entries(baseGameData.ffcHouseCards as {[key: string]: HouseCardContainer}));
+        ffcHouseCards.keys.forEach(hid => {
+            // Arryn must be part of baseGameHousesToCreate in Feast for Crows, so no need for a filter here!
+            const newHouseData = baseGameHousesToCreate.get(hid);
+            newHouseData.houseCards = ffcHouseCards.get(hid).houseCards;
+            baseGameHousesToCreate.set(hid, newHouseData);
+        });
+    }
+
     if (gameSettings.adwdHouseCards) {
         const adwdHouseCards = baseGameData.adwdHouseCards as {[key: string]: HouseCardContainer};
         const ffcHouseCards = baseGameData.ffcHouseCards as {[key: string]: HouseCardContainer};
@@ -166,16 +176,9 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             .filter(([hid, _]) => housesToCreate.includes(hid)));
 
         newHouseCards.keys.forEach(hid => {
-           const newHouseData = baseGameHousesToCreate.get(hid);
-           newHouseData.houseCards = newHouseCards.get(hid).houseCards;
-           baseGameHousesToCreate.set(hid, newHouseData);
-        });
-    } else if (entireGame.isFeastForCrows) {
-        const ffcHouseCards = new BetterMap(Object.entries(baseGameData.ffcHouseCards as {[key: string]: HouseCardContainer}));
-        ffcHouseCards.keys.forEach(hid => {
-           const newHouseData = baseGameHousesToCreate.get(hid);
-           newHouseData.houseCards = ffcHouseCards.get(hid).houseCards;
-           baseGameHousesToCreate.set(hid, newHouseData);
+            const newHouseData = baseGameHousesToCreate.get(hid);
+            newHouseData.houseCards = newHouseCards.get(hid).houseCards;
+            baseGameHousesToCreate.set(hid, newHouseData);
         });
     }
 

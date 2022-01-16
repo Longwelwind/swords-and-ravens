@@ -132,12 +132,10 @@ export default class UserLabel extends Component<UserLabelProps> {
                                             "Only players can vote"
                                         : canLaunchReplacePlayerByVassalVoteReason == "min-player-count-reached" ?
                                             "Minimum player count reached"
-                                        : canLaunchReplacePlayerByVassalVoteReason == "targaryen-must-be-a-player-controlled-house" ?
-                                            "Targaryen cannot be replaced by a vassal"
+                                        : canLaunchReplacePlayerByVassalVoteReason == "only-possible-when-defeated" ?
+                                            "Vassal replacement is allowed only when the house is considered defeated"
                                         : canLaunchReplacePlayerByVassalVoteReason == "ongoing-house-card-drafting" ?
                                             "During drafting houses cannot be replaced by vassals"
-                                        : canLaunchReplacePlayerByVassalVoteReason == "game-variant-incompatible" ?
-                                            "Vassals are not compatible with the current game variant"
                                         : "Vote not possible"
                                     }
                                 </Tooltip>

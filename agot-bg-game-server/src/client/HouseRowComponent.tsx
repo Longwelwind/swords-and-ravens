@@ -181,9 +181,9 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         </Row>
                     </Col>
                     {!this.isVassal && (<OverlayTrigger
-                        overlay={this.renderTotalLandRegionsTooltip(this.house)}
+                        overlay={this.renderVictoryConditionsTooltip(this.house)}
                         delay={{ show: 250, hide: 100 }}
-                        placement="top"
+                        placement="auto"
                     >
                         <Col xs="auto" className="d-flex align-items-center"
                             onMouseEnter={() => this.setHighlightedRegions(this.house.id == "targaryen" ? "with-loyalty-tokens-only" : "with-castles-only")}
@@ -355,9 +355,16 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         </Tooltip>;
     }
 
-    private renderTotalLandRegionsTooltip(house: House): OverlayChildren {
-        return <Tooltip id={house.id + "-total-land-regions"}>
-            <h5>Total Land Areas</h5><br/><h4 style={{textAlign: "center"}}><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
+    private renderVictoryConditionsTooltip(house: House): OverlayChildren {
+        return <Tooltip id={house.id + "-victory-tooltip"} className="westeros-tooltip">
+            <h5 style={{textAlign: "center"}}>&nbsp;&nbsp;Total&nbsp;Land&nbsp;Areas&nbsp;&nbsp;</h5>
+            <h4 style={{textAlign: "center"}}><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
+            {this.ingame.entireGame.isFeastForCrows && <>
+                <br/>
+                <h5 style={{textAlign: "center"}}>Castles</h5>
+                <h4 style={{textAlign: "center"}}><b>{_.sum(this.ingame.game.getCountHeldStructures(house).values)}</b>
+                <br/><small>(Don&apos;t count in case of a tie)</small></h4>
+            </>}
         </Tooltip>;
     }
 
