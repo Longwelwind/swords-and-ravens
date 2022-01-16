@@ -665,7 +665,7 @@
           },
           "westerosCards": [
             [{
-              "type": "mustering",
+              "type": "mustering-affc",
               "quantity": 1
             }],
             null,

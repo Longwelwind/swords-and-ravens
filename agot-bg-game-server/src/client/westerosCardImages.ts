@@ -26,6 +26,7 @@ import strongholdsOfResistance from "../../public/images/westeros-cards/4/Strong
 import theLongPlan from "../../public/images/westeros-cards/4/TheLongPlan.png";
 import wateringTheSeed from "../../public/images/westeros-cards/4/WateringTheSeed.png";
 import wordSpreadsQuickly from "../../public/images/westeros-cards/4/WordSpreadsQuickly.png";
+import musteringAffc from "../../public/images/westeros-cards/affc/MusteringAFFC.png";
 
 const westerosCardImages = new BetterMap([
     [0, new BetterMap([
@@ -34,6 +35,7 @@ const westerosCardImages = new BetterMap([
         ["winter-is-coming", winterIsComing],
         ["a-throne-of-blades", throneOfBlades],
         ["supply", supply],
+        ["mustering-affc", musteringAffc]
     ])],
     [1, new BetterMap([
         ["game-of-thrones", gameOfThrones],

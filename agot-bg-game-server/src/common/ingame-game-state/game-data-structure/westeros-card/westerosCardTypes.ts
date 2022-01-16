@@ -25,6 +25,7 @@ import StrongholdsOfResistanceWesterosCardType from "./StrongholdsOfResistanceWe
 import TheLongPlanWesterosCardType from "./TheLongPlanWesterosCardType";
 import WateringTheSeedWesterosCardType from "./WateringTheSeedWesterosCardType";
 import WordSpreadsQuicklyWesterosCardType from "./WordSpreadsQuicklyWesterosCardType";
+import AFeastForCrowsMusteringWesterosCardType from "./AFeastForCrowsMusteringWesterosCardType";
 
 export const lastDaysOfSummer = new LastDaysOfSummerWesterosCardType("last-days-of-summer", "Last\xa0Days\xa0of\xa0Summer", "Nothing happens.", "Nothing\xa0happens", 2);
 export const winterIsComing = new WinterIsComingWesterosCardType("winter-is-coming", "Winter\xa0is\xa0Coming", "Immediately shuffle this deck. Then draw and resolve a new card.", "Reshuffle\xa0deck");
@@ -33,6 +34,8 @@ export const supply = new SupplyWesterosCardType("supply", "Supply", "Adjust\xa0
 export const gameOfThrones = new GameOfThronesWesterosCardType("game-of-thrones", "Game\xa0of\xa0Thrones", "Each house gains Power\xa0tokens for each controlled crown icons and ports.", "Gain\xa0PT");
 export const mustering = new MusteringWesterosCardType("mustering", "Mustering", "Recruit new units in strongholds and castles.", "");
 export const aThroneOfBlades = new AThroneOfBladesWesterosCardType("a-throne-of-blades", "A\xa0Throne\xa0of\xa0Blades", "The holder of the Iron Throne token chooses whether a) everyone updates their Supply then reconciles armies b) everyone muster units, or c) this card has no effect.", "IT\xa0decides", 2);
+
+export const aFeastForCrowsMustering = new AFeastForCrowsMusteringWesterosCardType("mustering-affc", "Mustering", "Recruit new units in strongholds and castles.", "", 2);
 
 export const clashOfKings = new ClashOfKingsWesterosCardType("clash-of-kings", "Clash\xa0of\xa0Kings", "Bid on the three Influence tracks.", "Bid\xa0for\xa0tracks");
 export const darkWingsDarkWords = new DarkWingDarkWordsWesterosCardType("dark-wings-dark-words", "Dark\xa0Wings,\xa0Dark\xa0Words", "The holder of the Messenger Raven token chooses whether a) everyone bids on the  three Influence tracks b) everyone collects one Power\xa0token for every power icon present in areas they control, or c) this card has no effect.", "Raven\xa0decides", 2);
@@ -63,6 +66,7 @@ export const westerosCardTypes = new BetterMap<string, WesterosCardType>([
     [gameOfThrones.id, gameOfThrones],
     [mustering.id, mustering],
     [aThroneOfBlades.id, aThroneOfBlades],
+    [aFeastForCrowsMustering.id, aFeastForCrowsMustering],
     [clashOfKings.id, clashOfKings],
     [darkWingsDarkWords.id, darkWingsDarkWords],
     [feastForCrows.id, feastForCrows],
