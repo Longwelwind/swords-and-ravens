@@ -1316,6 +1316,11 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                     h.completedObjectives = 0;
                 });
                 ingame.game.world.regions.forEach((r) => r.overwrittenSuperControlPowerToken = null);
+
+                if (ingame.childGameState.type == "westeros" && ingame.childGameState.childGameState.type == "mustering") {
+                    const mustering = ingame.childGameState.childGameState;
+                    mustering.musteringType = 0;
+                }
             }
 
             return serializedGame;

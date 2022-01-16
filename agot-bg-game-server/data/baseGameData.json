@@ -667,6 +667,10 @@
             [{
               "type": "mustering-affc",
               "quantity": 1
+            },
+            {
+              "type": "rally-the-men",
+              "quantity": 2
             }],
             null,
             null

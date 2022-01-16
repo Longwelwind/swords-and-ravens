@@ -21,11 +21,12 @@ export default class DarkWingsDarkWordsGameState extends GameState<WesterosGameS
 
     firstStart(): void {
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(this.game.ravenHolder,
-            "The holder of the Raven Token can choose between CoK, GoT or None.",
+            "The holder of the Messenger Raven token can choose between \nClash of Kings, \n" +
+            "Game of Thrones, \nor nothing at all.",
             [
-                "Clash of Kings (Players bid for each Influence track)",
-                "Game of Thrones (Players gain Power tokens for controlled Crown icons and ports with ships)",
-                "None"
+                "Clash of Kings",
+                "Game of Thrones",
+                "Nothing"
             ]
         );
     }

@@ -17,7 +17,6 @@ import {ServerMessage} from "../../../../../messages/ServerMessage";
 import RegionKind from "../../../game-data-structure/RegionKind";
 import IngameGameState from "../../../IngameGameState";
 import User from "../../../../../server/User";
-import { observable } from "mobx";
 
 type MusteringRule = (Mustering & {cost: number});
 
@@ -27,7 +26,8 @@ export enum PlayerMusteringType {
     MUSTERING_WESTEROS_CARD = 0,
     STARRED_CONSOLIDATE_POWER = 1,
     THE_HORDE_DESCENDS_WILDLING_CARD = 2,
-    DEFENSE_MUSTER_ORDER = 3
+    DEFENSE_MUSTER_ORDER = 3,
+    RALLY_THE_MEN_WESTEROS_CARD = 4
 }
 
 interface ParentGameState extends GameState<any, any> {
@@ -43,7 +43,7 @@ interface ParentGameState extends GameState<any, any> {
  */
 export default class PlayerMusteringGameState extends GameState<ParentGameState> {
     house: House;
-    @observable type: PlayerMusteringType;
+    type: PlayerMusteringType;
 
     get game(): Game {
         return this.parentGameState.game;
@@ -72,15 +72,18 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
     get regions(): Region[] {
         switch (this.type) {
             case PlayerMusteringType.MUSTERING_WESTEROS_CARD:
-            case PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD:
+            case PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD: {
                 const regionsWithCastles = this.ingame.world.getControlledRegions(this.house).filter(r => r.castleLevel > 0);
                 return this.ingame.isVassalHouse(this.house) ? regionsWithCastles.filter(r => r.superControlPowerToken == this.house) : regionsWithCastles;
+            }
             case PlayerMusteringType.DEFENSE_MUSTER_ORDER:
                 return this.resolveConsolidatePowerGameState.actionGameState.getRegionsWithDefenseMusterOrderOfHouse(this.house).map(([r, _ot]) => r);
             case PlayerMusteringType.STARRED_CONSOLIDATE_POWER:
                 return this.resolveConsolidatePowerGameState.actionGameState.getRegionsWithConsolidatePowerOrderOfHouse(this.house).filter(([_r, ot]) => ot.starred).map(([r, _ot]) => r);
-            default:
-                throw new Error();
+            case PlayerMusteringType.RALLY_THE_MEN_WESTEROS_CARD: {
+                const regionsWithCastles = this.ingame.world.getControlledRegions(this.house).filter(r => r.castleLevel == 1);
+                return this.ingame.isVassalHouse(this.house) ? regionsWithCastles.filter(r => r.superControlPowerToken == this.house) : regionsWithCastles;
+            }
         }
     }
 
@@ -131,8 +134,10 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 })
             );
 
-            if (this.type != PlayerMusteringType.MUSTERING_WESTEROS_CARD) {
-                // If the mustering is from a Special Consolidate Power Order, "The hord descends" or the Defense/Muster Order
+            if (this.type == PlayerMusteringType.DEFENSE_MUSTER_ORDER ||
+                this.type == PlayerMusteringType.STARRED_CONSOLIDATE_POWER ||
+                this.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD) {
+                // If the mustering is from a Special Consolidate Power Order, a Defense/Muster Order or "The horde descends"
                 // there can only be mustering from one region
                 if (musterings.size > 1) {
                     return;
@@ -140,7 +145,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
             }
 
             // A vassal can only muster to their home town
-            if (this.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD && this.ingame.isVassalHouse(this.house)) {
+            if ((this.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD || this.type == PlayerMusteringType.RALLY_THE_MEN_WESTEROS_CARD) && this.ingame.isVassalHouse(this.house)) {
                 if (musterings.keys.some(r => r.superControlPowerToken != this.house)) {
                     return;
                 }
@@ -154,6 +159,17 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 // Check that the originating region is controlled by the house
                 if (this.ingame.getControllerOfHouse(originatingRegion.getController() as House) != player) {
                     return;
+                }
+
+                // Check that the mustering was originated by a castle
+                if (this.type == PlayerMusteringType.RALLY_THE_MEN_WESTEROS_CARD) {
+                    if (originatingRegion.castleLevel != 1) {
+                        return;
+                    }
+                } else {
+                    if (originatingRegion.castleLevel <= 0) {
+                        return;
+                    }
                 }
 
                 // A unit has not been twiced used for transformation
@@ -243,6 +259,10 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
     }
 
     getValidMusteringRules(originatingRegion: Region, musterings: BetterMap<Region, Mustering[]>): {region: Region; rules: MusteringRule[]}[] {
+        if (originatingRegion.castleLevel <= 0) {
+            return [];
+        }
+
         const possibleRecruitementRegions = [originatingRegion]
             .concat(this.game.world.getNeighbouringRegions(originatingRegion)
                 .filter(r => r.type.kind == RegionKind.SEA)
@@ -336,6 +356,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
             case PlayerMusteringType.MUSTERING_WESTEROS_CARD:
             case PlayerMusteringType.STARRED_CONSOLIDATE_POWER:
             case PlayerMusteringType.DEFENSE_MUSTER_ORDER:
+            case PlayerMusteringType.RALLY_THE_MEN_WESTEROS_CARD:
                 // Return true if there is any valid mustering rule for any unused region
                 return _.flatMap(this.regions.map(c => this.getValidMusteringRulesForRegion(c, musterings))).length > 0;
             case PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD:

@@ -18,7 +18,7 @@ interface ParentGameState extends GameState<any, any> {
 }
 
 export default class MusteringGameState extends GameState<ParentGameState, PlayerMusteringGameState> {
-
+    musteringType: PlayerMusteringType;
     get game(): Game {
         return this.parentGameState.game;
     }
@@ -27,7 +27,8 @@ export default class MusteringGameState extends GameState<ParentGameState, Playe
         return this.parentGameState.ingame;
     }
 
-    firstStart(): void {
+    firstStart(onlyAtCastles = false): void {
+        this.musteringType = onlyAtCastles ? PlayerMusteringType.RALLY_THE_MEN_WESTEROS_CARD : PlayerMusteringType.MUSTERING_WESTEROS_CARD;
         this.proceedNextHouse();
     }
 
@@ -53,13 +54,14 @@ export default class MusteringGameState extends GameState<ParentGameState, Playe
 
         this.setChildGameState(new PlayerMusteringGameState(this)).firstStart(
             nextHouse,
-            PlayerMusteringType.MUSTERING_WESTEROS_CARD
+            this.musteringType
         );
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedMusteringGameState {
         return {
             type: "mustering",
+            musteringType: this.musteringType,
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -67,6 +69,7 @@ export default class MusteringGameState extends GameState<ParentGameState, Playe
     static deserializeFromServer(parent: ParentGameState, data: SerializedMusteringGameState): MusteringGameState {
         const mustering = new MusteringGameState(parent);
 
+        mustering.musteringType = data.musteringType;
         mustering.childGameState = mustering.deserializeChildGameState(data.childGameState);
 
         return mustering;
@@ -79,5 +82,6 @@ export default class MusteringGameState extends GameState<ParentGameState, Playe
 
 export interface SerializedMusteringGameState {
     type: "mustering";
+    musteringType: PlayerMusteringType;
     childGameState: SerializedPlayerMusteringGameState;
 }
