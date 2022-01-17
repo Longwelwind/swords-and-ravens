@@ -60,7 +60,7 @@ export default class DraftInfluencePositionsGameState extends GameState<IngameGa
                 this.ingame.setInfluenceTrack(i, newInfluenceTrack);
             }
 
-            this.ingame.beginNewTurn();
+            this.ingame.onDraftingFinish();
             return;
         }
 

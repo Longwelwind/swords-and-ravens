@@ -4,6 +4,9 @@ import BetterMap from "../../../utils/BetterMap";
 import UnitType from "./UnitType";
 import unitTypes from "./unitTypes";
 import Game from "./Game";
+import { ObjectiveCard } from "./static-data-structure/ObjectiveCard";
+import Player from "../Player";
+import { objectiveCards } from "./static-data-structure/ObjectiveCards";
 
 export default class House {
     id: string;
@@ -17,10 +20,12 @@ export default class House {
     @observable knowsNextWildlingCard: boolean;
     @observable gainedLoyaltyTokens: number;
     @observable hasBeenReplacedByVassal: boolean;
-    @observable completedObjectives: number;
+    @observable secretObjectives: ObjectiveCard[];
+    @observable completedObjectives: ObjectiveCard[];
+    @observable victoryPoints: number;
 
     constructor(id: string, name: string, color: string, houseCards: BetterMap<string, HouseCard>, unitLimits: BetterMap<UnitType, number>,
-        powerTokens: number, maxPowerTokens: number, supplyLevel: number, gainedLoyaltyTokens: number, hasBeenReplacedByVassal: boolean, completedObjectives: number) {
+        powerTokens: number, maxPowerTokens: number, supplyLevel: number, gainedLoyaltyTokens = 0, hasBeenReplacedByVassal = false, victoryPoints = 0) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -32,10 +37,12 @@ export default class House {
         this.gainedLoyaltyTokens = gainedLoyaltyTokens;
         this.hasBeenReplacedByVassal = hasBeenReplacedByVassal;
         this.maxPowerTokens = maxPowerTokens;
-        this.completedObjectives = completedObjectives;
+        this.victoryPoints = victoryPoints;
+        this.secretObjectives = [];
+        this.completedObjectives = [];
     }
 
-    serializeToClient(admin: boolean, isVassalHouse: boolean): SerializedHouse {
+    serializeToClient(admin: boolean, player: Player | null, isVassalHouse: boolean): SerializedHouse {
         return {
             id: this.id,
             name: this.name,
@@ -48,7 +55,9 @@ export default class House {
             supplyLevel: this.supplyLevel,
             gainedLoyaltyTokens: this.gainedLoyaltyTokens,
             hasBeenReplacedByVassal: this.hasBeenReplacedByVassal,
-            completedObjectives: this.completedObjectives
+            victoryPoints: this.victoryPoints,
+            completedObjectives: this.completedObjectives.map(oc => oc.id),
+            secretObjectives: (admin || player?.house == this) ? this.secretObjectives.map(oc => oc.id) : []
         };
     }
 
@@ -68,10 +77,12 @@ export default class House {
             data.supplyLevel,
             data.gainedLoyaltyTokens,
             data.hasBeenReplacedByVassal,
-            data.completedObjectives
+            data.victoryPoints
         );
 
         house.knowsNextWildlingCard = data.knowsNextWildlingCard;
+        house.completedObjectives = data.completedObjectives.map(ocid => objectiveCards.get(ocid));
+        house.secretObjectives = data.secretObjectives.map(ocid => objectiveCards.get(ocid));
         return house;
     }
 }
@@ -88,5 +99,7 @@ export interface SerializedHouse {
     supplyLevel: number;
     gainedLoyaltyTokens: number;
     hasBeenReplacedByVassal: boolean;
-    completedObjectives: number;
+    secretObjectives: string[];
+    completedObjectives: string[];
+    victoryPoints: number;
 }

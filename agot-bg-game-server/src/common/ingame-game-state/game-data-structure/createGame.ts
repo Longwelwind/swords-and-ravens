@@ -227,7 +227,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
 
             const maxPowerTokens = maxPowerTokensPerHouse.has(hid) ? maxPowerTokensPerHouse.get(hid) : baseGameData.maxPowerTokens;
 
-            const house = new House(hid, houseData.name, houseData.color, houseCards, unitLimits, gameSettings.startWithSevenPowerTokens ? 7 : 5, maxPowerTokens, supplyLevel, 0, false, 0);
+            const house = new House(hid, houseData.name, houseData.color, houseCards, unitLimits, gameSettings.startWithSevenPowerTokens ? 7 : 5, maxPowerTokens, supplyLevel);
 
             return [hid, house];
         })

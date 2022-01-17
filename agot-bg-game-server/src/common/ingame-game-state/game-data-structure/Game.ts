@@ -18,6 +18,9 @@ import WesterosCardType from "./westeros-card/WesterosCardType";
 import IngameGameState from "../IngameGameState";
 import { vassalHousesOrders, playerHousesOrders, seaOrders } from "./orders";
 import IronBank, { SerializedIronBank } from "./IronBank";
+import Player from "../Player";
+import { ObjectiveCard } from "./static-data-structure/ObjectiveCard";
+import { objectiveCards } from "./static-data-structure/ObjectiveCards";
 
 export const MAX_WILDLING_STRENGTH = 12;
 export const MAX_LOYALTY_TOKEN_COUNT = 20;
@@ -51,6 +54,7 @@ export default class Game {
     oldPlayerHouseCards: BetterMap<House, BetterMap<string, HouseCard>> = new BetterMap();
     @observable removedDragonStrengthToken = 0;
     ironBank: IronBank | null;
+    @observable objectiveDeck: ObjectiveCard[] = [];
 
     /**
      * Contains the vassal relations of the game.
@@ -421,7 +425,7 @@ export default class Game {
             : _.sum(this.getCountHeldStructures(house).values);
         }
 
-        return house.completedObjectives;
+        return house.victoryPoints;
     }
 
     getTotalLoyaltyTokenCount(house: House): number {
@@ -473,10 +477,10 @@ export default class Game {
         return this.starredOrderRestrictions[place];
     }
 
-    serializeToClient(admin: boolean, knowsNextWildlingCard: boolean): SerializedGame {
+    serializeToClient(admin: boolean, player: Player | null): SerializedGame {
         return {
             lastUnitId: this.lastUnitId,
-            houses: this.houses.values.map(h => h.serializeToClient(admin, this.ingame.isVassalHouse(h))),
+            houses: this.houses.values.map(h => h.serializeToClient(admin, player, this.ingame.isVassalHouse(h))),
             world: this.world.serializeToClient(),
             turn: this.turn,
             ironThroneTrack: this.ironThroneTrack.map(h => h.id),
@@ -500,7 +504,7 @@ export default class Game {
             starredOrderRestrictions: this.starredOrderRestrictions,
             structuresCountNeededToWin: this.structuresCountNeededToWin,
             maxTurns: this.maxTurns,
-            clientNextWildlingCardId: (admin || knowsNextWildlingCard) ? this.wildlingDeck[0].id : null,
+            clientNextWildlingCardId: (admin || player?.house.knowsNextWildlingCard) ? this.wildlingDeck[0].id : null,
             revealedWesterosCards: this.revealedWesterosCards,
             vassalRelations: this.vassalRelations.map((key, value) => [key.id, value.id]),
             vassalHouseCards: this.vassalHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
@@ -508,7 +512,8 @@ export default class Game {
             deletedHouseCards: this.deletedHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
             oldPlayerHouseCards: this.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])]),
             removedDragonStrengthToken: this.removedDragonStrengthToken,
-            ironBank: this.ironBank ? this.ironBank.serializeToClient(admin) : null
+            ironBank: this.ironBank ? this.ironBank.serializeToClient(admin) : null,
+            objectiveDeck: admin ? this.objectiveDeck.map(oc => oc.id) : []
         };
     }
 
@@ -541,6 +546,7 @@ export default class Game {
         ));
         game.removedDragonStrengthToken = data.removedDragonStrengthToken;
         game.ironBank = data.ironBank ? IronBank.deserializeFromServer(game, data.ironBank) : null;
+        game.objectiveDeck = data.objectiveDeck.map(ocid => objectiveCards.get(ocid));
 
         return game;
     }
@@ -571,4 +577,5 @@ export interface SerializedGame {
     oldPlayerHouseCards: [string, [string, SerializedHouseCard][]][];
     removedDragonStrengthToken: number;
     ironBank: SerializedIronBank | null;
+    objectiveDeck: string[];
 }

@@ -38,6 +38,8 @@ import shuffleInPlace from "../../utils/shuffleInPlace";
 import popRandom from "../../utils/popRandom";
 import LoanCard from "./game-data-structure/loan-card/LoanCard";
 import PayDebtsGameState, { SerializedPayDebtsGameState } from "./pay-debts-game-state/PayDebtsGameState";
+import getShuffledObjectivesDeck, { objectiveCards } from "./game-data-structure/static-data-structure/ObjectiveCards";
+import { ObjectiveCard } from "./game-data-structure/static-data-structure/ObjectiveCard";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -79,9 +81,24 @@ export default class IngameGameState extends GameState<
 
         if (this.entireGame.gameSettings.draftHouseCards) {
             this.beginDraftingHouseCards();
+        } else if (this.entireGame.isFeastForCrows) {
+            this.chooseObjectives();
         } else {
             this.beginNewTurn();
         }
+    }
+
+    chooseObjectives(): void {
+        // todo: We have to create a new state here to choose 3 of 5 objectives. For now we just assign 5 objectives to each house
+        this.game.objectiveDeck = getShuffledObjectivesDeck();
+
+        this.game.houses.values.forEach(h => {
+            for (let i = 0; i < 5; i ++) {
+                h.secretObjectives.push(popRandom(this.game.objectiveDeck) as ObjectiveCard);
+            }
+        });
+
+        this.beginNewTurn();
     }
 
     beginDraftingHouseCards(): void {
@@ -106,7 +123,7 @@ export default class IngameGameState extends GameState<
             this.setInfluenceTrack(1, this.getRandomTrackOrder());
             this.setInfluenceTrack(2, this.getRandomTrackOrder());
 
-            this.beginNewTurn();
+            this.onDraftingFinish();
         } else {
             this.setChildGameState(new DraftHouseCardsGameState(this)).firstStart();
         }
@@ -154,6 +171,14 @@ export default class IngameGameState extends GameState<
 
     log(data: GameLogData, resolvedAutomatically = false): void {
         this.gameLogManager.log(data, resolvedAutomatically);
+    }
+
+    onDraftingFinish(): void {
+        if (this.entireGame.isFeastForCrows) {
+            this.chooseObjectives();
+        } else {
+            this.beginNewTurn();
+        }
     }
 
     onActionGameStateFinish(): void {
@@ -665,6 +690,16 @@ export default class IngameGameState extends GameState<
             if (message.crownModifier) {
                 region.crownModifier = message.crownModifier;
             }
+        } else if (message.type == "update-completed-objectives") {
+            message.objectives.forEach(([hid, objectives]) => {
+                this.game.houses.get(hid).completedObjectives = objectives.map(ocid => objectiveCards.get(ocid));
+            });
+
+            message.victoryPointCount.forEach(([hid, vpc]) => {
+                this.game.houses.get(hid).victoryPoints = vpc;
+            });
+        } else if (message.type == "update-secret-objectives") {
+            this.game.houses.get(message.house).secretObjectives = message.objectives.map(ocid => objectiveCards.get(ocid));
         } else {
             this.childGameState.onServerMessage(message);
         }
@@ -924,6 +959,22 @@ export default class IngameGameState extends GameState<
         return this.game.getTurnOrder().filter(h => !this.isVassalHouse(h));
     }
 
+    broadcastObjectives(): void {
+        this.entireGame.broadcastToClients({
+            type: "update-completed-objectives",
+            objectives: this.game.houses.values.map(h => [h.id, h.completedObjectives.map(oc => oc.id)] as [string, string[]]),
+            victoryPointCount: this.game.houses.values.map(h => [h.id, h.victoryPoints])
+        });
+
+        this.players.values.forEach(p => {
+            this.entireGame.sendMessageToClients([p.user], {
+                type: "update-secret-objectives",
+                house: p.house.id,
+                objectives: p.house.secretObjectives.map(oc => oc.id)
+            });
+        });
+    }
+
     broadcastVassalRelations(): void {
         this.entireGame.broadcastToClients({
             type: "vassal-relations",
@@ -991,7 +1042,7 @@ export default class IngameGameState extends GameState<
         return {
             type: "ingame",
             players: this.players.values.map(p => p.serializeToClient(admin, player)),
-            game: this.game.serializeToClient(admin, player != null && player.house.knowsNextWildlingCard),
+            game: this.game.serializeToClient(admin, player),
             gameLogManager: this.gameLogManager.serializeToClient(),
             votes: this.votes.values.map(v => v.serializeToClient(admin, player)),
             childGameState: this.childGameState.serializeToClient(admin, player)

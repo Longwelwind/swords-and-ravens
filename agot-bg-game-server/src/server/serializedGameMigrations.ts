@@ -1313,8 +1313,13 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
                 ingame.game.houses.forEach((h) => {
                     h.maxPowerTokens = 20;
-                    h.completedObjectives = 0;
+                    h.victoryPoints = 0;
+                    h.completedObjectives = [];
+                    h.secretObjectives = [];
                 });
+
+                ingame.game.objectiveDeck = [];
+
                 ingame.game.world.regions.forEach((r) => r.overwrittenSuperControlPowerToken = null);
 
                 if (ingame.childGameState.type == "westeros" && ingame.childGameState.childGameState.type == "mustering") {
