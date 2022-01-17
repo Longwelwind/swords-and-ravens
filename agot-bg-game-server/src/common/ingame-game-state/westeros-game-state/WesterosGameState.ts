@@ -21,10 +21,12 @@ import AThroneOfBladesGameState, {SerializedAThroneOfBladesGameState} from "./th
 import DarkWingsDarkWordsGameState, {SerializedDarkWingsDarkWordsGameState} from "./dark-wings-dark-words-game-state/DarkWingsDarkWordsGameState";
 import WesterosDeck4GameState, { SerializedWesterosDeck4GameState } from "./westeros-deck-4-game-state/WesterosDeck4GameState";
 import Region from "../game-data-structure/Region";
+import TheBurdenOfPowerGameState, { SerializedTheBurdenOfPowerGameState } from "./the-burden-of-power-game-state/TheBurdenOfPowerGameState";
 
 export default class WesterosGameState extends GameState<IngameGameState,
     WildlingsAttackGameState | ReconcileArmiesGameState<WesterosGameState> | MusteringGameState | ClashOfKingsGameState
     | PutToTheSwordGameState | AThroneOfBladesGameState | DarkWingsDarkWordsGameState | WesterosDeck4GameState
+    | TheBurdenOfPowerGameState
 > {
     revealedCards: WesterosCard[];
     @observable currentCardI = -1;
@@ -239,6 +241,8 @@ export default class WesterosGameState extends GameState<IngameGameState,
             return DarkWingsDarkWordsGameState.deserializeFromServer(this, data);
         } else if (data.type == "westeros-deck-4") {
             return WesterosDeck4GameState.deserializeFromServer(this, data);
+        } else if (data.type == "the-burden-of-power") {
+            return TheBurdenOfPowerGameState.deserializeFromServer(this, data);
         } else  {
             throw new Error();
         }
@@ -252,5 +256,6 @@ export interface SerializedWesterosGameState {
     planningRestrictions: string[];
     childGameState: SerializedWildlingsAttackGameState
         | SerializedReconcileArmiesGameState | SerializedMusteringGameState | SerializedClashOfKingsGameState
-        | SerializedPutToTheSwordGameState | SerializedAThroneOfBladesGameState | SerializedDarkWingsDarkWordsGameState | SerializedWesterosDeck4GameState;
+        | SerializedPutToTheSwordGameState | SerializedAThroneOfBladesGameState | SerializedDarkWingsDarkWordsGameState
+        | SerializedWesterosDeck4GameState | SerializedTheBurdenOfPowerGameState;
 }

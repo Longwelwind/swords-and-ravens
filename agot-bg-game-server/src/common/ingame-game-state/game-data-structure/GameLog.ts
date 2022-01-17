@@ -10,9 +10,11 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | WesterosCardExecuted | WesterosCardDrawn | CombatResult | WildlingCardRevealed | WildlingBidding
     | HighestBidderChosen | LowestBidderChosen | PlayerMustered | WinnerDeclared
     | RavenHolderWildlingCardPutBottom | RavenHolderWildlingCardPutTop | RavenHolderReplaceOrder | RavenNotUsed | RaidDone | DarkWingsDarkWordsChoice
-    | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan | ClaimVassalsBegan
+    | PutToTheSwordChoice | AThroneOfBladesChoice | TheBurdenOfPowerChoice
+    | WinterIsComing | WesterosPhaseBegan | ClaimVassalsBegan
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
-    | ActionPhaseBegan | ActionPhaseResolveRaidBegan | ActionPhaseResolveMarchBegan | ActionPhaseResolveConsolidatePowerBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingsAttack | MarchOrderRemoved
+    | ActionPhaseBegan | ActionPhaseResolveRaidBegan | ActionPhaseResolveMarchBegan | ActionPhaseResolveConsolidatePowerBegan | PlanningPhaseBegan
+    | WildlingStrengthTriggerWildlingsAttack | MarchOrderRemoved
     | ConsolidatePowerOrderResolved | ArmiesReconciled | EnemyPortTaken | ShipsDestroyedByEmptyCastle
     | HouseCardAbilityNotUsed | PatchfaceUsed | DoranUsed
     | TyrionLannisterHouseCardReplaced | TyrionLannisterChoiceMade
@@ -191,6 +193,12 @@ interface PutToTheSwordChoice {
 
 interface AThroneOfBladesChoice {
     type: "a-throne-of-blades-choice";
+    house: string;
+    choice: number;
+}
+
+interface TheBurdenOfPowerChoice {
+    type: "the-burden-of-power-choice";
     house: string;
     choice: number;
 }

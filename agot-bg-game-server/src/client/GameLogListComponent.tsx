@@ -451,6 +451,18 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>
                 );
             }
+            case "the-burden-of-power-choice": {
+                const house = this.game.houses.get(data.house);
+
+                return (
+                    <p>
+                        <b>{house.name}</b>, holder of the Iron Throne token, chose to
+                        {data.choice == 0 ? (
+                            <> reduce the Wildling track to the &ldquo;0&rdquo; position.</>
+                        ) : <> trigger a Mustering.</>}
+                    </p>
+                );
+            }
             case "dark-wings-dark-words-choice": {
                 const house = this.game.houses.get(data.house);
 
