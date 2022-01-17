@@ -1579,6 +1579,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         </b> card{data.westerosCardsCountForBottomOfDeck != 1 ? "s" : ""} to the bottom of the deck.
                 </p>;
             }
+            case "objectives-chosen": {
+                const house = this.game.houses.get(data.house);
+
+                return <p>
+                    House <b>{house.name}</b> has chosen their 3 objectives.
+                </p>;
+            }
         }
     }
 }

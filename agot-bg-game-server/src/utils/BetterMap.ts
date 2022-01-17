@@ -60,6 +60,12 @@ export default class BetterMap<K, V> {
         this._map.set(key, value);
     }
 
+    setRange(items: [K, V][]): void {
+        items.forEach(([key, value]) => {
+            this.set(key, value);
+        });
+    }
+
     replace(key: K, value: V): void {
         if (!this._map.has(key)) {
             throw new Error("Map doesn't have key \"" + key + "\"");

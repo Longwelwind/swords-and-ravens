@@ -38,8 +38,8 @@ import shuffleInPlace from "../../utils/shuffleInPlace";
 import popRandom from "../../utils/popRandom";
 import LoanCard from "./game-data-structure/loan-card/LoanCard";
 import PayDebtsGameState, { SerializedPayDebtsGameState } from "./pay-debts-game-state/PayDebtsGameState";
-import getShuffledObjectivesDeck, { objectiveCards } from "./game-data-structure/static-data-structure/ObjectiveCards";
-import { ObjectiveCard } from "./game-data-structure/static-data-structure/ObjectiveCard";
+import { objectiveCards } from "./game-data-structure/static-data-structure/ObjectiveCards";
+import ChooseInitialObjectivesGameState, { SerializedChooseInitialObjectivesGameState } from "./choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -47,6 +47,7 @@ export default class IngameGameState extends GameState<
     EntireGame,
     WesterosGameState | PlanningGameState | ActionGameState | CancelledGameState | GameEndedGameState
     | DraftHouseCardsGameState | ThematicDraftHouseCardsGameState | DraftInfluencePositionsGameState | PayDebtsGameState
+    | ChooseInitialObjectivesGameState
 > {
     players: BetterMap<User, Player> = new BetterMap<User, Player>();
     game: Game;
@@ -89,15 +90,10 @@ export default class IngameGameState extends GameState<
     }
 
     chooseObjectives(): void {
-        // todo: We have to create a new state here to choose 3 of 5 objectives. For now we just assign 5 objectives to each house
-        this.game.objectiveDeck = getShuffledObjectivesDeck();
+        this.setChildGameState(new ChooseInitialObjectivesGameState(this)).firstStart();
+    }
 
-        this.game.houses.values.forEach(h => {
-            for (let i = 0; i < 5; i ++) {
-                h.secretObjectives.push(popRandom(this.game.objectiveDeck) as ObjectiveCard);
-            }
-        });
-
+    onChooseInitialObjectivesGameStateEnd(): void {
         this.beginNewTurn();
     }
 
@@ -839,7 +835,7 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "already-playing"};
         }
 
-        if (_.some(this.players.values, p => p.house == forHouse)) {
+        if (this.players.values.some(p => p.house == forHouse)) {
             return {result: false, reason: "not-a-vassal"};
         }
 
@@ -1083,6 +1079,8 @@ export default class IngameGameState extends GameState<
                 return DraftInfluencePositionsGameState.deserializeFromServer(this, data);
             case "pay-debts":
                 return PayDebtsGameState.deserializeFromServer(this, data);
+            case "choose-initial-objectives":
+                return ChooseInitialObjectivesGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -1095,5 +1093,6 @@ export interface SerializedIngameGameState {
     gameLogManager: SerializedGameLogManager;
     childGameState: SerializedPlanningGameState | SerializedActionGameState | SerializedWesterosGameState
         | SerializedGameEndedGameState | SerializedCancelledGameState | SerializedDraftHouseCardsGameState
-        | SerializedThematicDraftHouseCardsGameState | SerializedDraftInfluencePositionsGameState | SerializedPayDebtsGameState;
+        | SerializedThematicDraftHouseCardsGameState | SerializedDraftInfluencePositionsGameState | SerializedPayDebtsGameState
+        | SerializedChooseInitialObjectivesGameState;
 }

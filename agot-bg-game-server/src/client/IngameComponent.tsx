@@ -91,6 +91,8 @@ import PayDebtsComponent from "./game-state-panel/PayDebtsComponent";
 import BetterMap from "../utils/BetterMap";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
 import PartialRecursive from "../utils/PartialRecursive";
+import ChooseInitialObjectivesGameState from "../common/ingame-game-state/choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
+import ChooseInitialObjectivesComponent from "./game-state-panel/ChooseInitialObjectivesComponent";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -555,7 +557,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         [[DraftInfluencePositionsGameState, DraftInfluencePositionsComponent]],
                                         [[GameEndedGameState, GameEndedComponent]],
                                         [[CancelledGameState, IngameCancelledComponent]],
-                                        [[PayDebtsGameState, PayDebtsComponent]]
+                                        [[PayDebtsGameState, PayDebtsComponent]],
+                                        [[ChooseInitialObjectivesGameState, ChooseInitialObjectivesComponent]]
                                     )
                                 )}
                             </ListGroup>
