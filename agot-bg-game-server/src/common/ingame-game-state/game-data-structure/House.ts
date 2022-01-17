@@ -4,9 +4,9 @@ import BetterMap from "../../../utils/BetterMap";
 import UnitType from "./UnitType";
 import unitTypes from "./unitTypes";
 import Game from "./Game";
-import { ObjectiveCard } from "./static-data-structure/ObjectiveCard";
+import { ObjectiveCard, SpecialObjectiveCard } from "./static-data-structure/ObjectiveCard";
 import Player from "../Player";
-import { objectiveCards } from "./static-data-structure/ObjectiveCards";
+import { objectiveCards, specialObjectiveCards } from "./static-data-structure/ObjectiveCards";
 
 export default class House {
     id: string;
@@ -20,6 +20,7 @@ export default class House {
     @observable knowsNextWildlingCard: boolean;
     @observable gainedLoyaltyTokens: number;
     @observable hasBeenReplacedByVassal: boolean;
+    specialObjective: SpecialObjectiveCard | null;
     @observable secretObjectives: ObjectiveCard[];
     @observable completedObjectives: ObjectiveCard[];
     @observable victoryPoints: number;
@@ -40,6 +41,7 @@ export default class House {
         this.victoryPoints = victoryPoints;
         this.secretObjectives = [];
         this.completedObjectives = [];
+        this.specialObjective = null;
     }
 
     serializeToClient(admin: boolean, player: Player | null, isVassalHouse: boolean): SerializedHouse {
@@ -55,6 +57,7 @@ export default class House {
             supplyLevel: this.supplyLevel,
             gainedLoyaltyTokens: this.gainedLoyaltyTokens,
             hasBeenReplacedByVassal: this.hasBeenReplacedByVassal,
+            specialObjective: this.specialObjective ? this.specialObjective.id : null,
             victoryPoints: this.victoryPoints,
             completedObjectives: this.completedObjectives.map(oc => oc.id),
             secretObjectives: (admin || player?.house == this) ? this.secretObjectives.map(oc => oc.id) : []
@@ -81,6 +84,7 @@ export default class House {
         );
 
         house.knowsNextWildlingCard = data.knowsNextWildlingCard;
+        house.specialObjective = data.specialObjective ? specialObjectiveCards.get(data.specialObjective) : null;
         house.completedObjectives = data.completedObjectives.map(ocid => objectiveCards.get(ocid));
         house.secretObjectives = data.secretObjectives.map(ocid => objectiveCards.get(ocid));
         return house;
@@ -99,6 +103,7 @@ export interface SerializedHouse {
     supplyLevel: number;
     gainedLoyaltyTokens: number;
     hasBeenReplacedByVassal: boolean;
+    specialObjective: string | null;
     secretObjectives: string[];
     completedObjectives: string[];
     victoryPoints: number;

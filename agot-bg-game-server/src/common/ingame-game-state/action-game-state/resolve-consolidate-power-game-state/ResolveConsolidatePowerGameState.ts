@@ -33,7 +33,7 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
     }
 
     get ingame(): IngameGameState {
-        return this.actionGameState.ingameGameState;
+        return this.actionGameState.ingame;
     }
 
     firstStart(): void {

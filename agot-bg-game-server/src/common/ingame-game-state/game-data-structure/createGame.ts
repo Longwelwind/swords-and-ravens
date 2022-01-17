@@ -19,6 +19,7 @@ import shuffleInPlace from "../../../utils/shuffleInPlace";
 import IronBank from "./IronBank";
 import loanCardTypes from "./loan-card/loanCardTypes";
 import LoanCard from "./loan-card/LoanCard";
+import { specialObjectiveCards } from "./static-data-structure/ObjectiveCards";
 
 interface HouseCardContainer {
     houseCards: {[key: string]: HouseCardData};
@@ -228,6 +229,14 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             const maxPowerTokens = maxPowerTokensPerHouse.has(hid) ? maxPowerTokensPerHouse.get(hid) : baseGameData.maxPowerTokens;
 
             const house = new House(hid, houseData.name, houseData.color, houseCards, unitLimits, gameSettings.startWithSevenPowerTokens ? 7 : 5, maxPowerTokens, supplyLevel);
+
+            if (entireGame.isFeastForCrows) {
+                const soc = specialObjectiveCards.values.find(soc => soc.houseId == house.id);
+                if (!soc) {
+                    throw new Error(`Special objective not found for house ${house.id}`);
+                }
+                house.specialObjective = soc;
+            }
 
             return [hid, house];
         })

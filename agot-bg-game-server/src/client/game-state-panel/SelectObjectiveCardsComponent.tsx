@@ -59,7 +59,7 @@ export default class SelectObjectiveCardsComponent extends Component<GameStateCo
                     </Row>
                 </Col>}
                 <Col xs={12} className="text-center">
-                    Waiting for {this.gameState.nonReadyHouses.map(h => h.name).join(", ")}
+                    Waiting for {this.gameState.notReadyHouses.map(h => h.name).join(", ")}
                 </Col>
             </>
         );
@@ -68,6 +68,12 @@ export default class SelectObjectiveCardsComponent extends Component<GameStateCo
     confirm(): void {
         if (!this.gameState.canBeSkipped && this.selectedObjectiveCards.length != this.gameState.count) {
             return;
+        }
+
+        if (this.gameState.canBeSkipped && this.choosableObjectives.length > 0 && this.selectedObjectiveCards.length == 0) {
+            if (!window.confirm("Are you sure you don't want to choose an Objective card?")) {
+                return;
+            }
         }
 
         this.props.gameState.select(this.selectedObjectiveCards);

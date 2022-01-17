@@ -79,8 +79,9 @@ export default class SavvyStewardGameState extends GameState<ExecuteLoanGameStat
     }
 
     deserializeChildGameState(data: SerializedSavvyStewardGameState["childGameState"]): SavvyStewardGameState["childGameState"] {
-        return SelectRegionGameState.deserializeFromServer(this, data);    }
+        return SelectRegionGameState.deserializeFromServer(this, data);
     }
+}
 
 export interface SerializedSavvyStewardGameState {
     type: "savvy-steward";

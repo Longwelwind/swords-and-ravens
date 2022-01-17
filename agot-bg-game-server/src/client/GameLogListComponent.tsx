@@ -34,6 +34,8 @@ import orderTypes from "../common/ingame-game-state/game-data-structure/order-ty
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFastForward } from "@fortawesome/free-solid-svg-icons";
 import LoanCardComponent from "./game-state-panel/utils/LoanCardComponent";
+import { objectiveCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/ObjectiveCards";
+import ObjectiveCardComponent from "./game-state-panel/utils/ObjectiveCardComponent";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -1585,6 +1587,37 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <p>
                     House <b>{house.name}</b> has chosen their 3 objectives.
                 </p>;
+            }
+            case "new-objective-card-drawn": {
+                const house = this.game.houses.get(data.house);
+
+                return <p>
+                    House <b>{house.name}</b> drew a new Objective card.
+                </p>;
+            }
+            case "special-objective-scored": {
+                const house = this.game.houses.get(data.house);
+
+                return <p>
+                    House <b>{house.name}</b> {data.scored ? "scored" : "did not score"} their Special Objective.
+                </p>;
+            }
+            case "objective-scored": {
+                const house = this.game.houses.get(data.house);
+                const objective = data.objective != null ? objectiveCards.get(data.objective) : null;
+
+                return objective != null ? <>
+                    <p>
+                        House <b>{house.name}</b> scored <b>{objective.name}</b> and awarded {data.victoryPoints} victory points.
+                    </p>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <ObjectiveCardComponent
+                            objectiveCard={objective}
+                            size="small"
+                        />
+                    </div>
+                </>
+                    : <>House <b>{house.name}</b> did not score an Objective card.</>
             }
         }
     }

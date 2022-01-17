@@ -1313,9 +1313,10 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
                 ingame.game.houses.forEach((h) => {
                     h.maxPowerTokens = 20;
-                    h.victoryPoints = 0;
-                    h.completedObjectives = [];
+                    h.specialObjective = null;
                     h.secretObjectives = [];
+                    h.completedObjectives = [];
+                    h.victoryPoints = 0;
                 });
 
                 ingame.game.objectiveDeck = [];

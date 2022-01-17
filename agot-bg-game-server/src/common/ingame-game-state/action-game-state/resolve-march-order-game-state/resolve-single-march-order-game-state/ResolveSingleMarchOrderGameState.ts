@@ -128,7 +128,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                 this.resolveMarchOrderGameState.moveUnits(startingRegion, units, region);
             });
 
-            this.actionGameState.ingameGameState.log({
+            this.actionGameState.ingame.log({
                 type: "march-resolved",
                 house: this.house.id,
                 startingRegion: startingRegion.id,
@@ -159,7 +159,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                 if (enemy) {
                     // Attack against an other house
 
-                    this.actionGameState.ingameGameState.log({
+                    this.actionGameState.ingame.log({
                         type: "attack",
                         attacker: this.house.id,
                         attacked: enemy.id,
@@ -179,7 +179,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                     region.garrison = 0;
                     this.resolveMarchOrderGameState.moveUnits(startingRegion, army, region);
 
-                    this.actionGameState.ingameGameState.log({
+                    this.actionGameState.ingame.log({
                         type: "attack",
                         attacker: this.house.id,
                         attacked: null,
@@ -197,7 +197,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             }
 
             if(moves.length == 0) {
-                this.actionGameState.ingameGameState.log({
+                this.actionGameState.ingame.log({
                     type: "march-order-removed",
                     house: this.house.id,
                     region: startingRegion.id
@@ -282,7 +282,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
     }
 
     getWaitedUsers(): User[] {
-        return [this.actionGameState.ingameGameState.getControllerOfHouse(this.house).user];
+        return [this.actionGameState.ingame.getControllerOfHouse(this.house).user];
     }
 
     /**

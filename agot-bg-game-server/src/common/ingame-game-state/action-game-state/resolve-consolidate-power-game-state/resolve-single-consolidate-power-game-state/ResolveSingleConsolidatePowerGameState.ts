@@ -34,7 +34,7 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
     }
 
     get ingame(): IngameGameState {
-        return this.actionGameState.ingameGameState;
+        return this.actionGameState.ingame;
     }
 
     get ironBank(): IronBank | null {

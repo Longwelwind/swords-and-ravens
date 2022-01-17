@@ -131,10 +131,6 @@ export default class Game {
         return (this.loyaltyTokensOnBoardCount + 1) <= MAX_LOYALTY_TOKEN_COUNT;
     }
 
-    constructor(ingame: IngameGameState) {
-        this.ingame = ingame;
-    }
-
     get nextWesterosCardTypes(): (WesterosCardType | null)[][] {
         const result: (WesterosCardType | null)[][] = [];
 
@@ -143,6 +139,14 @@ export default class Game {
         });
 
         return result;
+    }
+
+    get nonVassalHouses(): House[] {
+        return this.houses.values.filter(h => !this.ingame.isVassalHouse(h));
+    }
+
+    constructor(ingame: IngameGameState) {
+        this.ingame = ingame;
     }
 
     updateWildlingStrength(value: number): number {
@@ -475,6 +479,23 @@ export default class Game {
         }
 
         return this.starredOrderRestrictions[place];
+    }
+
+    updateSupplies(): void {
+        // Refresh the supply level of all houses
+        this.houses.values.forEach(h =>  {
+            h.supplyLevel = Math.min(this.supplyRestrictions.length - 1, this.getControlledSupplyIcons(h));
+        });
+
+        this.ingame.log({
+            type: "supply-adjusted",
+            supplies: this.houses.values.map(h => [h.id, h.supplyLevel])
+        });
+
+        this.ingame.entireGame.broadcastToClients({
+            type: "supply-adjusted",
+            supplies: this.houses.values.map(h => [h.id, h.supplyLevel])
+        });
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedGame {

@@ -31,7 +31,7 @@ export default class ObjectivesInfoComponent extends Component<ObjectivesInfoCom
 
     render(): ReactNode {
         const allCompletedObjectives = _.flatMap(this.game.houses.values, h => h.completedObjectives);
-        const playersSecretObjectives = this.authenticatedPlayer ? _.sortBy(this.authenticatedPlayer.house.secretObjectives, oc => oc.name) : [];
+        const playersSecretObjectives = this.authenticatedPlayer ? this.authenticatedPlayer.house.secretObjectives : [];
         const allAvailableObjectives = _.sortBy(_.without(objectiveCards.values, ...allCompletedObjectives, ...playersSecretObjectives), oc => oc.name);
         return <Col xs={12} className="h-100">
             {playersSecretObjectives.length > 0 && <Row className="justify-content-center">

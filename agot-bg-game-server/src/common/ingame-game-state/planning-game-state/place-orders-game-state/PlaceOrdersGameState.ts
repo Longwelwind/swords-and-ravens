@@ -53,7 +53,7 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
     }
 
     get participatingHouses(): House[] {
-        return this.forVassals ? this.game.houses.values.filter(h => this.ingame.isVassalHouse(h)) : this.game.houses.values.filter(h => !this.ingame.isVassalHouse(h));
+        return this.forVassals ? this.ingame.getVassalHouses() : this.game.nonVassalHouses;
     }
 
     firstStart(orders = new BetterMap<Region, Order>(), forVassals = false): void {

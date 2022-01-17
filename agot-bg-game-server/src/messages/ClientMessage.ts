@@ -7,7 +7,7 @@ export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | Unready |
     | LaunchReplacePlayerVote | LaunchReplacePlayerByVassalVote | LaunchReplaceVassalByPlayerVote
     | ClaimVassal | GiftPowerTokens | LaunchEndGameVote | SetPassword
     | DistributePowerTokens | DropPowerTokens | MoveLoyaltyToken | ResolveConsolidatePowerChoice | PlaceSellswords
-    | ResolveSpymaster | SelectObjectives;
+    | ResolveSpymaster | SelectObjectives | ScoreObjective;
 
 interface Ping {
     type: "ping";
@@ -292,4 +292,9 @@ interface ResolveSpymaster {
 interface SelectObjectives {
     type: "select-objectives";
     objectives: string[];
+}
+
+interface ScoreObjective {
+    type: "score-objective";
+    objective: string | null;
 }

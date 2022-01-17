@@ -17,6 +17,10 @@ import ResolveRaidOrderGameState
     from "../../common/ingame-game-state/action-game-state/resolve-raid-order-game-state/ResolveRaidOrderGameState";
 import ResolveRaidOrderComponent from "./ResolveRaidOrderComponent";
 import Row from "react-bootstrap/Row";
+import ReconcileArmiesGameState from "../../common/ingame-game-state/westeros-game-state/reconcile-armies-game-state/ReconcileArmiesGameState";
+import ReconcileArmiesComponent from "./ReconcileArmiesComponent";
+import ScoreObjectivesGameState from "../../common/ingame-game-state/action-game-state/score-objectives-game-state/ScoreObjectivesGameState";
+import ScoreObjectivesComponent from "./ScoreObjectivesComponent";
 
 @observer
 export default class ActionComponent extends Component<GameStateComponentProps<ActionGameState>> {
@@ -29,7 +33,9 @@ export default class ActionComponent extends Component<GameStateComponentProps<A
                             [UseRavenGameState, UseRavenGameStatePanelComponent],
                             [ResolveMarchOrderGameState, ResolveMarchOrderComponent],
                             [ResolveConsolidatePowerGameState, ResolveConsolidatePowerComponent],
-                            [ResolveRaidOrderGameState, ResolveRaidOrderComponent]
+                            [ResolveRaidOrderGameState, ResolveRaidOrderComponent],
+                            [ReconcileArmiesGameState, ReconcileArmiesComponent],
+                            [ScoreObjectivesGameState, ScoreObjectivesComponent]
                         ])}
                     </Row>
                 </ListGroupItem>

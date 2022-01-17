@@ -285,7 +285,7 @@ export const spreadingTheWealth = new ObjectiveCard(
     [["arryn", 1], ["baratheon", 1], ["lannister", 1], ["stark", 1]],
     (house, ingame) => {
         const powerTokensOnBoard = new BetterMap(
-            ingame.game.houses.values.map(h => [h, ingame.world.regions.values.filter(r => r.controlPowerToken == house).length]));
+            ingame.game.houses.values.map(h => [h, ingame.world.regions.values.filter(r => r.controlPowerToken == h).length]));
 
         let ownPtCount = 0;
         if (powerTokensOnBoard.has(house)) {

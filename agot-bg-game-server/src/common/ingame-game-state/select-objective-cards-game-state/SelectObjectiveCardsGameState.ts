@@ -10,14 +10,13 @@ import { ObjectiveCard } from "../game-data-structure/static-data-structure/Obje
 import { objectiveCards } from "../game-data-structure/static-data-structure/ObjectiveCards";
 import BetterMap from "../../../utils/BetterMap";
 import { observable } from "mobx";
-import ChooseInitialObjectivesGameState from "../choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
-
 
 interface ParentGameState extends GameState<any, any> {
     game: Game;
     ingame: IngameGameState;
 
-    onSelectObjectiveCardsFinish(selectedObjectives: BetterMap<House, ObjectiveCard[]>): void;
+    onObjectiveCardsSelected(house: House, selectedObjectiveCards: ObjectiveCard[]): void;
+    onSelectObjectiveCardsFinish(): void;
 }
 
 export default class SelectObjectiveCardsGameState<P extends ParentGameState> extends GameState<P> {
@@ -30,7 +29,7 @@ export default class SelectObjectiveCardsGameState<P extends ParentGameState> ex
         return this.selectableCardsPerHouse.keys;
     }
 
-    get nonReadyHouses(): House[] {
+    get notReadyHouses(): House[] {
         return this.participatingHouses.filter(h => !this.readyHouses.has(h));
     }
 
@@ -40,16 +39,9 @@ export default class SelectObjectiveCardsGameState<P extends ParentGameState> ex
         this.canBeSkipped = canBeSkipped;
         this.readyHouses = new BetterMap();
 
-        if (this.selectableCardsPerHouse.values.some(ocs => ocs.length == 0)) {
+        if (this.selectableCardsPerHouse.values.some(ocs => ocs.length == 0) && !canBeSkipped) {
             throw new Error("SelectObjectiveCardsGameState called with objectiveCards.length == 0!");
         }
-    }
-
-    select(objectives: ObjectiveCard[]): void {
-        this.parentGameState.entireGame.sendMessageToServer({
-            type: "select-objectives",
-            objectives: objectives.map(oc => oc.id)
-        });
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -78,31 +70,33 @@ export default class SelectObjectiveCardsGameState<P extends ParentGameState> ex
                 return;
             }
 
+            this.parentGameState.onObjectiveCardsSelected(house, selectedObjectives);
+
             this.readyHouses.set(house, selectedObjectives);
             this.entireGame.broadcastToClients({
                 type: "player-ready",
                 userId: player.user.id
             });
 
-            if (this.parentGameState instanceof ChooseInitialObjectivesGameState) {
-                this.parentGameState.ingame.log({
-                    type: "objectives-chosen",
-                    house: house.id
-                });
-            }
-
             this.checkAndProceedEndOfSelectObjectives();
         }
     }
 
     checkAndProceedEndOfSelectObjectives(): void {
-        if (this.participatingHouses.every(h => this.readyHouses.keys.includes(h))) {
-            this.parentGameState.onSelectObjectiveCardsFinish(this.readyHouses);
+        if (this.notReadyHouses.length == 0) {
+            this.parentGameState.onSelectObjectiveCardsFinish();
         }
     }
 
     getWaitedUsers(): User[] {
-        return this.nonReadyHouses.map(h => this.parentGameState.ingame.getControllerOfHouse(h).user);
+        return this.notReadyHouses.map(h => this.parentGameState.ingame.getControllerOfHouse(h).user);
+    }
+
+    select(objectives: ObjectiveCard[]): void {
+        this.parentGameState.entireGame.sendMessageToServer({
+            type: "select-objectives",
+            objectives: objectives.map(oc => oc.id)
+        });
     }
 
     onServerMessage(message: ServerMessage): void {

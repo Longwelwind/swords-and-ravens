@@ -9,7 +9,6 @@ import Game from "../game-data-structure/Game";
 import User from "../../../server/User";
 import { ObjectiveCard } from "../game-data-structure/static-data-structure/ObjectiveCard";
 import SelectObjectiveCardsGameState, { SerializedSelectObjectiveCardsGameState } from "../select-objective-cards-game-state/SelectObjectiveCardsGameState";
-import BetterMap from "../../../utils/BetterMap";
 import _ from "lodash";
 import getShuffledObjectivesDeck from "../game-data-structure/static-data-structure/ObjectiveCards";
 import popRandom from "../../../utils/popRandom";
@@ -29,7 +28,7 @@ export default class ChooseInitialObjectivesGameState extends GameState<IngameGa
     }
 
     get participatingHouses(): House[] {
-        return this.game.houses.values.filter(h => !this.ingame.isVassalHouse(h));
+        return this.game.nonVassalHouses;
     }
 
     constructor(ingameGameState: IngameGameState) {
@@ -39,28 +38,37 @@ export default class ChooseInitialObjectivesGameState extends GameState<IngameGa
     firstStart(): void {
         this.game.objectiveDeck = getShuffledObjectivesDeck();
 
-        this.game.houses.values.forEach(h => {
+        // Though we disallowed vassals for AFFC we use the nonVassalHouses to maybe enable it later at some point
+        this.game.nonVassalHouses.forEach(h => {
             for (let i = 0; i < 5; i ++) {
                 h.secretObjectives.push(popRandom(this.game.objectiveDeck) as ObjectiveCard);
             }
+
+            h.secretObjectives = _.sortBy(h.secretObjectives, oc => oc.name);
         });
 
         this.setChildGameState(new SelectObjectiveCardsGameState(this)).firstStart(
-            this.game.houses.values.map(h => [h, h.secretObjectives]),
+            this.game.nonVassalHouses.map(h => [h, h.secretObjectives]),
             3,
             false
         );
     }
 
-    onSelectObjectiveCardsFinish(selectedObjectives: BetterMap<House, ObjectiveCard[]>): void {
-        selectedObjectives.keys.forEach(h => {
-            const notSelected = _.difference(h.secretObjectives, selectedObjectives.get(h));
-            h.secretObjectives = selectedObjectives.get(h);
-            this.game.objectiveDeck.push(...notSelected);
+    onObjectiveCardsSelected(house: House, selectedObjectiveCards: ObjectiveCard[]): void {
+        const notSelected = _.difference(house.secretObjectives, selectedObjectiveCards);
+        house.secretObjectives = _.sortBy(selectedObjectiveCards, oc => oc.name);
+        this.game.objectiveDeck.push(...notSelected);
+
+        this.ingame.log({
+            type: "objectives-chosen",
+            house: house.id
         });
 
-        shuffleInPlace(this.game.objectiveDeck);
         this.ingame.broadcastObjectives();
+    }
+
+    onSelectObjectiveCardsFinish(): void {
+        shuffleInPlace(this.game.objectiveDeck);
         this.ingame.onChooseInitialObjectivesGameStateEnd();
     }
 

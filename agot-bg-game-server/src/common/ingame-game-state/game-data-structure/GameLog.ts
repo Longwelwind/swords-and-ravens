@@ -43,7 +43,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | FireMadeFleshChoice | PlayWithFireChoice | TheLongPlanChoice | MoveLoyaltyTokenChoice | LoanPurchased | OrderRemoved | InterestPaid
     | DebtPaid | CustomsOfficerPowerTokensGained | SellswordsPlaced | TheFacelessMenUnitsDestroyed | PyromancerExecuted | ExpertArtificerExecuted
     | LoyalMaesterExecuted | MasterAtArmsExecuted | SavvyStewardExecuted | SpymasterExecuted
-    | ObjectivesChosen;
+    | ObjectivesChosen | NewObjectiveCardDrawn | SpecialObjectiveScored | ObjectiveScored;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -937,4 +937,22 @@ interface SpymasterExecuted {
 interface ObjectivesChosen {
     type: "objectives-chosen";
     house: string;
+}
+
+interface NewObjectiveCardDrawn {
+    type: "new-objective-card-drawn";
+    house: string;
+}
+
+interface SpecialObjectiveScored {
+    type: "special-objective-scored";
+    house: string;
+    scored: boolean;
+}
+
+interface ObjectiveScored {
+    type: "objective-scored";
+    house: string;
+    objective: string | null;
+    victoryPoints: number;
 }
