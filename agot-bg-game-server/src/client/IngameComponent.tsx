@@ -93,6 +93,7 @@ import Region from "../common/ingame-game-state/game-data-structure/Region";
 import PartialRecursive from "../utils/PartialRecursive";
 import ChooseInitialObjectivesGameState from "../common/ingame-game-state/choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
 import ChooseInitialObjectivesComponent from "./game-state-panel/ChooseInitialObjectivesComponent";
+import ObjectivesInfoComponent from "./ObjectivesInfoComponent";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -666,7 +667,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         </Nav.Link>
                                     </div>
                                 </Nav.Item>
-                                {this.authenticatedPlayer && this.ingame.entireGame.isFeastForCrows && (
+                                {this.ingame.entireGame.isFeastForCrows && (
                                     <Nav.Item>
                                         <Nav.Link eventKey="objectives">
                                             <OverlayTrigger
@@ -761,12 +762,17 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         <GameLogListComponent ingameGameState={this.props.gameState} />
                                     </ScrollToBottom>
                                 </Tab.Pane>
-                                <Tab.Pane eventKey="settings">
+                                <Tab.Pane eventKey="settings" className="h-100">
                                     <GameSettingsComponent gameClient={this.props.gameClient}
                                         entireGame={this.props.gameState.entireGame} />
                                     <UserSettingsComponent user={this.props.gameClient.authenticatedUser}
                                         entireGame={this.props.gameState.entireGame}
                                         parent={this} />
+                                </Tab.Pane>
+                                <Tab.Pane eventKey="objectives" className="h-100">
+                                    <div className="d-flex flex-column h-100" style={{overflowY: "scroll"}}>
+                                        <ObjectivesInfoComponent ingame={this.ingame} gameClient={this.props.gameClient}/>
+                                    </div>
                                 </Tab.Pane>
                                 {this.authenticatedPlayer && (
                                     <Tab.Pane eventKey="note" className="h-100">

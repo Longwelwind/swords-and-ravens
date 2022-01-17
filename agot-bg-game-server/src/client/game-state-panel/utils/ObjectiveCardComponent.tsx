@@ -6,10 +6,10 @@ import ImagePopover from "./ImagePopover";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import { preventOverflow } from "@popperjs/core";
 import objectiveCardImages from "../../objectiveCardImages";
-import { ObjectiveCard } from "../../../common/ingame-game-state/game-data-structure/static-data-structure/ObjectiveCard";
+import { ObjectiveCard, SpecialObjectiveCard } from "../../../common/ingame-game-state/game-data-structure/static-data-structure/ObjectiveCard";
 
 interface ObjectiveCardComponentProps {
-    objectiveCard: ObjectiveCard;
+    objectiveCard: ObjectiveCard | SpecialObjectiveCard;
     size?: "small" | "smedium" | "medium" | "tiny";
     selected?: boolean;
     onClick?: () => void;
