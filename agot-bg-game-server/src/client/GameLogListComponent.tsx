@@ -1619,6 +1619,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 </>
                     : <>House <b>{house.name}</b> did not score an Objective card.</>
             }
+            case "ironborn-raid": {
+                const house = this.game.houses.get(data.house);
+                return <>
+                    <b>Ironborn Raid</b>: House <b>{house.name}</b> was reduced one position on the Victory track.
+                </>
+            }
         }
     }
 }

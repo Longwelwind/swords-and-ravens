@@ -679,6 +679,10 @@
             {
               "type": "famine",
               "quantity": 1
+            },
+            {
+              "type": "ironborn-raid",
+              "quantity": 1
             }],
             null,
             null

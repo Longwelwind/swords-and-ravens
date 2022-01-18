@@ -29,6 +29,7 @@ import AFeastForCrowsMusteringWesterosCardType from "./AFeastForCrowsMusteringWe
 import RallyTheMenWesterosCardType from "./RallyTheMenWesterosCardType";
 import TheBurdenOfPowerWesterosCardType from "./TheBurdenOfPowerWesterosCardType";
 import FamineWesterosCardType from "./FamineWesterosCardType";
+import IronbornRaidWesterosCardType from "./IronbornRaidWesterosCardType";
 
 export const lastDaysOfSummer = new LastDaysOfSummerWesterosCardType("last-days-of-summer", "Last\xa0Days\xa0of\xa0Summer", "Nothing happens.", "Nothing\xa0happens", 2);
 export const winterIsComing = new WinterIsComingWesterosCardType("winter-is-coming", "Winter\xa0is\xa0Coming", "Immediately shuffle this deck. Then draw and resolve a new card.", "Reshuffle\xa0deck");
@@ -42,6 +43,7 @@ export const aFeastForCrowsMustering = new AFeastForCrowsMusteringWesterosCardTy
 export const rallyTheMen = new RallyTheMenWesterosCardType("rally-the-men", "Rally\xa0the\xa0Men", "In turn order, players muster new units in every one of their areas containing a Castle.", "Muster in Castles", 2);
 export const burdenOfPower = new TheBurdenOfPowerWesterosCardType("the-burden-of-power", "The\xa0Burden\xa0of\xa0Power", "The holder of the Iron Throne token chooses whether a) the Wildling track is reduced to the \x220\x22 position, or b) everyone musters units in Strongholds and Castles", "IT\xa0decides");
 export const famine = new FamineWesterosCardType("famine", "Famine", "Each player is reduced one position on the Supply track and then, in turn order, reconciles armies.", "Supply -1", 2);
+export const ironbornRaid = new IronbornRaidWesterosCardType("ironborn-raid", "Ironborn Raid", "Each player with at least 2 scored Objective cards in his play area is reduced one position on the Victory track.", "VP -1", 2);
 
 export const clashOfKings = new ClashOfKingsWesterosCardType("clash-of-kings", "Clash\xa0of\xa0Kings", "Bid on the three Influence tracks.", "Bid\xa0for\xa0tracks");
 export const darkWingsDarkWords = new DarkWingDarkWordsWesterosCardType("dark-wings-dark-words", "Dark\xa0Wings,\xa0Dark\xa0Words", "The holder of the Messenger Raven token chooses whether a) everyone bids on the  three Influence tracks b) everyone collects one Power\xa0token for every power icon present in areas they control, or c) this card has no effect.", "Raven\xa0decides", 2);
@@ -76,6 +78,7 @@ export const westerosCardTypes = new BetterMap<string, WesterosCardType>([
     [rallyTheMen.id, rallyTheMen],
     [burdenOfPower.id, burdenOfPower],
     [famine.id, famine],
+    [ironbornRaid.id, ironbornRaid],
     [clashOfKings.id, clashOfKings],
     [darkWingsDarkWords.id, darkWingsDarkWords],
     [feastForCrows.id, feastForCrows],
