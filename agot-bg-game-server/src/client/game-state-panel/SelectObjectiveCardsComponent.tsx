@@ -77,5 +77,6 @@ export default class SelectObjectiveCardsComponent extends Component<GameStateCo
         }
 
         this.props.gameState.select(this.selectedObjectiveCards);
+        this.selectedObjectiveCards = [];
     }
 }

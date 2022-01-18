@@ -31,6 +31,8 @@ import WesterosCardComponent from "./utils/WesterosCardComponent";
 import WesterosDeck4GameState from "../../common/ingame-game-state/westeros-game-state/westeros-deck-4-game-state/WesterosDeck4GameState";
 import WesterosDeck4Component from "./westeros-deck-4-component/WesterosDeck4Component";
 import TheBurdenOfPowerGameState from "../../common/ingame-game-state/westeros-game-state/the-burden-of-power-game-state/TheBurdenOfPowerGameState";
+import ShiftingAmbitionsGameState from "../../common/ingame-game-state/westeros-game-state/shifting-ambitions-game-state/ShiftingAmbitionsGameState";
+import ShiftingAmbitionsComponent from "./ShiftingAmbitionsComponent";
 
 @observer
 export default class WesterosGameStateComponent extends Component<GameStateComponentProps<WesterosGameState>> {
@@ -68,7 +70,8 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
                     [ReconcileArmiesGameState, ReconcileArmiesComponent],
                     [ClashOfKingsGameState, ClashOfKingsComponent],
                     [MusteringGameState, MusteringComponent],
-                    [WesterosDeck4GameState, WesterosDeck4Component]
+                    [WesterosDeck4GameState, WesterosDeck4Component],
+                    [ShiftingAmbitionsGameState, ShiftingAmbitionsComponent]
                 ])}
             </>
         );

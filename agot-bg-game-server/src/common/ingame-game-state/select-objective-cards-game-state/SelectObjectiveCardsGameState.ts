@@ -15,7 +15,7 @@ interface ParentGameState extends GameState<any, any> {
     game: Game;
     ingame: IngameGameState;
 
-    onObjectiveCardsSelected(house: House, selectedObjectiveCards: ObjectiveCard[]): void;
+    onObjectiveCardsSelected(house: House, selectedObjectiveCards: ObjectiveCard[], resolvedAutomatically: boolean): void;
     onSelectObjectiveCardsFinish(): void;
 }
 
@@ -41,6 +41,14 @@ export default class SelectObjectiveCardsGameState<P extends ParentGameState> ex
 
         if (this.selectableCardsPerHouse.values.some(ocs => ocs.length == 0) && !canBeSkipped) {
             throw new Error("SelectObjectiveCardsGameState called with objectiveCards.length == 0!");
+        }
+
+        if (!this.canBeSkipped && this.selectableCardsPerHouse.keys.every(h => this.selectableCardsPerHouse.get(h).length == count)) {
+            this.selectableCardsPerHouse.keys.forEach(h => {
+                this.parentGameState.onObjectiveCardsSelected(h, this.selectableCardsPerHouse.get(h), true);
+            });
+
+            this.parentGameState.onSelectObjectiveCardsFinish();
         }
     }
 
@@ -70,7 +78,7 @@ export default class SelectObjectiveCardsGameState<P extends ParentGameState> ex
                 return;
             }
 
-            this.parentGameState.onObjectiveCardsSelected(house, selectedObjectives);
+            this.parentGameState.onObjectiveCardsSelected(house, selectedObjectives, false);
 
             this.readyHouses.set(house, selectedObjectives);
             this.entireGame.broadcastToClients({

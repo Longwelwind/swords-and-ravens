@@ -289,7 +289,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <>
                         <p>Wildling bidding results for Wildling Threat <b>{data.wildlingStrength}</b>:</p>
-                        <div className="mt-1"><HouseNumberResultsComponent results={bids} key="wildlings-log"></HouseNumberResultsComponent></div>
+                        <div className="mt-1"><HouseNumberResultsComponent results={bids} keyPrefix="wildlings-log"></HouseNumberResultsComponent></div>
                         {data.nightsWatchVictory ? (
                             <p>The <b>Night&apos;s Watch</b> won!</p>
                         ) : (
@@ -619,7 +619,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>}
 
                     <Row className="mb-1 mt-2">
-                        <HouseNumberResultsComponent results={bids} key={`cok_${data.trackerI}`}/>
+                        <HouseNumberResultsComponent results={bids} keyPrefix={`cok_${data.trackerI}`}/>
                     </Row>
                 </>;
             }
@@ -1195,7 +1195,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                 <>
                     <p>Supply levels have been adjusted:</p>
-                    <div className="mt-1"><HouseNumberResultsComponent results={supplies} key="supply"/></div>
+                    <div className="mt-1"><HouseNumberResultsComponent results={supplies} keyPrefix="supply"/></div>
                 </>);
             case "player-replaced": {
                 const oldUser = this.props.ingameGameState.entireGame.users.get(data.oldUser);
@@ -1604,11 +1604,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             }
             case "objective-scored": {
                 const house = this.game.houses.get(data.house);
-                const objective = data.objective != null ? objectiveCards.get(data.objective) : null;
+                const objective = data.objectiveCard != null ? objectiveCards.get(data.objectiveCard) : null;
 
                 return objective != null ? <>
                     <p>
-                        House <b>{house.name}</b> scored <b>{objective.name}</b> and awarded {data.victoryPoints} victory points.
+                        House <b>{house.name}</b> scored <b>{objective.name}</b> and awarded {data.victoryPoints} victory point{data.victoryPoints != 1 ? "s" : ""}.
                     </p>
                     <div style={{ display: 'flex', justifyContent: 'center' }}>
                         <ObjectiveCardComponent
@@ -1623,6 +1623,28 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 return <>
                     <b>Ironborn Raid</b>: House <b>{house.name}</b> was reduced one position on the Victory track.
+                </>
+            }
+            case "shifting-ambitions-objective-chosen-from-hand": {
+                const house = this.game.houses.get(data.house);
+                return <>
+                    <b>Shifting Ambitions</b>: House <b>{house.name}</b> put one Objective card to the pool.
+                </>
+            }
+            case "shifting-ambitions-objective-chosen-from-pool": {
+                const house = this.game.houses.get(data.house);
+                const objective = objectiveCards.get(data.objectiveCard);
+
+                return <>
+                    <p>
+                        <b>Shifting Ambitions</b>: House <b>{house.name}</b> choose <b>{objective.name}</b> from the Objective card pool.
+                    </p>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <ObjectiveCardComponent
+                            objectiveCard={objective}
+                            size="small"
+                        />
+                    </div>
                 </>
             }
         }

@@ -31,6 +31,7 @@ import rallyTheMen from "../../public/images/westeros-cards/affc/RallyTheMen.png
 import burdenOfPower from "../../public/images/westeros-cards/affc/TheBurdenOfPower.png";
 import famine from "../../public/images/westeros-cards/affc/Famine.png"
 import ironbornRaid from "../../public/images/westeros-cards/affc/IronbornRaid.png"
+import shiftingAmbitions from "../../public/images/westeros-cards/affc/ShiftingAmbitions.png"
 
 const westerosCardImages = new BetterMap([
     [0, new BetterMap([
@@ -43,7 +44,8 @@ const westerosCardImages = new BetterMap([
         ["rally-the-men", rallyTheMen],
         ["the-burden-of-power", burdenOfPower],
         ["famine", famine],
-        ["ironborn-raid", ironbornRaid]
+        ["ironborn-raid", ironbornRaid],
+        ["shifting-ambitions", shiftingAmbitions]
     ])],
     [1, new BetterMap([
         ["game-of-thrones", gameOfThrones],

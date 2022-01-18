@@ -28,7 +28,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting | UpdateCombatStats
     | UpdateDraftState | RevealBids | UpdateMaxTurns | PasswordResponse | ReplacedByVassal | UpdateDeletedHouseCards | UpdateOldPlayerHouseCards
     | LoyaltyTokenGained | LoyaltyTokenPlaced | DrangonStrengthTokenRemoved | UpdateLoanCards | UpdateRegionModifiers
-    | UpdateCompletedObjectives | UpdateSecretObjectives;
+    | UpdateCompletedObjectives | UpdateSecretObjectives | SyncShiftingAmbitionsGameState;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -427,4 +427,11 @@ interface UpdateSecretObjectives {
     type: "update-secret-objectives";
     house: string;
     objectives: string[];
+}
+
+interface SyncShiftingAmbitionsGameState {
+    type: "sync-shifting-ambitions";
+    step: number;
+    objectiveCardPool: string[];
+    turnOrder: string[];
 }

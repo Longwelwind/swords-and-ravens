@@ -377,7 +377,7 @@ export const friendlyConfines = new ObjectiveCard(
     [["arryn", 1], ["baratheon", 1], ["lannister", 1], ["stark", 1]],
     (house, ingame) => {
         const controlledCastles = new BetterMap(
-            ingame.game.houses.values.map(h => [h, ingame.world.regions.values.filter(r => r.castleLevel == 1 && r.getController() == house).length]));
+            ingame.game.houses.values.map(h => [h, ingame.world.regions.values.filter(r => r.castleLevel == 1 && r.getController() == h).length]));
 
         let ownCastleCount = 0;
         if (controlledCastles.has(house)) {

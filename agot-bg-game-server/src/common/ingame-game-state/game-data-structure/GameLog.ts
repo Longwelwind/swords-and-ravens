@@ -43,7 +43,8 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | FireMadeFleshChoice | PlayWithFireChoice | TheLongPlanChoice | MoveLoyaltyTokenChoice | LoanPurchased | OrderRemoved | InterestPaid
     | DebtPaid | CustomsOfficerPowerTokensGained | SellswordsPlaced | TheFacelessMenUnitsDestroyed | PyromancerExecuted | ExpertArtificerExecuted
     | LoyalMaesterExecuted | MasterAtArmsExecuted | SavvyStewardExecuted | SpymasterExecuted
-    | ObjectivesChosen | NewObjectiveCardDrawn | SpecialObjectiveScored | ObjectiveScored | IronbornRaid;
+    | ObjectivesChosen | NewObjectiveCardDrawn | SpecialObjectiveScored | ObjectiveScored | IronbornRaid
+    | ShiftingAmbitionsObjectiveChosenFromHand | ShiftingAmbitionsObjectiveChosenFromPool;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -953,11 +954,22 @@ interface SpecialObjectiveScored {
 interface ObjectiveScored {
     type: "objective-scored";
     house: string;
-    objective: string | null;
+    objectiveCard: string | null;
     victoryPoints: number;
 }
 
 interface IronbornRaid {
     type: "ironborn-raid",
     house: string;
+}
+
+interface ShiftingAmbitionsObjectiveChosenFromHand {
+    type: "shifting-ambitions-objective-chosen-from-hand";
+    house: string;
+}
+
+interface ShiftingAmbitionsObjectiveChosenFromPool {
+    type: "shifting-ambitions-objective-chosen-from-pool";
+    house: string;
+    objectiveCard: string;
 }

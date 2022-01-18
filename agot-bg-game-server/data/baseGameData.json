@@ -683,6 +683,10 @@
             {
               "type": "ironborn-raid",
               "quantity": 1
+            },
+            {
+              "type": "shifting-ambitions",
+              "quantity": 2
             }],
             null,
             null

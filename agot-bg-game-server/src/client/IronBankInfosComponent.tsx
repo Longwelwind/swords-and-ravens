@@ -60,7 +60,7 @@ export default class IronBankInfosComponent extends Component<IronBankInfosCompo
                                             </Col>
                                         </OverlayTrigger>
                                         <Col xs="auto" className="py-0">
-                                            <HouseNumberResultsComponent results={interestCosts} key="iron-bank-interests-costs" bold={true}/>
+                                            <HouseNumberResultsComponent results={interestCosts} keyPrefix="iron-bank-interests-costs" bold={true}/>
                                         </Col>
                                     </Row>}
                             </Col>

@@ -32,7 +32,7 @@ export default class ScoreOtherObjectivesGameState extends GameState<ScoreObject
             this.ingame.log({
                 type: "objective-scored",
                 house: house.id,
-                objective: null,
+                objectiveCard: null,
                 victoryPoints: 0
             });
         } else {
@@ -46,7 +46,7 @@ export default class ScoreOtherObjectivesGameState extends GameState<ScoreObject
                 this.ingame.log({
                     type: "objective-scored",
                     house: house.id,
-                    objective: oc.id,
+                    objectiveCard: oc.id,
                     victoryPoints: victoryPoints
                 });
             });

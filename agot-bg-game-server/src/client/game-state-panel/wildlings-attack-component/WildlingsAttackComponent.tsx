@@ -79,7 +79,7 @@ export default class WildlingsAttackComponent extends Component<GameStateCompone
                         ) : results ?
                             <Col xs={12}>
                                 <p>Bidding results:</p>
-                                <HouseNumberResultsComponent results={results} key="wildlings"/>
+                                <HouseNumberResultsComponent results={results} keyPrefix="wildlings"/>
                             </Col>
                         : <></>}
                         {renderChildGameState<WildlingsAttackGameState>(this.props, [
