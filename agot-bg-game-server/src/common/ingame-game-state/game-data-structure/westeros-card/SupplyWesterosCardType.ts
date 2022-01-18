@@ -4,21 +4,7 @@ import ReconcileArmiesGameState from "../../westeros-game-state/reconcile-armies
 
 export default class SupplyWesterosCardType extends WesterosCardType {
     execute(westeros: WesterosGameState): void {
-        // Refresh the supply level of all houses
-        westeros.game.houses.values.forEach(h =>  {
-            h.supplyLevel = Math.min(westeros.game.supplyRestrictions.length - 1, westeros.game.getControlledSupplyIcons(h));
-        });
-
-        westeros.ingame.log({
-            type: "supply-adjusted",
-            supplies: westeros.game.houses.values.map(h => [h.id, h.supplyLevel])
-        });
-
-        westeros.entireGame.broadcastToClients({
-            type: "supply-adjusted",
-            supplies: westeros.game.houses.values.map(h => [h.id, h.supplyLevel])
-        });
-
+        westeros.game.updateSupplies();
         // Check if any house needs to reconcile his armies
         westeros.setChildGameState(new ReconcileArmiesGameState(westeros)).firstStart();
     }

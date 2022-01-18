@@ -1,10 +1,7 @@
 import WesterosGameState from "../WesterosGameState";
 import GameState from "../../../GameState";
 import SimpleChoiceGameState, {SerializedSimpleChoiceGameState} from "../../simple-choice-game-state/SimpleChoiceGameState";
-import {
-    mustering,
-    supply
-} from "../../game-data-structure/westeros-card/westerosCardTypes";
+import { mustering, supply } from "../../game-data-structure/westeros-card/westerosCardTypes";
 import Game from "../../game-data-structure/Game";
 import Player from "../../Player";
 import {ClientMessage} from "../../../../messages/ClientMessage";
@@ -22,8 +19,8 @@ export default class AThroneOfBladesGameState extends GameState<WesterosGameStat
 
     firstStart(): void {
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(this.game.ironThroneHolder,
-            "The holder of the Iron Throne can choose between Mustering, Supply or None.",
-            ["Mustering", "Supply", "None"]
+            "The holder of the Iron Throne token can choose between Mustering, Supply, or nothing at all.",
+            ["Mustering", "Supply", "Nothing"]
         );
     }
 
@@ -59,11 +56,11 @@ export default class AThroneOfBladesGameState extends GameState<WesterosGameStat
     }
 
     static deserializeFromServer(westeros: WesterosGameState, data: SerializedAThroneOfBladesGameState): AThroneOfBladesGameState {
-        const putToTheSword = new AThroneOfBladesGameState(westeros);
+        const aThroneOfBlades = new AThroneOfBladesGameState(westeros);
 
-        putToTheSword.childGameState = putToTheSword.deserializeChildGameState(data.childGameState);
+        aThroneOfBlades.childGameState = aThroneOfBlades.deserializeChildGameState(data.childGameState);
 
-        return putToTheSword;
+        return aThroneOfBlades;
     }
 
     deserializeChildGameState(data: SerializedAThroneOfBladesGameState["childGameState"]): SimpleChoiceGameState {

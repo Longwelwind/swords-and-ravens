@@ -27,7 +27,8 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | CrowKillersStepChanged | ManipulateCombatHouseCard | ChangeCombatTidesOfBattleCard
     | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting | UpdateCombatStats
     | UpdateDraftState | RevealBids | UpdateMaxTurns | PasswordResponse | ReplacedByVassal | UpdateDeletedHouseCards | UpdateOldPlayerHouseCards
-    | LoyaltyTokenGained | LoyaltyTokenPlaced | DrangonStrengthTokenRemoved | UpdateLoanCards | UpdateRegionModifiers;
+    | LoyaltyTokenGained | LoyaltyTokenPlaced | DrangonStrengthTokenRemoved | UpdateLoanCards | UpdateRegionModifiers
+    | UpdateCompletedObjectives | UpdateSecretObjectives | SyncShiftingAmbitionsGameState;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -414,4 +415,23 @@ interface UpdateRegionModifiers {
     castleModifier?: number;
     barrelModifier?: number;
     crownModifier?: number;
+}
+
+interface UpdateCompletedObjectives {
+    type: "update-completed-objectives";
+    objectives: [string, string[]][];
+    victoryPointCount: [string, number][];
+}
+
+interface UpdateSecretObjectives {
+    type: "update-secret-objectives";
+    house: string;
+    objectives: string[];
+}
+
+interface SyncShiftingAmbitionsGameState {
+    type: "sync-shifting-ambitions";
+    step: number;
+    objectiveCardPool: string[];
+    turnOrder: string[];
 }

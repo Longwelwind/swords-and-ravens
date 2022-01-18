@@ -27,7 +27,7 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
     }
 
     get ingameGameState(): IngameGameState {
-        return this.actionGameState.ingameGameState;
+        return this.actionGameState.ingame;
     }
 
     get entireGame(): EntireGame {
@@ -93,13 +93,13 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         findOrphanedShipsAndDestroyThem(this.ingameGameState, this.actionGameState);
         //   ... check if ships can be converted
         const analyzePortResult = this.isTakeControlOfEnemyPortGameStateRequired();
-        if(analyzePortResult) {
+        if (analyzePortResult) {
             this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(analyzePortResult.port, analyzePortResult.newController, house);
             return;
         }
 
         //   ... check victory conditions
-        if(this.ingameGameState.checkVictoryConditions()) {
+        if (this.ingameGameState.checkVictoryConditions()) {
             return;
         }
 

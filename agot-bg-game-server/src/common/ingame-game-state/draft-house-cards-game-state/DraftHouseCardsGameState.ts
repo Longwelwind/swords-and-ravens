@@ -138,7 +138,7 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
                 this.ingame.setInfluenceTrack(i, newInfluenceTrack);
             }
 
-            this.ingame.beginNewTurn();
+            this.ingame.onDraftingFinish();
             return;
         }
 

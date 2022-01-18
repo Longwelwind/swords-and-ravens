@@ -22,6 +22,7 @@ export default class Region {
     @observable castleModifier: number;
     @observable barrelModifier: number;
     @observable crownModifier: number;
+    overwrittenSupoerControlPowerToken: House | null;
 
     // Client-side only to support live update of planned musterings
     @observable newUnits: Unit[];
@@ -37,6 +38,10 @@ export default class Region {
     }
 
     get superControlPowerToken(): House | null {
+        if (this.overwrittenSupoerControlPowerToken) {
+            return this.overwrittenSupoerControlPowerToken;
+        }
+
         return this.staticRegion.superControlPowerToken
             ? this.game.houses.tryGet(this.staticRegion.superControlPowerToken, null)
             : null;
@@ -91,7 +96,7 @@ export default class Region {
     }
 
     constructor(
-        game: Game, id: string, garrison: number, controlPowerToken: House | null = null, units: BetterMap<number, Unit> = new BetterMap<number, Unit>(),
+        game: Game, id: string, garrison: number, overwrittenSuperControlPowerToken: House | null, controlPowerToken: House | null = null, units: BetterMap<number, Unit> = new BetterMap<number, Unit>(),
         loyaltyTokens = 0, castleModifier = 0, barrelModifier = 0, crownModifier = 0) {
         this.game = game;
         this.id = id;
@@ -102,6 +107,7 @@ export default class Region {
         this.castleModifier = castleModifier;
         this.barrelModifier = barrelModifier;
         this.crownModifier = crownModifier;
+        this.overwrittenSupoerControlPowerToken = overwrittenSuperControlPowerToken;
         this.newUnits = [];
         this.removedUnits = [];
     }
@@ -141,7 +147,8 @@ export default class Region {
             loyaltyTokens: this.loyaltyTokens,
             castleModifier: this.castleModifier,
             barrelModifier: this.barrelModifier,
-            crownModifier: this.crownModifier
+            crownModifier: this.crownModifier,
+            overwrittenSuperControlPowerToken: this.overwrittenSupoerControlPowerToken ? this.overwrittenSupoerControlPowerToken.id : null
         }
     }
 
@@ -150,6 +157,7 @@ export default class Region {
 
         const region = new Region(
             game, data.id, data.garrison,
+            data.overwrittenSuperControlPowerToken ? game.houses.get(data.overwrittenSuperControlPowerToken) : null,
             data.controlPowerToken ? game.houses.get(data.controlPowerToken) : null,
             units,
             data.loyaltyTokens,
@@ -173,4 +181,5 @@ export interface SerializedRegion {
     castleModifier: number;
     barrelModifier: number;
     crownModifier: number;
+    overwrittenSuperControlPowerToken: string | null;
 }

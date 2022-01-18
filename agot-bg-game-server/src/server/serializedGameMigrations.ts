@@ -1303,6 +1303,34 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "55",
+        migrate: (serializedGame: any) => {
+            // Migration for AFFC
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                ingame.game.houses.forEach((h: any) => {
+                    h.maxPowerTokens = 20;
+                    h.specialObjective = null;
+                    h.secretObjectives = [];
+                    h.completedObjectives = [];
+                    h.victoryPoints = 0;
+                });
+
+                ingame.game.objectiveDeck = [];
+
+                ingame.game.world.regions.forEach((r: any) => r.overwrittenSuperControlPowerToken = null);
+
+                if (ingame.childGameState.type == "westeros" && ingame.childGameState.childGameState.type == "mustering") {
+                    const mustering = ingame.childGameState.childGameState;
+                    mustering.musteringType = 0;
+                }
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

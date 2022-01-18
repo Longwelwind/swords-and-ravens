@@ -18,6 +18,7 @@ import Game from "../common/ingame-game-state/game-data-structure/Game";
 import castleImage from "../../public/images/icons/castle.svg";
 import battleGearImage from "../../public/images/icons/battle-gear.svg";
 import verticalBanner from "../../public/images/icons/vertical-banner.svg"
+import laurelCrownImage from "../../public/images/icons/laurel-crown.svg";
 import Player from "../common/ingame-game-state/Player";
 import UserLabel from "./UserLabel";
 import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
@@ -33,6 +34,7 @@ import BetterMap from "../utils/BetterMap";
 import { observable } from "mobx";
 import User from "../server/User";
 import ConditionalWrap from "./utils/ConditionalWrap";
+import { sea } from "../common/ingame-game-state/game-data-structure/regionTypes";
 
 interface HouseRowComponentProps {
     house: House;
@@ -83,6 +85,12 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                 ? `Commanded by ${this.suzerainHouse.name}`
                 : "Up for grab"}
         </span>;
+
+        const victoryImage = this.props.ingame.entireGame.isFeastForCrows
+            ? laurelCrownImage :
+                this.house.id == "targaryen"
+                    ? verticalBanner
+                    : castleImage;
 
         try {
             controller = this.ingame.getControllerOfHouse(this.house).user;
@@ -174,9 +182,9 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         </Row>
                     </Col>
                     {!this.isVassal && (<OverlayTrigger
-                        overlay={this.renderTotalLandRegionsTooltip(this.house)}
+                        overlay={this.renderVictoryConditionsTooltip(this.house)}
                         delay={{ show: 250, hide: 100 }}
-                        placement="top"
+                        placement="auto"
                     >
                         <Col xs="auto" className="d-flex align-items-center"
                             onMouseEnter={() => this.setHighlightedRegions(this.house.id == "targaryen" ? "with-loyalty-tokens-only" : "with-castles-only")}
@@ -187,7 +195,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                     "hover-weak-outline",
                                     { "dye-warning": victoryPointsWarning },
                                     { "dye-critical": victoryPointsCritical })}
-                                src={this.house.id == "targaryen" ? verticalBanner : castleImage} width={40}
+                                src={victoryImage} width={40}
                                 style={{ marginLeft: "10px" }}
                             />
                         </Col>
@@ -298,13 +306,19 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     setHighlightedRegions(filter = ""): void {
         const regions = new BetterMap(this.ingame.world.getControlledRegions(this.house).map(r => [r, undefined] as [Region, string | undefined]));
         if (filter == "with-castles-only") {
-            regions.keys.filter(r => r.castleLevel == 0).forEach(r => regions.delete(r));
+            if (!this.props.ingame.entireGame.isFeastForCrows) {
+                regions.keys.filter(r => r.castleLevel == 0).forEach(r => regions.delete(r));
+            } else {
+                regions.clear();
+            }
         } else if (filter == "with-power-tokens-only") {
             regions.keys.filter(r => r.controlPowerToken != this.house).forEach(r => regions.delete(r));
         } else if (filter == "with-loyalty-tokens-only") {
             regions.clear();
             // Todo: We could show the loyalty count as region text here
-            this.ingame.world.regions.values.filter(r => r.loyaltyTokens > 0).forEach(r => regions.set(r, undefined));
+            if (!this.props.ingame.entireGame.isFeastForCrows) {
+                this.ingame.world.regions.values.filter(r => r.loyaltyTokens > 0).forEach(r => regions.set(r, undefined));
+            }
         } else if (filter != "") { // This is the unit type
             regions.keys.forEach(r => {
                 if (r.units.values.filter(u => u.type.id == filter).length == 0) {
@@ -342,16 +356,26 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         </Tooltip>;
     }
 
-    private renderTotalLandRegionsTooltip(house: House): OverlayChildren {
-        return <Tooltip id={house.id + "-total-land-regions"}>
-            <h5>Total Land Areas</h5><br/><h4 style={{textAlign: "center"}}><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
+    private renderVictoryConditionsTooltip(house: House): OverlayChildren {
+        return <Tooltip id={house.id + "-victory-tooltip"} className="westeros-tooltip">
+            <h5 style={{textAlign: "center"}}>&nbsp;&nbsp;Total&nbsp;Land&nbsp;Areas&nbsp;&nbsp;</h5>
+            <h4 style={{textAlign: "center"}}><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
+            {this.ingame.entireGame.isFeastForCrows && <>
+                <br/>
+                <br/>
+                <h5 style={{textAlign: "center"}}>Additional Information<br/><small>&nbsp;&nbsp;(Does not count in case of a tie)&nbsp;&nbsp;</small></h5>
+                <br/>
+                <h5 style={{textAlign: "center"}}>Castles:&nbsp;<b>{this.ingame.world.regions.values.filter(r => r.castleLevel == 1 && r.getController() == house).length}</b></h5>
+                <h5 style={{textAlign: "center"}}>Strongholds:&nbsp;<b>{this.ingame.world.regions.values.filter(r => r.castleLevel == 2 && r.getController() == house).length}</b></h5>
+                <h5 style={{textAlign: "center"}}>Sea Areas:&nbsp;<b>{this.ingame.world.regions.values.filter(r => r.type == sea && r.getController() == house).length}</b></h5>
+            </>}
         </Tooltip>;
     }
 
     private renderPowerPopover(house: House): OverlayChildren {
         const availablePower =  house.powerTokens;
         const powerTokensOnBoard = this.game.countPowerTokensOnBoard(house);
-        const powerInPool = this.game.maxPowerTokens - availablePower - powerTokensOnBoard;
+        const powerInPool = house.maxPowerTokens - availablePower - powerTokensOnBoard;
 
         return <Popover id={house.id + "-power-tooltip"} className="p-2">
             <b>{house.name}</b><br/>

@@ -38,6 +38,8 @@ import shuffleInPlace from "../../utils/shuffleInPlace";
 import popRandom from "../../utils/popRandom";
 import LoanCard from "./game-data-structure/loan-card/LoanCard";
 import PayDebtsGameState, { SerializedPayDebtsGameState } from "./pay-debts-game-state/PayDebtsGameState";
+import { objectiveCards } from "./game-data-structure/static-data-structure/ObjectiveCards";
+import ChooseInitialObjectivesGameState, { SerializedChooseInitialObjectivesGameState } from "./choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -45,6 +47,7 @@ export default class IngameGameState extends GameState<
     EntireGame,
     WesterosGameState | PlanningGameState | ActionGameState | CancelledGameState | GameEndedGameState
     | DraftHouseCardsGameState | ThematicDraftHouseCardsGameState | DraftInfluencePositionsGameState | PayDebtsGameState
+    | ChooseInitialObjectivesGameState
 > {
     players: BetterMap<User, Player> = new BetterMap<User, Player>();
     game: Game;
@@ -79,9 +82,19 @@ export default class IngameGameState extends GameState<
 
         if (this.entireGame.gameSettings.draftHouseCards) {
             this.beginDraftingHouseCards();
+        } else if (this.entireGame.isFeastForCrows) {
+            this.chooseObjectives();
         } else {
             this.beginNewTurn();
         }
+    }
+
+    chooseObjectives(): void {
+        this.setChildGameState(new ChooseInitialObjectivesGameState(this)).firstStart();
+    }
+
+    onChooseInitialObjectivesGameStateEnd(): void {
+        this.beginNewTurn();
     }
 
     beginDraftingHouseCards(): void {
@@ -106,7 +119,7 @@ export default class IngameGameState extends GameState<
             this.setInfluenceTrack(1, this.getRandomTrackOrder());
             this.setInfluenceTrack(2, this.getRandomTrackOrder());
 
-            this.beginNewTurn();
+            this.onDraftingFinish();
         } else {
             this.setChildGameState(new DraftHouseCardsGameState(this)).firstStart();
         }
@@ -156,6 +169,14 @@ export default class IngameGameState extends GameState<
         this.gameLogManager.log(data, resolvedAutomatically);
     }
 
+    onDraftingFinish(): void {
+        if (this.entireGame.isFeastForCrows) {
+            this.chooseObjectives();
+        } else {
+            this.beginNewTurn();
+        }
+    }
+
     onActionGameStateFinish(): void {
         this.beginNewTurn();
     }
@@ -187,7 +208,7 @@ export default class IngameGameState extends GameState<
 
     beginNewTurn(): void {
         if (this.game.turn == this.game.maxTurns) {
-            const winner = this.game.getPotentialWinner();
+            const winner = this.game.getPotentialWinner(true);
             this.setChildGameState(new GameEndedGameState(this)).firstStart(winner);
             return;
         }
@@ -460,7 +481,7 @@ export default class IngameGameState extends GameState<
         const originalValue = house.powerTokens;
 
         const powerTokensOnBoardCount = this.game.countPowerTokensOnBoard(house);
-        const maxPowerTokenCount = this.game.maxPowerTokens - powerTokensOnBoardCount;
+        const maxPowerTokenCount = house.maxPowerTokens - powerTokensOnBoardCount;
 
         house.powerTokens += delta;
         house.powerTokens = Math.max(0, Math.min(house.powerTokens, maxPowerTokenCount));
@@ -665,6 +686,16 @@ export default class IngameGameState extends GameState<
             if (message.crownModifier) {
                 region.crownModifier = message.crownModifier;
             }
+        } else if (message.type == "update-completed-objectives") {
+            message.objectives.forEach(([hid, objectives]) => {
+                this.game.houses.get(hid).completedObjectives = objectives.map(ocid => objectiveCards.get(ocid));
+            });
+
+            message.victoryPointCount.forEach(([hid, vpc]) => {
+                this.game.houses.get(hid).victoryPoints = vpc;
+            });
+        } else if (message.type == "update-secret-objectives") {
+            this.game.houses.get(message.house).secretObjectives = message.objectives.map(ocid => objectiveCards.get(ocid));
         } else {
             this.childGameState.onServerMessage(message);
         }
@@ -771,7 +802,11 @@ export default class IngameGameState extends GameState<
             }
 
             if (forHouse?.id == "targaryen" && !this.isHouseDefeated(forHouse)) {
-                return {result: false, reason: "targaryen-must-be-a-player-controlled-house"}
+                return {result: false, reason: "only-possible-when-defeated"}
+            }
+
+            if (this.entireGame.isFeastForCrows && !this.isHouseDefeated(forHouse)) {
+                return {result: false, reason: "only-possible-when-defeated"}
             }
         }
 
@@ -800,7 +835,7 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "already-playing"};
         }
 
-        if (_.some(this.players.values, p => p.house == forHouse)) {
+        if (this.players.values.some(p => p.house == forHouse)) {
             return {result: false, reason: "not-a-vassal"};
         }
 
@@ -829,8 +864,9 @@ export default class IngameGameState extends GameState<
             return true;
         }
 
-        // A house is considered defeated when it has no castle areas and no units anymore
-        return this.world.getControlledRegions(house).filter(r => r.castleLevel > 0).length == 0 && this.world.getUnitsOfHouse(house).length == 0;
+        // A house is considered defeated when it has no castle areas and no land units anymore
+        return this.world.getControlledRegions(house).filter(r => r.castleLevel > 0).length == 0 &&
+            this.world.getUnitsOfHouse(house).filter(u => u.type.id != "ship").length == 0;
     }
 
     launchReplacePlayerVote(player: Player): void {
@@ -919,6 +955,22 @@ export default class IngameGameState extends GameState<
         return this.game.getTurnOrder().filter(h => !this.isVassalHouse(h));
     }
 
+    broadcastObjectives(): void {
+        this.entireGame.broadcastToClients({
+            type: "update-completed-objectives",
+            objectives: this.game.houses.values.map(h => [h.id, h.completedObjectives.map(oc => oc.id)] as [string, string[]]),
+            victoryPointCount: this.game.houses.values.map(h => [h.id, h.victoryPoints])
+        });
+
+        this.players.values.forEach(p => {
+            this.entireGame.sendMessageToClients([p.user], {
+                type: "update-secret-objectives",
+                house: p.house.id,
+                objectives: p.house.secretObjectives.map(oc => oc.id)
+            });
+        });
+    }
+
     broadcastVassalRelations(): void {
         this.entireGame.broadcastToClients({
             type: "vassal-relations",
@@ -986,7 +1038,7 @@ export default class IngameGameState extends GameState<
         return {
             type: "ingame",
             players: this.players.values.map(p => p.serializeToClient(admin, player)),
-            game: this.game.serializeToClient(admin, player != null && player.house.knowsNextWildlingCard),
+            game: this.game.serializeToClient(admin, player),
             gameLogManager: this.gameLogManager.serializeToClient(),
             votes: this.votes.values.map(v => v.serializeToClient(admin, player)),
             childGameState: this.childGameState.serializeToClient(admin, player)
@@ -1027,6 +1079,8 @@ export default class IngameGameState extends GameState<
                 return DraftInfluencePositionsGameState.deserializeFromServer(this, data);
             case "pay-debts":
                 return PayDebtsGameState.deserializeFromServer(this, data);
+            case "choose-initial-objectives":
+                return ChooseInitialObjectivesGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -1039,5 +1093,6 @@ export interface SerializedIngameGameState {
     gameLogManager: SerializedGameLogManager;
     childGameState: SerializedPlanningGameState | SerializedActionGameState | SerializedWesterosGameState
         | SerializedGameEndedGameState | SerializedCancelledGameState | SerializedDraftHouseCardsGameState
-        | SerializedThematicDraftHouseCardsGameState | SerializedDraftInfluencePositionsGameState | SerializedPayDebtsGameState;
+        | SerializedThematicDraftHouseCardsGameState | SerializedDraftInfluencePositionsGameState | SerializedPayDebtsGameState
+        | SerializedChooseInitialObjectivesGameState;
 }

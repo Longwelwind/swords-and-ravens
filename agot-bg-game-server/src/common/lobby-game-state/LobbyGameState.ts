@@ -171,6 +171,9 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
             if (settings.setupId == "a-dance-with-dragons") {
                 settings.adwdHouseCards = true;
+            } else if (settings.setupId == "a-feast-for-crows") {
+                settings.vassals = false;
+                settings.useVassalPositions = false;
             }
 
             if (settings.thematicDraft) {
@@ -194,7 +197,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
             }
 
             // Allow disabling MoD options but enable them when switching to this setup
-            if (this.entireGame.gameSettings.setupId != "mother-of-dragons" && settings.setupId == "mother-of-dragons") {
+            if (!this.entireGame.isMotherOfDragons && settings.setupId == "mother-of-dragons") {
                 settings.vassals = true;
                 settings.seaOrderTokens = true;
                 settings.allowGiftingPowerTokens = true;
@@ -210,7 +213,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
             }
 
             // Reset the MoD settings
-            if (this.entireGame.gameSettings.setupId == "mother-of-dragons" && settings.setupId != "mother-of-dragons") {
+            if (this.entireGame.isMotherOfDragons && settings.setupId != "mother-of-dragons") {
                 settings.vassals = false;
                 settings.seaOrderTokens = false;
                 settings.allowGiftingPowerTokens = false;

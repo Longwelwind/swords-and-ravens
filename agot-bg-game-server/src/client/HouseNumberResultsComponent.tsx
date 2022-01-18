@@ -7,7 +7,7 @@ import ConditionalWrap from "./utils/ConditionalWrap";
 
 interface HouseNumberResultsProps {
     results: [House, number][];
-    key?: string;
+    keyPrefix?: string;
     bold?: boolean;
 }
 
@@ -15,7 +15,7 @@ export default class HouseNumberResultsComponent extends Component<HouseNumberRe
     render(): ReactNode {
         return <Row>
             {this.props.results.map(([house, result]) => (
-                <Col xs="auto" key={`${this.props.key ?? ""}_house-number-result_${house.id}`} className="d-flex flex-md-column align-items-center p-1">
+                <Col xs="auto" key={`${this.props.keyPrefix ?? ""}_house-number-result_${house.id}`} className="d-flex flex-md-column align-items-center p-1">
                     <div className="mb-2">
                         <SimpleInfluenceIconComponent house={house} />
                     </div>

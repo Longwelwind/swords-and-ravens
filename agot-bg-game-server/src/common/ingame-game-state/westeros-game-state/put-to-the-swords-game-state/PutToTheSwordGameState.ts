@@ -20,8 +20,8 @@ export default class PutToTheSwordGameState extends GameState<WesterosGameState,
     firstStart(): void {
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
             this.game.valyrianSteelBladeHolder,
-            "The holder of the Valyrian Blade Steel can choose between No March +1 orders, no Defense orders or none",
-            ["No march +1 orders", "No defense orders", "None"]
+            "The holder of the Valyrian Steel Blade can choose between No March +1 Orders, no Defense Orders, or no restrictions.",
+            ["No March +1 Orders", "No Defense Orders", "No restrictions"]
         );
     }
 

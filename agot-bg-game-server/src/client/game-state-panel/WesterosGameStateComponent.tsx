@@ -30,6 +30,11 @@ import classNames from "classnames";
 import WesterosCardComponent from "./utils/WesterosCardComponent";
 import WesterosDeck4GameState from "../../common/ingame-game-state/westeros-game-state/westeros-deck-4-game-state/WesterosDeck4GameState";
 import WesterosDeck4Component from "./westeros-deck-4-component/WesterosDeck4Component";
+import TheBurdenOfPowerGameState from "../../common/ingame-game-state/westeros-game-state/the-burden-of-power-game-state/TheBurdenOfPowerGameState";
+import ShiftingAmbitionsGameState from "../../common/ingame-game-state/westeros-game-state/shifting-ambitions-game-state/ShiftingAmbitionsGameState";
+import ShiftingAmbitionsComponent from "./ShiftingAmbitionsComponent";
+import NewInformationGameState from "../../common/ingame-game-state/westeros-game-state/new-information-game-state/NewInformationGameState";
+import NewInformationComponent from "./NewInformationComponent";
 
 @observer
 export default class WesterosGameStateComponent extends Component<GameStateComponentProps<WesterosGameState>> {
@@ -51,23 +56,10 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
                         ))}
                     </Row>
                 </ListGroupItem>
-                {this.props.gameState.childGameState instanceof PutToTheSwordGameState ? (
-                    <ListGroupItem className="px-2">
-                        <Row>
-                            <SimpleChoiceComponent gameClient={this.props.gameClient}
-                                                   gameState={this.props.gameState.childGameState.childGameState}
-                                                   mapControls={this.props.mapControls}/>
-                        </Row>
-                    </ListGroupItem>
-                ) : this.props.gameState.childGameState instanceof DarkWingsDarkWordsGameState ? (
-                    <ListGroupItem className="px-2">
-                        <Row>
-                            <SimpleChoiceComponent gameClient={this.props.gameClient}
-                                                   gameState={this.props.gameState.childGameState.childGameState}
-                                                   mapControls={this.props.mapControls}/>
-                        </Row>
-                    </ListGroupItem>
-                ) : this.props.gameState.childGameState instanceof AThroneOfBladesGameState ? (
+                {(this.props.gameState.childGameState instanceof PutToTheSwordGameState ||
+                    this.props.gameState.childGameState instanceof DarkWingsDarkWordsGameState ||
+                    this.props.gameState.childGameState instanceof AThroneOfBladesGameState ||
+                    this.props.gameState.childGameState instanceof TheBurdenOfPowerGameState) ? (
                     <ListGroupItem className="px-2">
                         <Row>
                             <SimpleChoiceComponent gameClient={this.props.gameClient}
@@ -80,7 +72,9 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
                     [ReconcileArmiesGameState, ReconcileArmiesComponent],
                     [ClashOfKingsGameState, ClashOfKingsComponent],
                     [MusteringGameState, MusteringComponent],
-                    [WesterosDeck4GameState, WesterosDeck4Component]
+                    [WesterosDeck4GameState, WesterosDeck4Component],
+                    [ShiftingAmbitionsGameState, ShiftingAmbitionsComponent],
+                    [NewInformationGameState, NewInformationComponent]
                 ])}
             </>
         );

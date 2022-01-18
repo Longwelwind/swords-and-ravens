@@ -34,6 +34,8 @@ import orderTypes from "../common/ingame-game-state/game-data-structure/order-ty
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFastForward } from "@fortawesome/free-solid-svg-icons";
 import LoanCardComponent from "./game-state-panel/utils/LoanCardComponent";
+import { objectiveCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/ObjectiveCards";
+import ObjectiveCardComponent from "./game-state-panel/utils/ObjectiveCardComponent";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -287,7 +289,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <>
                         <p>Wildling bidding results for Wildling Threat <b>{data.wildlingStrength}</b>:</p>
-                        <div className="mt-1"><HouseNumberResultsComponent results={bids} key="wildlings-log"></HouseNumberResultsComponent></div>
+                        <div className="mt-1"><HouseNumberResultsComponent results={bids} keyPrefix="wildlings-log"></HouseNumberResultsComponent></div>
                         {data.nightsWatchVictory ? (
                             <p>The <b>Night&apos;s Watch</b> won!</p>
                         ) : (
@@ -451,6 +453,18 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>
                 );
             }
+            case "the-burden-of-power-choice": {
+                const house = this.game.houses.get(data.house);
+
+                return (
+                    <p>
+                        <b>{house.name}</b>, holder of the Iron Throne token, chose to
+                        {data.choice == 0 ? (
+                            <> reduce the Wildling track to the &ldquo;0&rdquo; position.</>
+                        ) : <> trigger a Mustering.</>}
+                    </p>
+                );
+            }
             case "dark-wings-dark-words-choice": {
                 const house = this.game.houses.get(data.house);
 
@@ -605,7 +619,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>}
 
                     <Row className="mb-1 mt-2">
-                        <HouseNumberResultsComponent results={bids} key={`cok_${data.trackerI}`}/>
+                        <HouseNumberResultsComponent results={bids} keyPrefix={`cok_${data.trackerI}`}/>
                     </Row>
                 </>;
             }
@@ -1181,7 +1195,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                 <>
                     <p>Supply levels have been adjusted:</p>
-                    <div className="mt-1"><HouseNumberResultsComponent results={supplies} key="supply"/></div>
+                    <div className="mt-1"><HouseNumberResultsComponent results={supplies} keyPrefix="supply"/></div>
                 </>);
             case "player-replaced": {
                 const oldUser = this.props.ingameGameState.entireGame.users.get(data.oldUser);
@@ -1565,6 +1579,79 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Spymaster</b>: <b>{house.name}</b> chose Westeros deck <b>{data.westerosDeckI + 1}</b> and put <b>{data.westerosCardsCountForTopOfDeck}
                         </b> card{data.westerosCardsCountForTopOfDeck != 1 ? "s" : ""} on top of the deck and <b>{data.westerosCardsCountForBottomOfDeck}
                         </b> card{data.westerosCardsCountForBottomOfDeck != 1 ? "s" : ""} to the bottom of the deck.
+                </p>;
+            }
+            case "objectives-chosen": {
+                const house = this.game.houses.get(data.house);
+
+                return <p>
+                    House <b>{house.name}</b> has chosen their 3 objectives.
+                </p>;
+            }
+            case "new-objective-card-drawn": {
+                const house = this.game.houses.get(data.house);
+
+                return <p>
+                    House <b>{house.name}</b> drew a new Objective card.
+                </p>;
+            }
+            case "special-objective-scored": {
+                const house = this.game.houses.get(data.house);
+
+                return <p>
+                    House <b>{house.name}</b> {data.scored ? "scored" : "did not score"} their Special Objective.
+                </p>;
+            }
+            case "objective-scored": {
+                const house = this.game.houses.get(data.house);
+                const objective = data.objectiveCard != null ? objectiveCards.get(data.objectiveCard) : null;
+
+                return objective != null ? <>
+                    <p>
+                        House <b>{house.name}</b> scored <b>{objective.name}</b> and awarded {data.victoryPoints} victory point{data.victoryPoints != 1 ? "s" : ""}.
+                    </p>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <ObjectiveCardComponent
+                            objectiveCard={objective}
+                            size="small"
+                        />
+                    </div>
+                </>
+                    : <>House <b>{house.name}</b> did not score an Objective card.</>
+            }
+            case "ironborn-raid": {
+                const house = this.game.houses.get(data.house);
+                return <p>
+                    <b>Ironborn Raid</b>: House <b>{house.name}</b> was reduced one position on the Victory track.
+                </p>
+            }
+            case "shifting-ambitions-objective-chosen-from-hand": {
+                const house = this.game.houses.get(data.house);
+                return <p>
+                    <b>Shifting Ambitions</b>: House <b>{house.name}</b> put one Objective card to the pool.
+                </p>
+            }
+            case "shifting-ambitions-objective-chosen-from-pool": {
+                const house = this.game.houses.get(data.house);
+                const objective = objectiveCards.get(data.objectiveCard);
+
+                return <>
+                    <p>
+                        <b>Shifting Ambitions</b>: House <b>{house.name}</b> choose <b>{objective.name}</b> from the Objective card pool.
+                    </p>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <ObjectiveCardComponent
+                            objectiveCard={objective}
+                            size="small"
+                        />
+                    </div>
+                </>
+            }
+            case "new-information-objective-card-chosen": {
+                const house = this.game.houses.get(data.house);
+
+                return <p>
+                    <b>New Information</b>: House <b>{house.name}</b> chose one Objective card in their hand and shuffled it back into the objective deck.
                 </p>;
             }
         }

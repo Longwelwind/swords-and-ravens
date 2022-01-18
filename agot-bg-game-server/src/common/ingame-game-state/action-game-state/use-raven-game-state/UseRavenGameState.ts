@@ -17,7 +17,7 @@ export default class UseRavenGameState extends GameState<ActionGameState, Replac
     }
 
     get ingameGameState(): IngameGameState {
-        return this.actionGameState.ingameGameState;
+        return this.actionGameState.ingame;
     }
 
     get game(): Game {

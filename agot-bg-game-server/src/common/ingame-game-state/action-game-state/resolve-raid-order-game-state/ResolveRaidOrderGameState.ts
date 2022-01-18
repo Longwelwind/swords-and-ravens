@@ -22,7 +22,7 @@ export default class ResolveRaidOrderGameState extends GameState<ActionGameState
     }
 
     get ingameGameState(): IngameGameState {
-        return this.actionGameState.ingameGameState;
+        return this.actionGameState.ingame;
     }
 
     get entireGame(): EntireGame {

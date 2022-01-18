@@ -10,9 +10,11 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | WesterosCardExecuted | WesterosCardDrawn | CombatResult | WildlingCardRevealed | WildlingBidding
     | HighestBidderChosen | LowestBidderChosen | PlayerMustered | WinnerDeclared
     | RavenHolderWildlingCardPutBottom | RavenHolderWildlingCardPutTop | RavenHolderReplaceOrder | RavenNotUsed | RaidDone | DarkWingsDarkWordsChoice
-    | PutToTheSwordChoice | AThroneOfBladesChoice | WinterIsComing | WesterosPhaseBegan | ClaimVassalsBegan
+    | PutToTheSwordChoice | AThroneOfBladesChoice | TheBurdenOfPowerChoice
+    | WinterIsComing | WesterosPhaseBegan | ClaimVassalsBegan
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
-    | ActionPhaseBegan | ActionPhaseResolveRaidBegan | ActionPhaseResolveMarchBegan | ActionPhaseResolveConsolidatePowerBegan | PlanningPhaseBegan | WildlingStrengthTriggerWildlingsAttack | MarchOrderRemoved
+    | ActionPhaseBegan | ActionPhaseResolveRaidBegan | ActionPhaseResolveMarchBegan | ActionPhaseResolveConsolidatePowerBegan | PlanningPhaseBegan
+    | WildlingStrengthTriggerWildlingsAttack | MarchOrderRemoved
     | ConsolidatePowerOrderResolved | ArmiesReconciled | EnemyPortTaken | ShipsDestroyedByEmptyCastle
     | HouseCardAbilityNotUsed | PatchfaceUsed | DoranUsed
     | TyrionLannisterHouseCardReplaced | TyrionLannisterChoiceMade
@@ -40,7 +42,9 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | PowerTokensGifted | InfluenceTrackPositionChosen | TiesDecided | PlaceLoyaltyChoice | LoyaltyTokenPlaced | LoyaltyTokenGained
     | FireMadeFleshChoice | PlayWithFireChoice | TheLongPlanChoice | MoveLoyaltyTokenChoice | LoanPurchased | OrderRemoved | InterestPaid
     | DebtPaid | CustomsOfficerPowerTokensGained | SellswordsPlaced | TheFacelessMenUnitsDestroyed | PyromancerExecuted | ExpertArtificerExecuted
-    | LoyalMaesterExecuted | MasterAtArmsExecuted | SavvyStewardExecuted | SpymasterExecuted;
+    | LoyalMaesterExecuted | MasterAtArmsExecuted | SavvyStewardExecuted | SpymasterExecuted
+    | ObjectivesChosen | NewObjectiveCardDrawn | SpecialObjectiveScored | ObjectiveScored | IronbornRaid
+    | ShiftingAmbitionsObjectiveChosenFromHand | ShiftingAmbitionsObjectiveChosenFromPool | NewInformationObjectiveCardChosen;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -191,6 +195,12 @@ interface PutToTheSwordChoice {
 
 interface AThroneOfBladesChoice {
     type: "a-throne-of-blades-choice";
+    house: string;
+    choice: number;
+}
+
+interface TheBurdenOfPowerChoice {
+    type: "the-burden-of-power-choice";
     house: string;
     choice: number;
 }
@@ -923,4 +933,48 @@ interface SpymasterExecuted {
     westerosDeckI: number;
     westerosCardsCountForTopOfDeck: number;
     westerosCardsCountForBottomOfDeck: number;
+}
+
+interface ObjectivesChosen {
+    type: "objectives-chosen";
+    house: string;
+}
+
+interface NewObjectiveCardDrawn {
+    type: "new-objective-card-drawn";
+    house: string;
+}
+
+interface SpecialObjectiveScored {
+    type: "special-objective-scored";
+    house: string;
+    scored: boolean;
+}
+
+interface ObjectiveScored {
+    type: "objective-scored";
+    house: string;
+    objectiveCard: string | null;
+    victoryPoints: number;
+}
+
+interface IronbornRaid {
+    type: "ironborn-raid",
+    house: string;
+}
+
+interface ShiftingAmbitionsObjectiveChosenFromHand {
+    type: "shifting-ambitions-objective-chosen-from-hand";
+    house: string;
+}
+
+interface ShiftingAmbitionsObjectiveChosenFromPool {
+    type: "shifting-ambitions-objective-chosen-from-pool";
+    house: string;
+    objectiveCard: string;
+}
+
+interface NewInformationObjectiveCardChosen {
+    type: "new-information-objective-card-chosen",
+    house: string;
 }

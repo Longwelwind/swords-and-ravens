@@ -27,7 +27,7 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
     }
 
     get participatingHouses(): House[] {
-        return this.game.houses.values.filter(h => !this.ingame.isVassalHouse(h));
+        return this.game.nonVassalHouses;
     }
 
     constructor(ingameGameState: IngameGameState) {

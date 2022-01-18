@@ -18,6 +18,9 @@ import WesterosCardType from "./westeros-card/WesterosCardType";
 import IngameGameState from "../IngameGameState";
 import { vassalHousesOrders, playerHousesOrders, seaOrders } from "./orders";
 import IronBank, { SerializedIronBank } from "./IronBank";
+import Player from "../Player";
+import { ObjectiveCard } from "./static-data-structure/ObjectiveCard";
+import { objectiveCards } from "./static-data-structure/ObjectiveCards";
 
 export const MAX_WILDLING_STRENGTH = 12;
 export const MAX_LOYALTY_TOKEN_COUNT = 20;
@@ -45,13 +48,13 @@ export default class Game {
     westerosDecks: WesterosCard[][];
     structuresCountNeededToWin: number;
     @observable maxTurns: number;
-    maxPowerTokens: number;
     vassalHouseCards: BetterMap<string, HouseCard> = new BetterMap<string, HouseCard>();
     @observable houseCardsForDrafting: BetterMap<string, HouseCard> = new BetterMap();
     deletedHouseCards: BetterMap<string, HouseCard> = new BetterMap();
     oldPlayerHouseCards: BetterMap<House, BetterMap<string, HouseCard>> = new BetterMap();
     @observable removedDragonStrengthToken = 0;
     ironBank: IronBank | null;
+    @observable objectiveDeck: ObjectiveCard[] = [];
 
     /**
      * Contains the vassal relations of the game.
@@ -128,10 +131,6 @@ export default class Game {
         return (this.loyaltyTokensOnBoardCount + 1) <= MAX_LOYALTY_TOKEN_COUNT;
     }
 
-    constructor(ingame: IngameGameState) {
-        this.ingame = ingame;
-    }
-
     get nextWesterosCardTypes(): (WesterosCardType | null)[][] {
         const result: (WesterosCardType | null)[][] = [];
 
@@ -140,6 +139,14 @@ export default class Game {
         });
 
         return result;
+    }
+
+    get nonVassalHouses(): House[] {
+        return this.houses.values.filter(h => !this.ingame.isVassalHouse(h));
+    }
+
+    constructor(ingame: IngameGameState) {
+        this.ingame = ingame;
     }
 
     updateWildlingStrength(value: number): number {
@@ -240,14 +247,31 @@ export default class Game {
         return numberStructuresPerHouse.some(n => n >= this.structuresCountNeededToWin);
     }
 
-    getPotentialWinners(): House[] {
-        const victoryConditions: ((h: House) => number)[] = [
-            (h: House) => this.ingame.isVassalHouse(h) ? 1 : -1,
-            (h: House) => -this.getVictoryPoints(h),
-            (h: House) => -this.getTotalControlledLandRegions(h),
-            (h: House) => -h.supplyLevel,
-            (h: House) => this.ironThroneTrack.indexOf(h)
-        ];
+    getPotentialWinners(lastRound = false): House[] {
+        let victoryConditions: ((h: House) => number)[] = [];
+
+        if (!this.ingame.entireGame.isFeastForCrows) {
+            victoryConditions = [
+                (h: House) => this.ingame.isVassalHouse(h) ? 1 : -1,
+                (h: House) => -this.getVictoryPoints(h),
+                (h: House) => -this.getTotalControlledLandRegions(h),
+                (h: House) => -h.supplyLevel,
+                (h: House) => this.ironThroneTrack.indexOf(h)
+            ];
+        } else if (!lastRound) {
+            victoryConditions = [
+                (h: House) => this.ingame.isVassalHouse(h) ? 1 : -1,
+                (h: House) => -this.getVictoryPoints(h),
+                (h: House) => -this.getTotalControlledLandRegions(h),
+                (h: House) => this.ironThroneTrack.indexOf(h)
+            ]
+        } else {
+            victoryConditions = [
+                (h: House) => this.ingame.isVassalHouse(h) ? 1 : -1,
+                (h: House) => -this.getVictoryPoints(h),
+                (h: House) => this.ironThroneTrack.indexOf(h)
+            ]
+        }
 
         return _.sortBy(this.houses.values, victoryConditions);
     }
@@ -256,8 +280,8 @@ export default class Game {
         return this.world.regions.values.filter(r => r.getController() == h).filter(r => r.type == land).length;
     }
 
-    getPotentialWinner(): House {
-        return this.getPotentialWinners()[0];
+    getPotentialWinner(lastRound = false): House {
+        return this.getPotentialWinners(lastRound)[0];
     }
 
     getCountUnitsOfType(house: House, unitType: UnitType): number {
@@ -399,9 +423,13 @@ export default class Game {
     }
 
     getVictoryPoints(house: House): number {
-        return house.id == "targaryen"
+        if (!this.ingame.entireGame.isFeastForCrows) {
+            return house.id == "targaryen"
             ? this.getTotalLoyaltyTokenCount(house)
             : _.sum(this.getCountHeldStructures(house).values);
+        }
+
+        return house.victoryPoints;
     }
 
     getTotalLoyaltyTokenCount(house: House): number {
@@ -453,10 +481,27 @@ export default class Game {
         return this.starredOrderRestrictions[place];
     }
 
-    serializeToClient(admin: boolean, knowsNextWildlingCard: boolean): SerializedGame {
+    updateSupplies(): void {
+        // Refresh the supply level of all houses
+        this.houses.values.forEach(h =>  {
+            h.supplyLevel = Math.min(this.supplyRestrictions.length - 1, this.getControlledSupplyIcons(h));
+        });
+
+        this.ingame.log({
+            type: "supply-adjusted",
+            supplies: this.houses.values.map(h => [h.id, h.supplyLevel])
+        });
+
+        this.ingame.entireGame.broadcastToClients({
+            type: "supply-adjusted",
+            supplies: this.houses.values.map(h => [h.id, h.supplyLevel])
+        });
+    }
+
+    serializeToClient(admin: boolean, player: Player | null): SerializedGame {
         return {
             lastUnitId: this.lastUnitId,
-            houses: this.houses.values.map(h => h.serializeToClient(admin, this.ingame.isVassalHouse(h))),
+            houses: this.houses.values.map(h => h.serializeToClient(admin, player, this.ingame.isVassalHouse(h))),
             world: this.world.serializeToClient(),
             turn: this.turn,
             ironThroneTrack: this.ironThroneTrack.map(h => h.id),
@@ -480,8 +525,7 @@ export default class Game {
             starredOrderRestrictions: this.starredOrderRestrictions,
             structuresCountNeededToWin: this.structuresCountNeededToWin,
             maxTurns: this.maxTurns,
-            maxPowerTokens: this.maxPowerTokens,
-            clientNextWildlingCardId: (admin || knowsNextWildlingCard) ? this.wildlingDeck[0].id : null,
+            clientNextWildlingCardId: (admin || player?.house.knowsNextWildlingCard) ? this.wildlingDeck[0].id : null,
             revealedWesterosCards: this.revealedWesterosCards,
             vassalRelations: this.vassalRelations.map((key, value) => [key.id, value.id]),
             vassalHouseCards: this.vassalHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
@@ -489,7 +533,8 @@ export default class Game {
             deletedHouseCards: this.deletedHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
             oldPlayerHouseCards: this.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])]),
             removedDragonStrengthToken: this.removedDragonStrengthToken,
-            ironBank: this.ironBank ? this.ironBank.serializeToClient(admin) : null
+            ironBank: this.ironBank ? this.ironBank.serializeToClient(admin) : null,
+            objectiveDeck: admin ? this.objectiveDeck.map(oc => oc.id) : []
         };
     }
 
@@ -511,7 +556,6 @@ export default class Game {
         game.starredOrderRestrictions = data.starredOrderRestrictions;
         game.structuresCountNeededToWin = data.structuresCountNeededToWin;
         game.maxTurns = data.maxTurns;
-        game.maxPowerTokens = data.maxPowerTokens;
         game.revealedWesterosCards = data.revealedWesterosCards;
         game.clientNextWildlingCardId = data.clientNextWildlingCardId;
         game.vassalRelations = new BetterMap(data.vassalRelations.map(([vid, hid]) => [game.houses.get(vid), game.houses.get(hid)]));
@@ -523,6 +567,7 @@ export default class Game {
         ));
         game.removedDragonStrengthToken = data.removedDragonStrengthToken;
         game.ironBank = data.ironBank ? IronBank.deserializeFromServer(game, data.ironBank) : null;
+        game.objectiveDeck = data.objectiveDeck.map(ocid => objectiveCards.get(ocid));
 
         return game;
     }
@@ -544,7 +589,6 @@ export interface SerializedGame {
     supplyRestrictions: number[][];
     structuresCountNeededToWin: number;
     maxTurns: number;
-    maxPowerTokens: number;
     revealedWesterosCards: number;
     clientNextWildlingCardId: number | null;
     vassalRelations: [string, string][];
@@ -554,4 +598,5 @@ export interface SerializedGame {
     oldPlayerHouseCards: [string, [string, SerializedHouseCard][]][];
     removedDragonStrengthToken: number;
     ironBank: SerializedIronBank | null;
+    objectiveDeck: string[];
 }

@@ -102,9 +102,9 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                 <Tooltip id="adwd-house-cards-tooltip">
                                     The house cards will come from the A Dance with Dragons and A Feast for Crows expansions.
                                 </Tooltip>}>
-                                <label htmlFor="adwd-house-cards">Use <i>ADwD / AFfC</i> house cards</label>
+                                <label htmlFor="adwd-house-cards">Use <i>ADwD</i> house cards</label>
                             </OverlayTrigger>}
-                        disabled={this.props.entireGame.gameSettings.setupId == "a-dance-with-dragons"}
+                        disabled={this.props.entireGame.isDanceWithDragons}
                         checked={this.gameSettings.adwdHouseCards}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.adwdHouseCards = !this.gameSettings.adwdHouseCards)}
                     />

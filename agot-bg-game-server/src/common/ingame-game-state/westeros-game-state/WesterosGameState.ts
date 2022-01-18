@@ -21,10 +21,14 @@ import AThroneOfBladesGameState, {SerializedAThroneOfBladesGameState} from "./th
 import DarkWingsDarkWordsGameState, {SerializedDarkWingsDarkWordsGameState} from "./dark-wings-dark-words-game-state/DarkWingsDarkWordsGameState";
 import WesterosDeck4GameState, { SerializedWesterosDeck4GameState } from "./westeros-deck-4-game-state/WesterosDeck4GameState";
 import Region from "../game-data-structure/Region";
+import TheBurdenOfPowerGameState, { SerializedTheBurdenOfPowerGameState } from "./the-burden-of-power-game-state/TheBurdenOfPowerGameState";
+import ShiftingAmbitionsGameState, { SerializedShiftingAmbitionsGameState } from "./shifting-ambitions-game-state/ShiftingAmbitionsGameState";
+import NewInformationGameState, { SerializedNewInformationGameState } from "./new-information-game-state/NewInformationGameState";
 
 export default class WesterosGameState extends GameState<IngameGameState,
     WildlingsAttackGameState | ReconcileArmiesGameState<WesterosGameState> | MusteringGameState | ClashOfKingsGameState
     | PutToTheSwordGameState | AThroneOfBladesGameState | DarkWingsDarkWordsGameState | WesterosDeck4GameState
+    | TheBurdenOfPowerGameState | ShiftingAmbitionsGameState | NewInformationGameState
 > {
     revealedCards: WesterosCard[];
     @observable currentCardI = -1;
@@ -223,24 +227,29 @@ export default class WesterosGameState extends GameState<IngameGameState,
 
     deserializeChildGameState(data: SerializedWesterosGameState["childGameState"]): WesterosGameState["childGameState"]
     {
-        if (data.type == "wildlings-attack") {
-            return WildlingsAttackGameState.deserializeFromServer(this, data);
-        } else if (data.type == "reconcile-armies") {
-            return ReconcileArmiesGameState.deserializeFromServer(this, data);
-        } else if (data.type == "mustering") {
-            return MusteringGameState.deserializeFromServer(this, data);
-        } else if (data.type == "clash-of-kings") {
-            return ClashOfKingsGameState.deserializeFromServer(this, data);
-        } else if (data.type == "put-to-the-sword") {
-            return PutToTheSwordGameState.deserializeFromServer(this, data);
-        } else if (data.type == "a-throne-of-blades") {
-            return AThroneOfBladesGameState.deserializeFromServer(this, data);
-        } else if (data.type == "dark-wings-dark-words") {
-            return DarkWingsDarkWordsGameState.deserializeFromServer(this, data);
-        } else if (data.type == "westeros-deck-4") {
-            return WesterosDeck4GameState.deserializeFromServer(this, data);
-        } else  {
-            throw new Error();
+        switch (data.type) {
+            case "wildlings-attack":
+                return WildlingsAttackGameState.deserializeFromServer(this, data);
+            case "reconcile-armies":
+                return ReconcileArmiesGameState.deserializeFromServer(this, data);
+            case "mustering":
+                    return MusteringGameState.deserializeFromServer(this, data);
+            case "clash-of-kings":
+                return ClashOfKingsGameState.deserializeFromServer(this, data);
+            case "put-to-the-sword":
+                return PutToTheSwordGameState.deserializeFromServer(this, data);
+            case "a-throne-of-blades":
+                return AThroneOfBladesGameState.deserializeFromServer(this, data);
+            case "dark-wings-dark-words":
+                return DarkWingsDarkWordsGameState.deserializeFromServer(this, data);
+            case "westeros-deck-4":
+                return WesterosDeck4GameState.deserializeFromServer(this, data);
+            case "the-burden-of-power":
+                return TheBurdenOfPowerGameState.deserializeFromServer(this, data);
+            case "shifting-ambitions":
+                return ShiftingAmbitionsGameState.deserializeFromServer(this, data);
+            case "new-information":
+                return NewInformationGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -252,5 +261,7 @@ export interface SerializedWesterosGameState {
     planningRestrictions: string[];
     childGameState: SerializedWildlingsAttackGameState
         | SerializedReconcileArmiesGameState | SerializedMusteringGameState | SerializedClashOfKingsGameState
-        | SerializedPutToTheSwordGameState | SerializedAThroneOfBladesGameState | SerializedDarkWingsDarkWordsGameState | SerializedWesterosDeck4GameState;
+        | SerializedPutToTheSwordGameState | SerializedAThroneOfBladesGameState | SerializedDarkWingsDarkWordsGameState
+        | SerializedWesterosDeck4GameState | SerializedTheBurdenOfPowerGameState | SerializedShiftingAmbitionsGameState
+        | SerializedNewInformationGameState;
 }

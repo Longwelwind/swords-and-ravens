@@ -26,6 +26,13 @@ import strongholdsOfResistance from "../../public/images/westeros-cards/4/Strong
 import theLongPlan from "../../public/images/westeros-cards/4/TheLongPlan.png";
 import wateringTheSeed from "../../public/images/westeros-cards/4/WateringTheSeed.png";
 import wordSpreadsQuickly from "../../public/images/westeros-cards/4/WordSpreadsQuickly.png";
+import musteringAffc from "../../public/images/westeros-cards/affc/MusteringAFFC.png";
+import rallyTheMen from "../../public/images/westeros-cards/affc/RallyTheMen.png";
+import burdenOfPower from "../../public/images/westeros-cards/affc/TheBurdenOfPower.png";
+import famine from "../../public/images/westeros-cards/affc/Famine.png"
+import ironbornRaid from "../../public/images/westeros-cards/affc/IronbornRaid.png"
+import shiftingAmbitions from "../../public/images/westeros-cards/affc/ShiftingAmbitions.png"
+import newInformation from "../../public/images/westeros-cards/affc/NewInformation.png"
 
 const westerosCardImages = new BetterMap([
     [0, new BetterMap([
@@ -34,6 +41,13 @@ const westerosCardImages = new BetterMap([
         ["winter-is-coming", winterIsComing],
         ["a-throne-of-blades", throneOfBlades],
         ["supply", supply],
+        ["mustering-affc", musteringAffc],
+        ["rally-the-men", rallyTheMen],
+        ["the-burden-of-power", burdenOfPower],
+        ["famine", famine],
+        ["ironborn-raid", ironbornRaid],
+        ["shifting-ambitions", shiftingAmbitions],
+        ["new-information", newInformation]
     ])],
     [1, new BetterMap([
         ["game-of-thrones", gameOfThrones],

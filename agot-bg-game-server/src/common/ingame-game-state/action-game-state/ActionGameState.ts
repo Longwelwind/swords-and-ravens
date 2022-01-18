@@ -28,21 +28,28 @@ import {footman} from "../game-data-structure/unitTypes";
 import DefenseMusterOrderType from "../game-data-structure/order-types/DefenseMusterOrderType";
 import { raidSupportPlusOne } from "../game-data-structure/order-types/orderTypes";
 import IronBankOrderType from "../game-data-structure/order-types/IronBankOrderType";
+import ReconcileArmiesGameState, { SerializedReconcileArmiesGameState } from "../westeros-game-state/reconcile-armies-game-state/ReconcileArmiesGameState";
+import popRandom from "../../../utils/popRandom";
+import { ObjectiveCard } from "../game-data-structure/static-data-structure/ObjectiveCard";
+import ScoreObjectivesGameState, { SerializedScoreObjectivesGameState } from "./score-objectives-game-state/ScoreObjectivesGameState";
 
-export default class ActionGameState extends GameState<IngameGameState, UseRavenGameState | ResolveRaidOrderGameState | ResolveMarchOrderGameState | ResolveConsolidatePowerGameState> {
+export default class ActionGameState extends GameState<IngameGameState, UseRavenGameState | ResolveRaidOrderGameState
+                                                                        | ResolveMarchOrderGameState | ResolveConsolidatePowerGameState
+                                                                        | ReconcileArmiesGameState<ActionGameState> | ScoreObjectivesGameState>
+{
     planningRestrictions: PlanningRestriction[];
     @observable ordersOnBoard: BetterMap<Region, Order>;
 
-    get ingameGameState(): IngameGameState {
+    get ingame(): IngameGameState {
         return this.parentGameState;
     }
 
     get game(): Game {
-        return this.ingameGameState.game;
+        return this.ingame.game;
     }
 
     get entireGame(): EntireGame {
-        return this.ingameGameState.entireGame;
+        return this.ingame.entireGame;
     }
 
     constructor(ingameGameState: IngameGameState) {
@@ -53,7 +60,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
         this.planningRestrictions = planningRestrictions;
         this.ordersOnBoard = ordersOnBoard;
 
-        this.ingameGameState.log({
+        this.ingame.log({
             type: "action-phase-began"
         });
 
@@ -95,7 +102,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
             });
 
             if (log) {
-                this.ingameGameState.log({
+                this.ingame.log({
                     type: "order-removed",
                     region: region.id,
                     house: house?.id,
@@ -122,7 +129,41 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
     }
 
     onResolveConsolidatePowerEnd(): void {
-        this.ingameGameState.onActionGameStateFinish();
+        if (this.entireGame.isFeastForCrows) {
+            this.proceedFeastForCrowsSteps();
+        } else {
+            this.ingame.onActionGameStateFinish();
+        }
+    }
+
+    proceedFeastForCrowsSteps(): void {
+        this.game.updateSupplies();
+        // Check if any house needs to reconcile his armies
+        this.setChildGameState(new ReconcileArmiesGameState(this)).firstStart();
+    }
+
+    onReconcileArmiesGameStateEnd(): void {
+        this.setChildGameState(new ScoreObjectivesGameState(this)).firstStart();
+    }
+
+    onScoreObjectivesGameStateEnd(): void {
+        // Draw new objectives
+        this.game.houses.values.forEach(h => {
+            while (h.secretObjectives.length != 3) {
+                h.secretObjectives.push(popRandom(this.game.objectiveDeck) as ObjectiveCard);
+                this.ingame.log({
+                    type: "new-objective-card-drawn",
+                    house: h.id
+                }, true);
+            }
+        });
+
+        this.ingame.broadcastObjectives();
+        if (this.ingame.checkVictoryConditions()) {
+            return;
+        }
+
+        this.ingame.onActionGameStateFinish();
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -232,17 +273,20 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
         return actionGameState;
     }
 
-    deserializeChildGameState(data: SerializedActionGameState["childGameState"]): UseRavenGameState | ResolveRaidOrderGameState | ResolveMarchOrderGameState | ResolveConsolidatePowerGameState {
-        if (data.type == "use-raven") {
-            return UseRavenGameState.deserializeFromServer(this, data);
-        } else if (data.type == "resolve-march-order") {
-            return ResolveMarchOrderGameState.deserializeFromServer(this, data);
-        } else if (data.type == "resolve-raid-order") {
-            return ResolveRaidOrderGameState.deserializeFromServer(this, data);
-        } else if (data.type == "resolve-consolidate-power") {
-            return ResolveConsolidatePowerGameState.deserializeFromServer(this, data);
-        } else {
-            throw new Error();
+    deserializeChildGameState(data: SerializedActionGameState["childGameState"]): ActionGameState["childGameState"] {
+        switch (data.type) {
+            case "use-raven":
+                return UseRavenGameState.deserializeFromServer(this, data);
+            case "resolve-march-order":
+                return ResolveMarchOrderGameState.deserializeFromServer(this, data);
+            case "resolve-raid-order":
+                return ResolveRaidOrderGameState.deserializeFromServer(this, data);
+            case "resolve-consolidate-power":
+                return ResolveConsolidatePowerGameState.deserializeFromServer(this, data);
+            case "reconcile-armies":
+                return ReconcileArmiesGameState.deserializeFromServer(this, data);
+            case "score-objectives":
+                return ScoreObjectivesGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -252,5 +296,5 @@ export interface SerializedActionGameState {
     planningRestrictions: string[];
     ordersOnBoard: [string, number][];
     childGameState: SerializedUseRavenGameState | SerializedResolveMarchOrderGameState | SerializedResolveRaidOrderGameState
-        | SerializedResolveConsolidatePowerGameState;
+        | SerializedResolveConsolidatePowerGameState | SerializedReconcileArmiesGameState | SerializedScoreObjectivesGameState;
 }

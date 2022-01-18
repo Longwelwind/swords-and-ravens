@@ -32,7 +32,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             </Helmet>
             <Col xs={12} className={this.props.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
                 <div style={{ marginLeft: "1rem", marginBottom: "0rem", textAlign: "center"}}>
-                    <h4 style={{ display: "inline" }}>{this.props.entireGame.name} {this.getTidesOfBattleImage()} {this.getGameTypeBadge()}</h4>
+                    <h4 style={{ display: "inline" }}>{this.props.entireGame.name} {this.getTidesOfBattleImage()} {this.getGameTypeBadge()}</h4>{this.props.entireGame.isFeastForCrows && this.getBetaWarning()}
                 </div>
             </Col>
             {
@@ -64,7 +64,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     getBetaWarning(): ReactNode {
-        return <h6 style={{display: "inline", fontWeight: "normal"}}>BETA!</h6>
+        return <h6 style={{display: "inline", fontWeight: "normal"}}>&nbsp;BETA!</h6>
     }
 
     componentDidMount(): void {
