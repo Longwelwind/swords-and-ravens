@@ -675,6 +675,10 @@
             {
               "type": "the-burden-of-power",
               "quantity": 2
+            },
+            {
+              "type": "famine",
+              "quantity": 1
             }],
             null,
             null
