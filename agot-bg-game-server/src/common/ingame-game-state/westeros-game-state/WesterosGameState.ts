@@ -23,11 +23,12 @@ import WesterosDeck4GameState, { SerializedWesterosDeck4GameState } from "./west
 import Region from "../game-data-structure/Region";
 import TheBurdenOfPowerGameState, { SerializedTheBurdenOfPowerGameState } from "./the-burden-of-power-game-state/TheBurdenOfPowerGameState";
 import ShiftingAmbitionsGameState, { SerializedShiftingAmbitionsGameState } from "./shifting-ambitions-game-state/ShiftingAmbitionsGameState";
+import NewInformationGameState, { SerializedNewInformationGameState } from "./new-information-game-state/NewInformationGameState";
 
 export default class WesterosGameState extends GameState<IngameGameState,
     WildlingsAttackGameState | ReconcileArmiesGameState<WesterosGameState> | MusteringGameState | ClashOfKingsGameState
     | PutToTheSwordGameState | AThroneOfBladesGameState | DarkWingsDarkWordsGameState | WesterosDeck4GameState
-    | TheBurdenOfPowerGameState | ShiftingAmbitionsGameState
+    | TheBurdenOfPowerGameState | ShiftingAmbitionsGameState | NewInformationGameState
 > {
     revealedCards: WesterosCard[];
     @observable currentCardI = -1;
@@ -247,6 +248,8 @@ export default class WesterosGameState extends GameState<IngameGameState,
                 return TheBurdenOfPowerGameState.deserializeFromServer(this, data);
             case "shifting-ambitions":
                 return ShiftingAmbitionsGameState.deserializeFromServer(this, data);
+            case "new-information":
+                return NewInformationGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -259,5 +262,6 @@ export interface SerializedWesterosGameState {
     childGameState: SerializedWildlingsAttackGameState
         | SerializedReconcileArmiesGameState | SerializedMusteringGameState | SerializedClashOfKingsGameState
         | SerializedPutToTheSwordGameState | SerializedAThroneOfBladesGameState | SerializedDarkWingsDarkWordsGameState
-        | SerializedWesterosDeck4GameState | SerializedTheBurdenOfPowerGameState | SerializedShiftingAmbitionsGameState;
+        | SerializedWesterosDeck4GameState | SerializedTheBurdenOfPowerGameState | SerializedShiftingAmbitionsGameState
+        | SerializedNewInformationGameState;
 }

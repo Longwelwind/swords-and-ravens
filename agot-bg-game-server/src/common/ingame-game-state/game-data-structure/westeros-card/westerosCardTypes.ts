@@ -31,6 +31,7 @@ import TheBurdenOfPowerWesterosCardType from "./TheBurdenOfPowerWesterosCardType
 import FamineWesterosCardType from "./FamineWesterosCardType";
 import IronbornRaidWesterosCardType from "./IronbornRaidWesterosCardType";
 import ShiftingAmbitionsWesterosCardType from "./ShiftingAmbitionsWesterosCardType";
+import NewInformationWesterosCardType from "./NewInformationWesterosCardType";
 
 export const lastDaysOfSummer = new LastDaysOfSummerWesterosCardType("last-days-of-summer", "Last\xa0Days\xa0of\xa0Summer", "Nothing happens.", "Nothing\xa0happens", 2);
 export const winterIsComing = new WinterIsComingWesterosCardType("winter-is-coming", "Winter\xa0is\xa0Coming", "Immediately shuffle this deck. Then draw and resolve a new card.", "Reshuffle\xa0deck");
@@ -46,6 +47,7 @@ export const burdenOfPower = new TheBurdenOfPowerWesterosCardType("the-burden-of
 export const famine = new FamineWesterosCardType("famine", "Famine", "Each player is reduced one position on the Supply track and then, in turn order, reconciles armies.", "Supply -1", 2);
 export const ironbornRaid = new IronbornRaidWesterosCardType("ironborn-raid", "Ironborn Raid", "Each player with at least 2 scored Objective cards in his play area is reduced one position on the Victory track.", "VP -1", 2);
 export const shiftingAmbitions = new ShiftingAmbitionsWesterosCardType("shifting-ambitions", "Shifting Ambitions", "Each player chooses 1 Objective card from his hand and places it facedown in a common area. Shuffle the facedown cards and flip them faceup. Then, in turn order, each player chooses 1 of these cards and places it into his hand.", "Exchange objectives", 2);
+export const newInformation = new NewInformationWesterosCardType("new-information", "New Information", "In turn order, each player draws one Objective card. Then each player chooses one Objective card in his hand and shuffles it back into the objective deck.", "New objective", 2);
 
 export const clashOfKings = new ClashOfKingsWesterosCardType("clash-of-kings", "Clash\xa0of\xa0Kings", "Bid on the three Influence tracks.", "Bid\xa0for\xa0tracks");
 export const darkWingsDarkWords = new DarkWingDarkWordsWesterosCardType("dark-wings-dark-words", "Dark\xa0Wings,\xa0Dark\xa0Words", "The holder of the Messenger Raven token chooses whether a) everyone bids on the  three Influence tracks b) everyone collects one Power\xa0token for every power icon present in areas they control, or c) this card has no effect.", "Raven\xa0decides", 2);
@@ -82,6 +84,7 @@ export const westerosCardTypes = new BetterMap<string, WesterosCardType>([
     [famine.id, famine],
     [ironbornRaid.id, ironbornRaid],
     [shiftingAmbitions.id, shiftingAmbitions],
+    [newInformation.id, newInformation],
     [clashOfKings.id, clashOfKings],
     [darkWingsDarkWords.id, darkWingsDarkWords],
     [feastForCrows.id, feastForCrows],

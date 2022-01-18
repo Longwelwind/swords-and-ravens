@@ -1621,15 +1621,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             }
             case "ironborn-raid": {
                 const house = this.game.houses.get(data.house);
-                return <>
+                return <p>
                     <b>Ironborn Raid</b>: House <b>{house.name}</b> was reduced one position on the Victory track.
-                </>
+                </p>
             }
             case "shifting-ambitions-objective-chosen-from-hand": {
                 const house = this.game.houses.get(data.house);
-                return <>
+                return <p>
                     <b>Shifting Ambitions</b>: House <b>{house.name}</b> put one Objective card to the pool.
-                </>
+                </p>
             }
             case "shifting-ambitions-objective-chosen-from-pool": {
                 const house = this.game.houses.get(data.house);
@@ -1646,6 +1646,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         />
                     </div>
                 </>
+            }
+            case "new-information-objective-card-chosen": {
+                const house = this.game.houses.get(data.house);
+
+                return <p>
+                    <b>New Information</b>: House <b>{house.name}</b> chose one Objective card in their hand and shuffled it back into the objective deck.
+                </p>;
             }
         }
     }

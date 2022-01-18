@@ -154,7 +154,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
                 this.ingame.log({
                     type: "new-objective-card-drawn",
                     house: h.id
-                });
+                }, true);
             }
         });
 

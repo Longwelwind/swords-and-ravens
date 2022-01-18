@@ -44,7 +44,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | DebtPaid | CustomsOfficerPowerTokensGained | SellswordsPlaced | TheFacelessMenUnitsDestroyed | PyromancerExecuted | ExpertArtificerExecuted
     | LoyalMaesterExecuted | MasterAtArmsExecuted | SavvyStewardExecuted | SpymasterExecuted
     | ObjectivesChosen | NewObjectiveCardDrawn | SpecialObjectiveScored | ObjectiveScored | IronbornRaid
-    | ShiftingAmbitionsObjectiveChosenFromHand | ShiftingAmbitionsObjectiveChosenFromPool;
+    | ShiftingAmbitionsObjectiveChosenFromHand | ShiftingAmbitionsObjectiveChosenFromPool | NewInformationObjectiveCardChosen;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -972,4 +972,9 @@ interface ShiftingAmbitionsObjectiveChosenFromPool {
     type: "shifting-ambitions-objective-chosen-from-pool";
     house: string;
     objectiveCard: string;
+}
+
+interface NewInformationObjectiveCardChosen {
+    type: "new-information-objective-card-chosen",
+    house: string;
 }

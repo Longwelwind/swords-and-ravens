@@ -687,6 +687,10 @@
             {
               "type": "shifting-ambitions",
               "quantity": 2
+            },
+            {
+              "type": "new-information",
+              "quantity": 1
             }],
             null,
             null

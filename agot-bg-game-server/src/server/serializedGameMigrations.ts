@@ -9,7 +9,7 @@ import { vassalHouseCards } from "../common/ingame-game-state/game-data-structur
 import { DraftStep } from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import _ from "lodash";
 import shuffleInPlace from "../utils/shuffleInPlace";
-import { SerializedEntireGame } from "../common/EntireGame";
+//import { SerializedEntireGame } from "../common/EntireGame";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
     {
@@ -1306,12 +1306,12 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
     },
     {
         version: "55",
-        migrate: (serializedGame: SerializedEntireGame) => {
+        migrate: (serializedGame: any) => {
             // Migration for AFFC
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
 
-                ingame.game.houses.forEach((h) => {
+                ingame.game.houses.forEach((h: any) => {
                     h.maxPowerTokens = 20;
                     h.specialObjective = null;
                     h.secretObjectives = [];
@@ -1321,7 +1321,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
                 ingame.game.objectiveDeck = [];
 
-                ingame.game.world.regions.forEach((r) => r.overwrittenSuperControlPowerToken = null);
+                ingame.game.world.regions.forEach((r: any) => r.overwrittenSuperControlPowerToken = null);
 
                 if (ingame.childGameState.type == "westeros" && ingame.childGameState.childGameState.type == "mustering") {
                     const mustering = ingame.childGameState.childGameState;
