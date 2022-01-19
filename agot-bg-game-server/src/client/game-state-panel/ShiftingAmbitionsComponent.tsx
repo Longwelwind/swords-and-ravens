@@ -21,8 +21,10 @@ export default class ShiftingAmbitionsComponent extends Component<GameStateCompo
             <Row className="justify-content-center">
                 <Col xs={12} className="text-center">
                     {this.gameState.step == ShiftingAmbitionsStep.CHOOSE_OBJECTIVE_FROM_HAND
-                        ? "Each house choose 1 Objective card from their hand and places it facedown in a common area."
-                        : "In turn order, each house chooses 1 Objective card from the common area."}
+                        ? <>Each house choose 1 Objective card from their hand and places it facedown in a common area.<br/>
+                        <small>(Then the facedown cards are shuffled and flipped faceup and each house chooses 1 of these cards and places it into their hand.)</small></>
+                        : <>In turn order, each house chooses 1 Objective card from the common area and places it into their hand.</>
+                    }
                 </Col>
                 {drawPool && <Col xs="12">
                     <Row className="justify-content-center">
