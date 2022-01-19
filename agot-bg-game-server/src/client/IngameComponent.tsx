@@ -860,7 +860,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const remainingCards = this.game.remainingWesterosCardTypes.map(deck => _.sortBy(deck.entries, rwct => -rwct[1]));
         const nextCards = this.game.nextWesterosCardTypes;
 
-        return <Tooltip id="remaining-westeros-cards" className="westeros-tooltip">
+        return <Tooltip id="remaining-westeros-cards" className="tooltip-w-100">
             {this.gameSettings.cokWesterosPhase && (
                 <>
                     <Row className='mt-0'>

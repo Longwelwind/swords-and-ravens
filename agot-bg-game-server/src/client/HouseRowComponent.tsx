@@ -357,7 +357,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     }
 
     private renderVictoryConditionsTooltip(house: House): OverlayChildren {
-        return <Tooltip id={house.id + "-victory-tooltip"} className="westeros-tooltip">
+        return <Tooltip id={house.id + "-victory-tooltip"} className="tooltip-w-100">
             <h5 style={{textAlign: "center"}}>&nbsp;&nbsp;Total&nbsp;Land&nbsp;Areas&nbsp;&nbsp;</h5>
             <h4 style={{textAlign: "center"}}><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
             {this.ingame.entireGame.isFeastForCrows && <>

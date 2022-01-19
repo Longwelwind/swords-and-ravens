@@ -228,7 +228,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         const loanDeck = _.orderBy(ironBank.loanCardDeck.filter(lc => !lc.discarded), lc => lc.type.name);
         const purchasedLoans = ironBank.purchasedLoansPerHouse;
 
-        return <Tooltip id={"loan-cards-tooltip"} className="westeros-tooltip">
+        return <Tooltip id={"loan-cards-tooltip"} className="tooltip-w-100">
             <Col>
                 {loanSlots.length > 0 &&
                     <Col xs={12} className="mb-3">
@@ -612,7 +612,7 @@ export default class MapComponent extends Component<MapComponentProps> {
     }
 
     private renderOrderTooltip(order: Order | null, region: Region): OverlayChildren {
-        return <Tooltip id={"order-info"} className="westeros-tooltip">
+        return <Tooltip id={"order-info"} className="tooltip-w-100">
             <b>{order ? order.type.name : "Order token"}</b><small> of <b>{region.getController()?.name ?? "Unknown"}</b><br /><b>{region.name}</b></small>
         </Tooltip>;
     }

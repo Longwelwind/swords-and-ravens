@@ -461,7 +461,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <p>
                         <b>{house.name}</b>, holder of the Iron Throne token, chose to
                         {data.choice == 0 ? (
-                            <> reduce the Wildling track to the &ldquo;0&rdquo; position.</>
+                            <> reduce the Wildling track to the &quot;0&quot; position.</>
                         ) : <> trigger a Mustering.</>}
                     </p>
                 );
