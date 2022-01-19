@@ -74,9 +74,12 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
 
     render(): ReactNode {
         const gameRunning = !(this.ingame.leafState instanceof GameEndedGameState) && !(this.ingame.leafState instanceof CancelledGameState);
-        const victoryPoints = this.game.getVictoryPoints(this.house);
-        const victoryPointsWarning = gameRunning && (this.game.structuresCountNeededToWin - 2 == victoryPoints);
-        const victoryPointsCritical = gameRunning && (this.game.structuresCountNeededToWin - 1 == victoryPoints);
+        // We limit the victory points to 7 but in the UI we wan't to show if a player controls more than 7 castles
+        const victoryPoints = !this.ingame.entireGame.isFeastForCrows && this.house.id != "targaryen"
+            ? this.game.getControlledStrongholdAndCastleCount(this.house)
+            : this.game.getVictoryPoints(this.house);
+        const victoryPointsWarning = gameRunning && (this.game.victoryPointsCountNeededToWin - 2 == victoryPoints);
+        const victoryPointsCritical = gameRunning && (this.game.victoryPointsCountNeededToWin - 1 == victoryPoints || this.game.victoryPointsCountNeededToWin == victoryPoints);
         let controller: User;
         let isWaitedFor = false;
 

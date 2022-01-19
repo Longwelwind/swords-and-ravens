@@ -40,7 +40,8 @@ export default class ScoreSpecialObjectivesGameState extends GameState<ScoreObje
                 this.ingame.log({
                     type: "special-objective-scored",
                     house: h.id,
-                    scored: false
+                    scored: false,
+                    newTotal: h.victoryPoints
                 }, true);
                 this.readyHouses.push(h);
             }
@@ -66,14 +67,15 @@ export default class ScoreSpecialObjectivesGameState extends GameState<ScoreObje
             }
 
             if (message.objective != null) {
-                player.house.victoryPoints++;
+                this.ingame.game.updateVictoryPoints(player.house, 1);
                 this.ingame.broadcastObjectives();
             }
 
             this.ingame.log({
                 type: "special-objective-scored",
                 house: player.house.id,
-                scored: message.objective != null
+                scored: message.objective != null,
+                newTotal: player.house.victoryPoints
             });
 
             this.readyHouses.push(player.house);

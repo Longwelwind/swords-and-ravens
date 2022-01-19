@@ -950,6 +950,7 @@ interface SpecialObjectiveScored {
     type: "special-objective-scored";
     house: string;
     scored: boolean;
+    newTotal: number;
 }
 
 interface ObjectiveScored {
@@ -957,11 +958,13 @@ interface ObjectiveScored {
     house: string;
     objectiveCard: string | null;
     victoryPoints: number;
+    newTotal: number;
 }
 
 interface IronbornRaid {
     type: "ironborn-raid",
     house: string;
+    newTotal: number;
 }
 
 interface ShiftingAmbitionsObjectiveChosenFromHand {

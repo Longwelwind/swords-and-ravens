@@ -1600,7 +1600,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
 
                 return <p>
-                    House <b>{house.name}</b> {data.scored ? "scored" : "did not score"} their Special Objective.
+                    House <b>{house.name}</b> {data.scored
+                        ? <>scored their Special Objective and now has a total of <b>{data.newTotal}</b> victory points</>
+                        : <>did not score their Special Objective</>}.
                 </p>;
             }
             case "objective-scored": {
@@ -1609,7 +1611,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return objective != null ? <>
                     <p>
-                        House <b>{house.name}</b> scored <b>{objective.name}</b> and awarded {data.victoryPoints} victory point{data.victoryPoints != 1 ? "s" : ""}.
+                        House <b>{house.name}</b> scored <b>{objective.name}</b>, awarded <b>{data.victoryPoints}</b>&nbsp;victory&nbsp;point{data.victoryPoints != 1 ? "s" : ""} and now has a total of <b>{data.newTotal}</b>&nbsp;victory&nbsp;points.
                     </p>
                     <div style={{ display: 'flex', justifyContent: 'center' }}>
                         <ObjectiveCardComponent
@@ -1623,7 +1625,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "ironborn-raid": {
                 const house = this.game.houses.get(data.house);
                 return <p>
-                    <b>Ironborn Raid</b>: House <b>{house.name}</b> was reduced one position on the Victory track.
+                    <b>Ironborn Raid</b>: House <b>{house.name}</b> was reduced one position on the Victory track and now has a total of <b>{data.newTotal}</b> victory points.
                 </p>
             }
             case "shifting-ambitions-objective-chosen-from-hand": {

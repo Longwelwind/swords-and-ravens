@@ -203,7 +203,7 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
     }
 
     getPossibleRegionsForOrders(house: House): Region[] {
-        const possibleRegions = this.game.world.getControlledRegions(house).filter(r => r.units.size > 0);
+        const possibleRegions = this.game.world.regions.values.filter(r => r.units.size > 0 && r.getController() == house);
 
         if (!this.forVassals) {
             if (!this.ingame.isVassalHouse(house)) {

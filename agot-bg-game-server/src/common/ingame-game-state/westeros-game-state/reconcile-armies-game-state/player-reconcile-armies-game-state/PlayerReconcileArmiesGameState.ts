@@ -84,7 +84,7 @@ export default class PlayerReconcileArmiesGameState extends GameState<ReconcileA
     }
 
     getAllArmyUnitsOfHouse(house: House): Unit[] {
-        return _.flatMap(this.game.world.getControlledRegions(house).filter(r => r.units.size > 1).map(r => r.units.values));
+        return _.flatMap(this.game.world.regions.values.filter(r => r.units.size > 1 && r.getController() == house).map(r => r.units.values));
     }
 
     reconcileArmies(removedUnits: BetterMap<Region, Unit[]>): void {

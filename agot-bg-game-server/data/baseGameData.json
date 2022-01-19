@@ -1,5 +1,5 @@
 {
-  "structuresCountNeededToWin": 7,
+  "victoryPointsCountNeededToWin": 7,
   "maxTurns": 10,
   "maxPowerTokens": 20,
   "tracks": {
@@ -504,7 +504,7 @@
               "unitType": "knight",
               "house": "stark",
               "quantity": 1,
-              "quantityVassal": 1
+              "quantityVassal": 0
             }],
             "moat-cailin": [{
                 "unitType": "footman",

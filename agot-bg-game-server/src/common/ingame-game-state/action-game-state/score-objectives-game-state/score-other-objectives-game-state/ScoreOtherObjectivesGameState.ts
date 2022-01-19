@@ -33,13 +33,14 @@ export default class ScoreOtherObjectivesGameState extends GameState<ScoreObject
                 type: "objective-scored",
                 house: house.id,
                 objectiveCard: null,
-                victoryPoints: 0
+                victoryPoints: 0,
+                newTotal: house.victoryPoints
             });
         } else {
             // Though we just can score 1 objective by the rules, we do it in a loop
             selectedObjectiveCards.forEach(oc => {
                 const victoryPoints = oc.getVictoryPointsForHouse(house);
-                house.victoryPoints += victoryPoints;
+                this.game.updateVictoryPoints(house, victoryPoints);
                 house.completedObjectives.push(oc);
                 _.pull(house.secretObjectives, oc);
 
@@ -47,7 +48,8 @@ export default class ScoreOtherObjectivesGameState extends GameState<ScoreObject
                     type: "objective-scored",
                     house: house.id,
                     objectiveCard: oc.id,
-                    victoryPoints: victoryPoints
+                    victoryPoints: victoryPoints,
+                    newTotal: house.victoryPoints
                 });
             });
         }

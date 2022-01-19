@@ -8,10 +8,11 @@ export default class IronbornRaidWesterosCardType extends WesterosCardType {
         // Reduce victory track position by one for houses with at least 2 scored objectives
         houses.forEach(h =>  {
             if (h.completedObjectives.length >= 2) {
-                h.victoryPoints = Math.max(0, h.victoryPoints - 1);
+                westeros.game.updateVictoryPoints(h, -1);
                 westeros.ingame.log({
                     type: "ironborn-raid",
-                    house: h.id
+                    house: h.id,
+                    newTotal: h.victoryPoints
                 });
             }
         });
