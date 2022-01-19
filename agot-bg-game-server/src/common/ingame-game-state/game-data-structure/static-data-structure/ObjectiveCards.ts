@@ -90,7 +90,7 @@ export const extendYourReach = new ObjectiveCard(
     [["arryn", 2], ["baratheon", 1], ["lannister", 1], ["stark", 1]],
     (house, ingame) => {
         const seaAreasPerHouse = new BetterMap(
-            ingame.game.houses.values.map(h => [h, ingame.world.regions.values.filter(r => r.type == sea && r.getController() == house).length]));
+            ingame.game.houses.values.map(h => [h, ingame.world.regions.values.filter(r => r.type == sea && r.getController() == h).length]));
 
         let ownSeaAreasCount = 0;
         if (seaAreasPerHouse.has(house)) {
@@ -233,7 +233,7 @@ export const mercantileVentures = new ObjectiveCard(
     [["arryn", 2], ["baratheon", 1], ["lannister", 1], ["stark", 1]],
     (house, ingame) => {
         const controlledPortsPerHouse = new BetterMap(
-            ingame.game.houses.values.map(h => [h, ingame.world.regions.values.filter(r => r.type == port && r.getController() == house).length]));
+            ingame.game.houses.values.map(h => [h, ingame.world.regions.values.filter(r => r.type == port && r.getController() == h).length]));
 
         let ownPortCount = 0;
         if (controlledPortsPerHouse.has(house)) {
@@ -266,7 +266,7 @@ export const aStalwartPosition = new ObjectiveCard(
     [["arryn", 3], ["baratheon", 2], ["lannister", 1], ["stark", 1]],
     (house, ingame) => {
         const controlledStrongholds = new BetterMap(
-            ingame.game.houses.values.map(h => [h, ingame.world.regions.values.filter(r => r.castleLevel == 2 && r.getController() == house).length]));
+            ingame.game.houses.values.map(h => [h, ingame.world.regions.values.filter(r => r.castleLevel == 2 && r.getController() == h).length]));
 
         let ownStrongholdCount = 0;
         if (controlledStrongholds.has(house)) {
