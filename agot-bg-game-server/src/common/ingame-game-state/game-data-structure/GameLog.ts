@@ -45,7 +45,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | LoyalMaesterExecuted | MasterAtArmsExecuted | SavvyStewardExecuted | SpymasterExecuted
     | ObjectivesChosen | NewObjectiveCardDrawn | SpecialObjectiveScored | ObjectiveScored | IronbornRaid
     | ShiftingAmbitionsObjectiveChosenFromHand | ShiftingAmbitionsObjectiveChosenFromPool | NewInformationObjectiveCardChosen
-    | RevealAllObjectives;
+    | RevealAllObjectives | GarrisonRemoved | GarrisonReturned;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -983,4 +983,16 @@ interface NewInformationObjectiveCardChosen {
 interface RevealAllObjectives {
     type: "reveal-all-objectives";
     objectivesOfHouses: [string, string[]][];
+}
+
+interface GarrisonRemoved {
+    type: "garrison-removed";
+    region: string;
+    strength: number;
+}
+
+interface GarrisonReturned {
+    type: "garrison-returned";
+    region: string;
+    strength: number;
 }

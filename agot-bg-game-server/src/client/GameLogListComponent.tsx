@@ -1678,6 +1678,20 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </Col>
                 </Col>);
             }
+            case "garrison-removed": {
+                const region = this.world.regions.get(data.region);
+
+                return <p>
+                    A garrison token with strength <b>{data.strength}</b> was removed from <b>{region.name}</b>.
+                </p>;
+            }
+            case "garrison-returned": {
+                const region = this.world.regions.get(data.region);
+
+                return <p>
+                    A garrison token with strength <b>{data.strength}</b> was returned to <b>{region.name}</b>.
+                </p>;
+            }
         }
     }
 }

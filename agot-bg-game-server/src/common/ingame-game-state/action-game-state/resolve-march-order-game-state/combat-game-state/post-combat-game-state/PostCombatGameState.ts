@@ -141,12 +141,19 @@ export default class PostCombatGameState extends GameState<
     proceedCasualties(): void {
         // If there was a defeated garrison, remove it
         if (this.loser == this.combat.defender && this.combat.defendingRegion.garrison > 0) {
+            const oldGarrisonStrength = this.combat.defendingRegion.garrison;
             this.combat.defendingRegion.garrison = 0;
 
             this.entireGame.broadcastToClients({
                 type: "change-garrison",
                 region: this.combat.defendingRegion.id,
                 newGarrison: 0
+            });
+
+            this.parentGameState.ingameGameState.log({
+                type: "garrison-removed",
+                region: this.combat.defendingRegion.id,
+                strength: oldGarrisonStrength
             });
         }
 
