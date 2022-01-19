@@ -62,7 +62,7 @@ export interface GameSetup {
     tracks?: { ironThrone?: string[]; fiefdoms?: string[]; kingsCourt?: string[] };
     houseCards?: {[key: string]: HouseCardContainer};
     units?: {[key: string]: UnitData[]};
-    structuresCountNeededToWin?: number;
+    victoryPointsCountNeededToWin?: number;
     maxTurns?: number;
     supplyLevels?: {[key: string]: number};
     powerTokensOnBoard?: {[key: string]: string[]};
@@ -248,7 +248,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         game.maxTurns = 1000;
     }
 
-    game.structuresCountNeededToWin = selectedGameSetup.structuresCountNeededToWin != undefined ? selectedGameSetup.structuresCountNeededToWin : baseGameData.structuresCountNeededToWin;
+    game.victoryPointsCountNeededToWin = selectedGameSetup.victoryPointsCountNeededToWin != undefined ? selectedGameSetup.victoryPointsCountNeededToWin : baseGameData.victoryPointsCountNeededToWin;
     game.supplyRestrictions = baseGameData.supplyRestrictions;
     game.revealedWesterosCards = gameSettings.cokWesterosPhase ? 3 : 0;
 

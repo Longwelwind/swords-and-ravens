@@ -1331,6 +1331,26 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "56",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.game.victoryPointsCountNeededToWin = ingame.game.structuresCountNeededToWin;
+                ingame.gameLogManager.logs.forEach((l: any) => {
+                    switch (l.data.type) {
+                        case "objective-scored":
+                        case "special-objective-scored":
+                        case "ironborn-raid":
+                            l.data.newTotal = -1;
+                            break;
+                    }
+                });
+            }
+
+            return serializedGame;
+        }
     }
 ];
 
