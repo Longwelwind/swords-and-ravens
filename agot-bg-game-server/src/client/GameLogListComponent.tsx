@@ -36,6 +36,7 @@ import { faFastForward } from "@fortawesome/free-solid-svg-icons";
 import LoanCardComponent from "./game-state-panel/utils/LoanCardComponent";
 import { objectiveCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/ObjectiveCards";
 import ObjectiveCardComponent from "./game-state-panel/utils/ObjectiveCardComponent";
+import { ObjectiveCard } from "../common/ingame-game-state/game-data-structure/static-data-structure/ObjectiveCard";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -1002,7 +1003,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     <b>Massing on the Milkwater</b>: <b>{house.name}</b> {houseCardsReturned.length > 0 ? <>took
-                    back {joinReactNodes(houseCardsReturned.map(hc => <b key={`massing-on-the-milkwater-cards-back_${hc.id}`}>{hc.name}</b>), ", ")}</>
+                    back {joinReactNodes(houseCardsReturned.map(hc => <b key={`massing-on-the-milkwater-cards-back_${hc.id}`}>{hc.name}</b>), ", ")}.</>
                     : <>had no house cards on their discard pile.</>}
                 </p>;
             }
@@ -1653,6 +1654,29 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <p>
                     <b>New Information</b>: House <b>{house.name}</b> chose one Objective card in their hand and shuffled it back into the objective deck.
                 </p>;
+            }
+            case "reveal-all-objectives": {
+                const objectivesOfHouses = data.objectivesOfHouses.map(([hid, ocids]) => [
+                    this.game.houses.get(hid), ocids.map(ocid => objectiveCards.get(ocid))
+                ] as [House, ObjectiveCard[]]);
+
+                return objectivesOfHouses.map(([house, objectives]) => <Col xs={12} key={`objectives-of-house-${house.id}`}>
+                    <Col xs={12} className="text-center">
+                        Remaining Objectives of house <b>{house.name}</b>.
+                    </Col>
+                    <Col xs="12">
+                        <Row className="justify-content-center">
+                            {objectives.map(oc => (
+                                <Col xs="auto" key={oc.id}>
+                                    <ObjectiveCardComponent
+                                        objectiveCard={oc}
+                                        size="small"
+                                    />
+                                </Col>
+                            ))}
+                        </Row>
+                    </Col>
+                </Col>);
             }
         }
     }

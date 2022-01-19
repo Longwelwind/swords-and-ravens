@@ -22,7 +22,7 @@ export default class NewInformationGameState extends GameState<WesterosGameState
     }
 
     firstStart(): void {
-        this.game.nonVassalHouses.forEach(h => {
+        this.game.getTurnOrder().filter(h => !this.ingame.isVassalHouse(h)).forEach(h => {
             h.secretObjectives.push(popRandom(this.game.objectiveDeck) as ObjectiveCard);
             this.ingame.log({
                 type: "new-objective-card-drawn",
