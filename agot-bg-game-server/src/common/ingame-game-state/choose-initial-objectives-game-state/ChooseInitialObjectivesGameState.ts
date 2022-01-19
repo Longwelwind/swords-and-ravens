@@ -6,7 +6,6 @@ import {ClientMessage} from "../../../messages/ClientMessage";
 import {ServerMessage} from "../../../messages/ServerMessage";
 import House from "../game-data-structure/House";
 import Game from "../game-data-structure/Game";
-import User from "../../../server/User";
 import { ObjectiveCard } from "../game-data-structure/static-data-structure/ObjectiveCard";
 import SelectObjectiveCardsGameState, { SerializedSelectObjectiveCardsGameState } from "../select-objective-cards-game-state/SelectObjectiveCardsGameState";
 import _ from "lodash";
@@ -74,10 +73,6 @@ export default class ChooseInitialObjectivesGameState extends GameState<IngameGa
 
     getNotReadyPlayers(): Player[] {
         return this.participatingHouses.filter(h => h.houseCards.size < 7).map(h => this.ingame.getControllerOfHouse(h));
-    }
-
-    getWaitedUsers(): User[] {
-        return this.getNotReadyPlayers().map(p => p.user);
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
