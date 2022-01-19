@@ -176,6 +176,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                     // Attack against a neutral force
                     // That the player put up enough strength against the neutral force was
                     // already checked earlier. No need to re-check it now, just process the attack.
+                    const oldGarrisonStrength = region.garrison;
                     region.garrison = 0;
                     this.resolveMarchOrderGameState.moveUnits(startingRegion, army, region);
 
@@ -192,6 +193,12 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                         type: "change-garrison",
                         region: region.id,
                         newGarrison: region.garrison
+                    });
+
+                    this.ingame.log({
+                        type: "garrison-removed",
+                        region: region.id,
+                        strength: oldGarrisonStrength
                     });
                 }
             }

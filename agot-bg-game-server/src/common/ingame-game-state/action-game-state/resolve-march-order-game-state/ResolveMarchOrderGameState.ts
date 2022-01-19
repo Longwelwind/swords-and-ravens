@@ -83,6 +83,11 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
                     region: region.id,
                     newGarrison: region.garrison
                 });
+                this.ingameGameState.log({
+                    type: "garrison-returned",
+                    region: region.id,
+                    strength: region.garrison
+                });
             }
         })
 
