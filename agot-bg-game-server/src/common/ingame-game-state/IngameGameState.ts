@@ -291,7 +291,7 @@ export default class IngameGameState extends GameState<
     gainLoyaltyTokens(): void {
         const targaryen = this.game.targaryen;
         if (targaryen) {
-            this.world.getControlledRegions(targaryen).filter(r => r.loyaltyTokens > 0).forEach(r => {
+            this.world.regions.values.filter(r => r.loyaltyTokens > 0 && r.getController() == targaryen).forEach(r => {
                 targaryen.gainedLoyaltyTokens += r.loyaltyTokens;
 
                 this.entireGame.broadcastToClients({
@@ -873,7 +873,7 @@ export default class IngameGameState extends GameState<
         }
 
         // A house is considered defeated when it has no castle areas and no land units anymore
-        return this.world.getControlledRegions(house).filter(r => r.castleLevel > 0).length == 0 &&
+        return this.world.regions.values.filter(r => r.castleLevel > 0 && r.getController() == house).length == 0 &&
             this.world.getUnitsOfHouse(house).filter(u => u.type.id != "ship").length == 0;
     }
 

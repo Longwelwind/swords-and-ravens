@@ -73,7 +73,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         switch (this.type) {
             case PlayerMusteringType.MUSTERING_WESTEROS_CARD:
             case PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD: {
-                const regionsWithCastles = this.ingame.world.getControlledRegions(this.house).filter(r => r.castleLevel > 0);
+                const regionsWithCastles = this.ingame.world.regions.values.filter(r => r.castleLevel > 0 && r.getController() == this.house);
                 return this.ingame.isVassalHouse(this.house) ? regionsWithCastles.filter(r => r.superControlPowerToken == this.house) : regionsWithCastles;
             }
             case PlayerMusteringType.DEFENSE_MUSTER_ORDER:
@@ -81,7 +81,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
             case PlayerMusteringType.STARRED_CONSOLIDATE_POWER:
                 return this.resolveConsolidatePowerGameState.actionGameState.getRegionsWithConsolidatePowerOrderOfHouse(this.house).filter(([_r, ot]) => ot.starred).map(([r, _ot]) => r);
             case PlayerMusteringType.RALLY_THE_MEN_WESTEROS_CARD: {
-                const regionsWithCastles = this.ingame.world.getControlledRegions(this.house).filter(r => r.castleLevel == 1);
+                const regionsWithCastles = this.ingame.world.regions.values.filter(r => r.castleLevel == 1 && r.getController() == this.house);
                 return this.ingame.isVassalHouse(this.house) ? regionsWithCastles.filter(r => r.superControlPowerToken == this.house) : regionsWithCastles;
             }
         }

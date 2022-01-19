@@ -430,7 +430,7 @@ export default class Game {
     }
 
     getTotalLoyaltyTokenCount(house: House): number {
-        const superLoyaltyTokens = this.world.getControlledRegions(house).filter(r => r.superLoyaltyToken).length;
+        const superLoyaltyTokens = this.world.regions.values.filter(r => r.superLoyaltyToken && r.getController() == house).length;
         return superLoyaltyTokens + house.gainedLoyaltyTokens;
     }
 

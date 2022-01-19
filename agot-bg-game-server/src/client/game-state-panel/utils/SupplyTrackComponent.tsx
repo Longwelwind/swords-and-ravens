@@ -143,7 +143,7 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
     }
 
     setHighlightedRegions(house: House): void {
-        const regions = this.props.ingame.world.getControlledRegions(house).filter(r => r.supplyIcons > 0);
+        const regions = this.props.ingame.world.regions.values.filter(r => r.supplyIcons > 0 && r.getController() == house);
         this.highlightedRegions.clear();
 
         regions.forEach(r => {

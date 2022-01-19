@@ -14,10 +14,10 @@ export default class GameOfThronesWesterosCardType extends WesterosCardType {
         const gains = new BetterMap(westeros.game.houses.values.filter(h => !westeros.ingame.isVassalHouse(h)).map<[House, number]>(house => ([
                 house,
                 // Counter number of controlled crows
-                _.sum(world.getControlledRegions(house).map(r => r.crownIcons))
+                _.sum(world.regions.values.filter(r => r.crownIcons > 0 && r.getController() == house).map(r => r.crownIcons))
                 // Counter number of controlled ports where the adjacent sea area is un-constested
-                + world.getControlledRegions(house)
-                    .filter(r => r.type == port && r.units.size > 0)
+                + world.regions.values
+                    .filter(r => r.type == port && r.units.size > 0 && r.getController() == house)
                     .filter(r =>
                         world.getAdjacentSeaOfPort(r).getController() == null
                         || world.getAdjacentSeaOfPort(r).getController() == house
