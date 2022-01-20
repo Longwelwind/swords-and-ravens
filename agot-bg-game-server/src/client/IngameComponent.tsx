@@ -81,7 +81,6 @@ import housePowerTokensImages from "./housePowerTokensImages";
 import unitImages from "./unitImages";
 import DraftInfluencePositionsGameState from "../common/ingame-game-state/draft-influence-positions-game-state/DraftInfluencePositionsGameState";
 import DraftInfluencePositionsComponent from "./game-state-panel/DraftInfluencePositionsComponent";
-import { preventOverflow } from "@popperjs/core";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import { faChevronCircleLeft, faChevronCircleRight } from "@fortawesome/free-solid-svg-icons";
 import sleep from "../utils/sleep";
@@ -552,7 +551,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                                     trigger="click"
                                                                     placement="bottom-start"
                                                                     rootClose
-                                                                    popperConfig={{ modifiers: [preventOverflow] }}
                                                                 >
                                                                     {child}
                                                                 </OverlayTrigger>
@@ -603,7 +601,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         trigger="click"
                                         placement="auto"
                                         rootClose
-                                        popperConfig={{ modifiers: [preventOverflow] }}
                                     >
                                         <div>
                                             <img src={mammothImage} width={28} className={classNames(

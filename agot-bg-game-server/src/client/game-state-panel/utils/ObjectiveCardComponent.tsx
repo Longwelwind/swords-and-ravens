@@ -2,7 +2,6 @@ import {Component, default as React, ReactNode} from "react";
 import {observer} from "mobx-react";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import classNames from "classnames";
-import ImagePopover from "./ImagePopover";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import { preventOverflow } from "@popperjs/core";
 import objectiveCardImages from "../../objectiveCardImages";
@@ -37,7 +36,7 @@ export default class ObjectiveCardComponent extends Component<ObjectiveCardCompo
     }
 
     private renderPopover(): OverlayChildren {
-        return <ImagePopover className="vertical-game-card" style={{
+        return <div className="vertical-game-card" style={{
             backgroundImage: `url(${objectiveCardImages.get(this.props.objectiveCard.id)})`}}
         />;
     }

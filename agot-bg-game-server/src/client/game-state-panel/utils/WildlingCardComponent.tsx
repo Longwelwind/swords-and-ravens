@@ -6,7 +6,6 @@ import WildlingCardType from "../../../common/ingame-game-state/game-data-struct
 import wildlingCardImages from "../../wildlingCardImages";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import {OverlayChildren} from "react-bootstrap/Overlay";
-import ImagePopover from "./ImagePopover";
 import { preventOverflow } from "@popperjs/core";
 
 interface WildlingCardProps {
@@ -34,10 +33,11 @@ export default class WildlingCardComponent extends Component<WildlingCardProps> 
     }
 
     renderPopover(): OverlayChildren {
-        return this.props.tooltip ? <ImagePopover className="vertical-game-card bring-to-front"
-            style={{
-                backgroundImage: `url(${wildlingCardImages.get(this.props.cardType.id)})`}}
-            />
-            : <ImagePopover className="invisible"/>;
+        return this.props.tooltip
+            ? <div className="vertical-game-card bring-to-front"
+                style={{
+                    backgroundImage: `url(${wildlingCardImages.get(this.props.cardType.id)})`}}
+              />
+            : <div className="invisible"/>;
     }
 }

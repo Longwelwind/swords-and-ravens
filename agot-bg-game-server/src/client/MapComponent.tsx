@@ -37,7 +37,6 @@ import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import loyaltyTokenImage from "../../public/images/power-tokens/Loyalty.png"
 import loanCardImages from "./loanCardImages";
 import StaticIronBankView from "../common/ingame-game-state/game-data-structure/static-data-structure/StaticIronBankView";
-import ImagePopover from "./game-state-panel/utils/ImagePopover";
 import preventOverflow from "@popperjs/core/lib/modifiers/preventOverflow";
 import IronBankInfosComponent from "./IronBankInfosComponent";
 import invertColor from "./utils/invertColor";
@@ -190,7 +189,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         return ironBankView && this.ingame.game.ironBank && this.ingame.game.ironBank.loanSlots.map((lc, i) => (
             <OverlayTrigger
                 key={`loan-slot-${i}`}
-                overlay={<ImagePopover className="vertical-game-card" style={{ backgroundImage: lc ? `url(${loanCardImages.get(lc.type.id)})` : "none" }} />}
+                overlay={<div className="vertical-game-card" style={{ backgroundImage: lc ? `url(${loanCardImages.get(lc.type.id)})` : "none" }} />}
                 popperConfig={{ modifiers: [preventOverflow] }}
                 delay={{ show: 120, hide: 0 }}
                 placement="auto"
@@ -211,7 +210,6 @@ export default class MapComponent extends Component<MapComponentProps> {
             overlay={this.renderLoanCardsToolTip()}
             trigger="click"
             rootClose
-            popperConfig={{ modifiers: [preventOverflow] }}
             placement="auto"
         >
             <div id="loan-card-deck" className="order-container clickable" style={{

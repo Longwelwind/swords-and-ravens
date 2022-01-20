@@ -9,7 +9,6 @@ import ObjectiveCardComponent from "./game-state-panel/utils/ObjectiveCardCompon
 import GameClient from "./GameClient";
 import _ from "lodash";
 import Player from "../common/ingame-game-state/Player";
-import { preventOverflow } from "@popperjs/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBookReader, faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
@@ -84,7 +83,6 @@ export default class ObjectivesInfoComponent extends Component<ObjectivesInfoCom
                     <OverlayTrigger overlay={this.renderRulesTooltip()}
                         trigger="click"
                         rootClose
-                        popperConfig={{ modifiers: [preventOverflow] }}
                         placement="auto">
                             <h5 className="mb-0 text-center">
                                 <FontAwesomeIcon
