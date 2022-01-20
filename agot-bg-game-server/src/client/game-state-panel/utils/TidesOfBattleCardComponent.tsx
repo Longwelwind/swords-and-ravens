@@ -3,7 +3,6 @@ import {observer} from "mobx-react";
 import { TidesOfBattleCard } from "../../../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import tidesOfBattleImages from "../../../client/tidesOfBattleImages";
-import ImagePopover from "./ImagePopover";
 import { preventOverflow } from "@popperjs/core";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 
@@ -30,7 +29,7 @@ export default class TidesOfBattleCardComponent extends Component<TidesOfBattleC
     }
 
     renderPopover(): OverlayChildren {
-        return <ImagePopover className="vertical-game-card small" style={{
+        return <div className="vertical-game-card small" style={{
             backgroundImage: `url(${tidesOfBattleImages.get(this.props.tidesOfBattleCard.id)})`}}
         />;
     }
