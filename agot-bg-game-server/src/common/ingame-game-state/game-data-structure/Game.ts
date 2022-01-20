@@ -411,9 +411,8 @@ export default class Game {
     }
 
     updateVictoryPoints(house: House, delta: number): number {
-        const min = house.victoryPoints > 0 ? 1 : 0;
         const oldValue = house.victoryPoints;
-        house.victoryPoints = Math.max(min, Math.min(house.victoryPoints + delta, this.victoryPointsCountNeededToWin));
+        house.victoryPoints = Math.max(0, Math.min(house.victoryPoints + delta, this.victoryPointsCountNeededToWin));
         return house.victoryPoints - oldValue;
     }
 
