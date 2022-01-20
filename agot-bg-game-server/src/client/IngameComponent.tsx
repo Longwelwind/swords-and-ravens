@@ -97,6 +97,8 @@ import ObjectivesInfoComponent from "./ObjectivesInfoComponent";
 import { Popover } from "react-bootstrap";
 import WesterosCardComponent from "./game-state-panel/utils/WesterosCardComponent";
 import ConditionalWrap from "./utils/ConditionalWrap";
+import WildlingCardType from "../common/ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
+import WildlingCardComponent from "./game-state-panel/utils/WildlingCardComponent";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -596,20 +598,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         </div>
                                     </OverlayTrigger>
                                 </Row>
-                                <Row className="mx-0">
-                                    <OverlayTrigger overlay={
-                                        <Tooltip id="wildling-threat-tooltip">
-                                            <h6>Wildling Threat</h6>{knowsWildlingCard && nextWildlingCard ?
-                                                <><br /><br /><strong><u>{nextWildlingCard.type.name}</u></strong><br />
-                                                    <strong>Lowest Bidder:</strong> {nextWildlingCard.type.wildlingVictoryLowestBidderDescription}<br />
-                                                    <strong>Everyone Else:</strong> {nextWildlingCard.type.wildlingVictoryEverybodyElseDescription}<br /><br />
-                                                    <strong>Highest Bidder:</strong> {nextWildlingCard.type.nightsWatchDescription}
-                                                </>
-                                                : <></>
-                                            }
-                                        </Tooltip>
-                                    }
-                                        placement="auto">
+                                <Row className="mx-0 clickable">
+                                    <OverlayTrigger overlay={this.renderWildlingDeckPopover(knowsWildlingCard, nextWildlingCard?.type)}
+                                        trigger="click"
+                                        placement="auto"
+                                        rootClose
+                                        popperConfig={{ modifiers: [preventOverflow] }}
+                                    >
                                         <div>
                                             <img src={mammothImage} width={28} className={classNames(
                                                 { "dye-warning": wildlingsWarning && !warningAndKnowsNextWildingCard },
@@ -938,6 +933,36 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         </Col>
                     )}
                 </Row>
+            </Col>
+        </Popover>;
+    }
+
+    private renderWildlingDeckPopover(knowsWildlingCard: boolean, nextWildlingCard: WildlingCardType | undefined): OverlayChildren {
+        const wildlingDeck = _.sortBy(this.game.wildlingDeck.map(wc => wc.type).filter(wc => wc != nextWildlingCard), wc => wc.name);
+        return <Popover id="wildling-threat-tooltip">
+            <Col xs={12}>
+                {knowsWildlingCard && nextWildlingCard && (
+                    <>
+                        <Col xs={12} className="mt-0">
+                            <h5 className="text-center">Top Wilding Card</h5>
+                        </Col>
+                        <Col xs={12} className="mb-2">
+                            <Row className="justify-content-center">
+                                <WildlingCardComponent cardType={nextWildlingCard} size="smedium" tooltip />
+                            </Row>
+                        </Col>
+                    </>
+                )}
+                <Col xs={12} className="mt-0">
+                    <h5 className="text-center">The Wildling Deck</h5>
+                </Col>
+                <Col xs={12}>
+                    <Row className="justify-content-center mr-0 ml-0">
+                        {wildlingDeck.map(wc => <Col xs="auto" key={`wild-deck-${wc.id}`} className="justify-content-center">
+                            <WildlingCardComponent cardType={wc} size="small" tooltip />
+                        </Col>)}
+                    </Row>
+                </Col>
             </Col>
         </Popover>;
     }

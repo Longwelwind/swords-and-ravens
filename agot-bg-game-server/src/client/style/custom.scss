@@ -256,7 +256,6 @@ $tiny-scale: 0.12;
 
   width: $game-card-height;
   height: $game-card-width;
-  z-index: 2060 !important;
 }
 
 .horizontal-game-card.medium {
@@ -580,4 +579,8 @@ div.new-event {
 
 .make-black {
   filter: brightness(0%);
+}
+
+.bring-to-front {
+  z-index: 2060 !important;
 }

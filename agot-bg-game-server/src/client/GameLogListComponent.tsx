@@ -279,7 +279,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         <p>Wildling card revealed: <b>{wildlingCard.type.name}</b></p>
                         <Row className="justify-content-center">
                             <Col xs="auto">
-                                <WildlingCardComponent cardType={wildlingCard.type} size="medium" tooltip={true} placement="auto"/>
+                                <WildlingCardComponent cardType={wildlingCard.type} size="medium" tooltip />
                             </Col>
                         </Row>
                     </>
