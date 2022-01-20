@@ -13,7 +13,7 @@ import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 interface WesterosCardProps {
     cardType: WesterosCardType;
     westerosDeckI: number;
-    size?: "small" | "medium";
+    size?: "tiny" | "small" | "medium";
     tooltip?: boolean;
     classNames?: string;
     selected?: boolean;

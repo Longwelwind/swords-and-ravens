@@ -31,7 +31,7 @@ export default class DraftInfluencePositionsComponent extends Component<GameStat
                 {this.props.gameState.currentColumnIndex > -1 && this.props.gameState.currentRowIndex > -1 &&
                 <ListGroupItem>
                     <Row className="mt-1 mb-3 justify-content-center">
-                        <div style={{textAlign: "center"}}><b>{this.house.name}</b> must choose one Influence track.</div>
+                        <div className="text-center"><b>{this.house.name}</b> must choose one Influence track.</div>
                     </Row>
                     <Row>
                         <p>

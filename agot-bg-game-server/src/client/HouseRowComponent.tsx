@@ -215,7 +215,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                             rootClose
                         >
                             <div
-                                className="house-power-token hover-weak-outline"
+                                className="house-power-token hover-weak-outline clickable"
                                 style={{
                                     backgroundImage: `url(${housePowerTokensImages.get(this.house.id)})`,
                                     marginLeft: "10px"
@@ -361,16 +361,16 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
 
     private renderVictoryConditionsTooltip(house: House): OverlayChildren {
         return <Tooltip id={house.id + "-victory-tooltip"} className="tooltip-w-100">
-            <h5 style={{textAlign: "center"}}>&nbsp;&nbsp;Total&nbsp;Land&nbsp;Areas&nbsp;&nbsp;</h5>
-            <h4 style={{textAlign: "center"}}><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
+            <h5 className="text-center">&nbsp;&nbsp;Total&nbsp;Land&nbsp;Areas&nbsp;&nbsp;</h5>
+            <h4 className="text-center"><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
             {this.ingame.entireGame.isFeastForCrows && <>
                 <br/>
                 <br/>
-                <h5 style={{textAlign: "center"}}>Additional Information<br/><small>&nbsp;&nbsp;(Does not count in case of a tie)&nbsp;&nbsp;</small></h5>
+                <h5 className="text-center">Additional Information<br/><small>&nbsp;&nbsp;(Does not count in case of a tie)&nbsp;&nbsp;</small></h5>
                 <br/>
-                <h5 style={{textAlign: "center"}}>Castles:&nbsp;<b>{this.ingame.world.regions.values.filter(r => r.castleLevel == 1 && r.getController() == house).length}</b></h5>
-                <h5 style={{textAlign: "center"}}>Strongholds:&nbsp;<b>{this.ingame.world.regions.values.filter(r => r.castleLevel == 2 && r.getController() == house).length}</b></h5>
-                <h5 style={{textAlign: "center"}}>Sea Areas:&nbsp;<b>{this.ingame.world.regions.values.filter(r => r.type == sea && r.getController() == house).length}</b></h5>
+                <h5 className="text-center">Castles:&nbsp;<b>{this.ingame.world.regions.values.filter(r => r.castleLevel == 1 && r.getController() == house).length}</b></h5>
+                <h5 className="text-center">Strongholds:&nbsp;<b>{this.ingame.world.regions.values.filter(r => r.castleLevel == 2 && r.getController() == house).length}</b></h5>
+                <h5 className="text-center">Sea Areas:&nbsp;<b>{this.ingame.world.regions.values.filter(r => r.type == sea && r.getController() == house).length}</b></h5>
             </>}
         </Tooltip>;
     }

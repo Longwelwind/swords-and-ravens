@@ -256,6 +256,7 @@ $tiny-scale: 0.12;
 
   width: $game-card-height;
   height: $game-card-width;
+  z-index: 2060 !important;
 }
 
 .horizontal-game-card.medium {
@@ -381,6 +382,10 @@ $wildling-outline: rgba(#f8ff00, 0.5);
 
 .clickable {
   cursor: pointer;
+}
+
+.clickable:hover {
+  text-decoration: underline;
 }
 
 .region-area {
@@ -566,6 +571,7 @@ div.new-event {
 .userlabel:hover {
   color: white;
   text-decoration: underline;
+  cursor: pointer;
 }
 
 .white-space-pre-line {

@@ -94,12 +94,21 @@ import PartialRecursive from "../utils/PartialRecursive";
 import ChooseInitialObjectivesGameState from "../common/ingame-game-state/choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
 import ChooseInitialObjectivesComponent from "./game-state-panel/ChooseInitialObjectivesComponent";
 import ObjectivesInfoComponent from "./ObjectivesInfoComponent";
+import { Popover } from "react-bootstrap";
+import WesterosCardComponent from "./game-state-panel/utils/WesterosCardComponent";
+import ConditionalWrap from "./utils/ConditionalWrap";
 
 interface ColumnOrders {
     gameStateColumn: number;
     mapColumn: number;
     housesInfosColumn: number;
     collapseButtonColumn: number;
+}
+
+interface GameStatePhaseProps {
+    name: string;
+    gameState: any;
+    component: typeof Component;
 }
 
 interface IngameComponentProps {
@@ -477,7 +486,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     renderGameStateColumn(): ReactNode {
-        const phases: {name: string; gameState: any; component: typeof Component}[] = [
+        const phases: GameStatePhaseProps[] = [
             {name: "Westeros", gameState: WesterosGameState, component: WesterosGameStateComponent},
             {name: "Planning", gameState: PlanningGameState, component: PlanningComponent},
             {name: "Action", gameState: ActionGameState, component: ActionComponent}
@@ -519,6 +528,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             "warning" : this.props.gameState.childGameState instanceof CancelledGameState ?
             "danger" : undefined;
 
+        const getPhaseHeader = (phase: GameStatePhaseProps): JSX.Element => this.props.gameState.childGameState instanceof phase.gameState
+                ? <b className={classNames("weak-outline", { "clickable dropdown-toggle": phase.name == "Westeros" })}>{phase.name} phase</b>
+                : <span className={classNames("text-muted", { "clickable dropdown-toggle": phase.name == "Westeros" })}>{phase.name} phase</span>;
+
         return <Row className="mt-0">
             <Col xs={"12"} className="pt-0">
                 <Card id="game-state-panel" border={border} style={gameStatePanelStyle}>
@@ -527,26 +540,27 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             <ListGroup variant="flush">
                                 {phases.some(phase => this.props.gameState.childGameState instanceof phase.gameState) && (
                                     <ListGroupItem>
-                                        <OverlayTrigger
-                                            overlay={this.renderRemainingWesterosCards()}
-                                            delay={{ show: 250, hide: 100 }}
-                                            placement="bottom"
-                                            popperConfig={{ modifiers: [preventOverflow] }}
-                                        >
-                                            <Row className="justify-content-between">
-                                                {phases.map((phase, i) => (
-                                                    <Col xs="auto" key={i}>
-                                                        {this.props.gameState.childGameState instanceof phase.gameState ? (
-                                                            <strong className="weak-outline">{phase.name} phase</strong>
-                                                        ) : (
-                                                            <span className="text-muted">
-                                                                {phase.name} phase
-                                                            </span>
-                                                        )}
-                                                    </Col>
-                                                ))}
-                                            </Row>
-                                        </OverlayTrigger>
+                                        <Row className="justify-content-between">
+                                            {phases.map((phase, i) => (
+                                                <Col xs="auto" key={i}>
+                                                    <ConditionalWrap
+                                                            condition={phase.name == "Westeros"}
+                                                            wrap={child => <OverlayTrigger
+                                                                    overlay={this.renderRemainingWesterosCards()}
+                                                                    trigger="click"
+                                                                    placement="bottom-start"
+                                                                    rootClose
+                                                                    popperConfig={{ modifiers: [preventOverflow] }}
+                                                                >
+                                                                    {child}
+                                                                </OverlayTrigger>
+                                                            }
+                                                        >
+                                                            {getPhaseHeader(phase)}
+                                                        </ConditionalWrap>
+                                                </Col>)
+                                            )}
+                                        </Row>
                                     </ListGroupItem>
                                 )}
                                 {renderChildGameState(
@@ -565,7 +579,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             </ListGroup>
                         </Col>
                         <Col xs="auto" className="mx-1 px-0">
-                            <Col style={{ width: "28px", fontSize: "22px", textAlign: "center" }} className="px-0">
+                            <Col style={{ width: "28px", fontSize: "22px" }} className="px-0 text-center">
                                 <Row className="mb-3 mx-0" onMouseEnter={() => this.highlightRegionsOfHouses()} onMouseLeave={() => this.highlightedRegions.clear()}>
                                     <OverlayTrigger overlay={
                                         <Tooltip id="round-tooltip">
@@ -857,46 +871,75 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     private renderRemainingWesterosCards(): OverlayChildren {
-        const remainingCards = this.game.remainingWesterosCardTypes.map(deck => _.sortBy(deck.entries, rwct => -rwct[1]));
+        const remainingCards = this.game.remainingWesterosCardTypes.map(deck => _.sortBy(deck.entries, rwct => -rwct[1], rwct => rwct[0].name));
         const nextCards = this.game.nextWesterosCardTypes;
 
-        return <Tooltip id="remaining-westeros-cards" className="tooltip-w-100">
-            {this.gameSettings.cokWesterosPhase && (
-                <>
-                    <Row className='mt-0'>
-                        <Col>
-                            <h5 className='text-center'>Next Westeros Cards</h5>
-                        </Col>
-                    </Row>
-                    <Row>
-                        {nextCards.map((_, i) =>
-                            <Col key={"westeros-deck-" + i + "-header"} className='text-center'><b>Deck {i + 1}</b></Col>)}
-                    </Row>
-                    <Row>
-                        {nextCards.map((wd, i) =>
-                            <Col key={"westeros-deck-" + i + "-data"}>
-                                {wd.map((wc, j) => wc ? <div key={"westeros-deck-" + i + "-" + j + "-data"}>{wc.name}{wc.shortDescription && (<span>&ensp;<small>({wc.shortDescription})</small></span>)}</div> : <></>)}
-                            </Col>)}
-                    </Row>
-                </>
-            )}
-            <Row className={this.gameSettings.cokWesterosPhase ? 'mt-4' : 'mt-0'}>
-                <Col>
-                    <h5 className='text-center'>Remaining Westeros Cards</h5>
-                </Col>
-            </Row>
-            <Row>
-                {remainingCards.map((_, i) =>
-                    <Col key={"westeros-deck-" + i + "-header"} style={{ textAlign: "center" }}><b>Deck {i + 1}</b></Col>)}
-            </Row>
-            <Row className="mb-2">
-                {remainingCards.map((rc, i) =>
-                    <Col key={"westeros-deck-" + i + "-data"}>
-                        {rc.map(([wc, count], j) => <div key={"westeros-deck-" + i + "-" + j + "-data"}>{count}x {wc.name}{wc.shortDescription && (<span>&ensp;<small>({wc.shortDescription})</small></span>)}</div>)}
-                    </Col>
+        return <Popover id={"remaining-westeros-cards"} style={{maxWidth: "100%"}}>
+            <Col xs={12}>
+                {this.gameSettings.cokWesterosPhase && (
+                    <>
+                        <Row className='mt-0'>
+                            <Col>
+                                <h5 className='text-center'>Next Westeros Cards</h5>
+                            </Col>
+                        </Row>
+                        <Row>
+                            {nextCards.map((_, i) =>
+                                <Col key={"westeros-deck-" + i + "-header"} className='text-center'><b>Deck {i + 1}</b></Col>)}
+                        </Row>
+                        <Row>
+                            {nextCards.map((wd, i) =>
+                                <Col key={"westeros-deck-" + i + "-data"}>
+                                    {wd.map((wc, j) => wc
+                                        ? <div key={"westeros-deck-" + i + "-" + j + "-data"} className="mb-1">
+                                            <WesterosCardComponent
+                                                cardType={wc}
+                                                westerosDeckI={i}
+                                                size="small"
+                                                tooltip
+                                                showTitle
+                                            />
+                                          </div>
+                                        : <div/>
+                                    )}
+                                </Col>
+                            )}
+                        </Row>
+                    </>
                 )}
-            </Row>
-        </Tooltip>;
+                <Row className={this.gameSettings.cokWesterosPhase ? 'mt-4' : 'mt-0'}>
+                    <Col>
+                        <h5 className='text-center'>Remaining Westeros Cards</h5>
+                    </Col>
+                </Row>
+                <Row>
+                    {remainingCards.map((_, i) =>
+                        <Col key={"westeros-deck-" + i + "-header"} className="text-center"><b>Deck {i + 1}</b></Col>)}
+                </Row>
+                <Row className="mb-2">
+                    {remainingCards.map((rc, i) =>
+                        <Col key={"westeros-deck-" + i + "-data"}>
+                            {rc.map(([wc, count], j) =>
+                                <Row key={"westeros-deck-" + i + "-" + j + "-data"} className="m1 align-items-center">
+                                    <Col xs="auto" className="pr-0">
+                                        {count > 1 ? count : <>&nbsp;</>}
+                                    </Col>
+                                    <Col className="pl-0" style={{width: "130px", maxWidth: "130px"}}>
+                                        <WesterosCardComponent
+                                            cardType={wc}
+                                            westerosDeckI={i}
+                                            size="small"
+                                            tooltip
+                                            showTitle
+                                        />
+                                    </Col>
+                                </Row>
+                            )}
+                        </Col>
+                    )}
+                </Row>
+            </Col>
+        </Popover>;
     }
 
     getConnectedSpectators(): User[] {
