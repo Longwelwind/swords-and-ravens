@@ -279,7 +279,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         <p>Wildling card revealed: <b>{wildlingCard.type.name}</b></p>
                         <Row className="justify-content-center">
                             <Col xs="auto">
-                                <WildlingCardComponent cardType={wildlingCard.type} size="medium" tooltip={true} placement="auto"/>
+                                <WildlingCardComponent cardType={wildlingCard.type} size="medium" tooltip />
                             </Col>
                         </Row>
                     </>
@@ -364,7 +364,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "winner-declared": {
                 const winner = this.game.houses.get(data.winner);
                 return (
-                    <h5 style={{textAlign: "center"}}>Game has ended.<br/>House <b style={{color: winner.color}}>{winner.name}</b> wins this Game of Thrones!</h5>
+                    <h5 className="text-center">Game has ended.<br/>House <b style={{color: winner.color}}>{winner.name}</b> wins this Game of Thrones!</h5>
                 );
             }
             case "raven-holder-wildling-card-put-bottom": {

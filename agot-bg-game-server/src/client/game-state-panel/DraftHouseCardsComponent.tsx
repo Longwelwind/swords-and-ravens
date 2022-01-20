@@ -41,11 +41,11 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                 <ListGroupItem>
                     <Row className="mt-1 mb-3 justify-content-center">
                         {this.draftStep == DraftStep.DECIDE
-                        ? <div style={{textAlign: "center"}}><b>{this.house.name}</b> must decide whether to select a House card or an Influence track position.</div>
+                        ? <div className="text-center"><b>{this.house.name}</b> must decide whether to select a House card or an Influence track position.</div>
                         : this.draftStep == DraftStep.HOUSE_CARD
-                        ? <div style={{textAlign: "center"}}><b>{this.house.name}</b> must select one House card.</div>
+                        ? <div className="text-center"><b>{this.house.name}</b> must select one House card.</div>
                         : this.draftStep == DraftStep.INFLUENCE_TRACK
-                        ? <div style={{textAlign: "center"}}><b>{this.house.name}</b> must choose one Influence track.</div>
+                        ? <div className="text-center"><b>{this.house.name}</b> must choose one Influence track.</div>
                         : <></>}
                     </Row>
                     <Row>

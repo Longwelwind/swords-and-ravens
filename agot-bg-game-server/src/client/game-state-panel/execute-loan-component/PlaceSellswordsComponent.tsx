@@ -138,7 +138,7 @@ export default class PlaceSellswordsComponent extends Component<GameStateCompone
                                     rootClose
                                     overlay={
                                         <Popover id={"region-popover-" + modifiedRegion.id} className="p-2">
-                                            <h5 style={{ textAlign: "center" }}>{modifiedRegion.name}</h5>
+                                            <h5 className="text-center">{modifiedRegion.name}</h5>
                                             <>
                                                 {this.props.gameState.getValidUnitsForRegion(modifiedRegion, this.placedSellswordTypes).map((ut, i) =>
                                                     <Col key={modifiedRegion.id + "_sellsword_" + i}>

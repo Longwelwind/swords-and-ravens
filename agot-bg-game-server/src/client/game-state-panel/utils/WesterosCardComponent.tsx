@@ -13,7 +13,7 @@ import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 interface WesterosCardProps {
     cardType: WesterosCardType;
     westerosDeckI: number;
-    size?: "small" | "medium";
+    size?: "tiny" | "small" | "medium";
     tooltip?: boolean;
     classNames?: string;
     selected?: boolean;
@@ -53,7 +53,7 @@ export default class WesterosCardComponent extends Component<WesterosCardProps> 
 
     private renderPopover(): OverlayChildren {
         return this.props.tooltip ?
-            <ImagePopover className="horizontal-game-card"
+            <ImagePopover className="horizontal-game-card bring-to-front"
                 style={{backgroundImage: `url(${westerosCardImages.get(this.props.westerosDeckI).get(this.props.cardType.id)})`}}/>
             : <ImagePopover className="invisible"/>
     }
