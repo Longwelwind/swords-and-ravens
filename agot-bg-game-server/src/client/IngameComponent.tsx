@@ -916,10 +916,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         <Col key={"westeros-deck-" + i + "-data"}>
                             {rc.map(([wc, count], j) =>
                                 <Row key={"westeros-deck-" + i + "-" + j + "-data"} className="m1 align-items-center">
-                                    <Col xs="auto" className="pr-0">
+                                    <Col xs="auto" style={{marginRight: "-20px"}}>
                                         {count > 1 ? count : <>&nbsp;</>}
                                     </Col>
-                                    <Col className="pl-0" style={{width: "130px", maxWidth: "130px"}}>
+                                    <Col className="pl-0" style={{width: "145px", maxWidth: "145px"}}>
                                         <WesterosCardComponent
                                             cardType={wc}
                                             westerosDeckI={i}

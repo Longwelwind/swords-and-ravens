@@ -209,11 +209,12 @@ export default class MapComponent extends Component<MapComponentProps> {
     private renderLoanCardDeck(ironBankView: StaticIronBankView | null): ReactNode {
         return ironBankView && <OverlayTrigger
             overlay={this.renderLoanCardsToolTip()}
+            trigger="click"
+            rootClose
             popperConfig={{ modifiers: [preventOverflow] }}
-            delay={{ show: 120, hide: 0 }}
             placement="auto"
         >
-            <div id="loan-card-deck" className="order-container" style={{
+            <div id="loan-card-deck" className="order-container clickable" style={{
                 left: ironBankView.deckSlot.point.x,
                 top: ironBankView.deckSlot.point.y
             }}>
