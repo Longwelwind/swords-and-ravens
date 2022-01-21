@@ -26,7 +26,7 @@ class GameSerializer(ModelSerializer):
 
     class Meta:
         model = Game
-        fields = ['id', 'name', 'owner', 'serialized_game', 'view_of_game', 'state', 'version', 'players']
+        fields = ['id', 'name', 'owner', 'serialized_game', 'view_of_game', 'state', 'version', 'players', 'update_last_active']
 
     def update(self, instance, validated_data):
         instance.version = validated_data.pop('version', instance.version)
