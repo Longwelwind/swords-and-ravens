@@ -511,7 +511,13 @@ export default class CombatGameState extends GameState<
                 houseCardId ? this.ingameGameState.game.getHouseCardById(houseCardId) : null
             ]);
 
-            houseCards.forEach(([house, houseCard]) => this.houseCombatDatas.get(house).houseCard = houseCard);
+            houseCards.forEach(([house, houseCard]) => {
+                this.houseCombatDatas.get(house).houseCard = houseCard;
+                if (houseCard == null) {
+                    this.houseCombatDatas.get(house).houseCardChosen = false;
+                }
+            });
+            this.rerender++;
         } else if (message.type == "change-combat-tides-of-battle-card") {
             const drawnTidesOfBattleCards: [House, TidesOfBattleCard | null][] = message.tidesOfBattleCardIds.map(([houseId, tobId]) => [
                 this.game.houses.get(houseId),

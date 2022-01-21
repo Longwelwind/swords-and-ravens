@@ -357,7 +357,6 @@ interface TyrionLannisterHouseCardReplaced {
     type: "tyrion-lannister-house-card-replaced";
     house: string;
     affectedHouse: string;
-    oldHouseCard: string;
     newHouseCard: string | null;
 }
 
