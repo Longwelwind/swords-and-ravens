@@ -221,7 +221,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
         this.broadcastToClients({
             type: "new-user",
-            user: user.serializeToClient()
+            user: user.serializeToClient(false, user)
         });
 
         return user;
@@ -445,7 +445,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         return {
             id: this.id,
             name: this.name,
-            users: this.users.values.map(u => u.serializeToClient()),
+            users: this.users.values.map(u => u.serializeToClient(admin, user)),
             ownerUserId: this.ownerUserId,
             publicChatRoomId: this.publicChatRoomId,
             gameSettings: this.gameSettings,

@@ -1377,6 +1377,24 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "59",
+        migrate: (serializedGame: any) => {
+            // Init the note for all users
+            const users = serializedGame.users;
+            users.forEach((u: any) => u.note = "");
+            if (serializedGame.childGameState.type == "ingame") {
+                // Move player notes to user
+                const ingame = serializedGame.childGameState;
+                ingame.players.forEach((p: any) => {
+                    const user = users.find((u: any) => u.id == p.userId);
+                    user.note = p.note;
+                });
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

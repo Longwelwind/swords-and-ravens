@@ -379,7 +379,7 @@ export default class IngameGameState extends GameState<
                 );
             }
         } else if (message.type == "update-note") {
-            player.note = message.note.substring(0, NOTE_MAX_LENGTH);
+            player.user.note = message.note.substring(0, NOTE_MAX_LENGTH);
         } else if (message.type == "launch-replace-player-by-vassal-vote") {
             const playerToReplace = this.players.get(this.entireGame.users.get(message.player));
 
@@ -1048,7 +1048,7 @@ export default class IngameGameState extends GameState<
 
         return {
             type: "ingame",
-            players: this.players.values.map(p => p.serializeToClient(admin, player)),
+            players: this.players.values.map(p => p.serializeToClient()),
             game: this.game.serializeToClient(admin, player),
             gameLogManager: this.gameLogManager.serializeToClient(),
             votes: this.votes.values.map(v => v.serializeToClient(admin, player)),

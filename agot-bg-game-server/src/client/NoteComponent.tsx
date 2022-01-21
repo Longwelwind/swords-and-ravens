@@ -4,7 +4,8 @@ import * as React from "react";
 import GameClient from "./GameClient";
 import { FormControl } from "react-bootstrap";
 import IngameGameState, { NOTE_MAX_LENGTH } from "../common/ingame-game-state/IngameGameState";
-import Player from "../common/ingame-game-state/Player";
+import { observable } from "mobx";
+import _ from "lodash";
 
 interface NoteComponentProps {
     gameClient: GameClient;
@@ -13,22 +14,28 @@ interface NoteComponentProps {
 
 @observer
 export default class NoteComponent extends Component<NoteComponentProps> {
+    @observable note = this.props.gameClient.authenticatedUser?.note ?? "";
+
     render(): ReactNode {
         return (
             <>
                 <FormControl
                     maxLength={NOTE_MAX_LENGTH}
                     as="textarea"
-                    value={(this.props.gameClient.authenticatedPlayer as Player).note}
-                    onChange={(e: any) => this.onNoteChange(e.target.value)}
+                    value={this.note}
+                    onKeyUp={() => this.onNoteChange(this.note)}
+                    onChange={e => this.note = e.target.value}
                     style={{height: "100%"}}
+                    readOnly={this.props.gameClient.authenticatedPlayer == null}
                 />
             </>
         );
     }
 
-    onNoteChange(note: string): void {
-        (this.props.gameClient.authenticatedPlayer as Player).note = note;
-        this.props.ingame.updateNote(note);
-    }
+    onNoteChange = _.debounce((note: string) => {
+        if (this.props.gameClient.authenticatedPlayer) {
+            this.props.gameClient.authenticatedPlayer.user.note = note;
+            this.props.ingame.updateNote(note);
+        }
+    }, 500, { trailing: true });
 }

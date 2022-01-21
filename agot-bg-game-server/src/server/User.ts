@@ -12,6 +12,7 @@ export default class User {
     connectedClients: WebSocket[] = [];
     @observable otherUsersFromSameNetwork: string[] = [];
     @observable connected: boolean;
+    @observable note = "";
 
     constructor(id: string, name: string, game: EntireGame, settings: UserSettings, connected = false, otherUsersFromSameNetwork: string[] = []) {
         this.id = id;
@@ -47,18 +48,21 @@ export default class User {
         }
     }
 
-    serializeToClient(): SerializedUser {
+    serializeToClient(admin: boolean, user: User | null): SerializedUser {
         return {
             id: this.id,
             name: this.name,
             settings: this.settings,
             connected: this.connected,
-            otherUsersFromSameNetwork: this.otherUsersFromSameNetwork
+            otherUsersFromSameNetwork: this.otherUsersFromSameNetwork,
+            note: admin || user == this ? this.note : ""
         }
     }
 
     static deserializeFromServer(game: EntireGame, data: SerializedUser): User {
-        return new User(data.id, data.name, game, data.settings, data.connected, data.otherUsersFromSameNetwork);
+        const user = new User(data.id, data.name, game, data.settings, data.connected, data.otherUsersFromSameNetwork);
+        user.note = data.note;
+        return user;
     }
 }
 
@@ -68,4 +72,5 @@ export interface SerializedUser {
     settings: UserSettings;
     connected: boolean;
     otherUsersFromSameNetwork: string[];
+    note: string;
 }
