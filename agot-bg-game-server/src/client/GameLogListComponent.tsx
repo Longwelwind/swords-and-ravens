@@ -853,7 +853,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             }
             case "mace-tyrell-no-footman-available":
                 return <p>
-                    <b>Mace Tyrell</b>: No enemy Footman was available to be killed.
+                    <b>Mace Tyrell</b>: No enemy Footman was available to be destroyed.
                 </p>;
 
             case "mace-tyrell-footman-killed": {
@@ -861,7 +861,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const region = this.world.regions.get(data.region);
 
                 return <p>
-                    <b>Mace Tyrell</b>: <b>{house.name}</b> killed an enemy Footman
+                    <b>Mace Tyrell</b>: <b>{house.name}</b> destroyed an enemy Footman
                     in <b>{region.name}</b>.
                 </p>;
             }
@@ -870,7 +870,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const region = this.world.regions.get(data.region);
 
                 return <p>
-                    <b>Ser Ilyn Payne</b>: <b>{house.name}</b> killed an enemy Footman
+                    <b>Ser Ilyn Payne</b>: <b>{house.name}</b> destroyed an enemy Footman
                     in <b>{region.name}</b>.
                 </p>;
             }
@@ -923,7 +923,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const units = data.units.map(ut => unitTypes.get(ut).name);
                 return <p>
-                    <b>{house.name}</b> suffered casualties from the retreat: <>{joinReactNodes(units.map((unitType, i) => <b key={`retreat_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.
+                    <b>{house.name}</b> suffered casualties from the retreat and chose these units to be destroyed: <>{joinReactNodes(units.map((unitType, i) => <b key={`retreat_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.
                 </p>;
             }
             case "enemy-port-taken": {
@@ -1186,7 +1186,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const killed = data.killed.map(utid => unitTypes.get(utid).name);
                 return killed.length > 0 ?
                 <>
-                    <b>{house.name}</b> suffered battle casualties and chose these units to be killed: <>{joinReactNodes(killed.map((unitType, i) => <b key={`casualties_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.
+                    <b>{house.name}</b> suffered battle casualties and chose these units to be destroyed: <>{joinReactNodes(killed.map((unitType, i) => <b key={`casualties_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.
                 </> :
                 <></>;
             }
@@ -1239,7 +1239,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const casualty = unitTypes.get(data.casualty).name;
                 return <p>
-                    <b>Beric Dondarrion</b>: <b>{house.name}</b> chose a <b>{casualty}</b> to be killed.
+                    <b>Beric Dondarrion</b>: <b>{house.name}</b> chose a <b>{casualty}</b> to be destroyed.
                 </p>;
                 }
             case "varys-used": {
