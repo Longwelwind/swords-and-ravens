@@ -61,6 +61,12 @@ export default class TyrionLannisterAbilityGameState extends GameState<
                 return;
             }
 
+            this.combatGameState.houseCombatDatas.get(enemy).houseCard = null;
+            this.entireGame.broadcastToClients({
+                type: "change-combat-house-card",
+                houseCardIds: [[enemy.id, null]]
+            });
+
             this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(
                 enemy,
                 choosableHouseCards
@@ -94,13 +100,6 @@ export default class TyrionLannisterAbilityGameState extends GameState<
 
     onSelectHouseCardFinish(enemy: House, houseCard: HouseCard | null, resolvedAutomatically: boolean): void {
         const house = this.combatGameState.getEnemy(enemy);
-        const oldHouseCard = this.combatGameState.houseCombatDatas.get(enemy).houseCard;
-
-        // The house card of the enemy should never be null at this point.
-        // It can be after if they had no available other house cards.
-        if (oldHouseCard == null) {
-            throw new Error();
-        }
 
         this.changeHouseCardEnemy(enemy, houseCard);
 
@@ -108,7 +107,6 @@ export default class TyrionLannisterAbilityGameState extends GameState<
             type: "tyrion-lannister-house-card-replaced",
             house: house.id,
             affectedHouse: enemy.id,
-            oldHouseCard: oldHouseCard.id,
             newHouseCard: houseCard ? houseCard.id : null
         }, resolvedAutomatically);
 
