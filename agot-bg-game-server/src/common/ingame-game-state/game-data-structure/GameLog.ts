@@ -14,7 +14,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | WinterIsComing | WesterosPhaseBegan | ClaimVassalsBegan
     | CombatHouseCardChosen | CombatValyrianSwordUsed | ClashOfKingsBiddingDone | ClashOfKingsFinalOrdering
     | ActionPhaseBegan | ActionPhaseResolveRaidBegan | ActionPhaseResolveMarchBegan | ActionPhaseResolveConsolidatePowerBegan | PlanningPhaseBegan
-    | WildlingStrengthTriggerWildlingsAttack | MarchOrderRemoved
+    | WildlingStrengthTriggerWildlingsAttack
     | ConsolidatePowerOrderResolved | ArmiesReconciled | EnemyPortTaken | ShipsDestroyedByEmptyCastle
     | HouseCardAbilityNotUsed | PatchfaceUsed | DoranUsed
     | TyrionLannisterHouseCardReplaced | TyrionLannisterChoiceMade
@@ -268,12 +268,6 @@ interface PlanningPhaseBegan {
 interface WildlingStrengthTriggerWildlingsAttack {
     type: "wildling-strength-trigger-wildlings-attack";
     wildlingStrength: number;
-}
-
-interface MarchOrderRemoved {
-    type: "march-order-removed";
-    house: string;
-    region: string;
 }
 
 interface ConsolidatePowerOrderResolved {
