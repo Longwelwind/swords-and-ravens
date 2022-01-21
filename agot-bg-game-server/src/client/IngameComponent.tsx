@@ -41,7 +41,6 @@ import speakerImage from "../../public/images/icons/speaker.svg";
 import speakerOffImage from "../../public/images/icons/speaker-off.svg";
 import cardRandomImage from "../../public/images/icons/card-random.svg";
 import House from "../common/ingame-game-state/game-data-structure/House";
-import marked from "marked";
 import GameLogListComponent from "./GameLogListComponent";
 import Game, { MAX_WILDLING_STRENGTH } from "../common/ingame-game-state/game-data-structure/Game";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
@@ -996,10 +995,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     getOtherPlayers(): Player[] {
         return this.props.gameState.players.values.filter(p => p.user != this.props.gameClient.authenticatedUser);
-    }
-
-    compileGameLog(gameLog: string): string {
-        return marked(gameLog);
     }
 
     injectBetweenMessages(previous: Message | null, next: Message | null): ReactNode {
