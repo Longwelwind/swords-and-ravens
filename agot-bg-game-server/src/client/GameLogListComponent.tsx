@@ -194,18 +194,25 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <>
-                        <p>
-                            <b>{house.name}</b> marched from <b>{startingRegion.name}</b>{
-                                data.leftPowerToken != null && <> and left {data.leftPowerToken ? "a" : "no"} Power&nbsp;token behind</>}{moves.length > 0 ? ":" : "."}
-                        </p>
-                        {moves.length > 0 &&
-                        <ul>
-                            {moves.map(([region, unitTypes]) => (
-                                <li key={region.id}>
-                                    {joinReactNodes(unitTypes.map((ut, i) => <b key={`march_${ut.id}_${i}`}>{ut.name}</b>), ", ")} to <b>{region.name}</b>
-                                </li>
-                            ))}
-                        </ul>}
+                        {moves.length > 0
+                            ? <>
+                                <p>
+                                    <b>{house.name}</b> marched from <b>{startingRegion.name}</b>{
+                                        data.leftPowerToken != null && <> and left {data.leftPowerToken ? "a" : "no"} Power&nbsp;token behind</>}{moves.length > 0 ? ":" : "."}
+                                </p>
+                                <ul>
+                                    {moves.map(([region, unitTypes]) => (
+                                        <li key={region.id}>
+                                            {joinReactNodes(unitTypes.map((ut, i) => <b key={`march_${ut.id}_${i}`}>{ut.name}</b>), ", ")} to <b>{region.name}</b>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </>
+                            : <>
+                                <p>
+                                    <b>{house.name}</b> removed their March Order in <b>{startingRegion.name}</b>.
+                                </p>
+                            </>}
                     </>
                 );
             }
@@ -624,17 +631,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </Row>
                 </>;
             }
-            case "wildling-strength-trigger-wildlings-attack":
+            case "wildling-strength-trigger-wildlings-attack": {
                 return <p>
                     <b>Wildling Threat</b> reached <b>{data.wildlingStrength}</b>, triggering a <b>Wildling Attack</b>
-                </p>;
-
-            case "march-order-removed": {
-                const house = this.game.houses.get(data.house);
-                const region = this.game.world.regions.get(data.region);
-
-                return <p>
-                    <b>{house.name}</b> removed their March Order in <b>{region.name}</b>.
                 </p>;
             }
             case "consolidate-power-order-resolved": {

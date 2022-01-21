@@ -69,6 +69,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
     }
 
     onClientMessage(user: User, message: ClientMessage): boolean {
+        let updateLastActive = false;
         if (message.type == "launch-game") {
             if (!this.canStartGame(user).success) {
                 return false;
@@ -107,6 +108,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 housesToCreate,
                 new BetterMap(this.players.map((h, u) => ([h.id, u])))
             );
+            updateLastActive = true;
         } else if (message.type == "kick-player") {
             const kickedUser = this.entireGame.users.get(message.user);
 
@@ -115,12 +117,14 @@ export default class LobbyGameState extends GameState<EntireGame> {
             }
 
             this.setUserForLobbyHouse(null, kickedUser);
+            updateLastActive = true;
         } else if (message.type == "cancel-game") {
             if (!this.entireGame.isOwner(user)) {
                 return false;
             }
 
             this.entireGame.setChildGameState(new CancelledGameState(this.entireGame)).firstStart();
+            updateLastActive = true;
         } else if (message.type == "choose-house") {
             const house = message.house ? this.lobbyHouses.get(message.house) : null;
 
@@ -138,6 +142,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
             }
 
             this.setUserForLobbyHouse(house, user);
+            updateLastActive = true;
         } else if (message.type == "set-password") {
             let answer = v4();
             if (this.entireGame.isRealOwner(user)) {
@@ -230,7 +235,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
             });
         }
 
-        return false;
+        return updateLastActive;
     }
 
     setUserForLobbyHouse(house: LobbyHouse | null, user: User): void {
