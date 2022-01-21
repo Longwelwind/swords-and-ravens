@@ -686,23 +686,21 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         </Nav.Link>
                                     </Nav.Item>
                                 )}
-                                {this.authenticatedPlayer && (
-                                    <Nav.Item>
-                                        <Nav.Link eventKey="note">
-                                            <OverlayTrigger
-                                                overlay={<Tooltip id="note-tooltip">Personal note</Tooltip>}
-                                                placement="top"
-                                            >
-                                                <span>
-                                                    <FontAwesomeIcon
-                                                        style={{ color: "white" }}
-                                                        icon={faEdit} />
-                                                    {/* &nbsp;Notes */}
-                                                </span>
-                                            </OverlayTrigger>
-                                        </Nav.Link>
-                                    </Nav.Item>
-                                )}
+                                <Nav.Item>
+                                    <Nav.Link eventKey="note">
+                                        <OverlayTrigger
+                                            overlay={<Tooltip id="note-tooltip">Personal note</Tooltip>}
+                                            placement="top"
+                                        >
+                                            <span>
+                                                <FontAwesomeIcon
+                                                    style={{ color: "white" }}
+                                                    icon={faEdit} />
+                                                {/* &nbsp;Notes */}
+                                            </span>
+                                        </OverlayTrigger>
+                                    </Nav.Link>
+                                </Nav.Item>
                                 <Nav.Item>
                                     <Nav.Link eventKey="settings">
                                         <OverlayTrigger
@@ -779,11 +777,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         <ObjectivesInfoComponent ingame={this.ingame} gameClient={this.props.gameClient}/>
                                     </div>
                                 </Tab.Pane>
-                                {this.authenticatedPlayer && (
-                                    <Tab.Pane eventKey="note" className="h-100">
-                                        <NoteComponent gameClient={this.props.gameClient} ingame={this.props.gameState} />
-                                    </Tab.Pane>
-                                )}
+                                <Tab.Pane eventKey="note" className="h-100">
+                                    <NoteComponent gameClient={this.props.gameClient} ingame={this.props.gameState} />
+                                </Tab.Pane>
                                 {this.getPrivateChatRooms().map(({ roomId }) => (
                                     <Tab.Pane eventKey={roomId} key={roomId} className="h-100">
                                         <ChatComponent gameClient={this.props.gameClient}
