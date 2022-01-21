@@ -227,7 +227,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         return user;
     }
 
-    onClientMessage(user: User, message: ClientMessage): void {
+    onClientMessage(user: User, message: ClientMessage): boolean {
+        let updateLastActive = false;
         if (message.type == "change-settings") {
             user.settings = message.settings;
 
@@ -238,7 +239,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             })
         } else if (message.type == "change-game-settings") {
             if (!this.isOwner(user)) {
-                return;
+                return false;
             }
 
             // Only allow PBEM to be changed ingame
@@ -257,17 +258,18 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 }
 
                 // The PBEM setting has been changed => no need to pass the message to the child game state
-                return;
+                return false;
             }
 
             // For changing settings other than PBEM pass the message to the client game state
             this.childGameState.onClientMessage(user, message);
         } else {
-            this.childGameState.onClientMessage(user, message);
+            updateLastActive = this.childGameState.onClientMessage(user, message);
         }
 
 
         this.checkGameStateChanged();
+        return updateLastActive;
     }
 
     async onServerMessage(message: ServerMessage): Promise<void> {

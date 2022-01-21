@@ -114,7 +114,7 @@ def index(request):
     ]
 
     # Retrieves some stats to show on the front page
-    active_games_count = Game.objects.filter(updated_at__gt=datetime.now() - timedelta(days=2)).count()
+    active_games_count = Game.objects.filter(last_active_at__gt=datetime.now() - timedelta(days=5)).count()
 
     return render(
         request,
@@ -171,7 +171,7 @@ def games(request):
 
         # It seems to be hard to ask Postgres to order the list correctly.
         # It is done in Python
-        games = sorted(games, key=lambda game: ([IN_LOBBY, ONGOING].index(game.state), -datetime.timestamp(game.updated_at)))
+        games = sorted(games, key=lambda game: ([IN_LOBBY, ONGOING].index(game.state), -datetime.timestamp(game.last_active_at)))
 
         for game in games:
             # "game.player_in_game" contains a list of one or zero element, depending on whether the authenticated
@@ -223,7 +223,7 @@ def games(request):
         game.owner = request.user
         game.save()
 
-        if len(name) < 4 or 24 < len(name):
+        if len(name) > 200:
             return HttpResponseRedirect("/games")
 
         return HttpResponseRedirect(f"/play/{game.id}")

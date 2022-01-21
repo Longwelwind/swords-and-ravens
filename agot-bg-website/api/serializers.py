@@ -1,3 +1,4 @@
+import django.utils.timezone
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
 
@@ -24,13 +25,15 @@ class GameSerializer(ModelSerializer):
 
     class Meta:
         model = Game
-        fields = ['id', 'name', 'owner', 'serialized_game', 'view_of_game', 'state', 'version', 'players']
+        fields = ['id', 'name', 'owner', 'serialized_game', 'view_of_game', 'state', 'version', 'players', 'update_last_active']
 
     def update(self, instance, validated_data):
         instance.version = validated_data.pop('version', instance.version)
         instance.serialized_game = validated_data.pop('serialized_game', instance.serialized_game)
         instance.view_of_game = validated_data.pop('view_of_game', instance.view_of_game)
         instance.state = validated_data.pop('state', instance.state)
+        if validated_data.pop('update_last_active', False):
+            instance.last_active_at = django.utils.timezone.now()
 
         instance.players.all().delete()
 

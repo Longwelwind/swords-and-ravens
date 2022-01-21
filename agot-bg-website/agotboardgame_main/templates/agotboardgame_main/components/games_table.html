@@ -30,7 +30,7 @@
                             {% endif %}
                         </p>
                         <div class='text-small text-muted'>
-                            Last active {{ game.updated_at|naturaltime }}
+                            Last active {{ game.last_active_at|naturaltime }}
                         </div>
                     {% endif %}
                     <div><b>Owner: </b>{{ game.owner.username }}</div>

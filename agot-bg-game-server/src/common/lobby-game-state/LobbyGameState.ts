@@ -68,10 +68,10 @@ export default class LobbyGameState extends GameState<EntireGame> {
         }
     }
 
-    onClientMessage(user: User, message: ClientMessage): void {
+    onClientMessage(user: User, message: ClientMessage): boolean {
         if (message.type == "launch-game") {
             if (!this.canStartGame(user).success) {
-                return;
+                return false;
             }
 
             if (this.entireGame.gameSettings.randomHouses) {
@@ -111,13 +111,13 @@ export default class LobbyGameState extends GameState<EntireGame> {
             const kickedUser = this.entireGame.users.get(message.user);
 
             if (!this.entireGame.isOwner(user) || kickedUser == user) {
-                return;
+                return false;
             }
 
             this.setUserForLobbyHouse(null, kickedUser);
         } else if (message.type == "cancel-game") {
             if (!this.entireGame.isOwner(user)) {
-                return;
+                return false;
             }
 
             this.entireGame.setChildGameState(new CancelledGameState(this.entireGame)).firstStart();
@@ -126,7 +126,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
             // Check if the house is available
             if (house && (this.players.has(house) || !this.getAvailableHouses().includes(house))) {
-                return;
+                return false;
             }
 
             // Check password if a password is set and player has chosen a house (i.e. house != null to always allow leaving)
@@ -134,7 +134,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 house &&
                 this.password != message.password &&
                 !this.entireGame.isRealOwner(user)) {
-                return;
+                return false;
             }
 
             this.setUserForLobbyHouse(house, user);
@@ -229,6 +229,8 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings: settings
             });
         }
+
+        return false;
     }
 
     setUserForLobbyHouse(house: LobbyHouse | null, user: User): void {

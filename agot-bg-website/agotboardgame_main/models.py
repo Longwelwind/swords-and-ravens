@@ -1,3 +1,4 @@
+import django.utils.timezone
 import uuid
 
 from django.conf import settings
@@ -89,6 +90,7 @@ class Game(models.Model):
     state = models.TextField(default=IN_LOBBY)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    last_active_at = models.DateTimeField(default=django.utils.timezone.now())
 
     def is_in_game(self, user):
         return user in self.players.all()

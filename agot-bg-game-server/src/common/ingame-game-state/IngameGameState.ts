@@ -313,7 +313,7 @@ export default class IngameGameState extends GameState<
         }
     }
 
-    onClientMessage(user: User, message: ClientMessage): void {
+    onClientMessage(user: User, message: ClientMessage): boolean {
         if (message.type == "cancel-vote") {
             const vote = this.votes.get(message.vote);
 
@@ -322,7 +322,7 @@ export default class IngameGameState extends GameState<
             const player = this.players.get(this.entireGame.users.get(message.player));
 
             if (!this.canLaunchReplacePlayerVote(user).result) {
-                return;
+                return false;
             }
 
             this.createVote(user, new ReplacePlayer(user, player.user, player.house));
@@ -330,7 +330,7 @@ export default class IngameGameState extends GameState<
             const house = this.game.houses.get(message.house);
 
             if (!this.canLaunchReplaceVassalVote(user, house).result) {
-                return;
+                return false;
             }
 
             this.createVote(user, new ReplaceVassalByPlayer(user, house));
@@ -338,7 +338,10 @@ export default class IngameGameState extends GameState<
             const player = this.players.get(user);
 
             this.onPlayerMessage(player, message);
+            return true;
         }
+
+        return false;
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
