@@ -1,6 +1,6 @@
 import django.utils.timezone
 from rest_framework.relations import PrimaryKeyRelatedField
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, BooleanField
 
 from agotboardgame_main.models import User, Game, PlayerInGame
 from chat.models import Room, UserInRoom
@@ -22,10 +22,11 @@ class PlayerInGameSerializer(ModelSerializer):
 
 class GameSerializer(ModelSerializer):
     players = PlayerInGameSerializer(many=True)
+    update_last_active = BooleanField(required=False, default=False)
 
     class Meta:
         model = Game
-        fields = ['id', 'name', 'owner', 'serialized_game', 'view_of_game', 'state', 'version', 'players', 'update_last_active']
+        fields = ['id', 'name', 'owner', 'serialized_game', 'view_of_game', 'state', 'version', 'players']
 
     def update(self, instance, validated_data):
         instance.version = validated_data.pop('version', instance.version)
