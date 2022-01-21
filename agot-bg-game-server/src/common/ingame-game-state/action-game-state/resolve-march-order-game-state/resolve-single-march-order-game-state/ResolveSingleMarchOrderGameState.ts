@@ -203,14 +203,6 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                 }
             }
 
-            if(moves.length == 0) {
-                this.actionGameState.ingame.log({
-                    type: "march-order-removed",
-                    house: this.house.id,
-                    region: startingRegion.id
-                });
-            }
-
             // Remove the order
             this.actionGameState.removeOrderFromRegion(startingRegion);
             this.resolveMarchOrderGameState.onResolveSingleMarchOrderGameStateFinish(this.house);

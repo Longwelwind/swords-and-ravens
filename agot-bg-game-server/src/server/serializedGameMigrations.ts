@@ -1355,7 +1355,6 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
     {
         version: "57",
         migrate: (serializedGame: any) => {
-            
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
                 ingame.gameLogManager.logs.forEach((l: any) => {
@@ -1363,6 +1362,17 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         l.resolvedAutomatically = false;
                     }
                 });
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "58",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.gameLogManager.logs = ingame.gameLogManager.logs.filter((l: any) => l.data.type != "march-order-removed");
             }
 
             return serializedGame;
