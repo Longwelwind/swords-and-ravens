@@ -1351,6 +1351,22 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "57",
+        migrate: (serializedGame: any) => {
+            
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.gameLogManager.logs.forEach((l: any) => {
+                    if (l.data.type == "retreat-failed") {
+                        l.resolvedAutomatically = false;
+                    }
+                });
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

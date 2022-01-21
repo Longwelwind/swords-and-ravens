@@ -30,7 +30,7 @@ export default class ResolveRetreatComponent extends Component<GameStateComponen
                         {this.selectRegionComponent && this.selectRegionComponent.selectedRegion && this.getUnitsToKillToRetreatTo(this.selectRegionComponent.selectedRegion) > 0 && (
                             <Col xs={12} className="text-center">
                                 {this.getUnitsToKillToRetreatTo(this.selectRegionComponent.selectedRegion)} units would need
-                                to be killed if you retreat to <strong>{this.selectRegionComponent.selectedRegion.name}</strong>.
+                                to be destroyed if you retreat to <strong>{this.selectRegionComponent.selectedRegion.name}</strong>.
                             </Col>
                         )}
                     </>
