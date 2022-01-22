@@ -369,7 +369,8 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             <OverlayTrigger overlay={
                                 <Tooltip id="mixed-wd1-setting-tooltip">
                                     If enabled, 1&nbsp;<i>Mustering</i> card will be replaced by <i>Rally&nbsp;The&nbsp;Men</i>,
-                                    1&nbsp;<i>Supply</i> by <i>Famine</i> and 1&nbsp;<i>A&nbsp;Throne&nbsp;of&nbsp;Blades</i> by <i>The&nbsp;Burden&nbsp;of&nbsp;Power</i>.
+                                    1&nbsp;<i>A&nbsp;Throne&nbsp;of&nbsp;Blades</i> by <i>The&nbsp;Burden&nbsp;of&nbsp;Power</i>
+                                    and the <i>Last Days of Summer</i> by <i>Famine</i>.
                                 </Tooltip>}>
                                 <label htmlFor="mixed-wd1-setting">Mixed Westeros Deck 1</label>
                             </OverlayTrigger>}

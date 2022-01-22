@@ -1318,11 +1318,8 @@
   ],
   "mixedWesterosDeck1": [
     {
-      "type": "last-days-of-summer"
-    },
-    {
       "type": "supply",
-      "quantity": 2
+      "quantity": 3
     },
     {
       "type": "famine"
