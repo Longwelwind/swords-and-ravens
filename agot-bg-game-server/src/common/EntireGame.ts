@@ -35,7 +35,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         vassals: true, seaOrderTokens: true, startWithSevenPowerTokens: true, allowGiftingPowerTokens: true,
         draftHouseCards: false, thematicDraft: false, limitedDraft: false, blindDraft: false,
         cokWesterosPhase: false, endless: false, useVassalPositions: false, precedingMustering: false,
-        mixedWesterosDeck1: false };
+        mixedWesterosDeck1: false, removeTob3: false, removeTobSkulls: false, limitTob2: false};
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -517,4 +517,7 @@ export interface GameSettings {
     useVassalPositions: boolean;
     precedingMustering: boolean;
     mixedWesterosDeck1: boolean;
+    removeTob3: boolean;
+    removeTobSkulls: boolean;
+    limitTob2: boolean;
 }

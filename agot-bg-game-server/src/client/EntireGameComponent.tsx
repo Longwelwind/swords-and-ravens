@@ -50,7 +50,21 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     getTidesOfBattleImage(): ReactNode {
         return <OverlayTrigger
             placement="auto"
-            overlay={<Tooltip id="tob-active-tooltip">Tides of Battle</Tooltip>}
+            overlay={
+                <Tooltip id="tob-active-tooltip">
+                    <Col className="text-center">
+                        Tides of Battle
+                        {this.props.entireGame.gameSettings.removeTob3 && <>
+                            <br/><small>No 3s</small>
+                        </>}
+                        {this.props.entireGame.gameSettings.removeTob3 && <>
+                            <br/><small>No skulls</small>
+                        </>}
+                        {this.props.entireGame.gameSettings.removeTob3 && <>
+                            <br/><small>Only two 2s</small>
+                        </>}
+                    </Col>
+                </Tooltip>}
             popperConfig={{ modifiers: [preventOverflow] }}
         >
             <img src={rollingDicesImage} width="30" style={{ "display": this.props.entireGame.gameSettings.tidesOfBattle ? "inline" : "none", marginTop: "-6px", paddingLeft: "5px" }} />

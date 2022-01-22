@@ -362,6 +362,51 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         onChange={() => this.changeGameSettings(() => this.gameSettings.mixedWesterosDeck1 = !this.gameSettings.mixedWesterosDeck1)}
                     />
                 </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="remove-tob3-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="remove-tob3-setting-tooltip">
+                                    If enabled, 3s cards will be removed from the Tides of Battle deck.
+                                </Tooltip>}>
+                                <label htmlFor="remove-tob3-setting">Remove 3s cards from ToB</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.removeTob3}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.removeTob3 = !this.gameSettings.removeTob3)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="remove-tob-skulls-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="remove-tob-skulls-setting-tooltip">
+                                    If enabled, skull cards will be removed from the Tides of Battle deck.
+                                </Tooltip>}>
+                                <label htmlFor="remove-tob-skulls-setting">Remove skulls from ToB</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.removeTobSkulls}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.removeTobSkulls = !this.gameSettings.removeTobSkulls)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="limit-tob2-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="limit-tob2-setting-tooltip">
+                                    If enabled, the Tides of Battle deck will only contain two 2s cards instead of four.
+                                </Tooltip>}>
+                                <label htmlFor="limit-tob2-setting">Limit ToB 2s cards</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.limitTob2}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.limitTob2 = !this.gameSettings.limitTob2)}
+                    />
+                </Col>
             </Col>
         </Row>
     }

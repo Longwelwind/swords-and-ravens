@@ -73,7 +73,7 @@ export default class CombatGameState extends GameState<
     houseCombatDatas: BetterMap<House, HouseCombatData>;
     @observable valyrianSteelBladeUser: House | null;
     revealTidesOfBattleCards: boolean;
-    tidesOfBattleDeck: TidesOfBattleCard[] = this.isTidesOfBattleCardsActive ? getShuffledTidesOfBattleDeck() : [];
+    tidesOfBattleDeck: TidesOfBattleCard[] = this.isTidesOfBattleCardsActive ? getShuffledTidesOfBattleDeck(this.entireGame.gameSettings) : [];
 
     @observable
     stats: CombatStats[] = [];

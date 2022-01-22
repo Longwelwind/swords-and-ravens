@@ -226,6 +226,10 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.startWithSevenPowerTokens = false;
             }
 
+            if (settings.removeTob3 || settings.removeTobSkulls || settings.limitTob2) {
+                settings.tidesOfBattle = true;
+            }
+
             this.entireGame.gameSettings = settings;
 
             this.onGameSettingsChange();
