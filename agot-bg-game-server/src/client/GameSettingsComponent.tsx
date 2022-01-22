@@ -43,12 +43,10 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     {this.props.entireGame.childGameState instanceof IngameGameState && (
                         <Col xs={12} className="text-center mb-2">
                             {this.selectedGameSetupName}
-                            {this.entireGame.gameSettings.tidesOfBattle &&
-                                    <><br/><small>Tides of Battle</small></>}
                         </Col>
                     )}
                         <Row className="justify-content-center">
-                            <Col xs={12}>
+                            <Col xs={12} className="d-flex align-items-center">
                                 <OverlayTrigger overlay={
                                     <Tooltip id="pbem-tooltip">
                                         <b>Live Game</b><br />
@@ -57,7 +55,8 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                         <b>P</b>lay <b>B</b>y <b>E</b>-<b>M</b>ail<br />
                                         The asynchronous game mode. Players receive an e-mail when it is their turn.
                                         Those games are typically played over days or weeks.
-                                    </Tooltip>}>
+                                    </Tooltip>}
+                                >
                                     <select id="pbem-setting" name="pbem"
                                         value={this.gameSettings.pbem ? "PBEM" : "Live"}
                                         onChange={e => this.changeGameSettings(() => this.gameSettings.pbem = e.target.value == "PBEM")}>
@@ -65,6 +64,22 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                         <option key="PBEM" value="PBEM">Play By E-Mail</option>
                                     </select>
                                 </OverlayTrigger>
+                                {this.gameSettings.pbem && !(this.props.entireGame.childGameState instanceof IngameGameState) && (
+                                    <FormCheck
+                                        id="start-when-full-setting"
+                                        className="mx-3"
+                                        type="switch"
+                                        label={
+                                            <OverlayTrigger overlay={
+                                                <Tooltip id="start-when-full-setting-tooltip">
+                                                    If enabled, the game will start automatically once all seats are taken.
+                                                </Tooltip>}>
+                                                <label htmlFor="start-when-full-setting">Start when full</label>
+                                            </OverlayTrigger>}
+                                        checked={this.gameSettings.startWhenFull}
+                                        onChange={() => this.changeGameSettings(() => this.gameSettings.startWhenFull = !this.gameSettings.startWhenFull)}
+                                    />
+                                )}
                             </Col>
                         </Row>
                 </Row>

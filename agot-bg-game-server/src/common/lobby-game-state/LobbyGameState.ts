@@ -75,39 +75,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 return false;
             }
 
-            if (this.entireGame.gameSettings.randomHouses) {
-                // Assign a random house to the players
-                // We could shuffle in place as getAvailableHouses will return a new array.
-                // But it is best practice to only shuffle in place when we create the shuffled array by mapping, filtering, slicing, etc. ourselves
-                const availableHouses = this.getAvailableHouses();
-                do {
-                    const allShuffledHouses = shuffle(availableHouses);
-                    const connectedUsers = this.players.values;
-                    this.players = new BetterMap();
-                    for(const user of connectedUsers) {
-                        this.players.set(allShuffledHouses.splice(0, 1)[0], user);
-                    }
-                }
-                while (availableHouses.map(lh => lh.id).includes("targaryen") && !this.players.keys.map(lh => lh.id).includes("targaryen"))
-            } else if (this.entireGame.gameSettings.randomChosenHouses) {
-                const shuffled = shuffleInPlace(this.players.entries); // The BetterMap methods always use Array.from and this will never change. So it is ok to shuffleInPlace here.
-
-                    const lobbyHouses = this.players.keys;
-                    for (let i = 0; i < shuffled.length; i++) {
-                        this.players.set(lobbyHouses[i], shuffled[i][1]);
-                    }
-            }
-
-            let housesToCreate = this.getAvailableHouses().map(h => h.id);
-            if (this.entireGame.gameSettings.setupId == "learn-the-game" && !this.entireGame.gameSettings.vassals) {
-                const lobbyHouses = this.players.keys.map(lh => lh.id);
-                housesToCreate = housesToCreate.filter(h => lobbyHouses.includes(h));
-            }
-
-            this.entireGame.proceedToIngameGameState(
-                housesToCreate,
-                new BetterMap(this.players.map((h, u) => ([h.id, u])))
-            );
+            this.launchGame();
             updateLastActive = true;
         } else if (message.type == "kick-player") {
             const kickedUser = this.entireGame.users.get(message.user);
@@ -233,14 +201,45 @@ export default class LobbyGameState extends GameState<EntireGame> {
             this.entireGame.gameSettings = settings;
 
             this.onGameSettingsChange();
-
-            this.entireGame.broadcastToClients({
-                type: "game-settings-changed",
-                settings: settings
-            });
         }
 
         return updateLastActive;
+    }
+
+    launchGame(): void {
+        if (this.entireGame.gameSettings.randomHouses) {
+            // Assign a random house to the players
+            // We could shuffle in place as getAvailableHouses will return a new array.
+            // But it is best practice to only shuffle in place when we create the shuffled array by mapping, filtering, slicing, etc. ourselves
+            const availableHouses = this.getAvailableHouses();
+            do {
+                const allShuffledHouses = shuffle(availableHouses);
+                const connectedUsers = this.players.values;
+                this.players = new BetterMap();
+                for(const user of connectedUsers) {
+                    this.players.set(allShuffledHouses.splice(0, 1)[0], user);
+                }
+            }
+            while (availableHouses.map(lh => lh.id).includes("targaryen") && !this.players.keys.map(lh => lh.id).includes("targaryen"))
+        } else if (this.entireGame.gameSettings.randomChosenHouses) {
+            const shuffled = shuffleInPlace(this.players.entries); // The BetterMap methods always use Array.from and this will never change. So it is ok to shuffleInPlace here.
+
+                const lobbyHouses = this.players.keys;
+                for (let i = 0; i < shuffled.length; i++) {
+                    this.players.set(lobbyHouses[i], shuffled[i][1]);
+                }
+        }
+
+        let housesToCreate = this.getAvailableHouses().map(h => h.id);
+        if (this.entireGame.gameSettings.setupId == "learn-the-game" && !this.entireGame.gameSettings.vassals) {
+            const lobbyHouses = this.players.keys.map(lh => lh.id);
+            housesToCreate = housesToCreate.filter(h => lobbyHouses.includes(h));
+        }
+
+        this.entireGame.proceedToIngameGameState(
+            housesToCreate,
+            new BetterMap(this.players.map((h, u) => ([h.id, u])))
+        );
     }
 
     setUserForLobbyHouse(house: LobbyHouse | null, user: User): void {
@@ -258,6 +257,11 @@ export default class LobbyGameState extends GameState<EntireGame> {
             type: "house-chosen",
             players: this.players.entries.map(([house, user]) => [house.id, user.id])
         });
+
+        if (this.entireGame.gameSettings.startWhenFull && this.entireGame.gameSettings.pbem && this.players.size == this.entireGame.selectedGameSetup.playerCount) {
+            this.launchGame();
+            return;
+        }
 
         this.notifyOwnerWhenGameCanBeStarted();
     }
