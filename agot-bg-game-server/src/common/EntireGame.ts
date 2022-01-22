@@ -30,11 +30,12 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     ownerUserId: string;
     name: string;
 
-    @observable gameSettings: GameSettings = { pbem: true, setupId: "mother-of-dragons", playerCount: 8,
+    @observable gameSettings: GameSettings = { pbem: true, startWhenFull: false, setupId: "mother-of-dragons", playerCount: 8,
         randomHouses: false, randomChosenHouses: false, adwdHouseCards: false,  tidesOfBattle: false,
         vassals: true, seaOrderTokens: true, startWithSevenPowerTokens: true, allowGiftingPowerTokens: true,
         draftHouseCards: false, thematicDraft: false, limitedDraft: false, blindDraft: false,
-        cokWesterosPhase: false, endless: false, useVassalPositions: false, precedingMustering: false };
+        cokWesterosPhase: false, endless: false, useVassalPositions: false, precedingMustering: false,
+        mixedWesterosDeck1: false, removeTob3: false, removeTobSkulls: false, limitTob2: false};
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -245,24 +246,25 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             // Only allow PBEM to be changed ingame
             const settings = message.settings as GameSettings;
 
-            if (this.gameSettings.pbem != settings.pbem) {
-                this.gameSettings.pbem = settings.pbem;
-                this.broadcastToClients({
-                    type: "game-settings-changed",
-                    settings: this.gameSettings
-                });
+            if (settings.pbem && !this.gameSettings.pbem && this.ingameGameState) {
+                // Notify waited users due to ingame PBEM change
+                this.notifyWaitedUsers();
+            }
 
-                if (this.ingameGameState) {
-                    // Notify waited users due to ingame PBEM change
-                    this.notifyWaitedUsers();
-                }
+            this.gameSettings.pbem = settings.pbem;
 
-                // The PBEM setting has been changed => no need to pass the message to the child game state
-                return false;
+            if (!this.gameSettings.pbem) {
+                this.gameSettings.startWhenFull = false;
+                settings.startWhenFull = false;
             }
 
             // For changing settings other than PBEM pass the message to the client game state
             this.childGameState.onClientMessage(user, message);
+
+            this.entireGame.broadcastToClients({
+                type: "game-settings-changed",
+                settings: settings
+            });
         } else {
             updateLastActive = this.childGameState.onClientMessage(user, message);
         }
@@ -497,6 +499,7 @@ export interface SerializedEntireGame {
 
 export interface GameSettings {
     pbem: boolean;
+    startWhenFull: boolean;
     setupId: string;
     playerCount: number;
     randomHouses: boolean;
@@ -515,4 +518,8 @@ export interface GameSettings {
     endless: boolean;
     useVassalPositions: boolean;
     precedingMustering: boolean;
+    mixedWesterosDeck1: boolean;
+    removeTob3: boolean;
+    removeTobSkulls: boolean;
+    limitTob2: boolean;
 }

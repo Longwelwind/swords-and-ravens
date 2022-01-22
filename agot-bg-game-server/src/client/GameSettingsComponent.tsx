@@ -43,12 +43,10 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     {this.props.entireGame.childGameState instanceof IngameGameState && (
                         <Col xs={12} className="text-center mb-2">
                             {this.selectedGameSetupName}
-                            {this.entireGame.gameSettings.tidesOfBattle &&
-                                    <><br/><small>Tides of Battle</small></>}
                         </Col>
                     )}
                         <Row className="justify-content-center">
-                            <Col xs={12}>
+                            <Col xs={12} className="d-flex align-items-center">
                                 <OverlayTrigger overlay={
                                     <Tooltip id="pbem-tooltip">
                                         <b>Live Game</b><br />
@@ -57,7 +55,8 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                         <b>P</b>lay <b>B</b>y <b>E</b>-<b>M</b>ail<br />
                                         The asynchronous game mode. Players receive an e-mail when it is their turn.
                                         Those games are typically played over days or weeks.
-                                    </Tooltip>}>
+                                    </Tooltip>}
+                                >
                                     <select id="pbem-setting" name="pbem"
                                         value={this.gameSettings.pbem ? "PBEM" : "Live"}
                                         onChange={e => this.changeGameSettings(() => this.gameSettings.pbem = e.target.value == "PBEM")}>
@@ -65,6 +64,22 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                         <option key="PBEM" value="PBEM">Play By E-Mail</option>
                                     </select>
                                 </OverlayTrigger>
+                                {this.gameSettings.pbem && !(this.props.entireGame.childGameState instanceof IngameGameState) && (
+                                    <FormCheck
+                                        id="start-when-full-setting"
+                                        className="mx-3"
+                                        type="switch"
+                                        label={
+                                            <OverlayTrigger overlay={
+                                                <Tooltip id="start-when-full-setting-tooltip">
+                                                    If enabled, the game will start automatically once all seats are taken.
+                                                </Tooltip>}>
+                                                <label htmlFor="start-when-full-setting">Start when full</label>
+                                            </OverlayTrigger>}
+                                        checked={this.gameSettings.startWhenFull}
+                                        onChange={() => this.changeGameSettings(() => this.gameSettings.startWhenFull = !this.gameSettings.startWhenFull)}
+                                    />
+                                )}
                             </Col>
                         </Row>
                 </Row>
@@ -342,6 +357,69 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             </OverlayTrigger>}
                         checked={this.gameSettings.endless}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.endless = !this.gameSettings.endless)}
+                    />
+                </Col>
+            </Col>
+            <Col md="12" lg="auto" id="custom-settings-2-col" className="no-gutters">
+                <Col xs="12">
+                    <FormCheck
+                        id="mixed-wd1-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="mixed-wd1-setting-tooltip">
+                                    If enabled, 1&nbsp;<i>Mustering</i> card will be replaced by <i>Rally&nbsp;The&nbsp;Men</i>,
+                                    1&nbsp;<i>Supply</i> by <i>Famine</i> and 1&nbsp;<i>A&nbsp;Throne&nbsp;of&nbsp;Blades</i> by <i>The&nbsp;Burden&nbsp;of&nbsp;Power</i>.
+                                </Tooltip>}>
+                                <label htmlFor="mixed-wd1-setting">Mixed Westeros Deck 1</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.mixedWesterosDeck1}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.mixedWesterosDeck1 = !this.gameSettings.mixedWesterosDeck1)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="remove-tob3-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="remove-tob3-setting-tooltip">
+                                    If enabled, 3s cards will be removed from the Tides of Battle deck.
+                                </Tooltip>}>
+                                <label htmlFor="remove-tob3-setting">Remove 3s cards from ToB</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.removeTob3}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.removeTob3 = !this.gameSettings.removeTob3)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="remove-tob-skulls-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="remove-tob-skulls-setting-tooltip">
+                                    If enabled, skull cards will be removed from the Tides of Battle deck.
+                                </Tooltip>}>
+                                <label htmlFor="remove-tob-skulls-setting">Remove skulls from ToB</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.removeTobSkulls}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.removeTobSkulls = !this.gameSettings.removeTobSkulls)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="limit-tob2-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="limit-tob2-setting-tooltip">
+                                    If enabled, the Tides of Battle deck will only contain two 2s cards instead of four.
+                                </Tooltip>}>
+                                <label htmlFor="limit-tob2-setting">Limit ToB 2s cards</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.limitTob2}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.limitTob2 = !this.gameSettings.limitTob2)}
                     />
                 </Col>
             </Col>

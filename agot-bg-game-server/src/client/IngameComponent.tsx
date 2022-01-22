@@ -768,9 +768,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 <Tab.Pane eventKey="settings" className="h-100">
                                     <GameSettingsComponent gameClient={this.props.gameClient}
                                         entireGame={this.props.gameState.entireGame} />
-                                    <UserSettingsComponent user={this.props.gameClient.authenticatedUser}
-                                        entireGame={this.props.gameState.entireGame}
-                                        parent={this} />
+                                    <div style={{marginTop: -20}} >
+                                        <UserSettingsComponent user={this.props.gameClient.authenticatedUser}
+                                            entireGame={this.props.gameState.entireGame}
+                                            parent={this} />
+                                    </div>
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="objectives" className="h-100">
                                     <div className="d-flex flex-column h-100" style={{overflowY: "scroll"}}>

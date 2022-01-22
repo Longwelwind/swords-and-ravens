@@ -1,5 +1,7 @@
 import shuffleInPlace from "../../../../utils/shuffle";
 import BetterMap from "../../../../utils/BetterMap";
+import { GameSettings } from "../../../../common/EntireGame";
+import _ from "lodash";
 
 export class TidesOfBattleCard {
     id: string;
@@ -42,7 +44,7 @@ const tidesOfBattleAllocations = new BetterMap([
     [skull, 2]
 ]);
 
-export default function getShuffledTidesOfBattleDeck(): TidesOfBattleCard[] {
+export default function getShuffledTidesOfBattleDeck(settings: GameSettings): TidesOfBattleCard[] {
     const result: TidesOfBattleCard[] = [];
 
     tidesOfBattleAllocations.entries.forEach(([card, count]) => {
@@ -50,6 +52,20 @@ export default function getShuffledTidesOfBattleDeck(): TidesOfBattleCard[] {
            result.push(card);
        }
     });
+
+    if (settings.removeTob3) {
+        _.pull(result, three);
+    }
+
+    if (settings.removeTobSkulls) {
+        _.pull(result, skull);
+    }
+
+    if (settings.limitTob2) {
+        const removed = _.remove(result, c => c == two);
+        removed.length = 2;
+        result.push(...removed);
+    }
 
     return shuffleInPlace(result);
 }
