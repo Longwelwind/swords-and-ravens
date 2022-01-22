@@ -346,7 +346,6 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     // Load Westeros Cards
     let lastWesterosCardId = 0;
     game.westerosDecks = baseGameData.westerosCards.map(westerosDeckData => {
-
         const cards: WesterosCard[] = [];
         westerosDeckData.forEach((westerosCardData: WesterosCardData) => {
             const westerosCardType = westerosCardTypes.get(westerosCardData.type);
@@ -387,6 +386,23 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
                 }
             }
         }
+    }
+
+    if (gameSettings.mixedWesterosDeck1) {
+        const westerosCards = baseGameData.mixedWesterosDeck1;
+        const cards: WesterosCard[] = [];
+        westerosCards.forEach((westerosCardData: WesterosCardData) => {
+            const westerosCardType = westerosCardTypes.get(westerosCardData.type);
+            const quantity = westerosCardData.quantity ? westerosCardData.quantity : 1;
+            for (let i = 0;i < quantity;i++) {
+                const id = ++lastWesterosCardId;
+
+                cards.push(new WesterosCard(id, westerosCardType));
+            }
+        });
+
+        shuffleInPlace(cards);
+        game.westerosDecks[0] = cards;
     }
 
     // Load Wildling deck

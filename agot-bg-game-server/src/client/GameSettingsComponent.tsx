@@ -345,6 +345,24 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     />
                 </Col>
             </Col>
+            <Col md="12" lg="auto" id="custom-settings-2-col" className="no-gutters">
+                <Col xs="12">
+                    <FormCheck
+                        id="mixed-wd1-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="mixed-wd1-setting-tooltip">
+                                    If enabled, 1&nbsp;<i>Mustering</i> card will be replaced by <i>Rally&nbsp;The&nbsp;Men</i>,
+                                    1&nbsp;<i>Supply</i> by <i>Famine</i> and 1&nbsp;<i>A&nbsp;Throne&nbsp;of&nbsp;Blades</i> by <i>The&nbsp;Burden&nbsp;of&nbsp;Power</i>.
+                                </Tooltip>}>
+                                <label htmlFor="mixed-wd1-setting">Mixed Westeros Deck 1</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.mixedWesterosDeck1}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.mixedWesterosDeck1 = !this.gameSettings.mixedWesterosDeck1)}
+                    />
+                </Col>
+            </Col>
         </Row>
     }
 

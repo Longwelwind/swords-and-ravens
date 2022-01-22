@@ -1316,6 +1316,35 @@
       }
     ]
   ],
+  "mixedWesterosDeck1": [
+    {
+      "type": "last-days-of-summer"
+    },
+    {
+      "type": "supply",
+      "quantity": 2
+    },
+    {
+      "type": "famine"
+    },
+    {
+      "type": "mustering",
+      "quantity": 2
+    },
+    {
+      "type": "rally-the-men"
+    },
+    {
+      "type": "a-throne-of-blades",
+      "quantity": 1
+    },
+    {
+      "type": "the-burden-of-power"
+    },
+    {
+      "type": "winter-is-coming"
+    }
+  ],
   "wildlingCards": [
     {
       "type": "silence-at-the-wall"
