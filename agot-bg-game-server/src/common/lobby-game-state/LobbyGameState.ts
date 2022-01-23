@@ -22,6 +22,10 @@ export default class LobbyGameState extends GameState<EntireGame> {
         return this.parentGameState;
     }
 
+    get settings(): GameSettings {
+        return this.entireGame.gameSettings;
+    }
+
     firstStart(): void {
         // Load the available houses for this game
         this.lobbyHouses = this.getLobbyHouses();
@@ -139,7 +143,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
             let settings =  message.settings as GameSettings;
             if (this.players.size > settings.playerCount) {
                 // A variant which contains less players than connected is not allowed
-                settings = this.entireGame.gameSettings;
+                settings = this.settings;
             }
 
             if (settings.setupId == "a-dance-with-dragons") {
@@ -198,7 +202,12 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.tidesOfBattle = true;
             }
 
-            const hideRevealUserNames = settings.faceless != this.entireGame.gameSettings.faceless;
+            // Faceless requires Random
+            if (settings.faceless && !this.settings.randomHouses && !this.settings.randomChosenHouses) {
+                settings.randomHouses = true;
+            }
+
+            const hideRevealUserNames = settings.faceless != this.settings.faceless;
 
             this.entireGame.gameSettings = settings;
 
@@ -213,7 +222,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
     }
 
     launchGame(): void {
-        if (this.entireGame.gameSettings.randomHouses) {
+        if (this.settings.randomHouses) {
             // Assign a random house to the players
             // We could shuffle in place as getAvailableHouses will return a new array.
             // But it is best practice to only shuffle in place when we create the shuffled array by mapping, filtering, slicing, etc. ourselves
@@ -227,7 +236,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 }
             }
             while (availableHouses.map(lh => lh.id).includes("targaryen") && !this.players.keys.map(lh => lh.id).includes("targaryen"))
-        } else if (this.entireGame.gameSettings.randomChosenHouses) {
+        } else if (this.settings.randomChosenHouses) {
             const shuffled = shuffleInPlace(this.players.entries); // The BetterMap methods always use Array.from and this will never change. So it is ok to shuffleInPlace here.
 
                 const lobbyHouses = this.players.keys;
@@ -237,7 +246,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
         }
 
         let housesToCreate = this.getAvailableHouses().map(h => h.id);
-        if (this.entireGame.gameSettings.setupId == "learn-the-game" && !this.entireGame.gameSettings.vassals) {
+        if (this.settings.setupId == "learn-the-game" && !this.settings.vassals) {
             const lobbyHouses = this.players.keys.map(lh => lh.id);
             housesToCreate = housesToCreate.filter(h => lobbyHouses.includes(h));
         }
@@ -264,7 +273,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
             players: this.players.entries.map(([house, user]) => [house.id, user.id])
         });
 
-        if (this.entireGame.gameSettings.startWhenFull && this.entireGame.gameSettings.pbem && this.players.size == this.entireGame.selectedGameSetup.playerCount) {
+        if (this.settings.startWhenFull && this.settings.pbem && this.players.size == this.entireGame.selectedGameSetup.playerCount) {
             this.launchGame();
             return;
         }
@@ -282,7 +291,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
         if (this.canStartGame(owner).success) {
             // Only notify when min count is reached and when game is full to avoid many messages in between
             let minCountReached = false;
-            if (this.entireGame.gameSettings.vassals) {
+            if (this.settings.vassals) {
                 if (this.entireGame.selectedGameSetup.playerCount >= 8) {
                     minCountReached = this.players.size == MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN;
                 } else {
@@ -308,7 +317,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
         }
 
         // If Vassals are toggled we need at least min_player_count_with_vassals
-        if (this.entireGame.gameSettings.vassals) {
+        if (this.settings.vassals) {
             if (this.entireGame.selectedGameSetup.playerCount >= 8) {
                 if (this.players.size < MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN) {
                     return {success: false, reason: "not-enough-players"};
@@ -321,7 +330,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
             return {success: false, reason: "not-enough-players"};
         }
 
-        if (this.entireGame.gameSettings.playerCount == 8 && !this.entireGame.gameSettings.randomHouses) {
+        if (this.settings.playerCount == 8 && !this.settings.randomHouses) {
             if (!this.players.keys.map(lh => lh.id).includes("targaryen")) {
                 return {success: false, reason: "targaryen-must-be-a-player-controlled-house"};
             }
