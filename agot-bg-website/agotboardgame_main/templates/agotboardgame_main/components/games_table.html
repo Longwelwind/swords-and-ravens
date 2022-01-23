@@ -33,7 +33,11 @@
                             Last active {{ game.last_active_at|naturaltime }}
                         </div>
                     {% endif %}
-                    <div><b>Owner: </b>{{ game.owner.username }}</div>
+                    {% if game.view_of_game.settings.faceless %}
+                      <div></div>
+                    {% else %}
+                        <div><b>Owner: </b>{{ game.owner.username }}</div>
+                    {% endif %}
                 "
                 data-placement="right"
                 data-trigger="hover"

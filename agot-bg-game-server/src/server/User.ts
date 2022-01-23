@@ -6,7 +6,7 @@ import {observable} from "mobx";
 
 export default class User {
     id: string;
-    name: string;
+    @observable name: string;
     @observable settings: UserSettings;
     entireGame: EntireGame;
     connectedClients: WebSocket[] = [];
@@ -48,10 +48,10 @@ export default class User {
         }
     }
 
-    serializeToClient(admin: boolean, user: User | null): SerializedUser {
+    serializeToClient(admin: boolean, user: User | null, hideUserName: boolean): SerializedUser {
         return {
             id: this.id,
-            name: this.name,
+            name: hideUserName ? "Jaqen H'ghar": this.name,
             settings: this.settings,
             connected: this.connected,
             otherUsersFromSameNetwork: this.otherUsersFromSameNetwork,

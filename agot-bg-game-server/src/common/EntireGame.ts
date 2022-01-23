@@ -35,7 +35,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         vassals: true, seaOrderTokens: true, startWithSevenPowerTokens: true, allowGiftingPowerTokens: true,
         draftHouseCards: false, thematicDraft: false, limitedDraft: false, blindDraft: false,
         cokWesterosPhase: false, endless: false, useVassalPositions: false, precedingMustering: false,
-        mixedWesterosDeck1: false, removeTob3: false, removeTobSkulls: false, limitTob2: false};
+        mixedWesterosDeck1: false, removeTob3: false, removeTobSkulls: false, limitTob2: false, faceless: false};
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -222,7 +222,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
         this.broadcastToClients({
             type: "new-user",
-            user: user.serializeToClient(false, user)
+            user: user.serializeToClient(false, user, this.gameSettings.faceless)
         });
 
         return user;
@@ -306,6 +306,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         } else if (message.type == "update-other-users-with-same-ip") {
             const user = this.users.get(message.user);
             user.otherUsersFromSameNetwork = message.otherUsers;
+        } else if (message.type == "hide-reveal-user-names") {
+            message.names.forEach(([uid, name]) => this.users.get(uid).name = name);
         } else {
             this.childGameState.onServerMessage(message);
         }
@@ -441,13 +443,24 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         ));
     }
 
+    hideRevealUserNames(revealForever: boolean): void {
+        if (revealForever) {
+            this.gameSettings.faceless = false;
+        }
+
+        this.broadcastToClients({
+            type: "hide-reveal-user-names",
+            names: this.users.values.map(u => u.serializeToClient(false, null, this.gameSettings.faceless)).map(su => [su.id, su.name])
+        });
+    }
+
     serializeToClient(user: User | null): SerializedEntireGame {
         const admin = user == null;
 
         return {
             id: this.id,
             name: this.name,
-            users: this.users.values.map(u => u.serializeToClient(admin, user)),
+            users: this.users.values.map(u => u.serializeToClient(admin, user, this.gameSettings.faceless)),
             ownerUserId: this.ownerUserId,
             publicChatRoomId: this.publicChatRoomId,
             gameSettings: this.gameSettings,
@@ -522,4 +535,5 @@ export interface GameSettings {
     removeTob3: boolean;
     removeTobSkulls: boolean;
     limitTob2: boolean;
+    faceless: boolean;
 }

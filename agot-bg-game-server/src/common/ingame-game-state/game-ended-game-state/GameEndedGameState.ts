@@ -17,6 +17,8 @@ export default class GameEndedGameState extends GameState<IngameGameState> {
     firstStart(winner: House): void {
         this.winner = winner;
 
+        this.ingame.entireGame.hideRevealUserNames(true);
+
         this.ingame.log({
             type: "winner-declared",
             winner: winner.id

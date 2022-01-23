@@ -198,7 +198,13 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.tidesOfBattle = true;
             }
 
+            const hideRevealUserNames = settings.faceless != this.entireGame.gameSettings.faceless;
+
             this.entireGame.gameSettings = settings;
+
+            if (hideRevealUserNames) {
+                this.entireGame.hideRevealUserNames(false);
+            }
 
             this.onGameSettingsChange();
         }
