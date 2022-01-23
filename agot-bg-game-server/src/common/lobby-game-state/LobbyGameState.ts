@@ -203,7 +203,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
             }
 
             // Faceless requires Random
-            if (settings.faceless && !this.settings.randomHouses && !this.settings.randomChosenHouses) {
+            if (settings.faceless && !settings.randomHouses && !settings.randomChosenHouses) {
                 settings.randomHouses = true;
             }
 
