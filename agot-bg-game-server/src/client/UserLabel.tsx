@@ -39,6 +39,11 @@ export default class UserLabel extends Component<UserLabelProps> {
 
     render(): ReactNode {
         const isOwner = this.props.gameState.entireGame.isOwner(this.user);
+        let showMultiAccountProtectionIcon = this.user.otherUsersFromSameNetwork.length > 0;
+        // Hide it ingame for faceless
+        if (showMultiAccountProtectionIcon && this.props.gameState.entireGame.gameSettings.faceless && this.props.gameState instanceof IngameGameState) {
+            showMultiAccountProtectionIcon = false;
+        }
         return (
             <Navbar variant="dark" className="no-space-around">
                 <Navbar.Brand className="no-space-around">
@@ -50,7 +55,7 @@ export default class UserLabel extends Component<UserLabelProps> {
                         <OverlayTrigger overlay={<Tooltip id={`${this.user.id}-connection-tooltip`}>{this.user.connected ? "Connected" : "Disconnected"}</Tooltip>}>
                             <FontAwesomeIcon icon={faWifi} className={this.user.connected ? "text-success" : "text-danger"} />
                         </OverlayTrigger>
-                        {this.user.otherUsersFromSameNetwork.length > 0 && <OverlayTrigger placement="auto" overlay={this.renderOtherUsersFromSameNetworkTooltip()}>
+                        {showMultiAccountProtectionIcon && <OverlayTrigger placement="auto" overlay={this.renderOtherUsersFromSameNetworkTooltip()}>
                             <img src={clonesImage} width="18" style={{marginLeft: 5, marginTop: -3}}/>
                         </OverlayTrigger>}
                     </small>
