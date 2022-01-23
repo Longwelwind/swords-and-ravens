@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import select_template
 from django.views.decorators.http import require_POST
+from django.utils import timezone
 
 from agotboardgame.settings import GROUP_COLORS
 from agotboardgame_main.models import Game, ONGOING, IN_LOBBY, User, CANCELLED, PlayerInGame
@@ -167,8 +168,11 @@ def games(request):
         if request.user.is_authenticated:
             games_query = games_query.prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user=request.user), to_attr="player_in_game"))
 
-        games = games_query.filter(Q(state=IN_LOBBY) | Q(state=ONGOING))
-
+        eight_days_past = timezone.now() - timedelta(days=8)
+        if request.user.is_authenticated:
+            games = games_query.filter(Q(state=IN_LOBBY) | Q(state=ONGOING)).prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user__last_activity__lt=eight_days_past), to_attr="inactive_players"))
+        else:
+            games = games_query.filter(Q(state=IN_LOBBY) | Q(state=ONGOING))
         # It seems to be hard to ask Postgres to order the list correctly.
         # It is done in Python
         games = sorted(games, key=lambda game: ([IN_LOBBY, ONGOING].index(game.state), -datetime.timestamp(game.last_active_at)))
@@ -179,6 +183,7 @@ def games(request):
             # Transform that into a single field that can be None.
             if request.user.is_authenticated:
                 game.player_in_game = game.player_in_game[0] if len(game.player_in_game) > 0 else None
+                game.inactive_players = ", ".join(map(lambda p: p.user.username, game.inactive_players)) if len(game.inactive_players) > 0 else None
             else:
                 game.player_in_game = None
 
