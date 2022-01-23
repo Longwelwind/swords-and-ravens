@@ -9,7 +9,7 @@ import GameClient from "./GameClient";
 import LobbyGameState from "../common/lobby-game-state/LobbyGameState";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import { Dropdown, Nav, Navbar, NavDropdown } from "react-bootstrap";
+import { Col, Dropdown, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import Player from "../common/ingame-game-state/Player";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
@@ -39,11 +39,6 @@ export default class UserLabel extends Component<UserLabelProps> {
 
     render(): ReactNode {
         const isOwner = this.props.gameState.entireGame.isOwner(this.user);
-        let showMultiAccountProtectionIcon = this.user.otherUsersFromSameNetwork.length > 0;
-        // Hide it ingame for faceless
-        if (showMultiAccountProtectionIcon && this.props.gameState.entireGame.gameSettings.faceless && this.props.gameState instanceof IngameGameState) {
-            showMultiAccountProtectionIcon = false;
-        }
         return (
             <Navbar variant="dark" className="no-space-around">
                 <Navbar.Brand className="no-space-around">
@@ -55,9 +50,7 @@ export default class UserLabel extends Component<UserLabelProps> {
                         <OverlayTrigger overlay={<Tooltip id={`${this.user.id}-connection-tooltip`}>{this.user.connected ? "Connected" : "Disconnected"}</Tooltip>}>
                             <FontAwesomeIcon icon={faWifi} className={this.user.connected ? "text-success" : "text-danger"} />
                         </OverlayTrigger>
-                        {showMultiAccountProtectionIcon && <OverlayTrigger placement="auto" overlay={this.renderOtherUsersFromSameNetworkTooltip()}>
-                            <img src={clonesImage} width="18" style={{marginLeft: 5, marginTop: -3}}/>
-                        </OverlayTrigger>}
+                        {this.user.otherUsersFromSameNetwork.length > 0 && this.renderOtherUsersFromSameNetworkTooltip()}
                     </small>
                 </Navbar.Brand>
                 <Navbar.Collapse id={`navbar-${this.user.id}`} className="no-space-around">
@@ -73,10 +66,21 @@ export default class UserLabel extends Component<UserLabelProps> {
     }
 
     renderOtherUsersFromSameNetworkTooltip(): OverlayChildren {
-        return <Tooltip id={`${this.user.id}-other-users-with-same-ip-tooltip`}>
-            These users {this.props.gameState instanceof IngameGameState ? "play" : "joined"} from the same network as {this.user.name}:
-            <br/><br/>{this.user.otherUsersFromSameNetwork.map(usr => <div key={usr}>{usr}</div>)}
-        </Tooltip>
+        // As we force random houses now, we can show the icon, but hide the Tooltip
+        return <ConditionalWrap
+            condition={!this.props.gameState.entireGame.gameSettings.faceless}
+            wrap={child => <OverlayTrigger placement="auto"
+                overlay={<Tooltip id={`${this.user.id}-other-users-with-same-ip-tooltip`}>
+                    <Col>
+                        These users {this.props.gameState instanceof IngameGameState ? "play" : "joined"} from the same network as {this.user.name}:
+                        <br /><br />{this.user.otherUsersFromSameNetwork.map(usr => <div key={usr}>{usr}</div>)}
+                    </Col>
+                </Tooltip>}>
+                {child}
+            </OverlayTrigger>}
+            >
+            <img src={clonesImage} width="18" style={{ marginLeft: 5, marginTop: -3 }} />
+        </ConditionalWrap>;
     }
 
     renderIngameDropdownItems(ingame: IngameGameState): ReactNode {
