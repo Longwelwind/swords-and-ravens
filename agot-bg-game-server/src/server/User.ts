@@ -51,7 +51,7 @@ export default class User {
     serializeToClient(admin: boolean, user: User | null, hideUserName: boolean): SerializedUser {
         return {
             id: this.id,
-            name: hideUserName ? "Jaqen H'ghar": this.name,
+            name: admin ? this.name : hideUserName ? "Jaqen H'ghar": this.name,
             settings: this.settings,
             connected: this.connected,
             otherUsersFromSameNetwork: this.otherUsersFromSameNetwork,
