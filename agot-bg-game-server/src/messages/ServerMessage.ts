@@ -28,7 +28,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting | UpdateCombatStats
     | UpdateDraftState | RevealBids | UpdateMaxTurns | PasswordResponse | ReplacedByVassal | UpdateDeletedHouseCards | UpdateOldPlayerHouseCards
     | LoyaltyTokenGained | LoyaltyTokenPlaced | DrangonStrengthTokenRemoved | UpdateLoanCards | UpdateRegionModifiers
-    | UpdateCompletedObjectives | UpdateSecretObjectives | SyncShiftingAmbitionsGameState;
+    | UpdateCompletedObjectives | UpdateSecretObjectives | SyncShiftingAmbitionsGameState | HideRevealUserNames;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -434,4 +434,9 @@ interface SyncShiftingAmbitionsGameState {
     step: number;
     objectiveCardPool: string[];
     turnOrder: string[];
+}
+
+interface HideRevealUserNames {
+    type: "hide-reveal-user-names";
+    names: [string, string][];
 }

@@ -58,7 +58,7 @@ export default class UserLabel extends Component<UserLabelProps> {
                 <Navbar.Collapse id={`navbar-${this.user.id}`} className="no-space-around">
                     <Nav className="no-space-around">
                         <NavDropdown id={`nav-dropdown-${this.user.id}`} title={<span className="userlabel">{this.user.name}</span>} className="no-gutters">
-                            <Dropdown.Item href={`/user/${this.user.id}`} target="_blank" rel="noopener noreferrer">See Profile</Dropdown.Item>
+                            {!this.props.gameState.entireGame.gameSettings.faceless && <Dropdown.Item href={`/user/${this.user.id}`} target="_blank" rel="noopener noreferrer">See Profile</Dropdown.Item>}
                             {this.props.gameState instanceof IngameGameState && this.renderIngameDropdownItems(this.props.gameState)}
                         </NavDropdown>
                     </Nav>

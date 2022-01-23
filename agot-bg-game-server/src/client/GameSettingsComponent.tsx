@@ -301,6 +301,21 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             <Col md="12" lg="auto" id="custom-settings-col" className="no-gutters">
                 <Col xs="12">
                     <FormCheck
+                        id="faceless-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="faceless-setting-tooltip">
+                                    Player names will be hidden and revealed after game ended.
+                                </Tooltip>}>
+                                <label htmlFor="faceless-setting">Faceless</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.faceless}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.faceless = !this.gameSettings.faceless)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
                         id="westeros-phase-variant-setting"
                         type="switch"
                         label={
@@ -368,9 +383,9 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="mixed-wd1-setting-tooltip">
-                                    If enabled, 1&nbsp;<i>Mustering</i> card will be replaced by <i>Rally&nbsp;The&nbsp;Men</i>,
-                                    1&nbsp;<i>A&nbsp;Throne&nbsp;of&nbsp;Blades</i> by <i>The&nbsp;Burden&nbsp;of&nbsp;Power</i>
-                                    and the <i>Last Days of Summer</i> by <i>Famine</i>.
+                                    If enabled, one <i>Mustering</i> card will be replaced by <i>Rally&nbsp;The&nbsp;Men</i>,{" "}
+                                    one <i>A&nbsp;Throne&nbsp;of&nbsp;Blades</i> card by <i>The&nbsp;Burden&nbsp;of&nbsp;Power</i> and the{" "}
+                                    <i>Last&nbsp;Days&nbsp;of&nbsp;Summer</i> card by <i>Famine</i>.
                                 </Tooltip>}>
                                 <label htmlFor="mixed-wd1-setting">Mixed Westeros Deck 1</label>
                             </OverlayTrigger>}
