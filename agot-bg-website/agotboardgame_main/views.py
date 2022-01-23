@@ -163,12 +163,12 @@ def games(request):
         # Fetch the list of open or ongoing games.
         # Pre-fetch the PlayerInGame entry related to the authenticated player
         # This means that "game.players" will only contain one entry, the one related to the authenticated player.
-        games_query = Game.objects.annotate(players_count=Count('players')).prefetch_related('owner').prefetch_related('players')
+        games_query = Game.objects.annotate(players_count=Count('players')).prefetch_related('owner')
 
         if request.user.is_authenticated:
             games_query = games_query.prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user=request.user), to_attr="player_in_game"))
 
-        games = games_query.filter(Q(state=IN_LOBBY) | Q(state=ONGOING))
+        games = games_query.filter(Q(state=IN_LOBBY) | Q(state=ONGOING)).prefetch_related('players')
 
         # It seems to be hard to ask Postgres to order the list correctly.
         # It is done in Python
