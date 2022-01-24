@@ -18,12 +18,21 @@ Games -
                 </div>
             </div>
         </div>
+        <div class="col-lg-10 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    {% include "./components/games_chat.html" %}
+                </div>
+            </div>
+        </div>
         {% if my_games %}
         <div class="col-lg-10 mb-4">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Your Games</h4>
-                    {% games_table my_games user perms %}
+                    <div style="max-height: 400px; overflow-y: auto">
+                        {% games_table my_games user perms %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -32,7 +41,7 @@ Games -
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">
-                        Games
+                        All Games
                         <span
                             id="westerosi-time"
                             class="float-right badge badge-secondary"
@@ -55,13 +64,6 @@ Games -
                     <div style="height: 400px; overflow-y: auto">
                         {% games_table games user perms %}
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-10 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    {% include "./components/games_chat.html" %}
                 </div>
             </div>
         </div>
