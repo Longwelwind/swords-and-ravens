@@ -338,7 +338,7 @@ export default class IngameGameState extends GameState<
             const player = this.players.get(user);
 
             this.onPlayerMessage(player, message);
-            return true;
+            return !message.type.includes("vote");
         }
 
         return false;
