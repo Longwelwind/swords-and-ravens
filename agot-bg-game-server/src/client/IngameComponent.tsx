@@ -913,7 +913,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     <Col xs="auto" style={{marginRight: "-20px"}}>
                                         {count > 1 ? count : <>&nbsp;</>}
                                     </Col>
-                                    <Col className="pl-0" style={{width: "145px", maxWidth: "145px"}}>
+                                    <Col className="pl-0" style={{width: "150px", maxWidth: "150px"}}>
                                         <WesterosCardComponent
                                             cardType={wc}
                                             westerosDeckI={i}
