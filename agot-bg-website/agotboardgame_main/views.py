@@ -331,6 +331,7 @@ def user_profile(request, user_id):
     if request.user.is_authenticated and request.user == user:
         user.views_own_profile = True
 
+    user.games_of_user = sorted(PlayerInGame.objects.filter(user=user), key=lambda p_i_g: -datetime.timestamp(p_i_g.game.last_active_at))
     return render(request, "agotboardgame_main/user_profile.html", {"viewed_user": user, "group_name": group_name, "group_color": group_color})
 
 
