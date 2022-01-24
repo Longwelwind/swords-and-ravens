@@ -79,7 +79,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_prometheus.middleware.PrometheusAfterMiddleware',
-    'agotboardgame_main.middlewares.update_last_activity'
+    'agotboardgame_main.middlewares.update_last_activity',
+    'agotboardgame_main.middleware.OnlineNowMiddleware',
 ]
 
 ROOT_URLCONF = 'agotboardgame.urls'
