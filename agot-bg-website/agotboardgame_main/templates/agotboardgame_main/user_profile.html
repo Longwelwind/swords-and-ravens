@@ -28,6 +28,10 @@
                                     <span class="badge badge-pill badge-success">Open</span>
                                 {% elif player.game.state == "ONGOING" %}
                                     <span class="badge badge-pill badge-warning">Ongoing</span>
+                                {% elif player.game.state == "CANCELLED" %}
+                                    <span class="badge badge-pill badge-danger">Cancelled</span>
+                                {% elif viewed_user.views_own_profile and player.data.is_winner %}
+                                    <i class="fas fa-crown"></i>
                                 {% endif %}
                             </td>
                             <td class="align-middle">

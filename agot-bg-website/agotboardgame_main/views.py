@@ -328,6 +328,9 @@ def user_profile(request, user_id):
             group_color = possible_group_color
             break
 
+    if request.user.is_authenticated and request.user == user:
+        user.views_own_profile = True
+
     return render(request, "agotboardgame_main/user_profile.html", {"viewed_user": user, "group_name": group_name, "group_color": group_color})
 
 
