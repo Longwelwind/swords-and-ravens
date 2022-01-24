@@ -10,7 +10,6 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import select_template
 from django.views.decorators.http import require_POST
-from django.utils import timezone
 
 from agotboardgame.settings import GROUP_COLORS
 from agotboardgame_main.models import Game, ONGOING, IN_LOBBY, User, CANCELLED, PlayerInGame
@@ -168,25 +167,18 @@ def games(request):
         if request.user.is_authenticated:
             games_query = games_query.prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user=request.user), to_attr="player_in_game"))
 
-        games = games_query.filter(Q(state=IN_LOBBY) | Q(state=ONGOING)).prefetch_related('players')
+        games = games_query.filter(Q(state=IN_LOBBY) | Q(state=ONGOING))
 
         # It seems to be hard to ask Postgres to order the list correctly.
         # It is done in Python
         games = sorted(games, key=lambda game: ([IN_LOBBY, ONGOING].index(game.state), -datetime.timestamp(game.last_active_at)))
 
-        eight_days_past = timezone.now() - timedelta(days=8)
         for game in games:
             # "game.player_in_game" contains a list of one or zero element, depending on whether the authenticated
             # player is in the game.
             # Transform that into a single field that can be None.
-            inactive_players = []
             if request.user.is_authenticated:
                 game.player_in_game = game.player_in_game[0] if len(game.player_in_game) > 0 else None
-                for player_in_game in game.players.all():
-                    if player_in_game.user.last_activity < eight_days_past:
-                        inactive_players.append(player_in_game.user.username)
-                if len(inactive_players) > 0:
-                    game.inactive_players = ", ".join(inactive_players)
             else:
                 game.player_in_game = None
 
