@@ -21,7 +21,7 @@
             <div class="card-body">
                 <h4 class="card-title">Games</h4>
                 <table class="table table-hover table-sm">
-                    {% for player in viewed_user.playeringame_set.all %}
+                    {% for player in viewed_user.games_of_user %}
                         <tr>
                             <td class="align-middle text-center" style="width: 75px">
                                 {% if player.game.state == "IN_LOBBY" %}
