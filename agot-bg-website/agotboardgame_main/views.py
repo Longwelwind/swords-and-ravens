@@ -13,9 +13,11 @@ from django.views.decorators.http import require_POST
 from django.utils import timezone
 
 from agotboardgame.settings import GROUP_COLORS
-from agotboardgame_main.models import Game, ONGOING, IN_LOBBY, User, CANCELLED, PlayerInGame
+from agotboardgame_main.models import Game, ONGOING, IN_LOBBY, User, CANCELLED, FINISHED, PlayerInGame
 from chat.models import Room, UserInRoom
 from agotboardgame_main.forms import UpdateUsernameForm, UpdateSettingsForm
+
+IS_WINNER_TRACKING_START_DATE = date(2021, 2, 25)
 
 logger = logging.getLogger(__name__)
 
@@ -328,10 +330,14 @@ def user_profile(request, user_id):
             group_color = possible_group_color
             break
 
-    if request.user.is_authenticated and request.user == user:
-        user.views_own_profile = True
+    user.games_of_user = PlayerInGame.objects.filter(user=user).order_by('-game__created_at')
+    user.finished_count = user.games_of_user.filter(game__state=FINISHED, game__updated_at__gte=IS_WINNER_TRACKING_START_DATE).count()
+    user.won_count = user.games_of_user.filter(data__is_winner=True).count()
+    if user.finished_count > 0:
+        user.win_rate = "{:.1f}".format(user.won_count / user.finished_count * 100)
+    else:
+        user.win_rate = "{:.1f}".format(0.0)
 
-    user.games_of_user = sorted(PlayerInGame.objects.filter(user=user), key=lambda p_i_g: -datetime.timestamp(p_i_g.game.last_active_at))
     return render(request, "agotboardgame_main/user_profile.html", {"viewed_user": user, "group_name": group_name, "group_color": group_color})
 
 

@@ -12,7 +12,44 @@
     <div class="col-lg-6">
         <div class="card">
             <div class="card-body">
-                <strong>Last activity </strong> {{ viewed_user.last_activity|naturaltime}}
+                <table class="table">
+                    <tr>
+                        <td style="width: 150px">
+                            <b>Last activity:</b>
+                        </td>
+                        <td>
+                            {{ viewed_user.last_activity|naturaltime}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>Finished games:</b>
+                        </td>
+                        <td>
+                            {{ viewed_user.finished_count }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>Won games:</b>
+                        </td>
+                        <td>
+                            {{ viewed_user.won_count }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>Win rate:</b>
+                        </td>
+                        <td>
+                            {{ viewed_user.win_rate }} %
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
@@ -30,7 +67,7 @@
                                     <span class="badge badge-pill badge-warning">Ongoing</span>
                                 {% elif player.game.state == "CANCELLED" %}
                                     <span class="badge badge-pill badge-danger">Cancelled</span>
-                                {% elif viewed_user.views_own_profile and player.data.is_winner %}
+                                {% elif player.data.is_winner %}
                                     <i class="fas fa-crown"></i>
                                 {% endif %}
                             </td>
