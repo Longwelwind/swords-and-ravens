@@ -329,9 +329,11 @@ def user_profile(request, user_id):
             group_color = possible_group_color
             break
 
-    user.games_of_user = PlayerInGame.objects.filter(user=user).order_by('-game__created_at')
-    finished_games = user.games_of_user.filter(game__state=FINISHED)
-    user.ongoing_count = user.games_of_user.filter(game__state=ONGOING).count()
+    games_of_user = PlayerInGame.objects.filter(user=user).order_by('-game__created_at')
+    finished_games = games_of_user.filter(game__state=FINISHED)
+    user.games_of_user = games_of_user.filter(Q(game__state=IN_LOBBY) | Q(game__state=ONGOING) | Q(game__state=FINISHED))
+    user.cancelled_games = games_of_user.filter(game__state=CANCELLED)
+    user.ongoing_count = games_of_user.filter(game__state=ONGOING).count()
 
     user.won_count = 0
     user.finished_count = 0
@@ -346,9 +348,9 @@ def user_profile(request, user_id):
             user.finished_count += 1
 
     if user.finished_count > 0:
-        user.win_rate = "{:.1f}".format(user.won_count / user.finished_count * 100)
+        user.win_rate = "{:.1f} %".format(user.won_count / user.finished_count * 100)
     else:
-        user.win_rate = "{:.1f}".format(0.0)
+        user.win_rate = "n/a"
 
     return render(request, "agotboardgame_main/user_profile.html", {"viewed_user": user, "group_name": group_name, "group_color": group_color})
 

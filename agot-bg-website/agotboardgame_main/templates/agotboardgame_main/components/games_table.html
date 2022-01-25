@@ -1,7 +1,7 @@
 {% load house_icon %}
 {% load humanize %}
 
-<table class="table table-hover table-sm">
+<table class="table table-hover table-sm middle-aligned">
     <thead>
         <tr>
             <th style="width: 75px"></th>
@@ -42,14 +42,14 @@
                 data-placement="right"
                 data-trigger="hover"
             >
-                <td class="align-middle text-center">
+                <td class="text-center">
                     {% if game.state == "IN_LOBBY" %}
                         <span class="badge badge-success">Open</span>
                     {% elif game.state == "ONGOING" %}
                         <span class="badge badge-warning">Ongoing</span>
                     {% endif %}
                 </td>
-                <td class="align-middle">
+                <td>
                     {% if game.view_of_game.settings.pbem %}
                         <span class="badge badge-info"
                               data-toggle="tooltip"
@@ -105,7 +105,7 @@
                     {% endif %}
                     {{ game.name }}
                 </td>
-                <td class="align-middle text-center">
+                <td class="text-center">
                     {{ game.players_count }}{% if game.players_count != game.view_of_game.maxPlayerCount %}/{{ game.view_of_game.maxPlayerCount }}{% endif %}
                 </td>
                 <td class="text-right">
@@ -133,7 +133,7 @@
             </tr>
         {% empty %}
         <tr>
-            <td class="text-center align-middle" style="height: 50px" colspan="4">
+            <td class="text-center" style="height: 50px" colspan="4">
                 There are no open or ongoing games
             </td>
         </tr>
