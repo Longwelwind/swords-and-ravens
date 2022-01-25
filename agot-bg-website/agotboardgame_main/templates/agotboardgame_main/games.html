@@ -30,9 +30,7 @@ Games -
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Your Games</h4>
-                    <div style="max-height: 400px; overflow-y: auto">
-                        {% games_table my_games user perms %}
-                    </div>
+                    {% games_table my_games user perms %}
                 </div>
             </div>
         </div>
