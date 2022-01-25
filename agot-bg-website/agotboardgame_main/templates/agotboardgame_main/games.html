@@ -44,6 +44,16 @@ Games -
                 </div>
             </div>
         </div>
+        {% if open_live_games %}
+        <div class="col-lg-11 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Open Live Games</h4>
+                    {% games_table open_live_games user perms %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
         {% if my_games %}
         <div class="col-lg-11 mb-4">
             <div class="card">
