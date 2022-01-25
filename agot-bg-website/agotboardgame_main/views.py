@@ -18,8 +18,6 @@ from agotboardgame_main.models import Game, ONGOING, IN_LOBBY, User, CANCELLED, 
 from chat.models import Room, UserInRoom
 from agotboardgame_main.forms import UpdateUsernameForm, UpdateSettingsForm
 
-IS_WINNER_TRACKING_START_DATE = date(2021, 2, 25)
-
 logger = logging.getLogger(__name__)
 
 
@@ -332,16 +330,20 @@ def user_profile(request, user_id):
             break
 
     user.games_of_user = PlayerInGame.objects.filter(user=user).order_by('-game__created_at')
-    finished_games = user.games_of_user.filter(game__state=FINISHED, game__updated_at__gte=IS_WINNER_TRACKING_START_DATE)
-    user.finished_count = finished_games.count()
-    
-    # user.won_count = finished_games.filter(data__contains={"is_winner": True}).count()
-    # raises "django.db.utils.ProgrammingError: operator does not exist: json @> unknown" on the server
-    # so it's done in Python
+    finished_games = user.games_of_user.filter(game__state=FINISHED)
+    user.ongoing_count = user.games_of_user.filter(game__state=ONGOING).count()
+
     user.won_count = 0
+    user.finished_count = 0
     for game in finished_games:
-        if game.data['is_winner']:
+        is_winner = game.data.get("is_winner", None)
+        if is_winner is None:
+            pass
+        elif is_winner == True:
             user.won_count+=1
+            user.finished_count += 1
+        elif is_winner == False:
+            user.finished_count += 1
 
     if user.finished_count > 0:
         user.win_rate = "{:.1f}".format(user.won_count / user.finished_count * 100)
