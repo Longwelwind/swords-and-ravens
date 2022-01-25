@@ -211,11 +211,17 @@ def games(request):
         # Create the list of "My games"
         my_games = [game for game in games if game.player_in_game]
 
+        # Create the list of "Open live games"
+        open_live_games = [game for game in games if game.state == IN_LOBBY and\
+            game.players_count > 0 and\
+            game.view_of_game.get("settings", False)\
+            and game.view_of_game.get("settings").get("pbem", True) == False]
         public_room_id = Room.objects.get(name='public').id
 
         return render(request, "agotboardgame_main/games.html", {
             "games": games,
             "my_games": my_games,
+            "open_live_games": open_live_games,
             'public_room_id': public_room_id
         })
     elif request.method == "POST":
