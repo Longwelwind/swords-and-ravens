@@ -8,7 +8,7 @@ Games -
 
 {% block content %}
     <div class="row justify-content-center">
-        <div class="col-lg-10 mb-4">
+        <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Online users</h4>
@@ -18,7 +18,7 @@ Games -
                 </div>
             </div>
         </div>
-        <div class="col-lg-10 mb-4">
+        <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
                     {% include "./components/games_chat.html" %}
@@ -26,7 +26,7 @@ Games -
             </div>
         </div>
         {% if my_games %}
-        <div class="col-lg-10 mb-4">
+        <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Your Games</h4>
@@ -35,7 +35,7 @@ Games -
             </div>
         </div>
         {% endif %}
-        <div class="col-lg-10 mb-4">
+        <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">
@@ -65,7 +65,7 @@ Games -
                 </div>
             </div>
         </div>
-        <div class="col-lg-10">
+        <div class="col-lg-11">
             {% if perms.agotboardgame_main.add_game %}
             <div class="card">
                 <div class="card-body">
@@ -75,7 +75,7 @@ Games -
                                 {% csrf_token %}
                                 <div class="form-group">
                                     <label for="game-name-input">Game name</label>
-                                    <input id="game-name-input" name="name" class="form-control" required />
+                                    <input id="game-name-input" name="name" class="form-control" maxlength="200" required />
                                 </div>
                                 <button type="submit" class="btn btn-block btn-primary">
                                     Create game
