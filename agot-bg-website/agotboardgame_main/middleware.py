@@ -5,8 +5,8 @@ from django.utils.deprecation import MiddlewareMixin
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-ONLINE_THRESHOLD = getattr(settings, 'ONLINE_THRESHOLD', 60 * 3)
-ONLINE_MAX = getattr(settings, 'ONLINE_MAX', 150)
+ONLINE_THRESHOLD = getattr(settings, 'ONLINE_THRESHOLD', 60 * 5)
+ONLINE_MAX = getattr(settings, 'ONLINE_MAX', 50)
 
 
 def get_online_now(self):
