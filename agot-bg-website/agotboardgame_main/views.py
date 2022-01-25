@@ -334,7 +334,15 @@ def user_profile(request, user_id):
     user.games_of_user = PlayerInGame.objects.filter(user=user).order_by('-game__created_at')
     finished_games = user.games_of_user.filter(game__state=FINISHED, game__updated_at__gte=IS_WINNER_TRACKING_START_DATE)
     user.finished_count = finished_games.count()
-    user.won_count = finished_games.filter(data__contains={"is_winner": True}).count()
+    
+    # user.won_count = finished_games.filter(data__contains={"is_winner": True}).count()
+    # raises "django.db.utils.ProgrammingError: operator does not exist: json @> unknown" on the server
+    # so it's done in Python
+    user.won_count = 0
+    for game in finished_games:
+        if game.data['is_winner']:
+            user.won_count+=1
+
     if user.finished_count > 0:
         user.win_rate = "{:.1f}".format(user.won_count / user.finished_count * 100)
     else:

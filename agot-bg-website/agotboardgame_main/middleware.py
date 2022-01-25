@@ -10,7 +10,7 @@ ONLINE_MAX = getattr(settings, 'ONLINE_MAX', 150)
 
 
 def get_online_now(self):
-    return sorted(User.objects.filter(id__in=self.online_now_ids or []), key=lambda user: user.username)
+    return User.objects.filter(id__in=self.online_now_ids or []).order_by('username')
 
 
 class OnlineNowMiddleware(MiddlewareMixin):
