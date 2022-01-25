@@ -18,3 +18,14 @@
     height: 18px;
     width: 18px;
 }
+
+@media (min-width: 1650px) {
+    .decrease-container-margin {
+        margin-left: -20%;
+        margin-right: -20%;
+    }
+}
+
+table.middle-aligned tr td {
+    vertical-align: middle;
+}

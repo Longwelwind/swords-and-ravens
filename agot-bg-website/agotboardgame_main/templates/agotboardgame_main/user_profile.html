@@ -7,12 +7,16 @@
 {% load humanize %}
 
 {% block content %}
-<h3 class="mb-4">{% if group_name %}<span class="badge badge badge-{{ group_color }}">{{ group_name }}</span>{% endif %} {{ viewed_user.username }}</h3>
-<div class="row">
-    <div class="col-lg-6">
+<div class="row decrease-container-margin">
+    <div class="col">
+        <h3 class="mb-4">{% if group_name %}<span class="badge badge badge-{{ group_color }}">{{ group_name }}</span>{% endif %} {{ viewed_user.username }}</h3>
+    </div>
+</div>
+<div class="row decrease-container-margin">
+    <div class="col-lg-3">
         <div class="card">
             <div class="card-body">
-                <table class="table">
+                <table class="table middle-aligned">
                     <tr>
                         <td style="width: 150px">
                             <b>Last activity:</b>
@@ -50,7 +54,7 @@
                             <b>Win rate:</b>
                         </td>
                         <td>
-                            {{ viewed_user.win_rate }} %
+                            {{ viewed_user.win_rate }}
                         </td>
                     </tr>
                     <tr>
@@ -61,14 +65,14 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-6">
+    <div class="col-lg-5">
         <div class="card">
             <div class="card-body">
                 <h4 class="card-title">Games</h4>
-                <table class="table table-hover table-sm">
+                <table class="table table-hover table-sm middle-aligned">
                     {% for player in viewed_user.games_of_user %}
                         <tr>
-                            <td class="align-middle text-center" style="width: 75px">
+                            <td class="text-center" style="width: 75px">
                                 {% if player.game.state == "IN_LOBBY" %}
                                     <span class="badge badge-pill badge-success">Open</span>
                                 {% elif player.game.state == "ONGOING" %}
@@ -79,10 +83,10 @@
                                     <i class="fas fa-crown"></i>
                                 {% endif %}
                             </td>
-                            <td class="align-middle">
+                            <td>
                                 {{ player.game.name }}
                             </td>
-                            <td class="align-middle" style="width: 1px">
+                            <td style="width: 1px">
                                 <a class="btn btn-primary btn-sm"
                                    href="/play/{{ player.game.id }}"
                                    target="_blank"
@@ -91,7 +95,7 @@
                                 </a>
                             </td>
                             {% if perms.agotboardgame_main.can_play_as_another_player %}
-                                <td class="align-middle" style="width: 1px">
+                                <td style="width: 70px">
                                     <a class="btn btn-primary btn-sm"
                                        href="/play/{{ player.game.id }}/{{ viewed_user.id }}"
                                        target="_blank"
@@ -104,6 +108,44 @@
                     {% empty %}
                         <tr>
                             <td colspan="4" class="text-center">No games</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Cancelled Games</h4>
+                <table class="table table-hover table-sm middle-aligned">
+                    {% for player in viewed_user.cancelled_games %}
+                        <tr>
+                            <td>
+                                {{ player.game.name }}
+                            </td>
+                            <td style="width: 1px">
+                                <a class="btn btn-primary btn-sm"
+                                   href="/play/{{ player.game.id }}"
+                                   target="_blank"
+                                >
+                                    Join
+                                </a>
+                            </td>
+                            {% if perms.agotboardgame_main.can_play_as_another_player %}
+                                <td style="width: 70px">
+                                    <a class="btn btn-primary btn-sm"
+                                       href="/play/{{ player.game.id }}/{{ viewed_user.id }}"
+                                       target="_blank"
+                                    >
+                                        Join as
+                                    </a>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">No cancelled games</td>
                         </tr>
                     {% endfor %}
                 </table>
