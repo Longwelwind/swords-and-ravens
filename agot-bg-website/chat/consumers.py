@@ -158,24 +158,26 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
             await database_sync_to_async(lambda: self.user_in_room.save())()
         elif type == 'chat_retrieve':
-            count = count = data['count']
+            count = data['count']
+            first_message_id = data['first_message_id']
+
+            if first_message_id is not None:
+                first_message = await database_sync_to_async(lambda: Message.objects.get(id=first_message_id))()
+                first_message_created_at = await database_sync_to_async(lambda: first_message.created_at)()
+            else:
+                first_message_created_at = None
 
             if self.room.max_retrieve_count is not None:
                 count = min(self.room.max_retrieve_count, count)
 
-            messages = await database_sync_to_async(
-                lambda: Message.objects.filter(room=self.room).prefetch_related('user').order_by('-created_at')[0:count:-1]
-            )()
+            messages = await database_sync_to_async(lambda: self.get_and_transform_messages(count, first_message_created_at))()
 
             # Also include the last message viewed in the response
-            last_viewed_message = self.user_in_room.last_viewed_message if self.user_in_room else None
+            last_viewed_message = self.user_in_room.last_viewed_message if first_message_id is None and self.user_in_room else None
 
             await self.send_json({
-                'type': 'chat_messages_retrieved',
-                'messages': [
-                    {'id': message.id, 'text': message.text, 'user_id': str(message.user.id), 'user_username': message.user.username, 'created_at': message.created_at.isoformat()}
-                    for message in messages
-                ],
+                'type': 'chat_messages_retrieved' if first_message_id is None else 'more_chat_messages_retrieved',
+                'messages': messages,
                 'last_viewed_message': last_viewed_message.id if last_viewed_message else None
             })
 
@@ -194,3 +196,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             'user_username': user_username,
             'created_at': created_at
         })
+
+    def get_and_transform_messages(self, count, first_message_created_at):
+        if first_message_created_at is None:
+            messages = Message.objects.filter(room=self.room).prefetch_related('user').order_by('-created_at')[0:count:-1]
+        else:
+            messages = Message.objects.filter(Q(room=self.room) & Q(created_at__lt=first_message_created_at)).prefetch_related('user').order_by('-created_at')[:count]
+
+        return [{'id': message.id, 'text': message.text, 'user_id': str(message.user.id), 'user_username': message.user.username, 'created_at': message.created_at.isoformat()}
+                    for message in messages]

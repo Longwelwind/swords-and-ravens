@@ -14,6 +14,8 @@ import ScrollToBottom from "react-scroll-to-bottom";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import User from "../../server/User";
 import { preventOverflow } from "@popperjs/core";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSyncAlt } from "@fortawesome/free-solid-svg-icons";
 
 interface ChatComponentProps {
     gameClient: GameClient;
@@ -38,6 +40,7 @@ interface ChatComponentProps {
 @observer
 export default class ChatComponent extends Component<ChatComponentProps> {
     @observable inputText = "";
+    @observable noMoreMessages = false;
 
     static defaultProps = {
         injectBetweenMessages: (): any => <></>,
@@ -58,7 +61,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
         return (
             <div className="d-flex flex-column h-100">
                 {/* Setting a fixed height seems to be the only solution to make ScrollToBottom work */}
-                <ScrollToBottom className="mb-3 h-90 chat-scroll-to-bottom" scrollViewClassName="overflow-x-hidden">
+                <ScrollToBottom className="mb-2 h-90 chat-scroll-to-bottom" scrollViewClassName="overflow-x-hidden">
                     {/* In case there's no messages yet, inject with no messages as arguments */}
                     {messages.length == 0 && (
                         <React.Fragment key={"injected-for-all"}>
@@ -108,6 +111,19 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                             <Col xs="auto">
                                 <Button type="submit" onClick={(e: any) => {this.send(); e.preventDefault()}}>Send</Button>
                             </Col>
+                            <Col xs="auto">
+                                <button className="btn btn-outline-light btn-sm" onClick={(e: any) => { this.loadMoreMessages(); e.preventDefault() }} disabled={this.noMoreMessages}>
+                                    <OverlayTrigger
+                                        overlay={
+                                            <Tooltip id="mute-tooltip">
+                                                {this.noMoreMessages ? <>There are no more messages</> : <>Load more messages</>}
+                                            </Tooltip>
+                                        }
+                                    >
+                                        <FontAwesomeIcon icon={faSyncAlt} size="2x"/>
+                                    </OverlayTrigger>
+                                </button>
+                            </Col>
                         </Row>
                     </Form>
                 </div>
@@ -120,12 +136,16 @@ export default class ChatComponent extends Component<ChatComponentProps> {
             return;
         }
 
-        this.chatClient.sendMessage(this.chatClient.channels.get(this.props.roomId), this.inputText);
+        this.chatClient.sendMessage(this.channel, this.inputText);
         this.inputText = "";
     }
 
+    loadMoreMessages(): void {
+        this.chatClient.loadMoreMessages(this.channel);
+    }
+
     componentDidMount(): void {
-        this.channel.onMessage = () => this.onMessage();
+        this.channel.onMessage = (noMoreMessages) => this.onMessage(noMoreMessages);
     }
 
     componentWillUnmount(): void {
@@ -138,9 +158,13 @@ export default class ChatComponent extends Component<ChatComponentProps> {
         }
     }
 
-    onMessage(): void {
+    onMessage(noMoreMessages: boolean): void {
         if (this.props.currentlyViewed) {
             this.chatClient.markAsViewed(this.channel);
+        }
+
+        if (noMoreMessages) {
+            this.noMoreMessages = true;
         }
     }
 }

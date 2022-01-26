@@ -27,7 +27,7 @@
             chatWebsocket = new WebSocket((url.protocol == 'http:' ? 'ws:' : 'wss:') + '//' + url.host + '/ws/chat/room/' + publicRoomId);
             chatWebsocket.onopen = () => {
                 this.setState({state: 1});
-                chatWebsocket.send(JSON.stringify({type: 'chat_retrieve', count: 50}));
+                chatWebsocket.send(JSON.stringify({type: 'chat_retrieve', count: 50, first_message_id: null}));
             };
             chatWebsocket.onmessage = m => {
                 const data = JSON.parse(m.data);

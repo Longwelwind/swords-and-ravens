@@ -6,7 +6,7 @@ import _ from "lodash";
 
 const CHAT_SERVER_URL = process.env.CHAT_SERVER_URL || `${window.location.protocol == 'http:' ? 'ws' : 'wss'}://${window.location.host}`;
 
-type ChatServerMessage = NewMessage | MessagesRetrieved;
+type ChatServerMessage = NewMessage | MessagesRetrieved | MoreMessagesRetrieved;
 
 interface NewMessage extends MessageData {
     type: 'chat_message';
@@ -16,6 +16,11 @@ interface MessagesRetrieved {
     type: 'chat_messages_retrieved';
     messages: MessageData[];
     last_viewed_message: string;
+}
+
+interface MoreMessagesRetrieved {
+    type: 'more_chat_messages_retrieved';
+    messages: MessageData[];
 }
 
 interface MessageData {
@@ -38,7 +43,7 @@ export class Channel {
     @observable connected = false;
     @observable messages: Message[] = [];
     @observable lastViewedMessageId: string;
-    onMessage: (() => void) | null;
+    onMessage: ((noMoreMessages: boolean) => void) | null;
 
     get areThereNewMessage(): boolean {
         if (this.messages.length == 0) {
@@ -72,7 +77,7 @@ export default class ChatClient {
 
         websocket.onopen = () => {
             channel.connected = true;
-            channel.websocket.send(JSON.stringify({type: 'chat_retrieve', count: 75}))
+            channel.websocket.send(JSON.stringify({type: 'chat_retrieve', count: 20, first_message_id: null }))
         };
         websocket.onclose = () => channel.connected = false;
         websocket.onerror = () => channel.connected = false;
@@ -89,8 +94,8 @@ export default class ChatClient {
         if (lastMessage == null || lastMessage.id == channel.lastViewedMessageId) {
             return;
         }
+
         channel.lastViewedMessageId = lastMessage.id;
-        console.log('Marking as viewed');
 
         channel.websocket.send(JSON.stringify({type: 'chat_view_message', message_id: channel.lastViewedMessageId}));
     }
@@ -107,7 +112,7 @@ export default class ChatClient {
             return;
         }
 
-        if (text == null || text.match(/^\s*$/)){
+        if (text == null || text.match(/^\s*$/)) {
             return;
         }
         console.log('Message sent');
@@ -120,20 +125,42 @@ export default class ChatClient {
         if (message.type == 'chat_message') {
             this.parseMessage(channel, message);
 
-            if (channel.onMessage) {
-                channel.onMessage();
+            if (channel.onMessage) {
+                channel.onMessage(false);
             }
         } else if (message.type =='chat_messages_retrieved') {
             message.messages.forEach(m => this.parseMessage(channel, m));
             channel.lastViewedMessageId = message.last_viewed_message;
 
-            if (channel.onMessage) {
-                channel.onMessage();
+            if (channel.onMessage) {
+                channel.onMessage(false);
+            }
+        } else if (message.type == "more_chat_messages_retrieved") {
+            message.messages.forEach(m => this.parseMessage(channel, m, true));
+            // For more messages retrieved we dont need to update last_viewed_message or mark as viewed
+            if (message.messages.length == 0 && channel.onMessage) {
+                channel.onMessage(true)
             }
         }
     }
 
-    parseMessage(channel: Channel, data: MessageData): void {
+    loadMoreMessages(channel: Channel): void {
+        if (!channel.connected) {
+            return;
+        }
+
+        const authenticatedUser = this.gameClient.authenticatedUser;
+
+        // Only authenticated users can send messages
+        if (!authenticatedUser || !this.gameClient.entireGame
+            || !this.gameClient.entireGame.users.has(authenticatedUser.id) || channel.messages.length == 0) {
+            return;
+        }
+
+        channel.websocket.send(JSON.stringify({type: 'chat_retrieve', count: 50, first_message_id: channel.messages[0].id }))
+    }
+
+    parseMessage(channel: Channel, data: MessageData, retrievedMore = false): void {
         // `entireGame should always be non-null since channels are added once
         // the Entire game has been received from the server.
         if (this.gameClient.entireGame == null) {
@@ -149,7 +176,11 @@ export default class ChatClient {
         const text = data.text;
         const createdAt = new Date(Date.parse(data.created_at));
 
-        channel.messages.push({id, user, text, createdAt});
+        if (retrievedMore) {
+            channel.messages.unshift({id, user, text, createdAt});
+        } else {
+            channel.messages.push({id, user, text, createdAt});
+        }
     }
 }
 
