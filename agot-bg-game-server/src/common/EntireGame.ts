@@ -412,7 +412,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                     data: {
                         "house": player.house.id,
                         "waited_for": waitedForUsers.includes(user),
-                        "important_chat_rooms": importantChatRooms.map(cr => cr.roomId),
+                        "important_chat_rooms": _.concat(importantChatRooms.map(cr => cr.roomId), this.publicChatRoomId),
                         "is_winner": ingame.childGameState instanceof GameEndedGameState ? ingame.childGameState.winner == player.house : false,
                         "needed_for_vote": ingame.votes.values.filter(vote => vote.state == VoteState.ONGOING).some(vote => !vote.votes.has(player.house))
                     }
