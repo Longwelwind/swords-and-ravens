@@ -446,7 +446,7 @@ export default class IngameGameState extends GameState<
                 // response time value of the first user message that made him non waited for anymore.
                 return;
             }
-            
+
             if (!waitedUsers.includes(p.user) || p.waitedForData.leafStateId != this.entireGame.leafStateId) {
                 // We don't wait for the user anymore, send their personal response time to the website
                 p.sendPbemResponseTime();

@@ -20,9 +20,9 @@ interface CancelledComponentProps {
 export default class CancelledComponent extends Component<CancelledComponentProps> {
     render(): ReactNode {
         return (
-            <Col xs={12} sm={10} md={8} lg={6} xl={3} className="text-center">
+            <Col xs={12} sm={10} md={8} lg={6} xl={3}>
                 <Row>
-                    <Col>
+                    <Col className="text-center">
                         <Card border="danger" bg="danger">
                             <Card.Body className="text-center">
                                 <FontAwesomeIcon icon={faTimes} size="3x"/><br/>
@@ -34,7 +34,7 @@ export default class CancelledComponent extends Component<CancelledComponentProp
                 <Row>
                     <Col>
                         <Card>
-                            <Card.Body>
+                            <Card.Body style={{height: "500px"}}>
                                 <ChatComponent gameClient={this.props.gameClient}
                                                entireGame={this.props.gameState.entireGame}
                                                roomId={this.props.gameState.entireGame.publicChatRoomId}
