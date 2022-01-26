@@ -116,7 +116,7 @@ def index(request):
     ]
 
     # Retrieves some stats to show on the front page
-    active_games_count = Game.objects.filter(last_active_at__gt=datetime.now() - timedelta(days=5)).count()
+    active_games_count = Game.objects.filter(Q(state=ONGOING) & Q(last_active_at__gt=datetime.now() - timedelta(days=5))).count()
 
     return render(
         request,
