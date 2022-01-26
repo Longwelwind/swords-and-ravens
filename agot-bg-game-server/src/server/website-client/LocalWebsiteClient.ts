@@ -55,6 +55,10 @@ export default class LocalWebsiteClient implements WebsiteClient {
         console.log(`notifyGameEnded: ${userIds.join(", ")}`);
     }
 
+    async addPbemResponseTime(user: User, responseTimeInSeconds: number): Promise<void> {
+        console.log(`addPbemResponseTime: ${user.name}: ${responseTimeInSeconds}`);
+    }
+
     async createPublicChatRoom(name: string): Promise<string> {
         return `chat-${name}`;
     }

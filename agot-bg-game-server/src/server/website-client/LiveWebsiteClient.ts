@@ -136,6 +136,11 @@ export default class LiveWebsiteClient implements WebsiteClient {
         }).auth(this.masterApiUsername, this.masterApiPassword, true);
     }
 
+    async addPbemResponseTime(user: User, responseTimeInSeconds: number): Promise<void> {
+        await post(`${this.masterApiBaseUrl}/addPbemResponseTime/${user.id}/${responseTimeInSeconds}`)
+        .auth(this.masterApiUsername, this.masterApiPassword, true);
+    }
+
     async createPrivateChatRoom(users: User[], name: string): Promise<string> {
         const response = await this.request.post(`${this.masterApiBaseUrl}/room`, {
             body: {

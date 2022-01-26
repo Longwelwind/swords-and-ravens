@@ -173,6 +173,7 @@ interface GameStateChange {
     type: "game-state-change";
     level: number;
     serializedGameState: SerializedGameState;
+    newLeafId: string;
 }
 
 interface SupplyAdjusted {

@@ -34,4 +34,5 @@ export default interface WebsiteClient {
     notifyGameEnded(gameId: string, userIds: string[]): Promise<void>;
     createPublicChatRoom(name: string): Promise<string>;
     createPrivateChatRoom(users: User[], name: string): Promise<string>;
+    addPbemResponseTime(user: User, responseTimeInSeconds: number): Promise<void>;
 }
