@@ -3,6 +3,7 @@ import {observable} from "mobx";
 import EntireGame from "./EntireGame";
 import User from "../server/User";
 import House from "./ingame-game-state/game-data-structure/House";
+import { v4 } from "uuid";
 
 type AnyGameState = GameState<any, any> | null;
 
@@ -78,6 +79,7 @@ export default class GameState<ParentGameState extends AnyGameState, ChildGameSt
         this.childGameState = childGameState;
         this.childGameState.needsToBeTransmittedToClient = true;
 
+        this.entireGame.leafStateId = v4()
         return childGameState;
     }
 

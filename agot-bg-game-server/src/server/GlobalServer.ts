@@ -105,8 +105,6 @@ export default class GlobalServer {
             return;
         }
 
-        console.log(JSON.stringify(message));
-
         if (message.type == "authenticate") {
             const {userId, gameId, authToken} = message.authData;
 
@@ -178,7 +176,7 @@ export default class GlobalServer {
 
             const entireGame = user.entireGame;
 
-            console.log(`Message received for game ${entireGame.id}`);
+            console.log(`Message for game ${entireGame.id} from user ${user.id}:\n\t${JSON.stringify(message)}`);
 
             // Chat related messages are handled by GlobalServer because they must use the website client
             if (message.type == "create-private-chat-room") {
@@ -257,6 +255,7 @@ export default class GlobalServer {
         entireGame.onBattleResults = (users) => this.onBattleResults(entireGame, users);
         entireGame.onNewVoteStarted = (users) => this.onNewVoteStarted(entireGame, users);
         entireGame.onGameEnded = (users) => this.onGameEnded(entireGame, users);
+        entireGame.onNewPbemResponseTime = (user, responseTimeInSeconds) => this.onNewPbemResponseTime(user, responseTimeInSeconds);
 
         // Set the connection status of all users to false
         entireGame.users.values.forEach(u => u.connected = false);
@@ -352,6 +351,10 @@ export default class GlobalServer {
 
     onGameEnded(game: EntireGame, users: User[]): any {
         this.websiteClient.notifyGameEnded(game.id, users.map(u => u.id));
+    }
+
+    onNewPbemResponseTime(user: User, responseTimeInSeconds: number): void {
+        this.websiteClient.addPbemResponseTime(user, responseTimeInSeconds);
     }
 
     onClose(client: WebSocket): void {

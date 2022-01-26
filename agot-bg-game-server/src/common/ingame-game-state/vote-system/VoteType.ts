@@ -146,6 +146,7 @@ export class ReplacePlayer extends VoteType {
 
         // If we are waiting for the newPlayer, notify them about their turn
         if (vote.ingame.leafState.getWaitedUsers().includes(newPlayer.user)) {
+            newPlayer.setWaitedFor();
             vote.ingame.entireGame.notifyWaitedUsers([newPlayer.user]);
         }
     }
@@ -373,6 +374,7 @@ export class ReplaceVassalByPlayer extends VoteType {
 
         // If we are waiting for the newPlayer, notify them about their turn
         if (vote.ingame.leafState.getWaitedUsers().includes(newPlayer.user)) {
+            newPlayer.setWaitedFor();
             vote.ingame.entireGame.notifyWaitedUsers([newPlayer.user]);
         }
     }

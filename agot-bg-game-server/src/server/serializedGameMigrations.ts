@@ -9,6 +9,7 @@ import { vassalHouseCards } from "../common/ingame-game-state/game-data-structur
 import { DraftStep } from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import _ from "lodash";
 import shuffleInPlace from "../utils/shuffleInPlace";
+import { v4 } from "uuid";
 //import { SerializedEntireGame } from "../common/EntireGame";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
@@ -1390,6 +1391,21 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                 ingame.players.forEach((p: any) => {
                     const user = users.find((u: any) => u.id == p.userId);
                     user.note = p.note;
+                });
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "60",
+        migrate: (serializedGame: any) => {
+            // Migration for PBEM Speed
+            serializedGame.leafStateId = v4()
+
+            if (serializedGame.childGameState.type == "ingame") {
+                serializedGame.childGameState.players.forEach((p: any) => {
+                    p.waitedForData = null;
                 });
             }
 

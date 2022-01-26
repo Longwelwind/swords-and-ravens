@@ -16,6 +16,7 @@ import sleep from "../utils/sleep";
 import PostCombatGameState from "./ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState";
 import { StoredProfileSettings } from "../server/website-client/WebsiteClient";
 import Player from "./ingame-game-state/Player";
+import { v4 } from "uuid";
 
 export enum NotificationType {
     READY_TO_START,
@@ -29,6 +30,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     @observable users = new BetterMap<string, User>();
     ownerUserId: string;
     name: string;
+    leafStateId = v4();
 
     @observable gameSettings: GameSettings = { pbem: true, startWhenFull: false, setupId: "mother-of-dragons", playerCount: 8,
         randomHouses: false, randomChosenHouses: false, adwdHouseCards: false,  tidesOfBattle: false,
@@ -43,6 +45,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     onNewVoteStarted: (users: User[]) => void;
     onBattleResults: (users: User[]) => void;
     onGameEnded: (users: User[]) => void;
+    onNewPbemResponseTime: (user: User, responseTimeInSeconds: number) => void;
     publicChatRoomId: string;
     // Keys are the two users participating in the private chat.
     // A pair of user is sorted alphabetically by their id when used as a key.
@@ -101,12 +104,15 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         this.setChildGameState(new IngameGameState(this)).beginGame(housesToCreate, futurePlayers);
 
         this.checkGameStateChanged();
+
+        this.ingameGameState?.setWaitedForPlayers();
     }
 
     checkGameStateChanged(): void {
         const {level, gameState} = this.getFirstGameStateToBeRetransmitted();
 
         if (gameState) {
+            // console.log("===GAME STATE CHANGED===");
             // The GameState tree has been changed, broadcast a message to transmit to them
             // the new game state.
             this.broadcastCustomToClients(u => {
@@ -123,7 +129,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 return {
                     type: "game-state-change",
                     level,
-                    serializedGameState
+                    serializedGameState,
+                    newLeafId: this.leafStateId
                 };
             });
 
@@ -135,6 +142,16 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
                 gameState = gameState.childGameState;
             }
+
+            // Reset WaitedForData for all players
+            this.ingameGameState?.players.values.forEach(p => {
+                // In case there is still an unhandled WaitedForData we now send the response time
+                // Basically this should not happen, but we keep it for safety!
+                if (p.waitedForData?.handled === false) {
+                    p.sendPbemResponseTime();
+                }
+                p.resetWaitedFor();
+            });
 
             this.notifyWaitedUsers();
         }
@@ -246,9 +263,15 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             // Only allow PBEM to be changed ingame
             const settings = message.settings as GameSettings;
 
-            if (settings.pbem && !this.gameSettings.pbem && this.ingameGameState) {
-                // Notify waited users due to ingame PBEM change
-                this.notifyWaitedUsers();
+            if (this.ingameGameState) {
+                if (settings.pbem && !this.gameSettings.pbem) {
+                    // Notify waited users due to ingame PBEM change
+                    this.notifyWaitedUsers();
+                    // Do not activate waitedForData now. We start calculating with the next game state change
+                } else if (!this.gameSettings.pbem && settings.pbem) {
+                    // Reset waitedFor as we are now Live
+                    this.ingameGameState.players.values.forEach(p => p.resetWaitedFor());
+                }
             }
 
             this.gameSettings.pbem = settings.pbem;
@@ -269,24 +292,24 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             updateLastActive = this.childGameState.onClientMessage(user, message);
         }
 
-
+        this.ingameGameState?.checkWaitedForPlayers();
         this.checkGameStateChanged();
+        this.ingameGameState?.setWaitedForPlayers();
         return updateLastActive;
     }
 
     async onServerMessage(message: ServerMessage): Promise<void> {
         if (message.type == "game-state-change") {
-            const {level, serializedGameState} = message;
-
             // Get the GameState for whose the childGameState must change
-            const parentGameState = this.getGameStateNthLevelDown(level - 1);
+            const parentGameState = this.getGameStateNthLevelDown(message.level - 1);
 
-            const newChildGameState = parentGameState.deserializeChildGameState(serializedGameState);
+            const newChildGameState = parentGameState.deserializeChildGameState(message.serializedGameState);
 
             await this.waitBeforeChangingChildGameState(parentGameState, newChildGameState);
 
             parentGameState.childGameState = newChildGameState;
 
+            this.leafStateId = message.newLeafId;
             if (this.onClientGameStateChange) {
                 this.onClientGameStateChange();
             }
@@ -465,7 +488,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             publicChatRoomId: this.publicChatRoomId,
             gameSettings: this.gameSettings,
             privateChatRoomIds: this.privateChatRoomsIds.map((u1, v) => [u1.id, v.map((u2, rid) => [u2.id, rid])]),
-            childGameState: this.childGameState.serializeToClient(admin, user)
+            leafStateId: this.leafStateId,
+            childGameState: this.childGameState.serializeToClient(admin, user),
         };
     }
 
@@ -481,6 +505,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             new BetterMap(bm.map(([uid2, roomId]) => [entireGame.users.get(uid2), roomId]))
         ]));
 
+        entireGame.leafStateId = data.leafStateId;
         entireGame.childGameState = entireGame.deserializeChildGameState(data.childGameState);
 
         return entireGame;
@@ -508,6 +533,7 @@ export interface SerializedEntireGame {
     publicChatRoomId: string;
     privateChatRoomIds: [string, [string, string][]][];
     gameSettings: GameSettings;
+    leafStateId: string;
 }
 
 export interface GameSettings {

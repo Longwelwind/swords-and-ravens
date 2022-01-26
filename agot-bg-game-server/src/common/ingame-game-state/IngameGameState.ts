@@ -420,6 +420,40 @@ export default class IngameGameState extends GameState<
         }
     }
 
+    setWaitedForPlayers(): void {
+        if (!this.entireGame.gameSettings.pbem) {
+            return;
+        }
+
+        this.players.values.forEach(p => {
+            const isWaitedFor = this.leafState.getWaitedUsers().includes(p.user);
+
+            if (isWaitedFor && !p.waitedForData) {
+                // We wait for the user now
+                p.setWaitedFor();
+            }
+        });
+    }
+
+    checkWaitedForPlayers(): void {
+        const waitedUsers = this.leafState.getWaitedUsers();
+        this.players.values.forEach(p => {
+            if (!p.waitedForData || p.waitedForData.handled) {
+                // We are either still waiting for the user or
+                // we are in PlaceOrders, which allows to Unready and Ready multiple times.
+                // To make it totally perfect we would need to add the possibilty to delete
+                // the last sent value and send a new one. But for now we just use the
+                // response time value of the first user message that made him non waited for anymore.
+                return;
+            }
+            
+            if (!waitedUsers.includes(p.user) || p.waitedForData.leafStateId != this.entireGame.leafStateId) {
+                // We don't wait for the user anymore, send their personal response time to the website
+                p.sendPbemResponseTime();
+            }
+        });
+    }
+
     createVote(initiator: User, type: VoteType): Vote {
         const vote = new Vote(this, v4(), this.players.values.map(p => p.house), initiator, type);
         vote.type.onVoteCreated(vote);

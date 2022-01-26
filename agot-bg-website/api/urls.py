@@ -14,5 +14,6 @@ urlpatterns = [
     path('notifyYourTurn/<uuid:game_id>', views.notify_your_turn),
     path('notifyBattleResults/<uuid:game_id>', views.notify_battle_results),
     path('notifyNewVote/<uuid:game_id>', views.notify_new_vote),
-    path('notifyGameEnded/<uuid:game_id>', views.notify_game_ended)
+    path('notifyGameEnded/<uuid:game_id>', views.notify_game_ended),
+    path('addPbemResponseTime/<uuid:user_id>/<int:response_time>', views.add_pbem_response_time)
 ]

@@ -17,14 +17,14 @@ export default class GameLogManager {
         this.ingameGameState.entireGame.broadcastToClients({
             type: "add-game-log",
             data: data,
-            time: time.getTime() / 1000,
+            time: Math.floor(time.getTime() / 1000),
             resolvedAutomatically: resolvedAutomatically
         });
     }
 
     serializeToClient(): SerializedGameLogManager {
         return {
-            logs: this.logs.map(l => ({time: l.time.getTime() / 1000, data: l.data, resolvedAutomatically: l.resolvedAutomatically}))
+            logs: this.logs.map(l => ({time: Math.floor(l.time.getTime() / 1000), data: l.data, resolvedAutomatically: l.resolvedAutomatically}))
         };
     }
 

@@ -6,7 +6,7 @@ from django import template
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Count, Prefetch, F
+from django.db.models import Q, Count, Prefetch, F, Avg
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import select_template
@@ -14,7 +14,7 @@ from django.views.decorators.http import require_POST
 from django.utils import timezone
 
 from agotboardgame.settings import GROUP_COLORS
-from agotboardgame_main.models import Game, ONGOING, IN_LOBBY, User, CANCELLED, FINISHED, PlayerInGame
+from agotboardgame_main.models import Game, ONGOING, IN_LOBBY, PbemResponseTime, User, CANCELLED, FINISHED, PlayerInGame
 from chat.models import Room, UserInRoom
 from agotboardgame_main.forms import UpdateUsernameForm, UpdateSettingsForm
 
@@ -358,6 +358,21 @@ def user_profile(request, user_id):
     else:
         user.win_rate = "n/a"
 
+    # This will give the total average of the last 100 moves. But we want to exclude the 10 biggest and smallest values from list so we need to do it in Python
+    #avg_pbem_speed = PbemResponseTime.objects.filter(user=user).order_by('-created_at')[:100].aggregate(Avg('response_time')).get('response_time__avg')
+    #user.average_pbem_speed = str(timedelta(seconds=round(avg_pbem_speed))) if avg_pbem_speed is not None else "n/a"
+
+    elements = PbemResponseTime.objects.filter(user=user).order_by('-created_at')[:100]
+    if elements is not None and len(elements) > 0:
+        values = [element.response_time for element in elements]
+        if len(values) > 20:
+            values = sorted(values)
+            del values[:10]
+            del values[-10:]
+        avg = round(sum(values) / len(values))
+        user.average_pbem_speed = str(timedelta(seconds=avg))
+    else:
+        user.average_pbem_speed = "n/a"
     return render(request, "agotboardgame_main/user_profile.html", {"viewed_user": user, "group_name": group_name, "group_color": group_color})
 
 

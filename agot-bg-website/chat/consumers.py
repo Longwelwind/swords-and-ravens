@@ -78,7 +78,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 return
 
             if not user.is_authenticated:
-                logger.warning(f'An unauthenticated user tried to send the message "${text}" to room "{self.room.id}"')
+                logger.warning(f'An unauthenticated user tried to send the message "{text}" to room "{self.room.id}"')
                 return
 
             message = Message()
@@ -119,7 +119,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 count = min(self.room.max_retrieve_count, count)
 
             messages = await database_sync_to_async(
-                lambda: reversed(Message.objects.filter(room=self.room).prefetch_related('user').order_by('-created_at')[:count])
+                lambda: Message.objects.filter(room=self.room).prefetch_related('user').order_by('-created_at')[0:count:-1]
             )()
 
             # Also include the last message viewed in the response

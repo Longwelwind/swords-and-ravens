@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from agotboardgame.settings import DEFAULT_FROM_MAIL
-from agotboardgame_main.models import User, Game
+from agotboardgame_main.models import PbemResponseTime, User, Game
 from api.serializers import UserSerializer, GameSerializer, RoomSerializer
 from chat.models import Room
 
@@ -163,5 +163,17 @@ def notify_game_ended(request, game_id):
     ]
 
     send_mass_mail(mails)
+
+    return Response({'status': 'ok'})
+
+
+@api_view(['POST'])
+@csrf_exempt
+def add_pbem_response_time(request, user_id, response_time):
+    user = User.objects.get(id=user_id)
+
+    #print(f'Received response time {response_time} for user {user.username}')
+    new_entry = PbemResponseTime(user=user, response_time=response_time)
+    new_entry.save()
 
     return Response({'status': 'ok'})

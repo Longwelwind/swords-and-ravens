@@ -18,43 +18,51 @@
             <div class="card-body">
                 <table class="table middle-aligned">
                     <tr>
-                        <td style="width: 150px">
-                            <b>Last activity:</b>
+                        <td class="fitwidth">
+                            <b>Last activity</b>
                         </td>
                         <td>
                             {{ viewed_user.last_activity|naturaltime}}
                         </td>
                     </tr>
                     <tr>
-                        <td>
-                            <b>Ongoing games:</b>
+                        <td class="fitwidth">
+                            <b>Ongoing games</b>
                         </td>
                         <td>
                             {{ viewed_user.ongoing_count }}
                         </td>
                     </tr>
                     <tr>
-                        <td>
-                            <b>Finished games:</b>
+                        <td class="fitwidth">
+                            <b>Finished games</b>
                         </td>
                         <td>
                             {{ viewed_user.finished_count }}
                         </td>
                     </tr>
                     <tr>
-                        <td>
-                            <b>Won games:</b>
+                        <td class="fitwidth">
+                            <b>Won games</b>
                         </td>
                         <td>
                             {{ viewed_user.won_count }}
                         </td>
                     </tr>
                     <tr>
-                        <td>
-                            <b>Win rate:</b>
+                        <td class="fitwidth">
+                            <b>Win rate</b>
                         </td>
                         <td>
                             {{ viewed_user.win_rate }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>Average PBEM<br/>response time</b>
+                        </td>
+                        <td>
+                            {{ viewed_user.average_pbem_speed }}
                         </td>
                     </tr>
                     <tr>
