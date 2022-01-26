@@ -78,7 +78,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 return
 
             if not user.is_authenticated:
-                logger.warning(f'An unauthenticated user tried to send the message "${text}" to room "{self.room.id}"')
+                logger.warning(f'An unauthenticated user tried to send the message "{text}" to room "{self.room.id}"')
                 return
 
             message = Message()

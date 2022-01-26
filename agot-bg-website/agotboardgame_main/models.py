@@ -109,3 +109,9 @@ class PlayerInGame(models.Model):
     game = models.ForeignKey(Game, related_name='players', on_delete=models.CASCADE)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     data = JSONField()
+
+class PbemResponseTime(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    response_time = models.IntegerField(default=-1)
+    created_at = models.DateTimeField(auto_now_add=True)
