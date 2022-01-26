@@ -119,7 +119,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 count = min(self.room.max_retrieve_count, count)
 
             messages = await database_sync_to_async(
-                lambda: reversed(Message.objects.filter(room=self.room).prefetch_related('user').order_by('-created_at')[:count])
+                lambda: Message.objects.filter(room=self.room).prefetch_related('user').order_by('-created_at')[0:count:-1]
             )()
 
             # Also include the last message viewed in the response
