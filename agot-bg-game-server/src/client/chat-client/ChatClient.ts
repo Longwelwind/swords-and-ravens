@@ -72,7 +72,7 @@ export default class ChatClient {
 
         websocket.onopen = () => {
             channel.connected = true;
-            channel.websocket.send(JSON.stringify({type: 'chat_retrieve', count: 60}))
+            channel.websocket.send(JSON.stringify({type: 'chat_retrieve', count: 75}))
         };
         websocket.onclose = () => channel.connected = false;
         websocket.onerror = () => channel.connected = false;
@@ -111,7 +111,7 @@ export default class ChatClient {
             return;
         }
         console.log('Message sent');
-        channel.websocket.send(JSON.stringify({type: 'chat_message', text}));
+        channel.websocket.send(JSON.stringify({type: 'chat_message', text, gameId: this.gameClient.entireGame.id }));
     }
 
     onMessage(channel: Channel, message: ChatServerMessage): void {
