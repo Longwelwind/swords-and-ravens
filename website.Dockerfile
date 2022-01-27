@@ -11,7 +11,7 @@ COPY ./agot-bg-game-server/ .
 RUN yarn run generate-json-schemas
 RUN yarn run build-client
 
-FROM python:3.8.10-slim
+FROM python:3.8.7-slim-buster
 
 WORKDIR /app
 
