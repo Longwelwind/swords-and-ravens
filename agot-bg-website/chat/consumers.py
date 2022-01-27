@@ -186,7 +186,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         user_already_notified = cache.has_key(f'{self.room.id}_{other_user_in_room.user.id}')
         if not user_already_notified:
-            mailBody = render_to_string('agotboardgame_main/new_private_message.html',
+            mailBody = render_to_string('agotboardgame_main/new_private_message_notification.html',
                 {'message': message.text, 'receiver': other_user_in_room.user, 'sender': user, 'game': game,
                 'game_url': f'https://swordsandravens.net/play/{game.id}' })
             cache.set(f'{self.room.id}_{other_user_in_room.user.id}', True, 5 * 60)
