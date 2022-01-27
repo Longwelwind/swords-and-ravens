@@ -193,5 +193,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             send_mail(f'You received a new private message in game: \'{game.name}\'',
                 mailBody,
                 DEFAULT_FROM_MAIL,
-                [other_user_in_room.user.email])
+                [other_user_in_room.user.email],
+                True)
             #print (mailBody)

@@ -16,6 +16,7 @@ import User from "../../server/User";
 import { preventOverflow } from "@popperjs/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSyncAlt } from "@fortawesome/free-solid-svg-icons";
+import notificationSound from "../../../public/sounds/raven_call.ogg";
 
 interface ChatComponentProps {
     gameClient: GameClient;
@@ -41,6 +42,7 @@ interface ChatComponentProps {
 export default class ChatComponent extends Component<ChatComponentProps> {
     @observable inputText = "";
     @observable noMoreMessages = false;
+    audioPlayed = false;
 
     static defaultProps = {
         injectBetweenMessages: (): any => <></>,
@@ -145,7 +147,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
     }
 
     componentDidMount(): void {
-        this.channel.onMessage = (noMoreMessages) => this.onMessage(noMoreMessages);
+        this.channel.onMessage = (singleMessageRetrieved, noMoreMessages) => this.onMessage(singleMessageRetrieved, noMoreMessages);
     }
 
     componentWillUnmount(): void {
@@ -155,12 +157,18 @@ export default class ChatComponent extends Component<ChatComponentProps> {
     componentDidUpdate(_prevProps: Readonly<ChatComponentProps>, _prevState: Readonly<Record<string, unknown>>): void {
         if (this.props.currentlyViewed) {
             this.chatClient.markAsViewed(this.channel);
+            this.audioPlayed = false;
         }
     }
 
-    onMessage(noMoreMessages: boolean): void {
+    onMessage(singleMessageRetrieved: boolean, noMoreMessages: boolean): void {
         if (this.props.currentlyViewed) {
             this.chatClient.markAsViewed(this.channel);
+            this.audioPlayed = false;
+        } else if (singleMessageRetrieved && !this.audioPlayed && !this.props.gameClient.muted) {
+            const audio = new Audio(notificationSound);
+            audio.play();
+            this.audioPlayed = true;
         }
 
         if (noMoreMessages) {
