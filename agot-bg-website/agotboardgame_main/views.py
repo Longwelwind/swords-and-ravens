@@ -6,7 +6,7 @@ from django import template
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Count, Prefetch, F, Avg
+from django.db.models import Q, Count, Prefetch, F
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import select_template
@@ -257,16 +257,20 @@ def cancel_game(request, game_id):
 
 @login_required
 def play(request, game_id, user_id=None):
-    # Specifying a user_id allows users to impersonate other players in a game
-    if user_id and request.user.has_perm("agotboardgame_main.can_play_as_another_player"):
-        user = get_object_or_404(User, id=user_id)
-    else:
-        user = request.user
-
     game = get_object_or_404(Game, id=game_id)
 
     if not game:
         return HttpResponseNotFound()
+
+    # Specifying a user_id allows users to impersonate other players in a game
+    if user_id and request.user.has_perm("agotboardgame_main.can_play_as_another_player"):
+        if game.players.filter(user=request.user).count() > 0:
+            # A user cannot impersonate other players of games where he participates
+            user = request.user
+        else:
+            user = get_object_or_404(User, id=user_id)
+    else:
+        user = request.user
 
     auth_data = {
         "gameId": game_id,
@@ -335,23 +339,13 @@ def user_profile(request, user_id):
             group_color = possible_group_color
             break
 
-    games_of_user = PlayerInGame.objects.filter(user=user).order_by('-game__created_at')
-    finished_games = games_of_user.filter(game__state=FINISHED)
+    games_of_user = PlayerInGame.objects.prefetch_related('game').annotate(players_count=Count('game__players'))\
+        .filter(user=user).order_by('-game__created_at')
     user.games_of_user = games_of_user.filter(Q(game__state=IN_LOBBY) | Q(game__state=ONGOING) | Q(game__state=FINISHED))
     user.cancelled_games = games_of_user.filter(game__state=CANCELLED)
     user.ongoing_count = games_of_user.filter(game__state=ONGOING).count()
-
-    user.won_count = 0
-    user.finished_count = 0
-    for game in finished_games:
-        is_winner = game.data.get("is_winner", None)
-        if is_winner is None:
-            pass
-        elif is_winner == True:
-            user.won_count+=1
-            user.finished_count += 1
-        elif is_winner == False:
-            user.finished_count += 1
+    user.won_count = games_of_user.filter((Q(data__is_winner=True) & Q(players_count__gt=2))).count()
+    user.finished_count = games_of_user.filter((Q(game__state=FINISHED) & Q(players_count__gt=2))).count()
 
     if user.finished_count > 0:
         user.win_rate = "{:.1f} %".format(user.won_count / user.finished_count * 100)
