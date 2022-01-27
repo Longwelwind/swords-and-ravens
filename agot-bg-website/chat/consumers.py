@@ -1,10 +1,8 @@
-import json
 import logging
 
 from agotboardgame_main.models import Game
+from django.core.mail import send_mail
 from django.core.cache import cache
-from django.core.mail import EmailMultiAlternatives
-import threading
 from django.template.loader import render_to_string
 from agotboardgame.settings import DEFAULT_FROM_MAIL
 from channels.db import database_sync_to_async
@@ -14,26 +12,6 @@ from django.db.models import Q
 from chat.models import Room, Message, UserInRoom
 
 logger = logging.getLogger(__name__)
-
-
-class EmailThread(threading.Thread):
-    def __init__(self, subject, body, from_email, recipient_list, fail_silently, html):
-        self.subject = subject
-        self.body = body
-        self.recipient_list = recipient_list
-        self.from_email = from_email
-        self.fail_silently = fail_silently
-        self.html = html
-        threading.Thread.__init__(self)
-
-    def run (self):
-        msg = EmailMultiAlternatives(self.subject, self.body, self.from_email, self.recipient_list)
-        if self.html:
-            msg.attach_alternative(self.html, "text/html")
-        msg.send(self.fail_silently)
-
-def send_mail(subject, body, from_email, recipient_list, fail_silently=False, html=None, *args, **kwargs):
-    EmailThread(subject, body, from_email, recipient_list, fail_silently, html).start()
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
     def __init__(self, *args, **kwargs):
@@ -135,20 +113,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             if not pbem_active:
                 return
 
-            # print(user.username)
-
-            other_user_in_room = await database_sync_to_async(lambda: self.room.users.prefetch_related('user').exclude(user=user).first())()
-            if other_user_in_room is None:
-                return
-
-            user_already_notified = await database_sync_to_async(lambda: cache.has_key(f'{self.room.id}_{other_user_in_room.user.id}'))()
-            if not user_already_notified:
-                mailBody = render_to_string('agotboardgame_main/new_private_message.html',
-                    {'message': message.text, 'receiver': other_user_in_room.user, 'sender': user, 'game': game,
-                    'game_url': f'https://swordsandravens.net/play/{game.id}' })
-                await database_sync_to_async(lambda: cache.set(f'{self.room.id}_{other_user_in_room.user.id}', True, 5 * 60))()
-                send_mail(f'You received a new private message in game: \'{game.name}\'', mailBody, DEFAULT_FROM_MAIL, [other_user_in_room.user.email])
-                # print (mailBody)
+            await database_sync_to_async(lambda: self.notify_chat_partner(user, message, game))()
 
         if type == 'chat_view_message':
             message_id = data['message_id']
@@ -212,3 +177,21 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         return [{'id': message.id, 'text': message.text, 'user_id': str(message.user.id), 'user_username': message.user.username, 'created_at': message.created_at.isoformat()}
                     for message in messages]
+
+    def notify_chat_partner(self, user, message, game):
+        #print(user.username)
+        other_user_in_room = self.room.users.prefetch_related('user').exclude(user=user).first()
+        if other_user_in_room is None:
+            return
+
+        user_already_notified = cache.has_key(f'{self.room.id}_{other_user_in_room.user.id}')
+        if not user_already_notified:
+            mailBody = render_to_string('agotboardgame_main/new_private_message.html',
+                {'message': message.text, 'receiver': other_user_in_room.user, 'sender': user, 'game': game,
+                'game_url': f'https://swordsandravens.net/play/{game.id}' })
+            cache.set(f'{self.room.id}_{other_user_in_room.user.id}', True, 5 * 60)
+            send_mail(f'You received a new private message in game: \'{game.name}\'',
+                mailBody,
+                DEFAULT_FROM_MAIL,
+                [other_user_in_room.user.email])
+            #print (mailBody)
