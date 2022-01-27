@@ -128,20 +128,27 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             if self.room.public:
                 return
 
+            # notify the other user about a new private message
+
             game = await database_sync_to_async(lambda: Game.objects.get(id=data['gameId']))()
             pbem_active = game.view_of_game.get("settings", False) and game.view_of_game.get("settings").get("pbem", False) == True
             if not pbem_active:
                 return
 
-            # notify the other user about a new private message
-            other_user = await database_sync_to_async(lambda: self.room.users.prefetch_related('user').filter(~Q(id=user.id)).first())()
-            user_already_notified = await database_sync_to_async(lambda: cache.has_key(f'{self.room.id}_{other_user.id}'))()
-            if other_user is not None and not user_already_notified:
+            # print(user.username)
+
+            other_user_in_room = await database_sync_to_async(lambda: self.room.users.prefetch_related('user').exclude(user=user).first())()
+            if other_user_in_room is None:
+                return
+
+            user_already_notified = await database_sync_to_async(lambda: cache.has_key(f'{self.room.id}_{other_user_in_room.user.id}'))()
+            if not user_already_notified:
                 mailBody = render_to_string('agotboardgame_main/new_private_message.html',
-                    {'message': message.text, 'receiver': other_user, 'sender': user, 'game': game,
+                    {'message': message.text, 'receiver': other_user_in_room.user, 'sender': user, 'game': game,
                     'game_url': f'https://swordsandravens.net/play/{game.id}' })
-                await database_sync_to_async(lambda: cache.set(f'{self.room.id}_{other_user.id}', True, 5 * 60))()
-                send_mail(f'You received a new private message in game: \'{game.name}\'', mailBody, DEFAULT_FROM_MAIL, [other_user.user.email])
+                await database_sync_to_async(lambda: cache.set(f'{self.room.id}_{other_user_in_room.user.id}', True, 5 * 60))()
+                send_mail(f'You received a new private message in game: \'{game.name}\'', mailBody, DEFAULT_FROM_MAIL, [other_user_in_room.user.email])
+                # print (mailBody)
 
         if type == 'chat_view_message':
             message_id = data['message_id']
