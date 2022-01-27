@@ -341,10 +341,12 @@ def user_profile(request, user_id):
 
     games_of_user = PlayerInGame.objects.prefetch_related('game').annotate(players_count=Count('game__players'))\
         .filter(user=user).order_by('-game__created_at')
+    for game in games_of_user:
+        print (str(game.data))
     user.games_of_user = games_of_user.filter(Q(game__state=IN_LOBBY) | Q(game__state=ONGOING) | Q(game__state=FINISHED))
     user.cancelled_games = games_of_user.filter(game__state=CANCELLED)
     user.ongoing_count = games_of_user.filter(game__state=ONGOING).count()
-    user.won_count = games_of_user.filter((Q(data__is_winner=True) & Q(players_count__gt=2))).count()
+    user.won_count = games_of_user.filter(Q(data__contains={'is_winner': True}) & Q(players_count__gt=2)).count()
     user.finished_count = games_of_user.filter((Q(game__state=FINISHED) & Q(players_count__gt=2))).count()
 
     if user.finished_count > 0:
