@@ -43,7 +43,7 @@ export class Channel {
     @observable connected = false;
     @observable messages: Message[] = [];
     @observable lastViewedMessageId: string;
-    onMessage: ((noMoreMessages: boolean) => void) | null;
+    onMessage: ((singleMessageRetrieved: boolean, noMoreMessages: boolean) => void) | null;
 
     get areThereNewMessage(): boolean {
         if (this.messages.length == 0) {
@@ -126,20 +126,20 @@ export default class ChatClient {
             this.parseMessage(channel, message);
 
             if (channel.onMessage) {
-                channel.onMessage(false);
+                channel.onMessage(true, false);
             }
         } else if (message.type =='chat_messages_retrieved') {
             message.messages.forEach(m => this.parseMessage(channel, m));
             channel.lastViewedMessageId = message.last_viewed_message;
 
             if (channel.onMessage) {
-                channel.onMessage(false);
+                channel.onMessage(false, false);
             }
         } else if (message.type == "more_chat_messages_retrieved") {
             message.messages.forEach(m => this.parseMessage(channel, m, true));
             // For more messages retrieved we dont need to update last_viewed_message or mark as viewed
             if (message.messages.length == 0 && channel.onMessage) {
-                channel.onMessage(true)
+                channel.onMessage(false, true)
             }
         }
     }
