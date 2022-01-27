@@ -95,7 +95,7 @@
                                     <span class="badge badge-pill badge-warning">Ongoing</span>
                                 {% elif player.game.state == "CANCELLED" %}
                                     <span class="badge badge-pill badge-danger">Cancelled</span>
-                                {% elif player.data.is_winner %}
+                                {% elif player.has_won %}
                                     <i class="fas fa-crown"></i>
                                 {% endif %}
                             </td>

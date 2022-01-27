@@ -2,11 +2,14 @@ from cmath import pi
 import logging
 from datetime import datetime, date, timedelta
 
+from django.db.models.functions import Cast
+from django.contrib.postgres.fields.jsonb import KeyTextTransform
+
 from django import template
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Count, Prefetch, F
+from django.db.models import Q, Count, Prefetch, F, BooleanField
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import select_template
@@ -339,14 +342,13 @@ def user_profile(request, user_id):
             group_color = possible_group_color
             break
 
-    games_of_user = PlayerInGame.objects.prefetch_related('game').annotate(players_count=Count('game__players'))\
+    games_of_user = PlayerInGame.objects.prefetch_related('game').annotate(players_count=Count('game__players'),\
+        has_won=Cast(KeyTextTransform('is_winner', 'data'), BooleanField()))\
         .filter(user=user).order_by('-game__created_at')
-    for game in games_of_user:
-        print (str(game.data))
     user.games_of_user = games_of_user.filter(Q(game__state=IN_LOBBY) | Q(game__state=ONGOING) | Q(game__state=FINISHED))
     user.cancelled_games = games_of_user.filter(game__state=CANCELLED)
     user.ongoing_count = games_of_user.filter(game__state=ONGOING).count()
-    user.won_count = games_of_user.filter(Q(data__contains={'is_winner': True}) & Q(players_count__gt=2)).count()
+    user.won_count = games_of_user.filter(Q(has_won=True) & Q(players_count__gt=2)).count()
     user.finished_count = games_of_user.filter((Q(game__state=FINISHED) & Q(players_count__gt=2))).count()
 
     if user.finished_count > 0:
