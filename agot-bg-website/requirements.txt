@@ -24,12 +24,12 @@ djangorestframework==3.11.0
 hiredis==1.0.1
 hyperlink==19.0.0
 idna==2.8
-incremental==17.5.0
+incremental==21.3.0
 msgpack==0.6.2
 nltk==3.4.5
 oauthlib==3.0.2
 prometheus-client==0.7.1
-psycopg2-binary==2.8.3
+psycopg2-binary==2.8.6
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser==2.19
@@ -48,7 +48,7 @@ social-auth-app-django==3.1.0
 social-auth-core==3.2.0
 soupsieve==1.9.5
 sqlparse==0.3.0
-Twisted==19.10.0
+Twisted==21.7.0
 txaio==18.8.1
 urllib3==1.25.3
 whitenoise==5.0.1
