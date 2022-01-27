@@ -257,16 +257,20 @@ def cancel_game(request, game_id):
 
 @login_required
 def play(request, game_id, user_id=None):
-    # Specifying a user_id allows users to impersonate other players in a game
-    if user_id and request.user.has_perm("agotboardgame_main.can_play_as_another_player"):
-        user = get_object_or_404(User, id=user_id)
-    else:
-        user = request.user
-
     game = get_object_or_404(Game, id=game_id)
 
     if not game:
         return HttpResponseNotFound()
+
+    # Specifying a user_id allows users to impersonate other players in a game
+    if user_id and request.user.has_perm("agotboardgame_main.can_play_as_another_player"):
+        if game.players.filter(user=request.user).count() > 0:
+            # A user cannot impersonate other players of games where he participates
+            user = request.user
+        else:
+            user = get_object_or_404(User, id=user_id)
+    else:
+        user = request.user
 
     auth_data = {
         "gameId": game_id,
