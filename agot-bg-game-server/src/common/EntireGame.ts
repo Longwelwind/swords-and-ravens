@@ -46,6 +46,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     onBattleResults: (users: User[]) => void;
     onGameEnded: (users: User[]) => void;
     onNewPbemResponseTime: (user: User, responseTimeInSeconds: number) => void;
+    onClearChatRoom: (roomId: string) => void;
     publicChatRoomId: string;
     // Keys are the two users participating in the private chat.
     // A pair of user is sorted alphabetically by their id when used as a key.
@@ -101,6 +102,14 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     proceedToIngameGameState(housesToCreate: string[], futurePlayers: BetterMap<string, User>): void {
+        if (this.gameSettings.faceless && this.onClearChatRoom) {
+            this.onClearChatRoom(this.publicChatRoomId);
+            this.broadcastToClients({
+                type: "clear-chat-room",
+                roomId: this.publicChatRoomId
+            });
+        }
+
         this.setChildGameState(new IngameGameState(this)).beginGame(housesToCreate, futurePlayers);
 
         this.checkGameStateChanged();

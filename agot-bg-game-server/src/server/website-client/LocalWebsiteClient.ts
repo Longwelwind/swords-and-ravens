@@ -66,4 +66,8 @@ export default class LocalWebsiteClient implements WebsiteClient {
     async createPrivateChatRoom(users: User[], _name: string): Promise<string> {
         return `private-chat-between-${users.map(u => u.name).join("-")}`;
     }
+
+    async clearChatRoom(roomId: string): Promise<void> {
+        console.log("room " + roomId + " cleared.");
+    }
 }

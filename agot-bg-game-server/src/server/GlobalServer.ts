@@ -256,6 +256,7 @@ export default class GlobalServer {
         entireGame.onNewVoteStarted = (users) => this.onNewVoteStarted(entireGame, users);
         entireGame.onGameEnded = (users) => this.onGameEnded(entireGame, users);
         entireGame.onNewPbemResponseTime = (user, responseTimeInSeconds) => this.onNewPbemResponseTime(user, responseTimeInSeconds);
+        entireGame.onClearChatRoom = (roomId) => this.onClearChatRoom(roomId);
 
         // Set the connection status of all users to false
         entireGame.users.values.forEach(u => u.connected = false);
@@ -355,6 +356,10 @@ export default class GlobalServer {
 
     onNewPbemResponseTime(user: User, responseTimeInSeconds: number): void {
         this.websiteClient.addPbemResponseTime(user, responseTimeInSeconds);
+    }
+    
+    onClearChatRoom(roomId: string): void {
+        this.websiteClient.clearChatRoom(roomId);
     }
 
     onClose(client: WebSocket): void {
