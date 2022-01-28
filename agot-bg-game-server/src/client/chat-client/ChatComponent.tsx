@@ -143,7 +143,9 @@ export default class ChatComponent extends Component<ChatComponentProps> {
     }
 
     loadMoreMessages(): void {
-        this.chatClient.loadMoreMessages(this.channel);
+        if (!this.chatClient.loadMoreMessages(this.channel)) {
+            this.noMoreMessages = true;
+        }
     }
 
     componentDidMount(): void {
