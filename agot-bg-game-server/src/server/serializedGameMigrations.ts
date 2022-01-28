@@ -1357,7 +1357,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
         version: "57",
         migrate: (serializedGame: any) => {
             // Polish the logs and make 'retreat-failed' not resolved automatically as 
-            // only events, where the user could have had a choice should be marked witht this flag
+            // only events, where the user could have had a choice should be marked with this flag
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
                 ingame.gameLogManager.logs.forEach((l: any) => {
@@ -1418,14 +1418,40 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
         version: "61",
         migrate: (serializedGame: any) => {
             // Polish the logs and make 'new-objective-card-drawn' not resolved automatically as 
-            // only events, where the user could have had a choice should be marked witht this flag
+            // only events, where the user could have had a choice should be marked with this flag
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
-                ingame.gameLogManager.logs.forEach((l: any) => {
+                const indicesToBeRemoved: number[] = [];
+                const removedLogs: [number, any][] = [];
+                ingame.gameLogManager.logs.forEach((l: any, i: number) => {
                     if (l.data.type == "new-objective-card-drawn") {
                         l.resolvedAutomatically = false;
                     }
+
+                    // In addition we want to fix the "march-resolved" logs.
+                    // When I removed the log entry "march-order-removed" (migration v58) and optimized
+                    // rendering of "march-resolved" and reuse it for showing "March order has been removed from xyz"
+                    // I forgot to not send "march-resolved" in case no non-combat move was done but a battle was initiated.
+                    // So the game sent "march-resolved" with an empty array, followed by "attack" which resulted
+                    // in an incorrect displaying of "March order has been removed from xyz". This has been fixed in #1331.
+                    // So lets remove empty "march-resolved" logs followed by "attack" now:
+                    if (l.data.type == "march-resolved" && l.data.moves.length == 0) {
+                        if (i + 1 < ingame.gameLogManager.logs.length && ingame.gameLogManager.logs[i + 1].data.type == "attack") {
+                            const followingLog = ingame.gameLogManager.logs[i + 1];
+                            if (followingLog.data.attackingRegion == l.data.startingRegion) {
+                                indicesToBeRemoved.push(i);
+                            }
+                        }
+                    }
                 });
+
+                indicesToBeRemoved.reverse();
+
+                indicesToBeRemoved.forEach(i => {
+                    removedLogs.push([i, ingame.gameLogManager.logs.splice(i, 1)]);
+                });
+
+                ingame.gameLogManager.removedLogs = removedLogs;
             }
 
             return serializedGame;
