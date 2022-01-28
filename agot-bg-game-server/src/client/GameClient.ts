@@ -217,6 +217,11 @@ export default class GameClient {
             if (this.entireGame.onNewPrivateChatRoomCreated && this.isAuthenticatedUser(initiator)) {
                 this.entireGame.onNewPrivateChatRoomCreated(message.roomId);
             }
+        } else if (message.type == "clear-chat-room") {
+            const channel = this.chatClient.channels.tryGet(message.roomId, null);
+            if (channel) {
+                channel.messages = [];
+            }
         } else {
             if (!this.entireGame) {
                 console.error("Message other than \"authenticate-response\" received but entireGame == null");

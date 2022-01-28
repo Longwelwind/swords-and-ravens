@@ -11,6 +11,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from agotboardgame.settings import DEFAULT_FROM_MAIL
 from agotboardgame_main.models import PbemResponseTime, User, Game
+from chat.models import Message
 from api.serializers import UserSerializer, GameSerializer, RoomSerializer
 from chat.models import Room
 
@@ -176,4 +177,11 @@ def add_pbem_response_time(request, user_id, response_time):
     new_entry = PbemResponseTime(user=user, response_time=response_time)
     new_entry.save()
 
+    return Response({'status': 'ok'})
+
+
+@api_view(['DELETE'])
+@csrf_exempt
+def clear_chat_room(request, room_id):
+    Message.objects.filter(room_id=room_id).delete()
     return Response({'status': 'ok'})

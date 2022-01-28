@@ -38,7 +38,7 @@ export default class Player {
 
         const responseTimeInSeconds = Math.floor((new Date().getTime() - this.waitedForData.date.getTime()) / 1000);
 
-        if (responseTimeInSeconds > 20) {
+        if (responseTimeInSeconds > 20 && this.user.entireGame.onNewPbemResponseTime) {
             // Only send response time if is greater than 20 seconds to not count actions when a player was immeadiately activated again
             this.user.entireGame.onNewPbemResponseTime(this.user, responseTimeInSeconds);
         }

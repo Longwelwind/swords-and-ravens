@@ -138,7 +138,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
 
     async addPbemResponseTime(user: User, responseTimeInSeconds: number): Promise<void> {
         await post(`${this.masterApiBaseUrl}/addPbemResponseTime/${user.id}/${responseTimeInSeconds}`)
-        .auth(this.masterApiUsername, this.masterApiPassword, true);
+            .auth(this.masterApiUsername, this.masterApiPassword, true);
     }
 
     async createPrivateChatRoom(users: User[], name: string): Promise<string> {
@@ -152,5 +152,10 @@ export default class LiveWebsiteClient implements WebsiteClient {
         });
 
         return response.id;
+    }
+
+    async clearChatRoom(roomId: string): Promise<void> {
+        await this.request.delete(`${this.masterApiBaseUrl}/clearChatRoom/${roomId}`)
+            .auth(this.masterApiUsername, this.masterApiPassword, true)
     }
 }
