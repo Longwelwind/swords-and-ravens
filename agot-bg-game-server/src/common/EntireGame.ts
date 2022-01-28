@@ -395,7 +395,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                     user: p.user.name
                 }))
             : []);
-        const waitingFor = _waitingFor.map(wf => `${wf.house} (${wf.user})`).join(", ");
+        const waitingFor = _waitingFor.map(wf => `${wf.house}${this.gameSettings.faceless ? "" : (` (${wf.user})`)}`).join(", ");
 
         return {turn, maxPlayerCount, settings, waitingFor};
     }

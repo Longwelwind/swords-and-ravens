@@ -38,7 +38,7 @@ export default class UserLabel extends Component<UserLabelProps> {
     }
 
     render(): ReactNode {
-        const isOwner = this.props.gameState.entireGame.isOwner(this.user);
+        const isOwner = this.props.gameState.entireGame.isOwner(this.user) && !this.props.gameState.entireGame.gameSettings.faceless;
         return (
             <Navbar variant="dark" className="no-space-around">
                 <Navbar.Brand className="no-space-around">
