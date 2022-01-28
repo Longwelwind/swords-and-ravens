@@ -181,7 +181,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     def notify_chat_partner(self, user, message, game):
         #print(user.username)
         other_user_in_room = self.room.users.prefetch_related('user').exclude(user=user).first()
-        if other_user_in_room is None:
+        if other_user_in_room is None or not other_user_in_room.user.email_notification_active:
             return
 
         user_already_notified = cache.has_key(f'{self.room.id}_{other_user_in_room.user.id}')
