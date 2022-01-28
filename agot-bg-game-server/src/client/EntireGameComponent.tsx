@@ -57,10 +57,10 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                         {this.props.entireGame.gameSettings.removeTob3 && <>
                             <br/><small>No 3s</small>
                         </>}
-                        {this.props.entireGame.gameSettings.removeTob3 && <>
+                        {this.props.entireGame.gameSettings.removeTobSkulls && <>
                             <br/><small>No skulls</small>
                         </>}
-                        {this.props.entireGame.gameSettings.removeTob3 && <>
+                        {this.props.entireGame.gameSettings.limitTob2 && <>
                             <br/><small>Only two 2s</small>
                         </>}
                     </Col>
