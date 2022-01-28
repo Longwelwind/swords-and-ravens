@@ -27,7 +27,7 @@ export default class NewInformationGameState extends GameState<WesterosGameState
             this.ingame.log({
                 type: "new-objective-card-drawn",
                 house: h.id
-            }, true);
+            });
         });
 
         this.setChildGameState(new SelectObjectiveCardsGameState(this)).firstStart(

@@ -1356,6 +1356,8 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
     {
         version: "57",
         migrate: (serializedGame: any) => {
+            // Polish the logs and make 'retreat-failed' not resolved automatically as 
+            // only events, where the user could have had a choice should be marked witht this flag
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
                 ingame.gameLogManager.logs.forEach((l: any) => {
@@ -1406,6 +1408,23 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             if (serializedGame.childGameState.type == "ingame") {
                 serializedGame.childGameState.players.forEach((p: any) => {
                     p.waitedForData = null;
+                });
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "61",
+        migrate: (serializedGame: any) => {
+            // Polish the logs and make 'new-objective-card-drawn' not resolved automatically as 
+            // only events, where the user could have had a choice should be marked witht this flag
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.gameLogManager.logs.forEach((l: any) => {
+                    if (l.data.type == "new-objective-card-drawn") {
+                        l.resolvedAutomatically = false;
+                    }
                 });
             }
 
