@@ -128,13 +128,17 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                 this.resolveMarchOrderGameState.moveUnits(startingRegion, units, region);
             });
 
-            this.actionGameState.ingame.log({
-                type: "march-resolved",
-                house: this.house.id,
-                startingRegion: startingRegion.id,
-                moves: movesThatDontTriggerAttack.map(([r, us]) => [r.id, us.map(u => u.type.id)]),
-                leftPowerToken: leftPowerToken
-            });
+            const doNotLogMarchResolved = movesThatDontTriggerAttack.length == 0 && movesThatTriggerAttack.length > 0;
+
+            if (!doNotLogMarchResolved) {
+                this.actionGameState.ingame.log({
+                    type: "march-resolved",
+                    house: this.house.id,
+                    startingRegion: startingRegion.id,
+                    moves: movesThatDontTriggerAttack.map(([r, us]) => [r.id, us.map(u => u.type.id)]),
+                    leftPowerToken: leftPowerToken
+                });
+            }
 
             // It may be possible, that a user left a castle with ships in port empty.
             // If so, the ships in the port have to be destroyed.
