@@ -18,7 +18,8 @@
             this.state = {
                 input: '',
                 state: 0,
-                messages: []
+                messages: [],
+                noMoreMessages: false
             };
         }
 
@@ -27,7 +28,7 @@
             chatWebsocket = new WebSocket((url.protocol == 'http:' ? 'ws:' : 'wss:') + '//' + url.host + '/ws/chat/room/' + publicRoomId);
             chatWebsocket.onopen = () => {
                 this.setState({state: 1});
-                chatWebsocket.send(JSON.stringify({type: 'chat_retrieve', count: 50, first_message_id: null}));
+                chatWebsocket.send(JSON.stringify({type: 'chat_retrieve', count: 20, first_message_id: null}));
             };
             chatWebsocket.onmessage = m => {
                 const data = JSON.parse(m.data);
@@ -37,14 +38,24 @@
                     this.addMessage(data);
                 } else if (data.type == 'chat_messages_retrieved') {
                     data.messages.forEach(d => this.addMessage(d));
+                } else if (data.type == 'more_chat_messages_retrieved') {
+                    if (data.messages.length == 0) {
+                        this.setState({ noMoreMessages: true });
+                        return;
+                    }
+                    data.messages.forEach(d => this.addMessage(d, true));
                 }
             };
             chatWebsocket.onclose = () => this.setState({state: 2});
         }
 
-        addMessage(data) {
+        addMessage(data, insertAtStart) {
+            const parsedMsg = {id: data.id, username: data.user_username, text: data.text, created_at: new Date(Date.parse(data.created_at))};
             this.setState(state => {
-                const messages = state.messages.concat({username: data.user_username, text: data.text, created_at: new Date(Date.parse(data.created_at))});
+                const messages = !insertAtStart
+                    ? state.messages.concat(parsedMsg)
+                    : [parsedMsg].concat(state.messages);
+
                 return {messages};
             });
         }
@@ -54,6 +65,17 @@
             const data = {type: 'chat_message', text: this.state.input};
             chatWebsocket.send(JSON.stringify(data));
             this.setState({input: ''});
+        }
+
+        loadMoreMessages(e) {
+            e.preventDefault();
+            if (this.state.messages.length == 0) {
+                this.setState({ noMoreMessages: true });
+                return;
+            }
+
+            const data = {type: 'chat_retrieve', count: 50, first_message_id: this.state.messages[0].id};
+            chatWebsocket.send(JSON.stringify(data));
         }
 
         render() {
@@ -78,7 +100,7 @@
                     </div>
                 </div>
                 <form id="chat-message-form" class="mb-0">
-                    <div class="form-row align-items-center">
+                    <div class="form-row align-items-stretch">
                         <div class="col">
                             <input type="text"
                                    class="form-control"
@@ -95,6 +117,14 @@
                                     disabled=${!isAuthenticated}
                                     onClick=${e => this.sendMessage(e)}>
                                 Send
+                            </button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-secondary h-100"
+                                    disabled=${!isAuthenticated || this.state.noMoreMessages}
+                                    onClick=${e => this.loadMoreMessages(e)}
+                                    >
+                                    <i class="fas fa-sync-alt fa-lg"/>
                             </button>
                         </div>
                     </div>

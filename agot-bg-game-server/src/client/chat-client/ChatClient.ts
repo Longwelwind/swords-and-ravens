@@ -144,20 +144,21 @@ export default class ChatClient {
         }
     }
 
-    loadMoreMessages(channel: Channel): void {
+    loadMoreMessages(channel: Channel): boolean {
         if (!channel.connected) {
-            return;
+            return false;
         }
 
         const authenticatedUser = this.gameClient.authenticatedUser;
 
-        // Only authenticated users can send messages
+        // Only authenticated users can load more messages
         if (!authenticatedUser || !this.gameClient.entireGame
             || !this.gameClient.entireGame.users.has(authenticatedUser.id) || channel.messages.length == 0) {
-            return;
+            return false;
         }
 
-        channel.websocket.send(JSON.stringify({type: 'chat_retrieve', count: 50, first_message_id: channel.messages[0].id }))
+        channel.websocket.send(JSON.stringify({type: 'chat_retrieve', count: 50, first_message_id: channel.messages[0].id }));
+        return true;
     }
 
     parseMessage(channel: Channel, data: MessageData, retrievedMore = false): void {
