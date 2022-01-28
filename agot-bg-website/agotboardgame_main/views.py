@@ -343,8 +343,10 @@ def user_profile(request, user_id):
             break
 
     games_of_user = PlayerInGame.objects.prefetch_related('game').annotate(players_count=Count('game__players'),\
-        has_won=Cast(KeyTextTransform('is_winner', 'data'), BooleanField()))\
-        .filter(user=user).order_by('-game__created_at')
+            has_won=Cast(KeyTextTransform('is_winner', 'data'), BooleanField()),\
+            is_faceless=Cast(KeyTextTransform('faceless', KeyTextTransform('settings', 'game__view_of_game')), BooleanField())\
+        # We can simply filter for is_faceless=False|None and omit the check for ongoing games only as we reset the property after game ended.
+        ).filter(Q(user=user) & (Q(is_faceless=None) | Q(is_faceless=False))).order_by('-game__created_at')
     user.games_of_user = games_of_user.filter(Q(game__state=IN_LOBBY) | Q(game__state=ONGOING) | Q(game__state=FINISHED))
     user.cancelled_games = games_of_user.filter(game__state=CANCELLED)
     user.ongoing_count = games_of_user.filter(game__state=ONGOING).count()
