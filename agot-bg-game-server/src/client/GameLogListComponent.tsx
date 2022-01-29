@@ -37,6 +37,7 @@ import LoanCardComponent from "./game-state-panel/utils/LoanCardComponent";
 import { objectiveCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/ObjectiveCards";
 import ObjectiveCardComponent from "./game-state-panel/utils/ObjectiveCardComponent";
 import { ObjectiveCard } from "../common/ingame-game-state/game-data-structure/static-data-structure/ObjectiveCard";
+import crossedSwordsImage from "../../public/images/icons/crossed-swords.svg";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -182,7 +183,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <p>
-                        <b>{attacker.name}</b> attacked <b>{attacked ? attacked.name : "a neutral force"}</b> from <b>{attackingRegion.name}</b> to <b>
+                        <img src={crossedSwordsImage} className="mr-2" width="24px"/><b>{attacker.name}</b> attacked <b>{attacked ? attacked.name : "a neutral force"}</b> from <b>{attackingRegion.name}</b> to <b>
                         {attackedRegion.name}</b> with <>{joinReactNodes(army.map((ut, i) => <b key={`attack_${ut.id}_${i}`}>{ut.name}</b>), ', ')}</>.
                     </p>
                 );
