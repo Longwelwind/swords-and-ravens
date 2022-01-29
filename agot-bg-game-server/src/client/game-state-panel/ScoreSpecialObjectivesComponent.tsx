@@ -42,6 +42,10 @@ export default class ScoreSpecialObjectivesComponent extends Component<GameState
     }
 
     choose(score: boolean): void {
+        if (score == false && !window.confirm("Are you sure not to score your Special Objective card?")) {
+            return;
+        }
+
         this.gameState.sendDecision(score);
     }
 }

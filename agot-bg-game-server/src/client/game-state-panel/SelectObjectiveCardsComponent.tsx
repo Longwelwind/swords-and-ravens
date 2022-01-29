@@ -71,7 +71,7 @@ export default class SelectObjectiveCardsComponent extends Component<GameStateCo
         }
 
         if (this.gameState.canBeSkipped && this.choosableObjectives.length > 0 && this.selectedObjectiveCards.length == 0) {
-            if (!window.confirm("Are you sure you don't want to choose an Objective card?")) {
+            if (!window.confirm("Are you sure you don't want to score an Objective card?")) {
                 return;
             }
         }
