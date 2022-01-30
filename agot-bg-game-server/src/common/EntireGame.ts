@@ -37,7 +37,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         vassals: true, seaOrderTokens: true, startWithSevenPowerTokens: true, allowGiftingPowerTokens: true,
         draftHouseCards: false, thematicDraft: false, limitedDraft: false, blindDraft: false,
         cokWesterosPhase: false, endless: false, useVassalPositions: false, precedingMustering: false,
-        mixedWesterosDeck1: false, removeTob3: false, removeTobSkulls: false, limitTob2: false, faceless: false};
+        mixedWesterosDeck1: false, removeTob3: false, removeTobSkulls: false, limitTob2: false, faceless: false,
+        randomStartPositions: false};
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -264,7 +265,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 type: "settings-changed",
                 user: user.id,
                 settings: user.settings
-            })
+            });
         } else if (message.type == "change-game-settings") {
             if (!this.isOwner(user)) {
                 return false;
@@ -572,4 +573,5 @@ export interface GameSettings {
     removeTobSkulls: boolean;
     limitTob2: boolean;
     faceless: boolean;
+    randomStartPositions: boolean;
 }

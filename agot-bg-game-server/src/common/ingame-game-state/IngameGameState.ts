@@ -75,6 +75,18 @@ export default class IngameGameState extends GameState<
         this.game = createGame(this, housesToCreate, futurePlayers.keys);
         this.players = new BetterMap(futurePlayers.map((house, user) => [user, new Player(user, this.game.houses.get(house))]));
 
+        // In the past we always used the supply limits from the game setup, though we simply could have calculated them
+        // as every house starts according to their controlled barrels. For random start we have to recalculate supply, but only do it for
+        // non vassals as vassals always start at supply 4. So we cannot use game.updateSupplies but use a slightly different version of it:
+        this.getNonVassalHouses().forEach(h =>  {
+            h.supplyLevel = Math.min(this.game.supplyRestrictions.length - 1, this.game.getControlledSupplyIcons(h));
+        });
+
+        this.entireGame.broadcastToClients({
+            type: "supply-adjusted",
+            supplies: this.game.houses.values.map(h => [h.id, h.supplyLevel])
+        });
+        
         this.log({
             type: "user-house-assignments",
             assignments: futurePlayers.map((house, user) => [house, user.id]) as [string, string][]

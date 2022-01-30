@@ -157,6 +157,12 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         which hopefully solves the issues (#792 #796).
      */
 
+    const startingPositionsMap = new BetterMap(baseGameHousesToCreate.keys.filter(hid => hid != "targaryen").map(hid => [hid, hid]));
+    if (gameSettings.randomStartPositions) {
+        const randomizedList = shuffleInPlace(startingPositionsMap.values);
+        startingPositionsMap.keys.forEach((hid, i) => startingPositionsMap.set(hid, randomizedList[i]));
+    }
+
     // Overwrite house cards
     if (entireGame.isFeastForCrows) {
         const ffcHouseCards = new BetterMap(Object.entries(baseGameData.ffcHouseCards as {[key: string]: HouseCardContainer}));
@@ -324,11 +330,16 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
 
     const regions = new BetterMap(getStaticWorld(entireGame.gameSettings.playerCount).staticRegions.values.map(staticRegion => {
         const blocked = blockedRegions ? blockedRegions.includes(staticRegion.id) : false;
-        const garrisonValue = garrisonsFromGameSetup ? garrisonsFromGameSetup.has(staticRegion.id) ? garrisonsFromGameSetup.get(staticRegion.id)
-        : staticRegion.startingGarrison
-        : staticRegion.startingGarrison;
+        const garrisonValue = garrisonsFromGameSetup && garrisonsFromGameSetup.has(staticRegion.id)
+            ? garrisonsFromGameSetup.get(staticRegion.id)
+            : staticRegion.startingGarrison;
 
-        const superPowerToken = overwrittenSuperControlPowerToken.has(staticRegion.id) ? game.houses.get(overwrittenSuperControlPowerToken.get(staticRegion.id)) : null;
+        let superPowerToken = overwrittenSuperControlPowerToken.has(staticRegion.id) ? game.houses.get(overwrittenSuperControlPowerToken.get(staticRegion.id)) : null;
+
+        if (gameSettings.randomStartPositions && staticRegion.superControlPowerToken && startingPositionsMap.has(staticRegion.superControlPowerToken)) {
+            const newCapitalOwner = startingPositionsMap.get(staticRegion.superControlPowerToken);
+            superPowerToken = game.houses.get(newCapitalOwner);
+        }
 
         return [
             staticRegion.id,
@@ -419,7 +430,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     Object.entries(units).forEach(([regionId, data]) => {
         data.filter(unitData => housesToCreate.includes(unitData.house)).forEach(unitData => {
             const region = game.world.regions.get(regionId);
-            const house = game.houses.get(unitData.house);
+            const house = game.houses.get(gameSettings.randomStartPositions && startingPositionsMap.has(unitData.house) ? startingPositionsMap.get(unitData.house) : unitData.house);
             const unitType = unitTypes.get(unitData.unitType);
             const quantity = (!playerHouses.includes(house.id) || gameSettings.useVassalPositions) ? (unitData.quantityVassal ?? 0) : unitData.quantity;
 
