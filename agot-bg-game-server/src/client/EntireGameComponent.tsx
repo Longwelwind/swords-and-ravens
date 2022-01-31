@@ -15,8 +15,10 @@ import faviconNormal from "../../public/images/favicon.ico";
 import faviconAlert from "../../public/images/favicon-alert.ico";
 import rollingDicesImage from "../../public/images/icons/rolling-dices.svg";
 import {Helmet} from "react-helmet";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { FormCheck, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { preventOverflow } from "@popperjs/core";
+import DraftHouseCardsGameState from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
+import { observable } from "mobx";
 
 interface EntireGameComponentProps {
     entireGame: EntireGame;
@@ -25,14 +27,16 @@ interface EntireGameComponentProps {
 
 @observer
 export default class EntireGameComponent extends Component<EntireGameComponentProps> {
+    @observable showMapWhenDrafting = false;
+
     render(): ReactNode {
         return <>
             <Helmet>
                 <link rel="icon" href={this.props.gameClient.isOwnTurn() ? faviconAlert : faviconNormal} sizes="16x16" />
             </Helmet>
             <Col xs={12} className={this.props.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
-                <div style={{ marginLeft: "1rem", marginBottom: "0rem", textAlign: "center"}}>
-                    <h4 style={{ display: "inline" }}>{this.props.entireGame.name} {this.getTidesOfBattleImage()} {this.getGameTypeBadge()}</h4>{this.props.entireGame.isFeastForCrows && this.getBetaWarning()}
+                <div style={{ marginLeft: "1rem", marginBottom: "0rem", textAlign: "center", alignItems: "center"}}>
+                    <h4 style={{ display: "inline" }}>{this.props.entireGame.name} {this.getTidesOfBattleImage()} {this.getGameTypeBadge()}</h4>{this.renderMapSwitch()}
                 </div>
             </Col>
             {
@@ -77,13 +81,41 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             : <Badge variant="success" className="mx-3">Live</Badge>;
     }
 
-    getBetaWarning(): ReactNode {
+    renderBetaWarning(): ReactNode {
         return <h6 style={{display: "inline", fontWeight: "normal"}}>&nbsp;BETA!</h6>
+    }
+
+    renderMapSwitch(): ReactNode {
+        return this.props.entireGame.hasChildGameState(DraftHouseCardsGameState) &&
+            <FormCheck
+                id="show-hide-map-setting"
+                type="switch"
+                label="Show map"
+                style={{display: "inline", marginLeft: "10px"}}
+                checked={this.showMapWhenDrafting}
+                onChange={() => {
+                    this.showMapWhenDrafting = !this.showMapWhenDrafting;
+                    this.changeUserSettings();
+                }}
+            />
+    }
+
+    changeUserSettings(): void {
+        if (!this.props.gameClient.authenticatedUser) {
+            return;
+        }
+        const user = this.props.gameClient.authenticatedUser;
+        user.settings.showMapWhenDrafting = this.showMapWhenDrafting;
+        user.syncSettings();
     }
 
     componentDidMount(): void {
         document.title = this.props.entireGame.name;
         this.props.entireGame.onClientGameStateChange = () => this.onClientGameStateChange();
+
+        if (this.props.gameClient.authenticatedUser) {
+            this.showMapWhenDrafting = this.props.gameClient.authenticatedUser.settings.showMapWhenDrafting;
+        }
     }
 
     onClientGameStateChange(): void {

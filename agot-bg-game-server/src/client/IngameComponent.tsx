@@ -246,12 +246,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             this.housesInfosCollapsed ? faChevronCircleLeft : faChevronCircleRight
             : this.housesInfosCollapsed ? faChevronCircleRight : faChevronCircleLeft;
 
+        const showMap = !draftHouseCards || this.props.gameClient.authenticatedUser?.settings.showMapWhenDrafting;
+
         return (
             <>
-                <Col xs={{order: columnOrders.gameStateColumn}} style={{minWidth: this.gameSettings.playerCount == 8 ? "470px" : "450px", maxWidth: "800px"}}>
+                <Col xs={{order: columnOrders.gameStateColumn}} style={{minWidth: this.gameSettings.playerCount == 8 ? "470px" : "450px", maxWidth: draftHouseCards ? "1200px" : "800px"}}>
                     {this.renderGameStateColumn()}
                 </Col>
-                {!draftHouseCards && <Col xs={{span: "auto", order: columnOrders.mapColumn}}>
+                {showMap && <Col xs={{span: "auto", order: columnOrders.mapColumn}}>
                     <div id="map-component" style={mapStyle}>
                         <MapComponent
                             gameClient={this.props.gameClient}

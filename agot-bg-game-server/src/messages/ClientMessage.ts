@@ -181,6 +181,7 @@ export interface UserSettings {
     responsiveLayout: boolean;
     muted: boolean;
     tracksColumnCollapsed: boolean;
+    showMapWhenDrafting: boolean
 }
 
 export interface ChangeGameSettings {

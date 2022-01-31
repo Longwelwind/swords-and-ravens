@@ -244,7 +244,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             responsiveLayout: profileSettings.responsiveLayout,
             muted: profileSettings.muted,
             lastOpenedTab: null,
-            tracksColumnCollapsed: false
+            tracksColumnCollapsed: false,
+            showMapWhenDrafting: false
         });
         this.users.set(user.id, user);
 

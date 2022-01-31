@@ -14,6 +14,7 @@ import HouseCardComponent from "./utils/HouseCardComponent";
 import House from "../../common/ingame-game-state/game-data-structure/House";
 import SimpleChoiceGameState from "../../common/ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
 import SimpleChoiceComponent from "./SimpleChoiceComponent";
+import _ from "lodash";
 
 @observer
 export default class DraftHouseCardsComponent extends Component<GameStateComponentProps<DraftHouseCardsGameState>> {
@@ -35,6 +36,7 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
 
     render(): ReactNode {
         const availableCards = this.player && !this.doesControlHouse ? this.props.gameState.getFilteredHouseCardsForHouse(this.player.house) : [];
+        const remainingCardsForSpectators = !this.player ? _.sortBy(this.props.gameState.ingame.game.houseCardsForDrafting.values, hc => -hc.combatStrength, hc => hc.houseId) : [];
         return (
             <>
                 {this.props.gameState.currentColumnIndex > -1 && this.props.gameState.currentRowIndex > -1 &&
@@ -43,9 +45,9 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                         {this.draftStep == DraftStep.DECIDE
                         ? <div className="text-center"><b>{this.house.name}</b> must decide whether to select a House card or an Influence track position.</div>
                         : this.draftStep == DraftStep.HOUSE_CARD
-                        ? <div className="text-center"><b>{this.house.name}</b> must select one House card.</div>
+                        ? <div className="text-center"><b>{this.house.name}</b> must select a House card.</div>
                         : this.draftStep == DraftStep.INFLUENCE_TRACK
-                        ? <div className="text-center"><b>{this.house.name}</b> must choose one Influence track.</div>
+                        ? <div className="text-center"><b>{this.house.name}</b> must choose an Influence track.</div>
                         : <></>}
                     </Row>
                     <Row>
@@ -70,7 +72,7 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                     </Row>}
                     {this.player && !this.doesControlHouse &&
                     <Row>
-                        <Col xs="12">These are the house cards you could pick on your next turn:</Col>
+                        <Col xs="12" className="text-center">These are the house cards from which you may choose one on your next turn:</Col>
                         <Col xs="12">
                             <Row className="justify-content-center">
                                 {this.props.gameState.getAllHouseCards().map(hc => (
@@ -84,6 +86,22 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                                 ))}
                             </Row>
                         </Col>
+                    </Row>}
+                    {!this.player &&
+                    <Row>
+                        <Col xs="12" className="text-center">These are all remaining house cards:</Col>
+                            <Col xs="12">
+                                <Row className="justify-content-center">
+                                    {remainingCardsForSpectators.map(hc => (
+                                        <Col xs="auto" key={hc.id}>
+                                            <HouseCardComponent
+                                                houseCard={hc}
+                                                size="small"
+                                            />
+                                        </Col>
+                                    ))}
+                                </Row>
+                            </Col>
                     </Row>}
                 </ListGroupItem>}
             </>
