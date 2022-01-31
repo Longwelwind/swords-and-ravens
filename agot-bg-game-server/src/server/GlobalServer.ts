@@ -189,7 +189,7 @@ export default class GlobalServer {
                 }
 
                 // Create a chat room between these 2 players
-                const roomId = await this.websiteClient.createPrivateChatRoom(users, `Chat room for ${users.map(u => u.name).join(" and ")}`);
+                const roomId = await this.websiteClient.createPrivateChatRoom(users, `Chat room for ${users.map(u => u.name).join(" and ")} in game ${user.entireGame.id}`);
 
                 if (!entireGame.privateChatRoomsIds.has(users[0])) {
                     entireGame.privateChatRoomsIds.set(users[0], new BetterMap());

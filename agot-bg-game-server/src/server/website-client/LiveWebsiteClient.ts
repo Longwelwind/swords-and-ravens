@@ -1,8 +1,9 @@
 import WebsiteClient, {StoredGameData, StoredUserData} from "./WebsiteClient";
-import requestPromise, {post} from "request-promise";
+import requestPromise, {post, delete as httpDelete} from "request-promise";
 import {RequestAPI} from "request";
 import {StatusCodeError} from "request-promise/errors";
 import User from "../User";
+import * as Sentry from "@sentry/node"
 
 export default class LiveWebsiteClient implements WebsiteClient {
     masterApiBaseUrl: string;
@@ -88,57 +89,85 @@ export default class LiveWebsiteClient implements WebsiteClient {
     }
 
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/ban-types
-    async saveGame(gameId: string, serializedGame: any, viewOfGame: any, players: {userId: string; data: object}[], state: string, version: string, updateLastActive: boolean): Promise<void> {
-        await this.request.patch(`${this.masterApiBaseUrl}/game/${gameId}`, {
-            body: {
-                serialized_game: serializedGame,
-                state,
-                version,
-                view_of_game: viewOfGame,
-                players: players.map(p => ({user: p.userId, data: p.data})),
-                update_last_active: updateLastActive
-            }
-        });
+    async saveGame(gameId: string, serializedGame: any, viewOfGame: any, players: { userId: string; data: object }[], state: string, version: string, updateLastActive: boolean): Promise<void> {
+        try {
+            await this.request.patch(`${this.masterApiBaseUrl}/game/${gameId}`, {
+                body: {
+                    serialized_game: serializedGame,
+                    state,
+                    version,
+                    view_of_game: viewOfGame,
+                    players: players.map(p => ({ user: p.userId, data: p.data })),
+                    update_last_active: updateLastActive
+                }
+            });
+        } catch (e) {
+            Sentry.captureMessage(JSON.stringify(e), Sentry.Severity.Critical);
+        }
     }
 
     async notifyReadyToStart(gameId: string, userIds: string[]): Promise<void> {
-        await post(`${this.masterApiBaseUrl}/notifyReadyToStart/${gameId}`, {
-            body: {users: userIds},
-            json: true,
-        }).auth(this.masterApiUsername, this.masterApiPassword, true);
+        try {
+            await post(`${this.masterApiBaseUrl}/notifyReadyToStart/${gameId}`, {
+                body: { users: userIds },
+                json: true,
+            }).auth(this.masterApiUsername, this.masterApiPassword, true);
+        } catch (e) {
+            Sentry.captureMessage(JSON.stringify(e), Sentry.Severity.Error);
+        }
     }
 
     async notifyYourTurn(gameId: string, userIds: string[]): Promise<void> {
-        await post(`${this.masterApiBaseUrl}/notifyYourTurn/${gameId}`, {
-            body: {users: userIds},
-            json: true,
-        }).auth(this.masterApiUsername, this.masterApiPassword, true);
+        try {
+            await post(`${this.masterApiBaseUrl}/notifyYourTurn/${gameId}`, {
+                body: { users: userIds },
+                json: true,
+            }).auth(this.masterApiUsername, this.masterApiPassword, true);
+        } catch (e) {
+            Sentry.captureMessage(JSON.stringify(e), Sentry.Severity.Error);
+        }
     }
 
     async notifyBattleResults(gameId: string, userIds: string[]): Promise<void> {
-        await post(`${this.masterApiBaseUrl}/notifyBattleResults/${gameId}`, {
-            body: {users: userIds},
-            json: true,
-        }).auth(this.masterApiUsername, this.masterApiPassword, true);
+        try {
+            await post(`${this.masterApiBaseUrl}/notifyBattleResults/${gameId}`, {
+                body: { users: userIds },
+                json: true,
+            }).auth(this.masterApiUsername, this.masterApiPassword, true);
+        } catch (e) {
+            Sentry.captureMessage(JSON.stringify(e), Sentry.Severity.Error);
+        }
     }
 
     async notifyNewVote(gameId: string, userIds: string[]): Promise<void> {
-        await post(`${this.masterApiBaseUrl}/notifyNewVote/${gameId}`, {
-            body: {users: userIds},
-            json: true,
-        }).auth(this.masterApiUsername, this.masterApiPassword, true);
+        try {
+            await post(`${this.masterApiBaseUrl}/notifyNewVote/${gameId}`, {
+                body: { users: userIds },
+                json: true,
+            }).auth(this.masterApiUsername, this.masterApiPassword, true);
+        } catch (e) {
+            Sentry.captureMessage(JSON.stringify(e), Sentry.Severity.Error);
+        }
     }
 
     async notifyGameEnded(gameId: string, userIds: string[]): Promise<void> {
-        await post(`${this.masterApiBaseUrl}/notifyGameEnded/${gameId}`, {
-            body: {users: userIds},
-            json: true,
-        }).auth(this.masterApiUsername, this.masterApiPassword, true);
+        try {
+            await post(`${this.masterApiBaseUrl}/notifyGameEnded/${gameId}`, {
+                body: { users: userIds },
+                json: true,
+            }).auth(this.masterApiUsername, this.masterApiPassword, true);
+        } catch (e) {
+            Sentry.captureMessage(JSON.stringify(e), Sentry.Severity.Error);
+        }
     }
 
     async addPbemResponseTime(user: User, responseTimeInSeconds: number): Promise<void> {
-        await post(`${this.masterApiBaseUrl}/addPbemResponseTime/${user.id}/${responseTimeInSeconds}`)
-            .auth(this.masterApiUsername, this.masterApiPassword, true);
+        try {
+            await post(`${this.masterApiBaseUrl}/addPbemResponseTime/${user.id}/${responseTimeInSeconds}`)
+                .auth(this.masterApiUsername, this.masterApiPassword, true);
+        } catch (e) {
+            Sentry.captureMessage(JSON.stringify(e), Sentry.Severity.Error);
+        }
     }
 
     async createPrivateChatRoom(users: User[], name: string): Promise<string> {
@@ -155,7 +184,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
     }
 
     async clearChatRoom(roomId: string): Promise<void> {
-        await this.request.delete(`${this.masterApiBaseUrl}/clearChatRoom/${roomId}`)
+        await httpDelete(`${this.masterApiBaseUrl}/clearChatRoom/${roomId}`)
             .auth(this.masterApiUsername, this.masterApiPassword, true)
     }
 }
