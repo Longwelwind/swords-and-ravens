@@ -113,11 +113,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         this.setChildGameState(new IngameGameState(this)).beginGame(housesToCreate, futurePlayers);
 
         this.checkGameStateChanged();
-
-        this.ingameGameState?.setWaitedForPlayers();
     }
 
-    checkGameStateChanged(): void {
+    checkGameStateChanged(): boolean {
         const {level, gameState} = this.getFirstGameStateToBeRetransmitted();
 
         if (gameState) {
@@ -153,7 +151,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             }
 
             // Reset WaitedForData for all players
-            this.ingameGameState?.players.values.forEach(p => {
+            this.ingameGameState?.players.values.filter(p => p.waitedForData != null).forEach(p => {
                 // In case there is still an unhandled WaitedForData we now send the response time
                 // Basically this should not happen, but we keep it for safety!
                 if (p.waitedForData?.handled === false) {
@@ -163,7 +161,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             });
 
             this.notifyWaitedUsers();
+            return true;
         }
+
+        return false;
     }
 
     notifyWaitedUsers(waitedUsers: User[] = []): void {
@@ -301,9 +302,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             updateLastActive = this.childGameState.onClientMessage(user, message);
         }
 
-        this.ingameGameState?.checkWaitedForPlayers();
-        this.checkGameStateChanged();
-        this.ingameGameState?.setWaitedForPlayers();
+        const notWaitedAnymore = this.ingameGameState?.checkWaitedForPlayers() ?? [];
+        const gameStateChanged = this.checkGameStateChanged();
+        this.ingameGameState?.setWaitedForPlayers(gameStateChanged ? notWaitedAnymore : []);
         return updateLastActive;
     }
 

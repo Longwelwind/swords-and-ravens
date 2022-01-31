@@ -56,7 +56,7 @@ export default class LocalWebsiteClient implements WebsiteClient {
     }
 
     async addPbemResponseTime(user: User, responseTimeInSeconds: number): Promise<void> {
-        console.log(`addPbemResponseTime: ${user.name}: ${responseTimeInSeconds}`);
+        console.log(`ADD-PBEM-RESPONSE-TIME: ${user.name}: ${responseTimeInSeconds}`);
     }
 
     async createPublicChatRoom(name: string): Promise<string> {

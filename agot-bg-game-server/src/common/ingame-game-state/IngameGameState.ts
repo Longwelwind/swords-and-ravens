@@ -420,7 +420,7 @@ export default class IngameGameState extends GameState<
         }
     }
 
-    setWaitedForPlayers(): void {
+    setWaitedForPlayers(previouslyWaitedFor: Player[]): void {
         if (!this.entireGame.gameSettings.pbem) {
             return;
         }
@@ -430,28 +430,32 @@ export default class IngameGameState extends GameState<
 
             if (isWaitedFor && !p.waitedForData) {
                 // We wait for the user now
-                p.setWaitedFor();
+                p.setWaitedFor(previouslyWaitedFor.includes(p));
             }
         });
     }
 
-    checkWaitedForPlayers(): void {
+    checkWaitedForPlayers(): Player[] {
         const waitedUsers = this.leafState.getWaitedUsers();
+        const notWaitedForAnymore: Player[] = [];
         this.players.values.forEach(p => {
             if (!p.waitedForData || p.waitedForData.handled) {
-                // We are either still waiting for the user or
-                // we are in PlaceOrders, which allows to Unready and Ready multiple times.
+                // We are either still waiting for the user or  we are in a state like
+                // PlaceOrders, ChooseHouseCards or Bidding, which allows changing the decision.
                 // To make it totally perfect we would need to add the possibilty to delete
                 // the last sent value and send a new one. But for now we just use the
-                // response time value of the first user message that made him non waited for anymore.
+                // response time value of the first user message that made him not-waited-for anymore.
                 return;
             }
 
             if (!waitedUsers.includes(p.user) || p.waitedForData.leafStateId != this.entireGame.leafStateId) {
                 // We don't wait for the user anymore, send their personal response time to the website
                 p.sendPbemResponseTime();
+                notWaitedForAnymore.push(p);
             }
         });
+
+        return notWaitedForAnymore;
     }
 
     createVote(initiator: User, type: VoteType): Vote {

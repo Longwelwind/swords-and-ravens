@@ -13,7 +13,7 @@ export default class Player {
         this.waitedForData = waitedForData;
     }
 
-    setWaitedFor(): void {
+    setWaitedFor(hasBeenReactivatedAgain = false): void {
         if (!this.user.entireGame.gameSettings.pbem) {
             return;
         }
@@ -21,7 +21,8 @@ export default class Player {
         this.waitedForData = {
             date: new Date(),
             leafStateId: this.user.entireGame.leafStateId,
-            handled: false
+            handled: false,
+            hasBeenReactivated: hasBeenReactivatedAgain
         };
 
         // console.log(`Now waiting for ${this.user.name} in state ${this.waitedForData.leafStateId}`);
@@ -38,9 +39,12 @@ export default class Player {
 
         const responseTimeInSeconds = Math.floor((new Date().getTime() - this.waitedForData.date.getTime()) / 1000);
 
-        if (responseTimeInSeconds > 20 && this.user.entireGame.onNewPbemResponseTime) {
-            // Only send response time if is greater than 20 seconds to not count actions when a player was immeadiately activated again
+        // Send value if user was not reactivated again (and probably is still online to do his move immediately)
+        // or if his responseTime is greater than 5 mintes (thus meaning he decided to wait for the decision)
+        if (this.user.entireGame.onNewPbemResponseTime && (!this.waitedForData.hasBeenReactivated || responseTimeInSeconds > (5 * 60))) {
             this.user.entireGame.onNewPbemResponseTime(this.user, responseTimeInSeconds);
+        } else {
+            // console.log(`${this.user.name} has ben REACTIVATED`);
         }
 
         this.waitedForData.handled = true;
@@ -53,9 +57,9 @@ export default class Player {
             waitedForData: this.waitedForData ? {
                 date: this.waitedForData.date.getTime(),
                 leafStateId: this.waitedForData.leafStateId,
-                handled: this.waitedForData.handled
-            }
-                : null
+                handled: this.waitedForData.handled,
+                hasBeenReactivated: this.waitedForData.hasBeenReactivated
+            } : null
         };
     }
 
@@ -66,9 +70,10 @@ export default class Player {
             data.waitedForData ? {
                 date: new Date(data.waitedForData.date),
                 leafStateId: data.waitedForData.leafStateId,
-                handled: data.waitedForData.handled
-            }
-                : null);
+                handled: data.waitedForData.handled,
+                hasBeenReactivated: data.waitedForData.hasBeenReactivated
+            } : null,
+        );
     }
 }
 
@@ -82,10 +87,12 @@ export interface WaitedForData {
     date: Date;
     leafStateId: string;
     handled: boolean;
+    hasBeenReactivated: boolean;
 }
 
 export interface SerializedWaitedForData {
     date: number;
     leafStateId: string;
     handled: boolean;
+    hasBeenReactivated: boolean;
 }
