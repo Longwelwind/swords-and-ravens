@@ -395,21 +395,23 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
     getViewOfGame(): any {
         // Creating a view of the current turn of the game
-        const turn = this.childGameState instanceof IngameGameState
-            ? this.childGameState.game.turn
-            : -1;
+        const turn = this.ingameGameState?.game.turn ?? -1;
         const maxPlayerCount = this.gameSettings.playerCount;
         const settings = this.gameSettings;
-        const _waitingFor = (this.ingameGameState
-            ? this.leafState.getWaitedUsers().map(u => this.ingameGameState?.players.tryGet(u, null) ?? null)
+        const _waitingFor = (this.ingameGameState?.leafState.getWaitedUsers().map(u =>
+            this.ingameGameState?.players.tryGet(u, null) ?? null)
                 .filter(p => p != null).map((p: Player) => ({
                     house: p.house.name,
                     user: p.user.name
-                }))
-            : []);
+                })) ?? []);
         const waitingFor = _waitingFor.map(wf => `${wf.house}${this.gameSettings.faceless ? "" : (` (${wf.user})`)}`).join(", ");
+        let winner=null;
+        if (this.ingameGameState?.leafState instanceof GameEndedGameState) {
+            const user = this.ingameGameState.getControllerOfHouse(this.ingameGameState.leafState.winner).user;
+            winner = `${user.name} (${this.ingameGameState.leafState.winner.name})`;
+        }
 
-        return {turn, maxPlayerCount, settings, waitingFor};
+        return {turn, maxPlayerCount, settings, waitingFor, winner};
     }
 
     // eslint-disable-next-line @typescript-eslint/ban-types
