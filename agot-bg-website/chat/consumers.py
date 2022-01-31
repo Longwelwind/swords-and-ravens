@@ -108,12 +108,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
             # notify the other user about a new private message
 
-            game = await database_sync_to_async(lambda: Game.objects.get(id=data['gameId']))()
-            pbem_active = game.view_of_game.get("settings", False) and game.view_of_game.get("settings").get("pbem", False) == True
-            if not pbem_active:
-                return
-
-            await database_sync_to_async(lambda: self.notify_chat_partner(user, message, game))()
+            await database_sync_to_async(lambda: self.notify_chat_partner(user, message, data['gameId'], data['fromHouse']))()
 
         if type == 'chat_view_message':
             message_id = data['message_id']
@@ -178,17 +173,23 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         return [{'id': message.id, 'text': message.text, 'user_id': str(message.user.id), 'user_username': message.user.username, 'created_at': message.created_at.isoformat()}
                     for message in messages]
 
-    def notify_chat_partner(self, user, message, game):
-        #print(user.username)
+    def notify_chat_partner(self, user, message, game_id, from_house):
+        game = Game.objects.get(id=game_id)
+        pbem_active = game.view_of_game.get("settings", False) and game.view_of_game.get("settings").get("pbem", False) == True
+        if not pbem_active:
+            return
+        #print("from " + user.username)
         other_user_in_room = self.room.users.prefetch_related('user').exclude(user=user).first()
         if other_user_in_room is None or not other_user_in_room.user.email_notification_active:
             return
+
+        #print("to " + other_user_in_room.user.username)
 
         user_already_notified = cache.has_key(f'{self.room.id}_{other_user_in_room.user.id}')
         if not user_already_notified:
             mailBody = render_to_string('agotboardgame_main/new_private_message_notification.html',
                 {'message': message.text, 'receiver': other_user_in_room.user, 'sender': user, 'game': game,
-                'game_url': f'https://swordsandravens.net/play/{game.id}' })
+                'game_url': f'https://swordsandravens.net/play/{game.id}', 'from_house': from_house })
             cache.set(f'{self.room.id}_{other_user_in_room.user.id}', True, 5 * 60)
             send_mail(f'You received a new private message in game: \'{game.name}\'',
                 mailBody,

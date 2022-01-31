@@ -115,8 +115,8 @@ export default class ChatClient {
         if (text == null || text.match(/^\s*$/)) {
             return;
         }
-        console.log('Message sent');
-        channel.websocket.send(JSON.stringify({type: 'chat_message', text, gameId: this.gameClient.entireGame.id }));
+        const fromHouse = this.gameClient.entireGame.ingameGameState?.players.tryGet(authenticatedUser, null)?.house.name ?? "Unknown";
+        channel.websocket.send(JSON.stringify({type: 'chat_message', text, gameId: this.gameClient.entireGame.id, fromHouse: fromHouse }));
     }
 
     onMessage(channel: Channel, message: ChatServerMessage): void {
