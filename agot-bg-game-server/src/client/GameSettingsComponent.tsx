@@ -297,6 +297,21 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         onChange={() => this.changeGameSettings(() => this.gameSettings.blindDraft = !this.gameSettings.blindDraft)}
                     />
                 </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="random-start-positions-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="random-start-positions-setting-tooltip">
+                                    Houses randomly change their starting positions.
+                                </Tooltip>}>
+                                <label htmlFor="random-start-positions-setting">Random start positions</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.randomStartPositions}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.randomStartPositions = !this.gameSettings.randomStartPositions)}
+                    />
+                </Col>
             </Col>
             <Col md="12" lg="auto" id="custom-settings-col" className="no-gutters">
                 <Col xs="12">
@@ -316,6 +331,21 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 </Col>
                 <Col xs="12">
                     <FormCheck
+                        id="endless-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="endless-setting-tooltip">
+                                    The game will last until round 1000 unless a winner is declared earlier.
+                                </Tooltip>}>
+                                <label htmlFor="endless-setting">Endless</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.endless}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.endless = !this.gameSettings.endless)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
                         id="westeros-phase-variant-setting"
                         type="switch"
                         label={
@@ -323,7 +353,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                 <Tooltip id="westeros-phase-variant-tooltip">
                                     Players may look at the next 3 Westeros cards from each deck at any time.
                                 </Tooltip>}>
-                                <label htmlFor="westeros-phase-variant-setting">CoK Westeros Phase Variant</label>
+                                <label htmlFor="westeros-phase-variant-setting">CoK Westeros Phase</label>
                             </OverlayTrigger>}
                         checked={this.gameSettings.cokWesterosPhase}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.cokWesterosPhase = !this.gameSettings.cokWesterosPhase)}
@@ -357,21 +387,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             </OverlayTrigger>}
                         checked={this.gameSettings.precedingMustering}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.precedingMustering = !this.gameSettings.precedingMustering)}
-                    />
-                </Col>
-                <Col xs="12">
-                    <FormCheck
-                        id="endless-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="endless-setting-tooltip">
-                                    The game will last until round 1000 unless a winner is declared earlier.
-                                </Tooltip>}>
-                                <label htmlFor="endless-setting">Endless mode</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.endless}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.endless = !this.gameSettings.endless)}
                     />
                 </Col>
             </Col>
