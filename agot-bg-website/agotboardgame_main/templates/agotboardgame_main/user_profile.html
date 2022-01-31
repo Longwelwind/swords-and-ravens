@@ -4,6 +4,7 @@
 {{ viewed_user.username }} -
 {% endblock %}
 
+{% load house_icon %}
 {% load humanize %}
 
 {% block content %}
@@ -97,8 +98,8 @@
                             </th>
                             <th style="width: 1px"></th>
                             {% if perms.agotboardgame_main.can_play_as_another_player %}
-                            <th style="width: 1px"></th>
-                        {% endif %}
+                                <th style="width: 1px"></th>
+                            {% endif %}
                         </tr>
                     </thead>
                     {% for player in viewed_user.games_of_user %}
@@ -108,7 +109,9 @@
                             data-title="<div class='popover-title'>{{ player.game.name }}</div>"
                             data-boundary="window"
                             data-content="
-                                <div>Round: <b>{{ player.game.view_of_game.turn }}</b></div>
+                                {% if player.game.state != "IN_LOBBY" %}
+                                    <div>Round: <b>{{ player.game.view_of_game.turn }}</b></div>
+                                {% endif %}
                                 {% if player.game.state == "ONGOING" %}
                                     <p>
                                         {% if player.game.view_of_game.waitingFor %}
@@ -142,6 +145,11 @@
                                 {% endif %}
                             </td>
                             <td>
+                                {% if player.data.house %}
+                                    <span class="badge badge-light">
+                                        {% house_icon player.data.house %}
+                                    </span>
+                                {% endif %}
                                 {{ player.game.name }}
                             </td>
                             <td class="text-center">
@@ -190,13 +198,18 @@
                             </th>
                             <th style="width: 1px"></th>
                             {% if perms.agotboardgame_main.can_play_as_another_player %}
-                            <th style="width: 1px"></th>
-                        {% endif %}
+                                <th style="width: 1px"></th>
+                            {% endif %}
                         </tr>
                     </thead>
                     {% for player in viewed_user.cancelled_games %}
                         <tr>
                             <td>
+                                {% if player.data.house %}
+                                    <span class="badge badge-light">
+                                        {% house_icon player.data.house %}
+                                    </span>
+                                {% endif %}
                                 {{ player.game.name }}
                             </td>
                             <td class="text-center">
