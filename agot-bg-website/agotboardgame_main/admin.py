@@ -1,7 +1,8 @@
 from django.contrib import admin
 
-from agotboardgame_main.models import Game, PlayerInGame, User
+from agotboardgame_main.models import Game, PlayerInGame, User, PbemResponseTime
 
 admin.site.register(User)
 admin.site.register(Game)
 admin.site.register(PlayerInGame)
+admin.site.register(PbemResponseTime)
