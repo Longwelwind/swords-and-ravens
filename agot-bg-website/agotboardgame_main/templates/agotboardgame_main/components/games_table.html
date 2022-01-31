@@ -24,7 +24,7 @@
                 data-content="
                     {% if game.state == "ONGOING" %}
                         <p>
-                            Turn: <b>{{ game.view_of_game.turn }}</b>
+                            Round: <b>{{ game.view_of_game.turn }}</b>
                             {% if game.view_of_game.waitingFor %}
                                 <br/>Waiting for: {{ game.view_of_game.waitingFor }}
                             {% endif %}
