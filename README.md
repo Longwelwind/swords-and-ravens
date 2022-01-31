@@ -43,18 +43,34 @@ Closing and re-reunning `run-server` will create a new game.
 
 ### Launching the Website Only
 
-Requires `docker` and `python3`.
+Requires a Linux based OS, `docker` and `python3`.\
+_If you are on Windows you can install WSL2 to make it work. The project runs fine with the default Ubuntu distribution.
+Just enable Docker Desktop to be accessed from WSL if it's not activated per default._
+
+Make sure following packages are installed on your OS:
+
+```bash
+sudo apt-get install gcc libpq-dev -y
+sudo apt-get install python-dev  python-pip -y
+sudo apt-get install python3-dev python3-pip python3-venv python3-wheel -y
+```
 
 To spin up the PostgreSQL database and a Redis database, open a terminal and execute `docker-compose up`.
 
-Install the dependencies of the component, initialize the database and create a super user by running:
+In `agot-bg-website/agotboardgame_main/migrations` remove all files except `__init__.py` `0001_initial.py`.\
+_These deleted migration files are bound to the swordsandravens.net database and therefore
+you have to create the necessary migrations for your newly created database on your own._
+
+Install the dependencies of the website component, initialize the database and create a super user by running:
 
 ```bash
 cd agot-bg-website/
 cp .env.dev .env
 python3 -m venv venv
 source venv/bin/activate
+pip install wheels
 pip install -r requirements.txt
+cp agotboardgame_main/migrations_for_new_database.py agotboardgame_main/migrations/0002_initial_migrations.py
 python3 manage.py migrate
 
 # This command will ask for a password. Use "rootroot"
@@ -67,7 +83,8 @@ Once done, you can run the server by executing:
 python3 manage.py runserver
 ```
 
-The website will be accessible at `http://localhost:8000/` (as well as `http://localhost:8000/admin`). Some functionalities such as mail notifications and social authentications will require environment variables defined in `.env`.
+The website will be accessible at `http://localhost:8000/`. Some functionalities such as mail notifications and social authentications will require environment variables defined in `.env`.\
+As Google and Discord authentication is not available you can login via `http://localhost:8000/admin`.
 
 **Note**: If you try to open a game via the website, you will land on a template page.
 
@@ -75,7 +92,7 @@ The website will be accessible at `http://localhost:8000/` (as well as `http://l
 
 To launch the 2 components and make them inter-connected, make sure the dependencies are installed and the database is up and running (follow the instructions given in the precedent sections).
 
-Replace the environment configuration of the game-server with a live one: `cp .env.live .env`.
+Replace the environment configuration of the game-server with a live one: `cp .env.dev.live .env`.
 
 Replace the webpack configuration of the game-server with a live one: `cp webpack.client.js.live webpack.client.js`.
 
@@ -84,5 +101,7 @@ The front-end of the game server must be built and placed in the website. This c
 You can now run the game server and the website by launching, in 2 two different terminals:
 
 * In `agot-bg-game-server/`, execute `yarn run run-server`.
-* In `agot-bg-website/`, execute `python3 manage.py runserver`.
+* In `agot-bg-website/`, activate your venv and execute `python3 manage.py runserver`.
 
+**Note**: For play testing you at least need another user to run the game variant "Teach the game" locally.
+Create this user the same way you created the user Longwelwind.
