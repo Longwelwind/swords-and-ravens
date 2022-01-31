@@ -1356,7 +1356,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
     {
         version: "57",
         migrate: (serializedGame: any) => {
-            // Polish the logs and make 'retreat-failed' not resolved automatically as 
+            // Polish the logs and make 'retreat-failed' not resolved automatically as
             // only events, where the user could have had a choice should be marked with this flag
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
@@ -1417,7 +1417,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
     {
         version: "61",
         migrate: (serializedGame: any) => {
-            // Polish the logs and make 'new-objective-card-drawn' not resolved automatically as 
+            // Polish the logs and make 'new-objective-card-drawn' not resolved automatically as
             // only events, where the user could have had a choice should be marked with this flag
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;

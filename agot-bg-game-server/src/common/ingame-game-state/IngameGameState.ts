@@ -86,7 +86,7 @@ export default class IngameGameState extends GameState<
             type: "supply-adjusted",
             supplies: this.game.houses.values.map(h => [h.id, h.supplyLevel])
         });
-        
+
         this.log({
             type: "user-house-assignments",
             assignments: futurePlayers.map((house, user) => [house, user.id]) as [string, string][]
