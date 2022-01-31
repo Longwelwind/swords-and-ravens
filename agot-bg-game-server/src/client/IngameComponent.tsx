@@ -411,23 +411,23 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         </Card>
                     </Col>
                 </Row>
-                {this.authenticatedPlayer && (
-                    <Row id="game-controls">
-                        <Col xs="auto" className="pb-0">
-                            <button className="btn btn-outline-light btn-sm" onClick={() => this.props.gameClient.muted = !this.props.gameClient.muted}>
-                                <OverlayTrigger
-                                    overlay={
-                                        <Tooltip id="mute-tooltip">
-                                            {this.props.gameClient.muted
-                                                ? "Unmute"
-                                                : "Mute"}
-                                        </Tooltip>
-                                    }
-                                >
-                                    <img src={this.props.gameClient.muted ? speakerOffImage : speakerImage} width={32} />
-                                </OverlayTrigger>
-                            </button>
-                        </Col>
+                <Row id="game-controls">
+                    <Col xs="auto" className="pb-0">
+                        <button className="btn btn-outline-light btn-sm" onClick={() => this.props.gameClient.muted = !this.props.gameClient.muted}>
+                            <OverlayTrigger
+                                overlay={
+                                    <Tooltip id="mute-tooltip">
+                                        {this.props.gameClient.muted
+                                            ? "Unmute"
+                                            : "Mute"}
+                                    </Tooltip>
+                                }
+                            >
+                                <img src={this.props.gameClient.muted ? speakerOffImage : speakerImage} width={32} />
+                            </OverlayTrigger>
+                        </button>
+                    </Col>
+                    {this.authenticatedPlayer && <>
                         <Col xs="auto" className="pb-0">
                             <button
                                 className="btn btn-outline-light btn-sm"
@@ -483,7 +483,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </OverlayTrigger>
                             </button>
                         </Col>
-                    </Row>)}
+                    </>}
+                </Row>
             </>)
     }
 

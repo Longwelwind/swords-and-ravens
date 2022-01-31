@@ -357,7 +357,7 @@ export default class GlobalServer {
     onNewPbemResponseTime(user: User, responseTimeInSeconds: number): void {
         this.websiteClient.addPbemResponseTime(user, responseTimeInSeconds);
     }
-    
+
     onClearChatRoom(roomId: string): void {
         this.websiteClient.clearChatRoom(roomId);
     }
