@@ -57,6 +57,7 @@ interface PlayerAction {
     type: "player-action";
     house: string;
     action: PlayerActionType;
+    forHouses?: string[];
 }
 
 interface UserHouseAssignments {

@@ -121,24 +121,27 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         switch (data.type) {
             case "player-action": {
                 const house = this.game.houses.get(data.house);
+                const forHouses = data.forHouses ? data.forHouses.map(hid => this.game.houses.get(hid)) : null;
                 let text: string;
 
                 switch(data.action) {
                     case PlayerActionType.ORDERS_PLACED:
-                        text = "placed their orders.";
+                        text = "placed their orders";
                         break;
                     case PlayerActionType.BID_MADE:
-                        text = "made their bid.";
+                        text = "made their bid";
                         break;
                     case PlayerActionType.HOUSE_CARD_CHOSEN:
-                        text = "has chosen their house card.";
+                        text = "has chosen their house card";
                         break;
                     default:
-                        text = "Invalid PlayerActionType received."
+                        text = "Invalid PlayerActionType received"
                         break;
                 }
                 return <p>
-                    House <b>{house.name}</b> {text}
+                    <b>{house.name}</b> {text}{forHouses
+                        ? <> for {joinReactNodes(forHouses.map(h => <b key={`for_vassal_house_${h.id}`}>{h.name}</b>), ', ')}</>
+                        : <></>}.
                 </p>;
             }
             case "user-house-assignments":
@@ -182,10 +185,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const army = data.units.map(utid => unitTypes.get(utid));
 
                 return (
-                    <p>
-                        <img src={crossedSwordsImage} className="mr-2" width="24px"/><b>{attacker.name}</b> attacked <b>{attacked ? attacked.name : "a neutral force"}</b> from <b>{attackingRegion.name}</b> to <b>
-                        {attackedRegion.name}</b> with <>{joinReactNodes(army.map((ut, i) => <b key={`attack_${ut.id}_${i}`}>{ut.name}</b>), ', ')}</>.
-                    </p>
+                    <Row className="align-items-center">
+                        <Col xs="auto">
+                            <img src={crossedSwordsImage} width="24px"/>
+                        </Col>
+                        <Col>
+                            <b>{attacker.name}</b> attacked <b>{attacked ? attacked.name : "a neutral force"}</b> from <b>{attackingRegion.name}</b> to <b>
+                            {attackedRegion.name}</b> with <>{joinReactNodes(army.map((ut, i) => <b key={`attack_${ut.id}_${i}`}>{ut.name}</b>), ', ')}</>.
+                        </Col>
+                    </Row>
                 );
 
             case "march-resolved": {
@@ -272,7 +280,6 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <>
-                        <p>Combat result</p>
                         <div style={{ display: 'flex', justifyContent: 'center' }}>
                             <CombatInfoComponent housesCombatData={houseCombatDatas} />
                         </div>
@@ -591,14 +598,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     return [house, houseCard];
                 });
 
-                return <>
-                    <p>House cards were chosen:</p>
-                    <ul>
+                return <ul>
                         {houseCards.map(([h, hc]) => (
                             <li key={`housecard_${h.id}_${hc.id}`}><b>{h.name}</b> chose <b>{hc.name}</b></li>
                         ))}
-                    </ul>
-                </>;
+                    </ul>;
 
             case "clash-of-kings-final-ordering":
                 const finalOrder = data.finalOrder.map(hid => this.game.houses.get(hid));
@@ -653,7 +657,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <p>
-                        <b>{house.name}</b> reconciled their armies by removing:
+                        <b>{house.name}</b> reconciled their armies by destroying:
                     </p>
                     <ul>
                         {armies.map(([region, unitTypes]) => (

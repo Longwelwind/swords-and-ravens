@@ -154,7 +154,8 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
             this.ingameGameState.log({
                 type: "player-action",
                 house: player.house.id,
-                action: PlayerActionType.HOUSE_CARD_CHOSEN
+                action: PlayerActionType.HOUSE_CARD_CHOSEN,
+                forHouses: commandedHouse != player.house ? [commandedHouse.id] : undefined
             });
 
 
