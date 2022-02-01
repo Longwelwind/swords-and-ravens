@@ -106,6 +106,7 @@ class Game(models.Model):
             ("can_play_as_another_player", "Can impersonate an other player in a game"),
             ("cancel_game", "Can cancel a game")
         ]
+        ordering = ("-last_active_at", )
 
 
 class PlayerInGame(models.Model):
@@ -113,8 +114,21 @@ class PlayerInGame(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     data = JSONField()
 
+    def __str__(self):
+        return f"{self.user.username} in {self.game.name}"
+
+    class Meta:
+        ordering = ("-game__created_at", )
+
 class PbemResponseTime(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     response_time = models.IntegerField(default=-1)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        created_at_formmated = self.created_at.strftime("%m/%d/%y %H:%M:%S")
+        return f"{self.user.username}: {self.response_time}s. ({created_at_formmated})"
+
+    class Meta:
+        ordering = ("-created_at", )
