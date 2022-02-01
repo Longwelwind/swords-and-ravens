@@ -17,6 +17,7 @@ import PostCombatGameState from "./ingame-game-state/action-game-state/resolve-m
 import { StoredProfileSettings } from "../server/website-client/WebsiteClient";
 import Player from "./ingame-game-state/Player";
 import { v4 } from "uuid";
+import { ReplacePlayer, ReplacePlayerByVassal } from "./ingame-game-state/vote-system/VoteType";
 
 export enum NotificationType {
     READY_TO_START,
@@ -411,7 +412,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             winner = `${user.name} (${this.ingameGameState.leafState.winner.name})`;
         }
 
-        return {turn, maxPlayerCount, settings, waitingFor, winner};
+        const replacePlayerVoteOngoing = (this.ingameGameState?.votes.values.filter(v =>
+            v.state == VoteState.ONGOING && (v.type instanceof ReplacePlayer || v.type instanceof ReplacePlayerByVassal)).length ?? -1) > 0;
+
+        return {turn, maxPlayerCount, settings, waitingFor, winner, replacePlayerVoteOngoing};
     }
 
     // eslint-disable-next-line @typescript-eslint/ban-types

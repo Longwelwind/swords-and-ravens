@@ -167,14 +167,17 @@ def games(request):
         # Fetch the list of open or ongoing games.
         # Pre-fetch the PlayerInGame entry related to the authenticated player
         # This means that "game.players" will only contain one entry, the one related to the authenticated player.
-        games_query = Game.objects.annotate(players_count=Count('players')).prefetch_related('owner')
+        games_query = Game.objects.annotate(players_count=Count('players'),\
+            replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()))\
+            .prefetch_related('owner')
 
         if request.user.is_authenticated:
             games_query = games_query.prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user=request.user), to_attr="player_in_game"))
 
         eight_days_past = timezone.now() - timedelta(days=8)
         if request.user.is_authenticated:
-            games = games_query.filter(Q(state=IN_LOBBY) | Q(state=ONGOING)).prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user__last_activity__lt=eight_days_past), to_attr="inactive_players"))
+            games = games_query.filter(Q(state=IN_LOBBY) | Q(state=ONGOING)).prefetch_related(\
+                Prefetch('players', queryset=PlayerInGame.objects.filter(user__last_activity__lt=eight_days_past), to_attr="inactive_players"))
         else:
             games = games_query.filter(Q(state=IN_LOBBY) | Q(state=ONGOING))
         # It seems to be hard to ask Postgres to order the list correctly.
@@ -187,9 +190,10 @@ def games(request):
             # Transform that into a single field that can be None.
             if request.user.is_authenticated:
                 game.player_in_game = game.player_in_game[0] if len(game.player_in_game) > 0 else None
-                game.inactive_players = ", ".join(map(lambda p: p.user.username, game.inactive_players)) if len(game.inactive_players) > 0 else None
+                game.inactive_players = ", ".join(map(lambda p: p.user.username, game.inactive_players)) if len(game.inactive_players) > 0 and not game.replace_player_vote_ongoing else None
             else:
                 game.player_in_game = None
+                game.inactive_players = None
 
             # Check whether there is an unseen message in
             if game.player_in_game and "important_chat_rooms" in game.player_in_game.data:
