@@ -72,11 +72,14 @@ def generate_default_view_of_game():
     # display on the Games page. A default value is created here, which will be replaced by the game server
     # when the game is loaded there.
     return {
+        "turn": -1,
         "maxPlayerCount": 8,
         "settings": {
             "pbem": True
         },
-        "waitingFor": ""
+        "waitingFor": "",
+        "winner": None,
+        "replacePlayerVoteOngoing": False
     }
 
 
