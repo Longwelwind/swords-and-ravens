@@ -203,7 +203,22 @@
                         </tr>
                     </thead>
                     {% for player in viewed_user.cancelled_games %}
-                        <tr>
+                        <tr
+                            data-toggle="popover"
+                            data-html="true"
+                            data-title="<div class='popover-title'>{{ player.game.name }}</div>"
+                            data-boundary="window"
+                            data-content="
+                                {% if player.game.state != "IN_LOBBY" %}
+                                    <div>Round: <b>{{ player.game.view_of_game.turn }}</b></div>
+                                {% endif %}
+                                <div class='text-small text-muted'>
+                                    Created at {{ player.game.created_at|date:"M d, Y" }}
+                                </div>
+                            "
+                            data-placement="left"
+                            data-trigger="hover"
+                        >
                             <td>
                                 {% if player.data.house %}
                                     <span class="badge badge-light">
