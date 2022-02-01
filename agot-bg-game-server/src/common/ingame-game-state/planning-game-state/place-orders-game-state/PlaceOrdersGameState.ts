@@ -104,7 +104,8 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
             this.ingame.log({
                 type: "player-action",
                 house: player.house.id,
-                action: PlayerActionType.ORDERS_PLACED
+                action: PlayerActionType.ORDERS_PLACED,
+                forHouses: this.forVassals ? this.ingame.getVassalsControlledByPlayer(player).map(h => h.id) : undefined
             }, resolvedAutomatically);
         }
 
