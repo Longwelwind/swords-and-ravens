@@ -53,6 +53,9 @@ class User(AbstractUser):
     def can_update_username(self):
         return self.last_username_update_time is None
 
+    class Meta:
+        ordering = ("-date_joined", )
+
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -128,7 +131,7 @@ class PbemResponseTime(models.Model):
 
     def __str__(self):
         created_at_formmated = self.created_at.strftime("%m/%d/%y %H:%M:%S")
-        return f"{self.user.username}: {self.response_time}s. ({created_at_formmated})"
+        return f"{self.user.username}: {self.response_time} s ({created_at_formmated})"
 
     class Meta:
         ordering = ("-created_at", )
