@@ -355,7 +355,7 @@ def user_profile(request, user_id):
     user.cancelled_games = games_of_user.filter(game__state=CANCELLED)
     user.ongoing_count = games_of_user.filter(game__state=ONGOING).count()
     user.won_count = games_of_user.filter(Q(has_won=True) & Q(players_count__gt=2)).count()
-    user.finished_count = games_of_user.filter((Q(game__state=FINISHED) & Q(players_count__gt=2))).count()
+    user.finished_count = games_of_user.exclude(data__is_winner__isnull=True).filter((Q(game__state=FINISHED) & Q(players_count__gt=2))).count()
 
     if user.finished_count > 0:
         user.win_rate = "{:.1f} %".format(user.won_count / user.finished_count * 100)
