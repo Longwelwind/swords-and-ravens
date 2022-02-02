@@ -103,13 +103,16 @@
                     <div class="form-row align-items-stretch">
                         <div class="col">
                             <input type="text"
-                                   class="form-control"
-                                   id="chat-message"
-                                   placeholder="Message"
-                                   maxlength="200"
-                                   value=${this.state.input}
-                                   disabled=${!isAuthenticated}
-                                   onInput=${e => this.setState({input: e.target.value})}/>
+                                autoFocus="autofocus"
+                                class="form-control"
+                                id="chat-message"
+                                placeholder="Message"
+                                maxlength="200"
+                                value=${this.state.input}
+                                disabled=${!isAuthenticated}
+                                onChange=${e => { this.cursor = e.target.selectionStart; this.setState({input: e.target.value}); }}
+                                onFocus=${(e) => { e.target.selectionStart = this.cursor; }}
+                            />
                         </div>
                         <div class="col-auto">
                             <button type="submit"
