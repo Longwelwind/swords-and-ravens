@@ -70,7 +70,7 @@ Games -
                     <h4 class="card-title">
                         All Games
                     </h4>
-                    <div style="height: 400px; overflow-y: auto">
+                    <div style="max-height: 400px; overflow-y: auto">
                         {% games_table active_games user perms %}
                     </div>
                 </div>
@@ -103,7 +103,9 @@ Games -
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Games where last move was more than 5 days ago</h4>
-                    {% games_table inactive_games user perms %}
+                    <div style="max-height: 300px; overflow-y: auto">
+                        {% games_table inactive_games user perms %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -113,7 +115,9 @@ Games -
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Games with players who have not logged in for 8 days</h4>
-                    {% games_table replacement_needed_games user perms %}
+                    <div style="max-height: 300px; overflow-y: auto">
+                        {% games_table replacement_needed_games user perms %}
+                    </div>
                 </div>
             </div>
         </div>
