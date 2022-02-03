@@ -47,6 +47,10 @@ class User(AbstractUser):
     use_map_scrollbar = models.BooleanField(default=True)
     use_responsive_layout_on_mobile = models.BooleanField(default=False) #Now reused for "Align the game state column on the right"
 
+    def __str__(self):
+        date_joined_formatted = self.date_joined.strftime("%m/%d/%y %H:%M:%S")
+        return f"{self.username} ({date_joined_formatted})"
+
     def is_in_group(self, group_name):
         return self.groups.filter(name=group_name).exists()
 

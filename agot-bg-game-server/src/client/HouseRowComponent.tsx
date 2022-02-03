@@ -34,7 +34,7 @@ import BetterMap from "../utils/BetterMap";
 import { observable } from "mobx";
 import User from "../server/User";
 import ConditionalWrap from "./utils/ConditionalWrap";
-import { sea } from "../common/ingame-game-state/game-data-structure/regionTypes";
+import { port, sea } from "../common/ingame-game-state/game-data-structure/regionTypes";
 
 interface HouseRowComponentProps {
     house: House;
@@ -185,7 +185,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         </Row>
                     </Col>
                     {!this.isVassal && (<OverlayTrigger
-                        overlay={this.renderVictoryConditionsTooltip(this.house)}
+                        overlay={this.renderVictoryTrackTooltip(this.house)}
                         delay={{ show: 250, hide: 100 }}
                         placement="auto"
                     >
@@ -311,8 +311,6 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         if (filter == "with-castles-only") {
             if (!this.props.ingame.entireGame.isFeastForCrows) {
                 regions.keys.filter(r => r.castleLevel == 0).forEach(r => regions.delete(r));
-            } else {
-                regions.clear();
             }
         } else if (filter == "with-power-tokens-only") {
             regions.keys.filter(r => r.controlPowerToken != this.house).forEach(r => regions.delete(r));
@@ -359,19 +357,22 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         </Tooltip>;
     }
 
-    private renderVictoryConditionsTooltip(house: House): OverlayChildren {
+    private renderVictoryTrackTooltip(house: House): OverlayChildren {
         return <Tooltip id={house.id + "-victory-tooltip"} className="tooltip-w-100">
-            <h5 className="text-center">&nbsp;&nbsp;Total&nbsp;Land&nbsp;Areas&nbsp;&nbsp;</h5>
-            <h4 className="text-center"><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
-            {this.ingame.entireGame.isFeastForCrows && <>
-                <br/>
-                <br/>
-                <h5 className="text-center">Additional Information<br/><small>&nbsp;&nbsp;(Does not count in case of a tie)&nbsp;&nbsp;</small></h5>
-                <br/>
-                <h5 className="text-center">Castles:&nbsp;<b>{this.ingame.world.regions.values.filter(r => r.castleLevel == 1 && r.getController() == house).length}</b></h5>
-                <h5 className="text-center">Strongholds:&nbsp;<b>{this.ingame.world.regions.values.filter(r => r.castleLevel == 2 && r.getController() == house).length}</b></h5>
-                <h5 className="text-center">Sea Areas:&nbsp;<b>{this.ingame.world.regions.values.filter(r => r.type == sea && r.getController() == house).length}</b></h5>
-            </>}
+            <Col>
+                <h5 className="text-center">&nbsp;&nbsp;Total&nbsp;Land&nbsp;Areas&nbsp;&nbsp;</h5>
+                <h4 className="text-center"><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
+                {this.ingame.entireGame.isFeastForCrows && <>
+                    <br/>
+                    <br/>
+                    <h5 className="text-center">Additional Information<br/><small>&nbsp;&nbsp;(Does not count in case of a tie)&nbsp;&nbsp;</small></h5>
+                    <br/>
+                    <h5 className="text-center">Castles: <b>{this.ingame.world.regions.values.filter(r => r.castleLevel == 1 && r.getController() == house).length}</b></h5>
+                    <h5 className="text-center">Strongholds: <b>{this.ingame.world.regions.values.filter(r => r.castleLevel == 2 && r.getController() == house).length}</b></h5>
+                    <h5 className="text-center">Sea Areas: <b>{this.ingame.world.regions.values.filter(r => r.type == sea && r.getController() == house).length}</b></h5>
+                    <h5 className="text-center">Ports: <b>{this.ingame.world.regions.values.filter(r => r.type == port && r.getController() == house).length}</b></h5>
+                </>}
+            </Col>
         </Tooltip>;
     }
 
@@ -380,37 +381,39 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         const powerTokensOnBoard = this.game.countPowerTokensOnBoard(house);
         const powerInPool = house.maxPowerTokens - availablePower - powerTokensOnBoard;
 
-        return <Popover id={house.id + "-power-tooltip"} className="p-2">
-            <b>{house.name}</b><br/>
-            <small>Available: </small><b>{availablePower}</b><br/>
-            <small>On the board: </small><b>{powerTokensOnBoard}</b><br/>
-            <small>Power Pool: </small><b>{powerInPool}</b>
-            {this.props.gameClient.authenticatedPlayer &&
-            this.props.gameClient.authenticatedPlayer.house != house &&
-            this.ingame.canGiftPowerTokens(this.props.gameClient.authenticatedPlayer.house) &&
-                <div className="mt-1" ><br/>
-                    <GiftPowerTokensComponent
-                        toHouse={this.house}
-                        authenticatedPlayer={this.props.gameClient.authenticatedPlayer}
-                        ingame={this.ingame}/>
+        return <Popover id={house.id + "-power-tooltip"}>
+            <Col>
+                <h4>{house.name}</h4>
+                <h5><small>Available: </small><b>{availablePower}</b></h5>
+                <h5><small>On the board: </small><b>{powerTokensOnBoard}</b></h5>
+                <h5><small>Power Pool: </small><b>{powerInPool}</b></h5>
+                {this.props.gameClient.authenticatedPlayer &&
+                this.props.gameClient.authenticatedPlayer.house != house &&
+                this.ingame.canGiftPowerTokens(this.props.gameClient.authenticatedPlayer.house) &&
+                    <div className="mt-1" ><br/>
+                        <GiftPowerTokensComponent
+                            toHouse={this.house}
+                            authenticatedPlayer={this.props.gameClient.authenticatedPlayer}
+                            ingame={this.ingame}/>
+                    </div>
+                }
+                {house == this.ingame.game.targaryen && this.props.gameClient.authenticatedPlayer?.house == this.ingame.game.targaryen && this.ingame.isHouseDefeated(house) &&
+                <div className="mt-3">
+                    <Button
+                        onClick={() => {
+                            if (window.confirm("Are you sure you want to return all your power tokens to your pool?")) {
+                                this.props.ingame.dropPowerTokens(house);
+                                document.body.click();
+                            }
+                        }}
+                        disabled={house.powerTokens <= 0}
+                        variant="danger"
+                    >
+                        Drop all available Power tokens
+                    </Button>
                 </div>
-            }
-            {house == this.ingame.game.targaryen && this.props.gameClient.authenticatedPlayer?.house == this.ingame.game.targaryen && this.ingame.isHouseDefeated(house) &&
-            <div className="mt-3">
-                <Button
-                    onClick={() => {
-                        if (window.confirm("Are you sure you want to return all your power tokens to your pool?")) {
-                            this.props.ingame.dropPowerTokens(house);
-                            document.body.click();
-                        }
-                    }}
-                    disabled={house.powerTokens <= 0}
-                    variant="danger"
-                >
-                    Drop all available Power tokens
-                </Button>
-            </div>
-            }
+                }
+            </Col>
         </Popover>;
     }
 

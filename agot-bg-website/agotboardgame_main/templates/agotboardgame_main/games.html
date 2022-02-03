@@ -71,13 +71,13 @@ Games -
                         All Games
                     </h4>
                     <div style="height: 400px; overflow-y: auto">
-                        {% games_table games user perms %}
+                        {% games_table active_games user perms %}
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-11">
-            {% if perms.agotboardgame_main.add_game %}
+        {% if perms.agotboardgame_main.add_game %}
+        <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
                     <div class="row justify-content-center">
@@ -96,7 +96,27 @@ Games -
                     </div>
                 </div>
             </div>
-            {% endif %}
         </div>
+        {% endif %}
+        {% if inactive_games %}
+        <div class="col-lg-11 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Games where last move was more than 5 days ago</h4>
+                    {% games_table inactive_games user perms %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if replacement_needed_games %}
+        <div class="col-lg-11 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Games with players who have not logged in for 8 days</h4>
+                    {% games_table replacement_needed_games user perms %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 {% endblock %}

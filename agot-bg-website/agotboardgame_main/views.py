@@ -9,7 +9,7 @@ from django import template
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Count, Prefetch, F, BooleanField
+from django.db.models import Q, Count, Prefetch, F, BooleanField, ExpressionWrapper
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import select_template
@@ -167,9 +167,11 @@ def games(request):
         # Fetch the list of open or ongoing games.
         # Pre-fetch the PlayerInGame entry related to the authenticated player
         # This means that "game.players" will only contain one entry, the one related to the authenticated player.
+        five_days_past = timezone.now() - timedelta(days=5)
         games_query = Game.objects.annotate(players_count=Count('players'),\
-            replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()))\
-            .prefetch_related('owner')
+            replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()),\
+            inactive=ExpressionWrapper(Q(last_active_at__lt=five_days_past), output_field=BooleanField())\
+            ).prefetch_related('owner')
 
         if request.user.is_authenticated:
             games_query = games_query.prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user=request.user), to_attr="player_in_game"))
@@ -183,6 +185,12 @@ def games(request):
         # It seems to be hard to ask Postgres to order the list correctly.
         # It is done in Python
         games = sorted(games, key=lambda game: ([IN_LOBBY, ONGOING].index(game.state), -datetime.timestamp(game.last_active_at)))
+
+        active_games = []
+        inactive_games = []
+        replacement_needed_games = []
+        my_games = []
+        open_live_games = []
 
         for game in games:
             # "game.player_in_game" contains a list of one or zero element, depending on whether the authenticated
@@ -215,21 +223,29 @@ def games(request):
             else:
                 game.unread_messages = False
 
-        # Create the list of "My games"
-        my_games = [game for game in games if game.player_in_game]
+            if not game.inactive or game.state == IN_LOBBY:
+                active_games.append(game)
+            else:
+                inactive_games.append(game)
 
-        # Create the list of "Open live games"
-        open_live_games = [game for game in games if game.state == IN_LOBBY and\
-            game.players_count > 0 and\
-            game.view_of_game.get("settings", False)\
-            and game.view_of_game.get("settings").get("pbem", True) == False]
+            if game.player_in_game:
+                my_games.append(game)
+
+            if game.state == IN_LOBBY and game.players_count > 0 and game.view_of_game.get("settings", False) and game.view_of_game.get("settings").get("pbem", True) == False:
+                open_live_games.append(game)
+
+            if game.inactive_players is not None:
+                replacement_needed_games.append(game)
+
         public_room_id = Room.objects.get(name='public').id
 
         return render(request, "agotboardgame_main/games.html", {
-            "games": games,
+            "active_games": active_games,
+            "inactive_games": inactive_games,
             "my_games": my_games,
             "open_live_games": open_live_games,
-            'public_room_id': public_room_id
+            "replacement_needed_games": replacement_needed_games,
+            "public_room_id": public_room_id
         })
     elif request.method == "POST":
         if not request.user.has_perm("agotboardgame_main.add_game"):
