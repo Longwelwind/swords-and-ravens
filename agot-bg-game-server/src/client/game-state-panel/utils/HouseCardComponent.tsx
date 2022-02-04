@@ -6,6 +6,7 @@ import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import classNames from "classnames";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import { preventOverflow } from "@popperjs/core";
+import ImagePopover from "../../utils/ImagePopover";
 
 interface HouseCardComponentProps {
     houseCard: HouseCard;
@@ -38,7 +39,7 @@ export default class HouseCardComponent extends Component<HouseCardComponentProp
     }
 
     private renderPopover(): OverlayChildren {
-        return <div className="vertical-game-card" style={{
+        return <ImagePopover className="vertical-game-card" style={{
             backgroundImage: `url(${houseCardImages.get(this.props.houseCard.id)})`}}
         />;
     }

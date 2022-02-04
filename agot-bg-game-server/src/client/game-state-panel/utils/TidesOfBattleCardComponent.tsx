@@ -5,6 +5,7 @@ import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import tidesOfBattleImages from "../../../client/tidesOfBattleImages";
 import { preventOverflow } from "@popperjs/core";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import ImagePopover from "../../utils/ImagePopover";
 
 interface TidesOfBattleCardComponentProps {
     tidesOfBattleCard: TidesOfBattleCard;
@@ -29,7 +30,7 @@ export default class TidesOfBattleCardComponent extends Component<TidesOfBattleC
     }
 
     renderPopover(): OverlayChildren {
-        return <div className="vertical-game-card small" style={{
+        return <ImagePopover className="vertical-game-card small" style={{
             backgroundImage: `url(${tidesOfBattleImages.get(this.props.tidesOfBattleCard.id)})`}}
         />;
     }

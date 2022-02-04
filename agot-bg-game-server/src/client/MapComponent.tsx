@@ -40,6 +40,7 @@ import StaticIronBankView from "../common/ingame-game-state/game-data-structure/
 import preventOverflow from "@popperjs/core/lib/modifiers/preventOverflow";
 import IronBankInfosComponent from "./IronBankInfosComponent";
 import invertColor from "./utils/invertColor";
+import ImagePopover from "./utils/ImagePopover";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -189,7 +190,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         return ironBankView && this.ingame.game.ironBank && this.ingame.game.ironBank.loanSlots.map((lc, i) => (
             <OverlayTrigger
                 key={`loan-slot-${i}`}
-                overlay={<div className="vertical-game-card" style={{ backgroundImage: lc ? `url(${loanCardImages.get(lc.type.id)})` : "none" }} />}
+                overlay={<ImagePopover className="vertical-game-card" style={{ backgroundImage: lc ? `url(${loanCardImages.get(lc.type.id)})` : "none" }} />}
                 popperConfig={{ modifiers: [preventOverflow] }}
                 delay={{ show: 250, hide: 0 }}
                 placement="auto"

@@ -7,6 +7,7 @@ import wildlingCardImages from "../../wildlingCardImages";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import {OverlayChildren} from "react-bootstrap/Overlay";
 import { preventOverflow } from "@popperjs/core";
+import ImagePopover from "../../utils/ImagePopover";
 
 interface WildlingCardProps {
     cardType: WildlingCardType;
@@ -34,7 +35,7 @@ export default class WildlingCardComponent extends Component<WildlingCardProps> 
 
     renderPopover(): OverlayChildren {
         return this.props.tooltip
-            ? <div className="vertical-game-card bring-to-front"
+            ? <ImagePopover className="vertical-game-card bring-to-front"
                 style={{
                     backgroundImage: `url(${wildlingCardImages.get(this.props.cardType.id)})`}}
               />
