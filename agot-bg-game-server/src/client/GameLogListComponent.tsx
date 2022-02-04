@@ -167,9 +167,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const supporter = this.game.houses.get(data.supporter);
                 const supported = data.supported ? this.game.houses.get(data.supported) : null;
                 if (supported) {
-                    return <p><b>{supporter.name}</b> supported <b>{supported.name}</b>.</p>;
+                    return <p>House <b>{supporter.name}</b> supported House <b>{supported.name}</b>.</p>;
                 } else {
-                    return <p><b>{supporter.name}</b> supported no-one.</p>;
+                    return <p>House <b>{supporter.name}</b> supported no-one.</p>;
                 }
 
             case "support-refused": {
@@ -191,7 +191,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                             <img src={crossedSwordsImage} width="24px"/>
                         </Col>
                         <Col>
-                            House <b>{attacker.name}</b> attacked House <b>{attacked ? attacked.name : "a neutral force"}</b> from <b>{attackingRegion.name}</b> to <b>
+                            House <b>{attacker.name}</b> attacked {attacked ? <>House <b>{attacked.name}</b></> : <>a <b>neutral force</b></>} from <b>{attackingRegion.name}</b> to <b>
                             {attackedRegion.name}</b> with <>{joinReactNodes(army.map((ut, i) => <b key={`attack_${ut.id}_${i}`}>{ut.name}</b>), ', ')}</>.
                         </Col>
                     </Row>
@@ -284,7 +284,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         <div style={{ display: 'flex', justifyContent: 'center' }}>
                             <CombatInfoComponent housesCombatData={houseCombatDatas} />
                         </div>
-                        <p className="text-center mt-4"><b style={{color: winner.color, fontSize: "1.25rem"}}>{winner.name}</b> won the battle!</p>
+                        <p className="text-center mt-4">House <b style={{color: winner.color, fontSize: "1.25rem"}}>{winner.name}</b> won the battle!</p>
                     </>
                 );
             case "wildling-card-revealed":
@@ -435,21 +435,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     return (
                         <>
                             <p>
-                                <b>{raider.name}</b> raided <b>{raidee.name}</b>&apos;s <b>{orderRaided.type.name} Order
+                                House <b>{raider.name}</b> raided House <b>{raidee.name}</b>&apos;s <b>{orderRaided.type.name} Order
                                 </b> in <b>{raidedRegion.name}</b> from <b>{raiderRegion.name}</b>.
                             </p>
                             {data.raiderGainedPowerToken &&
-                                <p><b>{raider.name}</b> gained {data.raiderGainedPowerToken ? "a" : "no"} Power&nbsp;token
+                                <p>House <b>{raider.name}</b> gained {data.raiderGainedPowerToken ? "a" : "no"} Power&nbsp;token
                                     from this raid.</p>}
                             {data.raidedHouseLostPowerToken != null
-                                && <p><b>{raidee.name}</b> lost {data.raidedHouseLostPowerToken ? "a" : "no"} Power&nbsp;token
+                                && <p>House <b>{raidee.name}</b> lost {data.raidedHouseLostPowerToken ? "a" : "no"} Power&nbsp;token
                                     from this raid.</p>}
                         </>
                     );
                 } else {
                     return (
                         <p>
-                            <b>{raider.name}</b> raided nothing from <b>{raiderRegion.name}</b>.
+                            <b>House {raider.name}</b> raided nothing from <b>{raiderRegion.name}</b>.
                         </p>
                     );
                 }
@@ -625,7 +625,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     {distributor != null
                     ?
                     <p>
-                        <b>{distributor.name}</b> adapted the biddings for <b>{this.game.getNameInfluenceTrack(data.trackerI)}</b> track:
+                        House <b>{distributor.name}</b> adapted the biddings for <b>{this.game.getNameInfluenceTrack(data.trackerI)}</b> track:
                     </p>
                     :
                     <p>
@@ -762,9 +762,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const newHouseCard = data.newHouseCard ? this.allHouseCards.get(data.newHouseCard) : null;
 
                 return newHouseCard ? (
-                    <p><b>{affectedHouse.name}</b> chose <b>{newHouseCard.name}.</b></p>
+                    <p>House <b>{affectedHouse.name}</b> chose <b>{newHouseCard.name}.</b></p>
                 ) : (
-                    <p><b>{affectedHouse.name}</b> had no other available House card.</p>
+                    <p>House <b>{affectedHouse.name}</b> had no other available House card.</p>
                 );
             }
             case "arianne-martell-prevent-movement":
@@ -937,8 +937,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const port = this.world.regions.get(data.port);
                 return <p>
                     {data.shipCount > 0
-                        ? <><b>{newController.name}</b> converted {data.shipCount} ship{data.shipCount == 1 ? "" : "s"} from <b>{oldController.name}</b> in <b>{port.name}</b>.</>
-                        : <><b>{newController.name}</b> destroyed all <b>{oldController.name}</b> ships in <b>{port.name}</b>.</>}
+                        ? <>House <b>{newController.name}</b> converted {data.shipCount} ship{data.shipCount == 1 ? "" : "s"} from <b>{oldController.name}</b> in <b>{port.name}</b>.</>
+                        : <>House <b>{newController.name}</b> destroyed all <b>{oldController.name}</b> ships in <b>{port.name}</b>.</>}
                 </p>;
             }
             case "ships-destroyed-by-empty-castle": {
@@ -978,7 +978,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>;
                 } else {
                     return <p>
-                        <b>{chooser.name}</b> chose to reduce House <b>{house.name}</b> 2 positions
+                        <b>House {chooser.name}</b> chose to reduce House <b>{house.name}</b> 2 positions
                         on the <b>{trackName}</b> track.
                     </p>;
                 }
@@ -1016,7 +1016,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const lowestBidder = this.game.houses.get(data.lowestBidder);
 
                 return <p>
-                    <b>Massing on the Milkwater</b>: <b>{lowestBidder.name}</b> discards all House
+                    <b>Massing on the Milkwater</b>: House <b>{lowestBidder.name}</b> discards all House
                     cards with the highest combat strength, all other houses must discard one House card.
                 </p>;
             }
@@ -1043,7 +1043,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const lowestBidder = this.game.houses.get(data.lowestBidder);
 
                 return <p>
-                    <b>A King Beyond the Wall</b>: <b>{lowestBidder.name}</b> was moved to the
+                    <b>A King Beyond the Wall</b>: House <b>{lowestBidder.name}</b> was moved to the
                     bottom of all influence tracks.
                 </p>;
 
@@ -1157,7 +1157,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const newSupply = data.newSupply.map(([hid, supply]) => [this.game.houses.get(hid), supply] as [House, number]);
 
                 return <>
-                    <b>Rattleshirt&apos;s Raiders</b>: <b>{lowestBidder.name}</b> lost 2 levels of supply,
+                    <b>Rattleshirt&apos;s Raiders</b>: House <b>{lowestBidder.name}</b> lost 2 levels of supply,
                     all other houses lost 1 levels of supply.
                     <ul>
                         {newSupply.map(([house, supply]) => (
@@ -1236,7 +1236,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "commander-power-token-gained": {
                     const house = this.game.houses.get(data.house);
                     return <p>
-                        Commander House <b>{house.name}</b> gained a Power&nbsp;token for this battle.
+                        Commanding House <b>{house.name}</b> gained a Power&nbsp;token for this battle.
                     </p>;
                 }
             case "beric-dondarrion-used": {
@@ -1258,7 +1258,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const newHouseCard = this.allHouseCards.get(data.newHouseCard);
 
                 return <p>
-                    <b>Jaqen H&apos;Ghar</b>: House <b>{house.name}</b> randomly chose <b>{newHouseCard.name}</b> as <b>
+                    <b>Jaqen H&apos;ghar</b>: House <b>{house.name}</b> randomly chose <b>{newHouseCard.name}</b> as <b>
                         {affectedHouse.name}&apos;s</b> new House card.
                 </p>;
             }
