@@ -65,7 +65,7 @@ export default class FireMadeFleshGameState extends GameState<WesterosDeck4GameS
             }
 
             const capital = this.getOwnedCapital(house);
-            if (capital && dragons.length < 3 && !this.game.hasTooMuchArmies(house, new BetterMap([[capital, [dragon]]]))) {
+            if (capital && this.game.getAvailableUnitsOfType(house, dragon) > 0 && !this.game.hasTooMuchArmies(house, new BetterMap([[capital, [dragon]]]))) {
                 result.set(`Place a dragon in ${capital.name}`, FIRE_MADE_FLESH_EFFECT.REGAIN_DESTROYED_DRAGON);
             }
 
