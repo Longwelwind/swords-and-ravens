@@ -77,7 +77,7 @@ export default class ChatClient {
 
         websocket.onopen = () => {
             channel.connected = true;
-            channel.websocket.send(JSON.stringify({type: 'chat_retrieve', count: 20, first_message_id: null }))
+            channel.websocket.send(JSON.stringify({type: 'chat_retrieve', count: 15, first_message_id: null }))
         };
         websocket.onclose = () => channel.connected = false;
         websocket.onerror = () => channel.connected = false;
