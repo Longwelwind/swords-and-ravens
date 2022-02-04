@@ -45,7 +45,7 @@ export class Channel {
     @observable lastViewedMessageId: string;
     onMessage: ((singleMessageRetrieved: boolean, noMoreMessages: boolean) => void) | null;
 
-    get areThereNewMessage(): boolean {
+    get areThereUnreadMessages(): boolean {
         if (this.messages.length == 0) {
             return false;
         }

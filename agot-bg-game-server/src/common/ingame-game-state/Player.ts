@@ -1,11 +1,16 @@
 import House from "./game-data-structure/House";
 import User from "../../server/User";
 import IngameGameState from "./IngameGameState";
+import { VoteState } from "./vote-system/Vote";
 
 export default class Player {
     user: User;
     house: House;
     waitedForData: WaitedForData | null;
+
+    get isNeededForVote(): boolean {
+        return this.user.entireGame.ingameGameState?.votes.values.filter(vote => vote.state == VoteState.ONGOING).some(vote => !vote.votes.has(this.house)) ?? false;
+    }
 
     constructor(user: User, house: House, waitedForData: WaitedForData | null = null) {
         this.user = user;
