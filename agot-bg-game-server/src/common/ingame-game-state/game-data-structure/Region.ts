@@ -22,7 +22,7 @@ export default class Region {
     @observable castleModifier: number;
     @observable barrelModifier: number;
     @observable crownModifier: number;
-    overwrittenSupoerControlPowerToken: House | null;
+    overwrittenSuperControlPowerToken: House | null;
 
     // Client-side only to support live update of planned musterings
     @observable newUnits: Unit[];
@@ -38,8 +38,8 @@ export default class Region {
     }
 
     get superControlPowerToken(): House | null {
-        if (this.overwrittenSupoerControlPowerToken) {
-            return this.overwrittenSupoerControlPowerToken;
+        if (this.overwrittenSuperControlPowerToken) {
+            return this.overwrittenSuperControlPowerToken;
         }
 
         return this.staticRegion.superControlPowerToken
@@ -107,7 +107,7 @@ export default class Region {
         this.castleModifier = castleModifier;
         this.barrelModifier = barrelModifier;
         this.crownModifier = crownModifier;
-        this.overwrittenSupoerControlPowerToken = overwrittenSuperControlPowerToken;
+        this.overwrittenSuperControlPowerToken = overwrittenSuperControlPowerToken;
         this.newUnits = [];
         this.removedUnits = [];
     }
@@ -148,7 +148,7 @@ export default class Region {
             castleModifier: this.castleModifier,
             barrelModifier: this.barrelModifier,
             crownModifier: this.crownModifier,
-            overwrittenSuperControlPowerToken: this.overwrittenSupoerControlPowerToken ? this.overwrittenSupoerControlPowerToken.id : null
+            overwrittenSuperControlPowerToken: this.overwrittenSuperControlPowerToken ? this.overwrittenSuperControlPowerToken.id : null
         }
     }
 

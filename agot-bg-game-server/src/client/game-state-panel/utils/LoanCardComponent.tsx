@@ -4,7 +4,8 @@ import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import { preventOverflow } from "@popperjs/core";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import LoanCardType from "../../../common/ingame-game-state/game-data-structure/loan-card/LoanCardType";
-import loanCardImages from "../../../client/loanCardImages";
+import loanCardImages from "../../loanCardImages";
+import ImagePopover from "../../utils/ImagePopover";
 
 interface LoanCardComponentProps {
     loanCard: LoanCardType;
@@ -16,7 +17,7 @@ export default class LoanCardComponent extends Component<LoanCardComponentProps>
         return <OverlayTrigger
             overlay={this.renderPopover()}
             popperConfig={{modifiers: [preventOverflow]}}
-            delay={{show: 120, hide: 0}}
+            delay={{show: 250, hide: 0}}
             placement="auto"
         >
             <div
@@ -29,7 +30,7 @@ export default class LoanCardComponent extends Component<LoanCardComponentProps>
     }
 
     renderPopover(): OverlayChildren {
-        return <div className="vertical-game-card" style={{
+        return <ImagePopover className="vertical-game-card" style={{
             backgroundImage: `url(${loanCardImages.get(this.props.loanCard.id)})`}}
         />;
     }

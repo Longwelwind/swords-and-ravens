@@ -7,6 +7,7 @@ import houseCardsBackImages from "../../houseCardsBackImages";
 import HouseCard from "../../../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import { preventOverflow } from "@popperjs/core";
+import ImagePopover from "../../utils/ImagePopover";
 
 interface HouseCardBackComponentProps {
     house: House;
@@ -20,12 +21,12 @@ export default class HouseCardBackComponent extends Component<HouseCardBackCompo
         return (
             <OverlayTrigger
                 overlay={
-                    <div className="vertical-game-card" style={{
+                    <ImagePopover className="vertical-game-card" style={{
                         backgroundImage: `url(${houseCardImages.get(this.props.houseCard.id)})`
                     }}/>
                 }
                 popperConfig={{modifiers: [preventOverflow]}}
-                delay={{show: 120, hide: 0}}
+                delay={{show: 250, hide: 0}}
                 placement="auto"
             >
                 <div

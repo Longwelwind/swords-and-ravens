@@ -6,6 +6,7 @@ import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import { preventOverflow } from "@popperjs/core";
 import objectiveCardImages from "../../objectiveCardImages";
 import { ObjectiveCard, SpecialObjectiveCard } from "../../../common/ingame-game-state/game-data-structure/static-data-structure/ObjectiveCard";
+import ImagePopover from "../../utils/ImagePopover";
 
 interface ObjectiveCardComponentProps {
     objectiveCard: ObjectiveCard | SpecialObjectiveCard;
@@ -20,7 +21,7 @@ export default class ObjectiveCardComponent extends Component<ObjectiveCardCompo
         return <OverlayTrigger
                 overlay={this.renderPopover()}
                 popperConfig={{modifiers: [preventOverflow]}}
-                delay={{show: 120, hide: 0}}
+                delay={{show: 250, hide: 0}}
                 placement="auto"
             >
                 <img
@@ -36,7 +37,7 @@ export default class ObjectiveCardComponent extends Component<ObjectiveCardCompo
     }
 
     private renderPopover(): OverlayChildren {
-        return <div className="vertical-game-card" style={{
+        return <ImagePopover className="vertical-game-card" style={{
             backgroundImage: `url(${objectiveCardImages.get(this.props.objectiveCard.id)})`}}
         />;
     }

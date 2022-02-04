@@ -170,7 +170,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                             <Col xs="auto" style={{ marginLeft: 4 }}>
                                                 <OverlayTrigger
                                                     overlay={this.renderUnitTypeTooltip(type)}
-                                                    delay={{ show: 250, hide: 100 }}
+                                                    delay={{ show: 500, hide: 100 }}
                                                     placement="top">
                                                     <div className="unit-icon small hover-weak-outline" onMouseEnter={() => this.setHighlightedRegions(type.id)} onMouseLeave={() => this.highlightedRegions.clear()}
                                                         style={{
@@ -186,7 +186,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     </Col>
                     {!this.isVassal && (<OverlayTrigger
                         overlay={this.renderVictoryTrackTooltip(this.house)}
-                        delay={{ show: 250, hide: 100 }}
+                        delay={{ show: 500, hide: 100 }}
                         placement="auto"
                     >
                         <Col xs="auto" className="d-flex align-items-center"
@@ -353,7 +353,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     private renderUnitTypeTooltip(unitType: UnitType): OverlayChildren {
         return <Tooltip id={unitType.id + "-tooltip"}>
             <b>{unitType.name}</b><br/>
-            <small>{unitType.description}</small>
+            {unitType.description}
         </Tooltip>;
     }
 

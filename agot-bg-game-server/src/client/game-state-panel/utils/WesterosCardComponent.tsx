@@ -8,6 +8,7 @@ import westerosCardImages from "../../westerosCardImages";
 import ConditionalWrap from "../../../client/utils/ConditionalWrap"
 import { preventOverflow } from "@popperjs/core";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import ImagePopover from "../../utils/ImagePopover";
 
 interface WesterosCardProps {
     cardType: WesterosCardType;
@@ -26,7 +27,7 @@ export default class WesterosCardComponent extends Component<WesterosCardProps> 
         return <OverlayTrigger
             overlay={this.renderPopover()}
             popperConfig={{modifiers: [preventOverflow]}}
-            delay={{show: 120, hide: 0}}
+            delay={{show: 250, hide: 0}}
             placement="auto"
         >
             <div>
@@ -52,7 +53,7 @@ export default class WesterosCardComponent extends Component<WesterosCardProps> 
 
     private renderPopover(): OverlayChildren {
         return this.props.tooltip ?
-            <div className="horizontal-game-card bring-to-front"
+            <ImagePopover className="horizontal-game-card bring-to-front"
                 style={{backgroundImage: `url(${westerosCardImages.get(this.props.westerosDeckI).get(this.props.cardType.id)})`}}/>
             : <div className="invisible"/>
     }

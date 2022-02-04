@@ -33,9 +33,10 @@
                             Last active {{ game.last_active_at|naturaltime }}
                         </div>
                     {% endif %}
-                    {% if game.view_of_game.settings.faceless %}
-                      <div></div>
-                    {% else %}
+                    <div class='text-small text-muted'>
+                        Created {{ game.created_at|naturaltime }}
+                    </div>
+                    {% if not game.view_of_game.settings.faceless %}
                         <div><b>Owner: </b>{{ game.owner.username }}</div>
                     {% endif %}
                 "

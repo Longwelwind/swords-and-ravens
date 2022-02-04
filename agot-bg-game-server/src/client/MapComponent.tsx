@@ -40,6 +40,7 @@ import StaticIronBankView from "../common/ingame-game-state/game-data-structure/
 import preventOverflow from "@popperjs/core/lib/modifiers/preventOverflow";
 import IronBankInfosComponent from "./IronBankInfosComponent";
 import invertColor from "./utils/invertColor";
+import ImagePopover from "./utils/ImagePopover";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -113,7 +114,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                             {castleModifiers.has(r.id) && (
                                 <OverlayTrigger
                                     overlay={renderRegionTooltip(r)}
-                                    delay={{ show: 500, hide: 100 }}
+                                    delay={{ show: 750, hide: 100 }}
                                     placement="auto"
                                     popperConfig={{ modifiers: [preventOverflow] }}
                                 >
@@ -127,13 +128,13 @@ export default class MapComponent extends Component<MapComponentProps> {
                                 </OverlayTrigger>
                             )}
                             {(barrelModifiers.has(r.id) || crownModifiers.has(r.id)) && this.renderImprovements(r)}
-                            {r.overwrittenSupoerControlPowerToken &&
+                            {r.overwrittenSuperControlPowerToken &&
                                 <OverlayTrigger
                                     overlay={<Tooltip id={"power-token-" + r.id}>
-                                        <b>Printed Power token</b><small> of <b>{r.getController()?.name ?? "Unknown"}</b><br /><b>{r.name}</b></small>
+                                        <Col className="text-center"><h6>Printed Power token<small> of <b>{r.getController()?.name ?? "Unknown"}<br />{r.name}</b></small></h6></Col>
                                     </Tooltip>}
                                     key={"super-power-token-overlay-" + r.id}
-                                    delay={{ show: 250, hide: 100 }}
+                                    delay={{ show: 500, hide: 100 }}
                                     placement="auto"
                                     popperConfig={{ modifiers: [preventOverflow] }}
                                 >
@@ -142,7 +143,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                                         style={{
                                             left: r.powerTokenSlot.x,
                                             top: r.powerTokenSlot.y,
-                                            backgroundImage: `url(${housePowerTokensImages.get(r.overwrittenSupoerControlPowerToken.id)})`
+                                            backgroundImage: `url(${housePowerTokensImages.get(r.overwrittenSuperControlPowerToken.id)})`
                                         }}
                                     >
                                     </div>
@@ -151,10 +152,10 @@ export default class MapComponent extends Component<MapComponentProps> {
                             {r.controlPowerToken && (
                                 <OverlayTrigger
                                     overlay={<Tooltip id={"power-token-" + r.id}>
-                                        <b>Power token</b><small> of <b>{r.getController()?.name ?? "Unknown"}</b><br /><b>{r.name}</b></small>
+                                        <Col className="text-center"><h6>Power token<small> of <b>{r.getController()?.name ?? "Unknown"}<br />{r.name}</b></small></h6></Col>
                                     </Tooltip>}
                                     key={"power-token-overlay-" + r.id}
-                                    delay={{ show: 250, hide: 100 }}
+                                    delay={{ show: 500, hide: 100 }}
                                     placement="auto"
                                     popperConfig={{ modifiers: [preventOverflow] }}
                                 >
@@ -189,9 +190,9 @@ export default class MapComponent extends Component<MapComponentProps> {
         return ironBankView && this.ingame.game.ironBank && this.ingame.game.ironBank.loanSlots.map((lc, i) => (
             <OverlayTrigger
                 key={`loan-slot-${i}`}
-                overlay={<div className="vertical-game-card" style={{ backgroundImage: lc ? `url(${loanCardImages.get(lc.type.id)})` : "none" }} />}
+                overlay={<ImagePopover className="vertical-game-card" style={{ backgroundImage: lc ? `url(${loanCardImages.get(lc.type.id)})` : "none" }} />}
                 popperConfig={{ modifiers: [preventOverflow] }}
-                delay={{ show: 120, hide: 0 }}
+                delay={{ show: 250, hide: 0 }}
                 placement="auto"
             >
                 <div className="order-container" style={{
@@ -289,7 +290,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                     wrap={wrap ? wrap : child =>
                         <OverlayTrigger
                             overlay={renderRegionTooltip(region)}
-                            delay={{ show: 500, hide: 100 }}
+                            delay={{ show: 750, hide: 100 }}
                             placement="auto"
                             popperConfig={{ modifiers: [preventOverflow] }}
                         >
@@ -372,11 +373,11 @@ export default class MapComponent extends Component<MapComponentProps> {
                     }
 
                     return <OverlayTrigger
-                        overlay={<Tooltip id={"unit-tooltip-" + u.id}>
-                            <b>{u.type.name}</b><small> of <b>{controller?.name ?? "Unknown"}</b><br /><b>{r.name}</b></small>
+                        overlay={<Tooltip id={"unit-tooltip-" + u.id} className="tooltip-w-100">
+                            <Col className="text-center"><h6>{u.type.name}<small> of <b>{controller?.name ?? "Unknown"}</b><br /><b>{r.name}</b></small></h6></Col>
                         </Tooltip>}
                         key={"unit-overlay-" + u.id}
-                        delay={{ show: 250, hide: 100 }}
+                        delay={{ show: 500, hide: 100 }}
                         placement="auto"
                         popperConfig={{ modifiers: [preventOverflow] }}
                     >
@@ -407,11 +408,16 @@ export default class MapComponent extends Component<MapComponentProps> {
                 {garrisons.has(r.id) && (
                     <OverlayTrigger
                         overlay={<Tooltip id={"garrison-tooltip-" + r.id}>
-                            {garrisonControllers.get(r.id) == null ? <b>Neutral Force token</b> : <><b>Garrison</b> <small>of <b>{garrisonControllers.get(r.id)?.name ?? "Unknown"}</b></small></>}
-                            <br /><small><b>{r.name}</b></small>
+                            <Col className="text-center">
+                                <h6>{garrisonControllers.get(r.id) == null
+                                        ? <>Neutral Force token</>
+                                        : <>Garrison<small> of <b>{garrisonControllers.get(r.id)?.name ?? "Unknown"}</b></small></>}
+                                    <br /><small><b>{r.name}</b></small>
+                                </h6>
+                            </Col>
                         </Tooltip>}
                         key={"garrison-overlay-" + r.id}
-                        delay={{ show: 250, hide: 100 }}
+                        delay={{ show: 500, hide: 100 }}
                         placement="auto"
                         popperConfig={{ modifiers: [preventOverflow] }}
                     >
@@ -428,10 +434,10 @@ export default class MapComponent extends Component<MapComponentProps> {
                 {r.loyaltyTokens > 0 && (
                     <OverlayTrigger
                         overlay={<Tooltip id={"loyalty-tooltip-" + r.id}>
-                            <b>Loyalty token</b><br /><small><b>{r.name}</b></small>
+                            <Col className="text-center"><h6>Loyalty token<br /><small><b>{r.name}</b></small></h6></Col>
                         </Tooltip>}
                         key={"loyalty-overlay-" + r.id}
-                        delay={{ show: 250, hide: 100 }}
+                        delay={{ show: 500, hide: 100 }}
                         placement="auto"
                         popperConfig={{ modifiers: [preventOverflow] }}
                     >
@@ -464,7 +470,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                 return <OverlayTrigger
                     key={`barrel-${region.id}-${i}`}
                     overlay={renderRegionTooltip(region)}
-                    delay={{ show: 500, hide: 100 }}
+                    delay={{ show: 750, hide: 100 }}
                     placement="auto"
                     popperConfig={{ modifiers: [preventOverflow] }}
                 >
@@ -480,7 +486,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                 return <OverlayTrigger
                     key={`crown-${region.id}-${i}`}
                     overlay={renderRegionTooltip(region)}
-                    delay={{ show: 500, hide: 100 }}
+                    delay={{ show: 750, hide: 100 }}
                     placement="auto"
                     popperConfig={{ modifiers: [preventOverflow] }}
                 >
@@ -583,7 +589,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                     key={region.id}
                     wrap={wrap ? wrap : child =>
                         <OverlayTrigger overlay={this.renderOrderTooltip(order, region)}
-                            delay={{ show: 250, hide: 100 }}
+                            delay={{ show: 500, hide: 100 }}
                             placement="auto"
                             popperConfig={{ modifiers: [preventOverflow] }}
                         >
@@ -612,7 +618,9 @@ export default class MapComponent extends Component<MapComponentProps> {
 
     private renderOrderTooltip(order: Order | null, region: Region): OverlayChildren {
         return <Tooltip id={"order-info"} className="tooltip-w-100">
-            <b>{order ? order.type.name : "Order token"}</b><small> of <b>{region.getController()?.name ?? "Unknown"}</b><br /><b>{region.name}</b></small>
+            <Col className="text-center">
+                <h6>{order ? order.type.name : "Order token"}<small> of <b>{region.getController()?.name ?? "Unknown"}<br />{region.name}</b></small></h6>
+            </Col>
         </Tooltip>;
     }
 

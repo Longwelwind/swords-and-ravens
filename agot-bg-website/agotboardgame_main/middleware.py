@@ -10,7 +10,18 @@ ONLINE_MAX = getattr(settings, 'ONLINE_MAX', 50)
 
 
 def get_online_now(self):
-    return User.objects.filter(id__in=self.online_now_ids or []).order_by('username')
+    online_users = User.objects.filter(id__in=self.online_now_ids or []).order_by('username')
+    for user in online_users:
+        if user.is_in_group("Admin"):
+            user.is_admin = True
+            user.is_high_member = True
+        elif user.is_in_group("High Member"):
+            user.is_admin = False
+            user.is_high_member = True
+        else:
+            user.is_admin = False
+            user.is_high_member = False
+    return online_users
 
 
 class OnlineNowMiddleware(MiddlewareMixin):

@@ -38,6 +38,7 @@ import { objectiveCards } from "../common/ingame-game-state/game-data-structure/
 import ObjectiveCardComponent from "./game-state-panel/utils/ObjectiveCardComponent";
 import { ObjectiveCard } from "../common/ingame-game-state/game-data-structure/static-data-structure/ObjectiveCard";
 import crossedSwordsImage from "../../public/images/icons/crossed-swords.svg";
+import getIngameUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -150,7 +151,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <>
                     <div className="text-center"><h5>The fight for the Iron Throne has begun!</h5></div>
                     {assignments.map(([house, user]) =>
-                        <p  key={`${house.id}_${user.id}`}>House <b>{house.name}</b> is controlled by <b>{user.name}</b>.</p>
+                        <p  key={`${house.id}_${user.id}`}>House <b>{house.name}</b> is controlled by <b>{getIngameUserLinkOrLabel(this.props.ingameGameState, user)}</b>.</p>
                     )}
                 </>;
             case "turn-begin":
@@ -190,7 +191,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                             <img src={crossedSwordsImage} width="24px"/>
                         </Col>
                         <Col>
-                            <b>{attacker.name}</b> attacked <b>{attacked ? attacked.name : "a neutral force"}</b> from <b>{attackingRegion.name}</b> to <b>
+                            House <b>{attacker.name}</b> attacked House <b>{attacked ? attacked.name : "a neutral force"}</b> from <b>{attackingRegion.name}</b> to <b>
                             {attackedRegion.name}</b> with <>{joinReactNodes(army.map((ut, i) => <b key={`attack_${ut.id}_${i}`}>{ut.name}</b>), ', ')}</>.
                         </Col>
                     </Row>
@@ -319,7 +320,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <p>
-                        <b>{lowestBidder.name}</b> was chosen as the lowest bidder.
+                        House <b>{lowestBidder.name}</b> was chosen as the lowest bidder.
                     </p>
                 );
             }
@@ -328,7 +329,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <p>
-                        <b>{highestBidder.name}</b> was chosen as the highest bidder.
+                        House <b>{highestBidder.name}</b> was chosen as the highest bidder.
                     </p>
                 );
 
@@ -600,7 +601,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <ul>
                         {houseCards.map(([h, hc]) => (
-                            <li key={`housecard_${h.id}_${hc.id}`}><b>{h.name}</b> chose <b>{hc.name}</b></li>
+                            <li key={`housecard_${h.id}_${hc.id}`}>House <b>{h.name}</b> chose <b>{hc.name}</b></li>
                         ))}
                     </ul>;
 
@@ -1206,12 +1207,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const oldUser = this.props.ingameGameState.entireGame.users.get(data.oldUser);
                 const newUser = data.newUser ? this.props.ingameGameState.entireGame.users.get(data.newUser) : null;
                 const house = this.game.houses.get(data.house);
+                const newUserLabel = newUser ? getIngameUserLinkOrLabel(this.props.ingameGameState, newUser) : null;
 
-                return (
-                    <>
-                        <b>{oldUser.name}</b> (House <b>{house.name}</b>) was replaced by {newUser ? <b>{newUser.name}</b> : " a vassal"}.
-                    </>
-                );
+                return <>
+                    <b>{getIngameUserLinkOrLabel(this.props.ingameGameState, oldUser)}</b> (House <b>{house.name}</b>) was replaced by {newUserLabel ? <b>{newUserLabel}</b> : " a vassal"}.
+                </>;
             }
             case "vassal-replaced": {
                 const user = this.props.ingameGameState.entireGame.users.get(data.user);
@@ -1219,7 +1219,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <>
-                        Vassal House <b>{house.name}</b> was replaced by <b>{user.name}</b>.
+                        Vassal House <b>{house.name}</b> was replaced by <b>{getIngameUserLinkOrLabel(this.props.ingameGameState, user)}</b>.
                     </>
                 );
             }

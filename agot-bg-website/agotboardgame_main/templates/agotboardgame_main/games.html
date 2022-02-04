@@ -32,7 +32,13 @@ Games -
                         </script>
                     </h4>
                     {% for user in request.online_now %}
-                    <a style="margin-right: 10px;" href="/user/{{ user.id }}">{{ user.username }}</a>
+                    {% if user.is_admin %}
+                        <a style="margin-right: 10px; font-size: 1.125rem; color:red" href="/user/{{ user.id }}">{{ user.username }}</a>
+                    {% elif user.is_high_member %}
+                        <a style="margin-right: 10px; font-size: 1.125rem; color:darkgoldenrod" href="/user/{{ user.id }}">{{ user.username }}</a>
+                    {% else %}
+                        <a style="margin-right: 10px; font-size: 1.125rem;" href="/user/{{ user.id }}">{{ user.username }}</a>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>

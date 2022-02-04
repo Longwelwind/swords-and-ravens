@@ -1712,7 +1712,7 @@
         "footman": 8,
         "knight": 6,
         "ship": 8,
-        "siege-engine": 0
+        "dragon": 3
       },
       "houseCards": {
         "khal-drogo": {
