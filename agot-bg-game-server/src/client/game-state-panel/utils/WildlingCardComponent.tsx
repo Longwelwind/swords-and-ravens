@@ -19,7 +19,7 @@ export default class WildlingCardComponent extends Component<WildlingCardProps> 
     render(): ReactNode {
         return <OverlayTrigger
             overlay={this.renderPopover()}
-            delay={{show: 120, hide: 0}}
+            delay={{show: 250, hide: 0}}
             popperConfig={{modifiers: [preventOverflow]}}
             placement="auto"
         >

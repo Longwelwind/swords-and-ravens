@@ -21,7 +21,7 @@ export const cavalryCharge = new ObjectiveCard(
     "Have all 5 of your Knight units on the board.",
     [["arryn", 1], ["baratheon", 1], ["lannister", 1], ["stark", 1]],
     (house, ingame) => {
-        return ingame.world.getUnitsOfHouse(house).filter(u => u.type == knight).length == house.unitLimits.get(knight);
+        return ingame.world.getUnitsOfHouse(house).filter(u => u.type == knight).length == ingame.game.getUnitLimitOfType(house, knight);
     }
 );
 

@@ -25,7 +25,7 @@ export default class HouseCardBackComponent extends Component<HouseCardBackCompo
                     }}/>
                 }
                 popperConfig={{modifiers: [preventOverflow]}}
-                delay={{show: 120, hide: 0}}
+                delay={{show: 250, hide: 0}}
                 placement="auto"
             >
                 <div

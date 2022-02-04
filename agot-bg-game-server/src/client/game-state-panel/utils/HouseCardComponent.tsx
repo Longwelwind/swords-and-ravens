@@ -21,7 +21,7 @@ export default class HouseCardComponent extends Component<HouseCardComponentProp
         return <OverlayTrigger
                 overlay={this.renderPopover()}
                 popperConfig={{modifiers: [preventOverflow]}}
-                delay={{show: 120, hide: 0}}
+                delay={{show: 250, hide: 0}}
                 placement="auto"
             >
                 <img

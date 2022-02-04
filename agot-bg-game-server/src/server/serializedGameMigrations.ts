@@ -1456,7 +1456,21 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
-    }
+    },
+    {
+        version: "62",
+        migrate: (serializedGame: any) => {
+            // Add dragon limit 3 to Targaryen again to show dragons and their tooltip in the house row
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                const targaryen = ingame.game.houses.find((h: any) => h.id == "targaryen");
+                if (targaryen !== undefined) {
+                    targaryen.unitLimits.push(["dragon", 3]);
+                }
+            }
+            return serializedGame;
+        }
+    },
 ];
 
 export default serializedGameMigrations;
