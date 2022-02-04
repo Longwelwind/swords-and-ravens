@@ -97,6 +97,7 @@ import WesterosCardComponent from "./game-state-panel/utils/WesterosCardComponen
 import ConditionalWrap from "./utils/ConditionalWrap";
 import WildlingCardType from "../common/ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
 import WildlingCardComponent from "./game-state-panel/utils/WildlingCardComponent";
+import getIngameUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -397,13 +398,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             />
                                         ))}
                                         <ListGroupItem className="text-center font-italic" style={{maxWidth: 500}}>
-                                            <small>
+                                            <>
                                                 {connectedSpectators.length > 0 ? (
-                                                    <>Spectators: {joinReactNodes(this.getConnectedSpectators().map(u => <strong key={u.id}>{u.name}</strong>), ", ")}</>
+                                                    <>Spectators: {joinReactNodes(this.getConnectedSpectators().map(u => <b key={u.id}>{getIngameUserLinkOrLabel(this.props.gameState, u)}</b>), ", ")}</>
                                                 ) : (
                                                     <>No spectators</>
                                                 )}
-                                            </small>
+                                            </>
                                         </ListGroupItem>
                                     </ListGroup>
                                 </Card.Body>
