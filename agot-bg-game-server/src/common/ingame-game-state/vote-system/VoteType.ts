@@ -113,7 +113,7 @@ export class ReplacePlayer extends VoteType {
     }
 
     onVoteCreated(vote: Vote): void {
-        if (!this.replaced.connected) {
+        if (!this.replaced.connected && !vote.ingame.entireGame.gameSettings.onlyLive) {
             vote.votes.set(this.forHouse, true);
             vote.checkVoteFinished();
         }
@@ -187,7 +187,7 @@ export class ReplacePlayerByVassal extends VoteType {
     }
 
     onVoteCreated(vote: Vote): void {
-        if (!this.replaced.connected) {
+        if (!this.replaced.connected && !vote.ingame.entireGame.gameSettings.onlyLive) {
             vote.votes.set(this.forHouse, true);
             vote.checkVoteFinished();
         }

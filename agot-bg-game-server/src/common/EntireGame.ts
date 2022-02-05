@@ -33,7 +33,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     name: string;
     leafStateId = v4();
 
-    @observable gameSettings: GameSettings = { pbem: true, startWhenFull: false, setupId: "mother-of-dragons", playerCount: 8,
+    @observable gameSettings: GameSettings = { pbem: true, onlyLive: false, startWhenFull: false, setupId: "mother-of-dragons", playerCount: 8,
         randomHouses: false, randomChosenHouses: false, adwdHouseCards: false,  tidesOfBattle: false,
         vassals: true, seaOrderTokens: true, startWithSevenPowerTokens: true, allowGiftingPowerTokens: true,
         draftHouseCards: false, thematicDraft: false, limitedDraft: false, blindDraft: false,
@@ -276,12 +276,17 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             // Only allow PBEM to be changed ingame
             const settings = message.settings as GameSettings;
 
+            if (!this.gameSettings.pbem && this.gameSettings.onlyLive) {
+                // Don't allow changing PBEM if onlyLive is set
+                settings.pbem = false;
+            }
+
             if (this.ingameGameState) {
                 if (settings.pbem && !this.gameSettings.pbem) {
                     // Notify waited users due to ingame PBEM change
                     this.notifyWaitedUsers();
                     // Do not activate waitedForData now. We start calculating with the next game state change
-                } else if (!this.gameSettings.pbem && settings.pbem) {
+                } else if (this.gameSettings.pbem && !settings.pbem) {
                     // Reset waitedFor as we are now Live
                     this.ingameGameState.players.values.forEach(p => p.resetWaitedFor());
                 }
@@ -292,6 +297,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             if (!this.gameSettings.pbem) {
                 this.gameSettings.startWhenFull = false;
                 settings.startWhenFull = false;
+            } else {
+                this.gameSettings.onlyLive = false;
+                settings.onlyLive = false;
             }
 
             // For changing settings other than PBEM pass the message to the client game state
@@ -556,6 +564,7 @@ export interface SerializedEntireGame {
 
 export interface GameSettings {
     pbem: boolean;
+    onlyLive: boolean;
     startWhenFull: boolean;
     setupId: string;
     playerCount: number;
