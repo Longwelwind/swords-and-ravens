@@ -662,7 +662,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>
                     <ul>
                         {armies.map(([region, unitTypes]) => (
-                            <li key={`reconciling_${region.id}`}>{region.name}: {joinReactNodes(unitTypes.map((ut, i) => <b key={`${region.id}_${ut.id}_${i}`}>{ut.name}</b>), ", ")}</li>
+                            <li key={`reconciling_${region.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`${region.id}_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></li>
                         ))}
                     </ul>
                 </>;

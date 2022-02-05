@@ -45,6 +45,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             {this.selectedGameSetupName}
                         </Col>
                     )}
+                    {this.props.entireGame.entireGame.childGameState instanceof IngameGameState && this.props.entireGame.gameSettings.onlyLive ? <></> : (
                         <Row className="justify-content-center">
                             <Col xs={12} className="d-flex align-items-center">
                                 <OverlayTrigger overlay={
@@ -67,7 +68,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                 {this.gameSettings.pbem && !(this.props.entireGame.childGameState instanceof IngameGameState) && (
                                     <FormCheck
                                         id="start-when-full-setting"
-                                        className="mx-3"
+                                        className="mx-3 mt-2"
                                         type="switch"
                                         label={
                                             <OverlayTrigger overlay={
@@ -80,8 +81,25 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                         onChange={() => this.changeGameSettings(() => this.gameSettings.startWhenFull = !this.gameSettings.startWhenFull)}
                                     />
                                 )}
+                                {!this.gameSettings.pbem && !(this.props.entireGame.childGameState instanceof IngameGameState) && (
+                                    <FormCheck
+                                        id="only-live-setting"
+                                        className="mx-3 mt-2"
+                                        type="switch"
+                                        label={
+                                            <OverlayTrigger overlay={
+                                                <Tooltip id="only-live-setting-tooltip">
+                                                    If enabled, the owner of the game will not be able to switch the game to PBEM in-game.
+                                                    Additionally, the <i>CountToPassVote</i> is reduced to a fixed value of 3 to make it easier to turn quitters into vassals.
+                                                </Tooltip>}>
+                                                <label htmlFor="only-live-setting">No PBEM</label>
+                                            </OverlayTrigger>}
+                                        checked={this.gameSettings.onlyLive}
+                                        onChange={() => this.changeGameSettings(() => this.gameSettings.onlyLive = !this.gameSettings.onlyLive)}
+                                    />
+                                )}
                             </Col>
-                        </Row>
+                        </Row>)}
                 </Row>
                 {this.props.entireGame.childGameState instanceof LobbyGameState && this.renderLobbySettings()}
             </Col>
