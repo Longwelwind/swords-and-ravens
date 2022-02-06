@@ -199,10 +199,13 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
         return result;
     }
 
+    // As we broadcast serialized versions of game.houseCardsForDrafting and house.houseCards to the clients and and then create the
+    // house cards there from that serialized versions, it happens that a card can live twice client-side for a short period of time.
+    // So getAllHouseCards needs a unionBy to really have a unique list of house cards!
     getAllHouseCards(): HouseCard[] {
-        return _.sortBy(_.union(
+        return _.sortBy(_.unionBy(
                 this.game.houseCardsForDrafting.values,
-                _.flatMap(this.game.houses.values.map(h => h.houseCards.values))), hc => -hc.combatStrength, hc => hc.houseId);
+                _.flatMap(this.game.houses.values.map(h => h.houseCards.values)), hc => hc.id), hc => -hc.combatStrength, hc => hc.houseId);
     }
 
     getFilteredHouseCardsForHouse(house: House): HouseCard[] {
