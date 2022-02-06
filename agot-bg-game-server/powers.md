@@ -123,5 +123,5 @@ when you need an overview of the possible interactions that could occur with oth
 * If you win this combat, after casulaties are taken, you must destroy 1 of this vassal's units in the embattled area.
 * If the vassal loses this combat, after combat, you may muster 1 of this vassal's knights in either the area it retreated to or it's home area (if able).
 * Cancel your opponents chosen house card and return it to their hand. Then, randomly choose a house card from their hand to reveal as their chosen house card.
-* After combat, move this vassal to the top of the fiefdoms track (shifting other houses down)
+* After combat, move this vassal to the top of the fiefdoms track (shifting other houses down).
 * If this vassal is defending, the combat strength of all non-vassal footman is reduced to 0.
