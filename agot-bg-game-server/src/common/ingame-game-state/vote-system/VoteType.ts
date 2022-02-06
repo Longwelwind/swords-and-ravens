@@ -1,5 +1,5 @@
 import IngameGameState from "../IngameGameState";
-import Vote from "./Vote";
+import Vote, { VoteState } from "./Vote";
 import CancelledGameState from "../../cancelled-game-state/CancelledGameState";
 import House from "../game-data-structure/House";
 import Player from "../Player";
@@ -17,6 +17,10 @@ export default abstract class VoteType {
     abstract serializeToClient(): SerializedVoteType;
     abstract verb(): string;
     abstract executeAccepted(vote: Vote): void;
+
+    getPositiveCountToPass(vote: Vote): number {
+        return Math.floor(vote.participatingHouses.length * 2 / 3);
+    }
 
     onVoteCreated(_vote: Vote): void {
     }
@@ -112,6 +116,11 @@ export class ReplacePlayer extends VoteType {
         this.forHouse = forHouse;
     }
 
+    getPositiveCountToPass(vote: Vote): number {
+        const calculated = super.getPositiveCountToPass(vote);
+        return vote.ingame.entireGame.gameSettings.onlyLive ? Math.min(calculated, 3) : calculated;
+    }
+
     onVoteCreated(vote: Vote): void {
         if (!this.replaced.connected && !vote.ingame.entireGame.gameSettings.onlyLive) {
             vote.votes.set(this.forHouse, true);
@@ -186,6 +195,11 @@ export class ReplacePlayerByVassal extends VoteType {
         this.forHouse = forHouse;
     }
 
+    getPositiveCountToPass(vote: Vote): number {
+        const calculated = super.getPositiveCountToPass(vote);
+        return vote.ingame.entireGame.gameSettings.onlyLive ? Math.min(calculated, 3) : calculated;
+    }
+
     onVoteCreated(vote: Vote): void {
         if (!this.replaced.connected && !vote.ingame.entireGame.gameSettings.onlyLive) {
             vote.votes.set(this.forHouse, true);
@@ -200,6 +214,20 @@ export class ReplacePlayerByVassal extends VoteType {
     executeAccepted(vote: Vote): void {
         const oldPlayer = vote.ingame.players.values.find(p => p.user == this.replaced) as Player;
         const newVassalHouse = oldPlayer.house;
+
+        // In case the new vassal house is needed for another vote, vote with Reject
+        const missingVotes = vote.ingame.votes.values.filter(v => v.state == VoteState.ONGOING && v.participatingHouses.includes(newVassalHouse) && !v.votes.has(newVassalHouse));
+        missingVotes.forEach(v => {
+            v.votes.set(newVassalHouse, false);
+            vote.ingame.entireGame.broadcastToClients({
+                type: "vote-done",
+                choice: false,
+                vote: v.id,
+                voter: newVassalHouse.id
+            });
+
+            // We don't need to call v.checkVoteFinished() here as we vote with Reject and therefore never call executeAccepted()
+        });
 
         const forbiddenCommanders: House[] = [];
         // If we are in combat we can't assign the vassal to the opponent
@@ -325,6 +353,11 @@ export class ReplaceVassalByPlayer extends VoteType {
         super();
         this.replacer = replacer
         this.forHouse = forHouse;
+    }
+
+    getPositiveCountToPass(vote: Vote): number {
+        const calculated = super.getPositiveCountToPass(vote);
+        return vote.ingame.entireGame.gameSettings.onlyLive ? Math.min(calculated, 3) : calculated;
     }
 
     verb(): string {

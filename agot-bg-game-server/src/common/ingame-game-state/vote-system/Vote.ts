@@ -27,8 +27,7 @@ export default class Vote {
     participatingHouses: House[];
 
     get positiveCountToPass(): number {
-        const calculated = Math.floor(this.participatingHouses.length * 2 / 3);
-        return this.ingame.entireGame.gameSettings.onlyLive ? Math.min(calculated, 3) : calculated;
+        return this.type.getPositiveCountToPass(this);
     }
 
     get state(): VoteState {
