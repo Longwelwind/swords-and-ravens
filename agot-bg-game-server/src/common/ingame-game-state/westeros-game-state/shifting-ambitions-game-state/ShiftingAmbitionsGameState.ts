@@ -9,7 +9,7 @@ import SelectObjectiveCardsGameState, { SerializedSelectObjectiveCardsGameState 
 import { ObjectiveCard } from "../../game-data-structure/static-data-structure/ObjectiveCard";
 import House from "../../game-data-structure/House";
 import { observable } from "mobx";
-import { objectiveCards } from "../../game-data-structure/static-data-structure/ObjectiveCards";
+import { objectiveCards } from "../../game-data-structure/static-data-structure/objectiveCards";
 import _ from "lodash";
 import shuffleInPlace from "../../../../utils/shuffleInPlace";
 

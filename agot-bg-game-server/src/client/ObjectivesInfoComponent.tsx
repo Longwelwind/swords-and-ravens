@@ -4,7 +4,7 @@ import * as React from "react";
 import { Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import Game from "../common/ingame-game-state/game-data-structure/Game";
-import { specialObjectiveCards, objectiveCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/ObjectiveCards";
+import { specialObjectiveCards, objectiveCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/objectiveCards";
 import ObjectiveCardComponent from "./game-state-panel/utils/ObjectiveCardComponent";
 import GameClient from "./GameClient";
 import _ from "lodash";

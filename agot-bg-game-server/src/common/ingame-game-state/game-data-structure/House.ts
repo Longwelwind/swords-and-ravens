@@ -6,7 +6,7 @@ import unitTypes from "./unitTypes";
 import Game from "./Game";
 import { ObjectiveCard, SpecialObjectiveCard } from "./static-data-structure/ObjectiveCard";
 import Player from "../Player";
-import { objectiveCards, specialObjectiveCards } from "./static-data-structure/ObjectiveCards";
+import { objectiveCards, specialObjectiveCards } from "./static-data-structure/objectiveCards";
 
 export default class House {
     id: string;

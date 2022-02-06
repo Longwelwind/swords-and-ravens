@@ -133,7 +133,8 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="add-port-to-the-eyrie-setting-tooltip">
-                                    When this option is enabled, the Eyrie has a port.
+                                    When this option is enabled, the Eyrie has a port and House Arryn scores
+                                    only 1 victory point for Mercantile Ventures (the objective about ports).
                                 </Tooltip>}>
                                 <label htmlFor="add-port-to-the-eyrie-setting">Add a port to The Eyrie</label>
                             </OverlayTrigger>}
