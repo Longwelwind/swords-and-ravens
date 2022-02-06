@@ -34,7 +34,7 @@ import orderTypes from "../common/ingame-game-state/game-data-structure/order-ty
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFastForward } from "@fortawesome/free-solid-svg-icons";
 import LoanCardComponent from "./game-state-panel/utils/LoanCardComponent";
-import { objectiveCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/allObjectiveCards";
+import { objectiveCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/objectiveCards";
 import ObjectiveCardComponent from "./game-state-panel/utils/ObjectiveCardComponent";
 import { ObjectiveCard } from "../common/ingame-game-state/game-data-structure/static-data-structure/ObjectiveCard";
 import crossedSwordsImage from "../../public/images/icons/crossed-swords.svg";

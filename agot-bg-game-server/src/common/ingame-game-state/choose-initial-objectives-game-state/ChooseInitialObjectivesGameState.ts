@@ -9,7 +9,7 @@ import Game from "../game-data-structure/Game";
 import { ObjectiveCard } from "../game-data-structure/static-data-structure/ObjectiveCard";
 import SelectObjectiveCardsGameState, { SerializedSelectObjectiveCardsGameState } from "../select-objective-cards-game-state/SelectObjectiveCardsGameState";
 import _ from "lodash";
-import getShuffledObjectivesDeck from "../game-data-structure/static-data-structure/allObjectiveCards";
+import getShuffledObjectivesDeck from "../game-data-structure/static-data-structure/objectiveCards";
 import popRandom from "../../../utils/popRandom";
 import shuffleInPlace from "../../../utils/shuffleInPlace";
 
