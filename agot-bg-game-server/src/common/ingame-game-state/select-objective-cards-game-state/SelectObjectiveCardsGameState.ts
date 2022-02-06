@@ -7,7 +7,7 @@ import {ClientMessage} from "../../../messages/ClientMessage";
 import IngameGameState from "../IngameGameState";
 import User from "../../../server/User";
 import { ObjectiveCard } from "../game-data-structure/static-data-structure/ObjectiveCard";
-import { objectiveCards } from "../game-data-structure/static-data-structure/ObjectiveCards";
+import { objectiveCards } from "../game-data-structure/static-data-structure/allObjectiveCards";
 import BetterMap from "../../../utils/BetterMap";
 import { observable } from "mobx";
 

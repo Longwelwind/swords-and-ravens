@@ -19,7 +19,7 @@ import shuffleInPlace from "../../../utils/shuffleInPlace";
 import IronBank from "./IronBank";
 import loanCardTypes from "./loan-card/loanCardTypes";
 import LoanCard from "./loan-card/LoanCard";
-import { specialObjectiveCards } from "./static-data-structure/ObjectiveCards";
+import { specialObjectiveCards } from "./static-data-structure/allObjectiveCards";
 
 interface HouseCardContainer {
     houseCards: {[key: string]: HouseCardData};

@@ -39,7 +39,11 @@ export default class ScoreOtherObjectivesGameState extends GameState<ScoreObject
         } else {
             // Though we just can score 1 objective by the rules, we do it in a loop
             selectedObjectiveCards.forEach(oc => {
-                const victoryPoints = oc.getVictoryPointsForHouse(house);
+                let victoryPoints = oc.getVictoryPointsForHouse(house);
+                if (oc.id == "mercantile-ventures" && this.ingame.entireGame.gameSettings.addPortToTheEyrie) {
+                    victoryPoints = 1;
+                }
+
                 this.game.updateVictoryPoints(house, victoryPoints);
                 house.completedObjectives.push(oc);
                 _.pull(house.secretObjectives, oc);

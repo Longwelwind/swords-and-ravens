@@ -20,7 +20,7 @@ import { vassalHousesOrders, playerHousesOrders, seaOrders } from "./orders";
 import IronBank, { SerializedIronBank } from "./IronBank";
 import Player from "../Player";
 import { ObjectiveCard } from "./static-data-structure/ObjectiveCard";
-import { objectiveCards } from "./static-data-structure/ObjectiveCards";
+import { objectiveCards } from "./static-data-structure/allObjectiveCards";
 
 export const MAX_WILDLING_STRENGTH = 12;
 export const MAX_LOYALTY_TOKEN_COUNT = 20;

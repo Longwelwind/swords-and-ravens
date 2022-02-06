@@ -38,7 +38,7 @@ import shuffleInPlace from "../../utils/shuffleInPlace";
 import popRandom from "../../utils/popRandom";
 import LoanCard from "./game-data-structure/loan-card/LoanCard";
 import PayDebtsGameState, { SerializedPayDebtsGameState } from "./pay-debts-game-state/PayDebtsGameState";
-import { objectiveCards } from "./game-data-structure/static-data-structure/ObjectiveCards";
+import { objectiveCards } from "./game-data-structure/static-data-structure/allObjectiveCards";
 import ChooseInitialObjectivesGameState, { SerializedChooseInitialObjectivesGameState } from "./choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
 
 export const NOTE_MAX_LENGTH = 5000;

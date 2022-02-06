@@ -5,7 +5,7 @@ import { aFirmGrip, aMountainousTask, ampleHarvest, arborGold, aRiperFruit,
     lannisterSpecialObjective, mercantileVentures, navalSuperiority,
     nothingButGhosts, protectTheNeck, pullTheWeeds, spreadingTheWealth,
     starkSpecialObjective, stopTheStorm, supportTheCrown, takeTheBlack,
-    theBlade, theFinalHour, thePeoplesChosen, theRaven, theThrone } from "../common/ingame-game-state/game-data-structure/static-data-structure/ObjectiveCards";
+    theBlade, theFinalHour, thePeoplesChosen, theRaven, theThrone } from "../common/ingame-game-state/game-data-structure/static-data-structure/allObjectiveCards";
 import BetterMap from "../utils/BetterMap";
 import aFirmGripImage from "../../public/images/objectives/AFirmGrip.png";
 import aMountainousTaskImage from "../../public/images/objectives/AMountainousTask.png";
