@@ -200,7 +200,7 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
     }
 
     getAllHouseCards(): HouseCard[] {
-        return _.sortBy(_.concat(
+        return _.sortBy(_.union(
                 this.game.houseCardsForDrafting.values,
                 _.flatMap(this.game.houses.values.map(h => h.houseCards.values))), hc => -hc.combatStrength, hc => hc.houseId);
     }
