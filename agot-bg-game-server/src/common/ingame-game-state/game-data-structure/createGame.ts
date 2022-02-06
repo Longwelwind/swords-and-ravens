@@ -328,7 +328,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
 
     const overwrittenSuperControlPowerToken = new BetterMap(selectedGameSetup.superPowerTokens != undefined ? Object.entries(selectedGameSetup.superPowerTokens) : []);
 
-    const regions = new BetterMap(getStaticWorld(entireGame.gameSettings.playerCount).staticRegions.values.map(staticRegion => {
+    const regions = new BetterMap(getStaticWorld(gameSettings).staticRegions.values.map(staticRegion => {
         const blocked = blockedRegions ? blockedRegions.includes(staticRegion.id) : false;
         const garrisonValue = garrisonsFromGameSetup && garrisonsFromGameSetup.has(staticRegion.id)
             ? garrisonsFromGameSetup.get(staticRegion.id)
@@ -352,7 +352,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         ];
     }));
 
-    game.world = new World(regions, entireGame.gameSettings.playerCount);
+    game.world = new World(regions, gameSettings);
 
     // Load Westeros Cards
     let lastWesterosCardId = 0;

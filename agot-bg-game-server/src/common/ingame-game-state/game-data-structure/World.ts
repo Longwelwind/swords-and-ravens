@@ -13,17 +13,18 @@ import getStaticWorld from "./static-data-structure/getStaticWorld";
 import { dragon } from "./unitTypes";
 import staticWorld7p from "./static-data-structure/globalStaticWorld7p";
 import StaticIronBankView from "./static-data-structure/StaticIronBankView";
+import { GameSettings } from "../../../common/EntireGame";
 
 export default class World {
-    playerCount: number;
+    settings: GameSettings;
     regions: BetterMap<string, Region>;
 
     get borders(): StaticBorder[] {
-        return getStaticWorld(this.playerCount).staticBorders;
+        return getStaticWorld(this.settings).staticBorders;
     }
 
     get regionsWhichCanRegainGarrison(): StaticRegion[] {
-        return getStaticWorld(this.playerCount).staticRegions.values.filter(region => region.canRegainGarrison);
+        return getStaticWorld(this.settings).staticRegions.values.filter(region => region.canRegainGarrison);
     }
 
     get westerosLandRegionIds(): string[] {
@@ -42,12 +43,12 @@ export default class World {
     }
 
     get ironBankView(): StaticIronBankView | null {
-        return getStaticWorld(this.playerCount).ironBankView;
+        return getStaticWorld(this.settings).ironBankView;
     }
 
-    constructor(regions: BetterMap<string, Region>, playerCount: number) {
+    constructor(regions: BetterMap<string, Region>, settings: GameSettings) {
         this.regions = regions;
-        this.playerCount = playerCount;
+        this.settings = settings;
     }
 
     getRegion(staticRegion: StaticRegion): Region {
@@ -238,18 +239,18 @@ export default class World {
     serializeToClient(): SerializedWorld {
         return {
             regions: this.regions.values.map(r => r.serializeToClient()),
-            playerCount: this.playerCount
+            settings: this.settings
         };
     }
 
     static deserializeFromServer(game: Game, data: SerializedWorld): World {
         const regions = new BetterMap(data.regions.map(r => [r.id, Region.deserializeFromServer(game, r)]));
 
-        return new World(regions, data.playerCount);
+        return new World(regions, data.settings);
     }
 }
 
 export interface SerializedWorld {
     regions: SerializedRegion[];
-    playerCount: number;
+    settings: GameSettings;
 }

@@ -73,7 +73,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                         label={
                                             <OverlayTrigger overlay={
                                                 <Tooltip id="start-when-full-setting-tooltip">
-                                                    If enabled, the game will start automatically once all seats are taken.
+                                                    When this option is enabled, the game will start automatically once all seats are taken.
                                                 </Tooltip>}>
                                                 <label htmlFor="start-when-full-setting">Start when full</label>
                                             </OverlayTrigger>}
@@ -89,8 +89,8 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                         label={
                                             <OverlayTrigger overlay={
                                                 <Tooltip id="only-live-setting-tooltip">
-                                                    If enabled, the owner of the game will not be able to switch the game to PBEM in-game.
-                                                    Additionally, the <i>CountToPassVote</i> is reduced to a fixed value of 3 to make it easier to turn quitters into vassals.
+                                                    When this option is enabled, the owner of the game will not be able to switch the game to PBEM in-game.
+                                                    In addition, the number of positive votes required is reduced to a fixed value of 3 to make it easier to turn quitters into vassals.
                                                 </Tooltip>}>
                                                 <label htmlFor="only-live-setting">No PBEM</label>
                                             </OverlayTrigger>}
@@ -126,6 +126,21 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         {this.createPlayerCountItems()}
                     </select>&nbsp;&nbsp;Players
                 </Col>
+                {this.props.entireGame.isFeastForCrows && <Col xs="12">
+                    <FormCheck
+                        id="add-port-to-the-eyrie-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="add-port-to-the-eyrie-setting-tooltip">
+                                    When this option is enabled, the Eyrie has a port.
+                                </Tooltip>}>
+                                <label htmlFor="add-port-to-the-eyrie-setting">Add a port to The Eyrie</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.addPortToTheEyrie}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.addPortToTheEyrie = !this.gameSettings.addPortToTheEyrie)}
+                    />
+                </Col>}
                 <Col xs="12">
                     <FormCheck
                         id="adwd-house-cards"
@@ -170,22 +185,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             </OverlayTrigger>}
                         checked={this.gameSettings.randomHouses}
                         onChange={() => this.onRandomHousesChange()}
-                    />
-                </Col>
-                <Col xs="12">
-                    <FormCheck
-                        id="random-chosen-houses-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="random-chosen-houses-tooltip">
-                                    Only chosen houses will be randomized before the game starts.
-                                    This way users can define player and vassal houses and are still able to randomize the player houses.
-                                </Tooltip>}>
-                                <label htmlFor="random-chosen-houses-setting">Random chosen houses</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.randomChosenHouses}
-                        onChange={() => this.onRandomChosenHousesChange()}
                     />
                 </Col>
             </Col>
@@ -248,6 +247,22 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             </OverlayTrigger>}
                         checked={this.gameSettings.allowGiftingPowerTokens}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.allowGiftingPowerTokens = !this.gameSettings.allowGiftingPowerTokens)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="random-chosen-houses-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="random-chosen-houses-tooltip">
+                                    Only chosen houses will be randomized before the game starts.
+                                    This way users can define player and vassal houses and are still able to randomize the player houses.
+                                </Tooltip>}>
+                                <label htmlFor="random-chosen-houses-setting">Random chosen houses</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.randomChosenHouses}
+                        onChange={() => this.onRandomChosenHousesChange()}
                     />
                 </Col>
             </Col>
@@ -416,7 +431,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="mixed-wd1-setting-tooltip">
-                                    If enabled, one <i>Mustering</i> card will be replaced by <i>Rally&nbsp;The&nbsp;Men</i>,{" "}
+                                    When this option is enabled, one <i>Mustering</i> card will be replaced by <i>Rally&nbsp;The&nbsp;Men</i>,{" "}
                                     one <i>A&nbsp;Throne&nbsp;of&nbsp;Blades</i> card by <i>The&nbsp;Burden&nbsp;of&nbsp;Power</i> and the{" "}
                                     <i>Last&nbsp;Days&nbsp;of&nbsp;Summer</i> card by <i>Famine</i>.
                                 </Tooltip>}>
@@ -433,7 +448,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="remove-tob3-setting-tooltip">
-                                    If enabled, 3s cards will be removed from the Tides of Battle deck.
+                                    When this option is enabled, 3s cards will be removed from the Tides of Battle deck.
                                 </Tooltip>}>
                                 <label htmlFor="remove-tob3-setting">Remove 3s cards from ToB</label>
                             </OverlayTrigger>}
@@ -448,7 +463,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="remove-tob-skulls-setting-tooltip">
-                                    If enabled, skull cards will be removed from the Tides of Battle deck.
+                                    When this option is enabled, skull cards will be removed from the Tides of Battle deck.
                                 </Tooltip>}>
                                 <label htmlFor="remove-tob-skulls-setting">Remove skulls from ToB</label>
                             </OverlayTrigger>}
@@ -463,7 +478,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="limit-tob2-setting-tooltip">
-                                    If enabled, the Tides of Battle deck will only contain two 2s cards instead of four.
+                                    When this option is enabled, the Tides of Battle deck will only contain two 2s cards instead of four.
                                 </Tooltip>}>
                                 <label htmlFor="limit-tob2-setting">Limit ToB 2s cards</label>
                             </OverlayTrigger>}
