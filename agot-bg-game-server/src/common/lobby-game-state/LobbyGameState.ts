@@ -154,6 +154,10 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.mixedWesterosDeck1 = false;
             }
 
+            if (settings.setupId != "a-feast-for-crows") {
+                settings.addPortToTheEyrie = false;
+            }
+
             if (settings.thematicDraft) {
                 settings.draftHouseCards = true;
                 settings.limitedDraft = false;
@@ -196,6 +200,11 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.seaOrderTokens = false;
                 settings.allowGiftingPowerTokens = false;
                 settings.startWithSevenPowerTokens = false;
+            }
+
+            // Reset Dwd Cards
+            if (this.entireGame.isDanceWithDragons && settings.setupId != "a-dance-with-dragons") {
+                settings.adwdHouseCards = false;
             }
 
             if (settings.removeTob3 || settings.removeTobSkulls || settings.limitTob2) {

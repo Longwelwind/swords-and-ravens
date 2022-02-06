@@ -12,6 +12,7 @@ import Order from "../common/ingame-game-state/game-data-structure/Order";
 import westerosImage from "../../public/images/westeros.jpg";
 import westeros7pImage from "../../public/images/westeros-7p.jpg";
 import westerosWithEssosImage from "../../public/images/westeros-with-essos.jpg";
+import ffcEyrieWithPortImage from "../../public/images/ffc-eyrie-with-port.jpg";
 import castleDegradeImage from "../../public/images/region-modifications/CastleDegrade.png"
 import castleUpgradeImage from "../../public/images/region-modifications/CastleUpgrade.png"
 import barrelImage from "../../public/images/region-modifications/Barrel.png"
@@ -64,11 +65,15 @@ export default class MapComponent extends Component<MapComponentProps> {
 
     constructor(props: MapComponentProps) {
         super(props);
+        const settings = this.ingame.entireGame.gameSettings;
 
-        this.backgroundImage = this.ingame.entireGame.gameSettings.playerCount == 7
-            ? westeros7pImage
-            : this.ingame.entireGame.gameSettings.playerCount >= 8 ? westerosWithEssosImage
-                : westerosImage;
+        this.backgroundImage = settings.addPortToTheEyrie
+            ? ffcEyrieWithPortImage
+            : this.ingame.entireGame.gameSettings.playerCount == 7
+                ? westeros7pImage
+                : this.ingame.entireGame.gameSettings.playerCount >= 8
+                    ? westerosWithEssosImage
+                    : westerosImage;
 
         this.mapWidth = this.ingame.entireGame.gameSettings.playerCount >= 8 ? DELUXE_MAT_WIDTH : MAP_WIDTH;
     }
