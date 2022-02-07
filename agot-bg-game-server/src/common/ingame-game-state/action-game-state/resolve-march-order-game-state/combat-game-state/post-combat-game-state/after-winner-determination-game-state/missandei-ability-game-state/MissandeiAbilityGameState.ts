@@ -67,7 +67,7 @@ export default class MissandeiAbilityGameState extends GameState<
 
         houseCard.state = HouseCardState.AVAILABLE;
 
-        this.combat.entireGame.broadcastToClients({
+        this.entireGame.broadcastToClients({
             type: "change-state-house-card",
             houseId: house.id,
             cardIds: [houseCard.id],

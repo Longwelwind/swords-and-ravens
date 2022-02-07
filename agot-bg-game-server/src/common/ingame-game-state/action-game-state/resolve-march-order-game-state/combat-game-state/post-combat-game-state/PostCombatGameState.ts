@@ -91,7 +91,7 @@ export default class PostCombatGameState extends GameState<
             }
         });
 
-        this.combat.entireGame.broadcastToClients({
+        this.entireGame.broadcastToClients({
             type: "update-combat-stats",
             stats: this.combat.stats
         })

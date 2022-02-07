@@ -28,7 +28,8 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting | UpdateCombatStats
     | UpdateDraftState | RevealBids | UpdateMaxTurns | PasswordResponse | ReplacedByVassal | UpdateDeletedHouseCards | UpdateOldPlayerHouseCards
     | LoyaltyTokenGained | LoyaltyTokenPlaced | DrangonStrengthTokenRemoved | UpdateLoanCards | UpdateRegionModifiers
-    | UpdateCompletedObjectives | UpdateSecretObjectives | SyncShiftingAmbitionsGameState | HideRevealUserNames | ClearChatRoom;
+    | UpdateCompletedObjectives | UpdateSecretObjectives | SyncShiftingAmbitionsGameState | HideRevealUserNames | ClearChatRoom
+    | UpdateSelectableObjectives;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -445,4 +446,10 @@ interface HideRevealUserNames {
 interface ClearChatRoom {
     type: "clear-chat-room";
     roomId: string;
+}
+
+interface UpdateSelectableObjectives {
+    type: "update-selectable-objectives";
+    house: string;
+    selectableObjectives: string[];
 }

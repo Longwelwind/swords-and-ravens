@@ -244,7 +244,7 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
     }
 
     private updateDraftState(): void {
-        this.ingame.entireGame.broadcastToClients({
+        this.entireGame.broadcastToClients({
             type: "update-draft-state",
             rowIndex: this.currentRowIndex,
             columnIndex: this.currentColumnIndex,
