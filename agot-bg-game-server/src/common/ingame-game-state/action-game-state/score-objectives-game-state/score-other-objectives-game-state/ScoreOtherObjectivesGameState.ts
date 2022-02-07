@@ -9,8 +9,12 @@ import SelectObjectiveCardsGameState, { SerializedSelectObjectiveCardsGameState 
 import Game from "../../../../../common/ingame-game-state/game-data-structure/Game";
 import { ObjectiveCard } from "../../../../../common/ingame-game-state/game-data-structure/static-data-structure/ObjectiveCard";
 import _ from "lodash";
+import BetterMap from "../../../../../utils/BetterMap";
+import { backdoorPolitics } from "../../../../../common/ingame-game-state/game-data-structure/static-data-structure/objectiveCards";
 
 export default class ScoreOtherObjectivesGameState extends GameState<ScoreObjectivesGameState, SelectObjectiveCardsGameState<ScoreOtherObjectivesGameState>> {
+    victoryPointsAtBeginning: BetterMap<House, number>;
+
     get ingame(): IngameGameState {
         return this.parentGameState.ingame;
     }
@@ -20,6 +24,8 @@ export default class ScoreOtherObjectivesGameState extends GameState<ScoreObject
     }
 
     firstStart(): void {
+        this.victoryPointsAtBeginning = new BetterMap(this.game.nonVassalHouses.map(h => [h, h.victoryPoints]));
+
         this.setChildGameState(new SelectObjectiveCardsGameState(this)).firstStart(
             this.game.nonVassalHouses.map(h => [h, h.secretObjectives.filter(oc => oc.canScoreObjective(h, this.ingame))]),
             1,
@@ -59,6 +65,49 @@ export default class ScoreOtherObjectivesGameState extends GameState<ScoreObject
         }
 
         this.ingame.broadcastObjectives();
+        this.checkIfAnyHouseCanScoreBackdoorPoliticsNow();
+    }
+
+    checkIfAnyHouseCanScoreBackdoorPoliticsNow(): void {
+        // The following complicated logic is necessary to support simultanously scoring (much much faster!) of secret objectives.
+        // Basically there is only one objective "Backdoor Politics" which makes "turn order scoring" necessary.
+        // In some rare cases, you might be able to score Backdoor Politics, depending on the results of the other houses.
+        // We want to respect this and update the scorable objectives in that case, but have to respect turn order,
+        // so you cannot score it if you are ahead on IT track, but the others scored before you.
+        this.childGameState.notReadyHouses.forEach(house => {
+            if (!house.secretObjectives.includes(backdoorPolitics)) {
+                return;
+            }
+
+            const oldScorableObjectives = this.childGameState.selectableCardsPerHouse.get(house);
+            const newScorableObjectives = house.secretObjectives.filter(oc => oc.canScoreObjective(house, this.ingame));
+
+            if (newScorableObjectives.length > oldScorableObjectives.length &&
+                    !oldScorableObjectives.includes(backdoorPolitics) &&
+                    newScorableObjectives.includes(backdoorPolitics)) {
+
+                // Now divide the other houses in the ones which are ahead on IT track and the ones which are behind.
+                // The ones ahead must all have a victory point count greater than the count of the current house.
+                // The old victory point count of the ones behind must be greater the count of the current house.
+                // We use .every as this returns true on an empty array and is perfect for this purpose.
+
+                const turnOrder = this.game.getTurnOrder();
+                const ownTurnOrderIndex = turnOrder.findIndex(h => h == house);
+                const housesAhead = turnOrder.filter((_h, i) => i < ownTurnOrderIndex);
+                const housesBehind = turnOrder.filter((_h, i) => i > ownTurnOrderIndex);
+
+                if (housesAhead.every(h => h.victoryPoints > house.victoryPoints) && housesBehind.every(h => this.victoryPointsAtBeginning.get(h) > house.victoryPoints)) {
+                    // Okay we have to update the scorable objectives of the current not ready house
+                    this.childGameState.selectableCardsPerHouse.set(house, newScorableObjectives);
+                    // Only send selectable cards to the controller of the house:
+                    this.entireGame.sendMessageToClients([this.ingame.getControllerOfHouse(house).user], {
+                        type: "update-selectable-objectives",
+                        house: house.id,
+                        selectableObjectives: newScorableObjectives.map(oc => oc.id)
+                    });
+                }
+            }
+        });
     }
 
     onSelectObjectiveCardsFinish(): void {
@@ -76,12 +125,14 @@ export default class ScoreOtherObjectivesGameState extends GameState<ScoreObject
     serializeToClient(admin: boolean, player: Player | null): SerializedScoreOtherObjectivesGameState {
         return {
             type: "score-other-objectives",
+            victoryPointsAtBeginning: this.victoryPointsAtBeginning.entries.map(([house, vps]) => [house.id, vps]),
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
 
     static deserializeFromServer(scoreObjectives: ScoreObjectivesGameState, data: SerializedScoreOtherObjectivesGameState): ScoreOtherObjectivesGameState {
         const scoreOtherObjectives = new ScoreOtherObjectivesGameState(scoreObjectives);
+        scoreOtherObjectives.victoryPointsAtBeginning = new BetterMap(data.victoryPointsAtBeginning.map(([hid, vps]) => [scoreObjectives.game.houses.get(hid), vps]));
         scoreOtherObjectives.childGameState = scoreOtherObjectives.deserializeChildGameState(data.childGameState);
         return scoreOtherObjectives;
     }
@@ -96,5 +147,6 @@ export default class ScoreOtherObjectivesGameState extends GameState<ScoreObject
 
 export interface SerializedScoreOtherObjectivesGameState {
     type: "score-other-objectives";
-    childGameState: SerializedSelectObjectiveCardsGameState
+    victoryPointsAtBeginning: [string, number][];
+    childGameState: SerializedSelectObjectiveCardsGameState;
 }

@@ -1481,6 +1481,22 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "64",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                if (ingame.childGameState.type == "action" && ingame.childGameState.childGameState.type == "score-objectives" &&
+                        ingame.childGameState.childGameState.childGameState.type == "score-other-objectives") {
+                    const scoreOtherObjectives = ingame.childGameState.childGameState.childGameState;
+                    const participatingHouses = scoreOtherObjectives.childGameState.selectableCardsPerHouse.map(([hid, _ocids]: any) => ingame.game.houses.find((sh: any) => sh.id == hid));
+                    scoreOtherObjectives.victoryPointsAtBeginning = participatingHouses.map((sh: any) => [sh.id, sh.victoryPoints]);
+                }
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

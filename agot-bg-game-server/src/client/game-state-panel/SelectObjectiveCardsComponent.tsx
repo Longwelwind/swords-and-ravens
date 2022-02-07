@@ -52,7 +52,7 @@ export default class SelectObjectiveCardsComponent extends Component<GameStateCo
                             </Row>
                         </Col>
                         <Col xs="auto">
-                            <Button variant="success" onClick={() => this.confirm()} disabled={!this.gameState.canBeSkipped && this.selectedObjectiveCards.length != this.gameState.count}>
+                            <Button variant="success" onClick={() => this.confirm()} disabled={(!this.gameState.canBeSkipped && this.selectedObjectiveCards.length != this.gameState.count) || this.selectedObjectiveCards.length > this.gameState.count}>
                                 Confirm
                             </Button>
                         </Col>

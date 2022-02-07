@@ -20,7 +20,7 @@ interface ParentGameState extends GameState<any, any> {
 }
 
 export default class SelectObjectiveCardsGameState<P extends ParentGameState> extends GameState<P> {
-    selectableCardsPerHouse: BetterMap<House, ObjectiveCard[]>;
+    @observable selectableCardsPerHouse: BetterMap<House, ObjectiveCard[]>;
     count: number;
     canBeSkipped: boolean;
     @observable readyHouses: BetterMap<House, ObjectiveCard[]>;
@@ -110,7 +110,12 @@ export default class SelectObjectiveCardsGameState<P extends ParentGameState> ex
     onServerMessage(message: ServerMessage): void {
         if (message.type == "player-ready") {
             const player = this.parentGameState.ingame.players.get(this.entireGame.users.get(message.userId));
+            // On client-side only set an empty array for the selected objectives to not reveal the choice to other houses
             this.readyHouses.set(player.house, []);
+        } else if (message.type == "update-selectable-objectives") {
+            const house = this.parentGameState.game.houses.get(message.house);
+            const objectives = message.selectableObjectives.map(ocid => objectiveCards.get(ocid));
+            this.selectableCardsPerHouse.set(house, objectives);
         }
     }
 
