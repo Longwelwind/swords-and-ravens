@@ -109,7 +109,7 @@ export default class DraftInfluencePositionsGameState extends GameState<IngameGa
             }
         }
 
-        this.ingame.entireGame.broadcastToClients({
+        this.entireGame.broadcastToClients({
             type: "update-draft-state",
             rowIndex: this.currentRowIndex,
             columnIndex: this.currentColumnIndex,

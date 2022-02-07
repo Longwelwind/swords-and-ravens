@@ -68,14 +68,14 @@ export default class MelisandreAbilityGameState extends GameState<
         houseCard.state = HouseCardState.AVAILABLE;
         house.powerTokens += -houseCard.combatStrength;
 
-        this.combat.entireGame.broadcastToClients({
+        this.entireGame.broadcastToClients({
             type: "change-state-house-card",
             houseId: house.id,
             cardIds: [houseCard.id],
             state: HouseCardState.AVAILABLE
         });
 
-        this.combat.entireGame.broadcastToClients({
+        this.entireGame.broadcastToClients({
             type: "change-power-token",
             houseId: house.id,
             powerTokenCount: house.powerTokens

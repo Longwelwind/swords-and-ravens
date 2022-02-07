@@ -77,7 +77,7 @@ export default class PatchfaceAbilityGameState extends GameState<
             houseCard: houseCard.id
         }, resolvedAutomatically);
 
-        this.combat.entireGame.broadcastToClients({
+        this.entireGame.broadcastToClients({
             type: "change-state-house-card",
             houseId: affectedHouse.id,
             cardIds: [houseCard.id],
@@ -93,7 +93,7 @@ export default class PatchfaceAbilityGameState extends GameState<
                 hc.state = HouseCardState.AVAILABLE;
             });
 
-            this.combat.entireGame.broadcastToClients({
+            this.entireGame.broadcastToClients({
                 type: "change-state-house-card",
                 houseId: affectedHouse.id,
                 cardIds: returnedHouseCards.map(hc => hc.id),
