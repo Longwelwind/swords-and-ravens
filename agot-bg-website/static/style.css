@@ -34,3 +34,7 @@ td.fitwidth {
     width: 1px;
     white-space: nowrap;
 }
+
+.tooltip {
+    pointer-events: none;
+}
