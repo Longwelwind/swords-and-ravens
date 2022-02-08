@@ -10,6 +10,8 @@ import { DraftStep } from "../common/ingame-game-state/draft-house-cards-game-st
 import _ from "lodash";
 import shuffleInPlace from "../utils/shuffleInPlace";
 import { v4 } from "uuid";
+import facelessMenNames from "../../data/facelessMenNames.json";
+import popRandom from "../utils/popRandom";
 //import { SerializedEntireGame } from "../common/EntireGame";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
@@ -1493,6 +1495,21 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                     const participatingHouses = scoreOtherObjectives.childGameState.selectableCardsPerHouse.map(([hid, _ocids]: any) => ingame.game.houses.find((sh: any) => sh.id == hid));
                     scoreOtherObjectives.victoryPointsAtBeginning = participatingHouses.map((sh: any) => [sh.id, sh.victoryPoints]);
                 }
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "65",
+        migrate: (serializedGame: any) => {
+            serializedGame.users.forEach((u: any, i: number) => u.facelessName = `Faceless Man ${i+1}`);
+
+            if (serializedGame.childGameState.type == "ingame" && serializedGame.gameSettings.faceless) {
+                const ingame = serializedGame.childGameState;
+                const usersOfPlayers = ingame.players.map((p: any) => p.userId).map((uid: any) => serializedGame.users.find((u: any) => u.id == uid));
+                const facelessNames: string[] = facelessMenNames;
+                usersOfPlayers.forEach((u: any) => u.facelessName = popRandom(facelessNames) ?? u.facelessName);
             }
 
             return serializedGame;

@@ -239,7 +239,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     addUser(userId: string, userName: string, profileSettings: StoredProfileSettings): User {
-        const user = new User(userId, userName, this, {
+        const user = new User(userId, userName, `Faceless Man ${this.users.size + 1}`, this, {
             chatHouseNames: profileSettings.houseNamesForChat,
             mapScrollbar: profileSettings.mapScrollbar,
             responsiveLayout: profileSettings.responsiveLayout,
@@ -350,7 +350,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         } else if (message.type == "update-other-users-with-same-ip") {
             const user = this.users.get(message.user);
             user.otherUsersFromSameNetwork = message.otherUsers;
-        } else if (message.type == "hide-reveal-user-names") {
+        } else if (message.type == "hide-or-reveal-user-names") {
             message.names.forEach(([uid, name]) => this.users.get(uid).name = name);
         } else {
             this.childGameState.onServerMessage(message);
@@ -492,13 +492,13 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         ));
     }
 
-    hideRevealUserNames(revealForever: boolean): void {
+    hideOrRevealUserNames(revealForever: boolean): void {
         if (revealForever) {
             this.gameSettings.faceless = false;
         }
 
         this.broadcastToClients({
-            type: "hide-reveal-user-names",
+            type: "hide-or-reveal-user-names",
             names: this.users.values.map(u => u.serializeToClient(false, null, this.gameSettings.faceless)).map(su => [su.id, su.name])
         });
     }

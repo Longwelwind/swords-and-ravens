@@ -216,12 +216,12 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.randomHouses = true;
             }
 
-            const hideRevealUserNames = settings.faceless != this.settings.faceless;
+            const hideOrRevealUserNames = settings.faceless != this.settings.faceless;
 
             this.entireGame.gameSettings = settings;
 
-            if (hideRevealUserNames) {
-                this.entireGame.hideRevealUserNames(false);
+            if (hideOrRevealUserNames) {
+                this.entireGame.hideOrRevealUserNames(false);
             }
 
             this.onGameSettingsChange();
