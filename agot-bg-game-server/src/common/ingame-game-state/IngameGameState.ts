@@ -77,7 +77,7 @@ export default class IngameGameState extends GameState<
         this.players = new BetterMap(futurePlayers.map((house, user) => [user, new Player(user, this.game.houses.get(house))]));
 
         if (this.entireGame.gameSettings.faceless) {
-            const facelessNames: string[] = facelessMenNames;
+            const facelessNames: string[] = [...facelessMenNames];
             this.players.values.forEach(p => p.user.facelessName = popRandom(facelessNames) ?? p.user.facelessName);
             this.entireGame.hideOrRevealUserNames(false);
         }
