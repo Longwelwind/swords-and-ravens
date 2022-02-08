@@ -1508,7 +1508,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             if (serializedGame.childGameState.type == "ingame" && serializedGame.gameSettings.faceless) {
                 const ingame = serializedGame.childGameState;
                 const usersOfPlayers = ingame.players.map((p: any) => p.userId).map((uid: any) => serializedGame.users.find((u: any) => u.id == uid));
-                const facelessNames: string[] = facelessMenNames;
+                const facelessNames: string[] = [...facelessMenNames];
                 usersOfPlayers.forEach((u: any) => u.facelessName = popRandom(facelessNames) ?? u.facelessName);
             }
 
