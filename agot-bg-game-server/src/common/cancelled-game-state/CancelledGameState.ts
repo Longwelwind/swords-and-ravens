@@ -12,7 +12,7 @@ export default class CancelledGameState extends GameState<EntireGame | IngameGam
     }
 
     firstStart(): void {
-        this.entireGame.hideRevealUserNames(true);
+        this.entireGame.hideOrRevealUserNames(true);
         if (this.ingame) {
             this.entireGame.notifyUsers(this.ingame.players.keys, NotificationType.GAME_ENDED)
         }

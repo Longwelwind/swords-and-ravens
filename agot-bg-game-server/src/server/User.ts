@@ -7,6 +7,7 @@ import {observable} from "mobx";
 export default class User {
     id: string;
     @observable name: string;
+    @observable facelessName: string;
     @observable settings: UserSettings;
     entireGame: EntireGame;
     connectedClients: WebSocket[] = [];
@@ -14,9 +15,10 @@ export default class User {
     @observable connected: boolean;
     @observable note = "";
 
-    constructor(id: string, name: string, game: EntireGame, settings: UserSettings, connected = false, otherUsersFromSameNetwork: string[] = []) {
+    constructor(id: string, name: string, facelessName: string, game: EntireGame, settings: UserSettings, connected = false, otherUsersFromSameNetwork: string[] = []) {
         this.id = id;
         this.name = name;
+        this.facelessName = facelessName;
         this.settings = settings;
         this.entireGame = game;
         this.connected = connected;
@@ -51,7 +53,8 @@ export default class User {
     serializeToClient(admin: boolean, user: User | null, hideUserName: boolean): SerializedUser {
         return {
             id: this.id,
-            name: admin ? this.name : hideUserName ? "Jaqen H'ghar": this.name,
+            name: admin ? this.name : hideUserName ? this.facelessName : this.name,
+            facelessName: this.facelessName,
             settings: this.settings,
             connected: this.connected,
             otherUsersFromSameNetwork: this.otherUsersFromSameNetwork,
@@ -60,7 +63,7 @@ export default class User {
     }
 
     static deserializeFromServer(game: EntireGame, data: SerializedUser): User {
-        const user = new User(data.id, data.name, game, data.settings, data.connected, data.otherUsersFromSameNetwork);
+        const user = new User(data.id, data.name, data.facelessName, game, data.settings, data.connected, data.otherUsersFromSameNetwork);
         user.note = data.note;
         return user;
     }
@@ -69,6 +72,7 @@ export default class User {
 export interface SerializedUser {
     id: string;
     name: string;
+    facelessName: string;
     settings: UserSettings;
     connected: boolean;
     otherUsersFromSameNetwork: string[];

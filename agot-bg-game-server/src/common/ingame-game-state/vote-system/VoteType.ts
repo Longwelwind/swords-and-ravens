@@ -137,6 +137,11 @@ export class ReplacePlayer extends VoteType {
         const oldPlayer = vote.ingame.players.values.find(p => p.house == this.forHouse) as Player;
         const newPlayer = new Player(this.replacer, this.forHouse);
 
+        if (vote.ingame.entireGame.gameSettings.faceless) {
+            newPlayer.user.facelessName = vote.ingame.getFreeFacelessName() ?? newPlayer.user.facelessName;
+            vote.ingame.entireGame.hideOrRevealUserNames(false);
+        }
+
         vote.ingame.players.delete(oldPlayer.user);
         vote.ingame.players.set(newPlayer.user, newPlayer);
 
@@ -367,6 +372,11 @@ export class ReplaceVassalByPlayer extends VoteType {
     executeAccepted(vote: Vote): void {
         // Create a new player to replace the vassal
         const newPlayer = new Player(this.replacer, this.forHouse);
+
+        if (vote.ingame.entireGame.gameSettings.faceless) {
+            newPlayer.user.facelessName = vote.ingame.getFreeFacelessName() ?? newPlayer.user.facelessName;
+            vote.ingame.entireGame.hideOrRevealUserNames(false);
+        }
 
         this.forHouse.hasBeenReplacedByVassal = false;
 

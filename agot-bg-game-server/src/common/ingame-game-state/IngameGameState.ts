@@ -40,6 +40,7 @@ import LoanCard from "./game-data-structure/loan-card/LoanCard";
 import PayDebtsGameState, { SerializedPayDebtsGameState } from "./pay-debts-game-state/PayDebtsGameState";
 import { objectiveCards } from "./game-data-structure/static-data-structure/objectiveCards";
 import ChooseInitialObjectivesGameState, { SerializedChooseInitialObjectivesGameState } from "./choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
+import facelessMenNames from "../../../data/facelessMenNames.json";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -74,6 +75,12 @@ export default class IngameGameState extends GameState<
     beginGame(housesToCreate: string[], futurePlayers: BetterMap<string, User>): void {
         this.game = createGame(this, housesToCreate, futurePlayers.keys);
         this.players = new BetterMap(futurePlayers.map((house, user) => [user, new Player(user, this.game.houses.get(house))]));
+
+        if (this.entireGame.gameSettings.faceless) {
+            const facelessNames: string[] = facelessMenNames;
+            this.players.values.forEach(p => p.user.facelessName = popRandom(facelessNames) ?? p.user.facelessName);
+            this.entireGame.hideOrRevealUserNames(false);
+        }
 
         // In the past we always used the supply limits from the game setup, though we simply could have calculated them
         // as every house starts according to their controlled barrels. For random start we have to recalculate supply, but only do it for
@@ -323,6 +330,11 @@ export default class IngameGameState extends GameState<
                 r.loyaltyTokens = 0;
             });
         }
+    }
+
+    getFreeFacelessName(): string | null {
+        const freeFacelessNames: string[] = _.difference(facelessMenNames, this.players.values.map(p => p.user.facelessName));
+        return popRandom(freeFacelessNames);
     }
 
     onClientMessage(user: User, message: ClientMessage): boolean {
