@@ -285,6 +285,10 @@ def play(request, game_id, user_id=None):
     if not game:
         return HttpResponseNotFound()
 
+    if request.user.is_in_group("Penalized Member") and game.players.filter(user=request.user).count() == 0:
+        # Penalized members only can join their current running games
+        return HttpResponseRedirect("/games")
+
     # Specifying a user_id allows users to impersonate other players in a game
     if user_id and request.user.has_perm("agotboardgame_main.can_play_as_another_player"):
         if game.players.filter(user=request.user).count() > 0:
@@ -294,10 +298,6 @@ def play(request, game_id, user_id=None):
             user = get_object_or_404(User, id=user_id)
     else:
         user = request.user
-
-    if game.state == IN_LOBBY and user.is_in_group("Penalized Member"):
-        # Penalized members cannot create or join new games
-        return HttpResponseRedirect("/games")
 
     auth_data = {
         "gameId": game_id,
