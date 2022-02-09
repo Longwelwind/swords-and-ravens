@@ -295,6 +295,10 @@ def play(request, game_id, user_id=None):
     else:
         user = request.user
 
+    if game.state == IN_LOBBY and user.is_in_group("Penalized Member"):
+        # Penalized members cannot create or join new games
+        return HttpResponseRedirect("/games")
+
     auth_data = {
         "gameId": game_id,
         "userId": user.id,
