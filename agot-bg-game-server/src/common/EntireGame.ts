@@ -239,7 +239,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     addUser(userId: string, userName: string, profileSettings: StoredProfileSettings): User {
-        const user = new User(userId, userName, `Faceless Man ${this.users.size + 1}`, this, {
+        const user = new User(userId, userName, `Nobody ${this.users.size + 1}`, this, {
             chatHouseNames: profileSettings.houseNamesForChat,
             mapScrollbar: profileSettings.mapScrollbar,
             responsiveLayout: profileSettings.responsiveLayout,
