@@ -1514,6 +1514,13 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "66",
+        migrate: (serializedGame: any) => {
+            serializedGame.users.forEach((u: any) => u.facelessName = u.facelessName.replace("Faceless Man", "Nobody"));
+            return serializedGame;
+        }
     }
 ];
 

@@ -30,7 +30,6 @@ import { raidSupportPlusOne } from "../game-data-structure/order-types/orderType
 import IronBankOrderType from "../game-data-structure/order-types/IronBankOrderType";
 import ReconcileArmiesGameState, { SerializedReconcileArmiesGameState } from "../westeros-game-state/reconcile-armies-game-state/ReconcileArmiesGameState";
 import popRandom from "../../../utils/popRandom";
-import { ObjectiveCard } from "../game-data-structure/static-data-structure/ObjectiveCard";
 import ScoreObjectivesGameState, { SerializedScoreObjectivesGameState } from "./score-objectives-game-state/ScoreObjectivesGameState";
 
 export default class ActionGameState extends GameState<IngameGameState, UseRavenGameState | ResolveRaidOrderGameState
@@ -148,13 +147,21 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
 
     onScoreObjectivesGameStateEnd(): void {
         // Draw new objectives
-        this.game.houses.values.forEach(h => {
-            while (h.secretObjectives.length != 3) {
-                h.secretObjectives.push(popRandom(this.game.objectiveDeck) as ObjectiveCard);
-                this.ingame.log({
-                    type: "new-objective-card-drawn",
-                    house: h.id
-                });
+        this.game.getTurnOrder().filter(h => !this.ingame.isVassalHouse(h)).forEach(h => {
+            if (h.secretObjectives.length < 3) {
+                const newCard = popRandom(this.game.objectiveDeck);
+                if (newCard) {
+                    h.secretObjectives.push(newCard);
+                    this.ingame.log({
+                        type: "new-objective-card-drawn",
+                        house: h.id
+                    });
+                } else {
+                    this.ingame.log({
+                        type: "objective-deck-empty",
+                        house: h.id
+                    });
+                }
             }
         });
 

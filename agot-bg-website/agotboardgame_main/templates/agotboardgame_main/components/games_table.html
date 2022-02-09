@@ -110,6 +110,7 @@
                     {{ game.players_count }}{% if game.players_count != game.view_of_game.maxPlayerCount %}/{{ game.view_of_game.maxPlayerCount }}{% endif %}
                 </td>
                 <td class="text-right">
+                    {%if perms.agotboardgame_main.add_game or game.player_in_game %}
                     <a
                         target="_blank"
                         href="/play/{{ game.id }}"
@@ -124,6 +125,7 @@
                             Rejoin
                         {% endif %}
                     </a>
+                    {% endif %}
                     {% if perms.agotboardgame_main.cancel_game %}
                         <form action="/game/{{ game.id }}/cancel" method="POST" class="d-inline" onsubmit="return confirm('Do you really want to cancel this game?');">
                             {% csrf_token %}
