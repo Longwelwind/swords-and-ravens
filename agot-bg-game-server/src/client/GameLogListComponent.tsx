@@ -1698,6 +1698,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     A garrison token with strength <b>{data.strength}</b> was returned to <b>{region.name}</b>.
                 </p>;
             }
+            case "objective-deck-empty": {
+                const house = this.game.houses.get(data.house);
+
+                return <p>
+                    House <b>{house.name}</b> was not able to draw a new Objective card because the deck is empty.
+                </p>;
+            }
         }
     }
 }

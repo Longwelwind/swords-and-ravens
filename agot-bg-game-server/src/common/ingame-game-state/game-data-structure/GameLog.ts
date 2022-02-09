@@ -45,7 +45,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | LoyalMaesterExecuted | MasterAtArmsExecuted | SavvyStewardExecuted | SpymasterExecuted
     | ObjectivesChosen | NewObjectiveCardDrawn | SpecialObjectiveScored | ObjectiveScored | IronbornRaid
     | ShiftingAmbitionsObjectiveChosenFromHand | ShiftingAmbitionsObjectiveChosenFromPool | NewInformationObjectiveCardChosen
-    | RevealAllObjectives | GarrisonRemoved | GarrisonReturned;
+    | RevealAllObjectives | GarrisonRemoved | GarrisonReturned | ObjectiveDeckEmpty;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -992,4 +992,9 @@ interface GarrisonReturned {
     type: "garrison-returned";
     region: string;
     strength: number;
+}
+
+interface ObjectiveDeckEmpty {
+    type: "objective-deck-empty";
+    house: string;
 }
