@@ -243,7 +243,7 @@ CHANNEL_LAYERS = {
 GROUP_COLORS = {
     "Admin": "danger",
     "High Member": "info",
-    "Penalized Member": "warning"
+    "On probation": "warning"
 }
 
 # Vanilla Forum
