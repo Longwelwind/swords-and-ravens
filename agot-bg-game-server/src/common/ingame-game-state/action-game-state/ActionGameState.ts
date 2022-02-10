@@ -147,7 +147,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
 
     onScoreObjectivesGameStateEnd(): void {
         // Draw new objectives
-        this.game.getTurnOrder().filter(h => !this.ingame.isVassalHouse(h)).forEach(h => {
+        this.ingame.getTurnOrderWithoutVassals().forEach(h => {
             if (h.secretObjectives.length < 3) {
                 const newCard = popRandom(this.game.objectiveDeck);
                 if (newCard) {

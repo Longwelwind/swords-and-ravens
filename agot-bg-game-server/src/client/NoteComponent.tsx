@@ -35,7 +35,10 @@ export default class NoteComponent extends Component<NoteComponentProps> {
     onNoteChange = _.debounce((note: string) => {
         if (this.props.gameClient.authenticatedPlayer) {
             this.props.gameClient.authenticatedPlayer.user.note = note;
-            this.props.ingame.updateNote(note);
+            this.props.ingame.entireGame.sendMessageToServer({
+                type: "update-note",
+                note: note
+            });
         }
     }, 500, { trailing: true });
 }

@@ -73,7 +73,11 @@ export default class GiftPowerTokensComponent extends Component<GiftPowerTokensC
             <Col xs="auto" className="text-center">
                 <Button
                     onClick={() => {
-                        this.props.ingame.giftPowerTokens(this.toHouse, this.powerTokens);
+                        this.props.ingame.entireGame.sendMessageToServer({
+                            type: "gift-power-tokens",
+                            toHouse: this.toHouse.id,
+                            powerTokens: this.powerTokens
+                        });
                         this.powerTokens = 0;
                         document.body.click();
                     }}
