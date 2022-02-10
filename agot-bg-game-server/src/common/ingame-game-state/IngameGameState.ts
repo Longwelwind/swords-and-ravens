@@ -1059,21 +1059,6 @@ export default class IngameGameState extends GameState<
         });
     }
 
-    updateNote(note: string): void {
-        this.entireGame.sendMessageToServer({
-            type: "update-note",
-            note: note
-        });
-    }
-
-    giftPowerTokens(toHouse: House, powerTokens: number): void {
-        this.entireGame.sendMessageToServer({
-            type: "gift-power-tokens",
-            toHouse: toHouse.id,
-            powerTokens: powerTokens
-        });
-    }
-
     canGiftPowerTokens(house: House): boolean {
         if (!this.entireGame.gameSettings.allowGiftingPowerTokens) {
             // Targaryen always must be able to gift their tokens, so they can leave the game when defeated
@@ -1088,13 +1073,6 @@ export default class IngameGameState extends GameState<
         }
 
         return !this.isVassalHouse(house);
-    }
-
-    dropPowerTokens(house: House): void {
-        this.entireGame.sendMessageToServer({
-            type: "drop-power-tokens",
-            house: house.id
-        });
     }
 
     serializeToClient(admin: boolean, user: User | null): SerializedIngameGameState {

@@ -1,6 +1,6 @@
 import IngameGameState from "../IngameGameState";
 import GameState from "../../GameState";
-import Region from "../game-data-structure/Region";
+import Region, { RegionState } from "../game-data-structure/Region";
 import Order from "../game-data-structure/Order";
 import EntireGame from "../../EntireGame";
 import ResolveMarchOrderGameState, {SerializedResolveMarchOrderGameState} from "./resolve-march-order-game-state/ResolveMarchOrderGameState";
@@ -31,6 +31,7 @@ import IronBankOrderType from "../game-data-structure/order-types/IronBankOrderT
 import ReconcileArmiesGameState, { SerializedReconcileArmiesGameState } from "../westeros-game-state/reconcile-armies-game-state/ReconcileArmiesGameState";
 import popRandom from "../../../utils/popRandom";
 import ScoreObjectivesGameState, { SerializedScoreObjectivesGameState } from "./score-objectives-game-state/ScoreObjectivesGameState";
+import _ from "lodash";
 
 export default class ActionGameState extends GameState<IngameGameState, UseRavenGameState | ResolveRaidOrderGameState
                                                                         | ResolveMarchOrderGameState | ResolveConsolidatePowerGameState
@@ -61,6 +62,26 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
 
         this.ingame.log({
             type: "action-phase-began"
+        });
+
+        const worldState = _.orderBy(this.ingame.world.getWorldState(), [r => r.controller, r => r.id]);
+        const enrichedWorldState: RegionState[] = [];
+        worldState.forEach(r => {
+            //const region = this.ingame.world.regions.tryGet(r.id, null);
+            const region =  this.ingame.world.regions.get(r.id);
+            if (region && this.ordersOnBoard.has(region)) {
+                const order = this.ordersOnBoard.get(region);
+                r.order = { type: order.type.id };
+                if (this.game.isOrderRestricted(region, order, this.planningRestrictions)) {
+                    r.order.restricted = true;
+                }
+            }
+            enrichedWorldState.push(r);
+        });
+
+        this.ingame.log({
+            type: "orders-revealed",
+            worldState: enrichedWorldState
         });
 
         this.setChildGameState(new UseRavenGameState(this)).firstStart();
@@ -147,7 +168,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
 
     onScoreObjectivesGameStateEnd(): void {
         // Draw new objectives
-        this.game.getTurnOrder().filter(h => !this.ingame.isVassalHouse(h)).forEach(h => {
+        this.ingame.getTurnOrderWithoutVassals().forEach(h => {
             if (h.secretObjectives.length < 3) {
                 const newCard = popRandom(this.game.objectiveDeck);
                 if (newCard) {

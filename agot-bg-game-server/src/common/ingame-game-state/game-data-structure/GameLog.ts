@@ -1,4 +1,5 @@
 import { CombatStats } from "../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
+import { RegionState } from "./Region";
 
 export default interface GameLog {
     time: Date;
@@ -45,7 +46,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | LoyalMaesterExecuted | MasterAtArmsExecuted | SavvyStewardExecuted | SpymasterExecuted
     | ObjectivesChosen | NewObjectiveCardDrawn | SpecialObjectiveScored | ObjectiveScored | IronbornRaid
     | ShiftingAmbitionsObjectiveChosenFromHand | ShiftingAmbitionsObjectiveChosenFromPool | NewInformationObjectiveCardChosen
-    | RevealAllObjectives | GarrisonRemoved | GarrisonReturned | ObjectiveDeckEmpty;
+    | RevealAllObjectives | GarrisonRemoved | GarrisonReturned | ObjectiveDeckEmpty | OrdersRevealed;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -997,4 +998,9 @@ interface GarrisonReturned {
 interface ObjectiveDeckEmpty {
     type: "objective-deck-empty";
     house: string;
+}
+
+interface OrdersRevealed {
+    type: "orders-revealed";
+    worldState: RegionState[];
 }

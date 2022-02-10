@@ -27,7 +27,6 @@ import ConditionalWrap from "./utils/ConditionalWrap";
 import BetterMap from "../utils/BetterMap";
 import _ from "lodash";
 import PartialRecursive from "../utils/PartialRecursive";
-import StaticBorder from "../common/ingame-game-state/game-data-structure/static-data-structure/StaticBorder";
 import { land, sea } from "../common/ingame-game-state/game-data-structure/regionTypes";
 import PlaceOrdersGameState from "../common/ingame-game-state/planning-game-state/place-orders-game-state/PlaceOrdersGameState";
 import UseRavenGameState from "../common/ingame-game-state/action-game-state/use-raven-game-state/UseRavenGameState";
@@ -343,6 +342,7 @@ export default class MapComponent extends Component<MapComponentProps> {
             </div>;
         });
     }
+
     renderUnits(garrisons: BetterMap<string, string | null>): ReactNode {
         const propertiesForUnits = this.getModifiedPropertiesForEntities<Unit, UnitOnMapProperties>(
             _.flatMap(this.props.ingameGameState.world.regions.values.map(r => r.allUnits)),
@@ -585,7 +585,11 @@ export default class MapComponent extends Component<MapComponentProps> {
 
         const drawBorder = order?.type.restrictedTo == sea.kind;
         const controller = drawBorder ? region.getController() : null;
-        const color = drawBorder ? controller ? controller.id != "greyjoy" ? controller.color : "black" : undefined : undefined;
+        const color = drawBorder && controller
+            ? controller.id != "greyjoy" 
+                ? controller.color 
+                : "black"
+            : undefined;
 
         const wrap = properties.wrap;
 
@@ -627,16 +631,6 @@ export default class MapComponent extends Component<MapComponentProps> {
                 <h6>{order ? order.type.name : "Order token"}<small> of <b>{region.getController()?.name ?? "Unknown"}<br />{region.name}</b></small></h6>
             </Col>
         </Tooltip>;
-    }
-
-    getBorderPathD(border: StaticBorder): string {
-        return border.polygon.map(p => p.x + "," + p.y).join(" ");
-    }
-
-    getColorUnitSlot(r: Region): string {
-        const controller = r.getController();
-
-        return controller ? controller.color : "";
     }
 
     getRegionPath(region: Region): string {
