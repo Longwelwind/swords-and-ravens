@@ -1,4 +1,4 @@
-import Region, {SerializedRegion} from "./Region";
+import Region, {RegionState, SerializedRegion} from "./Region";
 import Point, {distanceSquared} from "../../../utils/Point";
 import Unit from "./Unit";
 import House from "./House";
@@ -234,6 +234,10 @@ export default class World {
     getCapitalOfHouse(house: House): Region | null {
         const capital = this.regions.values.filter(r => r.superControlPowerToken == house);
         return capital.length == 1 ? capital[0] : null;
+    }
+
+    getWorldState(): RegionState[] {
+        return this.regions.values.map(r => r.getRegionState());
     }
 
     serializeToClient(): SerializedWorld {

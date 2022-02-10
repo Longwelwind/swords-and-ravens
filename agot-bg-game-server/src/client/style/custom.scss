@@ -387,7 +387,20 @@ $wildling-outline: rgba(#f8ff00, 0.5);
   text-decoration: underline;
 }
 
+.link-color {
+  color: #00bc8c;
+}
+
+.link-color:hover {
+  color: #007053;
+}
+
 .region-area {
+  opacity: 0;
+  transition: all 0.12s linear;
+}
+
+.region-area-no-hover {
   opacity: 0;
   transition: all 0.12s linear;
 }
@@ -575,4 +588,12 @@ div.new-event {
 
 ul {
   list-style-type: none;
+}
+
+.scrollable-popover {
+  max-height: 850px;
+  max-width: 1250px;
+  overflow-y: auto;
+  overflow-x: auto;
+  white-space: pre-wrap;
 }

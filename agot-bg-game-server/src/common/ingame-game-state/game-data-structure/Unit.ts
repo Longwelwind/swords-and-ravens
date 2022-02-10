@@ -41,6 +41,18 @@ export default class Unit {
         return 0;
     }
 
+    getUnitState(): UnitState {
+        const result: UnitState = {
+            type: this.type.id,
+            house: this.allegiance.id
+        };
+        if (this.wounded) {
+            result.wounded = true;
+        }
+
+        return result;
+    }
+
     serializeToClient(): SerializedUnit {
         return {
             id: this.id,
@@ -67,4 +79,10 @@ export interface SerializedUnit {
     type: string;
     wounded: boolean;
     allegiance: string;
+}
+
+export interface UnitState {
+    type: string;
+    wounded?: boolean;
+    house: string;
 }

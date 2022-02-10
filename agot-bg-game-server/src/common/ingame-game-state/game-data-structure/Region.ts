@@ -1,5 +1,5 @@
 import RegionType from "./RegionType";
-import Unit, {SerializedUnit} from "./Unit";
+import Unit, {SerializedUnit, UnitState} from "./Unit";
 import House from "./House";
 import {observable} from "mobx";
 import Game from "./Game";
@@ -138,6 +138,51 @@ export default class Region {
         }
     }
 
+    getRegionState(): RegionState {
+        const result: RegionState = {
+            id: this.id
+        };
+
+        const controller = this.getController();
+        if (controller) {
+            result.controller = controller.id;
+        }
+
+        if (this.units.size != 0) {
+            result.units = this.units.values.map(u => u.getUnitState());
+        }
+
+        if (this.garrison != 0) {
+            result.garrison = this.garrison;
+        }
+
+        if (this.controlPowerToken) {
+            result.controlPowerToken = this.controlPowerToken.id;
+        }
+
+        if (this.loyaltyTokens != 0) {
+            result.loyaltyTokens = this.loyaltyTokens;
+        }
+
+        if (this.castleModifier != 0) {
+            result.castleModifier = this.castleModifier;
+        }
+
+        if (this.barrelModifier != 0) {
+            result.barrelModifier = this.barrelModifier;
+        }
+
+        if (this.crownModifier != 0) {
+            result.crownModifier = this.crownModifier;
+        }
+
+        if (this.overwrittenSuperControlPowerToken) {
+            result.overwrittenSuperControlPowerToken = this.overwrittenSuperControlPowerToken.id;
+        }
+
+        return result;
+    }
+
     serializeToClient(): SerializedRegion {
         return {
             id: this.id,
@@ -182,4 +227,18 @@ export interface SerializedRegion {
     barrelModifier: number;
     crownModifier: number;
     overwrittenSuperControlPowerToken: string | null;
+}
+
+export interface RegionState {
+    id: string;
+    controller?: string;
+    units?: UnitState[];
+    garrison?: number;
+    controlPowerToken?: string;
+    loyaltyTokens?: number;
+    castleModifier?: number;
+    barrelModifier?: number;
+    crownModifier?: number;
+    overwrittenSuperControlPowerToken?: string;
+    order?: { type: string; restricted?: boolean };
 }
