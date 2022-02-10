@@ -60,7 +60,7 @@ export default class GameClient {
         }
 
         if (!this.entireGame || !(this.entireGame.childGameState instanceof IngameGameState)) {
-            throw new Error("authenticatedPlayer requires IngameGameState");
+            return null;
         }
 
         if (this.entireGame.childGameState.players.has(this.authenticatedUser)) {

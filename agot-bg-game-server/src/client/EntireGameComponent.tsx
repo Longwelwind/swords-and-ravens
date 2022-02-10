@@ -15,10 +15,11 @@ import faviconNormal from "../../public/images/favicon.ico";
 import faviconAlert from "../../public/images/favicon-alert.ico";
 import rollingDicesImage from "../../public/images/icons/rolling-dices.svg";
 import {Helmet} from "react-helmet";
-import { FormCheck, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { FormCheck, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import { preventOverflow } from "@popperjs/core";
 import DraftHouseCardsGameState from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import { observable } from "mobx";
+import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
 
 interface EntireGameComponentProps {
     entireGame: EntireGame;
@@ -35,9 +36,15 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 <link rel="icon" href={this.props.gameClient.isOwnTurn() ? faviconAlert : faviconNormal} sizes="16x16" />
             </Helmet>
             <Col xs={12} className={this.props.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
-                <div style={{ marginLeft: "1rem", marginBottom: "0rem", textAlign: "center", alignItems: "center"}}>
-                    <h4 style={{ display: "inline" }}>{this.props.entireGame.name} {this.getTidesOfBattleImage()} {this.getGameTypeBadge()}</h4>{this.renderMapSwitch()}
-                </div>
+                <Row className="justify-content-center align-items-center">
+                    {this.renderHouseIcon()}
+                    <Col xs="auto">
+                        <h4>{this.props.entireGame.name}</h4>
+                    </Col>
+                    {this.renderTidesOfBattleImage()}
+                    {this.renderGameTypeBadge()}
+                    {this.renderMapSwitch()}
+                </Row>
             </Col>
             {
                 this.props.entireGame.childGameState instanceof LobbyGameState ? (
@@ -51,53 +58,71 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         </>;
     }
 
-    getTidesOfBattleImage(): ReactNode {
-        return <OverlayTrigger
-            placement="auto"
-            overlay={
-                <Tooltip id="tob-active-tooltip">
-                    <Col className="text-center">
-                        Tides of Battle
-                        {this.props.entireGame.gameSettings.removeTob3 && <>
-                            <br/><small>No 3s</small>
-                        </>}
-                        {this.props.entireGame.gameSettings.removeTobSkulls && <>
-                            <br/><small>No skulls</small>
-                        </>}
-                        {this.props.entireGame.gameSettings.limitTob2 && <>
-                            <br/><small>Only two 2s</small>
-                        </>}
-                    </Col>
-                </Tooltip>}
-            popperConfig={{ modifiers: [preventOverflow] }}
-        >
-            <img src={rollingDicesImage} width="30" style={{ "display": this.props.entireGame.gameSettings.tidesOfBattle ? "inline" : "none", marginTop: "-6px", paddingLeft: "5px" }} />
-        </OverlayTrigger>
+    renderTidesOfBattleImage(): ReactNode {
+        return this.props.entireGame.gameSettings.tidesOfBattle &&
+            <Col xs="auto">
+                <OverlayTrigger
+                    placement="auto"
+                    overlay={
+                        <Tooltip id="tob-active-tooltip">
+                            <Col className="text-center">
+                                Tides of Battle
+                                {this.props.entireGame.gameSettings.removeTob3 && <>
+                                    <br/><small>No 3s</small>
+                                </>}
+                                {this.props.entireGame.gameSettings.removeTobSkulls && <>
+                                    <br/><small>No skulls</small>
+                                </>}
+                                {this.props.entireGame.gameSettings.limitTob2 && <>
+                                    <br/><small>Only two 2s</small>
+                                </>}
+                            </Col>
+                        </Tooltip>}
+                    popperConfig={{ modifiers: [preventOverflow] }}
+                >
+                    <img src={rollingDicesImage} width="30" />
+                </OverlayTrigger>
+            </Col>;
     }
 
-    getGameTypeBadge(): ReactNode {
-        return this.props.entireGame.gameSettings.pbem
-            ? <Badge variant="primary" className="mx-3">PBEM</Badge>
-            : <Badge variant="success" className="mx-3">Live</Badge>;
+    renderGameTypeBadge(): ReactNode {
+        return <Col xs="auto">
+            <h4>
+                {this.props.entireGame.gameSettings.pbem
+                    ? <Badge variant="primary">PBEM</Badge>
+                    : <Badge variant="success">Live</Badge>}
+            </h4>
+        </Col>;
     }
 
     renderBetaWarning(): ReactNode {
-        return <h6 style={{display: "inline", fontWeight: "normal"}}>&nbsp;BETA!</h6>
+        return <Col xs="auto"><h6 style={{ fontWeight: "normal" }}>BETA!</h6></Col>
+    }
+
+    renderHouseIcon(): ReactNode {
+        return this.props.gameClient.authenticatedPlayer &&
+            <Col xs="auto">
+                <div style={{marginTop: "-4px"}}>
+                    <SimpleInfluenceIconComponent house={this.props.gameClient.authenticatedPlayer.house} small={true}/>
+                </div>
+            </Col>;
     }
 
     renderMapSwitch(): ReactNode {
         return this.props.entireGame.hasChildGameState(DraftHouseCardsGameState) &&
-            <FormCheck
-                id="show-hide-map-setting"
-                type="switch"
-                label="Show map"
-                style={{display: "inline", marginLeft: "10px"}}
-                checked={this.showMapWhenDrafting}
-                onChange={() => {
-                    this.showMapWhenDrafting = !this.showMapWhenDrafting;
-                    this.changeUserSettings();
-                }}
-            />
+            <Col xs="auto">
+                <FormCheck
+                    id="show-hide-map-setting"
+                    type="switch"
+                    label="Show map"
+                    style={{ marginTop: "-6px" }}
+                    checked={this.showMapWhenDrafting}
+                    onChange={() => {
+                        this.showMapWhenDrafting = !this.showMapWhenDrafting;
+                        this.changeUserSettings();
+                    }}
+                />
+            </Col>;
     }
 
     changeUserSettings(): void {

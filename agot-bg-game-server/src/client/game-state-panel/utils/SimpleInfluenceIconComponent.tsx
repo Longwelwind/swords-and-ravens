@@ -7,6 +7,7 @@ import { preventOverflow } from "@popperjs/core";
 
 interface SimpleInfluenceIconComponentProps {
     house: LobbyHouse;
+    small?: boolean;
 }
 
 export default class SimpleInfluenceIconComponent extends Component<SimpleInfluenceIconComponentProps> {
@@ -15,6 +16,7 @@ export default class SimpleInfluenceIconComponent extends Component<SimpleInflue
     }
 
     render(): ReactNode {
+        const height = this.props.small ? "28px" : undefined;
         return <OverlayTrigger overlay={
                 <Tooltip id="influence-icon">
                     <b>{this.house.name}</b>
@@ -24,7 +26,7 @@ export default class SimpleInfluenceIconComponent extends Component<SimpleInflue
             popperConfig={{modifiers: [preventOverflow]}}
         >
             <div className="influence-icon"
-                style={{backgroundImage: `url(${houseInfluenceImages.get(this.house.id)})`}}/>
+                style={{backgroundImage: `url(${houseInfluenceImages.get(this.house.id)})`, height: height}}/>
         </OverlayTrigger>;
     }
 }
