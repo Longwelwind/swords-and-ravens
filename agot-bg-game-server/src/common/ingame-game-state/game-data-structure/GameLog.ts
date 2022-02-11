@@ -46,7 +46,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | LoyalMaesterExecuted | MasterAtArmsExecuted | SavvyStewardExecuted | SpymasterExecuted
     | ObjectivesChosen | NewObjectiveCardDrawn | SpecialObjectiveScored | ObjectiveScored | IronbornRaid
     | ShiftingAmbitionsObjectiveChosenFromHand | ShiftingAmbitionsObjectiveChosenFromPool | NewInformationObjectiveCardChosen
-    | RevealAllObjectives | GarrisonRemoved | GarrisonReturned | ObjectiveDeckEmpty | OrdersRevealed;
+    | RevealAllObjectives | GarrisonRemoved | GarrisonReturned | ObjectiveDeckEmpty | OrdersRevealed | HouseCardsReturned;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -1003,4 +1003,11 @@ interface ObjectiveDeckEmpty {
 interface OrdersRevealed {
     type: "orders-revealed";
     worldState: RegionState[];
+}
+
+interface HouseCardsReturned {
+    type: "house-cards-returned";
+    house: string;
+    houseCards: string[];
+    houseCardDiscarded?: string;
 }

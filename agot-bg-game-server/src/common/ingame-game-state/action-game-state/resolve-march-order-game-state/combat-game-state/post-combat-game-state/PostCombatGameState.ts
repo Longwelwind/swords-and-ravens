@@ -94,7 +94,7 @@ export default class PostCombatGameState extends GameState<
         this.entireGame.broadcastToClients({
             type: "update-combat-stats",
             stats: this.combat.stats
-        })
+        });
 
         this.combat.ingameGameState.log({
             type: "combat-result",
@@ -377,12 +377,19 @@ export default class PostCombatGameState extends GameState<
 
         // If all cards are used or discarded, put all used as available,
         // except the one that has been used.
-        if (house.houseCards.values.every(hc => hc.state == HouseCardState.USED || hc.state == HouseCardState.DISCARDED)) {
+        if (house.houseCards.values.every(hc => hc.state == HouseCardState.USED)) {
             const houseCardsToMakeAvailable = house.houseCards.values
                 .filter(hc => hc != houseCard)
                 .filter(hc => hc.state == HouseCardState.USED);
 
             houseCardsToMakeAvailable.forEach(hc => hc.state = HouseCardState.AVAILABLE);
+
+            this.combat.ingameGameState.log({
+                type: "house-cards-returned",
+                house: house.id,
+                houseCards: houseCardsToMakeAvailable.map(hc => hc.id),
+                houseCardDiscarded: houseCard ? houseCard.id : undefined
+            });
 
             this.entireGame.broadcastToClients({
                 type: "change-state-house-card",

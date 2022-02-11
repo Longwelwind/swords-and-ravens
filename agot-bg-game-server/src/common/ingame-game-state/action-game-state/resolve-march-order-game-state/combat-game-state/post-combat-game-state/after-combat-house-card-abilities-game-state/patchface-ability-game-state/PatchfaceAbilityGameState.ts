@@ -93,6 +93,13 @@ export default class PatchfaceAbilityGameState extends GameState<
                 hc.state = HouseCardState.AVAILABLE;
             });
 
+            this.combat.ingameGameState.log({
+                type: "house-cards-returned",
+                house: affectedHouse.id,
+                houseCards: returnedHouseCards.map(hc => hc.id),
+                houseCardDiscarded: houseCard.id
+            });
+
             this.entireGame.broadcastToClients({
                 type: "change-state-house-card",
                 houseId: affectedHouse.id,

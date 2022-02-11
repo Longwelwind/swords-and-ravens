@@ -1750,6 +1750,17 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>
                 </OverlayTrigger>;
             }
+            case "house-cards-returned": {
+                const house = this.game.houses.get(data.house);
+                const returnedHouseCards = data.houseCards.map(hcid => this.allHouseCards.get(hcid));
+                const houseCardDiscarded = data.houseCardDiscarded ? this.allHouseCards.get(data.houseCardDiscarded) : null;
+
+                return <p>
+                    House <b>{house.name}</b> took back their discarded House
+                    cards ({joinReactNodes(returnedHouseCards.map(hc => <b key={`roose_${hc.id}`}>{hc.name}</b>), ", ")}).
+                    {houseCardDiscarded ? <><br/><b>{houseCardDiscarded.name}</b> was played as the last card and remains discarded.</> : <></>}
+                </p>;
+            }
         }
     }
 

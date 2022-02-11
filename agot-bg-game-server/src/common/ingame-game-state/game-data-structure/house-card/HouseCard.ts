@@ -4,8 +4,7 @@ import {observable} from "mobx";
 
 export enum HouseCardState {
     AVAILABLE,
-    USED,
-    DISCARDED
+    USED
 }
 
 export default class HouseCard {
