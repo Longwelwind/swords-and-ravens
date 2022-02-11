@@ -586,8 +586,8 @@ export default class MapComponent extends Component<MapComponentProps> {
         const drawBorder = order?.type.restrictedTo == sea.kind;
         const controller = drawBorder ? region.getController() : null;
         const color = drawBorder && controller
-            ? controller.id != "greyjoy" 
-                ? controller.color 
+            ? controller.id != "greyjoy"
+                ? controller.color
                 : "black"
             : undefined;
 

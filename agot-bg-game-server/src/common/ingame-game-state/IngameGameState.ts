@@ -358,6 +358,8 @@ export default class IngameGameState extends GameState<
             }
 
             this.createVote(user, new ReplaceVassalByPlayer(user, house));
+        } else if (message.type == "game-log-seen") {
+            this.gameLogManager.lastSeenLogTimes.set(user, new Date());
         } else if (this.players.has(user)) {
             const player = this.players.get(user);
 
@@ -1090,7 +1092,7 @@ export default class IngameGameState extends GameState<
             type: "ingame",
             players: this.players.values.map(p => p.serializeToClient()),
             game: this.game.serializeToClient(admin, player),
-            gameLogManager: this.gameLogManager.serializeToClient(),
+            gameLogManager: this.gameLogManager.serializeToClient(admin, user),
             votes: this.votes.values.map(v => v.serializeToClient(admin, player)),
             childGameState: this.childGameState.serializeToClient(admin, player)
         };

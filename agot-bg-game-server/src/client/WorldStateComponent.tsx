@@ -68,7 +68,6 @@ export default class WorldStateComponent extends Component<WorldStateComponentPr
                 <div style={{ position: "relative" }}>
                     {this.props.worldState.map(r => (
                         <div key={r.id}>
-                            {console.log(r.id + ": " + r.castleModifier)}
                             {r.castleModifier !== undefined && (
                                 <div
                                     className="castle-modification"
@@ -126,7 +125,7 @@ export default class WorldStateComponent extends Component<WorldStateComponentPr
 
     renderUnits(garrisons: BetterMap<string, string | null>): ReactNode {
         const regions = this.ingame.world.regions;
-        
+
         return this.props.worldState.map(r => {
             return <div
                 key={r.id}

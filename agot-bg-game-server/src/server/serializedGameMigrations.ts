@@ -1521,6 +1521,15 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             serializedGame.users.forEach((u: any) => u.facelessName = u.facelessName.replace("Faceless Man", "Nobody"));
             return serializedGame;
         }
+    },
+    {
+        version: "67",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                serializedGame.childGameState.gameLogManager.lastSeenLogTimes = [];
+            }
+            return serializedGame;
+        }
     }
 ];
 
