@@ -1530,6 +1530,15 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "68",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.gameSettings.setupId == "a-feast-for-crows") {
+                serializedGame.gameSettings.allowGiftingPowerTokens = false;
+            }
+            return serializedGame;
+        }
     }
 ];
 
