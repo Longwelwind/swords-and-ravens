@@ -487,6 +487,21 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         onChange={() => this.changeGameSettings(() => this.gameSettings.limitTob2 = !this.gameSettings.limitTob2)}
                     />
                 </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="reduce-vp-count-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="reduce-vp-count-setting-tooltip">
+                                    When this option is enabled, the number of victory points required for winning is reduced to <b>6</b> instead of 7.
+                                </Tooltip>}>
+                                <label htmlFor="reduce-vp-count-setting">Reduce VP count to 6</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.reduceVictoryPointsCountNeededToWinTo6}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.reduceVictoryPointsCountNeededToWinTo6 = !this.gameSettings.reduceVictoryPointsCountNeededToWinTo6)}
+                    />
+                </Col>
             </Col>
         </Row>
     }
