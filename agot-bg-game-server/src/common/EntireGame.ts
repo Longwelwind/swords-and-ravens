@@ -39,7 +39,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         draftHouseCards: false, thematicDraft: false, limitedDraft: false, blindDraft: false,
         cokWesterosPhase: false, endless: false, useVassalPositions: false, precedingMustering: false,
         mixedWesterosDeck1: false, removeTob3: false, removeTobSkulls: false, limitTob2: false, faceless: false,
-        randomStartPositions: false, addPortToTheEyrie: false};
+        randomStartPositions: false, addPortToTheEyrie: false, reduceVictoryPointsCountNeededToWinTo6: false};
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -591,4 +591,5 @@ export interface GameSettings {
     faceless: boolean;
     randomStartPositions: boolean;
     addPortToTheEyrie: boolean;
+    reduceVictoryPointsCountNeededToWinTo6: boolean;
 }

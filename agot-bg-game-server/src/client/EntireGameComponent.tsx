@@ -20,6 +20,8 @@ import { preventOverflow } from "@popperjs/core";
 import DraftHouseCardsGameState from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import { observable } from "mobx";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faExclamation } from "@fortawesome/free-solid-svg-icons";
 
 interface EntireGameComponentProps {
     entireGame: EntireGame;
@@ -44,6 +46,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     {this.renderTidesOfBattleImage()}
                     {this.renderGameTypeBadge()}
                     {this.renderMapSwitch()}
+                    {this.renderWarnings()}
                 </Row>
             </Col>
             {
@@ -95,8 +98,22 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         </Col>;
     }
 
-    renderBetaWarning(): ReactNode {
-        return <Col xs="auto"><h6 style={{ fontWeight: "normal" }}>BETA!</h6></Col>
+    renderWarnings(): ReactNode {
+        return <Col xs="auto">
+            {/* <h6 style={{ fontWeight: "normal" }}>BETA!</h6> */}
+            {this.props.entireGame.gameSettings.reduceVictoryPointsCountNeededToWinTo6 && <OverlayTrigger
+                    placement="auto"
+                    overlay={
+                        <Tooltip id="vp-counts-reduced-tooltip">
+                            <Col className="text-center">
+                                The number of victory points required for winning is reduced to <b>6</b> instead of 7!
+                            </Col>
+                        </Tooltip>}
+                    popperConfig={{ modifiers: [preventOverflow] }}
+                >
+                    <FontAwesomeIcon icon={faExclamation}/>
+                </OverlayTrigger>}
+        </Col>
     }
 
     renderHouseIcon(): ReactNode {
