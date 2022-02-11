@@ -41,9 +41,13 @@ import crossedSwordsImage from "../../public/images/icons/crossed-swords.svg";
 import getIngameUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import WorldStateComponent from "./WorldStateComponent";
+import GameClient from "./GameClient";
+import GameLogManager from "../common/ingame-game-state/game-data-structure/GameLogManager";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
+    gameClient: GameClient;
+    currentlyViewed: boolean;
 }
 
 @observer
@@ -56,6 +60,10 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
     get world(): World {
         return this.game.world;
+    }
+
+    get logManager(): GameLogManager {
+        return this.props.ingameGameState.gameLogManager;
     }
 
     createHouseCards(data: [string, HouseCardData][]): [string, HouseCard][] {
@@ -84,39 +92,63 @@ export default class GameLogListComponent extends Component<GameLogListComponent
     }
 
     render(): ReactNode {
-        return this.props.ingameGameState.gameLogManager.logs.map((l, i) => (
-            <Row key={`log_${i}`}>
-                <Col xs="auto" className="text-muted">
-                    <OverlayTrigger
-                        placement="auto"
-                        overlay={<Tooltip id={"log-date-" + l.time.getUTCMilliseconds()}>{l.time.toLocaleString()}</Tooltip>}
-                        popperConfig={{modifiers: [preventOverflow]}}
-                    >
-                        <small>
-                            {l.time.getHours().toString().padStart(2, "0")}
-                            :{l.time.getMinutes().toString().padStart(2, "0")}
-                        </small>
-                    </OverlayTrigger>
-                </Col>
-                {l.resolvedAutomatically && <Col xs="auto">
-                    <OverlayTrigger
-                        overlay={<Tooltip id="logs-tooltip">This action has been resolved automatically.</Tooltip>}
-                        placement="auto"
-                        popperConfig={{modifiers: [preventOverflow]}}
-                    >
-                        <span>
-                            <FontAwesomeIcon
-                                style={{ color: "white" }}
-                                icon={faFastForward} />
-                        </span>
-                    </OverlayTrigger>
-                </Col>}
-                <Col>
-                    <div className="game-log-content">
-                        {this.renderGameLogData(l.data)}
-                    </div>
-                </Col>
-            </Row>
+        const lastSeenLogTime = this.props.gameClient.authenticatedUser
+            ? this.logManager.lastSeenLogTimes.tryGet(this.props.gameClient.authenticatedUser, null)
+            : null;
+
+        return this.logManager.logs.map((l, i) => (
+            <div key={`log_${i}`}>
+                {lastSeenLogTime == null && i == 0 && (
+                    <Row className="justify-content-center align-items-center">
+                        <Col xs={true}><hr className="red"/></Col>
+                        <Col xs="auto" style={{color: "red"}}>
+                            <h6>New log entries</h6>
+                        </Col>
+                        <Col xs={true}><hr className="red"/></Col>
+                    </Row>
+                )}
+                <Row>
+                    <Col xs="auto" className="text-muted">
+                        <OverlayTrigger
+                            placement="auto"
+                            overlay={<Tooltip id={"log-date-" + l.time.getUTCMilliseconds()}>{l.time.toLocaleString()}</Tooltip>}
+                            popperConfig={{modifiers: [preventOverflow]}}
+                        >
+                            <small>
+                                {l.time.getHours().toString().padStart(2, "0")}
+                                :{l.time.getMinutes().toString().padStart(2, "0")}
+                            </small>
+                        </OverlayTrigger>
+                    </Col>
+                    {l.resolvedAutomatically && <Col xs="auto">
+                        <OverlayTrigger
+                            overlay={<Tooltip id="logs-tooltip">This action has been resolved automatically.</Tooltip>}
+                            placement="auto"
+                            popperConfig={{modifiers: [preventOverflow]}}
+                        >
+                            <span>
+                                <FontAwesomeIcon
+                                    style={{ color: "white" }}
+                                    icon={faFastForward} />
+                            </span>
+                        </OverlayTrigger>
+                    </Col>}
+                    <Col>
+                        <div className="game-log-content">
+                            {this.renderGameLogData(l.data)}
+                        </div>
+                    </Col>
+                </Row>
+                {lastSeenLogTime && (i + 1) < this.logManager.logs.length && this.logManager.logs[i].time <= lastSeenLogTime && this.logManager.logs[i + 1].time > lastSeenLogTime && (
+                    <Row className="justify-content-center align-items-center">
+                        <Col xs={true}><hr className="red"/></Col>
+                        <Col xs="auto" style={{color: "red"}}>
+                            <h6>New log entries</h6>
+                        </Col>
+                        <Col xs={true}><hr className="red"/></Col>
+                    </Row>
+                )}
+            </div>
         ));
     }
 
@@ -1727,5 +1759,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 <WorldStateComponent ingameGameState={this.props.ingameGameState} worldState={worldState}/>
             </Col>
         </Popover>;
+    }
+
+    componentDidUpdate(prevProps: Readonly<GameLogListComponentProps>, _prevState: Readonly<Record<string, unknown>>): void {
+        if (this.props.currentlyViewed) {
+            this.logManager.sendGameLogSeen();
+        }
+
+        if (this.props.gameClient.authenticatedUser && prevProps.currentlyViewed == true && !this.props.currentlyViewed) {
+            this.logManager.lastSeenLogTimes.set(this.props.gameClient.authenticatedUser, new Date());
+        }
+    }
+
+    componentDidMount(): void {
+        if (this.props.currentlyViewed) {
+            this.logManager.sendGameLogSeen();
+        }
     }
 }

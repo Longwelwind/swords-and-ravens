@@ -766,7 +766,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="game-logs" className="h-100">
                                     <ScrollToBottom className="h-100" scrollViewClassName="overflow-x-hidden">
-                                        <GameLogListComponent ingameGameState={this.props.gameState} />
+                                        <GameLogListComponent ingameGameState={this.props.gameState} gameClient={this.props.gameClient} currentlyViewed={this.currentOpenedTab == "game-logs"}/>
                                     </ScrollToBottom>
                                 </Tab.Pane>
                                 <Tab.Pane eventKey="settings" className="h-100">

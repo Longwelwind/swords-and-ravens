@@ -120,7 +120,7 @@ export default class ChatClient {
     }
 
     onMessage(channel: Channel, message: ChatServerMessage): void {
-        console.log(message);
+        // console.log(message);
 
         if (message.type == 'chat_message') {
             this.parseMessage(channel, message);

@@ -277,7 +277,7 @@ export default class Game {
     }
 
     getTotalControlledLandRegions(h: House): number {
-        return this.world.regions.values.filter(r => r.getController() == h).filter(r => r.type == land).length;
+        return this.world.regions.values.filter(r => r.type == land).filter(r => r.getController() == h).length;
     }
 
     getPotentialWinner(lastRound = false): House {
