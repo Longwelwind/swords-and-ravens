@@ -69,6 +69,14 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
             return false;
         }
 
+        // It might happen that a player gifted Power tokens during bidding and now
+        // doesn't have the amount of their bid anymore. So we need to adapt the biddings to
+        // the maximum of the players power tokens, just to be sure.
+        this.bids.keys.forEach(house => {
+            const bid = this.bids.get(house);
+            this.bids.set(house, Math.min(bid, house.powerTokens));
+        });
+
         // Remove the power tokens
         this.bids.entries.forEach(([house, bid]) => {
             house.powerTokens -= bid;
