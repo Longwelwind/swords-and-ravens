@@ -54,6 +54,9 @@ class User(AbstractUser):
     def is_in_group(self, group_name):
         return self.groups.filter(name=group_name).exists()
 
+    def is_in_one_group(self, group_names):
+        return self.groups.filter(name__in=group_names).exists()
+
     def can_update_username(self):
         return self.last_username_update_time is None
 
