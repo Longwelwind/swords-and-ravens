@@ -1539,6 +1539,46 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "69",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                // Decouple leftPowerToken from march resolved and create an own log for it
+                const newLogs: {time: number; data: any; index: number}[] = []
+                ingame.gameLogManager.logs.forEach((l: any, i: number) => {
+                    if (l.data.type == "march-resolved" && l.data.leftPowerToken !== null) {
+                        newLogs.push({
+                            time: l.time,
+                            index: i + 1,
+                            data: {
+                                type: "leave-power-token-choice",
+                                house: l.data.house,
+                                region: l.data.startingRegion,
+                                leftPowerToken: l.data.leftPowerToken
+                            }
+                        });
+
+                        // Remove the leftPowerToken info from the march-resolved log
+                        l.data.leftPowerToken = undefined;
+                    }
+                });
+
+                // Now inject the new logs in reversed order so the indices will be applied correctly
+                newLogs.reverse();
+
+                newLogs.forEach(log => {
+                    ingame.gameLogManager.logs.splice(log.index, 0 , {
+                        time: log.time,
+                        data: log.data
+                    });
+                });
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

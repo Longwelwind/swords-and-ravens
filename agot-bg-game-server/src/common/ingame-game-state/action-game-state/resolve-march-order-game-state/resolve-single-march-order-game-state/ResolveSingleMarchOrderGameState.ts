@@ -136,7 +136,6 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                     house: this.house.id,
                     startingRegion: startingRegion.id,
                     moves: movesThatDontTriggerAttack.map(([r, us]) => [r.id, us.map(u => u.type.id)]),
-                    leftPowerToken: leftPowerToken
                 });
             }
 
@@ -172,6 +171,15 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                         units: army.map(u => u.type.id)
                     });
 
+                    if (leftPowerToken != null) {
+                        this.ingame.log({
+                            type: "leave-power-token-choice",
+                            house: this.house.id,
+                            region: startingRegion.id,
+                            leftPowerToken: leftPowerToken
+                        });
+                    }
+
                     this.resolveMarchOrderGameState.proceedToCombat(
                         startingRegion, region, this.house, enemy, army, this.actionGameState.ordersOnBoard.get(startingRegion)
                     );
@@ -205,6 +213,15 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                         strength: oldGarrisonStrength
                     });
                 }
+            }
+
+            if (leftPowerToken != null) {
+                this.ingame.log({
+                    type: "leave-power-token-choice",
+                    house: this.house.id,
+                    region: startingRegion.id,
+                    leftPowerToken: leftPowerToken
+                });
             }
 
             // Remove the order
