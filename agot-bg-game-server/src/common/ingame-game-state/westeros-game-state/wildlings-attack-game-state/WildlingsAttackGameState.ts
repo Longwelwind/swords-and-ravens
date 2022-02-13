@@ -125,6 +125,10 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
         this.setChildGameState(new BiddingGameState(this)).firstStart(this.participatingHouses);
     }
 
+    getTrackWithoutTargaryen(track: House[]): House[] {
+        return track.filter(h => h != this.game.targaryen);
+    }
+
     onPlayerMessage(player: Player, message: ClientMessage): void {
         this.childGameState.onPlayerMessage(player, message);
     }

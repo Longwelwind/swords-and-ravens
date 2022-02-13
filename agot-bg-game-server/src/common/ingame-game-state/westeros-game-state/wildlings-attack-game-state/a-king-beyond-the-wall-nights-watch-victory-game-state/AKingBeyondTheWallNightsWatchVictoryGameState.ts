@@ -20,8 +20,21 @@ export default class AKingBeyondTheWallNightsWatchVictoryGameState extends GameS
     }
 
     firstStart(): void {
+        const highestBidder = this.parentGameState.highestBidder;
+        // If highest bidder is Targaryen or highest bidder already holds all dominance tokens
+        // we can skip this decision and simply log Iron Throne as processed automatically
+        if (highestBidder == this.game.targaryen || this.game.influenceTracks.every(track => highestBidder == _.first(track))) {
+            this.ingame.log({
+                type: "a-king-beyond-the-wall-highest-top-track",
+                house: highestBidder.id,
+                trackI: 0
+            }, true);
+            this.parentGameState.onWildlingCardExecuteEnd();
+            return;
+        }
+
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
-            this.parentGameState.highestBidder,
+            highestBidder,
             "",
             ["Iron Throne Track", "Fiefdoms Track", "King's Court Track"]
         );

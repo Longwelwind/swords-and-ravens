@@ -241,8 +241,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         {moves.length > 0
                             ? <>
                                 <p>
-                                    House <b>{house.name}</b> marched from <b>{startingRegion.name}</b>{
-                                        data.leftPowerToken != null && <> and left {data.leftPowerToken ? "a" : "no"} Power&nbsp;token behind</>}{moves.length > 0 ? ":" : "."}
+                                    House <b>{house.name}</b> marched from <b>{startingRegion.name}</b>:
                                 </p>
                                 <ul>
                                     {moves.map(([region, unitTypes]) => (
@@ -259,6 +258,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                             </>}
                     </>
                 );
+            }
+            case "leave-power-token-choice": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
+
+                return <p>
+                    House <b>{house.name}</b> left {data.leftPowerToken ? <>behind a</> : <b>no</b>} Power&nbsp;token in <b>{region.name}</b>.
+                </p>;
             }
             case "westeros-card-executed":
                 const westerosCardType = westerosCardTypes.get(data.westerosCardType);

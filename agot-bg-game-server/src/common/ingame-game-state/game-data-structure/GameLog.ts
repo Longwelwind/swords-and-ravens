@@ -7,7 +7,7 @@ export default interface GameLog {
     resolvedAutomatically?: boolean;
 }
 
-export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack | MarchResolved
+export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack | MarchResolved | LeavePowerTokenChoice
     | WesterosCardExecuted | WesterosCardDrawn | CombatResult | WildlingCardRevealed | WildlingBidding
     | HighestBidderChosen | LowestBidderChosen | PlayerMustered | WinnerDeclared
     | RavenHolderWildlingCardPutBottom | RavenHolderWildlingCardPutTop | RavenHolderReplaceOrder | RavenNotUsed | RaidDone | DarkWingsDarkWordsChoice
@@ -96,7 +96,6 @@ interface MarchResolved {
     house: string;
     startingRegion: string;
     moves: [string, string[]][];
-    leftPowerToken: boolean | null;
 }
 
 interface WesterosCardExecuted {
@@ -1010,4 +1009,11 @@ interface HouseCardsReturned {
     house: string;
     houseCards: string[];
     houseCardDiscarded?: string;
+}
+
+interface LeavePowerTokenChoice {
+    type: "leave-power-token-choice";
+    house: string;
+    region: string;
+    leftPowerToken: boolean;
 }

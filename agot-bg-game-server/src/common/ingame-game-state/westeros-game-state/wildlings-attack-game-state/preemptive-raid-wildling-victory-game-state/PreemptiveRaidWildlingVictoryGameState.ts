@@ -88,6 +88,20 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
                     // throne holder chooses one.
                     this.step = PreemptiveRaidStep.REDUCING_INFLUENCE_TRACKS;
 
+                    // But if lowest bidder is already last on all tracks we can skip this decision
+                    // and simply log a message that this was processed automatically with Iron Throne
+                    if (this.parentGameState.lowestBidder == this.game.targaryen ||
+                            this.game.influenceTracks.every(track => this.parentGameState.lowestBidder == _.last(this.parentGameState.getTrackWithoutTargaryen(track)))) {
+                        this.ingame.log({
+                            type: "preemptive-raid-track-reduced",
+                            house: this.parentGameState.lowestBidder.id,
+                            chooser: null,
+                            trackI: 0
+                        }, true);
+                        this.parentGameState.onWildlingCardExecuteEnd();
+                        return;
+                    }
+
                     this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
                         this.game.ironThroneHolder,
                         "The holder of the Iron Throne chooses which influence tracks will be reduced",
