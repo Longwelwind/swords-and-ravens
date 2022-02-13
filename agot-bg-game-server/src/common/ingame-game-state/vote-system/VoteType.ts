@@ -158,10 +158,12 @@ export class ReplacePlayer extends VoteType {
             house: this.forHouse.id
         });
 
-        if (vote.ingame.entireGame.isFeastForCrows) {
-            // Re-transmit objectives, so newPlayer doesn't need to reload to see his secret objectives
-            vote.ingame.broadcastObjectives();
-        }
+        // Re-transmit the whole game, so newPlayer receives possible secrets like objectives in FFC
+        vote.ingame.entireGame.sendMessageToClients([newPlayer.user], {
+            type: "authenticate-response",
+            game: vote.ingame.entireGame.serializeToClient(newPlayer.user),
+            userId: newPlayer.user.id
+        });
 
         // If we are waiting for newPlayer, notify him about his turn
         if (vote.ingame.leafState.getWaitedUsers().includes(newPlayer.user)) {
@@ -418,6 +420,13 @@ export class ReplaceVassalByPlayer extends VoteType {
             type: "update-house-cards",
             house: this.forHouse.id,
             houseCards: this.forHouse.houseCards.values.map(hc => hc.serializeToClient())
+        });
+
+        // Re-transmit the whole game, so newPlayer receives possible secrets like objectives in FFC
+        vote.ingame.entireGame.sendMessageToClients([newPlayer.user], {
+            type: "authenticate-response",
+            game: vote.ingame.entireGame.serializeToClient(newPlayer.user),
+            userId: newPlayer.user.id
         });
 
         // If we are waiting for the newPlayer, notify them about their turn
