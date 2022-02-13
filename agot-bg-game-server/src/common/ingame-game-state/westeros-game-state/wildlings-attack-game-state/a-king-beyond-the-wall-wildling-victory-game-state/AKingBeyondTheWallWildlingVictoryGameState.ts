@@ -30,9 +30,22 @@ export default class AKingBeyondTheWallWildlingVictoryGameState extends Wildling
     }
 
     executeForEveryoneElse(house: House): void {
-        this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(house, "", [
-            "Fiefdoms Track", "King's Court Track"
-        ]);
+        const fiefdoms = this.parentGameState.getTrackWithoutTargaryen(this.game.fiefdomsTrack);
+        const kingsCourt = this.parentGameState.getTrackWithoutTargaryen(this.game.kingsCourtTrack);
+        if (house == this.game.targaryen || (_.last(fiefdoms) == house && _.last(kingsCourt) == house)) {
+            // When house already is last on Fiefdoms track and last on King's Court track
+            // we can skip this decision and simply log "Fiefdoms track" as processed automatically
+            this.ingame.log({
+                type: "a-king-beyond-the-wall-house-reduce-track",
+                house: house.id,
+                trackI: 1
+            }, true);
+            this.proceedNextHouse(house);
+        } else {
+            this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(house, "", [
+                "Fiefdoms Track", "King's Court Track"
+            ]);
+        }
     }
 
     onSimpleChoiceGameStateEnd(choice: number): void {
