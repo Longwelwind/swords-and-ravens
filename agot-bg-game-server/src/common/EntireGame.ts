@@ -35,7 +35,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
     @observable gameSettings: GameSettings = { pbem: true, onlyLive: false, startWhenFull: false, setupId: "mother-of-dragons", playerCount: 8,
         randomHouses: false, randomChosenHouses: false, adwdHouseCards: false,  tidesOfBattle: false,
-        vassals: true, seaOrderTokens: true, startWithSevenPowerTokens: true, allowGiftingPowerTokens: true,
+        vassals: true, ironBank: true, seaOrderTokens: true, allowGiftingPowerTokens: true,
         draftHouseCards: false, thematicDraft: false, limitedDraft: false, blindDraft: false,
         cokWesterosPhase: false, endless: false, useVassalPositions: false, precedingMustering: false,
         mixedWesterosDeck1: false, removeTob3: false, removeTobSkulls: false, limitTob2: false, faceless: false,
@@ -574,8 +574,8 @@ export interface GameSettings {
     cokWesterosPhase: boolean;
     vassals: boolean;
     seaOrderTokens: boolean;
-    startWithSevenPowerTokens: boolean;
     allowGiftingPowerTokens: boolean;
+    ironBank: boolean;
     tidesOfBattle: boolean;
     draftHouseCards: boolean;
     thematicDraft: boolean;

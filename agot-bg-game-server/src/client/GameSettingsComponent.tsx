@@ -197,7 +197,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="vassals-tooltip">
-                                    Unassigned houses will be vassals introduced by the Mother of Dragons expansion.
+                                    Unassigned houses will be vassals introduced by the <i>Mother of Dragons</i> expansion.
                                 </Tooltip>}>
                                 <label htmlFor="vassals-setting">MoD Vassals</label>
                             </OverlayTrigger>}
@@ -207,32 +207,32 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 </Col>
                 <Col xs="12">
                     <FormCheck
+                        id="iron-bank-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="iron-bank-setting-tooltip">
+                                    Enable the Iron Bank from the <i>Mother of Dragons</i> expansion. All player houses start with 7 Power tokens instead of 5.
+                                </Tooltip>}>
+                                <label htmlFor="iron-bank-setting">MoD Iron Bank</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.ironBank}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.ironBank = !this.gameSettings.ironBank)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
                         id="sea-orders-setting"
                         type="switch"
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="sea-orders-tooltip">
-                                    Enable Sea Order tokens from the Mother of Dragons expansion.
+                                    Enable Sea Order tokens from the <i>Mother of Dragons</i> expansion.
                                 </Tooltip>}>
                                 <label htmlFor="sea-orders-setting">MoD Sea Order Tokens</label>
                             </OverlayTrigger>}
                         checked={this.gameSettings.seaOrderTokens}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.seaOrderTokens = !this.gameSettings.seaOrderTokens)}
-                    />
-                </Col>
-                <Col xs="12">
-                    <FormCheck
-                        id="seven-pt-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="seven-pt-tooltip">
-                                    Houses will start with 7 Power tokens instead of 5.
-                                </Tooltip>}>
-                                <label htmlFor="seven-pt-setting">MoD Start with 7 PT</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.startWithSevenPowerTokens}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.startWithSevenPowerTokens = !this.gameSettings.startWithSevenPowerTokens)}
                     />
                 </Col>
                 <Col xs="12">

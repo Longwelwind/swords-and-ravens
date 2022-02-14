@@ -184,15 +184,14 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.vassals = true;
                 settings.seaOrderTokens = true;
                 settings.allowGiftingPowerTokens = true;
-                settings.startWithSevenPowerTokens = true;
             }
 
             // Lock MoD settings for 8p
-            if (settings.setupId == "mother-of-dragons" && settings.playerCount == 8) {
+            if (settings.setupId == "mother-of-dragons" && settings.playerCount >= 8) {
                 settings.vassals = true;
+                settings.ironBank = true;
                 settings.seaOrderTokens = true;
                 settings.allowGiftingPowerTokens = true;
-                settings.startWithSevenPowerTokens = true;
             }
 
             // Reset the MoD settings
@@ -200,7 +199,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.vassals = false;
                 settings.seaOrderTokens = false;
                 settings.allowGiftingPowerTokens = false;
-                settings.startWithSevenPowerTokens = false;
+                settings.ironBank = false;
             }
 
             // Reset Dwd Cards
@@ -340,7 +339,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
             return {success: false, reason: "not-enough-players"};
         }
 
-        if (this.settings.playerCount == 8 && !this.settings.randomHouses) {
+        if (this.settings.playerCount >= 8 && !this.settings.randomHouses) {
             if (!this.players.keys.map(lh => lh.id).includes("targaryen")) {
                 return {success: false, reason: "targaryen-must-be-a-player-controlled-house"};
             }

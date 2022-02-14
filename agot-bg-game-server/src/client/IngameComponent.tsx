@@ -81,7 +81,7 @@ import unitImages from "./unitImages";
 import DraftInfluencePositionsGameState from "../common/ingame-game-state/draft-influence-positions-game-state/DraftInfluencePositionsGameState";
 import DraftInfluencePositionsComponent from "./game-state-panel/DraftInfluencePositionsComponent";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
-import { faChevronCircleLeft, faChevronCircleRight } from "@fortawesome/free-solid-svg-icons";
+import { faChevronCircleLeft, faChevronCircleRight, faUniversity } from "@fortawesome/free-solid-svg-icons";
 import sleep from "../utils/sleep";
 import joinNaturalLanguage from "./utils/joinNaturalLanguage";
 import PayDebtsGameState from "../common/ingame-game-state/pay-debts-game-state/PayDebtsGameState";
@@ -98,6 +98,7 @@ import ConditionalWrap from "./utils/ConditionalWrap";
 import WildlingCardType from "../common/ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
 import WildlingCardComponent from "./game-state-panel/utils/WildlingCardComponent";
 import getIngameUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
+import IronBankTabComponent from "./IronBankTabComponent";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -251,7 +252,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         return (
             <>
-                <Col xs={{order: columnOrders.gameStateColumn}} style={{minWidth: this.gameSettings.playerCount == 8 ? "470px" : "450px", maxWidth: draftHouseCards ? "1200px" : "800px"}}>
+                <Col xs={{order: columnOrders.gameStateColumn}} style={{minWidth: this.gameSettings.playerCount >= 8 ? "470px" : "450px", maxWidth: draftHouseCards ? "1200px" : "800px"}}>
                     {this.renderGameStateColumn()}
                 </Col>
                 {showMap && <Col xs={{span: "auto", order: columnOrders.mapColumn}}>
@@ -690,6 +691,22 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         </Nav.Link>
                                     </Nav.Item>
                                 )}
+                                {this.ingame.game.ironBank && this.ingame.entireGame.gameSettings.playerCount < 8 && (
+                                    <Nav.Item>
+                                        <Nav.Link eventKey="iron-bank">
+                                            <OverlayTrigger
+                                                overlay={<Tooltip id="iron-bank-tooltip">The Iron Bank</Tooltip>}
+                                                placement="top"
+                                            >
+                                                <span>
+                                                    <FontAwesomeIcon
+                                                        style={{ color: "white" }}
+                                                        icon={faUniversity} />
+                                                </span>
+                                            </OverlayTrigger>
+                                        </Nav.Link>
+                                    </Nav.Item>
+                                )}
                                 <Nav.Item>
                                     <Nav.Link eventKey="note">
                                         <OverlayTrigger
@@ -783,6 +800,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         <ObjectivesInfoComponent ingame={this.ingame} gameClient={this.props.gameClient}/>
                                     </div>
                                 </Tab.Pane>
+                                {this.game.ironBank && <Tab.Pane eventKey="iron-bank" className="h-100">
+                                    <div className="d-flex flex-column h-100" style={{overflowY: "scroll"}}>
+                                        <IronBankTabComponent ingame={this.ingame} ironBank={this.game.ironBank} />
+                                    </div>
+                                </Tab.Pane>}
                                 <Tab.Pane eventKey="note" className="h-100">
                                     <NoteComponent gameClient={this.props.gameClient} ingame={this.props.gameState} />
                                 </Tab.Pane>

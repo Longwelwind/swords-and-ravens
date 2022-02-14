@@ -16,7 +16,7 @@ import {land, port} from "./regionTypes";
 import PlanningRestriction from "./westeros-card/planning-restriction/PlanningRestriction";
 import WesterosCardType from "./westeros-card/WesterosCardType";
 import IngameGameState from "../IngameGameState";
-import { vassalHousesOrders, playerHousesOrders, seaOrders } from "./orders";
+import { vassalHousesOrders, playerHousesOrders, seaOrders, ironBankOrder } from "./orders";
 import IronBank, { SerializedIronBank } from "./IronBank";
 import Player from "../Player";
 import { ObjectiveCard } from "./static-data-structure/ObjectiveCard";
@@ -173,6 +173,10 @@ export default class Game {
 
         if (this.ingame.entireGame.gameSettings.seaOrderTokens) {
             return _.concat(playerHousesOrders, seaOrders);
+        }
+
+        if (this.ingame.entireGame.gameSettings.ironBank) {
+            return _.concat(playerHousesOrders, ironBankOrder);
         }
 
         return playerHousesOrders;
