@@ -44,7 +44,7 @@ export default class ScoreOtherObjectivesComponent extends Component<GameStateCo
         // which means by scoring a 4 the houses ahead could overtake the current house on the victory track, thus allowing to score BP)
         // and if all houses behind on IT track have a higher victory point count than the current house:
         const game = this.props.gameState.game;
-        const turnOrder = game.getTurnOrder();
+        const turnOrder = game.ingame.getTurnOrderWithoutVassals();
         const ownTurnOrderIndex = turnOrder.findIndex(h => h == controlledHouse);
         const housesAhead = turnOrder.filter((_h, i) => i < ownTurnOrderIndex);
         const housesBehind = turnOrder.filter((_h, i) => i > ownTurnOrderIndex);

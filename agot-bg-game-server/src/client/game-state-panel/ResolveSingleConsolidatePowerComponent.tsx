@@ -48,10 +48,6 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<Ga
         return this.gameState.ingame.game.ironBank;
     }
 
-    get theIronBank(): IronBank {
-        return this.gameState.ingame.game.theIronBank;
-    }
-
     render(): ReactNode {
         const availableOrders =this.props.gameState.parentGameState.getAvailableOrdersOfHouse(this.house);
         return (

@@ -1183,9 +1183,9 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                 })));
                 const loanSlots = [];
 
-                // Usually before everye westeros phase begins a loan card is drawn
-                // So when we are in any Westeros state we can reveal the top card now
-                // Don't do it when we are in planning, as some users might not have realized the new loan card
+                // Normally, a new loan card is drawn before the start of each Westeros phase.
+                // So, if we are in any state of Westeros, we can now reveal the top card.
+                // But we do not do it when we are in the planning phase, as some players may not have recognized the new loan card.
                 if (ingame.childGameState.type == "westeros") {
                     // Reveal the top loan card
                     loanSlots.push(loanDeck.shift());
@@ -1577,6 +1577,18 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                 });
             }
 
+            return serializedGame;
+        }
+    },
+    {
+        version: "70",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "lobby") {
+                // Migrate current lobby games and replace the old startWithSevenPowerTokens setting with the new ironBank setting
+                if (serializedGame.gameSettings.playerCount >= 8 || serializedGame.gameSettings.startWithSevenPowerTokens) {
+                    serializedGame.gameSettings.ironBank = true;
+                }
+            }
             return serializedGame;
         }
     }

@@ -43,3 +43,4 @@ export default orders;
 export const playerHousesOrders = orders.values.slice(0, 15);
 export const vassalHousesOrders = orders.values.slice(15, 19);
 export const seaOrders = orders.values.slice(19);
+export const ironBankOrder = orders.values[orders.size - 1];

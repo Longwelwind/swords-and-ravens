@@ -79,6 +79,16 @@ if (!powerTokenSlotsLayer) {
     throw new Error("No layer named Power Token Slots in map file");
 }
 
+const improvementSlotsLayer = westerosData.layers.find(l => l.name == "Improvement Slots");
+if (!improvementSlotsLayer) {
+    throw new Error("No layer named Improvement Slots in map file");
+}
+
+const castleSlotsLayer = westerosData.layers.find(l => l.name == "Castle Slots");
+if (!castleSlotsLayer) {
+    throw new Error("No layer named Castle Slots in map file");
+}
+
 const regionIdToUnitSlots = new BetterMap<string, UnitSlot>();
 (unitSlotsLayer.objects as TiledSquareObject[]).forEach(o => {
     const regionId = getTiledProperty(o.properties, "region");
@@ -124,6 +134,38 @@ const regionIdToPowerTokenSlots = new BetterMap<string, Point>();
     });
 });
 
+const regionIdToImprovementSlots = new BetterMap<string, UnitSlot>();
+(improvementSlotsLayer.objects as TiledSquareObject[]).forEach(o => {
+    const regionId = getTiledProperty(o.properties, "region");
+
+    if (regionIdToImprovementSlots.has(regionId)) {
+        throw new Error("Two improvement slots share the same regionId: " + regionId);
+    }
+
+    regionIdToImprovementSlots.set(regionId, {
+        point: {
+            x: o.x + o.width / 2,
+            y: o.y + o.height / 2
+        },
+        width: o.width
+    });
+});
+
+
+const regionIdToCastleSlots = new BetterMap<string, Point>();
+(castleSlotsLayer.objects as TiledSquareObject[]).forEach(o => {
+    const regionId = getTiledProperty(o.properties, "region");
+
+    if (regionIdToCastleSlots.has(regionId)) {
+        throw new Error("Two castle slots share the same regionId: " + regionId);
+    }
+
+    regionIdToCastleSlots.set(regionId, {
+        x: o.x + o.width / 2,
+        y: o.y + o.height / 2
+    });
+});
+
 const regions = new BetterMap<string, StaticRegion>((regionsLayer.objects as TiledSquareObject[]).map(regionData => {
     const x = regionData.x + regionData.width / 2;
     const y = regionData.y + regionData.height / 2;
@@ -145,11 +187,14 @@ const regions = new BetterMap<string, StaticRegion>((regionsLayer.objects as Til
     const orderSlot = regionIdToOrderSlots.get(id);
     const powerTokenSlot = regionIdToPowerTokenSlots.get(id);
 
+    const improvementSlot = regionIdToImprovementSlots.has(id) ? regionIdToImprovementSlots.get(id) : { point: {x: 50, y: 50}, width: 100 };
+    const castleSlot = regionIdToCastleSlots.has(id) ? regionIdToCastleSlots.get(id) : {x: 50, y: 50};
+
     return [
         id,
         new StaticRegion(
             id, regionData.name, {x, y}, regionTypes.get(type), unitSlot, orderSlot, powerTokenSlot, crownIcons,
-            supplyIcons, castleLevel, garrison, superControlPowerToken
+            supplyIcons, castleLevel, garrison, superControlPowerToken, false, false, improvementSlot, castleSlot
         )
     ];
 }));

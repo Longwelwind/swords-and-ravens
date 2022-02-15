@@ -22,7 +22,7 @@ import orderImages from "./orderImages";
 import unitImages from "./unitImages";
 import classNames from "classnames";
 import housePowerTokensImages from "./housePowerTokensImages";
-import { Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
+import { Col, OverlayTrigger, Tooltip } from "react-bootstrap";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import BetterMap from "../utils/BetterMap";
 import _ from "lodash";
@@ -41,6 +41,7 @@ import preventOverflow from "@popperjs/core/lib/modifiers/preventOverflow";
 import IronBankInfosComponent from "./IronBankInfosComponent";
 import invertColor from "./utils/invertColor";
 import ImagePopover from "./utils/ImagePopover";
+import renderLoanCardsToolTip from "./loanCardsTooltip";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -101,7 +102,6 @@ export default class MapComponent extends Component<MapComponentProps> {
             }
         }
         const ironBankView = this.ingame.world.ironBankView;
-        const ironBank = this.ingame.game.ironBank;
 
         const propertiesForRegions = this.getModifiedPropertiesForEntities<Region, RegionOnMapProperties>(
             this.props.ingameGameState.world.regions.values,
@@ -179,7 +179,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                     {this.renderUnits(garrisons)}
                     {this.renderOrders()}
                     {this.renderRegionTexts(propertiesForRegions)}
-                    {ironBank && this.renderIronBankInfos(ironBankView)}
+                    {this.renderIronBankInfos(ironBankView)}
                     {this.renderLoanCardDeck(ironBankView)}
                     {this.renderLoanCardSlots(ironBankView)}
                 </div>
@@ -212,7 +212,7 @@ export default class MapComponent extends Component<MapComponentProps> {
 
     private renderLoanCardDeck(ironBankView: StaticIronBankView | null): ReactNode {
         return ironBankView && <OverlayTrigger
-            overlay={this.renderLoanCardsToolTip()}
+            overlay={renderLoanCardsToolTip(this.ingame.game.theIronBank)}
             trigger="click"
             rootClose
             placement="auto"
@@ -224,50 +224,6 @@ export default class MapComponent extends Component<MapComponentProps> {
                 <div className="iron-bank-content hover-weak-outline" style={{ backgroundImage: `url(${loanCardImages.get("back")})`, width: ironBankView.deckSlot.width, height: ironBankView.deckSlot.height }} />
             </div>
         </OverlayTrigger>;
-    }
-
-    renderLoanCardsToolTip(): OverlayChildren {
-        const ironBank = this.ingame.game.theIronBank;
-        const loanSlots = ironBank.loanSlots.filter(lc => lc != null);
-        const loanDeck = _.orderBy(ironBank.loanCardDeck.filter(lc => !lc.discarded), lc => lc.type.name);
-        const purchasedLoans = ironBank.purchasedLoansPerHouse;
-
-        return <Tooltip id={"loan-cards-tooltip"} className="tooltip-w-100">
-            <Col>
-                {loanSlots.length > 0 &&
-                    <Col xs={12} className="mb-3">
-                        <Row className="justify-content-center mb-2">
-                            <h5 className='text-center'>Loan slots</h5>
-                        </Row>
-                        {loanSlots.map((lc, i) => <Row key={`loan-${lc?.id}-${i}`}>
-                            <h6>{lc?.type.name}:&nbsp;</h6><p className="white-space-pre-line">{lc?.type.description}</p>
-                        </Row>)}
-                    </Col>}
-                {loanDeck.length > 0 &&
-                    <Col xs={12} className="mb-3">
-                        <Row className="justify-content-center mb-2">
-                            <h5 className='text-center'>Available loans</h5>
-                        </Row>
-                        {loanDeck.map((lc, i) => <Row key={`loan-${lc.id}-${i}`}>
-                            <h6>{lc.type.name}:&nbsp;</h6><p className="white-space-pre-line">{lc.type.description}</p>
-                        </Row>)}
-                    </Col>}
-                {purchasedLoans.size > 0 &&
-                    <Col xs={12}>
-                        <Row className="justify-content-center mb-2">
-                            <h5 className='text-center'>Purchased loans</h5>
-                        </Row>
-                        {purchasedLoans.map((house, loans) => <Col xs={12} key={`purchased-loans-${house.id}`}>
-                            <Row className="justify-content-center mb-2">
-                                <h6>{house.name}</h6>
-                            </Row>
-                            {loans.map((lc, i) => <Row key={`loan-${lc.type.id}-${i}`}>
-                                <h6>{lc.type.name}:&nbsp;</h6><p className="white-space-pre-line">{lc.type.description}</p>
-                            </Row>)}
-                        </Col>)}
-                    </Col>}
-            </Col>
-        </Tooltip>;
     }
 
     private renderIronBankInfos(ironBankView: StaticIronBankView | null): ReactNode {

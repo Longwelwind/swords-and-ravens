@@ -233,7 +233,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
 
             const maxPowerTokens = maxPowerTokensPerHouse.has(hid) ? maxPowerTokensPerHouse.get(hid) : baseGameData.maxPowerTokens;
 
-            const house = new House(hid, houseData.name, houseData.color, houseCards, unitLimits, gameSettings.startWithSevenPowerTokens ? 7 : 5, maxPowerTokens, supplyLevel);
+            const house = new House(hid, houseData.name, houseData.color, houseCards, unitLimits, gameSettings.ironBank ? 7 : 5, maxPowerTokens, supplyLevel);
 
             if (entireGame.isFeastForCrows) {
                 const soc = specialObjectiveCards.values.find(soc => soc.houseId == house.id);
@@ -470,7 +470,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     game.vassalHouseCards = new BetterMap(vassalHouseCards.map(hc => [hc.id, hc]));
 
     // Init the Iron Bank
-    if (gameSettings.playerCount == 8) {
+    if (gameSettings.ironBank) {
         game.ironBank = new IronBank(game);
 
         // Load the Loan card deck
