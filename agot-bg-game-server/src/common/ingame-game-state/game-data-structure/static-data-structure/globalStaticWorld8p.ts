@@ -159,7 +159,7 @@ const regions = new BetterMap<string, StaticRegion>((regionsLayer.objects as Til
     const unitSlot = regionIdToUnitSlots.get(id);
     const orderSlot = regionIdToOrderSlots.get(id);
     const powerTokenSlot = regionIdToPowerTokenSlots.get(id);
-    const improvementSlot = regionIdToImprovementSlots.get(id);
+    const improvementSlot = regionIdToImprovementSlots.has(id) ? regionIdToImprovementSlots.get(id) : { point: {x: 50, y: 50}, width: 100 };
     const castleSlot = regionIdToCastleSlots.has(id) ? regionIdToCastleSlots.get(id) : {x: 50, y: 50};
 
     return [
