@@ -15,6 +15,7 @@ import _ from "lodash";
 import serializedGameMigrations from "./serializedGameMigrations";
 import { v4 } from "uuid";
 import sleep from "../utils/sleep";
+import { compress, decompressServer } from "../utils/compression";
 
 interface UserConnectionInfo {
     userId: string;
@@ -66,7 +67,7 @@ export default class GlobalServer {
             const socketId = v4();
             this.socketIds.set(client, socketId);
             client.on("message", (data: WebSocket.Data) => {
-                this.onMessage(client, data as string, clientIp, socketId);
+                this.onMessage(client, data, clientIp, socketId);
             });
             client.on("close", () => {
                 this.onClose(client);
@@ -75,8 +76,6 @@ export default class GlobalServer {
     }
 
     onSendServerMessage(users: User[], message: ServerMessage): void {
-        const data = JSON.stringify(message);
-
         users.forEach(user => {
             user.connectedClients.forEach(connectedClient => {
                 // It may happen that a connected is actually disconnected because,
@@ -84,18 +83,20 @@ export default class GlobalServer {
                 // this function and thus the client was not removed properly off
                 // the list.
                 if (connectedClient.readyState == WebSocket.OPEN) {
-                    connectedClient.send(data);
+                    this.send(connectedClient, message);
                 }
             });
         })
     }
 
-    async onMessage(client: WebSocket, data: string, clientIp: string, socketId: string): Promise<void> {
+    async onMessage(client: WebSocket, data: any, clientIp: string, socketId: string): Promise<void> {
         let message: ClientMessage | null = null;
         try {
-            message = JSON.parse(data) as ClientMessage;
+            const decompressed = decompressServer(data);
+            message = JSON.parse(decompressed) as ClientMessage;
         } catch (error) {
             console.warn(`Error while parsing JSON for: ${data}`);
+            console.log(error);
             return;
         }
 
@@ -153,11 +154,11 @@ export default class GlobalServer {
             // and the sending of the response, thus why the state of the socket needs to
             // be checked here.
             if (client.readyState == WebSocket.OPEN) {
-                client.send(JSON.stringify({
+                this.send(client, {
                     type: "authenticate-response",
                     userId: user.id,
                     game: entireGame.serializeToClient(user)
-                }));
+                });
             }
 
             // Update the connection status for all other users
@@ -264,6 +265,11 @@ export default class GlobalServer {
         this.loadedGames.set(gameId, entireGame);
 
         return entireGame;
+    }
+
+    send(socket: WebSocket, message: ServerMessage): void {
+        const compressed = compress(JSON.stringify(message));
+        socket.send(compressed);
     }
 
     deserializeStoredGame(gameData: StoredGameData): EntireGame {
