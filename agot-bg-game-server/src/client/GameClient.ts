@@ -8,6 +8,7 @@ import Player from "../common/ingame-game-state/Player";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import ChatClient from "./chat-client/ChatClient";
 import BetterMap from "../utils/BetterMap";
+import { compress, decompressClient } from "../utils/compression";
 
 export interface AuthData {
     userId: string;
@@ -95,7 +96,7 @@ export default class GameClient {
             this.onError();
         };
         this.socket.onmessage = (data: MessageEvent) => {
-            this.onMessage(data.data as string);
+            this.onMessage(data.data);
         };
         this.socket.onclose = () => {
             clearInterval(this.pingInterval);
@@ -168,13 +169,15 @@ export default class GameClient {
         this.connectionState = ConnectionState.AUTHENTICATING;
     }
 
-    onMessage(data: string): void {
+    async onMessage(data: any): Promise<void> {
         let message: ServerMessage | null = null;
 
         try {
-            message = JSON.parse(data) as ServerMessage;
+            const decompressed = await decompressClient(data);
+            message = JSON.parse(decompressed) as ServerMessage;
         } catch (e) {
             console.error("Error occured while parsing server message");
+            console.error(e);
             return;
         }
 
@@ -251,9 +254,9 @@ export default class GameClient {
     send(message: ClientMessage): void {
         console.debug("Sending:");
         console.debug(message);
-        const data = JSON.stringify(message);
+        const compressedData = compress(JSON.stringify(message));
 
-        this.socket.send(data);
+        this.socket.send(compressedData);
     }
 
     isAuthenticatedUser(user: User): boolean {
