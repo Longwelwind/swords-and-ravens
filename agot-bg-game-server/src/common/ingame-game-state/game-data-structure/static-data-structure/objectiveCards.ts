@@ -32,7 +32,7 @@ export const backdoorPolitics = new ObjectiveCard(
     [["arryn", 2], ["baratheon", 2], ["lannister", 2], ["stark", 2]],
     (house, ingame) => {
         const victoryPointsPerHouse = new BetterMap(
-            ingame.game.houses.values.map(h => [h, ingame.game.getVictoryPoints(h)]));
+            ingame.getNonVassalHouses().map(h => [h, ingame.game.getVictoryPoints(h)]));
 
         let ownVpValue = 0;
         if (victoryPointsPerHouse.has(house)) {
@@ -61,7 +61,7 @@ export const landGrab = new ObjectiveCard(
     [["arryn", 1], ["baratheon", 2], ["lannister", 1], ["stark", 1]],
     (house, ingame) => {
         const landAreasPerHouse = new BetterMap(
-            ingame.game.houses.values.map(h => [h, ingame.game.getTotalControlledLandRegions(h)]));
+            ingame.getNonVassalHouses().map(h => [h, ingame.game.getTotalControlledLandRegions(h)]));
 
         let ownLandAreasCount = 0;
         if (landAreasPerHouse.has(house)) {
@@ -90,7 +90,7 @@ export const extendYourReach = new ObjectiveCard(
     [["arryn", 2], ["baratheon", 1], ["lannister", 1], ["stark", 1]],
     (house, ingame) => {
         const seaAreasPerHouse = new BetterMap(
-            ingame.game.houses.values.map(h => [h, ingame.world.regions.values.filter(r => r.type == sea && r.getController() == h).length]));
+            ingame.getNonVassalHouses().map(h => [h, ingame.world.regions.values.filter(r => r.type == sea && r.getController() == h).length]));
 
         let ownSeaAreasCount = 0;
         if (seaAreasPerHouse.has(house)) {
@@ -189,7 +189,7 @@ export const navalSuperiority = new ObjectiveCard(
     [["arryn", 1], ["baratheon", 1], ["lannister", 1], ["stark", 1]],
     (house, ingame) => {
         const shipCountPerHouse = new BetterMap(
-            ingame.game.houses.values.map(h => [h, ingame.world.getUnitsOfHouse(h).filter(u => u.type == ship).length]));
+            ingame.getNonVassalHouses().map(h => [h, ingame.world.getUnitsOfHouse(h).filter(u => u.type == ship).length]));
 
         let ownShipCount = 0;
         if (shipCountPerHouse.has(house)) {
@@ -233,7 +233,7 @@ export const mercantileVentures = new ObjectiveCard(
     [["arryn", 2], ["baratheon", 1], ["lannister", 1], ["stark", 1]],
     (house, ingame) => {
         const controlledPortsPerHouse = new BetterMap(
-            ingame.game.houses.values.map(h => [h, ingame.world.regions.values.filter(r => r.type == port && r.getController() == h).length]));
+            ingame.getNonVassalHouses().map(h => [h, ingame.world.regions.values.filter(r => r.type == port && r.getController() == h).length]));
 
         let ownPortCount = 0;
         if (controlledPortsPerHouse.has(house)) {
@@ -266,7 +266,7 @@ export const aStalwartPosition = new ObjectiveCard(
     [["arryn", 3], ["baratheon", 2], ["lannister", 1], ["stark", 1]],
     (house, ingame) => {
         const controlledStrongholds = new BetterMap(
-            ingame.game.houses.values.map(h => [h, ingame.world.regions.values.filter(r => r.castleLevel == 2 && r.getController() == h).length]));
+            ingame.getNonVassalHouses().map(h => [h, ingame.world.regions.values.filter(r => r.castleLevel == 2 && r.getController() == h).length]));
 
         let ownStrongholdCount = 0;
         if (controlledStrongholds.has(house)) {
@@ -285,7 +285,7 @@ export const spreadingTheWealth = new ObjectiveCard(
     [["arryn", 1], ["baratheon", 1], ["lannister", 1], ["stark", 1]],
     (house, ingame) => {
         const powerTokensOnBoard = new BetterMap(
-            ingame.game.houses.values.map(h => [h, ingame.world.regions.values.filter(r => r.controlPowerToken == h).length]));
+            ingame.getNonVassalHouses().map(h => [h, ingame.world.regions.values.filter(r => r.controlPowerToken == h).length]));
 
         let ownPtCount = 0;
         if (powerTokensOnBoard.has(house)) {
@@ -377,7 +377,7 @@ export const friendlyConfines = new ObjectiveCard(
     [["arryn", 1], ["baratheon", 1], ["lannister", 1], ["stark", 1]],
     (house, ingame) => {
         const controlledCastles = new BetterMap(
-            ingame.game.houses.values.map(h => [h, ingame.world.regions.values.filter(r => r.castleLevel == 1 && r.getController() == h).length]));
+            ingame.getNonVassalHouses().map(h => [h, ingame.world.regions.values.filter(r => r.castleLevel == 1 && r.getController() == h).length]));
 
         let ownCastleCount = 0;
         if (controlledCastles.has(house)) {
@@ -429,7 +429,7 @@ export const arrynSpecialObjective = new SpecialObjectiveCard(
     "arryn",
     (house, ingame) => {
         const powerTokensPerHouse = new BetterMap(
-            ingame.game.houses.values.map(h => [h, h.powerTokens]));
+            ingame.getNonVassalHouses().map(h => [h, h.powerTokens]));
 
         let ownPtCount = 0;
         if (powerTokensPerHouse.has(house)) {

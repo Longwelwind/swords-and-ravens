@@ -91,7 +91,7 @@ export default class ScoreOtherObjectivesGameState extends GameState<ScoreObject
                 // The old victory point count of the ones behind must be greater the count of the current house.
                 // We use .every as this returns true on an empty array and is perfect for this purpose.
 
-                const turnOrder = this.game.getTurnOrder();
+                const turnOrder = this.game.ingame.getTurnOrderWithoutVassals();
                 const ownTurnOrderIndex = turnOrder.findIndex(h => h == house);
                 const housesAhead = turnOrder.filter((_h, i) => i < ownTurnOrderIndex);
                 const housesBehind = turnOrder.filter((_h, i) => i > ownTurnOrderIndex);
