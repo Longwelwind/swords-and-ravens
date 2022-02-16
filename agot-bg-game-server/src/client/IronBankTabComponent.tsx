@@ -28,14 +28,14 @@ export default class IronBankTabComponent extends Component<IronBankTabComponent
     render(): ReactNode {
         return <Col xs={12} className="h-100">
             <Row className="justify-content-center">
-                <Col xs="10">
+                <Col xs="11" style={{maxWidth: "550px"}}>
                     <IronBankInfosComponent
                         ingame={this.ingame}
                         ironBank={this.ironBank}
                     />
                 </Col>
             </Row>
-            <Row className="justify-content-center mt-5">
+            <Row className="justify-content-center mt-4">
                 {this.ironBank.loanSlots.slice().reverse().map((lc, i) => <Col xs="auto" key={`loan-slot-${i}`}>
                     <OverlayTrigger
                         overlay={<ImagePopover className="vertical-game-card" style={{ backgroundImage: lc ? `url(${loanCardImages.get(lc.type.id)})` : "none" }} />}
