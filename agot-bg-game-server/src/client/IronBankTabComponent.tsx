@@ -28,7 +28,7 @@ export default class IronBankTabComponent extends Component<IronBankTabComponent
     render(): ReactNode {
         return <Col xs={12} className="h-100">
             <Row className="justify-content-center">
-                <Col xs="11" style={{maxWidth: "550px"}}>
+                <Col xs="11" style={{maxWidth: "550px", maxHeight: "225px"}}>
                     <IronBankInfosComponent
                         ingame={this.ingame}
                         ironBank={this.ironBank}
