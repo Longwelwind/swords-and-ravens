@@ -601,3 +601,7 @@ ul {
 hr.red {
   border-top: 2px solid red;
 }
+
+.disable-pointer-events {
+  pointer-events: none;
+}

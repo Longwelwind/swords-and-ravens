@@ -42,6 +42,8 @@ import IronBankInfosComponent from "./IronBankInfosComponent";
 import invertColor from "./utils/invertColor";
 import ImagePopover from "./utils/ImagePopover";
 import renderLoanCardsToolTip from "./loanCardsTooltip";
+import PlayerMusteringGameState from "../common/ingame-game-state/westeros-game-state/mustering-game-state/player-mustering-game-state/PlayerMusteringGameState";
+import SelectRegionGameState from "../common/ingame-game-state/select-region-game-state/SelectRegionGameState";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -104,10 +106,24 @@ export default class MapComponent extends Component<MapComponentProps> {
         const ironBankView = this.ingame.world.ironBankView;
 
         const propertiesForRegions = this.getModifiedPropertiesForEntities<Region, RegionOnMapProperties>(
-            this.props.ingameGameState.world.regions.values,
+            this.ingame.world.regions.values,
             this.props.mapControls.modifyRegionsOnMap,
             { highlight: { active: false, color: "white" }, onClick: null, wrap: null }
         );
+
+        const playerMusteringGameState = this.ingame.hasChildGameState(PlayerMusteringGameState) ? this.ingame.getChildGameState(PlayerMusteringGameState) : null;
+        const placeOrdersGameState = this.ingame.hasChildGameState(PlaceOrdersGameState) ? this.ingame.getChildGameState(PlaceOrdersGameState) : null;
+        const selectRegionGameState = this.ingame.hasChildGameState(SelectRegionGameState) ? this.ingame.getChildGameState(SelectRegionGameState) : null;
+
+        const authenticatedUser = this.props.gameClient.authenticatedUser;
+
+        // If the user is to select a region, we disable the pointer events for units to forward the click event to the region.
+        // This makes it easier to hit the ports!
+        const disablePointerEventsForUnits = (authenticatedUser && (
+            (playerMusteringGameState && playerMusteringGameState.getWaitedUsers().includes(authenticatedUser)) ||
+            (placeOrdersGameState && placeOrdersGameState.getWaitedUsers().includes(authenticatedUser)) ||
+            (selectRegionGameState && selectRegionGameState.getWaitedUsers().includes(authenticatedUser))
+        )) ?? false;
 
         return (
             <div className="map"
@@ -176,7 +192,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                             )}
                         </div>
                     ))}
-                    {this.renderUnits(garrisons)}
+                    {this.renderUnits(garrisons, disablePointerEventsForUnits)}
                     {this.renderOrders()}
                     {this.renderRegionTexts(propertiesForRegions)}
                     {this.renderIronBankInfos(ironBankView)}
@@ -299,7 +315,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         });
     }
 
-    renderUnits(garrisons: BetterMap<string, string | null>): ReactNode {
+    renderUnits(garrisons: BetterMap<string, string | null>, disablePointerEvents: boolean): ReactNode {
         const propertiesForUnits = this.getModifiedPropertiesForEntities<Unit, UnitOnMapProperties>(
             _.flatMap(this.props.ingameGameState.world.regions.values.map(r => r.allUnits)),
             this.props.mapControls.modifyUnitsOnMap,
@@ -309,15 +325,20 @@ export default class MapComponent extends Component<MapComponentProps> {
         const garrisonControllers = new BetterMap(garrisons.keys.map(rid => [rid, this.props.ingameGameState.world.regions.get(rid).getController()]));
 
         return this.props.ingameGameState.world.regions.values.map(r => {
+            let disablePointerEventsForCurrentRegion = disablePointerEvents;
+            // If there is a clickable unit (e.g. during mustering), don't disable pointer events!
+            if (r.allUnits.map(r => propertiesForUnits.get(r)).some(p => p.onClick != null)) {
+                disablePointerEventsForCurrentRegion = false;
+            }
+
             const controller = r.getController();
             return <div
                 key={r.id}
-                className="units-container"
+                className={classNames("units-container", { "disable-pointer-events": disablePointerEventsForCurrentRegion })}
                 style={{ left: r.unitSlot.point.x, top: r.unitSlot.point.y, width: r.unitSlot.width, flexWrap: r.type == land ? "wrap-reverse" : "wrap" }}
             >
                 {r.allUnits.map(u => {
                     const property = propertiesForUnits.get(u);
-
                     let opacity: number;
                     // css transform
                     let transform: string;
@@ -356,6 +377,9 @@ export default class MapComponent extends Component<MapComponentProps> {
                                 },
                                 {
                                     "unit-highlight-green": property.highlight.color == "green"
+                                },
+                                {
+                                    "disable-pointer-events": disablePointerEventsForCurrentRegion
                                 }
                             )}
                             style={{

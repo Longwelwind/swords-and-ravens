@@ -183,10 +183,6 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
         this.reset();
     }
 
-    private getPowerTokenButtonText(powerTokenCount: number): string {
-        return `Get ${powerTokenCount} Power token${powerTokenCount > 1 ? "s" : ""}`;
-    }
-
     private modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
         if (this.doesControlCurrentHouse) {
             let regionsToModify = this.props.gameState.regions.filter(r => this.props.gameState.getValidMusteringRulesForRegion(r, this.musterings).length > 0);
