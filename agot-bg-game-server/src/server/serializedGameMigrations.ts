@@ -1591,6 +1591,18 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "71",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.gameSettings.setupId == "a-feast-for-crows") {
+                serializedGame.gameSettings.endless = false;
+                if (serializedGame.childGameState.type == "ingame" && serializedGame.childGameState.game.turn <= 10) {
+                    serializedGame.childGameState.game.maxTurns = 10;
+                }
+            }
+            return serializedGame;
+        }
     }
 ];
 

@@ -43,7 +43,7 @@ export default class ObjectivesInfoComponent extends Component<ObjectivesInfoCom
                     <Col xs="auto" key={oc.id}>
                         <ObjectiveCardComponent
                             objectiveCard={oc}
-                            size="small"
+                            size="medium"
                         />
                     </Col>)}
             </Row>}
@@ -53,7 +53,7 @@ export default class ObjectivesInfoComponent extends Component<ObjectivesInfoCom
                     <Col xs="auto" key={oc.id}>
                         <ObjectiveCardComponent
                             objectiveCard={oc}
-                            size="small"
+                            size="smedium"
                         />
                     </Col>)}
             </Row>

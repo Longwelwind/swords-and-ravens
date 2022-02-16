@@ -104,7 +104,7 @@ export default class IngameGameState extends GameState<
         } else if (this.entireGame.isFeastForCrows) {
             this.chooseObjectives();
         } else {
-            this.beginNewTurn();
+            this.beginNewRound();
         }
     }
 
@@ -113,7 +113,7 @@ export default class IngameGameState extends GameState<
     }
 
     onChooseInitialObjectivesGameStateEnd(): void {
-        this.beginNewTurn();
+        this.beginNewRound();
     }
 
     beginDraftingHouseCards(): void {
@@ -192,12 +192,12 @@ export default class IngameGameState extends GameState<
         if (this.entireGame.isFeastForCrows) {
             this.chooseObjectives();
         } else {
-            this.beginNewTurn();
+            this.beginNewRound();
         }
     }
 
     onActionGameStateFinish(): void {
-        this.beginNewTurn();
+        this.beginNewRound();
     }
 
     onWesterosGameStateFinish(planningRestrictions: PlanningRestriction[]): void {
@@ -225,7 +225,7 @@ export default class IngameGameState extends GameState<
         this.setChildGameState(new ActionGameState(this)).firstStart(placedOrders, planningRestrictions);
     }
 
-    beginNewTurn(): void {
+    beginNewRound(): void {
         if (this.game.turn == this.game.maxTurns) {
             const winner = this.game.getPotentialWinner(true);
             this.setChildGameState(new GameEndedGameState(this)).firstStart(winner);
