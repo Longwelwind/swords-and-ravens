@@ -95,8 +95,8 @@ export default class GameClient {
         this.socket.onerror = () => {
             this.onError();
         };
-        this.socket.onmessage = (data: MessageEvent) => {
-            this.onMessage(data.data);
+        this.socket.onmessage = async (data: MessageEvent) => {
+            await this.onMessage(data.data);
         };
         this.socket.onclose = () => {
             clearInterval(this.pingInterval);
