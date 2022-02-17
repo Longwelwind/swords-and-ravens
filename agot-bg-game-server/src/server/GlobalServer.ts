@@ -15,7 +15,7 @@ import _ from "lodash";
 import serializedGameMigrations from "./serializedGameMigrations";
 import { v4 } from "uuid";
 import sleep from "../utils/sleep";
-import { compress, decompressServer } from "../utils/compression";
+import { compress, decompress } from "./utils/compression";
 
 interface UserConnectionInfo {
     userId: string;
@@ -67,7 +67,7 @@ export default class GlobalServer {
             const socketId = v4();
             this.socketIds.set(client, socketId);
             client.on("message", (data: WebSocket.Data) => {
-                this.onMessage(client, data, clientIp, socketId);
+                this.onMessage(client, data as Buffer, clientIp, socketId);
             });
             client.on("close", () => {
                 this.onClose(client);
@@ -89,11 +89,10 @@ export default class GlobalServer {
         })
     }
 
-    async onMessage(client: WebSocket, data: any, clientIp: string, socketId: string): Promise<void> {
+    async onMessage(client: WebSocket, data: Buffer, clientIp: string, socketId: string): Promise<void> {
         let message: ClientMessage | null = null;
         try {
-            const decompressed = decompressServer(data);
-            message = JSON.parse(decompressed) as ClientMessage;
+            message = JSON.parse(decompress(data.toString())) as ClientMessage;
         } catch (error) {
             console.warn(`Error while parsing JSON for: ${data}`);
             console.log(error);
@@ -268,8 +267,7 @@ export default class GlobalServer {
     }
 
     send(socket: WebSocket, message: ServerMessage): void {
-        const compressed = compress(JSON.stringify(message));
-        socket.send(compressed);
+        socket.send(compress(JSON.stringify(message)));
     }
 
     deserializeStoredGame(gameData: StoredGameData): EntireGame {

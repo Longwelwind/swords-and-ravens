@@ -8,7 +8,7 @@ import Player from "../common/ingame-game-state/Player";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import ChatClient from "./chat-client/ChatClient";
 import BetterMap from "../utils/BetterMap";
-import { compress, decompressClient } from "../utils/compression";
+import { compress, decompress } from "./utils/compression";
 
 export interface AuthData {
     userId: string;
@@ -95,8 +95,8 @@ export default class GameClient {
         this.socket.onerror = () => {
             this.onError();
         };
-        this.socket.onmessage = async (data: MessageEvent) => {
-            await this.onMessage(data.data);
+        this.socket.onmessage = (data: MessageEvent) => {
+            this.onMessage(data.data as string);
         };
         this.socket.onclose = () => {
             clearInterval(this.pingInterval);
@@ -169,12 +169,11 @@ export default class GameClient {
         this.connectionState = ConnectionState.AUTHENTICATING;
     }
 
-    async onMessage(data: any): Promise<void> {
+    onMessage(data: string): void {
         let message: ServerMessage | null = null;
 
         try {
-            const decompressed = await decompressClient(data);
-            message = JSON.parse(decompressed) as ServerMessage;
+            message = JSON.parse(decompress(data)) as ServerMessage;
         } catch (e) {
             console.error("Error occured while parsing server message");
             console.error(e);
