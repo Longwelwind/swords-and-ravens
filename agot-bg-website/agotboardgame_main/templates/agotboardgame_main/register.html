@@ -6,19 +6,30 @@ Register -
 
 
 {% block content %}
-<div style="max-width: 360px; margin: 0 auto;margin-top: 80px">
-    <h3>Register</h3>
-    <div class="alert alert-warning" role="alert">
-        By registering, you agree that you own a licensed version of the board game.
+<div style="max-width: 575px; margin: 0 auto;margin-top: 80px">
+    <h3 class="text-center mb-3">Register</h3>
+    <div class="alert alert-warning text-center mb-5" role="alert">
+        By registering, you agree that you own a licensed version of the board game!
     </div>
-    <a href="{% url 'social:begin' 'google-oauth2' %}?next=/" class="btn btn-social btn-google btn-block">
-        <span class="fab fa-google"></span> Register with Google
-    </a>
-    <a href="{% url 'social:begin' 'discord' %}?next=/"
-       class="btn btn-social btn-block"
-       style="background-color: #7289DA; border-color: rgba(0,0,0,.2)"
-    >
-        <span class="fab fa-discord"></span> Register with Discord
-    </a>
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            <a href="{% url 'social:begin' 'google-oauth2' %}?next=/" class="btn btn-social btn-google btn-block text-center" style="max-width: 210px; min-width: 210px">
+                <span class="fab fa-google"></span> Register with Google
+            </a>
+        </div>
+        <div class="col-12"></div>
+        <div class="col-auto mt-2">
+            <a href="{% url 'social:begin' 'discord' %}?next=/"
+            class="btn btn-social btn-block text-center"
+            style="background-color: #7289DA; border-color: rgba(0,0,0,.2); max-width: 210px; min-width: 210px"
+            >
+                <span class="fab fa-discord"></span> Register with Discord
+            </a>
+        </div>
+    </div>
+    <div class="alert alert-info mt-5" role="alert">
+        <b>Note:</b> Email notifications about PBEM games can end up in your SPAM folder!
+        <br/>So please pay attention to your SPAM folder after joining your first PBEM games.
+    </div>
 </div>
 {% endblock %}
