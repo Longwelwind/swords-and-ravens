@@ -69,7 +69,7 @@ export const landGrab = new ObjectiveCard(
             landAreasPerHouse.delete(house);
         }
 
-        return landAreasPerHouse.values.some(tla => ownLandAreasCount > tla);
+        return landAreasPerHouse.values.every(tla => ownLandAreasCount > tla);
     }
 );
 
