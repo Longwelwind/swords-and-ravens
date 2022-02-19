@@ -42,8 +42,6 @@ import IronBankInfosComponent from "./IronBankInfosComponent";
 import invertColor from "./utils/invertColor";
 import ImagePopover from "./utils/ImagePopover";
 import renderLoanCardsToolTip from "./loanCardsTooltip";
-import PlayerMusteringGameState from "../common/ingame-game-state/westeros-game-state/mustering-game-state/player-mustering-game-state/PlayerMusteringGameState";
-import SelectRegionGameState from "../common/ingame-game-state/select-region-game-state/SelectRegionGameState";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -111,19 +109,11 @@ export default class MapComponent extends Component<MapComponentProps> {
             { highlight: { active: false, color: "white" }, onClick: null, wrap: null }
         );
 
-        const playerMusteringGameState = this.ingame.hasChildGameState(PlayerMusteringGameState) ? this.ingame.getChildGameState(PlayerMusteringGameState) : null;
-        const placeOrdersGameState = this.ingame.hasChildGameState(PlaceOrdersGameState) ? this.ingame.getChildGameState(PlaceOrdersGameState) : null;
-        const selectRegionGameState = this.ingame.hasChildGameState(SelectRegionGameState) ? this.ingame.getChildGameState(SelectRegionGameState) : null;
-
-        const authenticatedUser = this.props.gameClient.authenticatedUser;
-
         // If the user is to select a region, we disable the pointer events for units to forward the click event to the region.
         // This makes it easier to hit the ports!
-        const disablePointerEventsForUnits = (authenticatedUser && (
-            (playerMusteringGameState && playerMusteringGameState.getWaitedUsers().includes(authenticatedUser)) ||
-            (placeOrdersGameState && placeOrdersGameState.getWaitedUsers().includes(authenticatedUser)) ||
-            (selectRegionGameState && selectRegionGameState.getWaitedUsers().includes(authenticatedUser))
-        )) ?? false;
+        const disablePointerEventsForUnits = this.props.gameClient.authenticatedUser != null &&
+                this.props.ingameGameState.leafState.getWaitedUsers().includes(this.props.gameClient.authenticatedUser) &&
+                propertiesForRegions.values.some(p => p.onClick != null || p.wrap != null);
 
         return (
             <div className="map"
@@ -327,7 +317,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         return this.props.ingameGameState.world.regions.values.map(r => {
             let disablePointerEventsForCurrentRegion = disablePointerEvents;
             // If there is a clickable unit (e.g. during mustering), don't disable pointer events!
-            if (r.allUnits.map(r => propertiesForUnits.get(r)).some(p => p.onClick != null)) {
+            if (r.allUnits.map(u => propertiesForUnits.get(u)).some(p => p.onClick != null)) {
                 disablePointerEventsForCurrentRegion = false;
             }
 
