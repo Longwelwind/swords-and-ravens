@@ -170,6 +170,7 @@ def games(request):
         five_days_past = timezone.now() - timedelta(days=5)
         games_query = Game.objects.annotate(players_count=Count('players'),\
             replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()),\
+            is_faceless=Cast(KeyTextTransform('faceless', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
             inactive=ExpressionWrapper(Q(last_active_at__lt=five_days_past), output_field=BooleanField())\
             ).prefetch_related('owner')
 
@@ -198,7 +199,10 @@ def games(request):
             # Transform that into a single field that can be None.
             if request.user.is_authenticated:
                 game.player_in_game = game.player_in_game[0] if len(game.player_in_game) > 0 else None
-                game.inactive_players = ", ".join(map(lambda p: p.user.username, game.inactive_players)) if len(game.inactive_players) > 0 and not game.replace_player_vote_ongoing else None
+                if game.is_faceless:
+                    game.inactive_players = ", ".join(map(lambda p: p.data.get("house", "Unknown House").capitalize(), game.inactive_players)) if game.state == ONGOING and len(game.inactive_players) > 0 and not game.replace_player_vote_ongoing else None
+                else:
+                    game.inactive_players = ", ".join(map(lambda p: p.data.get("house", "Unknown House").capitalize() + " (" + p.user.username + ")", game.inactive_players)) if game.state == ONGOING and len(game.inactive_players) > 0 and not game.replace_player_vote_ongoing else None
             else:
                 game.player_in_game = None
                 game.inactive_players = None
