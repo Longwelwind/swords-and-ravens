@@ -168,10 +168,12 @@ def games(request):
         # Pre-fetch the PlayerInGame entry related to the authenticated player
         # This means that "game.players" will only contain one entry, the one related to the authenticated player.
         five_days_past = timezone.now() - timedelta(days=5)
+        two_days_past = timezone.now() - timedelta(days=2)
         games_query = Game.objects.annotate(players_count=Count('players'),\
             replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()),\
             is_faceless=Cast(KeyTextTransform('faceless', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
-            inactive=ExpressionWrapper(Q(last_active_at__lt=five_days_past), output_field=BooleanField())\
+            inactive_5=ExpressionWrapper(Q(last_active_at__lt=five_days_past), output_field=BooleanField()),\
+            inactive_2=ExpressionWrapper(Q(last_active_at__lt=two_days_past), output_field=BooleanField())\
             ).prefetch_related('owner')
 
         if request.user.is_authenticated:
@@ -199,10 +201,16 @@ def games(request):
             # Transform that into a single field that can be None.
             if request.user.is_authenticated:
                 game.player_in_game = game.player_in_game[0] if len(game.player_in_game) > 0 else None
-                if game.is_faceless:
-                    game.inactive_players = ", ".join(map(lambda p: p.data.get("house", "Unknown House").capitalize(), game.inactive_players)) if game.state == ONGOING and len(game.inactive_players) > 0 and not game.replace_player_vote_ongoing else None
+
+                if game.state == ONGOING and game.inactive_2 and len(game.inactive_players) > 0 and not game.replace_player_vote_ongoing:
+                    inactive_players = ""
+                    for inactive_player in game.inactive_players:
+                        house = inactive_player.data.get("house", "Unknown House").capitalize()
+                        if house in game.view_of_game.get("waitingFor", ""):
+                            inactive_players = inactive_players + house + (" (" + inactive_player.user.username + ")" if not game.is_faceless else "") + ", "
+                    game.inactive_players = inactive_players[:-2] if len(inactive_players) >= 2 else None
                 else:
-                    game.inactive_players = ", ".join(map(lambda p: p.data.get("house", "Unknown House").capitalize() + " (" + p.user.username + ")", game.inactive_players)) if game.state == ONGOING and len(game.inactive_players) > 0 and not game.replace_player_vote_ongoing else None
+                    game.inactive_players = None
             else:
                 game.player_in_game = None
                 game.inactive_players = None
@@ -227,9 +235,12 @@ def games(request):
             else:
                 game.unread_messages = False
 
-            if not game.inactive or game.state == IN_LOBBY:
+            if game.inactive_players is not None:
+                replacement_needed_games.append(game)
+
+            if not game.inactive_5 or game.state == IN_LOBBY:
                 active_games.append(game)
-            else:
+            elif game not in replacement_needed_games:
                 inactive_games.append(game)
 
             if game.player_in_game:
@@ -237,9 +248,6 @@ def games(request):
 
             if game.state == IN_LOBBY and game.players_count > 0 and game.view_of_game.get("settings", False) and game.view_of_game.get("settings").get("pbem", True) == False:
                 open_live_games.append(game)
-
-            if game.inactive_players is not None:
-                replacement_needed_games.append(game)
 
         public_room_id = Room.objects.get(name='public').id
 
