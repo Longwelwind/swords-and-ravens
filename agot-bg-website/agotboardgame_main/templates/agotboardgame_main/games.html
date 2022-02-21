@@ -120,7 +120,12 @@ Games -
         <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Games with players who have not logged in for 8 days</h4>
+                    <h4 class="card-title"
+                        data-toggle="tooltip"
+                        title="These are games where the last move was more than 2 days ago and the player being waited on has not logged in for 8 days."
+                    >
+                        Games waiting for inactive players
+                    </h4>
                     <div style="max-height: 300px; overflow-y: auto">
                         {% games_table replacement_needed_games user perms %}
                     </div>
