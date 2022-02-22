@@ -5,8 +5,6 @@ from rest_framework.serializers import ModelSerializer, BooleanField
 from agotboardgame_main.models import User, Game, PlayerInGame, PbemResponseTime
 from chat.models import Room, UserInRoom
 
-from django.db import transaction
-
 
 class PbemResponseTimeSerializer(ModelSerializer):
     class Meta:
@@ -38,7 +36,6 @@ class GameSerializer(ModelSerializer):
         model = Game
         fields = ['id', 'name', 'owner', 'serialized_game', 'view_of_game', 'state', 'version', 'players', 'update_last_active']
 
-    @transaction.atomic
     def update(self, instance, validated_data):
         instance.version = validated_data.pop('version', instance.version)
         instance.serialized_game = validated_data.pop('serialized_game', instance.serialized_game)
