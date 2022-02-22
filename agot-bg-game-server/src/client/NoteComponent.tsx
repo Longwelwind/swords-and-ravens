@@ -40,5 +40,5 @@ export default class NoteComponent extends Component<NoteComponentProps> {
                 note: note
             });
         }
-    }, 500, { trailing: true });
+    }, 1000, { trailing: true });
 }
