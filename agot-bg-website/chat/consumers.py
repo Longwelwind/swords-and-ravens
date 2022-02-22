@@ -190,7 +190,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             mailBody = render_to_string('agotboardgame_main/new_private_message_notification.html',
                 {'message': message.text, 'receiver': other_user_in_room.user, 'sender': user, 'game': game,
                 'game_url': f'https://swordsandravens.net/play/{game.id}', 'from_house': from_house })
-            cache.set(f'{self.room.id}_{other_user_in_room.user.id}', True, 5 * 60)
+            cache.set(f'{self.room.id}_{other_user_in_room.user.id}', True, 7 * 60)
             send_mail(f'You received a new private message in game: \'{game.name}\'',
                 mailBody,
                 DEFAULT_FROM_MAIL,
