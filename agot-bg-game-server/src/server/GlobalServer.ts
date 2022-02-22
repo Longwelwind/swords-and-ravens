@@ -16,6 +16,7 @@ import serializedGameMigrations from "./serializedGameMigrations";
 import { v4 } from "uuid";
 import sleep from "../utils/sleep";
 import { compress, decompress } from "./utils/compression";
+import { MutexInterface, Mutex, withTimeout } from 'async-mutex';
 
 interface UserConnectionInfo {
     userId: string;
@@ -29,6 +30,7 @@ export default class GlobalServer {
 
     websiteClient: WebsiteClient;
     loadedGames = new BetterMap<string, EntireGame>();
+    saveMutexes = new BetterMap<EntireGame, MutexInterface>();
     clientToUser: Map<WebSocket, User> = new Map<WebSocket, User>();
     clientMessageValidator: ValidateFunction;
     // The key of the outer map is the entireGameId. The key of the inner map is the socket id
@@ -58,6 +60,14 @@ export default class GlobalServer {
         }
 
         this.clientMessageValidator = new Ajv({allErrors: true}).compile(schema);
+    }
+
+    getSaveMutex(entireGame: EntireGame): MutexInterface {
+        if (!this.saveMutexes.has(entireGame)) {
+            this.saveMutexes.set(entireGame, withTimeout(new Mutex(), 5000));
+        }
+
+        return this.saveMutexes.get(entireGame);
     }
 
     async start(): Promise<void> {
@@ -213,16 +223,18 @@ export default class GlobalServer {
         }
     }
 
-    saveGame(entireGame: EntireGame, updateLastActive: boolean): void {
-        const state = entireGame.getStateOfGame();
-        const viewOfGame = entireGame.getViewOfGame();
-        const players = entireGame.getPlayersInGame();
-        const serializedGame = entireGame.serializeToClient(null);
-        // Assume that all game always follow the latest serializedGame version,
-        // since they have been migrated when loaded.
-        const version = this.latestSerializedGameVersion;
+    async saveGame(entireGame: EntireGame, updateLastActive: boolean): Promise<void> {
+        await this.getSaveMutex(entireGame).runExclusive(async() => {
+            const state = entireGame.getStateOfGame();
+            const viewOfGame = entireGame.getViewOfGame();
+            const players = entireGame.getPlayersInGame();
+            const serializedGame = entireGame.serializeToClient(null);
+            // Assume that all game always follow the latest serializedGame version,
+            // since they have been migrated when loaded.
+            const version = this.latestSerializedGameVersion;
 
-        this.websiteClient.saveGame(entireGame.id, serializedGame, viewOfGame, players, state, version, updateLastActive);
+            await this.websiteClient.saveGame(entireGame.id, serializedGame, viewOfGame, players, state, version, updateLastActive);
+        });
     }
 
     async getEntireGame(gameId: string): Promise<EntireGame | null> {

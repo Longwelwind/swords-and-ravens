@@ -5,8 +5,6 @@ from rest_framework.serializers import ModelSerializer, BooleanField
 from agotboardgame_main.models import User, Game, PlayerInGame, PbemResponseTime
 from chat.models import Room, UserInRoom
 
-from django.db import transaction
-
 
 class PbemResponseTimeSerializer(ModelSerializer):
     class Meta:
@@ -46,15 +44,14 @@ class GameSerializer(ModelSerializer):
         if validated_data.pop('update_last_active', False):
             instance.last_active_at = django.utils.timezone.now()
 
-        instance.save()
+        instance.players.all().delete()
 
         players_data = validated_data.pop('players')
+        for player_data in players_data:
+            PlayerInGame.objects.create(game=instance, **player_data)
 
-        to_delete = PlayerInGame.objects.select_for_update().filter(game=instance)
-        with transaction.atomic():
-            to_delete.delete()
-            for player_data in players_data:
-                PlayerInGame.objects.create(game=instance, **player_data)
+        instance.save()
+
         return instance
 
 
