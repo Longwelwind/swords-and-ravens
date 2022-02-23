@@ -127,16 +127,18 @@ const MAP_MIN_HEIGHT = Math.trunc(MAP_HEIGHT / 2);
 @observer
 export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
-    @observable currentOpenedTab = this.user?.settings.lastOpenedTab ?? "chat";
+    @observable currentOpenedTab = this.user?.settings.lastOpenedTab ?? (this.props.gameState.entireGame.gameSettings.pbem ? "game-logs" : "chat");
     @observable windowHeight: number | null = null;
     @observable gameStatePanelMaxHeight: number | null = null;
     @observable gameLogHeight: number = GAME_LOG_MIN_HEIGHT;
     @observable gameLogMinHeight: number = GAME_LOG_MIN_HEIGHT;
     @observable housesMaxHeight: number | null = null;
-    @observable housesInfosCollapsed = this.props.gameClient.authenticatedUser?.settings.tracksColumnCollapsed ?? false;
+    @observable housesInfosCollapsed = this.user?.settings.tracksColumnCollapsed ?? false;
     @observable highlightedRegions = new BetterMap<Region, PartialRecursive<RegionOnMapProperties>>();
     modifyRegionsOnMapCallback: any;
     resizeObserver: ResizeObserver | null = null;
+    onResizeCallback: (() => void) | null = null;
+    onVisibilityChangedCallback: (() => void) | null = null;
 
     get game(): Game {
         return this.ingame.game;
@@ -248,7 +250,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             this.housesInfosCollapsed ? faChevronCircleLeft : faChevronCircleRight
             : this.housesInfosCollapsed ? faChevronCircleRight : faChevronCircleLeft;
 
-        const showMap = !draftHouseCards || this.props.gameClient.authenticatedUser?.settings.showMapWhenDrafting;
+        const showMap = !draftHouseCards || this.user?.settings.showMapWhenDrafting;
 
         return (
             <>
@@ -268,10 +270,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 <Col xs={{span: "auto", order: columnOrders.collapseButtonColumn}} className="px-0">
                     <button className="btn btn-sm p-0" onClick={async() => {
                         this.housesInfosCollapsed = !this.housesInfosCollapsed;
-                        if (this.props.gameClient.authenticatedUser) {
-                            this.props.gameClient.authenticatedUser.settings.tracksColumnCollapsed = this.housesInfosCollapsed;
-                            this.props.gameClient.authenticatedUser.syncSettings();
-                        }
                         await sleep(750);
                         this.onWindowResize();
                     }}>
@@ -640,10 +638,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             if (k) {
                                 this.currentOpenedTab = k;
                             }
-                            if (this.user) {
-                                this.user.settings.lastOpenedTab = k;
-                                this.user.syncSettings();
-                            }
                         }}>
                         <Card.Header>
                             <Nav variant="tabs">
@@ -790,7 +784,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     <GameSettingsComponent gameClient={this.props.gameClient}
                                         entireGame={this.props.gameState.entireGame} />
                                     <div style={{marginTop: -20}} >
-                                        <UserSettingsComponent user={this.props.gameClient.authenticatedUser}
+                                        <UserSettingsComponent user={this.user}
                                             entireGame={this.props.gameState.entireGame}
                                             parent={this} />
                                     </div>
@@ -868,8 +862,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     getUserDisplayName(user: User): React.ReactNode {
-        const authenticatedUser = this.props.gameClient.authenticatedUser;
-        if (!authenticatedUser || !authenticatedUser.settings.chatHouseNames) {
+        if (!this.user || !this.user.settings.chatHouseNames) {
             return <>{user.name}</>;
         }
 
@@ -992,7 +985,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     onNewPrivateChatRoomClick(p: Player): void {
-        const users = _.sortBy([this.props.gameClient.authenticatedUser as User, p.user], u => u.id);
+        const users = _.sortBy([this.user as User, p.user], u => u.id);
 
         if (!this.props.gameState.entireGame.privateChatRoomsIds.has(users[0]) || !this.props.gameState.entireGame.privateChatRoomsIds.get(users[0]).has(users[1])) {
             // Create a new chat room for this player
@@ -1008,17 +1001,17 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     getPrivateChatRooms(): {user: User; roomId: string}[] {
-        return this.props.gameState.entireGame.getPrivateChatRoomsOf(this.props.gameClient.authenticatedUser as User);
+        return this.props.gameState.entireGame.getPrivateChatRoomsOf(this.user as User);
     }
 
     getPrivateChatRoomForPlayer(u: User): Channel {
-        const users = _.sortBy([this.props.gameClient.authenticatedUser as User, u], u => u.id);
+        const users = _.sortBy([this.user as User, u], u => u.id);
 
         return this.props.gameClient.chatClient.channels.get(this.props.gameState.entireGame.privateChatRoomsIds.get(users[0]).get(users[1]));
     }
 
     getOtherPlayers(): Player[] {
-        return this.props.gameState.players.values.filter(p => p.user != this.props.gameClient.authenticatedUser);
+        return this.props.gameState.players.values.filter(p => p.user != this.user);
     }
 
     injectBetweenMessages(previous: Message | null, next: Message | null): ReactNode {
@@ -1070,14 +1063,36 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         this.currentOpenedTab = roomId;
     }
 
+    onVisibilityChanged(): void {
+        if (document.visibilityState == "visible" || !this.user) {
+            return;
+        }
+
+        if (this.currentOpenedTab != this.user.settings.lastOpenedTab ||
+            this.housesInfosCollapsed != this.user.settings.tracksColumnCollapsed) {
+                this.user.settings.lastOpenedTab = this.currentOpenedTab;
+                this.user.settings.tracksColumnCollapsed = this.housesInfosCollapsed;
+                this.user.syncSettings();
+        }
+    }
+
+    onResize(): void {
+        this.onWindowResize();
+        this.onGameStatePanelResize();
+    }
+
     componentDidMount(): void {
         this.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
         this.props.gameState.entireGame.onNewPrivateChatRoomCreated = (roomId: string) => this.onNewPrivateChatRoomCreated(roomId);
+
+        const visibilityChangedCallback = (): void => this.onVisibilityChanged();
+        document.addEventListener("visibilitychange", visibilityChangedCallback);
+        this.onVisibilityChangedCallback = visibilityChangedCallback;
+
         if (!isMobile) {
-            window.addEventListener('resize', () => {
-                this.onWindowResize();
-                this.onGameStatePanelResize();
-            });
+            const resizeCallback = (): void => this.onResize();
+            window.addEventListener('resize', resizeCallback);
+            this.onResizeCallback = resizeCallback;
         }
 
         this.resizeObserver = new ResizeObserver(() => this.onGameStatePanelResize());
@@ -1090,11 +1105,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         this.props.gameState.entireGame.onNewPrivateChatRoomCreated = null;
         _.pull(this.mapControls.modifyRegionsOnMap, this.modifyRegionsOnMapCallback);
 
-        if (!isMobile) {
-            window.removeEventListener('resize', () => {
-                this.onWindowResize();
-                this.onGameStatePanelResize();
-            });
+        const visibilityChangedCallback = this.onVisibilityChangedCallback;
+        if (visibilityChangedCallback) {
+            document.removeEventListener("visibilitychange", visibilityChangedCallback);
+        }
+
+        const resizeCallback = this.onResizeCallback;
+        if (resizeCallback) {
+            window.removeEventListener('resize', resizeCallback);
         }
 
         if (this.resizeObserver) {
