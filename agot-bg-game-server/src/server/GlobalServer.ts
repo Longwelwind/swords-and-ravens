@@ -64,7 +64,7 @@ export default class GlobalServer {
 
     getSaveMutex(entireGame: EntireGame): MutexInterface {
         if (!this.saveMutexes.has(entireGame)) {
-            this.saveMutexes.set(entireGame, withTimeout(new Mutex(), 25 * 1000));
+            this.saveMutexes.set(entireGame, withTimeout(new Mutex(), 60 * 1000));
         }
 
         return this.saveMutexes.get(entireGame);
