@@ -57,7 +57,6 @@
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
     "request-promise-native": "^1.0.9",
-    "resize-observer-polyfill": "^1.5.1",
     "sass-loader": "^12.4.0",
     "stream-browserify": "^3.0.0",
     "style-loader": "^3.3.1",

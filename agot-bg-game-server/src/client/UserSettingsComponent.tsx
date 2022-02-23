@@ -8,13 +8,10 @@ import EntireGame from "../common/EntireGame";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import { observable } from "mobx";
 import { observer } from "mobx-react";
-import IngameComponent from "./IngameComponent";
-import { isMobile } from "react-device-detect";
 
 interface UserSettingsComponentProps {
     entireGame: EntireGame;
     user: User | null;
-    parent?: IngameComponent;
 }
 
 @observer
@@ -107,20 +104,11 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
     }
 
     changeUserSettings(): void {
-        let triggerResize = false;
         if (this.props.user) {
-            if (this.props.user.settings.mapScrollbar != this.mapScrollbar || this.props.user.settings.responsiveLayout != this.responsiveLayout) {
-                triggerResize = true;
-            }
-
             this.props.user.settings.mapScrollbar = this.mapScrollbar;
             this.props.user.settings.chatHouseNames = this.chatHouseNames;
             this.props.user.settings.responsiveLayout = this.responsiveLayout;
             this.props.user.syncSettings();
-        }
-
-        if (!isMobile && triggerResize && this.props.parent) {
-            this.props.parent.onWindowResize();
         }
     }
 }

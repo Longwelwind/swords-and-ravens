@@ -605,3 +605,24 @@ hr.red {
 .disable-pointer-events {
   pointer-events: none;
 }
+
+.flex-ratio-container {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+.flex-sized-to-content {
+  flex: 0 0 auto;
+  overflow-y: auto;
+}
+
+.flex-fill-remaining {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden !important;
+}
+
+.flex-footer {
+  flex: 0 1 60px;
+}
