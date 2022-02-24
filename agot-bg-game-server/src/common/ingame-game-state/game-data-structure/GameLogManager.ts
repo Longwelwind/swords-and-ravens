@@ -15,7 +15,7 @@ export function ticksToTime(ticks: number): Date {
 export default class GameLogManager {
     ingameGameState: IngameGameState;
     @observable logs: GameLog[] = [];
-    @observable lastSeenLogTimes: BetterMap<User, Date> = new BetterMap();
+    @observable lastSeenLogTimes: BetterMap<User, number> = new BetterMap();
 
     constructor(ingameGameState: IngameGameState) {
         this.ingameGameState = ingameGameState;
@@ -33,9 +33,10 @@ export default class GameLogManager {
         });
     }
 
-    sendGameLogSeen(): void {
+    sendGameLogSeen(time: number): void {
         this.ingameGameState.entireGame.sendMessageToServer({
-            type: "game-log-seen"
+            type: "game-log-seen",
+            time: time
         });
     }
 
@@ -43,9 +44,9 @@ export default class GameLogManager {
         return {
             logs: this.logs.map(l => ({time: timeToTicks(l.time), data: l.data, resolvedAutomatically: l.resolvedAutomatically})),
             lastSeenLogTimes: admin
-                ? this.lastSeenLogTimes.entries.map(([usr, time]) => [usr.id, timeToTicks(time)])
+                ? this.lastSeenLogTimes.entries.map(([usr, time]) => [usr.id, time])
                 : user
-                    ? this.lastSeenLogTimes.entries.filter(([usr, _time]) => usr == user).map(([usr, time]) => [usr.id, Math.floor(time.getTime() / 1000)])
+                    ? this.lastSeenLogTimes.entries.filter(([usr, _time]) => usr == user).map(([usr, time]) => [usr.id, time])
                     : []
         };
     }
@@ -54,7 +55,7 @@ export default class GameLogManager {
         const gameLogManager = new GameLogManager(ingameGameState);
 
         gameLogManager.logs = data.logs.map(l => ({time: ticksToTime(l.time), data: l.data, resolvedAutomatically: l.resolvedAutomatically}));
-        gameLogManager.lastSeenLogTimes = new BetterMap(data.lastSeenLogTimes.map(([uid, ticks]) => [ingameGameState.entireGame.users.get(uid), ticksToTime(ticks)]));
+        gameLogManager.lastSeenLogTimes = new BetterMap(data.lastSeenLogTimes.map(([uid, time]) => [ingameGameState.entireGame.users.get(uid), time]));
 
         return gameLogManager;
     }

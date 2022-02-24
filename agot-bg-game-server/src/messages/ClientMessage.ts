@@ -302,4 +302,5 @@ interface ScoreObjective {
 
 interface GameLogSeen {
     type: "game-log-seen";
+    time: number;
 }

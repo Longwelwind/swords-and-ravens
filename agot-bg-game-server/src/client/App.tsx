@@ -12,7 +12,6 @@ import { isMobile } from 'react-device-detect';
 import EntireGame from "../common/EntireGame";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 
-
 interface AppProps {
     gameClient: GameClient;
 }
@@ -39,12 +38,8 @@ export default class App extends Component<AppProps> {
         return this.isGameRunning && (this.entireGame?.gameSettings.playerCount ?? -1) >= 8;
     }
 
-    get actualScreenWidth(): number {
-        return Math.trunc(window.screen.width * window.devicePixelRatio);
-    }
-
     render(): ReactNode {
-        const minWidth = isMobile && this.isGameRunning ? this.is8pGame ? "2500px" : "2000px" : "auto";
+        const minWidth = isMobile && this.isGameRunning ? this.is8pGame ? "2550px" : "2000px" : "auto";
         return (
             <Container fluid={false} style={{
                 paddingTop: "0.5rem",
@@ -53,7 +48,8 @@ export default class App extends Component<AppProps> {
                 paddingLeft: "3rem",
                 maxWidth: "2800px",
                 minWidth: minWidth,
-                overflowX: "hidden" }}>
+                overflowX: "hidden"
+            }}>
                 <Row className="justify-content-center">
                     {this.props.gameClient.connectionState == ConnectionState.INITIALIZING ? (
                         <Col xs={3}>

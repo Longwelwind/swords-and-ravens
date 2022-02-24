@@ -104,7 +104,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         return this.ingame.rerender >= 0 && <>
             <ListGroupItem style={{padding: 0, margin: 0}}>
                 <div className={isWaitedFor ? "new-event" : ""} style={{paddingLeft: "8px", paddingRight: "10px", paddingTop: "12px", paddingBottom: "12px"}}>
-                <Row className="align-items-center">
+                <Row className="align-items-center flex-nowrap">
                     <Col xs="auto" className="pr-0" style={{ width: "32px" }} onMouseEnter={() => this.setHighlightedRegions()} onMouseLeave={() => this.highlightedRegions.clear()}>
                         {!this.isVassal ? (
                             <FontAwesomeIcon

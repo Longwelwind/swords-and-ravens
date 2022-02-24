@@ -359,7 +359,7 @@ export default class IngameGameState extends GameState<
 
             this.createVote(user, new ReplaceVassalByPlayer(user, house));
         } else if (message.type == "game-log-seen") {
-            this.gameLogManager.lastSeenLogTimes.set(user, new Date());
+            this.gameLogManager.lastSeenLogTimes.set(user, message.time);
         } else if (this.players.has(user)) {
             const player = this.players.get(user);
 
