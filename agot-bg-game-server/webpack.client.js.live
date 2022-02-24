@@ -48,7 +48,7 @@ module.exports = (env, argv) => {
                 process: "process/browser"
             },
             fallback: {
-                "crypto": require.resolve("crypto-browserify"),
+                "crypto": false,
                 "stream": require.resolve("stream-browserify")
             }
         },
