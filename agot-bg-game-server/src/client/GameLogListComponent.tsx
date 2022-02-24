@@ -42,7 +42,7 @@ import getIngameUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import WorldStateComponent from "./WorldStateComponent";
 import GameClient from "./GameClient";
-import GameLogManager from "../common/ingame-game-state/game-data-structure/GameLogManager";
+import GameLogManager, { ticksToTime, timeToTicks } from "../common/ingame-game-state/game-data-structure/GameLogManager";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -92,9 +92,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
     }
 
     render(): ReactNode {
-        const lastSeenLogTime = this.props.gameClient.authenticatedUser
+        const lastSeenLogTicks = this.props.gameClient.authenticatedUser
             ? this.logManager.lastSeenLogTimes.tryGet(this.props.gameClient.authenticatedUser, null)
             : null;
+
+        const lastSeenLogTime = lastSeenLogTicks ? ticksToTime(lastSeenLogTicks) : null;
 
         return this.logManager.logs.map((l, i) => (
             <div key={`log_${i}`}>
@@ -1779,23 +1781,23 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         </Popover>;
     }
 
-    debounceSendGameLogSeen = _.debounce(() => {
-        this.logManager.sendGameLogSeen();
+    debounceSendGameLogSeen = _.debounce(time => {
+        this.logManager.sendGameLogSeen(time);
     }, 2000, { trailing: true });
 
     componentDidUpdate(prevProps: Readonly<GameLogListComponentProps>, _prevState: Readonly<Record<string, unknown>>): void {
         if (this.props.currentlyViewed) {
-            this.debounceSendGameLogSeen();
+            this.debounceSendGameLogSeen(timeToTicks(new Date()));
         }
 
         if (this.props.gameClient.authenticatedUser && prevProps.currentlyViewed == true && !this.props.currentlyViewed) {
-            this.logManager.lastSeenLogTimes.set(this.props.gameClient.authenticatedUser, new Date());
+            this.logManager.lastSeenLogTimes.set(this.props.gameClient.authenticatedUser, timeToTicks(new Date()));
         }
     }
 
     componentDidMount(): void {
         if (this.props.currentlyViewed) {
-            this.logManager.sendGameLogSeen();
+            this.logManager.sendGameLogSeen(timeToTicks(new Date()));
         }
     }
 }
