@@ -39,6 +39,6 @@ export default class WildlingCardComponent extends Component<WildlingCardProps> 
                 style={{
                     backgroundImage: `url(${wildlingCardImages.get(this.props.cardType.id)})`}}
               />
-            : <div className="invisible"/>;
+            : <ImagePopover className="display-none"/>;
     }
 }

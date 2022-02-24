@@ -1779,9 +1779,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         </Popover>;
     }
 
+    debounceSendGameLogSeen = _.debounce(() => {
+        this.logManager.sendGameLogSeen();
+    }, 2000, { trailing: true });
+
     componentDidUpdate(prevProps: Readonly<GameLogListComponentProps>, _prevState: Readonly<Record<string, unknown>>): void {
         if (this.props.currentlyViewed) {
-            this.logManager.sendGameLogSeen();
+            this.debounceSendGameLogSeen();
         }
 
         if (this.props.gameClient.authenticatedUser && prevProps.currentlyViewed == true && !this.props.currentlyViewed) {
