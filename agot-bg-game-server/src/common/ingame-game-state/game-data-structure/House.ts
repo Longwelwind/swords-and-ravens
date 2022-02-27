@@ -7,6 +7,7 @@ import Game from "./Game";
 import { ObjectiveCard, SpecialObjectiveCard } from "./static-data-structure/ObjectiveCard";
 import Player from "../Player";
 import { objectiveCards, specialObjectiveCards } from "./static-data-structure/objectiveCards";
+import ThematicDraftHouseCardsGameState from "../thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 
 export default class House {
     id: string;
@@ -44,13 +45,29 @@ export default class House {
         this.specialObjective = null;
     }
 
-    serializeToClient(admin: boolean, player: Player | null, isVassalHouse: boolean): SerializedHouse {
+    serializeToClient(admin: boolean, player: Player | null, game: Game): SerializedHouse {
+        // Only serialize house cards to all clients if house is no vassal house to not reveal the created hand of vassals during combat
+        const isVassalHouse = game.ingame.isVassalHouse(this);
+
+        // During thematic draft only serialize own house cards to players
+        const isThematicDraft = game.ingame.childGameState instanceof ThematicDraftHouseCardsGameState;
+
+        const serializedHouseCards = this.houseCards.entries.map(([houseCardId, houseCard]) => [houseCardId, houseCard.serializeToClient()] as [string, SerializedHouseCard]);
+
         return {
             id: this.id,
             name: this.name,
             color: this.color,
             knowsNextWildlingCard: this.knowsNextWildlingCard,
-            houseCards: (admin || !isVassalHouse) ? this.houseCards.entries.map(([houseCardId, houseCard]) => [houseCardId, houseCard.serializeToClient()]) : [],
+            houseCards: admin
+                ? serializedHouseCards
+                : isThematicDraft
+                    ? player?.house == this
+                        ? serializedHouseCards
+                        : []
+                    : !isVassalHouse
+                        ? serializedHouseCards
+                        : [],
             unitLimits: this.unitLimits.map((unitType, limit) => [unitType.id, limit]),
             powerTokens: this.powerTokens,
             maxPowerTokens: this.maxPowerTokens,

@@ -1603,6 +1603,24 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "72",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame" && serializedGame.childGameState.childGameState.type == "thematic-draft-house-cards") {
+                const ingame = serializedGame.childGameState;
+                const thematicDraft = serializedGame.childGameState.childGameState;
+
+                thematicDraft.readyHouses = [];
+                ingame.game.houses.forEach((sh: any) => {
+                    if (sh.houseCards.length == 7) {
+                        thematicDraft.readyHouses.push(sh.id);
+                    }
+                });
+
+            }
+            return serializedGame;
+        }
     }
 ];
 
