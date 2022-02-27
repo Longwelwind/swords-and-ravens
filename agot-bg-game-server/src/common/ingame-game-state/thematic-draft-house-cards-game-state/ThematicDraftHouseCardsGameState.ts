@@ -10,8 +10,10 @@ import HouseCard from "../game-data-structure/house-card/HouseCard";
 import _ from "lodash";
 import User from "../../../server/User";
 import { houseCardCombatStrengthAllocations } from "../draft-house-cards-game-state/DraftHouseCardsGameState";
+import { observable } from "mobx";
 
 export default class ThematicDraftHouseCardsGameState extends GameState<IngameGameState> {
+    @observable readyHouses: House[];
     vassalsOnInfluenceTracks: House[][];
 
     get ingame(): IngameGameState {
@@ -39,6 +41,8 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
             type: "draft-house-cards-began"
         });
 
+        this.readyHouses = [];
+
         this.vassalsOnInfluenceTracks = this.game.influenceTracks.map(track => [...track]);
 
         // Clear the influence tracks:
@@ -48,6 +52,10 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
     }
 
     getFilteredHouseCardsForHouse(house: House): HouseCard[] {
+        if (!this.participatingHouses.includes(house)) {
+            throw new Error("getFilteredHouseCardsForHouse() called for a vassal house!");
+        }
+
         let availableCards = _.sortBy(this.game.houseCardsForDrafting.values.filter(hc => hc.houseId == house.id), hc => -hc.combatStrength);
         house.houseCards.forEach(card => {
             const countOfCardsWithThisCombatStrength = house.houseCards.values.filter(hc => hc.combatStrength == card.combatStrength).length;
@@ -60,7 +68,7 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
     }
 
     getNotReadyPlayers(): Player[] {
-        return this.participatingHouses.filter(h => h.houseCards.size < 7).map(h => this.ingame.getControllerOfHouse(h));
+        return _.without(this.participatingHouses, ...this.readyHouses).map(h => this.ingame.getControllerOfHouse(h));
     }
 
     getWaitedUsers(): User[] {
@@ -90,47 +98,68 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
             house.houseCards.set(houseCard.id, houseCard);
             this.game.houseCardsForDrafting.delete(houseCard.id);
 
-            this.entireGame.broadcastToClients({
+            player.user.send({
                 type: "update-house-cards",
                 house: house.id,
                 houseCards: house.houseCards.values.map(hc => hc.serializeToClient())
             });
 
-            this.entireGame.broadcastToClients({
+            player.user.send({
                 type: "update-house-cards-for-drafting",
-                houseCards: this.game.houseCardsForDrafting.values.map(hc => hc.serializeToClient())
+                houseCards: this.game.houseCardsForDrafting.values.filter(hc => hc.houseId == house.id).map(hc => hc.serializeToClient())
             });
 
-            this.ingame.log({
-                type: "house-card-picked",
-                house: house.id,
-                houseCard: houseCard.id
-            });
+            if (house.houseCards.size == 7) {
+                this.readyHouses.push(house);
+                this.entireGame.broadcastToClients({
+                    type: "player-ready",
+                    userId: player.user.id
+                });
+
+                this.ingame.log({
+                    type: "house-cards-chosen",
+                    house: house.id
+                });
+            }
 
             if (this.participatingHouses.every(h => h.houseCards.size == 7)) {
+                this.participatingHouses.forEach(h => {
+                    this.entireGame.broadcastToClients({
+                        type: "update-house-cards",
+                        house: h.id,
+                        houseCards: h.houseCards.values.map(hc => hc.serializeToClient())
+                    });
+                });
                 this.ingame.proceedDraftingInfluencePositions(this.vassalsOnInfluenceTracks);
             }
         }
     }
 
-    onServerMessage(_message: ServerMessage): void {
+    onServerMessage(message: ServerMessage): void {
+        if (message.type == "player-ready") {
+            const player = this.ingame.players.get(this.entireGame.users.get(message.userId));
+            this.readyHouses.push(player.house);
+        }
     }
 
     serializeToClient(_admin: boolean, _player: Player | null): SerializedThematicDraftHouseCardsGameState {
         return {
             type: "thematic-draft-house-cards",
+            readyHouses: this.readyHouses.map(h => h.id),
             vassalsOnInfluenceTracks: this.vassalsOnInfluenceTracks.map(track => track.map(h => h.id))
         };
     }
 
-    static deserializeFromServer(ingameGameState: IngameGameState, data: SerializedThematicDraftHouseCardsGameState): ThematicDraftHouseCardsGameState {
-        const thematicDraftHouseCardsGameState = new ThematicDraftHouseCardsGameState(ingameGameState);
-        thematicDraftHouseCardsGameState.vassalsOnInfluenceTracks = data.vassalsOnInfluenceTracks.map(track => track.map(hid => ingameGameState.game.houses.get(hid)))
+    static deserializeFromServer(ingame: IngameGameState, data: SerializedThematicDraftHouseCardsGameState): ThematicDraftHouseCardsGameState {
+        const thematicDraftHouseCardsGameState = new ThematicDraftHouseCardsGameState(ingame);
+        thematicDraftHouseCardsGameState.readyHouses = data.readyHouses.map(hid => ingame.game.houses.get(hid));
+        thematicDraftHouseCardsGameState.vassalsOnInfluenceTracks = data.vassalsOnInfluenceTracks.map(track => track.map(hid => ingame.game.houses.get(hid)))
         return thematicDraftHouseCardsGameState;
     }
 }
 
 export interface SerializedThematicDraftHouseCardsGameState {
     type: "thematic-draft-house-cards";
+    readyHouses: string[];
     vassalsOnInfluenceTracks: string[][];
 }

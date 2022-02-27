@@ -21,6 +21,7 @@ import IronBank, { SerializedIronBank } from "./IronBank";
 import Player from "../Player";
 import { ObjectiveCard } from "./static-data-structure/ObjectiveCard";
 import { objectiveCards } from "./static-data-structure/objectiveCards";
+import ThematicDraftHouseCardsGameState from "../thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 
 export const MAX_WILDLING_STRENGTH = 12;
 export const MAX_LOYALTY_TOKEN_COUNT = 20;
@@ -500,9 +501,10 @@ export default class Game {
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedGame {
+        const isThematicDraft = this.ingame.childGameState instanceof ThematicDraftHouseCardsGameState;
         return {
             lastUnitId: this.lastUnitId,
-            houses: this.houses.values.map(h => h.serializeToClient(admin, player, this.ingame.isVassalHouse(h))),
+            houses: this.houses.values.map(h => h.serializeToClient(admin, player, this)),
             world: this.world.serializeToClient(),
             turn: this.turn,
             ironThroneTrack: this.ironThroneTrack.map(h => h.id),
@@ -530,7 +532,9 @@ export default class Game {
             revealedWesterosCards: this.revealedWesterosCards,
             vassalRelations: this.vassalRelations.map((key, value) => [key.id, value.id]),
             vassalHouseCards: this.vassalHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
-            houseCardsForDrafting: this.houseCardsForDrafting.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
+            houseCardsForDrafting: admin || !isThematicDraft
+                ? this.houseCardsForDrafting.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])
+                : this.houseCardsForDrafting.entries.filter(([_hcid, hc]) => hc.houseId == player?.house.id).map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
             deletedHouseCards: this.deletedHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
             oldPlayerHouseCards: this.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])]),
             removedDragonStrengthToken: this.removedDragonStrengthToken,

@@ -597,7 +597,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const houseCard = this.allHouseCards.get(data.houseCard);
                 return <>
-                    <p>House <b>{house.name}</b> picked <b>{houseCard.name}</b></p>
+                    <p>House <b>{house.name}</b> picked <b>{houseCard.name}</b>.</p>
+                </>;
+            }
+
+            case "house-cards-chosen": {
+                const house = this.game.houses.get(data.house);
+                return <>
+                    <p>House <b>{house.name}</b> has chosen their house cards.</p>
                 </>;
             }
 

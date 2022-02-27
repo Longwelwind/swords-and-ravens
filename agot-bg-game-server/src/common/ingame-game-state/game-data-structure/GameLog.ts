@@ -37,7 +37,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | SupplyAdjusted | PlayerReplaced | VassalReplaced | UserHouseAssignments | PlayerAction | JonSnowUsed
     | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed | SerIlynPayneFootmanKilled | RodrikTheReaderUsed
     | VassalsClaimed | CommanderPowerTokenGained | BericDondarrionUsed | VarysUsed | JaqenHGharUsed | JonConningtonUsed | BronnUsed
-    | SerGerrisDrinkwaterUsed | DraftHouseCardsBegan | HouseCardPicked
+    | SerGerrisDrinkwaterUsed | DraftHouseCardsBegan | HouseCardPicked | HouseCardsChosen
     | LittlefingerPowerTokensGained | AlayneStoneUsed | LysaArrynFfcPowerTokensGained | AnyaWaynwoodPowerTokensGained | RobertArrynUsed
     | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained | DaenerysTargaryenPowerTokensDiscarded | MissandeiUsed
     | PowerTokensGifted | InfluenceTrackPositionChosen | TiesDecided | PlaceLoyaltyChoice | LoyaltyTokenPlaced | LoyaltyTokenGained
@@ -705,6 +705,11 @@ interface HouseCardPicked {
     type: "house-card-picked";
     house: string;
     houseCard: string;
+}
+
+interface HouseCardsChosen {
+    type: "house-cards-chosen";
+    house: string;
 }
 
 interface LittlefingerPowerTokensGained {
