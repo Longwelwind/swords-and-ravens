@@ -247,7 +247,7 @@ export default class Game {
     }
 
     areVictoryConditionsFulfilled(): boolean {
-        const numberVictoryPointsPerHouse = this.ingame.getNonVassalHouses().map(h => this.getVictoryPoints(h));
+        const numberVictoryPointsPerHouse = this.nonVassalHouses.map(h => this.getVictoryPoints(h));
 
         return numberVictoryPointsPerHouse.some(n => n >= this.victoryPointsCountNeededToWin);
     }
