@@ -22,16 +22,29 @@ export default class NewInformationGameState extends GameState<WesterosGameState
     }
 
     firstStart(): void {
-        this.game.getTurnOrder().filter(h => !this.ingame.isVassalHouse(h)).forEach(h => {
-            h.secretObjectives.push(popRandom(this.game.objectiveDeck) as ObjectiveCard);
-            this.ingame.log({
-                type: "new-objective-card-drawn",
-                house: h.id
-            });
+        this.game.ingame.getTurnOrderWithoutVassals().forEach(h => {
+            const newCard = popRandom(this.game.objectiveDeck);
+            if (newCard) {
+                h.secretObjectives.push(newCard);
+                this.ingame.log({
+                    type: "new-objective-card-drawn",
+                    house: h.id
+                });
+            } else {
+                this.ingame.log({
+                    type: "objective-deck-empty",
+                    house: h.id
+                });
+            }
         });
 
+        if (this.game.nonVassalHouses.every(h => h.secretObjectives.length <= 3)) {
+            this.parentGameState.onWesterosCardEnd();
+            return;
+        }
+
         this.setChildGameState(new SelectObjectiveCardsGameState(this)).firstStart(
-            this.game.nonVassalHouses.map(h => [h, h.secretObjectives]),
+            this.game.nonVassalHouses.filter(h => h.secretObjectives.length > 3).map(h => [h, h.secretObjectives]),
             1,
             false
         );

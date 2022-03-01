@@ -26,7 +26,7 @@ export default class DoranMartellAbilityGameState extends GameState<
         return this.parentGameState.parentGameState.parentGameState.ingameGameState;
     }
 
-    onSimpleChoiceGameStateEnd(choice: number): void {
+    onSimpleChoiceGameStateEnd(choice: number, resolvedAutomatically: boolean): void {
         const enemy = this.combatGameState.getEnemy(this.childGameState.house);
 
         // Put the enemy at the end of the influence track
@@ -39,12 +39,22 @@ export default class DoranMartellAbilityGameState extends GameState<
             house: this.childGameState.house.id,
             affectedHouse: enemy.id,
             influenceTrack: choice
-        });
+        }, resolvedAutomatically);
 
         this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);
     }
 
     firstStart(house: House): void {
+        const enemy = this.combatGameState.getEnemy(house);
+        if (this.game.influenceTracks.every(track => enemy == _.last(track))) {
+            this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
+                house,
+                "",
+                ["Iron Throne"]
+            );
+            return;
+        }
+
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
             house,
             "",

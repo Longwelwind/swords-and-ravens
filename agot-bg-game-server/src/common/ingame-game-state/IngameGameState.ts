@@ -85,7 +85,7 @@ export default class IngameGameState extends GameState<
         // In the past we always used the supply limits from the game setup, though we simply could have calculated them
         // as every house starts according to their controlled barrels. For random start we have to recalculate supply, but only do it for
         // non vassals as vassals always start at supply 4. So we cannot use game.updateSupplies but use a slightly different version of it:
-        this.getNonVassalHouses().forEach(h =>  {
+        this.game.nonVassalHouses.forEach(h =>  {
             h.supplyLevel = Math.min(this.game.supplyRestrictions.length - 1, this.game.getControlledSupplyIcons(h));
         });
 
@@ -967,10 +967,6 @@ export default class IngameGameState extends GameState<
 
     getVassalHouses(): House[] {
         return this.game.houses.values.filter(h => this.isVassalHouse(h));
-    }
-
-    getNonVassalHouses(): House[] {
-        return this.game.houses.values.filter(h => !this.isVassalHouse(h));
     }
 
     isVassalControlledByPlayer(vassal: House, player: Player): boolean {
