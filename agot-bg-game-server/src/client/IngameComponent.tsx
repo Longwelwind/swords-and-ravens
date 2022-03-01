@@ -90,7 +90,7 @@ import PartialRecursive from "../utils/PartialRecursive";
 import ChooseInitialObjectivesGameState from "../common/ingame-game-state/choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
 import ChooseInitialObjectivesComponent from "./game-state-panel/ChooseInitialObjectivesComponent";
 import ObjectivesInfoComponent from "./ObjectivesInfoComponent";
-import { Popover } from "react-bootstrap";
+import { Button, FormCheck, Modal, Popover } from "react-bootstrap";
 import WesterosCardComponent from "./game-state-panel/utils/WesterosCardComponent";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import WildlingCardType from "../common/ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
@@ -122,6 +122,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     @observable currentOpenedTab = this.user?.settings.lastOpenedTab ?? (this.props.gameState.entireGame.gameSettings.pbem ? "game-logs" : "chat");
     @observable housesInfosCollapsed = this.user?.settings.tracksColumnCollapsed ?? false;
     @observable highlightedRegions = new BetterMap<Region, PartialRecursive<RegionOnMapProperties>>();
+    @observable showMapScrollbarInfo = false;
     modifyRegionsOnMapCallback: any;
     onVisibilityChangedCallback: (() => void) | null = null;
 
@@ -214,7 +215,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         const showMap = !draftHouseCards || this.user?.settings.showMapWhenDrafting;
 
-        return (
+        return <>
                 <Row className="justify-content-center" style={{maxHeight: this.mapScrollbarEnabled ? "95vh" : "none"}}>
                     <Col xs={{order: columnOrders.gameStateColumn}} style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none", minWidth: "470px", maxWidth: draftHouseCards ? "1200px" : "800px"}}>
                         {this.renderGameStateColumn()}
@@ -239,7 +240,42 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         {this.renderHousesColumn()}
                     </Col>)}
                 </Row>
-        );
+                <Modal
+                    show={this.showMapScrollbarInfo}
+                    onHide={() => this.showMapScrollbarInfo = false} animation={false}
+                    backdrop="static"
+                    keyboard={false}
+                    centered
+                >
+                    <Modal.Body>
+                        <div className="text-center">
+                            The game is optimized for HD resolutions.<br/>
+                            You are using a lower resolution and for a more pleasant gaming experience you should disable <b>Map
+                            scrollbar</b> in the settings. You can find it by clicking on the gear icon.<br/><br/>
+                            <small><i>In your profile settings you can change the default behavior for this setting<br/>
+                            for all <b>future</b> games.</i></small>
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer style={{display: "flex", flexDirection: "column", justifyContent: "center"}}>
+                        <FormCheck
+                            id="dont-show-again-setting"
+                            type="switch"
+                            label={<label htmlFor="dont-show-again-setting">Don&apos;t show again</label>}
+                            checked={this.user?.settings.dontShowMapScrollbarInfoAgain}
+                            onChange={() => {
+                                if (!this.user) {
+                                    return;
+                                }
+                                this.user.settings.dontShowMapScrollbarInfoAgain = !this.user.settings.dontShowMapScrollbarInfoAgain;
+                                this.user.syncSettings();
+                            }}
+                        />
+                        <Button variant="primary" onClick={() => this.showMapScrollbarInfo = false}>
+                            Ok
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+        </>;
     }
 
     renderHousesColumn(): ReactNode {
@@ -979,6 +1015,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const visibilityChangedCallback = (): void => this.onVisibilityChanged();
         document.addEventListener("visibilitychange", visibilityChangedCallback);
         this.onVisibilityChangedCallback = visibilityChangedCallback;
+
+        const dontShowAgain = this.user?.settings.dontShowMapScrollbarInfoAgain ?? false;
+        if (screen.width < 1900 && this.mapScrollbarEnabled && !dontShowAgain) {
+            this.showMapScrollbarInfo = true;
+        }
     }
 
     componentWillUnmount(): void {
