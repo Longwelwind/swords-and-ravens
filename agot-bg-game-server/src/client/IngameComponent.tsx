@@ -735,6 +735,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         </Nav>
                     </Card.Header>
                     <Card.Body id="game-log-panel">
+                        {/* This is an invisible div to force the parent to stretch to its remaining width */}
+                        <div style={{visibility: "hidden", width: "850px"}} />
                         <Tab.Content className="h-100">
                             <Tab.Pane eventKey="chat" className="h-100">
                                 <ChatComponent gameClient={this.props.gameClient}
