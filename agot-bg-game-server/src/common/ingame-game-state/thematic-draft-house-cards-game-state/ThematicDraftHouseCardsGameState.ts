@@ -43,12 +43,10 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
 
         this.readyHouses = [];
 
-        this.vassalsOnInfluenceTracks = this.game.influenceTracks.map(track => [...track]);
-
-        // Clear the influence tracks:
-        for(let i=0; i<this.game.influenceTracks.length; i++) {
-            this.game.influenceTracks[i].length = 0;
-        }
+        // Don't draft influence positions anymore but keep "vassalsOnInfluenceTracks" and
+        // DraftInfluencePositionsGameState as possible Ingame child to not crash running drafts.
+        // Todo: Remove this in 3 months
+        this.vassalsOnInfluenceTracks = [];
     }
 
     getFilteredHouseCardsForHouse(house: House): HouseCard[] {
@@ -130,7 +128,7 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
                         houseCards: h.houseCards.values.map(hc => hc.serializeToClient())
                     });
                 });
-                this.ingame.proceedDraftingInfluencePositions(this.vassalsOnInfluenceTracks);
+                this.ingame.onDraftingFinish();
             }
         }
     }

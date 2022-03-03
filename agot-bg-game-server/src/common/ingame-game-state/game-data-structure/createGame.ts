@@ -316,10 +316,12 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             }
         });
 
-        // Remove player houses but not Targaryen from the influence tracks allowing to draft them as well
-        game.ironThroneTrack = game.ironThroneTrack.filter(h => !playerHouses.includes(h.id) || h.id == "targaryen");
-        game.fiefdomsTrack = game.fiefdomsTrack.filter(h => !playerHouses.includes(h.id) || h.id == "targaryen");
-        game.kingsCourtTrack = game.kingsCourtTrack.filter(h => !playerHouses.includes(h.id) || h.id == "targaryen");
+        if (!gameSettings.thematicDraft) {
+            // Remove player houses but not Targaryen from the influence tracks allowing to draft the tracks as well
+            game.ironThroneTrack = game.ironThroneTrack.filter(h => !playerHouses.includes(h.id) || h.id == "targaryen");
+            game.fiefdomsTrack = game.fiefdomsTrack.filter(h => !playerHouses.includes(h.id) || h.id == "targaryen");
+            game.kingsCourtTrack = game.kingsCourtTrack.filter(h => !playerHouses.includes(h.id) || h.id == "targaryen");
+        }
     }
 
     // Loading Tiled map
