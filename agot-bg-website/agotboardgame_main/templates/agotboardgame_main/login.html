@@ -22,6 +22,12 @@ Login -
         </div>
     </form>
     <hr/>-->
+    <noscript>
+        <div class="alert alert-danger text-center mb-5 mt-3" role="alert">
+            This page requires JavaScript. Please enable it and make sure that none of your browser extensions block scripts
+            or links to allow redirection to the available social auth providers.
+        </div>
+    </noscript>
     <a href="{% url 'social:begin' 'google-oauth2' %}?next=/" class="btn btn-social btn-google btn-block">
         <span class="fab fa-google"></span> Sign in with Google
     </a>
