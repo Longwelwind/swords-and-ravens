@@ -11,6 +11,7 @@ import ActionGameState from "../../../../../ActionGameState";
 import IngameGameState from "../../../../../../IngameGameState";
 import BetterMap from "../../../../../../../../utils/BetterMap";
 import { serGerrisDrinkwater } from "../../../../../../../../common/ingame-game-state/game-data-structure/house-card/houseCardAbilities";
+import _ from "lodash";
 
 export default class SerGerrisDrinkwaterAbilityGameState extends GameState<
     AfterWinnerDeterminationGameState["childGameState"],
@@ -38,7 +39,7 @@ export default class SerGerrisDrinkwaterAbilityGameState extends GameState<
 
         for (let trackI = 0; trackI < this.game.influenceTracks.length; trackI++) {
             const influenceTrack = this.game.getInfluenceTrackByI(trackI);
-            if (influenceTrack[0] != house && this.game.getTokenHolder(influenceTrack) != house) {
+            if (_.first(influenceTrack) != house) {
                 choices.set(this.game.getNameInfluenceTrack(trackI), trackI);
             }
         }
@@ -47,25 +48,14 @@ export default class SerGerrisDrinkwaterAbilityGameState extends GameState<
     }
 
     firstStart(house: House): void {
-        const choices = this.getChoices(house).keys;
-        if (choices.length == 1) {
-            this.ingame.log({
-                type: "house-card-ability-not-used",
-                house: house.id,
-                houseCard: serGerrisDrinkwater.id
-            });
-
-            this.parentGameState.onHouseCardResolutionFinish(house);
-        }
-
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
             house,
             "",
-            choices
+            this.getChoices(house).keys
         );
     }
 
-    onSimpleChoiceGameStateEnd(choice: number): void {
+    onSimpleChoiceGameStateEnd(choice: number, resolvedAutomatically: boolean): void {
         const house = this.childGameState.house;
 
         if (choice == 0) {
@@ -73,7 +63,7 @@ export default class SerGerrisDrinkwaterAbilityGameState extends GameState<
                 type: "house-card-ability-not-used",
                 house: house.id,
                 houseCard: serGerrisDrinkwater.id
-            });
+            }, resolvedAutomatically);
             this.parentGameState.onHouseCardResolutionFinish(house);
         } else {
             const trackI = this.getChoices(house).values[choice];
