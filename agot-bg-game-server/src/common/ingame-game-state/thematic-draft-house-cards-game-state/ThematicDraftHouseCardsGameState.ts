@@ -128,7 +128,12 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
                         houseCards: h.houseCards.values.map(hc => hc.serializeToClient())
                     });
                 });
-                this.ingame.onDraftingFinish();
+                if (this.vassalsOnInfluenceTracks.length == 0) {
+                    this.ingame.onDraftingFinish();
+                } else {
+                    // Todo: Remove this in 3 months as well
+                    this.ingame.proceedDraftingInfluencePositions(this.vassalsOnInfluenceTracks);
+                }
             }
         }
     }
