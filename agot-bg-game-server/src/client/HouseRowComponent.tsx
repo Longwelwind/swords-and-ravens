@@ -14,7 +14,7 @@ import _ from "lodash";
 import { HouseCardState } from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import HouseCardComponent from "./game-state-panel/utils/HouseCardComponent";
 import HouseCardBackComponent from "./game-state-panel/utils/HouseCardBackComponent";
-import Game from "../common/ingame-game-state/game-data-structure/Game";
+import Game, { MAX_LOYALTY_TOKEN_COUNT } from "../common/ingame-game-state/game-data-structure/Game";
 import castleImage from "../../public/images/icons/castle.svg";
 import battleGearImage from "../../public/images/icons/battle-gear.svg";
 import verticalBanner from "../../public/images/icons/vertical-banner.svg"
@@ -371,6 +371,12 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     <h5 className="text-center">Strongholds: <b>{this.ingame.world.regions.values.filter(r => r.castleLevel == 2 && r.getController() == house).length}</b></h5>
                     <h5 className="text-center">Sea Areas: <b>{this.ingame.world.regions.values.filter(r => r.type == sea && r.getController() == house).length}</b></h5>
                     <h5 className="text-center">Ports: <b>{this.ingame.world.regions.values.filter(r => r.type == port && r.getController() == house).length}</b></h5>
+                </>}
+                {house == this.game.targaryen && <>
+                    <br/>
+                    <h5 className="text-center">Loyalty tokens</h5>
+                    <h6>On the board: <b>{this.game.loyaltyTokensOnBoardCount}</b></h6>
+                    <h6>Loyalty Pool: <b>{MAX_LOYALTY_TOKEN_COUNT - this.game.loyaltyTokensOnBoardCount}</b></h6>
                 </>}
             </Col>
         </Tooltip>;

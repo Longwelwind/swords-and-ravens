@@ -1617,7 +1617,23 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         thematicDraft.readyHouses.push(sh.id);
                     }
                 });
+            }
+            return serializedGame;
+        }
+    },
+    {
+        version: "73",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame" && serializedGame.childGameState.childGameState.type == "westeros") {
+                // Migration for Watering the Seed fix. In the past, the Targaryen player was allowed to place up to 2 loyalty tokens
+                // though the card text says "Place 1 loyalty on 2 different areas" instead of "up to 2 different land areas" like
+                // it does for Domestic Disputes
+                const westeros = serializedGame.childGameState.childGameState;
 
+                if (westeros.childGameState.type == "westeros-deck-4" && westeros.childGameState.childGameState.type == "choose-multiple-regions-for-loyalty-token") {
+                    // Anyways, for running games in this state we initialize canBeSkipped with true to simply follow the old way (and not break Domestic Disputes)
+                    westeros.childGameState.childGameState.canBeSkipped = true;
+                }
             }
             return serializedGame;
         }
