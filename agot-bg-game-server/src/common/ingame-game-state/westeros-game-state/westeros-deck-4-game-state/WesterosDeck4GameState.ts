@@ -46,7 +46,7 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
             case domesticDisputes.id: {
                 const regions = this.game.world.westerosLandRegions.filter(r => r.superControlPowerToken != null);
                 this.setChildGameState(new ChooseMultipleRegionsForLoyaltyTokenGameState(this)).firstStart(
-                    this.game.targaryen, 1, regions, 4, "House Targaryen may place loyalty\xa0tokens in up to 4 capitals.");
+                    this.game.targaryen, 1, regions, 4, "House Targaryen may place loyalty\xa0tokens in up to 4 capitals.", true);
                 break;
             }
             case wateringTheSeed.id: {
@@ -56,7 +56,8 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
                     this.game.getVictoryPoints(this.game.targaryen),
                     regions,
                     2,
-                    "House Targaryen may place up to 2 loyalty\xa0tokens in regions adjacent to a river.");
+                    "House Targaryen may place 1 loyalty\xa0token on 2 different regions adjacent to a river.",
+                    false);
                 break;
             }
             case fireMadeFlesh.id: {

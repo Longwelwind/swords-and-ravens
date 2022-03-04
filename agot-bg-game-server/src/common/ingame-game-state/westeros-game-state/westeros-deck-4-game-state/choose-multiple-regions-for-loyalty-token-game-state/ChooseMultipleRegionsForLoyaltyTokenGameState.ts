@@ -19,6 +19,7 @@ export default class ChooseMultipleRegionsForLoyaltyTokenGameState extends GameS
     count: number;
     placedCount: number;
     hasAlreadyPaid: boolean;
+    canBeSkipped: boolean;
 
     get game(): Game {
         return this.parentGameState.game;
@@ -32,10 +33,11 @@ export default class ChooseMultipleRegionsForLoyaltyTokenGameState extends GameS
         return this.parentGameState.parentGameState;
     }
 
-    firstStart(house: House, costs: number, regions: Region[], count: number, description: string): void {
+    firstStart(house: House, costs: number, regions: Region[], count: number, description: string, canBeSkipped: boolean): void {
         this.regions = regions;
         this.costs = costs;
         this.count = count;
+        this.canBeSkipped = canBeSkipped;
         this.placedCount = 0;
         this.hasAlreadyPaid = false;
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(house, description, this.getChoices(house));
@@ -89,9 +91,13 @@ export default class ChooseMultipleRegionsForLoyaltyTokenGameState extends GameS
     onSelectRegionFinish(house: House, region: Region): void {
         this.placedCount++;
         this.westeros.placeLoyaltyToken(region);
-        this.regions = _.without(this.regions, region);
+        _.pull(this.regions, region);
 
         if (this.game.isLoyaltyTokenAvailable && this.placedCount < this.count && this.regions.length > 0) {
+            if (!this.canBeSkipped) {
+                this.setChildGameState(new SelectRegionGameState(this)).firstStart(house, this.regions);
+                return;
+            }
             this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(house, `House ${house.name} can choose to place another loyalty\xa0token.`, ["Place another loyalty token", "Finish"]);
         } else {
             this.westeros.onWesterosCardEnd();
@@ -114,6 +120,7 @@ export default class ChooseMultipleRegionsForLoyaltyTokenGameState extends GameS
             count: this.count,
             placedCount: this.placedCount,
             hasAlreadyPaid: this.hasAlreadyPaid,
+            canBeSkipped: this.canBeSkipped,
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -126,6 +133,7 @@ export default class ChooseMultipleRegionsForLoyaltyTokenGameState extends GameS
         gameState.count = data.count;
         gameState.placedCount = data.count;
         gameState.hasAlreadyPaid = data.hasAlreadyPaid;
+        gameState.canBeSkipped = data.canBeSkipped;
         gameState.childGameState = gameState.deserializeChildGameState(data.childGameState);
 
         return gameState;
@@ -149,5 +157,6 @@ export interface SerializedChooseMultipleRegionsForLoyaltyTokenGameState {
     count: number;
     placedCount: number;
     hasAlreadyPaid: boolean;
+    canBeSkipped: boolean;
     childGameState: SerializedSimpleChoiceGameState | SerializedSelectRegionGameState;
 }
