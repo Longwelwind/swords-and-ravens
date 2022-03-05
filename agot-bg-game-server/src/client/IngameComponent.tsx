@@ -1019,7 +1019,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         this.onVisibilityChangedCallback = visibilityChangedCallback;
 
         const dontShowAgain = this.user?.settings.dontShowMapScrollbarInfoAgain ?? false;
-        if (screen.width < 1900 && this.mapScrollbarEnabled && !dontShowAgain) {
+        if (screen.width < 1900 && screen.height < 1000 && this.mapScrollbarEnabled && !dontShowAgain) {
             this.showMapScrollbarInfo = true;
         }
     }
