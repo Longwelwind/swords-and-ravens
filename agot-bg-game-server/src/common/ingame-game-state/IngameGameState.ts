@@ -858,6 +858,10 @@ export default class IngameGameState extends GameState<
                 return {result: false, reason: "only-players-can-vote"};
             }
 
+            if (this.players.get(fromUser).house == forHouse) {
+                return {result: false, reason: "vassalizing-yourself-is-forbidden"};
+            }
+
             if (this.game.targaryen) {
                 if (this.players.size - 1 < MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN) {
                     return {result: false, reason: "min-player-count-reached"};
