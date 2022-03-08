@@ -72,6 +72,7 @@ pip install wheels
 pip install -r requirements.txt
 cp agotboardgame_main/migrations_for_new_database.py agotboardgame_main/migrations/0002_initial_migrations.py
 python3 manage.py migrate
+python3 manage.py createcachetable
 
 # This command will ask for a password. Use "rootroot"
 python3 manage.py createsuperuser --username Longwelwind

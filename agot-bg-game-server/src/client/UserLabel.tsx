@@ -141,6 +141,8 @@ export default class UserLabel extends Component<UserLabelProps> {
                                             "Only players can vote"
                                         : canLaunchReplacePlayerByVassalVoteReason == "min-player-count-reached" ?
                                             "Minimum player count reached"
+                                        : canLaunchReplacePlayerByVassalVoteReason == "vassalizing-yourself-is-forbidden" ?
+                                            "To avoid abuse you can no longer vassalize yourself"
                                         : canLaunchReplacePlayerByVassalVoteReason == "only-possible-when-defeated" ?
                                             "Vassal replacement is allowed only when the house is considered defeated"
                                         : canLaunchReplacePlayerByVassalVoteReason == "ongoing-house-card-drafting" ?
