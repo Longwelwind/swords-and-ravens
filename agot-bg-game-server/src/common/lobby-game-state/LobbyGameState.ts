@@ -140,10 +140,12 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 password: answer
             });
         } else if (message.type == "change-game-settings") {
-            let settings =  message.settings as GameSettings;
+            const settings =  message.settings as GameSettings;
+
+            // Allow change of game settings only if the selected variant has enough seats
+            // for all already connected players
             if (this.players.size > settings.playerCount) {
-                // A variant which contains less players than connected is not allowed
-                settings = this.settings;
+                return updateLastActive;
             }
 
             if (settings.setupId == "a-dance-with-dragons") {
