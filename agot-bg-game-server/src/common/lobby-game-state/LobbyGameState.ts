@@ -150,12 +150,19 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
             if (settings.setupId == "a-dance-with-dragons") {
                 settings.adwdHouseCards = true;
+                settings.asosHouseCards = false;
             } else if (settings.setupId == "a-feast-for-crows") {
                 settings.vassals = false;
                 settings.allowGiftingPowerTokens = false;
                 settings.useVassalPositions = false;
                 settings.mixedWesterosDeck1 = false;
                 settings.endless = false;
+            } else if (settings.asosHouseCards) {
+                settings.adwdHouseCards = false;
+            }
+
+            if (settings.adwdHouseCards) {
+                settings.asosHouseCards = false;
             }
 
             if (settings.setupId != "a-feast-for-crows") {
@@ -170,6 +177,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
             if (settings.draftHouseCards && !settings.limitedDraft) {
                 settings.adwdHouseCards = false;
+                settings.asosHouseCards = false;
             }
 
             if (settings.limitedDraft) {

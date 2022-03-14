@@ -454,6 +454,7 @@ interface RobbStarkRetreatRegionOverriden {
     type: "robb-stark-retreat-location-overriden";
     house: string;
     affectedHouse: string;
+    houseCardName: string;
 }
 
 interface RetreatRegionChosen {

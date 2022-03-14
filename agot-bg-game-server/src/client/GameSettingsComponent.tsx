@@ -149,13 +149,28 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="adwd-house-cards-tooltip">
-                                    The house cards will come from the A Dance with Dragons and A Feast for Crows expansions.
+                                    When this option is enabled, the house cards from the <i>A Dance with Dragons</i> and <i>A Feast for Crows</i> expansions are used.
                                 </Tooltip>}>
                                 <label htmlFor="adwd-house-cards">Use <i>ADwD</i> house cards</label>
                             </OverlayTrigger>}
                         disabled={this.props.entireGame.isDanceWithDragons}
                         checked={this.gameSettings.adwdHouseCards}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.adwdHouseCards = !this.gameSettings.adwdHouseCards)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="asos-house-cards-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="asos-house-cards-setting-tooltip">
+                                    When this option is enabled, the house cards from the 1st edition expansion <i>A Storm of Swords</i> are used.
+                                </Tooltip>}>
+                                <label htmlFor="asos-house-cards-setting">Use <i>ASoS</i> house cards</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.asosHouseCards}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.asosHouseCards = !this.gameSettings.asosHouseCards)}
                     />
                 </Col>
                 <Col xs="12">

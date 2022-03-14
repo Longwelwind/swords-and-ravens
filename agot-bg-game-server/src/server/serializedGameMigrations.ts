@@ -12,7 +12,7 @@ import shuffleInPlace from "../utils/shuffleInPlace";
 import { v4 } from "uuid";
 import facelessMenNames from "../../data/facelessMenNames.json";
 import popRandom from "../utils/popRandom";
-//import { SerializedEntireGame } from "../common/EntireGame";
+import { SerializedEntireGame } from "../common/EntireGame";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
     {
@@ -58,38 +58,37 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
     {
         version: "3",
         migrate: (serializedGame: any) => {
-          // Migration for #499
-          if (serializedGame.childGameState.type == "ingame") {
-              const serializedIngameGameState = serializedGame.childGameState;
-              if (serializedIngameGameState.childGameState.type == "action") {
-                  const serializedActionGameState = serializedIngameGameState.childGameState;
-                  if (serializedActionGameState.childGameState.type == "resolve-march-order") {
-                      const serializedResolveMarchOrderGameState = serializedActionGameState.childGameState;
+            // Migration for #499
+            if (serializedGame.childGameState.type == "ingame") {
+                const serializedIngameGameState = serializedGame.childGameState;
+                if (serializedIngameGameState.childGameState.type == "action") {
+                    const serializedActionGameState = serializedIngameGameState.childGameState;
+                    if (serializedActionGameState.childGameState.type == "resolve-march-order") {
+                        const serializedResolveMarchOrderGameState = serializedActionGameState.childGameState;
 
-                      let lastSelectedId: any;
+                        let lastSelectedId: any;
 
-                      const serializedChildGameState = serializedResolveMarchOrderGameState.childGameState;
-                      switch (serializedChildGameState.type) {
-                          case "resolve-single-march":
-                              lastSelectedId = serializedChildGameState.houseId;
-                              break;
-                          case "combat":
-                              lastSelectedId = serializedChildGameState.attackerId;
-                              break;
-                          case "take-control-of-enemy-port":
-                              lastSelectedId = serializedChildGameState.lastHouseThatResolvedMarchOrderId;
-                              break;
-                          default:
-                              throw new Error("Invalid childGameState type")
-                      }
+                        const serializedChildGameState = serializedResolveMarchOrderGameState.childGameState;
+                        switch (serializedChildGameState.type) {
+                            case "resolve-single-march":
+                                lastSelectedId = serializedChildGameState.houseId;
+                                break;
+                            case "combat":
+                                lastSelectedId = serializedChildGameState.attackerId;
+                                break;
+                            case "take-control-of-enemy-port":
+                                lastSelectedId = serializedChildGameState.lastHouseThatResolvedMarchOrderId;
+                                break;
+                            default:
+                                throw new Error("Invalid childGameState type")
+                        }
 
-                      // This will get the index of the last player that resolved a march order on the current turn order.
-                      // It might result in the pre-fix behavior if the Doran Martell was used as one of the cards in the child game state.
-                      serializedResolveMarchOrderGameState.currentTurnOrderIndex = serializedIngameGameState.game.ironThroneTrack.indexOf(lastSelectedId);
-                  }
-              }
-          }
-
+                        // This will get the index of the last player that resolved a march order on the current turn order.
+                        // It might result in the pre-fix behavior if the Doran Martell was used as one of the cards in the child game state.
+                        serializedResolveMarchOrderGameState.currentTurnOrderIndex = serializedIngameGameState.game.ironThroneTrack.indexOf(lastSelectedId);
+                    }
+                }
+            }
 
             // Migration for #506
             if (serializedGame.childGameState.type == "ingame") {
@@ -1635,6 +1634,23 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                     westeros.childGameState.childGameState.canBeSkipped = true;
                 }
             }
+            return serializedGame;
+        }
+    },
+    {
+        version: "74",
+        // TODO: Switch to an serializedGame: any before releasing it!!!
+        migrate: (serializedGame: SerializedEntireGame) => {
+            // Migration for Storm of Swords house cards
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.gameLogManager.logs.forEach((l) => {
+                    if (l.data.type == "robb-stark-retreat-location-overriden") {
+                        l.data.houseCardName = "Robb Stark";
+                    }
+                });
+            }
+
             return serializedGame;
         }
     }

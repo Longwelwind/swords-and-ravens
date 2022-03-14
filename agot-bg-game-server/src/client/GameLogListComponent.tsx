@@ -21,7 +21,7 @@ import orders from "../common/ingame-game-state/game-data-structure/orders";
 import CombatInfoComponent from "./CombatInfoComponent";
 import { OverlayTrigger, Popover, Tooltip } from "react-bootstrap";
 import User from "../server/User";
-import { baseHouseCardsData, adwdHouseCardsData, ffcHouseCardsData, modBHouseCardsData , HouseCardData } from "../common/ingame-game-state/game-data-structure/createGame";
+import { baseHouseCardsData, adwdHouseCardsData, ffcHouseCardsData, modBHouseCardsData , HouseCardData, asosHouseCardsData } from "../common/ingame-game-state/game-data-structure/createGame";
 import HouseCard from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import houseCardAbilities from "../common/ingame-game-state/game-data-structure/house-card/houseCardAbilities";
 import BetterMap from "../utils/BetterMap";
@@ -86,8 +86,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             this.createHouseCards(baseHouseCardsData),
             this.createHouseCards(adwdHouseCardsData),
             this.createHouseCards(ffcHouseCardsData),
-            //this.createHouseCards(modAHouseCardsData),
             this.createHouseCards(modBHouseCardsData),
+            this.createHouseCards(asosHouseCardsData),
             this.game.vassalHouseCards.entries);
     }
 
@@ -951,7 +951,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const affectedHouse = this.game.houses.get(data.affectedHouse);
 
                 return <p>
-                    <b>Robb Stark</b>: House <b>{house.name}</b> chose the retreat location of the
+                    <b>{data.houseCardName}</b>: House <b>{house.name}</b> chose the retreat location of the
                     retreating army of <b>{affectedHouse.name}</b>.
                 </p>;
             }
