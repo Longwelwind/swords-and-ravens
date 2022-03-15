@@ -29,10 +29,15 @@ export default class AeronDamphairAbilityGameState extends GameState<
     }
 
     firstStart(house: House): void {
-        // If the house doesn't have 2 power tokens, or doesn't have other available
-        // house cards, don't even ask him.
+        // If the house doesn't have 2 Power tokens, or doesn't have other available
+        // house cards, don't even ask.
         const availableHouseCards = this.getAvailableHouseCards(house);
         if (house.powerTokens < 2 || availableHouseCards.length == 0) {
+            this.ingame.log({
+                type: "house-card-ability-not-used",
+                house: house.id,
+                houseCard: aeronDamphair.id
+            }, true);
             this.parentGameState.onHouseCardResolutionFinish(house);
             return;
         }
@@ -55,7 +60,7 @@ export default class AeronDamphairAbilityGameState extends GameState<
                 type: "house-card-ability-not-used",
                 house: house.id,
                 houseCard: aeronDamphair.id
-            }, true);
+            });
 
             this.parentGameState.onHouseCardResolutionFinish(house);
         }
