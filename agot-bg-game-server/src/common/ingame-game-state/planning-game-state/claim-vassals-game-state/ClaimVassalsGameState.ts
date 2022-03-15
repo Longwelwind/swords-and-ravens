@@ -29,7 +29,7 @@ export default class ClaimVassalsGameState extends GameState<PlanningGameState, 
         this.proceedNextVassal(null);
     }
 
-    proceedNextVassal(lastToClaim: House | null): void {
+    proceedNextVassal(lastToClaim: House | null): void {
         const vassalsToClaim = this.ingame.getNonClaimedVassalHouses();
 
         if (vassalsToClaim.length == 0) {

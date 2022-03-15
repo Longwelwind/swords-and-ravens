@@ -53,7 +53,7 @@ export default class ClaimVassalComponent extends Component<GameStateComponentPr
     }
 
     onChange(h: House): void {
-        if (this.selectedVassals.includes(h)) {
+        if (this.selectedVassals.includes(h)) {
             _.pull(this.selectedVassals, h);
         } else {
             if (this.selectedVassals.length == this.props.gameState.count) {
