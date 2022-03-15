@@ -8,9 +8,9 @@ import QueenOfThornsAbilityGameState
 
 export default class QueenOfThornsHouseCardAbility extends HouseCardAbility {
 
-    immediatelyResolution(immediatelyResolutionState: ImmediatelyHouseCardAbilitiesResolutionGameState, house: House, _houseCard: HouseCard): void {
+    immediatelyResolution(immediatelyResolutionState: ImmediatelyHouseCardAbilitiesResolutionGameState, house: House, houseCard: HouseCard): void {
         immediatelyResolutionState.childGameState
             .setChildGameState(new QueenOfThornsAbilityGameState(immediatelyResolutionState.childGameState))
-            .firstStart(house);
+            .firstStart(house, houseCard.id == "queen-of-thorns-asos");
     }
 }

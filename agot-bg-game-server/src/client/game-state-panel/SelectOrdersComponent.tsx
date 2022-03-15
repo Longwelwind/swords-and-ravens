@@ -12,6 +12,7 @@ import _ from "lodash";
 import {OrderOnMapProperties} from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
 import joinReactNodes from "../utils/joinReactNodes";
+import Order from "../../common/ingame-game-state/game-data-structure/Order";
 
 @observer
 export default class SelectOrdersComponent extends Component<GameStateComponentProps<SelectOrdersGameState<ParentGameState>>> {
@@ -27,7 +28,9 @@ export default class SelectOrdersComponent extends Component<GameStateComponentP
                         <>
                             {this.selectedRegions.length > 0 &&
                             <Row className="justify-content-center">
-                                <p>Selected region{this.selectedRegions.length > 1 && "s"}: {joinReactNodes(this.selectedRegions.map(r => <b key={r.id}>{r.name}</b>), ', ')}</p>
+                                <p className="text-center">Selected Order token{this.selectedRegions.length > 1 && "s"}:<br/>
+                                    {joinReactNodes(this.selectedRegions.map(r => <span key={r.id}><b>{this.getOrderInRegion(r)?.type.name ?? "Unknown"}</b> in <b>{r.name}</b></span>), ', ')}
+                                </p>
                             </Row>}
                             <Row className="justify-content-center">
                                 <Col xs="auto">
@@ -50,6 +53,10 @@ export default class SelectOrdersComponent extends Component<GameStateComponentP
                 </Col>
             </>
         );
+    }
+
+    getOrderInRegion(region: Region): Order | null {
+        return this.props.gameState.parentGameState.actionGameState.ordersOnBoard.tryGet(region, null);
     }
 
     reset(): void {

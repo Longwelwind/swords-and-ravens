@@ -844,10 +844,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 </p>;
 
             case "queen-of-thorns-no-order-available": {
+                const house = this.game.houses.get(data.house);
                 const affectedHouse = this.game.houses.get(data.affectedHouse);
 
                 return <p>
-                    <b>Queen of Thorns</b>: <b>{affectedHouse.name}</b> had no adjacent Order tokens.
+                    <b>Queen of Thorns</b>: There were no orders of House <b>{affectedHouse.name}</b> that could have been removed by House <b>{house.name}</b>.
                 </p>;
             }
             case "queen-of-thorns-order-removed": {
@@ -858,7 +859,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     <b>Queen of Thorns</b>: House <b>{house.name}</b> removed
-                    a <b>{removedOrder.type.name}</b> Order of <b>{affectedHouse.name}</b> in <b>{region.name}</b>.
+                    a <b>{removedOrder.type.name}</b> Order of House <b>{affectedHouse.name}</b> in <b>{region.name}</b>.
                 </p>;
             }
             case "tywin-lannister-power-tokens-gained": {

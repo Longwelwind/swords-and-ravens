@@ -2283,7 +2283,8 @@
           "combatStrength": 1
         },
         "queen-of-thorns-asos": {
-          "name": "Queen of Thorns"
+          "name": "Queen of Thorns",
+          "ability": "queen-of-thorns"
         }
       }
     }

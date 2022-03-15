@@ -8,10 +8,12 @@ import {ServerMessage} from "../../../messages/ServerMessage";
 import EntireGame from "../../EntireGame";
 import IngameGameState from "../IngameGameState";
 import User from "../../../server/User";
+import ActionGameState from "../action-game-state/ActionGameState";
 
 export interface ParentGameState extends GameState<any, any> {
     entireGame: EntireGame;
     ingame: IngameGameState;
+    actionGameState: ActionGameState;
     game: Game;
 
     onSelectOrdersFinish(selectedOrders: Region[], resolvedAutomatically: boolean): void;
@@ -31,6 +33,12 @@ export default class SelectOrdersGameState<P extends ParentGameState> extends Ga
     }
 
     firstStart(house: House, possibleRegions: Region[], count: number): void {
+        possibleRegions.forEach(r => {
+            if (!this.parentGameState.actionGameState.ordersOnBoard.has(r)) {
+                throw new Error(`SelectOrdersGameState called but region ${r.name} is a possible region which does not contain an order!`);
+            }
+        });
+
         this.house = house;
         this.possibleRegions = possibleRegions;
         this.count = count;
