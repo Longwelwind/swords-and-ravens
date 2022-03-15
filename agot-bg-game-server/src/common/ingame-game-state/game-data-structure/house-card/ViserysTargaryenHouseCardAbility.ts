@@ -11,7 +11,7 @@ export default class ViserysTargaryenHouseCardAbility extends HouseCardAbility {
         beforeCombat.childGameState.setChildGameState(new ViserysTargaryenAbilityGameState(beforeCombat.childGameState)).firstStart(house);
     }
 
-    modifyCombatStrength(combat: CombatGameState, _house: House, houseCard: HouseCard, affectedHouseCard: HouseCard): number {
+    modifyCombatStrength(combat: CombatGameState, _house: House, houseCard: HouseCard, affectedHouseCard: HouseCard, _baseValue: number): number {
         const houseCardModifier = combat.houseCardModifiers.tryGet(this.id, null);
         return houseCardModifier && houseCard == affectedHouseCard ? houseCardModifier.combatStrength : 0;
     }

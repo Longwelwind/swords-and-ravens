@@ -1649,6 +1649,16 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         l.data.houseCardName = "Robb Stark";
                     }
                 });
+
+                if (ingame.childGameState.type == "action" && ingame.childGameState.childGameState.type == "resolve-march-order" && ingame.childGameState.childGameState.childGameState.type == "combat") {
+                    const combat = ingame.childGameState.childGameState.childGameState;
+                    combat.specialHouseCardModifier = null;
+
+                    if (combat.childGameState.type == "immediately-house-card-abilities-resolution" && combat.childGameState.childGameState.type == "house-card-resolution"
+                        && combat.childGameState.childGameState.childGameState.type == "aeron-damphair-ability") {
+                            combat.childGameState.childGameState.childGameState.reduceCombatStrengthOfNewHouseCard = false;
+                    }
+                }
             }
 
             return serializedGame;

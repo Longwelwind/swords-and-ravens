@@ -44,7 +44,7 @@ export default class HouseCardAbility {
         afterCombat.childGameState.onHouseCardResolutionFinish(house);
     }
 
-    modifyCombatStrength(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _affectedHouseCard: HouseCard): number {
+    modifyCombatStrength(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _affectedHouseCard: HouseCard, _baseValue: number): number {
         return 0;
     }
 

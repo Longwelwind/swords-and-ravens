@@ -8,7 +8,7 @@ export default class SerVardisEgenHouseCardAbility extends HouseCardAbility {
         return this.doesTrigger(combat, houseCard, affectedHouseCard, house) ? 2 : 0;
     }
 
-    modifyCombatStrength(combat: CombatGameState, house: House, houseCard: HouseCard, affectedHouseCard: HouseCard): number {
+    modifyCombatStrength(combat: CombatGameState, house: House, houseCard: HouseCard, affectedHouseCard: HouseCard, _baseValue: number): number {
         return this.doesTrigger(combat, houseCard, affectedHouseCard, house) ? 1 : 0;
     }
 

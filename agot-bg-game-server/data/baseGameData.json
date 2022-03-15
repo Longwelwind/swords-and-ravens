@@ -2212,7 +2212,8 @@
           "combatStrength": 1
         },
         "aeron-damphair-asos": {
-          "name": "Aeron Damphair"
+          "name": "Aeron Damphair",
+          "ability": "aeron-damphair"
         }
       }
     },
