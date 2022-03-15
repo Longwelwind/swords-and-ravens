@@ -453,8 +453,7 @@ export default class CombatGameState extends GameState<
             this.houseCombatDatas.entries.forEach(([house, hcd]) => {
                 // Assign Tides of Battle card and send it to the controllers of the houses
                 hcd.tidesOfBattleCard = popRandom(this.tidesOfBattleDeck);
-                this.entireGame.sendMessageToClients([this.ingameGameState.getControllerOfHouse(house).user],
-                {
+                this.ingameGameState.getControllerOfHouse(house).user.send({
                     type: "change-combat-tides-of-battle-card",
                     tidesOfBattleCardIds: [
                         [house.id, (hcd.tidesOfBattleCard as TidesOfBattleCard).id],

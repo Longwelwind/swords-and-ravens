@@ -306,9 +306,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             // For changing settings other than PBEM pass the message to the client game state
             this.childGameState.onClientMessage(user, message);
 
-            this.entireGame.broadcastToClients({
+            this.broadcastToClients({
                 type: "game-settings-changed",
-                settings: settings
+                settings: this.gameSettings
             });
         } else {
             updateLastActive = this.childGameState.onClientMessage(user, message);

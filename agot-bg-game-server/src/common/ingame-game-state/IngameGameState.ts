@@ -1038,7 +1038,7 @@ export default class IngameGameState extends GameState<
         });
 
         this.players.values.forEach(p => {
-            this.entireGame.sendMessageToClients([p.user], {
+            p.user.send({
                 type: "update-secret-objectives",
                 house: p.house.id,
                 objectives: p.house.secretObjectives.map(oc => oc.id)

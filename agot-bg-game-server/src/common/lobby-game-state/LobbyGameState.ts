@@ -129,21 +129,23 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 answer = message.password;
             } else {
                 // If user sent the correct password, or no password is set
-                // send password back the correct password
+                // send back the correct password
                 if (this.password == "" || this.password == message.password) {
                     answer = this.password;
                 }
             }
 
-            this.entireGame.sendMessageToClients([user], {
+            user.send({
                 type: "password-response",
                 password: answer
             });
         } else if (message.type == "change-game-settings") {
-            let settings =  message.settings as GameSettings;
+            const settings =  message.settings as GameSettings;
+
+            // Allow change of game settings only if the selected variant has enough seats
+            // for all already connected players
             if (this.players.size > settings.playerCount) {
-                // A variant which contains less players than connected is not allowed
-                settings = this.settings;
+                return updateLastActive;
             }
 
             if (settings.setupId == "a-dance-with-dragons") {
