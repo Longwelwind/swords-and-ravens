@@ -142,7 +142,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                 houseCardId: null
             });
 
-            this.entireGame.sendMessageToClients([player.user], {
+            player.user.send({
                 type: "house-card-chosen",
                 houseId: commandedHouse.id,
                 houseCardId: houseCard.id,

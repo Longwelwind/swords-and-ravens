@@ -100,7 +100,7 @@ export default class ScoreOtherObjectivesGameState extends GameState<ScoreObject
                     // Okay we have to update the scorable objectives of the current not ready house
                     this.childGameState.selectableCardsPerHouse.set(house, newScorableObjectives);
                     // Only send selectable cards to the controller of the house:
-                    this.entireGame.sendMessageToClients([this.ingame.getControllerOfHouse(house).user], {
+                    this.ingame.getControllerOfHouse(house).user.send({
                         type: "update-selectable-objectives",
                         house: house.id,
                         selectableObjectives: newScorableObjectives.map(oc => oc.id)

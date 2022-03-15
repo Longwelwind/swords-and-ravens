@@ -159,7 +159,7 @@ export class ReplacePlayer extends VoteType {
         });
 
         // Re-transmit the whole game, so newPlayer receives possible secrets like objectives in FFC
-        vote.ingame.entireGame.sendMessageToClients([newPlayer.user], {
+        newPlayer.user.send({
             type: "authenticate-response",
             game: vote.ingame.entireGame.serializeToClient(newPlayer.user),
             userId: newPlayer.user.id
@@ -423,7 +423,7 @@ export class ReplaceVassalByPlayer extends VoteType {
         });
 
         // Re-transmit the whole game, so newPlayer receives possible secrets like objectives in FFC
-        vote.ingame.entireGame.sendMessageToClients([newPlayer.user], {
+        newPlayer.user.send({
             type: "authenticate-response",
             game: vote.ingame.entireGame.serializeToClient(newPlayer.user),
             userId: newPlayer.user.id

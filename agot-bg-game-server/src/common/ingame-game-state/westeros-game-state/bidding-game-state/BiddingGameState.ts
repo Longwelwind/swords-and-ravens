@@ -48,7 +48,7 @@ export default class BiddingGameState<ParentGameState extends BiddingGameStatePa
                 value: -1
             });
 
-            this.entireGame.sendMessageToClients([player.user], {
+            player.user.send({
                 type: "bid-done",
                 houseId: player.house.id,
                 value: bid

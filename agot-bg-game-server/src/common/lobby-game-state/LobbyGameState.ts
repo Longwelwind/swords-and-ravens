@@ -129,13 +129,13 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 answer = message.password;
             } else {
                 // If user sent the correct password, or no password is set
-                // send password back the correct password
+                // send back the correct password
                 if (this.password == "" || this.password == message.password) {
                     answer = this.password;
                 }
             }
 
-            this.entireGame.sendMessageToClients([user], {
+            user.send({
                 type: "password-response",
                 password: answer
             });
