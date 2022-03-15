@@ -284,6 +284,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
             if (this.ingameGameState) {
                 if (settings.pbem && !this.gameSettings.pbem) {
+                    this.gameSettings.pbem = settings.pbem;
                     // Notify waited users due to ingame PBEM change
                     this.notifyWaitedUsers();
                     // Do not activate waitedForData now. We start calculating with the next game state change
