@@ -68,6 +68,7 @@ import DaenerysTargaryenBHouseCardAbility from "./DaenerysTargaryenBHouseCardAbi
 import RakharoHouseCardAbility from "./RakharoHouseCardAbility";
 import MissandeiHouseCardAbility from "./MissandeiHouseCardAbility";
 import CaptainGroleoHouseCardAbility from "./CaptainGroleoHouseCardAbility";
+import AshaGreyjoyASoSHouseCardAbility from "./AshaGreyjoyASoSHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -391,6 +392,10 @@ export const captainGroleo = new CaptainGroleoHouseCardAbility(
     "If you are attacking a land area by using ship transport, this card gains +1 combat strength"
     + " for each Targaryen Ship in areas adjacent to the embattled area."
 );
+export const ashaGreyjoyASoS = new AshaGreyjoyASoSHouseCardAbility(
+    "asha-greyjoy-asos",
+    "If you are being supported in this battle, gain two Sword Icons."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -460,7 +465,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [daenerysTargaryenB.id, daenerysTargaryenB],
     [rakharo.id, rakharo],
     [missandei.id, missandei],
-    [captainGroleo.id, captainGroleo]
+    [captainGroleo.id, captainGroleo],
+    [ashaGreyjoyASoS.id, ashaGreyjoyASoS]
 ]);
 
 export default houseCardAbilities;

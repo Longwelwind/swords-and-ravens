@@ -2195,7 +2195,8 @@
         },
         "asha-greyjoy-asos": {
           "name": "Asha Greyjoy",
-          "combatStrength": 2
+          "combatStrength": 2,
+          "ability": "asha-greyjoy-asos"
         },
         "theon-greyjoy-asos": {
           "name": "Theon Greyjoy",
