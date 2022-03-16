@@ -2185,7 +2185,8 @@
       "houseCards": {
         "balon-greyjoy-asos": {
           "name": "Balon Greyjoy",
-          "combatStrength": 4
+          "combatStrength": 4,
+          "ability": "balon-greyjoy-asos"
         },
         "dagmer-cleftjaw": {
           "name": "Dagmer Cleftjaw",

@@ -69,6 +69,7 @@ import RakharoHouseCardAbility from "./RakharoHouseCardAbility";
 import MissandeiHouseCardAbility from "./MissandeiHouseCardAbility";
 import CaptainGroleoHouseCardAbility from "./CaptainGroleoHouseCardAbility";
 import AshaGreyjoyASoSHouseCardAbility from "./AshaGreyjoyASoSHouseCardAbility";
+import BalonGreyjoyASoSHouseCardAbility from "./BalonGreyjoyASoSHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -396,6 +397,10 @@ export const ashaGreyjoyASoS = new AshaGreyjoyASoSHouseCardAbility(
     "asha-greyjoy-asos",
     "If you are being supported in this battle, gain two Sword Icons."
 );
+export const balonGreyjoyASoS = new BalonGreyjoyASoSHouseCardAbility(
+    "balon-greyjoy-asos",
+    "If you win this battle, gain Power tokens equal to the difference in total strength in the battle."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -466,7 +471,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [rakharo.id, rakharo],
     [missandei.id, missandei],
     [captainGroleo.id, captainGroleo],
-    [ashaGreyjoyASoS.id, ashaGreyjoyASoS]
+    [ashaGreyjoyASoS.id, ashaGreyjoyASoS],
+    [balonGreyjoyASoS.id, balonGreyjoyASoS]
 ]);
 
 export default houseCardAbilities;

@@ -46,7 +46,8 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | LoyalMaesterExecuted | MasterAtArmsExecuted | SavvyStewardExecuted | SpymasterExecuted
     | ObjectivesChosen | NewObjectiveCardDrawn | SpecialObjectiveScored | ObjectiveScored | IronbornRaid
     | ShiftingAmbitionsObjectiveChosenFromHand | ShiftingAmbitionsObjectiveChosenFromPool | NewInformationObjectiveCardChosen
-    | RevealAllObjectives | GarrisonRemoved | GarrisonReturned | ObjectiveDeckEmpty | OrdersRevealed | HouseCardsReturned;
+    | RevealAllObjectives | GarrisonRemoved | GarrisonReturned | ObjectiveDeckEmpty | OrdersRevealed | HouseCardsReturned
+    | BalonGreyjoyASoSPowerTokensGained;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -1022,4 +1023,10 @@ interface LeavePowerTokenChoice {
     house: string;
     region: string;
     leftPowerToken: boolean;
+}
+
+interface BalonGreyjoyASoSPowerTokensGained {
+    type: "balon-greyjoy-asos-power-tokens-gained";
+    house: string;
+    powerTokensGained: number;
 }

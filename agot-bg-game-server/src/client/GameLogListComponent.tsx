@@ -1778,6 +1778,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     {houseCardDiscarded ? <><br/><b>{houseCardDiscarded.name}</b> was played as the last card and remains discarded.</> : <></>}
                 </p>;
             }
+            case "balon-greyjoy-asos-power-tokens-gained": {
+                const house = this.game.houses.get(data.house);
+                const powerTokensGained = data.powerTokensGained;
+
+                return <p>
+                    <b>Balon Greyjoy</b>: House <b>{house.name}</b> gained {powerTokensGained} Power&nbsp;tokens.
+                </p>;
+            }
         }
     }
 
