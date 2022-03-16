@@ -1786,6 +1786,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Balon Greyjoy</b>: House <b>{house.name}</b> gained {powerTokensGained} Power&nbsp;tokens.
                 </p>;
             }
+            case "mace-tyrell-asos-order-placed": {
+                const house = this.game.houses.get(data.house);
+                const region = this.world.regions.get(data.region);
+                const order = orders.get(data.order);
+
+                return <p>
+                    <b>Mace Tyrell</b>: House <b>{house.name}</b> decided to place a <b>{order.type.name}</b> order in <b>{region.name}</b>.
+                </p>;
+            }
         }
     }
 

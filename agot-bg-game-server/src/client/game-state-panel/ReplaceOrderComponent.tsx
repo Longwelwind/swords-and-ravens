@@ -85,7 +85,7 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
     replaceOrder(): void {
         if (this.selectedRegion && this.selectedOrder) {
             if (this.props.gameState.ingameGameState.game.isOrderRestricted(this.selectedRegion, this.selectedOrder, this.props.gameState.parentGameState.parentGameState.planningRestrictions)) {
-                if (!window.confirm("Your replaced order is restricted and will be removed right away. Do you want to continue?")) {
+                if (!window.confirm("Your replaced order is restricted and will be removed afterwards. Do you want to continue?")) {
                     return;
                 }
             }

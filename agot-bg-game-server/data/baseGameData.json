@@ -2270,7 +2270,8 @@
         },
         "mace-tyrell-asos": {
           "name": "Mace Tyrell",
-          "combatStrength": 2
+          "combatStrength": 2,
+          "ability": "mace-tyrell-asos"
         },
         "ser-garlan-tyrell-asos": {
           "name": "Ser Garlan Tyrell",

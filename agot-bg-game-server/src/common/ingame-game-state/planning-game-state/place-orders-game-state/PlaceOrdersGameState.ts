@@ -377,7 +377,7 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
     }
 
     getAvailableOrders(house: House): Order[] {
-        return this.ingame.game.getAvailableOrders(this.placedOrders, house, this.parentGameState.planningRestrictions);
+        return this.ingame.game.getAvailableOrders(this.placedOrders, house);
     }
 
     isReady(house: House): boolean {

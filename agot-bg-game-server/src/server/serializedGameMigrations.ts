@@ -1648,6 +1648,26 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                     if (l.data.type == "robb-stark-retreat-location-overriden") {
                         l.data.houseCardName = "Robb Stark";
                     }
+
+                    // Fix incorrect defense order type ids in orders-revealed log
+                    if (l.data.type == "orders-revealed") {
+                        l.data.worldState.forEach((regionState) => {
+                            if (regionState.order?.type == "defense-plus-one") {
+                                regionState.order.type = "defense-plus-two";
+                            } else if (regionState.order?.type == "defensePlusOne") {
+                                regionState.order.type = "defense-plus-one";
+                            }
+                        });
+                    }
+
+                    // Fix incorrect defense order type ids in order-removed log
+                    if (l.data.type == "order-removed") {
+                        if (l.data.order == "defense-plus-one") {
+                            l.data.order = "defense-plus-two";
+                        } else if (l.data.order == "defensePlusOne") {
+                            l.data.order = "defense-plus-one";
+                        }
+                    }
                 });
 
                 if (ingame.childGameState.type == "action" && ingame.childGameState.childGameState.type == "resolve-march-order" && ingame.childGameState.childGameState.childGameState.type == "combat") {

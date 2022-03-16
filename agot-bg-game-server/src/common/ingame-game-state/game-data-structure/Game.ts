@@ -210,7 +210,7 @@ export default class Game {
             .filter(([region, _order]) => region.getController() == house) as [Region, Order][]);
     }
 
-    getAvailableOrders(allPlacedOrders: BetterMap<Region, Order | null>, house: House, _planningRestrictions: PlanningRestriction[]): Order[] {
+    getAvailableOrders(allPlacedOrders: BetterMap<Region, Order | null>, house: House): Order[] {
         const ordersList = this.getOrdersListForHouse(house);
         const placedOrders = this.getPlacedOrders(allPlacedOrders, house).values;
         let leftOrders = _.difference(

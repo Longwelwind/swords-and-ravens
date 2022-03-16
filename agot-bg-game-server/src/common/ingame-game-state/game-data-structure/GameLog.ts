@@ -47,7 +47,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | ObjectivesChosen | NewObjectiveCardDrawn | SpecialObjectiveScored | ObjectiveScored | IronbornRaid
     | ShiftingAmbitionsObjectiveChosenFromHand | ShiftingAmbitionsObjectiveChosenFromPool | NewInformationObjectiveCardChosen
     | RevealAllObjectives | GarrisonRemoved | GarrisonReturned | ObjectiveDeckEmpty | OrdersRevealed | HouseCardsReturned
-    | BalonGreyjoyASoSPowerTokensGained;
+    | BalonGreyjoyASoSPowerTokensGained | MaceTyrellASoSOrderPlaced;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -1029,4 +1029,11 @@ interface BalonGreyjoyASoSPowerTokensGained {
     type: "balon-greyjoy-asos-power-tokens-gained";
     house: string;
     powerTokensGained: number;
+}
+
+interface MaceTyrellASoSOrderPlaced {
+    type: "mace-tyrell-asos-order-placed";
+    house: string;
+    region: string;
+    order: number;
 }

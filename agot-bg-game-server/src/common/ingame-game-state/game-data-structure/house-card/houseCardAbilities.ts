@@ -70,6 +70,7 @@ import MissandeiHouseCardAbility from "./MissandeiHouseCardAbility";
 import CaptainGroleoHouseCardAbility from "./CaptainGroleoHouseCardAbility";
 import AshaGreyjoyASoSHouseCardAbility from "./AshaGreyjoyASoSHouseCardAbility";
 import BalonGreyjoyASoSHouseCardAbility from "./BalonGreyjoyASoSHouseCardAbility";
+import MaceTyrellASoSHouseCardAbility from "./MaceTyrellASoSHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -226,7 +227,7 @@ export const euronCrowsEyeDwd = new EuronCrowsEyeDwDAbility(
 );
 export const qyburn = new QyburnHouseCardAbility(
     "qyburn",
-    "You may discard two of your avaiable Power tokens to choose a House card in any players' discard pile."
+    "You may discard two of your available Power tokens to choose a House card in any players' discard pile."
     + " Qyburn gains the printed combat, strength and combat icons of that card, ignoring its text ability."
 );
 export const serAddamMarbrand = new SerAddamMarbrandAbility(
@@ -401,6 +402,11 @@ export const balonGreyjoyASoS = new BalonGreyjoyASoSHouseCardAbility(
     "balon-greyjoy-asos",
     "If you win this battle, gain Power tokens equal to the difference in total strength in the battle."
 );
+export const maceTyrellASoS = new MaceTyrellASoSHouseCardAbility(
+    "mace-tyrell-asos",
+    "If you win this battle, you may immediately place a Support or Defense order in this area " +
+        "(may not be a special order), removing any orders that were previously in this area."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -472,7 +478,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [missandei.id, missandei],
     [captainGroleo.id, captainGroleo],
     [ashaGreyjoyASoS.id, ashaGreyjoyASoS],
-    [balonGreyjoyASoS.id, balonGreyjoyASoS]
+    [balonGreyjoyASoS.id, balonGreyjoyASoS],
+    [maceTyrellASoS.id, maceTyrellASoS]
 ]);
 
 export default houseCardAbilities;
