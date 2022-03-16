@@ -2245,7 +2245,8 @@
         },
         "arianne-martell-asos": {
           "name": "Arianne Martell",
-          "combatStrength": 1
+          "combatStrength": 1,
+          "ability": "arianne-martell"
         },
         "maester-caleotte": {
           "name": "Maester Caleotte",
