@@ -13,12 +13,14 @@ import MelisandreAbilityGameState, {SerializedMelisandreAbilityGameState} from "
 import JonConningtonAbilityGameState, {SerializedJonConningtonAbilityGameState} from "./jon-connington-ability-game-state/JonConningtonAbilityGameState";
 import RobertArrynAbilityGameState, { SerializedRobertArrynAbilityGameState } from "./robert-arryn-ability-game-state/RobertArrynAbilityGameState";
 import MaceTyrellASoSAbilityGameState, { SerializedMaceTyrellASoSAbilityGameState } from "./mace-tyrell-asos-ability-game-state/MaceTyrellASoSAbilityGameState";
+import BranStarkAbilityGameState, { SerializedBranStarkAbilityGameState } from "./bran-stark-ability-game-state/BranStarkAbilityGameState";
 
 export default class AfterCombatHouseCardAbilitiesGameState extends GameState<
     PostCombatGameState,
     HouseCardResolutionGameState<
         AfterCombatHouseCardAbilitiesGameState,
-        PatchfaceAbilityGameState | MelisandreAbilityGameState | JonConningtonAbilityGameState | RobertArrynAbilityGameState | MaceTyrellASoSAbilityGameState
+        PatchfaceAbilityGameState | MelisandreAbilityGameState | JonConningtonAbilityGameState |
+        RobertArrynAbilityGameState | MaceTyrellASoSAbilityGameState | BranStarkAbilityGameState
     >
 >  {
     get postCombatGameState(): PostCombatGameState {
@@ -36,7 +38,7 @@ export default class AfterCombatHouseCardAbilitiesGameState extends GameState<
     firstStart(): void {
         this.setChildGameState(
             new HouseCardResolutionGameState<AfterCombatHouseCardAbilitiesGameState, PatchfaceAbilityGameState | MelisandreAbilityGameState
-            | JonConningtonAbilityGameState | RobertArrynAbilityGameState | MaceTyrellASoSAbilityGameState>(this)
+            | JonConningtonAbilityGameState | RobertArrynAbilityGameState | MaceTyrellASoSAbilityGameState | BranStarkAbilityGameState>(this)
         ).firstStart();
     }
 
@@ -92,6 +94,8 @@ export default class AfterCombatHouseCardAbilitiesGameState extends GameState<
                 return RobertArrynAbilityGameState.deserializeFromServer(houseCardResolution, data);
             case "mace-tyrell-asos-ability":
                 return MaceTyrellASoSAbilityGameState.deserializeFromServer(houseCardResolution, data);
+            case "bran-stark-ability":
+                return BranStarkAbilityGameState.deserializeFromServer(houseCardResolution, data);
         }
     }
 }
@@ -99,5 +103,6 @@ export default class AfterCombatHouseCardAbilitiesGameState extends GameState<
 export interface SerializedAfterCombatHouseCardAbilitiesGameState {
     type: "after-combat-house-card-abilities";
     childGameState: SerializedHouseCardResolutionGameState<SerializedPatchfaceAbilityGameState | SerializedMelisandreAbilityGameState
-    | SerializedJonConningtonAbilityGameState | SerializedRobertArrynAbilityGameState | SerializedMaceTyrellASoSAbilityGameState>;
+    | SerializedJonConningtonAbilityGameState | SerializedRobertArrynAbilityGameState | SerializedMaceTyrellASoSAbilityGameState
+    | SerializedBranStarkAbilityGameState>;
 }

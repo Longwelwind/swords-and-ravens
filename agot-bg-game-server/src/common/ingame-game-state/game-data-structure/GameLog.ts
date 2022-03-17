@@ -47,7 +47,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | ObjectivesChosen | NewObjectiveCardDrawn | SpecialObjectiveScored | ObjectiveScored | IronbornRaid
     | ShiftingAmbitionsObjectiveChosenFromHand | ShiftingAmbitionsObjectiveChosenFromPool | NewInformationObjectiveCardChosen
     | RevealAllObjectives | GarrisonRemoved | GarrisonReturned | ObjectiveDeckEmpty | OrdersRevealed | HouseCardsReturned
-    | BalonGreyjoyASoSPowerTokensGained | MaceTyrellASoSOrderPlaced;
+    | BalonGreyjoyASoSPowerTokensGained | MaceTyrellASoSOrderPlaced | BranStarkUsed;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -1036,4 +1036,10 @@ interface MaceTyrellASoSOrderPlaced {
     house: string;
     region: string;
     order: number;
+}
+
+interface BranStarkUsed {
+    type: "bran-stark-used";
+    house: string;
+    houseCard: string;
 }

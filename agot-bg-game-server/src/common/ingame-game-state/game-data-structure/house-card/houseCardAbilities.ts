@@ -71,6 +71,7 @@ import CaptainGroleoHouseCardAbility from "./CaptainGroleoHouseCardAbility";
 import AshaGreyjoyASoSHouseCardAbility from "./AshaGreyjoyASoSHouseCardAbility";
 import BalonGreyjoyASoSHouseCardAbility from "./BalonGreyjoyASoSHouseCardAbility";
 import MaceTyrellASoSHouseCardAbility from "./MaceTyrellASoSHouseCardAbility";
+import BranStarkHouseCardAbility from "./BranStarkHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -407,6 +408,10 @@ export const maceTyrellASoS = new MaceTyrellASoSHouseCardAbility(
     "If you win this battle, you may immediately place a Support or Defense order in this area " +
         "(may not be a special order), removing any orders that were previously in this area."
 );
+export const branStark = new BranStarkHouseCardAbility(
+    "bran-stark",
+    "You may retrieve one House Card from your discard pile at the end of the battle."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -479,7 +484,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [captainGroleo.id, captainGroleo],
     [ashaGreyjoyASoS.id, ashaGreyjoyASoS],
     [balonGreyjoyASoS.id, balonGreyjoyASoS],
-    [maceTyrellASoS.id, maceTyrellASoS]
+    [maceTyrellASoS.id, maceTyrellASoS],
+    [branStark.id, branStark]
 ]);
 
 export default houseCardAbilities;

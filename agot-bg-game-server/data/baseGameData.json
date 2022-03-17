@@ -2142,7 +2142,8 @@
           "combatStrength": 1
         },
         "bran-stark": {
-          "name": "Bran Stark"
+          "name": "Bran Stark",
+          "ability": "bran-stark"
         }
       }
     },

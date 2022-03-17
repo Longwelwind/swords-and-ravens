@@ -1795,6 +1795,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Mace Tyrell</b>: House <b>{house.name}</b> decided to place a <b>{order.type.name}</b> order in <b>{region.name}</b>.
                 </p>;
             }
+            case "bran-stark-used": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = this.allHouseCards.get(data.houseCard);
+                return <p>
+                   <b>Bran Stark</b>: House <b>{house.name}</b> decided to return <b>
+                        {houseCard.name}</b> to hand.
+                </p>;
+            }
         }
     }
 
