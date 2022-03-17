@@ -1678,6 +1678,21 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         && combat.childGameState.childGameState.childGameState.type == "aeron-damphair-ability") {
                             combat.childGameState.childGameState.childGameState.reduceCombatStrengthOfNewHouseCard = false;
                     }
+
+                    // Align the handling of optional house cards with the other house cards
+                    if (combat.childGameState.type == "post-combat" && combat.childGameState.childGameState.type == "after-winner-determination") {
+                        const afterWinner = combat.childGameState.childGameState;
+                        if (afterWinner.childGameState.type == "house-card-resolution" && (
+                                afterWinner.childGameState.childGameState.type == "alayne-stone-ability"
+                                || afterWinner.childGameState.childGameState.type == "lysa-arryn-mod-ability"
+                                || afterWinner.childGameState.childGameState.type == "reek-ability")
+                        ) {
+                            const ability = afterWinner.childGameState.childGameState;
+                            if (ability.childGameState.type == "simple-choice") {
+                                ability.childGameState.choices.reverse();
+                            }
+                        }
+                    }
                 }
             }
 

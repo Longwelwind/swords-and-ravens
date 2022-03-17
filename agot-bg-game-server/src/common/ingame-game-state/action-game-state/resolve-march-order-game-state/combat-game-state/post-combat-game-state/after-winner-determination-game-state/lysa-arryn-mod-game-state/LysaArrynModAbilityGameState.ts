@@ -37,7 +37,7 @@ export default class LysaArrynModAbilityGameState extends GameState<
             .firstStart(
                 house,
                 "",
-                ["Ignore", "Return Lysa Arryn to hand"]
+                ["Return Lysa Arryn to hand", "Ignore"]
             );
     }
 
@@ -45,12 +45,6 @@ export default class LysaArrynModAbilityGameState extends GameState<
         const house = this.childGameState.house;
 
         if (choice == 0) {
-            this.ingame.log({
-                type: "house-card-ability-not-used",
-                house: house.id,
-                houseCard: lysaArrynMod.id
-            });
-        } else {
             const lysaArrynHc = house.houseCards.get("lysa-arryn-mod");
             lysaArrynHc.state = HouseCardState.AVAILABLE;
             this.entireGame.broadcastToClients({
@@ -59,7 +53,12 @@ export default class LysaArrynModAbilityGameState extends GameState<
                 cardIds: [lysaArrynHc.id],
                 state: HouseCardState.AVAILABLE
             });
-
+        } else {
+            this.ingame.log({
+                type: "house-card-ability-not-used",
+                house: house.id,
+                houseCard: lysaArrynMod.id
+            });
         }
         this.parentGameState.onHouseCardResolutionFinish(house);
     }

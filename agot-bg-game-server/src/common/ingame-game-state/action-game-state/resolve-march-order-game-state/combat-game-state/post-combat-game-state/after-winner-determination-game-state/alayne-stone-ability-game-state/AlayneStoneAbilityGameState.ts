@@ -36,7 +36,7 @@ export default class AlayneStoneAbilityGameState extends GameState<
             .firstStart(
                 house,
                 "",
-                ["Ignore", "Activate"]
+                ["Activate", "Ignore"]
             );
     }
 
@@ -44,12 +44,6 @@ export default class AlayneStoneAbilityGameState extends GameState<
         const house = this.childGameState.house;
 
         if (choice == 0) {
-            this.ingame.log({
-                type: "house-card-ability-not-used",
-                house: house.id,
-                houseCard: alayneStone.id
-            });
-        } else {
             this.ingame.changePowerTokens(house, -2);
             const enemy = this.ingame.getControllerOfHouse(this.combatGameState.getEnemy(house)).house;
             const lostPowerTokens = enemy.powerTokens;
@@ -59,6 +53,12 @@ export default class AlayneStoneAbilityGameState extends GameState<
                 house: house.id,
                 affectedHouse: enemy.id,
                 lostPowerTokens: lostPowerTokens
+            });
+        } else {
+            this.ingame.log({
+                type: "house-card-ability-not-used",
+                house: house.id,
+                houseCard: alayneStone.id
             });
         }
         this.parentGameState.onHouseCardResolutionFinish(house);
