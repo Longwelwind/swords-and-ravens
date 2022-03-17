@@ -749,8 +749,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     wilddlingStatus = "decrease";
                 }
                 return <p>
-                    <b>Jon Snow</b>: House <b>{house.name}</b> decided to  <b>
-                        {wilddlingStatus} </b> the Wildling track by one space.
+                    <b>Jon Snow</b>: House <b>{house.name}</b> decided to <b>
+                        {wilddlingStatus}</b> the Wildling track by one space.
                 </p>;
             }
             case "doran-used": {
@@ -759,7 +759,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const influenceTrack = this.game.getNameInfluenceTrack(data.influenceTrack);
 
                 return <p>
-                    <b>Doran Martell</b>: House <b>{house.name}</b> decided to move <b>
+                    <b>Doran Martell</b>: House <b>{house.name}</b> decided to move House <b>
                         {affectedHouse.name}</b> to the bottom of the <b>{influenceTrack}</b> track.
                 </p>;
             }
@@ -1810,6 +1810,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <p>
                     <b>Cersei Lannister</b>: House <b>{house.name}</b> forced House <b>{affectedHouse.name}</b> to
                     discard {data.powerTokensDiscarded} Power&nbsp;token{data.powerTokensDiscarded != 1 && "s"}.
+                </p>;
+            }
+            case "doran-martell-asos-used": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+
+                return <p>
+                    <b>Doran Martell</b>: House <b>{house.name}</b> moved House <b>
+                        {affectedHouse.name}</b> to the bottom of the <b>Fiefdoms</b> track.
                 </p>;
             }
         }

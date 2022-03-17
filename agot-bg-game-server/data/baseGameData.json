@@ -2236,7 +2236,8 @@
         },
         "doran-martell-asos": {
           "name": "Doran Martell",
-          "combatStrength": 2
+          "combatStrength": 2,
+          "ability": "doran-martell-asos"
         },
         "nymeria-sand-asos": {
           "name": "Nymeria Sand",

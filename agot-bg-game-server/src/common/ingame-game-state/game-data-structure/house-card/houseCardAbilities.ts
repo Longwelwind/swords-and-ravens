@@ -74,6 +74,7 @@ import MaceTyrellASoSHouseCardAbility from "./MaceTyrellASoSHouseCardAbility";
 import BranStarkHouseCardAbility from "./BranStarkHouseCardAbility";
 import CatelynStarkASoSHouseCardAbility from "./CatelynStarkASoSHouseCardAbility";
 import CerseiLannisterASoSHouseCardAbility from "./CerseiLannisterASoSHouseCardAbility";
+import DoranMartellASoSHouseCardAbility from "./DoranMartellASoSHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -422,6 +423,11 @@ export const cerseiLannisterASoS = new CerseiLannisterASoSHouseCardAbility(
     "cersei-lannister-asos",
     "Your opponent must lose two Power tokens at the end of the battle."
 );
+export const doranMartelASoS = new DoranMartellASoSHouseCardAbility(
+    "doran-martell-asos",
+    "Immediately move your opponent to the bottom of the Fiefdoms Track. Then move players up and reassign " +
+        "the Valyrian Steel Blade as necessary."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -497,7 +503,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [maceTyrellASoS.id, maceTyrellASoS],
     [branStark.id, branStark],
     [catelynStarkASoS.id, catelynStarkASoS],
-    [cerseiLannisterASoS.id, cerseiLannisterASoS]
+    [cerseiLannisterASoS.id, cerseiLannisterASoS],
+    [doranMartelASoS.id, doranMartelASoS]
 ]);
 
 export default houseCardAbilities;
