@@ -1803,6 +1803,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         {houseCard.name}</b> to hand.
                 </p>;
             }
+            case "cersei-lannister-asos-power-tokens-discarded": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+
+                return <p>
+                    <b>Cersei Lannister</b>: House <b>{house.name}</b> forced House <b>{affectedHouse.name}</b> to
+                    discard {data.powerTokensDiscarded} Power&nbsp;token{data.powerTokensDiscarded != 1 && "s"}.
+                </p>;
+            }
         }
     }
 

@@ -73,6 +73,7 @@ import BalonGreyjoyASoSHouseCardAbility from "./BalonGreyjoyASoSHouseCardAbility
 import MaceTyrellASoSHouseCardAbility from "./MaceTyrellASoSHouseCardAbility";
 import BranStarkHouseCardAbility from "./BranStarkHouseCardAbility";
 import CatelynStarkASoSHouseCardAbility from "./CatelynStarkASoSHouseCardAbility";
+import CerseiLannisterASoSHouseCardAbility from "./CerseiLannisterASoSHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -417,6 +418,10 @@ export const catelynStarkASoS = new CatelynStarkASoSHouseCardAbility(
     "catelyn-stark-asos",
     "If you are being supported in this battle, gain +2 combat strength and one Fortification Icon."
 );
+export const cerseiLannisterASoS = new CerseiLannisterASoSHouseCardAbility(
+    "cersei-lannister-asos",
+    "Your opponent must lose two Power tokens at the end of the battle."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -491,7 +496,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [balonGreyjoyASoS.id, balonGreyjoyASoS],
     [maceTyrellASoS.id, maceTyrellASoS],
     [branStark.id, branStark],
-    [catelynStarkASoS.id, catelynStarkASoS]
+    [catelynStarkASoS.id, catelynStarkASoS],
+    [cerseiLannisterASoS.id, cerseiLannisterASoS]
 ]);
 
 export default houseCardAbilities;

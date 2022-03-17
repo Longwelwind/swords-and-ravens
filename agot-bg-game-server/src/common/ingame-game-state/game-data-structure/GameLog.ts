@@ -47,7 +47,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | ObjectivesChosen | NewObjectiveCardDrawn | SpecialObjectiveScored | ObjectiveScored | IronbornRaid
     | ShiftingAmbitionsObjectiveChosenFromHand | ShiftingAmbitionsObjectiveChosenFromPool | NewInformationObjectiveCardChosen
     | RevealAllObjectives | GarrisonRemoved | GarrisonReturned | ObjectiveDeckEmpty | OrdersRevealed | HouseCardsReturned
-    | BalonGreyjoyASoSPowerTokensGained | MaceTyrellASoSOrderPlaced | BranStarkUsed;
+    | BalonGreyjoyASoSPowerTokensGained | MaceTyrellASoSOrderPlaced | BranStarkUsed | CerseiLannisterASoSPowerTokensDiscarded;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -1042,4 +1042,11 @@ interface BranStarkUsed {
     type: "bran-stark-used";
     house: string;
     houseCard: string;
+}
+
+interface CerseiLannisterASoSPowerTokensDiscarded {
+    type: "cersei-lannister-asos-power-tokens-discarded";
+    house: string;
+    affectedHouse: string;
+    powerTokensDiscarded: number;
 }

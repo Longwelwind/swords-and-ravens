@@ -2098,7 +2098,8 @@
         },
         "cersei-lannister-asos": {
           "name": "Cersei Lannister",
-          "combatStrength": 1
+          "combatStrength": 1,
+          "ability": "cersei-lannister-asos"
         },
         "ser-ilyn-payne-asos": {
           "name": "Ser Ilyn Payne",
