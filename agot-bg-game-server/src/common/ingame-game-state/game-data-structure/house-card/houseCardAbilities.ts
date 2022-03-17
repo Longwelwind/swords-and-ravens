@@ -75,6 +75,7 @@ import BranStarkHouseCardAbility from "./BranStarkHouseCardAbility";
 import CatelynStarkASoSHouseCardAbility from "./CatelynStarkASoSHouseCardAbility";
 import CerseiLannisterASoSHouseCardAbility from "./CerseiLannisterASoSHouseCardAbility";
 import DoranMartellASoSHouseCardAbility from "./DoranMartellASoSHouseCardAbility";
+import MelisandreOfAsshaiHouseCardAbility from "./MelisandreOfAsshaiHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -322,8 +323,8 @@ export const littlefinger = new LittlefingerHouseCardAbility(
 );
 export const alayneStone = new AlayneStoneHouseCardAbility(
     "alayne-stone",
-    "If you control The Eyrie after this combat, gain a number of Power tokens equal to"
-     + " twice the printed combat strength of your opponent's played House card."
+    "If you win this combat and control The Eyrie, you may discard 2 of your available Power tokens to force"
+     + " your opponent to discard all of his available Power tokens."
 );
 export const lysaArrynFfc = new LysaArrynFfcHouseCardAbility(
     "lysa-arryn-ffc",
@@ -428,6 +429,10 @@ export const doranMartelASoS = new DoranMartellASoSHouseCardAbility(
     "Immediately move your opponent to the bottom of the Fiefdoms Track. Then move players up and reassign " +
         "the Valyrian Steel Blade as necessary."
 );
+export const melisandreOfAsshai = new MelisandreOfAsshaiHouseCardAbility(
+    "melisandre-of-asshai",
+    "Immediately gain Power tokens equal to the strength of your opponent's House Card."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -504,7 +509,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [branStark.id, branStark],
     [catelynStarkASoS.id, catelynStarkASoS],
     [cerseiLannisterASoS.id, cerseiLannisterASoS],
-    [doranMartelASoS.id, doranMartelASoS]
+    [doranMartelASoS.id, doranMartelASoS],
+    [melisandreOfAsshai.id, melisandreOfAsshai]
 ]);
 
 export default houseCardAbilities;

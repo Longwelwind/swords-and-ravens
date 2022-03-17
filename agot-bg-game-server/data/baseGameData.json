@@ -2162,7 +2162,8 @@
         },
         "melisandre-of-asshai": {
           "name": "Melisandre of Asshai",
-          "combatStrength": 2
+          "combatStrength": 2,
+          "ability": "melisandre-of-asshai"
         },
         "ser-axell-florent-asos": {
           "name": "Ser Axell Florent",

@@ -1821,6 +1821,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         {affectedHouse.name}</b> to the bottom of the <b>Fiefdoms</b> track.
                 </p>;
             }
+            case "melisandre-of-asshai-power-tokens-gained": {
+                const house = this.game.houses.get(data.house);
+                return <p>
+                    <b>Melisandre of Asshai</b>: House <b>{house.name}</b> gained {data.powerTokens} Power&nbsp;tokens.
+                </p>;
+            }
         }
     }
 
