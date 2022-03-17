@@ -2139,7 +2139,8 @@
         },
         "catelyn-stark-asos": {
           "name": "Catelyn Stark",
-          "combatStrength": 1
+          "combatStrength": 1,
+          "ability": "catelyn-stark-asos"
         },
         "bran-stark": {
           "name": "Bran Stark",

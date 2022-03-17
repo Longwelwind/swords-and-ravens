@@ -72,6 +72,7 @@ import AshaGreyjoyASoSHouseCardAbility from "./AshaGreyjoyASoSHouseCardAbility";
 import BalonGreyjoyASoSHouseCardAbility from "./BalonGreyjoyASoSHouseCardAbility";
 import MaceTyrellASoSHouseCardAbility from "./MaceTyrellASoSHouseCardAbility";
 import BranStarkHouseCardAbility from "./BranStarkHouseCardAbility";
+import CatelynStarkASoSHouseCardAbility from "./CatelynStarkASoSHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -412,6 +413,10 @@ export const branStark = new BranStarkHouseCardAbility(
     "bran-stark",
     "You may retrieve one House Card from your discard pile at the end of the battle."
 );
+export const catelynStarkASoS = new CatelynStarkASoSHouseCardAbility(
+    "catelyn-stark-asos",
+    "If you are being supported in this battle, gain +2 combat strength and one Fortification Icon."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -485,7 +490,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [ashaGreyjoyASoS.id, ashaGreyjoyASoS],
     [balonGreyjoyASoS.id, balonGreyjoyASoS],
     [maceTyrellASoS.id, maceTyrellASoS],
-    [branStark.id, branStark]
+    [branStark.id, branStark],
+    [catelynStarkASoS.id, catelynStarkASoS]
 ]);
 
 export default houseCardAbilities;
