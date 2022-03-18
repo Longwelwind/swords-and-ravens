@@ -153,7 +153,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                 </Tooltip>}>
                                 <label htmlFor="adwd-house-cards">Use <i>ADwD</i> house cards</label>
                             </OverlayTrigger>}
-                        disabled={this.props.entireGame.isDanceWithDragons}
                         checked={this.gameSettings.adwdHouseCards}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.adwdHouseCards = !this.gameSettings.adwdHouseCards)}
                     />

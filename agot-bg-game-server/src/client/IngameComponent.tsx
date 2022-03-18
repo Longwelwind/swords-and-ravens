@@ -178,8 +178,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     constructor(props: IngameComponentProps) {
         super(props);
         // Check for Dance with Dragons house cards
-        if (props.gameState.entireGame.gameSettings.adwdHouseCards ||
-            props.gameState.entireGame.isDanceWithDragons) {
+        if (props.gameState.entireGame.gameSettings.adwdHouseCards) {
             // Replace Stark images with Bolton images for DwD
             houseCardsBackImages.set("stark", houseCardsBackImages.get("bolton"));
             houseInfluenceImages.set("stark", houseInfluenceImages.get("bolton"));

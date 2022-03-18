@@ -148,25 +148,24 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 return updateLastActive;
             }
 
-            if (settings.setupId == "a-dance-with-dragons") {
-                settings.adwdHouseCards = true;
-                settings.asosHouseCards = false;
-            } else if (settings.setupId == "a-feast-for-crows") {
+            if (settings.setupId == "a-feast-for-crows") {
                 settings.vassals = false;
                 settings.allowGiftingPowerTokens = false;
                 settings.useVassalPositions = false;
                 settings.mixedWesterosDeck1 = false;
                 settings.endless = false;
-            } else if (settings.asosHouseCards) {
+            }
+
+            if (settings.setupId != "a-feast-for-crows") {
+                settings.addPortToTheEyrie = false;
+            }
+
+            if (settings.asosHouseCards) {
                 settings.adwdHouseCards = false;
             }
 
             if (settings.adwdHouseCards) {
                 settings.asosHouseCards = false;
-            }
-
-            if (settings.setupId != "a-feast-for-crows") {
-                settings.addPortToTheEyrie = false;
             }
 
             if (settings.thematicDraft) {
@@ -211,6 +210,12 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.seaOrderTokens = false;
                 settings.allowGiftingPowerTokens = false;
                 settings.ironBank = false;
+            }
+
+            // Allow disabling DwD cards but enable them when switching to this setup
+            if (!this.entireGame.isDanceWithDragons && settings.setupId == "a-dance-with-dragons") {
+                settings.adwdHouseCards = true;
+                settings.asosHouseCards = false;
             }
 
             // Reset Dwd Cards
