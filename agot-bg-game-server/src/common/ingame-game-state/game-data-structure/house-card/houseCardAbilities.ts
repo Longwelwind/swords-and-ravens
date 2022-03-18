@@ -77,6 +77,7 @@ import CerseiLannisterASoSHouseCardAbility from "./CerseiLannisterASoSHouseCardA
 import DoranMartellASoSHouseCardAbility from "./DoranMartellASoSHouseCardAbility";
 import MelisandreOfAsshaiHouseCardAbility from "./MelisandreOfAsshaiHouseCardAbility";
 import SalladharSaanASoSHouseCardAbility from "./SalladharSaanASoSHouseCardAbility";
+import SerDavosSeaworthASoSHouseCardAbility from "./SerDavosSeaworthASoSHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -438,6 +439,11 @@ export const salladharSaanASoS = new SalladharSaanASoSHouseCardAbility(
     "salladhar-saan-asos",
     "If you win this battle, you gain two Power tokens and your opponent loses two Power tokens."
 );
+export const serDavosSeaworthASoS = new SerDavosSeaworthASoSHouseCardAbility(
+    "ser-davos-seaworth-asos",
+    "If you lose this battle, your Units are not routed " +
+        "and you may spend two Power tokens to gain a Fortification Icon."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -516,7 +522,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [cerseiLannisterASoS.id, cerseiLannisterASoS],
     [doranMartelASoS.id, doranMartelASoS],
     [melisandreOfAsshai.id, melisandreOfAsshai],
-    [salladharSaanASoS.id, salladharSaanASoS]
+    [salladharSaanASoS.id, salladharSaanASoS],
+    [serDavosSeaworthASoS.id, serDavosSeaworthASoS]
 ]);
 
 export default houseCardAbilities;

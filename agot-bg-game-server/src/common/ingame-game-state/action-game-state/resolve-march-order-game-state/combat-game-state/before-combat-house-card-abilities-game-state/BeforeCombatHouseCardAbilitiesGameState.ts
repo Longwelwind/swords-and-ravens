@@ -11,12 +11,14 @@ import QyburnAbilityGameState, { SerializedQyburnAbilityGameState } from "./qybu
 import AeronDamphairDwDAbilityGameState, { SerializedAeronDamphairDwDAbilityGameState } from "./aeron-damphair-dwd-ability-game-state/AeronDamphairDwDAbilityGameState";
 import BronnAbilityGameState, { SerializedBronnAbilityGameState } from "./bronn-ability-game-state/BronnAbilityGameState";
 import ViserysTargaryenAbilityGameState, { SerializedViserysTargaryenAbilityGameState } from "./viserys-targaryen-ability-game-state/ViserysTargaryenAbilityGameState";
+import SerDavosSeaworthASoSAbilityGameState, { SerializedSerDavosSeaworthASoSAbilityGameState } from "./ser-davos-seaworth-asos-game-state/SerDavosSeaworthASoSAbilityGameState";
 
 export default class BeforeCombatHouseCardAbilitiesGameState extends GameState<
     CombatGameState,
     HouseCardResolutionGameState<
     BeforeCombatHouseCardAbilitiesGameState,
-    AeronDamphairDwDAbilityGameState | QyburnAbilityGameState | BronnAbilityGameState | ViserysTargaryenAbilityGameState
+    AeronDamphairDwDAbilityGameState | QyburnAbilityGameState | BronnAbilityGameState
+    | ViserysTargaryenAbilityGameState | SerDavosSeaworthASoSAbilityGameState
     >
 > {
     get combatGameState(): CombatGameState {
@@ -30,7 +32,7 @@ export default class BeforeCombatHouseCardAbilitiesGameState extends GameState<
     firstStart(): void {
         this.setChildGameState(
             new HouseCardResolutionGameState<BeforeCombatHouseCardAbilitiesGameState, AeronDamphairDwDAbilityGameState | QyburnAbilityGameState
-            | BronnAbilityGameState | ViserysTargaryenAbilityGameState>(this)
+            | BronnAbilityGameState | ViserysTargaryenAbilityGameState | SerDavosSeaworthASoSAbilityGameState>(this)
         ).firstStart();
     }
 
@@ -75,6 +77,8 @@ export default class BeforeCombatHouseCardAbilitiesGameState extends GameState<
                 return BronnAbilityGameState.deserializeFromServer(houseCardResolution, data);
             case "viserys-targaryen-ability":
                 return ViserysTargaryenAbilityGameState.deserializeFromServer(houseCardResolution, data);
+            case "ser-davos-seaworth-asos-ability":
+                return SerDavosSeaworthASoSAbilityGameState.deserializeFromServer(houseCardResolution, data);
         }
     }
 
@@ -95,6 +99,6 @@ export interface SerializedBeforeCombatHouseCardAbilitiesGameState {
     type: "before-combat-house-card-abilities-resolution";
     childGameState: SerializedHouseCardResolutionGameState<
     SerializedAeronDamphairDwDAbilityGameState | SerializedQyburnAbilityGameState | SerializedBronnAbilityGameState
-    | SerializedViserysTargaryenAbilityGameState
+    | SerializedViserysTargaryenAbilityGameState | SerializedSerDavosSeaworthASoSAbilityGameState
     >;
 }

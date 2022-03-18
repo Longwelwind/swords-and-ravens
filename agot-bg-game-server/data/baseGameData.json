@@ -2182,7 +2182,8 @@
           "towerIcons": 1
         },
         "ser-davos-seaworth-asos": {
-          "name": "Ser Davos Seaworth"
+          "name": "Ser Davos Seaworth",
+          "ability": "ser-davos-seaworth-asos"
         }
       }
     },

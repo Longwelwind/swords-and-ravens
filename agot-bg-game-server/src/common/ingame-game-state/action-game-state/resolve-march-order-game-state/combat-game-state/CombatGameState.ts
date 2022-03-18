@@ -480,6 +480,15 @@ export default class CombatGameState extends GameState<
         return affectedHouseCard.ability ? affectedHouseCard.ability.doesPreventCasualties(this, affectedHouse, affectedHouseCard) : false;
     }
 
+    areWoundsPrevented(affectedHouse: House): boolean {
+        const affectedHouseCard = this.houseCombatDatas.get(affectedHouse).houseCard;
+        if (!affectedHouseCard) {
+            return false;
+        }
+
+        return affectedHouseCard.ability ? affectedHouseCard.ability.doesPreventWounds(this, affectedHouse, affectedHouseCard) : false;
+    }
+
     isFinalCombatStrengthOverwritten(affectedHouse: House | null): boolean {
         if (!affectedHouse || !this.houseCombatDatas.has(affectedHouse)) {
             return false;

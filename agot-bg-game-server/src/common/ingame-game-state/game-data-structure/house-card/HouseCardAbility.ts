@@ -72,6 +72,10 @@ export default class HouseCardAbility {
         return false;
     }
 
+    doesPreventWounds(_combat: CombatGameState, _house: House, _houseCard: HouseCard): boolean {
+        return false;
+    }
+
     overrideRetreatLocationChooser(_postCombat: PostCombatGameState, _house: House, _houseCard: HouseCard, _retreater: House): House | null {
         return null;
     }

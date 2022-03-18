@@ -1835,6 +1835,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     {affectedHouse.name}</b> lost <b>{data.powerTokensLost}</b> Power&nbsp;token{data.powerTokensLost != 1 ? "s" : ""}.
                 </p>;
             }
+            case "ser-davos-seaworth-asos-fortification-gained": {
+                const house = this.game.houses.get(data.house);
+                return <p>
+                    <b>Ser Davos Seaworth</b>: House <b>{house.name}</b> has spent <b>2</b> Power&nbsp;tokens and gained 1 Fortification Icon.
+                </p>;
+            }
         }
     }
 

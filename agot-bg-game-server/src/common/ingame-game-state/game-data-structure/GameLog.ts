@@ -48,7 +48,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | ShiftingAmbitionsObjectiveChosenFromHand | ShiftingAmbitionsObjectiveChosenFromPool | NewInformationObjectiveCardChosen
     | RevealAllObjectives | GarrisonRemoved | GarrisonReturned | ObjectiveDeckEmpty | OrdersRevealed | HouseCardsReturned
     | BalonGreyjoyASoSPowerTokensGained | MaceTyrellASoSOrderPlaced | BranStarkUsed | CerseiLannisterASoSPowerTokensDiscarded
-    | DoranMartellASoSUsed | MelisandreOfAsshaiPowerTokensGained | SalladharSaanASoSPowerTokensChanged;
+    | DoranMartellASoSUsed | MelisandreOfAsshaiPowerTokensGained | SalladharSaanASoSPowerTokensChanged | SerDavosSeaworthASoSFortificationGained;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -1070,4 +1070,9 @@ interface SalladharSaanASoSPowerTokensChanged {
     powerTokensGained: number;
     affectedHouse: string;
     powerTokensLost: number;
+}
+
+interface SerDavosSeaworthASoSFortificationGained {
+    type: "ser-davos-seaworth-asos-fortification-gained";
+    house: string;
 }
