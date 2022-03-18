@@ -53,10 +53,10 @@ export default class ResolveSinglePayDebtComponent extends Component<GameStateCo
                 <Row>
                     <Col xs={12} className="text-center">
                         <p>
-                            The holder of the Valyrian Steel Blade destroys one unit for each unpaid interest power&nbsp;token.
+                            The holder of the Valyrian Steel Blade destroys one unit for each unpaid interest Power&nbsp;token.
                         </p>
                         <p>
-                            <b>{this.resolver.name}</b> must destroy {this.props.gameState.debt} units of house <b>{this.house.name}</b>.
+                            <b>{this.resolver.name}</b> must destroy <b>{this.props.gameState.debt}</b> unit{this.props.gameState.debt != 1 ? "s" : ""} of house <b>{this.house.name}</b>.
                         </p>
                     </Col>
                     {this.props.gameClient.doesControlHouse(this.resolver) ? (

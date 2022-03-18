@@ -76,6 +76,7 @@ import CatelynStarkASoSHouseCardAbility from "./CatelynStarkASoSHouseCardAbility
 import CerseiLannisterASoSHouseCardAbility from "./CerseiLannisterASoSHouseCardAbility";
 import DoranMartellASoSHouseCardAbility from "./DoranMartellASoSHouseCardAbility";
 import MelisandreOfAsshaiHouseCardAbility from "./MelisandreOfAsshaiHouseCardAbility";
+import SalladharSaanASoSHouseCardAbility from "./SalladharSaanASoSHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -433,6 +434,10 @@ export const melisandreOfAsshai = new MelisandreOfAsshaiHouseCardAbility(
     "melisandre-of-asshai",
     "Immediately gain Power tokens equal to the strength of your opponent's House Card."
 );
+export const salladharSaanASoS = new SalladharSaanASoSHouseCardAbility(
+    "salladhar-saan-asos",
+    "If you win this battle, you gain two Power tokens and your opponent loses two Power tokens."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -510,7 +515,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [catelynStarkASoS.id, catelynStarkASoS],
     [cerseiLannisterASoS.id, cerseiLannisterASoS],
     [doranMartelASoS.id, doranMartelASoS],
-    [melisandreOfAsshai.id, melisandreOfAsshai]
+    [melisandreOfAsshai.id, melisandreOfAsshai],
+    [salladharSaanASoS.id, salladharSaanASoS]
 ]);
 
 export default houseCardAbilities;

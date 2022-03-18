@@ -699,7 +699,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     House <b>{house.name}</b> resolved a <b>{data.starred && "Special "}Consolidate Power</b> order
-                    in <b>{region.name}</b> to gain <b>{countPowerToken}</b> Power&nbsp;token{countPowerToken > 1 && "s"}.
+                    in <b>{region.name}</b> to gain <b>{countPowerToken}</b> Power&nbsp;token{countPowerToken != 1 ? "s" : ""}.
                 </p>;
             }
             case "armies-reconciled": {
@@ -867,8 +867,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const powerTokensGained = data.powerTokensGained;
 
                 return <p>
-                    <b>Tywin Lannister</b>: House <b>{house.name}</b> gained {powerTokensGained} Power
-                    tokens.
+                    <b>Tywin Lannister</b>: House <b>{house.name}</b> gained <b>{powerTokensGained}</b> Power&nbsp;token{powerTokensGained != 1 ? "s" : ""}.
                 </p>;
             }
             case "qarl-the-maid-tokens-gained": {
@@ -876,7 +875,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const powerTokensGained = data.powerTokensGained;
 
                 return <p>
-                    <b>Qarl the Maid</b>: House <b>{house.name}</b> gained {powerTokensGained} Power&nbsp;tokens.
+                    <b>Qarl the Maid</b>: House <b>{house.name}</b> gained <b>{powerTokensGained}</b> Power&nbsp;token{powerTokensGained != 1 ? "s" : ""}.
                 </p>;
             }
             case "renly-baratheon-no-knight-available": {
@@ -1150,7 +1149,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     {units.length > 0
-                    ? (<><b>Crow Killers</b>: House <b>{house.name}</b> replaced {joinReactNodes(units.map(([region, unitTypes], i) => <span key={`crow-killers-replace_${i}`}><b>{unitTypes.length}</b> Knight{unitTypes.length > 1 && "s"} in <b>{region.name}</b></span>), ", ")} with Footmen.</>)
+                    ? (<><b>Crow Killers</b>: House <b>{house.name}</b> replaced {joinReactNodes(units.map(([region, unitTypes], i) => <span key={`crow-killers-replace_${i}`}><b>{unitTypes.length}</b> Knight{unitTypes.length != 1 ? "s" : ""} in <b>{region.name}</b></span>), ", ")} with Footmen.</>)
                     : (<><b>Crow Killers</b>: House <b>{house.name}</b> had no Knights to replace with Footmen.</>)}
                 </p>;
             }
@@ -1158,7 +1157,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const units: [Region, UnitType[]][] = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
 
-                return <p><b>Crow Killers</b>: House <b>{house.name}</b> had to destroy {joinReactNodes(units.map(([region, unitTypes], i) => <span key={`crow-killers-kill_${i}`}><b>{unitTypes.length}</b> Knight{unitTypes.length > 1 && "s"} in <b>{region.name}</b></span>), ", ")}.</p>;
+                return <p><b>Crow Killers</b>: House <b>{house.name}</b> had to destroy {joinReactNodes(units.map(([region, unitTypes], i) => <span key={`crow-killers-kill_${i}`}><b>{unitTypes.length}</b> Knight{unitTypes.length != 1 ? "s" : ""} in <b>{region.name}</b></span>), ", ")}.</p>;
             }
 
             case "crow-killers-footman-upgraded": {
@@ -1176,7 +1175,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     <b>Skinchanger Scout</b>: House <b>{house.name}</b> gets
-                    back <b>{data.powerToken}</b> Power&nbsp;tokens.
+                    back <b>{data.powerToken}</b> Power&nbsp;token{data.powerToken != 1 ? "s" : ""}.
                 </p>;
             }
             case "skinchanger-scout-wildling-victory": {
@@ -1190,7 +1189,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>
                     <ul>
                         {powerTokensLost.map(([house, amount]) => (
-                            <li key={`skinchanger-scout_${house.id}`}>House <b>{house.name}</b> lost <b>{amount}</b> Power&nbsp;tokens.</li>
+                            <li key={`skinchanger-scout_${house.id}`}>House <b>{house.name}</b> lost <b>{amount}</b> Power&nbsp;token{amount != 1 ? "s" : ""}.</li>
                         ))}
                     </ul>
                 </>;
@@ -1329,20 +1328,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "littlefinger-power-tokens-gained": {
                 const house = this.game.houses.get(data.house);
                 return <p>
-                    <b>Littlefinger</b>: House <b>{house.name}</b> gained {data.powerTokens} Power&nbsp;tokens.
+                    <b>Littlefinger</b>: House <b>{house.name}</b> gained <b>{data.powerTokens}</b> Power&nbsp;token{data.powerTokens != 1 ? "s" : ""}.
                 </p>;
             }
             case "alayne-stone-used": {
                 const house = this.game.houses.get(data.house);
                 const affectedHouse = this.game.houses.get(data.affectedHouse);
                 return <p>
-                    <b>Alayne Stone</b>: House <b>{house.name}</b> forced <b>{affectedHouse.name}</b> to discard all his {data.lostPowerTokens} available Power&nbsp;tokens.
+                    <b>Alayne Stone</b>: House <b>{house.name}</b> forced House <b>{affectedHouse.name}</b> to discard all their <b>{data.lostPowerTokens}</b> available
+                    Power&nbsp;token{data.lostPowerTokens != 1 ? "s" : ""}.
                 </p>;
             }
             case "lysa-arryn-ffc-power-tokens-gained": {
                 const house = this.game.houses.get(data.house);
                 return <p>
-                    <b>Lysa Arryn</b>: House <b>{house.name}</b> gained {data.powerTokens} Power&nbsp;tokens.
+                    <b>Lysa Arryn</b>: House <b>{house.name}</b> gained <b>{data.powerTokens}</b> Power&nbsp;token{data.powerTokens != 1 ? "s" : ""}.
                 </p>;
             }
             case "anya-waynwood-power-tokens-gained": {
@@ -1352,7 +1352,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <p><b>Anya Waynwood</b>:</p>
                     <ul>
                         {gains.map(([house, gain]) => (
-                            <li key={`anya-waynwood-${house.id}`}>House <b>{house.name}</b> gained <b>{gain}</b> Power&nbsp;tokens.</li>
+                            <li key={`anya-waynwood-${house.id}`}>House <b>{house.name}</b> gained <b>{gain}</b> Power&nbsp;token{gain != 1 ? "s" : ""}.</li>
                         ))}
                     </ul>
                 </p>;
@@ -1388,7 +1388,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const powerTokensGained = data.powerTokensGained;
 
                 return <p>
-                    <b>Illyrio Mopatis</b>: House <b>{house.name}</b> gained {powerTokensGained} Power&nbsp;tokens.
+                    <b>Illyrio Mopatis</b>: House <b>{house.name}</b> gained <b>{powerTokensGained}</b> Power&nbsp;token{powerTokensGained != 1 ? "s" : ""}.
                 </p>;
             }
             case "daenerys-targaryen-b-power-tokens-discarded": {
@@ -1397,7 +1397,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     <b>Daenerys Targaryen</b>: House <b>{house.name}</b> forced House <b>{affectedHouse.name}</b> to
-                    discard {data.powerTokensDiscarded} Power&nbsp;token{data.powerTokensDiscarded != 1 && "s"}.
+                    discard <b>{data.powerTokensDiscarded}</b> Power&nbsp;token{data.powerTokensDiscarded != 1 ? "s" : ""}.
                 </p>;
             }
             case "missandei-used": {
@@ -1411,7 +1411,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const affectedHouse = this.game.houses.get(data.affectedHouse);
                 return <p>
-                    House <b>{house.name}</b> gifted {data.powerTokens} Power&nbsp;token{data.powerTokens > 1 && "s"} to House <b>{affectedHouse.name}</b>.
+                    House <b>{house.name}</b> gifted <b>{data.powerTokens}</b> Power&nbsp;token{data.powerTokens != 1 ? "s" : ""} to House <b>{affectedHouse.name}</b>.
                 </p>;
             }
             case "influence-track-position-chosen": {
@@ -1448,7 +1448,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const region = this.world.regions.get(data.region);
                 return <p>
-                    House <b>{house.name}</b> gained {data.count} Loyalty&nbsp;token{data.count > 1 && "s"} in <b>{region.name}</b>.
+                    House <b>{house.name}</b> gained {data.count} Loyalty&nbsp;token{data.count != 1 ? "s" : ""} in <b>{region.name}</b>.
                 </p>
             }
             case "fire-made-flesh-choice": {
@@ -1783,7 +1783,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const powerTokensGained = data.powerTokensGained;
 
                 return <p>
-                    <b>Balon Greyjoy</b>: House <b>{house.name}</b> gained {powerTokensGained} Power&nbsp;tokens.
+                    <b>Balon Greyjoy</b>: House <b>{house.name}</b> gained <b>{powerTokensGained}</b> Power&nbsp;token{powerTokensGained != 1 ? "s" : ""}.
                 </p>;
             }
             case "mace-tyrell-asos-order-placed": {
@@ -1809,7 +1809,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     <b>Cersei Lannister</b>: House <b>{house.name}</b> forced House <b>{affectedHouse.name}</b> to
-                    discard {data.powerTokensDiscarded} Power&nbsp;token{data.powerTokensDiscarded != 1 && "s"}.
+                    discard <b>{data.powerTokensDiscarded}</b> Power&nbsp;token{data.powerTokensDiscarded != 1 ? "s" : ""}.
                 </p>;
             }
             case "doran-martell-asos-used": {
@@ -1824,7 +1824,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "melisandre-of-asshai-power-tokens-gained": {
                 const house = this.game.houses.get(data.house);
                 return <p>
-                    <b>Melisandre of Asshai</b>: House <b>{house.name}</b> gained {data.powerTokens} Power&nbsp;tokens.
+                    <b>Melisandre of Asshai</b>: House <b>{house.name}</b> gained <b>{data.powerTokens}</b> Power&nbsp;token{data.powerTokens != 1 ? "s" : ""}.
+                </p>;
+            }
+            case "salladhar-saan-asos-power-tokens-changed": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+                return <p>
+                    <b>Salladhar Saan</b>: House <b>{house.name}</b> gained <b>{data.powerTokensGained}</b> Power&nbsp;token{data.powerTokensGained != 1 ? "s" : ""}. House <b>
+                    {affectedHouse.name}</b> lost <b>{data.powerTokensLost}</b> Power&nbsp;token{data.powerTokensLost != 1 ? "s" : ""}.
                 </p>;
             }
         }

@@ -153,7 +153,7 @@ import queenOfThornsASoSImage from "../../public/images/house-cards/storm-of-swo
 import randyllTarlyASoSImage from "../../public/images/house-cards/storm-of-swords/RandyllTarly.png"
 import renlyBaratheonASoSImage from "../../public/images/house-cards/storm-of-swords/RenlyBaratheon.png"
 import robbStarkImage from "../../public/images/house-cards/storm-of-swords/RobbStark.png"
-import salladhorSaanASoSImage from "../../public/images/house-cards/storm-of-swords/SalladhorSaan.png"
+import salladharSaanASoSImage from "../../public/images/house-cards/storm-of-swords/SalladharSaan.png"
 import SerAxellFlorentASoSImage from "../../public/images/house-cards/storm-of-swords/SerAxellFlorent.png"
 import serDavosSeaworthASoSImage from "../../public/images/house-cards/storm-of-swords/SerDavosSeaworth.png"
 import serGarlanTyrellImage from "../../public/images/house-cards/storm-of-swords/SerGarlanTyrell.png"
@@ -317,7 +317,7 @@ const houseCardImages = new BetterMap([
     ["randyll-tarly-asos", randyllTarlyASoSImage],
     ["renly-baratheon-asos", renlyBaratheonASoSImage],
     ["robb-stark-asos", robbStarkImage],
-    ["salladhor-saan-asos", salladhorSaanASoSImage],
+    ["salladhar-saan-asos", salladharSaanASoSImage],
     ["ser-axell-florent-asos", SerAxellFlorentASoSImage],
     ["ser-davos-seaworth-asos", serDavosSeaworthASoSImage],
     ["ser-garlan-tyrell-asos", serGarlanTyrellImage],

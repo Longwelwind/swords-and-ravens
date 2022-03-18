@@ -2170,9 +2170,10 @@
           "combatStrength": 2,
           "towerIcons": 2
         },
-        "salladhor-saan-asos": {
-          "name": "Salladhor Saan",
-          "combatStrength": 1
+        "salladhar-saan-asos": {
+          "name": "Salladhar Saan",
+          "combatStrength": 1,
+          "ability": "salladhar-saan-asos"
         },
         "devan-seaworth": {
           "name": "Devan Seaworth",
