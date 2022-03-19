@@ -218,6 +218,12 @@ export default class PostCombatGameState extends GameState<
                     this.onChooseCasualtiesGameStateEnd(this.loser, locationLoserArmy, loserArmyLeft, true);
                 }
                 return;
+            } else if (loserCasualtiesCount < loserArmyLeft.length) {
+                this.combat.ingameGameState.log({
+                    type: "casualties-prevented",
+                    house: this.loser.id,
+                    houseCard: (this.combat.houseCombatDatas.get(this.loser).houseCard as HouseCard).id
+                });
             }
         }
 
@@ -245,6 +251,13 @@ export default class PostCombatGameState extends GameState<
                 }
                 return;
             } else {
+                if (skullCount < enemyCombatData.army.length) {
+                    this.combat.ingameGameState.log({
+                        type: "casualties-prevented",
+                        house: enemy.id,
+                        houseCard: (enemyCombatData.houseCard as HouseCard).id
+                    });
+                }
                 this.proceedSkullIconHandling();
                 return;
             }

@@ -949,9 +949,10 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "robb-stark-retreat-location-overriden": {
                 const house = this.game.houses.get(data.house);
                 const affectedHouse = this.game.houses.get(data.affectedHouse);
+                const houseCard = this.allHouseCards.get(data.houseCard);
 
                 return <p>
-                    <b>{data.houseCardName}</b>: House <b>{house.name}</b> chose the retreat location of the
+                    <b>{houseCard.name}</b>: House <b>{house.name}</b> chose the retreat location of the
                     retreating army of <b>{affectedHouse.name}</b>.
                 </p>;
             }
@@ -1839,6 +1840,24 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 return <p>
                     <b>Ser Davos Seaworth</b>: House <b>{house.name}</b> has spent <b>2</b> Power&nbsp;tokens and gained 1 Fortification Icon.
+                </p>;
+            }
+            case "casualties-prevented": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = this.allHouseCards.get(data.houseCard);
+
+                return <p>
+                    <b>{houseCard.name}</b> prevented casualties of House <b>{house.name}</b>.
+                </p>;
+            }
+            case "ser-ilyn-payne-asos-casualty-suffered": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+                const unitType = unitTypes.get(data.unit);
+
+                return <p>
+                    <b>Ser Ilyn Payne</b>: House <b>{house.name}</b> forced House <b>{affectedHouse.name}</b> to lose a casualty. House <b>
+                        {affectedHouse.name}</b> chose a <b>{unitType.name}</b>.
                 </p>;
             }
         }

@@ -48,7 +48,8 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | ShiftingAmbitionsObjectiveChosenFromHand | ShiftingAmbitionsObjectiveChosenFromPool | NewInformationObjectiveCardChosen
     | RevealAllObjectives | GarrisonRemoved | GarrisonReturned | ObjectiveDeckEmpty | OrdersRevealed | HouseCardsReturned
     | BalonGreyjoyASoSPowerTokensGained | MaceTyrellASoSOrderPlaced | BranStarkUsed | CerseiLannisterASoSPowerTokensDiscarded
-    | DoranMartellASoSUsed | MelisandreOfAsshaiPowerTokensGained | SalladharSaanASoSPowerTokensChanged | SerDavosSeaworthASoSFortificationGained;
+    | DoranMartellASoSUsed | MelisandreOfAsshaiPowerTokensGained | SalladharSaanASoSPowerTokensChanged | SerDavosSeaworthASoSFortificationGained
+    | CasualtiesPrevented | SerIlynPayneASoSCasualtySuffered;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -456,7 +457,7 @@ interface RobbStarkRetreatRegionOverriden {
     type: "robb-stark-retreat-location-overriden";
     house: string;
     affectedHouse: string;
-    houseCardName: string;
+    houseCard: string;
 }
 
 interface RetreatRegionChosen {
@@ -1075,4 +1076,17 @@ interface SalladharSaanASoSPowerTokensChanged {
 interface SerDavosSeaworthASoSFortificationGained {
     type: "ser-davos-seaworth-asos-fortification-gained";
     house: string;
+}
+
+interface CasualtiesPrevented {
+    type: "casualties-prevented";
+    house: string;
+    houseCard: string;
+}
+
+interface SerIlynPayneASoSCasualtySuffered {
+    type: "ser-ilyn-payne-asos-casualty-suffered";
+    house: string;
+    affectedHouse: string;
+    unit: string;
 }

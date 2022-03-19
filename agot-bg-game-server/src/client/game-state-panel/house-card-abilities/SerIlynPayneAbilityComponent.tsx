@@ -18,7 +18,7 @@ export default class SerIlynPayneAbilityComponent extends Component<GameStateCom
             <>
                 <Col xs={12} className="text-center">
                     <b>Ser Ilyn Payne</b>: House <b>{this.props.gameState.house.name}</b> may kill a Footman of
-                    house <b>{this.props.gameState.combatGameState.getEnemy(this.props.gameState.house).name}</b>.
+                    House <b>{this.props.gameState.combatGameState.getEnemy(this.props.gameState.house).name}</b>.
                 </Col>
                 {renderChildGameState(this.props, [
                     [SimpleChoiceGameState, SimpleChoiceComponent],

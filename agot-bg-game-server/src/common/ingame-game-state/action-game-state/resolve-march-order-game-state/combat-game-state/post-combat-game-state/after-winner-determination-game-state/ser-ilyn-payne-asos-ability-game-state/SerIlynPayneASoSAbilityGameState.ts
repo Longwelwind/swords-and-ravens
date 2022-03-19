@@ -1,6 +1,5 @@
 import GameState from "../../../../../../../GameState";
 import AfterWinnerDeterminationGameState from "../AfterWinnerDeterminationGameState";
-import SimpleChoiceGameState, {SerializedSimpleChoiceGameState} from "../../../../../../simple-choice-game-state/SimpleChoiceGameState";
 import Game from "../../../../../../game-data-structure/Game";
 import CombatGameState from "../../../CombatGameState";
 import House from "../../../../../../game-data-structure/House";
@@ -13,11 +12,11 @@ import IngameGameState from "../../../../../../IngameGameState";
 import Unit from "../../../../../../game-data-structure/Unit";
 import _ from "lodash";
 import SelectUnitsGameState, {SerializedSelectUnitsGameState} from "../../../../../../select-units-game-state/SelectUnitsGameState";
-import { serIlynPayne } from "../../../../../../../../common/ingame-game-state/game-data-structure/house-card/houseCardAbilities";
-import HouseCard from "../../../../../../../../common/ingame-game-state/game-data-structure/house-card/HouseCard";
-export default class SerIlynPayneAbilityGameState extends GameState<
-    AfterWinnerDeterminationGameState["childGameState"],
-    SimpleChoiceGameState | SelectUnitsGameState<SerIlynPayneAbilityGameState>
+import { serIlynPayneASoS } from "../../../../../../game-data-structure/house-card/houseCardAbilities";
+import HouseCard from "../../../../../../game-data-structure/house-card/HouseCard";
+
+export default class SerIlynPayneASoSAbilityGameState extends GameState<
+    AfterWinnerDeterminationGameState["childGameState"], SelectUnitsGameState<SerIlynPayneASoSAbilityGameState>
 > {
     house: House
     get game(): Game {
@@ -53,15 +52,25 @@ export default class SerIlynPayneAbilityGameState extends GameState<
             return;
         }
 
-        this.setChildGameState(new SimpleChoiceGameState(this))
-            .firstStart(
-                house,
-                "",
-                ["Activate", "Ignore"]
-            );
+        const enemyArmy = this.combatGameState.houseCombatDatas.get(this.enemy).army;
+        // I dont think this will happen as we do skull handling after AfterWinnerDetermination but let's be sure.
+        if (enemyArmy.length == 0) {
+            this.ingame.log({
+                type: "house-card-ability-not-used",
+                house: this.house.id,
+                houseCard: serIlynPayneASoS.id
+            }, true);
+            this.parentGameState.onHouseCardResolutionFinish(house);
+        }
+
+        this.setChildGameState(new SelectUnitsGameState(this)).firstStart(
+            this.enemy,
+            enemyArmy,
+            1
+        );
     }
 
-    onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][]): void {
+    onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][], resolvedAutomatically: boolean): void {
         // There will only be one footman in "selectedUnit",
         // but the following code deals with the multiple units present.
         selectedUnits.forEach(([region, units]) => {
@@ -89,55 +98,14 @@ export default class SerIlynPayneAbilityGameState extends GameState<
             });
 
             this.ingame.log({
-                type: "ser-ilyn-payne-footman-killed",
-                house: house.id,
-                region: region.id
-            });
-
-            // Ilyn Payne may cause an orphaned order. We have to delete it now as a unit may retreat to the region
-            // which would cause the order to stay!
-            this.combatGameState.parentGameState.actionGameState.findOrphanedOrdersAndRemoveThem();
+                type: "ser-ilyn-payne-asos-casualty-suffered",
+                house: this.house.id,
+                affectedHouse: house.id,
+                unit: units[0].type.id
+            }, resolvedAutomatically);
         });
 
-        if (selectedUnits.length == 0) {
-            this.ingame.log({
-                type: "house-card-ability-not-used",
-                house: this.house.id,
-                houseCard: serIlynPayne.id
-            });
-        }
-
-        this.parentGameState.onHouseCardResolutionFinish(house);
-    }
-
-    onSimpleChoiceGameStateEnd(choice: number): void {
-        if (choice == 0) {
-            const availableFootmen = this.actionGameState.getFootmenOfHouse(this.enemy);
-
-            if (availableFootmen.length == 0) {
-                this.ingame.log({
-                    type: "house-card-ability-not-used",
-                    house: this.house.id,
-                    houseCard: serIlynPayne.id
-                }, true);
-                this.parentGameState.onHouseCardResolutionFinish(this.house);
-                return;
-            }
-
-            this.setChildGameState(new SelectUnitsGameState(this)).firstStart(
-                this.house,
-                availableFootmen,
-                1,
-                true
-            );
-        } else {
-            this.ingame.log({
-                type: "house-card-ability-not-used",
-                house: this.house.id,
-                houseCard: serIlynPayne.id
-            });
-            this.parentGameState.onHouseCardResolutionFinish(this.house);
-        }
+        this.parentGameState.onHouseCardResolutionFinish(this.house);
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -148,16 +116,16 @@ export default class SerIlynPayneAbilityGameState extends GameState<
         this.childGameState.onServerMessage(message);
     }
 
-    serializeToClient(admin: boolean, player: Player | null): SerializedSerIlynPayneAbilityGameState {
+    serializeToClient(admin: boolean, player: Player | null): SerializedSerIlynPayneASoSAbilityGameState {
         return {
-            type: "ser-ilyn-payne-ability",
+            type: "ser-ilyn-payne-asos-ability",
             house: this.house.id,
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
 
-    static deserializeFromServer(afterWinnerDeterminationChild: AfterWinnerDeterminationGameState["childGameState"], data: SerializedSerIlynPayneAbilityGameState): SerIlynPayneAbilityGameState {
-        const serIlynPayneAbility = new SerIlynPayneAbilityGameState(afterWinnerDeterminationChild);
+    static deserializeFromServer(afterWinnerDeterminationChild: AfterWinnerDeterminationGameState["childGameState"], data: SerializedSerIlynPayneASoSAbilityGameState): SerIlynPayneASoSAbilityGameState {
+        const serIlynPayneAbility = new SerIlynPayneASoSAbilityGameState(afterWinnerDeterminationChild);
 
         serIlynPayneAbility.house = afterWinnerDeterminationChild.game.houses.get(data.house);
         serIlynPayneAbility.childGameState = serIlynPayneAbility.deserializeChildGameState(data.childGameState);
@@ -165,18 +133,16 @@ export default class SerIlynPayneAbilityGameState extends GameState<
         return serIlynPayneAbility;
     }
 
-    deserializeChildGameState(data: SerializedSerIlynPayneAbilityGameState["childGameState"]): SerIlynPayneAbilityGameState["childGameState"] {
+    deserializeChildGameState(data: SerializedSerIlynPayneASoSAbilityGameState["childGameState"]): SerIlynPayneASoSAbilityGameState["childGameState"] {
         switch (data.type) {
-            case "simple-choice":
-                return SimpleChoiceGameState.deserializeFromServer(this, data);
             case "select-units":
                 return SelectUnitsGameState.deserializeFromServer(this, data);
         }
     }
 }
 
-export interface SerializedSerIlynPayneAbilityGameState {
-    type: "ser-ilyn-payne-ability";
+export interface SerializedSerIlynPayneASoSAbilityGameState {
+    type: "ser-ilyn-payne-asos-ability";
     house: string;
-    childGameState: SerializedSimpleChoiceGameState | SerializedSelectUnitsGameState;
+    childGameState: SerializedSelectUnitsGameState;
 }

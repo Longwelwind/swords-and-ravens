@@ -11,7 +11,7 @@ export default class RobbStarkHouseCardAbility extends HouseCardAbility {
                 type: "robb-stark-retreat-location-overriden",
                 house: house.id,
                 affectedHouse: postCombat.combat.getEnemy(house).id,
-                houseCardName: houseCard.name
+                houseCard: houseCard.id
             });
 
             return house;

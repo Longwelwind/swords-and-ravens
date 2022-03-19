@@ -79,6 +79,7 @@ import MelisandreOfAsshaiHouseCardAbility from "./MelisandreOfAsshaiHouseCardAbi
 import SalladharSaanASoSHouseCardAbility from "./SalladharSaanASoSHouseCardAbility";
 import SerDavosSeaworthASoSHouseCardAbility from "./SerDavosSeaworthASoSHouseCardAbility";
 import SerGregorCleganeASoSHouseCardAbility from "./SerGregorCleganeASoSHouseCardAbility";
+import SerIlynPayneASoSHouseCardAbility from "./SerIlynPayneASoSHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -449,6 +450,10 @@ export const serGregorCleganeASoS = new SerGregorCleganeASoSHouseCardAbility(
     "ser-gregor-clegane-asos",
     "Gain a number of Sword Icons equal to three minus the strength of your opponent's House Card."
 );
+export const serIlynPayneASoS = new SerIlynPayneASoSHouseCardAbility(
+    "ser-ilyn-payne-asos",
+    "If you win this battle, your opponent must lose one casualty, regardless of the number of Fortification Icons he has."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -529,7 +534,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [melisandreOfAsshai.id, melisandreOfAsshai],
     [salladharSaanASoS.id, salladharSaanASoS],
     [serDavosSeaworthASoS.id, serDavosSeaworthASoS],
-    [serGregorCleganeASoS.id, serGregorCleganeASoS]
+    [serGregorCleganeASoS.id, serGregorCleganeASoS],
+    [serIlynPayneASoS.id, serIlynPayneASoS]
 ]);
 
 export default houseCardAbilities;

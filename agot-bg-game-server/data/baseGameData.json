@@ -2104,7 +2104,8 @@
         },
         "ser-ilyn-payne-asos": {
           "name": "Ser Ilyn Payne",
-          "combatStrength": 1
+          "combatStrength": 1,
+          "ability": "ser-ilyn-payne-asos"
         },
         "tyrion-lannister-asos": {
           "name": "Tyrion Lannister",

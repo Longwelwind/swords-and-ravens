@@ -32,6 +32,8 @@ import LysaArrynModAbilityGameState from "../../../common/ingame-game-state/acti
 import LysaArrynModAbilityComponent from "./LysaArrynModAbilityComponent";
 import MissandeiAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/missandei-ability-game-state/MissandeiAbilityGameState";
 import MissandeiAbilityComponent from "./MissandeiAbilityComponent";
+import SerIlynPayneASoSAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/ser-ilyn-payne-asos-ability-game-state/SerIlynPayneASoSAbilityGameState";
+import SerIlynPayneASoSAbilityComponent from "./SerIlynPayneASoSAbilityComponent";
 
 @observer
 export default class AfterWinnerDeterminationComponent extends Component<GameStateComponentProps<AfterWinnerDeterminationGameState>> {
@@ -47,7 +49,8 @@ export default class AfterWinnerDeterminationComponent extends Component<GameSta
             [BericDondarrionAbilityGameState, BericDondarrionAbilityComponent],
             [AlayneStoneAbilityGameState, AlayneStoneAbilityComponent],
             [LysaArrynModAbilityGameState, LysaArrynModAbilityComponent],
-            [MissandeiAbilityGameState, MissandeiAbilityComponent]
+            [MissandeiAbilityGameState, MissandeiAbilityComponent],
+            [SerIlynPayneASoSAbilityGameState, SerIlynPayneASoSAbilityComponent]
         ]);
     }
 }

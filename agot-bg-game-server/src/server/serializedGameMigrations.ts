@@ -1646,7 +1646,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                 const ingame = serializedGame.childGameState;
                 ingame.gameLogManager.logs.forEach((l) => {
                     if (l.data.type == "robb-stark-retreat-location-overriden") {
-                        l.data.houseCardName = "Robb Stark";
+                        l.data.houseCard = "robb-stark";
                     }
 
                     // Fix incorrect defense order type ids in orders-revealed log
