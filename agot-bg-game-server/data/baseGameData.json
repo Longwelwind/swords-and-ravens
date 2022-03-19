@@ -2220,7 +2220,8 @@
         },
         "victarion-greyjoy-asos": {
           "name": "Victarion Greyjoy",
-          "combatStrength": 1
+          "combatStrength": 1,
+          "ability": "victarion-greyjoy-asos"
         },
         "aeron-damphair-asos": {
           "name": "Aeron Damphair",

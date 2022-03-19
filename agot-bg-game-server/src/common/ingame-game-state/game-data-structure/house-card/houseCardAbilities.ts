@@ -82,6 +82,7 @@ import SerGregorCleganeASoSHouseCardAbility from "./SerGregorCleganeASoSHouseCar
 import SerIlynPayneASoSHouseCardAbility from "./SerIlynPayneASoSHouseCardAbility";
 import TyrionLannisterASoSHouseCardAbility from "./TyrionLannisterASoSHouseCardAbility";
 import StannisBaratheonASoSHouseCardAbility from "./StannisBaratheonASoSHouseCardAbility";
+import VictarionGreyjoyASoSHouseCardAbility from "./VictarionGreyjoyASoSHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -465,6 +466,10 @@ export const stannisBaratheonASoS = new StannisBaratheonASoSHouseCardAbility(
     "stannis-baratheon-asos",
     "If your opponent has the Iron Throne Influence token, you may steal it until the next \"Clash of Kings\" resolution and gain a Sword Icon."
 );
+export const victarionGreyjoyASoS = new VictarionGreyjoyASoSHouseCardAbility(
+    "victarion-greyjoy-asos",
+    "If this battle is adjacent to a sea area, gain +1 combat strength and a Fortification Icon."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -548,7 +553,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [serGregorCleganeASoS.id, serGregorCleganeASoS],
     [serIlynPayneASoS.id, serIlynPayneASoS],
     [tyrionLannisterAsos.id, tyrionLannisterAsos],
-    [stannisBaratheonASoS.id, stannisBaratheonASoS]
+    [stannisBaratheonASoS.id, stannisBaratheonASoS],
+    [victarionGreyjoyASoS.id, victarionGreyjoyASoS]
 ]);
 
 export default houseCardAbilities;
