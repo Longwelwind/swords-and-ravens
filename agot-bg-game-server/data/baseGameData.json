@@ -2084,7 +2084,8 @@
         },
         "ser-gregor-clegane-asos": {
           "name": "Ser Gregor Clegane",
-          "combatStrength": 3
+          "combatStrength": 3,
+          "ability": "ser-gregor-clegane-asos"
         },
         "tywin-lannister-asos": {
           "name": "Tywin Lannister",
