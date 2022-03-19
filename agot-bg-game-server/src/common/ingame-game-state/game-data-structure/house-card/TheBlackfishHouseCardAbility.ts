@@ -5,7 +5,7 @@ import HouseCard from "./HouseCard";
 
 export default class TheBlackfishHouseCardAbility extends HouseCardAbility {
 
-    doesPreventCasualties(_combat: CombatGameState, _house: House, _houseCard: HouseCard): boolean {
-        return true;
+    doesPreventCasualties(_combat: CombatGameState, _house: House, houseCard: HouseCard, isSkullCasualty: boolean): boolean {
+        return houseCard.id == "the-blackfish" || !isSkullCasualty;
     }
 }

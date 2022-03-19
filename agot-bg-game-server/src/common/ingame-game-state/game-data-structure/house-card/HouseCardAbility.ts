@@ -68,7 +68,7 @@ export default class HouseCardAbility {
         return false;
     }
 
-    doesPreventCasualties(_combat: CombatGameState, _house: House, _houseCard: HouseCard): boolean {
+    doesPreventCasualties(_combat: CombatGameState, _house: House, _houseCard: HouseCard, _isSkullCasualty: boolean): boolean {
         return false;
     }
 

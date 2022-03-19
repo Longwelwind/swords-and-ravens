@@ -241,7 +241,7 @@ export default class PostCombatGameState extends GameState<
             const skullCount = (this.combat.houseCombatDatas.get(house).tidesOfBattleCard as TidesOfBattleCard).skullIcons;
             const enemy = this.combat.getEnemy(house);
             const enemyCombatData = this.combat.houseCombatDatas.get(enemy);
-            if (!this.combat.areCasualtiesPrevented(enemy)) {
+            if (!this.combat.areCasualtiesPrevented(enemy, true)) {
                 if (skullCount < enemyCombatData.army.length) {
                     this.setChildGameState(new ChooseCasualtiesGameState(this)).firstStart(enemy, enemyCombatData.army, skullCount);
                 } else {

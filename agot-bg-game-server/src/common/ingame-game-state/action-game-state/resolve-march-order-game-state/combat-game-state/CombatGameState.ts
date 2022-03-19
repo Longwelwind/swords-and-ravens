@@ -471,13 +471,13 @@ export default class CombatGameState extends GameState<
         }
     }
 
-    areCasualtiesPrevented(affectedHouse: House): boolean {
+    areCasualtiesPrevented(affectedHouse: House, isSkullCasualty = false): boolean {
         const affectedHouseCard = this.houseCombatDatas.get(affectedHouse).houseCard;
         if (!affectedHouseCard) {
             return false;
         }
 
-        return affectedHouseCard.ability ? affectedHouseCard.ability.doesPreventCasualties(this, affectedHouse, affectedHouseCard) : false;
+        return affectedHouseCard.ability ? affectedHouseCard.ability.doesPreventCasualties(this, affectedHouse, affectedHouseCard, isSkullCasualty) : false;
     }
 
     areWoundsPrevented(affectedHouse: House): boolean {
