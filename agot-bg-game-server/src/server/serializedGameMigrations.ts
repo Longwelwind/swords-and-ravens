@@ -1644,6 +1644,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             // Migration for Storm of Swords house cards
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
+                ingame.game.usurper = null;
                 ingame.gameLogManager.logs.forEach((l) => {
                     if (l.data.type == "robb-stark-retreat-location-overriden") {
                         l.data.houseCard = "robb-stark";

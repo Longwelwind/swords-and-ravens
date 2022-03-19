@@ -28,17 +28,13 @@ export default class BronnAbilityGameState extends GameState<
         return this.parentGameState.parentGameState.parentGameState.ingameGameState;
     }
 
-    get controllerOfEnemy(): House {
-        return this.combatGameState.ingameGameState.getControllerOfHouse(this.enemy).house;
-    }
-
     firstStart(house: House): void {
         this.enemy = this.combatGameState.getEnemy(house);
 
         // According to Jason Waldons answer the commander cannot use Bronn's ability:
         // "Since vassals do not possess and thus cannot spend power tokens (page 7 of the Mother of Dragons rulebook),
         // Bronn's effect cannot be resolved on behalf of a vassal."
-        if (this.ingame.isVassalHouse(this.enemy) || this.controllerOfEnemy.powerTokens < 2) {
+        if (this.ingame.isVassalHouse(this.enemy) || this.enemy.powerTokens < 2) {
             this.combatGameState.ingameGameState.log({
                 type: "house-card-ability-not-used",
                 house: this.enemy.id,
@@ -88,11 +84,11 @@ export default class BronnAbilityGameState extends GameState<
             modifier: houseCardModifier
         });
 
-        this.ingame.changePowerTokens(this.controllerOfEnemy, -2);
+        this.ingame.changePowerTokens(this.enemy, -2);
 
         this.ingame.log({
             type: "bronn-used",
-            house: this.controllerOfEnemy.id
+            house: this.enemy.id
         });
 
         this.parentGameState.onHouseCardResolutionFinish(house);

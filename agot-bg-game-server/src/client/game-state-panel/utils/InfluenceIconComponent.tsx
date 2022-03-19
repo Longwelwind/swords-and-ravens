@@ -31,7 +31,7 @@ export default class InfluenceIconComponent extends Component<InfluenceIconCompo
     render(): ReactNode {
         let isTokenHolder = false;
         try {
-            const tokenHolder = this.ingame.game.getTokenHolder(this.track);
+            const tokenHolder = this.props.name == "Iron Throne" ? this.ingame.game.ironThroneHolder : this.ingame.game.getTokenHolder(this.track);
             isTokenHolder = tokenHolder == this.house;
 
             if (this.props.name == "Fiefdoms" && this.house) {

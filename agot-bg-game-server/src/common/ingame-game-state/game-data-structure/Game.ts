@@ -63,9 +63,10 @@ export default class Game {
      */
     vassalRelations = new BetterMap<House, House>();
     revealedWesterosCards = 0;
+    @observable usurper: House | null;
 
     get ironThroneHolder(): House {
-        return this.getTokenHolder(this.ironThroneTrack);
+        return this.usurper ? this.usurper : this.getTokenHolder(this.ironThroneTrack);
     }
 
     get valyrianSteelBladeHolder(): House {
@@ -539,7 +540,8 @@ export default class Game {
             oldPlayerHouseCards: this.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])]),
             removedDragonStrengthToken: this.removedDragonStrengthToken,
             ironBank: this.ironBank ? this.ironBank.serializeToClient(admin) : null,
-            objectiveDeck: admin ? this.objectiveDeck.map(oc => oc.id) : []
+            objectiveDeck: admin ? this.objectiveDeck.map(oc => oc.id) : [],
+            usurper: this.usurper ? this.usurper.id : null
         };
     }
 
@@ -573,6 +575,7 @@ export default class Game {
         game.removedDragonStrengthToken = data.removedDragonStrengthToken;
         game.ironBank = data.ironBank ? IronBank.deserializeFromServer(game, data.ironBank) : null;
         game.objectiveDeck = data.objectiveDeck.map(ocid => objectiveCards.get(ocid));
+        game.usurper = data.usurper ? game.houses.get(data.usurper) : null;
 
         return game;
     }
@@ -604,4 +607,5 @@ export interface SerializedGame {
     removedDragonStrengthToken: number;
     ironBank: SerializedIronBank | null;
     objectiveDeck: string[];
+    usurper: string | null;
 }

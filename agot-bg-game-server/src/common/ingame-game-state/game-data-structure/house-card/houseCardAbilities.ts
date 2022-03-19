@@ -81,6 +81,7 @@ import SerDavosSeaworthASoSHouseCardAbility from "./SerDavosSeaworthASoSHouseCar
 import SerGregorCleganeASoSHouseCardAbility from "./SerGregorCleganeASoSHouseCardAbility";
 import SerIlynPayneASoSHouseCardAbility from "./SerIlynPayneASoSHouseCardAbility";
 import TyrionLannisterASoSHouseCardAbility from "./TyrionLannisterASoSHouseCardAbility";
+import StannisBaratheonASoSHouseCardAbility from "./StannisBaratheonASoSHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -460,6 +461,10 @@ export const tyrionLannisterAsos = new TyrionLannisterASoSHouseCardAbility(
     "You may return your opponent's House Card to his hand and force him to choose a different one. If he does not have any other House Cards, " +
         "then he may not use a House Card this battle."
 );
+export const stannisBaratheonASoS = new StannisBaratheonASoSHouseCardAbility(
+    "stannis-baratheon-asos",
+    "If your opponent has the Iron Throne Influence token, you may steal it until the next \"Clash of Kings\" resolution and gain a Sword Icon."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -542,7 +547,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [serDavosSeaworthASoS.id, serDavosSeaworthASoS],
     [serGregorCleganeASoS.id, serGregorCleganeASoS],
     [serIlynPayneASoS.id, serIlynPayneASoS],
-    [tyrionLannisterAsos.id, tyrionLannisterAsos]
+    [tyrionLannisterAsos.id, tyrionLannisterAsos],
+    [stannisBaratheonASoS.id, stannisBaratheonASoS]
 ]);
 
 export default houseCardAbilities;

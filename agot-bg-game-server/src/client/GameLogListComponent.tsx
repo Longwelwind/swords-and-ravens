@@ -1860,6 +1860,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         {affectedHouse.name}</b> chose a <b>{unitType.name}</b>.
                 </p>;
             }
+            case "stannis-baratheon-asos-used": {
+                const house = this.game.houses.get(data.house);
+                const oldThroneOwner = this.game.houses.get(data.oldThroneOwner);
+
+                return <p>
+                    <b>Stannis Baratheon</b>: House <b>{house.name}</b> has stolen the Iron Throne dominance token from House <b>{oldThroneOwner.name}</b>.
+                </p>;
+            }
         }
     }
 

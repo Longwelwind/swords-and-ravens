@@ -2155,7 +2155,8 @@
       "houseCards": {
         "stannis-baratheon-asos": {
           "name": "Stannis Baratheon",
-          "combatStrength": 4
+          "combatStrength": 4,
+          "ability": "stannis-baratheon-asos"
         },
         "renly-baratheon-asos": {
           "name": "Renly Baratheon",

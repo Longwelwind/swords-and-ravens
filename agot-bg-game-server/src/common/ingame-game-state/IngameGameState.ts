@@ -771,6 +771,8 @@ export default class IngameGameState extends GameState<
             });
         } else if (message.type == "update-secret-objectives") {
             this.game.houses.get(message.house).secretObjectives = message.objectives.map(ocid => objectiveCards.get(ocid));
+        } else if (message.type == "update-usurper") {
+            this.game.usurper = message.house ? this.game.houses.get(message.house) : null;
         } else {
             this.childGameState.onServerMessage(message);
         }
