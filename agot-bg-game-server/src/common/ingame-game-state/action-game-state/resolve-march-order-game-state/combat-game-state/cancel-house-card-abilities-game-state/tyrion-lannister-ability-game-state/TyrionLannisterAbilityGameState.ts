@@ -11,11 +11,11 @@ import SelectHouseCardGameState, {SerializedSelectHouseCardGameState} from "../.
 import HouseCard, {HouseCardState} from "../../../../../game-data-structure/house-card/HouseCard";
 import SimpleChoiceGameState, {SerializedSimpleChoiceGameState} from "../../../../../simple-choice-game-state/SimpleChoiceGameState";
 import IngameGameState from "../../../../../IngameGameState";
+import ImmediatelyHouseCardAbilitiesResolutionGameState from "../../immediately-house-card-abilities-resolution-game-state/ImmediatelyHouseCardAbilitiesResolutionGameState";
 
 export default class TyrionLannisterAbilityGameState extends GameState<
-    CancelHouseCardAbilitiesGameState["childGameState"],
-        SimpleChoiceGameState
-        | SelectHouseCardGameState<TyrionLannisterAbilityGameState>
+    CancelHouseCardAbilitiesGameState["childGameState"] | ImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"],
+        SimpleChoiceGameState | SelectHouseCardGameState<TyrionLannisterAbilityGameState>
     > {
     get game(): Game {
         return this.parentGameState.game;
@@ -122,7 +122,7 @@ export default class TyrionLannisterAbilityGameState extends GameState<
         });
     }
 
-    static deserializeFromServer(houseCardResolution: CancelHouseCardAbilitiesGameState["childGameState"], data: SerializedTyrionLannisterAbilityGameState): TyrionLannisterAbilityGameState {
+    static deserializeFromServer(houseCardResolution: CancelHouseCardAbilitiesGameState["childGameState"] | ImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"], data: SerializedTyrionLannisterAbilityGameState): TyrionLannisterAbilityGameState {
         const tyrionLannisterAbilityGameState = new TyrionLannisterAbilityGameState(houseCardResolution);
 
         tyrionLannisterAbilityGameState.childGameState = tyrionLannisterAbilityGameState.deserializeChildGameState(data.childGameState);

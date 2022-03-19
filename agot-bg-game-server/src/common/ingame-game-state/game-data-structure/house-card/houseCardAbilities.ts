@@ -80,6 +80,7 @@ import SalladharSaanASoSHouseCardAbility from "./SalladharSaanASoSHouseCardAbili
 import SerDavosSeaworthASoSHouseCardAbility from "./SerDavosSeaworthASoSHouseCardAbility";
 import SerGregorCleganeASoSHouseCardAbility from "./SerGregorCleganeASoSHouseCardAbility";
 import SerIlynPayneASoSHouseCardAbility from "./SerIlynPayneASoSHouseCardAbility";
+import TyrionLannisterASoSHouseCardAbility from "./TyrionLannisterASoSHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -454,6 +455,11 @@ export const serIlynPayneASoS = new SerIlynPayneASoSHouseCardAbility(
     "ser-ilyn-payne-asos",
     "If you win this battle, your opponent must lose one casualty, regardless of the number of Fortification Icons he has."
 );
+export const tyrionLannisterAsos = new TyrionLannisterASoSHouseCardAbility(
+    "tyrion-lannister-asos",
+    "You may return your opponent's House Card to his hand and force him to choose a different one. If he does not have any other House Cards, " +
+        "then he may not use a House Card this battle."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -535,7 +541,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [salladharSaanASoS.id, salladharSaanASoS],
     [serDavosSeaworthASoS.id, serDavosSeaworthASoS],
     [serGregorCleganeASoS.id, serGregorCleganeASoS],
-    [serIlynPayneASoS.id, serIlynPayneASoS]
+    [serIlynPayneASoS.id, serIlynPayneASoS],
+    [tyrionLannisterAsos.id, tyrionLannisterAsos]
 ]);
 
 export default houseCardAbilities;

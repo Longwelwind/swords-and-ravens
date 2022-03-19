@@ -11,13 +11,14 @@ import {ServerMessage} from "../../../../../../messages/ServerMessage";
 import DoranMartellAbilityGameState, {SerializedDoranMartellAbilityGameState} from "./doran-martell-ability-game-state/DoranMartellAbilityGameState";
 import AeronDamphairAbilityGameState, {SerializedAeronDamphairAbilityGameState} from "./aeron-damphair-ability-game-state/AeronDamphairAbilityGameState";
 import MaceTyrellAbilityGameState, {SerializedMaceTyrellAbilityGameState} from "./mace-tyrell-ability-game-state/MaceTyrellAbilityGameState";
+import TyrionLannisterAbilityGameState, { SerializedTyrionLannisterAbilityGameState } from "../cancel-house-card-abilities-game-state/tyrion-lannister-ability-game-state/TyrionLannisterAbilityGameState";
 
 export default class ImmediatelyHouseCardAbilitiesResolutionGameState extends GameState<
     CombatGameState,
     HouseCardResolutionGameState<
         ImmediatelyHouseCardAbilitiesResolutionGameState,
         QueenOfThornsAbilityGameState | DoranMartellAbilityGameState
-        | AeronDamphairAbilityGameState | MaceTyrellAbilityGameState
+        | AeronDamphairAbilityGameState | MaceTyrellAbilityGameState | TyrionLannisterAbilityGameState
     >
 > {
     get combatGameState(): CombatGameState {
@@ -31,7 +32,7 @@ export default class ImmediatelyHouseCardAbilitiesResolutionGameState extends Ga
     firstStart(): void {
         this.setChildGameState(
             new HouseCardResolutionGameState<ImmediatelyHouseCardAbilitiesResolutionGameState, QueenOfThornsAbilityGameState | DoranMartellAbilityGameState
-            | AeronDamphairAbilityGameState | MaceTyrellAbilityGameState>(this)
+            | AeronDamphairAbilityGameState | MaceTyrellAbilityGameState | TyrionLannisterAbilityGameState>(this)
         ).firstStart();
     }
 
@@ -76,6 +77,8 @@ export default class ImmediatelyHouseCardAbilitiesResolutionGameState extends Ga
                 return AeronDamphairAbilityGameState.deserializeFromServer(houseCardResolution, data);
             case "mace-tyrell-ability":
                 return MaceTyrellAbilityGameState.deserializeFromServer(houseCardResolution, data);
+            case "tyrion-lannister-ability":
+                return TyrionLannisterAbilityGameState.deserializeFromServer(houseCardResolution, data);
         }
     }
 
@@ -96,6 +99,6 @@ export interface SerializedImmediatelyHouseCardAbilitiesResolutionGameState {
     type: "immediately-house-card-abilities-resolution";
     childGameState: SerializedHouseCardResolutionGameState<
         SerializedQueenOfThornsAbilityGameState | SerializedDoranMartellAbilityGameState
-        | SerializedAeronDamphairAbilityGameState | SerializedMaceTyrellAbilityGameState
+        | SerializedAeronDamphairAbilityGameState | SerializedMaceTyrellAbilityGameState | SerializedTyrionLannisterAbilityGameState
     >;
 }

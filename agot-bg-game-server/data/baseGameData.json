@@ -2109,7 +2109,7 @@
         },
         "tyrion-lannister-asos": {
           "name": "Tyrion Lannister",
-          "ability": "tyrion-lannister"
+          "ability": "tyrion-lannister-asos"
         }
       }
     },
