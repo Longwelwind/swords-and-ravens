@@ -148,9 +148,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 return updateLastActive;
             }
 
-            if (settings.setupId == "a-dance-with-dragons") {
-                settings.adwdHouseCards = true;
-            } else if (settings.setupId == "a-feast-for-crows") {
+            if (settings.setupId == "a-feast-for-crows") {
                 settings.vassals = false;
                 settings.allowGiftingPowerTokens = false;
                 settings.useVassalPositions = false;
@@ -162,6 +160,14 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.addPortToTheEyrie = false;
             }
 
+            if (settings.asosHouseCards) {
+                settings.adwdHouseCards = false;
+            }
+
+            if (settings.adwdHouseCards) {
+                settings.asosHouseCards = false;
+            }
+
             if (settings.thematicDraft) {
                 settings.draftHouseCards = true;
                 settings.limitedDraft = false;
@@ -170,6 +176,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
             if (settings.draftHouseCards && !settings.limitedDraft) {
                 settings.adwdHouseCards = false;
+                settings.asosHouseCards = false;
             }
 
             if (settings.limitedDraft) {
@@ -203,6 +210,12 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.seaOrderTokens = false;
                 settings.allowGiftingPowerTokens = false;
                 settings.ironBank = false;
+            }
+
+            // Allow disabling DwD cards but enable them when switching to this setup
+            if (!this.entireGame.isDanceWithDragons && settings.setupId == "a-dance-with-dragons") {
+                settings.adwdHouseCards = true;
+                settings.asosHouseCards = false;
             }
 
             // Reset Dwd Cards

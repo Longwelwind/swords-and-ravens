@@ -4,7 +4,7 @@ import House from "../House";
 import HouseCard from "./HouseCard";
 
 export default class TheonGreyjoyHouseCardAbility extends HouseCardAbility {
-    modifyCombatStrength(combat: CombatGameState, house: House, _houseCard: HouseCard, _affectedHouseCard: HouseCard): number {
+    modifyCombatStrength(combat: CombatGameState, house: House, _houseCard: HouseCard, _affectedHouseCard: HouseCard, _baseValue: number): number {
         return this.doesTrigger(combat, house, _houseCard, _affectedHouseCard) ? 1 : 0;
     }
 

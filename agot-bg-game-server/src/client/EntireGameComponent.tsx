@@ -99,9 +99,10 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     renderWarnings(): ReactNode {
-        return <Col xs="auto">
-            {/* <h6 style={{ fontWeight: "normal" }}>BETA!</h6> */}
-            {this.props.entireGame.gameSettings.reduceVictoryPointsCountNeededToWinTo6 && <OverlayTrigger
+        return <>
+            {this.props.entireGame.gameSettings.reduceVictoryPointsCountNeededToWinTo6 &&
+            <Col xs="auto">
+                <OverlayTrigger
                     placement="auto"
                     overlay={
                         <Tooltip id="vp-counts-reduced-tooltip">
@@ -111,9 +112,14 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                         </Tooltip>}
                     popperConfig={{ modifiers: [preventOverflow] }}
                 >
-                    <FontAwesomeIcon icon={faExclamation}/>
-                </OverlayTrigger>}
-        </Col>
+                    <h4><Badge variant="warning"><FontAwesomeIcon icon={faExclamation} size="sm"/></Badge></h4>
+                </OverlayTrigger>
+            </Col>}
+            {this.props.entireGame.gameSettings.asosHouseCards &&
+            <Col xs="auto">
+                <h4><Badge variant="warning">BETA</Badge></h4>
+            </Col>}
+        </>;
     }
 
     renderHouseIcon(): ReactNode {

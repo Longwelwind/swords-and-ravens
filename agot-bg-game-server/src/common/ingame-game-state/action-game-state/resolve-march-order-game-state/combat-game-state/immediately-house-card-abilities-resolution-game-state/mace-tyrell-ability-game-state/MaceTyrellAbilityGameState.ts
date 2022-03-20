@@ -13,6 +13,7 @@ import Unit from "../../../../../game-data-structure/Unit";
 import {footman} from "../../../../../game-data-structure/unitTypes";
 import IngameGameState from "../../../../../IngameGameState";
 import groupBy from "../../../../../../../utils/groupBy";
+import HouseCard from "../../../../../game-data-structure/house-card/HouseCard";
 
 export default class MaceTyrellAbilityGameState extends GameState<
     ImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"],
@@ -43,8 +44,9 @@ export default class MaceTyrellAbilityGameState extends GameState<
             this.parentGameState.onHouseCardResolutionFinish(house);
         } else if (this.combatGameState.areCasualtiesPrevented(enemy)) {
             this.ingame.log({
-                type: "mace-tyrell-casualties-prevented",
-                house: house.id
+                type: "casualties-prevented",
+                house: house.id,
+                houseCard: (this.combatGameState.houseCombatDatas.get(enemy).houseCard as HouseCard).id
             });
 
             this.parentGameState.onHouseCardResolutionFinish(house);

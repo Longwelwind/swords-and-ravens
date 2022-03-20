@@ -14,6 +14,7 @@ import Unit from "../../../../../../game-data-structure/Unit";
 import _ from "lodash";
 import SelectUnitsGameState, {SerializedSelectUnitsGameState} from "../../../../../../select-units-game-state/SelectUnitsGameState";
 import { serIlynPayne } from "../../../../../../../../common/ingame-game-state/game-data-structure/house-card/houseCardAbilities";
+import HouseCard from "../../../../../../../../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 export default class SerIlynPayneAbilityGameState extends GameState<
     AfterWinnerDeterminationGameState["childGameState"],
     SimpleChoiceGameState | SelectUnitsGameState<SerIlynPayneAbilityGameState>
@@ -43,7 +44,11 @@ export default class SerIlynPayneAbilityGameState extends GameState<
         this.house = house
 
         if (this.combatGameState.areCasualtiesPrevented(this.enemy)) {
-            // todo: Log
+            this.ingame.log({
+                type: "casualties-prevented",
+                house: this.enemy.id,
+                houseCard: (this.combatGameState.houseCombatDatas.get(this.enemy).houseCard as HouseCard).id
+            });
             this.parentGameState.onHouseCardResolutionFinish(house);
             return;
         }

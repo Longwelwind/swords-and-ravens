@@ -16,6 +16,8 @@ export default class AeronDamphairAbilityGameState extends GameState<
     ImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"],
     SimpleChoiceGameState | SelectHouseCardGameState<AeronDamphairAbilityGameState>
 > {
+    reduceCombatStrengthOfNewHouseCard: boolean;
+
     get game(): Game {
         return this.parentGameState.game;
     }
@@ -28,9 +30,10 @@ export default class AeronDamphairAbilityGameState extends GameState<
         return this.parentGameState.parentGameState.parentGameState.ingameGameState;
     }
 
-    firstStart(house: House): void {
+    firstStart(house: House, reduceCombatStrengthOfNewHouseCard: boolean): void {
         // If the house doesn't have 2 Power tokens, or doesn't have other available
         // house cards, don't even ask.
+        this.reduceCombatStrengthOfNewHouseCard = reduceCombatStrengthOfNewHouseCard;
         const availableHouseCards = this.getAvailableHouseCards(house);
         if (house.powerTokens < 2 || availableHouseCards.length == 0) {
             this.ingame.log({
@@ -98,6 +101,15 @@ export default class AeronDamphairAbilityGameState extends GameState<
         // Remove 2 power tokens
         this.ingame.changePowerTokens(house, -2);
 
+        if (this.reduceCombatStrengthOfNewHouseCard) {
+            this.combatGameState.specialHouseCardModifier = { houseCard: houseCard, combatStrength: -1 };
+            this.entireGame.broadcastToClients({
+                type: "update-special-house-card-modifier",
+                houseCardId: this.combatGameState.specialHouseCardModifier.houseCard.id,
+                combatStrength: this.combatGameState.specialHouseCardModifier.combatStrength
+            });
+        }
+
         this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);
     }
 
@@ -117,6 +129,7 @@ export default class AeronDamphairAbilityGameState extends GameState<
     serializeToClient(admin: boolean, player: Player | null): SerializedAeronDamphairAbilityGameState {
         return {
             type: "aeron-damphair-ability",
+            reduceCombatStrengthOfNewHouseCard: this.reduceCombatStrengthOfNewHouseCard,
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -124,6 +137,7 @@ export default class AeronDamphairAbilityGameState extends GameState<
     static deserializeFromServer(houseCardResolution: ImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"], data: SerializedAeronDamphairAbilityGameState): AeronDamphairAbilityGameState {
         const aeronDamphairAbilityGameState = new AeronDamphairAbilityGameState(houseCardResolution);
 
+        aeronDamphairAbilityGameState.reduceCombatStrengthOfNewHouseCard = data.reduceCombatStrengthOfNewHouseCard;
         aeronDamphairAbilityGameState.childGameState = aeronDamphairAbilityGameState.deserializeChildGameState(data.childGameState);
 
         return aeronDamphairAbilityGameState;
@@ -141,5 +155,6 @@ export default class AeronDamphairAbilityGameState extends GameState<
 
 export interface SerializedAeronDamphairAbilityGameState {
     type: "aeron-damphair-ability";
+    reduceCombatStrengthOfNewHouseCard: boolean;
     childGameState: SerializedSimpleChoiceGameState | SerializedSelectHouseCardGameState;
 }

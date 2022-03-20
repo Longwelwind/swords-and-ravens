@@ -12,7 +12,7 @@ export default class DoranMartellDwDAbility extends HouseCardAbility {
         return houseCard == affectedHouseCard ? house.houseCards.values.filter(hc => hc.state == HouseCardState.AVAILABLE && hc != houseCard).length : 0
     }
 
-    modifyCombatStrength(_combat: CombatGameState, _house: House, houseCard: HouseCard, affectedHouseCard: HouseCard): number {
+    modifyCombatStrength(_combat: CombatGameState, _house: House, houseCard: HouseCard, affectedHouseCard: HouseCard, _baseValue: number): number {
         return houseCard == affectedHouseCard ? Math.max(-4, -_house.houseCards.values.filter(hc => hc.state == HouseCardState.AVAILABLE && hc != houseCard).length) : 0
     }
 }

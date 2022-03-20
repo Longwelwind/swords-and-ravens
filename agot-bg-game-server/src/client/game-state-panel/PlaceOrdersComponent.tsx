@@ -137,7 +137,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                         highlight: {active: !this.placeOrders.placedOrders.has(r)},
                         wrap: (child: ReactElement) => (
                             <OverlayTrigger
-                                placement="auto"
+                                placement="auto-start"
                                 trigger="click"
                                 rootClose
                                 overlay={

@@ -124,8 +124,8 @@ function getHouseCardSet(container: {[key: string]: HouseCardContainer}): HouseC
 export const baseHouseCardsData = getHouseCardData(baseGameData.houses);
 export const adwdHouseCardsData = getHouseCardData(baseGameData.adwdHouseCards);
 export const ffcHouseCardsData = getHouseCardData(baseGameData.ffcHouseCards);
-//export const modAHouseCardsData = getHouseCardData(baseGameData.modAHouseCards);
 export const modBHouseCardsData = getHouseCardData(baseGameData.modBHouseCards);
+export const asosHouseCardsData = getHouseCardData(baseGameData.asosHouseCards);
 
 export const allGameSetups = new BetterMap(Object.entries(baseGameData.setups as {[key: string]: GameSetupContainer}));
 
@@ -184,6 +184,15 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         newHouseCards.keys.forEach(hid => {
             const newHouseData = baseGameHousesToCreate.get(hid);
             newHouseData.houseCards = newHouseCards.get(hid).houseCards;
+            baseGameHousesToCreate.set(hid, newHouseData);
+        });
+    }
+
+    if (gameSettings.asosHouseCards) {
+        const asosHouseCards = new BetterMap(Object.entries(baseGameData.asosHouseCards as {[key: string]: HouseCardContainer}));
+        asosHouseCards.keys.filter(hid => housesToCreate.includes(hid)).forEach(hid => {
+            const newHouseData = baseGameHousesToCreate.get(hid);
+            newHouseData.houseCards = asosHouseCards.get(hid).houseCards;
             baseGameHousesToCreate.set(hid, newHouseData);
         });
     }
@@ -287,25 +296,30 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         const adwdHouseCards = getHouseCardSet(baseGameData.adwdHouseCards);
         const ffcHouseCards = getHouseCardSet(baseGameData.ffcHouseCards);
         const modBHouseCards = getHouseCardSet(baseGameData.modBHouseCards);
+        const asosHouseCards = getHouseCardSet(baseGameData.asosHouseCards);
 
         if (gameSettings.limitedDraft) {
             let limitedHouseCards: HouseCard[] = [];
 
             if (gameSettings.setupId == 'mother-of-dragons') {
                 if (gameSettings.adwdHouseCards) {
-                    limitedHouseCards = _.concat(modBHouseCards, adwdHouseCards, ffcHouseCards);
+                    limitedHouseCards = _.concat(adwdHouseCards, modBHouseCards, ffcHouseCards);
+                } else if (gameSettings.asosHouseCards) {
+                    limitedHouseCards = _.concat(asosHouseCards, modBHouseCards, ffcHouseCards);
                 } else {
                     limitedHouseCards = baseGameHouseCards;
                 }
             } else if (gameSettings.adwdHouseCards) {
                 limitedHouseCards = adwdHouseCards;
+            } else if (gameSettings.asosHouseCards) {
+                limitedHouseCards = asosHouseCards;
             } else {
                 const excludeArrynAndTargaryen = baseGameHouseCards.filter(hc => hc.houseId != "arryn" && hc.houseId != "targaryen");
                 limitedHouseCards = excludeArrynAndTargaryen;
             }
             game.houseCardsForDrafting = new BetterMap(limitedHouseCards.map(hc => [hc.id, hc]));
         } else {
-            const allHouseCards = _.concat(baseGameHouseCards, adwdHouseCards, ffcHouseCards, modBHouseCards);
+            const allHouseCards = _.concat(baseGameHouseCards, adwdHouseCards, ffcHouseCards, modBHouseCards, asosHouseCards);
             game.houseCardsForDrafting = new BetterMap(allHouseCards.map(hc => [hc.id, hc]));
         }
 

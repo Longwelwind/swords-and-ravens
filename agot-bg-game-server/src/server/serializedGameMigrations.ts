@@ -58,38 +58,37 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
     {
         version: "3",
         migrate: (serializedGame: any) => {
-          // Migration for #499
-          if (serializedGame.childGameState.type == "ingame") {
-              const serializedIngameGameState = serializedGame.childGameState;
-              if (serializedIngameGameState.childGameState.type == "action") {
-                  const serializedActionGameState = serializedIngameGameState.childGameState;
-                  if (serializedActionGameState.childGameState.type == "resolve-march-order") {
-                      const serializedResolveMarchOrderGameState = serializedActionGameState.childGameState;
+            // Migration for #499
+            if (serializedGame.childGameState.type == "ingame") {
+                const serializedIngameGameState = serializedGame.childGameState;
+                if (serializedIngameGameState.childGameState.type == "action") {
+                    const serializedActionGameState = serializedIngameGameState.childGameState;
+                    if (serializedActionGameState.childGameState.type == "resolve-march-order") {
+                        const serializedResolveMarchOrderGameState = serializedActionGameState.childGameState;
 
-                      let lastSelectedId: any;
+                        let lastSelectedId: any;
 
-                      const serializedChildGameState = serializedResolveMarchOrderGameState.childGameState;
-                      switch (serializedChildGameState.type) {
-                          case "resolve-single-march":
-                              lastSelectedId = serializedChildGameState.houseId;
-                              break;
-                          case "combat":
-                              lastSelectedId = serializedChildGameState.attackerId;
-                              break;
-                          case "take-control-of-enemy-port":
-                              lastSelectedId = serializedChildGameState.lastHouseThatResolvedMarchOrderId;
-                              break;
-                          default:
-                              throw new Error("Invalid childGameState type")
-                      }
+                        const serializedChildGameState = serializedResolveMarchOrderGameState.childGameState;
+                        switch (serializedChildGameState.type) {
+                            case "resolve-single-march":
+                                lastSelectedId = serializedChildGameState.houseId;
+                                break;
+                            case "combat":
+                                lastSelectedId = serializedChildGameState.attackerId;
+                                break;
+                            case "take-control-of-enemy-port":
+                                lastSelectedId = serializedChildGameState.lastHouseThatResolvedMarchOrderId;
+                                break;
+                            default:
+                                throw new Error("Invalid childGameState type")
+                        }
 
-                      // This will get the index of the last player that resolved a march order on the current turn order.
-                      // It might result in the pre-fix behavior if the Doran Martell was used as one of the cards in the child game state.
-                      serializedResolveMarchOrderGameState.currentTurnOrderIndex = serializedIngameGameState.game.ironThroneTrack.indexOf(lastSelectedId);
-                  }
-              }
-          }
-
+                        // This will get the index of the last player that resolved a march order on the current turn order.
+                        // It might result in the pre-fix behavior if the Doran Martell was used as one of the cards in the child game state.
+                        serializedResolveMarchOrderGameState.currentTurnOrderIndex = serializedIngameGameState.game.ironThroneTrack.indexOf(lastSelectedId);
+                    }
+                }
+            }
 
             // Migration for #506
             if (serializedGame.childGameState.type == "ingame") {
@@ -1635,6 +1634,72 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                     westeros.childGameState.childGameState.canBeSkipped = true;
                 }
             }
+            return serializedGame;
+        }
+    },
+    {
+        version: "74",
+        migrate: (serializedGame: any) => {
+            // Migration for Storm of Swords house cards
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                // Initialize usurper with null (ASoS Stannis Baratheon)
+                ingame.game.usurper = null;
+
+                // Fix changed log entries
+                ingame.gameLogManager.logs.forEach((l: any) => {
+                    if (l.data.type == "robb-stark-retreat-location-overriden") {
+                        l.data.houseCard = "robb-stark";
+                    }
+
+                    // Fix incorrect defense order type ids in orders-revealed log
+                    if (l.data.type == "orders-revealed") {
+                        l.data.worldState.forEach((regionState: any) => {
+                            if (regionState.order?.type == "defense-plus-one") {
+                                regionState.order.type = "defense-plus-two";
+                            } else if (regionState.order?.type == "defensePlusOne") {
+                                regionState.order.type = "defense-plus-one";
+                            }
+                        });
+                    }
+
+                    // Fix incorrect defense order type ids in order-removed log
+                    if (l.data.type == "order-removed") {
+                        if (l.data.order == "defense-plus-one") {
+                            l.data.order = "defense-plus-two";
+                        } else if (l.data.order == "defensePlusOne") {
+                            l.data.order = "defense-plus-one";
+                        }
+                    }
+                });
+
+                if (ingame.childGameState.type == "action" && ingame.childGameState.childGameState.type == "resolve-march-order" && ingame.childGameState.childGameState.childGameState.type == "combat") {
+                    const combat = ingame.childGameState.childGameState.childGameState;
+                    combat.specialHouseCardModifier = null;
+
+                    if (combat.childGameState.type == "immediately-house-card-abilities-resolution" && combat.childGameState.childGameState.type == "house-card-resolution"
+                        && combat.childGameState.childGameState.childGameState.type == "aeron-damphair-ability") {
+                            combat.childGameState.childGameState.childGameState.reduceCombatStrengthOfNewHouseCard = false;
+                    }
+
+                    // Align the handling of optional house cards with the other house cards
+                    if (combat.childGameState.type == "post-combat" && combat.childGameState.childGameState.type == "after-winner-determination") {
+                        const afterWinner = combat.childGameState.childGameState;
+                        if (afterWinner.childGameState.type == "house-card-resolution" && (
+                                afterWinner.childGameState.childGameState.type == "alayne-stone-ability"
+                                || afterWinner.childGameState.childGameState.type == "lysa-arryn-mod-ability"
+                                || afterWinner.childGameState.childGameState.type == "reek-ability")
+                        ) {
+                            const ability = afterWinner.childGameState.childGameState;
+                            if (ability.childGameState.type == "simple-choice") {
+                                ability.childGameState.choices.reverse();
+                            }
+                        }
+                    }
+                }
+            }
+
             return serializedGame;
         }
     }

@@ -37,7 +37,7 @@ export default class ReekAbilityGameState extends GameState<
             .firstStart(
                 house,
                 "",
-                ["Ignore", "Return Reek to Hand"]
+                ["Return Reek to Hand", "Ignore"]
             );
     }
 
@@ -45,12 +45,6 @@ export default class ReekAbilityGameState extends GameState<
         const house = this.childGameState.house;
 
         if (choice == 0) {
-            this.ingame.log({
-                type: "house-card-ability-not-used",
-                house: house.id,
-                houseCard: reek.id
-            });
-        } else {
             const reekHc = house.houseCards.get("reek");
             reekHc.state = HouseCardState.AVAILABLE;
             this.entireGame.broadcastToClients({
@@ -59,7 +53,12 @@ export default class ReekAbilityGameState extends GameState<
                 cardIds: [reekHc.id],
                 state: HouseCardState.AVAILABLE
             });
-
+        } else {
+            this.ingame.log({
+                type: "house-card-ability-not-used",
+                house: house.id,
+                houseCard: reek.id
+            });
         }
         this.parentGameState.onHouseCardResolutionFinish(house);
     }

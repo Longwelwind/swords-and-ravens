@@ -29,7 +29,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | UpdateDraftState | RevealBids | UpdateMaxTurns | PasswordResponse | ReplacedByVassal | UpdateDeletedHouseCards | UpdateOldPlayerHouseCards
     | LoyaltyTokenGained | LoyaltyTokenPlaced | DrangonStrengthTokenRemoved | UpdateLoanCards | UpdateRegionModifiers
     | UpdateCompletedObjectives | UpdateSecretObjectives | SyncShiftingAmbitionsGameState | HideOrRevealUserNames | ClearChatRoom
-    | UpdateSelectableObjectives;
+    | UpdateSelectableObjectives | UpdateSpecialHouseCardModifier | UpdateUsurper;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -334,6 +334,12 @@ interface UpdateHouseCardModifier {
     modifier: HouseCardModifier;
 }
 
+interface UpdateSpecialHouseCardModifier {
+    type: "update-special-house-card-modifier";
+    houseCardId: string;
+    combatStrength: number;
+}
+
 interface UpdateHouseCards {
     type: "update-house-cards";
     house: string;
@@ -452,4 +458,9 @@ interface UpdateSelectableObjectives {
     type: "update-selectable-objectives";
     house: string;
     selectableObjectives: string[];
+}
+
+interface UpdateUsurper {
+    type: "update-usurper";
+    house: string | null;
 }

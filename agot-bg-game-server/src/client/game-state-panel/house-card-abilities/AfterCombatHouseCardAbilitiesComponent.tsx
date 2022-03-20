@@ -14,6 +14,10 @@ import JonConningtonAbilityGameState from "../../../common/ingame-game-state/act
 import JonConningtonAbilityComponent from "./JonConningtonAbilityComponent";
 import RobertArrynAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-combat-house-card-abilities-game-state/robert-arryn-ability-game-state/RobertArrynAbilityGameState";
 import RobertArrynAbilityComponent from "./RobertArrynAbilityComponent";
+import MaceTyrellASoSAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-combat-house-card-abilities-game-state/mace-tyrell-asos-ability-game-state/MaceTyrellASoSAbilityGameState";
+import MaceTyrellASoSAbilityComponent from "./MaceTyrellASoSAbilityComponent";
+import BranStarkAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-combat-house-card-abilities-game-state/bran-stark-ability-game-state/BranStarkAbilityGameState";
+import BranStarkAbilityComponent from "./BranStarkAbilityComponent";
 
 @observer
 export default class AfterCombatHouseCardAbilitiesComponent extends Component<GameStateComponentProps<AfterCombatHouseCardAbilitiesGameState>> {
@@ -22,7 +26,9 @@ export default class AfterCombatHouseCardAbilitiesComponent extends Component<Ga
             [PatchfaceAbilityGameState, PatchfaceAbilityComponent],
             [MelisandreAbilityGameState, MelisandreAbilityComponent],
             [JonConningtonAbilityGameState, JonConningtonAbilityComponent],
-            [RobertArrynAbilityGameState, RobertArrynAbilityComponent]
+            [RobertArrynAbilityGameState, RobertArrynAbilityComponent],
+            [MaceTyrellASoSAbilityGameState, MaceTyrellASoSAbilityComponent],
+            [BranStarkAbilityGameState, BranStarkAbilityComponent]
         ]);
     }
 }

@@ -34,7 +34,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     leafStateId = v4();
 
     @observable gameSettings: GameSettings = { pbem: true, onlyLive: false, startWhenFull: false, setupId: "mother-of-dragons", playerCount: 8,
-        randomHouses: false, randomChosenHouses: false, adwdHouseCards: false,  tidesOfBattle: false,
+        adwdHouseCards: false, asosHouseCards: false, randomHouses: false, randomChosenHouses: false,  tidesOfBattle: false,
         vassals: true, ironBank: true, seaOrderTokens: true, allowGiftingPowerTokens: true,
         draftHouseCards: false, thematicDraft: false, limitedDraft: false, blindDraft: false,
         cokWesterosPhase: false, endless: false, useVassalPositions: false, precedingMustering: false,
@@ -344,7 +344,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             const user = this.users.get(message.user);
 
             user.settings = message.settings;
-        } else if (message.type == "game-settings-changed") {
+        } else if (message.type == "game-settings-changed") {
             this.gameSettings = message.settings;
         } else if (message.type == "update-connection-status") {
             const user = this.users.get(message.user);
@@ -573,6 +573,7 @@ export interface GameSettings {
     randomHouses: boolean;
     randomChosenHouses: boolean;
     adwdHouseCards: boolean;
+    asosHouseCards: boolean;
     cokWesterosPhase: boolean;
     vassals: boolean;
     seaOrderTokens: boolean;

@@ -46,7 +46,10 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | LoyalMaesterExecuted | MasterAtArmsExecuted | SavvyStewardExecuted | SpymasterExecuted
     | ObjectivesChosen | NewObjectiveCardDrawn | SpecialObjectiveScored | ObjectiveScored | IronbornRaid
     | ShiftingAmbitionsObjectiveChosenFromHand | ShiftingAmbitionsObjectiveChosenFromPool | NewInformationObjectiveCardChosen
-    | RevealAllObjectives | GarrisonRemoved | GarrisonReturned | ObjectiveDeckEmpty | OrdersRevealed | HouseCardsReturned;
+    | RevealAllObjectives | GarrisonRemoved | GarrisonReturned | ObjectiveDeckEmpty | OrdersRevealed | HouseCardsReturned
+    | BalonGreyjoyASoSPowerTokensGained | MaceTyrellASoSOrderPlaced | BranStarkUsed | CerseiLannisterASoSPowerTokensDiscarded
+    | DoranMartellASoSUsed | MelisandreOfAsshaiPowerTokensGained | SalladharSaanASoSPowerTokensChanged | SerDavosSeaworthASoSFortificationGained
+    | CasualtiesPrevented | SerIlynPayneASoSCasualtySuffered | StannisBaratheonASoSUsed;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -454,6 +457,7 @@ interface RobbStarkRetreatRegionOverriden {
     type: "robb-stark-retreat-location-overriden";
     house: string;
     affectedHouse: string;
+    houseCard: string;
 }
 
 interface RetreatRegionChosen {
@@ -1021,4 +1025,74 @@ interface LeavePowerTokenChoice {
     house: string;
     region: string;
     leftPowerToken: boolean;
+}
+
+interface BalonGreyjoyASoSPowerTokensGained {
+    type: "balon-greyjoy-asos-power-tokens-gained";
+    house: string;
+    powerTokensGained: number;
+}
+
+interface MaceTyrellASoSOrderPlaced {
+    type: "mace-tyrell-asos-order-placed";
+    house: string;
+    region: string;
+    order: number;
+}
+
+interface BranStarkUsed {
+    type: "bran-stark-used";
+    house: string;
+    houseCard: string;
+}
+
+interface CerseiLannisterASoSPowerTokensDiscarded {
+    type: "cersei-lannister-asos-power-tokens-discarded";
+    house: string;
+    affectedHouse: string;
+    powerTokensDiscarded: number;
+}
+
+interface DoranMartellASoSUsed {
+    type: "doran-martell-asos-used",
+    house: string;
+    affectedHouse: string;
+}
+
+interface MelisandreOfAsshaiPowerTokensGained {
+    type: "melisandre-of-asshai-power-tokens-gained";
+    house: string;
+    powerTokens: number;
+}
+
+interface SalladharSaanASoSPowerTokensChanged {
+    type: "salladhar-saan-asos-power-tokens-changed";
+    house: string;
+    powerTokensGained: number;
+    affectedHouse: string;
+    powerTokensLost: number;
+}
+
+interface SerDavosSeaworthASoSFortificationGained {
+    type: "ser-davos-seaworth-asos-fortification-gained";
+    house: string;
+}
+
+interface CasualtiesPrevented {
+    type: "casualties-prevented";
+    house: string;
+    houseCard: string;
+}
+
+interface SerIlynPayneASoSCasualtySuffered {
+    type: "ser-ilyn-payne-asos-casualty-suffered";
+    house: string;
+    affectedHouse: string;
+    unit: string;
+}
+
+interface StannisBaratheonASoSUsed {
+    type: "stannis-baratheon-asos-used";
+    house: string;
+    oldThroneOwner: string;
 }

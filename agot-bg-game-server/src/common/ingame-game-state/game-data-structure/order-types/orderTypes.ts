@@ -14,8 +14,8 @@ export const marchMinusOne = new MarchOrderType("march-minus-one", "March -1", f
 export const march = new MarchOrderType("march", "March", false, 0);
 export const marchPlusOne = new MarchOrderType("march-plus-one", "March +1", true, 1);
 
-export const defensePlusOne = new DefenseOrderType("defensePlusOne", "Defense +1", false, 1);
-export const defensePlusTwo = new DefenseOrderType("defense-plus-one", "Defense +2", true, 2);
+export const defensePlusOne = new DefenseOrderType("defense-plus-one", "Defense +1", false, 1);
+export const defensePlusTwo = new DefenseOrderType("defense-plus-two", "Defense +2", true, 2);
 export const defensePlusThree = new DefenseOrderType("defense-plus-three", "Defense +3", false, 3);
 
 export const support = new SupportOrderType("support", "Support", false);

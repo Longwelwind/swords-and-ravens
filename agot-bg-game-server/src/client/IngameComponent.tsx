@@ -178,8 +178,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     constructor(props: IngameComponentProps) {
         super(props);
         // Check for Dance with Dragons house cards
-        if (props.gameState.entireGame.gameSettings.adwdHouseCards ||
-            props.gameState.entireGame.isDanceWithDragons) {
+        if (props.gameState.entireGame.gameSettings.adwdHouseCards) {
             // Replace Stark images with Bolton images for DwD
             houseCardsBackImages.set("stark", houseCardsBackImages.get("bolton"));
             houseInfluenceImages.set("stark", houseInfluenceImages.get("bolton"));
@@ -957,7 +956,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     onNewPrivateChatRoomClick(p: Player): void {
         const users = _.sortBy([this.user as User, p.user], u => u.id);
 
-        if (!this.props.gameState.entireGame.privateChatRoomsIds.has(users[0]) || !this.props.gameState.entireGame.privateChatRoomsIds.get(users[0]).has(users[1])) {
+        if (!this.props.gameState.entireGame.privateChatRoomsIds.has(users[0]) || !this.props.gameState.entireGame.privateChatRoomsIds.get(users[0]).has(users[1])) {
             // Create a new chat room for this player
             this.props.gameState.entireGame.sendMessageToServer({
                 type: "create-private-chat-room",

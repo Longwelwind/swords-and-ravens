@@ -13,6 +13,10 @@ import BronnAbilityComponent from "./BronnAbilityComponent";
 import ViserysTargaryenAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/before-combat-house-card-abilities-game-state/viserys-targaryen-ability-game-state/ViserysTargaryenAbilityGameState";
 import ViserysTargaryenAbilityComponent from "./ViserysTargaryenAbilityComponent";
 import React from "react";
+import SerDavosSeaworthASoSAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/before-combat-house-card-abilities-game-state/ser-davos-seaworth-asos-game-state/SerDavosSeaworthASoSAbilityGameState";
+import SerDavosSeaworthASoSAbilityComponent from "./SerDavosSeaworthASoSAbilityComponent";
+import StannisBaratheonASoSAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/before-combat-house-card-abilities-game-state/stannis-baratheon-asos-ability-game-state/StannisBaratheonASoSAbilityGameState";
+import StannisBaratheonASoSAbilityComponent from "./StannisBaratheonASoSAbilityComponent";
 
 @observer
 export default class BeforeCombatHouseCardAbilitiesComponent extends Component<GameStateComponentProps<BeforeCombatHouseCardAbilitiesGameState>> {
@@ -22,7 +26,9 @@ export default class BeforeCombatHouseCardAbilitiesComponent extends Component<G
             [AeronDamphairDwDAbilityGameState, AeronDamphairDwDAbilityComponent],
             [QyburnAbilityGameState, QyburnAbilityComponent],
             [BronnAbilityGameState, BronnAbilityComponent],
-            [ViserysTargaryenAbilityGameState, ViserysTargaryenAbilityComponent]
+            [ViserysTargaryenAbilityGameState, ViserysTargaryenAbilityComponent],
+            [SerDavosSeaworthASoSAbilityGameState, SerDavosSeaworthASoSAbilityComponent],
+            [StannisBaratheonASoSAbilityGameState, StannisBaratheonASoSAbilityComponent]
         ]);
     }
 }

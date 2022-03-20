@@ -167,14 +167,16 @@ export default class ResolveRetreatGameState extends GameState<
         const armyLeft = this.postCombat.loserCombatData.army;
 
         if (armyLeft.length > 0) {
-            // Mark those as wounded
-            armyLeft.forEach(u => u.wounded = true);
+            if (!this.combat.areWoundsPrevented(this.postCombat.loser)) {
+                // Mark those as wounded
+                armyLeft.forEach(u => u.wounded = true);
 
-            this.entireGame.broadcastToClients({
-                type: "units-wounded",
-                regionId: this.postCombat.loserCombatData.region.id,
-                unitIds: armyLeft.map(u => u.id)
-            });
+                this.entireGame.broadcastToClients({
+                    type: "units-wounded",
+                    regionId: this.postCombat.loserCombatData.region.id,
+                    unitIds: armyLeft.map(u => u.id)
+                });
+            }
 
             // Retreat those unit to this location
             armyLeft.forEach(u => this.postCombat.loserCombatData.region.units.delete(u.id));

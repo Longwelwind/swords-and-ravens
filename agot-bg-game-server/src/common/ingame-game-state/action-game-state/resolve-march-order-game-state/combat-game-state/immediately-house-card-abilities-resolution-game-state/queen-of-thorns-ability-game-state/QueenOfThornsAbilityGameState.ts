@@ -32,8 +32,8 @@ export default class QueenOfThornsAbilityGameState extends GameState<
         return this.parentGameState.parentGameState.parentGameState.ingameGameState;
     }
 
-    firstStart(house: House): void {
-        const removableOrders = this.getRemovableOrders(house);
+    firstStart(house: House, allowRemovingOrderInEmbattledArea: boolean): void {
+        const removableOrders = this.getRemovableOrders(house, allowRemovingOrderInEmbattledArea);
 
         if (removableOrders.length > 0) {
             this.setChildGameState(new SelectOrdersGameState(this)).firstStart(house, removableOrders, 1);
@@ -42,24 +42,23 @@ export default class QueenOfThornsAbilityGameState extends GameState<
                 type: "queen-of-thorns-no-order-available",
                 house: house.id,
                 affectedHouse: this.combatGameState.getEnemy(house).id
-            }, true);
+            });
 
             this.parentGameState.onHouseCardResolutionFinish(house);
         }
     }
 
-    getRemovableOrders(house: House): Region[] {
+    getRemovableOrders(house: House, allowRemovingOrderInEmbattledArea: boolean): Region[] {
         const enemy = this.combatGameState.getEnemy(house);
 
-        return this.game.world.getNeighbouringRegions(this.combatGameState.defendingRegion)
-            // Remove regions that don't contain an order
-            .filter(r => this.actionGameState.ordersOnBoard.has(r))
-            .map(r => ({r, o: this.actionGameState.ordersOnBoard.get(r)}))
-            // Remove regions that don't belong to the enemy
-            .filter(({r}) => r.getController() == enemy)
-            // Remove the attacking regions (which contain the original march order)
-            .filter(({r}) => r != this.combatGameState.attackingRegion)
-            .map(({r}) => r);
+        const regions = this.game.world.getNeighbouringRegions(this.combatGameState.defendingRegion);
+
+        if (allowRemovingOrderInEmbattledArea) {
+            regions.push(this.combatGameState.defendingRegion);
+        }
+
+        // Remove regions that don't contain an order and that don't belong to the enemy
+        return regions.filter(r => this.actionGameState.ordersOnBoard.has(r) && r.getController() == enemy);
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {

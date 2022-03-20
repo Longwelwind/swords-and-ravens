@@ -28,6 +28,14 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
     proceedNextTrack(): void {
         this.currentTrackI++;
 
+        if (this.currentTrackI == 1 && this.game.usurper != null) {
+            // We have bid for the IT track. Now reset a possible usurper
+            this.game.usurper = null;
+            this.entireGame.broadcastToClients({
+                type: "update-usurper",
+                house: null
+            });
+        }
         this.entireGame.broadcastToClients({
             type: "bidding-next-track",
             nextTrack: this.currentTrackI

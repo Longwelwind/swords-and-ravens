@@ -1963,7 +1963,7 @@
           "swordIcons": 2
         },
         "willas-tyrell": {
-          "name": "Willas Tarly",
+          "name": "Willas Tyrell",
           "combatStrength": 2,
           "towerIcons": 1
         },
@@ -2069,6 +2069,239 @@
         "missandei": {
           "name": "Missandei",
           "ability": "missandei"
+        }
+      }
+    }
+  },
+  "asosHouseCards": {
+    "lannister": {
+      "houseCards": {
+        "ser-jaime-lannister-asos": {
+          "name": "Ser Jaime Lannister",
+          "combatStrength": 4,
+          "swordIcons": 1,
+          "towerIcons": 1
+        },
+        "ser-gregor-clegane-asos": {
+          "name": "Ser Gregor Clegane",
+          "combatStrength": 3,
+          "ability": "ser-gregor-clegane-asos"
+        },
+        "tywin-lannister-asos": {
+          "name": "Tywin Lannister",
+          "combatStrength": 2,
+          "towerIcons": 2
+        },
+        "joffrey-lannister": {
+          "name": "Joffrey Lannister",
+          "combatStrength": 2,
+          "swordIcons": 1
+        },
+        "cersei-lannister-asos": {
+          "name": "Cersei Lannister",
+          "combatStrength": 1,
+          "ability": "cersei-lannister-asos"
+        },
+        "ser-ilyn-payne-asos": {
+          "name": "Ser Ilyn Payne",
+          "combatStrength": 1,
+          "ability": "ser-ilyn-payne-asos"
+        },
+        "tyrion-lannister-asos": {
+          "name": "Tyrion Lannister",
+          "ability": "tyrion-lannister-asos"
+        }
+      }
+    },
+    "stark": {
+      "houseCards": {
+        "robb-stark-asos": {
+          "name": "Robb Stark",
+          "combatStrength": 4,
+          "swordIcons": 2
+        },
+        "smalljon-umber": {
+          "name": "Smalljon Umber",
+          "combatStrength": 3,
+          "towerIcons": 1
+        },
+        "eddard-stark-asos": {
+          "name": "Eddard Stark",
+          "combatStrength": 2,
+          "ability": "the-blackfish"
+        },
+        "jory-cassel": {
+          "name": "Jory Cassel",
+          "combatStrength": 2,
+          "swordIcons": 1
+        },
+        "maege-mormont": {
+          "name": "Maege Mormont",
+          "combatStrength": 1,
+          "ability": "robb-stark"
+        },
+        "catelyn-stark-asos": {
+          "name": "Catelyn Stark",
+          "combatStrength": 1,
+          "ability": "catelyn-stark-asos"
+        },
+        "bran-stark": {
+          "name": "Bran Stark",
+          "ability": "bran-stark"
+        }
+      }
+    },
+    "baratheon": {
+      "houseCards": {
+        "stannis-baratheon-asos": {
+          "name": "Stannis Baratheon",
+          "combatStrength": 4,
+          "ability": "stannis-baratheon-asos"
+        },
+        "renly-baratheon-asos": {
+          "name": "Renly Baratheon",
+          "combatStrength": 3,
+          "swordIcons": 2
+        },
+        "melisandre-of-asshai": {
+          "name": "Melisandre of Asshai",
+          "combatStrength": 2,
+          "ability": "melisandre-of-asshai"
+        },
+        "ser-axell-florent-asos": {
+          "name": "Ser Axell Florent",
+          "combatStrength": 2,
+          "towerIcons": 2
+        },
+        "salladhar-saan-asos": {
+          "name": "Salladhar Saan",
+          "combatStrength": 1,
+          "ability": "salladhar-saan-asos"
+        },
+        "devan-seaworth": {
+          "name": "Devan Seaworth",
+          "combatStrength": 1,
+          "swordIcons": 1,
+          "towerIcons": 1
+        },
+        "ser-davos-seaworth-asos": {
+          "name": "Ser Davos Seaworth",
+          "ability": "ser-davos-seaworth-asos"
+        }
+      }
+    },
+    "greyjoy": {
+      "houseCards": {
+        "balon-greyjoy-asos": {
+          "name": "Balon Greyjoy",
+          "combatStrength": 4,
+          "ability": "balon-greyjoy-asos"
+        },
+        "dagmer-cleftjaw": {
+          "name": "Dagmer Cleftjaw",
+          "combatStrength": 3,
+          "swordIcons": 1,
+          "towerIcons": 1
+        },
+        "asha-greyjoy-asos": {
+          "name": "Asha Greyjoy",
+          "combatStrength": 2,
+          "ability": "asha-greyjoy-asos"
+        },
+        "theon-greyjoy-asos": {
+          "name": "Theon Greyjoy",
+          "combatStrength": 2,
+          "towerIcons": 1
+        },
+        "andrik-the-unsmiling": {
+          "name": "Andrik the Unsmiling",
+          "combatStrength": 1,
+          "swordIcons": 2
+        },
+        "victarion-greyjoy-asos": {
+          "name": "Victarion Greyjoy",
+          "combatStrength": 1,
+          "ability": "victarion-greyjoy-asos"
+        },
+        "aeron-damphair-asos": {
+          "name": "Aeron Damphair",
+          "ability": "aeron-damphair"
+        }
+      }
+    },
+    "martell": {
+      "houseCards": {
+        "the-red-viper-asos": {
+          "name": "The Red Viper",
+          "combatStrength": 4,
+          "swordIcons": 2
+        },
+        "darkstar-asos": {
+          "name": "Darkstar",
+          "combatStrength": 3,
+          "swordIcons": 1
+        },
+        "doran-martell-asos": {
+          "name": "Doran Martell",
+          "combatStrength": 2,
+          "ability": "doran-martell-asos"
+        },
+        "nymeria-sand-asos": {
+          "name": "Nymeria Sand",
+          "combatStrength": 2,
+          "ability": "nymeria-sand"
+        },
+        "areo-hotah-asos": {
+          "name": "Areo Hotah",
+          "combatStrength": 1,
+          "towerIcons": 1
+        },
+        "arianne-martell-asos": {
+          "name": "Arianne Martell",
+          "combatStrength": 1,
+          "ability": "arianne-martell"
+        },
+        "maester-caleotte": {
+          "name": "Maester Caleotte",
+          "towerIcons": 3
+        }
+      }
+    },
+    "tyrell": {
+      "houseCards": {
+        "ser-loras-tyrell-asos": {
+          "name": "Ser Loras Tyrell",
+          "combatStrength": 4,
+          "swordIcons": 1
+        },
+        "randyll-tarly-asos": {
+          "name": "Randyll Tarly",
+          "combatStrength": 3,
+          "swordIcons": 2
+        },
+        "mace-tyrell-asos": {
+          "name": "Mace Tyrell",
+          "combatStrength": 2,
+          "ability": "mace-tyrell-asos"
+        },
+        "ser-garlan-tyrell-asos": {
+          "name": "Ser Garlan Tyrell",
+          "combatStrength": 2,
+          "towerIcons": 1
+        },
+        "margaery-tyrell-asos": {
+          "name": "Margaery Tyrell",
+          "combatStrength": 1,
+          "towerIcons": 2
+        },
+        "willas-tyrell-asos": {
+          "name": "Willas Tyrell",
+          "combatStrength": 1,
+          "ability": "willas-tyrell-asos"
+        },
+        "queen-of-thorns-asos": {
+          "name": "Queen of Thorns",
+          "ability": "queen-of-thorns"
         }
       }
     }

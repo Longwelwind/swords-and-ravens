@@ -68,6 +68,22 @@ import DaenerysTargaryenBHouseCardAbility from "./DaenerysTargaryenBHouseCardAbi
 import RakharoHouseCardAbility from "./RakharoHouseCardAbility";
 import MissandeiHouseCardAbility from "./MissandeiHouseCardAbility";
 import CaptainGroleoHouseCardAbility from "./CaptainGroleoHouseCardAbility";
+import AshaGreyjoyASoSHouseCardAbility from "./AshaGreyjoyASoSHouseCardAbility";
+import BalonGreyjoyASoSHouseCardAbility from "./BalonGreyjoyASoSHouseCardAbility";
+import MaceTyrellASoSHouseCardAbility from "./MaceTyrellASoSHouseCardAbility";
+import BranStarkHouseCardAbility from "./BranStarkHouseCardAbility";
+import CatelynStarkASoSHouseCardAbility from "./CatelynStarkASoSHouseCardAbility";
+import CerseiLannisterASoSHouseCardAbility from "./CerseiLannisterASoSHouseCardAbility";
+import DoranMartellASoSHouseCardAbility from "./DoranMartellASoSHouseCardAbility";
+import MelisandreOfAsshaiHouseCardAbility from "./MelisandreOfAsshaiHouseCardAbility";
+import SalladharSaanASoSHouseCardAbility from "./SalladharSaanASoSHouseCardAbility";
+import SerDavosSeaworthASoSHouseCardAbility from "./SerDavosSeaworthASoSHouseCardAbility";
+import SerGregorCleganeASoSHouseCardAbility from "./SerGregorCleganeASoSHouseCardAbility";
+import SerIlynPayneASoSHouseCardAbility from "./SerIlynPayneASoSHouseCardAbility";
+import TyrionLannisterASoSHouseCardAbility from "./TyrionLannisterASoSHouseCardAbility";
+import StannisBaratheonASoSHouseCardAbility from "./StannisBaratheonASoSHouseCardAbility";
+import VictarionGreyjoyASoSHouseCardAbility from "./VictarionGreyjoyASoSHouseCardAbility";
+import WillasTyrellHouseCardAbility from "./WillasTyrellHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -224,7 +240,7 @@ export const euronCrowsEyeDwd = new EuronCrowsEyeDwDAbility(
 );
 export const qyburn = new QyburnHouseCardAbility(
     "qyburn",
-    "You may discard two of your avaiable Power tokens to choose a House card in any players' discard pile."
+    "You may discard two of your available Power tokens to choose a House card in any players' discard pile."
     + " Qyburn gains the printed combat, strength and combat icons of that card, ignoring its text ability."
 );
 export const serAddamMarbrand = new SerAddamMarbrandAbility(
@@ -315,8 +331,8 @@ export const littlefinger = new LittlefingerHouseCardAbility(
 );
 export const alayneStone = new AlayneStoneHouseCardAbility(
     "alayne-stone",
-    "If you control The Eyrie after this combat, gain a number of Power tokens equal to"
-     + " twice the printed combat strength of your opponent's played House card."
+    "If you win this combat and control The Eyrie, you may discard 2 of your available Power tokens to force"
+     + " your opponent to discard all of his available Power tokens."
 );
 export const lysaArrynFfc = new LysaArrynFfcHouseCardAbility(
     "lysa-arryn-ffc",
@@ -391,6 +407,74 @@ export const captainGroleo = new CaptainGroleoHouseCardAbility(
     "If you are attacking a land area by using ship transport, this card gains +1 combat strength"
     + " for each Targaryen Ship in areas adjacent to the embattled area."
 );
+export const ashaGreyjoyASoS = new AshaGreyjoyASoSHouseCardAbility(
+    "asha-greyjoy-asos",
+    "If you are being supported in this battle, gain two Sword Icons."
+);
+export const balonGreyjoyASoS = new BalonGreyjoyASoSHouseCardAbility(
+    "balon-greyjoy-asos",
+    "If you win this battle, gain Power tokens equal to the difference in total strength in the battle."
+);
+export const maceTyrellASoS = new MaceTyrellASoSHouseCardAbility(
+    "mace-tyrell-asos",
+    "If you win this battle, you may immediately place a Support or Defense order in this area " +
+        "(may not be a special order), removing any orders that were previously in this area."
+);
+export const branStark = new BranStarkHouseCardAbility(
+    "bran-stark",
+    "You may retrieve one House Card from your discard pile at the end of the battle."
+);
+export const catelynStarkASoS = new CatelynStarkASoSHouseCardAbility(
+    "catelyn-stark-asos",
+    "If you are being supported in this battle, gain +2 combat strength and one Fortification Icon."
+);
+export const cerseiLannisterASoS = new CerseiLannisterASoSHouseCardAbility(
+    "cersei-lannister-asos",
+    "Your opponent must lose two Power tokens at the end of the battle."
+);
+export const doranMartelASoS = new DoranMartellASoSHouseCardAbility(
+    "doran-martell-asos",
+    "Immediately move your opponent to the bottom of the Fiefdoms Track. Then move players up and reassign " +
+        "the Valyrian Steel Blade as necessary."
+);
+export const melisandreOfAsshai = new MelisandreOfAsshaiHouseCardAbility(
+    "melisandre-of-asshai",
+    "Immediately gain Power tokens equal to the strength of your opponent's House Card."
+);
+export const salladharSaanASoS = new SalladharSaanASoSHouseCardAbility(
+    "salladhar-saan-asos",
+    "If you win this battle, you gain two Power tokens and your opponent loses two Power tokens."
+);
+export const serDavosSeaworthASoS = new SerDavosSeaworthASoSHouseCardAbility(
+    "ser-davos-seaworth-asos",
+    "If you lose this battle, your Units are not routed " +
+        "and you may spend two Power tokens to gain a Fortification Icon."
+);
+export const serGregorCleganeASoS = new SerGregorCleganeASoSHouseCardAbility(
+    "ser-gregor-clegane-asos",
+    "Gain a number of Sword Icons equal to three minus the strength of your opponent's House Card."
+);
+export const serIlynPayneASoS = new SerIlynPayneASoSHouseCardAbility(
+    "ser-ilyn-payne-asos",
+    "If you win this battle, your opponent must lose one casualty, regardless of the number of Fortification Icons he has."
+);
+export const tyrionLannisterAsos = new TyrionLannisterASoSHouseCardAbility(
+    "tyrion-lannister-asos",
+    "You may return your opponent's House Card to his hand and force him to choose a different one. If he does not have any other House Cards, " +
+        "then he may not use a House Card this battle."
+);
+export const stannisBaratheonASoS = new StannisBaratheonASoSHouseCardAbility(
+    "stannis-baratheon-asos",
+    "If your opponent has the Iron Throne Influence token, you may steal it until the next \"Clash of Kings\" resolution and gain a Sword Icon."
+);
+export const victarionGreyjoyASoS = new VictarionGreyjoyASoSHouseCardAbility(
+    "victarion-greyjoy-asos",
+    "If this battle is adjacent to a sea area, gain +1 combat strength and a Fortification Icon."
+);
+export const willasTyrellASoS = new WillasTyrellHouseCardAbility(
+    "willas-tyrell-asos",
+    "If you are defending in this battle, this House Card has a strength of 3."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -460,7 +544,23 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [daenerysTargaryenB.id, daenerysTargaryenB],
     [rakharo.id, rakharo],
     [missandei.id, missandei],
-    [captainGroleo.id, captainGroleo]
+    [captainGroleo.id, captainGroleo],
+    [ashaGreyjoyASoS.id, ashaGreyjoyASoS],
+    [balonGreyjoyASoS.id, balonGreyjoyASoS],
+    [maceTyrellASoS.id, maceTyrellASoS],
+    [branStark.id, branStark],
+    [catelynStarkASoS.id, catelynStarkASoS],
+    [cerseiLannisterASoS.id, cerseiLannisterASoS],
+    [doranMartelASoS.id, doranMartelASoS],
+    [melisandreOfAsshai.id, melisandreOfAsshai],
+    [salladharSaanASoS.id, salladharSaanASoS],
+    [serDavosSeaworthASoS.id, serDavosSeaworthASoS],
+    [serGregorCleganeASoS.id, serGregorCleganeASoS],
+    [serIlynPayneASoS.id, serIlynPayneASoS],
+    [tyrionLannisterAsos.id, tyrionLannisterAsos],
+    [stannisBaratheonASoS.id, stannisBaratheonASoS],
+    [victarionGreyjoyASoS.id, victarionGreyjoyASoS],
+    [willasTyrellASoS.id, willasTyrellASoS]
 ]);
 
 export default houseCardAbilities;

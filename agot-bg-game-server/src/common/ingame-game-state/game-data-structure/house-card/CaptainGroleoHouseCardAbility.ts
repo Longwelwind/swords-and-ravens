@@ -7,7 +7,7 @@ import { ship } from "../unitTypes";
 import _ from "lodash";
 
 export default class CaptainGroleoHouseCardAbility extends HouseCardAbility {
-    modifyCombatStrength(combat: CombatGameState, house: House, houseCard: HouseCard, affectedHouseCard: HouseCard): number {
+    modifyCombatStrength(combat: CombatGameState, house: House, houseCard: HouseCard, affectedHouseCard: HouseCard, _baseValue: number): number {
         if (houseCard != affectedHouseCard
             || combat.attacker != house
             || combat.defendingRegion.type != land
