@@ -166,7 +166,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                 <Tooltip id="asos-house-cards-setting-tooltip">
                                     When this option is enabled, the house cards from the 1st edition expansion <i>A Storm of Swords</i> are used.
                                 </Tooltip>}>
-                                <label htmlFor="asos-house-cards-setting">Use <i>ASoS</i> house cards</label>
+                                <label htmlFor="asos-house-cards-setting">Use <i>ASoS</i> house cards (<i>BETA</i>)</label>
                             </OverlayTrigger>}
                         checked={this.gameSettings.asosHouseCards}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.asosHouseCards = !this.gameSettings.asosHouseCards)}

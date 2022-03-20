@@ -12,7 +12,7 @@ import shuffleInPlace from "../utils/shuffleInPlace";
 import { v4 } from "uuid";
 import facelessMenNames from "../../data/facelessMenNames.json";
 import popRandom from "../utils/popRandom";
-import { SerializedEntireGame } from "../common/EntireGame";
+//import { SerializedEntireGame } from "../common/EntireGame";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
     {
@@ -1639,8 +1639,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
     },
     {
         version: "74",
-        // TODO: Switch to an serializedGame: any before releasing it!!!
-        migrate: (serializedGame: SerializedEntireGame) => {
+        migrate: (serializedGame: any) => {
             // Migration for Storm of Swords house cards
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
@@ -1648,21 +1647,15 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                 // Initialize usurper with null (ASoS Stannis Baratheon)
                 ingame.game.usurper = null;
 
-                // Initialize originalCombatStrength with current combat strength for all House Cards (Willas Tyrell)
-                /*ingame.game.houses.forEach((h) => h.houseCards.forEach(([_hcid, hc]) => hc.originalCombatStrength = hc.combatStrength));
-                ingame.game.vassalHouseCards.forEach(([_hcid, hc]) => hc.originalCombatStrength = hc.combatStrength);
-                ingame.game.houseCardsForDrafting.forEach(([_hcid, hc]) => hc.originalCombatStrength = hc.combatStrength);
-                ingame.game.deletedHouseCards.forEach(([_hcid, hc]) => hc.originalCombatStrength = hc.combatStrength);
-                ingame.game.oldPlayerHouseCards.forEach(([_h, hcdata]) => hcdata.forEach(([_hcid, hc]) => hc.originalCombatStrength = hc.combatStrength));*/
-
-                ingame.gameLogManager.logs.forEach((l) => {
+                // Fix changed log entries
+                ingame.gameLogManager.logs.forEach((l: any) => {
                     if (l.data.type == "robb-stark-retreat-location-overriden") {
                         l.data.houseCard = "robb-stark";
                     }
 
                     // Fix incorrect defense order type ids in orders-revealed log
                     if (l.data.type == "orders-revealed") {
-                        l.data.worldState.forEach((regionState) => {
+                        l.data.worldState.forEach((regionState: any) => {
                             if (regionState.order?.type == "defense-plus-one") {
                                 regionState.order.type = "defense-plus-two";
                             } else if (regionState.order?.type == "defensePlusOne") {
