@@ -122,7 +122,17 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
                                                 <label htmlFor="burn-vsb">Burn Valyrian Steel Blade</label>
                                             </OverlayTrigger>}
                                         checked={this.burnValyrianSteelBlade}
-                                        onChange={() => this.burnValyrianSteelBlade = !this.burnValyrianSteelBlade}
+                                        onChange={() => {
+                                            if (!this.burnValyrianSteelBlade && !window.confirm(
+                                                "Are you sure you want to use the VSB right now without knowing which house card the opponent has selected?\n\n"
+                                                + "This could be useful, for example, if you think Doran Martell or Ser Gerris Drinkwater will take your blade soon. "
+                                                + "Then it might make sense to burn the blade now in any case, because the game might not ask you later "
+                                                + "if the blade can't be used usefully."
+                                            )) {
+                                                return;
+                                            }
+                                            this.burnValyrianSteelBlade = !this.burnValyrianSteelBlade;
+                                        }}
                                         style={{zIndex: "auto"}}
                                     />
                                 </Col>
