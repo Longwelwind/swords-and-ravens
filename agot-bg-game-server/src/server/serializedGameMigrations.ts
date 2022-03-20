@@ -1644,7 +1644,17 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             // Migration for Storm of Swords house cards
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
+
+                // Initialize usurper with null (ASoS Stannis Baratheon)
                 ingame.game.usurper = null;
+
+                // Initialize originalCombatStrength with current combat strength for all House Cards (Willas Tyrell)
+                /*ingame.game.houses.forEach((h) => h.houseCards.forEach(([_hcid, hc]) => hc.originalCombatStrength = hc.combatStrength));
+                ingame.game.vassalHouseCards.forEach(([_hcid, hc]) => hc.originalCombatStrength = hc.combatStrength);
+                ingame.game.houseCardsForDrafting.forEach(([_hcid, hc]) => hc.originalCombatStrength = hc.combatStrength);
+                ingame.game.deletedHouseCards.forEach(([_hcid, hc]) => hc.originalCombatStrength = hc.combatStrength);
+                ingame.game.oldPlayerHouseCards.forEach(([_h, hcdata]) => hcdata.forEach(([_hcid, hc]) => hc.originalCombatStrength = hc.combatStrength));*/
+
                 ingame.gameLogManager.logs.forEach((l) => {
                     if (l.data.type == "robb-stark-retreat-location-overriden") {
                         l.data.houseCard = "robb-stark";

@@ -83,6 +83,7 @@ import SerIlynPayneASoSHouseCardAbility from "./SerIlynPayneASoSHouseCardAbility
 import TyrionLannisterASoSHouseCardAbility from "./TyrionLannisterASoSHouseCardAbility";
 import StannisBaratheonASoSHouseCardAbility from "./StannisBaratheonASoSHouseCardAbility";
 import VictarionGreyjoyASoSHouseCardAbility from "./VictarionGreyjoyASoSHouseCardAbility";
+import WillasTyrellHouseCardAbility from "./WillasTyrellHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
     "theon-greyjoy",
@@ -470,6 +471,10 @@ export const victarionGreyjoyASoS = new VictarionGreyjoyASoSHouseCardAbility(
     "victarion-greyjoy-asos",
     "If this battle is adjacent to a sea area, gain +1 combat strength and a Fortification Icon."
 );
+export const willasTyrellASoS = new WillasTyrellHouseCardAbility(
+    "willas-tyrell-asos",
+    "If you are defending in this battle, this House Card has a strength of 3."
+);
 
 const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [theonGreyjoy.id, theonGreyjoy],
@@ -554,7 +559,8 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
     [serIlynPayneASoS.id, serIlynPayneASoS],
     [tyrionLannisterAsos.id, tyrionLannisterAsos],
     [stannisBaratheonASoS.id, stannisBaratheonASoS],
-    [victarionGreyjoyASoS.id, victarionGreyjoyASoS]
+    [victarionGreyjoyASoS.id, victarionGreyjoyASoS],
+    [willasTyrellASoS.id, willasTyrellASoS]
 ]);
 
 export default houseCardAbilities;

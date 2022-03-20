@@ -11,6 +11,7 @@ export default class HouseCard {
     id: string;
     name: string;
     combatStrength: number;
+    originalCombatStrength?: number;
     swordIcons: number;
     towerIcons: number;
     ability: HouseCardAbility | null;
@@ -29,6 +30,7 @@ export default class HouseCard {
         this.disabledAbility = null;
         this.disabled = false;
         this.houseId = houseId;
+        this.originalCombatStrength = undefined;
     }
 
     serializeToClient(): SerializedHouseCard {
@@ -36,6 +38,7 @@ export default class HouseCard {
             id: this.id,
             name: this.name,
             combatStrength: this.combatStrength,
+            originalCombatStrength: this.originalCombatStrength,
             swordIcons: this.swordIcons,
             towerIcons: this.towerIcons,
             abilityId: this.ability ? this.ability.id : null,
@@ -60,6 +63,7 @@ export default class HouseCard {
         houseCard.state = data.state;
         houseCard.disabledAbility = data.disabledAbilityId ? houseCardAbilities.get(data.disabledAbilityId) : null;
         houseCard.disabled = data.disabled;
+        houseCard.originalCombatStrength = data.originalCombatStrength;
 
         return houseCard;
     }
@@ -69,6 +73,7 @@ export interface SerializedHouseCard {
     id: string;
     name: string;
     combatStrength: number;
+    originalCombatStrength?: number;
     swordIcons: number;
     towerIcons: number;
     abilityId: string | null;

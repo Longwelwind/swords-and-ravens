@@ -2296,7 +2296,8 @@
         },
         "willas-tyrell-asos": {
           "name": "Willas Tyrell",
-          "combatStrength": 1
+          "combatStrength": 1,
+          "ability": "willas-tyrell-asos"
         },
         "queen-of-thorns-asos": {
           "name": "Queen of Thorns",

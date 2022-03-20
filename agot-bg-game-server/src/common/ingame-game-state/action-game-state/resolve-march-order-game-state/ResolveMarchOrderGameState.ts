@@ -60,17 +60,21 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
 
         // Reset all card abilities (e.g. due to DWD Queen of Thorns)
         const allHouseCards = _.concat(_.flatMap(this.game.houses.values.map(h => h.houseCards.values)), this.game.vassalHouseCards.values);
-        const disabledHouseCards = allHouseCards.filter(hc => hc.disabled);
+        const manipulatedHouseCards = allHouseCards.filter(hc => hc.disabled || hc.originalCombatStrength !== undefined);
 
-        disabledHouseCards.forEach(card => {
+        manipulatedHouseCards.forEach(card => {
             card.ability = card.disabledAbility;
             card.disabled = false;
             card.disabledAbility = null;
+            if (card.originalCombatStrength !== undefined) {
+                card.combatStrength = card.originalCombatStrength;
+                card.originalCombatStrength = undefined;
+            }
         });
 
         this.entireGame.broadcastToClients({
             type: "manipulate-combat-house-card",
-            manipulatedHouseCards: disabledHouseCards.map(hc => [hc.id, hc.serializeToClient()])
+            manipulatedHouseCards: manipulatedHouseCards.map(hc => [hc.id, hc.serializeToClient()])
         });
 
         // Restore Garrisons (Pentos)
@@ -217,13 +221,19 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
 
     onServerMessage(message: ServerMessage): void {
         if (message.type == "manipulate-combat-house-card") {
-            const allHouseCards = _.flatMap(this.game.houses.values.map(h => h.houseCards.values));
+            const allHouseCards = _.concat(
+                _.flatMap(this.game.houses.values.map(h => h.houseCards.values)),
+                _.flatMap(this.game.oldPlayerHouseCards.values.map(houseCardsPerOldPlayer => houseCardsPerOldPlayer.values)),
+                this.game.deletedHouseCards.values
+            );
             message.manipulatedHouseCards.forEach(([hcid, shc]) => {
                 const found = allHouseCards.find(hc => hc.id == hcid);
                 if (found) {
                     found.ability = shc.abilityId ? houseCardAbilities.get(shc.abilityId) : null;
                     found.disabled = shc.disabled;
                     found.disabledAbility = shc.disabledAbilityId ? houseCardAbilities.get(shc.disabledAbilityId) : null;
+                    found.combatStrength = shc.combatStrength;
+                    found.originalCombatStrength = shc.originalCombatStrength;
                 }
             });
 
