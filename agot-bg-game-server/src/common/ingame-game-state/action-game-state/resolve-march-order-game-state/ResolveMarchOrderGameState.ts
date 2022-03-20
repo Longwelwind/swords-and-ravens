@@ -72,10 +72,12 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
             }
         });
 
-        this.entireGame.broadcastToClients({
-            type: "manipulate-combat-house-card",
-            manipulatedHouseCards: manipulatedHouseCards.map(hc => [hc.id, hc.serializeToClient()])
-        });
+        if (manipulatedHouseCards.length > 0) {
+            this.entireGame.broadcastToClients({
+                type: "manipulate-combat-house-card",
+                manipulatedHouseCards: manipulatedHouseCards.map(hc => [hc.id, hc.serializeToClient()])
+            });
+        }
 
         // Restore Garrisons (Pentos)
         this.world.regionsWhichCanRegainGarrison.forEach(staticRegion => {
