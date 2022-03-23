@@ -19,6 +19,16 @@ export default class GameEndedGameState extends GameState<IngameGameState> {
 
         this.ingame.entireGame.hideOrRevealUserNames(true);
 
+        // Send reveal-all-objectives before winner-declared
+        if (this.entireGame.isFeastForCrows) {
+            this.ingame.log({
+                type: "reveal-all-objectives",
+                objectivesOfHouses: this.ingame.game.getPotentialWinners().filter(h => !this.ingame.isVassalHouse(h)).reverse().map(h => [
+                    h.id, h.secretObjectives.map(oc => oc.id)
+                ] as [string, string[]])
+            });
+        }
+
         this.ingame.log({
             type: "winner-declared",
             winner: winner.id

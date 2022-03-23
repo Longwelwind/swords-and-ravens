@@ -115,6 +115,11 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         this.setChildGameState(new IngameGameState(this)).beginGame(housesToCreate, futurePlayers);
 
         this.checkGameStateChanged();
+
+        // Assign new faceless names after we have updated the game-state tree on client-side.
+        // This will load the IngameComponent first and prevent the new names to be shown
+        // in the LobbyComponent for a short period.
+        this.ingameGameState?.assignNewFacelessNames();
     }
 
     checkGameStateChanged(): boolean {
