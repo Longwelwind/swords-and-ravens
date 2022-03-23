@@ -232,14 +232,6 @@ export default class IngameGameState extends GameState<
         if (this.game.turn == this.game.maxTurns) {
             const winner = this.game.getPotentialWinner(true);
             this.setChildGameState(new GameEndedGameState(this)).firstStart(winner);
-            if (this.entireGame.isFeastForCrows) {
-                this.log({
-                    type: "reveal-all-objectives",
-                    objectivesOfHouses: this.game.getPotentialWinners().filter(h => !this.isVassalHouse(h)).reverse().map(h => [
-                        h.id, h.secretObjectives.map(oc => oc.id)
-                    ] as [string, string[]])
-                });
-            }
             return;
         }
 
