@@ -77,8 +77,9 @@ export default class IngameGameState extends GameState<
         this.players = new BetterMap(futurePlayers.map((house, user) => [user, new Player(user, this.game.houses.get(house))]));
 
         // In the past we always used the supply limits from the game setup, though we simply could have calculated them
-        // as every house starts according to their controlled barrels. For random start we have to recalculate supply, but only do it for
-        // non vassals as vassals always start at supply 4. So we cannot use game.updateSupplies but use a slightly different version of it:
+        // as every house starts according to their controlled barrels.
+        // For the custom settings "Random Start Positions" and "Vassal Start Positions"
+        // we now have to calculate the supply limits of player houses in the beginning. (Vassals always start at supply level 4)
         this.game.nonVassalHouses.forEach(h =>  {
             h.supplyLevel = Math.min(this.game.supplyRestrictions.length - 1, this.game.getControlledSupplyIcons(h));
         });
@@ -288,18 +289,6 @@ export default class IngameGameState extends GameState<
                 this.setChildGameState(new PayDebtsGameState(this)).firstStart(unpaidInterest);
             }
         } else {
-            if (this.entireGame.gameSettings.useVassalPositions) {
-                // Refresh supply limits of player houses
-                this.game.houses.values.filter(h => !this.isVassalHouse(h)).forEach(h =>  {
-                    h.supplyLevel = Math.min(this.game.supplyRestrictions.length - 1, this.game.getControlledSupplyIcons(h));
-                });
-
-                this.entireGame.broadcastToClients({
-                    type: "supply-adjusted",
-                    supplies: this.game.houses.values.map(h => [h.id, h.supplyLevel])
-                });
-            }
-
             // No Westeros phase during the first turn
             this.proceedPlanningGameState();
         }
