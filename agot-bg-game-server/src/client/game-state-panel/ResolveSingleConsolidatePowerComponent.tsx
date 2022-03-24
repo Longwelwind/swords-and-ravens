@@ -54,7 +54,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<Ga
             <>
                 <Col xs={12} className="text-center">
                     {this.gameState.ingame.isVassalHouse(this.house)
-                        ? <>Vassal house <b>{this.house.name}</b> must resolve their Muster Order{this.defenseMusterOrderRegion && <> in <b>{this.defenseMusterOrderRegion.name}</b></>}.</>
+                        ? <>Vassal House <b>{this.house.name}</b> must resolve their Muster Order{this.defenseMusterOrderRegion && <> in <b>{this.defenseMusterOrderRegion.name}</b></>}.</>
                         : <>House <b>{this.house.name}</b> must resolve one of its Consolidate Power{availableOrders.values.some(ot => ot instanceof IronBankOrderType) ? " or Iron Bank" : ""} Orders.</>}
                 </Col>
                 {this.doesControlCurrentHouse ?
