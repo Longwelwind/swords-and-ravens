@@ -317,6 +317,7 @@ $tiny-scale: 0.12;
 
 $outline-color: white;
 $weak-outline: rgba($outline-color, 0.2);
+$smedium-outline: rgba($outline-color, 0.5);
 $medium-outline: rgba($outline-color, 0.8);
 $strong-outline: rgba($outline-color, 1);
 
@@ -326,6 +327,11 @@ $strong-outline: rgba($outline-color, 1);
 
 .hover-weak-outline:hover {
   filter: drop-shadow(1px 1px 3px $weak-outline) drop-shadow(-1px -1px 3px $weak-outline);
+  transition: all 0.12s linear;
+}
+
+.hover-smedium-outline:hover {
+  filter: drop-shadow(5px 5px 5px $smedium-outline) drop-shadow(-5px -5px 5px $smedium-outline);
   transition: all 0.12s linear;
 }
 
@@ -374,9 +380,9 @@ $unit-highlight-outline-green: rgba(green, 1.0);
   filter: drop-shadow(4px 4px 4px $unit-highlight-outline-green) drop-shadow(-4px -4px 4px $unit-highlight-outline-green);
 }
 
-$wildling-outline: rgba(#f8ff00, 0.5);
+$wildling-outline: rgba(yellow, 0.6);
 .wildling-highlight {
-  filter: drop-shadow(1px 1px 3px $wildling-outline) drop-shadow(-1px -1px 3px $wildling-outline);
+  filter: drop-shadow(2px 2px 3px $wildling-outline) drop-shadow(-2px -2px 3px $wildling-outline);
 }
 
 .clickable {
@@ -385,6 +391,11 @@ $wildling-outline: rgba(#f8ff00, 0.5);
 
 .clickable:hover {
   text-decoration: underline;
+
+}
+
+.clickable-no-underline {
+  cursor: pointer;
 }
 
 .link-color {

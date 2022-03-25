@@ -215,7 +215,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                             rootClose
                         >
                             <div
-                                className="house-power-token hover-weak-outline clickable"
+                                className="house-power-token hover-smedium-outline clickable"
                                 style={{
                                     backgroundImage: `url(${housePowerTokensImages.get(this.house.id)})`,
                                     marginLeft: "10px"
@@ -301,7 +301,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     }
 
     onLaunchReplaceVassalVoteClick(): void {
-        if (window.confirm(`Do you want to launch a vote to replace vassal house ${this.house.name}?`)) {
+        if (window.confirm(`Do you want to launch a vote to replace Vassal House ${this.house.name}?`)) {
             this.props.ingame.launchReplaceVassalByPlayerVote(this.house);
         }
     }
@@ -407,7 +407,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                 <div className="mt-3">
                     <Button
                         onClick={() => {
-                            if (window.confirm("Are you sure you want to return all your power tokens to your pool?")) {
+                            if (window.confirm("Are you sure you want to return all your Power tokens to your pool?")) {
                                 this.props.ingame.entireGame.sendMessageToServer({
                                     type: "drop-power-tokens",
                                     house: house.id

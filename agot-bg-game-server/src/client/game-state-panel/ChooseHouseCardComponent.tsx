@@ -160,7 +160,7 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
                 )}
                 <Col xs={12} className="text-center">
                     <div>
-                        Waiting for {waitingFor.map(h => h.name).join(" and ")} to choose their House&nbsp;Card{waitingFor.length > 1 && "s"}...
+                        Waiting for {waitingFor.map(h => h.name).join(" and ")} to choose their House&nbsp;card{waitingFor.length != 1 ? "s" : ""}...
                     </div>
                 </Col>
             </>

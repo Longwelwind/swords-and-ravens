@@ -9,6 +9,8 @@ import loanCardImages from "./loanCardImages";
 import ImagePopover from "./utils/ImagePopover";
 import { preventOverflow } from "@popperjs/core";
 import renderLoanCardsToolTip from "./loanCardsTooltip";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCaretLeft } from "@fortawesome/free-solid-svg-icons";
 
 interface IronBankTabComponentProps {
     ingame: IngameGameState;
@@ -36,17 +38,21 @@ export default class IronBankTabComponent extends Component<IronBankTabComponent
                 </Col>
             </Row>
             <Row className="justify-content-center mt-4">
-                {this.ironBank.loanSlots.slice().reverse().map((lc, i) => <Col xs="auto" key={`loan-slot-${i}`}>
+                {this.ironBank.loanSlots.slice().reverse().map((lc, i) => <Col xs="auto" key={`loan-slot-${i}`} className="pr-0">
                     <OverlayTrigger
                         overlay={<ImagePopover className="vertical-game-card" style={{ backgroundImage: lc ? `url(${loanCardImages.get(lc.type.id)})` : "none" }} />}
                         popperConfig={{ modifiers: [preventOverflow] }}
                         delay={{ show: 250, hide: 0 }}
                         placement="auto"
                     >
-                        {lc ? <div className="vertical-game-card smedium hover-weak-outline" style={{ backgroundImage: lc ? `url(${loanCardImages.get(lc.type.id)})` : "none" }} />
-                            : <div className="vertical-game-card game-card-slot smedium"/>}
+                        <div className="d-flex flex-row align-items-center">
+                            {lc
+                                ? <div className="vertical-game-card smedium hover-weak-outline" style={{ backgroundImage: lc ? `url(${loanCardImages.get(lc.type.id)})` : "none" }} />
+                                : <div className="vertical-game-card game-card-slot smedium"/>}
+                            <FontAwesomeIcon className="ml-2" icon={faCaretLeft} size="2x" />
+                        </div>
                     </OverlayTrigger>
-                    <Badge variant="secondary" style={{fontSize: "16px", marginTop: "10px", marginLeft: "35px"}}>{this.ironBank.loanCosts.slice().reverse()[i]}</Badge>
+                    <Badge variant="secondary" style={{fontSize: "18px", marginTop: "10px", marginLeft: "35px"}}>{this.ironBank.loanCosts.slice().reverse()[i]}</Badge>
                 </Col>)}
                 <Col xs="auto">
                     <OverlayTrigger
@@ -55,7 +61,7 @@ export default class IronBankTabComponent extends Component<IronBankTabComponent
                         rootClose
                         placement="auto"
                     >
-                        <div className="vertical-game-card smedium hover-weak-outline clickable" style={{ backgroundImage: `url(${loanCardImages.get("back")})`}} />
+                        <div className="vertical-game-card smedium hover-smedium-outline clickable" style={{ backgroundImage: `url(${loanCardImages.get("back")})`}} />
                     </OverlayTrigger>
                 </Col>
             </Row>

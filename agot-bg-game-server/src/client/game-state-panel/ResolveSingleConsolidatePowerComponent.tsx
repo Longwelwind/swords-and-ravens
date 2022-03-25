@@ -54,7 +54,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<Ga
             <>
                 <Col xs={12} className="text-center">
                     {this.gameState.ingame.isVassalHouse(this.house)
-                        ? <>Vassal house <b>{this.house.name}</b> must resolve their Muster Order{this.defenseMusterOrderRegion && <> in <b>{this.defenseMusterOrderRegion.name}</b></>}.</>
+                        ? <>Vassal House <b>{this.house.name}</b> must resolve their Muster Order{this.defenseMusterOrderRegion && <> in <b>{this.defenseMusterOrderRegion.name}</b></>}.</>
                         : <>House <b>{this.house.name}</b> must resolve one of its Consolidate Power{availableOrders.values.some(ot => ot instanceof IronBankOrderType) ? " or Iron Bank" : ""} Orders.</>}
                 </Col>
                 {this.doesControlCurrentHouse ?
@@ -109,7 +109,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<Ga
                                                     this.gameState.choosePurchaseLoan(purchasable.slotIndex, this.selectedOrderRegion as Region);
                                                     this.reset();
                                                 }}>
-                                                    Pay {purchasable.costs} Power token{purchasable.costs > 1 ? "s" : ""} to purchase {purchasable.loan.name}
+                                                    Pay {purchasable.costs} Power token{purchasable.costs != 1 ? "s" : ""} to purchase {purchasable.loan.name}
                                                 </Button>
                                             </Col>
                                         )}
@@ -143,7 +143,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<Ga
     }
 
     private getPowerTokenButtonText(powerTokenCount: number): string {
-        return `Gain ${powerTokenCount} Power token${powerTokenCount > 1 ? "s" : ""}`;
+        return `Gain ${powerTokenCount} Power token${powerTokenCount != 1 ? "s" : ""}`;
     }
 
     private modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {

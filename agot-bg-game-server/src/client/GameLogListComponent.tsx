@@ -1223,7 +1223,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <>
                     <ul>
                         {gains.map(([house, gain]) => (
-                            <li key={`got-${house.id}`}>House <b>{house.name}</b> gained <b>{gain}</b> Power&nbsp;token{gain > 1 ? "s" : ""}.</li>
+                            <li key={`got-${house.id}`}>House <b>{house.name}</b> gained <b>{gain}</b> Power&nbsp;token{gain != 1 ? "s" : ""}.</li>
                         ))}
                     </ul>
                 </>;
@@ -1503,7 +1503,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>
                 } else if (data.powerTokensDiscardedToCancelMovement &&  data.powerTokensDiscardedToCancelMovement > 0) {
                     return <p>
-                        House <b>{house.name}</b> discarded <b>{data.powerTokensDiscardedToCancelMovement}</b> Power&nbsp;token{data.powerTokensDiscardedToCancelMovement > 1 ? "s" : ""} to cancel the previous movement.
+                        House <b>{house.name}</b> discarded <b>{data.powerTokensDiscardedToCancelMovement}</b> Power&nbsp;token{data.powerTokensDiscardedToCancelMovement != 1 ? "s" : ""} to cancel the previous movement.
                     </p>
                 } else if (data.regionFrom && data.regionTo) {
                     const regionFrom = this.world.regions.get(data.regionFrom);
@@ -1549,7 +1549,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const debt = data.cost + data.paid;
                 return <p>
-                    House <b>{house.name}</b> paid an interest of <b>{Math.abs(data.paid)}</b> Power token{Math.abs(data.paid) > 1 ? "s" : ""} to the Iron Bank.{debt > 0 ? <>&nbsp;<b>{debt}</b> interest debt could not be paid.</> : ""}
+                    House <b>{house.name}</b> paid an interest of <b>{Math.abs(data.paid)}</b> Power token{Math.abs(data.paid) != 1 ? "s" : ""} to the Iron Bank.{debt > 0 ? <>&nbsp;<b>{debt}</b> interest debt could not be paid.</> : ""}
                 </p>
             }
             case "debt-paid": {

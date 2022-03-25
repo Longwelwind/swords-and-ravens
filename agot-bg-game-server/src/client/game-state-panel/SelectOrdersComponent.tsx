@@ -28,7 +28,7 @@ export default class SelectOrdersComponent extends Component<GameStateComponentP
                         <>
                             {this.selectedRegions.length > 0 &&
                             <Row className="justify-content-center">
-                                <p className="text-center">Selected Order token{this.selectedRegions.length > 1 && "s"}:<br/>
+                                <p className="text-center">Selected Order token{this.selectedRegions.length != 1 ? "s" : ""}:<br/>
                                     {joinReactNodes(this.selectedRegions.map(r => <span key={r.id}><b>{this.getOrderInRegion(r)?.type.name ?? "Unknown"}</b> in <b>{r.name}</b></span>), ', ')}
                                 </p>
                             </Row>}

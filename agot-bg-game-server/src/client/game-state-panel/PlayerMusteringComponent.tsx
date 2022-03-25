@@ -53,7 +53,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                     ) : this.props.gameState.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD ? (
                         <>House <b>{this.house.name}</b> can muster units in one of their controlled Strongholds or Castles.</>
                     ) : this.props.gameState.type == PlayerMusteringType.DEFENSE_MUSTER_ORDER ? (
-                        <>Vassal house <b>{this.house.name}</b> can resolve their Defense/Muster order in {this.props.gameState.regions[0]?.name ?? "Unknown"}.</>
+                        <>Vassal House <b>{this.house.name}</b> can resolve their Defense/Muster order in {this.props.gameState.regions[0]?.name ?? "Unknown"}.</>
                     ) : this.props.gameState.type == PlayerMusteringType.RALLY_THE_MEN_WESTEROS_CARD && (
                         <>Players can muster units in their controlled Castles.</>
                     )}

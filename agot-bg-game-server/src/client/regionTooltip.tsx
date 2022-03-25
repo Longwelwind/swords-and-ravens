@@ -21,16 +21,16 @@ export function renderRegionTooltip(region: Region): OverlayChildren {
             }
             {(region.supplyIcons > 0 || region.crownIcons > 0) && (
                 <>
-                    <br />{region.supplyIcons > 0 && <><b>{region.supplyIcons}</b> Barrel{region.supplyIcons > 1 && "s"}</>}
+                    <br />{region.supplyIcons > 0 && <><b>{region.supplyIcons}</b> Barrel{region.supplyIcons != 1 ? "s" : ""}</>}
                     {(region.supplyIcons > 0 && region.crownIcons > 0) && " - "}
-                    {region.crownIcons > 0 && <><b>{region.crownIcons}</b> Crown{region.crownIcons > 1 && "s"}</>}
+                    {region.crownIcons > 0 && <><b>{region.crownIcons}</b> Crown{region.crownIcons != 1 ? "s" : ""}</>}
                 </>
             )}
             {region.controlPowerToken && (
                 <><br/>Power token</>
             )}
             {loyaltyTokenCount > 0 && (
-                <><br/><b>{loyaltyTokenCount}</b> Loyalty token{loyaltyTokenCount > 1 && "s"}</>
+                <><br/><b>{loyaltyTokenCount}</b> Loyalty token{loyaltyTokenCount != 1 ? "s" : ""}</>
             )}
             {region.units.size > 0 && (
                 <div className="mt-2">{joinReactNodes(region.units.values.map(u => u.wounded ? <span key={u.id}><s>{u.type.name}</s></span> : <span key={u.id}>{u.type.name}</span>), ", ")}</div>

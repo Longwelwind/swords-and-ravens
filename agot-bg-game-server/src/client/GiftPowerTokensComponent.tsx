@@ -43,7 +43,7 @@ export default class GiftPowerTokensComponent extends Component<GiftPowerTokensC
                     <Col xs="auto">
                         <OverlayTrigger overlay={
                             <Tooltip id="gift-power-tokens-tooltip">
-                                Gift Power tokens to<br/>house <b>{this.toHouse.name}</b>
+                                Gift Power tokens to<br/>House <b>{this.toHouse.name}</b>
                             </Tooltip>}
                             popperConfig={{modifiers: [preventOverflow]}}
                             placement="auto">
