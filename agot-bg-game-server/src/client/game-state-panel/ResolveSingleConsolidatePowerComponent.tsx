@@ -109,7 +109,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<Ga
                                                     this.gameState.choosePurchaseLoan(purchasable.slotIndex, this.selectedOrderRegion as Region);
                                                     this.reset();
                                                 }}>
-                                                    Pay {purchasable.costs} Power token{purchasable.costs > 1 ? "s" : ""} to purchase {purchasable.loan.name}
+                                                    Pay {purchasable.costs} Power token{purchasable.costs != 1 ? "s" : ""} to purchase {purchasable.loan.name}
                                                 </Button>
                                             </Col>
                                         )}
@@ -143,7 +143,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<Ga
     }
 
     private getPowerTokenButtonText(powerTokenCount: number): string {
-        return `Gain ${powerTokenCount} Power token${powerTokenCount > 1 ? "s" : ""}`;
+        return `Gain ${powerTokenCount} Power token${powerTokenCount != 1 ? "s" : ""}`;
     }
 
     private modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
