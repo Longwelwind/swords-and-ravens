@@ -227,7 +227,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                 left: ironBankView.deckSlot.point.x,
                 top: ironBankView.deckSlot.point.y
             }}>
-                <div className="iron-bank-content hover-weak-outline" style={{ backgroundImage: `url(${loanCardImages.get("back")})`, width: ironBankView.deckSlot.width, height: ironBankView.deckSlot.height }} />
+                <div className="iron-bank-content hover-smedium-outline" style={{ backgroundImage: `url(${loanCardImages.get("back")})`, width: ironBankView.deckSlot.width, height: ironBankView.deckSlot.height }} />
             </div>
         </OverlayTrigger>;
     }

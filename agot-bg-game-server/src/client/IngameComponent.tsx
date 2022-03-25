@@ -503,8 +503,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             "danger" : undefined;
 
         const getPhaseHeader = (phase: GameStatePhaseProps): JSX.Element => this.props.gameState.childGameState instanceof phase.gameState
-                ? <b className={classNames("weak-outline", { "clickable dropdown-toggle": phase.name == "Westeros" })}>{phase.name} phase</b>
-                : <span className={classNames("text-muted", { "clickable dropdown-toggle": phase.name == "Westeros" })}>{phase.name} phase</span>;
+                ? <b className={classNames("weak-outline", { "clickable hover-smedium-outline dropdown-toggle": phase.name == "Westeros" })}>{phase.name} phase</b>
+                : <span className={classNames("text-muted", { "clickable hover-smedium-outline dropdown-toggle": phase.name == "Westeros" })}>{phase.name} phase</span>;
 
         return <div className={this.mapScrollbarEnabled ? "flex-ratio-container" : ""}>
             <Card id="game-state-panel" className={this.mapScrollbarEnabled ? "flex-sized-to-content" : ""} border={border} style={{maxHeight: this.mapScrollbarEnabled ? "70%" : "none", paddingRight: "10px", marginBottom: "10px" }}>
@@ -568,7 +568,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     </div>
                                 </OverlayTrigger>
                             </Row>
-                            <Row className="mx-0 clickable">
+                            <Row className="mx-0 clickable-no-underline hover-smedium-outline">
                                 <OverlayTrigger overlay={this.renderWildlingDeckPopover(knowsWildlingCard, nextWildlingCard?.type)}
                                     trigger="click"
                                     placement="auto"

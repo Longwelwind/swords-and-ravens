@@ -215,7 +215,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                             rootClose
                         >
                             <div
-                                className="house-power-token hover-weak-outline clickable"
+                                className="house-power-token hover-smedium-outline clickable"
                                 style={{
                                     backgroundImage: `url(${housePowerTokensImages.get(this.house.id)})`,
                                     marginLeft: "10px"
