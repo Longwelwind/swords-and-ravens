@@ -14,13 +14,13 @@ import TheFacelessMenLoanCardType from "./TheFacelessMenLoanCardType";
 import VanguardCavalryLoanCardType from "./VanguardCavalryLoanCardType";
 
 export const customsOfficer = new CustomsOfficerLoanCardType(
-    "customs-officer", "Customs Officer", "Gain 10 power tokens."
+    "customs-officer", "Customs Officer", "Gain 10 Power tokens."
 );
 
 export const expertArtificer = new ExpertArtificerLoanCardType(
     "expert-artificer", "Expert Artificer",
     "Choose any land area and place a power improvement there.\n" +
-        "Then, gain 8 power tokens."
+        "Then, gain 8 Power tokens."
 );
 
 export const fullHost = new FullHostLoanCardType(

@@ -407,7 +407,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                 <div className="mt-3">
                     <Button
                         onClick={() => {
-                            if (window.confirm("Are you sure you want to return all your power tokens to your pool?")) {
+                            if (window.confirm("Are you sure you want to return all your Power tokens to your pool?")) {
                                 this.props.ingame.entireGame.sendMessageToServer({
                                     type: "drop-power-tokens",
                                     house: house.id

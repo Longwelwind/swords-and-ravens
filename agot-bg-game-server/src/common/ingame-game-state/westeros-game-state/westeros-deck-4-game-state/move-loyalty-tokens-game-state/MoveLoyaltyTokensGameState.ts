@@ -85,7 +85,7 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
             return result;
         }
 
-        result.push(`Discard ${this.costsToCancelPreviousMovement} power tokens to cancel the previous movement`);
+        result.push(`Discard ${this.costsToCancelPreviousMovement} Power tokens to cancel the previous movement`);
         return result;
     }
 
@@ -109,7 +109,7 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
                 throw new Error();
             }
 
-            // Remove the power token
+            // Remove the Power token
             this.ingame.changePowerTokens(house, -this.costsToCancelPreviousMovement);
 
             // Undo the last move
@@ -158,7 +158,7 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
         });
 
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(this.game.targaryen,
-            `House Targaryen may discard ${this.costsToCancelPreviousMovement} power token${this.costsToCancelPreviousMovement != 1 ? "s" : ""} to move the loyalty\xa0token from ${this.previousMovement.to.name} back to ${this.previousMovement.from.name}.`,
+            `House Targaryen may discard ${this.costsToCancelPreviousMovement} Power token${this.costsToCancelPreviousMovement != 1 ? "s" : ""} to move the loyalty\xa0token from ${this.previousMovement.to.name} back to ${this.previousMovement.from.name}.`,
             this.getChoices(this.game.targaryen));
     }
 
