@@ -249,8 +249,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     <Modal.Body>
                         <div className="text-center">
                             The game is optimized for HD resolutions.<br/>
-                            You are using a lower resolution and for a more pleasant gaming experience you should disable <b>Map
-                            scrollbar</b> in the settings. You can find it by clicking on the gear icon.<br/><br/>
+                            You are using a lower resolution and for a pleasant gaming experience you should
+                            play around with the zoom level of your browser and the <b>Map scrollbar</b> setting.
+                            You can find it by clicking on the gear icon.<br/><br/>
                             <small><i>In your profile settings you can change the default behavior for this setting<br/>
                             for all <b>future</b> games.</i></small>
                         </div>
@@ -1018,7 +1019,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         this.onVisibilityChangedCallback = visibilityChangedCallback;
 
         const dontShowAgain = this.user?.settings.dontShowMapScrollbarInfoAgain ?? false;
-        if (screen.width < 1900 && screen.height < 1000 && this.mapScrollbarEnabled && !dontShowAgain) {
+        if (screen.width < 1920 && screen.height < 1080 && this.mapScrollbarEnabled && !dontShowAgain) {
             this.showMapScrollbarInfo = true;
         }
     }
