@@ -9,7 +9,7 @@ export default class SalladharSaanASoSHouseCardAbility extends HouseCardAbility 
             const combat = afterWinnerDetermination.combatGameState;
             const enemy = combat.getEnemy(house);
             const powerTokensGained = combat.ingameGameState.changePowerTokens(house, 2);
-            const powerTokensLost = combat.ingameGameState.changePowerTokens(house, -2);
+            const powerTokensLost = combat.ingameGameState.changePowerTokens(enemy, -2);
 
             afterWinnerDetermination.combatGameState.ingameGameState.log({
                 type: "salladhar-saan-asos-power-tokens-changed",
