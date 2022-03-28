@@ -623,11 +623,12 @@ export default class CombatGameState extends GameState<
         const specialModifier = affectedHouseCard == null || this.specialHouseCardModifier == null || this.specialHouseCardModifier.houseCard != affectedHouseCard
             ? 0
             : this.specialHouseCardModifier.combatStrength;
-        return this.getStatOfHouseCard(
+        // We need to make sure that the house card strength cannot be less than 0, because DwD Doran Martell against Balon could cause a negative house card strength.
+        return Math.max(0, this.getStatOfHouseCard(
             house,
             hc => Math.max(0, hc.combatStrength + specialModifier),
             (h, hc, a, ahc, bv) => a.modifyCombatStrength(this, h, hc, ahc, bv)
-        );
+        ));
     }
 
     getHouseCardSwordIcons(house: House): number {
