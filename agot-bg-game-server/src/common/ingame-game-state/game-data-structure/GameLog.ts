@@ -49,7 +49,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | RevealAllObjectives | GarrisonRemoved | GarrisonReturned | ObjectiveDeckEmpty | OrdersRevealed | HouseCardsReturned
     | BalonGreyjoyASoSPowerTokensGained | MaceTyrellASoSOrderPlaced | BranStarkUsed | CerseiLannisterASoSPowerTokensDiscarded
     | DoranMartellASoSUsed | MelisandreOfAsshaiPowerTokensGained | SalladharSaanASoSPowerTokensChanged | SerDavosSeaworthASoSFortificationGained
-    | CasualtiesPrevented | SerIlynPayneASoSCasualtySuffered | StannisBaratheonASoSUsed;
+    | CasualtiesPrevented | SerIlynPayneASoSCasualtySuffered | StannisBaratheonASoSUsed | AeronDamphairHouseCardChanged;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -1095,4 +1095,11 @@ interface StannisBaratheonASoSUsed {
     type: "stannis-baratheon-asos-used";
     house: string;
     oldThroneOwner: string;
+}
+
+interface AeronDamphairHouseCardChanged {
+    type: "aeron-damphair-house-card-changed";
+    house: string;
+    newHouseCard: string;
+    reducedCombatStrength: boolean;
 }

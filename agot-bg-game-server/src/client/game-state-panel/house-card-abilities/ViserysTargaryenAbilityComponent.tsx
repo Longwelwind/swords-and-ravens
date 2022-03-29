@@ -18,7 +18,7 @@ export default class ViserysTargaryenAbilityComponent extends Component<GameStat
         return (
             <>
                 <Col xs={12} className="text-center">
-                    <b>Viserys Targaryen</b>: House <b>{this.props.gameState.childGameState.house.name}</b> may discard a house card
+                    <b>Viserys Targaryen</b>: House <b>{this.props.gameState.childGameState.house.name}</b> may discard a House card
                     from their hand to add its printed combat strength to Viserys Targaryens&apos;s combat strength.
                 </Col>
                 {renderChildGameState(this.props, [

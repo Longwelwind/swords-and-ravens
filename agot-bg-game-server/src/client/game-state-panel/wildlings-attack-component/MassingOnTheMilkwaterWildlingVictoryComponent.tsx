@@ -15,7 +15,7 @@ export default class MassingOnTheMilkwaterWildlingVictoryComponent extends Compo
     render(): ReactNode {
         return (
             <>
-                <Col xs={12} className="text-center">Houses choose their house cards to discard.</Col>
+                <Col xs={12} className="text-center">Houses choose their House cards to discard.</Col>
                 {renderChildGameState(this.props, [
                     [SelectHouseCardGameState, SelectHouseCardComponent]
                 ])}

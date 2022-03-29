@@ -18,7 +18,7 @@ export default class AeronDamphairAbilityComponent extends Component<GameStateCo
         return (
             <>
                 <Col xs={12} className="text-center">
-                    <b>Aeron Damphair:</b> House <b>{this.props.gameState.childGameState.house.name}</b> can spend 2 Power tokens to change their house card.
+                    <b>Aeron Damphair:</b> House <b>{this.props.gameState.childGameState.house.name}</b> may discard 2 Power tokens to change their House card.
                 </Col>
                 {renderChildGameState(this.props, [
                     [SimpleChoiceGameState, SimpleChoiceComponent],

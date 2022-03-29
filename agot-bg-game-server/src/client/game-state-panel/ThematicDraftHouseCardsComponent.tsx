@@ -27,7 +27,7 @@ export default class ThematicDraftHouseCardsComponent extends Component<GameStat
                         <>
                             <Row  className="justify-content-center">
                                 <Col xs="12" className="text-center">
-                                    Please select a house card:
+                                    Please select a House card:
                                 </Col>
                             </Row>
                             <Row className="justify-content-center">
