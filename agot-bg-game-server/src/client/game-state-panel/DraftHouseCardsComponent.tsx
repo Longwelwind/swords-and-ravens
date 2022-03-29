@@ -52,8 +52,8 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                     </Row>
                     <Row>
                         <p>
-                            <b>Note</b>: All house cards work in a generic way.<br/>
-                            That means house card abilities (e.g. Salladhor) referring to specific houses are always available for any house you use.<br/>
+                            <b>Note</b>: All House cards work in a generic way.<br/>
+                            That means House card abilities (e.g. Salladhor) referring to specific houses are always available for any house you use.<br/>
                             Character references are equivalent to the same-strength character in your hand (e.g. Reek and any 3-strength card).<br/>
                             References to capitals always refer to your house&apos;s home territory (e.g. Littlefinger).
                         </p>
@@ -72,7 +72,7 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                     </Row>}
                     {this.player && !this.doesControlHouse &&
                     <Row>
-                        <Col xs="12" className="text-center">These are the house cards from which you may choose one on your next turn:</Col>
+                        <Col xs="12" className="text-center">These are the House cards from which you may choose one on your next turn:</Col>
                         <Col xs="12">
                             <Row className="justify-content-center">
                                 {this.props.gameState.getAllHouseCards().map(hc => (
@@ -89,7 +89,7 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                     </Row>}
                     {!this.player &&
                     <Row>
-                        <Col xs="12" className="text-center">These are all remaining house cards:</Col>
+                        <Col xs="12" className="text-center">These are all remaining House cards:</Col>
                             <Col xs="12">
                                 <Row className="justify-content-center">
                                     {remainingCardsForSpectators.map(hc => (

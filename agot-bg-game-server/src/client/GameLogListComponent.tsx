@@ -169,7 +169,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         text = "made their bid";
                         break;
                     case PlayerActionType.HOUSE_CARD_CHOSEN:
-                        text = "has chosen their House card";
+                        text = "chose their House card";
                         break;
                     default:
                         text = "Invalid PlayerActionType received"
@@ -589,7 +589,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "draft-house-cards-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h5><b>Draft House Cards</b></h5>
+                        <h5><b>Draft House cards</b></h5>
                     </Col>
                 </Row>;
 
@@ -604,7 +604,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "house-cards-chosen": {
                 const house = this.game.houses.get(data.house);
                 return <>
-                    <p>House <b>{house.name}</b> has chosen their house cards.</p>
+                    <p>House <b>{house.name}</b> has chosen their House cards.</p>
                 </>;
             }
 
@@ -1060,7 +1060,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <p>
                     <b>Massing on the Milkwater</b>: House <b>{house.name}</b> {houseCardsReturned.length > 0 ? <>took
                     back {joinReactNodes(houseCardsReturned.map(hc => <b key={`massing-on-the-milkwater-cards-back_${hc.id}`}>{hc.name}</b>), ", ")}.</>
-                    : <>had no house cards on their discard pile.</>}
+                    : <>had no House cards on their discard pile.</>}
                 </p>;
             }
             case "massing-on-the-milkwater-wildling-victory": {
@@ -1866,6 +1866,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     <b>Stannis Baratheon</b>: House <b>{house.name}</b> has stolen the Iron Throne dominance token from House <b>{oldThroneOwner.name}</b>.
+                </p>;
+            }
+            case "aeron-damphair-house-card-changed": {
+                const house = this.game.houses.get(data.house);
+                const newHouseCard = this.allHouseCards.get(data.newHouseCard);
+
+                return <p>
+                    <b>Aeron Damphair</b>: House <b>{house.name}</b> chose to discard <b>2</b> Power tokens to use <b>{newHouseCard.name}
+                        </b> as their new House card{data.reducedCombatStrength ? <> at the cost of <b>-1</b> combat strength</> : ""}.
                 </p>;
             }
         }

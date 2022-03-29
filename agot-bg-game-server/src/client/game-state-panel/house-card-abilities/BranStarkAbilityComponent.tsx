@@ -17,7 +17,7 @@ export default class BranStarkAbilityComponent extends Component<GameStateCompon
         return (
             <>
                 <Col xs={12} className="text-center">
-                    <b>Bran Stark</b>: House <b>{this.props.gameState.childGameState.house.name}</b> may return one House Card from their discard pile.
+                    <b>Bran Stark</b>: House <b>{this.props.gameState.childGameState.house.name}</b> may return one House card from their discard pile.
                 </Col>
                 {renderChildGameState(this.props, [
                     [SimpleChoiceGameState, SimpleChoiceComponent],

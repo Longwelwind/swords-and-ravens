@@ -32,7 +32,7 @@ export default class AeronDamphairAbilityGameState extends GameState<
 
     firstStart(house: House, reduceCombatStrengthOfNewHouseCard: boolean): void {
         // If the house doesn't have 2 Power tokens, or doesn't have other available
-        // house cards, don't even ask.
+        // House cards, don't even ask.
         this.reduceCombatStrengthOfNewHouseCard = reduceCombatStrengthOfNewHouseCard;
         const availableHouseCards = this.getAvailableHouseCards(house);
         if (house.powerTokens < 2 || availableHouseCards.length == 0) {
@@ -70,7 +70,7 @@ export default class AeronDamphairAbilityGameState extends GameState<
     }
 
     onSelectHouseCardFinish(house: House, houseCard: HouseCard): void {
-        // Discard Aeron Damphair, which should normally be the current house card
+        // Discard Aeron Damphair, which should normally be the current House card
         // of "house".
         const houseCombatData = this.combatGameState.houseCombatDatas.get(house);
         const aeronDamphairHouseCard = houseCombatData.houseCard;
@@ -90,7 +90,7 @@ export default class AeronDamphairAbilityGameState extends GameState<
             state: HouseCardState.USED
         });
 
-        // Mark the new house card as the one used by the house
+        // Mark the new House card as the one used by the house
         houseCombatData.houseCard = houseCard;
 
         this.entireGame.broadcastToClients({
@@ -109,6 +109,13 @@ export default class AeronDamphairAbilityGameState extends GameState<
                 combatStrength: this.combatGameState.specialHouseCardModifier.combatStrength
             });
         }
+
+        this.ingame.log({
+            type: "aeron-damphair-house-card-changed",
+            house: house.id,
+            newHouseCard: houseCard.id,
+            reducedCombatStrength: this.reduceCombatStrengthOfNewHouseCard
+        });
 
         this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);
     }

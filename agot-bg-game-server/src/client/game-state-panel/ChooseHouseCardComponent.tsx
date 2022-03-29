@@ -84,7 +84,7 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
             this.combat.stats.length > 0 ? <></> :
             <>
                 <Col xs={12} className="text-center">
-                    The attacker and the defender must choose a House Card
+                    The attacker and the defender must choose a House card
                 </Col>
                 {this.shouldChooseHouseCard() && this.combat.rerender >= 0 && (
                     <>
@@ -124,7 +124,7 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
                                         checked={this.burnValyrianSteelBlade}
                                         onChange={() => {
                                             if (!this.burnValyrianSteelBlade && !window.confirm(
-                                                "Are you sure you want to use the VSB right now without knowing which house card the opponent has selected?\n\n"
+                                                "Are you sure you want to use the VSB right now without knowing which House card the opponent has selected?\n\n"
                                                 + "This could be useful, for example, if you think Doran Martell or Ser Gerris Drinkwater will take your blade soon. "
                                                 + "Then it might make sense to burn the blade now in any case, because the game might not ask you later "
                                                 + "if the blade can't be used usefully."

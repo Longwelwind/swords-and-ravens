@@ -149,9 +149,9 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="adwd-house-cards-tooltip">
-                                    When this option is enabled, the house cards from the <i>A Dance with Dragons</i> and <i>A Feast for Crows</i> expansions are used.
+                                    When this option is enabled, the House cards from the <i>A Dance with Dragons</i> and <i>A Feast for Crows</i> expansions are used.
                                 </Tooltip>}>
-                                <label htmlFor="adwd-house-cards">Use <i>ADwD</i> house cards</label>
+                                <label htmlFor="adwd-house-cards">Use <i>ADwD</i> House cards</label>
                             </OverlayTrigger>}
                         checked={this.gameSettings.adwdHouseCards}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.adwdHouseCards = !this.gameSettings.adwdHouseCards)}
@@ -164,9 +164,9 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="asos-house-cards-setting-tooltip">
-                                    When this option is enabled, the house cards from the 1st edition expansion <i>A Storm of Swords</i> are used.
+                                    When this option is enabled, the House cards from the 1st edition expansion <i>A Storm of Swords</i> are used.
                                 </Tooltip>}>
-                                <label htmlFor="asos-house-cards-setting">Use <i>ASoS</i> house cards (<i>BETA</i>)</label>
+                                <label htmlFor="asos-house-cards-setting">Use <i>ASoS</i> House cards (<i>BETA</i>)</label>
                             </OverlayTrigger>}
                         checked={this.gameSettings.asosHouseCards}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.asosHouseCards = !this.gameSettings.asosHouseCards)}
@@ -289,11 +289,11 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="draft-house-cards-tooltip">
-                                    Players will draft their house cards or a position on a chosen Influence track step by step
-                                    in a randomly chosen order before the game starts. House cards can be chosen from all 2nd Edition Base Game house cards
-                                    and from all 2nd Edition expansions (ADwD, AFfC, MoD) house cards.
+                                    Players will draft their House cards or a position on a chosen Influence track step by step
+                                    in a randomly chosen order before the game starts. House cards can be chosen from all 2nd Edition Base Game House cards
+                                    and from all expansions (ASoS, ADwD, AFfC, MoD) House cards.
                                 </Tooltip>}>
-                                <label htmlFor="draft-house-cards-settings">Draft house cards</label>
+                                <label htmlFor="draft-house-cards-settings">Draft House cards</label>
                             </OverlayTrigger>}
                         checked={this.gameSettings.draftHouseCards}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.draftHouseCards = !this.gameSettings.draftHouseCards)}
@@ -306,9 +306,9 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="limited-draft-tooltip">
-                                    Same as normal draft mode but house cards can be chosen from the selected game scenario only.
+                                    Same as normal draft mode but House cards can be chosen from the selected game scenario only.
                                 </Tooltip>}>
-                                <label htmlFor="limited-draft-setting">Limited draft</label>
+                                <label htmlFor="limited-draft-setting">Limited Draft</label>
                             </OverlayTrigger>}
                         checked={this.gameSettings.limitedDraft}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.limitedDraft = !this.gameSettings.limitedDraft)}
@@ -321,10 +321,10 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="thematic-draft-tooltip">
-                                    Players will draft their house cards simultaneously from the available decks of their house.
+                                    Players will draft their House cards simultaneously from the available decks of their house.
                                     Afterwards players will draft the Influence tracks step by step in a randomly chosen order.
                                 </Tooltip>}>
-                                <label htmlFor="thematic-draft-setting">Thematic draft</label>
+                                <label htmlFor="thematic-draft-setting">Thematic Draft</label>
                             </OverlayTrigger>}
                         checked={this.gameSettings.thematicDraft}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.thematicDraft = !this.gameSettings.thematicDraft)}
@@ -337,9 +337,9 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="blind-draft-tooltip">
-                                    Players receive random house cards and influence positions. Can be combined with limited draft.
+                                    Players receive random House cards and Influence positions. Can be combined with <i>Limited Draft</i>.
                                 </Tooltip>}>
-                                <label htmlFor="blind-draft-setting">Blind draft</label>
+                                <label htmlFor="blind-draft-setting">Blind Draft</label>
                             </OverlayTrigger>}
                         checked={this.gameSettings.blindDraft}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.blindDraft = !this.gameSettings.blindDraft)}

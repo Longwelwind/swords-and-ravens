@@ -42,7 +42,7 @@ export default class RobertArrynAbilityComponent extends Component<GameStateComp
                 )}
                 {this.selectHouseCard && (
                     <Col xs={12} className="text-center">
-                        <b>Robert Arryn</b>: House <b>{this.house.name}</b> has to decide which house card to remove from the game.
+                        <b>Robert Arryn</b>: House <b>{this.house.name}</b> has to decide which House card to remove from the game.
                     </Col>
                 )}
                 {renderChildGameState(this.props, [
