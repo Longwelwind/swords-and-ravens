@@ -33,7 +33,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     name: string;
     leafStateId = v4();
 
-    @observable gameSettings: GameSettings = { pbem: true, onlyLive: false, startWhenFull: false, setupId: "mother-of-dragons", playerCount: 8,
+    @observable gameSettings: GameSettings = { setupId: "mother-of-dragons", playerCount: 8, pbem: true, onlyLive: false, startWhenFull: false, private: false,
         adwdHouseCards: false, asosHouseCards: false, randomHouses: false, randomChosenHouses: false,  tidesOfBattle: false,
         vassals: true, ironBank: true, seaOrderTokens: true, allowGiftingPowerTokens: true,
         draftHouseCards: false, thematicDraft: false, limitedDraft: false, blindDraft: false,
@@ -279,7 +279,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 return false;
             }
 
-            // Only allow PBEM to be changed ingame
+            // Only allow PBEM and Private to be changed ingame
             const settings = message.settings as GameSettings;
 
             if (!this.gameSettings.pbem && this.gameSettings.onlyLive) {
@@ -309,7 +309,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 settings.onlyLive = false;
             }
 
-            // For changing settings other than PBEM pass the message to the client game state
+            this.gameSettings.private = message.settings.private;
+
+            // For changing settings other than PBEM or Private pass the message to the client game state
             this.childGameState.onClientMessage(user, message);
 
             this.broadcastToClients({
@@ -570,11 +572,12 @@ export interface SerializedEntireGame {
 }
 
 export interface GameSettings {
+    setupId: string;
+    playerCount: number;
     pbem: boolean;
     onlyLive: boolean;
     startWhenFull: boolean;
-    setupId: string;
-    playerCount: number;
+    private: boolean;
     randomHouses: boolean;
     randomChosenHouses: boolean;
     adwdHouseCards: boolean;

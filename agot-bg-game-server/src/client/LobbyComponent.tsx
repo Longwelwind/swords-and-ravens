@@ -98,87 +98,89 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                     </Card>
                 </Col>
                 <Col xs={10} xl={8}>
-                    <Card>
-                        <Card.Body style={{paddingTop: "10px", paddingBottom: "10px"}}>
-                            <Row>
-                                <GameSettingsComponent
-                                    gameClient={this.props.gameClient}
-                                    entireGame={this.lobby.entireGame} />
-                            </Row>
-                            {(this.props.gameClient.isRealOwner() || this.props.gameState.password != "") &&
-                            <Row className="mt-2">
-                                <Col>
-                                    <Row className="justify-content-center">
-                                        <DebouncedPasswordComponent
-                                            password={this.password}
-                                            onChangeCallback={newPassword => {
-                                                this.password = newPassword;
-                                                this.props.gameState.sendPassword(newPassword);
-                                            }}
-                                        />
-                                    </Row>
-                                </Col>
-                            </Row>}
-                            <Row className="mt-3">
-                                <Col>
-                                    <Button
-                                        block
-                                        onClick={() => this.lobby.start()}
-                                        disabled={!canStartGame}
-                                    >
-                                        <ConditionalWrap
-                                            condition={!canStartGame}
-                                            wrap={children =>
-                                                <OverlayTrigger
-                                                    overlay={
-                                                        <Tooltip id="start-game">
-                                                            {canStartGameReason == "not-enough-players" ?
-                                                                "More players must join to be able to start the game."
-                                                            : canStartGameReason == "targaryen-must-be-a-player-controlled-house" ?
-                                                                "House Targaryen must be chosen by a player"
-                                                            : canStartGameReason == "not-owner" ?
-                                                                "Only the owner of the game can start it"
-                                                            : null}
-                                                        </Tooltip>
-                                                    }
-                                                >
-                                                    {children}
-                                                </OverlayTrigger>
-                                            }
+                    <Row className="justify-content-center no-space-around">
+                        <Card>
+                            <Card.Body style={{paddingTop: "10px", paddingBottom: "10px"}}>
+                                <Row>
+                                    <GameSettingsComponent
+                                        gameClient={this.props.gameClient}
+                                        entireGame={this.lobby.entireGame} />
+                                </Row>
+                                {(this.props.gameClient.isRealOwner() || this.props.gameState.password != "") &&
+                                <Row className="mt-2">
+                                    <Col>
+                                        <Row className="justify-content-center">
+                                            <DebouncedPasswordComponent
+                                                password={this.password}
+                                                onChangeCallback={newPassword => {
+                                                    this.password = newPassword;
+                                                    this.props.gameState.sendPassword(newPassword);
+                                                }}
+                                            />
+                                        </Row>
+                                    </Col>
+                                </Row>}
+                                <Row className="mt-3">
+                                    <Col>
+                                        <Button
+                                            block
+                                            onClick={() => this.lobby.start()}
+                                            disabled={!canStartGame}
                                         >
-                                            <span>Start</span>
-                                        </ConditionalWrap>
-                                    </Button>
-                                </Col>
-                                <Col xs="auto">
-                                    <Button
-                                        variant="danger"
-                                        onClick={() => this.cancel()}
-                                        disabled={!canCancelGame}
-                                    >
-                                        <ConditionalWrap
-                                            condition={!canCancelGame}
-                                            wrap={children =>
-                                                <OverlayTrigger
-                                                    overlay={
-                                                        <Tooltip id="start-game">
-                                                            {canCancelGameReason == "not-owner" ?
-                                                                "Only the owner of the game can cancel it"
-                                                            : null}
-                                                        </Tooltip>
-                                                    }
-                                                >
-                                                    {children}
-                                                </OverlayTrigger>
-                                            }
+                                            <ConditionalWrap
+                                                condition={!canStartGame}
+                                                wrap={children =>
+                                                    <OverlayTrigger
+                                                        overlay={
+                                                            <Tooltip id="start-game">
+                                                                {canStartGameReason == "not-enough-players" ?
+                                                                    "More players must join to be able to start the game."
+                                                                : canStartGameReason == "targaryen-must-be-a-player-controlled-house" ?
+                                                                    "House Targaryen must be chosen by a player"
+                                                                : canStartGameReason == "not-owner" ?
+                                                                    "Only the owner of the game can start it"
+                                                                : null}
+                                                            </Tooltip>
+                                                        }
+                                                    >
+                                                        {children}
+                                                    </OverlayTrigger>
+                                                }
+                                            >
+                                                <span>Start</span>
+                                            </ConditionalWrap>
+                                        </Button>
+                                    </Col>
+                                    <Col xs="auto">
+                                        <Button
+                                            variant="danger"
+                                            onClick={() => this.cancel()}
+                                            disabled={!canCancelGame}
                                         >
-                                            <FontAwesomeIcon icon={faTimes} />
-                                        </ConditionalWrap>
-                                    </Button>
-                                </Col>
-                            </Row>
-                        </Card.Body>
-                    </Card>
+                                            <ConditionalWrap
+                                                condition={!canCancelGame}
+                                                wrap={children =>
+                                                    <OverlayTrigger
+                                                        overlay={
+                                                            <Tooltip id="start-game">
+                                                                {canCancelGameReason == "not-owner" ?
+                                                                    "Only the owner of the game can cancel it"
+                                                                : null}
+                                                            </Tooltip>
+                                                        }
+                                                    >
+                                                        {children}
+                                                    </OverlayTrigger>
+                                                }
+                                            >
+                                                <FontAwesomeIcon icon={faTimes} />
+                                            </ConditionalWrap>
+                                        </Button>
+                                    </Col>
+                                </Row>
+                            </Card.Body>
+                        </Card>
+                    </Row>
                 </Col>
         </>;
     }

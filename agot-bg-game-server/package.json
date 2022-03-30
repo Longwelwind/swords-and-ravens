@@ -4,9 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.36",
-    "@fortawesome/free-solid-svg-icons": "^5.15.4",
-    "@fortawesome/react-fontawesome": "^0.1.16",
+    "@fortawesome/fontawesome-svg-core": "^6.1.1",
+    "@fortawesome/free-solid-svg-icons": "^6.1.1",
+    "@fortawesome/react-fontawesome": "^0.1.18",
     "@sentry/node": "^6.16.1",
     "@types/classnames": "^2.3.1",
     "@types/dotenv": "^8.2.0",

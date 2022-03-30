@@ -169,11 +169,14 @@ def games(request):
         # This means that "game.players" will only contain one entry, the one related to the authenticated player.
         five_days_past = timezone.now() - timedelta(days=5)
         two_days_past = timezone.now() - timedelta(days=2)
+        three_weeks_past = timezone.now() - timedelta(days=21)
         games_query = Game.objects.annotate(players_count=Count('players'),\
             replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()),\
             is_faceless=Cast(KeyTextTransform('faceless', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
+            is_private=Cast(KeyTextTransform('private', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
             inactive_5=ExpressionWrapper(Q(last_active_at__lt=five_days_past), output_field=BooleanField()),\
-            inactive_2=ExpressionWrapper(Q(last_active_at__lt=two_days_past), output_field=BooleanField())\
+            inactive_2=ExpressionWrapper(Q(last_active_at__lt=two_days_past), output_field=BooleanField()),\
+            inactive_21=ExpressionWrapper(Q(last_active_at__lt=three_weeks_past), output_field=BooleanField())\
             ).prefetch_related('owner')
 
         if request.user.is_authenticated:
@@ -189,10 +192,11 @@ def games(request):
         # It is done in Python
         games = sorted(games, key=lambda game: ([IN_LOBBY, ONGOING].index(game.state), -datetime.timestamp(game.last_active_at)))
 
+        my_games = []
         active_games = []
         inactive_games = []
         replacement_needed_games = []
-        my_games = []
+        inactive_private_games = []
         open_live_games = []
 
         for game in games:
@@ -202,7 +206,7 @@ def games(request):
             if request.user.is_authenticated:
                 game.player_in_game = game.player_in_game[0] if len(game.player_in_game) > 0 else None
 
-                if game.state == ONGOING and game.inactive_2 and len(game.inactive_players) > 0 and not game.replace_player_vote_ongoing:
+                if game.state == ONGOING and not game.is_private and game.inactive_2 and len(game.inactive_players) > 0 and not game.replace_player_vote_ongoing:
                     inactive_players = ""
                     for inactive_player in game.inactive_players:
                         house = inactive_player.data.get("house", "Unknown House").capitalize()
@@ -238,9 +242,12 @@ def games(request):
             if game.inactive_players is not None:
                 replacement_needed_games.append(game)
 
-            if not game.inactive_5 or game.state == IN_LOBBY:
+            if game.is_private and game.inactive_21:
+                inactive_private_games.append(game)
+
+            if (game.is_private and game not in inactive_private_games) or not game.inactive_5 or game.state == IN_LOBBY:
                 active_games.append(game)
-            elif game not in replacement_needed_games:
+            elif game not in replacement_needed_games and not game.is_private:
                 inactive_games.append(game)
 
             if game.player_in_game:
@@ -257,6 +264,7 @@ def games(request):
             "my_games": my_games,
             "open_live_games": open_live_games,
             "replacement_needed_games": replacement_needed_games,
+            "inactive_private_games": inactive_private_games,
             "public_room_id": public_room_id
         })
     elif request.method == "POST":

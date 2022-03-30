@@ -98,6 +98,21 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                         onChange={() => this.changeGameSettings(() => this.gameSettings.onlyLive = !this.gameSettings.onlyLive)}
                                     />
                                 )}
+                                <FormCheck
+                                    id="private-game-setting"
+                                    className="mx-3 mt-2"
+                                    type="switch"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="private-game-setting-tooltip">
+                                                Enable this option if you know all participants and if you want to prevent
+                                                security and replacement mechanisms from being activated.
+                                            </Tooltip>}>
+                                            <label htmlFor="private-game-setting">Private Game</label>
+                                        </OverlayTrigger>}
+                                    checked={this.gameSettings.private}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.private = !this.gameSettings.private)}
+                                />
                             </Col>
                         </Row>)}
                 </Row>
