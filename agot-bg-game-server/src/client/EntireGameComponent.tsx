@@ -21,7 +21,7 @@ import DraftHouseCardsGameState from "../common/ingame-game-state/draft-house-ca
 import { observable } from "mobx";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faExclamation } from "@fortawesome/free-solid-svg-icons";
+import { faExclamation, faLock } from "@fortawesome/free-solid-svg-icons";
 
 interface EntireGameComponentProps {
     entireGame: EntireGame;
@@ -39,6 +39,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             </Helmet>
             <Col xs={12} className={this.props.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
                 <Row className="justify-content-center align-items-center">
+                    {this.renderPrivateBadge()}
                     {this.renderHouseIcon()}
                     <Col xs="auto">
                         <h4>{this.props.entireGame.name}</h4>
@@ -85,6 +86,15 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 >
                     <img src={rollingDicesImage} width="30" />
                 </OverlayTrigger>
+            </Col>;
+    }
+
+    renderPrivateBadge(): ReactNode {
+        return !this.props.entireGame.gameSettings.private ? <></> :
+            <Col xs="auto">
+                <h4>
+                    <Badge variant="primary"><FontAwesomeIcon icon={faLock} className="mr-2" size="sm"/>PRIVATE</Badge>
+                </h4>
             </Col>;
     }
 

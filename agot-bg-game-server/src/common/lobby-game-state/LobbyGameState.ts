@@ -127,6 +127,14 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 });
                 // Always send back the chosen password to the owner
                 answer = message.password;
+
+                if (answer != "") {
+                    this.entireGame.gameSettings.private = true;
+                    this.entireGame.broadcastToClients({
+                        type: "game-settings-changed",
+                        settings: this.entireGame.gameSettings
+                    });
+                }
             } else {
                 // If user sent the correct password, or no password is set
                 // send back the correct password

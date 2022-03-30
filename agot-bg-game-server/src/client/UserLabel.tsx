@@ -50,7 +50,7 @@ export default class UserLabel extends Component<UserLabelProps> {
                         <OverlayTrigger overlay={<Tooltip id={`${this.user.id}-connection-tooltip`}>{this.user.connected ? "Connected" : "Disconnected"}</Tooltip>}>
                             <FontAwesomeIcon icon={faWifi} className={this.user.connected ? "text-success" : "text-danger"} />
                         </OverlayTrigger>
-                        {this.user.otherUsersFromSameNetwork.length > 0 && this.renderOtherUsersFromSameNetworkTooltip()}
+                        {!this.props.gameState.entireGame.gameSettings.private && this.user.otherUsersFromSameNetwork.length > 0 && this.renderOtherUsersFromSameNetworkTooltip()}
                     </small>
                 </Navbar.Brand>
                 <Navbar.Collapse id={`navbar-${this.user.id}`} className="no-space-around">
