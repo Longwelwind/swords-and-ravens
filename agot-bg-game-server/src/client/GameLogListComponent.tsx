@@ -803,7 +803,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const chooseToReplace = data.chooseToReplace;
 
                 return <p>
-                    <b>Tyrion Lannister</b>: House <b>{house.name}</b> {!chooseToReplace && "didn't "}force{chooseToReplace && "d"} <b>
+                    <b>Tyrion Lannister</b>: House <b>{house.name}</b> {!chooseToReplace && "didn't "}force{chooseToReplace && "d"} House <b>
                         {affectedHouse.name}</b> to choose a new House card.
                 </p>;
             }
