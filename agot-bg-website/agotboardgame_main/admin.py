@@ -9,7 +9,7 @@ class GameAdmin(admin.ModelAdmin):
 
 @admin.register(PlayerInGame)
 class PlayerInGameAdmin(admin.ModelAdmin):
-    search_fields = ("user__username__startswith", )
+    search_fields = ("user__username__startswith", "game__id__startswith", "game__name__startswith")
 
 @admin.register(PbemResponseTime)
 class PbemResponseTimeAdmin(admin.ModelAdmin):
