@@ -45,76 +45,75 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             {this.selectedGameSetupName}
                         </Col>
                     )}
-                    {this.props.entireGame.entireGame.childGameState instanceof IngameGameState && this.props.entireGame.gameSettings.onlyLive ? <></> : (
-                        <Row className="justify-content-center">
-                            <Col xs={12} className="d-flex align-items-center">
-                                <OverlayTrigger overlay={
-                                    <Tooltip id="pbem-tooltip">
-                                        <b>Live Game</b><br />
-                                        A live game can be played when all players are online.
-                                        They are notified by sound when it is their turn.<br /><br />
-                                        <b>P</b>lay <b>B</b>y <b>E</b>-<b>M</b>ail<br />
-                                        The asynchronous game mode. Players receive an e-mail when it is their turn.
-                                        Those games are typically played over days or weeks.
-                                    </Tooltip>}
-                                >
-                                    <select id="pbem-setting" name="pbem"
-                                        value={this.gameSettings.pbem ? "PBEM" : "Live"}
-                                        onChange={e => this.changeGameSettings(() => this.gameSettings.pbem = e.target.value == "PBEM")}>
-                                        <option key="Live" value="Live">Live Game</option>
-                                        <option key="PBEM" value="PBEM">Play By E-Mail</option>
-                                    </select>
-                                </OverlayTrigger>
-                                {this.gameSettings.pbem && !(this.props.entireGame.childGameState instanceof IngameGameState) && (
-                                    <FormCheck
-                                        id="start-when-full-setting"
-                                        className="mx-3 mt-2"
-                                        type="switch"
-                                        label={
-                                            <OverlayTrigger overlay={
-                                                <Tooltip id="start-when-full-setting-tooltip">
-                                                    When this option is enabled, the game will start automatically once all seats are taken.
-                                                </Tooltip>}>
-                                                <label htmlFor="start-when-full-setting">Start when full</label>
-                                            </OverlayTrigger>}
-                                        checked={this.gameSettings.startWhenFull}
-                                        onChange={() => this.changeGameSettings(() => this.gameSettings.startWhenFull = !this.gameSettings.startWhenFull)}
-                                    />
-                                )}
-                                {!this.gameSettings.pbem && !(this.props.entireGame.childGameState instanceof IngameGameState) && (
-                                    <FormCheck
-                                        id="only-live-setting"
-                                        className="mx-3 mt-2"
-                                        type="switch"
-                                        label={
-                                            <OverlayTrigger overlay={
-                                                <Tooltip id="only-live-setting-tooltip">
-                                                    When this option is enabled, the owner of the game will not be able to switch the game to PBEM in-game.
-                                                    In addition, the number of positive votes required is reduced to a fixed value of 3 to make it easier to turn quitters into vassals.
-                                                </Tooltip>}>
-                                                <label htmlFor="only-live-setting">No PBEM</label>
-                                            </OverlayTrigger>}
-                                        checked={this.gameSettings.onlyLive}
-                                        onChange={() => this.changeGameSettings(() => this.gameSettings.onlyLive = !this.gameSettings.onlyLive)}
-                                    />
-                                )}
+                    <Row className="justify-content-center">
+                        <Col xs={12} className="d-flex align-items-center">
+                            {this.props.entireGame.entireGame.childGameState instanceof IngameGameState && this.props.entireGame.gameSettings.onlyLive ? <></> : <OverlayTrigger overlay={
+                                <Tooltip id="pbem-tooltip">
+                                    <b>Live Game</b><br />
+                                    A live game can be played when all players are online.
+                                    They are notified by sound when it is their turn.<br /><br />
+                                    <b>P</b>lay <b>B</b>y <b>E</b>-<b>M</b>ail<br />
+                                    The asynchronous game mode. Players receive an e-mail when it is their turn.
+                                    Those games are typically played over days or weeks.
+                                </Tooltip>}
+                            >
+                                <select id="pbem-setting" name="pbem"
+                                    value={this.gameSettings.pbem ? "PBEM" : "Live"}
+                                    onChange={e => this.changeGameSettings(() => this.gameSettings.pbem = e.target.value == "PBEM")}>
+                                    <option key="Live" value="Live">Live Game</option>
+                                    <option key="PBEM" value="PBEM">Play By E-Mail</option>
+                                </select>
+                            </OverlayTrigger>}
+                            {this.gameSettings.pbem && !(this.props.entireGame.childGameState instanceof IngameGameState) && (
                                 <FormCheck
-                                    id="private-game-setting"
+                                    id="start-when-full-setting"
                                     className="mx-3 mt-2"
                                     type="switch"
                                     label={
                                         <OverlayTrigger overlay={
-                                            <Tooltip id="private-game-setting-tooltip">
-                                                Enable this option if you know all participants and if you want to prevent
-                                                security and replacement mechanisms from being activated.
+                                            <Tooltip id="start-when-full-setting-tooltip">
+                                                When this option is enabled, the game will start automatically once all seats are taken.
                                             </Tooltip>}>
-                                            <label htmlFor="private-game-setting">Private Game</label>
+                                            <label htmlFor="start-when-full-setting">Start when full</label>
                                         </OverlayTrigger>}
-                                    checked={this.gameSettings.private}
-                                    onChange={() => this.changeGameSettings(() => this.gameSettings.private = !this.gameSettings.private)}
+                                    checked={this.gameSettings.startWhenFull}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.startWhenFull = !this.gameSettings.startWhenFull)}
                                 />
-                            </Col>
-                        </Row>)}
+                            )}
+                            {!this.gameSettings.pbem && !(this.props.entireGame.childGameState instanceof IngameGameState) && (
+                                <FormCheck
+                                    id="only-live-setting"
+                                    className="mx-3 mt-2"
+                                    type="switch"
+                                    label={
+                                        <OverlayTrigger overlay={
+                                            <Tooltip id="only-live-setting-tooltip">
+                                                When this option is enabled, the owner of the game will not be able to switch the game to PBEM in-game.
+                                                In addition, the number of positive votes required is reduced to a fixed value of 3 to make it easier to turn quitters into vassals.
+                                            </Tooltip>}>
+                                            <label htmlFor="only-live-setting">No PBEM</label>
+                                        </OverlayTrigger>}
+                                    checked={this.gameSettings.onlyLive}
+                                    onChange={() => this.changeGameSettings(() => this.gameSettings.onlyLive = !this.gameSettings.onlyLive)}
+                                />
+                            )}
+                            <FormCheck
+                                id="private-game-setting"
+                                className="mx-3 mt-2"
+                                type="switch"
+                                label={
+                                    <OverlayTrigger overlay={
+                                        <Tooltip id="private-game-setting-tooltip">
+                                            Enable this option if you know all participants and if you want to prevent
+                                            security and replacement mechanisms from being activated.
+                                        </Tooltip>}>
+                                        <label htmlFor="private-game-setting">Private Game</label>
+                                    </OverlayTrigger>}
+                                checked={this.gameSettings.private}
+                                onChange={() => this.changeGameSettings(() => this.gameSettings.private = !this.gameSettings.private)}
+                            />
+                        </Col>
+                    </Row>
                 </Row>
                 {this.props.entireGame.childGameState instanceof LobbyGameState && this.renderLobbySettings()}
             </Col>

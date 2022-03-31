@@ -8,8 +8,4 @@ class RoomAdmin(admin.ModelAdmin):
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
-    search_fields = ("user__username__startswith", "room__id__startswith")
-
-""" @admin.register(UserInRoom)
-class UserInRoomAdmin(admin.ModelAdmin):
-    pass """
+    search_fields = ("user__username__startswith", "room__id__startswith", "room__name__icontains")
