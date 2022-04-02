@@ -4,7 +4,7 @@ from chat.models import UserInRoom, Message, Room
 
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ("name__icontains", "id__startswith")
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):

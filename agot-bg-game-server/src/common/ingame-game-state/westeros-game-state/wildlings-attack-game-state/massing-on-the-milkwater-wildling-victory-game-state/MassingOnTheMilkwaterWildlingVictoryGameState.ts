@@ -60,7 +60,7 @@ export default class MassingOnTheMilkwaterWildlingVictoryGameState extends Wildl
             type: "massing-on-the-milkwater-house-cards-removed",
             house: this.parentGameState.lowestBidder.id,
             houseCardsUsed: cardsToDiscard.map(hc => hc.id)
-        });
+        }, true);
 
         this.proceedNextHouse(house);
     }
