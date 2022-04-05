@@ -19,7 +19,7 @@ export default class TheBurdenOfPowerGameState extends GameState<WesterosGameSta
 
     firstStart(): void {
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(this.game.ironThroneHolder,
-            "The holder of the Iron Throne token chooses whether a) the Wilding track is reduced to the \x220\x22 position, or everyone musters units in Strongholds and Castles.",
+            "The holder of the Iron Throne token chooses whether a) the Wilding track is reduced to the \x220\x22 position, or b) everyone musters units in Strongholds and Castles.",
             ["Reduce the Wildling track to 0", "Mustering"]
         );
     }

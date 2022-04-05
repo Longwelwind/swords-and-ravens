@@ -194,7 +194,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <Row className="justify-content-center">
                     <Col xs={true}><hr/></Col>
                     <Col xs="auto">
-                        <h4>Turn <b>{data.turn}</b></h4>
+                        <h4>Round <b>{data.turn}</b></h4>
                     </Col>
                     <Col xs={true}><hr/></Col>
                 </Row>;
