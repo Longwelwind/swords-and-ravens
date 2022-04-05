@@ -50,7 +50,7 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
                                 <Button onClick={() => this.seeTopWildlingCardInstead()} disabled={this.selectedOrder != null}>Look at the Top Wildling Card instead</Button>
                             </Col>
                             <Col xs={12} className="d-flex justify-content-center">
-                                <Button variant="danger" disabled={this.selectedOrder == null && this.selectedRegion == null} onClick={() => this.reset()}>Reset selection</Button>
+                                <Button variant="danger" disabled={this.selectedOrder == null && this.selectedRegion == null} onClick={() => this.reset()}>Reset</Button>
                             </Col>
                         </Col>
                     </>

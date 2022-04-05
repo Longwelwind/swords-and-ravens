@@ -127,7 +127,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<Ga
                                             variant="danger"
                                             onClick={() => this.reset()}
                                         >
-                                            Reset selection
+                                            Reset
                                         </Button>
                                     </Col>
                                 </Row>

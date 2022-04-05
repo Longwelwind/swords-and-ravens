@@ -103,7 +103,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                                 variant="danger"
                                                 onClick={() => this.reset()}
                                             >
-                                                Cancel
+                                                Reset
                                             </Button>
                                         </Col>
                                     </Row>
