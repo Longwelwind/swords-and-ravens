@@ -41,6 +41,7 @@ import PayDebtsGameState, { SerializedPayDebtsGameState } from "./pay-debts-game
 import { objectiveCards } from "./game-data-structure/static-data-structure/objectiveCards";
 import ChooseInitialObjectivesGameState, { SerializedChooseInitialObjectivesGameState } from "./choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
 import facelessMenNames from "../../../data/facelessMenNames.json";
+import sleep from "../../utils/sleep";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -54,7 +55,10 @@ export default class IngameGameState extends GameState<
     game: Game;
     gameLogManager: GameLogManager = new GameLogManager(this);
     votes: BetterMap<string, Vote> = new BetterMap();
+
+    // Client-side only
     @observable rerender = 0;
+    @observable marchResolutionAnimation: BetterMap<Unit, Region> = new BetterMap();
 
     get entireGame(): EntireGame {
         return this.parentGameState;
@@ -589,7 +593,7 @@ export default class IngameGameState extends GameState<
         }
     }
 
-    onServerMessage(message: ServerMessage): void {
+    async onServerMessage(message: ServerMessage): Promise<void> {
         if (message.type == "supply-adjusted") {
             const supplies: [House, number][] = message.supplies.map(([houseId, supply]) => [this.game.houses.get(houseId), supply]);
 
@@ -633,9 +637,29 @@ export default class IngameGameState extends GameState<
             const units = message.units.map(uid => from.units.get(uid));
 
             units.forEach(u => {
+                this.marchResolutionAnimation.set(u, to);
+            });
+
+            await sleep(5000);
+
+            units.forEach(u => {
+                this.marchResolutionAnimation.tryDelete(u);
                 from.units.delete(u.id);
                 to.units.set(u.id, u);
                 u.region = to;
+            });
+        } else if (message.type == "animate-attack") {
+            const units = message.units.map(uid => this.world.getUnitById(uid));
+            const to = this.world.regions.get(message.to);
+
+            units.forEach(u => {
+                this.marchResolutionAnimation.set(u, to);
+            });
+
+            await sleep(5000);
+
+            units.forEach(u => {
+                this.marchResolutionAnimation.tryDelete(u);
             });
         } else if (message.type == "units-wounded") {
             const region = this.world.regions.get(message.regionId);

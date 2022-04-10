@@ -42,6 +42,7 @@ import IronBankInfosComponent from "./IronBankInfosComponent";
 import invertColor from "./utils/invertColor";
 import ImagePopover from "./utils/ImagePopover";
 import renderLoanCardsToolTip from "./loanCardsTooltip";
+import Xarrow from "react-xarrows";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -188,6 +189,19 @@ export default class MapComponent extends Component<MapComponentProps> {
                     {this.renderIronBankInfos(ironBankView)}
                     {this.renderLoanCardDeck(ironBankView)}
                     {this.renderLoanCardSlots(ironBankView)}
+                    {this.ingame.marchResolutionAnimation.entries.map(([unit, to]) =>
+                        <Xarrow
+                            key={`arrow-${unit.id}-${to.id}`}
+                            start={`unit-div-${unit.id}`}
+                            end={`units-container-${to.id}`}
+                            color={unit.allegiance.id != "greyjoy" ? unit.allegiance.color : "black"}
+                            curveness={0.5}
+                            dashness={{animation: 2}}
+                            path="smooth"
+                            headShape="circle"
+                            headSize={3}
+                        />)
+                    }
                 </div>
                 <svg style={{ width: `${this.mapWidth}px`, height: `${MAP_HEIGHT}px` }}>
                     {this.renderRegions(propertiesForRegions)}
@@ -323,6 +337,7 @@ export default class MapComponent extends Component<MapComponentProps> {
 
             const controller = r.getController();
             return <div
+                id={`units-container-${r.id}`}
                 key={r.id}
                 className={classNames("units-container", { "disable-pointer-events": disablePointerEventsForCurrentRegion })}
                 style={{ left: r.unitSlot.point.x, top: r.unitSlot.point.y, width: r.unitSlot.width, flexWrap: r.type == land ? "wrap-reverse" : "wrap" }}
@@ -353,7 +368,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                         placement="auto"
                         popperConfig={{ modifiers: [preventOverflow] }}
                     >
-                        <div onClick={property.onClick ? property.onClick : undefined}
+                        <div id={`unit-div-${u.id}`} onClick={property.onClick ? property.onClick : undefined}
                             className={classNames(
                                 "unit-icon hover-weak-outline",
                                 {

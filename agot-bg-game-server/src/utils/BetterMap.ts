@@ -82,6 +82,15 @@ export default class BetterMap<K, V> {
         this._map.delete(key);
     }
 
+    tryDelete(key: K): boolean {
+        if (this._map.has(key)) {
+            this._map.delete(key);
+            return true;
+        }
+
+        return false;
+    }
+
     has(key: K): boolean {
         return this._map.has(key);
     }

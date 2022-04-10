@@ -54,6 +54,7 @@
     "react-helmet": "^6.1.0",
     "react-scroll-to-bottom": "^4.2.0",
     "react-svg-loader": "^3.0.3",
+    "react-xarrows": "^2.0.2",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
     "request-promise-native": "^1.0.9",
