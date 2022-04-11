@@ -18,6 +18,9 @@ import { StoredProfileSettings } from "../server/website-client/WebsiteClient";
 import Player from "./ingame-game-state/Player";
 import { v4 } from "uuid";
 import { ReplacePlayer, ReplacePlayerByVassal } from "./ingame-game-state/vote-system/VoteType";
+import WildlingsAttackGameState from "./ingame-game-state/westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
+import BiddingGameState from "./ingame-game-state/westeros-game-state/bidding-game-state/BiddingGameState";
+import SimpleChoiceGameState from "./ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
 
 export enum NotificationType {
     READY_TO_START,
@@ -367,13 +370,28 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     async waitBeforeChangingChildGameState(parentGameState: GameState<any, any>, newChildGameState: GameState<any, any>): Promise<void> {
-        // Wait 6 seconds when CombatGameState is over to show the battle results via the CombatInfoComponent
+        // Wait 5 seconds when CombatGameState was completely fast-tracked to show the battle results via the CombatInfoComponent
         if (this.hasChildGameState(CombatGameState) &&
                 // Only do it when there is no PostCombatGameState in the tree as PostCombat shows the dialog already
                 !this.hasChildGameState(PostCombatGameState) &&
                 !parentGameState.hasParentGameState(CombatGameState) &&
                 !newChildGameState.hasChildGameState(CombatGameState)) {
-            await sleep(6000);
+            await sleep(5000);
+        }
+
+        // Wait 5 seconds when WildlingsAttackGameState was completely fast-tracked to show the revealed Wildling card
+        if (this.hasChildGameState(WildlingsAttackGameState) &&
+                !parentGameState.hasParentGameState(WildlingsAttackGameState) &&
+                !newChildGameState.hasChildGameState(WildlingsAttackGameState)) {
+
+            // We can identify if it was fast-tracked if the current child state is Bidding or SimpleChoice (= Resolving ties).
+            // As we checked earlier that WildlingsAttackGameState is no longer part of the tree we now know that no other WildlingsAttack
+            // child state was set which would have shown the revealed Wildling card to the clients.
+            const wildlings = this.getChildGameState(WildlingsAttackGameState);
+            if (wildlings.childGameState instanceof BiddingGameState || wildlings.childGameState instanceof SimpleChoiceGameState) {
+                wildlings.childGameState = null;
+                await sleep(5000);
+            }
         }
     }
 
@@ -387,7 +405,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
     broadcastCustomToClients(craftMessage: (u: User) => ServerMessage): void {
         this.users.values.forEach(u => {
-            this.sendMessageToClients([u], craftMessage(u));
+            if (u.connected) {
+                this.sendMessageToClients([u], craftMessage(u));
+            }
         });
     }
 

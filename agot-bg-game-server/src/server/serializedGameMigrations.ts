@@ -1702,6 +1702,15 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "75",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame" && serializedGame.childGameState.childGameState.type == "planning") {
+                serializedGame.childGameState.childGameState.revealedWesterosCardIds = [];
+            }
+            return serializedGame;
+        }
     }
 ];
 

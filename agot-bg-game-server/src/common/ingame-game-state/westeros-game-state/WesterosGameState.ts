@@ -177,7 +177,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
             return;
         }
 
-        this.ingame.onWesterosGameStateFinish(this.planningRestrictions);
+        this.ingame.onWesterosGameStateFinish(this.planningRestrictions, this.revealedCards);
     }
 
     executeCard(card: WesterosCard): void {

@@ -38,6 +38,7 @@ import { objectiveCards } from "../common/ingame-game-state/game-data-structure/
 import ObjectiveCardComponent from "./game-state-panel/utils/ObjectiveCardComponent";
 import { ObjectiveCard } from "../common/ingame-game-state/game-data-structure/static-data-structure/ObjectiveCard";
 import crossedSwordsImage from "../../public/images/icons/crossed-swords.svg";
+import mammothImage from "../../public/images/icons/mammoth.svg";
 import getIngameUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import WorldStateComponent from "./WorldStateComponent";
@@ -688,9 +689,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 </>;
             }
             case "wildling-strength-trigger-wildlings-attack": {
-                return <p>
-                    <b>Wildling Threat</b> reached <b>{data.wildlingStrength}</b>, triggering a <b>Wildling Attack</b>
-                </p>;
+                return <Row className="align-items-center">
+                    <Col xs="auto">
+                        <img src={mammothImage} width="24px"/>
+                    </Col>
+                    <Col>
+                        <b>Wildling Threat</b> reached <b>{data.wildlingStrength}</b>, triggering a <b>Wildling Attack</b>!
+                    </Col>
+                </Row>;
             }
             case "consolidate-power-order-resolved": {
                 const house = this.game.houses.get(data.house);
