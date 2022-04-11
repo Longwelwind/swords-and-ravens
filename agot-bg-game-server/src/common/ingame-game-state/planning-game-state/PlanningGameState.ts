@@ -14,9 +14,12 @@ import PlaceOrdersGameState, { SerializedPlaceOrdersGameState } from "./place-or
 import ClaimVassalsGameState, { SerializedClaimVassalsGameState } from "./claim-vassals-game-state/ClaimVassalsGameState";
 import planningRestrictions from "../game-data-structure/westeros-card/planning-restriction/planningRestrictions";
 import MusteringGameState, { SerializedMusteringGameState } from "../westeros-game-state/mustering-game-state/MusteringGameState";
+import WesterosCard from "../game-data-structure/westeros-card/WesterosCard";
+import getById from "../../../utils/getById";
 
 export default class PlanningGameState extends GameState<IngameGameState, PlaceOrdersGameState | ClaimVassalsGameState | MusteringGameState> {
     planningRestrictions: PlanningRestriction[];
+    revealeadWesterosCards: WesterosCard[];
 
     get ingame(): IngameGameState {
         return this.parentGameState;
@@ -34,8 +37,9 @@ export default class PlanningGameState extends GameState<IngameGameState, PlaceO
         return this.ingame.entireGame;
     }
 
-    firstStart(planningRestrictions: PlanningRestriction[]): void {
+    firstStart(planningRestrictions: PlanningRestriction[], revealeadWesterosCards: WesterosCard[]): void {
         this.planningRestrictions = planningRestrictions;
+        this.revealeadWesterosCards = revealeadWesterosCards;
         this.setChildGameState(new ClaimVassalsGameState(this)).firstStart();
     }
 
@@ -76,6 +80,7 @@ export default class PlanningGameState extends GameState<IngameGameState, PlaceO
         return {
             type: "planning",
             planningRestrictions: this.planningRestrictions.map(pr => pr.id),
+            revealedWesterosCardIds: this.revealeadWesterosCards.map(wc => wc.id),
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -84,6 +89,7 @@ export default class PlanningGameState extends GameState<IngameGameState, PlaceO
         const planningGameState = new PlanningGameState(ingameGameState);
 
         planningGameState.planningRestrictions = data.planningRestrictions.map(prid => planningRestrictions.get(prid));
+        planningGameState.revealeadWesterosCards = data.revealedWesterosCardIds.map((cid, i) => getById(ingameGameState.game.westerosDecks[i], cid));
         planningGameState.childGameState = planningGameState.deserializeChildGameState(data.childGameState);
 
         return planningGameState;
@@ -104,5 +110,6 @@ export default class PlanningGameState extends GameState<IngameGameState, PlaceO
 export interface SerializedPlanningGameState {
     type: "planning";
     planningRestrictions: string[];
+    revealedWesterosCardIds: number[];
     childGameState: SerializedPlaceOrdersGameState | SerializedClaimVassalsGameState | SerializedMusteringGameState;
 }

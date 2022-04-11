@@ -207,22 +207,14 @@ export default class IngameGameState extends GameState<
         this.beginNewRound();
     }
 
-    onWesterosGameStateFinish(planningRestrictions: PlanningRestriction[]): void {
-        this.proceedPlanningGameState(planningRestrictions);
+    onWesterosGameStateFinish(planningRestrictions: PlanningRestriction[], revealedWesterosCards: WesterosCard[]): void {
+        this.proceedPlanningGameState(planningRestrictions, revealedWesterosCards);
     }
 
-    broadcastCustom(f: (player: Player | null) => ServerMessage): void {
-        this.entireGame.broadcastCustomToClients(u => {
-            const player = this.players.has(u) ? this.players.get(u) : null;
-
-            return f(player);
-        });
-    }
-
-    proceedPlanningGameState(planningRestrictions: PlanningRestriction[] = []): void {
+    proceedPlanningGameState(planningRestrictions: PlanningRestriction[] = [], revealedWesterosCards: WesterosCard[] = []): void {
         this.game.vassalRelations = new BetterMap();
         this.broadcastVassalRelations();
-        this.setChildGameState(new PlanningGameState(this)).firstStart(planningRestrictions);
+        this.setChildGameState(new PlanningGameState(this)).firstStart(planningRestrictions, revealedWesterosCards);
     }
 
     proceedToActionGameState(placedOrders: BetterMap<Region, Order>, planningRestrictions: PlanningRestriction[]): void {
@@ -636,9 +628,11 @@ export default class IngameGameState extends GameState<
             const to = this.world.regions.get(message.to);
             const units = message.units.map(uid => from.units.get(uid));
 
-            units.forEach(u => {
-                this.marchResolutionAnimation.set(u, to);
-            });
+            if (from != to) {
+                units.forEach(u => {
+                    this.marchResolutionAnimation.set(u, to);
+                });
+            }
 
             await sleep(5000);
 

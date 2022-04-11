@@ -29,6 +29,7 @@ import TheHordeDescendsNightsWatchVictoryGameState, {SerializedTheHordeDescendsN
 import IngameGameState from "../../IngameGameState";
 import { observable } from "mobx";
 import BetterMap from "../../../../utils/BetterMap";
+import User from "../../../../server/User";
 
 export default class WildlingsAttackGameState extends GameState<WesterosGameState,
     BiddingGameState<WildlingsAttackGameState> | SimpleChoiceGameState | PreemptiveRaidWildlingVictoryGameState
@@ -281,6 +282,14 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
         });
 
         this.westerosGameState.onWildlingsAttackGameStateEnd();
+    }
+
+    getWaitedUsers(): User[] {
+        if (this.childGameState) {
+            return this.childGameState.getWaitedUsers();
+        }
+
+        return [];
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedWildlingsAttackGameState {

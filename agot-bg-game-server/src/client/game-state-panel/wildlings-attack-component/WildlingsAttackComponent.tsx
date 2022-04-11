@@ -82,7 +82,7 @@ export default class WildlingsAttackComponent extends Component<GameStateCompone
                                 <HouseNumberResultsComponent results={results} keyPrefix="wildlings"/>
                             </Col>
                         : <></>}
-                        {renderChildGameState<WildlingsAttackGameState>(this.props, [
+                        {this.props.gameState.childGameState && renderChildGameState<WildlingsAttackGameState>(this.props, [
                             [SimpleChoiceGameState, SimpleChoiceComponent],
                             [BiddingGameState, BiddingComponent],
                             [PreemptiveRaidWildlingVictoryGameState, PreemptiveRaidWildlingVictoryComponent],

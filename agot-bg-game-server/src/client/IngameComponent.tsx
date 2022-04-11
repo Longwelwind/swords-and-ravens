@@ -216,7 +216,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         return <>
                 <Row className="justify-content-center" style={{maxHeight: this.mapScrollbarEnabled ? "95vh" : "none"}}>
-                    <Col xs={{order: columnOrders.gameStateColumn}} style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none", minWidth: "470px", maxWidth: draftHouseCards ? "1200px" : "800px"}}>
+                    <Col xs={{order: columnOrders.gameStateColumn}} style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none", minWidth: "485px", maxWidth: draftHouseCards ? "1200px" : "800px"}}>
                         {this.renderGameStateColumn()}
                     </Col>
                     {showMap && <Col xs={{span: "auto", order: columnOrders.mapColumn}} style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none"}}>
