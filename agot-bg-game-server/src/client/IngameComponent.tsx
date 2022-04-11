@@ -214,9 +214,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         const showMap = !draftHouseCards || this.user?.settings.showMapWhenDrafting;
 
+        const col1MinWidth = this.ingame.entireGame.gameSettings.playerCount >= 8 ? "485px" : "470px";
+
         return <>
                 <Row className="justify-content-center" style={{maxHeight: this.mapScrollbarEnabled ? "95vh" : "none"}}>
-                    <Col xs={{order: columnOrders.gameStateColumn}} style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none", minWidth: "485px", maxWidth: draftHouseCards ? "1200px" : "800px"}}>
+                    <Col xs={{order: columnOrders.gameStateColumn}} style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none", minWidth: col1MinWidth, maxWidth: draftHouseCards ? "1200px" : "800px"}}>
                         {this.renderGameStateColumn()}
                     </Col>
                     {showMap && <Col xs={{span: "auto", order: columnOrders.mapColumn}} style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none"}}>
