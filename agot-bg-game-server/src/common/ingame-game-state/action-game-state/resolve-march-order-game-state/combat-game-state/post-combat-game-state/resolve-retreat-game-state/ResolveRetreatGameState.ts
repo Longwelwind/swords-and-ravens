@@ -215,7 +215,7 @@ export default class ResolveRetreatGameState extends GameState<
     }
 
     getValidRetreatRegions(attackingRegion: Region, defendingRegion: Region, attacker: House, loser: House, attackingArmy: Unit[], loserArmy: Unit[], finalChooser: House): Region[] {
-        let possibleRetreatRegions = this.world.getValidRetreatRegions(
+        const possibleRetreatRegions = this.world.getValidRetreatRegions(
             defendingRegion,
             loser,
             loserArmy
@@ -236,27 +236,29 @@ export default class ResolveRetreatGameState extends GameState<
 
             if(finalChooser == attacker) {
                 // Final chooser is the attacker himself
-                possibleRetreatRegions = attackingRegionIsBlockedForRetreat
+                // We can omit the supply check as attacker will never exceed supply by retreating back to the attacking region
+                return attackingRegionIsBlockedForRetreat
                     // If attacking region is blocked there is no possible retreat area.
                     ? []
                     // Otherwise there is only the attacking region
                     : [attackingRegion];
-
-                    // We can omit the supply check as attacker will never exceed supply by retreating back to the attacking region
-                return possibleRetreatRegions;
             } else {
                 // Final chooser is someone else.
                 // He can decide to retreat the units to a valid region adjacent to the combat
                 if (attackingRegionIsBlockedForRetreat) {
                     // But if attacking region is blocked it must be filtered out
-                    possibleRetreatRegions = possibleRetreatRegions.filter(r => r != attackingRegion);
+                    _.pull(possibleRetreatRegions, attackingRegion);
+                } else if (!possibleRetreatRegions.includes(attackingRegion)) {
+                    // Dragons may have flown into the embattled area,
+                    // so the starting region may not be one of the possible retreat regions.
+                    possibleRetreatRegions.push(attackingRegion);
                 }
             }
         } else {
             // Filter out the attacking region as due to Berric Dondarrion (and maybe some other effects)
             // The attacking region may not be occupied by the enemy anymore and therefore isn't filtered by
             // getValidRetreatRegions anymore
-            possibleRetreatRegions = possibleRetreatRegions.filter(r => r != attackingRegion);
+            _.pull(possibleRetreatRegions, attackingRegion);
         }
 
         if (possibleRetreatRegions.length == 0) {
