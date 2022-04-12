@@ -345,7 +345,9 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             })
             // A commander cannot march into regions of one of its vassal. A vassal cannot march into regions of its commander
             // or into regions of an other vassal of its commander
-            .filter(r => !this.ingame.getOtherVassalFamilyHouses(this.house).includes(r.getController()));
+            .filter(r => !this.ingame.getOtherVassalFamilyHouses(this.house).includes(r.getController()))
+            // Vassals cannot march into ports
+            .filter(r => r.type == port ? !this.ingame.isVassalHouse(this.house) : true);
     }
 
     getMovesThatTriggerAttack(moves: [Region, Unit[]][]): [Region, Unit[]][] {
