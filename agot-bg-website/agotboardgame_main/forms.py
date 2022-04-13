@@ -17,7 +17,7 @@ class UpdateSettingsForm(ModelForm):
         labels = {
             "email_notification_active": "PBEM Notifications",
             "mute_games": "Join games in the muted state",
-            "use_house_names_for_chat": "Use house names for ingame chat",
+            "use_house_names_for_chat": "Join games by using house names for in-game chat",
             "use_map_scrollbar": "Join games by using the map scrollbar",
             "use_responsive_layout_on_mobile": "Align the game state column on the right (Desktop only)"
         }

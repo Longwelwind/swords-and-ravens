@@ -91,7 +91,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                     </OverlayTrigger>
                                 </Col>
                                 <Col xs="auto" className="mx-1">
-                                    <strong>{this.props.getUserDisplayName(m.user)}</strong>
+                                    {this.props.getUserDisplayName(m.user)}
                                 </Col>
                                 <Col style={{overflowWrap: "anywhere"}}>
                                     {m.text}

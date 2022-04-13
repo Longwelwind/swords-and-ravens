@@ -834,16 +834,20 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     getUserDisplayName(user: User): React.ReactNode {
-        if (!this.user || !this.user.settings.chatHouseNames) {
-            return <>{user.name}</>;
-        }
-
         const player = this.props.gameState.players.tryGet(user, null);
-        if (player) {
-            return <>{player.house.name}</>;
-        }
+        const displayName = !this.user?.settings.chatHouseNames || !player
+            ? user.name
+            : player.house.name;
 
-        return <>{user.name}</>;
+        // Spectators are shown in burlywood brown
+        return <span style={{color: player?.house.color ?? "#deb887" }}>
+            <b>
+                {displayName}
+            </b>
+            {!player && <small>
+                {" "}(Spectator)
+            </small>}
+        </span>;
     }
 
     get publicChatRoom(): Channel {
@@ -983,7 +987,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     getOtherPlayers(): Player[] {
-        return this.props.gameState.players.values.filter(p => p.user != this.user);
+        return _.sortBy(this.props.gameState.players.values,
+            p => this.user?.settings.chatHouseNames ? p.house.name : p.user.name)
+            .filter(p => p.user != this.user);
     }
 
     injectBetweenMessages(previous: Message | null, next: Message | null): ReactNode {
