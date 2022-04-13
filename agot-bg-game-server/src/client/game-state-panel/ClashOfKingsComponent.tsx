@@ -15,18 +15,31 @@ import ListGroupItem from "react-bootstrap/ListGroupItem";
 import Col from "react-bootstrap/Col";
 import DistributePowerTokensGameState from "../../common/ingame-game-state/westeros-game-state/clash-of-kings-game-state/distribute-power-tokens-game-state/DistributePowerTokensGameState";
 import DistributePowerTokensComponent from "./DistributePowerTokensComponent";
+import stoneThroneImage from "../../../public/images/icons/stone-throne.svg";
+import ravenImage from "../../../public/images/icons/raven.svg";
+import diamondHiltImage from "../../../public/images/icons/diamond-hilt.svg";
 
 @observer
 export default class ClashOfKingsComponent extends Component<GameStateComponentProps<ClashOfKingsGameState>> {
     render(): ReactNode {
+        const currentTrackI = this.props.gameState.currentTrackI
+        const image = currentTrackI == 0
+            ? stoneThroneImage
+            : currentTrackI == 1
+                ? diamondHiltImage
+                : ravenImage;
+
         return <>
             <ListGroupItem className="px-2">
+                <Row className="justify-content-center mt-2 mb-1">
+                    <img src={image} width="40px" className="mr-2"/><h4 className="mt-2">Clash of Kings</h4><img src={image} width="40px" className="ml-2"/>
+                </Row>
                 <Row className="justify-content-center">
                     <Col xs={12} className="text-center">
                         Houses bid for the <strong>
-                        {this.props.gameState.game.getNameInfluenceTrack(this.props.gameState.currentTrackI)}</strong> track.
+                        {this.props.gameState.game.getNameInfluenceTrack(currentTrackI)}</strong> track.
                     </Col>
-                    <Fragment key={this.props.gameState.currentTrackI}>
+                    <Fragment key={currentTrackI}>
                         {renderChildGameState(this.props, [
                             [BiddingGameState, BiddingComponent],
                             [ResolveTiesGameState, ResolveTiesComponent],

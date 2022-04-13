@@ -48,6 +48,7 @@ import joinReactNodes from "../../../client/utils/joinReactNodes";
 import House from "../../../common/ingame-game-state/game-data-structure/House";
 import _ from "lodash";
 import HouseNumberResultsComponent from "../../../client/HouseNumberResultsComponent";
+import mammothImage from "../../../../public/images/icons/mammoth.svg";
 
 @observer
 export default class WildlingsAttackComponent extends Component<GameStateComponentProps<WildlingsAttackGameState>> {
@@ -58,14 +59,15 @@ export default class WildlingsAttackComponent extends Component<GameStateCompone
             : null;
         return (
             <>
+                <Row className="justify-content-center mt-2 mb-1">
+                    <img src={mammothImage} width="40px" className="mr-2"/><h4 className="mt-2">Wildlings Attack</h4><img src={mammothImage} width="40px" className="ml-2"/>
+                </Row>
                 {wildlingCardType && (
-                    <ListGroupItem className="px-2">
-                        <Row className="justify-content-center">
-                            <Col xs="auto">
-                                <WildlingCardComponent cardType={wildlingCardType}/>
-                            </Col>
-                        </Row>
-                    </ListGroupItem>
+                    <Row className="justify-content-center">
+                        <Col xs="auto">
+                            <WildlingCardComponent cardType={wildlingCardType}/>
+                        </Col>
+                    </Row>
                 )}
                 <ListGroupItem className="px-2">
                     <Row>
