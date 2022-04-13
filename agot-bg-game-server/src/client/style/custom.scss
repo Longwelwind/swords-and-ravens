@@ -168,6 +168,7 @@ strong
 }
 
 .unit-icon {
+  position: relative;
   width: 32px;
   height: 32px;
   background-size: contain;
@@ -644,4 +645,15 @@ hr.red {
 
 .flex-footer {
   flex: 0 1 60px;
+}
+
+.center-relative-to-parent {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.v-hidden {
+  visibility: hidden;
 }

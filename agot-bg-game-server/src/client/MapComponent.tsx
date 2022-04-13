@@ -192,8 +192,8 @@ export default class MapComponent extends Component<MapComponentProps> {
                     {this.ingame.marchResolutionAnimation.entries.map(([unit, to]) =>
                         <Xarrow
                             key={`arrow-${unit.id}-${to.id}`}
-                            start={`unit-div-${unit.id}`}
-                            end={`units-container-${to.id}`}
+                            start={`centered-unit-div-for-march-markers-${unit.id}`}
+                            end={`centered-units-container-div-for-march-markers-${to.id}`}
                             color={unit.allegiance.id != "greyjoy" ? unit.allegiance.color : "black"}
                             curveness={0.5}
                             dashness={{animation: 2}}
@@ -337,7 +337,6 @@ export default class MapComponent extends Component<MapComponentProps> {
 
             const controller = r.getController();
             return <div
-                id={`units-container-${r.id}`}
                 key={r.id}
                 className={classNames("units-container", { "disable-pointer-events": disablePointerEventsForCurrentRegion })}
                 style={{ left: r.unitSlot.point.x, top: r.unitSlot.point.y, width: r.unitSlot.width, flexWrap: r.type == land ? "wrap-reverse" : "wrap" }}
@@ -368,7 +367,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                         placement="auto"
                         popperConfig={{ modifiers: [preventOverflow] }}
                     >
-                        <div id={`unit-div-${u.id}`} onClick={property.onClick ? property.onClick : undefined}
+                        <div onClick={property.onClick ? property.onClick : undefined}
                             className={classNames(
                                 "unit-icon hover-weak-outline",
                                 {
@@ -392,7 +391,9 @@ export default class MapComponent extends Component<MapComponentProps> {
                                 opacity: opacity,
                                 transform: transform
                             }}
-                        />
+                        >
+                            <div id={`centered-unit-div-for-march-markers-${u.id}`} className="center-relative-to-parent disable-pointer-events v-hidden"/>
+                        </div>
                     </OverlayTrigger>
                 })}
                 {garrisons.has(r.id) && (
@@ -447,6 +448,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                         </div>
                     </OverlayTrigger>
                 )}
+                <div id={`centered-units-container-div-for-march-markers-${r.id}`} className="center-relative-to-parent disable-pointer-events v-hidden"/>
             </div>
         });
     }
