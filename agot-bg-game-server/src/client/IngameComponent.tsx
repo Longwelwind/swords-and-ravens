@@ -382,7 +382,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             <ListGroupItem className="text-center font-italic" style={{ maxWidth: 500 }}>
                                 <>
                                     {connectedSpectators.length > 0 ? (
-                                        <>Spectators: {joinReactNodes(this.getConnectedSpectators().map(u => <b key={u.id}>{getIngameUserLinkOrLabel(this.props.gameState, u)}</b>), ", ")}</>
+                                        <>Spectators: {joinReactNodes(this.getConnectedSpectators().map(u => <b key={u.id}>{getIngameUserLinkOrLabel(this.props.gameState, u, null)}</b>), ", ")}</>
                                     ) : (
                                         <>No spectators</>
                                     )}
@@ -719,7 +719,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     <Dropdown.Menu>
                                         {this.getOtherPlayers().map(p => (
                                             <Dropdown.Item onClick={() => this.onNewPrivateChatRoomClick(p)} key={p.user.id}>
-                                                {this.getUserDisplayName(p.user)}
+                                                {this.getUserDisplayNameLabel(p.user)}
                                             </Dropdown.Item>
                                         ))}
                                     </Dropdown.Menu>
@@ -729,7 +729,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 <Nav.Item key={roomId}>
                                     <div className={classNames({ "new-event": this.getPrivateChatRoomForPlayer(user).areThereUnreadMessages })}>
                                         <Nav.Link eventKey={roomId}>
-                                            {this.getUserDisplayName(user)}
+                                            {this.getUserDisplayNameLabel(user)}
                                         </Nav.Link>
                                     </div>
                                 </Nav.Item>
@@ -746,7 +746,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     roomId={this.props.gameState.entireGame.publicChatRoomId}
                                     currentlyViewed={this.currentOpenedTab == "chat"}
                                     injectBetweenMessages={(p, n) => this.injectBetweenMessages(p, n)}
-                                    getUserDisplayName={u => this.getUserDisplayName(u)} />
+                                    getUserDisplayName={u => <b>{getIngameUserLinkOrLabel(this.ingame, u, this.ingame.players.tryGet(u, null), this.user?.settings.chatHouseNames)}</b>} />
                             </Tab.Pane>
                             <Tab.Pane eventKey="game-logs" className="h-100">
                                 <ScrollToBottom className="h-100" scrollViewClassName="overflow-x-hidden">
@@ -781,7 +781,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         entireGame={this.props.gameState.entireGame}
                                         roomId={roomId}
                                         currentlyViewed={this.currentOpenedTab == roomId}
-                                        getUserDisplayName={u => this.getUserDisplayName(u)} />
+                                        getUserDisplayName={u => <b>{getIngameUserLinkOrLabel(this.ingame, u, this.ingame.players.tryGet(u, null), this.user?.settings.chatHouseNames)}</b>} />
                                 </Tab.Pane>
                             ))}
                         </Tab.Content>
@@ -833,21 +833,31 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         return result;
     }
 
-    getUserDisplayName(user: User): React.ReactNode {
+    getUserDisplayNameLabel(user: User): React.ReactNode {
         const player = this.props.gameState.players.tryGet(user, null);
         const displayName = !this.user?.settings.chatHouseNames || !player
             ? user.name
             : player.house.name;
 
-        // Spectators are shown in burlywood brown
-        return <span style={{color: player?.house.color ?? "#deb887" }}>
-            <b>
-                {displayName}
-            </b>
-            {!player && <small>
-                {" "}(Spectator)
-            </small>}
-        </span>;
+        return <ConditionalWrap
+            condition={!player}
+            wrap={children =>
+                <OverlayTrigger
+                    overlay={
+                        <Tooltip id="user-is-spectator-tooltip">
+                            This user does not participate in the game
+                        </Tooltip>
+                    }
+                    placement="auto"
+                    delay={{ show: 250, hide: 0 }}
+                >
+                    {children}
+                </OverlayTrigger>
+            }
+        >
+            {/* Spectators are shown in burlywood brown */}
+            <b style={{ color: player?.house.color ?? "#deb887" }}>{displayName}</b>
+        </ConditionalWrap>
     }
 
     get publicChatRoom(): Channel {
