@@ -3,7 +3,7 @@ import { Component, ReactNode } from "react";
 import React from "react";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import House from "../common/ingame-game-state/game-data-structure/House";
-import { ListGroupItem, Row, Col, OverlayTrigger, Tooltip, Popover, Button, Navbar, Nav, NavDropdown } from "react-bootstrap";
+import { ListGroupItem, Row, Col, OverlayTrigger, Tooltip, Popover, Navbar, Nav, NavDropdown } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
 import { faStar } from "@fortawesome/free-solid-svg-icons/faStar";
@@ -94,6 +94,10 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                 this.house.id == "targaryen"
                     ? verticalBanner
                     : castleImage;
+
+        const availablePower =  this.house.powerTokens;
+        const powerTokensOnBoard = this.game.countPowerTokensOnBoard(this.house);
+        const powerInPool = this.house.maxPowerTokens - availablePower - powerTokensOnBoard;
 
         try {
             controller = this.ingame.getControllerOfHouse(this.house).user;
@@ -186,7 +190,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     </Col>
                     {!this.isVassal && (<OverlayTrigger
                         overlay={this.renderVictoryTrackTooltip(this.house)}
-                        delay={{ show: 500, hide: 100 }}
+                        delay={{ show: 250, hide: 100 }}
                         placement="auto"
                     >
                         <Col xs="auto" className="d-flex align-items-center"
@@ -207,9 +211,15 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         onMouseEnter={() => this.setHighlightedRegions("with-power-tokens-only")}
                         onMouseLeave={() => this.highlightedRegions.clear()}
                     >
-                        <div style={{ fontSize: "18px" }}>{this.house.powerTokens}</div>
                         <OverlayTrigger
-                            overlay={this.renderPowerPopover(this.house)}
+                            overlay={this.renderPowerTooltip(availablePower, powerTokensOnBoard, powerInPool)}
+                            delay={{ show: 250, hide: 100 }}
+                            placement="auto"
+                        >
+                            <b style={{ fontSize: "18px", color: powerInPool == 0 ? "red" : undefined }}>{this.house.powerTokens}</b>
+                        </OverlayTrigger>
+                        <OverlayTrigger
+                            overlay={this.renderPowerPopover(availablePower, powerTokensOnBoard, powerInPool)}
                             placement="auto"
                             trigger="click"
                             rootClose
@@ -382,48 +392,45 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         </Tooltip>;
     }
 
-    private renderPowerPopover(house: House): OverlayChildren {
-        const availablePower =  house.powerTokens;
-        const powerTokensOnBoard = this.game.countPowerTokensOnBoard(house);
-        const powerInPool = house.maxPowerTokens - availablePower - powerTokensOnBoard;
-
-        return <Popover id={house.id + "-power-tooltip"}>
+    private renderPowerPopover(availablePower: number, powerTokensOnBoard: number, powerInPool: number): OverlayChildren {
+        return <Popover id={this.house.id + "-power-popover"} className="px-3 pt-2">
             <Col>
-                <h4>{house.name}</h4>
-                <h5><small>Available: </small><b>{availablePower}</b></h5>
-                <h5><small>On the board: </small><b>{powerTokensOnBoard}</b></h5>
-                <h5><small>Power Pool: </small><b>{powerInPool}</b></h5>
-                {this.props.gameClient.authenticatedPlayer &&
-                this.props.gameClient.authenticatedPlayer.house != house &&
-                this.ingame.canGiftPowerTokens(this.props.gameClient.authenticatedPlayer.house) &&
-                    <div className="mt-1" ><br/>
-                        <GiftPowerTokensComponent
-                            toHouse={this.house}
-                            authenticatedPlayer={this.props.gameClient.authenticatedPlayer}
-                            ingame={this.ingame}/>
-                    </div>
-                }
-                {house == this.ingame.game.targaryen && this.props.gameClient.authenticatedPlayer?.house == this.ingame.game.targaryen && this.ingame.isHouseDefeated(house) &&
-                <div className="mt-3">
-                    <Button
-                        onClick={() => {
-                            if (window.confirm("Are you sure you want to return all your Power tokens to your pool?")) {
-                                this.props.ingame.entireGame.sendMessageToServer({
-                                    type: "drop-power-tokens",
-                                    house: house.id
-                                });
-                                document.body.click();
-                            }
-                        }}
-                        disabled={house.powerTokens <= 0}
-                        variant="danger"
-                    >
-                        Drop all available Power tokens
-                    </Button>
-                </div>
-                }
+                <Row className="justify-content-center">
+                    <h4>{this.house.name}&apos;s Power</h4>
+                </Row>
+                <Row className="justify-content-center">
+                    <Col xs="auto">
+                        <h5><small>Available:</small> <b>{availablePower}</b></h5>
+                        <h5><small>On the board:</small> <b>{powerTokensOnBoard}</b></h5>
+                        <h5><small>Power Pool:</small> <b>{powerInPool}</b></h5>
+                    </Col>
+                </Row>
+                {this.props.gameClient.authenticatedPlayer && this.props.gameClient.authenticatedPlayer.house != this.house &&
+                    this.ingame.canGiftPowerTokens(this.props.gameClient.authenticatedPlayer.house) && <Row className="mt-3" >
+                    <GiftPowerTokensComponent
+                        toHouse={this.house}
+                        authenticatedPlayer={this.props.gameClient.authenticatedPlayer}
+                        ingame={this.ingame}/>
+                </Row>}
             </Col>
         </Popover>;
+    }
+
+    private renderPowerTooltip(availablePower: number, powerTokensOnBoard: number, powerInPool: number): OverlayChildren {
+        return <Tooltip id={this.house.id + "-power-tooltip"} className="tooltip-w-100">
+            <Col>
+                <Row className="justify-content-center">
+                    <h4>{this.house.name}&apos;s Power</h4>
+                </Row>
+                <Row className="justify-content-center">
+                    <Col xs="auto">
+                        <h5><small>Available:</small> <b>{availablePower}</b></h5>
+                        <h5><small>On the board:</small> <b>{powerTokensOnBoard}</b></h5>
+                        <h5><small>Power Pool:</small> <b>{powerInPool}</b></h5>
+                    </Col>
+                </Row>
+            </Col>
+        </Tooltip>;
     }
 
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {

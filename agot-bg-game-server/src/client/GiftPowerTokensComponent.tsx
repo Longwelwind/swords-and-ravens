@@ -63,29 +63,29 @@ export default class GiftPowerTokensComponent extends Component<GiftPowerTokensC
                             disabled={!this.canGiftPowerTokens()}
                         />
                     </Col>
-                    <Col xs="auto">
-                        <div style={{ marginLeft: "5px" }}>
-                            <b>{this.powerTokens}</b>
-                        </div>
+                    <Col style={{ width: "50px" }}>
+                        <b>{this.powerTokens}</b>
                     </Col>
                 </Row>
-            </Col>
-            <Col xs="auto" className="text-center">
-                <Button
-                    onClick={() => {
-                        this.props.ingame.entireGame.sendMessageToServer({
-                            type: "gift-power-tokens",
-                            toHouse: this.toHouse.id,
-                            powerTokens: this.powerTokens
-                        });
-                        this.powerTokens = 0;
-                        document.body.click();
-                    }}
-                    disabled={!this.canGiftPowerTokens()}
-                    variant="success"
-                >
-                    Confirm
-                </Button>
+                <Row className="justify-content-center">
+                    <Col xs="auto">
+                        <Button
+                            onClick={() => {
+                                this.props.ingame.entireGame.sendMessageToServer({
+                                    type: "gift-power-tokens",
+                                    toHouse: this.toHouse.id,
+                                    powerTokens: this.powerTokens
+                                });
+                                this.powerTokens = 0;
+                                document.body.click();
+                            }}
+                            disabled={!this.canGiftPowerTokens()}
+                            variant="success"
+                        >
+                            Confirm
+                        </Button>
+                    </Col>
+                </Row>
             </Col>
         </>;
     }
