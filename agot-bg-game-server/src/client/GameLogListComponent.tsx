@@ -55,8 +55,12 @@ interface GameLogListComponentProps {
 export default class GameLogListComponent extends Component<GameLogListComponentProps> {
     allHouseCards = new BetterMap(this.getAllHouseCards());
 
+    get ingame(): IngameGameState {
+        return this.props.ingameGameState;
+    }
+
     get game(): Game {
-        return this.props.ingameGameState.game;
+        return this.ingame.game;
     }
 
     get world(): World {
@@ -64,7 +68,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
     }
 
     get logManager(): GameLogManager {
-        return this.props.ingameGameState.gameLogManager;
+        return this.ingame.gameLogManager;
     }
 
     createHouseCards(data: [string, HouseCardData][]): [string, HouseCard][] {
@@ -184,11 +188,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             }
             case "user-house-assignments":
                 const assignments = data.assignments.map(([houseId, userId]) =>
-                    [this.game.houses.get(houseId), this.props.ingameGameState.entireGame.users.get(userId)]) as [House, User][];
+                    [this.game.houses.get(houseId), this.ingame.entireGame.users.get(userId)]) as [House, User][];
                 return <>
                     <div className="text-center"><h5>The fight for the Iron Throne has begun!</h5></div>
                     {assignments.map(([house, user]) =>
-                        <p  key={`${house.id}_${user.id}`}>House <b>{house.name}</b> is controlled by <b>{getIngameUserLinkOrLabel(this.props.ingameGameState, user)}</b>.</p>
+                        <p  key={`${house.id}_${user.id}`}>House <b>{house.name}</b> is controlled by <b>{getIngameUserLinkOrLabel(this.ingame, user, this.ingame.players.tryGet(user, null))}</b>.</p>
                     )}
                 </>;
             case "turn-begin":
@@ -1261,22 +1265,22 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <div className="mt-1"><HouseNumberResultsComponent results={supplies} keyPrefix="supply"/></div>
                 </>);
             case "player-replaced": {
-                const oldUser = this.props.ingameGameState.entireGame.users.get(data.oldUser);
-                const newUser = data.newUser ? this.props.ingameGameState.entireGame.users.get(data.newUser) : null;
+                const oldUser = this.ingame.entireGame.users.get(data.oldUser);
+                const newUser = data.newUser ? this.ingame.entireGame.users.get(data.newUser) : null;
                 const house = this.game.houses.get(data.house);
-                const newUserLabel = newUser ? getIngameUserLinkOrLabel(this.props.ingameGameState, newUser) : null;
+                const newUserLabel = newUser ? getIngameUserLinkOrLabel(this.ingame, newUser, this.ingame.players.tryGet(newUser, null)) : null;
 
                 return <>
-                    <b>{getIngameUserLinkOrLabel(this.props.ingameGameState, oldUser)}</b> (House <b>{house.name}</b>) was replaced by {newUserLabel ? <b>{newUserLabel}</b> : " a vassal"}.
+                    <b>{getIngameUserLinkOrLabel(this.ingame, oldUser, this.ingame.players.tryGet(oldUser, null))}</b> (House <b>{house.name}</b>) was replaced by {newUserLabel ? <b>{newUserLabel}</b> : " a vassal"}.
                 </>;
             }
             case "vassal-replaced": {
-                const user = this.props.ingameGameState.entireGame.users.get(data.user);
+                const user = this.ingame.entireGame.users.get(data.user);
                 const house = this.game.houses.get(data.house);
 
                 return (
                     <>
-                        Vassal House <b>{house.name}</b> was replaced by <b>{getIngameUserLinkOrLabel(this.props.ingameGameState, user)}</b>.
+                        Vassal House <b>{house.name}</b> was replaced by <b>{getIngameUserLinkOrLabel(this.ingame, user, this.ingame.players.tryGet(user, null))}</b>.
                     </>
                 );
             }
@@ -1889,7 +1893,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
     private renderOrdersRevealedPopover(worldState: RegionState[]): OverlayChildren {
         return <Popover id="orders-revealed-popover" className="scrollable-popover">
             <Col className="p-3">
-                <WorldStateComponent ingameGameState={this.props.ingameGameState} worldState={worldState}/>
+                <WorldStateComponent ingameGameState={this.ingame} worldState={worldState}/>
             </Col>
         </Popover>;
     }
