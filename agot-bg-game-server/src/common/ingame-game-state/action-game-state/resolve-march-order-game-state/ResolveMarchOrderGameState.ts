@@ -169,6 +169,12 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
 
             // If there was a power token from an other house, remove it
             if (to.controlPowerToken) {
+                this.ingameGameState.log({
+                    type: "control-power-token-removed",
+                    regionId: to.id,
+                    houseId: to.controlPowerToken.id
+                });
+
                 to.controlPowerToken = null;
 
                 this.entireGame.broadcastToClients({

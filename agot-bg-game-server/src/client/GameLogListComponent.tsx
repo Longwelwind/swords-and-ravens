@@ -1887,6 +1887,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         </b> as their new House card{data.reducedCombatStrength ? <> at the cost of <b>-1</b> combat strength</> : ""}.
                 </p>;
             }
+            case "control-power-token-removed": {
+                const region = this.world.regions.get(data.regionId);
+                const house = this.game.houses.get(data.houseId);
+
+                return <p>
+                    A Power token of House <b>{house.name}</b> was removed from <b>{region.name}</b>.
+                </p>;
+            }
         }
     }
 
