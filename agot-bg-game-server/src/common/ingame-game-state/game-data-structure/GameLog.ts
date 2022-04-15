@@ -49,7 +49,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | RevealAllObjectives | GarrisonRemoved | GarrisonReturned | ObjectiveDeckEmpty | OrdersRevealed | HouseCardsReturned
     | BalonGreyjoyASoSPowerTokensGained | MaceTyrellASoSOrderPlaced | BranStarkUsed | CerseiLannisterASoSPowerTokensDiscarded
     | DoranMartellASoSUsed | MelisandreOfAsshaiPowerTokensGained | SalladharSaanASoSPowerTokensChanged | SerDavosSeaworthASoSFortificationGained
-    | CasualtiesPrevented | SerIlynPayneASoSCasualtySuffered | StannisBaratheonASoSUsed | AeronDamphairHouseCardChanged;
+    | CasualtiesPrevented | SerIlynPayneASoSCasualtySuffered | StannisBaratheonASoSUsed | AeronDamphairHouseCardChanged | ControlPowerTokenRemoved;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -1102,4 +1102,10 @@ interface AeronDamphairHouseCardChanged {
     house: string;
     newHouseCard: string;
     reducedCombatStrength: boolean;
+}
+
+interface ControlPowerTokenRemoved {
+    type: "control-power-token-removed";
+    regionId: string;
+    houseId: string;
 }
