@@ -123,11 +123,6 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                 leftPowerToken = false;
             }
 
-            // Execute the moves that don't trigger a fight
-            movesThatDontTriggerAttack.forEach(([region, units]) => {
-                this.resolveMarchOrderGameState.moveUnits(startingRegion, units, region);
-            });
-
             const doNotLogMarchResolved = movesThatDontTriggerAttack.length == 0 && movesThatTriggerAttack.length > 0;
 
             if (!doNotLogMarchResolved) {
@@ -138,6 +133,11 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                     moves: movesThatDontTriggerAttack.map(([r, us]) => [r.id, us.map(u => u.type.id)]),
                 });
             }
+
+            // Execute the moves that don't trigger a fight
+            movesThatDontTriggerAttack.forEach(([region, units]) => {
+                this.resolveMarchOrderGameState.moveUnits(startingRegion, units, region);
+            });
 
             // It may be possible, that a user left a castle with ships in port empty.
             // If so, the ships in the port have to be destroyed.
@@ -195,10 +195,6 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                     // Attack against a neutral force
                     // That the player put up enough strength against the neutral force was
                     // already checked earlier. No need to re-check it now, just process the attack.
-                    const oldGarrisonStrength = region.garrison;
-                    region.garrison = 0;
-                    this.resolveMarchOrderGameState.moveUnits(startingRegion, army, region);
-
                     this.actionGameState.ingame.log({
                         type: "attack",
                         attacker: this.house.id,
@@ -207,6 +203,10 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                         attackedRegion: region.id,
                         units: army.map(u => u.type.id)
                     });
+
+                    const oldGarrisonStrength = region.garrison;
+                    region.garrison = 0;
+                    this.resolveMarchOrderGameState.moveUnits(startingRegion, army, region);
 
                     this.entireGame.broadcastToClients({
                         type: "change-garrison",
