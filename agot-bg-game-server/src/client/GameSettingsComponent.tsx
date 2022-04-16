@@ -294,6 +294,22 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         onChange={() => this.onRandomChosenHousesChange()}
                     />
                 </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="random-vassal-assignment-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="random-vassal-assignment-tooltip">
+                                    Vassals are randomly assigned to the player houses.
+                                </Tooltip>}>
+                                <label htmlFor="random-vassal-assignment-setting">Random vassal assignment</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.randomVassalAssignment}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.randomVassalAssignment = !this.gameSettings.randomVassalAssignment)}
+                    />
+                </Col>
+
             </Col>
             <Col md="12" lg="auto" id="draft-settings-col" className="no-gutters">
                 <Col xs="12">
