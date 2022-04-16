@@ -8,6 +8,8 @@ import Game from "../../game-data-structure/Game";
 import Player from "../../Player";
 import IngameGameState from "../../IngameGameState";
 import _ from "lodash";
+import BetterMap from "../../../../utils/BetterMap";
+import popRandom from "../../../../utils/popRandom";
 
 export default class ClaimVassalsGameState extends GameState<PlanningGameState, ClaimVassalGameState> {
     passedVassalsCount = 0;
@@ -26,7 +28,44 @@ export default class ClaimVassalsGameState extends GameState<PlanningGameState, 
                 type: "claim-vassals-began"
             });
         }
-        this.proceedNextVassal(null);
+
+        if (this.ingame.entireGame.gameSettings.randomVassalAssignment) {
+            this.proceedRandomVassalAssignment();
+        } else {
+            this.proceedNextVassal(null);
+        }
+    }
+
+    proceedRandomVassalAssignment(): void {
+        const vassalsToClaim = this.ingame.getNonClaimedVassalHouses();
+        let vassalRelationsChanged = false;
+
+        while (vassalsToClaim.length > 0) {
+            const housesAndTheirVassals = new BetterMap(this.ingame.getTurnOrderWithoutVassals().map(
+                h => [h, this.ingame.getControlledHouses(this.ingame.getControllerOfHouse(h))] as [House, House[]]));
+
+            const lowestVassalCount = Math.min(...housesAndTheirVassals.values.map(vassals => vassals.length));
+
+            const randomHouseWithLowestCount = popRandom(
+                housesAndTheirVassals.entries.filter(([_h, vassals]) => vassals.length == lowestVassalCount).map(([h, _vassals]) => h)) as House;
+
+            const nextVassalToClaim = popRandom(vassalsToClaim) as House;
+
+            this.game.vassalRelations.set(nextVassalToClaim, randomHouseWithLowestCount);
+            vassalRelationsChanged = true;
+
+            this.ingame.log({
+                type: "vassals-claimed",
+                house: randomHouseWithLowestCount.id,
+                vassals: [nextVassalToClaim.id]
+            }, true);
+        }
+
+        if (vassalRelationsChanged) {
+            this.ingame.broadcastVassalRelations();
+        }
+
+        this.parentGameState.onClaimVassalsFinished();
     }
 
     proceedNextVassal(lastToClaim: House | null): void {

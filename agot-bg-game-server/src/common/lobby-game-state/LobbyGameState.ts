@@ -240,6 +240,10 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.randomHouses = true;
             }
 
+            if (!settings.vassals) {
+                settings.randomVassalAssignment = false;
+            }
+
             const hideOrRevealUserNames = settings.faceless != this.settings.faceless;
 
             this.entireGame.gameSettings = settings;
