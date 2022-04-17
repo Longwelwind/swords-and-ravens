@@ -97,7 +97,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col xs={10} xl={8}>
+                <Col xs={11}>
                     <Row className="justify-content-center no-space-around">
                         <Card>
                             <Card.Body style={{paddingTop: "10px", paddingBottom: "10px"}}>

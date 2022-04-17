@@ -1718,6 +1718,17 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             serializedGame.users.forEach((u: any) => u.settings.chatHouseNames = false);
             return serializedGame;
         }
+    },
+    {
+        version: "77",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.game.dragonStrengthTokens = [2, 4, 6, 8, 10];
+                _.pull(ingame.game.dragonStrengthTokens, ingame.game.removedDragonStrengthToken);
+            }
+            return serializedGame;
+        }
     }
 ];
 

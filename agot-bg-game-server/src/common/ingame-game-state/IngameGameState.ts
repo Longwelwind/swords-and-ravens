@@ -745,6 +745,7 @@ export default class IngameGameState extends GameState<
             const region = this.world.regions.get(message.region);
             region.loyaltyTokens = message.newLoyaltyTokenCount;
         } else if (message.type == "dragon-strength-token-removed") {
+            _.pull(this.game.dragonStrengthTokens, message.fromRound);
             this.game.removedDragonStrengthToken = message.fromRound;
         } else if (message.type == "update-loan-cards") {
             this.game.theIronBank.loanCardDeck = message.loanCardDeck.map(lc => LoanCard.deserializeFromServer(this.game, lc));

@@ -120,7 +120,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
         );
     }
     renderLobbySettings(): ReactNode {
-        return <Row className="mt-2">
+        return <Row className="mt-2 justify-content-center">
             <Col md="12" lg="auto" id="base-settings-col" className="no-gutters">
                 <Col xs="12">
                     <select id="setups" name="setups"
@@ -180,7 +180,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                 <Tooltip id="asos-house-cards-setting-tooltip">
                                     When this option is enabled, the House cards from the 1st edition expansion <i>A Storm of Swords</i> are used.
                                 </Tooltip>}>
-                                <label htmlFor="asos-house-cards-setting">Use <i>ASoS</i> House cards (<i>BETA</i>)</label>
+                                <label htmlFor="asos-house-cards-setting">Use <i>ASoS</i> House cards</label>
                             </OverlayTrigger>}
                         checked={this.gameSettings.asosHouseCards}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.asosHouseCards = !this.gameSettings.asosHouseCards)}
@@ -188,32 +188,17 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 </Col>
                 <Col xs="12">
                     <FormCheck
-                        id="tides-of-battle-setting"
+                        id="faceless-setting"
                         type="switch"
                         label={
                             <OverlayTrigger overlay={
-                                <Tooltip id="tides-of-battle-tooltip">
-                                    Optional game module that enhances the risks and uncertainty of combat.
+                                <Tooltip id="faceless-setting-tooltip">
+                                    Player names will be hidden and revealed after game ended.
                                 </Tooltip>}>
-                                <label htmlFor="tides-of-battle-setting">Tides of Battle</label>
+                                <label htmlFor="faceless-setting">Faceless</label>
                             </OverlayTrigger>}
-                        checked={this.gameSettings.tidesOfBattle}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.tidesOfBattle = !this.gameSettings.tidesOfBattle)}
-                    />
-                </Col>
-                <Col xs="12">
-                    <FormCheck
-                        id="random-houses-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="random-houses-tooltip">
-                                    All houses will be randomized before the game starts.
-                                </Tooltip>}>
-                                <label htmlFor="random-houses-setting">Random houses</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.randomHouses}
-                        onChange={() => this.onRandomHousesChange()}
+                        checked={this.gameSettings.faceless}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.faceless = !this.gameSettings.faceless)}
                     />
                 </Col>
             </Col>
@@ -280,22 +265,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 </Col>
                 <Col xs="12">
                     <FormCheck
-                        id="random-chosen-houses-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="random-chosen-houses-tooltip">
-                                    Only chosen houses will be randomized before the game starts.
-                                    This way users can define player and vassal houses and are still able to randomize the player houses.
-                                </Tooltip>}>
-                                <label htmlFor="random-chosen-houses-setting">Random chosen houses</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.randomChosenHouses}
-                        onChange={() => this.onRandomChosenHousesChange()}
-                    />
-                </Col>
-                <Col xs="12">
-                    <FormCheck
                         id="random-vassal-assignment-setting"
                         type="switch"
                         label={
@@ -309,7 +278,118 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         onChange={() => this.changeGameSettings(() => this.gameSettings.randomVassalAssignment = !this.gameSettings.randomVassalAssignment)}
                     />
                 </Col>
-
+                {this.props.entireGame.isMotherOfDragons && this.props.entireGame.gameSettings.playerCount >= 8 && <Col xs="12">
+                    <FormCheck
+                        id="custom-mod-balancing-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="custom-mod-balancing-tooltip">
+                                    A community proposal to avoid an early gang up against Targaryen. For details see<br/>
+                                    <a href="https://community.swordsandravens.net/viewtopic.php?t=6" target="_blank" rel="noopener noreferrer">
+                                        Tex&apos;s balance proposal
+                                    </a>.
+                                </Tooltip>}
+                                delay={{show: 0, hide: 2000}}>
+                                <label htmlFor="custom-mod-balancing-setting">Custom MoD Balancing</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.customModBalancing}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.customModBalancing = !this.gameSettings.customModBalancing)}
+                    />
+                </Col>}
+            </Col>
+            <Col md="12" lg="auto" id="extended-base-settings-col" className="no-gutters">
+                <Col xs="12">
+                    <FormCheck
+                        id="random-houses-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="random-houses-tooltip">
+                                    House assignments are created randomly.
+                                </Tooltip>}>
+                                <label htmlFor="random-houses-setting">Random houses</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.randomHouses}
+                        onChange={() => this.onRandomHousesChange()}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="random-chosen-houses-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="random-chosen-houses-tooltip">
+                                    Only the selected house assignments are randomly exchanged.
+                                    This way, users can define player and vassal houses and are still able to randomize the player houses.
+                                </Tooltip>}>
+                                <label htmlFor="random-chosen-houses-setting">Random chosen houses</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.randomChosenHouses}
+                        onChange={() => this.onRandomChosenHousesChange()}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="tides-of-battle-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="tides-of-battle-tooltip">
+                                    Optional game module that enhances the risks and uncertainty of combat.
+                                </Tooltip>}>
+                                <label htmlFor="tides-of-battle-setting">Tides of Battle</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.tidesOfBattle}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.tidesOfBattle = !this.gameSettings.tidesOfBattle)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="remove-tob3-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="remove-tob3-setting-tooltip">
+                                    When this option is enabled, 3s cards will be removed from the Tides of Battle deck.
+                                </Tooltip>}>
+                                <label htmlFor="remove-tob3-setting">Remove 3s cards from ToB</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.removeTob3}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.removeTob3 = !this.gameSettings.removeTob3)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="remove-tob-skulls-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="remove-tob-skulls-setting-tooltip">
+                                    When this option is enabled, skull cards will be removed from the Tides of Battle deck.
+                                </Tooltip>}>
+                                <label htmlFor="remove-tob-skulls-setting">Remove skulls from ToB</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.removeTobSkulls}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.removeTobSkulls = !this.gameSettings.removeTobSkulls)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="limit-tob2-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="limit-tob2-setting-tooltip">
+                                    When this option is enabled, the Tides of Battle deck will only contain two 2s cards instead of four.
+                                </Tooltip>}>
+                                <label htmlFor="limit-tob2-setting">Limit ToB 2s cards</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.limitTob2}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.limitTob2 = !this.gameSettings.limitTob2)}
+                    />
+                </Col>
             </Col>
             <Col md="12" lg="auto" id="draft-settings-col" className="no-gutters">
                 <Col xs="12">
@@ -375,100 +455,8 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         onChange={() => this.changeGameSettings(() => this.gameSettings.blindDraft = !this.gameSettings.blindDraft)}
                     />
                 </Col>
-                <Col xs="12">
-                    <FormCheck
-                        id="random-start-positions-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="random-start-positions-setting-tooltip">
-                                    Houses randomly change their starting positions.
-                                </Tooltip>}>
-                                <label htmlFor="random-start-positions-setting">Random start positions</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.randomStartPositions}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.randomStartPositions = !this.gameSettings.randomStartPositions)}
-                    />
-                </Col>
             </Col>
             <Col md="12" lg="auto" id="custom-settings-col" className="no-gutters">
-                <Col xs="12">
-                    <FormCheck
-                        id="faceless-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="faceless-setting-tooltip">
-                                    Player names will be hidden and revealed after game ended.
-                                </Tooltip>}>
-                                <label htmlFor="faceless-setting">Faceless</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.faceless}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.faceless = !this.gameSettings.faceless)}
-                    />
-                </Col>
-                <Col xs="12">
-                    <FormCheck
-                        id="endless-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="endless-setting-tooltip">
-                                    The game will last until round 1000 unless a winner is declared earlier.
-                                </Tooltip>}>
-                                <label htmlFor="endless-setting">Endless</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.endless}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.endless = !this.gameSettings.endless)}
-                    />
-                </Col>
-                <Col xs="12">
-                    <FormCheck
-                        id="westeros-phase-variant-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="westeros-phase-variant-tooltip">
-                                    Players may look at the next 3 Westeros cards from each deck at any time.
-                                </Tooltip>}>
-                                <label htmlFor="westeros-phase-variant-setting">CoK Westeros Phase</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.cokWesterosPhase}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.cokWesterosPhase = !this.gameSettings.cokWesterosPhase)}
-                    />
-                </Col>
-                <Col xs="12">
-                    <FormCheck
-                        id="use-vassal-positions-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="use-vassal-positions-tooltip">
-                                    Player houses will as well start with their vassal starting positions.
-                                </Tooltip>}>
-                                <label htmlFor="use-vassal-positions-setting">Use vassal starting positions</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.useVassalPositions}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.useVassalPositions = !this.gameSettings.useVassalPositions)}
-                    />
-                </Col>
-                <Col xs="12">
-                    <FormCheck
-                        id="preceding-mustering-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="preceding-mustering-tooltip">
-                                    All players can recruit units like during a mustering event in their castles before the game starts.
-                                </Tooltip>}>
-                                <label htmlFor="preceding-mustering-setting">Preceding mustering</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.precedingMustering}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.precedingMustering = !this.gameSettings.precedingMustering)}
-                    />
-                </Col>
-            </Col>
-            <Col md="12" lg="auto" id="custom-settings-2-col" className="no-gutters">
                 <Col xs="12">
                     <FormCheck
                         id="mixed-wd1-setting"
@@ -488,47 +476,17 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 </Col>
                 <Col xs="12">
                     <FormCheck
-                        id="remove-tob3-setting"
+                        id="westeros-phase-variant-setting"
                         type="switch"
                         label={
                             <OverlayTrigger overlay={
-                                <Tooltip id="remove-tob3-setting-tooltip">
-                                    When this option is enabled, 3s cards will be removed from the Tides of Battle deck.
+                                <Tooltip id="westeros-phase-variant-tooltip">
+                                    Players may look at the next 3 Westeros cards from each deck at any time.
                                 </Tooltip>}>
-                                <label htmlFor="remove-tob3-setting">Remove 3s cards from ToB</label>
+                                <label htmlFor="westeros-phase-variant-setting">CoK Westeros Phase</label>
                             </OverlayTrigger>}
-                        checked={this.gameSettings.removeTob3}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.removeTob3 = !this.gameSettings.removeTob3)}
-                    />
-                </Col>
-                <Col xs="12">
-                    <FormCheck
-                        id="remove-tob-skulls-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="remove-tob-skulls-setting-tooltip">
-                                    When this option is enabled, skull cards will be removed from the Tides of Battle deck.
-                                </Tooltip>}>
-                                <label htmlFor="remove-tob-skulls-setting">Remove skulls from ToB</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.removeTobSkulls}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.removeTobSkulls = !this.gameSettings.removeTobSkulls)}
-                    />
-                </Col>
-                <Col xs="12">
-                    <FormCheck
-                        id="limit-tob2-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="limit-tob2-setting-tooltip">
-                                    When this option is enabled, the Tides of Battle deck will only contain two 2s cards instead of four.
-                                </Tooltip>}>
-                                <label htmlFor="limit-tob2-setting">Limit ToB 2s cards</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.limitTob2}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.limitTob2 = !this.gameSettings.limitTob2)}
+                        checked={this.gameSettings.cokWesterosPhase}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.cokWesterosPhase = !this.gameSettings.cokWesterosPhase)}
                     />
                 </Col>
                 <Col xs="12">
@@ -544,6 +502,68 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             </OverlayTrigger>}
                         checked={this.gameSettings.reduceVictoryPointsCountNeededToWinTo6}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.reduceVictoryPointsCountNeededToWinTo6 = !this.gameSettings.reduceVictoryPointsCountNeededToWinTo6)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="endless-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="endless-setting-tooltip">
+                                    The number of game rounds is increased to 1000.
+                                </Tooltip>}>
+                                <label htmlFor="endless-setting">Endless</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.endless}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.endless = !this.gameSettings.endless)}
+                    />
+                </Col>
+            </Col>
+            <Col md="12" lg="auto" id="custom-settings-2-col" className="no-gutters">
+                <Col xs="12">
+                    <FormCheck
+                        id="random-start-positions-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="random-start-positions-setting-tooltip">
+                                    Houses randomly change their starting positions.
+                                </Tooltip>}>
+                                <label htmlFor="random-start-positions-setting">Random start positions</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.randomStartPositions}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.randomStartPositions = !this.gameSettings.randomStartPositions)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="preceding-mustering-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="preceding-mustering-tooltip">
+                                    All players can recruit units like during a mustering event in their castles before the game starts.
+                                </Tooltip>}>
+                                <label htmlFor="preceding-mustering-setting">Preceding mustering</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.precedingMustering}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.precedingMustering = !this.gameSettings.precedingMustering)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="use-vassal-positions-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="use-vassal-positions-tooltip">
+                                    Player houses will as well start with their vassal starting positions.
+                                </Tooltip>}>
+                                <label htmlFor="use-vassal-positions-setting">Use vassal starting positions</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.useVassalPositions}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.useVassalPositions = !this.gameSettings.useVassalPositions)}
                     />
                 </Col>
             </Col>

@@ -457,11 +457,33 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
 
             for (let i = 0;i < quantity; i++) {
                 const unit = game.createUnit(region, unitType, house);
-
                 region.units.set(unit.id, unit);
             }
         });
     });
+
+    if (gameSettings.customModBalancing) {
+        // Apply the new starting positions
+        Object.entries(baseGameData.customModBalancing as {[key: string]: UnitData[]}).forEach(([regionId, data]) => {
+            data.filter(unitData => housesToCreate.includes(unitData.house)).forEach(unitData => {
+                const region = game.world.regions.get(regionId);
+                const house = game.houses.get(gameSettings.randomStartPositions && startingPositionsMap.has(unitData.house) ? startingPositionsMap.get(unitData.house) : unitData.house);
+                const unitType = unitTypes.get(unitData.unitType);
+                const quantity = (!playerHouses.includes(house.id) || gameSettings.useVassalPositions) ? (unitData.quantityVassal ?? 0) : unitData.quantity;
+
+                // Remove already created units
+                region.units.clear();
+
+                for (let i = 0;i < quantity; i++) {
+                    const unit = game.createUnit(region, unitType, house);
+                    region.units.set(unit.id, unit);
+                }
+            });
+        });
+
+        // Apply alternate dragon strength tokens
+        game.dragonStrengthTokens = baseGameData.alternateDragonStrengthTokens;
+    }
 
     game.starredOrderRestrictions = baseGameData.starredOrderRestrictions[baseGameData.starredOrderRestrictions.findIndex(
         restrictions => game.houses.size <= restrictions.length)];

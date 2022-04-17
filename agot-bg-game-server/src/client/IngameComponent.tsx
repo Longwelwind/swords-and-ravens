@@ -808,13 +808,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     renderDragonStrengthTooltip(): OverlayChildren {
-        const roundsWhenIncreased: number[] = [];
-        for(let i = this.game.turn + 1; i <= 10; i++) {
-            if (i % 2 == 0) {
-                roundsWhenIncreased.push(i);
-            }
-        }
-        _.pull(roundsWhenIncreased, this.game.removedDragonStrengthToken);
+        const roundsWhenIncreased = this.game.dragonStrengthTokens.filter(onRound => onRound > this.game.turn);
         return <Tooltip id="dragon-strength-tooltip">
             <div className="m-1 text-center">
                 <h6>Current Dragon Strength</h6>

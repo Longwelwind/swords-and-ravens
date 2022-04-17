@@ -7,6 +7,7 @@
     "fiefdoms": ["greyjoy", "tyrell", "martell", "stark", "baratheon", "lannister"],
     "kingsCourt": ["lannister", "stark", "martell", "baratheon", "tyrell", "greyjoy"]
   },
+  "alternateDragonStrengthTokens": [2, 4, 7, 9, 10],
   "setups": {
     "base-game": {
       "name": "2nd Edition Base Game (3p/6p)",
@@ -1235,6 +1236,36 @@
         "quantityVassal": 1
       }
     ]
+  },
+  "customModBalancing": {
+    "port-of-pentos": [
+      {
+        "unitType": "ship",
+        "house": "targaryen",
+        "quantity": 2
+      }
+    ],
+    "bay-of-pentos": [
+      {
+        "unitType": "ship",
+        "house": "targaryen",
+        "quantity": 0
+      }
+    ],
+    "blackwater-bay": [
+      {
+        "unitType": "ship",
+        "house": "baratheon",
+        "quantity": 1,
+        "quantityVassal": 0
+      }
+    ],
+    "shipbreaker-bay": [{
+      "unitType": "ship",
+      "house": "baratheon",
+      "quantity": 1,
+      "quantityVassal": 0
+    }]
   },
   "starredOrderRestrictions": [
     [3, 2, 1, 0],
