@@ -290,7 +290,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                         Tex&apos;s balance proposal
                                     </a>.
                                 </Tooltip>}
-                                delay={{show: 0, hide: 2000}}>
+                                delay={{show: 0, hide: 1500}}>
                                 <label htmlFor="custom-mod-balancing-setting">Custom MoD Balancing</label>
                             </OverlayTrigger>}
                         checked={this.gameSettings.customModBalancing}
@@ -523,21 +523,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             <Col md="12" lg="auto" id="custom-settings-2-col" className="no-gutters">
                 <Col xs="12">
                     <FormCheck
-                        id="random-start-positions-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="random-start-positions-setting-tooltip">
-                                    Houses randomly change their starting positions.
-                                </Tooltip>}>
-                                <label htmlFor="random-start-positions-setting">Random start positions</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.randomStartPositions}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.randomStartPositions = !this.gameSettings.randomStartPositions)}
-                    />
-                </Col>
-                <Col xs="12">
-                    <FormCheck
                         id="preceding-mustering-setting"
                         type="switch"
                         label={
@@ -553,14 +538,29 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 </Col>
                 <Col xs="12">
                     <FormCheck
+                        id="random-start-positions-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="random-start-positions-setting-tooltip">
+                                    Houses randomly change their start positions.
+                                </Tooltip>}>
+                                <label htmlFor="random-start-positions-setting">Random start positions</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.randomStartPositions}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.randomStartPositions = !this.gameSettings.randomStartPositions)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
                         id="use-vassal-positions-setting"
                         type="switch"
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="use-vassal-positions-tooltip">
-                                    Player houses will as well start with their vassal starting positions.
+                                    Player houses will as well start with their vassal start positions.
                                 </Tooltip>}>
-                                <label htmlFor="use-vassal-positions-setting">Use vassal starting positions</label>
+                                <label htmlFor="use-vassal-positions-setting">Vassal start positions</label>
                             </OverlayTrigger>}
                         checked={this.gameSettings.useVassalPositions}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.useVassalPositions = !this.gameSettings.useVassalPositions)}
