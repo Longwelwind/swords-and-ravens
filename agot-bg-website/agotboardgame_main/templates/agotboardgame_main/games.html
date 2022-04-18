@@ -33,11 +33,11 @@ Games -
                     </h4>
                     {% for user in request.online_now %}
                     {% if user.is_admin %}
-                        <a style="margin-right: 10px; font-size: 1.125rem; color:brown" href="/user/{{ user.id }}">{{ user.username }}</a>
+                        <a style="margin-right: 10px; font-size: 1.125rem; color:brown" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">{{ user.username }}</a>
                     {% elif user.is_high_member %}
-                        <a style="margin-right: 10px; font-size: 1.125rem; color:darkgoldenrod" href="/user/{{ user.id }}">{{ user.username }}</a>
+                        <a style="margin-right: 10px; font-size: 1.125rem; color:darkgoldenrod" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">{{ user.username }}</a>
                     {% else %}
-                        <a style="margin-right: 10px; font-size: 1.125rem;" href="/user/{{ user.id }}">{{ user.username }}</a>
+                        <a style="margin-right: 10px; font-size: 1.125rem;" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">{{ user.username }}</a>
                     {% endif %}
                     {% endfor %}
                 </div>
