@@ -220,6 +220,10 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.ironBank = false;
             }
 
+            if (settings.playerCount < 8) {
+                settings.customModBalancing = false;
+            }
+
             // Allow disabling DwD cards but enable them when switching to this setup
             if (!this.entireGame.isDanceWithDragons && settings.setupId == "a-dance-with-dragons") {
                 settings.adwdHouseCards = true;

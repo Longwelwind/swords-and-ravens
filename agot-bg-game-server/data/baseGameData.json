@@ -1220,14 +1220,6 @@
         "quantityVassal": 1
       }
     ],
-    "braavosian-coastlands": [
-      {
-        "unitType": "ship",
-        "house": "targaryen",
-        "quantity": 0,
-        "quantityVassal": 1
-      }
-    ],
     "volantis": [
       {
         "unitType": "knight",
@@ -1242,14 +1234,16 @@
       {
         "unitType": "ship",
         "house": "targaryen",
-        "quantity": 2
+        "quantity": 2,
+        "quantityVassal": 2
       }
     ],
     "bay-of-pentos": [
       {
         "unitType": "ship",
         "house": "targaryen",
-        "quantity": 0
+        "quantity": 0,
+        "quantityVassal": 1
       }
     ],
     "blackwater-bay": [
@@ -1257,14 +1251,14 @@
         "unitType": "ship",
         "house": "baratheon",
         "quantity": 1,
-        "quantityVassal": 0
+        "quantityVassal": 1
       }
     ],
     "shipbreaker-bay": [{
       "unitType": "ship",
       "house": "baratheon",
       "quantity": 1,
-      "quantityVassal": 0
+      "quantityVassal": 2
     }]
   },
   "starredOrderRestrictions": [

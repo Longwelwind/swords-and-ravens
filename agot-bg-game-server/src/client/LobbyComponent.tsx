@@ -116,6 +116,14 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                                     this.password = newPassword;
                                                     this.props.gameState.sendPassword(newPassword);
                                                 }}
+                                                tooltip={
+                                                    <Tooltip id="game-password-tooltip">
+                                                        {this.props.gameClient.isRealOwner()
+                                                            ? <>You can set a password here to prevent strangers from joining your game.</>
+                                                            : this.props.gameState.password != ""
+                                                                ? <>Enter the password here to unlock and join the game.</>
+                                                                : <></>}
+                                                    </Tooltip>}
                                             />
                                         </Row>
                                     </Col>

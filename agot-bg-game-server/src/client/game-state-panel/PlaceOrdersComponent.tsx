@@ -66,9 +66,9 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                     <Row className="justify-content-center">
                         <Col xs={12} className="text-center">
                             {!this.forVassals ? (
-                                <>Players must assign orders in each region where they possess at least one unit now.</>
+                                <>Players must now place orders in every region where they have at least one unit.</>
                             ) : (
-                                <>Players must assign orders for their vassals now.</>
+                                <>Players must now place orders for their vassals.</>
                             )}
                         </Col>
                         {this.placeOrders.parentGameState.planningRestrictions.map(pr => this.restrictionToWesterosCardTypeMap.tryGet(pr, null))
