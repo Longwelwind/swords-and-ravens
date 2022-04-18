@@ -13,6 +13,7 @@ import SelectUnitsGameState, { SerializedSelectUnitsGameState } from "../../../s
 import Unit from "../../../game-data-structure/Unit";
 import BetterMap from "../../../../../utils/BetterMap";
 import { dragon } from "../../../game-data-structure/unitTypes";
+import _ from "lodash";
 
 enum FIRE_MADE_FLESH_STEP {
     CHOOSE_EFFECT,
@@ -60,7 +61,7 @@ export default class FireMadeFleshGameState extends GameState<WesterosDeck4GameS
         if (this.step == FIRE_MADE_FLESH_STEP.CHOOSE_EFFECT) {
             result.set("Ignore", FIRE_MADE_FLESH_EFFECT.IGNORE);
             const dragons = this.getDragonsOnBoard(house);
-            if (this.game.turn < 10 && dragons.length > 0) {
+            if (this.game.turn < (_.last(this.game.dragonStrengthTokens) as number) && dragons.length > 0) {
                 result.set("Destroy one dragon", FIRE_MADE_FLESH_EFFECT.KILL_DRAGON);
             }
 
@@ -71,11 +72,9 @@ export default class FireMadeFleshGameState extends GameState<WesterosDeck4GameS
 
             return result;
         } else if (this.step == FIRE_MADE_FLESH_STEP.CHOOSE_DRAGON_STRENGTH_TOKEN) {
-            for(let i = this.game.turn + 1; i <= 10; i++) {
-                if (i > 2 && i % 2 == 0) {
-                    result.set(i.toString(), i);
-                }
-            }
+            this.game.dragonStrengthTokens.filter(onRound => onRound > this.game.turn).forEach(onRound => {
+                result.set(onRound.toString(), onRound);
+            });
         }
 
         if (result.size == 0) {
@@ -127,7 +126,9 @@ export default class FireMadeFleshGameState extends GameState<WesterosDeck4GameS
                 removedDragonStrengthToken: decision
             }, resolvedAutomatically);
 
+            _.pull(this.game.dragonStrengthTokens, decision);
             this.game.removedDragonStrengthToken = decision;
+
             this.entireGame.broadcastToClients({
                 type: "dragon-strength-token-removed",
                 fromRound: decision

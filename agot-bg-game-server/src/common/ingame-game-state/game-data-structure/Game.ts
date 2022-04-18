@@ -53,6 +53,7 @@ export default class Game {
     @observable houseCardsForDrafting: BetterMap<string, HouseCard> = new BetterMap();
     deletedHouseCards: BetterMap<string, HouseCard> = new BetterMap();
     oldPlayerHouseCards: BetterMap<House, BetterMap<string, HouseCard>> = new BetterMap();
+    @observable dragonStrengthTokens = [2, 4, 6, 8, 10];
     @observable removedDragonStrengthToken = 0;
     ironBank: IronBank | null;
     @observable objectiveDeck: ObjectiveCard[] = [];
@@ -118,11 +119,25 @@ export default class Game {
     }
 
     get currentDragonStrength(): number {
-        if (this.removedDragonStrengthToken > 0 && this.turn < this.removedDragonStrengthToken) {
-            return Math.min(5, Math.floor(this.turn/2) + 1);
-        } else {
-            return Math.min(5, Math.floor(this.turn/2));
+        if (this.turn > 10) {
+            return 5;
         }
+
+        // If a dragon strength token has been removed from the round track
+        // the initial value is 1 instead of 0
+        const result = this.removedDragonStrengthToken == 0 ? 0 : 1;
+        for (let i=0; i<this.dragonStrengthTokens.length; i++) {
+            if (this.dragonStrengthTokens[i] == this.turn) {
+                return result + i + 1; // +1 because of the 0-based index
+            }
+            if (this.dragonStrengthTokens[i] > this.turn) {
+                // If the current token value is greater than current round we add the current index,
+                // which is the value of the previous dragon strength token on the round track (0-based index)
+                return result + i;
+            }
+        }
+
+        throw new Error("Error in calculating currentDragonStrength");
     }
 
     get loyaltyTokensOnBoardCount(): number {
@@ -538,6 +553,7 @@ export default class Game {
                 : this.houseCardsForDrafting.entries.filter(([_hcid, hc]) => hc.houseId == player?.house.id).map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
             deletedHouseCards: this.deletedHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
             oldPlayerHouseCards: this.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])]),
+            dragonStrengthTokens: this.dragonStrengthTokens,
             removedDragonStrengthToken: this.removedDragonStrengthToken,
             ironBank: this.ironBank ? this.ironBank.serializeToClient(admin) : null,
             objectiveDeck: admin ? this.objectiveDeck.map(oc => oc.id) : [],
@@ -572,6 +588,7 @@ export default class Game {
         game.oldPlayerHouseCards = new BetterMap(data.oldPlayerHouseCards.map(([hid, hcs]) =>
             [game.houses.get(hid), new BetterMap(hcs.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]))]
         ));
+        game.dragonStrengthTokens = data.dragonStrengthTokens;
         game.removedDragonStrengthToken = data.removedDragonStrengthToken;
         game.ironBank = data.ironBank ? IronBank.deserializeFromServer(game, data.ironBank) : null;
         game.objectiveDeck = data.objectiveDeck.map(ocid => objectiveCards.get(ocid));
@@ -604,6 +621,7 @@ export interface SerializedGame {
     houseCardsForDrafting: [string, SerializedHouseCard][];
     deletedHouseCards: [string, SerializedHouseCard][];
     oldPlayerHouseCards: [string, [string, SerializedHouseCard][]][];
+    dragonStrengthTokens: number[];
     removedDragonStrengthToken: number;
     ironBank: SerializedIronBank | null;
     objectiveDeck: string[];
