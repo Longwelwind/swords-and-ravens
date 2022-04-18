@@ -50,7 +50,7 @@
         }
 
         addMessage(data, insertAtStart) {
-            const parsedMsg = {id: data.id, username: data.user_username, text: data.text, created_at: new Date(Date.parse(data.created_at))};
+            const parsedMsg = {id: data.id, username: data.user_username, user_id: data.user_id, text: data.text, created_at: new Date(Date.parse(data.created_at))};
             this.setState(state => {
                 const messages = !insertAtStart
                     ? state.messages.concat(parsedMsg)
@@ -89,7 +89,7 @@
                                         <small class="text-muted">${('0' + m.created_at.getHours()).slice(-2)}:${('0' + m.created_at.getMinutes()).slice(-2)}</small>
                                     </div>
                                     <div class="col-auto mx-2">
-                                        <strong>${m.username}</strong>
+                                        <b><a href="/user/${m.user_id}" target="_blank" rel="noopener noreferrer" style="color: white;">${m.username}</a></b>
                                     </div>
                                     <div class="col" style="overflow-wrap: break-all; max-width: 650px;">
                                         ${m.text}
