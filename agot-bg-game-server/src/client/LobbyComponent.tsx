@@ -93,7 +93,11 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                             <ChatComponent gameClient={this.props.gameClient}
                                         entireGame={this.lobby.entireGame}
                                         roomId={this.lobby.entireGame.publicChatRoomId}
-                                        currentlyViewed={true}/>
+                                        currentlyViewed={true}
+                                        getUserDisplayName={u =>
+                                            <a href={`/user/${u.id}`} target="_blank" rel="noopener noreferrer" style={{color: "white"}}><b>{u.name}</b></a>
+                                        }
+                            />
                         </Card.Body>
                     </Card>
                 </Col>
