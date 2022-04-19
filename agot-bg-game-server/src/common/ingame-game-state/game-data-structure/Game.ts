@@ -119,7 +119,7 @@ export default class Game {
     }
 
     get currentDragonStrength(): number {
-        if (this.turn > 10) {
+        if (this.turn > (_.last(this.dragonStrengthTokens) as number)) {
             return 5;
         }
 
