@@ -1533,7 +1533,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <>
                     <p>
-                        House <b>{house.name}</b> resolved a <b>Iron Bank</b> order in <b>
+                        House <b>{house.name}</b> resolved an <b>Iron&nbsp;Bank</b> order in <b>
                             {region.name}</b> and paid <b>{data.paid}</b> Power&nbsp;token{data.paid != 1 ? "s" : ""} for
                     </p>
                     <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -1559,7 +1559,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const debt = data.cost + data.paid;
                 return <p>
-                    House <b>{house.name}</b> paid an interest of <b>{Math.abs(data.paid)}</b> Power token{Math.abs(data.paid) != 1 ? "s" : ""} to the Iron Bank.{debt > 0 ? <>&nbsp;<b>{debt}</b> interest debt could not be paid.</> : ""}
+                    House <b>{house.name}</b> paid an interest of <b>{Math.abs(data.paid)}</b> Power token{Math.abs(data.paid) != 1 ? "s" : ""} to the Iron&nbsp;Bank.{debt > 0 ? <>&nbsp;<b>{debt}</b> interest debt could not be paid.</> : ""}
                 </p>
             }
             case "debt-paid": {
@@ -1568,7 +1568,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]) as [Region, UnitType[]][];
 
                 return <p>
-                    <b>Debts to the Iron Bank</b>: {units.length > 0
+                    <b>Debts to the Iron&nbsp;Bank</b>: {units.length > 0
                     ? (<>House <b>{resolver.name}</b> chose to destroy {joinReactNodes(units.map(([region, unitTypes]) =>
                             <span key={`pay-debt_${region.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`pay-debt_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), ", ")} of House <b>{house.name}</b>.</>)
                     : <>House <b>{house.name} </b> had no units to destroy.</>}

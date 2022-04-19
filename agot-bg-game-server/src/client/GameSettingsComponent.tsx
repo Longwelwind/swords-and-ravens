@@ -225,9 +225,11 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="iron-bank-setting-tooltip">
-                                    Enable the Iron Bank from the <i>Mother of Dragons</i> expansion. All player houses start with 7 Power tokens instead of 5.
+                                    Enable the Iron&nbsp;Bank from the <i>Mother of Dragons</i> expansion. All player houses start with 7 Power tokens instead of 5.
+                                    <br/><br/>
+                                    <i>Note: Enabling the Iron&nbsp;Bank makes the Iron&nbsp;Bank sea order available, even if sea orders are deactivated.</i>
                                 </Tooltip>}>
-                                <label htmlFor="iron-bank-setting">MoD Iron Bank</label>
+                                <label htmlFor="iron-bank-setting">MoD Iron&nbsp;Bank</label>
                             </OverlayTrigger>}
                         checked={this.gameSettings.ironBank}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.ironBank = !this.gameSettings.ironBank)}
