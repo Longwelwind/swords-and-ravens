@@ -36,9 +36,13 @@ export default class CancelledComponent extends Component<CancelledComponentProp
                         <Card>
                             <Card.Body style={{height: "500px"}}>
                                 <ChatComponent gameClient={this.props.gameClient}
-                                               entireGame={this.props.gameState.entireGame}
-                                               roomId={this.props.gameState.entireGame.publicChatRoomId}
-                                               currentlyViewed={true}/>
+                                    entireGame={this.props.gameState.entireGame}
+                                    roomId={this.props.gameState.entireGame.publicChatRoomId}
+                                    currentlyViewed={true}
+                                    getUserDisplayName={u =>
+                                        <a href={`/user/${u.id}`} target="_blank" rel="noopener noreferrer" style={{ color: "white" }}><b>{u.name}</b></a>
+                                    }
+                                />
                             </Card.Body>
                         </Card>
                     </Col>
