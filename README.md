@@ -68,7 +68,7 @@ cd agot-bg-website/
 cp .env.dev .env
 python3 -m venv venv
 source venv/bin/activate
-pip install wheels
+pip install wheel
 pip install -r requirements.txt
 cp agotboardgame_main/migrations_for_new_database.py agotboardgame_main/migrations/0002_initial_migrations.py
 python3 manage.py migrate
