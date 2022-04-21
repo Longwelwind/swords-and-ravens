@@ -32,6 +32,16 @@ export default class AlayneStoneAbilityGameState extends GameState<
     }
 
     firstStart(house: House): void {
+        if (house.powerTokens < 2) {
+            this.ingame.log({
+                type: "house-card-ability-not-used",
+                house: house.id,
+                houseCard: alayneStone.id
+            }, true);
+            this.parentGameState.onHouseCardResolutionFinish(house);
+            return;
+        }
+
         this.setChildGameState(new SimpleChoiceGameState(this))
             .firstStart(
                 house,
