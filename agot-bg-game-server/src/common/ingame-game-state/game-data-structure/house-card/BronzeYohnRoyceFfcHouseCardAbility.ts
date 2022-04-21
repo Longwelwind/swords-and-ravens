@@ -9,6 +9,6 @@ export default class BronzeYohnRoyceFfcHouseCardAbility extends HouseCardAbility
             return 0;
         }
         const enemy = combat.getEnemy(house);
-        return combat.ingameGameState.isVassalHouse(enemy) || house.powerTokens > enemy.powerTokens ? 1 : 0;
+        return !combat.ingameGameState.isVassalHouse(enemy) && house.powerTokens > enemy.powerTokens ? 1 : 0;
     }
 }
