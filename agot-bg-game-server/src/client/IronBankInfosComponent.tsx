@@ -28,7 +28,7 @@ export default class IronBankInfosComponent extends Component<IronBankInfosCompo
         const backgroundOpacity = braavosController || interestCosts.length > 0 ? 0.5 : 1;
         return (
             <>
-                <Card style={{ height: "100%" }} className="hover-smedium-outline">
+                <Card style={{ height: "100%" }} className="hover-weak-outline">
                     <Card.Img variant="top" src={ironBankImage} style={{opacity: backgroundOpacity, height: "100%", width: "auto"}}/>
                     <Card.ImgOverlay style={{ padding: 16, paddingBottom: 8 }} className="clickable-no-underline">
                         <OverlayTrigger

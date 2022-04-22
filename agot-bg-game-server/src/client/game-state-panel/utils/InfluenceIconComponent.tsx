@@ -51,7 +51,7 @@ export default class InfluenceIconComponent extends Component<InfluenceIconCompo
             }
             placement="bottom"
         >
-            <div className={classNames("influence-icon", {"medium-outline": isTokenHolder}, {"invisible": this.house == null})}
+            <div className={classNames("influence-icon", {"smedium-outline": isTokenHolder}, {"invisible": this.house == null})}
                 style={{backgroundImage: this.house ? `url(${houseInfluenceImages.get(this.house.id)})` : "none"}}>
             </div>
         </OverlayTrigger>;

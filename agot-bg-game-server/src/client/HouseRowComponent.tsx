@@ -199,7 +199,6 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                             <div style={{ fontSize: "20px", color: victoryPointsWarning ? "#F39C12" : victoryPointsCritical ? "#FF0000" : undefined }}><b>{victoryPoints}</b></div>
                             <img
                                 className={classNames(
-                                    "hover-weak-outline",
                                     { "dye-warning": victoryPointsWarning },
                                     { "dye-critical": victoryPointsCritical })}
                                 src={victoryImage} width={40}
@@ -225,7 +224,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                             rootClose
                         >
                             <div
-                                className="house-power-token hover-smedium-outline clickable"
+                                className="house-power-token hover-weak-outline clickable"
                                 style={{
                                     backgroundImage: `url(${housePowerTokensImages.get(this.house.id)})`,
                                     marginLeft: "10px"

@@ -325,73 +325,71 @@ $tiny-scale: 0.12;
 }
 
 $outline-color: white;
-$weak-outline: rgba($outline-color, 0.2);
-$smedium-outline: rgba($outline-color, 0.5);
-$medium-outline: rgba($outline-color, 0.8);
-$strong-outline: rgba($outline-color, 1);
+$medium-outline: rgba($outline-color, 0.6);
 
-.weak-outline {
-  filter: drop-shadow(1px 1px 3px $weak-outline) drop-shadow(-1px -1px 3px $weak-outline);
+.weak-text-outline {
+  filter: drop-shadow(1px 1px 2px $medium-outline) drop-shadow(-1px -1px 2px $medium-outline);
 }
 
-.hover-weak-outline:hover {
-  filter: drop-shadow(1px 1px 3px $weak-outline) drop-shadow(-1px -1px 3px $weak-outline);
+.hover-weak-text-outline:hover {
+  filter: drop-shadow(1px 1px 2px $medium-outline) drop-shadow(-1px -1px 2px $medium-outline);
   transition: all 0.12s linear;
 }
 
+.weak-outline {
+  filter: drop-shadow(1px 1px 2px $medium-outline) drop-shadow(-1px -1px 2px $medium-outline) drop-shadow(1px -1px 2px $medium-outline) drop-shadow(-1px 1px 2px $medium-outline);
+}
+
+.hover-weak-outline:hover {
+  filter: drop-shadow(1px 1px 2px $medium-outline) drop-shadow(-1px -1px 2px $medium-outline) drop-shadow(1px -1px 2px $medium-outline) drop-shadow(-1px 1px 2px $medium-outline);
+  transition: all 0.12s linear;
+}
+
+.smedium-outline {
+	filter: drop-shadow(3px 3px 3px $medium-outline) drop-shadow(-3px -3px 3px $medium-outline) drop-shadow(3px -3px 3px $medium-outline) drop-shadow(-3px 3px 3px $medium-outline);
+}
+
 .hover-smedium-outline:hover {
-  filter: drop-shadow(5px 5px 5px $smedium-outline) drop-shadow(-5px -5px 5px $smedium-outline);
+	filter: drop-shadow(3px 3px 3px $medium-outline) drop-shadow(-3px -3px 3px $medium-outline) drop-shadow(3px -3px 3px $medium-outline) drop-shadow(-3px 3px 3px $medium-outline);
   transition: all 0.12s linear;
 }
 
 .medium-outline {
-	filter: drop-shadow(6px 6px 6px $medium-outline) drop-shadow(-6px -6px 6px $medium-outline);
-  }
+	filter: drop-shadow(3px 3px 3px $outline-color) drop-shadow(-3px -3px 3px $outline-color) drop-shadow(3px -3px 3px $outline-color) drop-shadow(-3px 3px 3px $outline-color);
+}
 
 .hover-medium-outline:hover {
-filter: drop-shadow(6px 6px 6px $medium-outline) drop-shadow(-6px -6px 6px $medium-outline);
-transition: all 0.12s linear;
+  filter: drop-shadow(3px 3px 3px $outline-color) drop-shadow(-3px -3px 3px $outline-color) drop-shadow(4px -4px 4px $outline-color) drop-shadow(-3px 3px 3px $outline-color);
+  transition: all 0.12s linear;
 }
 
 .strong-outline {
-filter: drop-shadow(6px 6px 6px $strong-outline) drop-shadow(-6px -6px 6px $strong-outline);
+  filter: drop-shadow(5px 5px 6px $outline-color) drop-shadow(-5px -5px 6px $outline-color) drop-shadow(5px -5px 6px $outline-color) drop-shadow(-5px 5px 6px $outline-color);
 }
 
 .hover-strong-outline:hover {
-filter: drop-shadow(6px 6px 6px $strong-outline) drop-shadow(-6px -6px 6px $strong-outline);
-transition: all 0.12s linear;
+  filter: drop-shadow(5px 5px 6px $outline-color) drop-shadow(-5px -5px 6px $outline-color) drop-shadow(5px -5px 6px $outline-color) drop-shadow(-5px 5px 6px $outline-color);
+  transition: all 0.12s linear;
 }
 
-$attacking-army-outline: rgba(red, 1.0);
+$attacking-army-outline: red;
 .attacking-army-highlight {
-  filter: drop-shadow(4px 4px 4px $attacking-army-outline) drop-shadow(-4px -4px 4px $attacking-army-outline);
+  filter: drop-shadow(3px 3px 3px $attacking-army-outline) drop-shadow(-3px -3px 3px $attacking-army-outline) drop-shadow(3px -3px 3px $attacking-army-outline) drop-shadow(-3px 3px 3px $attacking-army-outline);
 }
 
-.attacking-army-highlight:hover {
-  filter: drop-shadow(4px 4px 4px $attacking-army-outline) drop-shadow(-4px -4px 4px $attacking-army-outline);
-}
-
-$unit-highlight-outline-yellow: rgba(yellow, 1.0);
+$unit-highlight-outline-yellow: yellow;
 .unit-highlight-yellow {
-  filter: drop-shadow(4px 4px 4px $unit-highlight-outline-yellow) drop-shadow(-4px -4px 4px $unit-highlight-outline-yellow);
+  filter: drop-shadow(3px 3px 3px $unit-highlight-outline-yellow) drop-shadow(-3px -3px 3px $unit-highlight-outline-yellow) drop-shadow(3px -3px 3px $unit-highlight-outline-yellow) drop-shadow(-3px 3px 3px $unit-highlight-outline-yellow);
 }
 
-.unit-highlight-yellow:hover {
-  filter: drop-shadow(4px 4px 4px $unit-highlight-outline-yellow) drop-shadow(-4px -4px 4px $unit-highlight-outline-yellow);
-}
-
-$unit-highlight-outline-green: rgba(green, 1.0);
+$unit-highlight-outline-green: green;
 .unit-highlight-green {
-  filter: drop-shadow(4px 4px 4px $unit-highlight-outline-green) drop-shadow(-4px -4px 4px $unit-highlight-outline-green);
-}
-
-.unit-highlight-green:hover {
-  filter: drop-shadow(4px 4px 4px $unit-highlight-outline-green) drop-shadow(-4px -4px 4px $unit-highlight-outline-green);
+  filter: drop-shadow(3px 3px 3px $unit-highlight-outline-green) drop-shadow(-3px -3px 3px $unit-highlight-outline-green) drop-shadow(3px -3px 3px $unit-highlight-outline-green) drop-shadow(-3px 3px 3px $unit-highlight-outline-green);
 }
 
 $wildling-outline: rgba(yellow, 0.6);
 .wildling-highlight {
-  filter: drop-shadow(2px 2px 3px $wildling-outline) drop-shadow(-2px -2px 3px $wildling-outline);
+  filter: drop-shadow(2px 2px 2px $wildling-outline) drop-shadow(-2px -2px 2px $wildling-outline) drop-shadow(2px -2px 2px $wildling-outline) drop-shadow(-2px 2px 2px $wildling-outline);
 }
 
 .clickable {

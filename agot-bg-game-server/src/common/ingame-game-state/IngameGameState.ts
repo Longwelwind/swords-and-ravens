@@ -58,7 +58,7 @@ export default class IngameGameState extends GameState<
 
     // Client-side only
     @observable rerender = 0;
-    @observable marchResolutionAnimation: BetterMap<Unit, Region> = new BetterMap();
+    @observable marchMarkers: BetterMap<Unit, Region> = new BetterMap();
 
     get entireGame(): EntireGame {
         return this.parentGameState;
@@ -630,30 +630,17 @@ export default class IngameGameState extends GameState<
 
             if (from != to) {
                 units.forEach(u => {
-                    this.marchResolutionAnimation.set(u, to);
+                    this.marchMarkers.set(u, to);
                 });
             }
 
             await sleep(5000);
 
             units.forEach(u => {
-                this.marchResolutionAnimation.tryDelete(u);
+                this.marchMarkers.tryDelete(u);
                 from.units.delete(u.id);
                 to.units.set(u.id, u);
                 u.region = to;
-            });
-        } else if (message.type == "animate-attack") {
-            const units = message.units.map(uid => this.world.getUnitById(uid));
-            const to = this.world.regions.get(message.to);
-
-            units.forEach(u => {
-                this.marchResolutionAnimation.set(u, to);
-            });
-
-            await sleep(5000);
-
-            units.forEach(u => {
-                this.marchResolutionAnimation.tryDelete(u);
             });
         } else if (message.type == "units-wounded") {
             const region = this.world.regions.get(message.regionId);

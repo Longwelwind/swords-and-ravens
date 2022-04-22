@@ -180,13 +180,6 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                         });
                     }
 
-                    this.entireGame.broadcastToClients({
-                        type: "animate-attack",
-                        units: army.map(u => u.id),
-                        to: region.id,
-                        color: this.house.id != "greyjoy" ? this.house.color : "black"
-                    });
-
                     this.resolveMarchOrderGameState.proceedToCombat(
                         startingRegion, region, this.house, enemy, army, this.actionGameState.ordersOnBoard.get(startingRegion)
                     );

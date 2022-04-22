@@ -21,6 +21,7 @@ export interface RegionOnMapProperties {
 export interface UnitOnMapProperties {
     highlight: HighlightProperties;
     onClick: (() => void) | null;
+    targetRegion: Region | null;
 }
 
 export interface OrderOnMapProperties {

@@ -116,6 +116,12 @@ export default class MapComponent extends Component<MapComponentProps> {
                 this.props.ingameGameState.leafState.getWaitedUsers().includes(this.props.gameClient.authenticatedUser) &&
                 propertiesForRegions.values.some(p => p.onClick != null || p.wrap != null);
 
+        const propertiesForUnits = this.getModifiedPropertiesForEntities<Unit, UnitOnMapProperties>(
+            _.flatMap(this.props.ingameGameState.world.regions.values.map(r => r.allUnits)),
+            this.props.mapControls.modifyUnitsOnMap,
+            { highlight: { active: false, color: "white" }, onClick: null, targetRegion: null }
+        );
+
         return (
             <div className="map"
                 style={{ backgroundImage: `url(${this.backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem" }}>
@@ -183,31 +189,39 @@ export default class MapComponent extends Component<MapComponentProps> {
                             )}
                         </div>
                     ))}
-                    {this.renderUnits(garrisons, disablePointerEventsForUnits)}
+                    {this.renderUnits(propertiesForUnits, garrisons, disablePointerEventsForUnits)}
                     {this.renderOrders()}
                     {this.renderRegionTexts(propertiesForRegions)}
                     {this.renderIronBankInfos(ironBankView)}
                     {this.renderLoanCardDeck(ironBankView)}
                     {this.renderLoanCardSlots(ironBankView)}
-                    {this.ingame.marchResolutionAnimation.entries.map(([unit, to]) =>
-                        <Xarrow
-                            key={`arrow-${unit.id}-${to.id}`}
-                            start={`centered-unit-div-for-march-markers-${unit.id}`}
-                            end={`centered-units-container-div-for-march-markers-${to.id}`}
-                            color={unit.allegiance.id != "greyjoy" ? unit.allegiance.color : "black"}
-                            curveness={0.5}
-                            dashness={{animation: 2}}
-                            path="smooth"
-                            headShape="circle"
-                            headSize={3}
-                        />)
-                    }
+                    {this.renderMarchMarkers(propertiesForUnits)}
                 </div>
                 <svg style={{ width: `${this.mapWidth}px`, height: `${MAP_HEIGHT}px` }}>
                     {this.renderRegions(propertiesForRegions)}
                 </svg>
             </div>
         )
+    }
+
+    renderMarchMarkers(propertiesForUnits: BetterMap<Unit, UnitOnMapProperties>): ReactNode[] {
+        const markers = _.unionBy(
+            propertiesForUnits.entries.filter(([_u, uprop]) => uprop.targetRegion != null).map(([u, uprop]) => [u, uprop.targetRegion] as [Unit, Region]),
+            this.ingame.marchMarkers.entries, ([u, _r]) => u.id)
+            .filter(([u, r]) => u.region != r);
+
+        return markers.map(([unit, to]) =>
+            <Xarrow
+                key={`arrow-${unit.id}-${to.id}`}
+                start={`centered-unit-div-for-march-markers-${unit.id}`}
+                end={`centered-units-container-div-for-march-markers-${to.id}`}
+                color={unit.allegiance.id != "greyjoy" ? unit.allegiance.color : "black"}
+                curveness={0.5}
+                dashness={{animation: 2}}
+                path="smooth"
+                headShape="circle"
+                headSize={3}
+            />);
     }
 
     private renderLoanCardSlots(ironBankView: StaticIronBankView | null): ReactNode {
@@ -241,7 +255,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                 left: ironBankView.deckSlot.point.x,
                 top: ironBankView.deckSlot.point.y
             }}>
-                <div className="iron-bank-content hover-smedium-outline" style={{ backgroundImage: `url(${loanCardImages.get("back")})`, width: ironBankView.deckSlot.width, height: ironBankView.deckSlot.height }} />
+                <div className="iron-bank-content hover-weak-outline" style={{ backgroundImage: `url(${loanCardImages.get("back")})`, width: ironBankView.deckSlot.width, height: ironBankView.deckSlot.height }} />
             </div>
         </OverlayTrigger>;
     }
@@ -319,13 +333,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         });
     }
 
-    renderUnits(garrisons: BetterMap<string, string | null>, disablePointerEvents: boolean): ReactNode {
-        const propertiesForUnits = this.getModifiedPropertiesForEntities<Unit, UnitOnMapProperties>(
-            _.flatMap(this.props.ingameGameState.world.regions.values.map(r => r.allUnits)),
-            this.props.mapControls.modifyUnitsOnMap,
-            { highlight: { active: false, color: "white" }, onClick: null }
-        );
-
+    renderUnits(propertiesForUnits: BetterMap<Unit, UnitOnMapProperties>, garrisons: BetterMap<string, string | null>, disablePointerEvents: boolean): ReactNode {
         const garrisonControllers = new BetterMap(garrisons.keys.map(rid => [rid, this.props.ingameGameState.world.regions.get(rid).getController()]));
 
         return this.props.ingameGameState.world.regions.values.map(r => {
