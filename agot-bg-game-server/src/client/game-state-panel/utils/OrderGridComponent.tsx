@@ -33,9 +33,10 @@ export default class OrderGridComponent extends Component<OrderGridProps> {
                                 <Col xs="auto" className="p-1" key={o.id}>
                                     <div className={classNames(
                                             "order-icon",
-                                            {"clickable": this.isOrderAvailable(o) && this.props.selectedOrder != o},
+                                            {"clickable": this.isOrderAvailable(o)},
                                             {"hover-weak-outline": this.isOrderAvailable(o) && this.props.selectedOrder != o},
-                                            {"strong-outline": this.props.selectedOrder == o},
+                                            {"medium-outline": this.props.selectedOrder == o},
+                                            {"hover-strong-outline": this.props.selectedOrder == o},
                                             {"restricted-order": this.props.restrictedOrders.includes(o)},
                                             {"unavailable-order": !this.isOrderAvailable(o)}
                                             )

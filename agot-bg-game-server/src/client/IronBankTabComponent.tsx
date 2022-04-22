@@ -61,7 +61,7 @@ export default class IronBankTabComponent extends Component<IronBankTabComponent
                         rootClose
                         placement="auto"
                     >
-                        <div className="vertical-game-card smedium hover-smedium-outline clickable" style={{ backgroundImage: `url(${loanCardImages.get("back")})`}} />
+                        <div className="vertical-game-card smedium hover-weak-outline clickable" style={{ backgroundImage: `url(${loanCardImages.get("back")})`}} />
                     </OverlayTrigger>
                 </Col>
             </Row>

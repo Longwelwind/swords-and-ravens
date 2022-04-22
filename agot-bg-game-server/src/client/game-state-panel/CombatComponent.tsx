@@ -37,6 +37,8 @@ import BeforeCombatHouseCardAbilitiesComponent from "./house-card-abilities/Befo
 import HouseCard from "../../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import { tidesOfBattleCards } from "../../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
 import unitTypes from "../../common/ingame-game-state/game-data-structure/unitTypes";
+import SelectUnitsGameState from "../../common/ingame-game-state/select-units-game-state/SelectUnitsGameState";
+import AfterCombatHouseCardAbilitiesGameState from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-combat-house-card-abilities-game-state/AfterCombatHouseCardAbilitiesGameState";
 
 @observer
 export default class CombatComponent extends Component<GameStateComponentProps<CombatGameState>> {
@@ -56,7 +58,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
     }
 
     get combatStats(): CombatStats[] {
-        return this.props.gameState.stats;
+        return this.combat.stats;
     }
 
     render(): ReactNode {
@@ -82,8 +84,8 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
             : [
                 {
                     house: this.attacker,
-                    houseCard: this.props.gameState.attackerHouseCard,
-                    region: this.props.gameState.attackingRegion,
+                    houseCard: this.combat.attackerHouseCard,
+                    region: this.combat.attackingRegion,
                     army: this.combat.getBaseCombatStrength(this.attacker),
                     armyUnits: this.combat.attackingArmy.map(u => u.type),
                     woundedUnits: [], // Attacking units can never be wounded, so we don't need to filter here
@@ -94,12 +96,12 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                     valyrianSteelBlade: this.combat.getValyrianBladeBonus(this.attacker),
                     total: this.combat.getTotalCombatStrength(this.attacker),
                     houseCardBackId: this.getHouseCardBackId(this.attacker),
-                    tidesOfBattleCard: this.props.gameState.attackerTidesOfBattleCard
+                    tidesOfBattleCard: this.combat.attackerTidesOfBattleCard
                 },
                 {
                     house: this.defender,
-                    houseCard: this.props.gameState.defenderHouseCard,
-                    region: this.props.gameState.defendingRegion,
+                    houseCard: this.combat.defenderHouseCard,
+                    region: this.combat.defendingRegion,
                     army: this.combat.getBaseCombatStrength(this.defender),
                     armyUnits: this.combat.defendingArmy.filter(u => !u.wounded).map(u => u.type),
                     woundedUnits: this.combat.defendingArmy.filter(u => u.wounded).map(u => u.type),
@@ -110,13 +112,13 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                     valyrianSteelBlade: this.combat.getValyrianBladeBonus(this.defender),
                     total: this.combat.getTotalCombatStrength(this.defender),
                     houseCardBackId: this.getHouseCardBackId(this.defender),
-                    tidesOfBattleCard: this.props.gameState.defenderTidesOfBattleCard
+                    tidesOfBattleCard: this.combat.defenderTidesOfBattleCard
                 }
             ];
         return (
             <>
                 <Col xs={12}>
-                    {this.props.gameState.rerender >= 0 && (
+                    {this.combat.rerender >= 0 && (
                         <>
                             <div style={{ display: 'flex', justifyContent: 'center' }}>
                                 <h5>Battle {this.combatStats.length > 0 && "results "} for <b>{this.combat.defendingRegion.name}</b></h5>
@@ -157,7 +159,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
     private getHouseCardBackId(house: House): string | undefined {
         const combatData = this.combat.houseCombatDatas.get(house);
         if (combatData.houseCardChosen) {
-            return this.props.gameState.ingameGameState.isVassalHouse(house) ? "vassal" : house.id;
+            return this.combat.ingameGameState.isVassalHouse(house) ? "vassal" : house.id;
         }
 
         return undefined;
@@ -166,26 +168,26 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
         // Highlight the embattled area in yellow
         return [[
-            this.props.gameState.defendingRegion,
+            this.combat.defendingRegion,
             {highlight: {active: true, color: "yellow"}}
         ]];
     }
 
     modifyUnitsOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {
-        const authenticatedPlayer = this.props.gameClient.authenticatedPlayer;
+        // Highlight the attacking army in red when game state tree does not contain SelectUnitsGameState
+        // or the user does not control the house to select units but never show march markers when attacker lost the combat
+        // (but post combat may be still active for abilties)
+        const postCombat = this.combat.childGameState instanceof PostCombatGameState ? this.combat.childGameState : null;
+        const drawMarchMarkers = !postCombat || (!postCombat.hasChildGameState(AfterCombatHouseCardAbilitiesGameState) && postCombat.winner == this.combat.attacker);
+        const selectUnits = this.combat.hasChildGameState(SelectUnitsGameState) ? this.combat.getChildGameState(SelectUnitsGameState) as SelectUnitsGameState<any>: null;
 
-        // Highlight the attacking army in red
-        // We just hightlight the attacking army until PostCombatGameState for combatants
-        // as during PostCombat some effects will highlight units for selection
-        // for winner and loser (e.g. Retreat, Renly Baratheon, Ilyn Payn, ToB skull, etc.)
-        if (this.props.gameState.childGameState instanceof DeclareSupportGameState
-            || this.props.gameState.childGameState instanceof ChooseHouseCardGameState
-            || this.props.gameState.childGameState instanceof UseValyrianSteelBladeGameState
-            // But we can highlight the attacking army for non combatants during the whole combat phase
-            || (authenticatedPlayer == null || !this.props.gameState.houseCombatDatas.keys.some(h => this.props.gameClient.doesControlHouse(h)))) {
-            return this.props.gameState.attackingArmy.map(u => ([u, {highlight: {active: false, color: "red"}}]));
+        if (!selectUnits || !this.props.gameClient.doesControlHouse(selectUnits.house)) {
+            return this.combat.attackingArmy.map(u => ([u, {highlight: {active: false, color: "red"}, targetRegion: drawMarchMarkers ? this.combat.defendingRegion : null}]));
+        } else if (this.props.gameClient.doesControlHouse(selectUnits.house)) {
+            return [];
+        } else {
+            return this.combat.attackingArmy.map(u => ([u, {targetRegion: drawMarchMarkers ? this.combat.defendingRegion : null}]));
         }
-        return [];
     }
 
     componentDidMount(): void {
