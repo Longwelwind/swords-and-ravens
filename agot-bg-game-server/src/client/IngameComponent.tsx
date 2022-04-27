@@ -39,6 +39,8 @@ import spikedDragonHeadImage from "../../public/images/icons/spiked-dragon-head.
 import speakerImage from "../../public/images/icons/speaker.svg";
 import speakerOffImage from "../../public/images/icons/speaker-off.svg";
 import cardRandomImage from "../../public/images/icons/card-random.svg";
+import leverLeftImage from "../../public/images/icons/lever-left.svg";
+import leverRightImage from "../../public/images/icons/lever-right.svg";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import GameLogListComponent from "./GameLogListComponent";
 import Game, { MAX_WILDLING_STRENGTH } from "../common/ingame-game-state/game-data-structure/Game";
@@ -366,6 +368,16 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             />
                         </ListGroupItem>
                     </ListGroup>
+                    <img
+                        src={leverRightImage} width={20}
+                        className="clickable"
+                        onClick={() => {
+                            if (this.user) {
+                                this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
+                            }
+                        }}
+                        style={{position: "absolute", left: "1px", top: "1px"}}
+                    />
                 </Card>
                 <Card className={this.mapScrollbarEnabled ? "flex-fill-remaining" : ""} style={{marginBottom: "10px"}}>
                     <Card.Body id="houses-panel" className="no-space-around">
@@ -602,6 +614,16 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         </Col>
                     </Col>
                 </Row>
+                <img
+                    src={leverLeftImage} width={20}
+                    className="clickable"
+                    onClick={() => {
+                        if (this.user) {
+                            this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
+                        }
+                    }}
+                    style={{position: "absolute", left: "1px", top: "1px"}}
+                />
             </Card>
             <Card style={{height: this.mapScrollbarEnabled ? "auto" : "800px"}} className={this.mapScrollbarEnabled ? "flex-fill-remaining" : ""}>
                 <Tab.Container activeKey={this.currentOpenedTab}
