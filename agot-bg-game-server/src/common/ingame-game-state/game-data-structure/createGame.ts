@@ -36,6 +36,7 @@ interface HouseData {
     color: string;
     unitLimits: {[key: string]: number};
     houseCards: {[key: string]: HouseCardData};
+    laterHouseCards?: {[key: string]: HouseCardData};
     supplyLevel: number;
 }
 
@@ -173,7 +174,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         });
     }
 
-    if (gameSettings.adwdHouseCards) {
+    if (gameSettings.adwdHouseCards || gameSettings.houseCardsEvolution) {
         const adwdHouseCards = baseGameData.adwdHouseCards as {[key: string]: HouseCardContainer};
         const ffcHouseCards = baseGameData.ffcHouseCards as {[key: string]: HouseCardContainer};
         const modBHouseCards = baseGameData.modBHouseCards as {[key: string]: HouseCardContainer};
@@ -181,11 +182,19 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             _.concat(Object.entries(adwdHouseCards), Object.entries(ffcHouseCards), Object.entries(modBHouseCards))
             .filter(([hid, _]) => housesToCreate.includes(hid)));
 
-        newHouseCards.keys.forEach(hid => {
-            const newHouseData = baseGameHousesToCreate.get(hid);
-            newHouseData.houseCards = newHouseCards.get(hid).houseCards;
-            baseGameHousesToCreate.set(hid, newHouseData);
-        });
+        if (gameSettings.adwdHouseCards) {
+            newHouseCards.keys.forEach(hid => {
+                const newHouseData = baseGameHousesToCreate.get(hid);
+                newHouseData.houseCards = newHouseCards.get(hid).houseCards;
+                baseGameHousesToCreate.set(hid, newHouseData);
+            });
+        } else if (gameSettings.houseCardsEvolution) {
+            newHouseCards.keys.forEach(hid => {
+                const newHouseData = baseGameHousesToCreate.get(hid);
+                newHouseData.laterHouseCards = newHouseCards.get(hid).houseCards;
+                baseGameHousesToCreate.set(hid, newHouseData);
+            });
+        }
     }
 
     if (gameSettings.asosHouseCards) {
@@ -232,6 +241,17 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
                 // Vassals have no own house cards
                 : new BetterMap<string, HouseCard>();
 
+            const laterHouseCards = playerHouses.includes(hid) && houseData.laterHouseCards
+                ? new BetterMap<string, HouseCard>(
+                    Object.entries(houseData.laterHouseCards)
+                        .map(([houseCardId, houseCardData]) => {
+                            const houseCard = createHouseCard(houseCardId, houseCardData, hid);
+                            return [houseCardId, houseCard];
+                        })
+                )
+                // Vassals have no house cards
+                : null;
+
             const unitLimits = new BetterMap(
                 Object.entries(houseData.unitLimits as {[key: string]: number})
                     .map(([unitTypeId, limit]) => [unitTypes.get(unitTypeId), limit])
@@ -242,7 +262,8 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
 
             const maxPowerTokens = maxPowerTokensPerHouse.has(hid) ? maxPowerTokensPerHouse.get(hid) : baseGameData.maxPowerTokens;
 
-            const house = new House(hid, houseData.name, houseData.color, houseCards, unitLimits, gameSettings.ironBank ? 7 : 5, maxPowerTokens, supplyLevel);
+            const house = new House(hid, houseData.name, houseData.color, unitLimits,
+                gameSettings.ironBank ? 7 : 5, maxPowerTokens, supplyLevel, houseCards, laterHouseCards);
 
             if (entireGame.isFeastForCrows) {
                 const soc = specialObjectiveCards.values.find(soc => soc.houseId == house.id);

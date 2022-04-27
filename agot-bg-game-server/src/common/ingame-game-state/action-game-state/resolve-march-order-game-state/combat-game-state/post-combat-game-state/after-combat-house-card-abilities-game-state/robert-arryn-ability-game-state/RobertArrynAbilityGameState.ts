@@ -91,15 +91,16 @@ export default class RobertArrynAbilityGameState extends GameState<
         const robertArrynHc = this.house.houseCards.get("robert-arryn");
         this.game.deletedHouseCards.set(robertArrynHc.id, robertArrynHc);
         this.house.houseCards.delete(robertArrynHc.id);
-        this.entireGame.broadcastToClients({
-            type: "update-house-cards",
-            house: this.house.id,
-            houseCards: this.house.houseCards.values.map(hc => hc.serializeToClient())
-        });
 
         this.entireGame.broadcastToClients({
             type: "update-deleted-house-cards",
             houseCards: this.game.deletedHouseCards.values.map(hc => hc.serializeToClient())
+        });
+
+        this.entireGame.broadcastToClients({
+            type: "update-house-cards",
+            house: this.house.id,
+            houseCards: this.house.houseCards.values.map(hc => hc.serializeToClient())
         });
 
         this.ingame.log({

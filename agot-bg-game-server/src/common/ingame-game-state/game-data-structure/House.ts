@@ -16,6 +16,7 @@ export default class House {
     unitLimits: BetterMap<UnitType, number>;
     maxPowerTokens: number;
     @observable houseCards: BetterMap<string, HouseCard>;
+    laterHouseCards: BetterMap<string, HouseCard> | null;
     @observable powerTokens: number;
     @observable supplyLevel: number;
     @observable knowsNextWildlingCard: boolean;
@@ -26,16 +27,19 @@ export default class House {
     @observable completedObjectives: ObjectiveCard[];
     @observable victoryPoints: number;
 
-    constructor(id: string, name: string, color: string, houseCards: BetterMap<string, HouseCard>, unitLimits: BetterMap<UnitType, number>,
-        powerTokens: number, maxPowerTokens: number, supplyLevel: number, gainedLoyaltyTokens = 0, hasBeenReplacedByVassal = false, victoryPoints = 0) {
+    constructor(id: string, name: string, color: string, unitLimits: BetterMap<UnitType, number>,
+        powerTokens: number, maxPowerTokens: number, supplyLevel: number, houseCards: BetterMap<string, HouseCard>,
+        laterHouseCards: BetterMap<string, HouseCard> | null = null,
+        gainedLoyaltyTokens = 0, hasBeenReplacedByVassal = false, victoryPoints = 0) {
         this.id = id;
         this.name = name;
         this.color = color;
         this.knowsNextWildlingCard = false;
-        this.houseCards = houseCards;
         this.unitLimits = unitLimits;
         this.powerTokens = powerTokens;
         this.supplyLevel = supplyLevel;
+        this.houseCards = houseCards;
+        this.laterHouseCards = laterHouseCards;
         this.gainedLoyaltyTokens = gainedLoyaltyTokens;
         this.hasBeenReplacedByVassal = hasBeenReplacedByVassal;
         this.maxPowerTokens = maxPowerTokens;
@@ -68,6 +72,9 @@ export default class House {
                     : !isVassalHouse
                         ? serializedHouseCards
                         : [],
+            laterHouseCards: admin && this.laterHouseCards != null // laterHouseCards are used server-side only. Therefore clients always receive "null"
+                ? this.laterHouseCards.entries.map(([houseCardId, houseCard]) => [houseCardId, houseCard.serializeToClient()] as [string, SerializedHouseCard])
+                : null,
             unitLimits: this.unitLimits.map((unitType, limit) => [unitType.id, limit]),
             powerTokens: this.powerTokens,
             maxPowerTokens: this.maxPowerTokens,
@@ -86,15 +93,17 @@ export default class House {
             data.id,
             data.name,
             data.color,
-            new BetterMap<string, HouseCard>(
-                data.houseCards.map(([string, data]) => [string, HouseCard.deserializeFromServer(data)]),
-            ),
             new BetterMap<UnitType, number>(
                 data.unitLimits.map(([utid, limit]) => [unitTypes.get(utid), limit])
             ),
             data.powerTokens,
             data.maxPowerTokens,
             data.supplyLevel,
+            new BetterMap<string, HouseCard>(
+                data.houseCards.map(([string, data]) => [string, HouseCard.deserializeFromServer(data)])),
+            data.laterHouseCards
+                ? new BetterMap<string, HouseCard>(data.laterHouseCards.map(([string, data]) => [string, HouseCard.deserializeFromServer(data)]))
+                : null,
             data.gainedLoyaltyTokens,
             data.hasBeenReplacedByVassal,
             data.victoryPoints
@@ -114,6 +123,7 @@ export interface SerializedHouse {
     color: string;
     knowsNextWildlingCard: boolean;
     houseCards: [string, SerializedHouseCard][];
+    laterHouseCards: [string, SerializedHouseCard][] | null;
     unitLimits: [string, number][];
     powerTokens: number;
     maxPowerTokens: number;

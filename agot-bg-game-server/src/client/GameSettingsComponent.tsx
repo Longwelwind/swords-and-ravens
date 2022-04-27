@@ -188,17 +188,17 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 </Col>
                 <Col xs="12">
                     <FormCheck
-                        id="faceless-setting"
+                        id="decks-evolution-setting"
                         type="switch"
                         label={
                             <OverlayTrigger overlay={
-                                <Tooltip id="faceless-setting-tooltip">
-                                    Player names will be hidden and revealed after game ended.
+                                <Tooltip id="decks-evolution-setting-tooltip">
+                                    This is a community variant, starting with the house cards from the base game. However, from round <b>5</b> onwards, each house returns its alternative deck when the last house card has been played.
                                 </Tooltip>}>
-                                <label htmlFor="faceless-setting">Faceless</label>
+                                <label htmlFor="decks-evolution-setting">House cards evolution</label>
                             </OverlayTrigger>}
-                        checked={this.gameSettings.faceless}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.faceless = !this.gameSettings.faceless)}
+                        checked={this.gameSettings.houseCardsEvolution}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.houseCardsEvolution = !this.gameSettings.houseCardsEvolution)}
                     />
                 </Col>
             </Col>
@@ -519,6 +519,21 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             </OverlayTrigger>}
                         checked={this.gameSettings.endless}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.endless = !this.gameSettings.endless)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="faceless-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="faceless-setting-tooltip">
+                                    Player names will be hidden and revealed after game ended.
+                                </Tooltip>}>
+                                <label htmlFor="faceless-setting">Faceless</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.faceless}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.faceless = !this.gameSettings.faceless)}
                     />
                 </Col>
             </Col>
