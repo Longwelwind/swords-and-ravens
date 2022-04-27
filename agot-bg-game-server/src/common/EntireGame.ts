@@ -37,12 +37,12 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     leafStateId = v4();
 
     @observable gameSettings: GameSettings = { setupId: "mother-of-dragons", playerCount: 8, pbem: true, onlyLive: false, startWhenFull: false, private: false,
-        adwdHouseCards: false, asosHouseCards: false, randomHouses: false, randomChosenHouses: false,  tidesOfBattle: false,
+        addPortToTheEyrie: false, adwdHouseCards: false, asosHouseCards: false, houseCardsEvolution: false,
         vassals: true, ironBank: true, seaOrderTokens: true, allowGiftingPowerTokens: true, randomVassalAssignment: false, customModBalancing: false,
+        randomHouses: false, randomChosenHouses: false, tidesOfBattle: false, removeTob3: false, removeTobSkulls: false, limitTob2: false,
         draftHouseCards: false, thematicDraft: false, limitedDraft: false, blindDraft: false,
-        cokWesterosPhase: false, endless: false, useVassalPositions: false, precedingMustering: false,
-        mixedWesterosDeck1: false, removeTob3: false, removeTobSkulls: false, limitTob2: false, faceless: false,
-        randomStartPositions: false, addPortToTheEyrie: false, reduceVictoryPointsCountNeededToWinTo6: false};
+        mixedWesterosDeck1: false, cokWesterosPhase: false, reduceVictoryPointsCountNeededToWinTo6: false, endless: false,  faceless: false,
+        useVassalPositions: false, precedingMustering: false, randomStartPositions: false};
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -625,4 +625,5 @@ export interface GameSettings {
     reduceVictoryPointsCountNeededToWinTo6: boolean;
     randomVassalAssignment: boolean;
     customModBalancing: boolean;
+    houseCardsEvolution: boolean;
 }

@@ -14,6 +14,7 @@ import notificationSound from "../../public/sounds/notification.ogg";
 import faviconNormal from "../../public/images/favicon.ico";
 import faviconAlert from "../../public/images/favicon-alert.ico";
 import rollingDicesImage from "../../public/images/icons/rolling-dices.svg";
+import cardExchangeImage from "../../public/images/icons/card-exchange.svg";
 import {Helmet} from "react-helmet";
 import { FormCheck, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import { preventOverflow } from "@popperjs/core";
@@ -45,6 +46,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                         <h4>{this.props.entireGame.name}</h4>
                     </Col>
                     {this.renderTidesOfBattleImage()}
+                    {this.renderHouseCardsEvolutionImage()}
                     {this.renderGameTypeBadge()}
                     {this.renderMapSwitch()}
                     {this.renderWarnings()}
@@ -85,6 +87,22 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     popperConfig={{ modifiers: [preventOverflow] }}
                 >
                     <img src={rollingDicesImage} width="30" />
+                </OverlayTrigger>
+            </Col>;
+    }
+
+    renderHouseCardsEvolutionImage(): ReactNode {
+        return this.props.entireGame.gameSettings.houseCardsEvolution &&
+            <Col xs="auto">
+                <OverlayTrigger
+                    placement="auto"
+                    overlay={
+                        <Tooltip id="evolution-active-tooltip">
+                            From round <b>5</b> onwards, each house returns its alternative deck when the last house card has been played.
+                        </Tooltip>}
+                    popperConfig={{ modifiers: [preventOverflow] }}
+                >
+                    <img src={cardExchangeImage} width="30" />
                 </OverlayTrigger>
             </Col>;
     }

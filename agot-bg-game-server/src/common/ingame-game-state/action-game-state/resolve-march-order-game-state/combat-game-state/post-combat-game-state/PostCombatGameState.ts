@@ -391,25 +391,58 @@ export default class PostCombatGameState extends GameState<
         // If all cards are used or discarded, put all used as available,
         // except the one that has been used.
         if (house.houseCards.values.every(hc => hc.state == HouseCardState.USED)) {
-            const houseCardsToMakeAvailable = house.houseCards.values
-                .filter(hc => hc != houseCard)
-                .filter(hc => hc.state == HouseCardState.USED);
+            if (this.entireGame.gameSettings.houseCardsEvolution
+                && house.laterHouseCards != null
+                && this.combat.ingameGameState.game.turn >= 5) {            
 
-            houseCardsToMakeAvailable.forEach(hc => hc.state = HouseCardState.AVAILABLE);
+                // We need to swap to the new deck now
+                house.houseCards.keys.forEach(hcid => {
+                    this.game.deletedHouseCards.set(hcid, house.houseCards.get(hcid));
+                    house.houseCards.delete(hcid);
+                });
 
-            this.combat.ingameGameState.log({
-                type: "house-cards-returned",
-                house: house.id,
-                houseCards: houseCardsToMakeAvailable.map(hc => hc.id),
-                houseCardDiscarded: houseCard ? houseCard.id : undefined
-            });
+                house.laterHouseCards.entries.forEach(([hcid, hc]) => house.houseCards.set(hcid, hc));
+                house.laterHouseCards = null;
 
-            this.entireGame.broadcastToClients({
-                type: "change-state-house-card",
-                houseId: house.id,
-                cardIds: houseCardsToMakeAvailable.map(hc => hc.id),
-                state: HouseCardState.AVAILABLE
-            });
+                this.entireGame.broadcastToClients({
+                    type: "update-deleted-house-cards",
+                    houseCards: this.game.deletedHouseCards.values.map(hc => hc.serializeToClient())
+                });
+
+                this.entireGame.broadcastToClients({
+                    type: "update-house-cards",
+                    house: house.id,
+                    houseCards: house.houseCards.values.map(hc => hc.serializeToClient())
+                });
+
+                this.combat.ingameGameState.log({
+                    type: "house-cards-returned",
+                    house: house.id,
+                    houseCards: house.houseCards.keys,
+                    houseCardDiscarded: undefined
+                });
+
+                // No need to "update-later-house-cards" as they are used by the game-server only
+            } else {
+                const houseCardsToMakeAvailable = house.houseCards.values
+                    .filter(hc => hc != houseCard && hc.state == HouseCardState.USED)
+
+                houseCardsToMakeAvailable.forEach(hc => hc.state = HouseCardState.AVAILABLE);
+
+                this.combat.ingameGameState.log({
+                    type: "house-cards-returned",
+                    house: house.id,
+                    houseCards: houseCardsToMakeAvailable.map(hc => hc.id),
+                    houseCardDiscarded: houseCard ? houseCard.id : undefined
+                });
+
+                this.entireGame.broadcastToClients({
+                    type: "change-state-house-card",
+                    houseId: house.id,
+                    cardIds: houseCardsToMakeAvailable.map(hc => hc.id),
+                    state: HouseCardState.AVAILABLE
+                });
+            }
         }
     }
 

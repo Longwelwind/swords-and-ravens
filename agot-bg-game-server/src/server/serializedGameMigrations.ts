@@ -1728,6 +1728,16 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "78",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.game.houses.forEach((sh: any) => sh.laterHouseCards = null);
+            }
+            return serializedGame;
+        }
     }
 ];
 

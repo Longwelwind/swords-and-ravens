@@ -156,6 +156,15 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 return updateLastActive;
             }
 
+            if (settings.houseCardsEvolution) {
+                settings.adwdHouseCards = false;
+                settings.asosHouseCards = false;
+                settings.draftHouseCards = false;
+                settings.thematicDraft = false;
+                settings.limitedDraft = false;
+                settings.blindDraft = false;
+            }
+
             if (settings.setupId == "a-feast-for-crows") {
                 settings.vassals = false;
                 settings.allowGiftingPowerTokens = false;
