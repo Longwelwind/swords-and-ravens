@@ -8,6 +8,7 @@ export default function renderLoanCardsToolTip(ironBank: IronBank): OverlayChild
     const loanSlots = ironBank.loanSlots.filter(lc => lc != null);
     const loanDeck = _.orderBy(ironBank.loanCardDeck.filter(lc => !lc.discarded), lc => lc.type.name);
     const purchasedLoans = ironBank.purchasedLoansPerHouse;
+    const discardedLoans = _.orderBy(ironBank.loanCardDeck.filter(lc => lc.discarded), lc => lc.type.name);
 
     return <Tooltip id={"loan-cards-tooltip"} className="tooltip-w-100">
         <Col>
@@ -42,6 +43,15 @@ export default function renderLoanCardsToolTip(ironBank: IronBank): OverlayChild
                             <h6>{lc.type.name}:&nbsp;</h6><p className="white-space-pre-line">{lc.type.description}</p>
                         </Row>)}
                     </Col>)}
+                </Col>}
+            {discardedLoans.length > 0 &&
+                <Col xs={12} className="mb-3">
+                    <Row className="justify-content-center mb-2">
+                        <h5 className='text-center'>Discarded loans</h5>
+                    </Row>
+                    {discardedLoans.map((lc, i) => <Row key={`loan-${lc.id}-${i}`}>
+                        <h6>{lc.type.name}:&nbsp;</h6><p className="white-space-pre-line">{lc.type.description}</p>
+                    </Row>)}
                 </Col>}
         </Col>
     </Tooltip>;
