@@ -39,8 +39,6 @@ import spikedDragonHeadImage from "../../public/images/icons/spiked-dragon-head.
 import speakerImage from "../../public/images/icons/speaker.svg";
 import speakerOffImage from "../../public/images/icons/speaker-off.svg";
 import cardRandomImage from "../../public/images/icons/card-random.svg";
-import leverLeftImage from "../../public/images/icons/lever-left.svg";
-import leverRightImage from "../../public/images/icons/lever-right.svg";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import GameLogListComponent from "./GameLogListComponent";
 import Game, { MAX_WILDLING_STRENGTH } from "../common/ingame-game-state/game-data-structure/Game";
@@ -82,7 +80,7 @@ import unitImages from "./unitImages";
 import DraftInfluencePositionsGameState from "../common/ingame-game-state/draft-influence-positions-game-state/DraftInfluencePositionsGameState";
 import DraftInfluencePositionsComponent from "./game-state-panel/DraftInfluencePositionsComponent";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
-import { faChevronCircleLeft, faChevronCircleRight, faUniversity } from "@fortawesome/free-solid-svg-icons";
+import { faRightLeft, faUniversity } from "@fortawesome/free-solid-svg-icons";
 import joinNaturalLanguage from "./utils/joinNaturalLanguage";
 import PayDebtsGameState from "../common/ingame-game-state/pay-debts-game-state/PayDebtsGameState";
 import PayDebtsComponent from "./game-state-panel/PayDebtsComponent";
@@ -104,7 +102,6 @@ interface ColumnOrders {
     gameStateColumn: number;
     mapColumn: number;
     housesInfosColumn: number;
-    collapseButtonColumn: number;
 }
 
 interface GameStatePhaseProps {
@@ -205,14 +202,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     render(): ReactNode {
-        const mobileDevice = isMobile;
         const draftHouseCards = this.props.gameState.childGameState instanceof DraftHouseCardsGameState;
 
-        const columnOrders = this.getColumnOrders(mobileDevice, this.user?.settings.responsiveLayout ?? false);
-
-        const collapseIcon = columnOrders.collapseButtonColumn == 1 ?
-            this.housesInfosCollapsed ? faChevronCircleLeft : faChevronCircleRight
-            : this.housesInfosCollapsed ? faChevronCircleRight : faChevronCircleLeft;
+        const columnOrders = this.getColumnOrders(this.user?.settings.responsiveLayout);
 
         const showMap = !draftHouseCards || this.user?.settings.showMapWhenDrafting;
 
@@ -229,16 +221,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 gameClient={this.props.gameClient}
                                 ingameGameState={this.props.gameState}
                                 mapControls={this.mapControls}
+                                collapseClicked={() => this.housesInfosCollapsed = !this.housesInfosCollapsed}
                             />
                         </div>
                     </Col>}
-                    {!mobileDevice &&
-                    <Col xs={{span: "auto", order: columnOrders.collapseButtonColumn}} className="px-0" style={{maxHeight: "50%"}}>
-                        <button className="btn btn-sm p-0" onClick={() => this.housesInfosCollapsed = !this.housesInfosCollapsed}>
-                            <FontAwesomeIcon icon={collapseIcon} />
-                        </button>
-                    </Col>}
-                    {(!this.housesInfosCollapsed || mobileDevice) && (
+                    {(!this.housesInfosCollapsed || isMobile) && (
                     <Col xs={{ span: "auto", order: columnOrders.housesInfosColumn }} id="tracks-houses-column" style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none"}}>
                         {this.renderHousesColumn()}
                     </Col>)}
@@ -368,16 +355,15 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             />
                         </ListGroupItem>
                     </ListGroup>
-                    <img
-                        src={leverRightImage} width={20}
-                        className="clickable"
-                        onClick={() => {
+                    <button className="btn btn-sm p-0" onClick={() => {
                             if (this.user) {
                                 this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
                             }
                         }}
-                        style={{position: "absolute", left: "1px", top: "1px"}}
-                    />
+                        style={{position: "absolute", left: "2px"}}
+                    >
+                        <FontAwesomeIcon icon={faRightLeft} style={{color: "white"}}/>
+                    </button>
                 </Card>
                 <Card className={this.mapScrollbarEnabled ? "flex-fill-remaining" : ""} style={{marginBottom: "10px"}}>
                     <Card.Body id="houses-panel" className="no-space-around">
@@ -614,16 +600,15 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         </Col>
                     </Col>
                 </Row>
-                <img
-                    src={leverLeftImage} width={20}
-                    className="clickable"
-                    onClick={() => {
+                <button className="btn btn-sm p-0" onClick={() => {
                         if (this.user) {
                             this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
                         }
                     }}
-                    style={{position: "absolute", left: "1px", top: "1px"}}
-                />
+                    style={{position: "absolute", left: "2px"}}
+                >
+                    <FontAwesomeIcon icon={faRightLeft} style={{color: "white"}}/>
+                </button>
             </Card>
             <Card style={{height: this.mapScrollbarEnabled ? "auto" : "800px"}} className={this.mapScrollbarEnabled ? "flex-fill-remaining" : ""}>
                 <Tab.Container activeKey={this.currentOpenedTab}
@@ -839,14 +824,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         </Tooltip>
     }
 
-    getColumnOrders(mobileDevice: boolean, alignGameStateToTheRight: boolean): ColumnOrders {
-        const result = { gameStateColumn: 1, mapColumn: 2, collapseButtonColumn: 3, housesInfosColumn: 4 };
-
-        if (!mobileDevice && alignGameStateToTheRight) {
-            return { collapseButtonColumn: 1, housesInfosColumn: 2, mapColumn: 3, gameStateColumn: 4 };
-        }
-
-        return result;
+    getColumnOrders(alignGameStateToTheRight?: boolean): ColumnOrders {
+        return alignGameStateToTheRight
+            ? { housesInfosColumn: 1, mapColumn: 2, gameStateColumn: 3 }
+            : { gameStateColumn: 1, mapColumn: 2, housesInfosColumn: 3 };
     }
 
     getUserDisplayNameLabel(user: User): React.ReactNode {
