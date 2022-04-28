@@ -76,7 +76,7 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                                             <Tooltip id="game-state-column-right-setting-tooltip">
                                                 This setting swaps the houses column with the game state column, so that the game state column is displayed to the right of the map.
                                             </Tooltip>}>
-                                            <label htmlFor="game-state-column-right-setting">Game state column on the right (Desktop only)</label>
+                                            <label htmlFor="game-state-column-right-setting">Game state column on the right</label>
                                         </OverlayTrigger>}
                                     checked={this.responsiveLayout}
                                     onChange={() => {
