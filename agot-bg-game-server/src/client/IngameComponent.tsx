@@ -97,6 +97,7 @@ import WildlingCardType from "../common/ingame-game-state/game-data-structure/wi
 import WildlingCardComponent from "./game-state-panel/utils/WildlingCardComponent";
 import getIngameUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 import IronBankTabComponent from "./IronBankTabComponent";
+import sleep from "../utils/sleep";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -122,6 +123,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     @observable housesInfosCollapsed = this.user?.settings.tracksColumnCollapsed ?? false;
     @observable highlightedRegions = new BetterMap<Region, PartialRecursive<RegionOnMapProperties>>();
     @observable showMapScrollbarInfo = false;
+    @observable columnSwapAnimationClassName = "";
     modifyRegionsOnMapCallback: any;
     onVisibilityChangedCallback: (() => void) | null = null;
 
@@ -212,7 +214,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         return <>
                 <Row className="justify-content-center" style={{maxHeight: this.mapScrollbarEnabled ? "95vh" : "none"}}>
-                    <Col xs={{order: columnOrders.gameStateColumn}} style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none", minWidth: col1MinWidth, maxWidth: draftHouseCards ? "1200px" : "800px"}}>
+                    <Col xs={{order: columnOrders.gameStateColumn}} className={this.columnSwapAnimationClassName}
+                        style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none", minWidth: col1MinWidth, maxWidth: draftHouseCards ? "1200px" : "800px"}}
+                    >
                         {this.renderGameStateColumn()}
                     </Col>
                     {showMap && <Col xs={{span: "auto", order: columnOrders.mapColumn}} style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none"}}>
@@ -226,7 +230,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         </div>
                     </Col>}
                     {(!this.housesInfosCollapsed || isMobile) && (
-                    <Col xs={{ span: "auto", order: columnOrders.housesInfosColumn }} id="tracks-houses-column" style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none"}}>
+                    <Col xs={{ span: "auto", order: columnOrders.housesInfosColumn }} className={this.columnSwapAnimationClassName}
+                        style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none"}}
+                    >
                         {this.renderHousesColumn()}
                     </Col>)}
                 </Row>
@@ -355,9 +361,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             />
                         </ListGroupItem>
                     </ListGroup>
-                    <button className="btn btn-sm p-0" onClick={() => {
-                            if (this.user) {
+                    <button className="btn btn-sm p-0" onClick={async() => {
+                            if (this.user && this.columnSwapAnimationClassName == "") {
+                                this.columnSwapAnimationClassName = "animate__animated animate__fadeIn"
                                 this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
+                                await sleep(950);
+                                this.columnSwapAnimationClassName = "";
                             }
                         }}
                         style={{position: "absolute", left: "2px"}}
@@ -600,9 +609,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         </Col>
                     </Col>
                 </Row>
-                <button className="btn btn-sm p-0" onClick={() => {
-                        if (this.user) {
+                <button className="btn btn-sm p-0" onClick={async() => {
+                        if (this.user && this.columnSwapAnimationClassName == "") {
+                            this.columnSwapAnimationClassName = "animate__animated animate__fadeIn"
                             this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
+                            await sleep(950);
+                            this.columnSwapAnimationClassName = "";
                         }
                     }}
                     style={{position: "absolute", left: "2px"}}

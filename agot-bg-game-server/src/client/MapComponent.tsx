@@ -390,6 +390,9 @@ export default class MapComponent extends Component<MapComponentProps> {
                             className={classNames(
                                 "unit-icon hover-weak-outline",
                                 {
+                                    "clickable": property.onClick != null
+                                },
+                                {
                                     "medium-outline hover-strong-outline": property.highlight.active
                                 },
                                 {
