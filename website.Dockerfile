@@ -11,11 +11,14 @@ COPY ./agot-bg-game-server/ .
 RUN yarn run generate-json-schemas
 RUN yarn run build-client
 
-FROM python:3.6-slim
+FROM python:3.8-slim
+
+RUN apt-get update && apt-get install -y gcc libpq-dev
 
 WORKDIR /app
 
 COPY ./agot-bg-website/requirements.txt .
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 RUN pip install daphne==2.4.1
 
@@ -25,20 +28,5 @@ COPY --from=build-client /app/dist/index.html ./agotboardgame_main/templates/ago
 
 COPY ./agot-bg-website .
 COPY website.Procfile Procfile
-
-# In order to run the following command, environment variable must be set.
-# None of them will be used, though, so we can just put placeholders
-RUN SECRET_KEY=not_used \
-    DATABASE_URL=not_used \
-    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY=not_used \
-    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=not_used \
-    SOCIAL_AUTH_DISCORD_KEY=not_used \
-    SOCIAL_AUTH_DISCORD_SECRET=not_used \
-    EMAIL_HOST=not_used \
-    EMAIL_PORT=not_used \
-    EMAIL_HOST_USER=not_used \
-    EMAIL_HOST_PASSWORD=not_used \
-    REDIS_URL=not_used \
-    python manage.py collectstatic -l
 
 RUN mkdir /django_metrics

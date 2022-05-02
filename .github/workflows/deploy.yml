@@ -35,10 +35,29 @@ jobs:
       run: docker build -f ./website.Dockerfile -t $GITHUB_PACKAGES_WEBSITE_DOCKER_IMAGE .
     - name: Upload Docker image to GitHub Packages
       run: docker push $GITHUB_PACKAGES_WEBSITE_DOCKER_IMAGE
+  build-assets:
+    name: Build game assets
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./agot-bg-game-server
+    env:
+      ASSET_PATH: https://swords-and-ravens.ams3.cdn.digitaloceanspaces.com/
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+    - name: Build assets
+      run: yarn run generate-json-schemas && yarn run build-client
+    - uses: actions/upload-artifact@v3
+      with:
+        name: front-end-game-server
+        path: agot-bg-game-server/dist
+        retention-days: 1
   deploy:
     name: Deploy
     runs-on: ubuntu-18.04
-    needs: [game-server-docker-build, website-docker-build]
+    needs: [game-server-docker-build, website-docker-build, build-assets]
     env:
       SSH_KEY: ${{ secrets.CI_DEPLOY_SSH_KEY }}
     steps:
@@ -64,3 +83,34 @@ jobs:
       run: ssh -o StrictHostKeyChecking=no $DOKKU_HOST "dokku tags:deploy swordsandravens.net ${{ github.sha }}"
     - name: Clean Host
       run: ssh -o StrictHostKeyChecking=no $DOKKU_HOST "docker system prune -a -f --filter \"until=45m\""
+  deploy-static-assets:
+    name: Deploy Static Assets
+    runs-on: ubuntu-18.04
+    defaults:
+      run:
+        working-directory: ./agot-bg-website
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_LOCATION: ${{ secrets.AWS_LOCATION }}
+      AWS_S3_ENDPOINT_URL: ${{ secrets.AWS_S3_ENDPOINT_URL }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_STORAGE_BUCKET_NAME: ${{ secrets.AWS_STORAGE_BUCKET_NAME }}
+    needs: [build-assets]
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v3
+      with:
+        python-version: '3.8.9'
+    - name: Install python dependencies
+      run:  pip install -r requirements.txt
+    - name: Copy dev config
+      run: mv .env.dev .env
+    - name: Download static assets
+      uses: actions/download-artifact@v3
+      with:
+        name: front-end-game-server
+        path: agot-bg-website/dist/
+    - name: Copy assets
+      run: cp -r dist/. static_game/
+    - name: Upload assets
+      run: DEBUG=0 NO_DATABASE=1 python manage.py collectstatic --no-input

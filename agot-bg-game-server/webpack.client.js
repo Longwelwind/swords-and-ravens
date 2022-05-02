@@ -2,12 +2,14 @@ const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 
+const ASSET_PATH = process.env.ASSET_PATH || '/static/';
+
 module.exports = (env, argv) => {
     return {
         output: {
             path: __dirname + "/dist/",
             filename: "bundle.[contenthash].js",
-            publicPath: "/static/"
+            publicPath: ASSET_PATH
         },
         entry: "./src/client/client.tsx",
         target: "web",

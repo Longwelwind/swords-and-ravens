@@ -20,7 +20,9 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 env = environ.Env(
     DEBUG=(bool, False),
-    VANILLA_IGNORED_USERS_WHEN_MIGRATING=(list, [])
+    NO_DATABASE=(bool, False),
+    VANILLA_IGNORED_USERS_WHEN_MIGRATING=(list, []),
+    AWS_LOCATION=(str, ""),
 )
 environ.Env.read_env(".env")
 
@@ -28,6 +30,7 @@ environ.Env.read_env(".env")
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DEBUG = env("DEBUG")
+NO_DATABASE = env("NO_DATABASE")
 
 USE_X_FORWARDED_HOST = not DEBUG
 # Force https redirect
@@ -64,7 +67,8 @@ INSTALLED_APPS = [
     'django_prometheus',
     'channels',
     'chat',
-    'debug_toolbar'
+    'debug_toolbar',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -138,9 +142,12 @@ LOGIN_URL = '/login/'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-DATABASES = {
-    'default': env.db()
-}
+if not NO_DATABASE:
+    DATABASES = {
+        'default': env.db()
+    }
+else:
+    DATABASES = {}
 
 
 # Password validation
@@ -179,7 +186,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+if DEBUG:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+else:
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 STATIC_URL = '/static/'
 
@@ -191,6 +201,16 @@ STATICFILES_DIRS = [
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 WHITENOISE_IMMUTABLE_FILE_TEST = r'^.+\.[0-9a-f]{20,32}\..+$'
+
+AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_ENDPOINT_URL = env('AWS_S3_ENDPOINT_URL')
+AWS_DEFAULT_ACL = 'public-read'
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_LOCATION = env('AWS_LOCATION')
 
 # Rest Framework
 
