@@ -5,19 +5,14 @@
 <head>
     <title>{% block title %}{% endblock %} Swords and Ravens</title>
     <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
-    {% bootstrap_css %}
     <link rel="stylesheet"
-          href="{% static 'css/all.css' %}"
-          integrity="sha384-thyJY0mibKOMGsqeOqL+ZrGGDObQBZoNb3L7ZzJ4UiiyuYPhYsnvtgWD8RGPLhTC">
+          href="{% static 'css/all.css' %}">
     <link rel="stylesheet"
-          href="{% static 'css/bootstrap.min.css' %}"
-          integrity="sha384-w+8Gqjk9Cuo6XH9HKHG5t5I1VR4YBNdPt/29vwgfZR485eoEJZ8rJRbm3TR32P6k">
+          href="{% static 'css/bootstrap.min.css' %}">
     <link rel="stylesheet"
-          href="{% static 'css/bootstrap-social.min.css' %}"
-          integrity="sha384-N7gull5mxE2uLDqZ+kcZolhmuopwLtTcThUsVnUS2LVMQljojN9cfJ9A6fUA63zB">
+          href="{% static 'css/bootstrap-social.min.css' %}">
     <link rel="stylesheet"
-          href="{% static 'css/font-awesome.min.css' %}"  
-          integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN">
+          href="{% static 'css/font-awesome.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
 </head>
 
@@ -84,10 +79,11 @@
     <div class="container pt-4" style="min-height:100%">
         {% block content %}{% endblock %}
     </div>
-    {% bootstrap_javascript jquery="full" %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-            crossorigin="anonymous">
+    <script src="{% static 'scripts/jquery-3.3.1.min.js' %}">
+    </script>
+    <script src="{% static 'scripts/popper.min.js' %}">
+    </script>
+    <script src="{% static 'scripts/bootstrap.min.js' %}">
     </script>
     <script>
         $(function () {
