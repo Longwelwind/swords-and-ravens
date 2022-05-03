@@ -1,11 +1,12 @@
+{% load static %}
+
 <div id="chat-container" style="height: 302px"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/preact/8.5.2/preact.min.js"
-        integrity="sha256-uE3E2W7iyrYJy+/48n4qGW6IgqbRFBjALmSYLHzJtSs="
-        crossorigin="anonymous">
+<script src="{% static 'preact/preact.min.js' %}"
+        integrity="sha256-uE3E2W7iyrYJy+/48n4qGW6IgqbRFBjALmSYLHzJtSs=">
 </script>
 <script type="module">
-    import { h, Component, render } from 'https://unpkg.com/preact?module';
-    import htm from 'https://unpkg.com/htm?module';
+    import { h, Component, render } from "{% static 'preact/preact.module.js' %}";
+    import htm from "{% static 'preact/htm.module.js' %}";
     const html = htm.bind(h);
 
     let publicRoomId = '{{ public_room_id }}';
