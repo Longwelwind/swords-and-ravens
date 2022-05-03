@@ -8,6 +8,8 @@ RUN yarn install --frozen-lockfile
 
 COPY ./agot-bg-game-server/ .
 
+ENV ASSET_PATH=https://swords-and-ravens.ams3.cdn.digitaloceanspaces.com/
+
 RUN yarn run generate-json-schemas
 RUN yarn run build-client
 
