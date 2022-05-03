@@ -155,14 +155,23 @@
                             <td class="text-center">
                                 {{ player.players_count }}{% if player.players_count != player.game.view_of_game.maxPlayerCount %}/{{ player.game.view_of_game.maxPlayerCount }}{% endif %}
                             </td>
+                            {% if not banned_or_on_probation %}
                             <td style="width: 1px">
                                 <a class="btn btn-primary btn-sm"
-                                   href="/play/{{ player.game.id }}"
-                                   target="_blank"
+                                    href="/play/{{ player.game.id }}"
+                                    target="_blank"
+                                    {% if not request.user.is_authenticated %}
+                                        title="You must be logged in to join or spectate a game"
+                                    {% endif %}
                                 >
-                                    Join
+                                    {% if request.user.id == viewed_user.id %}
+                                        Rejoin
+                                    {% else %}
+                                        Spectate
+                                    {% endif %}
                                 </a>
                             </td>
+                            {% endif %}
                             {% if perms.agotboardgame_main.can_play_as_another_player %}
                                 <td style="width: 70px">
                                     <a class="btn btn-primary btn-sm"
@@ -230,14 +239,23 @@
                             <td class="text-center">
                                 {{ player.players_count }}{% if player.players_count != player.game.view_of_game.maxPlayerCount %}/{{ player.game.view_of_game.maxPlayerCount }}{% endif %}
                             </td>
+                            {% if not banned_or_on_probation %}
                             <td style="width: 1px">
                                 <a class="btn btn-primary btn-sm"
-                                   href="/play/{{ player.game.id }}"
-                                   target="_blank"
+                                    href="/play/{{ player.game.id }}"
+                                    target="_blank"
+                                    {% if not request.user.is_authenticated %}
+                                        title="You must be logged in to join or spectate a game"
+                                    {% endif %}
                                 >
-                                    Join
+                                    {% if request.user.id == viewed_user.id %}
+                                        Rejoin
+                                    {% else %}
+                                        Spectate
+                                    {% endif %}
                                 </a>
                             </td>
+                            {% endif %}
                             {% if perms.agotboardgame_main.can_play_as_another_player %}
                                 <td style="width: 70px">
                                     <a class="btn btn-primary btn-sm"

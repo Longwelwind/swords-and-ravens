@@ -110,19 +110,27 @@
                     {{ game.players_count }}{% if game.players_count != game.view_of_game.maxPlayerCount %}/{{ game.view_of_game.maxPlayerCount }}{% endif %}
                 </td>
                 <td class="text-right">
-                    {%if perms.agotboardgame_main.add_game or game.player_in_game %}
+                    {%if not banned_or_on_probation or game.player_in_game %}
                     <a
                         target="_blank"
                         href="/play/{{ game.id }}"
-                        class="btn btn-primary btn-sm {% if not user.is_authenticated %}disabled{% endif %}"
+                        class="btn btn-primary btn-sm"
                         {% if not user.is_authenticated %}
-                            title="You must be logged in to join or observe a game"
+                            title="You must be logged in to join or spectate a game"
                         {% endif %}
                     >
-                        {% if not game.player_in_game %}
-                            Join
+                        {% if game.state == "IN_LOBBY" %}
+                            {% if not game.player_in_game %}
+                                Join
+                            {% else %}
+                                Rejoin
+                            {% endif %}
                         {% else %}
-                            Rejoin
+                            {% if not game.player_in_game %}
+                                Spectate
+                            {% else %}
+                                Rejoin
+                            {% endif %}
                         {% endif %}
                     </a>
                     {% endif %}

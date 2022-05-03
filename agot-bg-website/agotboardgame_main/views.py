@@ -417,7 +417,12 @@ def user_profile(request, user_id):
         user.average_pbem_speed = str(timedelta(seconds=avg))
     else:
         user.average_pbem_speed = "n/a"
-    return render(request, "agotboardgame_main/user_profile.html", {"viewed_user": user, "group_name": group_name, "group_color": group_color})
+    return render(request, "agotboardgame_main/user_profile.html", {
+        "viewed_user": user,
+        "group_name": group_name,
+        "group_color": group_color,
+        "banned_or_on_probation": request.user.is_authenticated and request.user.is_in_one_group(["On probation", "Banned"])
+    })
 
 
 def logout_view(request):

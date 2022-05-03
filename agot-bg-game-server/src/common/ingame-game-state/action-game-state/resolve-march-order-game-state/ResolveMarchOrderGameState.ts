@@ -63,9 +63,11 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         const manipulatedHouseCards = allHouseCards.filter(hc => hc.disabled || hc.originalCombatStrength !== undefined);
 
         manipulatedHouseCards.forEach(card => {
-            card.ability = card.disabledAbility;
-            card.disabled = false;
-            card.disabledAbility = null;
+            if (card.disabled) {
+                card.ability = card.disabledAbility;
+                card.disabled = false;
+                card.disabledAbility = null;
+            }
             if (card.originalCombatStrength !== undefined) {
                 card.combatStrength = card.originalCombatStrength;
                 card.originalCombatStrength = undefined;
