@@ -211,6 +211,7 @@ AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
 AWS_LOCATION = env('AWS_LOCATION')
+AWS_QUERYSTRING_AUTH=False
 
 # Rest Framework
 
