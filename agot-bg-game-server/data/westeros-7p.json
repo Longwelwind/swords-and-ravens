@@ -1069,7 +1069,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":true,
+         "visible":false,
          "x":0,
          "y":0
         }, 
@@ -15919,10 +15919,27 @@
                  "width":42,
                  "x":262.333333333333,
                  "y":1204.66666666667
+                }, 
+                {
+                 "height":36,
+                 "id":601,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"region",
+                         "type":"string",
+                         "value":"the-vale-of-arryn"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":42,
+                 "x":519.5,
+                 "y":592.5
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":false,
+         "visible":true,
          "x":0,
          "y":0
         }, 
@@ -17655,12 +17672,12 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":false,
+         "visible":true,
          "x":0,
          "y":0
         }],
  "nextlayerid":12,
- "nextobjectid":601,
+ "nextobjectid":602,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.7.2",
