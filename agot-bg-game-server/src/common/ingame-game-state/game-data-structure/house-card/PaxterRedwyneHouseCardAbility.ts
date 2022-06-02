@@ -9,7 +9,7 @@ import RegionKind from "../RegionKind";
 export default class PaxterRedwyneHouseCardAbility extends HouseCardAbility {
 
     modifyUnitCombatStrength(combat: CombatGameState, house: House, _houseCard: HouseCard, _houseSide: House, affectedUnit: Unit, _support: boolean, _currentStrength: number): number {
-        if (combat.attackingRegion.type.kind == RegionKind.SEA && affectedUnit.allegiance == house && affectedUnit.type == ship) {
+        if (combat.attackingRegion.type.kind == RegionKind.SEA && affectedUnit.allegiance == house && affectedUnit.type == ship && !affectedUnit.wounded) {
             return 1;
         }
 

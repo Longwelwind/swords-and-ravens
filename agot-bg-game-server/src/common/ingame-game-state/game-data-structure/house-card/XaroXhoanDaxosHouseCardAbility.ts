@@ -11,6 +11,6 @@ export default class XaroXhoanDaxosHouseCardAbility extends HouseCardAbility {
         const enemy = combat.getEnemy(house);
         const ships = combat.houseCombatDatas.get(house).army.filter(u => u.type == ship);
         const enemyShips = combat.houseCombatDatas.get(enemy).army.filter(u => u.type == ship);
-        return affectedUnit.allegiance == house && affectedUnit.type == ship && ships.length > enemyShips.length ? 1 : 0;
+        return affectedUnit.allegiance == house && affectedUnit.type == ship && ships.length > enemyShips.length && !affectedUnit.wounded ? 1 : 0;
     }
 }
