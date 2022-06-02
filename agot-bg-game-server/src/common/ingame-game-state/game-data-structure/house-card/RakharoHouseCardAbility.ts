@@ -8,7 +8,7 @@ import { land } from "../regionTypes";
 
 export default class RakharoHouseCardAbility extends HouseCardAbility {
     modifyUnitCombatStrength(combat: CombatGameState, house: House, _houseCard: HouseCard, _houseSide: House, affectedUnit: Unit, support: boolean, _currentStrength: number): number {
-        return !support && combat.defendingRegion.type == land && combat.defendingRegion.castleLevel == 0 && affectedUnit.allegiance == house && affectedUnit.type == knight
+        return !support && combat.defendingRegion.type == land && combat.defendingRegion.castleLevel == 0 && affectedUnit.allegiance == house && affectedUnit.type == knight && !affectedUnit.wounded
             ? 2
             : 0;
     }

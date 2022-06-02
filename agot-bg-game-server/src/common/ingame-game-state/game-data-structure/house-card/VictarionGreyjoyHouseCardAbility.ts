@@ -8,7 +8,7 @@ import {ship} from "../unitTypes";
 export default class VictarionGreyjoyHouseCardAbility extends HouseCardAbility {
 
     modifyUnitCombatStrength(combat: CombatGameState, house: House, _houseCard: HouseCard, _houseSide: House, affectedUnit: Unit, _support: boolean, _currentStrength: number): number {
-        if (house == combat.attacker && affectedUnit.allegiance == house && affectedUnit.type == ship) {
+        if (house == combat.attacker && affectedUnit.allegiance == house && affectedUnit.type == ship && !affectedUnit.wounded) {
             return 1;
         }
 
