@@ -102,7 +102,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
                 }
             });
         } catch (e) {
-            Sentry.captureMessage(JSON.stringify(e), Sentry.Severity.Critical);
+            Sentry.captureException(e);
         }
     }
 
@@ -113,7 +113,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
                 json: true,
             }).auth(this.masterApiUsername, this.masterApiPassword, true);
         } catch (e) {
-            Sentry.captureMessage(JSON.stringify(e), Sentry.Severity.Error);
+            Sentry.captureException(e);
         }
     }
 
@@ -124,7 +124,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
                 json: true,
             }).auth(this.masterApiUsername, this.masterApiPassword, true);
         } catch (e) {
-            Sentry.captureMessage(JSON.stringify(e), Sentry.Severity.Error);
+            Sentry.captureException(e);
         }
     }
 
@@ -135,7 +135,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
                 json: true,
             }).auth(this.masterApiUsername, this.masterApiPassword, true);
         } catch (e) {
-            Sentry.captureMessage(JSON.stringify(e), Sentry.Severity.Error);
+            Sentry.captureException(e);
         }
     }
 
@@ -146,7 +146,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
                 json: true,
             }).auth(this.masterApiUsername, this.masterApiPassword, true);
         } catch (e) {
-            Sentry.captureMessage(JSON.stringify(e), Sentry.Severity.Error);
+            Sentry.captureException(e);
         }
     }
 
@@ -157,7 +157,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
                 json: true,
             }).auth(this.masterApiUsername, this.masterApiPassword, true);
         } catch (e) {
-            Sentry.captureMessage(JSON.stringify(e), Sentry.Severity.Error);
+            Sentry.captureException(e);
         }
     }
 
@@ -166,7 +166,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
             await post(`${this.masterApiBaseUrl}/addPbemResponseTime/${user.id}/${responseTimeInSeconds}`)
                 .auth(this.masterApiUsername, this.masterApiPassword, true);
         } catch (e) {
-            Sentry.captureMessage(JSON.stringify(e), Sentry.Severity.Error);
+            Sentry.captureException(e);
         }
     }
 

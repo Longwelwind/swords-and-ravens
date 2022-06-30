@@ -17,6 +17,7 @@ import { v4 } from "uuid";
 import sleep from "../utils/sleep";
 import { compress, decompress } from "./utils/compression";
 import { MutexInterface, Mutex, withTimeout } from 'async-mutex';
+import * as Sentry from "@sentry/node"
 
 interface UserConnectionInfo {
     userId: string;
@@ -37,6 +38,7 @@ export default class GlobalServer {
     // So we can invalidate the correct UserConnectionInfo object after a defined period of time
     multiAccountingProtection = new BetterMap<string, BetterMap<string, UserConnectionInfo>>();
     socketIds = new BetterMap<WebSocket, string>();
+    debug = false;
 
     get latestSerializedGameVersion(): string {
         const lastMigration = _.last(serializedGameMigrations);
@@ -57,6 +59,7 @@ export default class GlobalServer {
         } else {
             console.log("Launching with local-website client");
             this.websiteClient = new LocalWebsiteClient();
+            this.debug = true;
         }
 
         this.clientMessageValidator = new Ajv({allErrors: true}).compile(schema);
@@ -258,10 +261,8 @@ export default class GlobalServer {
         entireGame.onSendClientMessage = _ => {
             console.error("Server instance of ingame tried to send a client message");
         };
-        entireGame.onSendServerMessage = (users, message) => {
-            this.onSendServerMessage(users, message);
-        };
 
+        entireGame.onSendServerMessage = (users, message) => this.onSendServerMessage(users, message);
         entireGame.onReadyToStart = (users) => this.onReadyToStart(entireGame, users);
         entireGame.onWaitedUsers = (users) => this.onWaitedUsers(entireGame, users);
         entireGame.onBattleResults = (users) => this.onBattleResults(entireGame, users);
@@ -269,6 +270,7 @@ export default class GlobalServer {
         entireGame.onGameEnded = (users) => this.onGameEnded(entireGame, users);
         entireGame.onNewPbemResponseTime = (user, responseTimeInSeconds) => this.onNewPbemResponseTime(user, responseTimeInSeconds);
         entireGame.onClearChatRoom = (roomId) => this.onClearChatRoom(roomId);
+        entireGame.onCaptureSentryMessage = (message, severity) => this.onCaptureSentryMessage(message, severity);
 
         // Set the connection status of all users to false
         entireGame.users.values.forEach(u => u.connected = false);
@@ -340,7 +342,7 @@ export default class GlobalServer {
     }
 
     onWaitedUsers(game: EntireGame, users: User[]): void {
-        const offlineUsers = users.filter(u => !u.connected);
+        const offlineUsers = users.filter(u => !u.connected || this.debug);
         if (offlineUsers.length == 0) {
             return;
         }
@@ -349,7 +351,7 @@ export default class GlobalServer {
     }
 
     onBattleResults(game: EntireGame, users: User[]): void {
-        const offlineUsers = users.filter(u => !u.connected);
+        const offlineUsers = users.filter(u => !u.connected || this.debug);
         if (offlineUsers.length == 0) {
             return;
         }
@@ -358,7 +360,7 @@ export default class GlobalServer {
     }
 
     onNewVoteStarted(game: EntireGame, users: User[]): void {
-        const offlineUsers = users.filter(u => !u.connected);
+        const offlineUsers = users.filter(u => !u.connected || this.debug);
         if (offlineUsers.length == 0) {
             return;
         }
@@ -376,6 +378,10 @@ export default class GlobalServer {
 
     onClearChatRoom(roomId: string): void {
         this.websiteClient.clearChatRoom(roomId);
+    }
+
+    onCaptureSentryMessage(message: string, severity: "info" | "warning" | "error" | "fatal"): void {
+        Sentry.captureMessage(message, severity as Sentry.Severity);
     }
 
     onClose(client: WebSocket): void {

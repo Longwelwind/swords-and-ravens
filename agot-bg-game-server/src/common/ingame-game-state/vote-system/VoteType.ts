@@ -433,6 +433,11 @@ export class ReplaceVassalByPlayer extends VoteType {
                 // Server-side the order is never null but it doesn't hurt to check before we cast to <Region, Order>
                 return o != null && ctrl && !vote.ingame.isVassalHouse(ctrl) && ctrl != this.forHouse;
             }) as [Region, Order][];
+
+            // Reset waitedFor data, to properly call ingame.setWaitedForPlayers() by the game-state-change
+            vote.ingame.resetAllWaitedForData();
+
+            // game-state-change will notify all waited users, no need to do it explicitly
             planning.setChildGameState(new PlaceOrdersGameState(planning)).firstStart(new BetterMap(placedPlayerOrders));
         } else if (vote.ingame.leafState.getWaitedUsers().includes(newPlayer.user)) {
             // If we are waiting for the newPlayer, notify them about their turn

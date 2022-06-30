@@ -280,6 +280,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
     actionAfterVassalReplacement(newVassal: House): void {
         if (this.combatGameState.houseCombatDatas.keys.includes(newVassal)) {
+            this.combatGameState.ingameGameState.resetAllWaitedForData();
             this.combatGameState.proceedToChooseGeneral();
             this.entireGame.broadcastToClients({
                 type: "replaced-by-vassal"

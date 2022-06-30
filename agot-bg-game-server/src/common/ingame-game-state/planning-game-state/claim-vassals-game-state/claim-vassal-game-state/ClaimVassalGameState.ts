@@ -87,6 +87,7 @@ export default class ClaimVassalGameState extends GameState<ClaimVassalsGameStat
         this.ingame.game.vassalRelations.keys.forEach(vassal => this.ingame.game.vassalRelations.delete(vassal));
         this.ingame.broadcastVassalRelations();
         const planning = this.parentGameState.parentGameState;
+        this.ingame.resetAllWaitedForData();
         planning.setChildGameState(new ClaimVassalsGameState(planning)).firstStart();
     }
 

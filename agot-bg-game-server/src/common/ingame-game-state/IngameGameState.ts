@@ -440,6 +440,10 @@ export default class IngameGameState extends GameState<
         });
     }
 
+    resetAllWaitedForData(): void {
+        this.players.values.forEach(p => p.resetWaitedFor());
+    }
+
     checkWaitedForPlayers(): Player[] {
         const waitedUsers = this.leafState.getWaitedUsers();
         const notWaitedForAnymore: Player[] = [];

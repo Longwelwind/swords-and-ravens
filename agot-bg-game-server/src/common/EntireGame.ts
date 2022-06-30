@@ -52,6 +52,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     onGameEnded: (users: User[]) => void;
     onNewPbemResponseTime: (user: User, responseTimeInSeconds: number) => void;
     onClearChatRoom: (roomId: string) => void;
+    onCaptureSentryMessage: (message: string, severity: "info" | "warning" | "error" | "fatal") => void;
+
     publicChatRoomId: string;
     // Keys are the two users participating in the private chat.
     // A pair of user is sorted alphabetically by their id when used as a key.
@@ -166,6 +168,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 // Basically this should not happen, but we keep it for safety!
                 if (p.waitedForData?.handled === false) {
                     p.sendPbemResponseTime();
+
+                    if (this.onCaptureSentryMessage) {
+                        this.onCaptureSentryMessage(`Unhandled waitedForData in game ${this.entireGame.id} for user ${p.user.name} (${p.user.id})`, "warning");
+                    }
                 }
                 p.resetWaitedFor();
             });
@@ -298,7 +304,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                     // Do not activate waitedForData now. We start calculating with the next game state change
                 } else if (this.gameSettings.pbem && !settings.pbem) {
                     // Reset waitedFor as we are now Live
-                    this.ingameGameState.players.values.forEach(p => p.resetWaitedFor());
+                    this.ingameGameState.resetAllWaitedForData();
                 }
             }
 
