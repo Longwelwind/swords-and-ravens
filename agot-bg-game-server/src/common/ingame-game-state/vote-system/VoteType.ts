@@ -9,6 +9,9 @@ import WildlingCardEffectInTurnOrderGameState from "../westeros-game-state/wildl
 import GameState from "../../../common/GameState";
 import BetterMap from "../../../utils/BetterMap";
 import HouseCardResolutionGameState from "../action-game-state/resolve-march-order-game-state/combat-game-state/house-card-resolution-game-state/HouseCardResolutionGameState";
+import PlaceOrdersGameState from "../planning-game-state/place-orders-game-state/PlaceOrdersGameState";
+import Region from "../game-data-structure/Region";
+import Order from "../game-data-structure/Order";
 
 export type SerializedVoteType = SerializedCancelGame | SerializedEndGame
     | SerializedReplacePlayer | SerializedReplacePlayerByVassal | SerializedReplaceVassalByPlayer;
@@ -422,18 +425,32 @@ export class ReplaceVassalByPlayer extends VoteType {
             houseCards: this.forHouse.houseCards.values.map(hc => hc.serializeToClient())
         });
 
+        const placeOrders = vote.ingame.leafState instanceof PlaceOrdersGameState ? vote.ingame.leafState : null;
+        if (placeOrders && placeOrders.forVassals) {
+            const planning = placeOrders.parentGameState;
+            const placedPlayerOrders = placeOrders.placedOrders.entries.filter(([r, o]) => {
+                const ctrl = r.getController();
+                // Server-side the order is never null but it doesn't hurt to check before we cast to <Region, Order>
+                return o != null && ctrl && !vote.ingame.isVassalHouse(ctrl) && ctrl != this.forHouse;
+            }) as [Region, Order][];
+
+            // Reset waitedFor data, to properly call ingame.setWaitedForPlayers() by the game-state-change
+            vote.ingame.resetAllWaitedForData();
+
+            // game-state-change will notify all waited users, no need to do it explicitly
+            planning.setChildGameState(new PlaceOrdersGameState(planning)).firstStart(new BetterMap(placedPlayerOrders));
+        } else if (vote.ingame.leafState.getWaitedUsers().includes(newPlayer.user)) {
+            // If we are waiting for the newPlayer, notify them about their turn
+            newPlayer.setWaitedFor();
+            vote.ingame.entireGame.notifyWaitedUsers([newPlayer.user]);
+        }
+
         // Re-transmit the whole game, so newPlayer receives possible secrets like objectives in FFC
         newPlayer.user.send({
             type: "authenticate-response",
             game: vote.ingame.entireGame.serializeToClient(newPlayer.user),
             userId: newPlayer.user.id
         });
-
-        // If we are waiting for the newPlayer, notify them about their turn
-        if (vote.ingame.leafState.getWaitedUsers().includes(newPlayer.user)) {
-            newPlayer.setWaitedFor();
-            vote.ingame.entireGame.notifyWaitedUsers([newPlayer.user]);
-        }
     }
 
     serializeToClient(): SerializedReplaceVassalByPlayer {
