@@ -29,6 +29,7 @@ export default interface WebsiteClient {
     saveGame(gameId: string, serializedGame: object, viewOfGame: object, players: {userId: string; data: object}[], state: string, version: string, updateLastActive: boolean): Promise<void>;
     notifyReadyToStart(gameId: string, userIds: string[]): Promise<void>;
     notifyYourTurn(gameId: string, userIds: string[]): Promise<void>;
+    notifyBribeForSupport(gameId: string, userIds: string[]): Promise<void>;
     notifyBattleResults(gameId: string, userIds: string[]): Promise<void>;
     notifyNewVote(gameId: string, userIds: string[]): Promise<void>;
     notifyGameEnded(gameId: string, userIds: string[]): Promise<void>;

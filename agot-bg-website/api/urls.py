@@ -12,6 +12,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('notifyReadyToStart/<uuid:game_id>', views.notify_ready_to_start),
     path('notifyYourTurn/<uuid:game_id>', views.notify_your_turn),
+    path('notifyBribeForSupport/<uuid:game_id>', views.notify_bribe_for_support),
     path('notifyBattleResults/<uuid:game_id>', views.notify_battle_results),
     path('notifyNewVote/<uuid:game_id>', views.notify_new_vote),
     path('notifyGameEnded/<uuid:game_id>', views.notify_game_ended),

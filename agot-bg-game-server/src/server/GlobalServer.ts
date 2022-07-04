@@ -266,6 +266,7 @@ export default class GlobalServer {
         entireGame.onReadyToStart = (users) => this.onReadyToStart(entireGame, users);
         entireGame.onWaitedUsers = (users) => this.onWaitedUsers(entireGame, users);
         entireGame.onBattleResults = (users) => this.onBattleResults(entireGame, users);
+        entireGame.onBribeForSupport = (users) => this.onBribeForSupport(entireGame, users);
         entireGame.onNewVoteStarted = (users) => this.onNewVoteStarted(entireGame, users);
         entireGame.onGameEnded = (users) => this.onGameEnded(entireGame, users);
         entireGame.onNewPbemResponseTime = (user, responseTimeInSeconds) => this.onNewPbemResponseTime(user, responseTimeInSeconds);
@@ -348,6 +349,15 @@ export default class GlobalServer {
         }
 
         this.websiteClient.notifyYourTurn(game.id, offlineUsers.map(u => u.id));
+    }
+
+    onBribeForSupport(game: EntireGame, users: User[]): void {
+        const offlineUsers = users.filter(u => !u.connected || this.debug);
+        if (offlineUsers.length == 0) {
+            return;
+        }
+
+        this.websiteClient.notifyBribeForSupport(game.id, offlineUsers.map(u => u.id));
     }
 
     onBattleResults(game: EntireGame, users: User[]): void {
