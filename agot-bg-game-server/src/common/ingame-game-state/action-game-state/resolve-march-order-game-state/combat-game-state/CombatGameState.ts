@@ -12,7 +12,7 @@ import {ServerMessage} from "../../../../../messages/ServerMessage";
 import Player from "../../../Player";
 import {ClientMessage} from "../../../../../messages/ClientMessage";
 import ChooseHouseCardGameState, {SerializedChooseHouseCardGameState} from "./choose-house-card-game-state/ChooseHouseCardGameState";
-import EntireGame from "../../../../EntireGame";
+import EntireGame, { NotificationType } from "../../../../EntireGame";
 import Game from "../../../game-data-structure/Game";
 import UseValyrianSteelBladeGameState, {SerializedUseValyrianSteelBladeGameState} from "./use-valyrian-steel-blade-game-state/UseValyrianSteelBladeGameState";
 import HouseCard from "../../../game-data-structure/house-card/HouseCard";
@@ -193,7 +193,7 @@ export default class CombatGameState extends GameState<
         });
 
         // Begin by the declaration of support
-        if (!this.proceedNextSupportDeclaration()) {
+        if (!this.proceedNextSupportDeclaration(true)) {
             this.proceedToChooseGeneral();
         }
     }
@@ -584,12 +584,17 @@ export default class CombatGameState extends GameState<
         this.setChildGameState(new ChooseHouseCardGameState(this)).firstStart(choosableHouseCards);
     }
 
-    proceedNextSupportDeclaration(): boolean {
+    proceedNextSupportDeclaration(firstTime = false): boolean {
         const nextHouseToDeclareSupport = this.getNextHouseToDeclareSupport();
 
         if (!nextHouseToDeclareSupport) {
             // All the necessary houses have declared support
             return false;
+        }
+
+        if (firstTime && this.entireGame.gameSettings.allowGiftingPowerTokens && this.defender.powerTokens > 0) {
+            // Notify the defender that he can bribe for support now
+            this.entireGame.notifyUsers([this.ingameGameState.getControllerOfHouse(this.defender).user], NotificationType.BRIBE_FOR_SUPPORT);
         }
 
         this.setChildGameState(new DeclareSupportGameState(this)).firstStart(nextHouseToDeclareSupport);

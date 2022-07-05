@@ -43,6 +43,10 @@ export default class LocalWebsiteClient implements WebsiteClient {
         console.log(`notifyYourTurn: ${userIds.join(", ")}`);
     }
 
+    async notifyBribeForSupport(gameId: string, userIds: string[]): Promise<void> {
+        console.log(`notifyBribeForSupport: ${userIds.join(", ")}`);
+    }
+
     async notifyBattleResults(_gameId: string, userIds: string[]): Promise<void> {
         console.log(`notifyBattleResults: ${userIds.join(", ")}`);
     }

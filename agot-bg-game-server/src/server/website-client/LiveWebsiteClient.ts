@@ -128,6 +128,17 @@ export default class LiveWebsiteClient implements WebsiteClient {
         }
     }
 
+    async notifyBribeForSupport(gameId: string, userIds: string[]): Promise<void> {
+        try {
+            await post(`${this.masterApiBaseUrl}/notifyBribeForSupport/${gameId}`, {
+                body: { users: userIds },
+                json: true,
+            }).auth(this.masterApiUsername, this.masterApiPassword, true);
+        } catch (e) {
+            Sentry.captureException(e);
+        }
+    }
+
     async notifyBattleResults(gameId: string, userIds: string[]): Promise<void> {
         try {
             await post(`${this.masterApiBaseUrl}/notifyBattleResults/${gameId}`, {

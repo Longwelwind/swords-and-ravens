@@ -89,6 +89,33 @@ def notify_your_turn(request, game_id):
 
 @api_view(['POST'])
 @csrf_exempt
+def notify_bribe_for_support(request, game_id):
+    user_ids = request.data['users']
+    game = Game.objects.get(id=game_id)
+    users = [User.objects.get(id=user_id) for user_id in user_ids]
+
+    # Filter users who turned off email
+    users = [user for user in users if user.email_notification_active]
+
+    mails = [
+        (
+            f'You are attacked and now can call for support in \'{game.name}\'',
+            render_to_string(
+                'agotboardgame_main/bribe_for_support_notification.html',
+                {'game': game, 'user': user, 'game_url': request.build_absolute_uri(reverse('play', args=[game.id]))}
+            ),
+            DEFAULT_FROM_MAIL, [user.email]
+        )
+        for user in users
+    ]
+
+    send_mass_mail(mails)
+
+    return Response({'status': 'ok'})
+
+
+@api_view(['POST'])
+@csrf_exempt
 def notify_battle_results(request, game_id):
     user_ids = request.data['users']
     game = Game.objects.get(id=game_id)

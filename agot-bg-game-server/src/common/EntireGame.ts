@@ -24,6 +24,7 @@ import SimpleChoiceGameState from "./ingame-game-state/simple-choice-game-state/
 
 export enum NotificationType {
     READY_TO_START,
+    BRIBE_FOR_SUPPORT,
     BATTLE_RESULTS,
     NEW_VOTE_STARTED,
     GAME_ENDED
@@ -48,6 +49,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     onWaitedUsers: (users: User[]) => void;
     onReadyToStart: (users: User[]) => void;
     onNewVoteStarted: (users: User[]) => void;
+    onBribeForSupport: (users: User[]) => void;
     onBattleResults: (users: User[]) => void;
     onGameEnded: (users: User[]) => void;
     onNewPbemResponseTime: (user: User, responseTimeInSeconds: number) => void;
@@ -223,6 +225,11 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             case NotificationType.BATTLE_RESULTS:
                 if (this.onBattleResults) {
                     this.onBattleResults(users);
+                }
+                break;
+            case NotificationType.BRIBE_FOR_SUPPORT:
+                if (this.onBribeForSupport) {
+                    this.onBribeForSupport(users);
                 }
                 break;
         }
