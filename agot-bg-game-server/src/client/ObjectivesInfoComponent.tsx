@@ -78,7 +78,7 @@ export default class ObjectivesInfoComponent extends Component<ObjectivesInfoCom
                         />
                     </Col>)}
             </Row>
-            <Row className="justify-content-center mt-4 clickable hover-weak-outline">
+            <Row className="justify-content-center mt-4 clickable">
                 <Col xs={12}>
                     <OverlayTrigger overlay={this.renderRulesTooltip()}
                         trigger="click"
