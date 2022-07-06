@@ -2,20 +2,38 @@ import House from "./game-data-structure/House";
 import User from "../../server/User";
 import IngameGameState from "./IngameGameState";
 import { VoteState } from "./vote-system/Vote";
+import { observable } from "mobx";
 
 export default class Player {
     user: User;
     house: House;
     waitedForData: WaitedForData | null;
+    @observable liveClockData: LiveClockData | null;
 
     get isNeededForVote(): boolean {
         return this.user.entireGame.ingameGameState?.votes.values.filter(vote => vote.state == VoteState.ONGOING).some(vote => !vote.votes.has(this.house)) ?? false;
     }
 
-    constructor(user: User, house: House, waitedForData: WaitedForData | null = null) {
+    get totalRemainingSeconds(): number | null {
+        if (!this.liveClockData) {
+            return null;
+        }
+
+        let total = this.liveClockData.remainingSeconds;
+        if (this.liveClockData.timerStartedAt) {
+            const elapsedSeconds = Math.floor((new Date().getTime() - this.liveClockData.timerStartedAt.getTime()) / 1000);
+            total -= elapsedSeconds;
+            total = Math.max(0, total);
+        }
+
+        return total;
+    }
+
+    constructor(user: User, house: House, waitedForData: WaitedForData | null = null, liveClockData: LiveClockData | null = null) {
         this.user = user;
         this.house = house;
         this.waitedForData = waitedForData;
+        this.liveClockData = liveClockData;
     }
 
     setWaitedFor(hasBeenReactivatedAgain = false): void {
@@ -55,6 +73,19 @@ export default class Player {
         this.waitedForData.handled = true;
     }
 
+    startClientClockInterval(): void {
+        if (this.liveClockData?.timerStartedAt) {
+            this.liveClockData.clientIntervalId = window.setInterval(() => this.user.entireGame.ingameGameState?.forceRerender(), 1000);
+        }
+    }
+
+    stopClientClockInterval(): void {
+        if (this.liveClockData && this.liveClockData.clientIntervalId >= 0) {
+            window.clearInterval(this.liveClockData.clientIntervalId);
+            this.liveClockData.clientIntervalId = -1;
+        }
+    }
+
     serializeToClient(): SerializedPlayer {
         return {
             userId: this.user.id,
@@ -64,6 +95,10 @@ export default class Player {
                 leafStateId: this.waitedForData.leafStateId,
                 handled: this.waitedForData.handled,
                 hasBeenReactivated: this.waitedForData.hasBeenReactivated
+            } : null,
+            liveClockData: this.liveClockData ? {
+                remainingSeconds: this.liveClockData.remainingSeconds,
+                timerStartedAt: this.liveClockData.timerStartedAt ? this.liveClockData.timerStartedAt.getTime() : null
             } : null
         };
     }
@@ -78,6 +113,12 @@ export default class Player {
                 handled: data.waitedForData.handled,
                 hasBeenReactivated: data.waitedForData.hasBeenReactivated
             } : null,
+            data.liveClockData ? {
+                remainingSeconds: data.liveClockData.remainingSeconds,
+                serverTimer: null,
+                timerStartedAt: data.liveClockData.timerStartedAt ? new Date(data.liveClockData.timerStartedAt) : null,
+                clientIntervalId: -1
+            } : null
         );
     }
 }
@@ -86,6 +127,7 @@ export interface SerializedPlayer {
     userId: string;
     houseId: string;
     waitedForData: SerializedWaitedForData | null;
+    liveClockData: SerializedLiveClockData | null;
 }
 
 export interface WaitedForData {
@@ -93,6 +135,18 @@ export interface WaitedForData {
     leafStateId: string;
     handled: boolean;
     hasBeenReactivated: boolean;
+}
+
+export interface LiveClockData {
+    remainingSeconds: number;
+    serverTimer: NodeJS.Timeout | null;
+    timerStartedAt: Date | null;
+    clientIntervalId: number;
+}
+
+export interface SerializedLiveClockData {
+    remainingSeconds: number;
+    timerStartedAt: number | null;
 }
 
 export interface SerializedWaitedForData {

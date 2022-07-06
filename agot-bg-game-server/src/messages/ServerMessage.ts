@@ -29,7 +29,8 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | UpdateDraftState | RevealBids | UpdateMaxTurns | PasswordResponse | ReplacedByVassal | UpdateDeletedHouseCards | UpdateOldPlayerHouseCards
     | LoyaltyTokenGained | LoyaltyTokenPlaced | DrangonStrengthTokenRemoved | UpdateLoanCards | UpdateRegionModifiers
     | UpdateCompletedObjectives | UpdateSecretObjectives | SyncShiftingAmbitionsGameState | HideOrRevealUserNames | ClearChatRoom
-    | UpdateSelectableObjectives | UpdateSpecialHouseCardModifier | UpdateUsurper;
+    | UpdateSelectableObjectives | UpdateSpecialHouseCardModifier | UpdateUsurper
+    | StartPlayerClock | StopPlayerClock;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -310,12 +311,14 @@ interface PlayerReplaced {
     type: "player-replaced";
     oldUser: string;
     newUser?: string;
+    liveClockRemainingSeconds?: number;
 }
 
 interface VassalReplaced {
     type: "vassal-replaced";
     house: string;
     user: string;
+    liveClockRemainingSeconds?: number;
 }
 
 interface CrowKillersStepChanged {
@@ -463,4 +466,17 @@ interface UpdateSelectableObjectives {
 interface UpdateUsurper {
     type: "update-usurper";
     house: string | null;
+}
+
+interface StartPlayerClock {
+    type: "start-player-clock";
+    userId: string;
+    remainingSeconds: number;
+    timerStartedAt: number;
+}
+
+interface StopPlayerClock {
+    type: "stop-player-clock";
+    userId: string;
+    remainingSeconds: number;
 }

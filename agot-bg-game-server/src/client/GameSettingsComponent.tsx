@@ -88,10 +88,11 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     label={
                                         <OverlayTrigger overlay={
                                             <Tooltip id="only-live-setting-tooltip">
-                                                When this option is enabled, the owner of the game will not be able to switch the game to PBEM in-game.
-                                                In addition, the number of positive votes required is reduced to a fixed value of 3 to make it easier to turn quitters into vassals.
+                                                When this option is enabled each player will have a game clock of 1h. When a player&apos;s time runs out, he is automatically turned into a vassal.<br/>
+                                                In addition, the owner of the game will not be able to switch to PBEM in-game, and the number of positive votes required to replace a player
+                                                is reduced to 3 to make it easier to address quitters.
                                             </Tooltip>}>
-                                            <label htmlFor="only-live-setting">No PBEM</label>
+                                            <label htmlFor="only-live-setting">Game clock</label>
                                         </OverlayTrigger>}
                                     checked={this.gameSettings.onlyLive}
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.onlyLive = !this.gameSettings.onlyLive)}

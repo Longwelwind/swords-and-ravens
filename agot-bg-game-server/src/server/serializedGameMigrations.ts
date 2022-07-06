@@ -1738,6 +1738,16 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "79",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.players.forEach((p: any) => p.liveClockData = null);
+            }
+            return serializedGame;
+        }
     }
 ];
 

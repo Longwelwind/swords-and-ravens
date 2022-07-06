@@ -10,7 +10,6 @@ import CancelledGameState from "../cancelled-game-state/CancelledGameState";
 import shuffle from "../../utils/shuffle";
 import shuffleInPlace from "../../utils/shuffleInPlace";
 import _ from "lodash";
-import { MIN_PLAYER_COUNT_WITH_VASSALS, MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN } from "../ingame-game-state/game-data-structure/Game";
 import { v4 } from "uuid";
 
 export default class LobbyGameState extends GameState<EntireGame> {
@@ -340,16 +339,8 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
         if (this.canStartGame(owner).success) {
             // Only notify when min count is reached and when game is full to avoid many messages in between
-            let minCountReached = false;
-            if (this.settings.vassals) {
-                if (this.entireGame.selectedGameSetup.playerCount >= 8) {
-                    minCountReached = this.players.size == MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN;
-                } else {
-                    minCountReached = this.players.size == MIN_PLAYER_COUNT_WITH_VASSALS;
-                }
-            }
-
-            const maxCountReached = this.players.size == this.entireGame.selectedGameSetup.playerCount;
+            const minCountReached = this.settings.vassals && this.players.size == this.entireGame.minPlayerCount;
+            const maxCountReached = this.players.size == this.entireGame.gameSettings.playerCount;
 
             if (minCountReached || maxCountReached) {
                 this.entireGame.notifyUsers([owner], NotificationType.READY_TO_START);
@@ -368,12 +359,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
         // If Vassals are toggled we need at least min_player_count_with_vassals
         if (this.settings.vassals) {
-            if (this.entireGame.selectedGameSetup.playerCount >= 8) {
-                if (this.players.size < MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN) {
-                    return {success: false, reason: "not-enough-players"};
-                }
-            }
-            else if (this.players.size < MIN_PLAYER_COUNT_WITH_VASSALS) {
+            if (this.players.size < this.entireGame.minPlayerCount) {
                 return {success: false, reason: "not-enough-players"};
             }
         } else if (this.players.size < this.entireGame.selectedGameSetup.playerCount) {
