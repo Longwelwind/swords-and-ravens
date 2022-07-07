@@ -10,9 +10,8 @@ import Region from "../game-data-structure/Region";
 import Order from "../game-data-structure/Order";
 
 export type SerializedVoteType = SerializedCancelGame | SerializedEndGame
-    | SerializedReplacePlayer | SerializedReplacePlayerByVassal | SerializedReplaceVassalByPlayer;
-
-// TODO: Add ExtendAllPlayerClocks VoteType
+    | SerializedReplacePlayer | SerializedReplacePlayerByVassal | SerializedReplaceVassalByPlayer
+    | SerializedExtendPlayerClocks;
 
 export default abstract class VoteType {
     abstract serializeToClient(): SerializedVoteType;
@@ -49,8 +48,74 @@ export default abstract class VoteType {
                 // Same than above
                 // eslint-disable-next-line @typescript-eslint/no-use-before-define
                 return EndGame.deserializeFromServer(ingame, data);
+            case "extend-all-player-clocks":
+                // Same than above
+                // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                return ExtendPlayerClocks.deserializeFromServer(ingame, data);
         }
     }
+}
+
+export class ExtendPlayerClocks extends VoteType {
+    verb(): string {
+        return "extend all player clocks by 15 minutes";
+    }
+
+    executeAccepted(vote: Vote): void {
+        const ingame = vote.ingame;
+
+        ingame.players.forEach(p => {
+            if (!p.liveClockData) {
+                throw new Error("LiveClockData must be present in ExtendPlayerClocks");
+            }
+
+            if (!p.liveClockData.timerStartedAt) {
+                p.liveClockData.remainingSeconds += 15 * 60;
+                ingame.entireGame.broadcastToClients({
+                    type: "stop-player-clock",
+                    remainingSeconds: p.liveClockData.remainingSeconds,
+                    userId: p.user.id
+                });
+            } else {
+                if (!p.liveClockData.serverTimer) {
+                    throw new Error("A serverTimer must be present when timerStartedAt is set");
+                }
+
+                p.liveClockData.remainingSeconds = (p.totalRemainingSeconds as number) + 15 * 60;
+
+                ingame.entireGame.broadcastToClients({
+                    type: "stop-player-clock",
+                    remainingSeconds: p.liveClockData.remainingSeconds,
+                    userId: p.user.id
+                });
+
+                clearTimeout(p.liveClockData.serverTimer);
+                p.liveClockData.serverTimer = setTimeout(() => { ingame.onPlayerClockTimeout(p) }, p.liveClockData.remainingSeconds * 1000);
+                p.liveClockData.timerStartedAt = new Date();
+
+                ingame.entireGame.broadcastToClients({
+                    type: "start-player-clock",
+                    remainingSeconds: p.liveClockData.remainingSeconds,
+                    timerStartedAt: p.liveClockData.timerStartedAt.getTime(),
+                    userId: p.user.id
+                });
+            }
+        });
+    }
+
+    serializeToClient(): SerializedExtendPlayerClocks {
+        return {
+            type: "extend-all-player-clocks"
+        };
+    }
+
+    static deserializeFromServer(_ingame: IngameGameState, _data: SerializedExtendPlayerClocks): ExtendPlayerClocks {
+        return new ExtendPlayerClocks();
+    }
+}
+
+export interface SerializedExtendPlayerClocks {
+    type: "extend-all-player-clocks";
 }
 
 export class CancelGame extends VoteType {
