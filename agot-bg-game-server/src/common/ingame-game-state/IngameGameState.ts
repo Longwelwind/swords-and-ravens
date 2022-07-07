@@ -606,10 +606,10 @@ export default class IngameGameState extends GameState<
         }
 
         this.endPlayerClock(player, false);
+        this.replacePlayerByVassal(player);
 
-        const canReplacePlayerByVassal = this.players.size - 1 >= this.entireGame.minPlayerCount;
-        if (canReplacePlayerByVassal) {
-            this.replacePlayerByVassal(player);
+        if (this.players.size == 1) {
+            this.setChildGameState(new GameEndedGameState(this)).firstStart(this.players.values[0].house);
         }
 
         this.entireGame.checkGameStateChanged();
