@@ -151,8 +151,16 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
             // Allow change of game settings only if the selected variant has enough seats
             // for all already connected players
-            if (this.players.size > settings.playerCount) {
+            if (this.players.size > settings.playerCount || settings.playerCount < 2 || settings.playerCount > 8) {
                 return updateLastActive;
+            }
+
+            if (settings.initialLiveClock < 60) {
+                settings.initialLiveClock = 60;
+            }
+
+            if (settings.initialLiveClock > 120) {
+                settings.initialLiveClock = 120;
             }
 
             if (settings.houseCardsEvolution) {

@@ -99,6 +99,18 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.onlyLive = !this.gameSettings.onlyLive)}
                                 />
                             )}
+                            {this.gameSettings.onlyLive &&
+                            <div>
+                                <select id="initial-live-clock" name="initialLiveClock"
+                                    value={this.gameSettings.initialLiveClock}
+                                    onChange={e => this.onInitialLiveClockChange(e.target.value)}
+                                >
+                                    <option key="60" value={60}>60</option>
+                                    <option key="75" value={75}>75</option>
+                                    <option key="90" value={90}>90</option>
+                                    <option key="120" value={120}>120</option>
+                                </select>&nbsp;min
+                            </div>}
                             <FormCheck
                                 id="private-game-setting"
                                 className="mx-3 mt-2"
@@ -633,6 +645,16 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
         }
 
         this.gameSettings.playerCount = parseInt(newVal);
+
+        this.changeGameSettings();
+    }
+
+    onInitialLiveClockChange(newVal: string): void {
+        if (!this.canChangeGameSettings) {
+            return;
+        }
+
+        this.gameSettings.initialLiveClock = parseInt(newVal);
 
         this.changeGameSettings();
     }

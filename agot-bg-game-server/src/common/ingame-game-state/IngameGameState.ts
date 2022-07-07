@@ -84,7 +84,7 @@ export default class IngameGameState extends GameState<
 
         if (this.entireGame.gameSettings.onlyLive) {
             this.players.values.forEach(p => p.liveClockData = {
-                remainingSeconds: 60 * 60,
+                remainingSeconds: this.entireGame.gameSettings.initialLiveClock * 60,
                 timerStartedAt: null,
                 serverTimer: null,
                 clientIntervalId: -1,
