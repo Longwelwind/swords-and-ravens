@@ -22,7 +22,7 @@ import GameEndedGameState, {SerializedGameEndedGameState} from "./game-ended-gam
 import UnitType from "./game-data-structure/UnitType";
 import WesterosCard from "./game-data-structure/westeros-card/WesterosCard";
 import Vote, { SerializedVote, VoteState } from "./vote-system/Vote";
-import VoteType, { CancelGame, EndGame, ReplacePlayer, ReplacePlayerByVassal, ReplaceVassalByPlayer } from "./vote-system/VoteType";
+import VoteType, { CancelGame, EndGame, ExtendPlayerClocks, ReplacePlayer, ReplacePlayerByVassal, ReplaceVassalByPlayer } from "./vote-system/VoteType";
 import { v4 } from "uuid";
 import CancelledGameState, { SerializedCancelledGameState } from "../cancelled-game-state/CancelledGameState";
 import HouseCard from "./game-data-structure/house-card/HouseCard";
@@ -84,7 +84,7 @@ export default class IngameGameState extends GameState<
 
         if (this.entireGame.gameSettings.onlyLive) {
             this.players.values.forEach(p => p.liveClockData = {
-                remainingSeconds: 60 * 60,
+                remainingSeconds: this.entireGame.gameSettings.initialLiveClock * 60,
                 timerStartedAt: null,
                 serverTimer: null,
                 clientIntervalId: -1,
@@ -394,6 +394,13 @@ export default class IngameGameState extends GameState<
                     new EndGame()
                 );
             }
+        } else if (message.type == "launch-extend-player-clocks-vote") {
+            if (this.canLaunchExtendPlayerClocksVote(player).result) {
+                this.createVote(
+                    player.user,
+                    new ExtendPlayerClocks()
+                );
+            }
         } else if (message.type == "update-note") {
             player.user.note = message.note.substring(0, NOTE_MAX_LENGTH);
         } else if (message.type == "launch-replace-player-by-vassal-vote") {
@@ -606,10 +613,10 @@ export default class IngameGameState extends GameState<
         }
 
         this.endPlayerClock(player, false);
+        this.replacePlayerByVassal(player);
 
-        const canReplacePlayerByVassal = this.players.size - 1 >= this.entireGame.minPlayerCount;
-        if (canReplacePlayerByVassal) {
-            this.replacePlayerByVassal(player);
+        if (this.players.size == 1) {
+            this.setChildGameState(new GameEndedGameState(this)).firstStart(this.players.values[0].house);
         }
 
         this.entireGame.checkGameStateChanged();
@@ -1014,7 +1021,19 @@ export default class IngameGameState extends GameState<
         }
     }
 
+    launchExtendPlayerClocksVote(): void {
+        if (window.confirm('Do you want to launch a vote to extend all player clocks by 15 minutes?')) {
+            this.entireGame.sendMessageToServer({
+                type: "launch-extend-player-clocks-vote"
+            });
+        }
+    }
+
     canLaunchCancelGameVote(player: Player | null): {result: boolean; reason: string} {
+        if (this.players.size <= 2) {
+            return {result: false, reason: "not-enough-voter"};
+        }
+
         const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof CancelGame);
 
         if (existingVotes.length > 0) {
@@ -1037,6 +1056,10 @@ export default class IngameGameState extends GameState<
     }
 
     canLaunchEndGameVote(player: Player | null): {result: boolean; reason: string} {
+        if (this.players.size <= 2) {
+            return {result: false, reason: "not-enough-voter"};
+        }
+
         const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof EndGame);
 
         if (existingVotes.length > 0) {
@@ -1057,6 +1080,36 @@ export default class IngameGameState extends GameState<
 
         if (this.game.turn == this.game.maxTurns) {
             return {result: false, reason: "already-last-turn"};
+        }
+
+        return {result: true, reason: ""};
+    }
+
+    canLaunchExtendPlayerClocksVote(player: Player | null): {result: boolean; reason: string} {
+        if (!this.entireGame.gameSettings.onlyLive) {
+            return {result: false, reason: "no-live-clock-game"};
+        }
+
+        if (this.players.size <= 2) {
+            return {result: false, reason: "not-enough-voter"};
+        }
+
+        const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof ExtendPlayerClocks);
+
+        if (existingVotes.length > 0) {
+            return {result: false, reason: "already-existing"};
+        }
+
+        if (player == null || !this.players.values.includes(player)) {
+            return {result: false, reason: "only-players-can-vote"};
+        }
+
+        if (this.childGameState instanceof CancelledGameState) {
+            return {result: false, reason: "already-cancelled"};
+        }
+
+        if (this.childGameState instanceof GameEndedGameState) {
+            return {result: false, reason: "already-ended"};
         }
 
         return {result: true, reason: ""};
@@ -1118,6 +1171,10 @@ export default class IngameGameState extends GameState<
     }
 
     canLaunchReplaceVassalVote(fromUser: User | null, forHouse: House): {result: boolean; reason: string} {
+        if (this.players.size <= 2) {
+            return {result: false, reason: "not-enough-voter"};
+        }
+
         if (!fromUser) {
             return {result: false, reason: "only-authenticated-users-can-vote"};
         }

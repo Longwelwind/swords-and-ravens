@@ -5,7 +5,7 @@ export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | Unready |
     | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings | CreatePrivateChatRoom | ChangeGameSettings
     | CancelGame | Vote | LaunchCancelGameVote | CancelVote | UpdateNote | SelectWesterosCard
     | LaunchReplacePlayerVote | LaunchReplacePlayerByVassalVote | LaunchReplaceVassalByPlayerVote
-    | ClaimVassal | GiftPowerTokens | LaunchEndGameVote | SetPassword
+    | ClaimVassal | GiftPowerTokens | LaunchEndGameVote | LaunchExtendPlayerClocksVote | SetPassword
     | DistributePowerTokens | DropPowerTokens | MoveLoyaltyToken | ResolveConsolidatePowerChoice | PlaceSellswords
     | ResolveSpymaster | SelectObjectives | ScoreObjective | GameLogSeen;
 
@@ -248,6 +248,10 @@ interface GiftPowerTokens {
 
 interface LaunchEndGameVote {
     type: "launch-end-game-vote";
+}
+
+interface LaunchExtendPlayerClocksVote {
+    type: "launch-extend-player-clocks-vote";
 }
 
 interface SetPassword {

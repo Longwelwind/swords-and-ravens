@@ -5,6 +5,7 @@ import {ClientMessage} from "../../messages/ClientMessage";
 import { ServerMessage } from "../../messages/ServerMessage";
 import IngameGameState from "../ingame-game-state/IngameGameState";
 import Player from "../ingame-game-state/Player";
+import { VoteState } from "../ingame-game-state/vote-system/Vote";
 
 export default class CancelledGameState extends GameState<EntireGame | IngameGameState> {
     get ingame(): IngameGameState | null {
@@ -13,6 +14,9 @@ export default class CancelledGameState extends GameState<EntireGame | IngameGam
 
     firstStart(): void {
         this.entireGame.hideOrRevealUserNames(true);
+
+        this.ingame?.votes.values.filter(v => v.state == VoteState.ONGOING).forEach(v => v.cancelVote());
+
         if (this.ingame) {
             this.entireGame.notifyUsers(this.ingame.players.keys, NotificationType.GAME_ENDED)
         }

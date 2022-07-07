@@ -6,6 +6,7 @@ import {ServerMessage} from "../../../messages/ServerMessage";
 import IngameGameState from "../IngameGameState";
 import User from "../../../server/User";
 import { NotificationType } from "../../EntireGame";
+import { VoteState } from "../vote-system/Vote";
 
 export default class GameEndedGameState extends GameState<IngameGameState> {
     winner: House;
@@ -33,6 +34,8 @@ export default class GameEndedGameState extends GameState<IngameGameState> {
             type: "winner-declared",
             winner: winner.id
         });
+
+        this.ingame.votes.values.filter(v => v.state == VoteState.ONGOING).forEach(v => v.cancelVote());
 
         this.entireGame.notifyUsers(this.ingame.players.keys, NotificationType.GAME_ENDED);
     }

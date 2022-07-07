@@ -23,6 +23,8 @@ import { observable } from "mobx";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamation, faLock } from "@fortawesome/free-solid-svg-icons";
+import _ from "lodash";
+import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
 
 interface EntireGameComponentProps {
     entireGame: EntireGame;
@@ -32,6 +34,18 @@ interface EntireGameComponentProps {
 @observer
 export default class EntireGameComponent extends Component<EntireGameComponentProps> {
     @observable showMapWhenDrafting = false;
+    @observable rerender = 0;
+
+    setIntervalId = -1;
+
+    get ingame(): IngameGameState | null {
+        return this.props.entireGame.ingameGameState;
+    }
+
+    get isGameEnded(): boolean {
+        return this.props.entireGame.leafState instanceof CancelledGameState ||
+            this.props.entireGame.leafState instanceof GameEndedGameState;
+    }
 
     render(): ReactNode {
         return <>
@@ -50,6 +64,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     {this.renderGameTypeBadge()}
                     {this.renderMapSwitch()}
                     {this.renderWarnings()}
+                    {this.rerender >= 0 && this.renderGameDuration()}
                 </Row>
             </Col>
             {
@@ -150,6 +165,28 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         </>;
     }
 
+    renderGameDuration(): ReactNode {
+        if (!this.ingame) {
+            return null;
+        }
+
+        let gameDuration: string | null = null;
+        const firstLog = _.first(this.props.entireGame.ingameGameState?.gameLogManager.logs ?? []);
+
+        if (firstLog) {
+            const lastTimeStamp = this.isGameEnded ?
+                _.last(this.props.entireGame.ingameGameState?.gameLogManager.logs ?? [])?.time ?? new Date()
+                : new Date();
+
+            gameDuration = this.secondsToString(this.getTotalElapsedSeconds(firstLog.time, lastTimeStamp));
+        }
+
+        return gameDuration && <Col xs="auto">
+            <h4><Badge variant="secondary">{gameDuration}</Badge></h4>
+        </Col>;
+    }
+
+
     renderHouseIcon(): ReactNode {
         return this.props.gameClient.authenticatedPlayer &&
             <Col xs="auto">
@@ -185,12 +222,35 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         user.syncSettings();
     }
 
+    getTotalElapsedSeconds(begin: Date, end: Date): number {
+        return Math.floor((end.getTime() - begin.getTime()) / 1000);
+    }
+
+    secondsToString(seconds: number): string {
+        const hhmm = new Date(seconds * 1000).toISOString().slice(11, 16);
+        const days = Math.floor(seconds / (3600 * 24));
+
+        return days <= 0 ? hhmm : `${days} day${days != 1 ? "s" : ""} ${hhmm}`;
+    }
+
+    forceRerender(): void {
+        if (this.rerender > 0) {
+            this.rerender--;
+        } else {
+            this.rerender++;
+        }
+    }
+
     componentDidMount(): void {
         document.title = this.props.entireGame.name;
         this.props.entireGame.onClientGameStateChange = () => this.onClientGameStateChange();
 
         if (this.props.gameClient.authenticatedUser) {
             this.showMapWhenDrafting = this.props.gameClient.authenticatedUser.settings.showMapWhenDrafting;
+        }
+
+        if (!this.isGameEnded) {
+            this.setIntervalId = window.setInterval(() => this.forceRerender(), 15 * 1000);
         }
     }
 
@@ -203,5 +263,9 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
 
     componentWillUnmount(): void {
         this.props.entireGame.onClientGameStateChange = null;
+        if (this.setIntervalId >= 0) {
+            window.clearInterval(this.setIntervalId);
+            this.setIntervalId = -1;
+        }
     }
 }

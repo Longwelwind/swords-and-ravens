@@ -30,6 +30,7 @@ import Tooltip from "react-bootstrap/Tooltip";
 import stoneThroneImage from "../../public/images/icons/stone-throne.svg";
 import cancelImage from "../../public/images/icons/cancel.svg";
 import truceImage from "../../public/images/icons/truce.svg";
+import stopwatchPlus15Image from "../../public/images/icons/stopwatch-plus-15.svg";
 import ravenImage from "../../public/images/icons/raven.svg";
 import diamondHiltImage from "../../public/images/icons/diamond-hilt.svg";
 import diamondHiltUsedImage from "../../public/images/icons/diamond-hilt-used.svg";
@@ -278,6 +279,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     renderHousesColumn(): ReactNode {
         const {result: canLaunchCancelGameVote, reason: canLaunchCancelGameVoteReason} = this.props.gameState.canLaunchCancelGameVote(this.authenticatedPlayer);
         const {result: canLaunchEndGameVote, reason: canLaunchEndGameVoteReason} = this.props.gameState.canLaunchEndGameVote(this.authenticatedPlayer);
+        const {result: canLaunchExtendPlayerClocksVote, reason: canLaunchExtendPlayerClocksVoteReason} = this.props.gameState.canLaunchExtendPlayerClocksVote(this.authenticatedPlayer);
 
         const connectedSpectators = this.getConnectedSpectators();
 
@@ -426,6 +428,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         <Tooltip id="cancel-game-vote-tooltip">
                                             {canLaunchCancelGameVote ? (
                                                 "Launch a vote to cancel the game"
+                                            ) : canLaunchCancelGameVoteReason == "not-enough-voter" ? (
+                                                "There are not enough voters left in the game"
                                             ) : canLaunchCancelGameVoteReason == "only-players-can-vote" ? (
                                                 "Only participating players can vote"
                                             ) : canLaunchCancelGameVoteReason == "already-existing" ? (
@@ -453,6 +457,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         <Tooltip id="end-game-vote-tooltip">
                                             {canLaunchEndGameVote ? (
                                                 "Launch a vote to end the game after the current round"
+                                            ) : canLaunchEndGameVoteReason == "not-enough-voter" ? (
+                                                "There are not enough voters left in the game"
                                             ) : canLaunchEndGameVoteReason == "only-players-can-vote" ? (
                                                 "Only participating players can vote"
                                             ) : canLaunchEndGameVoteReason == "already-last-turn" ? (
@@ -470,6 +476,35 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </OverlayTrigger>
                             </button>
                         </Col>
+                        {this.ingame.entireGame.gameSettings.onlyLive &&
+                        <Col xs="auto">
+                            <button
+                                className="btn btn-outline-light btn-sm"
+                                onClick={() => this.props.gameState.launchExtendPlayerClocksVote()}
+                                disabled={!canLaunchExtendPlayerClocksVote}
+                            >
+                                <OverlayTrigger
+                                    overlay={
+                                        <Tooltip id="extend-clocks-vote-tooltip">
+                                            {canLaunchExtendPlayerClocksVote ? (
+                                                "Launch a vote to extend all player clocks by 15 minutes"
+                                            ) : canLaunchExtendPlayerClocksVoteReason == "not-enough-voter" ? (
+                                                "There are not enough voters left in the game"
+                                            ) : canLaunchExtendPlayerClocksVoteReason == "only-players-can-vote" ? (
+                                                "Only participating players can vote"
+                                            ) : canLaunchExtendPlayerClocksVoteReason == "already-existing" ? (
+                                                "A vote to extend all clocks is already ongoing"
+                                            ) : canLaunchExtendPlayerClocksVoteReason == "already-cancelled" ? (
+                                                "Game has already been cancelled"
+                                            ) : canLaunchExtendPlayerClocksVoteReason == "already-ended" ? (
+                                                "Game has already ended"
+                                            ) : "Vote not possible"}
+                                        </Tooltip>}
+                                >
+                                    <img src={stopwatchPlus15Image} width={32} />
+                                </OverlayTrigger>
+                            </button>
+                        </Col>}
                     </>}
                 </Row>
             </div>)

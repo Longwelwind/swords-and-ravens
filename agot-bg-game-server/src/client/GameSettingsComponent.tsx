@@ -88,7 +88,8 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     label={
                                         <OverlayTrigger overlay={
                                             <Tooltip id="only-live-setting-tooltip">
-                                                When this option is enabled each player will have a game clock of 1h. When a player&apos;s time runs out, he is automatically turned into a vassal.<br/>
+                                                When this option is enabled each player will have a game clock of 60, 75, 90 or 120 minutes. When a player&apos;s time runs out, he is automatically turned into a vassal.
+                                                The last remaining player immediately wins the game. All players can launch a vote to extend the player clock by 15 minutes.<br/>
                                                 In addition, the owner of the game will not be able to switch to PBEM in-game, and the number of positive votes required to replace a player
                                                 is reduced to 3 to make it easier to address quitters.
                                             </Tooltip>}>
@@ -98,6 +99,18 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.onlyLive = !this.gameSettings.onlyLive)}
                                 />
                             )}
+                            {this.gameSettings.onlyLive &&
+                            <div>
+                                <select id="initial-live-clock" name="initialLiveClock"
+                                    value={this.gameSettings.initialLiveClock}
+                                    onChange={e => this.onInitialLiveClockChange(e.target.value)}
+                                >
+                                    <option key="60" value={60}>60</option>
+                                    <option key="75" value={75}>75</option>
+                                    <option key="90" value={90}>90</option>
+                                    <option key="120" value={120}>120</option>
+                                </select>&nbsp;min
+                            </div>}
                             <FormCheck
                                 id="private-game-setting"
                                 className="mx-3 mt-2"
@@ -632,6 +645,16 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
         }
 
         this.gameSettings.playerCount = parseInt(newVal);
+
+        this.changeGameSettings();
+    }
+
+    onInitialLiveClockChange(newVal: string): void {
+        if (!this.canChangeGameSettings) {
+            return;
+        }
+
+        this.gameSettings.initialLiveClock = parseInt(newVal);
 
         this.changeGameSettings();
     }
