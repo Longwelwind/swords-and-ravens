@@ -1,20 +1,18 @@
 import IngameGameState from "../IngameGameState";
-import Vote, { VoteState } from "./Vote";
+import Vote from "./Vote";
 import CancelledGameState from "../../cancelled-game-state/CancelledGameState";
 import House from "../game-data-structure/House";
 import Player from "../Player";
 import User from "../../../server/User";
-import CombatGameState from "../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
-import WildlingCardEffectInTurnOrderGameState from "../westeros-game-state/wildlings-attack-game-state/WildlingCardEffectInTurnOrderGameState";
-import GameState from "../../../common/GameState";
 import BetterMap from "../../../utils/BetterMap";
-import HouseCardResolutionGameState from "../action-game-state/resolve-march-order-game-state/combat-game-state/house-card-resolution-game-state/HouseCardResolutionGameState";
 import PlaceOrdersGameState from "../planning-game-state/place-orders-game-state/PlaceOrdersGameState";
 import Region from "../game-data-structure/Region";
 import Order from "../game-data-structure/Order";
 
 export type SerializedVoteType = SerializedCancelGame | SerializedEndGame
     | SerializedReplacePlayer | SerializedReplacePlayerByVassal | SerializedReplaceVassalByPlayer;
+
+// TODO: Add ExtendAllPlayerClocks VoteType
 
 export default abstract class VoteType {
     abstract serializeToClient(): SerializedVoteType;
@@ -138,7 +136,10 @@ export class ReplacePlayer extends VoteType {
     executeAccepted(vote: Vote): void {
         // Create a new player to replace the old one
         const oldPlayer = vote.ingame.players.values.find(p => p.house == this.forHouse) as Player;
+        vote.ingame.endPlayerClock(oldPlayer);
+
         const newPlayer = new Player(this.replacer, this.forHouse);
+        vote.ingame.applyAverageOfRemainingClocksToNewPlayer(newPlayer, oldPlayer);
 
         if (vote.ingame.entireGame.gameSettings.faceless) {
             newPlayer.user.facelessName = vote.ingame.getFreeFacelessName() ?? newPlayer.user.facelessName;
@@ -151,7 +152,8 @@ export class ReplacePlayer extends VoteType {
         vote.ingame.entireGame.broadcastToClients({
             type: "player-replaced",
             oldUser: oldPlayer.user.id,
-            newUser: newPlayer.user.id
+            newUser: newPlayer.user.id,
+            liveClockRemainingSeconds: newPlayer.liveClockData?.remainingSeconds
         });
 
         vote.ingame.log({
@@ -228,114 +230,8 @@ export class ReplacePlayerByVassal extends VoteType {
 
     executeAccepted(vote: Vote): void {
         const oldPlayer = vote.ingame.players.values.find(p => p.user == this.replaced) as Player;
-        const newVassalHouse = oldPlayer.house;
-
-        // In case the new vassal house is needed for another vote, vote with Reject
-        const missingVotes = vote.ingame.votes.values.filter(v => v.state == VoteState.ONGOING && v.participatingHouses.includes(newVassalHouse) && !v.votes.has(newVassalHouse));
-        missingVotes.forEach(v => {
-            v.votes.set(newVassalHouse, false);
-            vote.ingame.entireGame.broadcastToClients({
-                type: "vote-done",
-                choice: false,
-                vote: v.id,
-                voter: newVassalHouse.id
-            });
-
-            // We don't need to call v.checkVoteFinished() here as we vote with Reject and therefore never call executeAccepted()
-        });
-
-        const forbiddenCommanders: House[] = [];
-        // If we are in combat we can't assign the vassal to the opponent
-        const anyCombat = vote.ingame.getFirstChildGameState(CombatGameState);
-        if (anyCombat) {
-            const combat = anyCombat as CombatGameState;
-            if (combat.isCommandingHouseInCombat(newVassalHouse)) {
-                const commandedHouse = combat.getCommandedHouseInCombat(newVassalHouse);
-                const enemy = combat.getEnemy(commandedHouse);
-
-                forbiddenCommanders.push(vote.ingame.getControllerOfHouse(enemy).house);
-            }
-        }
-
-        // Delete the old player so the house is a vassal now
-        vote.ingame.players.delete(oldPlayer.user);
-
-        // Find new commander beginning with the potential winner so he cannot simply march into the vassals regions now
-        let newCommander: House | null = null;
-        for (const house of vote.ingame.game.getPotentialWinners().filter(h => !vote.ingame.isVassalHouse(h))) {
-            if (!forbiddenCommanders.includes(house)) {
-                newCommander = house;
-                break;
-            }
-        }
-
-        if (!newCommander) {
-            throw new Error("Unable to determine new commander");
-        }
-
-        // It may happen that you replace a player which commands vassals. Assign them to the potential winner.
-        vote.ingame.game.vassalRelations.entries.forEach(([vassal, commander]) => {
-            if (newVassalHouse == commander) {
-                vote.ingame.game.vassalRelations.set(vassal, newCommander as House);
-            }
-        });
-
-        // Assign new commander to replaced house
-        vote.ingame.game.vassalRelations.set(newVassalHouse, newCommander);
-
-        // Broadcast new vassal relations before deletion of player!
-        vote.ingame.broadcastVassalRelations();
-
-        newVassalHouse.hasBeenReplacedByVassal = true;
-
-        vote.ingame.entireGame.broadcastToClients({
-            type: "player-replaced",
-            oldUser: oldPlayer.user.id
-        });
-
-        vote.ingame.log({
-            type: "player-replaced",
-            oldUser: this.replaced.id,
-            house: newVassalHouse.id
-        });
-
-        // Remove house cards from new vassal house so abilities like Qyburn cannot use this cards anymore
-        vote.ingame.game.oldPlayerHouseCards.set(newVassalHouse, newVassalHouse.houseCards);
-
-        // Only clear house cards now, when game is not in HouseCardResolutionGameState as some abilities like Viserys
-        // require a hand and will result in SelectHouseCardGameState with 0 cards for selection
-        if (!vote.ingame.hasChildGameState(HouseCardResolutionGameState)) {
-            newVassalHouse.houseCards = new BetterMap();
-        }
-
-        vote.ingame.entireGame.broadcastToClients({
-            type: "update-old-player-house-cards",
-            houseCards: vote.ingame.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.serializeToClient())])
-        });
-
-        vote.ingame.entireGame.broadcastToClients({
-            type: "update-house-cards",
-            house: newVassalHouse.id,
-            houseCards: []
-        });
-
-        // Perform action of current state
-        vote.ingame.leafState.actionAfterVassalReplacement(newVassalHouse);
-
-        // In case the new vassal should execute a wildlings effect, skip it
-        if (vote.ingame.hasChildGameState(WildlingCardEffectInTurnOrderGameState)) {
-            const wildlingEffect = vote.ingame.getChildGameState(WildlingCardEffectInTurnOrderGameState) as WildlingCardEffectInTurnOrderGameState<GameState<any, any>>;
-            const leaf = vote.ingame.leafState as any;
-            if (leaf.house && leaf.house == newVassalHouse) {
-                wildlingEffect.proceedNextHouse(newVassalHouse);
-            }
-        }
-
-        const newCommanderPlayer = vote.ingame.players.values.find(p => p.house == newCommander);
-        // If we are waiting for the new commander, notify them about their turn
-        if (newCommanderPlayer && vote.ingame.leafState.getWaitedUsers().includes(newCommanderPlayer.user)) {
-            vote.ingame.entireGame.notifyWaitedUsers([newCommanderPlayer.user]);
-        }
+        vote.ingame.endPlayerClock(oldPlayer);
+        vote.ingame.replacePlayerByVassal(oldPlayer);
     }
 
     serializeToClient(): SerializedReplacePlayerByVassal {
@@ -382,6 +278,7 @@ export class ReplaceVassalByPlayer extends VoteType {
     executeAccepted(vote: Vote): void {
         // Create a new player to replace the vassal
         const newPlayer = new Player(this.replacer, this.forHouse);
+        vote.ingame.applyAverageOfRemainingClocksToNewPlayer(newPlayer, null);
 
         if (vote.ingame.entireGame.gameSettings.faceless) {
             newPlayer.user.facelessName = vote.ingame.getFreeFacelessName() ?? newPlayer.user.facelessName;
@@ -401,7 +298,8 @@ export class ReplaceVassalByPlayer extends VoteType {
         vote.ingame.entireGame.broadcastToClients({
             type: "vassal-replaced",
             house: this.forHouse.id,
-            user: newPlayer.user.id
+            user: newPlayer.user.id,
+            liveClockRemainingSeconds: newPlayer.liveClockData?.remainingSeconds
         });
 
         vote.ingame.log({

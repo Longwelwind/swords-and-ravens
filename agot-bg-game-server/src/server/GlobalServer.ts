@@ -240,6 +240,21 @@ export default class GlobalServer {
         });
     }
 
+    restartLiveClockTimers(entireGame: EntireGame): void {
+        if (!entireGame.gameSettings.onlyLive || !entireGame.ingameGameState) {
+            return;
+        }
+
+        entireGame.ingameGameState.players.values.forEach(p => {
+            const totalRemaining = p.totalRemainingSeconds;
+            if (totalRemaining != null && p.liveClockData?.timerStartedAt) {
+                p.liveClockData.remainingSeconds = totalRemaining;
+                p.liveClockData.serverTimer = setTimeout(() => entireGame.ingameGameState?.onPlayerClockTimeout(p), totalRemaining * 1000);
+                p.liveClockData.timerStartedAt = new Date();
+            }
+        });
+    }
+
     async getEntireGame(gameId: string): Promise<EntireGame | null> {
         // Check if it has already been loaded
         if (this.loadedGames.has(gameId)) {
@@ -252,10 +267,16 @@ export default class GlobalServer {
             return null;
         }
 
+        const needsDeserialization = gameData.serializedGame != null;
+
         // Load it
-        const entireGame = gameData.serializedGame
+        const entireGame = needsDeserialization
             ? this.deserializeStoredGame(gameData)
             : await this.createGame(gameData.id, gameData.ownerId, gameData.name);
+
+        if (needsDeserialization) {
+            this.restartLiveClockTimers(entireGame);
+        }
 
         // Bind listeners
         entireGame.onSendClientMessage = _ => {

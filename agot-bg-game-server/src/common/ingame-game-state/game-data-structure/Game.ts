@@ -25,8 +25,6 @@ import ThematicDraftHouseCardsGameState from "../thematic-draft-house-cards-game
 
 export const MAX_WILDLING_STRENGTH = 12;
 export const MAX_LOYALTY_TOKEN_COUNT = 20;
-export const MIN_PLAYER_COUNT_WITH_VASSALS = 3;
-export const MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN = 4;
 
 export default class Game {
     ingame: IngameGameState;

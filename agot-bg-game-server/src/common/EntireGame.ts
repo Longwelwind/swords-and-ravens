@@ -99,6 +99,12 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         return this.gameSettings.setupId == "mother-of-dragons";
     }
 
+    get minPlayerCount(): number {
+        // For Debug we can manipulate this to allow games with only 1 player
+        //return 1;
+        return this.gameSettings.playerCount >= 8 ? 4 : 3;
+    }
+
     constructor(id: string, ownerId: string, name: string) {
         super(null);
         this.id = id;
@@ -122,6 +128,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         this.setChildGameState(new IngameGameState(this)).beginGame(housesToCreate, futurePlayers);
 
         this.checkGameStateChanged();
+
+        this.doPlayerClocksHandling();
 
         // Assign new faceless names after we have updated the game-state tree on client-side.
         // This will load the IngameComponent first and prevent the new names to be shown
@@ -341,7 +349,65 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         const notWaitedAnymore = this.ingameGameState?.checkWaitedForPlayers() ?? [];
         const gameStateChanged = this.checkGameStateChanged();
         this.ingameGameState?.setWaitedForPlayers(gameStateChanged ? notWaitedAnymore : []);
+
+        this.doPlayerClocksHandling();
+
         return updateLastActive;
+    }
+
+    doPlayerClocksHandling(): void {
+        if (this.gameSettings.onlyLive && this.ingameGameState) {
+            const waitedPlayers = this.leafState.getWaitedUsers().map(u => (this.ingameGameState as IngameGameState).players.get(u));
+            waitedPlayers.forEach(p => {
+                if (!p.liveClockData) {
+                    throw new Error("LiveClockData must be present in doPlayerClocksHandling");
+                }
+
+                // If timer is already running but player is still active, do nothing
+                if (p.liveClockData.timerStartedAt == null && p.liveClockData.remainingSeconds > 0) {
+                    p.liveClockData.serverTimer = setTimeout(() => { this.ingameGameState?.onPlayerClockTimeout(p) }, p.liveClockData.remainingSeconds * 1000);
+                    p.liveClockData.timerStartedAt = new Date();
+
+                    this.broadcastToClients({
+                        type: "start-player-clock",
+                        remainingSeconds: p.liveClockData.remainingSeconds,
+                        timerStartedAt: p.liveClockData.timerStartedAt.getTime(),
+                        userId: p.user.id
+                    });
+                }
+            });
+
+            const notWaitedPlayers = _.difference(this.ingameGameState.players.values, waitedPlayers);
+
+            notWaitedPlayers.forEach(p => {
+                if (!p.liveClockData) {
+                    throw new Error("LiveClockData must be present in doPlayerClocksHandling");
+                }
+
+                if (p.liveClockData.timerStartedAt) {
+                    if (!p.liveClockData.serverTimer) {
+                        throw new Error("serverTimer must be present in doPlayerClocksHandling");
+                    }
+
+                    // Stop the timer
+                    clearTimeout(p.liveClockData.serverTimer);
+                    p.liveClockData.serverTimer = null;
+
+                    // This user is no longer waited for
+                    // Calculate new remainingSeconds and broadcast to clients
+                    const elapsedSeconds = Math.floor((new Date().getTime() - p.liveClockData.timerStartedAt.getTime()) / 1000);
+                    p.liveClockData.remainingSeconds -= elapsedSeconds;
+                    p.liveClockData.remainingSeconds = Math.max(0, p.liveClockData.remainingSeconds);
+                    p.liveClockData.timerStartedAt = null;
+
+                    this.broadcastToClients({
+                        type: "stop-player-clock",
+                        remainingSeconds: p.liveClockData.remainingSeconds,
+                        userId: p.user.id
+                    });
+                }
+            });
+        }
     }
 
     async onServerMessage(message: ServerMessage): Promise<void> {
@@ -441,6 +507,13 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             return "ONGOING";
         } else {
             return "CANCELLED";
+        }
+    }
+
+    startClientClockIntervals(): void {
+        if (this.gameSettings.onlyLive && this.childGameState instanceof IngameGameState) {
+            const ingame = this.childGameState;
+            ingame.players.values.forEach(p => p.startClientClockInterval());
         }
     }
 

@@ -9,7 +9,7 @@ import Region from "./game-data-structure/Region";
 import PlanningGameState, {SerializedPlanningGameState} from "./planning-game-state/PlanningGameState";
 import ActionGameState, {SerializedActionGameState} from "./action-game-state/ActionGameState";
 import Order from "./game-data-structure/Order";
-import Game, {MIN_PLAYER_COUNT_WITH_VASSALS, MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN, SerializedGame} from "./game-data-structure/Game";
+import Game, {SerializedGame} from "./game-data-structure/Game";
 import WesterosGameState, {SerializedWesterosGameState} from "./westeros-game-state/WesterosGameState";
 import createGame from "./game-data-structure/createGame";
 import BetterMap from "../../utils/BetterMap";
@@ -42,6 +42,8 @@ import { objectiveCards } from "./game-data-structure/static-data-structure/obje
 import ChooseInitialObjectivesGameState, { SerializedChooseInitialObjectivesGameState } from "./choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
 import facelessMenNames from "../../../data/facelessMenNames.json";
 import sleep from "../../utils/sleep";
+import WildlingCardEffectInTurnOrderGameState from "./westeros-game-state/wildlings-attack-game-state/WildlingCardEffectInTurnOrderGameState";
+import HouseCardResolutionGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/house-card-resolution-game-state/HouseCardResolutionGameState";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -79,6 +81,15 @@ export default class IngameGameState extends GameState<
     beginGame(housesToCreate: string[], futurePlayers: BetterMap<string, User>): void {
         this.game = createGame(this, housesToCreate, futurePlayers.keys);
         this.players = new BetterMap(futurePlayers.map((house, user) => [user, new Player(user, this.game.houses.get(house))]));
+
+        if (this.entireGame.gameSettings.onlyLive) {
+            this.players.values.forEach(p => p.liveClockData = {
+                remainingSeconds: 60 * 60,
+                timerStartedAt: null,
+                serverTimer: null,
+                clientIntervalId: -1,
+            });
+        }
 
         // In the past we always used the supply limits from the game setup, though we simply could have calculated them
         // as every house starts according to their controlled barrels.
@@ -589,6 +600,170 @@ export default class IngameGameState extends GameState<
         }
     }
 
+    onPlayerClockTimeout(player: Player): void {
+        if (!player.liveClockData) {
+            throw new Error("LiveClockData must be present in onPlayerClockTimeout");
+        }
+
+        this.endPlayerClock(player, false);
+
+        const canReplacePlayerByVassal = this.players.size - 1 >= this.entireGame.minPlayerCount;
+        if (canReplacePlayerByVassal) {
+            this.replacePlayerByVassal(player);
+        }
+
+        this.entireGame.checkGameStateChanged();
+        this.entireGame.doPlayerClocksHandling();
+    }
+
+    endPlayerClock(player: Player, clearTimer = true): void {
+        if (!player.liveClockData) {
+            return;
+        }
+
+        if (clearTimer && player.liveClockData.serverTimer) {
+            clearTimeout(player.liveClockData.serverTimer);
+        }
+
+        player.liveClockData.serverTimer = null;
+        player.liveClockData.timerStartedAt = null;
+        player.liveClockData.remainingSeconds = 0;
+
+        this.entireGame.broadcastToClients({
+            type: "stop-player-clock",
+            remainingSeconds: 0,
+            userId: player.user.id
+        });
+    }
+
+    applyAverageOfRemainingClocksToNewPlayer(newPlayer: Player, oldPlayer: Player | null): void {
+        if (!this.entireGame.gameSettings.onlyLive) {
+            return;
+        }
+
+        const otherPlayers = this.players.values;
+        _.pull(otherPlayers, newPlayer, oldPlayer);
+
+        const avg = Math.floor(_.sum(otherPlayers.map(p => p.totalRemainingSeconds ?? 0)) / otherPlayers.length);
+        newPlayer.liveClockData = {
+            remainingSeconds: avg,
+            clientIntervalId: -1,
+            serverTimer: null,
+            timerStartedAt: null
+        }
+    }
+
+    replacePlayerByVassal(player: Player): void {
+        const newVassalHouse = player.house;
+
+        // In case the new vassal house is needed for another vote, vote with Reject
+        const missingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.participatingHouses.includes(newVassalHouse) && !v.votes.has(newVassalHouse));
+        missingVotes.forEach(v => {
+            v.votes.set(newVassalHouse, false);
+            this.entireGame.broadcastToClients({
+                type: "vote-done",
+                choice: false,
+                vote: v.id,
+                voter: newVassalHouse.id
+            });
+
+            // We don't need to call v.checkVoteFinished() here as we vote with Reject and therefore never call executeAccepted()
+        });
+
+        const forbiddenCommanders: House[] = [];
+        // If we are in combat we can't assign the vassal to the opponent
+        const anyCombat = this.getFirstChildGameState(CombatGameState);
+        if (anyCombat) {
+            const combat = anyCombat as CombatGameState;
+            if (combat.isCommandingHouseInCombat(newVassalHouse)) {
+                const commandedHouse = combat.getCommandedHouseInCombat(newVassalHouse);
+                const enemy = combat.getEnemy(commandedHouse);
+
+                forbiddenCommanders.push(this.getControllerOfHouse(enemy).house);
+            }
+        }
+
+        // Delete the old player so the house is a vassal now
+        this.players.delete(player.user);
+
+        // Find new commander beginning with the potential winner so he cannot simply march into the vassals regions now
+        let newCommander: House | null = null;
+        for (const house of this.game.getPotentialWinners().filter(h => !this.isVassalHouse(h))) {
+            if (!forbiddenCommanders.includes(house)) {
+                newCommander = house;
+                break;
+            }
+        }
+
+        if (!newCommander) {
+            throw new Error("Unable to determine new commander");
+        }
+
+        // It may happen that you replace a player which commands vassals. Assign them to the potential winner.
+        this.game.vassalRelations.entries.forEach(([vassal, commander]) => {
+            if (newVassalHouse == commander) {
+                this.game.vassalRelations.set(vassal, newCommander as House);
+            }
+        });
+
+        // Assign new commander to replaced house
+        this.game.vassalRelations.set(newVassalHouse, newCommander);
+
+        // Broadcast new vassal relations before deletion of player!
+        this.broadcastVassalRelations();
+
+        newVassalHouse.hasBeenReplacedByVassal = true;
+
+        this.entireGame.broadcastToClients({
+            type: "player-replaced",
+            oldUser: player.user.id
+        });
+
+        this.log({
+            type: "player-replaced",
+            oldUser: player.user.id,
+            house: newVassalHouse.id
+        });
+
+        // Remove house cards from new vassal house so abilities like Qyburn cannot use this cards anymore
+        this.game.oldPlayerHouseCards.set(newVassalHouse, newVassalHouse.houseCards);
+
+        // Only clear house cards now, when game is not in HouseCardResolutionGameState as some abilities like Viserys
+        // require a hand and will result in SelectHouseCardGameState with 0 cards for selection
+        if (!this.hasChildGameState(HouseCardResolutionGameState)) {
+            newVassalHouse.houseCards = new BetterMap();
+        }
+
+        this.entireGame.broadcastToClients({
+            type: "update-old-player-house-cards",
+            houseCards: this.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.serializeToClient())])
+        });
+
+        this.entireGame.broadcastToClients({
+            type: "update-house-cards",
+            house: newVassalHouse.id,
+            houseCards: []
+        });
+
+        // Perform action of current state
+        this.leafState.actionAfterVassalReplacement(newVassalHouse);
+
+        // In case the new vassal should execute a wildlings effect, skip it
+        if (this.hasChildGameState(WildlingCardEffectInTurnOrderGameState)) {
+            const wildlingEffect = this.getChildGameState(WildlingCardEffectInTurnOrderGameState) as WildlingCardEffectInTurnOrderGameState<GameState<any, any>>;
+            const leaf = this.leafState as any;
+            if (leaf.house && leaf.house == newVassalHouse) {
+                wildlingEffect.proceedNextHouse(newVassalHouse);
+            }
+        }
+
+        const newCommanderPlayer = this.players.values.find(p => p.house == newCommander);
+        // If we are waiting for the new commander, notify them about their turn
+        if (newCommanderPlayer && this.leafState.getWaitedUsers().includes(newCommanderPlayer.user)) {
+            this.entireGame.notifyWaitedUsers([newCommanderPlayer.user]);
+        }
+    }
+
     async onServerMessage(message: ServerMessage): Promise<void> {
         if (message.type == "supply-adjusted") {
             const supplies: [House, number][] = message.supplies.map(([houseId, supply]) => [this.game.houses.get(houseId), supply]);
@@ -695,6 +870,15 @@ export default class IngameGameState extends GameState<
             const newUser = message.newUser ? this.entireGame.users.get(message.newUser) : null;
             const newPlayer = newUser ? new Player(newUser, oldPlayer.house) : null;
 
+            if (newPlayer && message.liveClockRemainingSeconds !== undefined) {
+                newPlayer.liveClockData = {
+                    clientIntervalId: -1,
+                    remainingSeconds: message.liveClockRemainingSeconds,
+                    serverTimer: null,
+                    timerStartedAt: null
+                }
+            }
+
             if (newUser && newPlayer) {
                 this.players.set(newUser, newPlayer);
             } else {
@@ -703,19 +887,28 @@ export default class IngameGameState extends GameState<
 
             this.players.delete(oldPlayer.user);
 
-            this.rerender++;
+            this.forceRerender();
         } else if (message.type == "vassal-replaced") {
             const house = this.game.houses.get(message.house);
             house.hasBeenReplacedByVassal = false;
             const user = this.entireGame.users.get(message.user);
             const newPlayer = new Player(user, house);
 
+            if (message.liveClockRemainingSeconds !== undefined) {
+                newPlayer.liveClockData = {
+                    clientIntervalId: -1,
+                    remainingSeconds: message.liveClockRemainingSeconds,
+                    serverTimer: null,
+                    timerStartedAt: null
+                }
+            }
+
             this.players.set(user, newPlayer);
 
-            this.rerender++;
+            this.forceRerender();
         } else if (message.type == "vassal-relations") {
             this.game.vassalRelations = new BetterMap(message.vassalRelations.map(([vId, cId]) => [this.game.houses.get(vId), this.game.houses.get(cId)]));
-            this.rerender++;
+            this.forceRerender();
         } else if (message.type == "update-house-cards") {
             const house = this.game.houses.get(message.house);
             house.houseCards = new BetterMap(message.houseCards.map(hc => [hc.id, HouseCard.deserializeFromServer(hc)]));
@@ -766,8 +959,38 @@ export default class IngameGameState extends GameState<
             this.game.houses.get(message.house).secretObjectives = message.objectives.map(ocid => objectiveCards.get(ocid));
         } else if (message.type == "update-usurper") {
             this.game.usurper = message.house ? this.game.houses.get(message.house) : null;
+        } else if (message.type == "start-player-clock") {
+            const player = this.players.get(this.entireGame.users.get(message.userId));
+
+            if (!player.liveClockData) {
+                throw new Error("LiveClockData must be present in start-player-clock");
+            }
+
+            player.liveClockData.remainingSeconds = message.remainingSeconds;
+            player.liveClockData.timerStartedAt = new Date(message.timerStartedAt);
+
+            player.startClientClockInterval();
+        } else if (message.type == "stop-player-clock") {
+            const player = this.players.get(this.entireGame.users.get(message.userId));
+
+            if (!player.liveClockData) {
+                throw new Error("LiveClockData must be present stop-player-clock");
+            }
+
+            player.liveClockData.remainingSeconds = message.remainingSeconds;
+            player.liveClockData.timerStartedAt = null;
+
+            player.stopClientClockInterval();
         } else {
             this.childGameState.onServerMessage(message);
+        }
+    }
+
+    forceRerender(): void {
+        if (this.rerender > 0) {
+            this.rerender--;
+        } else {
+            this.rerender++;
         }
     }
 
@@ -857,14 +1080,8 @@ export default class IngameGameState extends GameState<
                 return {result: false, reason: "vassalizing-yourself-is-forbidden"};
             }
 
-            if (this.game.targaryen) {
-                if (this.players.size - 1 < MIN_PLAYER_COUNT_WITH_VASSALS_AND_TARGARYEN) {
-                    return {result: false, reason: "min-player-count-reached"};
-                }
-            } else {
-                if (this.players.size - 1 < MIN_PLAYER_COUNT_WITH_VASSALS) {
-                    return {result: false, reason: "min-player-count-reached"};
-                }
+            if (this.players.size - 1 < this.entireGame.minPlayerCount) {
+                return {result: false, reason: "min-player-count-reached"};
             }
 
             if (this.childGameState instanceof DraftHouseCardsGameState) {

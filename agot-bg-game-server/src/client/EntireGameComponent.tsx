@@ -143,7 +143,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     <h4><Badge variant="warning"><FontAwesomeIcon icon={faExclamation} size="sm"/></Badge></h4>
                 </OverlayTrigger>
             </Col>}
-            {this.props.entireGame.gameSettings.asosHouseCards &&
+            {this.props.entireGame.gameSettings.onlyLive &&
             <Col xs="auto">
                 <h4><Badge variant="warning">BETA</Badge></h4>
             </Col>}

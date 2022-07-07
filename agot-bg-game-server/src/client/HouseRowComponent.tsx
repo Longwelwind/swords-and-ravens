@@ -16,6 +16,7 @@ import HouseCardComponent from "./game-state-panel/utils/HouseCardComponent";
 import HouseCardBackComponent from "./game-state-panel/utils/HouseCardBackComponent";
 import Game, { MAX_LOYALTY_TOKEN_COUNT } from "../common/ingame-game-state/game-data-structure/Game";
 import castleImage from "../../public/images/icons/castle.svg";
+import stopwatchImage from "../../public/images/icons/stopwatch.svg";
 import battleGearImage from "../../public/images/icons/battle-gear.svg";
 import verticalBanner from "../../public/images/icons/vertical-banner.svg"
 import laurelCrownImage from "../../public/images/icons/laurel-crown.svg";
@@ -32,7 +33,6 @@ import Region from "../common/ingame-game-state/game-data-structure/Region";
 import PartialRecursive from "../utils/PartialRecursive";
 import BetterMap from "../utils/BetterMap";
 import { observable } from "mobx";
-import User from "../server/User";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import { port, sea } from "../common/ingame-game-state/game-data-structure/regionTypes";
 
@@ -80,7 +80,6 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
             : this.game.getVictoryPoints(this.house);
         const victoryPointsWarning = gameRunning && (this.game.victoryPointsCountNeededToWin - 2 == victoryPoints);
         const victoryPointsCritical = gameRunning && (this.game.victoryPointsCountNeededToWin - 1 == victoryPoints || this.game.victoryPointsCountNeededToWin == victoryPoints);
-        let controller: User;
         let isWaitedFor = false;
 
         const vassalTitle = <span className="userlabel">
@@ -99,20 +98,36 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         const powerTokensOnBoard = this.game.countPowerTokensOnBoard(this.house);
         const powerInPool = this.house.maxPowerTokens - availablePower - powerTokensOnBoard;
 
+        let clockWarning = false;
+        let clockCritical = false;
+
+        let player: Player | null = null;
+        let clock: number | null = null;
+
         try {
-            controller = this.ingame.getControllerOfHouse(this.house).user;
-            isWaitedFor = !this.isVassal ? this.ingame.getWaitedUsers().includes(controller) : false;
+            if (!this.isVassal) {
+                player = this.player;
+                isWaitedFor = this.ingame.getWaitedUsers().includes(player.user);
+
+                clock = player.totalRemainingSeconds;
+
+                if (clock != null) {
+                    clockCritical = clock > 0 && clock < (10 * 60);
+                    clockWarning = !clockCritical && clock > 0 && clock < (20 * 60);
+                }
+            }
         } catch {
-            // Just swallow this
+            console.warn("getControllerOfHouse has thrown an error but we should never see this error anymore!");
         }
+
         return this.ingame.rerender >= 0 && <>
             <ListGroupItem style={{padding: 0, margin: 0}}>
                 <div className={isWaitedFor ? "new-event" : ""} style={{paddingLeft: "8px", paddingRight: "10px", paddingTop: "12px", paddingBottom: "12px"}}>
                 <Row className="align-items-center flex-nowrap">
                     <Col xs="auto" className="pr-0" style={{ width: "32px" }} onMouseEnter={() => this.setHighlightedRegions()} onMouseLeave={() => this.highlightedRegions.clear()}>
-                        {!this.isVassal ? (
+                        {player ? (
                             <FontAwesomeIcon
-                                className={classNames({ "invisible": !this.props.gameClient.isAuthenticatedUser(this.player.user) })}
+                                className={classNames({ "invisible": !this.props.gameClient.isAuthenticatedUser(player.user) })}
                                 style={{ color: this.house.color }}
                                 icon={faStar}
                                 size="lg"
@@ -134,11 +149,11 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     </Col>
                     <Col onMouseEnter={() => this.setHighlightedRegions()} onMouseLeave={() => this.highlightedRegions.clear()} className="pr-0">
                         <h5 style={{ margin: 0, padding: 0 }}><b style={{ "color": this.house.color }}>{this.house.name}</b><br /></h5>
-                        {!this.isVassal ? (
+                        {player ? (
                             <>
                                 {" "}
                                 <UserLabel
-                                    user={this.player.user}
+                                    user={player.user}
                                     gameState={this.ingame}
                                     gameClient={this.props.gameClient}
                                 />
@@ -233,6 +248,17 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         </OverlayTrigger>
                     </Col>
                 </Row>
+                {clock != null &&
+                <Row className="justify-content-center mb-2">
+                    <img src={stopwatchImage} width={24}
+                        className={classNames(
+                            { "dye-warning": clockWarning },
+                            { "dye-critical": clockCritical })}
+                    />
+                    <div style={{ fontSize: "18px", color: clockWarning ? "#F39C12" : clockCritical ? "#FF0000" : undefined, marginLeft: "4px" }}>
+                        <b>{new Date(clock * 1000).toISOString().slice(12,19)}</b>
+                    </div>
+                </Row>}
                 <Row className="justify-content-center">
                     {!this.isVassal ?
                         _.sortBy(this.house.houseCards.values, hc => hc.combatStrength).map(hc => (
