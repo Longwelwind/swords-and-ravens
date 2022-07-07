@@ -426,6 +426,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         <Tooltip id="cancel-game-vote-tooltip">
                                             {canLaunchCancelGameVote ? (
                                                 "Launch a vote to cancel the game"
+                                            ) : canLaunchCancelGameVoteReason == "not-enough-voter" ? (
+                                                "There are not enough voters left in the game"
                                             ) : canLaunchCancelGameVoteReason == "only-players-can-vote" ? (
                                                 "Only participating players can vote"
                                             ) : canLaunchCancelGameVoteReason == "already-existing" ? (
@@ -453,6 +455,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         <Tooltip id="end-game-vote-tooltip">
                                             {canLaunchEndGameVote ? (
                                                 "Launch a vote to end the game after the current round"
+                                            ) : canLaunchEndGameVoteReason == "not-enough-voter" ? (
+                                                "There are not enough voters left in the game"
                                             ) : canLaunchEndGameVoteReason == "only-players-can-vote" ? (
                                                 "Only participating players can vote"
                                             ) : canLaunchEndGameVoteReason == "already-last-turn" ? (
