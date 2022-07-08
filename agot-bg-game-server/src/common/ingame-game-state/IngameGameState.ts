@@ -1145,10 +1145,6 @@ export default class IngameGameState extends GameState<
                 return {result: false, reason: "ongoing-house-card-drafting"}
             }
 
-            if (forHouse?.id == "targaryen" && !this.isHouseDefeated(forHouse)) {
-                return {result: false, reason: "only-possible-when-defeated"}
-            }
-
             if (this.entireGame.isFeastForCrows && !this.isHouseDefeated(forHouse)) {
                 return {result: false, reason: "only-possible-when-defeated"}
             }
