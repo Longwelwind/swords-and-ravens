@@ -102,7 +102,7 @@ export default class PostCombatGameState extends GameState<
             stats: this.combat.stats
         });
 
-        this.proceedCasualties();
+        this.proceedAfterWinnerDetermination();
     }
 
     onChooseCasualtiesGameStateEnd(house: House, region: Region, selectedCasualties: Unit[], resolvedAutomatically: boolean): void {
@@ -213,7 +213,7 @@ export default class PostCombatGameState extends GameState<
                 if (loserCasualtiesCount < loserArmyLeft.length) {
                     this.setChildGameState(new ChooseCasualtiesGameState(this)).firstStart(this.loser, loserArmyLeft, loserCasualtiesCount);
                 } else {
-                    // If the count of casualties is bigger or equal than the remaining army, a ChooseCasualtiesGameSTate
+                    // If the count of casualties is bigger or equal than the remaining army, a ChooseCasualtiesGameState
                     // is not needed. The army left can be exterminated.
                     this.onChooseCasualtiesGameStateEnd(this.loser, locationLoserArmy, loserArmyLeft, true);
                 }
@@ -238,6 +238,7 @@ export default class PostCombatGameState extends GameState<
         if (nextHousesToResolve.length > 0) {
             const house = nextHousesToResolve[0];
             this.resolvedSkullIcons.push(house);
+            // We can savely cast to TidesOfBattleCard as we filtered for not null previously via nextHousesToResolve
             const skullCount = (this.combat.houseCombatDatas.get(house).tidesOfBattleCard as TidesOfBattleCard).skullIcons;
             const enemy = this.combat.getEnemy(house);
             const enemyCombatData = this.combat.houseCombatDatas.get(enemy);
@@ -245,7 +246,7 @@ export default class PostCombatGameState extends GameState<
                 if (skullCount < enemyCombatData.army.length) {
                     this.setChildGameState(new ChooseCasualtiesGameState(this)).firstStart(enemy, enemyCombatData.army, skullCount);
                 } else {
-                    // If the count of casualties is bigger or equal than the remaining army, a ChooseCasualtiesGameSTate
+                    // If the count of casualties is bigger or equal than the remaining army, a ChooseCasualtiesGameState
                     // is not needed. The army left can be exterminated.
                     this.onChooseCasualtiesGameStateEnd(enemy, enemyCombatData.region, enemyCombatData.army, true);
                 }
@@ -263,7 +264,7 @@ export default class PostCombatGameState extends GameState<
             }
         }
 
-        this.proceedHouseCardHandling();
+        this.proceedRetreat();
     }
 
     proceedHouseCardHandling(): void {
@@ -292,7 +293,7 @@ export default class PostCombatGameState extends GameState<
             }
         });
 
-        this.proceedAfterWinnerDetermination();
+        this.setChildGameState(new AfterCombatHouseCardAbilitiesGameState(this)).firstStart();
     }
 
     proceedAfterWinnerDetermination(): void {
@@ -314,7 +315,7 @@ export default class PostCombatGameState extends GameState<
     }
 
     onAfterWinnerDeterminationFinish(): void {
-        this.proceedRetreat();
+        this.proceedCasualties();
     }
 
     proceedRetreat(): void {
@@ -357,7 +358,7 @@ export default class PostCombatGameState extends GameState<
         // Remove the order from attacking region
         this.removeOrderFromRegion(this.combat.attackingRegion);
 
-        this.setChildGameState(new AfterCombatHouseCardAbilitiesGameState(this)).firstStart();
+        this.proceedHouseCardHandling();
     }
 
     removeOrderFromRegion(region: Region): void {
@@ -384,9 +385,8 @@ export default class PostCombatGameState extends GameState<
 
         this.combat.houseCombatDatas.keys.forEach(house => {
             // In case one of the combatants has been replaced by a vassal during
-            // AfterWinnerDetermination, ResolveRetreat or AfterCombatHouseCardAbilities
-            // we have missed doHouseCardHandling() to remove the house cards from the new vassal.
-            // So remove them now:
+            // AfterCombatHouseCardAbilitiesGameState we have missed to remove
+            // the house cards from the new vassal. So remove them now:
             if (this.combat.ingameGameState.isVassalHouse(house) && house.houseCards.size > 0) {
                 house.houseCards = new BetterMap();
                 this.entireGame.broadcastToClients({
