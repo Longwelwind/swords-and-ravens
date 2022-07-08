@@ -43,7 +43,6 @@ import ChooseInitialObjectivesGameState, { SerializedChooseInitialObjectivesGame
 import facelessMenNames from "../../../data/facelessMenNames.json";
 import sleep from "../../utils/sleep";
 import WildlingCardEffectInTurnOrderGameState from "./westeros-game-state/wildlings-attack-game-state/WildlingCardEffectInTurnOrderGameState";
-import HouseCardResolutionGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/house-card-resolution-game-state/HouseCardResolutionGameState";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -732,25 +731,25 @@ export default class IngameGameState extends GameState<
             house: newVassalHouse.id
         });
 
-        // Remove house cards from new vassal house so abilities like Qyburn cannot use this cards anymore
+        // Save the house cards, so vassalization can be undone and cards can be re-assigned to a new player
         this.game.oldPlayerHouseCards.set(newVassalHouse, newVassalHouse.houseCards);
-
-        // Only clear house cards now, when game is not in HouseCardResolutionGameState as some abilities like Viserys
-        // require a hand and will result in SelectHouseCardGameState with 0 cards for selection
-        if (!this.hasChildGameState(HouseCardResolutionGameState)) {
-            newVassalHouse.houseCards = new BetterMap();
-        }
-
         this.entireGame.broadcastToClients({
             type: "update-old-player-house-cards",
             houseCards: this.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.serializeToClient())])
         });
 
-        this.entireGame.broadcastToClients({
-            type: "update-house-cards",
-            house: newVassalHouse.id,
-            houseCards: []
-        });
+        // In case we are in combat we will do proceedHouseCardHandling() where we eventually recycle the deck,
+        // then save the oldPlayerHouseCards again and then remove the house cards from this vassal house.
+        if (!this.hasChildGameState(CombatGameState)) {
+            // If we're not in combat, we have to remove the house cards from the new vassal now
+            newVassalHouse.houseCards = new BetterMap();
+
+            this.entireGame.broadcastToClients({
+                type: "update-house-cards",
+                house: newVassalHouse.id,
+                houseCards: []
+            });
+        }
 
         // Perform action of current state
         this.leafState.actionAfterVassalReplacement(newVassalHouse);
