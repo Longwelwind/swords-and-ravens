@@ -70,6 +70,10 @@ export default class UseValyrianSteelBladeGameState extends GameState<CombatGame
                 return;
             }
 
+            if (player.house != this.game.valyrianSteelBladeHolder) {
+                return;
+            }
+
             if (message.use) {
                 if (this.forNewTidesOfBattleCard) {
                     this.combatGameState.houseCombatDatas.get(this.house).tidesOfBattleCard = popRandom(this.combatGameState.tidesOfBattleDeck);
@@ -110,6 +114,14 @@ export default class UseValyrianSteelBladeGameState extends GameState<CombatGame
             type: "use-valyrian-steel-blade",
             use: use
         });
+    }
+
+    actionAfterVassalReplacement(_newVassal: House): void {
+        // It may be possible that this.house no longer use the VSB
+        if (this.ingame.getControllerOfHouse(this.house).house != this.game.valyrianSteelBladeHolder) {
+            // Then we simply proceed
+            this.combatGameState.onUseValyrianSteelBladeGameStateEnd();
+        }
     }
 
     onServerMessage(_message: ServerMessage): void {
