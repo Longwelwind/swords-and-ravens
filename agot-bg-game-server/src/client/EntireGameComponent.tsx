@@ -182,7 +182,16 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         }
 
         return gameDuration && <Col xs="auto">
-            <h4><Badge variant="secondary">{gameDuration}</Badge></h4>
+            <OverlayTrigger
+                placement="bottom"
+                overlay={
+                    <Tooltip id="total-playing-time-tooltip">
+                        <b>Total playing time</b>
+                    </Tooltip>}
+                popperConfig={{ modifiers: [preventOverflow] }}
+            >
+                <h4><Badge variant="secondary">{gameDuration}</Badge></h4>
+            </OverlayTrigger>
         </Col>;
     }
 
