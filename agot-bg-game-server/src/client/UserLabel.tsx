@@ -139,6 +139,8 @@ export default class UserLabel extends Component<UserLabelProps> {
                                             "The game has ended"
                                         : canLaunchReplacePlayerByVassalVoteReason == "only-players-can-vote" ?
                                             "Only players can vote"
+                                        : canLaunchReplacePlayerByVassalVoteReason == "not-enough-voter" ?
+                                            "There are not enough voters left in the game"
                                         : canLaunchReplacePlayerByVassalVoteReason == "min-player-count-reached" ?
                                             "Minimum player count reached"
                                         : canLaunchReplacePlayerByVassalVoteReason == "vassalizing-yourself-is-forbidden" ?

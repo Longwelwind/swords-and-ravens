@@ -1132,7 +1132,11 @@ export default class IngameGameState extends GameState<
                 return {result: false, reason: "vassalizing-yourself-is-forbidden"};
             }
 
-            if (this.players.size - 1 < this.entireGame.minPlayerCount) {
+            if (this.entireGame.gameSettings.onlyLive) {
+                if (this.players.size <= 2) {
+                    return {result: false, reason: "not-enough-voter"};
+                }
+            } else if (this.players.size == this.entireGame.minPlayerCount) {
                 return {result: false, reason: "min-player-count-reached"};
             }
 
