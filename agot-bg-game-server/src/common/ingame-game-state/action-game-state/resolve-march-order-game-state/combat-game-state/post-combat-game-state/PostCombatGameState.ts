@@ -271,7 +271,22 @@ export default class PostCombatGameState extends GameState<
         // Unassign the house cards from vassals again
         this.combat.houseCombatDatas.forEach(({houseCard}, house) => {
             if (this.combat.ingameGameState.isVassalHouse(house)) {
+                if (houseCard && house.hasBeenReplacedByVassal && !this.game.vassalHouseCards.values.includes(houseCard)) {
+                    this.markHouseAsUsed(house, houseCard);
+                    this.game.oldPlayerHouseCards.set(house, house.houseCards);
+
+                    this.entireGame.broadcastToClients({
+                        type: "update-old-player-house-cards",
+                        houseCards: this.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.serializeToClient())])
+                    });
+                }
+
                 house.houseCards = new BetterMap();
+                this.entireGame.broadcastToClients({
+                    type: "update-house-cards",
+                    house: house.id,
+                    houseCards: []
+                });
             } else {
                 this.markHouseAsUsed(house, houseCard);
             }
