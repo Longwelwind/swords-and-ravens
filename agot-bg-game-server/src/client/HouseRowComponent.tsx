@@ -112,8 +112,8 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                 clock = player.totalRemainingSeconds;
 
                 if (clock != null) {
-                    clockCritical = clock > 0 && clock < (10 * 60);
-                    clockWarning = !clockCritical && clock > 0 && clock < (20 * 60);
+                    clockCritical = gameRunning && clock > 0 && clock < (10 * 60);
+                    clockWarning = gameRunning && !clockCritical && clock > 0 && clock < (20 * 60);
                 }
             }
         } catch {
