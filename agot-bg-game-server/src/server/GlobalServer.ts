@@ -292,7 +292,7 @@ export default class GlobalServer {
         entireGame.onGameEnded = (users) => this.onGameEnded(entireGame, users);
         entireGame.onNewPbemResponseTime = (user, responseTimeInSeconds) => this.onNewPbemResponseTime(user, responseTimeInSeconds);
         entireGame.onClearChatRoom = (roomId) => this.onClearChatRoom(roomId);
-        entireGame.onCaptureSentryMessage = (message, severity) => this.onCaptureSentryMessage(message, severity);
+        entireGame.onCaptureSentryMessage = (message, severity) => this.onCaptureSentryMessage(`${entireGame.id}: ${message}`, severity);
 
         // Set the connection status of all users to false
         entireGame.users.values.forEach(u => u.connected = false);

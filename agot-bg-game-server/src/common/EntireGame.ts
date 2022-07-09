@@ -180,7 +180,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                     p.sendPbemResponseTime();
 
                     if (this.onCaptureSentryMessage) {
-                        this.onCaptureSentryMessage(`Unhandled waitedForData in game ${this.entireGame.id} for user ${p.user.name} (${p.user.id})`, "warning");
+                        this.onCaptureSentryMessage(`Unhandled waitedForData for user ${p.user.name} (${p.user.id})`, "warning");
                     }
                 }
                 p.resetWaitedFor();
