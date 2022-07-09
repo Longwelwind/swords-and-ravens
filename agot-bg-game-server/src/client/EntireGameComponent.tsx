@@ -42,6 +42,10 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         return this.props.entireGame.ingameGameState;
     }
 
+    get lobby(): LobbyGameState | null {
+        return this.props.entireGame.lobbyGameState;
+    }
+
     get isGameEnded(): boolean {
         return this.props.entireGame.leafState instanceof CancelledGameState ||
             this.props.entireGame.leafState instanceof GameEndedGameState;
@@ -166,33 +170,44 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     renderGameDuration(): ReactNode {
-        if (!this.ingame) {
-            return null;
-        }
-
-        let gameDuration: string | null = null;
-        const firstLog = _.first(this.props.entireGame.ingameGameState?.gameLogManager.logs ?? []);
-
-        if (firstLog) {
-            const lastTimeStamp = this.isGameEnded ?
-                _.last(this.props.entireGame.ingameGameState?.gameLogManager.logs ?? [])?.time ?? new Date()
-                : new Date();
-
-            gameDuration = this.secondsToString(this.getTotalElapsedSeconds(firstLog.time, lastTimeStamp));
-        }
-
-        return gameDuration && <Col xs="auto">
-            <OverlayTrigger
+        if (this.ingame) {
+            let gameDuration: string | null = null;
+            const firstLog = _.first(this.props.entireGame.ingameGameState?.gameLogManager.logs ?? []);
+    
+            if (firstLog) {
+                const lastTimeStamp = this.isGameEnded ?
+                    _.last(this.props.entireGame.ingameGameState?.gameLogManager.logs ?? [])?.time ?? new Date()
+                    : new Date();
+    
+                gameDuration = this.secondsToString(this.getTotalElapsedSeconds(firstLog.time, lastTimeStamp));
+            }
+    
+            return gameDuration && <Col xs="auto">
+                <OverlayTrigger
+                    placement="bottom"
+                    overlay={
+                        <Tooltip id="total-playing-time-tooltip">
+                            <b>Total playing time</b>
+                        </Tooltip>}
+                    popperConfig={{ modifiers: [preventOverflow] }}
+                >
+                    <h4><Badge variant="secondary">{gameDuration}</Badge></h4>
+                </OverlayTrigger>
+            </Col>;
+        } else if (this.lobby) {
+            return <OverlayTrigger
                 placement="bottom"
                 overlay={
-                    <Tooltip id="total-playing-time-tooltip">
-                        <b>Total playing time</b>
+                    <Tooltip id="westeros-time-tooltip">
+                        <b>Westeros time <small>(basically UTC)</small></b>
                     </Tooltip>}
                 popperConfig={{ modifiers: [preventOverflow] }}
             >
-                <h4><Badge variant="secondary">{gameDuration}</Badge></h4>
+                <h4><Badge variant="secondary">{new Date().toISOString().slice(11, 16)}</Badge></h4>
             </OverlayTrigger>
-        </Col>;
+        }
+
+        return null;
     }
 
 
@@ -259,7 +274,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         }
 
         if (!this.isGameEnded) {
-            this.setIntervalId = window.setInterval(() => this.forceRerender(), 15 * 1000);
+            this.setIntervalId = window.setInterval(() => this.forceRerender(), 1000);
         }
     }
 
