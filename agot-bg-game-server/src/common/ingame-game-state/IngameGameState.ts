@@ -625,15 +625,16 @@ export default class IngameGameState extends GameState<
                 this.setChildGameState(new GameEndedGameState(this)).firstStart(winner);
                 this.entireGame.checkGameStateChanged();
             }
-    
+
             this.replacePlayerByVassal(player);
+            this.entireGame.saveGame();
         } catch (e) {
             const message = typeof e === "string"
                 ? e
                 : e instanceof Error
                     ? e.message
                     : "Unknown error in onPlayerClockTimeout";
-            this.entireGame.onCaptureSentryMessage(message, "fatal");
+            this.entireGame.onCaptureSentryMessage(`onPlayerClockTimeout failed for user ${player.user.name} (${player.user.id}): ${message}`, "fatal");
         } finally {
             this.entireGame.checkGameStateChanged();
             this.entireGame.doPlayerClocksHandling();
