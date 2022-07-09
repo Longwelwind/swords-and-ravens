@@ -113,7 +113,7 @@ export default class IronBank {
     // Returns the amount of unpaid interest
     payInterest(): [House, number][] {
         const result = new BetterMap<House, number>();
-        this.interestCost.forEach(([house, cost]) => {
+        this.interestCost.filter(([house, _]) => !this.game.ingame.isVassalHouse(house)).forEach(([house, cost]) => {
             const reallyPaid = this.game.ingame.changePowerTokens(house, -cost);
 
             const delta = cost + reallyPaid;
