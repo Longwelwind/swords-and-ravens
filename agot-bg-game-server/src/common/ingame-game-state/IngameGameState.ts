@@ -607,19 +607,37 @@ export default class IngameGameState extends GameState<
     }
 
     onPlayerClockTimeout(player: Player): void {
-        if (!player.liveClockData) {
-            throw new Error("LiveClockData must be present in onPlayerClockTimeout");
+        // Use a try catch here as an exception in a timer callback seems to crash the server
+        try {
+            if (!player.liveClockData) {
+                throw new Error("LiveClockData must be present in onPlayerClockTimeout");
+            }
+    
+            this.endPlayerClock(player, false);
+    
+            if (this.players.size == 2) {
+                // Replacing a vassal now could lead to an invalid state.
+                // E.G. PayDebtsGameState will fail because there is no-one left to do the destroy units choice
+                // When we are in combat, replacing vassal will fail, as there is no house left to assign the new vassal
+                // Therefore we go to GameEnded first and then replace the last house with a vassal:
+    
+                const winner = _.without(this.players.values, player)[0].house;
+                this.setChildGameState(new GameEndedGameState(this)).firstStart(winner);
+                this.entireGame.checkGameStateChanged();
+            }
+    
+            this.replacePlayerByVassal(player);
+        } catch (e) {
+            const message = typeof e === "string"
+                ? e
+                : e instanceof Error
+                    ? e.message
+                    : "Unknown error in onPlayerClockTimeout";
+            this.entireGame.onCaptureSentryMessage(message, "fatal");
+        } finally {
+            this.entireGame.checkGameStateChanged();
+            this.entireGame.doPlayerClocksHandling();
         }
-
-        this.endPlayerClock(player, false);
-        this.replacePlayerByVassal(player);
-
-        if (this.players.size == 1) {
-            this.setChildGameState(new GameEndedGameState(this)).firstStart(this.players.values[0].house);
-        }
-
-        this.entireGame.checkGameStateChanged();
-        this.entireGame.doPlayerClocksHandling();
     }
 
     endPlayerClock(player: Player, clearTimer = true): void {
