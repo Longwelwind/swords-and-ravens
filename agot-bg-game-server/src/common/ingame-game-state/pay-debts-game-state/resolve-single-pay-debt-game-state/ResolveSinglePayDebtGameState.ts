@@ -75,7 +75,7 @@ export default class ResolveSinglePayDebtGameState extends GameState<PayDebtsGam
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "reconcile-armies") {
-            if (this.ingame.getControllerOfHouse(this.resolver).user != player.user) {
+            if (this.ingame.getControllerOfHouse(this.resolver) != player) {
                 return;
             }
 

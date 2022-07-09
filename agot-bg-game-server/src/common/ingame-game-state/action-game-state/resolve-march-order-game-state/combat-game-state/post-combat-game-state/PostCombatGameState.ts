@@ -383,9 +383,17 @@ export default class PostCombatGameState extends GameState<
             this.combat.ingameGameState.getControllerOfHouse(h).user), NotificationType.BATTLE_RESULTS);
 
         this.combat.houseCombatDatas.keys.forEach(house => {
-            // Reset vassal house cards again in case an ingame vassal replacement prevented the reset
-            if (this.combat.ingameGameState.isVassalHouse(house)) {
+            // In case one of the combatants has been replaced by a vassal during
+            // AfterWinnerDetermination, ResolveRetreat or AfterCombatHouseCardAbilities
+            // we have missed doHouseCardHandling() to remove the house cards from the new vassal.
+            // So remove them now:
+            if (this.combat.ingameGameState.isVassalHouse(house) && house.houseCards.size > 0) {
                 house.houseCards = new BetterMap();
+                this.entireGame.broadcastToClients({
+                    type: "update-house-cards",
+                    house: house.id,
+                    houseCards: []
+                });
             }
         });
         this.combat.resolveMarchOrderGameState.onResolveSingleMarchOrderGameStateFinish(this.attacker);

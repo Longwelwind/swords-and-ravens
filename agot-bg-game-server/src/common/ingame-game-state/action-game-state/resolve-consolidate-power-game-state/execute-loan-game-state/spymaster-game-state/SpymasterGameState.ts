@@ -28,7 +28,6 @@ export default class SpymasterGameState extends GameState<ExecuteLoanGameState,
 
     get choices(): BetterMap<string, number> {
         const choices = new BetterMap<string, number>();
-        choices.set("Ignore", -1);
         const deckNames = [ "First", "Second", "Third", "Fourth" ];
         for (let i = 0; i < this.game.westerosDecks.length; i++) {
             const deck = this.game.westerosDecks[i];
