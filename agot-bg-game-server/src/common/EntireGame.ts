@@ -55,6 +55,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     onNewPbemResponseTime: (user: User, responseTimeInSeconds: number) => void;
     onClearChatRoom: (roomId: string) => void;
     onCaptureSentryMessage: (message: string, severity: "info" | "warning" | "error" | "fatal") => void;
+    onSaveGame: () => void;
 
     publicChatRoomId: string;
     // Keys are the two users participating in the private chat.
@@ -616,6 +617,12 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             type: "hide-or-reveal-user-names",
             names: this.users.values.map(u => u.serializeToClient(false, null, this.gameSettings.faceless)).map(su => [su.id, su.name])
         });
+    }
+
+    saveGame(): void {
+        if (this.onSaveGame) {
+            this.onSaveGame();
+        }
     }
 
     serializeToClient(user: User | null): SerializedEntireGame {
