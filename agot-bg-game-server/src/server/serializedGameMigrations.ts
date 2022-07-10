@@ -1799,6 +1799,16 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "84",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame" && serializedGame.gameSettings.pbem) {
+                const ingame = serializedGame.childGameState;
+                ingame.players.forEach((p: any) => p.waitedForData = null);
+            }
+            return serializedGame;
+        }
     }
 ];
 

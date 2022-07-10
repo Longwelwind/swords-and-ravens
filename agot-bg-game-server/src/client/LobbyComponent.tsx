@@ -161,6 +161,9 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                                                     "House Targaryen must be chosen by a player"
                                                                 : canStartGameReason == "not-owner" ?
                                                                     "Only the owner of the game can start it"
+                                                                : canStartGameReason == "waiting-for-update" ?
+                                                                    "Currently, no new PBEM games can be started, as all PBEM games are paused "
+                                                                    + "until there is no one left in combat to then release a new game version"
                                                                 : null}
                                                             </Tooltip>
                                                         }

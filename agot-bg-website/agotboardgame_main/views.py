@@ -176,7 +176,8 @@ def games(request):
             is_private=Cast(KeyTextTransform('private', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
             inactive_5=ExpressionWrapper(Q(last_active_at__lt=five_days_past), output_field=BooleanField()),\
             inactive_2=ExpressionWrapper(Q(last_active_at__lt=two_days_past), output_field=BooleanField()),\
-            inactive_21=ExpressionWrapper(Q(last_active_at__lt=three_weeks_past), output_field=BooleanField())\
+            inactive_21=ExpressionWrapper(Q(last_active_at__lt=three_weeks_past), output_field=BooleanField()),\
+            is_in_combat=Cast(KeyTextTransform('isInCombat', 'view_of_game'), BooleanField())\
             ).prefetch_related('owner')
 
         if request.user.is_authenticated:
@@ -198,6 +199,7 @@ def games(request):
         replacement_needed_games = []
         inactive_private_games = []
         open_live_games = []
+        games_in_combat_phase = []
 
         for game in games:
             # "game.player_in_game" contains a list of one or zero element, depending on whether the authenticated
@@ -256,6 +258,9 @@ def games(request):
             if game.state == IN_LOBBY and game.players_count > 0 and game.view_of_game.get("settings", False) and game.view_of_game.get("settings").get("pbem", True) == False:
                 open_live_games.append(game)
 
+            if game.is_in_combat:
+                games_in_combat_phase.append(game)
+
         public_room_id = Room.objects.get(name='public').id
 
         return render(request, "agotboardgame_main/games.html", {
@@ -265,6 +270,7 @@ def games(request):
             "open_live_games": open_live_games,
             "replacement_needed_games": replacement_needed_games,
             "inactive_private_games": inactive_private_games,
+            "games_in_combat_phase": games_in_combat_phase,
             "public_room_id": public_room_id
         })
     elif request.method == "POST":
