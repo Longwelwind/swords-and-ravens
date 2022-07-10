@@ -1118,6 +1118,17 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "already-existing"};
         }
 
+        const acceptedVotes = this.votes.values.filter(v => v.state == VoteState.ACCEPTED && v.type instanceof ExtendPlayerClocks);
+
+        if (acceptedVotes.length > 0) {
+            return {result: false, reason: "already-extended"};
+        }
+
+        const refusedVotes = this.votes.values.filter(v => v.state == VoteState.REFUSED && v.type instanceof ExtendPlayerClocks);
+        if (refusedVotes.length > 1) {
+            return {result: false, reason: "max-vote-count-reached"};
+        }
+
         if (player == null || !this.players.values.includes(player)) {
             return {result: false, reason: "only-players-can-vote"};
         }

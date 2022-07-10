@@ -87,11 +87,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     type="switch"
                                     label={
                                         <OverlayTrigger overlay={
-                                            <Tooltip id="only-live-setting-tooltip">
-                                                When this option is enabled each player will have a game clock of 60, 75, 90 or 120 minutes. When a player&apos;s time runs out, he is automatically turned into a vassal.
-                                                The last remaining player immediately wins the game. All players can launch a vote to extend the player clock by 15 minutes.<br/>
-                                                In addition, the owner of the game will not be able to switch to PBEM in-game, and the number of positive votes required to replace a player
-                                                is reduced to 3 to make it easier to address quitters.
+                                            <Tooltip id="only-live-setting-tooltip" className="tooltip-w-100">
+                                                When this option is enabled each player will have a game clock of 60, 75, 90 or 120 minutes.<br/>
+                                                When a player&apos;s time runs out, he is automatically turned into a vassal.<br/>
+                                                The last remaining player immediately wins the game.<br/>
+                                                All player clocks can be extended once for 15 minutes by vote. After 2 failed voting attempts,<br/>
+                                                no further voting can be initiated.<br/>
+                                                In addition, the owner of the game will not be able to switch to PBEM in-game,<br/>
+                                                and the number of positive votes required to replace a player is reduced to 3<br/>
+                                                to make it easier to address quitters.
                                             </Tooltip>}>
                                             <label htmlFor="only-live-setting">Game clock</label>
                                         </OverlayTrigger>}

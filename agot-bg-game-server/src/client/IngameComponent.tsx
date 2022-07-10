@@ -494,6 +494,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 "Only participating players can vote"
                                             ) : canLaunchExtendPlayerClocksVoteReason == "already-existing" ? (
                                                 "A vote to extend all clocks is already ongoing"
+                                            ) : canLaunchExtendPlayerClocksVoteReason == "already-extended" ? (
+                                                "Player clocks have already been extended"
+                                            ) : canLaunchExtendPlayerClocksVoteReason == "max-vote-count-reached" ? (
+                                                "The maximum amount of votes was reached"
                                             ) : canLaunchExtendPlayerClocksVoteReason == "already-cancelled" ? (
                                                 "Game has already been cancelled"
                                             ) : canLaunchExtendPlayerClocksVoteReason == "already-ended" ? (
