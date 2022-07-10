@@ -60,10 +60,6 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         return this.ingame.game;
     }
 
-    get isVassal(): boolean {
-        return this.ingame.isVassalHouse(this.house);
-    }
-
     get player(): Player {
         return this.ingame.getControllerOfHouse(this.house);
     }
@@ -73,6 +69,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     }
 
     render(): ReactNode {
+        const isVassal = this.ingame.isVassalHouse(this.house);
         const gameRunning = !(this.ingame.leafState instanceof GameEndedGameState) && !(this.ingame.leafState instanceof CancelledGameState);
         // We limit the victory points to 7 but in the UI we wan't to show if a player controls more than 7 castles
         const victoryPoints = !this.ingame.entireGame.isFeastForCrows && this.house.id != "targaryen"
@@ -105,7 +102,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         let clock: number | null = null;
 
         try {
-            if (!this.isVassal) {
+            if (!isVassal) {
                 player = this.player;
                 isWaitedFor = this.ingame.getWaitedUsers().includes(player.user);
 
@@ -203,7 +200,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                             )}
                         </Row>
                     </Col>
-                    {!this.isVassal && (<OverlayTrigger
+                    {!isVassal && (<OverlayTrigger
                         overlay={this.renderVictoryTrackTooltip(this.house)}
                         delay={{ show: 250, hide: 100 }}
                         placement="auto"
@@ -221,7 +218,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                             />
                         </Col>
                     </OverlayTrigger>)}
-                    <Col xs="auto" className={classNames("d-flex align-items-center", { "invisible": this.isVassal })}
+                    <Col xs="auto" className={classNames("d-flex align-items-center", { "invisible": isVassal })}
                         onMouseEnter={() => this.setHighlightedRegions("with-power-tokens-only")}
                         onMouseLeave={() => this.highlightedRegions.clear()}
                     >
@@ -260,7 +257,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     </div>
                 </Row>}
                 <Row className="justify-content-center">
-                    {!this.isVassal ?
+                    {!isVassal ?
                         _.sortBy(this.house.houseCards.values, hc => hc.combatStrength).map(hc => (
                         <Col xs="auto" key={hc.id}>
                             {hc.state == HouseCardState.AVAILABLE ? (
@@ -286,19 +283,19 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         </Col>
                     ))}
                 </Row>
+                {this.house.laterHouseCards != null && !isVassal &&
                 <Row className="justify-content-center">
-                    {this.house.laterHouseCards != null && this.house.laterHouseCards.size > 0 &&
-                        _.sortBy(this.house.laterHouseCards.values, hc => hc.combatStrength).map(hc => (
-                            <Col xs="auto" key={hc.id}>
-                                <HouseCardComponent
-                                        houseCard={hc}
-                                        size="tiny"
-                                        unavailable
-                                    />
-                            </Col>
-                        )
+                    {_.sortBy(this.house.laterHouseCards.values, hc => hc.combatStrength).map(hc => (
+                        <Col xs="auto" key={hc.id}>
+                            <HouseCardComponent
+                                houseCard={hc}
+                                size="tiny"
+                                unavailable
+                            />
+                        </Col>
+                    )
                     )}
-                </Row>
+                </Row>}
                 </div>
             </ListGroupItem>
         </>;
