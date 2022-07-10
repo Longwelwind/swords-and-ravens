@@ -44,6 +44,7 @@ import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import WorldStateComponent from "./WorldStateComponent";
 import GameClient from "./GameClient";
 import GameLogManager, { ticksToTime, timeToTicks } from "../common/ingame-game-state/game-data-structure/GameLogManager";
+import { secondsToString } from "./utils/secondsToString";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -1893,6 +1894,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     A Power token of House <b>{house.name}</b> was removed from <b>{region.name}</b>.
+                </p>;
+            }
+            case "game-paused": {
+                return <p>
+                    The game was paused by vote.
+                </p>;
+            }
+            case "game-resumed": {
+                return <p>
+                    The game was resumed by vote. Pause time: {secondsToString(data.pauseTimeInSeconds, true)}
                 </p>;
             }
         }

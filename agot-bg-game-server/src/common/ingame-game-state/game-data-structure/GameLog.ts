@@ -49,7 +49,8 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | RevealAllObjectives | GarrisonRemoved | GarrisonReturned | ObjectiveDeckEmpty | OrdersRevealed | HouseCardsReturned
     | BalonGreyjoyASoSPowerTokensGained | MaceTyrellASoSOrderPlaced | BranStarkUsed | CerseiLannisterASoSPowerTokensDiscarded
     | DoranMartellASoSUsed | MelisandreOfAsshaiPowerTokensGained | SalladharSaanASoSPowerTokensChanged | SerDavosSeaworthASoSFortificationGained
-    | CasualtiesPrevented | SerIlynPayneASoSCasualtySuffered | StannisBaratheonASoSUsed | AeronDamphairHouseCardChanged | ControlPowerTokenRemoved;
+    | CasualtiesPrevented | SerIlynPayneASoSCasualtySuffered | StannisBaratheonASoSUsed | AeronDamphairHouseCardChanged | ControlPowerTokenRemoved
+    | GamePaused | GameResumed;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -1108,4 +1109,13 @@ interface ControlPowerTokenRemoved {
     type: "control-power-token-removed";
     regionId: string;
     houseId: string;
+}
+
+interface GamePaused {
+    type: "game-paused";
+}
+
+interface GameResumed {
+    type: "game-resumed";
+    pauseTimeInSeconds: number;
 }
