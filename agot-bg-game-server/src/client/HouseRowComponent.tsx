@@ -286,6 +286,19 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         </Col>
                     ))}
                 </Row>
+                <Row className="justify-content-center">
+                    {this.house.laterHouseCards != null && this.house.laterHouseCards.size > 0 &&
+                        _.sortBy(this.house.laterHouseCards.values, hc => hc.combatStrength).map(hc => (
+                            <Col xs="auto" key={hc.id}>
+                                <HouseCardComponent
+                                        houseCard={hc}
+                                        size="tiny"
+                                        unavailable
+                                    />
+                            </Col>
+                        )
+                    )}
+                </Row>
                 </div>
             </ListGroupItem>
         </>;

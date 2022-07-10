@@ -937,6 +937,9 @@ export default class IngameGameState extends GameState<
         } else if (message.type == "update-house-cards") {
             const house = this.game.houses.get(message.house);
             house.houseCards = new BetterMap(message.houseCards.map(hc => [hc.id, HouseCard.deserializeFromServer(hc)]));
+        } else if (message.type == "later-house-cards-applied") {
+            const house = this.game.houses.get(message.house);
+            house.laterHouseCards = null;
         } else if (message.type == "update-house-cards-for-drafting") {
             this.game.houseCardsForDrafting = new BetterMap(message.houseCards.map(hc => [hc.id, HouseCard.deserializeFromServer(hc)]));
         } else if (message.type == "update-deleted-house-cards") {

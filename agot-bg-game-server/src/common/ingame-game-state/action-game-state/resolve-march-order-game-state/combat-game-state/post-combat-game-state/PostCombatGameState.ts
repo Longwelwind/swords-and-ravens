@@ -438,14 +438,17 @@ export default class PostCombatGameState extends GameState<
                     houseCards: house.houseCards.values.map(hc => hc.serializeToClient())
                 });
 
+                this.entireGame.broadcastToClients({
+                    type: "later-house-cards-applied",
+                    house: house.id
+                });
+
                 this.combat.ingameGameState.log({
                     type: "house-cards-returned",
                     house: house.id,
                     houseCards: house.houseCards.keys,
                     houseCardDiscarded: undefined
                 });
-
-                // No need to "update-later-house-cards" as they are used by the game-server only
             } else {
                 const houseCardsToMakeAvailable = house.houseCards.values
                     .filter(hc => hc != houseCard && hc.state == HouseCardState.USED)
