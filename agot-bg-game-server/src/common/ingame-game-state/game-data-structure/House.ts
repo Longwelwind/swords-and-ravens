@@ -72,7 +72,7 @@ export default class House {
                     : !isVassalHouse
                         ? serializedHouseCards
                         : [],
-            laterHouseCards: admin && this.laterHouseCards != null // laterHouseCards are used server-side only. Therefore clients always receive "null"
+            laterHouseCards: this.laterHouseCards != null
                 ? this.laterHouseCards.entries.map(([houseCardId, houseCard]) => [houseCardId, houseCard.serializeToClient()] as [string, SerializedHouseCard])
                 : null,
             unitLimits: this.unitLimits.map((unitType, limit) => [unitType.id, limit]),
