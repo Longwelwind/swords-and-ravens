@@ -16,7 +16,7 @@ export default class House {
     unitLimits: BetterMap<UnitType, number>;
     maxPowerTokens: number;
     @observable houseCards: BetterMap<string, HouseCard>;
-    laterHouseCards: BetterMap<string, HouseCard> | null;
+    @observable laterHouseCards: BetterMap<string, HouseCard> | null;
     @observable powerTokens: number;
     @observable supplyLevel: number;
     @observable knowsNextWildlingCard: boolean;
