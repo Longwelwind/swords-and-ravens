@@ -359,24 +359,27 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     doPlayerClocksHandling(): void {
         if (this.gameSettings.onlyLive && this.ingameGameState) {
             const waitedPlayers = this.leafState.getWaitedUsers().map(u => (this.ingameGameState as IngameGameState).players.get(u));
-            waitedPlayers.forEach(p => {
-                if (!p.liveClockData) {
-                    throw new Error("LiveClockData must be present in doPlayerClocksHandling");
-                }
 
-                // If timer is already running but player is still active, do nothing
-                if (p.liveClockData.timerStartedAt == null && p.liveClockData.remainingSeconds > 0) {
-                    p.liveClockData.serverTimer = setTimeout(() => { this.ingameGameState?.onPlayerClockTimeout(p) }, p.liveClockData.remainingSeconds * 1000);
-                    p.liveClockData.timerStartedAt = new Date();
+            if (!this.ingameGameState.game.paused) {
+                waitedPlayers.forEach(p => {
+                    if (!p.liveClockData) {
+                        throw new Error("LiveClockData must be present in doPlayerClocksHandling");
+                    }
 
-                    this.broadcastToClients({
-                        type: "start-player-clock",
-                        remainingSeconds: p.liveClockData.remainingSeconds,
-                        timerStartedAt: p.liveClockData.timerStartedAt.getTime(),
-                        userId: p.user.id
-                    });
-                }
-            });
+                    // If timer is already running but player is still active, do nothing
+                    if (p.liveClockData.timerStartedAt == null && p.liveClockData.remainingSeconds > 0) {
+                        p.liveClockData.serverTimer = setTimeout(() => { this.ingameGameState?.onPlayerClockTimeout(p) }, p.liveClockData.remainingSeconds * 1000);
+                        p.liveClockData.timerStartedAt = new Date();
+
+                        this.broadcastToClients({
+                            type: "start-player-clock",
+                            remainingSeconds: p.liveClockData.remainingSeconds,
+                            timerStartedAt: p.liveClockData.timerStartedAt.getTime(),
+                            userId: p.user.id
+                        });
+                    }
+                });
+            }
 
             const notWaitedPlayers = _.difference(this.ingameGameState.players.values, waitedPlayers);
 

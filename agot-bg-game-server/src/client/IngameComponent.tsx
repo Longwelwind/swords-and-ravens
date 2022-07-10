@@ -31,6 +31,8 @@ import stoneThroneImage from "../../public/images/icons/stone-throne.svg";
 import cancelImage from "../../public/images/icons/cancel.svg";
 import truceImage from "../../public/images/icons/truce.svg";
 import stopwatchPlus15Image from "../../public/images/icons/stopwatch-plus-15.svg";
+import pauseImage from "../../public/images/icons/pause-button.svg";
+import playImage from "../../public/images/icons/play-button.svg";
 import ravenImage from "../../public/images/icons/raven.svg";
 import diamondHiltImage from "../../public/images/icons/diamond-hilt.svg";
 import diamondHiltUsedImage from "../../public/images/icons/diamond-hilt-used.svg";
@@ -279,6 +281,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     renderHousesColumn(): ReactNode {
         const {result: canLaunchCancelGameVote, reason: canLaunchCancelGameVoteReason} = this.props.gameState.canLaunchCancelGameVote(this.authenticatedPlayer);
         const {result: canLaunchEndGameVote, reason: canLaunchEndGameVoteReason} = this.props.gameState.canLaunchEndGameVote(this.authenticatedPlayer);
+        const {result: canLaunchPauseGameVote, reason: canLaunchPauseGameVoteReason} = this.props.gameState.canLaunchPauseGameVote(this.authenticatedPlayer);
+        const {result: canLaunchResumeGameVote, reason: canLaunchResumeGameVoteReason} = this.props.gameState.canLaunchResumeGameVote(this.authenticatedPlayer);
         const {result: canLaunchExtendPlayerClocksVote, reason: canLaunchExtendPlayerClocksVoteReason} = this.props.gameState.canLaunchExtendPlayerClocksVote(this.authenticatedPlayer);
 
         const connectedSpectators = this.getConnectedSpectators();
@@ -476,6 +480,60 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </OverlayTrigger>
                             </button>
                         </Col>
+                        {this.ingame.entireGame.gameSettings.onlyLive && !this.ingame.game.paused &&
+                        <Col xs="auto">
+                            <button
+                                className="btn btn-outline-light btn-sm"
+                                onClick={() => this.props.gameState.launchPauseGameVote()}
+                                disabled={!canLaunchPauseGameVote}
+                            >
+                                <OverlayTrigger
+                                    overlay={
+                                        <Tooltip id="pause-game-vote-tooltip">
+                                            {canLaunchPauseGameVote ? (
+                                                "Launch a vote to pause the game"
+                                            ) : canLaunchPauseGameVoteReason == "only-players-can-vote" ? (
+                                                "Only participating players can vote"
+                                            ) : canLaunchPauseGameVoteReason == "already-existing" ? (
+                                                "A vote to pause the game is already ongoing"
+                                            ) : canLaunchPauseGameVoteReason == "already-cancelled" ? (
+                                                "Game has already been cancelled"
+                                            ) : canLaunchPauseGameVoteReason == "already-ended" ? (
+                                                "Game has already ended"
+                                            ) : "Vote not possible"}
+                                        </Tooltip>}
+                                >
+                                    <img src={pauseImage} width={32} />
+                                </OverlayTrigger>
+                            </button>
+                        </Col>}
+                        {this.ingame.entireGame.gameSettings.onlyLive && this.ingame.game.paused &&
+                        <Col xs="auto">
+                            <button
+                                className="btn btn-outline-light btn-sm"
+                                onClick={() => this.props.gameState.launchResumeGameVote()}
+                                disabled={!canLaunchResumeGameVote}
+                            >
+                                <OverlayTrigger
+                                    overlay={
+                                        <Tooltip id="resume-game-vote-tooltip">
+                                            {canLaunchResumeGameVote ? (
+                                                "Launch a vote to resume the game"
+                                            ) : canLaunchResumeGameVoteReason == "only-players-can-vote" ? (
+                                                "Only participating players can vote"
+                                            ) : canLaunchResumeGameVoteReason == "already-existing" ? (
+                                                "A vote to resume the game is already ongoing"
+                                            ) : canLaunchResumeGameVoteReason == "already-cancelled" ? (
+                                                "Game has already been cancelled"
+                                            ) : canLaunchResumeGameVoteReason == "already-ended" ? (
+                                                "Game has already ended"
+                                            ) : "Vote not possible"}
+                                        </Tooltip>}
+                                >
+                                    <img src={playImage} width={32} />
+                                </OverlayTrigger>
+                            </button>
+                        </Col>}
                         {this.ingame.entireGame.gameSettings.onlyLive &&
                         <Col xs="auto">
                             <button

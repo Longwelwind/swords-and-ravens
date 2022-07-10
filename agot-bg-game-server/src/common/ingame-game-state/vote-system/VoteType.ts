@@ -11,7 +11,7 @@ import Order from "../game-data-structure/Order";
 
 export type SerializedVoteType = SerializedCancelGame | SerializedEndGame
     | SerializedReplacePlayer | SerializedReplacePlayerByVassal | SerializedReplaceVassalByPlayer
-    | SerializedExtendPlayerClocks;
+    | SerializedPauseGame | SerializedResumeGame | SerializedExtendPlayerClocks;
 
 export default abstract class VoteType {
     abstract serializeToClient(): SerializedVoteType;
@@ -52,8 +52,114 @@ export default abstract class VoteType {
                 // Same than above
                 // eslint-disable-next-line @typescript-eslint/no-use-before-define
                 return ExtendPlayerClocks.deserializeFromServer(ingame, data);
+            case "pause-game":
+                // Same than above
+                // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                return PauseGame.deserializeFromServer(ingame, data);
+            case "resume-game":
+                // Same than above
+                // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                return ResumeGame.deserializeFromServer(ingame, data);
         }
     }
+}
+
+export class PauseGame extends VoteType {
+    verb(): string {
+        return "pause the game";
+    }
+
+    executeAccepted(vote: Vote): void {
+        const ingame = vote.ingame;
+
+        ingame.game.paused = new Date();
+        ingame.log({
+            type: "game-paused"
+        });
+        ingame.entireGame.broadcastToClients({
+            type: "game-paused"
+        });
+
+        ingame.players.forEach(p => {
+            if (!p.liveClockData) {
+                throw new Error("LiveClockData must be present in PauseGame");
+            }
+
+            if (p.liveClockData.timerStartedAt) {
+                if (!p.liveClockData.serverTimer) {
+                    throw new Error("A serverTimer must be present when timerStartedAt is set");
+                }
+
+                p.liveClockData.remainingSeconds = p.totalRemainingSeconds as number;
+
+                clearTimeout(p.liveClockData.serverTimer);
+                p.liveClockData.serverTimer = null;
+                p.liveClockData.timerStartedAt = null;
+
+                ingame.entireGame.broadcastToClients({
+                    type: "stop-player-clock",
+                    remainingSeconds: p.liveClockData.remainingSeconds,
+                    userId: p.user.id
+                });
+            }
+        });
+    }
+
+    serializeToClient(): SerializedPauseGame {
+        return {
+            type: "pause-game"
+        };
+    }
+
+    static deserializeFromServer(_ingame: IngameGameState, _data: SerializedPauseGame): PauseGame {
+        return new PauseGame();
+    }
+}
+
+export interface SerializedPauseGame {
+    type: "pause-game";
+}
+
+export class ResumeGame extends VoteType {
+    verb(): string {
+        return "resume the game";
+    }
+
+    executeAccepted(vote: Vote): void {
+        const ingame = vote.ingame;
+
+        if (!ingame.game.paused) {
+            throw new Error("Game must be paused here");
+        }
+
+        const pauseTimeInSeconds = Math.floor((new Date().getTime() - ingame.game.paused.getTime()) / 1000);
+        ingame.game.paused = null;
+        ingame.log({
+            type: "game-resumed",
+            pauseTimeInSeconds: pauseTimeInSeconds
+        });
+        ingame.entireGame.broadcastToClients({
+            type: "game-resumed"
+        });
+
+        // Basically there is nothing more to do.
+        // entireGame.onClientMessage() will call doPlayerClocksHandling
+        // and reactivate the timers
+    }
+
+    serializeToClient(): SerializedResumeGame {
+        return {
+            type: "resume-game"
+        };
+    }
+
+    static deserializeFromServer(_ingame: IngameGameState, _data: SerializedResumeGame): ResumeGame {
+        return new ResumeGame();
+    }
+}
+
+export interface SerializedResumeGame {
+    type: "resume-game";
 }
 
 export class ExtendPlayerClocks extends VoteType {

@@ -241,7 +241,7 @@ export default class GlobalServer {
     }
 
     restartLiveClockTimers(entireGame: EntireGame): void {
-        if (!entireGame.gameSettings.onlyLive || !entireGame.ingameGameState) {
+        if (!entireGame.gameSettings.onlyLive || !entireGame.ingameGameState || entireGame.ingameGameState.game.paused) {
             return;
         }
 

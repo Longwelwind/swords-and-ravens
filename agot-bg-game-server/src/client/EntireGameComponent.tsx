@@ -25,6 +25,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamation, faLock } from "@fortawesome/free-solid-svg-icons";
 import _ from "lodash";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
+import { secondsToString } from "./utils/secondsToString";
 
 interface EntireGameComponentProps {
     entireGame: EntireGame;
@@ -147,6 +148,10 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
 
     renderWarnings(): ReactNode {
         return <>
+            {this.props.entireGame.ingameGameState?.game.paused &&
+            <Col xs="auto">
+                <h4><Badge variant="danger">PAUSED</Badge></h4>
+            </Col>}
             {this.props.entireGame.gameSettings.reduceVictoryPointsCountNeededToWinTo6 &&
             <Col xs="auto">
                 <OverlayTrigger
@@ -173,15 +178,15 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         if (this.ingame) {
             let gameDuration: string | null = null;
             const firstLog = _.first(this.props.entireGame.ingameGameState?.gameLogManager.logs ?? []);
-    
+
             if (firstLog) {
                 const lastTimeStamp = this.isGameEnded ?
                     _.last(this.props.entireGame.ingameGameState?.gameLogManager.logs ?? [])?.time ?? new Date()
                     : new Date();
-    
-                gameDuration = this.secondsToString(this.getTotalElapsedSeconds(firstLog.time, lastTimeStamp));
+
+                gameDuration = secondsToString(this.getTotalElapsedSeconds(firstLog.time, lastTimeStamp));
             }
-    
+
             return gameDuration && <Col xs="auto">
                 <OverlayTrigger
                     placement="bottom"
@@ -248,13 +253,6 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
 
     getTotalElapsedSeconds(begin: Date, end: Date): number {
         return Math.floor((end.getTime() - begin.getTime()) / 1000);
-    }
-
-    secondsToString(seconds: number): string {
-        const hhmm = new Date(seconds * 1000).toISOString().slice(11, 16);
-        const days = Math.floor(seconds / (3600 * 24));
-
-        return days <= 0 ? hhmm : `${days} day${days != 1 ? "s" : ""} ${hhmm}`;
     }
 
     forceRerender(): void {

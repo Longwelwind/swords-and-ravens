@@ -30,7 +30,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | LoyaltyTokenGained | LoyaltyTokenPlaced | DrangonStrengthTokenRemoved | UpdateLoanCards | UpdateRegionModifiers
     | UpdateCompletedObjectives | UpdateSecretObjectives | SyncShiftingAmbitionsGameState | HideOrRevealUserNames | ClearChatRoom
     | UpdateSelectableObjectives | UpdateSpecialHouseCardModifier | UpdateUsurper
-    | StartPlayerClock | StopPlayerClock | LaterHouseCardsApplied;
+    | StartPlayerClock | StopPlayerClock | GamePaused | GameResumed | LaterHouseCardsApplied;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -484,4 +484,12 @@ interface StopPlayerClock {
 interface LaterHouseCardsApplied {
     type: "later-house-cards-applied";
     house: string;
+}
+
+interface GamePaused {
+    type: "game-paused";
+}
+
+interface GameResumed {
+    type: "game-resumed";
 }

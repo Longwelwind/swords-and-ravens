@@ -5,9 +5,10 @@ export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | Unready |
     | SelectOrders | SelectHouseCard | SelectRegion | ChangeSettings | CreatePrivateChatRoom | ChangeGameSettings
     | CancelGame | Vote | LaunchCancelGameVote | CancelVote | UpdateNote | SelectWesterosCard
     | LaunchReplacePlayerVote | LaunchReplacePlayerByVassalVote | LaunchReplaceVassalByPlayerVote
-    | ClaimVassal | GiftPowerTokens | LaunchEndGameVote | LaunchExtendPlayerClocksVote | SetPassword
+    | ClaimVassal | GiftPowerTokens | LaunchEndGameVote | SetPassword
     | DistributePowerTokens | DropPowerTokens | MoveLoyaltyToken | ResolveConsolidatePowerChoice | PlaceSellswords
-    | ResolveSpymaster | SelectObjectives | ScoreObjective | GameLogSeen;
+    | ResolveSpymaster | SelectObjectives | ScoreObjective | GameLogSeen
+    | LaunchPauseGameVote | LaunchResumeGameVote | LaunchExtendPlayerClocksVote;
 
 interface Ping {
     type: "ping";
@@ -250,10 +251,6 @@ interface LaunchEndGameVote {
     type: "launch-end-game-vote";
 }
 
-interface LaunchExtendPlayerClocksVote {
-    type: "launch-extend-player-clocks-vote";
-}
-
 interface SetPassword {
     type: "set-password";
     password: string;
@@ -308,4 +305,15 @@ interface ScoreObjective {
 interface GameLogSeen {
     type: "game-log-seen";
     time: number;
+}
+interface LaunchExtendPlayerClocksVote {
+    type: "launch-extend-player-clocks-vote";
+}
+
+interface LaunchPauseGameVote {
+    type: "launch-pause-game-vote";
+}
+
+interface LaunchResumeGameVote {
+    type: "launch-resume-game-vote";
 }

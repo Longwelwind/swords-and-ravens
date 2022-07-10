@@ -55,6 +55,7 @@ export default class Game {
     @observable removedDragonStrengthToken = 0;
     ironBank: IronBank | null;
     @observable objectiveDeck: ObjectiveCard[] = [];
+    @observable paused: Date | null;
 
     /**
      * Contains the vassal relations of the game.
@@ -555,7 +556,8 @@ export default class Game {
             removedDragonStrengthToken: this.removedDragonStrengthToken,
             ironBank: this.ironBank ? this.ironBank.serializeToClient(admin) : null,
             objectiveDeck: admin ? this.objectiveDeck.map(oc => oc.id) : [],
-            usurper: this.usurper ? this.usurper.id : null
+            usurper: this.usurper ? this.usurper.id : null,
+            paused: this.paused ? this.paused.getTime() : null
         };
     }
 
@@ -591,6 +593,7 @@ export default class Game {
         game.ironBank = data.ironBank ? IronBank.deserializeFromServer(game, data.ironBank) : null;
         game.objectiveDeck = data.objectiveDeck.map(ocid => objectiveCards.get(ocid));
         game.usurper = data.usurper ? game.houses.get(data.usurper) : null;
+        game.paused = data.paused ? new Date(data.paused) : null;
 
         return game;
     }
@@ -624,4 +627,5 @@ export interface SerializedGame {
     ironBank: SerializedIronBank | null;
     objectiveDeck: string[];
     usurper: string | null;
+    paused: number | null;
 }
