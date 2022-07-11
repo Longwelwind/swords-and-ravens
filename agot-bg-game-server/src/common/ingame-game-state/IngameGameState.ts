@@ -59,6 +59,7 @@ export default class IngameGameState extends GameState<
 
     // Client-side only
     @observable rerender = 0;
+    @observable clockUpdate = 0;
     @observable marchMarkers: BetterMap<Unit, Region> = new BetterMap();
 
     get entireGame(): EntireGame {
@@ -1044,6 +1045,14 @@ export default class IngameGameState extends GameState<
             this.rerender--;
         } else {
             this.rerender++;
+        }
+    }
+
+    forceClockUpdate(): void {
+        if (this.clockUpdate > 0) {
+            this.clockUpdate--;
+        } else {
+            this.clockUpdate++;
         }
     }
 
