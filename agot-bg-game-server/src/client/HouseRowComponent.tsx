@@ -245,7 +245,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         </OverlayTrigger>
                     </Col>
                 </Row>
-                {clock != null &&
+                {clock != null && this.ingame.clockUpdate >= 0 &&
                 <Row className="justify-content-center mb-2">
                     <img src={stopwatchImage} width={24}
                         className={classNames(

@@ -75,7 +75,7 @@ export default class Player {
 
     startClientClockInterval(): void {
         if (this.liveClockData?.timerStartedAt) {
-            this.liveClockData.clientIntervalId = window.setInterval(() => this.user.entireGame.ingameGameState?.forceRerender(), 1000);
+            this.liveClockData.clientIntervalId = window.setInterval(() => this.user.entireGame.ingameGameState?.forceClockUpdate(), 1000);
         }
     }
 
