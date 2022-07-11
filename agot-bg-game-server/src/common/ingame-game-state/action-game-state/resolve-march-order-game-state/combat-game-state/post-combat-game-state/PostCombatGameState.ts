@@ -218,7 +218,7 @@ export default class PostCombatGameState extends GameState<
                     this.onChooseCasualtiesGameStateEnd(this.loser, locationLoserArmy, loserArmyLeft, true);
                 }
                 return;
-            } else if (loserCasualtiesCount < loserArmyLeft.length) {
+            } else {
                 this.combat.ingameGameState.log({
                     type: "casualties-prevented",
                     house: this.loser.id,
@@ -251,7 +251,7 @@ export default class PostCombatGameState extends GameState<
                 }
                 return;
             } else {
-                if (skullCount < enemyCombatData.army.length) {
+                if (enemyCombatData.army.length > 0) {
                     this.combat.ingameGameState.log({
                         type: "casualties-prevented",
                         house: enemy.id,
