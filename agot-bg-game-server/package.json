@@ -67,10 +67,10 @@
     "typescript-json-schema": "^0.53.0",
     "url-loader": "^4.1.1",
     "uuid": "^8.3.2",
-    "webpack": "^5.66.0",
-    "webpack-cli": "^4.9.1",
-    "webpack-dev-server": "^4.7.3",
-    "ws": "^8.4.2"
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.9.3",
+    "ws": "^8.8.0"
   },
   "scripts": {
     "run-client": "webpack-dev-server --config webpack.client.js --mode=development",
