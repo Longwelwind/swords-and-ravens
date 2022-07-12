@@ -21,6 +21,7 @@ import { ReplacePlayer, ReplacePlayerByVassal } from "./ingame-game-state/vote-s
 import WildlingsAttackGameState from "./ingame-game-state/westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
 import BiddingGameState from "./ingame-game-state/westeros-game-state/bidding-game-state/BiddingGameState";
 import SimpleChoiceGameState from "./ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
+import getElapsedSeconds from "../utils/getElapsedSeconds";
 
 export enum NotificationType {
     READY_TO_START,
@@ -55,7 +56,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     onNewPbemResponseTime: (user: User, responseTimeInSeconds: number) => void;
     onClearChatRoom: (roomId: string) => void;
     onCaptureSentryMessage: (message: string, severity: "info" | "warning" | "error" | "fatal") => void;
-    onSaveGame: () => void;
+    onSaveGame: (updateLastActive: boolean) => void;
+
+    // Debounced saveGame so we don't spam the website client
+    saveGame: (updateLastActive: boolean) => void = _.debounce(this.privateSaveGame, 2000);
 
     publicChatRoomId: string;
     // Keys are the two users participating in the private chat.
@@ -289,7 +293,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         return user;
     }
 
-    onClientMessage(user: User, message: ClientMessage): boolean {
+    onClientMessage(user: User, message: ClientMessage): void {
         let updateLastActive = false;
         if (message.type == "change-settings") {
             user.settings = message.settings;
@@ -301,7 +305,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             });
         } else if (message.type == "change-game-settings") {
             if (!this.isOwner(user)) {
-                return false;
+                return;
             }
 
             // Only allow PBEM and Private to be changed ingame
@@ -353,7 +357,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
         this.doPlayerClocksHandling();
 
-        return updateLastActive;
+        this.saveGame(updateLastActive);
     }
 
     doPlayerClocksHandling(): void {
@@ -399,8 +403,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
                     // This user is no longer waited for
                     // Calculate new remainingSeconds and broadcast to clients
-                    const elapsedSeconds = Math.floor((new Date().getTime() - p.liveClockData.timerStartedAt.getTime()) / 1000);
-                    p.liveClockData.remainingSeconds -= elapsedSeconds;
+                    p.liveClockData.remainingSeconds -= getElapsedSeconds(p.liveClockData.timerStartedAt);
                     p.liveClockData.remainingSeconds = Math.max(0, p.liveClockData.remainingSeconds);
                     p.liveClockData.timerStartedAt = null;
 
@@ -624,9 +627,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         });
     }
 
-    saveGame(): void {
+    private privateSaveGame(updateLastActive: boolean): void {
         if (this.onSaveGame) {
-            this.onSaveGame();
+            this.onSaveGame(updateLastActive);
         }
     }
 

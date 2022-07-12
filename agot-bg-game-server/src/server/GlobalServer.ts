@@ -16,7 +16,6 @@ import serializedGameMigrations from "./serializedGameMigrations";
 import { v4 } from "uuid";
 import sleep from "../utils/sleep";
 import { compress, decompress } from "./utils/compression";
-import { MutexInterface, Mutex, withTimeout } from 'async-mutex';
 import * as Sentry from "@sentry/node"
 
 interface UserConnectionInfo {
@@ -31,7 +30,6 @@ export default class GlobalServer {
 
     websiteClient: WebsiteClient;
     loadedGames = new BetterMap<string, EntireGame>();
-    saveMutexes = new BetterMap<EntireGame, MutexInterface>();
     clientToUser: Map<WebSocket, User> = new Map<WebSocket, User>();
     clientMessageValidator: ValidateFunction;
     // The key of the outer map is the entireGameId. The key of the inner map is the socket id
@@ -63,14 +61,6 @@ export default class GlobalServer {
         }
 
         this.clientMessageValidator = new Ajv({allErrors: true}).compile(schema);
-    }
-
-    getSaveMutex(entireGame: EntireGame): MutexInterface {
-        if (!this.saveMutexes.has(entireGame)) {
-            this.saveMutexes.set(entireGame, withTimeout(new Mutex(), 60 * 1000));
-        }
-
-        return this.saveMutexes.get(entireGame);
     }
 
     async start(): Promise<void> {
@@ -180,7 +170,6 @@ export default class GlobalServer {
             // Do nothing.
         } else {
             const user = this.clientToUser.get(client);
-            let updateLastActive = false;
 
             if (!user) {
                 console.error("Client sent a message other than \"authenticate\" but is not authenticated");
@@ -218,26 +207,24 @@ export default class GlobalServer {
                         initiator: user.id
                     });
                 });
-            } else {
-                updateLastActive = entireGame.onClientMessage(user, message);
-            }
 
-            this.saveGame(entireGame, updateLastActive);
+                this.saveGame(entireGame, false);
+            } else {
+                entireGame.onClientMessage(user, message);
+            }
         }
     }
 
     async saveGame(entireGame: EntireGame, updateLastActive: boolean): Promise<void> {
-        await this.getSaveMutex(entireGame).runExclusive(async() => {
-            const state = entireGame.getStateOfGame();
-            const viewOfGame = entireGame.getViewOfGame();
-            const players = entireGame.getPlayersInGame();
-            const serializedGame = entireGame.serializeToClient(null);
-            // Assume that all game always follow the latest serializedGame version,
-            // since they have been migrated when loaded.
-            const version = this.latestSerializedGameVersion;
+        const state = entireGame.getStateOfGame();
+        const viewOfGame = entireGame.getViewOfGame();
+        const players = entireGame.getPlayersInGame();
+        const serializedGame = entireGame.serializeToClient(null);
+        // Assume that all game always follow the latest serializedGame version,
+        // since they have been migrated when loaded.
+        const version = this.latestSerializedGameVersion;
 
-            await this.websiteClient.saveGame(entireGame.id, serializedGame, viewOfGame, players, state, version, updateLastActive);
-        });
+        await this.websiteClient.saveGame(entireGame.id, serializedGame, viewOfGame, players, state, version, updateLastActive);
     }
 
     restartLiveClockTimers(entireGame: EntireGame): void {
@@ -293,7 +280,7 @@ export default class GlobalServer {
         entireGame.onNewPbemResponseTime = (user, responseTimeInSeconds) => this.onNewPbemResponseTime(user, responseTimeInSeconds);
         entireGame.onClearChatRoom = (roomId) => this.onClearChatRoom(roomId);
         entireGame.onCaptureSentryMessage = (message, severity) => this.onCaptureSentryMessage(`${entireGame.id}: ${message}`, severity);
-        entireGame.onSaveGame = () => this.saveGame(entireGame, false);
+        entireGame.onSaveGame = (updateLastActive: boolean) => this.saveGame(entireGame, updateLastActive);
 
         // Set the connection status of all users to false
         entireGame.users.values.forEach(u => u.connected = false);

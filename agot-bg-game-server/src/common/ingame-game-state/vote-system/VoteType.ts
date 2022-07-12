@@ -8,6 +8,7 @@ import BetterMap from "../../../utils/BetterMap";
 import PlaceOrdersGameState from "../planning-game-state/place-orders-game-state/PlaceOrdersGameState";
 import Region from "../game-data-structure/Region";
 import Order from "../game-data-structure/Order";
+import getElapsedSeconds from "../../../utils/getElapsedSeconds";
 
 export type SerializedVoteType = SerializedCancelGame | SerializedEndGame
     | SerializedReplacePlayer | SerializedReplacePlayerByVassal | SerializedReplaceVassalByPlayer
@@ -132,7 +133,7 @@ export class ResumeGame extends VoteType {
             throw new Error("Game must be paused here");
         }
 
-        const pauseTimeInSeconds = Math.floor((new Date().getTime() - ingame.game.paused.getTime()) / 1000);
+        const pauseTimeInSeconds = getElapsedSeconds(ingame.game.paused);
         ingame.game.paused = null;
         ingame.log({
             type: "game-resumed",
