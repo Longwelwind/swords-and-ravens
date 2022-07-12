@@ -3,6 +3,7 @@ import User from "../../server/User";
 import IngameGameState from "./IngameGameState";
 import { VoteState } from "./vote-system/Vote";
 import { observable } from "mobx";
+import getElapsedSeconds from "../../utils/getElapsedSeconds";
 
 export default class Player {
     user: User;
@@ -21,8 +22,7 @@ export default class Player {
 
         let total = this.liveClockData.remainingSeconds;
         if (this.liveClockData.timerStartedAt) {
-            const elapsedSeconds = Math.floor((new Date().getTime() - this.liveClockData.timerStartedAt.getTime()) / 1000);
-            total -= elapsedSeconds;
+            total -= getElapsedSeconds(this.liveClockData.timerStartedAt);
             total = Math.max(0, total);
         }
 
@@ -60,7 +60,7 @@ export default class Player {
             return;
         }
 
-        const responseTimeInSeconds = Math.floor((new Date().getTime() - this.waitedForData.date.getTime()) / 1000);
+        const responseTimeInSeconds = getElapsedSeconds(this.waitedForData.date);
 
         // Send value if user was not reactivated again (and probably is still online to do his move immediately)
         // or if his responseTime is greater than 5 mintes (thus meaning he decided to wait for the decision)

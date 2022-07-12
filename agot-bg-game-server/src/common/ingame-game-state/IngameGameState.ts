@@ -649,7 +649,7 @@ export default class IngameGameState extends GameState<
             }
 
             this.replacePlayerByVassal(player);
-            this.entireGame.saveGame();
+            this.entireGame.saveGame(false);
         } catch (e) {
             const message = typeof e === "string"
                 ? e
