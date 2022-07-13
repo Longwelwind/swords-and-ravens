@@ -29,6 +29,7 @@ import { secondsToString } from "./utils/secondsToString";
 import introSound from "../../public/sounds/game-of-thrones-intro.ogg";
 import fadeOutAudioById from "./utils/fadeOutAudio";
 import CombatGameState from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
+import { GameResumed } from "../common/ingame-game-state/game-data-structure/GameLog";
 
 interface EntireGameComponentProps {
     entireGame: EntireGame;
@@ -76,7 +77,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     {this.renderGameTypeBadge()}
                     {this.renderMapSwitch()}
                     {this.renderWarnings()}
-                    {this.rerender >= 0 && this.renderGameDuration()}
+                    {this.rerender >= 0 && this.renderClock()}
                 </Row>
             </Col>
             {
@@ -183,20 +184,30 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         </>;
     }
 
-    renderGameDuration(): ReactNode {
+    renderClock(): ReactNode {
         if (this.ingame) {
-            let gameDuration: string | null = null;
-            const firstLog = _.first(this.props.entireGame.ingameGameState?.gameLogManager.logs ?? []);
+            let totalPlayingTime: string | null = null;
+            const gameLogManager = this.props.entireGame.ingameGameState?.gameLogManager;
+            const firstLog = _.first(gameLogManager?.logs ?? []);
 
             if (firstLog) {
-                const lastTimeStamp = this.isGameEnded ?
-                    _.last(this.props.entireGame.ingameGameState?.gameLogManager.logs ?? [])?.time ?? new Date()
-                    : new Date();
+                const lastTimeStamp = this.ingame.game.paused
+                    ? this.ingame.game.paused
+                    : this.isGameEnded
+                        ? _.last(gameLogManager?.logs ?? [])?.time ?? new Date()
+                        : new Date();
 
-                gameDuration = secondsToString(this.getTotalElapsedSeconds(firstLog.time, lastTimeStamp));
+                // Remove pause times:
+                const totalPauseTime = _.sum(gameLogManager?.logs.filter(l => l.data.type == "game-resumed")
+                    .map(l => (l.data as GameResumed).pauseTimeInSeconds));
+
+                let elapsed = this.getTotalElapsedSeconds(firstLog.time, lastTimeStamp);
+                elapsed -= totalPauseTime;
+
+                totalPlayingTime = secondsToString(elapsed);
             }
 
-            return gameDuration && <Col xs="auto">
+            return totalPlayingTime && <Col xs="auto">
                 <OverlayTrigger
                     placement="bottom"
                     overlay={
@@ -205,7 +216,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                         </Tooltip>}
                     popperConfig={{ modifiers: [preventOverflow] }}
                 >
-                    <h4><Badge variant="secondary">{gameDuration}</Badge></h4>
+                    <h4><Badge variant="secondary">{totalPlayingTime}</Badge></h4>
                 </OverlayTrigger>
             </Col>;
         } else if (this.lobby) {
