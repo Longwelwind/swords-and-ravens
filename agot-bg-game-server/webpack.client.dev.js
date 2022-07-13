@@ -9,7 +9,9 @@ module.exports = (env, argv) => {
         output: {
             path: __dirname + "/dist/",
             filename: "bundle.[contenthash].js",
-            publicPath: ASSET_PATH
+            publicPath: ASSET_PATH,
+            pathinfo: false,
+            hashFunction: "xxhash64",
         },
         entry: "./src/client/client.tsx",
         target: "web",
@@ -42,7 +44,8 @@ module.exports = (env, argv) => {
                     test: /\.(ico)$/i,
                     use: 'file-loader'
                 },
-            ]
+            ],
+            unsafeCache: true,
         },
         resolve: {
             extensions: [".tsx", ".ts", ".js"],
@@ -52,7 +55,7 @@ module.exports = (env, argv) => {
             fallback: {
                 "crypto": false,
                 "stream": require.resolve("stream-browserify")
-            }
+            },
         },
         plugins: [
             new HtmlWebpackPlugin({
@@ -64,7 +67,7 @@ module.exports = (env, argv) => {
             }),
             new webpack.ProvidePlugin({
                 process: 'process/browser',
-            })
+            }),
         ],
         optimization: {
             minimizer: [
@@ -75,7 +78,17 @@ module.exports = (env, argv) => {
                         }
                     }
                 })
-            ]
+            ],
+            sideEffects: false,
+            providedExports: false,
+            usedExports: false,
+            innerGraph: false,
+            mergeDuplicateChunks: false,
+            removeEmptyChunks: false,
+        },
+        cache: {
+            type: 'filesystem',
+            compression: 'gzip',
         }
     };
 };

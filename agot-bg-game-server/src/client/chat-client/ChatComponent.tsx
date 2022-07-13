@@ -11,7 +11,7 @@ import ChatClient, {Channel, Message} from "./ChatClient";
 import EntireGame from "../../common/EntireGame";
 // @ts-expect-error Somehow ts complains that this module cannot be found while it is
 import ScrollToBottom from "react-scroll-to-bottom";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Alert, OverlayTrigger, Tooltip } from "react-bootstrap";
 import User from "../../server/User";
 import { preventOverflow } from "@popperjs/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -104,6 +104,12 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                         </>
                     ))}
                 </ScrollToBottom>
+                {!this.channel.connected &&
+                <Row noGutters={true} className="flex-nowrap justify-content-center">
+                    <Alert variant="danger" >
+                        This chat stopped working. Please reload!
+                    </Alert>
+                </Row>}
                 <div>
                     <Form>
                         <Row>

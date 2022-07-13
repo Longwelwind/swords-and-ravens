@@ -7,9 +7,7 @@ module.exports = (env, argv) => {
         output: {
             path: __dirname + "/dist/",
             filename: "bundle.[contenthash].js",
-            publicPath: "/static/",
-            pathinfo: false,
-            hashFunction: "xxhash64",
+            publicPath: "/static/"
         },
         entry: "./src/client/client.tsx",
         target: "web",
@@ -42,8 +40,7 @@ module.exports = (env, argv) => {
                     test: /\.(ico)$/i,
                     use: 'file-loader'
                 },
-            ],
-            unsafeCache: true,
+            ]
         },
         resolve: {
             extensions: [".tsx", ".ts", ".js"],
@@ -76,17 +73,7 @@ module.exports = (env, argv) => {
                         }
                     }
                 })
-            ],
-            sideEffects: false,
-            providedExports: false,
-            usedExports: false,
-            innerGraph: false,
-            mergeDuplicateChunks: false,
-            removeEmptyChunks: false,
-        },
-        cache: {
-            type: 'filesystem',
-            compression: 'gzip',
+            ]
         },
         devServer: {
             proxy: {
