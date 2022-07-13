@@ -7,6 +7,8 @@ import ListGroupItem from "react-bootstrap/ListGroupItem";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import crownImage from "../../../public/images/icons/crown.svg";
+import introSound from "../../../public/sounds/game-of-thrones-intro.ogg";
+import fadeOutAudioById from "../utils/fadeOutAudio";
 
 @observer
 export default class GameEndedComponent extends Component<GameStateComponentProps<GameEndedGameState>> {
@@ -31,7 +33,12 @@ export default class GameEndedComponent extends Component<GameStateComponentProp
                         </Row>
                     </Col>
                 </Row>
+                {!this.props.gameClient.muted && <audio id="game-ended-sound" src={introSound} autoPlay />}
             </ListGroupItem>
         );
+    }
+
+    componentDidMount(): void {
+        fadeOutAudioById("game-ended-sound");
     }
 }
