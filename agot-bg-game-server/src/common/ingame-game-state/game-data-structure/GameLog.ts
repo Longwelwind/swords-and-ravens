@@ -1118,4 +1118,5 @@ interface GamePaused {
 export interface GameResumed {
     type: "game-resumed";
     pauseTimeInSeconds: number;
+    autoResumed: boolean;
 }

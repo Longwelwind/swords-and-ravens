@@ -17,6 +17,7 @@ import { v4 } from "uuid";
 import sleep from "../utils/sleep";
 import { compress, decompress } from "./utils/compression";
 import * as Sentry from "@sentry/node"
+import { getTimeDeltaInSeconds } from "../utils/getElapsedSeconds";
 
 interface UserConnectionInfo {
     userId: string;
@@ -228,15 +229,30 @@ export default class GlobalServer {
     }
 
     restartLiveClockTimers(entireGame: EntireGame): void {
-        if (!entireGame.gameSettings.onlyLive || !entireGame.ingameGameState || entireGame.ingameGameState.game.paused) {
+        if (!entireGame.gameSettings.onlyLive || !entireGame.ingameGameState) {
             return;
         }
 
-        entireGame.ingameGameState.players.values.forEach(p => {
+        const ingame = entireGame.ingameGameState;
+
+        if (ingame.game.willBeAutoResumedAt) {
+            const remainingSeconds = getTimeDeltaInSeconds(ingame.game.willBeAutoResumedAt, new Date());
+            if (remainingSeconds > 0) {
+                // Pause still ongoing, set a new timer
+                ingame.autoResumeTimeout = setTimeout(() => { ingame.resumeGame(); }, remainingSeconds * 1000);
+                ingame.game.willBeAutoResumedAt = new Date();
+                ingame.game.willBeAutoResumedAt.setSeconds(ingame.game.willBeAutoResumedAt.getSeconds() + remainingSeconds);
+            } else {
+                // Pause ended already, resume this game
+                ingame.resumeGame();
+            }
+        }
+
+        ingame.players.values.forEach(p => {
             const totalRemaining = p.totalRemainingSeconds;
             if (totalRemaining != null && p.liveClockData?.timerStartedAt) {
                 p.liveClockData.remainingSeconds = totalRemaining;
-                p.liveClockData.serverTimer = setTimeout(() => entireGame.ingameGameState?.onPlayerClockTimeout(p), totalRemaining * 1000);
+                p.liveClockData.serverTimer = setTimeout(() => ingame.onPlayerClockTimeout(p), totalRemaining * 1000);
                 p.liveClockData.timerStartedAt = new Date();
             }
         });

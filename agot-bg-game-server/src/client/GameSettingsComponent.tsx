@@ -93,6 +93,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                                 The last remaining player immediately wins the game.<br/>
                                                 All player clocks can be extended once for 15 minutes by vote. After 2 failed voting attempts,<br/>
                                                 no further voting can be initiated.<br/>
+                                                Also, these games can be paused, but public games will automatically resume after 10 minutes.<br/>
                                                 In addition, the owner of the game will not be able to switch to PBEM in-game,<br/>
                                                 and the number of positive votes required to replace a player is reduced to 3<br/>
                                                 to make it easier to address quitters.
@@ -103,7 +104,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.onlyLive = !this.gameSettings.onlyLive)}
                                 />
                             )}
-                            {this.gameSettings.onlyLive &&
+                            {this.gameSettings.onlyLive && !(this.props.entireGame.childGameState instanceof IngameGameState) &&
                             <div>
                                 <select id="initial-live-clock" name="initialLiveClock"
                                     value={this.gameSettings.initialLiveClock}
@@ -115,6 +116,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     <option key="120" value={120}>120</option>
                                 </select>&nbsp;min
                             </div>}
+                            {!(this.props.entireGame.childGameState instanceof IngameGameState) &&
                             <FormCheck
                                 id="private-game-setting"
                                 className="mx-3 mt-2"
@@ -129,7 +131,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     </OverlayTrigger>}
                                 checked={this.gameSettings.private}
                                 onChange={() => this.changeGameSettings(() => this.gameSettings.private = !this.gameSettings.private)}
-                            />
+                            />}
                         </Col>
                     </Row>
                 </Row>

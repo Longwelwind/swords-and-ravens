@@ -56,6 +56,7 @@ export default class Game {
     ironBank: IronBank | null;
     @observable objectiveDeck: ObjectiveCard[] = [];
     @observable paused: Date | null;
+    @observable willBeAutoResumedAt: Date | null;
 
     /**
      * Contains the vassal relations of the game.
@@ -557,7 +558,8 @@ export default class Game {
             ironBank: this.ironBank ? this.ironBank.serializeToClient(admin) : null,
             objectiveDeck: admin ? this.objectiveDeck.map(oc => oc.id) : [],
             usurper: this.usurper ? this.usurper.id : null,
-            paused: this.paused ? this.paused.getTime() : null
+            paused: this.paused ? this.paused.getTime() : null,
+            willBeAutoResumedAt: this.willBeAutoResumedAt ? this.willBeAutoResumedAt.getTime() : null
         };
     }
 
@@ -594,6 +596,7 @@ export default class Game {
         game.objectiveDeck = data.objectiveDeck.map(ocid => objectiveCards.get(ocid));
         game.usurper = data.usurper ? game.houses.get(data.usurper) : null;
         game.paused = data.paused ? new Date(data.paused) : null;
+        game.willBeAutoResumedAt = data.willBeAutoResumedAt ? new Date(data.willBeAutoResumedAt) : null;
 
         return game;
     }
@@ -628,4 +631,5 @@ export interface SerializedGame {
     objectiveDeck: string[];
     usurper: string | null;
     paused: number | null;
+    willBeAutoResumedAt: number | null;
 }

@@ -30,6 +30,7 @@ import introSound from "../../public/sounds/game-of-thrones-intro.ogg";
 import fadeOutAudioById from "./utils/fadeOutAudio";
 import CombatGameState from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import { GameResumed } from "../common/ingame-game-state/game-data-structure/GameLog";
+import { getTimeDeltaInSeconds } from "../utils/getElapsedSeconds";
 
 interface EntireGameComponentProps {
     entireGame: EntireGame;
@@ -185,7 +186,23 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     renderClock(): ReactNode {
-        if (this.ingame) {
+        if (this.ingame?.game.willBeAutoResumedAt) {
+            // Show a 10 minutes countdown
+            const countdown = secondsToString(getTimeDeltaInSeconds(this.ingame?.game.willBeAutoResumedAt, new Date()), true);
+
+            return <Col xs="auto">
+                <OverlayTrigger
+                    placement="bottom"
+                    overlay={
+                        <Tooltip id="game-resumes-tooltip">
+                            <b>Countdown until game resumes</b>
+                        </Tooltip>}
+                    popperConfig={{ modifiers: [preventOverflow] }}
+                >
+                    <h4><Badge variant="secondary">{countdown}</Badge></h4>
+                </OverlayTrigger>
+            </Col>;
+        } else if (this.ingame) {
             let totalPlayingTime: string | null = null;
             const gameLogManager = this.props.entireGame.ingameGameState?.gameLogManager;
             const firstLog = _.first(gameLogManager?.logs ?? []);
@@ -201,7 +218,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 const totalPauseTime = _.sum(gameLogManager?.logs.filter(l => l.data.type == "game-resumed")
                     .map(l => (l.data as GameResumed).pauseTimeInSeconds));
 
-                let elapsed = this.getTotalElapsedSeconds(firstLog.time, lastTimeStamp);
+                let elapsed = getTimeDeltaInSeconds(lastTimeStamp, firstLog.time);
                 elapsed -= totalPauseTime;
 
                 totalPlayingTime = secondsToString(elapsed);
@@ -269,10 +286,6 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         const user = this.props.gameClient.authenticatedUser;
         user.settings.showMapWhenDrafting = this.showMapWhenDrafting;
         user.syncSettings();
-    }
-
-    getTotalElapsedSeconds(begin: Date, end: Date): number {
-        return Math.floor((end.getTime() - begin.getTime()) / 1000);
     }
 
     forceClockRerender(): void {

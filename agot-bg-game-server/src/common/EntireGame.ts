@@ -339,8 +339,6 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 settings.onlyLive = false;
             }
 
-            this.gameSettings.private = message.settings.private;
-
             // For changing settings other than PBEM or Private pass the message to the client game state
             this.childGameState.onClientMessage(user, message);
 

@@ -488,6 +488,7 @@ interface LaterHouseCardsApplied {
 
 interface GamePaused {
     type: "game-paused";
+    willBeAutoResumedAt: number | null;
 }
 
 interface GameResumed {
