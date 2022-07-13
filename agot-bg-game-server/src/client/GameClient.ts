@@ -31,7 +31,7 @@ export default class GameClient {
     @observable entireGame: EntireGame | null = null;
 
     @observable authenticated = false;
-    @observable authenticatedUser: User | null = null
+    @observable authenticatedUser: User | null = null;
     chatClient: ChatClient = new ChatClient(this);
 
     get muted(): boolean {
@@ -53,7 +53,7 @@ export default class GameClient {
 
     authData: AuthData;
 
-    pingInterval: any;
+    pingInterval: number;
 
     get authenticatedPlayer(): Player | null {
         if (!this.authenticatedUser) {
@@ -88,8 +88,7 @@ export default class GameClient {
         this.socket.onopen = () => {
             // Heroku timeouts a WebSocket connection after 55 seconds of inactivity.
             // To prevent this, the client sends a ping regurarly
-            this.pingInterval = setInterval(() => this.send({type: "ping"}), 30000);
-
+            this.pingInterval = window.setInterval(() => this.send({type: "ping"}), 30 * 1000);
             this.onOpen();
         };
         this.socket.onerror = () => {
@@ -99,7 +98,7 @@ export default class GameClient {
             this.onMessage(data.data as string);
         };
         this.socket.onclose = () => {
-            clearInterval(this.pingInterval);
+            window.clearInterval(this.pingInterval);
             this.onClose();
         }
     }

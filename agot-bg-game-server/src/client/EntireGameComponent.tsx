@@ -26,6 +26,9 @@ import { faExclamation, faLock } from "@fortawesome/free-solid-svg-icons";
 import _ from "lodash";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
 import { secondsToString } from "./utils/secondsToString";
+import introSound from "../../public/sounds/game-of-thrones-intro.ogg";
+import fadeOutAudioById from "./utils/fadeOutAudio";
+import CombatGameState from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 
 interface EntireGameComponentProps {
     entireGame: EntireGame;
@@ -50,6 +53,10 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     get isGameEnded(): boolean {
         return this.props.entireGame.leafState instanceof CancelledGameState ||
             this.props.entireGame.leafState instanceof GameEndedGameState;
+    }
+
+    get isInCombat (): boolean {
+        return this.props.entireGame.hasChildGameState(CombatGameState);
     }
 
     render(): ReactNode {
@@ -81,6 +88,8 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     <CancelledComponent gameClient={this.props.gameClient} gameState={this.props.entireGame.childGameState} />
                 )
             }
+            {!this.props.gameClient.muted && !this.isGameEnded && !this.isInCombat &&
+            <audio id="welcome-sound" src={introSound} autoPlay />}
         </>;
     }
 
@@ -255,7 +264,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         return Math.floor((end.getTime() - begin.getTime()) / 1000);
     }
 
-    forceRerender(): void {
+    forceClockRerender(): void {
         if (this.rerender > 0) {
             this.rerender--;
         } else {
@@ -272,7 +281,8 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         }
 
         if (!this.isGameEnded) {
-            this.setIntervalId = window.setInterval(() => this.forceRerender(), 1000);
+            this.setIntervalId = window.setInterval(() => this.forceClockRerender(), 1000);
+            fadeOutAudioById("welcome-sound");
         }
     }
 
