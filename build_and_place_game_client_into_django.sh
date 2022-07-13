@@ -16,7 +16,7 @@
 echo "---> Building the game client"
 cd agot-bg-game-server
 yarn install
-yarn run build-client
+yarn run build-local-client
 
 echo "---> Placing the static files of the game client into Django's static file folder"
 cd ../

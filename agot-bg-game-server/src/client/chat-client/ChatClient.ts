@@ -46,6 +46,10 @@ export class Channel {
     onMessage: ((singleMessageRetrieved: boolean, noMoreMessages: boolean) => void) | null;
 
     get areThereUnreadMessages(): boolean {
+        if (!this.connected) {
+            return true;
+        }
+
         if (this.messages.length == 0) {
             return false;
         }

@@ -95,8 +95,6 @@ To launch the 2 components and make them inter-connected, make sure the dependen
 
 Replace the environment configuration of the game-server with a live one: `cp .env.dev.live .env`.
 
-Replace the webpack configuration of the game-server with a live one: `cp webpack.client.js.live webpack.client.js`.
-
 The front-end of the game server must be built and placed in the website. This can be done by executing `./build_and_place_game_client_into_django.sh`.
 
 You can now run the game server and the website by launching, in 2 two different terminals:
