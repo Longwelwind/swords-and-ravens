@@ -27,7 +27,7 @@ import _ from "lodash";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
 import { secondsToString } from "./utils/secondsToString";
 import introSound from "../../public/sounds/game-of-thrones-intro.ogg";
-import fadeOutAudioById from "./utils/fadeOutAudio";
+import fadeOutAudio from "./utils/fadeOutAudio";
 import CombatGameState from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import { GameResumed } from "../common/ingame-game-state/game-data-structure/GameLog";
 import { getTimeDeltaInSeconds } from "../utils/getElapsedSeconds";
@@ -41,6 +41,7 @@ interface EntireGameComponentProps {
 export default class EntireGameComponent extends Component<EntireGameComponentProps> {
     @observable showMapWhenDrafting = false;
     @observable rerender = 0;
+    @observable welcomeSoundPlayed = false;
 
     setIntervalId = -1;
 
@@ -90,7 +91,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     <CancelledComponent gameClient={this.props.gameClient} gameState={this.props.entireGame.childGameState} />
                 )
             }
-            {!this.props.gameClient.musicMuted && !this.isGameEnded && !this.isInCombat &&
+            {!this.welcomeSoundPlayed && !this.props.gameClient.musicMuted && !this.isGameEnded && !this.isInCombat &&
             <audio id="welcome-sound" src={introSound} autoPlay preload="metadata" />}
         </>;
     }
@@ -304,9 +305,20 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             this.showMapWhenDrafting = this.props.gameClient.authenticatedUser.settings.showMapWhenDrafting;
         }
 
-        if (!this.isGameEnded) {
-            this.setIntervalId = window.setInterval(() => this.forceClockRerender(), 1000);
-            fadeOutAudioById("welcome-sound");
+        if (this.isGameEnded) {
+            this.welcomeSoundPlayed = true;
+            return;
+        }
+
+        this.setIntervalId = window.setInterval(() => this.forceClockRerender(), 1000);
+
+        const audio = document.getElementById("welcome-sound") as HTMLAudioElement;
+        if (!audio) {
+            // set it to played when it's not part of the state tree
+            this.welcomeSoundPlayed = true;
+        } else {
+            audio.onended = () => this.welcomeSoundPlayed = true;
+            fadeOutAudio(audio);
         }
     }
 

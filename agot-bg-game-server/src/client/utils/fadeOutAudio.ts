@@ -1,6 +1,4 @@
-export default function fadeOutAudioById (audioId: string): void {
-    const sound = document.getElementById(audioId) as HTMLAudioElement;
-
+export default function fadeOutAudio (sound?: HTMLAudioElement): void {
     if (!sound) {
         return;
     }
