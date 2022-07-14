@@ -145,7 +145,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                     [CancelHouseCardAbilitiesGameState, CancelHouseCardAbilitiesComponent],
                     [BeforeCombatHouseCardAbilitiesGameState, BeforeCombatHouseCardAbilitiesComponent]
                 ])}
-                {!this.props.gameClient.muted && <audio id="combat-sound" src={combatSound} autoPlay />}
+                {!this.props.gameClient.musicMuted && <audio id="combat-sound" src={combatSound} autoPlay preload="metadata"/>}
             </>
         );
     }

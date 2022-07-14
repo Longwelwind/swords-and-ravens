@@ -184,6 +184,7 @@ export interface UserSettings {
     tracksColumnCollapsed: boolean;
     showMapWhenDrafting: boolean;
     dontShowMapScrollbarInfoAgain: boolean;
+    musicMuted: boolean;
 }
 
 export interface ChangeGameSettings {

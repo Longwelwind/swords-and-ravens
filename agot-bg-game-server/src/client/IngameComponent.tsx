@@ -39,8 +39,9 @@ import diamondHiltUsedImage from "../../public/images/icons/diamond-hilt-used.sv
 import hourglassImage from "../../public/images/icons/hourglass.svg";
 import mammothImage from "../../public/images/icons/mammoth.svg";
 import spikedDragonHeadImage from "../../public/images/icons/spiked-dragon-head.svg";
-import speakerImage from "../../public/images/icons/speaker.svg";
+import megaphoneImage from "../../public/images/icons/megaphone.svg";
 import speakerOffImage from "../../public/images/icons/speaker-off.svg";
+import musicalNotesImage from "../../public/images/icons/musical-notes.svg";
 import cardRandomImage from "../../public/images/icons/card-random.svg";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import GameLogListComponent from "./GameLogListComponent";
@@ -411,12 +412,27 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 overlay={
                                     <Tooltip id="mute-tooltip">
                                         {this.props.gameClient.muted
-                                            ? "Unmute"
-                                            : "Mute"}
+                                            ? "Unmute notifications"
+                                            : "Mute notifications"}
                                     </Tooltip>
                                 }
                             >
-                                <img src={this.props.gameClient.muted ? speakerOffImage : speakerImage} width={32} />
+                                <img src={this.props.gameClient.muted ? speakerOffImage : megaphoneImage} width={32} />
+                            </OverlayTrigger>
+                        </button>
+                    </Col>
+                    <Col xs="auto">
+                        <button className="btn btn-outline-light btn-sm" onClick={() => this.props.gameClient.musicMuted = !this.props.gameClient.musicMuted}>
+                            <OverlayTrigger
+                                overlay={
+                                    <Tooltip id="mute-tooltip">
+                                        {this.props.gameClient.musicMuted
+                                            ? "Unmute music"
+                                            : "Mute music"}
+                                    </Tooltip>
+                                }
+                            >
+                                <img src={this.props.gameClient.musicMuted ? speakerOffImage : musicalNotesImage} width={32} />
                             </OverlayTrigger>
                         </button>
                     </Col>

@@ -33,7 +33,7 @@ export default class GameEndedComponent extends Component<GameStateComponentProp
                         </Row>
                     </Col>
                 </Row>
-                {!this.props.gameClient.muted && <audio id="game-ended-sound" src={introSound} autoPlay />}
+                {!this.props.gameClient.musicMuted && <audio id="game-ended-sound" src={introSound} autoPlay preload="metadata"/>}
             </ListGroupItem>
         );
     }
