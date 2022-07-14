@@ -88,8 +88,8 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     <CancelledComponent gameClient={this.props.gameClient} gameState={this.props.entireGame.childGameState} />
                 )
             }
-            {!this.props.gameClient.muted && !this.isGameEnded && !this.isInCombat &&
-            <audio id="welcome-sound" src={introSound} autoPlay />}
+            {!this.props.gameClient.musicMuted && !this.isGameEnded && !this.isInCombat &&
+            <audio id="welcome-sound" src={introSound} autoPlay preload="metadata" />}
         </>;
     }
 

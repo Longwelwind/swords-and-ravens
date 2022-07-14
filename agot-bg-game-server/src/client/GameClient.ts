@@ -51,6 +51,23 @@ export default class GameClient {
         this.authenticatedUser.syncSettings();
     }
 
+    get musicMuted(): boolean {
+        if (!this.authenticatedUser) {
+            throw new Error("Game client must have an authenticated user");
+        }
+
+        return this.authenticatedUser.settings.musicMuted;
+    }
+
+    set musicMuted(value: boolean) {
+        if (!this.authenticatedUser) {
+            throw new Error("Game client must have an authenticated user");
+        }
+
+        this.authenticatedUser.settings.musicMuted = value;
+        this.authenticatedUser.syncSettings();
+    }
+
     authData: AuthData;
 
     pingInterval: number;
