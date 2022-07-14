@@ -62,17 +62,20 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
             return [h, houseCards];
         }));
 
-        // In case users just have one house card it can be selected automatically
-        if (this.canAutomaticallyChooseLastHouseCard(this.combatGameState.attacker) &&
-            this.canAutomaticallyChooseLastHouseCard(this.combatGameState.defender) &&
-            !this.entireGame.gameSettings.pbem) {
-            // We have to stop during live games here and let the last cards be confirmed by all combatants
-            // to force all clients to update their tree to CombatGameState. Otherwise it might happen, that CombatGameState
-            // is completely fast-tracked (when VSB is not involved, no house card with special abilities is involved
-            // and casualties/retreat can be fast-tracked) and therefore the CombatInfoDialog is never
-            // displayed at the GameState panel and even worse: packets like "units-wounded" are not received by the clients
-            // which leads to desynchronization.
-            return;
+        // In case a house just has one house card left it maybe can be chosen automatically.
+        // But if the house received support or holds the unused VSB we cannot automatically choose the last card,
+        // to allow the house to refuse their granted support (e.g. due to Roose Bolton or Stannis DWD)
+        // or to burn the VSB now in this game state.
+
+        if (this.canAutomaticallyChooseLastHouseCard(this.combatGameState.attacker) && this.canAutomaticallyChooseLastHouseCard(this.combatGameState.defender)) {
+            // Both last house cards can be chosen automatically, so this game-state-will be resolved automatically.
+            // In rare cases the whole combat may be fast-tracked by the game server. This can happen when no abilities are involved,
+            // casualties can be fast-tracked (loser just has 1 unit or units are all of the same type),
+            // and retreat is fast-tracked as well (e.g. attacker retreats back to the starting reagion).
+
+            // So we will send an extra game-state-change here to force all connected clients to update their client game state tree to combat.
+            // This will ensure, that the combat dialog will be displayed at least for 5 seconds and all combat related server messages will be received
+            this.entireGame.checkGameStateChanged(true);
         }
 
         this.tryAutomaticallyChooseLastHouseCard(this.combatGameState.attacker);
@@ -301,16 +304,17 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
     private canAutomaticallyChooseLastHouseCard(house: House): boolean {
         const choosableCards = this.getChoosableCards(house);
+        if (choosableCards.length != 1) {
+            return false;
+        }
+
         const ingame = this.ingameGameState;
 
         const houseCanBurnTheVsb = !ingame.game.valyrianSteelBladeUsed &&
-            (ingame.game.valyrianSteelBladeHolder == house || ingame.getVassalsControlledByPlayer(ingame.getControllerOfHouse(ingame.game.valyrianSteelBladeHolder)).includes(house));
+            (ingame.game.valyrianSteelBladeHolder == house
+                || ingame.getVassalsControlledByPlayer(ingame.getControllerOfHouse(ingame.game.valyrianSteelBladeHolder)).includes(house));
 
-        // We can only fast-track the last house card if house received no support and house cannot burn the VSB
-        // (To allow refusing support or burning the VSB we cannot simply choose the last card automatically all the time...)
-        return choosableCards.length == 1 &&
-            !this.combatGameState.supporters.values.includes(house) &&
-            !houseCanBurnTheVsb;
+        return !this.combatGameState.supporters.values.includes(house) && !houseCanBurnTheVsb;
     }
 
     static deserializeFromServer(combatGameState: CombatGameState, data: SerializedChooseHouseCardGameState): ChooseHouseCardGameState {

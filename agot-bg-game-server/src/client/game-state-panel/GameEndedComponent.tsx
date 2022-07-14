@@ -8,7 +8,7 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import crownImage from "../../../public/images/icons/crown.svg";
 import introSound from "../../../public/sounds/game-of-thrones-intro.ogg";
-import fadeOutAudioById from "../utils/fadeOutAudio";
+import fadeOutAudio from "../utils/fadeOutAudio";
 
 @observer
 export default class GameEndedComponent extends Component<GameStateComponentProps<GameEndedGameState>> {
@@ -39,6 +39,6 @@ export default class GameEndedComponent extends Component<GameStateComponentProp
     }
 
     componentDidMount(): void {
-        fadeOutAudioById("game-ended-sound");
+        fadeOutAudio(document.getElementById("game-ended-sound") as HTMLAudioElement);
     }
 }
