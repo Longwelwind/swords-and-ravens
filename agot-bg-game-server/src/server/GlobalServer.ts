@@ -216,7 +216,7 @@ export default class GlobalServer {
         }
     }
 
-    async saveGame(entireGame: EntireGame, updateLastActive: boolean): Promise<void> {
+    saveGame(entireGame: EntireGame, updateLastActive: boolean): void {
         const state = entireGame.getStateOfGame();
         const viewOfGame = entireGame.getViewOfGame();
         const players = entireGame.getPlayersInGame();
@@ -225,7 +225,7 @@ export default class GlobalServer {
         // since they have been migrated when loaded.
         const version = this.latestSerializedGameVersion;
 
-        await this.websiteClient.saveGame(entireGame.id, serializedGame, viewOfGame, players, state, version, updateLastActive);
+        this.websiteClient.saveGame(entireGame.id, serializedGame, viewOfGame, players, state, version, updateLastActive);
     }
 
     restartLiveClockTimers(entireGame: EntireGame): void {

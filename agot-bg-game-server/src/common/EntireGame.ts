@@ -22,6 +22,7 @@ import WildlingsAttackGameState from "./ingame-game-state/westeros-game-state/wi
 import BiddingGameState from "./ingame-game-state/westeros-game-state/bidding-game-state/BiddingGameState";
 import SimpleChoiceGameState from "./ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
 import getElapsedSeconds from "../utils/getElapsedSeconds";
+import { MutexInterface, Mutex, withTimeout } from 'async-mutex';
 
 export enum NotificationType {
     READY_TO_START,
@@ -69,6 +70,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     onNewPrivateChatRoomCreated: ((roomId: string) => void) | null;
     // Client-side callback fired whenever the current GameState changes.
     onClientGameStateChange: (() => void) | null;
+    // Client-side mutex to ensure order of incoming messages
+    onServerMessageMutex: MutexInterface = withTimeout(new Mutex(), 15 * 1000);
 
     get lobbyGameState(): LobbyGameState | null {
         return this.childGameState instanceof LobbyGameState ? this.childGameState : null;
@@ -421,41 +424,43 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     async onServerMessage(message: ServerMessage): Promise<void> {
-        if (message.type == "game-state-change") {
-            // Get the GameState for whose the childGameState must change
-            const parentGameState = this.getGameStateNthLevelDown(message.level - 1);
+        await this.onServerMessageMutex.runExclusive(async () => {
+            if (message.type == "game-state-change") {
+                // Get the GameState for whose the childGameState must change
+                const parentGameState = this.getGameStateNthLevelDown(message.level - 1);
 
-            const newChildGameState = parentGameState.deserializeChildGameState(message.serializedGameState);
+                const newChildGameState = parentGameState.deserializeChildGameState(message.serializedGameState);
 
-            await this.waitBeforeChangingChildGameState(parentGameState, newChildGameState);
+                await this.waitBeforeChangingChildGameState(parentGameState, newChildGameState);
 
-            parentGameState.childGameState = newChildGameState;
+                parentGameState.childGameState = newChildGameState;
 
-            this.leafStateId = message.newLeafId;
-            if (this.onClientGameStateChange) {
-                this.onClientGameStateChange();
+                this.leafStateId = message.newLeafId;
+                if (this.onClientGameStateChange) {
+                    this.onClientGameStateChange();
+                }
+            } else if (message.type == "new-user") {
+                const user = User.deserializeFromServer(this, message.user);
+
+                this.users.set(user.id, user);
+            } else if (message.type == "settings-changed") {
+                const user = this.users.get(message.user);
+
+                user.settings = message.settings;
+            } else if (message.type == "game-settings-changed") {
+                this.gameSettings = message.settings;
+            } else if (message.type == "update-connection-status") {
+                const user = this.users.get(message.user);
+                user.connected = message.status;
+            } else if (message.type == "update-other-users-with-same-ip") {
+                const user = this.users.get(message.user);
+                user.otherUsersFromSameNetwork = message.otherUsers;
+            } else if (message.type == "hide-or-reveal-user-names") {
+                message.names.forEach(([uid, name]) => this.users.get(uid).name = name);
+            } else {
+                this.childGameState.onServerMessage(message);
             }
-        } else if (message.type == "new-user") {
-            const user = User.deserializeFromServer(this, message.user);
-
-            this.users.set(user.id, user);
-        } else if (message.type == "settings-changed") {
-            const user = this.users.get(message.user);
-
-            user.settings = message.settings;
-        } else if (message.type == "game-settings-changed") {
-            this.gameSettings = message.settings;
-        } else if (message.type == "update-connection-status") {
-            const user = this.users.get(message.user);
-            user.connected = message.status;
-        } else if (message.type == "update-other-users-with-same-ip") {
-            const user = this.users.get(message.user);
-            user.otherUsersFromSameNetwork = message.otherUsers;
-        } else if (message.type == "hide-or-reveal-user-names") {
-            message.names.forEach(([uid, name]) => this.users.get(uid).name = name);
-        } else {
-            this.childGameState.onServerMessage(message);
-        }
+        });
     }
 
     async waitBeforeChangingChildGameState(parentGameState: GameState<any, any>, newChildGameState: GameState<any, any>): Promise<void> {
