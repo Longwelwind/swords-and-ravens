@@ -712,9 +712,8 @@ export default class IngameGameState extends GameState<
                 type: "game-resumed"
             });
 
-            // Basically there is nothing more to do.
-            // entireGame.onClientMessage() will call doPlayerClocksHandling
-            // and reactivate the timers
+            this.entireGame.doPlayerClocksHandling();
+            this.entireGame.saveGame(false);
         } catch (e) {
             const message = typeof e === "string"
                 ? e
