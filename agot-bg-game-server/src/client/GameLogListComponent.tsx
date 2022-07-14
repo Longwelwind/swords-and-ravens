@@ -1903,7 +1903,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             }
             case "game-resumed": {
                 return <p>
-                    The game was resumed by vote. Pause time: {secondsToString(data.pauseTimeInSeconds, true)}
+                    The game was {data.autoResumed ? "automatically resumed" : "resumed by vote"}. Pause time: {secondsToString(data.pauseTimeInSeconds, true)}
                 </p>;
             }
         }

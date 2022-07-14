@@ -8,7 +8,6 @@ import BetterMap from "../../../utils/BetterMap";
 import PlaceOrdersGameState from "../planning-game-state/place-orders-game-state/PlaceOrdersGameState";
 import Region from "../game-data-structure/Region";
 import Order from "../game-data-structure/Order";
-import getElapsedSeconds from "../../../utils/getElapsedSeconds";
 
 export type SerializedVoteType = SerializedCancelGame | SerializedEndGame
     | SerializedReplacePlayer | SerializedReplacePlayerByVassal | SerializedReplaceVassalByPlayer
@@ -74,12 +73,6 @@ export class PauseGame extends VoteType {
         const ingame = vote.ingame;
 
         ingame.game.paused = new Date();
-        ingame.log({
-            type: "game-paused"
-        });
-        ingame.entireGame.broadcastToClients({
-            type: "game-paused"
-        });
 
         ingame.players.forEach(p => {
             if (!p.liveClockData) {
@@ -103,6 +96,21 @@ export class PauseGame extends VoteType {
                     userId: p.user.id
                 });
             }
+        });
+
+        if (!ingame.entireGame.gameSettings.private) {
+            // Start a timer to auto resume
+            const tenMinutesInMs = 10 * 60 * 1000;
+            ingame.autoResumeTimeout = setTimeout(() => { ingame.resumeGame(); }, tenMinutesInMs);
+            ingame.game.willBeAutoResumedAt = new Date(new Date().getTime() + tenMinutesInMs);
+        }
+
+        ingame.log({
+            type: "game-paused"
+        });
+        ingame.entireGame.broadcastToClients({
+            type: "game-paused",
+            willBeAutoResumedAt: ingame.game.willBeAutoResumedAt ? ingame.game.willBeAutoResumedAt.getTime() : null
         });
     }
 
@@ -129,23 +137,13 @@ export class ResumeGame extends VoteType {
     executeAccepted(vote: Vote): void {
         const ingame = vote.ingame;
 
-        if (!ingame.game.paused) {
-            throw new Error("Game must be paused here");
+        // Reset a possible running resume timer
+        if (ingame.autoResumeTimeout) {
+            clearTimeout(ingame.autoResumeTimeout);
+            ingame.autoResumeTimeout = null;
         }
 
-        const pauseTimeInSeconds = getElapsedSeconds(ingame.game.paused);
-        ingame.game.paused = null;
-        ingame.log({
-            type: "game-resumed",
-            pauseTimeInSeconds: pauseTimeInSeconds
-        });
-        ingame.entireGame.broadcastToClients({
-            type: "game-resumed"
-        });
-
-        // Basically there is nothing more to do.
-        // entireGame.onClientMessage() will call doPlayerClocksHandling
-        // and reactivate the timers
+        ingame.resumeGame(true);
     }
 
     serializeToClient(): SerializedResumeGame {

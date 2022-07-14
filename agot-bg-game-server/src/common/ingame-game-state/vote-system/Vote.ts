@@ -1,12 +1,13 @@
 import User from "../../../server/User";
 import BetterMap from "../../../utils/BetterMap";
-import VoteType, { ReplaceVassalByPlayer, SerializedVoteType } from "./VoteType";
+import VoteType, { ReplaceVassalByPlayer, ResumeGame, SerializedVoteType } from "./VoteType";
 import IngameGameState from "../IngameGameState";
 import { observable } from "mobx";
 import House from "../game-data-structure/House";
 import Player from "../Player";
 import CombatGameState from "../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import ClaimVassalsGameState from "../planning-game-state/claim-vassals-game-state/ClaimVassalsGameState";
+import { getTimeDeltaInSeconds } from "../../../utils/getElapsedSeconds";
 
 export enum VoteState {
     ONGOING,
@@ -55,6 +56,12 @@ export default class Vote {
 
             if (this.ingame.hasChildGameState(ClaimVassalsGameState)) {
                 return { result: false, reason: "ongoing-claim-vassals" };
+            }
+        }
+
+        if (this.type instanceof ResumeGame && this.ingame.game.willBeAutoResumedAt) {
+            if (getTimeDeltaInSeconds(this.ingame.game.willBeAutoResumedAt, new Date()) <= 5) {
+                return { result: false, reason: "wait-for-auto-resume" };
             }
         }
 

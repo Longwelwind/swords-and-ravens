@@ -43,6 +43,7 @@ import ChooseInitialObjectivesGameState, { SerializedChooseInitialObjectivesGame
 import facelessMenNames from "../../../data/facelessMenNames.json";
 import sleep from "../../utils/sleep";
 import WildlingCardEffectInTurnOrderGameState from "./westeros-game-state/wildlings-attack-game-state/WildlingCardEffectInTurnOrderGameState";
+import getElapsedSeconds from "../../utils/getElapsedSeconds";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -56,6 +57,8 @@ export default class IngameGameState extends GameState<
     game: Game;
     gameLogManager: GameLogManager = new GameLogManager(this);
     votes: BetterMap<string, Vote> = new BetterMap();
+
+    autoResumeTimeout: NodeJS.Timeout | null = null;
 
     // Client-side only
     @observable rerender = 0;
@@ -656,6 +659,7 @@ export default class IngameGameState extends GameState<
                 : e instanceof Error
                     ? e.message
                     : "Unknown error in onPlayerClockTimeout";
+            console.error(message);
             this.entireGame.onCaptureSentryMessage(`onPlayerClockTimeout failed for user ${player.user.name} (${player.user.id}): ${message}`, "fatal");
         } finally {
             this.entireGame.checkGameStateChanged();
@@ -681,6 +685,45 @@ export default class IngameGameState extends GameState<
             remainingSeconds: 0,
             userId: player.user.id
         });
+    }
+
+    resumeGame(byVote = false): void {
+        try {
+            if (!this.game.paused) {
+                throw new Error("Game must be paused here");
+            }
+
+            const pauseTimeInSeconds = getElapsedSeconds(this.game.paused);
+            this.game.paused = null;
+            this.game.willBeAutoResumedAt = null;
+            this.autoResumeTimeout = null;
+
+            // Cancel possible ResumeGame votes
+            this.votes.values.filter(v => v.type instanceof ResumeGame && v.state == VoteState.ONGOING).forEach(v => {
+                v.cancelVote();
+            });
+
+            this.log({
+                type: "game-resumed",
+                pauseTimeInSeconds: pauseTimeInSeconds,
+                autoResumed: !byVote
+            });
+            this.entireGame.broadcastToClients({
+                type: "game-resumed"
+            });
+
+            // Basically there is nothing more to do.
+            // entireGame.onClientMessage() will call doPlayerClocksHandling
+            // and reactivate the timers
+        } catch (e) {
+            const message = typeof e === "string"
+                ? e
+                : e instanceof Error
+                    ? e.message
+                    : "Unknown error in resumeGame";
+            console.error(message);
+            this.entireGame.onCaptureSentryMessage(`resumeGame failed: ${message}`, "fatal");
+        }
     }
 
     applyAverageOfRemainingClocksToNewPlayer(newPlayer: Player, oldPlayer: Player | null): void {
@@ -1033,8 +1076,12 @@ export default class IngameGameState extends GameState<
             player.stopClientClockInterval();
         } else if (message.type == "game-paused") {
             this.game.paused = new Date();
+            if (message.willBeAutoResumedAt) {
+                this.game.willBeAutoResumedAt = new Date(message.willBeAutoResumedAt);
+            }
         } else if (message.type == "game-resumed") {
             this.game.paused = null;
+            this.game.willBeAutoResumedAt = null;
         } else {
             this.childGameState.onServerMessage(message);
         }
