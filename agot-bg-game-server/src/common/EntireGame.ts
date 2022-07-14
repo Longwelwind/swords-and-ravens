@@ -282,7 +282,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             tracksColumnCollapsed: false,
             showMapWhenDrafting: false,
             dontShowMapScrollbarInfoAgain: false,
-            musicMuted: false
+            musicMuted: profileSettings.muted
         });
         this.users.set(user.id, user);
 
