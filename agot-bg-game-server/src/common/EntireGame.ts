@@ -142,7 +142,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         this.ingameGameState?.assignNewFacelessNames();
     }
 
-    checkGameStateChanged(): boolean {
+    checkGameStateChanged(skipNotifyWaitedUsers = false): boolean {
         const {level, gameState} = this.getFirstGameStateToBeRetransmitted();
 
         if (gameState) {
@@ -175,6 +175,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 gameState.needsToBeTransmittedToClient = false;
 
                 gameState = gameState.childGameState;
+            }
+
+            if (skipNotifyWaitedUsers) {
+                return true;
             }
 
             // Reset WaitedForData for all players
