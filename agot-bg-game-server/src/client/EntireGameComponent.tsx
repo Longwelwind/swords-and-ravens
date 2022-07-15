@@ -31,6 +31,7 @@ import fadeOutAudio from "./utils/fadeOutAudio";
 import CombatGameState from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import { GameResumed } from "../common/ingame-game-state/game-data-structure/GameLog";
 import { getTimeDeltaInSeconds } from "../utils/getElapsedSeconds";
+import { toast } from "react-toastify";
 
 interface EntireGameComponentProps {
     entireGame: EntireGame;
@@ -327,9 +328,25 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     onClientGameStateChange(): void {
-        if (this.props.gameClient.isOwnTurn() && !this.props.gameClient.muted) {
-            const audio = new Audio(notificationSound);
-            audio.play();
+        if (this.props.gameClient.isOwnTurn()) {
+            if (!this.props.gameClient.muted) {
+                const audio = new Audio(notificationSound);
+                audio.play();
+            }
+
+            const player = this.props.gameClient.authenticatedPlayer;
+            if (player) {
+                 // must be truthy but so what
+                 toast(<div className="d-flex">
+                    <HouseIconComponent house={player.house}></HouseIconComponent>
+                    <h3 className="d-inline ml-3">It&apos;s your turn!</h3>
+                 </div>, {
+                    autoClose: 4000,
+                    toastId: "your-turn-toast"
+                 });
+            }
+        } else {
+            toast.dismiss("your-turn-toast");
         }
     }
 
