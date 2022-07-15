@@ -80,10 +80,22 @@ export default class WildlingsAttackComponent extends Component<GameStateCompone
                             </Col>
                         ) : results ?
                             <Col xs={12}>
-                                <p>Bidding results:</p>
-                                <HouseNumberResultsComponent results={results} keyPrefix="wildlings"/>
+                                <p className="text-center">Bidding results:</p>
+                                <div className="d-flex justify-content-center">
+                                    <HouseNumberResultsComponent results={results} keyPrefix="wildlings"/>
+                                </div>
                             </Col>
                         : <></>}
+                        {this.props.gameState._highestBidder && <Col xs={12} className="justify-content-center">
+                            <p className="text-center mt-2">
+                                Highest Bidder: <b style={{"color": this.props.gameState._highestBidder.color}}>{this.props.gameState._highestBidder.name}</b>
+                            </p>
+                        </Col>}
+                        {this.props.gameState._lowestBidder && <Col xs={12} className="justify-content-center">
+                            <p className="text-center mt-2">
+                                Lowest Bidder: <b style={{"color": this.props.gameState._lowestBidder.color}}>{this.props.gameState._lowestBidder.name}</b>
+                            </p>
+                        </Col>}
                         {this.props.gameState.childGameState && renderChildGameState<WildlingsAttackGameState>(this.props, [
                             [SimpleChoiceGameState, SimpleChoiceComponent],
                             [BiddingGameState, BiddingComponent],

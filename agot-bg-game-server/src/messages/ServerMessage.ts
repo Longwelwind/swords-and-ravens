@@ -30,7 +30,8 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | LoyaltyTokenGained | LoyaltyTokenPlaced | DrangonStrengthTokenRemoved | UpdateLoanCards | UpdateRegionModifiers
     | UpdateCompletedObjectives | UpdateSecretObjectives | SyncShiftingAmbitionsGameState | HideOrRevealUserNames | ClearChatRoom
     | UpdateSelectableObjectives | UpdateSpecialHouseCardModifier | UpdateUsurper
-    | StartPlayerClock | StopPlayerClock | GamePaused | GameResumed | LaterHouseCardsApplied;
+    | StartPlayerClock | StopPlayerClock | GamePaused | GameResumed | LaterHouseCardsApplied
+    | WildlingTiesResolved;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -493,4 +494,10 @@ interface GamePaused {
 
 interface GameResumed {
     type: "game-resumed";
+}
+
+interface WildlingTiesResolved {
+    type: "wilding-ties-resolved";
+    highestBidder?: string;
+    lowestBidder?: string;
 }

@@ -11,8 +11,7 @@ import GameEndedGameState from "./ingame-game-state/game-ended-game-state/GameEn
 import { GameSetup, getGameSetupContainer } from "./ingame-game-state/game-data-structure/createGame";
 import CancelledGameState, { SerializedCancelledGameState } from "./cancelled-game-state/CancelledGameState";
 import { VoteState } from "./ingame-game-state/vote-system/Vote";
-import CombatGameState from "./ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
-import sleep from "../utils/sleep";
+import CombatGameState, { CombatStats } from "./ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import PostCombatGameState from "./ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState";
 import { StoredProfileSettings } from "../server/website-client/WebsiteClient";
 import Player from "./ingame-game-state/Player";
@@ -22,7 +21,8 @@ import WildlingsAttackGameState from "./ingame-game-state/westeros-game-state/wi
 import BiddingGameState from "./ingame-game-state/westeros-game-state/bidding-game-state/BiddingGameState";
 import SimpleChoiceGameState from "./ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
 import getElapsedSeconds from "../utils/getElapsedSeconds";
-import { MutexInterface, Mutex, withTimeout } from 'async-mutex';
+import WildlingCardType from "./ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
+import House from "./ingame-game-state/game-data-structure/House";
 
 export enum NotificationType {
     READY_TO_START,
@@ -70,8 +70,12 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     onNewPrivateChatRoomCreated: ((roomId: string) => void) | null;
     // Client-side callback fired whenever the current GameState changes.
     onClientGameStateChange: (() => void) | null;
-    // Client-side mutex to ensure order of incoming messages
-    onServerMessageMutex: MutexInterface = withTimeout(new Mutex(), 15 * 1000);
+
+    onCombatFastTracked: ((stats: CombatStats[]) => void) | null;
+    onWildingsAttackFastTracked: ((wildingCard: WildlingCardType,
+        biddings: [number, House[]][] | null,
+        highestBidder: House | null,
+        lowestBidder: House | null) => void) | null;
 
     get lobbyGameState(): LobbyGameState | null {
         return this.childGameState instanceof LobbyGameState ? this.childGameState : null;
@@ -423,54 +427,56 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         }
     }
 
-    async onServerMessage(message: ServerMessage): Promise<void> {
-        await this.onServerMessageMutex.runExclusive(async () => {
-            if (message.type == "game-state-change") {
-                // Get the GameState for whose the childGameState must change
-                const parentGameState = this.getGameStateNthLevelDown(message.level - 1);
+    onServerMessage(message: ServerMessage): void {
+        if (message.type == "game-state-change") {
+            // Get the GameState for whose the childGameState must change
+            const parentGameState = this.getGameStateNthLevelDown(message.level - 1);
 
-                const newChildGameState = parentGameState.deserializeChildGameState(message.serializedGameState);
+            const newChildGameState = parentGameState.deserializeChildGameState(message.serializedGameState);
 
-                await this.waitBeforeChangingChildGameState(parentGameState, newChildGameState);
+            this.checkGameStatesFastTracked(parentGameState, newChildGameState);
 
-                parentGameState.childGameState = newChildGameState;
+            parentGameState.childGameState = newChildGameState;
 
-                this.leafStateId = message.newLeafId;
-                if (this.onClientGameStateChange) {
-                    this.onClientGameStateChange();
-                }
-            } else if (message.type == "new-user") {
-                const user = User.deserializeFromServer(this, message.user);
-
-                this.users.set(user.id, user);
-            } else if (message.type == "settings-changed") {
-                const user = this.users.get(message.user);
-
-                user.settings = message.settings;
-            } else if (message.type == "game-settings-changed") {
-                this.gameSettings = message.settings;
-            } else if (message.type == "update-connection-status") {
-                const user = this.users.get(message.user);
-                user.connected = message.status;
-            } else if (message.type == "update-other-users-with-same-ip") {
-                const user = this.users.get(message.user);
-                user.otherUsersFromSameNetwork = message.otherUsers;
-            } else if (message.type == "hide-or-reveal-user-names") {
-                message.names.forEach(([uid, name]) => this.users.get(uid).name = name);
-            } else {
-                this.childGameState.onServerMessage(message);
+            this.leafStateId = message.newLeafId;
+            if (this.onClientGameStateChange) {
+                this.onClientGameStateChange();
             }
-        });
+        } else if (message.type == "new-user") {
+            const user = User.deserializeFromServer(this, message.user);
+
+            this.users.set(user.id, user);
+        } else if (message.type == "settings-changed") {
+            const user = this.users.get(message.user);
+
+            user.settings = message.settings;
+        } else if (message.type == "game-settings-changed") {
+            this.gameSettings = message.settings;
+        } else if (message.type == "update-connection-status") {
+            const user = this.users.get(message.user);
+            user.connected = message.status;
+        } else if (message.type == "update-other-users-with-same-ip") {
+            const user = this.users.get(message.user);
+            user.otherUsersFromSameNetwork = message.otherUsers;
+        } else if (message.type == "hide-or-reveal-user-names") {
+            message.names.forEach(([uid, name]) => this.users.get(uid).name = name);
+        } else {
+            this.childGameState.onServerMessage(message);
+        }
     }
 
-    async waitBeforeChangingChildGameState(parentGameState: GameState<any, any>, newChildGameState: GameState<any, any>): Promise<void> {
+    checkGameStatesFastTracked(parentGameState: GameState<any, any>, newChildGameState: GameState<any, any>): void {
         // Wait 5 seconds when CombatGameState was completely fast-tracked to show the battle results via the CombatInfoComponent
         if (this.hasChildGameState(CombatGameState) &&
                 // Only do it when there is no PostCombatGameState in the tree as PostCombat shows the dialog already
                 !this.hasChildGameState(PostCombatGameState) &&
                 !parentGameState.hasParentGameState(CombatGameState) &&
                 !newChildGameState.hasChildGameState(CombatGameState)) {
-            await sleep(5000);
+
+            if (this.onCombatFastTracked) {
+                const combat = this.getChildGameState(CombatGameState) as CombatGameState;
+                this.onCombatFastTracked(combat.stats);
+            }
         }
 
         // Wait 5 seconds when WildlingsAttackGameState was completely fast-tracked to show the revealed Wildling card
@@ -481,10 +487,11 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             // We can identify if it was fast-tracked if the current child state is Bidding or SimpleChoice (= Resolving ties).
             // As we checked earlier that WildlingsAttackGameState is no longer part of the tree we now know that no other WildlingsAttack
             // child state was set which would have shown the revealed Wildling card to the clients.
-            const wildlings = this.getChildGameState(WildlingsAttackGameState);
+            const wildlings = this.getChildGameState(WildlingsAttackGameState) as WildlingsAttackGameState;
             if (wildlings.childGameState instanceof BiddingGameState || wildlings.childGameState instanceof SimpleChoiceGameState) {
-                wildlings.childGameState = null;
-                await sleep(5000);
+                if (this.onWildingsAttackFastTracked && wildlings.wildlingCard) {
+                    this.onWildingsAttackFastTracked(wildlings.wildlingCard.type, wildlings.biddingResults,  wildlings._highestBidder, wildlings._lowestBidder);
+                }
             }
         }
     }

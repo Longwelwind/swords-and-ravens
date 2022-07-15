@@ -11,6 +11,7 @@ import User from "../server/User";
 import { isMobile } from 'react-device-detect';
 import EntireGame from "../common/EntireGame";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
+import { ToastContainer } from 'react-toastify';
 
 interface AppProps {
     gameClient: GameClient;
@@ -40,7 +41,7 @@ export default class App extends Component<AppProps> {
 
     render(): ReactNode {
         const minWidth = isMobile && this.isGameRunning ? this.is8pGame ? "2550px" : "2000px" : "auto";
-        return (
+        return <>
             <Container fluid={false} style={{
                 paddingTop: "0.5rem",
                 paddingBottom: "1rem",
@@ -79,6 +80,15 @@ export default class App extends Component<AppProps> {
                     ) : (function () { throw "Should never happen" })()}
                 </Row>
             </Container>
-        );
+            <ToastContainer
+                autoClose={7500}
+                position="top-center"
+                closeOnClick
+                pauseOnFocusLoss
+                pauseOnHover
+                theme="dark"
+                style={{width: "auto", height: "auto"}}
+            />
+        </>;
     }
 }

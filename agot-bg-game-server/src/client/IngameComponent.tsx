@@ -10,6 +10,7 @@ import ListGroupItem from "react-bootstrap/ListGroupItem";
 import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
+import { toast } from "react-toastify";
 import renderChildGameState from "./utils/renderChildGameState";
 import WesterosGameState from "../common/ingame-game-state/westeros-game-state/WesterosGameState";
 import WesterosGameStateComponent from "./game-state-panel/WesterosGameStateComponent";
@@ -80,7 +81,9 @@ import houseCardsBackImages from "./houseCardsBackImages";
 import houseInfluenceImages from "./houseInfluenceImages";
 import houseOrderImages from "./houseOrderImages";
 import housePowerTokensImages from "./housePowerTokensImages";
+import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
 import unitImages from "./unitImages";
+import { tidesOfBattleCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
 import DraftInfluencePositionsGameState from "../common/ingame-game-state/draft-influence-positions-game-state/DraftInfluencePositionsGameState";
 import DraftInfluencePositionsComponent from "./game-state-panel/DraftInfluencePositionsComponent";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
@@ -101,7 +104,10 @@ import WildlingCardType from "../common/ingame-game-state/game-data-structure/wi
 import WildlingCardComponent from "./game-state-panel/utils/WildlingCardComponent";
 import getIngameUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 import IronBankTabComponent from "./IronBankTabComponent";
+import { CombatStats } from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import sleep from "../utils/sleep";
+import CombatInfoComponent from "./CombatInfoComponent";
+import HouseNumberResultsComponent from "./HouseNumberResultsComponent";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -1150,6 +1156,72 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         }
     }
 
+    getCombatFastTrackedComponent(stats: CombatStats[]): React.ReactNode {
+        const winners = stats.filter(cs => cs.isWinner);
+        const winner = winners.length > 0
+            ? this.game.houses.get(winners[0].house)
+            : null;
+
+        const houseCombatDatas = stats.map(stat => {
+            const house = this.game.houses.get(stat.house);
+            const houseCard = stat.houseCard ? this.game.getHouseCardById(stat.houseCard) : null;
+            const tidesOfBattleCard = stat.tidesOfBattleCard === undefined
+                ? undefined
+                : stat.tidesOfBattleCard != null
+                    ? tidesOfBattleCards.get(stat.tidesOfBattleCard)
+                    : null;
+
+            return {
+                ...stat,
+                house,
+                region: this.game.world.regions.get(stat.region),
+                houseCard: houseCard,
+                armyUnits: stat.armyUnits.map(ut => unitTypes.get(ut)),
+                woundedUnits: stat.woundedUnits.map(ut => unitTypes.get(ut)),
+                tidesOfBattleCard: tidesOfBattleCard};
+            });
+
+        return <>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <h5>Battle results for <b>{houseCombatDatas[1].region.name}</b></h5>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <CombatInfoComponent
+                    housesCombatData={houseCombatDatas}
+                />
+            </div>
+            {winner && <p className="text-center mt-2">
+                Winner: <b style={{"color": winner.color}}>{winner.name}</b>
+            </p>}
+        </>;
+    }
+
+    getWildlingsAttackFastTrackedComponent(
+        wildlingCard: WildlingCardType,
+        biddings: [number, House[]][] | null,
+        highestBidder: House | null,
+        lowestBidder: House | null) : React.ReactNode {
+            const results = biddings
+                ? _.flatMap(biddings.map(([bid, houses]) => houses.map(h => [h, bid] as [House, number])))
+                : null;
+
+            return <div>
+                <p className="text-center">Resolution of <b>Wildlings Attack</b><br/>was performed automatically</p>
+                <div className="d-flex justify-content-center">
+                    <WildlingCardComponent cardType={wildlingCard}/>
+                </div>
+                {results && <div className="d-flex justify-content-center mt-2">
+                    <HouseNumberResultsComponent results={results} keyPrefix="wildling-biddings"/>
+                </div>}
+                {highestBidder && <p className="text-center mt-2">
+                    Highest Bidder: <b style={{"color": highestBidder.color}}>{highestBidder.name}</b>
+                </p>}
+                {lowestBidder && <p className="text-center mt-2">
+                    Lowest Bidder: <b style={{"color": lowestBidder.color}}>{lowestBidder.name}</b>
+                </p>}
+            </div>;
+    }
+
     componentDidMount(): void {
         this.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
         this.props.gameState.entireGame.onNewPrivateChatRoomCreated = (roomId: string) => this.onNewPrivateChatRoomCreated(roomId);
@@ -1162,6 +1234,16 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         if (screen.width < 1920 && screen.height < 1080 && this.mapScrollbarEnabled && !dontShowAgain) {
             this.showMapScrollbarInfo = true;
         }
+
+        this.ingame.entireGame.onCombatFastTracked = (stats) => {
+            if (stats.length == 0) return;
+            toast(this.getCombatFastTrackedComponent(stats));
+        }
+
+        this.ingame.entireGame.onWildingsAttackFastTracked =
+            (wildlingCard, biddings, highestBidder, lowestBidder) => {
+                toast(this.getWildlingsAttackFastTrackedComponent(wildlingCard, biddings, highestBidder, lowestBidder));
+            }
     }
 
     componentWillUnmount(): void {
