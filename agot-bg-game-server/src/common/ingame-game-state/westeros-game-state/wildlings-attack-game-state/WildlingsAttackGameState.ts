@@ -139,6 +139,9 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
             this.wildlingCard = this.game.wildlingDeck.find(c => c.id == message.wildlingCard) as WildlingCard;
         } else if (message.type == "reveal-bids") {
             this.biddingResults = message.bids.map(([bid, houses]) => [bid, houses.map(h => this.game.houses.get(h))]);
+        } else if (message.type == "wilding-ties-resolved") {
+            this._highestBidder = message.highestBidder ? this.game.houses.get(message.highestBidder) : null;
+            this._lowestBidder = message.lowestBidder ? this.game.houses.get(message.lowestBidder) : null;
         } else {
             this.childGameState.onServerMessage(message);
         }
@@ -180,6 +183,11 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
                 return;
             }
 
+            this.entireGame.broadcastToClients({
+                type: "wilding-ties-resolved",
+                highestBidder: this.highestBidders[0].id
+            });
+
             this.proceedNightsWatchWon(this.highestBidders[0]);
         } else {
             // Wildlings attack was successful
@@ -192,6 +200,11 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
                 );
                 return;
             }
+
+            this.entireGame.broadcastToClients({
+                type: "wilding-ties-resolved",
+                lowestBidder: this.lowestBidders[0].id
+            });
 
             this.proceedWildlingWon(this.lowestBidders[0]);
         }
@@ -206,6 +219,11 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
         if (this.nightsWatchWon) {
             const highestBidder = this.highestBidders[choice];
 
+            this.entireGame.broadcastToClients({
+                type: "wilding-ties-resolved",
+                highestBidder: highestBidder.id
+            });
+
             this.westerosGameState.ingame.log({
                 type: "highest-bidder-chosen",
                 highestBidder: highestBidder.id
@@ -215,11 +233,15 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
         } else {
             const lowestBidder = this.lowestBidders[choice];
 
+            this.entireGame.broadcastToClients({
+                type: "wilding-ties-resolved",
+                lowestBidder: lowestBidder.id
+            });
+
             this.westerosGameState.ingame.log({
                 type: "lowest-bidder-chosen",
                 lowestBidder: lowestBidder.id
             });
-
 
             this.proceedWildlingWon(this.lowestBidders[choice]);
         }

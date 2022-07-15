@@ -41,7 +41,6 @@ import PayDebtsGameState, { SerializedPayDebtsGameState } from "./pay-debts-game
 import { objectiveCards } from "./game-data-structure/static-data-structure/objectiveCards";
 import ChooseInitialObjectivesGameState, { SerializedChooseInitialObjectivesGameState } from "./choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
 import facelessMenNames from "../../../data/facelessMenNames.json";
-import sleep from "../../utils/sleep";
 import WildlingCardEffectInTurnOrderGameState from "./westeros-game-state/wildlings-attack-game-state/WildlingCardEffectInTurnOrderGameState";
 import getElapsedSeconds from "../../utils/getElapsedSeconds";
 
@@ -853,7 +852,7 @@ export default class IngameGameState extends GameState<
         }
     }
 
-    async onServerMessage(message: ServerMessage): Promise<void> {
+    onServerMessage(message: ServerMessage): void {
         if (message.type == "supply-adjusted") {
             const supplies: [House, number][] = message.supplies.map(([houseId, supply]) => [this.game.houses.get(houseId), supply]);
 
@@ -902,14 +901,14 @@ export default class IngameGameState extends GameState<
                 });
             }
 
-            await sleep(5000);
-
-            units.forEach(u => {
-                this.marchMarkers.tryDelete(u);
-                from.units.delete(u.id);
-                to.units.set(u.id, u);
-                u.region = to;
-            });
+            window.setTimeout(() => {
+                units.forEach(u => {
+                    this.marchMarkers.tryDelete(u);
+                    from.units.delete(u.id);
+                    to.units.set(u.id, u);
+                    u.region = to;
+                });
+            }, 5000);
         } else if (message.type == "units-wounded") {
             const region = this.world.regions.get(message.regionId);
             const units = message.unitIds.map(uid => region.units.get(uid));
