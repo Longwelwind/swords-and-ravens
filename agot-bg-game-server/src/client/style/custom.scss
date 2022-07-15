@@ -228,6 +228,7 @@ strong
 
 $game-card-width: 270px;
 $game-card-height: 1.57 * $game-card-width;
+$fairly-scale: 0.7;
 $medium-scale: 0.5;
 $smedium-scale: 0.35;
 $small-scale: 0.2;
@@ -238,6 +239,11 @@ $tiny-scale: 0.12;
 
   width: $game-card-width;
   height: $game-card-height;
+}
+
+.vertical-game-card.fairly {
+  width: $game-card-width * $fairly-scale;
+  height: $game-card-height * $fairly-scale;
 }
 
 .vertical-game-card.medium {

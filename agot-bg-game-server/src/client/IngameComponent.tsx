@@ -1208,7 +1208,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 : null;
 
             return <div>
-                <p className="text-center">Resolution of <b>Wildlings Attack</b><br/>was performed automatically</p>
+                <h5 className="text-center mb-2">{highestBidder ? "Night's watch victory" : "Wildling victory"}</h5>
                 <div className="d-flex justify-content-center">
                     <WildlingCardComponent cardType={wildlingCard}/>
                 </div>
