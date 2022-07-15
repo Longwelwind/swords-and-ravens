@@ -20,11 +20,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faTimes} from "@fortawesome/free-solid-svg-icons/faTimes";
 import UserLabel from "./UserLabel";
 import EntireGame from "../common/EntireGame";
-import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
+import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
 import { observable } from "mobx";
 import DebouncedPasswordComponent from "./utils/DebouncedPasswordComponent";
 import { faLock } from "@fortawesome/free-solid-svg-icons";
-import { setBoltonInfluenceImage, setStarkInfluenceImage } from "./houseInfluenceImages";
+import { setBoltonIconImage, setStarkIconImage } from "./houseIconImages";
 
 interface LobbyComponentProps {
     gameClient: GameClient;
@@ -66,7 +66,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                     <ListGroupItem key={h.id} style={{minHeight: "62px"}}>
                                         <Row className="align-items-center" style={{opacity: this.isHouseAvailable(h) ? 1 : 0.3}}>
                                             {!this.randomHouses && <Col xs="auto" className="no-gutters">
-                                                <SimpleInfluenceIconComponent house={h}/>
+                                                <HouseIconComponent house={h}/>
                                             </Col>}
                                             <Col className="no-gutters">
                                                 <div>
@@ -253,10 +253,10 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
 
     UNSAFE_componentWillUpdate(): void {
         if (this.entireGame.gameSettings.adwdHouseCards) {
-            setBoltonInfluenceImage();
+            setBoltonIconImage();
             this.lobby.lobbyHouses.get("stark").name = "Bolton";
         } else {
-            setStarkInfluenceImage();
+            setStarkIconImage();
             this.lobby.lobbyHouses.get("stark").name = "Stark";
         }
     }

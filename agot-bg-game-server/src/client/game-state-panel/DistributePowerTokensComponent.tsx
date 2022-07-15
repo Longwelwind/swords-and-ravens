@@ -10,7 +10,7 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import Button from "react-bootstrap/Button";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import SimpleInfluenceIconComponent from "./utils/SimpleInfluenceIconComponent";
+import HouseIconComponent from "./utils/HouseIconComponent";
 import HouseNumberResultsComponent from "../HouseNumberResultsComponent";
 import { faAngleDown, faAngleUp } from "@fortawesome/free-solid-svg-icons";
 import BetterMap from "../../utils/BetterMap";
@@ -44,7 +44,7 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
                                 {this.currentBidResults.entries.map(([h, bid]) => (
                                     <Col xs="auto" key={h.id} className="d-flex flex-md-column align-items-center">
                                         <div className="mb-2">
-                                            <SimpleInfluenceIconComponent house={h}/>
+                                            <HouseIconComponent house={h}/>
                                         </div>
                                         <div className="text-center" style={{fontSize: "18px", marginBottom: "5px"}}>{bid + (this.additionalPowerTokens.has(h) ? this.additionalPowerTokens.get(h) : 0)}</div>
                                         <div className="btn-group btn-group-xs">

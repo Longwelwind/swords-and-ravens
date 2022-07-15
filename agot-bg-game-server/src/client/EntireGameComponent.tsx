@@ -20,7 +20,7 @@ import { FormCheck, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import { preventOverflow } from "@popperjs/core";
 import DraftHouseCardsGameState from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import { observable } from "mobx";
-import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
+import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamation, faLock } from "@fortawesome/free-solid-svg-icons";
 import _ from "lodash";
@@ -253,12 +253,16 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         return null;
     }
 
-
     renderHouseIcon(): ReactNode {
-        return this.props.gameClient.authenticatedPlayer &&
+        // Hack for ADWD Bolton as the Ingame c'tor is not called here yet:
+        const house = this.props.gameClient.authenticatedPlayer?.house;
+        if (house && this.props.entireGame.gameSettings.adwdHouseCards && house.id == "stark") {
+            house.name = "Bolton";
+        }
+        return house &&
             <Col xs="auto">
                 <div style={{marginTop: "-4px"}}>
-                    <SimpleInfluenceIconComponent house={this.props.gameClient.authenticatedPlayer.house} small={true}/>
+                    <HouseIconComponent house={house} small={true}/>
                 </div>
             </Col>;
     }

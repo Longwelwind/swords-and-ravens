@@ -12,7 +12,7 @@ import {faCheck} from "@fortawesome/free-solid-svg-icons/faCheck";
 import {faBan} from "@fortawesome/free-solid-svg-icons/faBan";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
-import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
+import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { preventOverflow } from "@popperjs/core";
 import ConditionalWrap from "./utils/ConditionalWrap";
@@ -57,7 +57,7 @@ export default class VoteComponent extends Component<VoteComponentProps> {
                                 {this.vote.participatingHouses.map(h => (
                                     <Col xs={"auto"} key={`vote-${this.vote.id}-${h.id}`}>
                                         <div className="mb-2">
-                                            <SimpleInfluenceIconComponent house={h}/>
+                                            <HouseIconComponent house={h}/>
                                         </div>
                                         <div className="text-center">
                                             {this.vote.votes.has(h) ? (

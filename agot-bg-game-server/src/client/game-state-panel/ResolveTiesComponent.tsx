@@ -14,7 +14,7 @@ import {faAngleLeft} from "@fortawesome/free-solid-svg-icons/faAngleLeft";
 import {faAngleRight} from "@fortawesome/free-solid-svg-icons/faAngleRight";
 import { faStar } from "@fortawesome/free-solid-svg-icons/faStar";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import SimpleInfluenceIconComponent from "./utils/SimpleInfluenceIconComponent";
+import HouseIconComponent from "./utils/HouseIconComponent";
 import HouseNumberResultsComponent from "../HouseNumberResultsComponent";
 
 @observer
@@ -50,7 +50,7 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
                                             </div>
                                         )}
                                         <div className="mb-2">
-                                            <SimpleInfluenceIconComponent house={h}/>
+                                            <HouseIconComponent house={h}/>
                                         </div>
                                         <div className="text-center" style={{fontSize: "18px", marginBottom: "5px"}}>{this.props.gameState.getBidOfHouse(h)}</div>
                                         <div className="btn-group btn-group-xs">

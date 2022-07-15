@@ -108,6 +108,7 @@ import { CombatStats } from "../common/ingame-game-state/action-game-state/resol
 import sleep from "../utils/sleep";
 import CombatInfoComponent from "./CombatInfoComponent";
 import HouseNumberResultsComponent from "./HouseNumberResultsComponent";
+import houseIconImages from "./houseIconImages";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -196,6 +197,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             houseOrderImages.set("stark", houseOrderImages.get("bolton"));
             housePowerTokensImages.set("stark", housePowerTokensImages.get("bolton"));
             unitImages.set("stark", unitImages.get("bolton"));
+            houseIconImages.set("stark", houseIconImages.get("bolton"));
 
             const boltons = this.props.gameState.game.houses.tryGet("stark", null);
             if (boltons) {
