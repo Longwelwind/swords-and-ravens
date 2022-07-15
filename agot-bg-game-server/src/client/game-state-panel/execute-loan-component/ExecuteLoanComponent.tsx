@@ -22,6 +22,7 @@ import SavvyStewardGameState from "../../../common/ingame-game-state/action-game
 import SavvyStewardComponent from "../SavvyStewardComponent";
 import SpymasterGameState from "../../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/execute-loan-game-state/spymaster-game-state/SpymasterGameState";
 import SpymasterComponent from "../SpymasterComponent";
+import buyCardImage from "../../../../public/images/icons/buy-card.svg";
 
 @observer
 export default class ExecuteLoanComponent extends Component<GameStateComponentProps<ExecuteLoanGameState>> {
@@ -35,7 +36,10 @@ export default class ExecuteLoanComponent extends Component<GameStateComponentPr
     }
     render(): ReactNode {
         return <Col xs={12}>
-            <Row className="justify-content-center">
+            <Row className="justify-content-center align-items-center">
+                <Col xs="auto">
+                    <img src={buyCardImage} height={100} />
+                </Col>
                 <Col xs="auto">
                     <LoanCardComponent loanCard={this.props.gameState.loanCardType} />
                 </Col>
