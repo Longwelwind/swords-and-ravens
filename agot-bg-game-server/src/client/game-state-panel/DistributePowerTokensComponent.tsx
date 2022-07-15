@@ -75,8 +75,10 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
                     </>
                 ) : <>
                     <Col xs={12}>
-                        <p>Bidding results:</p>
-                        <HouseNumberResultsComponent results={results} keyPrefix="cok"/>
+                        <p className="text-center">Bidding results:</p>
+                        <div className="d-flex justify-content-center">
+                            <HouseNumberResultsComponent results={results} keyPrefix="cok"/>
+                        </div>
                     </Col>
                     <Col xs={12} className="text-center">Waiting for {this.props.gameState.house.name}...</Col>
                 </>}
