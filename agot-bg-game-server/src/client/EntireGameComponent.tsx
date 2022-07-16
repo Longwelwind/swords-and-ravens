@@ -27,7 +27,6 @@ import _ from "lodash";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
 import { secondsToString } from "./utils/secondsToString";
 import introSound from "../../public/sounds/game-of-thrones-intro.ogg";
-import fadeOutAudio from "./utils/fadeOutAudio";
 import CombatGameState from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import { GameResumed } from "../common/ingame-game-state/game-data-structure/GameLog";
 import { getTimeDeltaInSeconds } from "../utils/getElapsedSeconds";
@@ -42,7 +41,7 @@ interface EntireGameComponentProps {
 export default class EntireGameComponent extends Component<EntireGameComponentProps> {
     @observable showMapWhenDrafting = false;
     @observable rerender = 0;
-    @observable welcomeSoundPlayed = false;
+    @observable playWelcomeSound = false;
 
     setIntervalId = -1;
 
@@ -92,8 +91,9 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     <CancelledComponent gameClient={this.props.gameClient} gameState={this.props.entireGame.childGameState} />
                 )
             }
-            {!this.welcomeSoundPlayed && !this.props.gameClient.musicMuted && !this.isGameEnded && !this.isInCombat &&
-            <audio id="welcome-sound" src={introSound} autoPlay preload="metadata" />}
+            {this.playWelcomeSound && !this.props.gameClient.musicMuted &&
+                <audio id="welcome-sound" src={introSound} autoPlay onEnded={() => this.playWelcomeSound = false} />
+            }
         </>;
     }
 
@@ -304,26 +304,35 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
 
     componentDidMount(): void {
         document.title = this.props.entireGame.name;
+
+        if (this.isGameEnded) {
+            return;
+        }
+
         this.props.entireGame.onClientGameStateChange = () => this.onClientGameStateChange();
+        this.props.entireGame.onGameStarted = () => this.onGameStarted();
 
         if (this.props.gameClient.authenticatedUser) {
             this.showMapWhenDrafting = this.props.gameClient.authenticatedUser.settings.showMapWhenDrafting;
         }
 
-        if (this.isGameEnded) {
-            this.welcomeSoundPlayed = true;
+        this.setIntervalId = window.setInterval(() => this.forceClockRerender(), 1000);
+
+        if (!this.isInCombat) {
+            this.playWelcomeSound = true;
+        }
+    }
+
+    onGameStarted(): void {
+        const audio = document.getElementById("welcome-sound") as HTMLAudioElement;
+        // Make sure it's not playing right now
+        if (audio && !audio.paused) {
             return;
         }
 
-        this.setIntervalId = window.setInterval(() => this.forceClockRerender(), 1000);
-
-        const audio = document.getElementById("welcome-sound") as HTMLAudioElement;
-        if (!audio) {
-            // set it to played when it's not part of the state tree
-            this.welcomeSoundPlayed = true;
-        } else {
-            audio.onended = () => this.welcomeSoundPlayed = true;
-            fadeOutAudio(audio);
+        if (!this.props.gameClient.musicMuted) {
+            const intro = new Audio(introSound);
+            intro.play();
         }
     }
 
@@ -342,7 +351,8 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     <h3 className="d-inline ml-3">It&apos;s your turn!</h3>
                  </div>, {
                     autoClose: 4000,
-                    toastId: "your-turn-toast"
+                    toastId: "your-turn-toast",
+                    pauseOnHover: false
                  });
             }
         } else {
@@ -352,6 +362,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
 
     componentWillUnmount(): void {
         this.props.entireGame.onClientGameStateChange = null;
+        this.props.entireGame.onGameStarted = null;
         if (this.setIntervalId >= 0) {
             window.clearInterval(this.setIntervalId);
             this.setIntervalId = -1;

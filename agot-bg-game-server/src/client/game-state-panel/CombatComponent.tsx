@@ -40,7 +40,6 @@ import unitTypes from "../../common/ingame-game-state/game-data-structure/unitTy
 import SelectUnitsGameState from "../../common/ingame-game-state/select-units-game-state/SelectUnitsGameState";
 import AfterCombatHouseCardAbilitiesGameState from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-combat-house-card-abilities-game-state/AfterCombatHouseCardAbilitiesGameState";
 import combatSound from "../../../public/sounds/combat.ogg";
-import fadeOutAudio from "../utils/fadeOutAudio";
 
 @observer
 export default class CombatComponent extends Component<GameStateComponentProps<CombatGameState>> {
@@ -145,7 +144,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                     [CancelHouseCardAbilitiesGameState, CancelHouseCardAbilitiesComponent],
                     [BeforeCombatHouseCardAbilitiesGameState, BeforeCombatHouseCardAbilitiesComponent]
                 ])}
-                {!this.props.gameClient.musicMuted && <audio id="combat-sound" src={combatSound} autoPlay preload="metadata"/>}
+                {!this.props.gameClient.musicMuted && <audio id="combat-sound" src={combatSound} autoPlay />}
             </>
         );
     }
@@ -196,7 +195,6 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
     componentDidMount(): void {
         this.props.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
         this.props.mapControls.modifyUnitsOnMap.push(this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap());
-        fadeOutAudio(document.getElementById("combat-sound") as HTMLAudioElement);
     }
 
     componentWillUnmount(): void {
