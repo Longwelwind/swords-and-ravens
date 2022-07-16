@@ -59,13 +59,16 @@ export default class WildlingsAttackComponent extends Component<GameStateCompone
             : null;
         return (
             <>
-                <Row className="justify-content-center mt-2 mb-1">
+                {!this.props.gameState.biddingResults && <Row className="justify-content-center mt-2 mb-1">
                     <img src={mammothImage} width="40px" className="mr-2"/><h4 className="mt-2">Wildlings Attack</h4><img src={mammothImage} width="40px" className="ml-2"/>
-                </Row>
+                </Row>}
+                {this.props.gameState.biddingResults && <h5 className="text-center mt-1">
+                    {this.props.gameState.nightsWatchWon ? "Night's Watch Victory" : "Wildling Victory"}
+                </h5>}
                 {wildlingCardType && (
                     <Row className="justify-content-center">
                         <Col xs="auto">
-                            <WildlingCardComponent cardType={wildlingCardType}/>
+                            <WildlingCardComponent cardType={wildlingCardType} size="fairly" tooltip />
                         </Col>
                     </Row>
                 )}
@@ -79,22 +82,22 @@ export default class WildlingsAttackComponent extends Component<GameStateCompone
                                 Wildlings which are attacking with a strength of <b>{this.props.gameState.game.wildlingStrength}</b>!
                             </Col>
                         ) : results ?
-                            <Col xs={12}>
-                                <p className="text-center">Bidding results:</p>
+                            <Col xs={12} className="no-space-around">
+                                <div className="text-center mb-1">Bidding results:</div>
                                 <div className="d-flex justify-content-center">
                                     <HouseNumberResultsComponent results={results} keyPrefix="wildlings"/>
                                 </div>
                             </Col>
                         : <></>}
                         {this.props.gameState._highestBidder && <Col xs={12} className="justify-content-center">
-                            <p className="text-center mt-2">
+                            <div className="text-center mt-1">
                                 Highest Bidder: <b style={{"color": this.props.gameState._highestBidder.color}}>{this.props.gameState._highestBidder.name}</b>
-                            </p>
+                            </div>
                         </Col>}
                         {this.props.gameState._lowestBidder && <Col xs={12} className="justify-content-center">
-                            <p className="text-center mt-2">
+                            <div className="text-center mt-1">
                                 Lowest Bidder: <b style={{"color": this.props.gameState._lowestBidder.color}}>{this.props.gameState._lowestBidder.name}</b>
-                            </p>
+                            </div>
                         </Col>}
                         {this.props.gameState.childGameState && renderChildGameState<WildlingsAttackGameState>(this.props, [
                             [SimpleChoiceGameState, SimpleChoiceComponent],

@@ -20,7 +20,7 @@ import { FormCheck, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import { preventOverflow } from "@popperjs/core";
 import DraftHouseCardsGameState from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import { observable } from "mobx";
-import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
+import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamation, faLock } from "@fortawesome/free-solid-svg-icons";
 import _ from "lodash";
@@ -31,6 +31,7 @@ import fadeOutAudio from "./utils/fadeOutAudio";
 import CombatGameState from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import { GameResumed } from "../common/ingame-game-state/game-data-structure/GameLog";
 import { getTimeDeltaInSeconds } from "../utils/getElapsedSeconds";
+import { toast } from "react-toastify";
 
 interface EntireGameComponentProps {
     entireGame: EntireGame;
@@ -253,12 +254,16 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         return null;
     }
 
-
     renderHouseIcon(): ReactNode {
-        return this.props.gameClient.authenticatedPlayer &&
+        // Hack for ADWD Bolton as the Ingame c'tor is not called here yet:
+        const house = this.props.gameClient.authenticatedPlayer?.house;
+        if (house && this.props.entireGame.gameSettings.adwdHouseCards && house.id == "stark") {
+            house.name = "Bolton";
+        }
+        return house &&
             <Col xs="auto">
                 <div style={{marginTop: "-4px"}}>
-                    <SimpleInfluenceIconComponent house={this.props.gameClient.authenticatedPlayer.house} small={true}/>
+                    <HouseIconComponent house={house} small={true}/>
                 </div>
             </Col>;
     }
@@ -323,9 +328,25 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     onClientGameStateChange(): void {
-        if (this.props.gameClient.isOwnTurn() && !this.props.gameClient.muted) {
-            const audio = new Audio(notificationSound);
-            audio.play();
+        if (this.props.gameClient.isOwnTurn()) {
+            if (!this.props.gameClient.muted) {
+                const audio = new Audio(notificationSound);
+                audio.play();
+            }
+
+            const player = this.props.gameClient.authenticatedPlayer;
+            if (player) {
+                 // must be truthy but so what
+                 toast(<div className="d-flex">
+                    <HouseIconComponent house={player.house}></HouseIconComponent>
+                    <h3 className="d-inline ml-3">It&apos;s your turn!</h3>
+                 </div>, {
+                    autoClose: 4000,
+                    toastId: "your-turn-toast"
+                 });
+            }
+        } else {
+            toast.dismiss("your-turn-toast");
         }
     }
 

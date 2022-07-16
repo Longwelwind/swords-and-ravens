@@ -86,6 +86,10 @@ export default class App extends Component<AppProps> {
                 closeOnClick
                 pauseOnFocusLoss
                 pauseOnHover
+                newestOnTop
+                draggable
+                draggablePercent={60}
+                limit={3}
                 theme="dark"
                 style={{width: "auto", height: "auto"}}
             />

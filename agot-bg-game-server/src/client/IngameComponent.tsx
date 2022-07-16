@@ -108,6 +108,7 @@ import { CombatStats } from "../common/ingame-game-state/action-game-state/resol
 import sleep from "../utils/sleep";
 import CombatInfoComponent from "./CombatInfoComponent";
 import HouseNumberResultsComponent from "./HouseNumberResultsComponent";
+import houseIconImages from "./houseIconImages";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -196,6 +197,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             houseOrderImages.set("stark", houseOrderImages.get("bolton"));
             housePowerTokensImages.set("stark", housePowerTokensImages.get("bolton"));
             unitImages.set("stark", unitImages.get("bolton"));
+            houseIconImages.set("stark", houseIconImages.get("bolton"));
 
             const boltons = this.props.gameState.game.houses.tryGet("stark", null);
             if (boltons) {
@@ -1206,7 +1208,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 : null;
 
             return <div>
-                <p className="text-center">Resolution of <b>Wildlings Attack</b><br/>was performed automatically</p>
+                <h5 className="text-center mb-2">{highestBidder ? "Night's watch victory" : "Wildling victory"}</h5>
                 <div className="d-flex justify-content-center">
                     <WildlingCardComponent cardType={wildlingCard}/>
                 </div>

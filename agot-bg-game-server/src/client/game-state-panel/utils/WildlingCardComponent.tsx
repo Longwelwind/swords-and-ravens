@@ -11,7 +11,7 @@ import ImagePopover from "../../utils/ImagePopover";
 
 interface WildlingCardProps {
     cardType: WildlingCardType;
-    size?: "tiny" | "small" | "smedium" | "medium";
+    size?: "tiny" | "small" | "smedium" | "medium" | "fairly";
     tooltip?: boolean;
 }
 
