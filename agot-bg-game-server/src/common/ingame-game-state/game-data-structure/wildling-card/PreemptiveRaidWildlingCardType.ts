@@ -21,6 +21,12 @@ export default class PreemptiveRaidWildlingCardType extends WildlingCardType {
             wildlingStrength: wildlingStrength
         });
 
+        wildlingsAttack.entireGame.broadcastToClients({
+            type: "preemptive-raid-new-attack",
+            biddings: wildlingsAttack.biddingResults?.map(([bid, houses]) => [bid, houses.map(h => h.id)]) ?? [],
+            highestBidder: (wildlingsAttack._highestBidder as House).id
+        });
+
         wildlingsAttack.parentGameState
             .setChildGameState(new WildlingsAttackGameState(wildlingsAttack.parentGameState))
             .firstStart(wildlingStrength, _.difference(wildlingsAttack.game.houses.values, [wildlingsAttack.highestBidder as House]));

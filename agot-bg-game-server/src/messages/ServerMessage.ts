@@ -31,7 +31,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | UpdateCompletedObjectives | UpdateSecretObjectives | SyncShiftingAmbitionsGameState | HideOrRevealUserNames | ClearChatRoom
     | UpdateSelectableObjectives | UpdateSpecialHouseCardModifier | UpdateUsurper
     | StartPlayerClock | StopPlayerClock | GamePaused | GameResumed | LaterHouseCardsApplied
-    | WildlingTiesResolved;
+    | WildlingTiesResolved | PreemptiveRaidNewAttack;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -500,4 +500,10 @@ interface WildlingTiesResolved {
     type: "wilding-ties-resolved";
     highestBidder?: string;
     lowestBidder?: string;
+}
+
+interface PreemptiveRaidNewAttack {
+    type: "preemptive-raid-new-attack";
+    biddings: [number, string[]][]
+    highestBidder: string;
 }
