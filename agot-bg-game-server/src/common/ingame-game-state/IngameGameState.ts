@@ -64,6 +64,8 @@ export default class IngameGameState extends GameState<
     @observable clockUpdate = 0;
     @observable marchMarkers: BetterMap<Unit, Region> = new BetterMap();
 
+    onPreemptiveRaidNewAttack: ((biddings: [number, House[]][], highestBidder: House) => void) | null = null;
+
     get entireGame(): EntireGame {
         return this.parentGameState;
     }
@@ -1080,7 +1082,13 @@ export default class IngameGameState extends GameState<
         } else if (message.type == "game-resumed") {
             this.game.paused = null;
             this.game.willBeAutoResumedAt = null;
-        } else {
+        } else if (message.type == "preemptive-raid-new-attack" && this.onPreemptiveRaidNewAttack) {
+            const biddings = message.biddings.map(([bid, hids]) =>
+                [bid, hids.map(hid => this.game.houses.get(hid))] as [number, House[]]);
+            const highestBidder = this.game.houses.get(message.highestBidder);
+            this.onPreemptiveRaidNewAttack(biddings, highestBidder);
+        }
+        else {
             this.childGameState.onServerMessage(message);
         }
     }

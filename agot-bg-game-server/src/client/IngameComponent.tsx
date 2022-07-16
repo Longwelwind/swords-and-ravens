@@ -109,6 +109,7 @@ import sleep from "../utils/sleep";
 import CombatInfoComponent from "./CombatInfoComponent";
 import HouseNumberResultsComponent from "./HouseNumberResultsComponent";
 import houseIconImages from "./houseIconImages";
+import { preemptiveRaid } from "../common/ingame-game-state/game-data-structure/wildling-card/wildlingCardTypes";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -1246,6 +1247,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             (wildlingCard, biddings, highestBidder, lowestBidder) => {
                 toast(this.getWildlingsAttackFastTrackedComponent(wildlingCard, biddings, highestBidder, lowestBidder));
             }
+
+        this.ingame.onPreemptiveRaidNewAttack = (biddings, highestBidder) => {
+            toast(this.getWildlingsAttackFastTrackedComponent(preemptiveRaid, biddings, highestBidder, null));
+        }
     }
 
     componentWillUnmount(): void {
