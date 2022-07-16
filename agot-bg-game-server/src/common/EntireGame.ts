@@ -58,6 +58,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     onClearChatRoom: (roomId: string) => void;
     onCaptureSentryMessage: (message: string, severity: "info" | "warning" | "error" | "fatal") => void;
     onSaveGame: (updateLastActive: boolean) => void;
+    onGameStarted: (() => void) | null = null;
 
     // Debounced saveGame so we don't spam the website client
     saveGame: (updateLastActive: boolean) => void = _.debounce(this.privateSaveGame, 2000);
@@ -460,6 +461,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             user.otherUsersFromSameNetwork = message.otherUsers;
         } else if (message.type == "hide-or-reveal-user-names") {
             message.names.forEach(([uid, name]) => this.users.get(uid).name = name);
+        } else if (message.type == "game-started") {
+            if (this.onGameStarted) {
+                this.onGameStarted();
+            }
         } else {
             this.childGameState.onServerMessage(message);
         }

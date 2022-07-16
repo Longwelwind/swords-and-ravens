@@ -106,8 +106,8 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                 </ScrollToBottom>
                 {!this.channel.connected &&
                 <Row noGutters={true} className="flex-nowrap justify-content-center">
-                    <Alert variant="danger" >
-                        This chat stopped working. Please reload!
+                    <Alert variant="warning" className="text-center">
+                        This chat is not connected. Please wait until the connection is established or reload the page.
                     </Alert>
                 </Row>}
                 <div>

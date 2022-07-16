@@ -83,6 +83,10 @@ export default class IngameGameState extends GameState<
     }
 
     beginGame(housesToCreate: string[], futurePlayers: BetterMap<string, User>): void {
+        this.entireGame.broadcastToClients({
+            type: "game-started"
+        });
+
         this.game = createGame(this, housesToCreate, futurePlayers.keys);
         this.players = new BetterMap(futurePlayers.map((house, user) => [user, new Player(user, this.game.houses.get(house))]));
 
@@ -101,11 +105,6 @@ export default class IngameGameState extends GameState<
         // we now have to calculate the supply limits of player houses in the beginning. (Vassals always start at supply level 4)
         this.game.nonVassalHouses.forEach(h =>  {
             h.supplyLevel = Math.min(this.game.supplyRestrictions.length - 1, this.game.getControlledSupplyIcons(h));
-        });
-
-        this.entireGame.broadcastToClients({
-            type: "supply-adjusted",
-            supplies: this.game.houses.values.map(h => [h.id, h.supplyLevel])
         });
 
         this.log({
