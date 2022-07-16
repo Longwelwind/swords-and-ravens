@@ -556,6 +556,21 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         onChange={() => this.changeGameSettings(() => this.gameSettings.faceless = !this.gameSettings.faceless)}
                     />
                 </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="no-private-chats-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="no-private-chats-setting-tooltip">
+                                    Players will not be able to create private chat rooms.
+                                </Tooltip>}>
+                                <label htmlFor="no-private-chats-setting">Disable private chats</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.noPrivateChats}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.noPrivateChats = !this.gameSettings.noPrivateChats)}
+                    />
+                </Col>
             </Col>
             <Col md="12" lg="auto" id="custom-settings-2-col" className="no-gutters">
                 <Col xs="12">

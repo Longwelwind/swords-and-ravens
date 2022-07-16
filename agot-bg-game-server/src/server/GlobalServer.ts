@@ -183,6 +183,9 @@ export default class GlobalServer {
 
             // Chat related messages are handled by GlobalServer because they must use the website client
             if (message.type == "create-private-chat-room") {
+                if (entireGame.gameSettings.noPrivateChats) {
+                    return;
+                }
                 const otherUser = user.entireGame.users.get(message.otherUser);
                 // Check if a chat room has not already been started between these 2 users
                 const users = _.sortBy([user, otherUser], u => u.id);

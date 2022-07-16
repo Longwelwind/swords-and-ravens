@@ -844,7 +844,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     </OverlayTrigger>
                                 </Nav.Link>
                             </Nav.Item>
-                            {this.authenticatedPlayer && <Nav.Item>
+                            {this.authenticatedPlayer && !this.props.gameState.entireGame.gameSettings.noPrivateChats &&
+                            <Nav.Item>
                                 <Dropdown>
                                     <Dropdown.Toggle id="private-chat-room-dropdown" variant="link">
                                         <OverlayTrigger

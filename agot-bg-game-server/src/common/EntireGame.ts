@@ -45,7 +45,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         randomHouses: false, randomChosenHouses: false, tidesOfBattle: false, removeTob3: false, removeTobSkulls: false, limitTob2: false,
         draftHouseCards: false, thematicDraft: false, limitedDraft: false, blindDraft: false,
         mixedWesterosDeck1: false, cokWesterosPhase: false, reduceVictoryPointsCountNeededToWinTo6: false, endless: false,  faceless: false,
-        useVassalPositions: false, precedingMustering: false, randomStartPositions: false, initialLiveClock: 60};
+        useVassalPositions: false, precedingMustering: false, randomStartPositions: false, initialLiveClock: 60,
+        noPrivateChats: false
+    };
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
     onWaitedUsers: (users: User[]) => void;
@@ -748,4 +750,5 @@ export interface GameSettings {
     customModBalancing: boolean;
     houseCardsEvolution: boolean;
     initialLiveClock: number;
+    noPrivateChats: boolean;
 }
