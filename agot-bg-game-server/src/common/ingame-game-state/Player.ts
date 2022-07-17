@@ -37,7 +37,7 @@ export default class Player {
     }
 
     setWaitedFor(hasBeenReactivatedAgain = false): void {
-        if (!this.user.entireGame.gameSettings.pbem || this.user.entireGame.ingameGameState?.pausedForUpdate) {
+        if (!this.user.entireGame.gameSettings.pbem) {
             return;
         }
 
