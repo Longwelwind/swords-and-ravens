@@ -109,14 +109,28 @@ export default class SelectObjectiveCardsGameState<P extends ParentGameState> ex
 
     onServerMessage(message: ServerMessage): void {
         if (message.type == "player-ready") {
-            const player = this.parentGameState.ingame.players.get(this.entireGame.users.get(message.userId));
-            // On client-side only set an empty array for the selected objectives to not reveal the choice to other houses
-            this.readyHouses.set(player.house, []);
+            if (message.userId != "") {
+                const player = this.parentGameState.ingame.players.get(this.entireGame.users.get(message.userId));
+                // On client-side only set an empty array for the selected objectives to not reveal the choice to other houses
+                this.readyHouses.set(player.house, []);
+            } else {
+                this.parentGameState.ingame.getVassalHouses().forEach(h => this.readyHouses.set(h, []));
+            }
         } else if (message.type == "update-selectable-objectives") {
             const house = this.parentGameState.game.houses.get(message.house);
             const objectives = message.selectableObjectives.map(ocid => objectiveCards.get(ocid));
             this.selectableCardsPerHouse.set(house, objectives);
         }
+    }
+
+    actionAfterVassalReplacement(newVassal: House): void {
+        this.readyHouses.set(newVassal, []);
+        this.entireGame.broadcastToClients({
+            type: "player-ready",
+            userId: ""
+        });
+
+        this.checkAndProceedEndOfSelectObjectives();
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedSelectObjectiveCardsGameState {

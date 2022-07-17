@@ -102,8 +102,27 @@ export default class ScoreSpecialObjectivesGameState extends GameState<ScoreObje
 
     onServerMessage(message: ServerMessage): void {
         if (message.type == "player-ready") {
-            const player = this.parentGameState.ingame.players.get(this.entireGame.users.get(message.userId));
-            this.readyHouses.push(player.house);
+            if (message.userId != "") {
+                const player = this.parentGameState.ingame.players.get(this.entireGame.users.get(message.userId));
+                this.readyHouses.push(player.house);
+            } else {
+                this.ingame.getVassalHouses().forEach(h => {
+                    if (!this.readyHouses.includes(h)) {
+                        this.readyHouses.push(h);
+                    }
+                });
+            }
+        }
+    }
+
+    actionAfterVassalReplacement(newVassal: House): void {
+        if (!this.readyHouses.includes(newVassal)) {
+            this.readyHouses.push(newVassal);
+            this.entireGame.broadcastToClients({
+                type: "player-ready",
+                userId: ""
+            });
+            this.checkAndProceedEndOfScoreSpecialObjectives();
         }
     }
 

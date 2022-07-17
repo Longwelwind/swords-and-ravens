@@ -18,6 +18,7 @@ import sleep from "../utils/sleep";
 import { compress, decompress } from "./utils/compression";
 import * as Sentry from "@sentry/node"
 import { getTimeDeltaInSeconds } from "../utils/getElapsedSeconds";
+import IngameGameState from "../common/ingame-game-state/IngameGameState";
 
 interface UserConnectionInfo {
     userId: string;
@@ -183,7 +184,8 @@ export default class GlobalServer {
 
             // Chat related messages are handled by GlobalServer because they must use the website client
             if (message.type == "create-private-chat-room") {
-                if (entireGame.gameSettings.noPrivateChats) {
+                const ingame = entireGame.childGameState instanceof IngameGameState ? entireGame.childGameState : null;
+                if (!ingame || !ingame.players.has(user) || entireGame.gameSettings.noPrivateChats) {
                     return;
                 }
                 const otherUser = user.entireGame.users.get(message.otherUser);

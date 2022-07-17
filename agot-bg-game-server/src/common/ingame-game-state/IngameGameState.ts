@@ -1343,7 +1343,7 @@ export default class IngameGameState extends GameState<
                 return {result: false, reason: "ongoing-house-card-drafting"}
             }
 
-            if (this.entireGame.isFeastForCrows && !this.isHouseDefeated(forHouse)) {
+            if (this.entireGame.isFeastForCrows && !this.isHouseDefeated(forHouse) && !this.entireGame.gameSettings.onlyLive) {
                 return {result: false, reason: "only-possible-when-defeated"}
             }
         }

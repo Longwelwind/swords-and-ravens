@@ -35,7 +35,8 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
     }
 
     render(): ReactNode {
-        const availableCards = this.player && !this.doesControlHouse ? this.props.gameState.getFilteredHouseCardsForHouse(this.player.house) : [];
+        const showCardsPreview = this.player && (!this.doesControlHouse || this.draftStep == DraftStep.DECIDE);
+        const availableCards = this.player && showCardsPreview ? this.props.gameState.getFilteredHouseCardsForHouse(this.player.house) : [];
         const remainingCardsForSpectators = !this.player ? _.sortBy(this.props.gameState.ingame.game.houseCardsForDrafting.values, hc => -hc.combatStrength, hc => hc.houseId) : [];
         return (
             <>
@@ -70,8 +71,7 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                             [SimpleChoiceGameState, SimpleChoiceComponent]
                         ])}
                     </Row>}
-                    {this.player && (!this.doesControlHouse
-                        || (this.props.gameState.childGameState instanceof SimpleChoiceGameState && this.draftStep == DraftStep.DECIDE)) &&
+                    {showCardsPreview &&
                     <Row>
                         <Col xs="12" className="text-center">These are the House cards from which you may choose one on your next turn:</Col>
                         <Col xs="12">
