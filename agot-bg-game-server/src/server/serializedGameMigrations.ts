@@ -1757,6 +1757,20 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "81",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.game.houses.forEach((h: any) => {
+                    if (h.id == "targaryen") {
+                        h.color = "#9013FE";
+                    }
+                });
+            }
+            return serializedGame;
+        }
     }
 ];
 
