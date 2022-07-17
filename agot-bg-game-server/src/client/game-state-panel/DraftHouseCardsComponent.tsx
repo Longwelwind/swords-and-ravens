@@ -70,7 +70,8 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                             [SimpleChoiceGameState, SimpleChoiceComponent]
                         ])}
                     </Row>}
-                    {this.player && !this.doesControlHouse &&
+                    {this.player && (!this.doesControlHouse
+                        || (this.props.gameState.childGameState instanceof SimpleChoiceGameState && this.draftStep == DraftStep.DECIDE)) &&
                     <Row>
                         <Col xs="12" className="text-center">These are the House cards from which you may choose one on your next turn:</Col>
                         <Col xs="12">
