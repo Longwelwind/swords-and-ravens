@@ -86,6 +86,12 @@ export default class ShiftingAmbitionsGameState extends GameState<WesterosGameSt
         if (this.turnOrder.length > 0) {
             const nextHouse = this.turnOrder.shift() as House;
 
+            // Due to vassalization it may be possible that this house is now a vassal
+            if (this.ingame.isVassalHouse(nextHouse)) {
+                this.proceedNextHouse();
+                return;
+            }
+
             this.setChildGameState(new SelectObjectiveCardsGameState(this)).firstStart(
                 [[nextHouse, this.objectiveCardPool]],
                 1,

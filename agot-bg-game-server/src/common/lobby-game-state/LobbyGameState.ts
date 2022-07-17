@@ -178,7 +178,6 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.useVassalPositions = false;
                 settings.mixedWesterosDeck1 = false;
                 settings.endless = false;
-                settings.onlyLive = false;
             }
 
             if (settings.setupId != "a-feast-for-crows") {
