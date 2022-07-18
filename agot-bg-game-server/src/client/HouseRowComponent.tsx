@@ -25,8 +25,6 @@ import UserLabel from "./UserLabel";
 import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
 import { observer } from "mobx-react";
 import GiftPowerTokensComponent from "./GiftPowerTokensComponent";
-import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
-import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import MapControls, { RegionOnMapProperties } from "./MapControls";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
@@ -70,7 +68,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
 
     render(): ReactNode {
         const isVassal = this.ingame.isVassalHouse(this.house);
-        const gameRunning = !(this.ingame.leafState instanceof GameEndedGameState) && !(this.ingame.leafState instanceof CancelledGameState);
+        const gameRunning = !this.ingame.isEnded && !this.ingame.isCancelled;
         // We limit the victory points to 7 but in the UI we wan't to show if a player controls more than 7 castles
         const victoryPoints = !this.ingame.entireGame.isFeastForCrows && this.house.id != "targaryen"
             ? this.game.getControlledStrongholdAndCastleCount(this.house)
@@ -106,7 +104,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                 player = this.player;
                 isWaitedFor = this.ingame.getWaitedUsers().includes(player.user);
 
-                clock = player.totalRemainingSeconds;
+                clock = player.liveClockData ? player.totalRemainingSeconds : null;
 
                 if (clock != null) {
                     clockCritical = gameRunning && clock > 0 && clock < (10 * 60);

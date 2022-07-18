@@ -59,8 +59,8 @@ export default class Vote {
             }
         }
 
-        if (this.type instanceof ResumeGame && this.ingame.game.willBeAutoResumedAt) {
-            if (getTimeDeltaInSeconds(this.ingame.game.willBeAutoResumedAt, new Date()) <= 5) {
+        if (this.type instanceof ResumeGame && this.ingame.willBeAutoResumedAt) {
+            if (getTimeDeltaInSeconds(this.ingame.willBeAutoResumedAt, new Date()) <= 5) {
                 return { result: false, reason: "wait-for-auto-resume" };
             }
         }

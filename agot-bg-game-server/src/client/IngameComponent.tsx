@@ -505,7 +505,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </OverlayTrigger>
                             </button>
                         </Col>
-                        {this.ingame.entireGame.gameSettings.onlyLive && !this.ingame.game.paused &&
+                        {this.ingame.entireGame.gameSettings.onlyLive && !this.ingame.paused &&
                         <Col xs="auto">
                             <button
                                 className="btn btn-outline-light btn-sm"
@@ -532,7 +532,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </OverlayTrigger>
                             </button>
                         </Col>}
-                        {this.ingame.entireGame.gameSettings.onlyLive && this.ingame.game.paused &&
+                        {this.ingame.entireGame.gameSettings.onlyLive && this.ingame.paused &&
                         <Col xs="auto">
                             <button
                                 className="btn btn-outline-light btn-sm"
@@ -608,7 +608,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             this.authenticatedPlayer.house.knowsNextWildlingCard;
         const nextWildlingCard = this.game.wildlingDeck.find(c => c.id == this.game.clientNextWildlingCardId);
 
-        const gameRunning = !(this.ingame.leafState instanceof GameEndedGameState) && !(this.ingame.leafState instanceof CancelledGameState);
+        const gameRunning = !this.ingame.isEnded && !this.ingame.isCancelled;
         const roundWarning = gameRunning && (this.game.maxTurns - this.game.turn) == 1;
         const roundCritical = gameRunning && (this.game.turn == this.game.maxTurns);
 

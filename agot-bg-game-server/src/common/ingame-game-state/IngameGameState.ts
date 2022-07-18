@@ -56,7 +56,10 @@ export default class IngameGameState extends GameState<
     game: Game;
     gameLogManager: GameLogManager = new GameLogManager(this);
     votes: BetterMap<string, Vote> = new BetterMap();
+    @observable paused: Date | null;
+    @observable willBeAutoResumedAt: Date | null;
 
+    // Server-side only
     autoResumeTimeout: NodeJS.Timeout | null = null;
 
     // Client-side only
@@ -76,6 +79,14 @@ export default class IngameGameState extends GameState<
 
     get sortedByLeadingPlayers(): Player[] {
         return this.game.getPotentialWinners().map(h => this.getControllerOfHouse(h));
+    }
+
+    get isEnded(): boolean {
+        return this.childGameState instanceof GameEndedGameState;
+    }
+
+    get isCancelled(): boolean {
+        return this.childGameState instanceof CancelledGameState;
     }
 
     constructor(entireGame: EntireGame) {
@@ -395,7 +406,7 @@ export default class IngameGameState extends GameState<
             player.user.note = message.note.substring(0, NOTE_MAX_LENGTH);
         }
 
-        if (this.game.paused) {
+        if (this.paused) {
             return;
         }
 
@@ -689,13 +700,13 @@ export default class IngameGameState extends GameState<
 
     resumeGame(byVote = false): void {
         try {
-            if (!this.game.paused) {
+            if (!this.paused) {
                 throw new Error("Game must be paused here");
             }
 
-            const pauseTimeInSeconds = getElapsedSeconds(this.game.paused);
-            this.game.paused = null;
-            this.game.willBeAutoResumedAt = null;
+            const pauseTimeInSeconds = getElapsedSeconds(this.paused);
+            this.paused = null;
+            this.willBeAutoResumedAt = null;
             this.autoResumeTimeout = null;
 
             // Cancel possible ResumeGame votes
@@ -733,7 +744,7 @@ export default class IngameGameState extends GameState<
         const otherPlayers = this.players.values;
         _.pull(otherPlayers, newPlayer, oldPlayer);
 
-        const avg = Math.floor(_.sum(otherPlayers.map(p => p.totalRemainingSeconds ?? 0)) / otherPlayers.length);
+        const avg = Math.floor(_.sum(otherPlayers.map(p => p.totalRemainingSeconds)) / otherPlayers.length);
         newPlayer.liveClockData = {
             remainingSeconds: avg,
             clientIntervalId: -1,
@@ -1074,13 +1085,13 @@ export default class IngameGameState extends GameState<
 
             player.stopClientClockInterval();
         } else if (message.type == "game-paused") {
-            this.game.paused = new Date();
+            this.paused = new Date();
             if (message.willBeAutoResumedAt) {
-                this.game.willBeAutoResumedAt = new Date(message.willBeAutoResumedAt);
+                this.willBeAutoResumedAt = new Date(message.willBeAutoResumedAt);
             }
         } else if (message.type == "game-resumed") {
-            this.game.paused = null;
-            this.game.willBeAutoResumedAt = null;
+            this.paused = null;
+            this.willBeAutoResumedAt = null;
         } else if (message.type == "preemptive-raid-new-attack" && this.onPreemptiveRaidNewAttack) {
             const biddings = message.biddings.map(([bid, hids]) =>
                 [bid, hids.map(hid => this.game.houses.get(hid))] as [number, House[]]);
@@ -1167,11 +1178,11 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "only-players-can-vote"};
         }
 
-        if (this.childGameState instanceof CancelledGameState) {
+        if (this.isCancelled) {
             return {result: false, reason: "already-cancelled"};
         }
 
-        if (this.childGameState instanceof GameEndedGameState) {
+        if (this.isEnded) {
             return {result: false, reason: "already-ended"};
         }
 
@@ -1193,11 +1204,11 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "only-players-can-vote"};
         }
 
-        if (this.childGameState instanceof CancelledGameState) {
+        if (this.isCancelled) {
             return {result: false, reason: "already-cancelled"};
         }
 
-        if (this.childGameState instanceof GameEndedGameState) {
+        if (this.isEnded) {
             return {result: false, reason: "already-ended"};
         }
 
@@ -1219,7 +1230,7 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "already-existing"};
         }
 
-        if (this.game.paused) {
+        if (this.paused) {
             return {result: false, reason: "already-paused"};
         }
 
@@ -1227,11 +1238,11 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "only-players-can-vote"};
         }
 
-        if (this.childGameState instanceof CancelledGameState) {
+        if (this.isCancelled) {
             return {result: false, reason: "already-cancelled"};
         }
 
-        if (this.childGameState instanceof GameEndedGameState) {
+        if (this.isEnded) {
             return {result: false, reason: "already-ended"};
         }
 
@@ -1249,7 +1260,7 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "already-existing"};
         }
 
-        if (!this.game.paused) {
+        if (!this.paused) {
             return {result: false, reason: "not-paused"};
         }
 
@@ -1257,11 +1268,11 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "only-players-can-vote"};
         }
 
-        if (this.childGameState instanceof CancelledGameState) {
+        if (this.isCancelled) {
             return {result: false, reason: "already-cancelled"};
         }
 
-        if (this.childGameState instanceof GameEndedGameState) {
+        if (this.isEnded) {
             return {result: false, reason: "already-ended"};
         }
 
@@ -1298,11 +1309,11 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "only-players-can-vote"};
         }
 
-        if (this.childGameState instanceof CancelledGameState) {
+        if (this.isCancelled) {
             return {result: false, reason: "already-cancelled"};
         }
 
-        if (this.childGameState instanceof GameEndedGameState) {
+        if (this.isEnded) {
             return {result: false, reason: "already-ended"};
         }
 
@@ -1353,11 +1364,11 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "ongoing-vote"};
         }
 
-        if (this.childGameState instanceof CancelledGameState) {
+        if (this.isCancelled) {
             return {result: false, reason: "game-cancelled"};
         }
 
-        if (this.childGameState instanceof GameEndedGameState) {
+        if (this.isEnded) {
             return {result: false, reason: "game-ended"};
         }
 
@@ -1390,11 +1401,11 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "ongoing-vote"};
         }
 
-        if (this.childGameState instanceof CancelledGameState) {
+        if (this.isCancelled) {
             return {result: false, reason: "game-cancelled"};
         }
 
-        if (this.childGameState instanceof GameEndedGameState) {
+        if (this.isEnded) {
             return {result: false, reason: "game-ended"};
         }
 
@@ -1557,6 +1568,8 @@ export default class IngameGameState extends GameState<
             game: this.game.serializeToClient(admin, player),
             gameLogManager: this.gameLogManager.serializeToClient(admin, user),
             votes: this.votes.values.map(v => v.serializeToClient(admin, player)),
+            paused: this.paused ? this.paused.getTime() : null,
+            willBeAutoResumedAt: this.willBeAutoResumedAt ? this.willBeAutoResumedAt.getTime() : null,
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -1570,6 +1583,8 @@ export default class IngameGameState extends GameState<
         );
         ingameGameState.votes = new BetterMap(data.votes.map(sv => [sv.id, Vote.deserializeFromServer(ingameGameState, sv)]));
         ingameGameState.gameLogManager = GameLogManager.deserializeFromServer(ingameGameState, data.gameLogManager);
+        ingameGameState.paused = data.paused ? new Date(data.paused) : null;
+        ingameGameState.willBeAutoResumedAt = data.willBeAutoResumedAt ? new Date(data.willBeAutoResumedAt) : null;
         ingameGameState.childGameState = ingameGameState.deserializeChildGameState(data.childGameState);
 
         return ingameGameState;
@@ -1607,6 +1622,8 @@ export interface SerializedIngameGameState {
     game: SerializedGame;
     votes: SerializedVote[];
     gameLogManager: SerializedGameLogManager;
+    paused: number | null;
+    willBeAutoResumedAt: number | null;
     childGameState: SerializedPlanningGameState | SerializedActionGameState | SerializedWesterosGameState
         | SerializedGameEndedGameState | SerializedCancelledGameState | SerializedDraftHouseCardsGameState
         | SerializedThematicDraftHouseCardsGameState | SerializedDraftInfluencePositionsGameState | SerializedPayDebtsGameState

@@ -15,9 +15,9 @@ export default class Player {
         return this.user.entireGame.ingameGameState?.votes.values.filter(vote => vote.state == VoteState.ONGOING).some(vote => !vote.votes.has(this.house)) ?? false;
     }
 
-    get totalRemainingSeconds(): number | null {
+    get totalRemainingSeconds(): number {
         if (!this.liveClockData) {
-            return null;
+            throw new Error("totalRemainingSeconds requested but no liveClockData present");
         }
 
         let total = this.liveClockData.remainingSeconds;

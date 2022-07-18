@@ -167,7 +167,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
 
     renderWarnings(): ReactNode {
         return <>
-            {this.props.entireGame.ingameGameState?.game.paused &&
+            {this.props.entireGame.ingameGameState?.paused &&
             <Col xs="auto">
                 <h4><Badge variant="danger">PAUSED</Badge></h4>
             </Col>}
@@ -194,9 +194,9 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     renderClock(): ReactNode {
-        if (this.ingame?.game.willBeAutoResumedAt) {
+        if (this.ingame?.willBeAutoResumedAt) {
             // Show a 10 minutes countdown
-            const countdown = secondsToString(getTimeDeltaInSeconds(this.ingame?.game.willBeAutoResumedAt, new Date()), true);
+            const countdown = secondsToString(getTimeDeltaInSeconds(this.ingame?.willBeAutoResumedAt, new Date()), true);
 
             return <Col xs="auto">
                 <OverlayTrigger
@@ -216,8 +216,8 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             const firstLog = _.first(gameLogManager?.logs ?? []);
 
             if (firstLog) {
-                const lastTimeStamp = this.ingame.game.paused
-                    ? this.ingame.game.paused
+                const lastTimeStamp = this.ingame.paused
+                    ? this.ingame.paused
                     : this.isGameEnded
                         ? _.last(gameLogManager?.logs ?? [])?.time ?? new Date()
                         : new Date();
