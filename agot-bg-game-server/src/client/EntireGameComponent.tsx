@@ -16,7 +16,7 @@ import faviconAlert from "../../public/images/favicon-alert.ico";
 import rollingDicesImage from "../../public/images/icons/rolling-dices.svg";
 import cardExchangeImage from "../../public/images/icons/card-exchange.svg";
 import {Helmet} from "react-helmet";
-import { FormCheck, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
+import { Card, FormCheck, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import { preventOverflow } from "@popperjs/core";
 import DraftHouseCardsGameState from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import { observable } from "mobx";
@@ -31,6 +31,12 @@ import CombatGameState from "../common/ingame-game-state/action-game-state/resol
 import { GameResumed } from "../common/ingame-game-state/game-data-structure/GameLog";
 import { getTimeDeltaInSeconds } from "../utils/getElapsedSeconds";
 import { toast } from "react-toastify";
+import { cssTransition } from "react-toastify";
+
+const yourTurnToastAnimation = cssTransition({
+    enter: "slide-in-elliptic-top-fwd",
+    exit: "slide-out-elliptic-top-bck"
+});
 
 interface EntireGameComponentProps {
     entireGame: EntireGame;
@@ -346,14 +352,20 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             const player = this.props.gameClient.authenticatedPlayer;
             if (player) {
                  // must be truthy but so what
-                 toast(<div className="d-flex">
-                    <HouseIconComponent house={player.house}></HouseIconComponent>
-                    <h3 className="d-inline ml-3">It&apos;s your turn!</h3>
-                 </div>, {
+                toast(<div>
+                    <Card>
+                        <Card.Body className="d-flex align-items-center">
+                            <HouseIconComponent house={player.house} size={100}></HouseIconComponent>
+                            <h2 className="d-inline ml-3" style={{ color: "white" }}>It&apos;s your turn!</h2>
+                        </Card.Body>
+                    </Card>
+                </div>, {
                     autoClose: 4000,
                     toastId: "your-turn-toast",
-                    pauseOnHover: false
-                 });
+                    pauseOnHover: false,
+                    theme: "light",
+                    transition: yourTurnToastAnimation
+                });
             }
         } else {
             toast.dismiss("your-turn-toast");

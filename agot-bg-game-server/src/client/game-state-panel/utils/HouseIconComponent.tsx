@@ -9,6 +9,7 @@ import houseIconImages from "../../../client/houseIconImages";
 interface HouseIconComponentProps {
     house: LobbyHouse;
     small?: boolean;
+    size?: number;
 }
 
 @observer
@@ -18,7 +19,10 @@ export default class HouseIconComponent extends Component<HouseIconComponentProp
     }
 
     render(): ReactNode {
-        const height = this.props.small ? "28px" : undefined;
+        const size = this.props.size ? `${this.props.size}px`
+            : this.props.small
+                ? "28px"
+                : undefined;
         return <OverlayTrigger overlay={
                 <Tooltip id="house-icon">
                     <b>{this.house.name}</b>
@@ -27,7 +31,7 @@ export default class HouseIconComponent extends Component<HouseIconComponentProp
             placement="bottom"
         >
             <div className="influence-icon"
-                style={{backgroundImage: `url(${houseIconImages.get(this.house.id)})`, height: height}}>
+                style={{backgroundImage: `url(${houseIconImages.get(this.house.id)})`, height: size, width: size}}>
             </div>
         </OverlayTrigger>;
     }
