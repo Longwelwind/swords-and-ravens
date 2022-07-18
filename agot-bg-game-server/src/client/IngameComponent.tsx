@@ -377,7 +377,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             />
                         </ListGroupItem>
                     </ListGroup>
-                    <button className="btn btn-sm p-0" onClick={async() => {
+                    <button className="btn btn-outline-light btn-sm" onClick={async() => {
                             if (this.user && this.columnSwapAnimationClassName == "") {
                                 this.columnSwapAnimationClassName = "animate__animated animate__fadeIn"
                                 this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
@@ -385,7 +385,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 this.columnSwapAnimationClassName = "";
                             }
                         }}
-                        style={{position: "absolute", left: "2px"}}
+                        style={{position: "absolute", left: "0px", padding: "8px", borderStyle: "none"}}
                     >
                         <FontAwesomeIcon icon={faRightLeft} style={{color: "white"}}/>
                     </button>
@@ -639,7 +639,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 : <span className={classNames("text-muted", { "clickable dropdown-toggle": phase.name == "Westeros" })}>{phase.name} phase</span>;
 
         return <div className={this.mapScrollbarEnabled ? "flex-ratio-container" : ""}>
-            <Card id="game-state-panel" className={this.mapScrollbarEnabled ? "flex-sized-to-content" : ""} border={border} style={{maxHeight: this.mapScrollbarEnabled ? "70%" : "none", paddingRight: "10px", marginBottom: "10px" }}>
+            <Card id="game-state-panel" className={this.mapScrollbarEnabled ? "flex-sized-to-content" : ""} border={border} style={{maxHeight: this.mapScrollbarEnabled ? "70%" : "none", paddingRight: "10px", marginBottom: "10px", borderWidth: "3px" }}>
                 <Row className="no-space-around">
                     <Col>
                         <ListGroup variant="flush">
@@ -731,7 +731,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         </Col>
                     </Col>
                 </Row>
-                <button className="btn btn-sm p-0" onClick={async() => {
+                <button className="btn btn-outline-light btm-sm" onClick={async() => {
                         if (this.user && this.columnSwapAnimationClassName == "") {
                             this.columnSwapAnimationClassName = "animate__animated animate__fadeIn"
                             this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
@@ -739,7 +739,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             this.columnSwapAnimationClassName = "";
                         }
                     }}
-                    style={{position: "absolute", left: "2px"}}
+                    style={{position: "absolute", left: "0px", padding: "8px", borderStyle: "none"}}
                 >
                     <FontAwesomeIcon icon={faRightLeft} style={{color: "white"}}/>
                 </button>
@@ -1185,7 +1185,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 tidesOfBattleCard: tidesOfBattleCard};
             });
 
-        return <>
+        return <div>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <h5>Battle results for <b>{houseCombatDatas[1].region.name}</b></h5>
             </div>
@@ -1197,7 +1197,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             {winner && <p className="text-center mt-2">
                 Winner: <b style={{"color": winner.color}}>{winner.name}</b>
             </p>}
-        </>;
+        </div>;
     }
 
     getWildlingsAttackFastTrackedComponent(

@@ -25,7 +25,7 @@ export default class SeeTopWildlingCardComponent extends Component<GameStateComp
                     <Row className="justify-content-center">
                         {this.props.gameClient.doesControlHouse(this.props.gameState.ravenHolder) && (
                             <Col xs="auto">
-                                <WildlingCardComponent cardType={this.props.gameState.topWildlingCard.type}/>
+                                <WildlingCardComponent cardType={this.props.gameState.topWildlingCard.type} size="fairly" tooltip/>
                             </Col>
                         )}
                     </Row>
