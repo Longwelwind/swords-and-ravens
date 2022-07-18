@@ -1777,6 +1777,10 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
         migrate: (serializedGame: any) => {
             if (serializedGame.childGameState.type == "ingame") {
                 const ingame = serializedGame.childGameState;
+                if (serializedGame.gameSettings.onlyLive && !serializedGame.gameSettings.initialLiveClock) {
+                    serializedGame.gameSettings.initialLiveClock = 75;
+                }
+
                 ingame.paused = ingame.game.paused ? ingame.game.paused : null;
                 ingame.willBeAutoResumedAt = ingame.game.willBeAutoResumedAt ? ingame.game.willBeAutoResumedAt : null;
                 ingame.game.paused = undefined;

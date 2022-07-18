@@ -17,7 +17,6 @@ import { v4 } from "uuid";
 import sleep from "../utils/sleep";
 import { compress, decompress } from "./utils/compression";
 import * as Sentry from "@sentry/node"
-import { getTimeDeltaInSeconds } from "../utils/getElapsedSeconds";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 
 interface UserConnectionInfo {
@@ -234,32 +233,83 @@ export default class GlobalServer {
     }
 
     restartLiveClockTimers(entireGame: EntireGame): void {
-        if (!entireGame.gameSettings.onlyLive || !entireGame.ingameGameState) {
+        if (!entireGame.gameSettings.onlyLive || !entireGame.ingameGameState
+            || entireGame.ingameGameState.isEnded || entireGame.ingameGameState.isCancelled) {
             return;
         }
 
+        const now = new Date();
         const ingame = entireGame.ingameGameState;
 
         if (ingame.willBeAutoResumedAt) {
-            const remainingSeconds = getTimeDeltaInSeconds(ingame.willBeAutoResumedAt, new Date());
-            if (remainingSeconds > 0) {
-                // Pause still ongoing, set a new timer
-                ingame.autoResumeTimeout = setTimeout(() => { ingame.resumeGame(); }, remainingSeconds * 1000);
-                ingame.willBeAutoResumedAt = new Date();
-                ingame.willBeAutoResumedAt.setSeconds(ingame.willBeAutoResumedAt.getSeconds() + remainingSeconds);
+            // If server restarts during game pause, game must be resumed by vote
+            ingame.willBeAutoResumedAt = null;
+        }
+
+        if (ingame.players.values.some(p => p.liveClockData == null)) {
+            // Something really strange happened. Pause game, reinit all live clock datas and return;
+            this.onCaptureSentryMessage("Player with liveClockData = null in onlyLive game detected", "error");
+            ingame.players.values.forEach(p => p.liveClockData = {
+                remainingSeconds: entireGame.gameSettings.initialLiveClock * 60,
+                timerStartedAt: null,
+                serverTimer: null,
+                clientIntervalId: -1,
+            });
+            ingame.willBeAutoResumedAt = null;
+            ingame.paused = now;
+            return;
+        }
+
+        const clockDataPerPlayer = new BetterMap(ingame.players.values.map(p => {
+            return [p, {
+                    timerStartedAt: p.liveClockData?.timerStartedAt ?? null,
+                    totalRemainingSeconds: p.totalRemainingSeconds
+                }]
+            })
+        );
+
+        if (clockDataPerPlayer.values.some(clockData =>
+            clockData.timerStartedAt != null && clockData.totalRemainingSeconds == 0)
+        ) {
+            // A clock was started but server was offline for so long, that a clock ran out of time already
+            // In this case we pause the game so it must be resumed by vote or cancelled.
+            // Then we calculate the average remaining seconds of players with no active timer and assign it to the ones with an active timer
+            ingame.paused = now;
+
+            const playersWithNoActiveTimer = clockDataPerPlayer.entries
+                .filter(([_p, clockData]) => clockData.timerStartedAt == null);
+
+            if (playersWithNoActiveTimer.length == 0) {
+                // Timers of all players were running => reinit all clocks
+                clockDataPerPlayer.keys.forEach(p => {
+                    clockDataPerPlayer.set(p, {
+                        timerStartedAt: null, // We paused the game => Don't restart a timer
+                        totalRemainingSeconds: entireGame.gameSettings.initialLiveClock * 60
+                    });
+                });
             } else {
-                // Pause ended already, resume this game
-                ingame.resumeGame();
+                // Apply average to the players with active timer
+                const avg = Math.floor(_.sum(playersWithNoActiveTimer.map(([_p, clockData]) => clockData.totalRemainingSeconds)) / playersWithNoActiveTimer.length);
+                clockDataPerPlayer.entries.forEach(([p, clockData]) => {
+                    if (clockData.timerStartedAt != null) {
+                        clockDataPerPlayer.set(p, {
+                            timerStartedAt: null, // We paused the game => Don't restart a timer
+                            totalRemainingSeconds: avg
+                        });
+                    }
+                });
             }
         }
 
-        ingame.players.values.forEach(p => {
-            const totalRemaining = p.totalRemainingSeconds;
-            if (totalRemaining != null && p.liveClockData?.timerStartedAt) {
-                p.liveClockData.remainingSeconds = totalRemaining;
-                p.liveClockData.serverTimer = setTimeout(() => ingame.onPlayerClockTimeout(p), totalRemaining * 1000);
-                p.liveClockData.timerStartedAt = new Date();
-            }
+        clockDataPerPlayer.entries.forEach(([p, clockData]) => {
+            p.liveClockData = {
+                remainingSeconds: clockData.totalRemainingSeconds,
+                timerStartedAt: clockData.timerStartedAt ? now : null,
+                serverTimer: clockData.timerStartedAt
+                    ? setTimeout(() => ingame.onPlayerClockTimeout(p), clockData.totalRemainingSeconds * 1000)
+                    : null,
+                clientIntervalId: -1
+            };
         });
     }
 
@@ -283,7 +333,11 @@ export default class GlobalServer {
             : await this.createGame(gameData.id, gameData.ownerId, gameData.name);
 
         if (needsDeserialization) {
-            this.restartLiveClockTimers(entireGame);
+            try {
+                this.restartLiveClockTimers(entireGame);
+            } catch (e) {
+                Sentry.captureException(e);
+            }
         }
 
         // Bind listeners

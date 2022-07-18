@@ -81,6 +81,14 @@ export default class IngameGameState extends GameState<
         return this.game.getPotentialWinners().map(h => this.getControllerOfHouse(h));
     }
 
+    get isEnded(): boolean {
+        return this.childGameState instanceof GameEndedGameState;
+    }
+
+    get isCancelled(): boolean {
+        return this.childGameState instanceof CancelledGameState;
+    }
+
     constructor(entireGame: EntireGame) {
         super(entireGame);
     }
@@ -736,7 +744,7 @@ export default class IngameGameState extends GameState<
         const otherPlayers = this.players.values;
         _.pull(otherPlayers, newPlayer, oldPlayer);
 
-        const avg = Math.floor(_.sum(otherPlayers.map(p => p.totalRemainingSeconds ?? 0)) / otherPlayers.length);
+        const avg = Math.floor(_.sum(otherPlayers.map(p => p.totalRemainingSeconds)) / otherPlayers.length);
         newPlayer.liveClockData = {
             remainingSeconds: avg,
             clientIntervalId: -1,
@@ -1170,11 +1178,11 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "only-players-can-vote"};
         }
 
-        if (this.childGameState instanceof CancelledGameState) {
+        if (this.isCancelled) {
             return {result: false, reason: "already-cancelled"};
         }
 
-        if (this.childGameState instanceof GameEndedGameState) {
+        if (this.isEnded) {
             return {result: false, reason: "already-ended"};
         }
 
@@ -1196,11 +1204,11 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "only-players-can-vote"};
         }
 
-        if (this.childGameState instanceof CancelledGameState) {
+        if (this.isCancelled) {
             return {result: false, reason: "already-cancelled"};
         }
 
-        if (this.childGameState instanceof GameEndedGameState) {
+        if (this.isEnded) {
             return {result: false, reason: "already-ended"};
         }
 
@@ -1230,11 +1238,11 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "only-players-can-vote"};
         }
 
-        if (this.childGameState instanceof CancelledGameState) {
+        if (this.isCancelled) {
             return {result: false, reason: "already-cancelled"};
         }
 
-        if (this.childGameState instanceof GameEndedGameState) {
+        if (this.isEnded) {
             return {result: false, reason: "already-ended"};
         }
 
@@ -1260,11 +1268,11 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "only-players-can-vote"};
         }
 
-        if (this.childGameState instanceof CancelledGameState) {
+        if (this.isCancelled) {
             return {result: false, reason: "already-cancelled"};
         }
 
-        if (this.childGameState instanceof GameEndedGameState) {
+        if (this.isEnded) {
             return {result: false, reason: "already-ended"};
         }
 
@@ -1301,11 +1309,11 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "only-players-can-vote"};
         }
 
-        if (this.childGameState instanceof CancelledGameState) {
+        if (this.isCancelled) {
             return {result: false, reason: "already-cancelled"};
         }
 
-        if (this.childGameState instanceof GameEndedGameState) {
+        if (this.isEnded) {
             return {result: false, reason: "already-ended"};
         }
 
@@ -1356,11 +1364,11 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "ongoing-vote"};
         }
 
-        if (this.childGameState instanceof CancelledGameState) {
+        if (this.isCancelled) {
             return {result: false, reason: "game-cancelled"};
         }
 
-        if (this.childGameState instanceof GameEndedGameState) {
+        if (this.isEnded) {
             return {result: false, reason: "game-ended"};
         }
 
@@ -1393,11 +1401,11 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "ongoing-vote"};
         }
 
-        if (this.childGameState instanceof CancelledGameState) {
+        if (this.isCancelled) {
             return {result: false, reason: "game-cancelled"};
         }
 
-        if (this.childGameState instanceof GameEndedGameState) {
+        if (this.isEnded) {
             return {result: false, reason: "game-ended"};
         }
 

@@ -528,9 +528,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             return "IN_LOBBY";
         } else if (this.childGameState instanceof IngameGameState) {
             const ingame = this.childGameState;
-            if (ingame.childGameState instanceof GameEndedGameState) {
+            if (ingame.isEnded) {
                 return "FINISHED";
-            } else if (ingame.childGameState instanceof CancelledGameState) {
+            } else if (ingame.isCancelled) {
                 return "CANCELLED";
             }
             return "ONGOING";

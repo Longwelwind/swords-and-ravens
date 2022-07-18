@@ -84,7 +84,7 @@ export class PauseGame extends VoteType {
                     throw new Error("A serverTimer must be present when timerStartedAt is set");
                 }
 
-                p.liveClockData.remainingSeconds = p.totalRemainingSeconds as number;
+                p.liveClockData.remainingSeconds = p.totalRemainingSeconds;
 
                 clearTimeout(p.liveClockData.serverTimer);
                 p.liveClockData.serverTimer = null;
@@ -186,7 +186,7 @@ export class ExtendPlayerClocks extends VoteType {
                     throw new Error("A serverTimer must be present when timerStartedAt is set");
                 }
 
-                p.liveClockData.remainingSeconds = (p.totalRemainingSeconds as number) + 15 * 60;
+                p.liveClockData.remainingSeconds = p.totalRemainingSeconds + 15 * 60;
 
                 ingame.entireGame.broadcastToClients({
                     type: "stop-player-clock",
