@@ -377,7 +377,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         if (this.gameSettings.onlyLive && this.ingameGameState) {
             const waitedPlayers = this.leafState.getWaitedUsers().map(u => (this.ingameGameState as IngameGameState).players.get(u));
 
-            if (!this.ingameGameState.game.paused) {
+            if (!this.ingameGameState.paused) {
                 waitedPlayers.forEach(p => {
                     if (!p.liveClockData) {
                         throw new Error("LiveClockData must be present in doPlayerClocksHandling");

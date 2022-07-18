@@ -505,7 +505,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </OverlayTrigger>
                             </button>
                         </Col>
-                        {this.ingame.entireGame.gameSettings.onlyLive && !this.ingame.game.paused &&
+                        {this.ingame.entireGame.gameSettings.onlyLive && !this.ingame.paused &&
                         <Col xs="auto">
                             <button
                                 className="btn btn-outline-light btn-sm"
@@ -532,7 +532,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </OverlayTrigger>
                             </button>
                         </Col>}
-                        {this.ingame.entireGame.gameSettings.onlyLive && this.ingame.game.paused &&
+                        {this.ingame.entireGame.gameSettings.onlyLive && this.ingame.paused &&
                         <Col xs="auto">
                             <button
                                 className="btn btn-outline-light btn-sm"

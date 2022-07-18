@@ -72,7 +72,7 @@ export class PauseGame extends VoteType {
     executeAccepted(vote: Vote): void {
         const ingame = vote.ingame;
 
-        ingame.game.paused = new Date();
+        ingame.paused = new Date();
 
         ingame.players.forEach(p => {
             if (!p.liveClockData) {
@@ -102,7 +102,7 @@ export class PauseGame extends VoteType {
             // Start a timer to auto resume
             const tenMinutesInMs = 10 * 60 * 1000;
             ingame.autoResumeTimeout = setTimeout(() => { ingame.resumeGame(); }, tenMinutesInMs);
-            ingame.game.willBeAutoResumedAt = new Date(new Date().getTime() + tenMinutesInMs);
+            ingame.willBeAutoResumedAt = new Date(new Date().getTime() + tenMinutesInMs);
         }
 
         ingame.log({
@@ -110,7 +110,7 @@ export class PauseGame extends VoteType {
         });
         ingame.entireGame.broadcastToClients({
             type: "game-paused",
-            willBeAutoResumedAt: ingame.game.willBeAutoResumedAt ? ingame.game.willBeAutoResumedAt.getTime() : null
+            willBeAutoResumedAt: ingame.willBeAutoResumedAt ? ingame.willBeAutoResumedAt.getTime() : null
         });
     }
 

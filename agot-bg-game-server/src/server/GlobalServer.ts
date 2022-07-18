@@ -240,13 +240,13 @@ export default class GlobalServer {
 
         const ingame = entireGame.ingameGameState;
 
-        if (ingame.game.willBeAutoResumedAt) {
-            const remainingSeconds = getTimeDeltaInSeconds(ingame.game.willBeAutoResumedAt, new Date());
+        if (ingame.willBeAutoResumedAt) {
+            const remainingSeconds = getTimeDeltaInSeconds(ingame.willBeAutoResumedAt, new Date());
             if (remainingSeconds > 0) {
                 // Pause still ongoing, set a new timer
                 ingame.autoResumeTimeout = setTimeout(() => { ingame.resumeGame(); }, remainingSeconds * 1000);
-                ingame.game.willBeAutoResumedAt = new Date();
-                ingame.game.willBeAutoResumedAt.setSeconds(ingame.game.willBeAutoResumedAt.getSeconds() + remainingSeconds);
+                ingame.willBeAutoResumedAt = new Date();
+                ingame.willBeAutoResumedAt.setSeconds(ingame.willBeAutoResumedAt.getSeconds() + remainingSeconds);
             } else {
                 // Pause ended already, resume this game
                 ingame.resumeGame();
