@@ -155,8 +155,8 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 return updateLastActive;
             }
 
-            if (settings.initialLiveClock < 60) {
-                settings.initialLiveClock = 60;
+            if (settings.initialLiveClock < 45) {
+                settings.initialLiveClock = 45;
             }
 
             if (settings.initialLiveClock > 120) {
