@@ -25,6 +25,10 @@ import { observable } from "mobx";
 import DebouncedPasswordComponent from "./utils/DebouncedPasswordComponent";
 import { faLock } from "@fortawesome/free-solid-svg-icons";
 import { setBoltonIconImage, setStarkIconImage } from "./houseIconImages";
+import megaphoneImage from "../../public/images/icons/megaphone.svg";
+import speakerOffImage from "../../public/images/icons/speaker-off.svg";
+import musicalNotesImage from "../../public/images/icons/musical-notes.svg";
+
 
 interface LobbyComponentProps {
     gameClient: GameClient;
@@ -188,6 +192,36 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                                 <FontAwesomeIcon icon={faTimes} />
                                             </ConditionalWrap>
                                         </Button>
+                                    </Col>
+                                    <Col xs="auto">
+                                        <button className="btn btn-outline-light btn-sm" onClick={() => this.props.gameClient.muted = !this.props.gameClient.muted}>
+                                            <OverlayTrigger
+                                                overlay={
+                                                    <Tooltip id="mute-tooltip">
+                                                        {this.props.gameClient.muted
+                                                            ? "Unmute notifications"
+                                                            : "Mute notifications"}
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                <img src={this.props.gameClient.muted ? speakerOffImage : megaphoneImage} height={26} />
+                                            </OverlayTrigger>
+                                        </button>
+                                    </Col>
+                                    <Col xs="auto">
+                                        <button className="btn btn-outline-light btn-sm" onClick={() => this.props.gameClient.musicMuted = !this.props.gameClient.musicMuted}>
+                                            <OverlayTrigger
+                                                overlay={
+                                                    <Tooltip id="mute-tooltip">
+                                                        {this.props.gameClient.musicMuted
+                                                            ? "Unmute music"
+                                                            : "Mute music"}
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                <img src={this.props.gameClient.musicMuted ? speakerOffImage : musicalNotesImage} height={26} />
+                                            </OverlayTrigger>
+                                        </button>
                                     </Col>
                                 </Row>
                             </Card.Body>
