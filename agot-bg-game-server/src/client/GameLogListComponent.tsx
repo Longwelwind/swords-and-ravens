@@ -27,7 +27,6 @@ import houseCardAbilities from "../common/ingame-game-state/game-data-structure/
 import BetterMap from "../utils/BetterMap";
 import { tidesOfBattleCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
 import HouseNumberResultsComponent from "./HouseNumberResultsComponent";
-import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
 import { preventOverflow } from "@popperjs/core";
 import loanCardTypes from "../common/ingame-game-state/game-data-structure/loan-card/loanCardTypes";
 import orderTypes from "../common/ingame-game-state/game-data-structure/order-types/orderTypes";

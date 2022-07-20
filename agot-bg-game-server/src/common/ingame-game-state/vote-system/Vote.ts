@@ -1,6 +1,6 @@
 import User from "../../../server/User";
 import BetterMap from "../../../utils/BetterMap";
-import VoteType, { ReplaceVassalByPlayer, ResumeGame, SerializedVoteType } from "./VoteType";
+import VoteType, { ReplacePlayer, ReplacePlayerByVassal, ReplaceVassalByPlayer, ResumeGame, SerializedVoteType } from "./VoteType";
 import IngameGameState from "../IngameGameState";
 import { observable } from "mobx";
 import House from "../game-data-structure/House";
@@ -66,6 +66,10 @@ export default class Vote {
         }
 
         return { result: true, reason: "ok" };
+    }
+
+    get isReplaceVoteType(): boolean {
+        return this.type instanceof ReplacePlayer || this.type instanceof ReplacePlayerByVassal || this.type instanceof ReplaceVassalByPlayer;
     }
 
     constructor(

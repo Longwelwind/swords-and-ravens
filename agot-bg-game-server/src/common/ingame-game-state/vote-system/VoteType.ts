@@ -307,6 +307,8 @@ export class ReplacePlayer extends VoteType {
     }
 
     executeAccepted(vote: Vote): void {
+        vote.ingame.cancelPendingReplaceVotes();
+
         // Create a new player to replace the old one
         const oldPlayer = vote.ingame.players.values.find(p => p.house == this.forHouse) as Player;
         vote.ingame.endPlayerClock(oldPlayer);
@@ -452,6 +454,8 @@ export class ReplaceVassalByPlayer extends VoteType {
     }
 
     executeAccepted(vote: Vote): void {
+        vote.ingame.cancelPendingReplaceVotes();
+
         // Create a new player to replace the vassal
         const newPlayer = new Player(this.replacer, this.forHouse);
         vote.ingame.applyAverageOfRemainingClocksToNewPlayer(newPlayer, null);
