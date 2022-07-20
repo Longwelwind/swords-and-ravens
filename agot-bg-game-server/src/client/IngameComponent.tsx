@@ -132,7 +132,7 @@ interface IngameComponentProps {
 @observer
 export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
-    @observable currentOpenedTab = this.user?.settings.lastOpenedTab ?? (this.props.gameState.entireGame.gameSettings.pbem ? "game-logs" : "chat");
+    @observable currentOpenedTab = this.user?.settings.lastOpenedTab ?? (this.gameSettings.pbem ? "game-logs" : "chat");
     @observable housesInfosCollapsed = this.user?.settings.tracksColumnCollapsed ?? false;
     @observable highlightedRegions = new BetterMap<Region, PartialRecursive<RegionOnMapProperties>>();
     @observable showMapScrollbarInfo = false;
@@ -149,7 +149,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     get user(): User | null {
-        return this.props.gameClient.authenticatedUser ? this.props.gameClient.authenticatedUser : null;
+        return this.gameClient.authenticatedUser ? this.gameClient.authenticatedUser : null;
     }
 
     get ingame(): IngameGameState {
@@ -157,11 +157,15 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     get authenticatedPlayer(): Player | null {
-        return this.props.gameClient.authenticatedPlayer;
+        return this.gameClient.authenticatedPlayer;
     }
 
     get mapScrollbarEnabled(): boolean {
         return !isMobile && (this.user?.settings.mapScrollbar ?? true);
+    }
+
+    get gameClient(): GameClient {
+        return this.props.gameClient;
     }
 
     get tracks(): {name: string; trackToShow: (House | null)[]; realTrack: House[]; stars: boolean}[] {
@@ -218,13 +222,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     render(): ReactNode {
-        const draftHouseCards = this.props.gameState.childGameState instanceof DraftHouseCardsGameState;
+        const draftHouseCards = this.ingame.childGameState instanceof DraftHouseCardsGameState;
 
         const columnOrders = this.getColumnOrders(this.user?.settings.responsiveLayout);
 
         const showMap = !draftHouseCards || this.user?.settings.showMapWhenDrafting;
 
-        const col1MinWidth = this.ingame.entireGame.gameSettings.playerCount >= 8 ? "485px" : "470px";
+        const col1MinWidth = this.gameSettings.playerCount >= 8 ? "485px" : "470px";
 
         return <>
                 <Row className="justify-content-center" style={{maxHeight: this.mapScrollbarEnabled ? "95vh" : "none"}}>
@@ -236,8 +240,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     {showMap && <Col xs={{span: "auto", order: columnOrders.mapColumn}} style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none"}}>
                         <div id="map-component" style={{height: this.mapScrollbarEnabled ? "100%" : "auto", overflowY: "auto", overflowX: "hidden", maxHeight: MAP_HEIGHT}}>
                             <MapComponent
-                                gameClient={this.props.gameClient}
-                                ingameGameState={this.props.gameState}
+                                gameClient={this.gameClient}
+                                ingameGameState={this.ingame}
                                 mapControls={this.mapControls}
                                 collapseClicked={() => this.housesInfosCollapsed = !this.housesInfosCollapsed}
                             />
@@ -290,11 +294,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     renderHousesColumn(): ReactNode {
-        const {result: canLaunchCancelGameVote, reason: canLaunchCancelGameVoteReason} = this.props.gameState.canLaunchCancelGameVote(this.authenticatedPlayer);
-        const {result: canLaunchEndGameVote, reason: canLaunchEndGameVoteReason} = this.props.gameState.canLaunchEndGameVote(this.authenticatedPlayer);
-        const {result: canLaunchPauseGameVote, reason: canLaunchPauseGameVoteReason} = this.props.gameState.canLaunchPauseGameVote(this.authenticatedPlayer);
-        const {result: canLaunchResumeGameVote, reason: canLaunchResumeGameVoteReason} = this.props.gameState.canLaunchResumeGameVote(this.authenticatedPlayer);
-        const {result: canLaunchExtendPlayerClocksVote, reason: canLaunchExtendPlayerClocksVoteReason} = this.props.gameState.canLaunchExtendPlayerClocksVote(this.authenticatedPlayer);
+        const {result: canLaunchCancelGameVote, reason: canLaunchCancelGameVoteReason} = this.ingame.canLaunchCancelGameVote(this.authenticatedPlayer);
+        const {result: canLaunchEndGameVote, reason: canLaunchEndGameVoteReason} = this.ingame.canLaunchEndGameVote(this.authenticatedPlayer);
+        const {result: canLaunchPauseGameVote, reason: canLaunchPauseGameVoteReason} = this.ingame.canLaunchPauseGameVote(this.authenticatedPlayer);
+        const {result: canLaunchResumeGameVote, reason: canLaunchResumeGameVoteReason} = this.ingame.canLaunchResumeGameVote(this.authenticatedPlayer);
+        const {result: canLaunchExtendPlayerClocksVote, reason: canLaunchExtendPlayerClocksVoteReason} = this.ingame.canLaunchExtendPlayerClocksVote(this.authenticatedPlayer);
 
         const connectedSpectators = this.getConnectedSpectators();
 
@@ -323,7 +327,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                             to increase by one the combat strength of his army in a combat.<br />
                                                             In case of a tie in a combat, the winner is the house which is
                                                             the highest in this tracker.<br /><br />
-                                                            {this.props.gameState.game.valyrianSteelBladeUsed ? (
+                                                            {this.game.valyrianSteelBladeUsed ? (
                                                                 <>The Valyrian Steel Blade has been used this round.</>
                                                             ) : (
                                                                 <>The Valyrian Steel Blade is available.</>
@@ -349,7 +353,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         <Col xs="auto" key={`track_${i}_${h?.id ?? j}`}>
                                             <InfluenceIconComponent
                                                 house={h}
-                                                ingame={this.props.gameState}
+                                                ingame={this.ingame}
                                                 track={realTrack}
                                                 name={name}
                                             />
@@ -373,7 +377,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             <SupplyTrackComponent
                                 supplyRestrictions={this.game.supplyRestrictions}
                                 houses={this.game.houses}
-                                ingame={this.props.gameState}
+                                ingame={this.ingame}
                                 mapControls={this.mapControls}
                             />
                         </ListGroupItem>
@@ -394,11 +398,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 <Card className={this.mapScrollbarEnabled ? "flex-fill-remaining" : ""} style={{marginBottom: "10px"}}>
                     <Card.Body id="houses-panel" className="no-space-around">
                         <ListGroup variant="flush">
-                            {this.props.gameState.game.getPotentialWinners().map(h => (
+                            {this.game.getPotentialWinners().map(h => (
                                 <HouseRowComponent
                                     key={h.id}
-                                    gameClient={this.props.gameClient}
-                                    ingame={this.props.gameState}
+                                    gameClient={this.gameClient}
+                                    ingame={this.ingame}
                                     house={h}
                                     mapControls={this.mapControls}
                                 />
@@ -406,7 +410,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             <ListGroupItem className="text-center font-italic" style={{ maxWidth: 500 }}>
                                 <>
                                     {connectedSpectators.length > 0 ? (
-                                        <>Spectators: {joinReactNodes(this.getConnectedSpectators().map(u => <b key={u.id}>{getIngameUserLinkOrLabel(this.props.gameState, u, null)}</b>), ", ")}</>
+                                        <>Spectators: {joinReactNodes(this.getConnectedSpectators().map(u => <b key={u.id}>{getIngameUserLinkOrLabel(this.ingame, u, null)}</b>), ", ")}</>
                                     ) : (
                                         <>No spectators</>
                                     )}
@@ -417,32 +421,32 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 </Card>
                 <Row className={this.mapScrollbarEnabled ? "flex-footer" : ""} id="game-controls">
                     <Col xs="auto">
-                        <button className="btn btn-outline-light btn-sm" onClick={() => this.props.gameClient.muted = !this.props.gameClient.muted}>
+                        <button className="btn btn-outline-light btn-sm" onClick={() => this.gameClient.muted = !this.gameClient.muted}>
                             <OverlayTrigger
                                 overlay={
                                     <Tooltip id="mute-tooltip">
-                                        {this.props.gameClient.muted
+                                        {this.gameClient.muted
                                             ? "Unmute notifications"
                                             : "Mute notifications"}
                                     </Tooltip>
                                 }
                             >
-                                <img src={this.props.gameClient.muted ? speakerOffImage : megaphoneImage} width={32} />
+                                <img src={this.gameClient.muted ? speakerOffImage : megaphoneImage} width={32} />
                             </OverlayTrigger>
                         </button>
                     </Col>
                     <Col xs="auto">
-                        <button className="btn btn-outline-light btn-sm" onClick={() => this.props.gameClient.musicMuted = !this.props.gameClient.musicMuted}>
+                        <button className="btn btn-outline-light btn-sm" onClick={() => this.gameClient.musicMuted = !this.gameClient.musicMuted}>
                             <OverlayTrigger
                                 overlay={
                                     <Tooltip id="mute-tooltip">
-                                        {this.props.gameClient.musicMuted
+                                        {this.gameClient.musicMuted
                                             ? "Unmute music"
                                             : "Mute music"}
                                     </Tooltip>
                                 }
                             >
-                                <img src={this.props.gameClient.musicMuted ? speakerOffImage : musicalNotesImage} width={32} />
+                                <img src={this.gameClient.musicMuted ? speakerOffImage : musicalNotesImage} width={32} />
                             </OverlayTrigger>
                         </button>
                     </Col>
@@ -450,7 +454,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         <Col xs="auto">
                             <button
                                 className="btn btn-outline-light btn-sm"
-                                onClick={() => this.props.gameState.launchCancelGameVote()}
+                                onClick={() => this.ingame.launchCancelGameVote()}
                                 disabled={!canLaunchCancelGameVote}
                             >
                                 <OverlayTrigger
@@ -479,7 +483,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         <Col xs="auto">
                             <button
                                 className="btn btn-outline-light btn-sm"
-                                onClick={() => this.props.gameState.launchEndGameVote()}
+                                onClick={() => this.ingame.launchEndGameVote()}
                                 disabled={!canLaunchEndGameVote}
                             >
                                 <OverlayTrigger
@@ -506,11 +510,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </OverlayTrigger>
                             </button>
                         </Col>
-                        {this.ingame.entireGame.gameSettings.onlyLive && !this.ingame.paused &&
+                        {this.gameSettings.onlyLive && !this.ingame.paused &&
                         <Col xs="auto">
                             <button
                                 className="btn btn-outline-light btn-sm"
-                                onClick={() => this.props.gameState.launchPauseGameVote()}
+                                onClick={() => this.ingame.launchPauseGameVote()}
                                 disabled={!canLaunchPauseGameVote}
                             >
                                 <OverlayTrigger
@@ -533,11 +537,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </OverlayTrigger>
                             </button>
                         </Col>}
-                        {this.ingame.entireGame.gameSettings.onlyLive && this.ingame.paused &&
+                        {this.gameSettings.onlyLive && this.ingame.paused &&
                         <Col xs="auto">
                             <button
                                 className="btn btn-outline-light btn-sm"
-                                onClick={() => this.props.gameState.launchResumeGameVote()}
+                                onClick={() => this.ingame.launchResumeGameVote()}
                                 disabled={!canLaunchResumeGameVote}
                             >
                                 <OverlayTrigger
@@ -560,11 +564,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </OverlayTrigger>
                             </button>
                         </Col>}
-                        {this.ingame.entireGame.gameSettings.onlyLive &&
+                        {this.gameSettings.onlyLive &&
                         <Col xs="auto">
                             <button
                                 className="btn btn-outline-light btn-sm"
-                                onClick={() => this.props.gameState.launchExtendPlayerClocksVote()}
+                                onClick={() => this.ingame.launchExtendPlayerClocksVote()}
                                 disabled={!canLaunchExtendPlayerClocksVote}
                             >
                                 <OverlayTrigger
@@ -631,11 +635,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             }
         }
 
-        const border = this.props.gameClient.isOwnTurn() ?
-            "warning" : this.props.gameState.childGameState instanceof CancelledGameState ?
+        const border = this.gameClient.isOwnTurn() ?
+            "warning" : this.ingame.childGameState instanceof CancelledGameState ?
             "danger" : undefined;
 
-        const getPhaseHeader = (phase: GameStatePhaseProps): JSX.Element => this.props.gameState.childGameState instanceof phase.gameState
+        const getPhaseHeader = (phase: GameStatePhaseProps): JSX.Element => this.ingame.childGameState instanceof phase.gameState
                 ? <b className={classNames("weak-text-outline", { "clickable dropdown-toggle": phase.name == "Westeros" })}>{phase.name} phase</b>
                 : <span className={classNames("text-muted", { "clickable dropdown-toggle": phase.name == "Westeros" })}>{phase.name} phase</span>;
 
@@ -644,7 +648,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 <Row className="no-space-around">
                     <Col>
                         <ListGroup variant="flush">
-                            {phases.some(phase => this.props.gameState.childGameState instanceof phase.gameState) && (
+                            {phases.some(phase => this.ingame.childGameState instanceof phase.gameState) && (
                                 <ListGroupItem>
                                     <Row className="justify-content-between">
                                         {phases.map((phase, i) => (
@@ -720,7 +724,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     </div>
                                 </OverlayTrigger>
                             </Row>
-                            {this.props.gameState.entireGame.gameSettings.playerCount >= 8 && <Row className="mx-0 mt-3">
+                            {this.gameSettings.playerCount >= 8 && <Row className="mx-0 mt-3">
                                 <OverlayTrigger overlay={this.renderDragonStrengthTooltip()}
                                     placement="auto">
                                     <div>
@@ -784,22 +788,24 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     </Nav.Link>
                                 </div>
                             </Nav.Item>
-                            <Nav.Item>
-                                <div className={classNames({ "new-event": this.props.gameClient.authenticatedPlayer?.isNeededForVote })}>
-                                    <Nav.Link eventKey="votes">
-                                        <OverlayTrigger
-                                            overlay={<Tooltip id="votes-tooltip">Votes</Tooltip>}
-                                            placement="top"
-                                        >
-                                            <span>
-                                                <FontAwesomeIcon
-                                                    style={{ color: "white" }}
-                                                    icon={faCheckToSlot} />
-                                            </span>
-                                        </OverlayTrigger>
-                                    </Nav.Link>
-                                </div>
-                            </Nav.Item>
+                            {this.ingame.votes.size > 0 && (
+                                <Nav.Item>
+                                    <div className={classNames({ "new-event": this.gameClient.authenticatedPlayer?.isNeededForVote })}>
+                                        <Nav.Link eventKey="votes">
+                                            <OverlayTrigger
+                                                overlay={<Tooltip id="votes-tooltip">Votes</Tooltip>}
+                                                placement="top"
+                                            >
+                                                <span>
+                                                    <FontAwesomeIcon
+                                                        style={{ color: "white" }}
+                                                        icon={faCheckToSlot} />
+                                                </span>
+                                            </OverlayTrigger>
+                                        </Nav.Link>
+                                    </div>
+                                </Nav.Item>
+                            )}
                             {this.ingame.entireGame.isFeastForCrows && (
                                 <Nav.Item>
                                     <Nav.Link eventKey="objectives">
@@ -814,7 +820,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     </Nav.Link>
                                 </Nav.Item>
                             )}
-                            {this.ingame.game.ironBank && this.ingame.entireGame.gameSettings.playerCount < 8 && (
+                            {this.game.ironBank && this.gameSettings.playerCount < 8 && (
                                 <Nav.Item>
                                     <Nav.Link eventKey="iron-bank">
                                         <OverlayTrigger
@@ -861,7 +867,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     </OverlayTrigger>
                                 </Nav.Link>
                             </Nav.Item>
-                            {this.authenticatedPlayer && !this.props.gameState.entireGame.gameSettings.noPrivateChats &&
+                            {this.authenticatedPlayer && !this.gameSettings.noPrivateChats &&
                             <Nav.Item>
                                 <Dropdown>
                                     <Dropdown.Toggle id="private-chat-room-dropdown" variant="link">
@@ -900,35 +906,35 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         <div style={{visibility: "hidden", width: "850px"}} />
                         <Tab.Content className="h-100">
                             <Tab.Pane eventKey="chat" className="h-100">
-                                <ChatComponent gameClient={this.props.gameClient}
-                                    entireGame={this.props.gameState.entireGame}
-                                    roomId={this.props.gameState.entireGame.publicChatRoomId}
+                                <ChatComponent gameClient={this.gameClient}
+                                    entireGame={this.ingame.entireGame}
+                                    roomId={this.ingame.entireGame.publicChatRoomId}
                                     currentlyViewed={this.currentOpenedTab == "chat"}
                                     injectBetweenMessages={(p, n) => this.injectBetweenMessages(p, n)}
                                     getUserDisplayName={u => <b>{getIngameUserLinkOrLabel(this.ingame, u, this.ingame.players.tryGet(u, null), this.user?.settings.chatHouseNames)}</b>} />
                             </Tab.Pane>
-                            <Tab.Pane eventKey="votes" className="h-100">
+                            {this.ingame.votes.size > 0 && <Tab.Pane eventKey="votes" className="h-100">
                                 <ScrollToBottom className="h-100" scrollViewClassName="overflow-x-hidden">
-                                    <VotesListComponent gameClient={this.props.gameClient} ingame={this.props.gameState} />
+                                    <VotesListComponent gameClient={this.gameClient} ingame={this.ingame} />
                                 </ScrollToBottom>
-                            </Tab.Pane>
+                            </Tab.Pane>}
                             <Tab.Pane eventKey="game-logs" className="h-100">
                                 <ScrollToBottom className="h-100" scrollViewClassName="overflow-x-hidden">
-                                    <GameLogListComponent ingameGameState={this.props.gameState} gameClient={this.props.gameClient} currentlyViewed={this.currentOpenedTab == "game-logs"}/>
+                                    <GameLogListComponent ingameGameState={this.ingame} gameClient={this.gameClient} currentlyViewed={this.currentOpenedTab == "game-logs"}/>
                                 </ScrollToBottom>
                             </Tab.Pane>
                             <Tab.Pane eventKey="settings" className="h-100">
-                                <GameSettingsComponent gameClient={this.props.gameClient}
-                                    entireGame={this.props.gameState.entireGame} />
+                                <GameSettingsComponent gameClient={this.gameClient}
+                                    entireGame={this.ingame.entireGame} />
                                 <div style={{marginTop: -20}} >
                                     <UserSettingsComponent user={this.user}
-                                        entireGame={this.props.gameState.entireGame}
+                                        entireGame={this.ingame.entireGame}
                                     />
                                 </div>
                             </Tab.Pane>
                             <Tab.Pane eventKey="objectives" className="h-100">
                                 <div className="d-flex flex-column h-100" style={{overflowY: "scroll"}}>
-                                    <ObjectivesInfoComponent ingame={this.ingame} gameClient={this.props.gameClient}/>
+                                    <ObjectivesInfoComponent ingame={this.ingame} gameClient={this.gameClient}/>
                                 </div>
                             </Tab.Pane>
                             {this.game.ironBank && <Tab.Pane eventKey="iron-bank" className="h-100">
@@ -937,12 +943,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </div>
                             </Tab.Pane>}
                             <Tab.Pane eventKey="note" className="h-100">
-                                <NoteComponent gameClient={this.props.gameClient} ingame={this.props.gameState} />
+                                <NoteComponent gameClient={this.gameClient} ingame={this.ingame} />
                             </Tab.Pane>
                             {this.getPrivateChatRooms().map(({ roomId }) => (
                                 <Tab.Pane eventKey={roomId} key={roomId} className="h-100">
-                                    <ChatComponent gameClient={this.props.gameClient}
-                                        entireGame={this.props.gameState.entireGame}
+                                    <ChatComponent gameClient={this.gameClient}
+                                        entireGame={this.ingame.entireGame}
                                         roomId={roomId}
                                         currentlyViewed={this.currentOpenedTab == roomId}
                                         getUserDisplayName={u => <b>{getIngameUserLinkOrLabel(this.ingame, u, this.ingame.players.tryGet(u, null), this.user?.settings.chatHouseNames)}</b>} />
@@ -988,7 +994,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     getUserDisplayNameLabel(user: User): React.ReactNode {
-        const player = this.props.gameState.players.tryGet(user, null);
+        const player = this.ingame.players.tryGet(user, null);
         const displayName = !this.user?.settings.chatHouseNames || !player
             ? user.name
             : player.house.name;
@@ -1015,7 +1021,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     get publicChatRoom(): Channel {
-        return this.props.gameClient.chatClient.channels.get(this.props.gameState.entireGame.publicChatRoomId);
+        return this.gameClient.chatClient.channels.get(this.ingame.entireGame.publicChatRoomId);
     }
 
     private renderRemainingWesterosCards(): OverlayChildren {
@@ -1121,37 +1127,37 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     getConnectedSpectators(): User[] {
-        return this.props.gameState.getSpectators().filter(u => u.connected);
+        return this.ingame.getSpectators().filter(u => u.connected);
     }
 
     onNewPrivateChatRoomClick(p: Player): void {
         const users = _.sortBy([this.user as User, p.user], u => u.id);
 
-        if (!this.props.gameState.entireGame.privateChatRoomsIds.has(users[0]) || !this.props.gameState.entireGame.privateChatRoomsIds.get(users[0]).has(users[1])) {
+        if (!this.ingame.entireGame.privateChatRoomsIds.has(users[0]) || !this.ingame.entireGame.privateChatRoomsIds.get(users[0]).has(users[1])) {
             // Create a new chat room for this player
-            this.props.gameState.entireGame.sendMessageToServer({
+            this.ingame.entireGame.sendMessageToServer({
                 type: "create-private-chat-room",
                 otherUser: p.user.id
             });
         } else {
             // The room already exists
             // Set the current tab to this user
-            this.currentOpenedTab = this.props.gameState.entireGame.privateChatRoomsIds.get(users[0]).get(users[1]);
+            this.currentOpenedTab = this.ingame.entireGame.privateChatRoomsIds.get(users[0]).get(users[1]);
         }
     }
 
     getPrivateChatRooms(): {user: User; roomId: string}[] {
-        return this.props.gameState.entireGame.getPrivateChatRoomsOf(this.user as User);
+        return this.ingame.entireGame.getPrivateChatRoomsOf(this.user as User);
     }
 
     getPrivateChatRoomForPlayer(u: User): Channel {
         const users = _.sortBy([this.user as User, u], u => u.id);
 
-        return this.props.gameClient.chatClient.channels.get(this.props.gameState.entireGame.privateChatRoomsIds.get(users[0]).get(users[1]));
+        return this.gameClient.chatClient.channels.get(this.ingame.entireGame.privateChatRoomsIds.get(users[0]).get(users[1]));
     }
 
     getOtherPlayers(): Player[] {
-        return _.sortBy(this.props.gameState.players.values,
+        return _.sortBy(this.ingame.players.values,
             p => this.user?.settings.chatHouseNames ? p.house.name : p.user.name)
             .filter(p => p.user != this.user);
     }
@@ -1245,7 +1251,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     componentDidMount(): void {
         this.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
-        this.props.gameState.entireGame.onNewPrivateChatRoomCreated = (roomId: string) => this.onNewPrivateChatRoomCreated(roomId);
+        this.ingame.entireGame.onNewPrivateChatRoomCreated = (roomId: string) => this.onNewPrivateChatRoomCreated(roomId);
 
         const visibilityChangedCallback = (): void => this.onVisibilityChanged();
         document.addEventListener("visibilitychange", visibilityChangedCallback);
@@ -1271,7 +1277,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         }
 
         this.ingame.onVoteStarted = () => {
-            if (!this.props.gameClient.muted) {
+            if (!this.gameClient.muted) {
                 const audio = new Audio(voteSound);
                 audio.play();
             }
@@ -1279,7 +1285,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     componentWillUnmount(): void {
-        this.props.gameState.entireGame.onNewPrivateChatRoomCreated = null;
+        this.ingame.entireGame.onNewPrivateChatRoomCreated = null;
         _.pull(this.mapControls.modifyRegionsOnMap, this.modifyRegionsOnMapCallback);
 
         const visibilityChangedCallback = this.onVisibilityChangedCallback;
