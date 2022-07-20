@@ -63,7 +63,6 @@ import {Channel, Message} from "./chat-client/ChatClient";
 // @ts-expect-error Somehow this module cannot be found while it is
 import ScrollToBottom from "react-scroll-to-bottom";
 import GameSettingsComponent from "./GameSettingsComponent";
-import VoteComponent from "./VoteComponent";
 import IngameCancelledComponent from "./game-state-panel/IngameCancelledComponent";
 import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
 import joinReactNodes from "./utils/joinReactNodes";
@@ -87,7 +86,7 @@ import { tidesOfBattleCards } from "../common/ingame-game-state/game-data-struct
 import DraftInfluencePositionsGameState from "../common/ingame-game-state/draft-influence-positions-game-state/DraftInfluencePositionsGameState";
 import DraftInfluencePositionsComponent from "./game-state-panel/DraftInfluencePositionsComponent";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
-import { faRightLeft, faUniversity } from "@fortawesome/free-solid-svg-icons";
+import { faCheckToSlot, faRightLeft, faUniversity } from "@fortawesome/free-solid-svg-icons";
 import joinNaturalLanguage from "./utils/joinNaturalLanguage";
 import PayDebtsGameState from "../common/ingame-game-state/pay-debts-game-state/PayDebtsGameState";
 import PayDebtsComponent from "./game-state-panel/PayDebtsComponent";
@@ -110,6 +109,7 @@ import CombatInfoComponent from "./CombatInfoComponent";
 import HouseNumberResultsComponent from "./HouseNumberResultsComponent";
 import houseIconImages from "./houseIconImages";
 import { preemptiveRaid } from "../common/ingame-game-state/game-data-structure/wildling-card/wildlingCardTypes";
+import VotesListComponent from "./VotesListComponent";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -768,7 +768,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </Nav.Link>
                             </Nav.Item>
                             <Nav.Item>
-                                <div className={classNames({ "new-event": this.publicChatRoom.areThereUnreadMessages || this.props.gameClient.authenticatedPlayer?.isNeededForVote })}>
+                                <div className={classNames({ "new-event": this.publicChatRoom.areThereUnreadMessages })}>
                                     <Nav.Link eventKey="chat">
                                         <OverlayTrigger
                                             overlay={<Tooltip id="chat-tooltip">Game Chat</Tooltip>}
@@ -778,6 +778,22 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 <FontAwesomeIcon
                                                     style={{ color: "white" }}
                                                     icon={faComments} />
+                                            </span>
+                                        </OverlayTrigger>
+                                    </Nav.Link>
+                                </div>
+                            </Nav.Item>
+                            <Nav.Item>
+                                <div className={classNames({ "new-event": this.props.gameClient.authenticatedPlayer?.isNeededForVote })}>
+                                    <Nav.Link eventKey="votes">
+                                        <OverlayTrigger
+                                            overlay={<Tooltip id="votes-tooltip">Votes</Tooltip>}
+                                            placement="top"
+                                        >
+                                            <span>
+                                                <FontAwesomeIcon
+                                                    style={{ color: "white" }}
+                                                    icon={faCheckToSlot} />
                                             </span>
                                         </OverlayTrigger>
                                     </Nav.Link>
@@ -889,6 +905,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     currentlyViewed={this.currentOpenedTab == "chat"}
                                     injectBetweenMessages={(p, n) => this.injectBetweenMessages(p, n)}
                                     getUserDisplayName={u => <b>{getIngameUserLinkOrLabel(this.ingame, u, this.ingame.players.tryGet(u, null), this.user?.settings.chatHouseNames)}</b>} />
+                            </Tab.Pane>
+                            <Tab.Pane eventKey="votes" className="h-100">
+                                <ScrollToBottom className="h-100" scrollViewClassName="overflow-x-hidden">
+                                    <VotesListComponent gameClient={this.props.gameClient} ingame={this.props.gameState} />
+                                </ScrollToBottom>
                             </Tab.Pane>
                             <Tab.Pane eventKey="game-logs" className="h-100">
                                 <ScrollToBottom className="h-100" scrollViewClassName="overflow-x-hidden">
@@ -1134,13 +1155,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             .filter(p => p.user != this.user);
     }
 
-    injectBetweenMessages(previous: Message | null, next: Message | null): ReactNode {
-        // Take the necessary votes to render, based on the `createdAt` times of
-        // `previous` and `next`.
-        const votesToRender = this.props.gameState.votes.values.filter(v => (previous != null ? previous.createdAt < v.createdAt : true) && (next ? v.createdAt < next.createdAt : true));
-        return _.sortBy(votesToRender, v => v.createdAt).map(v => (
-            <VoteComponent key={v.id} vote={v} gameClient={this.props.gameClient} ingame={this.props.gameState} />
-        ));
+    injectBetweenMessages(_previous: Message | null, _next: Message | null): ReactNode {
+        return null;
     }
 
     onNewPrivateChatRoomCreated(roomId: string): void {
