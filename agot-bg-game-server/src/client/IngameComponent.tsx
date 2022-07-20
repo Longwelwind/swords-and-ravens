@@ -769,7 +769,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </Nav.Link>
                             </Nav.Item>
                             <Nav.Item>
-                                <div className={classNames({ "new-event": this.publicChatRoom.areThereUnreadMessages })}>
+                                <div className={classNames({ "new-event": this.publicChatRoom.areThereUnreadMessages, "disconnected": !this.publicChatRoom.connected })}>
                                     <Nav.Link eventKey="chat">
                                         <OverlayTrigger
                                             overlay={<Tooltip id="chat-tooltip">Game Chat</Tooltip>}
@@ -886,7 +886,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             </Nav.Item>}
                             {this.getPrivateChatRooms().map(({ user, roomId }) => (
                                 <Nav.Item key={roomId}>
-                                    <div className={classNames({ "new-event": this.getPrivateChatRoomForPlayer(user).areThereUnreadMessages })}>
+                                    <div className={classNames({ "new-event": this.getPrivateChatRoomForPlayer(user).areThereUnreadMessages, "disconnected": !this.publicChatRoom.connected })}>
                                         <Nav.Link eventKey={roomId}>
                                             {this.getUserDisplayNameLabel(user)}
                                         </Nav.Link>

@@ -493,6 +493,13 @@ div.new-event {
   border-width: 3px;
 }
 
+div.disconnected {
+  border: solid;
+  border-color: red !important;
+  border-radius: 5px;
+  border-width: 3px;
+}
+
 .chat-scroll-to-bottom {
   height: 258px;
 }
