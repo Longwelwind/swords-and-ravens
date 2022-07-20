@@ -387,6 +387,7 @@ def user_profile(request, user_id):
             break
 
     games_of_user = PlayerInGame.objects.prefetch_related('game').annotate(players_count=Count('game__players'),\
+            game_variant=KeyTextTransform('setupId', KeyTextTransform('settings', 'game__view_of_game')),\
             has_won=Cast(KeyTextTransform('is_winner', 'data'), BooleanField()),\
             is_faceless=Cast(KeyTextTransform('faceless', KeyTextTransform('settings', 'game__view_of_game')), BooleanField())\
         # We can simply filter for is_faceless=False|None and omit the check for ongoing games only as we reset the property after game ended.
@@ -394,8 +395,8 @@ def user_profile(request, user_id):
     user.games_of_user = games_of_user.filter(Q(game__state=IN_LOBBY) | Q(game__state=ONGOING) | Q(game__state=FINISHED))
     user.cancelled_games = games_of_user.filter(game__state=CANCELLED)
     user.ongoing_count = games_of_user.filter(game__state=ONGOING).count()
-    user.won_count = games_of_user.filter(Q(has_won=True) & Q(players_count__gt=2)).count()
-    user.finished_count = games_of_user.exclude(data__is_winner__isnull=True).filter((Q(game__state=FINISHED) & Q(players_count__gt=2))).count()
+    user.won_count = games_of_user.filter(Q(has_won=True) & ~Q(game_variant='learn-the-game')).count()
+    user.finished_count = games_of_user.exclude(data__is_winner__isnull=True).filter((Q(game__state=FINISHED) & ~Q(game_variant='learn-the-game'))).count()
 
     if user.finished_count > 0:
         user.win_rate = "{:.1f} %".format(user.won_count / user.finished_count * 100)
