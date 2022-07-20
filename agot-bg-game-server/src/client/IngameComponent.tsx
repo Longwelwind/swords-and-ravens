@@ -110,6 +110,7 @@ import HouseNumberResultsComponent from "./HouseNumberResultsComponent";
 import houseIconImages from "./houseIconImages";
 import { preemptiveRaid } from "../common/ingame-game-state/game-data-structure/wildling-card/wildlingCardTypes";
 import VotesListComponent from "./VotesListComponent";
+import voteSound from "../../public/sounds/vote-started.ogg";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -1268,6 +1269,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         this.ingame.onPreemptiveRaidNewAttack = (biddings, highestBidder) => {
             toast(this.getWildlingsAttackFastTrackedComponent(preemptiveRaid, biddings, highestBidder, null));
         }
+
+        this.ingame.onVoteStarted = () => {
+            if (!this.props.gameClient.muted) {
+                const audio = new Audio(voteSound);
+                audio.play();
+            }
+        }
     }
 
     componentWillUnmount(): void {
@@ -1278,6 +1286,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         if (visibilityChangedCallback) {
             document.removeEventListener("visibilitychange", visibilityChangedCallback);
         }
+
+        this.ingame.entireGame.onWildingsAttackFastTracked = null;
+        this.ingame.entireGame.onCombatFastTracked = null;
+        this.ingame.onPreemptiveRaidNewAttack = null;
+        this.ingame.onVoteStarted = null;
     }
 
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {

@@ -67,6 +67,7 @@ export default class IngameGameState extends GameState<
     @observable clockUpdate = 0;
     @observable marchMarkers: BetterMap<Unit, Region> = new BetterMap();
 
+    onVoteStarted: (() => void) | null = null;
     onPreemptiveRaidNewAttack: ((biddings: [number, House[]][], highestBidder: House) => void) | null = null;
 
     get entireGame(): EntireGame {
@@ -963,6 +964,9 @@ export default class IngameGameState extends GameState<
         } else if (message.type == "vote-started") {
             const vote = Vote.deserializeFromServer(this, message.vote);
             this.votes.set(vote.id, vote);
+            if (this.onVoteStarted) {
+                this.onVoteStarted();
+            }
         } else if (message.type == "vote-cancelled") {
             const vote = this.votes.get(message.vote);
             vote.cancelled = true;
