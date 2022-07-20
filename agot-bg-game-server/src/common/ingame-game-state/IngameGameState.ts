@@ -341,12 +341,16 @@ export default class IngameGameState extends GameState<
         return popRandom(freeFacelessNames);
     }
 
-    onClientMessage(user: User, message: ClientMessage): boolean {
-        if (message.type == "cancel-vote") {
-            const vote = this.votes.get(message.vote);
+    cancelPendingReplaceVotes(): void {
+        this.votes.values.forEach(v => {
+            if (v.state == VoteState.ONGOING && v.isReplaceVoteType) {
+                v.cancelVote();
+            }
+        });
+    }
 
-            vote.cancelVote();
-        } else if (message.type == "launch-replace-player-vote") {
+    onClientMessage(user: User, message: ClientMessage): boolean {
+        if (message.type == "launch-replace-player-vote") {
             const player = this.players.get(this.entireGame.users.get(message.player));
 
             if (!this.canLaunchReplacePlayerVote(user).result) {
@@ -754,6 +758,8 @@ export default class IngameGameState extends GameState<
     }
 
     replacePlayerByVassal(player: Player): void {
+        this.cancelPendingReplaceVotes();
+
         const newVassalHouse = player.house;
 
         // In case the new vassal house is needed for another vote, vote with Reject
