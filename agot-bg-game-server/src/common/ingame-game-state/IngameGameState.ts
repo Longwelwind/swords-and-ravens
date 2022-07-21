@@ -793,9 +793,9 @@ export default class IngameGameState extends GameState<
         // Delete the old player so the house is a vassal now
         this.players.delete(player.user);
 
-        // Find new commander beginning with the potential winner so he cannot simply march into the vassals regions now
+        // Find new commander beginning with last in turn order
         let newCommander: House | null = null;
-        for (const house of this.game.getPotentialWinners().filter(h => !this.isVassalHouse(h))) {
+        for (const house of [...this.game.getTurnOrder()].reverse().filter(h => !this.isVassalHouse(h))) {
             if (!forbiddenCommanders.includes(house)) {
                 newCommander = house;
                 break;
