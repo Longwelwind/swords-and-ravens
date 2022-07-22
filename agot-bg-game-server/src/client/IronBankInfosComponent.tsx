@@ -19,13 +19,13 @@ interface IronBankInfosComponentProps {
 @observer
 export default class IronBankInfosComponent extends Component<IronBankInfosComponentProps> {
     get isEssosMapUsed(): boolean {
-        return this.props.ingame.entireGame.gameSettings.playerCount == 8;
+        return this.props.ingame.entireGame.gameSettings.playerCount >= 8;
     }
 
     render(): ReactNode {
         const braavosController = this.props.ironBank.controllerOfBraavos;
         const interestCosts = this.props.ingame.game.houses.values.map(h => [h, this.props.ironBank.purchasedLoans.filter(lc => lc.purchasedBy == h).length] as [House, number]).filter(([_h, costs]) => costs > 0);
-        const backgroundOpacity = braavosController || interestCosts.length > 0 ? 0.5 : 1;
+        const backgroundOpacity = braavosController || interestCosts.length > 0 ? 0.35 : 1;
         return (
             <>
                 <Card style={{ height: "100%" }} className="hover-weak-outline">
@@ -85,7 +85,7 @@ export default class IronBankInfosComponent extends Component<IronBankInfosCompo
                             </Col>
                         </OverlayTrigger>
                         <Col xs="auto" className="py-0">
-                            <HouseNumberResultsComponent results={interestCosts} keyPrefix="iron-bank-interests-costs" bold={true} />
+                            <HouseNumberResultsComponent results={interestCosts} keyPrefix="iron-bank-interests-costs" bold makeGreyjoyBlack />
                         </Col>
                     </Row>}
             </Col>

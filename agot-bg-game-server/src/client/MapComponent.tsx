@@ -205,9 +205,9 @@ export default class MapComponent extends Component<MapComponentProps> {
                     {this.renderRegions(propertiesForRegions)}
                 </svg>
                 {!isMobile &&
-                <button className="btn btn-sm p-0"
+                <button className="btn btn-outline-light btn-sm"
                     onClick={() => { if (this.props.collapseClicked) this.props.collapseClicked(); }}
-                    style={{position: "absolute", left: "10px"}}
+                    style={{position: "absolute", left: "10px", padding: "8px", borderStyle: "none"}}
                 >
                     <FontAwesomeIcon icon={faAlignJustify} style={{color: "white"}} size="lg"/>
                 </button>}
