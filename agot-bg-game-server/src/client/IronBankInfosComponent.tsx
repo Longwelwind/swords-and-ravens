@@ -25,7 +25,7 @@ export default class IronBankInfosComponent extends Component<IronBankInfosCompo
     render(): ReactNode {
         const braavosController = this.props.ironBank.controllerOfBraavos;
         const interestCosts = this.props.ingame.game.houses.values.map(h => [h, this.props.ironBank.purchasedLoans.filter(lc => lc.purchasedBy == h).length] as [House, number]).filter(([_h, costs]) => costs > 0);
-        const backgroundOpacity = braavosController || interestCosts.length > 0 ? 0.35 : 1;
+        const backgroundOpacity = braavosController || interestCosts.length > 0 ? 0.7 : 1;
         return (
             <>
                 <Card style={{ height: "100%" }} className="hover-weak-outline">
