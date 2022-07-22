@@ -9,6 +9,7 @@ interface HouseNumberResultsProps {
     results: [House, number][];
     keyPrefix?: string;
     bold?: boolean;
+    makeGreyjoyBlack?: boolean;
 }
 
 export default class HouseNumberResultsComponent extends Component<HouseNumberResultsProps> {
@@ -17,7 +18,7 @@ export default class HouseNumberResultsComponent extends Component<HouseNumberRe
             {this.props.results.map(([house, result]) => (
                 <Col xs="auto" key={`${this.props.keyPrefix ?? ""}_house-number-result_${house.id}`} className="d-flex flex-md-column align-items-center p-1">
                     <div className="mb-2">
-                        <HouseIconComponent house={house} />
+                        <HouseIconComponent house={house} makeGreyjoyBlack={this.props.makeGreyjoyBlack} />
                     </div>
                     <ConditionalWrap
                         condition={this.props.bold ?? false}
