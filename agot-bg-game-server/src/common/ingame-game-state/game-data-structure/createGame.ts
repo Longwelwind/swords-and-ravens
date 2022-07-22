@@ -230,14 +230,13 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     game.houses = new BetterMap(
         baseGameHousesToCreate.entries
         .map(([hid, houseData]) => {
-            const houseCards = playerHouses.includes(hid)
+            const houseCards: BetterMap<string, HouseCard> = playerHouses.includes(hid)
                 ? new BetterMap<string, HouseCard>(
                     Object.entries(houseData.houseCards)
                         .map(([houseCardId, houseCardData]) => {
                             const houseCard = createHouseCard(houseCardId, houseCardData, hid);
                             return [houseCardId, houseCard];
-                        })
-                )
+                        }))
                 // Vassals have no own house cards
                 : new BetterMap<string, HouseCard>();
 
