@@ -450,8 +450,7 @@ export default class PostCombatGameState extends GameState<
                     houseCardDiscarded: undefined
                 });
             } else {
-                const houseCardsToMakeAvailable = house.houseCards.values
-                    .filter(hc => hc != houseCard && hc.state == HouseCardState.USED)
+                const houseCardsToMakeAvailable = house.houseCards.values.filter(hc => hc != houseCard);
 
                 houseCardsToMakeAvailable.forEach(hc => hc.state = HouseCardState.AVAILABLE);
 

@@ -67,9 +67,8 @@ export default class PatchfaceAbilityGameState extends GameState<
     }
 
     onSelectHouseCardFinish(house: House, houseCard: HouseCard, resolvedAutomatically: boolean): void {
-        houseCard.state = HouseCardState.USED;
-
         const affectedHouse = this.game.houses.values.find(h => h.houseCards.values.includes(houseCard)) as House;
+
         this.ingame.log({
             type: "patchface-used",
             house: house.id,
@@ -77,36 +76,7 @@ export default class PatchfaceAbilityGameState extends GameState<
             houseCard: houseCard.id
         }, resolvedAutomatically);
 
-        this.entireGame.broadcastToClients({
-            type: "change-state-house-card",
-            houseId: affectedHouse.id,
-            cardIds: [houseCard.id],
-            state: HouseCardState.USED
-        });
-
-        // If this was the last card of the house, all cards
-        // except the discarded one are returned.
-        if (affectedHouse.houseCards.values.every(hc => hc.state == HouseCardState.USED)) {
-            const returnedHouseCards = affectedHouse.houseCards.values.filter(hc => hc != houseCard);
-
-            returnedHouseCards.forEach(hc => {
-                hc.state = HouseCardState.AVAILABLE;
-            });
-
-            this.combat.ingameGameState.log({
-                type: "house-cards-returned",
-                house: affectedHouse.id,
-                houseCards: returnedHouseCards.map(hc => hc.id),
-                houseCardDiscarded: houseCard.id
-            });
-
-            this.entireGame.broadcastToClients({
-                type: "change-state-house-card",
-                houseId: affectedHouse.id,
-                cardIds: returnedHouseCards.map(hc => hc.id),
-                state: HouseCardState.AVAILABLE
-            });
-        }
+        this.parentGameState.parentGameState.parentGameState.markHouseAsUsed(affectedHouse, houseCard);
 
         this.parentGameState.onHouseCardResolutionFinish(house);
     }
