@@ -16,6 +16,9 @@ export default class LobbyGameState extends GameState<EntireGame> {
     lobbyHouses: BetterMap<string, LobbyHouse>;
     @observable players = new BetterMap<LobbyHouse, User>();
     @observable password = "";
+    @observable readyUsers: User[] | null = null;
+    @observable readyCheckWillTimeoutAt: Date | null = null
+    readyCheckTimeout: NodeJS.Timeout | null;
 
     get entireGame(): EntireGame {
         return this.parentGameState;
@@ -72,14 +75,40 @@ export default class LobbyGameState extends GameState<EntireGame> {
     }
 
     onClientMessage(user: User, message: ClientMessage): boolean {
+        if (this.readyUsers != null) {
+            // Only allow "ready"
+            if (message.type == "ready" && !this.readyUsers.includes(user)) {
+                this.readyUsers.push(user);
+                this.broadcastReadyCheckUpdate();
+            }
+
+            if (this.players.values.every(u => this.readyUsers?.includes(u))) {
+                if (this.readyCheckTimeout) {
+                    clearTimeout(this.readyCheckTimeout);
+                    this.readyCheckTimeout = null;
+                }
+                this.players.values.forEach(u => u.onConnectionStateChanged = null);
+                this.launchGame();
+                return true;
+            }
+            return false;
+        }
+
         let updateLastActive = false;
+
         if (message.type == "launch-game") {
             if (!this.canStartGame(user).success) {
                 return false;
             }
 
-            this.launchGame();
-            updateLastActive = true;
+            if (this.settings.pbem) {
+                // Start game immeadiately
+                this.launchGame();
+                updateLastActive = true;
+            } else {
+                // Launch the Ready check and start the game if everyone goes ready in time
+                this.launchReadyCheck();
+            }
         } else if (message.type == "kick-player") {
             const kickedUser = this.entireGame.users.get(message.user);
 
@@ -315,6 +344,35 @@ export default class LobbyGameState extends GameState<EntireGame> {
         );
     }
 
+    launchReadyCheck(): void {
+        this.readyUsers = [];
+        this.readyCheckWillTimeoutAt = new Date(new Date().getTime() + 30 * 1000);
+        this.readyCheckTimeout = setTimeout(() => {
+            this.readyUsers = null;
+            this.readyCheckTimeout = null;
+            this.players.values.forEach(u => u.onConnectionStateChanged = null);
+            this.readyCheckWillTimeoutAt = null;
+            this.broadcastReadyCheckUpdate();
+        }, 30 * 1000);
+        this.players.values.forEach(u => u.onConnectionStateChanged = (user) => this.connectionStateChangedWhileReadyCheck(user));
+        this.broadcastReadyCheckUpdate();
+    }
+
+    connectionStateChangedWhileReadyCheck(user: User): void {
+        if (this.readyUsers && !user.connected) {
+            _.pull(this.readyUsers, user);
+            this.broadcastReadyCheckUpdate();
+        }
+    }
+
+    broadcastReadyCheckUpdate(): void {
+        this.entireGame.broadcastToClients({
+            type: "ready-check",
+            readyUsers: this.readyUsers ? this.readyUsers.map(u => u.id) : null,
+            readyCheckWillTimeoutAt: this.readyCheckWillTimeoutAt ? this.readyCheckWillTimeoutAt.getTime() : null
+        });
+    }
+
     setUserForLobbyHouse(house: LobbyHouse | null, user: User): void {
         this.players.forEach((houseUser, house) => {
             if (user == houseUser) {
@@ -405,6 +463,21 @@ export default class LobbyGameState extends GameState<EntireGame> {
             }
         } else if (message.type == "password-response") {
             this.password = message.password;
+        } else if (message.type == "ready-check") {
+            let notifyPlayers = false;
+            if (!this.readyUsers && message.readyUsers) {
+                // Set a flag to notify players
+                notifyPlayers = true;
+            }
+
+            this.readyUsers = message.readyUsers ? message.readyUsers.map(uid => this.entireGame.users.get(uid)) : null;
+            this.readyCheckWillTimeoutAt = message.readyCheckWillTimeoutAt ? new Date(message.readyCheckWillTimeoutAt) : null;
+
+            if (notifyPlayers && this.entireGame.onClientGameStateChange) {
+                // Now fake a game state change to play a sound for the ready check
+                // as getWaitedUsers now is aware about the running ready check (now: this.readyUsers != null)
+                this.entireGame.onClientGameStateChange();
+            }
         }
     }
 
@@ -435,6 +508,12 @@ export default class LobbyGameState extends GameState<EntireGame> {
         });
     }
 
+    ready(): void {
+        this.entireGame.sendMessageToServer({
+            type: "ready"
+        });
+    }
+
     sendPassword(password: string): void {
         this.entireGame.sendMessageToServer({
             type: "set-password",
@@ -443,6 +522,10 @@ export default class LobbyGameState extends GameState<EntireGame> {
     }
 
     getWaitedUsers(): User[] {
+        if (this.readyUsers) {
+            return _.difference(this.players.values, this.readyUsers);
+        }
+
         if (!this.entireGame.users.has(this.entireGame.ownerUserId)) {
             return [];
         }
@@ -460,7 +543,9 @@ export default class LobbyGameState extends GameState<EntireGame> {
             password: this.password == "" ||
                 admin || (user && this.entireGame.isRealOwner(user))
                 ? this.password
-                : v4()
+                : v4(),
+            readyUsers: this.readyUsers ? this.readyUsers.map(u => u.id) : null,
+            readyCheckWillTimeoutAt: this.readyCheckWillTimeoutAt ? this.readyCheckWillTimeoutAt.getTime() : null
         };
     }
 
@@ -470,6 +555,8 @@ export default class LobbyGameState extends GameState<EntireGame> {
         lobbyGameState.lobbyHouses = new BetterMap(data.lobbyHouses.map(h => [h.id, h]));
         lobbyGameState.players = new BetterMap(data["players"].map(([hid, uid]) => [lobbyGameState.lobbyHouses.get(hid), entireGame.users.get(uid)]));
         lobbyGameState.password = data.password;
+        lobbyGameState.readyUsers = data.readyUsers ? data.readyUsers.map(uid => entireGame.users.get(uid)) : null;
+        lobbyGameState.readyCheckWillTimeoutAt = data.readyCheckWillTimeoutAt ? new Date(data.readyCheckWillTimeoutAt) : null;
 
         return lobbyGameState;
     }
@@ -480,6 +567,8 @@ export interface SerializedLobbyGameState {
     players: [string, string][];
     lobbyHouses: LobbyHouse[];
     password: string;
+    readyUsers: string[] | null;
+    readyCheckWillTimeoutAt: number | null;
 }
 
 export interface LobbyHouse {

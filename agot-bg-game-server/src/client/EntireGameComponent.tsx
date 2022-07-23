@@ -186,10 +186,10 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     <h4><Badge variant="warning"><FontAwesomeIcon icon={faExclamation} size="sm"/></Badge></h4>
                 </OverlayTrigger>
             </Col>}
-            {this.props.entireGame.gameSettings.onlyLive &&
+            {/* {this.props.entireGame.gameSettings.onlyLive &&
             <Col xs="auto">
                 <h4><Badge variant="warning">BETA</Badge></h4>
-            </Col>}
+            </Col>} */}
         </>;
     }
 
@@ -244,7 +244,23 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     <h4><Badge variant="secondary">{totalPlayingTime}</Badge></h4>
                 </OverlayTrigger>
             </Col>;
-        } else if (this.lobby) {
+        } else if (this.lobby && this.lobby.readyCheckWillTimeoutAt) {
+            // Show a 30 seconds countdown
+            const countdown = getTimeDeltaInSeconds(this.lobby.readyCheckWillTimeoutAt, new Date());
+
+            return <Col xs="auto">
+                <OverlayTrigger
+                    placement="bottom"
+                    overlay={
+                        <Tooltip id="ready-check-countdown-tooltip">
+                            <b>Countdown for Ready Check</b>
+                        </Tooltip>}
+                    popperConfig={{ modifiers: [preventOverflow] }}
+                >
+                    <h4><Badge variant="secondary">{countdown}</Badge></h4>
+                </OverlayTrigger>
+            </Col>;
+        }else if (this.lobby) {
             return <OverlayTrigger
                 placement="bottom"
                 overlay={

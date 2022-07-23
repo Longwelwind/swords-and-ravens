@@ -14,6 +14,7 @@ export default class User {
     @observable otherUsersFromSameNetwork: string[] = [];
     @observable connected: boolean;
     @observable note = "";
+    onConnectionStateChanged: ((user: User) => void) | null = null;
 
     constructor(id: string, name: string, facelessName: string, game: EntireGame, settings: UserSettings, connected = false, otherUsersFromSameNetwork: string[] = []) {
         this.id = id;
@@ -47,6 +48,10 @@ export default class User {
                 user: this.id,
                 status: this.connected
             });
+
+            if (this.onConnectionStateChanged) {
+                this.onConnectionStateChanged(this);
+            }
         }
     }
 

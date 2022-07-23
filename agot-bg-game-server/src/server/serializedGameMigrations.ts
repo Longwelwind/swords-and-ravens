@@ -1788,6 +1788,17 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "83",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "lobby") {
+                const lobby = serializedGame.childGameState;
+                lobby.readyCheckWillTimeoutAt = null;
+                lobby.readyUsers = null;
+            }
+            return serializedGame;
+        }
     }
 ];
 

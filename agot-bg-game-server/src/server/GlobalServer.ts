@@ -233,6 +233,12 @@ export default class GlobalServer {
     }
 
     restartLiveClockTimers(entireGame: EntireGame): void {
+        if (entireGame.lobbyGameState) {
+            // Set all players unready
+            entireGame.lobbyGameState.readyUsers = null;
+            entireGame.lobbyGameState.readyCheckWillTimeoutAt = null;
+        }
+
         if (!entireGame.gameSettings.onlyLive || !entireGame.ingameGameState
             || entireGame.ingameGameState.isEnded || entireGame.ingameGameState.isCancelled) {
             return;
