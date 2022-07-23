@@ -3,5 +3,5 @@ export default function getElapsedSeconds(since: Date): number {
 }
 
 export function getTimeDeltaInSeconds(minuend: Date, subtrahend: Date): number {
-    return Math.floor((minuend.getTime() - subtrahend.getTime()) / 1000);
+    return Math.round((minuend.getTime() - subtrahend.getTime()) / 1000);
 }

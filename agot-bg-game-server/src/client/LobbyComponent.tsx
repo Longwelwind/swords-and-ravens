@@ -14,7 +14,7 @@ import ChatComponent from "./chat-client/ChatComponent";
 import GameSettingsComponent from "./GameSettingsComponent";
 import User from "../server/User";
 import ConditionalWrap from "./utils/ConditionalWrap";
-import { OverlayTrigger } from "react-bootstrap";
+import { Badge, OverlayTrigger } from "react-bootstrap";
 import Tooltip from "react-bootstrap/Tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faTimes} from "@fortawesome/free-solid-svg-icons/faTimes";
@@ -23,7 +23,7 @@ import EntireGame from "../common/EntireGame";
 import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
 import { observable } from "mobx";
 import DebouncedPasswordComponent from "./utils/DebouncedPasswordComponent";
-import { faLock } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faLock } from "@fortawesome/free-solid-svg-icons";
 import { setBoltonIconImage, setStarkIconImage } from "./houseIconImages";
 import megaphoneImage from "../../public/images/icons/megaphone.svg";
 import speakerOffImage from "../../public/images/icons/speaker-off.svg";
@@ -37,7 +37,7 @@ interface LobbyComponentProps {
 
 @observer
 export default class LobbyComponent extends Component<LobbyComponentProps> {
-    @observable password = this.props.gameClient.isRealOwner() ? this.props.gameState.password : "";
+    @observable password = this.props.gameClient.isRealOwner() ? this.lobby.password : "";
 
     get authenticatedUser(): User {
         return this.props.gameClient.authenticatedUser as User;
@@ -53,6 +53,10 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
 
     get lobby(): LobbyGameState {
         return this.props.gameState;
+    }
+
+    get readyCheckOngoing(): boolean {
+        return this.lobby.readyUsers != null;
     }
 
     @observable chatHeight = 430;
@@ -114,7 +118,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                         gameClient={this.props.gameClient}
                                         entireGame={this.lobby.entireGame} />
                                 </Row>
-                                {(this.props.gameClient.isRealOwner() || this.props.gameState.password != "") &&
+                                {(this.props.gameClient.isRealOwner() || this.lobby.password != "") && !this.readyCheckOngoing &&
                                 <Row className="mt-2">
                                     <Col>
                                         <Row className="justify-content-center">
@@ -122,13 +126,13 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                                 password={this.password}
                                                 onChangeCallback={newPassword => {
                                                     this.password = newPassword;
-                                                    this.props.gameState.sendPassword(newPassword);
+                                                    this.lobby.sendPassword(newPassword);
                                                 }}
                                                 tooltip={
                                                     <Tooltip id="game-password-tooltip">
                                                         {this.props.gameClient.isRealOwner()
                                                             ? <>You can set a password here to prevent strangers from joining your game.</>
-                                                            : this.props.gameState.password != ""
+                                                            : this.lobby.password != ""
                                                                 ? <>Enter the password here to unlock and join the game.</>
                                                                 : <></>}
                                                     </Tooltip>}
@@ -141,15 +145,17 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                         <Button
                                             block
                                             onClick={() => this.lobby.start()}
-                                            disabled={!canStartGame}
+                                            disabled={!canStartGame || this.readyCheckOngoing}
                                         >
                                             <ConditionalWrap
-                                                condition={!canStartGame}
+                                                condition={!canStartGame || this.readyCheckOngoing}
                                                 wrap={children =>
                                                     <OverlayTrigger
                                                         overlay={
                                                             <Tooltip id="start-game">
-                                                                {canStartGameReason == "not-enough-players" ?
+                                                                {this.readyCheckOngoing ?
+                                                                    "Ready check is ongoing"
+                                                                : canStartGameReason == "not-enough-players" ?
                                                                     "More players must join to be able to start the game."
                                                                 : canStartGameReason == "targaryen-must-be-a-player-controlled-house" ?
                                                                     "House Targaryen must be chosen by a player"
@@ -163,7 +169,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                                     </OverlayTrigger>
                                                 }
                                             >
-                                                <span>Start</span>
+                                                {this.lobby.settings.pbem ? <span>Start</span> : <span>Launch Ready Check to start the game</span>}
                                             </ConditionalWrap>
                                         </Button>
                                     </Col>
@@ -171,15 +177,17 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                         <Button
                                             variant="danger"
                                             onClick={() => this.cancel()}
-                                            disabled={!canCancelGame}
+                                            disabled={!canCancelGame || this.readyCheckOngoing}
                                         >
                                             <ConditionalWrap
-                                                condition={!canCancelGame}
+                                                condition={!canCancelGame || this.readyCheckOngoing}
                                                 wrap={children =>
                                                     <OverlayTrigger
                                                         overlay={
                                                             <Tooltip id="start-game">
-                                                                {canCancelGameReason == "not-owner" ?
+                                                                {this.readyCheckOngoing ?
+                                                                    "Ready check is ongoing"
+                                                                : canCancelGameReason == "not-owner" ?
                                                                     "Only the owner of the game can cancel it"
                                                                 : null}
                                                             </Tooltip>
@@ -235,13 +243,31 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
         const invisible = !this.isHouseAvailable(h);
 
         if (!this.props.gameClient.isRealOwner() &&
-            this.props.gameState.password != "" &&
-            this.password != this.props.gameState.password &&
+            this.lobby.password != "" &&
+            this.password != this.lobby.password &&
             // If user is already seated, allow them to "Leave"
             (!this.lobby.players.has(h) || this.lobby.players.get(h) != this.authenticatedUser)) {
             return <Col xs="auto" className={invisible ? "invisible" : ""}>
                 <FontAwesomeIcon icon={faLock} size="2x"/>
             </Col>;
+        }
+
+        if (this.lobby.readyUsers != null) {
+            // Ready-check ongoing
+            if (!this.lobby.players.has(h)) {
+                return null;
+            }
+            return  (
+                this.lobby.readyUsers.includes(this.lobby.players.get(h)) ? (
+                    <Col xs="auto" className={invisible ? "invisible" : ""}>
+                        <Badge variant="success"><FontAwesomeIcon icon={faCheck} size="2x" /></Badge>
+                    </Col>
+                ) : this.lobby.players.get(h) == this.authenticatedUser ? (
+                    <Col xs="auto" className={invisible ? "invisible" : ""}>
+                        <Button variant="success" onClick={() => this.ready()}>Ready</Button>
+                    </Col>
+                ) : null
+            );
         }
 
         return  (
@@ -283,6 +309,10 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
 
     leave(): void {
         this.lobby.chooseHouse(null, this.password);
+    }
+
+    ready(): void {
+        this.lobby.ready();
     }
 
     UNSAFE_componentWillUpdate(): void {

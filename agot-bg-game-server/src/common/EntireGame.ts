@@ -323,6 +323,11 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 return;
             }
 
+            if (this.lobbyGameState?.readyUsers != null) {
+                // Disallow changing settings when ready check is running
+                message.settings = this.gameSettings;
+            }
+
             // Only allow PBEM and Private to be changed ingame
             const settings = message.settings as GameSettings;
 
