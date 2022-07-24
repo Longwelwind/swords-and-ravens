@@ -1174,10 +1174,6 @@ export default class IngameGameState extends GameState<
     }
 
     canLaunchCancelGameVote(player: Player | null): {result: boolean; reason: string} {
-        if (this.players.size <= 2) {
-            return {result: false, reason: "not-enough-voter"};
-        }
-
         const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof CancelGame);
 
         if (existingVotes.length > 0) {
@@ -1200,10 +1196,6 @@ export default class IngameGameState extends GameState<
     }
 
     canLaunchEndGameVote(player: Player | null): {result: boolean; reason: string} {
-        if (this.players.size <= 2) {
-            return {result: false, reason: "not-enough-voter"};
-        }
-
         const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof EndGame);
 
         if (existingVotes.length > 0) {
@@ -1294,10 +1286,6 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "no-live-clock-game"};
         }
 
-        if (this.players.size <= 2) {
-            return {result: false, reason: "not-enough-voter"};
-        }
-
         const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof ExtendPlayerClocks);
 
         if (existingVotes.length > 0) {
@@ -1348,11 +1336,7 @@ export default class IngameGameState extends GameState<
                 return {result: false, reason: "vassalizing-yourself-is-forbidden"};
             }
 
-            if (this.entireGame.gameSettings.onlyLive) {
-                if (this.players.size <= 2) {
-                    return {result: false, reason: "not-enough-voter"};
-                }
-            } else if (this.players.size == this.entireGame.minPlayerCount) {
+            if (!this.entireGame.gameSettings.onlyLive && this.players.size == this.entireGame.minPlayerCount) {
                 return {result: false, reason: "min-player-count-reached"};
             }
 
@@ -1386,10 +1370,6 @@ export default class IngameGameState extends GameState<
     }
 
     canLaunchReplaceVassalVote(fromUser: User | null, forHouse: House): {result: boolean; reason: string} {
-        if (this.players.size <= 2) {
-            return {result: false, reason: "not-enough-voter"};
-        }
-
         if (!fromUser) {
             return {result: false, reason: "only-authenticated-users-can-vote"};
         }

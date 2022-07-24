@@ -8,6 +8,8 @@ import BetterMap from "../../../utils/BetterMap";
 import PlaceOrdersGameState from "../planning-game-state/place-orders-game-state/PlaceOrdersGameState";
 import Region from "../game-data-structure/Region";
 import Order from "../game-data-structure/Order";
+import _ from "lodash";
+import GameEndedGameState from "../game-ended-game-state/GameEndedGameState";
 
 export type SerializedVoteType = SerializedCancelGame | SerializedEndGame
     | SerializedReplacePlayer | SerializedReplacePlayerByVassal | SerializedReplaceVassalByPlayer
@@ -407,9 +409,22 @@ export class ReplacePlayerByVassal extends VoteType {
     }
 
     executeAccepted(vote: Vote): void {
-        const oldPlayer = vote.ingame.players.values.find(p => p.user == this.replaced) as Player;
-        vote.ingame.endPlayerClock(oldPlayer);
-        vote.ingame.replacePlayerByVassal(oldPlayer);
+        const ingame = vote.ingame;
+        const oldPlayer = ingame.players.values.find(p => p.user == this.replaced) as Player;
+        ingame.endPlayerClock(oldPlayer);
+
+        if (ingame.players.size == 2) {
+            // Replacing a vassal now could lead to an invalid state.
+            // E.G. PayDebtsGameState will fail because there is no-one left to do the destroy units choice
+            // When we are in combat, replacing vassal will fail, as there is no house left to assign the new vassal
+            // Therefore we go to GameEnded first and then replace the last house with a vassal:
+
+            const winner = _.without(ingame.players.values, oldPlayer)[0].house;
+            ingame.setChildGameState(new GameEndedGameState(ingame)).firstStart(winner);
+            ingame.entireGame.checkGameStateChanged();
+        }
+
+        ingame.replacePlayerByVassal(oldPlayer);
     }
 
     serializeToClient(): SerializedReplacePlayerByVassal {
