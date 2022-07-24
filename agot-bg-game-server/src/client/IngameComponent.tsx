@@ -462,8 +462,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         <Tooltip id="cancel-game-vote-tooltip">
                                             {canLaunchCancelGameVote ? (
                                                 "Launch a vote to cancel the game"
-                                            ) : canLaunchCancelGameVoteReason == "not-enough-voter" ? (
-                                                "There are not enough voters left in the game"
+                                            ) : canLaunchCancelGameVoteReason == "game-paused" ? (
+                                                "The game must be resumed first"
                                             ) : canLaunchCancelGameVoteReason == "only-players-can-vote" ? (
                                                 "Only participating players can vote"
                                             ) : canLaunchCancelGameVoteReason == "already-existing" ? (
@@ -491,8 +491,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         <Tooltip id="end-game-vote-tooltip">
                                             {canLaunchEndGameVote ? (
                                                 "Launch a vote to end the game after the current round"
-                                            ) : canLaunchEndGameVoteReason == "not-enough-voter" ? (
-                                                "There are not enough voters left in the game"
+                                            ) : canLaunchEndGameVoteReason == "game-paused" ? (
+                                                "The game must be resumed first"
                                             ) : canLaunchEndGameVoteReason == "only-players-can-vote" ? (
                                                 "Only participating players can vote"
                                             ) : canLaunchEndGameVoteReason == "already-last-turn" ? (
@@ -576,8 +576,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         <Tooltip id="extend-clocks-vote-tooltip">
                                             {canLaunchExtendPlayerClocksVote ? (
                                                 "Launch a vote to extend all player clocks by 15 minutes"
-                                            ) : canLaunchExtendPlayerClocksVoteReason == "not-enough-voter" ? (
-                                                "There are not enough voters left in the game"
+                                            ) : canLaunchExtendPlayerClocksVoteReason == "game-paused" ? (
+                                                "The game must be resumed first"
                                             ) : canLaunchExtendPlayerClocksVoteReason == "only-players-can-vote" ? (
                                                 "Only participating players can vote"
                                             ) : canLaunchExtendPlayerClocksVoteReason == "already-existing" ? (

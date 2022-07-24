@@ -1174,6 +1174,10 @@ export default class IngameGameState extends GameState<
     }
 
     canLaunchCancelGameVote(player: Player | null): {result: boolean; reason: string} {
+        if (this.paused) {
+            return {result: false, reason: "game-paused"};
+        }
+
         const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof CancelGame);
 
         if (existingVotes.length > 0) {
@@ -1196,6 +1200,10 @@ export default class IngameGameState extends GameState<
     }
 
     canLaunchEndGameVote(player: Player | null): {result: boolean; reason: string} {
+        if (this.paused) {
+            return {result: false, reason: "game-paused"};
+        }
+
         const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof EndGame);
 
         if (existingVotes.length > 0) {
@@ -1282,6 +1290,10 @@ export default class IngameGameState extends GameState<
     }
 
     canLaunchExtendPlayerClocksVote(player: Player | null): {result: boolean; reason: string} {
+        if (this.paused) {
+            return {result: false, reason: "game-paused"};
+        }
+
         if (!this.entireGame.gameSettings.onlyLive) {
             return {result: false, reason: "no-live-clock-game"};
         }
@@ -1319,6 +1331,10 @@ export default class IngameGameState extends GameState<
     }
 
     canLaunchReplacePlayerVote(fromUser: User | null, replaceWithVassal = false, forHouse: House | null = null): {result: boolean; reason: string} {
+        if (this.paused) {
+            return {result: false, reason: "game-paused"};
+        }
+
         if (!fromUser) {
             return {result: false, reason: "only-authenticated-users-can-vote"};
         }
@@ -1370,6 +1386,10 @@ export default class IngameGameState extends GameState<
     }
 
     canLaunchReplaceVassalVote(fromUser: User | null, forHouse: House): {result: boolean; reason: string} {
+        if (this.paused) {
+            return {result: false, reason: "game-paused"};
+        }
+
         if (!fromUser) {
             return {result: false, reason: "only-authenticated-users-can-vote"};
         }

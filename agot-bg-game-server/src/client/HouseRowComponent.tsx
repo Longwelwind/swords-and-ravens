@@ -310,8 +310,8 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         <OverlayTrigger
                             overlay={
                                 <Tooltip id="replace-player-tooltip">
-                                    {reason == "not-enough-voter" ?
-                                        "There are not enough voters left in the game"
+                                    {reason == "game-paused" ?
+                                        "The game must be resumed first"
                                         : reason == "already-playing" ?
                                         "You are already playing in this game"
                                         : reason == "ongoing-vote" ?
