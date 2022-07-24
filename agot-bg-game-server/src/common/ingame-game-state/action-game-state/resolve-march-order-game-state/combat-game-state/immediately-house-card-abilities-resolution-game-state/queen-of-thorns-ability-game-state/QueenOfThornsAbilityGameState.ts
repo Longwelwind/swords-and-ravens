@@ -58,7 +58,7 @@ export default class QueenOfThornsAbilityGameState extends GameState<
         }
 
         // Remove regions that don't contain an order and that don't belong to the enemy
-        return regions.filter(r => this.actionGameState.ordersOnBoard.has(r) && r.getController() == enemy);
+        return regions.filter(r => this.actionGameState.ordersOnBoard.has(r) && r.getController() == enemy && r != this.combatGameState.attackingRegion);
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
