@@ -28,7 +28,9 @@ export default class Vote {
     participatingHouses: House[];
 
     get positiveCountToPass(): number {
-        return this.type.getPositiveCountToPass(this);
+        return this.participatingHouses.length <= 2
+            ? this.participatingHouses.length
+            : this.type.getPositiveCountToPass(this);
     }
 
     get state(): VoteState {
