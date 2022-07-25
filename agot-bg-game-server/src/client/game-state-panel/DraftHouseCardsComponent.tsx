@@ -15,9 +15,11 @@ import House from "../../common/ingame-game-state/game-data-structure/House";
 import SimpleChoiceGameState from "../../common/ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
 import SimpleChoiceComponent from "./SimpleChoiceComponent";
 import _ from "lodash";
+import { observable } from "mobx";
 
 @observer
 export default class DraftHouseCardsComponent extends Component<GameStateComponentProps<DraftHouseCardsGameState>> {
+    @observable nameFilter = "";
     get house(): House {
         return this.props.gameState.childGameState.house;
     }
@@ -75,9 +77,17 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                     <Row>
                         <Col xs="12" className="text-center">These are the House cards from which you may choose one on your next turn:</Col>
                         <Col xs="12">
+                            <Row className="justify-content-center mb-2">
+                                <input
+                                    placeholder="Filter for name"
+                                    type="text"
+                                    value={this.nameFilter}
+                                    onChange={e => this.nameFilter = e.target.value}
+                                />
+                            </Row>
                             <Row className="justify-content-center">
                                 {this.props.gameState.getAllHouseCards().map(hc => (
-                                    <Col xs="auto" key={hc.id}>
+                                    (this.nameFilter == "" || hc.name.toLowerCase().includes(this.nameFilter.toLowerCase())) && <Col xs="auto" key={hc.id}>
                                         <HouseCardComponent
                                             houseCard={hc}
                                             size="small"
