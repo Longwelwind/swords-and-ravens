@@ -10,23 +10,33 @@ import SelectHouseCardGameState
     from "../../common/ingame-game-state/select-house-card-game-state/SelectHouseCardGameState";
 import HouseCard from "../../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import HouseCardComponent from "./utils/HouseCardComponent";
+import DraftHouseCardsGameState from "../../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 
 @observer
 export default class SelectHouseCardComponent extends Component<GameStateComponentProps<SelectHouseCardGameState<any>>> {
     @observable selectedHouseCard: HouseCard | null;
+    @observable nameFilter = "";
 
     render(): ReactNode {
         return (
             <>
                 {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
                 <Col xs={12}>
+                    {this.props.gameState.entireGame.hasChildGameState(DraftHouseCardsGameState) && <Row className="justify-content-center mb-2">
+                        <input
+                            placeholder="Filter for name"
+                            type="text"
+                            value={this.nameFilter}
+                            onChange={e => this.nameFilter = e.target.value}
+                        />
+                    </Row>}
                     <Row className="justify-content-center">
                         <Col xs="12">
                             <Row className="justify-content-center">
                                 {this.props.gameState.houseCards.map(hc => (
                                     // The house argument is used to decide which card-back is used
                                     // Since we will never show a back-card here, we can give whatever value fits.
-                                    <Col xs="auto" key={hc.id}>
+                                    (this.nameFilter == "" || hc.name.toLowerCase().includes(this.nameFilter.toLowerCase())) && <Col xs="auto" key={hc.id}>
                                         <HouseCardComponent
                                             houseCard={hc}
                                             size="small"
