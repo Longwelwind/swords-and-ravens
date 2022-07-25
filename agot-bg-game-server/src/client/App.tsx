@@ -83,10 +83,10 @@ export default class App extends Component<AppProps> {
             <ToastContainer
                 autoClose={7500}
                 position="top-center"
-                closeOnClick
+                closeOnClick={!isMobile}
                 pauseOnFocusLoss
                 pauseOnHover
-                draggable
+                draggable={isMobile}
                 draggablePercent={60}
                 limit={3}
                 theme="dark"
