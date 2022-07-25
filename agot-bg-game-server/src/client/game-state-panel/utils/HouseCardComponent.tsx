@@ -39,7 +39,7 @@ export default class HouseCardComponent extends Component<HouseCardComponentProp
     }
 
     private renderPopover(): OverlayChildren {
-        return <ImagePopover className="vertical-game-card" style={{
+        return <ImagePopover className="vertical-game-card bring-to-front" style={{
             backgroundImage: `url(${houseCardImages.get(this.props.houseCard.id)})`}}
         />;
     }

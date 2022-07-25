@@ -30,7 +30,7 @@ export default class TidesOfBattleCardComponent extends Component<TidesOfBattleC
     }
 
     renderPopover(): OverlayChildren {
-        return <ImagePopover className="vertical-game-card small" style={{
+        return <ImagePopover className="vertical-game-card small bring-to-front" style={{
             backgroundImage: `url(${tidesOfBattleImages.get(this.props.tidesOfBattleCard.id)})`}}
         />;
     }

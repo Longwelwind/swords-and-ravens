@@ -30,7 +30,7 @@ export default class LoanCardComponent extends Component<LoanCardComponentProps>
     }
 
     renderPopover(): OverlayChildren {
-        return <ImagePopover className="vertical-game-card" style={{
+        return <ImagePopover className="vertical-game-card bring-to-front" style={{
             backgroundImage: `url(${loanCardImages.get(this.props.loanCard.id)})`}}
         />;
     }

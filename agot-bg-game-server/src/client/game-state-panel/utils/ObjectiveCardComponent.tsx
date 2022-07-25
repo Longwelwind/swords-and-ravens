@@ -37,7 +37,7 @@ export default class ObjectiveCardComponent extends Component<ObjectiveCardCompo
     }
 
     private renderPopover(): OverlayChildren {
-        return <ImagePopover className="vertical-game-card" style={{
+        return <ImagePopover className="vertical-game-card bring-to-front" style={{
             backgroundImage: `url(${objectiveCardImages.get(this.props.objectiveCard.id)})`}}
         />;
     }
