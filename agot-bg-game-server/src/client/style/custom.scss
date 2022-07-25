@@ -614,7 +614,7 @@ div.disconnected {
 }
 
 .bring-to-front {
-  z-index: 2060 !important;
+  z-index: 9999 !important;
 }
 
 ul {
@@ -699,6 +699,7 @@ hr.red {
 }
 
 :root {
+  --toastify-z-index: 9998;
   --toastify-color-progress-dark: #F39C12;
   --toastify-color-progress-light: #F39C12;
 }

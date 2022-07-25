@@ -21,7 +21,7 @@ export default class HouseCardBackComponent extends Component<HouseCardBackCompo
         return (
             <OverlayTrigger
                 overlay={
-                    <ImagePopover className="vertical-game-card" style={{
+                    <ImagePopover className="vertical-game-card bring-to-front" style={{
                         backgroundImage: `url(${houseCardImages.get(this.props.houseCard.id)})`
                     }}/>
                 }

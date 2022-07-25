@@ -40,7 +40,7 @@ export default class IronBankTabComponent extends Component<IronBankTabComponent
             <Row className="justify-content-center mt-4">
                 {this.ironBank.loanSlots.slice().reverse().map((lc, i) => <Col xs="auto" key={`loan-slot-${i}`} className="pr-0">
                     <OverlayTrigger
-                        overlay={<ImagePopover className="vertical-game-card" style={{ backgroundImage: lc ? `url(${loanCardImages.get(lc.type.id)})` : "none" }} />}
+                        overlay={<ImagePopover className="vertical-game-card bring-to-front" style={{ backgroundImage: lc ? `url(${loanCardImages.get(lc.type.id)})` : "none" }} />}
                         popperConfig={{ modifiers: [preventOverflow] }}
                         delay={{ show: 250, hide: 0 }}
                         placement="auto"
