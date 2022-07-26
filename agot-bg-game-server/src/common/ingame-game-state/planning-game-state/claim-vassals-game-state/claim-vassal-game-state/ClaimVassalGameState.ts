@@ -85,10 +85,11 @@ export default class ClaimVassalGameState extends GameState<ClaimVassalsGameStat
 
     actionAfterVassalReplacement(_newVassal: House): void {
         this.ingame.game.vassalRelations.keys.forEach(vassal => this.ingame.game.vassalRelations.delete(vassal));
-        this.ingame.broadcastVassalRelations();
         const planning = this.parentGameState.parentGameState;
         this.ingame.resetAllWaitedForData();
         planning.setChildGameState(new ClaimVassalsGameState(planning)).firstStart();
+        this.ingame.entireGame.checkGameStateChanged();
+        this.ingame.broadcastVassalRelations();
     }
 
     static deserializeFromServer(claimVassals: ClaimVassalsGameState, data: SerializedClaimVassalGameState): ClaimVassalGameState {

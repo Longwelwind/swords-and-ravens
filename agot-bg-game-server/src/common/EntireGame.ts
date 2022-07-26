@@ -196,8 +196,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 // In case there is still an unhandled WaitedForData we now send the response time
                 // Basically this should not happen, but we keep it for safety!
                 if (p.waitedForData?.handled === false) {
-                    p.sendPbemResponseTime();
-
+                    console.warn(`Unhandled waitedForData for user ${p.user.name} (${p.user.id})`);
                     if (this.onCaptureSentryMessage) {
                         this.onCaptureSentryMessage(`Unhandled waitedForData for user ${p.user.name} (${p.user.id})`, "warning");
                     }

@@ -422,6 +422,7 @@ export class ReplacePlayerByVassal extends VoteType {
             const winner = _.without(ingame.players.values, oldPlayer)[0].house;
             ingame.setChildGameState(new GameEndedGameState(ingame)).firstStart(winner);
             ingame.entireGame.checkGameStateChanged();
+            return;
         }
 
         ingame.replacePlayerByVassal(oldPlayer);

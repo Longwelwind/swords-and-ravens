@@ -657,6 +657,8 @@ export default class IngameGameState extends GameState<
 
     onPlayerClockTimeout(player: Player): void {
         // Use a try catch here as an exception in a timer callback seems to crash the server
+        let updateLastActive = false;
+
         try {
             if (!player.liveClockData) {
                 throw new Error("LiveClockData must be present in onPlayerClockTimeout");
@@ -672,11 +674,21 @@ export default class IngameGameState extends GameState<
 
                 const winner = _.without(this.players.values, player)[0].house;
                 this.setChildGameState(new GameEndedGameState(this)).firstStart(winner);
-                this.entireGame.checkGameStateChanged();
+                updateLastActive = true;
+                return;
+            }
+
+            if (this.hasChildGameState(ThematicDraftHouseCardsGameState) || this.hasChildGameState(DraftHouseCardsGameState)) {
+                // Determine winner by finding the one with the most time left. On draw apply normal tie breaker.
+                const winner = _.orderBy(this.game.getPotentialWinners().filter(h => h != player.house && !this.isVassalHouse(h)),
+                    h => this.getControllerOfHouse(h).liveClockData?.remainingSeconds, "desc")[0];
+
+                this.setChildGameState(new GameEndedGameState(this)).firstStart(winner);
+                updateLastActive = true;
+                return;
             }
 
             this.replacePlayerByVassal(player);
-            this.entireGame.saveGame(false);
         } catch (e) {
             const message = typeof e === "string"
                 ? e
@@ -688,6 +700,7 @@ export default class IngameGameState extends GameState<
         } finally {
             this.entireGame.checkGameStateChanged();
             this.entireGame.doPlayerClocksHandling();
+            this.entireGame.saveGame(updateLastActive);
         }
     }
 
