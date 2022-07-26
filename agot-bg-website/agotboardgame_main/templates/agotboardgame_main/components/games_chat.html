@@ -40,7 +40,7 @@
                     data.messages.forEach(d => this.addMessage(d));
                 } else if (data.type == 'more_chat_messages_retrieved') {
                     if (data.messages.length == 0) {
-                        this.setState({ noMoreMessages: true });
+                        this.setState({ noMoreMessages: true, input: this.state.input });
                         return;
                     }
                     data.messages.forEach(d => this.addMessage(d, true));
@@ -56,7 +56,7 @@
                     ? state.messages.concat(parsedMsg)
                     : [parsedMsg].concat(state.messages);
 
-                return {messages};
+                return {messages: messages, input: this.state.input};
             });
         }
 
@@ -70,7 +70,7 @@
         loadMoreMessages(e) {
             e.preventDefault();
             if (this.state.messages.length == 0) {
-                this.setState({ noMoreMessages: true });
+                this.setState({ noMoreMessages: true, input: this.state.input });
                 return;
             }
 
