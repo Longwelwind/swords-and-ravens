@@ -90,6 +90,10 @@ export default class IngameGameState extends GameState<
         return this.childGameState instanceof CancelledGameState;
     }
 
+    get pausedForUpdate(): boolean {
+        return !this.entireGame.gameSettings.onlyLive && !this.hasChildGameState(CombatGameState);
+    }
+
     constructor(entireGame: EntireGame) {
         super(entireGame);
     }
@@ -409,6 +413,10 @@ export default class IngameGameState extends GameState<
         }
         else if (message.type == "update-note") {
             player.user.note = message.note.substring(0, NOTE_MAX_LENGTH);
+        }
+
+        if (this.pausedForUpdate) {
+            return;
         }
 
         if (this.paused) {

@@ -196,8 +196,8 @@ export default class GameClient {
             return;
         }
 
-        console.debug("Receiving:");
-        console.debug(message);
+        //console.debug("Receiving:");
+        //console.debug(message);
 
         if (message.type == "authenticate-response") {
             this.entireGame = EntireGame.deserializeFromServer(message.game);
@@ -269,8 +269,8 @@ export default class GameClient {
     }
 
     send(message: ClientMessage): void {
-        console.debug("Sending:");
-        console.debug(message);
+        //console.debug("Sending:");
+        //console.debug(message);
         const compressedData = compress(JSON.stringify(message));
 
         this.socket.send(compressedData);

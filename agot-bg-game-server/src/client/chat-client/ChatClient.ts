@@ -71,13 +71,15 @@ export default class ChatClient {
 
     addChannel(id: string): void {
         const websocket = new WebSocket(`${CHAT_SERVER_URL}/ws/chat/room/${id}`);
-
         const channel = new Channel(id, websocket);
         this.channels.set(id, channel);
 
         websocket.onopen = () => {
             channel.connected = true;
-            channel.websocket.send(JSON.stringify({type: 'chat_retrieve', count: 15, first_message_id: null }))
+            // Ask for the first 15 messages with a delay of 100ms to decrease pressure
+            window.setTimeout(() => {
+                channel.websocket.send(JSON.stringify({type: 'chat_retrieve', count: 15, first_message_id: null }))
+            }, 100);
         };
         websocket.onclose = () => channel.connected = false;
         websocket.onerror = () => channel.connected = false;
@@ -123,22 +125,29 @@ export default class ChatClient {
         // console.log(message);
 
         if (message.type == 'chat_message') {
-            this.parseMessage(channel, message);
-
-            if (channel.onMessage) {
-                channel.onMessage(true, false);
+            const msg = this.parseMessage(message);
+            if (msg) {
+                channel.messages.push(msg);
+                if (channel.onMessage) {
+                    channel.onMessage(true, false);
+                }
             }
         } else if (message.type =='chat_messages_retrieved') {
-            message.messages.forEach(m => this.parseMessage(channel, m));
-            channel.lastViewedMessageId = message.last_viewed_message;
+            const msgs = message.messages.map(m => this.parseMessage(m)).filter(m => m != null) as Message[];
+            if (msgs.length > 0) {
+                this.addMultipleMessages(channel, msgs);
+                channel.lastViewedMessageId = message.last_viewed_message;
 
-            if (channel.onMessage) {
-                channel.onMessage(false, false);
+                if (channel.onMessage) {
+                    channel.onMessage(false, false);
+                }
             }
         } else if (message.type == "more_chat_messages_retrieved") {
-            message.messages.forEach(m => this.parseMessage(channel, m, true));
-            // For more messages retrieved we dont need to update last_viewed_message or mark as viewed
-            if (message.messages.length == 0 && channel.onMessage) {
+            const msgs = message.messages.map(m => this.parseMessage(m)).filter(m => m != null) as Message[];
+            if (msgs.length > 0) {
+                this.addMultipleMessages(channel, msgs, true);
+            } else if (msgs.length == 0 && channel.onMessage) {
+                // For more messages retrieved we dont need to update last_viewed_message or mark as viewed
                 channel.onMessage(false, true)
             }
         }
@@ -161,7 +170,15 @@ export default class ChatClient {
         return true;
     }
 
-    parseMessage(channel: Channel, data: MessageData, retrievedMore = false): void {
+    addMultipleMessages(channel: Channel, messages: Message[], retrievedMore = false): void {
+        if (retrievedMore) {
+            channel.messages.unshift(...messages.reverse());
+        } else {
+            channel.messages.push(...messages);
+        }
+    }
+
+    parseMessage(data: MessageData): Message | null {
         // `entireGame should always be non-null since channels are added once
         // the Entire game has been received from the server.
         if (this.gameClient.entireGame == null) {
@@ -169,19 +186,15 @@ export default class ChatClient {
         }
 
         if (!this.gameClient.entireGame.users.has(data.user_id)) {
-            return;
+            return null;
         }
 
-        const id = data.id;
-        const user = this.gameClient.entireGame.users.get(data.user_id);
-        const text = data.text;
-        const createdAt = new Date(Date.parse(data.created_at));
-
-        if (retrievedMore) {
-            channel.messages.unshift({id, user, text, createdAt});
-        } else {
-            channel.messages.push({id, user, text, createdAt});
-        }
+        return {
+            id: data.id,
+            user: this.gameClient.entireGame.users.get(data.user_id),
+            text: data.text,
+            createdAt: new Date(Date.parse(data.created_at))
+        };
     }
 }
 
