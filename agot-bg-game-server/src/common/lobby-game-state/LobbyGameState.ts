@@ -416,10 +416,6 @@ export default class LobbyGameState extends GameState<EntireGame> {
     }
 
     canStartGame(user: User): {success: boolean; reason: string} {
-        if (!this.settings.onlyLive) {
-            return {success: false, reason: "waiting-for-update"};
-        }
-
         if (!this.entireGame.isOwner(user)) {
             return {success: false, reason: "not-owner"};
         }

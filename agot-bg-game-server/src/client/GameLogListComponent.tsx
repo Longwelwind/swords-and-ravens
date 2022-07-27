@@ -840,10 +840,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const returnedHouseCards = data.houseCards.map(hcid => this.allHouseCards.get(hcid));
 
-                return <p>
+                return returnedHouseCards.length > 0 ? <p>
                     <b>Roose Bolton</b>: House <b>{house.name}</b> took back all discarded House
                     cards ({joinReactNodes(returnedHouseCards.map(hc => <b key={`roose_${hc.id}`}>{hc.name}</b>), ", ")}).
-                </p>;
+                </p>
+                : <p><b>Roose Bolton</b>: House <b>{house.name}</b> had no discarded House cards.</p>;
             }
             case "loras-tyrell-attack-order-moved":
                 const order = orders.get(data.order);

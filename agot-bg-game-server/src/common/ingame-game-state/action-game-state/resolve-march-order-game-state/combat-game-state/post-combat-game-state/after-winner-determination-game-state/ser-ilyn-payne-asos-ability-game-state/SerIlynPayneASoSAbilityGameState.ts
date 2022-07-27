@@ -53,8 +53,9 @@ export default class SerIlynPayneASoSAbilityGameState extends GameState<
         }
 
         const enemyArmy = this.combatGameState.houseCombatDatas.get(this.enemy).army;
-        // I dont think this will happen as we do skull handling after AfterWinnerDetermination but let's be sure.
+
         if (enemyArmy.length == 0) {
+            // Casualties are resolved later, but in case of an attack on a garrison, there may be no army
             this.ingame.log({
                 type: "house-card-ability-not-used",
                 house: this.house.id,

@@ -16,7 +16,7 @@ import faviconAlert from "../../public/images/favicon-alert.ico";
 import rollingDicesImage from "../../public/images/icons/rolling-dices.svg";
 import cardExchangeImage from "../../public/images/icons/card-exchange.svg";
 import {Helmet} from "react-helmet";
-import { Alert, Card, FormCheck, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
+import { Card, FormCheck, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import { preventOverflow } from "@popperjs/core";
 import DraftHouseCardsGameState from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import { observable } from "mobx";
@@ -73,16 +73,6 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             <Helmet>
                 <link rel="icon" href={this.props.gameClient.isOwnTurn() ? faviconAlert : faviconNormal} sizes="16x16" />
             </Helmet>
-            {this.ingame?.pausedForUpdate &&
-            <Col xs={12} className="mt-1">
-                <Row className="justify-content-center">
-                    <Alert variant="warning" className="mb-0">
-                        Currently, all PBEM games that are not in the combat phase are paused until all running games are out of combat in order to release a new game version.
-                        PBEM response times are not affected by the delay.<br/>
-                        Until the new version is deployed, only live games can be played with the new game clock option, as these games cannot be turned to PBEM in-game.
-                    </Alert>
-                </Row>
-            </Col>}
             <Col xs={12} className={this.props.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
                 <Row className="justify-content-center align-items-center">
                     {this.renderPrivateBadge()}
