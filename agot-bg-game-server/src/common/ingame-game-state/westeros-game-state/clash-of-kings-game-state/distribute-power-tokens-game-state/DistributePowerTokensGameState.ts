@@ -43,7 +43,7 @@ export default class DistributePowerTokensGameState extends GameState<ClashOfKin
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "distribute-power-tokens") {
-            if (player.house != this.house) {
+            if (this.parentGameState.ingame.getControllerOfHouse(this.house) != player) {
                 return;
             }
 
