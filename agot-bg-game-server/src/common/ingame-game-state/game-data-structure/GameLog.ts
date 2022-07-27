@@ -37,7 +37,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | SupplyAdjusted | PlayerReplaced | VassalReplaced | UserHouseAssignments | PlayerAction | JonSnowUsed
     | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed | SerIlynPayneFootmanKilled | RodrikTheReaderUsed
     | VassalsClaimed | CommanderPowerTokenGained | BericDondarrionUsed | VarysUsed | JaqenHGharUsed | JonConningtonUsed | BronnUsed
-    | SerGerrisDrinkwaterUsed | DraftHouseCardsBegan | HouseCardPicked | HouseCardsChosen
+    | SerGerrisDrinkwaterUsed | ReekUsed | LysaArrynModUsed | DraftHouseCardsBegan | HouseCardPicked | HouseCardsChosen
     | LittlefingerPowerTokensGained | AlayneStoneUsed | LysaArrynFfcPowerTokensGained | AnyaWaynwoodPowerTokensGained | RobertArrynUsed
     | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained | DaenerysTargaryenPowerTokensDiscarded | MissandeiUsed
     | PowerTokensGifted | InfluenceTrackPositionChosen | TiesDecided | PlaceLoyaltyChoice | LoyaltyTokenPlaced | LoyaltyTokenGained
@@ -325,6 +325,16 @@ interface SerGerrisDrinkwaterUsed {
     type: "ser-gerris-drinkwater-used";
     house: string;
     influenceTrack: number;
+}
+
+interface ReekUsed {
+    type: "reek-used";
+    house: string;
+}
+
+interface LysaArrynModUsed {
+    type: "lysa-arryn-mod-used";
+    house: string;
 }
 
 interface RodrikTheReaderUsed {

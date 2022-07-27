@@ -571,9 +571,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         const replacePlayerVoteOngoing = (this.ingameGameState?.votes.values.filter(v =>
             v.state == VoteState.ONGOING && (v.type instanceof ReplacePlayer || v.type instanceof ReplacePlayerByVassal)).length ?? -1) > 0;
 
-        const isInCombat = this.entireGame.hasChildGameState(CombatGameState);
-
-        return {turn, maxPlayerCount, settings, waitingFor, winner, replacePlayerVoteOngoing, isInCombat};
+        return {turn, maxPlayerCount, settings, waitingFor, winner, replacePlayerVoteOngoing};
     }
 
     // eslint-disable-next-line @typescript-eslint/ban-types

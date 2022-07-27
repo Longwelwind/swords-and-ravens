@@ -28,7 +28,7 @@ export default class RooseBoltonHouseCardAbility extends HouseCardAbility {
         afterWinnerDetermination.childGameState.onHouseCardResolutionFinish(house);
     }
 
-    doesPreventDiscardingHouseCardAfterCombat(postCombat: PostCombatGameState, house: House): boolean {
+    doesPreventDiscardingHouseCardAfterCombat(postCombat: PostCombatGameState, house: House, _houseCard: HouseCard): boolean {
         return postCombat.loser == house;
     }
 }

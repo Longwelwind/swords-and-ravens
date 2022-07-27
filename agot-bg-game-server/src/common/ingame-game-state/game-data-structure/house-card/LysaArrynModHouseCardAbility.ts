@@ -5,6 +5,7 @@ import AfterWinnerDeterminationGameState
     from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/AfterWinnerDeterminationGameState";
 import DefenseOrderType from "../order-types/DefenseOrderType";
 import LysaArrynModAbilityGameState from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/lysa-arryn-mod-game-state/LysaArrynModAbilityGameState";
+import PostCombatGameState from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState";
 
 export default class LysaArrynModHouseCardAbility extends HouseCardAbility {
     afterWinnerDetermination(afterWinnerDetermination: AfterWinnerDeterminationGameState, house: House, _houseCard: HouseCard): void {
@@ -19,5 +20,9 @@ export default class LysaArrynModHouseCardAbility extends HouseCardAbility {
         }
 
         afterWinnerDetermination.childGameState.onHouseCardResolutionFinish(house);
+    }
+
+    doesPreventDiscardingHouseCardAfterCombat(postCombat: PostCombatGameState, _house: House, houseCard: HouseCard): boolean {
+        return postCombat.notDiscardedHouseCardIds.includes(houseCard.id);
     }
 }
