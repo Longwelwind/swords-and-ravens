@@ -644,7 +644,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 : <span className={classNames("text-muted", { "clickable dropdown-toggle": phase.name == "Westeros" })}>{phase.name} phase</span>;
 
         return <div className={this.mapScrollbarEnabled ? "flex-ratio-container" : ""}>
-            <Card id="game-state-panel" className={this.mapScrollbarEnabled ? "flex-sized-to-content" : ""} border={border} style={{maxHeight: this.mapScrollbarEnabled ? "70%" : "none", paddingRight: "10px", marginBottom: "10px", borderWidth: "3px" }}>
+            <Card id="game-state-panel" className={this.mapScrollbarEnabled ? "flex-sized-to-content" : ""} border={border} style={{maxHeight: this.mapScrollbarEnabled ? "70%" : "none", paddingRight: "10px", marginBottom: "10px", borderWidth: "3px", overflowY: "scroll" }}>
                 <Row className="no-space-around">
                     <Col>
                         <ListGroup variant="flush">

@@ -91,4 +91,8 @@ export default class HouseCardAbility {
     forcesValyrianSteelBladeDecision(_combat: CombatGameState, _valyrianSteelBladeHolder: House): boolean {
         return false;
     }
+
+    doesPreventDiscardingHouseCardAfterCombat(_postCombat: PostCombatGameState, _house: House): boolean {
+        return false;
+    }
 }

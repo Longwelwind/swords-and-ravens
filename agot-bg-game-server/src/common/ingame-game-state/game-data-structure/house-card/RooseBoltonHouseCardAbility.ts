@@ -3,6 +3,7 @@ import AfterWinnerDeterminationGameState
     from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/AfterWinnerDeterminationGameState";
 import House from "../House";
 import HouseCard, {HouseCardState} from "./HouseCard";
+import PostCombatGameState from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState";
 
 export default class RooseBoltonHouseCardAbility extends HouseCardAbility {
     afterWinnerDetermination(afterWinnerDetermination: AfterWinnerDeterminationGameState, house: House, _houseCard: HouseCard): void {
@@ -25,5 +26,9 @@ export default class RooseBoltonHouseCardAbility extends HouseCardAbility {
         }
 
         afterWinnerDetermination.childGameState.onHouseCardResolutionFinish(house);
+    }
+
+    doesPreventDiscardingHouseCardAfterCombat(postCombat: PostCombatGameState, house: House): boolean {
+        return postCombat.loser == house;
     }
 }

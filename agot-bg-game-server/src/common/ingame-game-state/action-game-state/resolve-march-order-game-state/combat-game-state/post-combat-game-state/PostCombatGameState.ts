@@ -399,8 +399,12 @@ export default class PostCombatGameState extends GameState<
         this.combat.resolveMarchOrderGameState.onResolveSingleMarchOrderGameStateFinish(this.attacker);
     }
 
-    markHouseAsUsed(house: House, houseCard: HouseCard | null): void {
+    markHouseAsUsed(house: House, houseCard: HouseCard | null, forceDiscard = false): void {
         if (houseCard) {
+            if (!forceDiscard && houseCard.ability?.doesPreventDiscardingHouseCardAfterCombat(this, house)) {
+                return;
+            }
+
             houseCard.state = HouseCardState.USED;
 
             this.entireGame.broadcastToClients({
