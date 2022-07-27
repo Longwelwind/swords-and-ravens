@@ -783,6 +783,20 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         {influenceTrack}</b> track.
                 </p>;
             }
+            case "reek-used": {
+                const house = this.game.houses.get(data.house);
+
+                return <p>
+                    <b>Reek</b>: House <b>{house.name}</b> decided to return <b>Reek</b> to hand.
+                </p>;
+            }
+            case "lysa-arryn-mod-used": {
+                const house = this.game.houses.get(data.house);
+
+                return <p>
+                    <b>Lysa Arryn</b>: House <b>{house.name}</b> decided to return <b>Lysa Arryn</b> to hand.
+                </p>;
+            }
             case "qyburn-used": {
                 const house = this.game.houses.get(data.house);
                 const houseCard = this.allHouseCards.get(data.houseCard);

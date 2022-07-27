@@ -7,6 +7,7 @@ import AfterWinnerDeterminationGameState
     from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/AfterWinnerDeterminationGameState";
 import ReekAbilityGameState
     from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/reek-ability-game-state/ReekAbilityGameState";
+import PostCombatGameState from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState";
 
 export default class ReekHouseCardAbility extends HouseCardAbility {
     immediatelyResolution(immediately: ImmediatelyHouseCardAbilitiesResolutionGameState, house: House, _houseCard: HouseCard): void {
@@ -32,5 +33,9 @@ export default class ReekHouseCardAbility extends HouseCardAbility {
         }
 
         afterWinnerDetermination.childGameState.onHouseCardResolutionFinish(house);
+    }
+
+    doesPreventDiscardingHouseCardAfterCombat(postCombat: PostCombatGameState, _house: House, houseCard: HouseCard): boolean {
+        return postCombat.notDiscardedHouseCardIds.includes(houseCard.id);
     }
 }

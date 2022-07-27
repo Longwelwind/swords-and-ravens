@@ -28,6 +28,7 @@ export default class PostCombatGameState extends GameState<
     winner: House;
     loser: House;
     resolvedSkullIcons: House[] = [];
+    notDiscardedHouseCardIds: string[] = [];
 
     get combat(): CombatGameState {
         return this.parentGameState;
@@ -401,7 +402,7 @@ export default class PostCombatGameState extends GameState<
 
     markHouseAsUsed(house: House, houseCard: HouseCard | null, forceDiscard = false): void {
         if (houseCard) {
-            if (!forceDiscard && houseCard.ability?.doesPreventDiscardingHouseCardAfterCombat(this, house)) {
+            if (!forceDiscard && houseCard.ability?.doesPreventDiscardingHouseCardAfterCombat(this, house, houseCard)) {
                 return;
             }
 
@@ -481,6 +482,7 @@ export default class PostCombatGameState extends GameState<
             winner: this.winner.id,
             loser: this.loser.id,
             resolvedSkullIcons: this.resolvedSkullIcons.map(h => h.id),
+            notDiscardedHouseCardIds: this.notDiscardedHouseCardIds,
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -491,6 +493,7 @@ export default class PostCombatGameState extends GameState<
         postCombat.winner = combat.game.houses.get(data.winner);
         postCombat.loser = combat.game.houses.get(data.loser);
         postCombat.resolvedSkullIcons = data.resolvedSkullIcons.map(hid => combat.game.houses.get(hid));
+        postCombat.notDiscardedHouseCardIds = data.notDiscardedHouseCardIds;
         postCombat.childGameState = postCombat.deserializeChildGameState(data.childGameState);
 
         return postCombat;
@@ -515,6 +518,7 @@ export interface SerializedPostCombatGameState {
     winner: string;
     loser: string;
     resolvedSkullIcons: string[];
+    notDiscardedHouseCardIds: string[];
     childGameState: SerializedResolveRetreatGameState
         | SerializedChooseCasualtiesGameState
         | SerializedAfterWinnerDeterminationGameState

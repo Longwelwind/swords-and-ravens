@@ -10,7 +10,6 @@ import {ServerMessage} from "../../../../../../../../messages/ServerMessage";
 import ActionGameState from "../../../../../ActionGameState";
 import IngameGameState from "../../../../../../IngameGameState";
 import { reek } from "../../../../../../game-data-structure/house-card/houseCardAbilities";
-import { HouseCardState } from "../../../../../../../ingame-game-state/game-data-structure/house-card/HouseCard";
 
 export default class ReekAbilityGameState extends GameState<
     AfterWinnerDeterminationGameState["childGameState"],
@@ -45,13 +44,10 @@ export default class ReekAbilityGameState extends GameState<
         const house = this.childGameState.house;
 
         if (choice == 0) {
-            const reekHc = house.houseCards.get("reek");
-            reekHc.state = HouseCardState.AVAILABLE;
-            this.entireGame.broadcastToClients({
-                type: "change-state-house-card",
-                houseId: house.id,
-                cardIds: [reekHc.id],
-                state: HouseCardState.AVAILABLE
+            this.parentGameState.parentGameState.parentGameState.notDiscardedHouseCardIds.push(reek.id);
+            this.ingame.log({
+                type: "reek-used",
+                house: house.id
             });
         } else {
             this.ingame.log({

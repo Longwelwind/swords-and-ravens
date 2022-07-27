@@ -10,7 +10,6 @@ import {ServerMessage} from "../../../../../../../../messages/ServerMessage";
 import ActionGameState from "../../../../../ActionGameState";
 import IngameGameState from "../../../../../../IngameGameState";
 import { lysaArrynMod } from "../../../../../../game-data-structure/house-card/houseCardAbilities";
-import { HouseCardState } from "../../../../../../game-data-structure/house-card/HouseCard";
 
 export default class LysaArrynModAbilityGameState extends GameState<
     AfterWinnerDeterminationGameState["childGameState"],
@@ -45,13 +44,10 @@ export default class LysaArrynModAbilityGameState extends GameState<
         const house = this.childGameState.house;
 
         if (choice == 0) {
-            const lysaArrynHc = house.houseCards.get("lysa-arryn-mod");
-            lysaArrynHc.state = HouseCardState.AVAILABLE;
-            this.entireGame.broadcastToClients({
-                type: "change-state-house-card",
-                houseId: house.id,
-                cardIds: [lysaArrynHc.id],
-                state: HouseCardState.AVAILABLE
+            this.parentGameState.parentGameState.parentGameState.notDiscardedHouseCardIds.push(lysaArrynMod.id);
+            this.ingame.log({
+                type: "lysa-arryn-mod-used",
+                house: house.id
             });
         } else {
             this.ingame.log({

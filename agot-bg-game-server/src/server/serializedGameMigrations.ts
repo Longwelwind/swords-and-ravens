@@ -1809,6 +1809,21 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "85",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                if (ingame.childGameState.type == "action" && ingame.childGameState.childGameState.type == "resolve-march-order" &&
+                    ingame.childGameState.childGameState.childGameState.type == "combat"
+                    && ingame.childGameState.childGameState.childGameState.childGameState.type == "post-combat") {
+                        ingame.childGameState.childGameState.childGameState.childGameState.notDiscardedHouseCardIds = [];
+                }
+            }
+            return serializedGame;
+        }
     }
 ];
 
