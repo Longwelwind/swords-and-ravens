@@ -364,7 +364,7 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
         let currentRow = this.currentRowIndex;
 
         const houses: House[] = [];
-        for(let i=0; i<this.houses.length; i++) {
+        for(let i=0; i<this.houses.length * 2; i++) {
             const nextIndices = this.getNextIndices(currentCol, currentRow);
             houses.push(this.houses[this.draftOrder[nextIndices.row][nextIndices.col]]);
             currentCol = nextIndices.col;
