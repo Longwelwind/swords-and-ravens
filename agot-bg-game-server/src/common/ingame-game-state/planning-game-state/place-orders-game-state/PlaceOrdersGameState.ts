@@ -171,6 +171,14 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
                 return;
             }
 
+            if (order && this.game.isOrderRestricted(region, order, this.planningGameState.planningRestrictions)) {
+                const availableOrders = this.getAvailableOrders(house).filter(o => o != order);
+                if (availableOrders.some(o => !this.game.isOrderRestricted(region, o, this.planningGameState.planningRestrictions))) {
+                    // Player has to use their legal orders first
+                    return;
+                }
+            }
+
             // When a player placed or removed an order he is unready
             this.setUnready(player);
 
