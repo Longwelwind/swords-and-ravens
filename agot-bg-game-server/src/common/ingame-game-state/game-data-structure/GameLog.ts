@@ -37,7 +37,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | SupplyAdjusted | PlayerReplaced | VassalReplaced | UserHouseAssignments | PlayerAction | JonSnowUsed
     | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed | SerIlynPayneFootmanKilled | RodrikTheReaderUsed
     | VassalsClaimed | CommanderPowerTokenGained | BericDondarrionUsed | VarysUsed | JaqenHGharUsed | JonConningtonUsed | BronnUsed
-    | SerGerrisDrinkwaterUsed | ReekUsed | LysaArrynModUsed | DraftHouseCardsBegan | HouseCardPicked | HouseCardsChosen
+    | SerGerrisDrinkwaterUsed | ReekUsed | ReekReturnedRamsay | LysaArrynModUsed | DraftHouseCardsBegan | HouseCardPicked | HouseCardsChosen
     | LittlefingerPowerTokensGained | AlayneStoneUsed | LysaArrynFfcPowerTokensGained | AnyaWaynwoodPowerTokensGained | RobertArrynUsed
     | HouseCardRemovedFromGame | ViserysTargaryenUsed | IllyrioMopatisPowerTokensGained | DaenerysTargaryenPowerTokensDiscarded | MissandeiUsed
     | PowerTokensGifted | InfluenceTrackPositionChosen | TiesDecided | PlaceLoyaltyChoice | LoyaltyTokenPlaced | LoyaltyTokenGained
@@ -330,6 +330,12 @@ interface SerGerrisDrinkwaterUsed {
 interface ReekUsed {
     type: "reek-used";
     house: string;
+}
+
+interface ReekReturnedRamsay {
+    type: "reek-returned-ramsay";
+    house: string;
+    returnedCardId: string;
 }
 
 interface LysaArrynModUsed {

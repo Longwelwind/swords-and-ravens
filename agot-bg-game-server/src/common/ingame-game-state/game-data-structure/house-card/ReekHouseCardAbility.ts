@@ -12,13 +12,19 @@ import PostCombatGameState from "../../action-game-state/resolve-march-order-gam
 export default class ReekHouseCardAbility extends HouseCardAbility {
     immediatelyResolution(immediately: ImmediatelyHouseCardAbilitiesResolutionGameState, house: House, _houseCard: HouseCard): void {
         const houseCardWithThreeStrength = house.houseCards.values.filter(hc => hc.combatStrength == 3);
-        if (houseCardWithThreeStrength.length == 1) {
+        if (houseCardWithThreeStrength.length == 1 && houseCardWithThreeStrength[0].state == HouseCardState.USED) {
             houseCardWithThreeStrength[0].state = HouseCardState.AVAILABLE;
             immediately.entireGame.broadcastToClients({
                 type: "change-state-house-card",
                 houseId: house.id,
                 cardIds: [houseCardWithThreeStrength[0].id],
                 state: HouseCardState.AVAILABLE
+            });
+
+            immediately.parentGameState.ingameGameState.log({
+                type: "reek-returned-ramsay",
+                house: house.id,
+                returnedCardId: houseCardWithThreeStrength[0].id
             });
         }
         immediately.childGameState.onHouseCardResolutionFinish(house);

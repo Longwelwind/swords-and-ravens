@@ -790,6 +790,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Reek</b>: House <b>{house.name}</b> decided to return <b>Reek</b> to hand.
                 </p>;
             }
+            case "reek-returned-ramsay": {
+                const house = this.game.houses.get(data.house);
+                const houseCard = this.allHouseCards.get(data.returnedCardId);
+
+                return <p>
+                    <b>Reek</b>: <b>{houseCard.name}</b> of House <b>{house.name}</b> was returned to hand.
+                </p>;
+            }
             case "lysa-arryn-mod-used": {
                 const house = this.game.houses.get(data.house);
 
