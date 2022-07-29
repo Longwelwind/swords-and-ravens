@@ -110,6 +110,20 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                 </Col>
                             </>
                         )}
+                        {this.props.gameState.supportersAgainstNeutralForce == null &&
+                        (this.props.gameState.getPossibleSupportingHousesAgainstNeutralForces()?.size ?? -1) > 0 &&
+                        <Col xs={12}>
+                            <Row className="justify-content-center">
+                                <Col xs="auto">
+                                    <Button
+                                        variant="primary"
+                                        onClick={() => this.callForSupportAgainstNeutralForces()}
+                                    >
+                                        Call for Support against Neutral Forces
+                                    </Button>
+                                </Col>
+                            </Row>
+                        </Col>}
                     </>
                 ) : (
                     <Col xs={12} className="text-center">
@@ -118,6 +132,12 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                 )}
             </>
         );
+    }
+
+    callForSupportAgainstNeutralForces(): void {
+        this.props.gameState.entireGame.sendMessageToServer({
+            type: "call-for-support-against-neutral-force"
+        });
     }
 
     UNSAFE_componentWillUpdate(): any {

@@ -1929,6 +1929,17 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     The game was {data.autoResumed ? "automatically resumed" : "resumed by vote"}. Pause time: {secondsToString(data.pauseTimeInSeconds, true)}
                 </p>;
             }
+            case "support-attack-against-neutral-force": {
+                const region = this.world.regions.get(data.region);
+                const house = this.game.houses.get(data.house);
+                const supporter = this.game.houses.get(data.supporter);
+
+                return <p>
+                    House <b>{supporter.name}</b> {data.refused
+                        ? <>refused to grant support to House <b>{house.name}</b></>
+                        : <>would support House <b>{house.name}</b></>} to attack the Neutral Force in <b>{region.name}</b>.
+                </p>;
+            }
         }
     }
 
