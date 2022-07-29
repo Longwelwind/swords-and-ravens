@@ -12,6 +12,8 @@ import GameStateComponentProps from "./GameStateComponentProps";
 import renderChildGameState from "../utils/renderChildGameState";
 import TakeControlOfEnemyPortGameState from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
 import TakeControlOfEnemyPortComponent from "./TakeControlOfEnemyPortComponent";
+import CallForSupportAgainstNeutralForceGameState from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/call-for-support-against-neutral-force-game-state/CallForSupportAgainstNeutralForceGameState";
+import CallForSupportAgainstNeutralForcesComponent from "./CallForSupportAgainstNeutralForcesComponent";
 
 @observer
 export default class ResolveMarchOrderComponent extends Component<GameStateComponentProps<ResolveMarchOrderGameState>> {
@@ -19,7 +21,8 @@ export default class ResolveMarchOrderComponent extends Component<GameStateCompo
         return renderChildGameState(this.props, [
             [ResolveSingleMarchOrderGameState, ResolveSingleMarchOrderComponent],
             [CombatGameState, CombatComponent],
-            [TakeControlOfEnemyPortGameState, TakeControlOfEnemyPortComponent]
+            [TakeControlOfEnemyPortGameState, TakeControlOfEnemyPortComponent],
+            [CallForSupportAgainstNeutralForceGameState, CallForSupportAgainstNeutralForcesComponent]
         ]);
     }
 }

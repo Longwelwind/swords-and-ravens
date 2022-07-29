@@ -50,7 +50,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | BalonGreyjoyASoSPowerTokensGained | MaceTyrellASoSOrderPlaced | BranStarkUsed | CerseiLannisterASoSPowerTokensDiscarded
     | DoranMartellASoSUsed | MelisandreOfAsshaiPowerTokensGained | SalladharSaanASoSPowerTokensChanged | SerDavosSeaworthASoSFortificationGained
     | CasualtiesPrevented | SerIlynPayneASoSCasualtySuffered | StannisBaratheonASoSUsed | AeronDamphairHouseCardChanged | ControlPowerTokenRemoved
-    | GamePaused | GameResumed;
+    | GamePaused | GameResumed | SupportAttackAgainstNeutralForce;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -1135,4 +1135,12 @@ export interface GameResumed {
     type: "game-resumed";
     pauseTimeInSeconds: number;
     autoResumed: boolean;
+}
+
+export interface SupportAttackAgainstNeutralForce {
+    type: "support-attack-against-neutral-force";
+    house: string;
+    supporter: string;
+    region: string;
+    refused?: boolean;
 }

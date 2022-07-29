@@ -18,8 +18,11 @@ import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameSt
 import { findOrphanedShipsAndDestroyThem } from "../../port-helper/PortHelper";
 import _ from "lodash";
 import houseCardAbilities from "../../game-data-structure/house-card/houseCardAbilities";
+import BetterMap from "../../../../utils/BetterMap";
+import CallForSupportAgainstNeutralForceGameState, { SerializedCallForSupportAgainstNeutralForceGameState } from "./call-for-support-against-neutral-force-game-state/CallForSupportAgainstNeutralForceGameState";
 
-export default class ResolveMarchOrderGameState extends GameState<ActionGameState, ResolveSingleMarchOrderGameState | CombatGameState | TakeControlOfEnemyPortGameState> {
+export default class ResolveMarchOrderGameState extends GameState<
+        ActionGameState, ResolveSingleMarchOrderGameState | CombatGameState | TakeControlOfEnemyPortGameState | CallForSupportAgainstNeutralForceGameState> {
     public currentTurnOrderIndex: number;
 
     get actionGameState(): ActionGameState {
@@ -125,6 +128,10 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         this.onResolveSingleMarchOrderGameStateFinish(lastHouseThatResolvedMarchOrder);
     }
 
+    onCallForSupportAgainstNeutralForceGameStateEnd(houseThatResolvesMarchOrder: House, supportersAgainstNeutralForce: BetterMap<Region, House[]>): void {
+        this.setChildGameState(new ResolveSingleMarchOrderGameState(this)).firstStart(houseThatResolvesMarchOrder, supportersAgainstNeutralForce);
+    }
+
     proceedNextResolveSingleMarchOrder(): void {
         const houseToResolve = this.getNextHouseToResolveMarchOrder();
 
@@ -226,7 +233,26 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
-        this.childGameState.onPlayerMessage(player, message);
+        if (message.type == "call-for-support-against-neutral-force") {
+            const resolveSingleMarch = this.childGameState as ResolveSingleMarchOrderGameState;
+            if (!resolveSingleMarch || this.ingameGameState.getControllerOfHouse(resolveSingleMarch.house) != player) {
+                return;
+            }
+
+            if (resolveSingleMarch.supportersAgainstNeutralForce != null) {
+                return;
+            }
+
+            const possipleSupporters = resolveSingleMarch.getPossibleSupportingHousesAgainstNeutralForces();
+            if (!possipleSupporters || possipleSupporters.size == 0) {
+                return;
+            }
+            this.setChildGameState(new CallForSupportAgainstNeutralForceGameState(this)).firstStart(
+                resolveSingleMarch.house, possipleSupporters
+            );
+        } else {
+            this.childGameState.onPlayerMessage(player, message);
+        }
     }
 
     onServerMessage(message: ServerMessage): void {
@@ -272,13 +298,15 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
         return resolveMarchOrderGameState;
     }
 
-    deserializeChildGameState(data: SerializedResolveMarchOrderGameState["childGameState"]): ResolveSingleMarchOrderGameState | CombatGameState | TakeControlOfEnemyPortGameState {
+    deserializeChildGameState(data: SerializedResolveMarchOrderGameState["childGameState"]): ResolveMarchOrderGameState["childGameState"] {
         if (data.type == "resolve-single-march") {
             return ResolveSingleMarchOrderGameState.deserializeFromServer(this, data);
         } else if (data.type == "combat") {
             return CombatGameState.deserializeFromServer(this, data);
         } else if (data.type == "take-control-of-enemy-port") {
             return TakeControlOfEnemyPortGameState.deserializeFromServer(this, data);
+        } else if (data.type == "call-for-support-against-neutral-force") {
+            return CallForSupportAgainstNeutralForceGameState.deserializeFromServer(this, data);
         } else {
             throw new Error();
         }
@@ -287,6 +315,7 @@ export default class ResolveMarchOrderGameState extends GameState<ActionGameStat
 
 export interface SerializedResolveMarchOrderGameState {
     type: "resolve-march-order";
-    childGameState: SerializedResolveSingleMarchOrderGameState | SerializedCombatGameState | SerializedTakeControlOfEnemyPortGameState;
+    childGameState: SerializedResolveSingleMarchOrderGameState | SerializedCombatGameState
+        | SerializedTakeControlOfEnemyPortGameState | SerializedCallForSupportAgainstNeutralForceGameState;
     currentTurnOrderIndex: number;
 }
