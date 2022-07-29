@@ -127,11 +127,11 @@ export default class IronBankInfosComponent extends Component<IronBankInfosCompo
                 <>
                     <h5>Controlling Braavos</h5>
                     Though no easy task, it is possible to gain the upper hand in negotiating with the Iron&nbsp;Bank<br/>
-                    by controlling the city it resides in. The first player to defeat the 5-strength neutral force token<br/>
+                    by controlling the city it resides in. The first player to defeat the 5-strength Neutral Force token<br/>
                     on Braavos places that token facedown in front of them. While a player has this token,<br/>
                     that token acts as a reminder that the player receives a <b>–1</b> to the <b>initial cost</b> of the loan<br/>
                     (but not the interest).<br/>
-                    If another player takes control of Braavos they immediately receive the Braavos neutral force token.
+                    If another player takes control of Braavos they immediately receive the Braavos Neutral Force token.
                 </>}
             </Col>
         </Tooltip>;

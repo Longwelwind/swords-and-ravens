@@ -14,7 +14,7 @@ export default class CallForSupportAgainstNeutralForcesComponent extends Compone
         return (
             <>
                 <Col xs={12} className="text-center">
-                    <p>House <b>{this.props.gameState.houseThatResolvesMarchOrder.name}</b> calls for support against neutral forces.</p>
+                    <p>House <b>{this.props.gameState.houseThatResolvesMarchOrder.name}</b> calls for support against <b>Neutral Forces</b>.</p>
                 </Col>
                 {renderChildGameState(this.props, [
                     [SimpleChoiceGameState, SimpleChoiceComponent]
