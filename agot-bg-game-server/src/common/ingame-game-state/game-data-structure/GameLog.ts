@@ -1,4 +1,5 @@
 import { CombatStats } from "../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
+import { ReplacementReason } from "../IngameGameState";
 import { RegionState } from "./Region";
 
 export default interface GameLog {
@@ -669,6 +670,7 @@ interface PlayerReplaced {
     oldUser: string;
     newUser?: string;
     house: string;
+    reason?: ReplacementReason
 }
 
 interface VassalReplaced {

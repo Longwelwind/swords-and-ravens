@@ -264,7 +264,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                     </Col>
                 ) : this.lobby.players.get(h) == this.authenticatedUser ? (
                     <Col xs="auto" className={invisible ? "invisible" : ""}>
-                        <Button variant="success" onClick={() => this.ready()}>Ready</Button>
+                        <Button variant="outline-success" onClick={() => this.ready()}>Set Ready</Button>
                     </Col>
                 ) : null
             );

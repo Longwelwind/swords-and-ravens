@@ -571,7 +571,11 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         const replacePlayerVoteOngoing = (this.ingameGameState?.votes.values.filter(v =>
             v.state == VoteState.ONGOING && (v.type instanceof ReplacePlayer || v.type instanceof ReplacePlayerByVassal)).length ?? -1) > 0;
 
-        return {turn, maxPlayerCount, settings, waitingFor, winner, replacePlayerVoteOngoing};
+        const oldPlayerIds = this.entireGame.ingameGameState?.oldPlayerIds ?? [];
+        const timeoutPlayerIds = this.entireGame.ingameGameState?.timeoutPlayerIds ?? [];
+        const replacerIds = this.entireGame.ingameGameState?.replacerIds ?? [];
+
+        return {turn, maxPlayerCount, settings, waitingFor, winner, replacePlayerVoteOngoing, oldPlayerIds, timeoutPlayerIds, replacerIds};
     }
 
     // eslint-disable-next-line @typescript-eslint/ban-types

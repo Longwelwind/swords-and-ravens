@@ -144,13 +144,14 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
                                     </Button>
                                 </Col>
                                 {this.props.gameClient.authenticatedPlayer &&
+                                this.props.gameState.canRefuseSupport(this.combat.tryGetCommandedHouseInCombat(this.props.gameClient.authenticatedPlayer)) &&
                                 <Col xs="auto">
                                     <Button variant="warning" onClick={() => {
                                             if (window.confirm("Are you sure you want to refuse all the support you have received?")) {
                                                 this.props.gameState.refuseSupport();
                                             }
                                         }}
-                                        disabled={!this.props.gameState.canRefuseSupport(this.combat.tryGetCommandedHouseInCombat(this.props.gameClient.authenticatedPlayer))}>
+                                    >
                                         Refuse received support
                                     </Button>
                                 </Col>}

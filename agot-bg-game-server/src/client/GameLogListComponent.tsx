@@ -2,7 +2,7 @@ import {Component, ReactNode} from "react";
 import React from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import IngameGameState from "../common/ingame-game-state/IngameGameState";
+import IngameGameState, { ReplacementReason } from "../common/ingame-game-state/IngameGameState";
 import {GameLogData, PlayerActionType} from "../common/ingame-game-state/game-data-structure/GameLog";
 import Game from "../common/ingame-game-state/game-data-structure/Game";
 import House from "../common/ingame-game-state/game-data-structure/House";
@@ -1293,9 +1293,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const newUser = data.newUser ? this.ingame.entireGame.users.get(data.newUser) : null;
                 const house = this.game.houses.get(data.house);
                 const newUserLabel = newUser ? getIngameUserLinkOrLabel(this.ingame, newUser, this.ingame.players.tryGet(newUser, null)) : null;
+                const reason = data.reason == ReplacementReason.CLOCK_TIMEOUT
+                    ? " due to clock timeout"
+                    : data.reason == ReplacementReason.VOTE
+                        ? " due to vote"
+                        : "";
 
                 return <>
-                    <b>{getIngameUserLinkOrLabel(this.ingame, oldUser, this.ingame.players.tryGet(oldUser, null))}</b> (House <b>{house.name}</b>) was replaced by {newUserLabel ? <b>{newUserLabel}</b> : " a vassal"}.
+                    <b>{getIngameUserLinkOrLabel(this.ingame, oldUser, this.ingame.players.tryGet(oldUser, null))}</b> (House <b>{house.name}</b>) was
+                    replaced by {newUserLabel ? <b>{newUserLabel}</b> : " a vassal"}{reason}.
                 </>;
             }
             case "vassal-replaced": {
