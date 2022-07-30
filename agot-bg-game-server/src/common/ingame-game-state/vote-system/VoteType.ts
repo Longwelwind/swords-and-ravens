@@ -1,4 +1,4 @@
-import IngameGameState from "../IngameGameState";
+import IngameGameState, { ReplacementReason } from "../IngameGameState";
 import Vote from "./Vote";
 import CancelledGameState from "../../cancelled-game-state/CancelledGameState";
 import House from "../game-data-structure/House";
@@ -425,7 +425,7 @@ export class ReplacePlayerByVassal extends VoteType {
             return;
         }
 
-        ingame.replacePlayerByVassal(oldPlayer);
+        ingame.replacePlayerByVassal(oldPlayer, ReplacementReason.VOTE);
     }
 
     serializeToClient(): SerializedReplacePlayerByVassal {

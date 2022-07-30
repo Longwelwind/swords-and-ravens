@@ -46,6 +46,11 @@ import getElapsedSeconds from "../../utils/getElapsedSeconds";
 
 export const NOTE_MAX_LENGTH = 5000;
 
+export const enum ReplacementReason {
+    VOTE,
+    CLOCK_TIMEOUT
+}
+
 export default class IngameGameState extends GameState<
     EntireGame,
     WesterosGameState | PlanningGameState | ActionGameState | CancelledGameState | GameEndedGameState
@@ -680,7 +685,7 @@ export default class IngameGameState extends GameState<
                 return;
             }
 
-            this.replacePlayerByVassal(player);
+            this.replacePlayerByVassal(player, ReplacementReason.CLOCK_TIMEOUT);
         } catch (e) {
             const message = typeof e === "string"
                 ? e
@@ -771,7 +776,7 @@ export default class IngameGameState extends GameState<
         }
     }
 
-    replacePlayerByVassal(player: Player): void {
+    replacePlayerByVassal(player: Player, reason: ReplacementReason): void {
         this.cancelPendingReplaceVotes();
 
         const newVassalHouse = player.house;
@@ -842,7 +847,8 @@ export default class IngameGameState extends GameState<
         this.log({
             type: "player-replaced",
             oldUser: player.user.id,
-            house: newVassalHouse.id
+            house: newVassalHouse.id,
+            reason: reason
         });
 
         // Save the house cards, so vassalization can be undone and cards can be re-assigned to a new player
