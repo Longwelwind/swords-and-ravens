@@ -323,6 +323,14 @@ export class ReplacePlayer extends VoteType {
             vote.ingame.entireGame.hideOrRevealUserNames(false);
         }
 
+        if (!vote.ingame.oldPlayerIds.includes(oldPlayer.user.id)) {
+            vote.ingame.oldPlayerIds.push(oldPlayer.user.id);
+        }
+
+        if (!vote.ingame.replacerIds.includes(newPlayer.user.id)) {
+            vote.ingame.replacerIds.push(newPlayer.user.id);
+        }
+
         vote.ingame.players.delete(oldPlayer.user);
         vote.ingame.players.set(newPlayer.user, newPlayer);
 
@@ -422,7 +430,6 @@ export class ReplacePlayerByVassal extends VoteType {
             const winner = _.without(ingame.players.values, oldPlayer)[0].house;
             ingame.setChildGameState(new GameEndedGameState(ingame)).firstStart(winner);
             ingame.entireGame.checkGameStateChanged();
-            return;
         }
 
         ingame.replacePlayerByVassal(oldPlayer, ReplacementReason.VOTE);

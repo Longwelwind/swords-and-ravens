@@ -58,6 +58,9 @@ export default class IngameGameState extends GameState<
     | ChooseInitialObjectivesGameState
 > {
     players: BetterMap<User, Player> = new BetterMap<User, Player>();
+    oldPlayerIds: string[] = [];
+    replacerIds: string[] = [];
+    timeoutPlayerIds: string[] = [];
     game: Game;
     gameLogManager: GameLogManager = new GameLogManager(this);
     votes: BetterMap<string, Vote> = new BetterMap();
@@ -672,7 +675,7 @@ export default class IngameGameState extends GameState<
                 const winner = _.without(this.players.values, player)[0].house;
                 this.setChildGameState(new GameEndedGameState(this)).firstStart(winner);
                 updateLastActive = true;
-                return;
+                this.entireGame.checkGameStateChanged();
             }
 
             if (this.hasChildGameState(ThematicDraftHouseCardsGameState) || this.hasChildGameState(DraftHouseCardsGameState)) {
@@ -808,6 +811,11 @@ export default class IngameGameState extends GameState<
             }
         }
 
+        if (reason == ReplacementReason.VOTE && !this.oldPlayerIds.includes(player.user.id)) {
+            this.oldPlayerIds.push(player.user.id);
+        } else if (reason == ReplacementReason.CLOCK_TIMEOUT && !this.timeoutPlayerIds.includes(player.user.id)) {
+            this.timeoutPlayerIds.push(player.user.id);
+        }
         // Delete the old player so the house is a vassal now
         this.players.delete(player.user);
 
@@ -1594,6 +1602,9 @@ export default class IngameGameState extends GameState<
         return {
             type: "ingame",
             players: this.players.values.map(p => p.serializeToClient()),
+            oldPlayerIds: this.oldPlayerIds,
+            replacerIds: this.replacerIds,
+            timeoutPlayerIds: this.timeoutPlayerIds,
             game: this.game.serializeToClient(admin, player),
             gameLogManager: this.gameLogManager.serializeToClient(admin, user),
             votes: this.votes.values.map(v => v.serializeToClient(admin, player)),
@@ -1610,6 +1621,9 @@ export default class IngameGameState extends GameState<
         ingameGameState.players = new BetterMap(
             data.players.map(p => [entireGame.users.get(p.userId), Player.deserializeFromServer(ingameGameState, p)])
         );
+        ingameGameState.oldPlayerIds = data.oldPlayerIds;
+        ingameGameState.replacerIds = data.replacerIds;
+        ingameGameState.timeoutPlayerIds = data.timeoutPlayerIds;
         ingameGameState.votes = new BetterMap(data.votes.map(sv => [sv.id, Vote.deserializeFromServer(ingameGameState, sv)]));
         ingameGameState.gameLogManager = GameLogManager.deserializeFromServer(ingameGameState, data.gameLogManager);
         ingameGameState.paused = data.paused ? new Date(data.paused) : null;
@@ -1648,6 +1662,9 @@ export default class IngameGameState extends GameState<
 export interface SerializedIngameGameState {
     type: "ingame";
     players: SerializedPlayer[];
+    oldPlayerIds: string[];
+    replacerIds: string[];
+    timeoutPlayerIds: string[];
     game: SerializedGame;
     votes: SerializedVote[];
     gameLogManager: SerializedGameLogManager;

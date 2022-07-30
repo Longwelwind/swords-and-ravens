@@ -1824,6 +1824,30 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "86",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                ingame.oldPlayerIds = [];
+                ingame.replacerIds = [];
+                ingame.timeoutPlayerIds = [];
+
+                const replacedLogs = ingame.gameLogManager.logs.filter((l: any) => l.data.type == "player-replaced");
+                replacedLogs.forEach((l: any) => {
+                    ingame.oldPlayerIds.push(l.data.oldUser);
+                    if (l.data.newUser) {
+                        ingame.replacerIds.push(l.data.newUser);
+                    }
+                });
+
+                ingame.oldPlayerIds = _.uniq(ingame.oldPlayerIds);
+                ingame.replacerIds = _.uniq(ingame.replacerIds);
+            }
+            return serializedGame;
+        }
     }
 ];
 
