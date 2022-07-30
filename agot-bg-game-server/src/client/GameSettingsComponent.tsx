@@ -89,7 +89,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                         <OverlayTrigger overlay={
                                             <Tooltip id="only-live-setting-tooltip" className="tooltip-w-100">
                                                 When this option is enabled each player will have a game clock of 45, 60, 75, 90 or 120 minutes.<br/>
-                                                When a player&apos;s time runs out, he is automatically turned into a vassal.<br/>
+                                                When a player&apos;s time runs out, he is automatically turned into a vassal and this cannot be undone!<br/>
                                                 The last remaining player immediately wins the game.<br/>
                                                 All player clocks can be extended once for 15 minutes by vote. After 2 failed voting attempts,<br/>
                                                 no further voting can be initiated.<br/>

@@ -1413,6 +1413,10 @@ export default class IngameGameState extends GameState<
     }
 
     canLaunchReplaceVassalVote(fromUser: User | null, forHouse: House): {result: boolean; reason: string} {
+        if (this.entireGame.gameSettings.onlyLive) {
+            return {result: false, reason: "forbidden-in-clock-games"};
+        }
+
         if (this.paused) {
             return {result: false, reason: "game-paused"};
         }
