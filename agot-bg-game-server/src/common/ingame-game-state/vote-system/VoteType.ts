@@ -397,11 +397,6 @@ export class ReplacePlayerByVassal extends VoteType {
         this.forHouse = forHouse;
     }
 
-    getPositiveCountToPass(vote: Vote): number {
-        const calculated = super.getPositiveCountToPass(vote);
-        return vote.ingame.entireGame.gameSettings.onlyLive ? Math.min(calculated, 3) : calculated;
-    }
-
     onVoteCreated(vote: Vote): void {
         if (!this.replaced.connected && !vote.ingame.entireGame.gameSettings.onlyLive && vote.ingame.players.size >= 5) {
             // Let the player to be replaced automatically vote with accept when he is offline

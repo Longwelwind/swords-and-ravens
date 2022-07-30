@@ -312,6 +312,8 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                 <Tooltip id="replace-player-tooltip">
                                     {reason == "game-paused" ?
                                         "The game must be resumed first"
+                                        : reason == "forbidden-in-clock-games" ?
+                                        "Undoing vassal replacement is not allowed in games with game clock"
                                         : reason == "already-playing" ?
                                         "You are already playing in this game"
                                         : reason == "ongoing-vote" ?
