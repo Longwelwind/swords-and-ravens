@@ -271,8 +271,8 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
     }
 
     canRefuseSupport(house: House | null): boolean {
-        // Support can only be refused if house is supported and if it has not played a house card yet
-        return house != null && this.combatGameState.supporters.values.includes(house) && !this.houseCards.has(house);
+        // Support can only be refused if house is supported
+        return house != null && this.combatGameState.supporters.values.includes(house);
     }
 
     refuseSupport(): void {
