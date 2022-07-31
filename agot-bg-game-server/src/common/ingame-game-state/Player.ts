@@ -37,7 +37,7 @@ export default class Player {
     }
 
     setWaitedFor(hasBeenReactivatedAgain = false): void {
-        if (!this.user.entireGame.gameSettings.pbem) {
+        if (!this.user.entireGame.gameSettings.pbem || this.user.connected) {
             return;
         }
 
@@ -62,9 +62,8 @@ export default class Player {
 
         const responseTimeInSeconds = getElapsedSeconds(this.waitedForData.date);
 
-        // Send value if user was not reactivated again (and probably is still online to do his move immediately)
-        // or if his responseTime is greater than 5 mintes (thus meaning he decided to wait for the decision)
-        if (this.user.entireGame.onNewPbemResponseTime && (!this.waitedForData.hasBeenReactivated || responseTimeInSeconds > (5 * 60))) {
+        // Send value if user was not reactivated again (and probably is still online to do his move immediately...)
+        if (this.user.entireGame.onNewPbemResponseTime && !this.waitedForData.hasBeenReactivated) {
             this.user.entireGame.onNewPbemResponseTime(this.user, responseTimeInSeconds);
         } else {
             // console.log(`${this.user.name} has ben REACTIVATED`);
