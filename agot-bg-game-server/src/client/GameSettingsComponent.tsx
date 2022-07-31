@@ -93,10 +93,8 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                                 The last remaining player immediately wins the game.<br/>
                                                 All player clocks can be extended once for 15 minutes by vote. After 2 failed voting attempts,<br/>
                                                 no further voting can be initiated.<br/>
-                                                Also, these games can be paused, but public games will automatically resume after 10 minutes.<br/>
-                                                In addition, the owner of the game will not be able to switch to PBEM in-game,<br/>
-                                                and the number of positive votes required to replace a player is reduced to 3<br/>
-                                                to make it easier to address quitters.
+                                                In addition, these games can be paused, but public games will automatically resume after 10 minutes<br/>
+                                                and the owner of the game will not be able to switch to PBEM in-game.
                                             </Tooltip>}>
                                             <label htmlFor="only-live-setting">Game clock</label>
                                         </OverlayTrigger>}
