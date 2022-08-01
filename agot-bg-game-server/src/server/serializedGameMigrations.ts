@@ -1848,6 +1848,24 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "87",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.gameSettings.onlyLive && serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                ingame.players.forEach((p: any) => {
+                    if (!p.liveClockData) {
+                        p.liveClockData = {
+                            remainingSeconds: 60 * 60,
+                            timerStartedAt: null
+                        };
+                    }
+                });
+            }
+            return serializedGame;
+        }
     }
 ];
 
