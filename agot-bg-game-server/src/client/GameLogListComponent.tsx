@@ -850,14 +850,22 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <p>House <b>{affectedHouse.name}</b> had no other available House card.</p>
                 );
             }
-            case "arianne-martell-prevent-movement":
+            case "arianne-martell-prevent-movement": {
                 const enemyHouse = this.game.houses.get(data.enemyHouse);
 
                 return <p>
-                    <b>Arianne Martell</b>: <b>{enemyHouse.name}</b> cannot move their attacking
-                    army to the embattled area.
+                    <b>Arianne Martell</b>: House <b>{enemyHouse.name}</b> cannot move their
+                    army into the embattled area.
                 </p>;
+            }
+            case "arianne-martell-force-retreat": {
+                const house = this.game.houses.get(data.house);
+                const enemyHouse = this.game.houses.get(data.enemyHouse);
 
+                return <p>
+                    <b>Arianne Martell</b>: House <b>{house.name}</b> forced  House <b>{enemyHouse.name}</b> to retreat.
+                </p>;
+            }
             case "roose-bolton-house-cards-returned": {
                 const house = this.game.houses.get(data.house);
                 const returnedHouseCards = data.houseCards.map(hcid => this.allHouseCards.get(hcid));
@@ -1022,7 +1030,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const port = this.world.regions.get(data.port);
                 return <p>
                     {data.shipCount > 0
-                        ? <>House <b>{newController.name}</b> converted {data.shipCount} ship{data.shipCount == 1 ? "" : "s"} from <b>{oldController.name}</b> in <b>{port.name}</b>.</>
+                        ? <>House <b>{newController.name}</b> converted {data.shipCount} ship{data.shipCount == 1 ? "" : "s"} from House <b>{oldController.name}</b> in <b>{port.name}</b>.</>
                         : <>House <b>{newController.name}</b> destroyed all <b>{oldController.name}</b> ships in <b>{port.name}</b>.</>}
                 </p>;
             }
