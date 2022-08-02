@@ -45,6 +45,7 @@ import GameClient from "./GameClient";
 import GameLogManager, { ticksToTime, timeToTicks } from "../common/ingame-game-state/game-data-structure/GameLogManager";
 import { secondsToString } from "./utils/secondsToString";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
+import orderImages from "./orderImages";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -226,12 +227,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const attackingRegion = this.game.world.regions.get(data.attackingRegion);
                 const attackedRegion = this.game.world.regions.get(data.attackedRegion);
                 const army = data.units.map(utid => unitTypes.get(utid));
+                const orderImgUrl = data.orderType ? orderImages.get(data.orderType) : null;
 
                 return (
                     <Row className="align-items-center">
                         <Col xs="auto">
-                            <img src={crossedSwordsImage} width="24px"/>
+                            <img src={crossedSwordsImage} width="32px"/>
                         </Col>
+                        {orderImgUrl && <Col xs="auto">
+                            <img src={orderImgUrl} width="42px"/>
+                        </Col>}
                         <Col>
                             House <b>{attacker.name}</b> attacked {attacked ? <>House <b>{attacked.name}</b></> : <>a <b>Neutral Force</b></>} from <b>{attackingRegion.name}</b> to <b>
                             {attackedRegion.name}</b> with <>{joinReactNodes(army.map((ut, i) => <b key={`attack_${ut.id}_${i}`}>{ut.name}</b>), ', ')}</>.
@@ -243,9 +248,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const startingRegion = this.world.regions.get(data.startingRegion);
                 const moves: [Region, UnitType[]][] = data.moves.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
+                const orderImgUrl = data.orderType ? orderImages.get(data.orderType) : null;
 
                 return (
-                    <>
+                    <Row className="align-items-center">
+                        {orderImgUrl && <Col xs="auto">
+                            <img src={orderImgUrl} width="42px"/>
+                        </Col>}
+                        <Col>
                         {moves.length > 0
                             ? <>
                                 <p>
@@ -264,7 +274,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                                     House <b>{house.name}</b> removed their March Order in <b>{startingRegion.name}</b>.
                                 </p>
                             </>}
-                    </>
+                        </Col>
+                    </Row>
                 );
             }
             case "leave-power-token-choice": {

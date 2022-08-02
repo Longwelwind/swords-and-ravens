@@ -94,6 +94,7 @@ interface Attack {
     attackingRegion: string;
     attackedRegion: string;
     units: string[];
+    orderType?: string;
 }
 
 interface MarchResolved {
@@ -101,6 +102,7 @@ interface MarchResolved {
     house: string;
     startingRegion: string;
     moves: [string, string[]][];
+    orderType?: string;
 }
 
 interface WesterosCardExecuted {

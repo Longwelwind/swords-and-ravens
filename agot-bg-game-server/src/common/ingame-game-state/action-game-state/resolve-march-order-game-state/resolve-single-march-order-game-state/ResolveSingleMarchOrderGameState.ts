@@ -133,6 +133,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                     house: this.house.id,
                     startingRegion: startingRegion.id,
                     moves: movesThatDontTriggerAttack.map(([r, us]) => [r.id, us.map(u => u.type.id)]),
+                    orderType: this.actionGameState.ordersOnBoard.has(startingRegion) ? this.actionGameState.ordersOnBoard.get(startingRegion).type.id : undefined
                 });
             }
 
@@ -170,7 +171,8 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                         attacked: enemy.id,
                         attackingRegion: startingRegion.id,
                         attackedRegion: region.id,
-                        units: army.map(u => u.type.id)
+                        units: army.map(u => u.type.id),
+                        orderType: this.actionGameState.ordersOnBoard.has(startingRegion) ? this.actionGameState.ordersOnBoard.get(startingRegion).type.id : undefined
                     });
 
                     if (leftPowerToken != null) {
@@ -196,7 +198,8 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                         attacked: null,
                         attackingRegion: startingRegion.id,
                         attackedRegion: region.id,
-                        units: army.map(u => u.type.id)
+                        units: army.map(u => u.type.id),
+                        orderType: this.actionGameState.ordersOnBoard.has(startingRegion) ? this.actionGameState.ordersOnBoard.get(startingRegion).type.id : undefined
                     });
 
                     const oldGarrisonStrength = region.garrison;
