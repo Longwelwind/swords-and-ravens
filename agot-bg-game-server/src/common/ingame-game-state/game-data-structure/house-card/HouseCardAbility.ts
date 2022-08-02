@@ -95,4 +95,8 @@ export default class HouseCardAbility {
     doesPreventDiscardingHouseCardAfterCombat(_postCombat: PostCombatGameState, _house: House, _houseCard: HouseCard): boolean {
         return false;
     }
+
+    forcesRetreatOfVictoriousDefender(_postCombat: PostCombatGameState, _house: House, _houseCard: HouseCard): boolean {
+        return false;
+    }
 }

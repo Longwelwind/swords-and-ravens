@@ -20,7 +20,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | ConsolidatePowerOrderResolved | ArmiesReconciled | EnemyPortTaken | ShipsDestroyedByEmptyCastle
     | HouseCardAbilityNotUsed | PatchfaceUsed | DoranUsed
     | TyrionLannisterHouseCardReplaced | TyrionLannisterChoiceMade
-    | ArianneMartellPreventMovement | LorasTyrellAttackOrderMoved | TywinLannisterPowerTokensGained
+    | ArianneMartellPreventMovement | ArianneMartellForceRetreat | LorasTyrellAttackOrderMoved | TywinLannisterPowerTokensGained
     | RooseBoltonHouseCardsReturned | QueenOfThornsOrderRemoved | QueenOfThornsNoOrderAvailable
     | RenlyBaratheonNoFootmanAvailable | RenlyBaratheonNoKnightAvailable | RenlyBaratheonFootmanUpgradedToKnight
     | MaceTyrellNoFootmanAvailable | MaceTyrellCasualtiesPrevented | MaceTyrellFootmanKilled
@@ -94,6 +94,7 @@ interface Attack {
     attackingRegion: string;
     attackedRegion: string;
     units: string[];
+    orderType?: string;
 }
 
 interface MarchResolved {
@@ -101,6 +102,7 @@ interface MarchResolved {
     house: string;
     startingRegion: string;
     moves: [string, string[]][];
+    orderType?: string;
 }
 
 interface WesterosCardExecuted {
@@ -378,6 +380,12 @@ interface TyrionLannisterHouseCardReplaced {
 
 interface ArianneMartellPreventMovement {
     type: "arianne-martell-prevent-movement";
+    house: string;
+    enemyHouse: string;
+}
+
+interface ArianneMartellForceRetreat {
+    type: "arianne-martell-force-retreat";
     house: string;
     enemyHouse: string;
 }

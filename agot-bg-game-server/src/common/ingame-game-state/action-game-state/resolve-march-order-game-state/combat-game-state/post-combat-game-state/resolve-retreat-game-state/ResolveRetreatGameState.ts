@@ -20,7 +20,7 @@ export default class ResolveRetreatGameState extends GameState<
     PostCombatGameState,
     SelectRegionGameState<ResolveRetreatGameState> | SelectUnitsGameState<ResolveRetreatGameState>
 > {
-    retreatRegion: Region;
+    retreatRegion: Region | null = null;
 
     get combat(): CombatGameState {
         return this.postCombat.combat;
@@ -138,7 +138,11 @@ export default class ResolveRetreatGameState extends GameState<
         this.onSelectUnitsEnd(this.postCombat.loser, [], false);
     }
 
-    onSelectUnitsEnd(loser: House, selectedUnits: [Region, Unit[]][], resolvedAutomatically: boolean): void {
+    onSelectUnitsEnd(_loser: House, selectedUnits: [Region, Unit[]][], resolvedAutomatically: boolean): void {
+        if (!this.retreatRegion) {
+            throw new Error("retreatRegion must be set at this point!");
+        }
+
         // Kill the casualties of the retreat selected by the loser
         selectedUnits.forEach(([region, units]) => {
             units.forEach(u => region.units.delete(u.id));
@@ -180,8 +184,8 @@ export default class ResolveRetreatGameState extends GameState<
 
             // Retreat those unit to this location
             armyLeft.forEach(u => this.postCombat.loserCombatData.region.units.delete(u.id));
-            armyLeft.forEach(u => this.retreatRegion.units.set(u.id, u));
-            armyLeft.forEach(u => u.region = this.retreatRegion);
+            armyLeft.forEach(u => this.retreatRegion?.units.set(u.id, u));
+            armyLeft.forEach(u => u.region = this.retreatRegion as Region);
 
             this.entireGame.broadcastToClients({
                 type: "move-units",
@@ -256,7 +260,7 @@ export default class ResolveRetreatGameState extends GameState<
             }
         } else {
             // Filter out the attacking region as due to Berric Dondarrion (and maybe some other effects)
-            // The attacking region may not be occupied by the enemy anymore and therefore isn't filtered by
+            // the attacking region may not be occupied by the enemy anymore and therefore isn't filtered by
             // getValidRetreatRegions anymore
             _.pull(possibleRetreatRegions, attackingRegion);
         }
@@ -335,9 +339,7 @@ export default class ResolveRetreatGameState extends GameState<
     static deserializeFromServer(postCombat: PostCombatGameState, data: SerializedResolveRetreatGameState): ResolveRetreatGameState {
         const resolveRetreat = new ResolveRetreatGameState(postCombat);
 
-        if (data.retreatRegion) {
-            resolveRetreat.retreatRegion = postCombat.game.world.regions.get(data.retreatRegion);
-        }
+        resolveRetreat.retreatRegion = data.retreatRegion ? postCombat.game.world.regions.get(data.retreatRegion) : null;
         resolveRetreat.childGameState = resolveRetreat.deserializeChildGameState(data.childGameState);
 
         return resolveRetreat;

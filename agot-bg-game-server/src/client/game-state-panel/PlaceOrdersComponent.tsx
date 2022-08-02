@@ -66,7 +66,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                     <Row className="justify-content-center">
                         <Col xs={12} className="text-center">
                             {!this.forVassals ? (
-                                <>Players must now place orders in every region where they have at least one unit.</>
+                                <>Players must now place orders in every area where they have at least one unit.</>
                             ) : (
                                 <>Players must now place orders for their vassals.</>
                             )}

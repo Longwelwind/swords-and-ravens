@@ -62,7 +62,7 @@ export default class PlaceSellswordsComponent extends Component<GameStateCompone
                             <Col xs={12} className="text-center">
                                 {this.props.gameState.regions.length == 1 ?
                                     <>Click into <b>{this.props.gameState.regions[0].name}</b> to place a sellsword there.</>
-                                  : <>Click on a region to place a sellsword there.</>}
+                                  : <>Click on a area to place a sellsword there.</>}
                             </Col>
                         )}
                         <Col xs={12}>

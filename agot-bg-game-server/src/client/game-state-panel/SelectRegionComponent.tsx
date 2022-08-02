@@ -24,7 +24,7 @@ export default class SelectRegionComponent extends Component<GameStateComponentP
                         <>
                             {this.selectedRegion && (
                                 <p className="text-center">
-                                    Selected region: {this.selectedRegion.name}
+                                    Selected area: <b>{this.selectedRegion.name}</b>
                                 </p>
                             )}
                             <Row className="justify-content-center">

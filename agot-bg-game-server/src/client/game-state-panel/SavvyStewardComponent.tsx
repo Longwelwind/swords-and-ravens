@@ -21,7 +21,7 @@ export default class SavvyStewardComponent extends Component<GameStateComponentP
             this.props.gameClient.doesControlHouse(this.house) ? (
                 <>
                     <Col xs={12} className="text-center">
-                        Select a region to blace a Barrel there.
+                        Select an area to blace a Barrel there.
                     </Col>
                     {renderChildGameState(this.props, [
                         [SelectRegionGameState, SelectRegionComponent]

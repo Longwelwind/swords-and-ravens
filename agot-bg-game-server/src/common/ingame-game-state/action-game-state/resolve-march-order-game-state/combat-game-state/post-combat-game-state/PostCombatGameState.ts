@@ -27,6 +27,7 @@ export default class PostCombatGameState extends GameState<
 > {
     winner: House;
     loser: House;
+    originalLoser: House | null = null;
     resolvedSkullIcons: House[] = [];
     notDiscardedHouseCardIds: string[] = [];
 
@@ -332,7 +333,25 @@ export default class PostCombatGameState extends GameState<
     }
 
     onResolveRetreatFinish(): void {
-        this.proceedEndOfCombat();
+        if (this.doesVictoriousDefenderNeedToRetreat() && !this.originalLoser) {
+            // For the sake of simplicity, declare the winner the loser for the upcoming retreat phase.
+            // This way we do not have to complicate the code and handle the possible retreat of the winner in ResolveRetreatGameState.
+            this.combat.ingameGameState.log({
+                type: "arianne-martell-force-retreat",
+                house: this.loser.id,
+                enemyHouse: this.winner.id
+            });
+
+            this.originalLoser = this.loser;
+            this.loser = this.winner;
+            this.proceedRetreat();
+        } else {
+            if (this.originalLoser) {
+                this.loser = this.originalLoser;
+            }
+
+            this.proceedEndOfCombat();
+        }
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -351,6 +370,12 @@ export default class PostCombatGameState extends GameState<
                 // It might be that this movement can be prevented by house cards (e.g. Arianne Martell)
                 if (!this.isAttackingArmyMovementPrevented()) {
                     this.combat.resolveMarchOrderGameState.moveUnits(this.combat.attackingRegion, this.combat.attackingArmy, this.combat.defendingRegion);
+                } else {
+                    this.combat.ingameGameState.log({
+                        type: "arianne-martell-prevent-movement",
+                        house: this.combat.defender.id,
+                        enemyHouse: this.combat.attacker.id
+                    });
                 }
             }
             this.removeOrderFromRegion(this.combat.defendingRegion);
@@ -376,6 +401,18 @@ export default class PostCombatGameState extends GameState<
             }
 
             return houseCard.ability ? s || houseCard.ability.doesPreventAttackingArmyFromMoving(this, h, houseCard) : s;
+        }, false);
+    }
+
+    doesVictoriousDefenderNeedToRetreat(): boolean {
+        return this.combat.getOrderResolutionHouseCard().reduce((s, h) => {
+            const houseCard = this.combat.houseCombatDatas.get(h).houseCard;
+
+            if (houseCard == null) {
+                return s;
+            }
+
+            return houseCard.ability ? s || houseCard.ability.forcesRetreatOfVictoriousDefender(this, h, houseCard) : s;
         }, false);
     }
 
@@ -481,6 +518,7 @@ export default class PostCombatGameState extends GameState<
             type: "post-combat",
             winner: this.winner.id,
             loser: this.loser.id,
+            originalLoser: this.originalLoser ? this.originalLoser.id : null,
             resolvedSkullIcons: this.resolvedSkullIcons.map(h => h.id),
             notDiscardedHouseCardIds: this.notDiscardedHouseCardIds,
             childGameState: this.childGameState.serializeToClient(admin, player)
@@ -492,6 +530,7 @@ export default class PostCombatGameState extends GameState<
 
         postCombat.winner = combat.game.houses.get(data.winner);
         postCombat.loser = combat.game.houses.get(data.loser);
+        postCombat.originalLoser = data.originalLoser ? combat.game.houses.get(data.originalLoser) : null;
         postCombat.resolvedSkullIcons = data.resolvedSkullIcons.map(hid => combat.game.houses.get(hid));
         postCombat.notDiscardedHouseCardIds = data.notDiscardedHouseCardIds;
         postCombat.childGameState = postCombat.deserializeChildGameState(data.childGameState);
@@ -517,6 +556,7 @@ export interface SerializedPostCombatGameState {
     type: "post-combat";
     winner: string;
     loser: string;
+    originalLoser: string | null;
     resolvedSkullIcons: string[];
     notDiscardedHouseCardIds: string[];
     childGameState: SerializedResolveRetreatGameState

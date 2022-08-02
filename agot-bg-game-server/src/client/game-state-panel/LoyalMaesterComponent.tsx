@@ -21,7 +21,7 @@ export default class LoyalMaesterComponent extends Component<GameStateComponentP
             this.props.gameClient.doesControlHouse(this.house) ? (
                 <>
                     <Col xs={12} className="text-center">
-                        Select a region to place a Barrel.
+                        Select an area to place a Barrel.
                     </Col>
                     {renderChildGameState(this.props, [
                         [SelectRegionGameState, SelectRegionComponent]

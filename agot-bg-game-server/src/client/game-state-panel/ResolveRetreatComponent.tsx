@@ -19,25 +19,29 @@ export default class ResolveRetreatComponent extends Component<GameStateComponen
     @observable selectRegionComponent: SelectRegionComponent;
 
     render(): ReactNode {
+        const unitCountToBeDestroyed = (this.selectRegionComponent && this.selectRegionComponent.selectedRegion)
+            ? this.getUnitCountToBeDestroyedByRetreatTo(this.selectRegionComponent.selectedRegion)
+            : 0;
         return (
             <>
                 {this.props.gameState.childGameState instanceof SelectRegionGameState ? (
                     <>
                         <Col xs={12} className="text-center">
-                            {this.props.gameState.childGameState.house.name} must choose the retreat location
+                            House <b>{this.props.gameState.childGameState.house.name}</b> must choose the retreat location
                             of the defeated army.
                         </Col>
-                        {this.selectRegionComponent && this.selectRegionComponent.selectedRegion && this.getUnitsToKillToRetreatTo(this.selectRegionComponent.selectedRegion) > 0 && (
+                        {unitCountToBeDestroyed > 0 && this.selectRegionComponent && this.selectRegionComponent.selectedRegion && (
                             <Col xs={12} className="text-center">
-                                {this.getUnitsToKillToRetreatTo(this.selectRegionComponent.selectedRegion)} units would need
-                                to be destroyed if you retreat to <strong>{this.selectRegionComponent.selectedRegion.name}</strong>.
+                                <b>{unitCountToBeDestroyed}</b> unit{unitCountToBeDestroyed > 1 ? "s" : ""} must
+                                be destroyed if you retreat to <b>{this.selectRegionComponent.selectedRegion.name}</b>.
                             </Col>
                         )}
                     </>
                 ) : this.props.gameState.childGameState instanceof SelectUnitsGameState ? (
                     <Col xs={12} className="text-center">
-                        {this.props.gameState.childGameState.house.name} must
-                        choose {this.props.gameState.childGameState.count} casualties to reconcile their armies.
+                        House <b>{this.props.gameState.childGameState.house.name}</b> must
+                        choose <b>{this.props.gameState.childGameState.count}</b> casualt{this.props.gameState.childGameState.count > 1 ? "ies" : "y"} to
+                        retreat to <b>{this.props.gameState.retreatRegion?.name ?? "Unknown"}</b>.
                     </Col>
                 ) : null}
                 {renderChildGameState(this.props, [
@@ -48,7 +52,7 @@ export default class ResolveRetreatComponent extends Component<GameStateComponen
         );
     }
 
-    getUnitsToKillToRetreatTo(region: Region): number {
+    getUnitCountToBeDestroyedByRetreatTo(region: Region): number {
         return this.props.gameState.getCasualtiesOfRetreatRegion(region);
     }
 }

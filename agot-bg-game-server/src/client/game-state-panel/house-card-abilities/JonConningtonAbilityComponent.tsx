@@ -14,7 +14,7 @@ export default class JonConningtonAbilityComponent extends Component<GameStateCo
         return (
             <>
                 <Col xs={12} className="text-center">
-                    <b>Jon Connington</b>: Vassal house <b>{this.props.gameState.house.name}</b> may muster a knight either to the retreating region or to their capital.
+                    <b>Jon Connington</b>: Vassal house <b>{this.props.gameState.house.name}</b> may muster one knight either in the area it retreated to or its home area.
                 </Col>
                 {renderChildGameState(this.props, [
                     [SimpleChoiceGameState, SimpleChoiceComponent]
