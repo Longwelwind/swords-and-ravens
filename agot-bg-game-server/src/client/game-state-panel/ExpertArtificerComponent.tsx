@@ -21,7 +21,7 @@ export default class ExpertArtificerComponent extends Component<GameStateCompone
             this.props.gameClient.doesControlHouse(this.house) ? (
                 <>
                     <Col xs={12} className="text-center">
-                        Select a region to place a Crown.
+                        Select an area to place a Crown.
                     </Col>
                     {renderChildGameState(this.props, [
                         [SelectRegionGameState, SelectRegionComponent]

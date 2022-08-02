@@ -15,7 +15,7 @@ export default class ChooseCasualtiesComponent extends Component<GameStateCompon
         return (
             <>
                 <Col xs={12} className="text-center">
-                    House <b>{this.props.gameState.childGameState.house.name}</b> must choose {this.props.gameState.childGameState.count} of their units as casualties of the fight.
+                    House <b>{this.props.gameState.childGameState.house.name}</b> must choose <b>{this.props.gameState.childGameState.count}</b> of their units as casualties of the fight.
                 </Col>
                 {renderChildGameState(this.props, [
                     [SelectUnitsGameState, SelectUnitsComponent]
