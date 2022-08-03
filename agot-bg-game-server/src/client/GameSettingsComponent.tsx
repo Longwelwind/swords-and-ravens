@@ -138,17 +138,103 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             </Col>
         );
     }
+
+    renderGameSetupsTooltipContent(selectedSetupId: string): ReactNode {
+        switch(selectedSetupId) {
+            case "base-game":
+                return <>
+                    <h5>The official <i>A Game of Thrones Board Game - 2nd edition</i></h5>
+                    This setup supports 3-player and 6-player modes. The rulebook is available online.<br/>
+                    The Neutral Force tokens for 4 and 5 players are not implemented, as the unoffical variants<br/>
+                    and the Vassals of Mother of Dragons expansion are much better.
+                </>;
+            case "mother-of-dragons":
+                return <>
+                    <h5>The official <i>Mother of Dragons</i> expansion</h5>
+                    This expansion adds 2 additional houses: Arryn and Targaryen, as well as some more interesting mechanics:<br/>
+                    Vassals, Sea Orders and the Iron Bank. If the game is selected with 8 players and House Targaryen,<br/>
+                    a completely new map part &apos;Essos&apos; is also added. The rulebook is available online.
+                </>;
+            case "a-dance-with-dragons":
+                return <>
+                    <h5>The official <i>Dance with Dragons</i> expansion</h5>
+                    This expansion thematically reflects a later point in the Game of Thrones story<br/>
+                    and therefore <i>lasts only <b>6</b> rounds!</i> It adds new house cards and new starting positions<br/>
+                    for all 6 houses from the base game.
+                </>;
+            case "a-feast-for-crows":
+                return <>
+                    <h5>The official <i>Feast for Crows</i> expansion</h5>
+                    This is a 4 player expansion. It adds House Arryn and a completely new way to score victory points.<br/>
+                    Instead of capturing castles you have to complete secret objectives.<br/>
+                    The exact rules can be found in the game as a tooltip in the Objectives tab.
+                </>;
+            case "a-dance-with-mother-of-dragons":
+                return <>
+                    <h5>The unofficial <i>A Dance with Mother of Dragons</i> variant</h5>
+                    This is a community-created variant and combines A Dance with Dragons and Mother with Dragons.<br/>
+                    So it also <i>lasts only <b>6</b> rounds</i>, offers new starting positions and is played with the<br/>
+                    Dance with Dragons / Feast for Crows house cards and the Mother of Dragons B deck for Targaryen.<br/>
+                    It is still in the test phase and can be adapted from time to time.
+                </>;
+            case "struggle-in-the-north":
+                return <>
+                    <h5>The unofficial <i>Struggle in the North</i> variant</h5>
+                    This is a community-created variant for 4 and 5 players only.<br/>
+                    It is very similar to the base game with fewer players, but instead of Neutral Force tokens,<br/>
+                    the southern territories of House Martell and House Tyrell, respectively, are blocked areas.
+                </>;
+            case "rumble-in-the-south":
+                return <>
+                    <h5>The unofficial <i>Rumbe in the South</i> variant</h5>
+                    This is a community-created variant for 4 players only.<br/>
+                    House Stark and House Greyjoy do not participate and thus Pyke is blocked<br/>
+                    as well as almost all of North.
+                </>;
+            case "race-to-kings-landing":
+                return <>
+                    <h5>The unofficial <i>Race to Kings Landing</i> variant</h5>
+                    This is a community-created variant for 5 players only.<br/>
+                    House Baratheon does not participate and thus Dragonstone is blocked.
+                </>;
+            case "no-kraken-for-dinner":
+                return <>
+                    <h5>The unofficial <i>No Kraken for Dinner</i> variant</h5>
+                    This is a community-created variant for 5 players only.<br/>
+                    House Greyjoy does not participate and thus Pyke is blocked.
+                </>;
+            case "learn-the-game":
+                return <>
+                    <h5>Teach the Game mode</h5>
+                    This mode allows you to start the game with only 2 players to explain the basic mechanics to a friend.<br/>
+                    Additionally, the mode can be used with vassals from the Mother of Dragons expansion<br/>
+                    and the &apos;Random vassal assignment&apos; option to make the game semi-playable with two players.<br/>
+                    However, victories do not count towards the win rate.
+                </>;
+            default:
+                return null;
+        }
+    }
+
     renderLobbySettings(): ReactNode {
         return <Row className="mt-2 justify-content-center">
             <Col md="12" lg="auto" id="base-settings-col" className="no-gutters">
                 <Col xs="12">
-                    <select id="setups" name="setups"
-                        value={this.gameSettings.setupId}
-                        onChange={e => this.onSetupChange(e.target.value)}
-                        style={{marginBottom: "8px"}}
+                    <OverlayTrigger overlay={
+                        <Tooltip id="game-setups-tooltip" className="tooltip-w-100">
+                            {this.renderGameSetupsTooltipContent((document.getElementById("game-setups") as HTMLInputElement)?.value ?? "")}
+                        </Tooltip>}
+                        placement="top"
+                        delay={{show: 500, hide: 0}}
                     >
-                        {this.createSetupItems()}
-                    </select>
+                        <select id="game-setups" name="setups"
+                            value={this.gameSettings.setupId}
+                            onChange={e => this.onSetupChange(e.target.value)}
+                            style={{marginBottom: "8px"}}
+                        >
+                            {this.createSetupItems()}
+                        </select>
+                    </OverlayTrigger>
                 </Col>
                 <Col xs="auto">
                     <select id="player-count" name="playerCount"
