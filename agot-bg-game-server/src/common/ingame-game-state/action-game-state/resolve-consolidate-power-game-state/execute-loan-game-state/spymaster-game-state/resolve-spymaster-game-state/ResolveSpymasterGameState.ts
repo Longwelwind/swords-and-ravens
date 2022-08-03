@@ -1,12 +1,12 @@
-import GameState from "../../GameState";
-import Game from "../game-data-structure/Game";
-import House from "../game-data-structure/House";
-import {ServerMessage} from "../../../messages/ServerMessage";
-import Player from "../Player";
-import {ClientMessage} from "../../../messages/ClientMessage";
-import IngameGameState from "../IngameGameState";
-import User from "../../../server/User";
-import WesterosCard from "../game-data-structure/westeros-card/WesterosCard";
+import GameState from "../../../../../../GameState";
+import Game from "../../../../../game-data-structure/Game";
+import House from "../../../../../game-data-structure/House";
+import {ServerMessage} from "../../../../../../../messages/ServerMessage";
+import Player from "../../../../../Player";
+import {ClientMessage} from "../../../../../../../messages/ClientMessage";
+import IngameGameState from "../../../../../IngameGameState";
+import User from "../../../../../../../server/User";
+import WesterosCard from "../../../../../game-data-structure/westeros-card/WesterosCard";
 
 interface ParentGameState extends GameState<any, any> {
     game: Game;
