@@ -4,7 +4,7 @@ import House from "./House";
 import Region from "./Region";
 import World from "./World";
 import WesterosCard from "./westeros-card/WesterosCard";
-import {westerosCardTypes} from "./westeros-card/westerosCardTypes";
+import {fireMadeFlesh, westerosCardTypes} from "./westeros-card/westerosCardTypes";
 import unitTypes from "./unitTypes";
 import Game from "./Game";
 import WildlingCard from "./wildling-card/WildlingCard";
@@ -20,6 +20,7 @@ import IronBank from "./IronBank";
 import loanCardTypes from "./loan-card/loanCardTypes";
 import LoanCard from "./loan-card/LoanCard";
 import { specialObjectiveCards } from "./static-data-structure/objectiveCards";
+import popRandom from "../../../utils/popRandom";
 
 interface HouseCardContainer {
     houseCards: {[key: string]: HouseCardData};
@@ -538,4 +539,28 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     }
 
     return game;
+}
+
+export function applyChangesForDanceWithMotherOfDragons(ingame: IngameGameState): void {
+    const game = ingame.game;
+    const lannister = game.houses.tryGet("lannister", null);
+    if (!game.targaryen || !game.ironBank || !lannister) {
+        throw new Error("Targaryen, Lannister and the Iron Bank must be present in Dance with Mother of Dragons variant");
+    }
+    game.targaryen.powerTokens = 10;
+    game.ironBank.drawNewLoanCard();
+
+    if (!ingame.isVassalHouse(lannister)) {
+        const initialLoanForLannister = popRandom(game.ironBank.loanCardDeck) as LoanCard;
+        game.ironBank.purchasedLoans.push(initialLoanForLannister);
+        initialLoanForLannister.purchasedBy = lannister;
+    }
+
+    // Reshuffle WD 4 deck as long as necessary, so Fire Made Flesh is not in the top 3 cards
+    // to allow revealing and resolving the top 3 cards
+    while (_.some(_.take(game.westerosDecks[3], 3), wc => wc.type == fireMadeFlesh)) {
+        shuffleInPlace(game.westerosDecks[3]);
+    }
+
+    game.dragonStrengthTokens = [2, 4, 6];
 }

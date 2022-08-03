@@ -11,7 +11,7 @@ import ActionGameState, {SerializedActionGameState} from "./action-game-state/Ac
 import Order from "./game-data-structure/Order";
 import Game, {SerializedGame} from "./game-data-structure/Game";
 import WesterosGameState, {SerializedWesterosGameState} from "./westeros-game-state/WesterosGameState";
-import createGame from "./game-data-structure/createGame";
+import createGame, { applyChangesForDanceWithMotherOfDragons } from "./game-data-structure/createGame";
 import BetterMap from "../../utils/BetterMap";
 import House from "./game-data-structure/House";
 import Unit from "./game-data-structure/Unit";
@@ -109,6 +109,10 @@ export default class IngameGameState extends GameState<
 
         this.game = createGame(this, housesToCreate, futurePlayers.keys);
         this.players = new BetterMap(futurePlayers.map((house, user) => [user, new Player(user, this.game.houses.get(house))]));
+
+        if (this.entireGame.isDanceWithMotherOfDragons) {
+            applyChangesForDanceWithMotherOfDragons(this);
+        }
 
         if (this.entireGame.gameSettings.onlyLive) {
             this.players.values.forEach(p => p.liveClockData = {
@@ -310,6 +314,9 @@ export default class IngameGameState extends GameState<
             } else {
                 this.setChildGameState(new PayDebtsGameState(this)).firstStart(unpaidInterest);
             }
+        } else if (this.entireGame.isDanceWithMotherOfDragons) {
+            // Reveal top 3 Westeros deck 4 cards
+            this.setChildGameState(new WesterosGameState(this)).firstStart(true);
         } else {
             // No Westeros phase during the first turn
             this.proceedPlanningGameState();

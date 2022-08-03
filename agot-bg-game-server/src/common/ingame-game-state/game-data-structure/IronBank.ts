@@ -56,6 +56,9 @@ export default class IronBank {
     }
 
     drawNewLoanCard(): void {
+        if (this.loanCardDeck.length == 0) {
+            return;
+        }
         const drawnCard = this.loanCardDeck.shift();
         this.loanSlots.unshift(drawnCard ?? null);
         const removedFromSlots = this.loanSlots.pop();

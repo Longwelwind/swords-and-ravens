@@ -8,7 +8,7 @@ import {observable} from "mobx";
 import {observer} from "mobx-react";
 import WesterosCard from "../../common/ingame-game-state/game-data-structure/westeros-card/WesterosCard";
 import WesterosCardComponent from "./utils/WesterosCardComponent";
-import ResolveSpymasterGameState from "../../common/ingame-game-state/resolve-spymaster-game-state/ResolveSpymasterGameState";
+import ResolveSpymasterGameState from "../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/execute-loan-game-state/spymaster-game-state/resolve-spymaster-game-state/ResolveSpymasterGameState";
 import _ from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowsAltH } from "@fortawesome/free-solid-svg-icons";

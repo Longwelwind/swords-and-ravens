@@ -8,7 +8,7 @@ import renderChildGameState from "../utils/renderChildGameState";
 import SimpleChoiceGameState from "../../common/ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
 import SimpleChoiceComponent from "./SimpleChoiceComponent";
 import SpymasterGameState from "../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/execute-loan-game-state/spymaster-game-state/SpymasterGameState";
-import ResolveSpymasterGameState from "../../common/ingame-game-state/resolve-spymaster-game-state/ResolveSpymasterGameState";
+import ResolveSpymasterGameState from "../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/execute-loan-game-state/spymaster-game-state/resolve-spymaster-game-state/ResolveSpymasterGameState";
 import ResolveSpymasterComponent from "./ResolveSpymasterComponent";
 
 

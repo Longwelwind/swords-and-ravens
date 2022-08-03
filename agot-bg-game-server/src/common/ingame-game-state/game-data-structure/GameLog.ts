@@ -115,6 +115,7 @@ interface WesterosCardDrawn {
     type: "westeros-cards-drawn";
     addedWildlingStrength: number;
     westerosCardTypes: string[];
+    revealAndResolveTop3WesterosDeck4Cards?: boolean;
 }
 
 interface CombatResult {

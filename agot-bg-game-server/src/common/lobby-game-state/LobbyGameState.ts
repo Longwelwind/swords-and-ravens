@@ -251,7 +251,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
             }
 
             // Lock MoD settings for 8p
-            if (settings.setupId == "mother-of-dragons" && settings.playerCount >= 8) {
+            if ((settings.setupId == "mother-of-dragons" || settings.setupId == "a-dance-with-mother-of-dragons") && settings.playerCount >= 8) {
                 settings.vassals = true;
                 settings.ironBank = true;
                 settings.seaOrderTokens = true;
@@ -259,26 +259,23 @@ export default class LobbyGameState extends GameState<EntireGame> {
             }
 
             // Reset the MoD settings
-            if (this.entireGame.isMotherOfDragons && settings.setupId != "mother-of-dragons") {
+            if ((this.entireGame.isMotherOfDragons || this.entireGame.isDanceWithMotherOfDragons) && settings.setupId != "mother-of-dragons"
+                && settings.setupId != "a-dance-with-mother-of-dragons") {
                 settings.vassals = false;
                 settings.seaOrderTokens = false;
                 settings.allowGiftingPowerTokens = false;
                 settings.ironBank = false;
             }
 
-            if (settings.playerCount < 8) {
+            if (settings.playerCount < 8 || settings.setupId == "a-dance-with-mother-of-dragons") {
                 settings.customModBalancing = false;
             }
 
             // Allow disabling DwD cards but enable them when switching to this setup
-            if (!this.entireGame.isDanceWithDragons && settings.setupId == "a-dance-with-dragons") {
+            if ((!this.entireGame.isDanceWithDragons && !this.entireGame.isDanceWithMotherOfDragons) &&
+                (settings.setupId == "a-dance-with-dragons" || settings.setupId == "a-dance-with-mother-of-dragons")) {
                 settings.adwdHouseCards = true;
                 settings.asosHouseCards = false;
-            }
-
-            // Reset Dwd Cards
-            if (this.entireGame.isDanceWithDragons && settings.setupId != "a-dance-with-dragons") {
-                settings.adwdHouseCards = false;
             }
 
             if (settings.removeTob3 || settings.removeTobSkulls || settings.limitTob2) {

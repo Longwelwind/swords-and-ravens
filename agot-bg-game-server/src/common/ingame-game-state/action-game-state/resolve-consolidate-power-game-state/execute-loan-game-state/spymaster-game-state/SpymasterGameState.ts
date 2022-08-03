@@ -8,7 +8,7 @@ import { ServerMessage } from "../../../../../../messages/ServerMessage";
 import { ClientMessage } from "../../../../../../messages/ClientMessage";
 import Player from "../../../../Player";
 import BetterMap from "../../../../../../utils/BetterMap";
-import ResolveSpymasterGameState, { SerializedResolveSpymasterGameState } from "../../../../resolve-spymaster-game-state/ResolveSpymasterGameState";
+import ResolveSpymasterGameState, { SerializedResolveSpymasterGameState } from "./resolve-spymaster-game-state/ResolveSpymasterGameState";
 import WesterosCard from "../../../../../ingame-game-state/game-data-structure/westeros-card/WesterosCard";
 import _ from "lodash";
 
