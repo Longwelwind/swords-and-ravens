@@ -114,6 +114,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         return this.gameSettings.setupId == "mother-of-dragons";
     }
 
+    get isDanceWithMotherOfDragons(): boolean {
+        return this.gameSettings.setupId == "a-dance-with-mother-of-dragons";
+    }
+
     get minPlayerCount(): number {
         // For Debug we can manipulate this to allow games with only 1 player
         //return 1;

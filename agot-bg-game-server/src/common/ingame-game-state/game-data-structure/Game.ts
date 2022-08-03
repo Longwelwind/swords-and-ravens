@@ -123,7 +123,14 @@ export default class Game {
 
         // If a dragon strength token has been removed from the round track
         // the initial value is 1 instead of 0
-        const result = this.removedDragonStrengthToken == 0 ? 0 : 1;
+        const result = this.ingame.entireGame.isDanceWithMotherOfDragons
+            ? this.removedDragonStrengthToken == 0
+                ? 2
+                : 3
+            : this.removedDragonStrengthToken == 0
+                ? 0
+                : 1;
+
         for (let i=0; i<this.dragonStrengthTokens.length; i++) {
             if (this.dragonStrengthTokens[i] == this.turn) {
                 return result + i + 1; // +1 because of the 0-based index
