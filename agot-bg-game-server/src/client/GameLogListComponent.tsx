@@ -231,12 +231,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <Row className="align-items-center">
-                        <Col xs="auto">
-                            <img src={crossedSwordsImage} width="32px"/>
-                        </Col>
                         {orderImgUrl && <Col xs="auto">
                             <img src={orderImgUrl} width="42px"/>
                         </Col>}
+                        <Col xs="auto">
+                            <img src={crossedSwordsImage} width="32px"/>
+                        </Col>
                         <Col>
                             House <b>{attacker.name}</b> attacked {attacked ? <>House <b>{attacked.name}</b></> : <>a <b>Neutral Force</b></>} from <b>{attackingRegion.name}</b> to <b>
                             {attackedRegion.name}</b> with <>{joinReactNodes(army.map((ut, i) => <b key={`attack_${ut.id}_${i}`}>{ut.name}</b>), ', ')}</>.
