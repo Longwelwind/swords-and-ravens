@@ -47,6 +47,15 @@ export default class ResolveRetreatGameState extends GameState<
     }
 
     firstStart(): void {
+        // Due to Arianne Martell ASoS we have to proceed destroyUnitsThatCannotRetreatOrAreWounded again:
+        this.postCombat.destroyUnitsWhichCannotRetreatOrAreWounded();
+
+        if (this.postCombat.loserCombatData.army.length == 0) {
+            // If there are no units left, end resolve retreat
+            this.postCombat.onResolveRetreatFinish();
+            return;
+        }
+
         // House cards may override the chooser of the retreat location
         // and this has to be considered when getting valid retreat regions
         const overridenChooser = this.getOverridenRetreatLocationChooser(this.postCombat.loser);

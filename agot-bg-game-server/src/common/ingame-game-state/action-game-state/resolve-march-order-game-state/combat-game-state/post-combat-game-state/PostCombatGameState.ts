@@ -159,8 +159,7 @@ export default class PostCombatGameState extends GameState<
             });
         }
 
-        const locationLoserArmy = this.attacker == this.loser ? this.combat.attackingRegion : this.combat.defendingRegion;
-        const loserArmy = this.attacker == this.loser ? this.combat.attackingArmy : this.combat.defendingArmy;
+        const locationLoserArmy = this.loserCombatData.region;
 
         const winnerSwordIcons = this.attacker == this.winner
             ? this.combat.getHouseCardSwordIcons(this.attacker)
@@ -175,6 +174,38 @@ export default class PostCombatGameState extends GameState<
                 + (this.combat.defenderTidesOfBattleCard ? this.combat.defenderTidesOfBattleCard.towerIcons : 0);
 
         // All units of the loser army that can't retreat or are wounded are immediately killed
+        this.destroyUnitsWhichCannotRetreatOrAreWounded();
+
+        const loserArmyLeft = this.loserCombatData.army;
+        const maxLoserCasualtiesCount = Math.max(0, winnerSwordIcons - loserTowerIcons);
+        const loserCasualtiesCount = Math.min(maxLoserCasualtiesCount, loserArmyLeft.length);
+
+        if (loserCasualtiesCount > 0) {
+            // Check if casualties are prevented this combat
+            if (!this.combat.areCasualtiesPrevented(this.loser)) {
+                if (loserCasualtiesCount < loserArmyLeft.length) {
+                    this.setChildGameState(new ChooseCasualtiesGameState(this)).firstStart(this.loser, loserArmyLeft, loserCasualtiesCount);
+                } else {
+                    // If the count of casualties is bigger or equal than the remaining army, a ChooseCasualtiesGameState
+                    // is not needed. The army left can be exterminated.
+                    this.onChooseCasualtiesGameStateEnd(this.loser, locationLoserArmy, loserArmyLeft, true);
+                }
+                return;
+            } else {
+                this.combat.ingameGameState.log({
+                    type: "casualties-prevented",
+                    house: this.loser.id,
+                    houseCard: (this.combat.houseCombatDatas.get(this.loser).houseCard as HouseCard).id
+                });
+            }
+        }
+
+        this.proceedSkullIconHandling();
+    }
+
+    destroyUnitsWhichCannotRetreatOrAreWounded() {
+        const loserArmy = this.loserCombatData.army;
+        const locationLoserArmy = this.loserCombatData.region;
         const immediatelyKilledLoserUnits = loserArmy.filter(u => u.wounded || !u.type.canRetreat);
 
         if (immediatelyKilledLoserUnits.length > 0) {
@@ -204,32 +235,6 @@ export default class PostCombatGameState extends GameState<
                 army: this.loserCombatData.army.map(u => u.id)
             });
         }
-
-        const loserArmyLeft = _.difference(loserArmy, immediatelyKilledLoserUnits);
-        const maxLoserCasualtiesCount = Math.max(0, winnerSwordIcons - loserTowerIcons);
-        const loserCasualtiesCount = Math.min(maxLoserCasualtiesCount, loserArmyLeft.length);
-
-        if (loserCasualtiesCount > 0) {
-            // Check if casualties are prevented this combat
-            if (!this.combat.areCasualtiesPrevented(this.loser)) {
-                if (loserCasualtiesCount < loserArmyLeft.length) {
-                    this.setChildGameState(new ChooseCasualtiesGameState(this)).firstStart(this.loser, loserArmyLeft, loserCasualtiesCount);
-                } else {
-                    // If the count of casualties is bigger or equal than the remaining army, a ChooseCasualtiesGameState
-                    // is not needed. The army left can be exterminated.
-                    this.onChooseCasualtiesGameStateEnd(this.loser, locationLoserArmy, loserArmyLeft, true);
-                }
-                return;
-            } else {
-                this.combat.ingameGameState.log({
-                    type: "casualties-prevented",
-                    house: this.loser.id,
-                    houseCard: (this.combat.houseCombatDatas.get(this.loser).houseCard as HouseCard).id
-                });
-            }
-        }
-
-        this.proceedSkullIconHandling();
     }
 
     proceedSkullIconHandling(): void {
@@ -321,15 +326,7 @@ export default class PostCombatGameState extends GameState<
     }
 
     proceedRetreat(): void {
-        // A retreat is only triggered if, after resolving casualties, there are
-        // remaining troops in the loser's army.
-        if (this.combat.houseCombatDatas.get(this.loser).army.length > 0) {
-            this.setChildGameState(new ResolveRetreatGameState(this))
-                .firstStart();
-            return;
-        }
-
-        this.onResolveRetreatFinish();
+        this.setChildGameState(new ResolveRetreatGameState(this)).firstStart();
     }
 
     onResolveRetreatFinish(): void {
