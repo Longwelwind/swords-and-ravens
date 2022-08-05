@@ -1031,12 +1031,6 @@
               "house": "martell",
               "quantity": 1,
               "quantityVassal": 1
-            },
-            {
-              "unitType": "knight",
-              "house": "martell",
-              "quantity": 1,
-              "quantityVassal": 1
             }],
             "the-boneway": [{
               "unitType": "footman",
