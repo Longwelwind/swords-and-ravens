@@ -368,7 +368,8 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
         const result = new BetterMap<Region, House[]>();
 
         reachableNeutralForces.forEach(neutralForce => {
-            const supportingRegions = this.actionGameState.getPossibleSupportingRegions(neutralForce).filter(({region}) => region.getController() != this.house);
+            const supportingRegions = this.actionGameState.getPossibleSupportingRegions(neutralForce).filter(({region}) =>
+                region.getController() != this.house && !this.ingame.getOtherVassalFamilyHouses(this.house).includes(region.getController()));
             const houses = _.uniq(supportingRegions.map(({region}) => region.getController() as House));
 
             if (houses.length > 0) {
