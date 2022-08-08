@@ -9,10 +9,10 @@ export default class PreemptiveRaidWildlingCardType extends WildlingCardType {
     executeNightsWatchWon(wildlingsAttack: WildlingsAttackGameState): void {
         const wildlingStrength = 6;
 
-        wildlingsAttack.game.wildlingStrength = wildlingStrength;
+        wildlingsAttack.game.wildlingStrength = 0;
         wildlingsAttack.entireGame.broadcastToClients({
             type: "change-wildling-strength",
-            wildlingStrength: wildlingStrength
+            wildlingStrength: 0
         });
 
         wildlingsAttack.ingame.log({
