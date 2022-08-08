@@ -44,7 +44,7 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
     // This field is null before the bidding phase is over,
     // as the wildling card will be drawn after the bidding phase is over.
     wildlingCard: WildlingCard | null;
-    wildlingStrength: number;
+    @observable wildlingStrength: number;
     _highestBidder: House | null;
     _lowestBidder: House | null;
     @observable biddingResults: [number, House[]][] | null;
@@ -54,7 +54,7 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
     }
 
     get excludedHouses(): House[] {
-        return _.difference(this.game.houses.values, this.participatingHouses);
+        return _.difference(this.game.houses.values, this.participatingHouses).filter(h => !this.ingame.isVassalHouse(h));
     }
 
     get totalBid(): number {
@@ -166,7 +166,7 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
 
         this.westerosGameState.ingame.log({
             type: "wildling-bidding",
-            wildlingStrength: this.westerosGameState.game.wildlingStrength,
+            wildlingStrength: this.wildlingStrength,
             results: this.biddingResults.map(([bid, houses]) => [bid, houses.map(h => h.id)]),
             nightsWatchVictory: this.nightsWatchWon
         });
