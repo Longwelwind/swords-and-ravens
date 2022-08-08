@@ -17,6 +17,8 @@ import DefenseMusterOrderType from "../../../game-data-structure/order-types/Def
 import PlayerMusteringGameState, { PlayerMusteringType } from "../../../westeros-game-state/mustering-game-state/player-mustering-game-state/PlayerMusteringGameState";
 import IronBank from "../../../game-data-structure/IronBank";
 import { observable } from "mobx";
+import BetterMap from "../../../../../utils/BetterMap";
+import _ from "lodash";
 
 export default class ResolveSingleConsolidatePowerGameState extends GameState<ResolveConsolidatePowerGameState> {
     @observable house: House;
@@ -53,10 +55,10 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
         }
 
         const defenseMusterOrders = availableOrders.filter(([_r, ot]) => ot instanceof DefenseMusterOrderType);
-        const consolidatePowerOrders = availableOrders.filter(([_r, ot]) => ot instanceof ConsolidatePowerOrderType);
+        const consolidatePowerOrders = new BetterMap(availableOrders.filter(([_r, ot]) => ot instanceof ConsolidatePowerOrderType));
         const ironBankOrders = availableOrders.filter(([_r, ot]) => ot instanceof IronBankOrderType);
 
-        if (defenseMusterOrders.length > 1 || (defenseMusterOrders.length == 1 && (consolidatePowerOrders.length > 0 || ironBankOrders.length > 0))) {
+        if (defenseMusterOrders.length > 1 || (defenseMusterOrders.length == 1 && (consolidatePowerOrders.size > 0 || ironBankOrders.length > 0))) {
             throw new Error("Too much Defense / Muster orders placed or Defense / Muster together with player CP/IB orders placed!");
         }
 
@@ -70,14 +72,18 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
         // if the starred ones are present on regions with no structure.
         // In that case, fast-track the process and simply resolve one of those.
 
-        if (ironBankOrders.length == 0 && consolidatePowerOrders.every(([r, ot]) => !ot.starred || (ot.starred && !r.hasStructure))) {
-            // Take one of the CP order and resolve it
-            const region = consolidatePowerOrders[0][0];
+        if (ironBankOrders.length == 0 && consolidatePowerOrders.size > 0 && consolidatePowerOrders.entries.every(([r, ot]) => !ot.starred || (ot.starred && !r.hasStructure))) {
+            // Take the order which will gain the most Power tokens and resolve it automatically
+            // This is done to avoid resolving CPs manually all the time. In the past the order didn't matter but
+            // due to The Faceless Men players want to resolve the orders with the most tokens first.
+            const regionsWithPossibleGains = consolidatePowerOrders.keys.map(r => [r, this.getPotentialGainedPowerTokens(r, house)] as [Region, number]);
+            const ordered = _.orderBy(regionsWithPossibleGains, ([_region, gains]) => gains, "desc");
+            const regionToResolveCpAutomatically = ordered[0][0];
 
-            this.parentGameState.resolveConsolidatePowerOrderForPt(region, house, true);
+            this.parentGameState.resolveConsolidatePowerOrderForPt(regionToResolveCpAutomatically, house, true);
 
             // Remove the order from the board
-            this.actionGameState.removeOrderFromRegion(region);
+            this.actionGameState.removeOrderFromRegion(regionToResolveCpAutomatically);
 
             // Proceed to the next house
             this.onResolveSingleConsolidatePowerFinish();
@@ -85,8 +91,7 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
         }
 
         // Check if Iron Bank order can be fast-tracked because there might be no purchasable loan
-        if ((ironBankOrders.length == 1 && consolidatePowerOrders.length == 0 && this.ironBank && this.ironBank.getPurchasableLoans(this.house).length == 0) ||
-            (ironBankOrders.length == 1 && this.ironBank && this.ironBank.loanSlots.every(lc => lc == null))) {
+        if (ironBankOrders.length == 1 && consolidatePowerOrders.size == 0 && this.ironBank?.getPurchasableLoans(this.house).length == 0) {
             const region = ironBankOrders[0][0];
             this.actionGameState.removeOrderFromRegion(region, true, this.house, true);
             this.onResolveSingleConsolidatePowerFinish();
