@@ -19,6 +19,7 @@ import IronBank from "../../../game-data-structure/IronBank";
 import { observable } from "mobx";
 import BetterMap from "../../../../../utils/BetterMap";
 import _ from "lodash";
+import { dragon, ship, siegeEngine } from "../../../../../common/ingame-game-state/game-data-structure/unitTypes";
 
 export default class ResolveSingleConsolidatePowerGameState extends GameState<ResolveConsolidatePowerGameState> {
     @observable house: House;
@@ -77,7 +78,15 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
             // This is done to avoid resolving CPs manually all the time. In the past the order didn't matter but
             // due to The Faceless Men players want to resolve the orders with the most tokens first.
             const regionsWithPossibleGains = consolidatePowerOrders.keys.map(r => [r, this.getPotentialGainedPowerTokens(r, house)] as [Region, number]);
-            const ordered = _.orderBy(regionsWithPossibleGains, ([_region, gains]) => gains, "desc");
+            const ordered = _.sortBy(regionsWithPossibleGains,
+                // Resolve CP orders on ships as last
+                ([region, _gains]) => region.units.values.some(u => u.type == ship) ? 1 : -1,
+                // Resolve CP orders with Siege Engines later as they are immune to Faceless Men
+                ([region, _gains]) => region.units.values.some(u => u.type == siegeEngine || u.type == dragon) ? 1 : -1,
+                // Resolve CP orders with only 1 unit first
+                ([region, _gains]) => region.units.values.length,
+                // Resolve CP orders with highest gain first
+                ([_region, gains]) => -gains);
             const regionToResolveCpAutomatically = ordered[0][0];
 
             this.parentGameState.resolveConsolidatePowerOrderForPt(regionToResolveCpAutomatically, house, true);
