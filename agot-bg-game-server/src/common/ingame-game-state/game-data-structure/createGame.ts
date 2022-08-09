@@ -562,5 +562,5 @@ export function applyChangesForDanceWithMotherOfDragons(ingame: IngameGameState)
         shuffleInPlace(game.westerosDecks[3]);
     }
 
-    game.dragonStrengthTokens = [2, 4, 6];
+    game.dragonStrengthTokens = [2, 4, 5, 6];
 }

@@ -125,8 +125,8 @@ export default class Game {
         // the initial value is 1 instead of 0
         const result = this.ingame.entireGame.isDanceWithMotherOfDragons
             ? this.removedDragonStrengthToken == 0
-                ? 2
-                : 3
+                ? 1
+                : 2
             : this.removedDragonStrengthToken == 0
                 ? 0
                 : 1;
