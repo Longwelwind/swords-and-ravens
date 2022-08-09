@@ -709,7 +709,7 @@
           "tracks": {
             "ironThrone": ["lannister", "tyrell", "baratheon", "greyjoy", "martell", "arryn", "stark", "targaryen"],
             "fiefdoms": ["greyjoy", "baratheon", "stark", "martell", "arryn", "lannister", "tyrell", "targaryen"],
-            "kingsCourt": ["tyrell", "arryn", "martell", "stark", "lannister", "greyjoy", "baratheon", "targaryen"]
+            "kingsCourt": ["arryn", "tyrell", "martell", "stark", "lannister", "greyjoy", "baratheon", "targaryen"]
           },
           "loyaltyTokens": {
             "kings-landing": 1
@@ -754,7 +754,7 @@
           "powerTokensOnBoard": {
             "arryn": ["the-vale-of-arryn", "the-fingers"],
             "stark": ["moat-cailin", "widows-watch"],
-            "lannister": ["blackwater", "stoney-sept"],
+            "lannister": ["blackwater"],
             "greyjoy": ["searoad-marches"],
             "baratheon": ["storms-end"],
             "tyrell": ["oldtown", "dornish-marches", "the-arbor", "three-towers", "the-reach"],
@@ -854,7 +854,7 @@
               "quantityVassal": 2
             }],
             "lannisport": [{
-              "unitType": "knight",
+              "unitType": "footman",
               "house": "lannister",
               "quantity": 1,
               "quantityVassal": 1
@@ -881,6 +881,12 @@
               "quantity": 1,
               "quantityVassal": 1
             }, {
+              "unitType": "footman",
+              "house": "lannister",
+              "quantity": 1,
+              "quantityVassal": 1
+            }],
+            "stoney-sept": [{
               "unitType": "footman",
               "house": "lannister",
               "quantity": 1,
