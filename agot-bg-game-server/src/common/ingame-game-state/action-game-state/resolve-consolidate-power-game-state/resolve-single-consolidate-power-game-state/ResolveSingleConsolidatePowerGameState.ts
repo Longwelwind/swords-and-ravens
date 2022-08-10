@@ -19,7 +19,6 @@ import IronBank from "../../../game-data-structure/IronBank";
 import { observable } from "mobx";
 import BetterMap from "../../../../../utils/BetterMap";
 import _ from "lodash";
-import { dragon, ship, siegeEngine } from "../../../../../common/ingame-game-state/game-data-structure/unitTypes";
 
 export default class ResolveSingleConsolidatePowerGameState extends GameState<ResolveConsolidatePowerGameState> {
     @observable house: House;
@@ -73,18 +72,12 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
         // if the starred ones are present on regions with no structure.
         // In that case, fast-track the process and simply resolve one of those.
 
-        if (ironBankOrders.length == 0 && consolidatePowerOrders.size > 0 && consolidatePowerOrders.entries.every(([r, ot]) => !ot.starred || (ot.starred && !r.hasStructure))) {
+        if (this.canCpOrdersBeResolvedAutomatically(ironBankOrders, consolidatePowerOrders)) {
             // Take the order which will gain the most Power tokens and resolve it automatically
             // This is done to avoid resolving CPs manually all the time. In the past the order didn't matter but
             // due to The Faceless Men players want to resolve the orders with the most tokens first.
             const regionsWithPossibleGains = consolidatePowerOrders.keys.map(r => [r, this.getPotentialGainedPowerTokens(r, house)] as [Region, number]);
             const ordered = _.sortBy(regionsWithPossibleGains,
-                // Resolve CP orders on ships as last
-                ([region, _gains]) => region.units.values.some(u => u.type == ship) ? 1 : -1,
-                // Resolve CP orders with Siege Engines later as they are immune to Faceless Men
-                ([region, _gains]) => region.units.values.some(u => u.type == siegeEngine || u.type == dragon) ? 1 : -1,
-                // Resolve CP orders with only 1 unit first
-                ([region, _gains]) => region.units.values.length,
                 // Resolve CP orders with highest gain first
                 ([_region, gains]) => -gains);
             const regionToResolveCpAutomatically = ordered[0][0];
@@ -105,6 +98,30 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
             this.actionGameState.removeOrderFromRegion(region, true, this.house, true);
             this.onResolveSingleConsolidatePowerFinish();
         }
+    }
+
+    private canCpOrdersBeResolvedAutomatically(ironBankOrders: [Region, ConsolidatePowerOrderType | IronBankOrderType | DefenseMusterOrderType][],
+        consolidatePowerOrders: BetterMap<Region, ConsolidatePowerOrderType | IronBankOrderType | DefenseMusterOrderType>): boolean {
+        // When there are Iron Bank orders left, CPs cannot be resolved automatically
+        if (ironBankOrders.length > 0) {
+            return false;
+        }
+
+        // When there are CP* orders on castle areas they can be used for mustering and therefore not resolved automatically
+        if (consolidatePowerOrders.entries.some(([r, ot]) => ot.starred && r.hasStructure)) {
+            return false;
+        }
+
+        if (consolidatePowerOrders.size > 1 && this.game.ironBank && this.game.ironBank.loanSlots.some(lc => lc?.type.preventsAutomaticResolutionOfCpOrders)) {
+            // If Faceless men is present on the loan slots we have to check if someone else has an Iron Bank order to resolve
+            // and then multiple CPs must be resolved manually
+            const otherIronBankOrders = this.actionGameState.ordersOnBoard.entries.filter(([region, order]) =>
+                order.type instanceof IronBankOrderType && region.getController() != this.house);
+
+            return otherIronBankOrders.length == 0;
+        }
+
+        return true;
     }
 
     getPotentialGainedPowerTokens(region: Region, house: House): number {

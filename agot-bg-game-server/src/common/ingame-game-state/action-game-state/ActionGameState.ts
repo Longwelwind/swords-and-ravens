@@ -235,25 +235,25 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
 
     getRegionsWithRaidOrderOfHouse(house: House): [Region, RaidOrderType | RaidSupportOrderType][] {
         return this.ordersOnBoard.entries
-            .filter(([region, order]) => region.getController() == house && (order.type instanceof RaidOrderType || order.type instanceof RaidSupportOrderType))
+            .filter(([region, order]) => (order.type instanceof RaidOrderType || order.type instanceof RaidSupportOrderType) && region.getController() == house)
             .map(([region, order]) => [region, order.type as RaidOrderType | RaidSupportOrderType]);
     }
 
     getRegionsWithMarchOrderOfHouse(house: House): Region[] {
         return this.ordersOnBoard.entries
-            .filter(([region, order]) => region.getController() == house && order.type instanceof MarchOrderType)
+            .filter(([region, order]) => order.type instanceof MarchOrderType && region.getController() == house)
             .map(([region, _order]) => region);
     }
 
     getRegionsWithConsolidatePowerOrderOfHouse(house: House): [Region, ConsolidatePowerOrderType][] {
         return this.ordersOnBoard.entries
-            .filter(([region, order]) => region.getController() == house && order.type instanceof ConsolidatePowerOrderType)
+            .filter(([region, order]) => order.type instanceof ConsolidatePowerOrderType && region.getController() == house)
             .map(([region, order]) => [region, order.type]);
     }
 
     getRegionsWithIronBankOrderOfHouse(house: House): [Region, IronBankOrderType][] {
         return this.ordersOnBoard.entries
-            .filter(([region, order]) => region.getController() == house && order.type instanceof IronBankOrderType)
+            .filter(([region, order]) => order.type instanceof IronBankOrderType && region.getController() == house)
             .map(([region, order]) => [region, order.type]);
     }
 
@@ -263,7 +263,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
 
     getRegionsWithDefenseMusterOrderOfHouse(house: House): [Region, DefenseMusterOrderType][] {
         return this.ordersOnBoard.entries
-            .filter(([region, order]) => region.getController() == house && order.type instanceof DefenseMusterOrderType)
+            .filter(([region, order]) => order.type instanceof DefenseMusterOrderType && region.getController() == house)
             .map(([region, order]) => [region, order.type as DefenseMusterOrderType]);
     }
 

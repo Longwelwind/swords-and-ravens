@@ -72,7 +72,8 @@ export const spymaster = new SpymasterLoanCardType(
 export const theFacelessMen = new TheFacelessMenLoanCardType(
     "the-faceless-men", "The Faceless Men",
     "Destroy one Knight in any one area  and one Footman in any one other area.\n" +
-        "The units may belong to any player or vassal."
+        "The units may belong to any player or vassal.",
+    true
 );
 
 export const vanguardCavalry = new VanguardCavalryLoanCardType(
