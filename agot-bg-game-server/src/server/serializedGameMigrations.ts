@@ -1866,6 +1866,17 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "88",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame" && serializedGame.gameSettings.setupId == "a-dance-with-mother-of-dragons") {
+                const ingame = serializedGame.childGameState;
+                ingame.game.dragonStrengthTokens = [2, 4, 5, 6];
+                ingame.game.removedDragonStrengthToken = 0;
+            }
+            return serializedGame;
+        }
     }
 ];
 
