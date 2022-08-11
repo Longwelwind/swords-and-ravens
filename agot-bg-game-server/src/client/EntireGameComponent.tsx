@@ -75,17 +75,17 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             </Helmet>
             <Col xs={12} className={this.props.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
                 <Row className="justify-content-center align-items-center">
-                    {this.renderPrivateBadge()}
+                    {this.rerender >= 0 && this.renderClock()}
                     {this.renderHouseIcon()}
-                    <Col xs="auto">
+                    <Col xs="auto" className="px-3">
                         <h4>{this.props.entireGame.name}</h4>
                     </Col>
+                    {this.renderGameTypeBadge()}
                     {this.renderTidesOfBattleImage()}
                     {this.renderHouseCardsEvolutionImage()}
-                    {this.renderGameTypeBadge()}
                     {this.renderMapSwitch()}
                     {this.renderWarnings()}
-                    {this.rerender >= 0 && this.renderClock()}
+                    {this.renderPrivateBadge()}
                 </Row>
             </Col>
             {
@@ -261,16 +261,18 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 </OverlayTrigger>
             </Col>;
         }else if (this.lobby) {
-            return <OverlayTrigger
-                placement="bottom"
-                overlay={
-                    <Tooltip id="westeros-time-tooltip">
-                        <b>Westeros time <small>(basically UTC)</small></b>
-                    </Tooltip>}
-                popperConfig={{ modifiers: [preventOverflow] }}
-            >
-                <h4><Badge variant="secondary">{new Date().toISOString().slice(11, 16)}</Badge></h4>
-            </OverlayTrigger>
+            return <Col xs="auto">
+                <OverlayTrigger
+                    placement="bottom"
+                    overlay={
+                        <Tooltip id="westeros-time-tooltip">
+                            <b>Westeros time <small>(basically UTC)</small></b>
+                        </Tooltip>}
+                    popperConfig={{ modifiers: [preventOverflow] }}
+                >
+                    <h4><Badge variant="secondary">{new Date().toISOString().slice(11, 16)}</Badge></h4>
+                </OverlayTrigger>
+            </Col>
         }
 
         return null;
