@@ -50,7 +50,6 @@ import { isMobile } from "react-device-detect";
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
 export const DELUXE_MAT_WIDTH = 1204;
-const BLOCKED_REGION_BY_INFINITE_GARRISON = 1000;
 
 interface MapComponentProps {
     gameClient: GameClient;
@@ -90,7 +89,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         const crownModifiers = new BetterMap<string, number>();
 
         for (const region of this.props.ingameGameState.world.regions.values) {
-            if (region.garrison > 0 && region.garrison != BLOCKED_REGION_BY_INFINITE_GARRISON) {
+            if (region.garrison > 0 && !region.isBlocked) {
                 garrisons.set(region.id, getGarrisonToken(region.garrison));
             }
 
@@ -286,11 +285,10 @@ export default class MapComponent extends Component<MapComponentProps> {
 
     renderRegions(propertiesForRegions: BetterMap<Region, RegionOnMapProperties>): ReactNode {
         return propertiesForRegions.entries.map(([region, properties]) => {
-            const blocked = region.garrison == BLOCKED_REGION_BY_INFINITE_GARRISON;
             const wrap = properties.wrap;
 
             return (
-                <ConditionalWrap condition={!blocked}
+                <ConditionalWrap condition={!region.isBlocked}
                     key={region.id}
                     wrap={wrap ? wrap : child =>
                         <OverlayTrigger
@@ -305,10 +303,10 @@ export default class MapComponent extends Component<MapComponentProps> {
                 >
                     <polygon
                         points={this.getRegionPath(region)}
-                        fill={blocked ? "black" : properties.highlight.color}
+                        fill={region.isBlocked ? "black" : properties.highlight.color}
                         fillRule="evenodd"
                         className={classNames(
-                            blocked ? "blocked-region" : "region-area",
+                            region.isBlocked ? "blocked-region" : "region-area",
                             properties.highlight.active && {
                                 "clickable": true,
                                 // Whatever the strength of the highlight defined, show the same

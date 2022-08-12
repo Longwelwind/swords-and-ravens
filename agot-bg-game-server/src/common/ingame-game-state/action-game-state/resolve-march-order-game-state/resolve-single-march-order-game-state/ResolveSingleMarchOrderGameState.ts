@@ -356,7 +356,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             // and we filtered for land previously
             .map(startingRegion => this.world.getReachableRegions(startingRegion, this.house, startingRegion.units.values))
         // Neutral forces have a garrison but no controller
-        ).filter(r => r.garrison > 0 && r.garrison != 1000 && r.getController() == null);
+        ).filter(r => r.garrison > 0 && !r.isBlocked && r.getController() == null);
     }
 
     getPossibleSupportingHousesAgainstNeutralForces(): BetterMap<Region, House[]> | null {

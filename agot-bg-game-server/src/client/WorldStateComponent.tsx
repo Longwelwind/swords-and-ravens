@@ -22,7 +22,6 @@ import loyaltyTokenImage from "../../public/images/power-tokens/Loyalty.png"
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
 export const DELUXE_MAT_WIDTH = 1204;
-const BLOCKED_REGION_BY_INFINITE_GARRISON = 1000;
 
 interface WorldStateComponentProps {
     ingameGameState: IngameGameState;
@@ -57,7 +56,7 @@ export default class WorldStateComponent extends Component<WorldStateComponentPr
         const garrisons = new BetterMap<string, string | null>();
 
         for (const region of this.props.worldState) {
-            if (region.garrison && region.garrison > 0 && region.garrison != BLOCKED_REGION_BY_INFINITE_GARRISON) {
+            if (region.garrison && region.garrison > 0 && region.garrison != 1000) {
                 garrisons.set(region.id, getGarrisonToken(region.garrison));
             }
         }
@@ -113,7 +112,7 @@ export default class WorldStateComponent extends Component<WorldStateComponentPr
     renderRegions(): ReactNode {
         const regions = this.ingame.world.regions;
         return this.props.worldState.map(region => {
-            const blocked = region.garrison == BLOCKED_REGION_BY_INFINITE_GARRISON;
+            const blocked = region.garrison == 1000;
             return <polygon key={`render-region-${region.id}`}
                         points={this.getRegionPath(regions.get(region.id))}
                         fill={blocked ? "black" : undefined}
