@@ -30,7 +30,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
     | PutToTheSwordGameState | AThroneOfBladesGameState | DarkWingsDarkWordsGameState | WesterosDeck4GameState
     | TheBurdenOfPowerGameState | ShiftingAmbitionsGameState | NewInformationGameState
 > {
-    revealAndResolveTop3WesterosDeck4Cards = false;
+    revealAndResolveTop2WesterosDeck4Cards = false;
     revealedCards: WesterosCard[];
     @observable currentCardI = -1;
     /**
@@ -67,15 +67,15 @@ export default class WesterosGameState extends GameState<IngameGameState,
         }
     }
 
-    firstStart(revealAndResolveTop3WesterosDeck4Cards = false): void {
+    firstStart(revealAndResolveTop2WesterosDeck4Cards = false): void {
         this.ingame.log({
             type: "westeros-phase-began"
         });
 
-        this.revealAndResolveTop3WesterosDeck4Cards = revealAndResolveTop3WesterosDeck4Cards;
+        this.revealAndResolveTop2WesterosDeck4Cards = revealAndResolveTop2WesterosDeck4Cards;
         this.revealedCards = [];
 
-        if (!revealAndResolveTop3WesterosDeck4Cards) {
+        if (!revealAndResolveTop2WesterosDeck4Cards) {
             // Reveal the top cards of each deck
             // Note: For the endless mode it doesn't make sense to execute Westeros deck 4 cards again!
             // Therefore we apply a hack here: If the drawn card is already discarded, we don't add it to the revealed cards array anymore,
@@ -97,7 +97,8 @@ export default class WesterosGameState extends GameState<IngameGameState,
                 deck.push(card);
             }
         } else {
-            for (let i=0; i < 3; i++) {
+            // For A Dance with Mother of Dragons variant reveal top 2 WD 4 cards to add some loyalty tokens to the board
+            for (let i=0; i < 2; i++) {
                 const card = this.game.westerosDecks[3].shift() as WesterosCard;
                 card.discarded = true;
                 this.revealedCards.push(card);
@@ -123,7 +124,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
             type: "westeros-cards-drawn",
             westerosCardTypes: this.revealedCards.map(c => c.type.id),
             addedWildlingStrength: addedWildlingStrength,
-            revealAndResolveTop3WesterosDeck4Cards: revealAndResolveTop3WesterosDeck4Cards
+            revealAndResolveTop3WesterosDeck4Cards: revealAndResolveTop2WesterosDeck4Cards
         });
 
         if (addedWildlingStrength > 0) {
@@ -183,14 +184,20 @@ export default class WesterosGameState extends GameState<IngameGameState,
             return;
         }
 
-        this.ingame.onWesterosGameStateFinish(this.planningRestrictions, !this.revealAndResolveTop3WesterosDeck4Cards ? this.revealedCards : []);
+        // We just forward the revealed cards if it was a normal Westeros phase
+        // to show the Westeros cards during Planning phase as well.
+        // This is helpful when all Westeros cards were resolved automatically,
+        // e.g. Supply, GoT and Sea of Storms, and players dont need to check
+        // the game log for this in live games all the time.
+        // But that's why we pass an empty array for revealAndResolveTop2WesterosDeck4Cards.
+        this.ingame.onWesterosGameStateFinish(this.planningRestrictions, !this.revealAndResolveTop2WesterosDeck4Cards ? this.revealedCards : []);
     }
 
     executeCard(card: WesterosCard): void {
         this.ingame.log({
             type: "westeros-card-executed",
             westerosCardType: card.type.id,
-            westerosDeckI: !this.revealAndResolveTop3WesterosDeck4Cards ? this.currentCardI : 3
+            westerosDeckI: !this.revealAndResolveTop2WesterosDeck4Cards ? this.currentCardI : 3
         });
 
         card.type.execute(this);
@@ -223,7 +230,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
     serializeToClient(admin: boolean, player: Player | null): SerializedWesterosGameState {
         return {
             type: "westeros",
-            revealAndResolveTop3WesterosDeck4Cards: this.revealAndResolveTop3WesterosDeck4Cards,
+            revealAndResolveTop2WesterosDeck4Cards: this.revealAndResolveTop2WesterosDeck4Cards,
             revealedCardIds: this.revealedCards.map(c => c.id),
             currentCardI: this.currentCardI,
             planningRestrictions: this.planningRestrictions.map(pr => pr.id),
@@ -235,8 +242,8 @@ export default class WesterosGameState extends GameState<IngameGameState,
         const westerosGameState = new WesterosGameState(ingameGameState);
 
         westerosGameState.currentCardI = data.currentCardI;
-        westerosGameState.revealAndResolveTop3WesterosDeck4Cards = data.revealAndResolveTop3WesterosDeck4Cards;
-        westerosGameState.revealedCards = !data.revealAndResolveTop3WesterosDeck4Cards
+        westerosGameState.revealAndResolveTop2WesterosDeck4Cards = data.revealAndResolveTop2WesterosDeck4Cards;
+        westerosGameState.revealedCards = !data.revealAndResolveTop2WesterosDeck4Cards
             ? data.revealedCardIds.map((cid, i) => getById(ingameGameState.game.westerosDecks[i], cid))
             : data.revealedCardIds.map((cid) => getById(ingameGameState.game.westerosDecks[3], cid));
         westerosGameState.childGameState = westerosGameState.deserializeChildGameState(data.childGameState);
@@ -279,7 +286,7 @@ export interface SerializedWesterosGameState {
     revealedCardIds: number[];
     currentCardI: number;
     planningRestrictions: string[];
-    revealAndResolveTop3WesterosDeck4Cards: boolean;
+    revealAndResolveTop2WesterosDeck4Cards: boolean;
     childGameState: SerializedWildlingsAttackGameState
         | SerializedReconcileArmiesGameState | SerializedMusteringGameState | SerializedClashOfKingsGameState
         | SerializedPutToTheSwordGameState | SerializedAThroneOfBladesGameState | SerializedDarkWingsDarkWordsGameState

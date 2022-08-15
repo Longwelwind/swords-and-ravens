@@ -47,7 +47,7 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
                             <Col xs="auto" key={i}>
                                 <WesterosCardComponent
                                     cardType={wc.type}
-                                    westerosDeckI={this.props.gameState.revealAndResolveTop3WesterosDeck4Cards ? 3 : i}
+                                    westerosDeckI={this.props.gameState.revealAndResolveTop2WesterosDeck4Cards ? 3 : i}
                                     size={"small"}
                                     tooltip={true}
                                     classNames={classNames({"medium-outline": this.props.gameState.currentCardI == i})}
