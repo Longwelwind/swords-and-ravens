@@ -49,6 +49,8 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
     render(): ReactNode {
         const showVsb = this.attacker.valyrianSteelBlade > 0 || this.defender.valyrianSteelBlade > 0;
         const showTob = this.attacker.tidesOfBattleCard !== undefined || this.defender.tidesOfBattleCard !== undefined;
+        const attackerArmyBonus = this.attacker.orderBonus + this.attacker.garrison;
+        const defenderArmyBonus = this.defender.orderBonus + this.defender.garrison;
         return <div style={{maxWidth: "340px", minWidth: "340px"}}>
             <div style={{display: "grid", gridGap: "5px", gridTemplateColumns: "auto 1fr auto 1fr auto", justifyItems: "center", alignItems: "center"}} className="text-center">
                 <div style={{gridRow: "1", gridColumn: "1 / span 2"}}>
@@ -124,13 +126,13 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                 </div>
 
                 <div style={{gridRow: "2", gridColumn: "2"}}>
-                    {this.attacker.army} (+{this.attacker.orderBonus + this.attacker.garrison})
+                    {this.attacker.army}{attackerArmyBonus != 0 && <> ({attackerArmyBonus > 0 ? "+" : ""}{attackerArmyBonus})</>}
                 </div>
                 <div style={{gridRow: "2", gridColumn: "3"}}>
                     <b>Army</b>
                 </div>
                 <div style={{gridRow: "2", gridColumn: "4"}}>
-                    {this.defender.army} (+{this.defender.orderBonus + this.defender.garrison})
+                    {this.defender.army}{defenderArmyBonus != 0 && <> ({defenderArmyBonus > 0 ? "+" : ""}{defenderArmyBonus})</>}
                 </div>
 
                 <div style={{gridRow: "3", gridColumn: "2"}}>
