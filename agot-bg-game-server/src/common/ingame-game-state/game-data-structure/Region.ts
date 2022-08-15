@@ -95,6 +95,10 @@ export default class Region {
         return _.difference(_.concat(this.units.values, this.newUnits), this.removedUnits);
     }
 
+    get isBlocked(): boolean {
+        return this.garrison == 1000;
+    }
+
     constructor(
         game: Game, id: string, garrison: number, overwrittenSuperControlPowerToken: House | null, controlPowerToken: House | null = null, units: BetterMap<number, Unit> = new BetterMap<number, Unit>(),
         loyaltyTokens = 0, castleModifier = 0, barrelModifier = 0, crownModifier = 0) {

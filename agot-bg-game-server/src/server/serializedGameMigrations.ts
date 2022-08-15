@@ -1877,6 +1877,21 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "89",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame" && serializedGame.gameSettings.setupId == "a-dance-with-mother-of-dragons") {
+                const ingame = serializedGame.childGameState;
+                
+                if (ingame.childGameState.type == "westeros") {
+                    const westeros = ingame.childGameState;
+
+                    westeros.revealAndResolveTop2WesterosDeck4Cards = westeros.revealAndResolveTop3WesterosDeck4Cards;
+                }
+            }
+            return serializedGame;
+        }
     }
 ];
 
