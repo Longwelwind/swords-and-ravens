@@ -46,13 +46,7 @@ export default class DeclareSupportGameState extends GameState<CombatGameState> 
         }
     }
 
-    onServerMessage(message: ServerMessage): void {
-        if (message.type == "support-declared") {
-            const house = this.game.houses.get(message.houseId);
-            const supportedHouse = message.supportedHouseId ? this.game.houses.get(message.supportedHouseId) : null;
-
-            this.combatGameState.supporters.set(house, supportedHouse);
-        }
+    onServerMessage(_message: ServerMessage): void {
     }
 
     getWaitedUsers(): User[] {

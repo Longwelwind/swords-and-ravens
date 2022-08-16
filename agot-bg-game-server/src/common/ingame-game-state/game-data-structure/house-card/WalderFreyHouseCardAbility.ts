@@ -11,6 +11,11 @@ export default class WalderFreyHouseCardAbility extends HouseCardAbility {
             const supporting = combat.supporters.get(supporter);
             if (supporter != enemy && supporting == enemy) {
                 combat.supporters.set(supporter, house);
+                combat.entireGame.broadcastToClients({
+                    type: "support-declared",
+                    houseId: supporter.id,
+                    supportedHouseId: house.id
+                });
             }
         });
 

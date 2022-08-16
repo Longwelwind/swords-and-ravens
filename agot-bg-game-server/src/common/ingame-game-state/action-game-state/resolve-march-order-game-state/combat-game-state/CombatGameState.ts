@@ -552,7 +552,12 @@ export default class CombatGameState extends GameState<
             this.specialHouseCardModifier = { houseCard: this.game.getHouseCardById(message.houseCardId), combatStrength: message.combatStrength };
         } else if (message.type == "update-combat-stats") {
             this.stats = message.stats;
-        } else {
+        } else if (message.type == "support-declared") {
+            const house = this.game.houses.get(message.houseId);
+            const supportedHouse = message.supportedHouseId ? this.game.houses.get(message.supportedHouseId) : null;
+            this.supporters.set(house, supportedHouse);
+        }
+        else {
             this.childGameState.onServerMessage(message);
         }
     }
