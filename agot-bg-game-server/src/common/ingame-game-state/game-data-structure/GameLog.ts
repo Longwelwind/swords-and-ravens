@@ -51,7 +51,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | BalonGreyjoyASoSPowerTokensGained | MaceTyrellASoSOrderPlaced | BranStarkUsed | CerseiLannisterASoSPowerTokensDiscarded
     | DoranMartellASoSUsed | MelisandreOfAsshaiPowerTokensGained | SalladharSaanASoSPowerTokensChanged | SerDavosSeaworthASoSFortificationGained
     | CasualtiesPrevented | SerIlynPayneASoSCasualtySuffered | StannisBaratheonASoSUsed | AeronDamphairHouseCardChanged | ControlPowerTokenRemoved
-    | GamePaused | GameResumed | SupportAttackAgainstNeutralForce;
+    | GamePaused | GameResumed | SupportAttackAgainstNeutralForce | HousesSwapped;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -1154,4 +1154,12 @@ export interface SupportAttackAgainstNeutralForce {
     supporter: string;
     region: string;
     refused?: boolean;
+}
+
+export interface HousesSwapped {
+    type: "houses-swapped";
+    initiator: string;
+    swappingUser: string;
+    initiatorHouse: string;
+    swappingHouse: string;
 }

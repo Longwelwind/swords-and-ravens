@@ -13,7 +13,7 @@ import GameEndedGameState from "../game-ended-game-state/GameEndedGameState";
 
 export type SerializedVoteType = SerializedCancelGame | SerializedEndGame
     | SerializedReplacePlayer | SerializedReplacePlayerByVassal | SerializedReplaceVassalByPlayer
-    | SerializedPauseGame | SerializedResumeGame | SerializedExtendPlayerClocks;
+    | SerializedPauseGame | SerializedResumeGame | SerializedExtendPlayerClocks | SerializedSwapHouses;
 
 export default abstract class VoteType {
     abstract serializeToClient(): SerializedVoteType;
@@ -62,6 +62,10 @@ export default abstract class VoteType {
                 // Same than above
                 // eslint-disable-next-line @typescript-eslint/no-use-before-define
                 return ResumeGame.deserializeFromServer(ingame, data);
+            case "swap-houses":
+                // Same than above
+                // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                return SwapHouses.deserializeFromServer(ingame, data);
         }
     }
 }
@@ -564,4 +568,92 @@ export interface SerializedReplaceVassalByPlayer {
     type: "replace-vassal-by-player";
     replacer: string;
     forHouse: string;
+}
+
+
+export class SwapHouses extends VoteType {
+    initiator: User;
+    swappingUser: User;
+    initiatorHouse: House;
+    swappingHouse: House;
+
+    constructor(initiator: User, swappingPlayer: User, initiatorHouse: House, swappingHouse: House) {
+        super();
+        this.initiator = initiator;
+        this.swappingUser = swappingPlayer;
+        this.initiatorHouse = initiatorHouse;
+        this.swappingHouse = swappingHouse;
+    }
+
+    getPositiveCountToPass(vote: Vote): number {
+        return vote.participatingHouses.length;
+    }
+
+    verb(): string {
+        return `swap houses with ${this.swappingUser.name} (${this.initiatorHouse.name} <=> ${this.swappingHouse.name})`;
+    }
+
+    executeAccepted(vote: Vote): void {
+        // Create a new player to replace the old one
+        const initiator = vote.ingame.players.get(this.initiator);
+        const swappingPlayer = vote.ingame.players.get(this.swappingUser);
+
+        initiator.house = this.swappingHouse;
+        swappingPlayer.house = this.initiatorHouse;
+
+        vote.ingame.entireGame.broadcastToClients({
+            type: "houses-swapped",
+            initiator: this.initiator.id,
+            swappingUser: this.swappingUser.id
+        });
+
+        // Re-transmit the whole game, so players receives possible secrets like objectives in FFC
+        initiator.user.send({
+            type: "authenticate-response",
+            game: vote.ingame.entireGame.serializeToClient(initiator.user),
+            userId: initiator.user.id
+        });
+
+        // Re-transmit the whole game, so players receives possible secrets like objectives in FFC
+        swappingPlayer.user.send({
+            type: "authenticate-response",
+            game: vote.ingame.entireGame.serializeToClient(swappingPlayer.user),
+            userId: swappingPlayer.user.id
+        });
+
+        vote.ingame.log({
+            type: "houses-swapped",
+            initiator: this.initiator.id,
+            swappingUser: this.swappingUser.id,
+            initiatorHouse: this.initiatorHouse.id,
+            swappingHouse: this.swappingHouse.id
+        });
+    }
+
+    serializeToClient(): SerializedSwapHouses {
+        return {
+            type: "swap-houses",
+            initiator: this.initiator.id,
+            swappingUser: this.swappingUser.id,
+            initiatorHouse: this.initiatorHouse.id,
+            swappingHouse: this.swappingHouse.id
+        };
+    }
+
+    static deserializeFromServer(ingame: IngameGameState, data: SerializedSwapHouses): SwapHouses {
+        const initiator = ingame.entireGame.users.get(data.initiator);
+        const swappingUser = ingame.entireGame.users.get(data.swappingUser);
+        const initiatorHouse = ingame.game.houses.get(data.initiatorHouse);
+        const swappingHouse = ingame.game.houses.get(data.swappingHouse);
+
+        return new SwapHouses(initiator, swappingUser, initiatorHouse, swappingHouse);
+    }
+}
+
+export interface SerializedSwapHouses {
+    type: "swap-houses";
+    initiator: string;
+    swappingUser: string;
+    initiatorHouse: string;
+    swappingHouse: string;
 }

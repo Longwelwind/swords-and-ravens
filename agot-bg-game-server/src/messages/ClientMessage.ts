@@ -8,7 +8,7 @@ export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | Unready |
     | ClaimVassal | GiftPowerTokens | LaunchEndGameVote | SetPassword
     | DistributePowerTokens | DropPowerTokens | MoveLoyaltyToken | ResolveConsolidatePowerChoice | PlaceSellswords
     | ResolveSpymaster | SelectObjectives | ScoreObjective | GameLogSeen | CallForSupportAgainstNeutralForce
-    | LaunchPauseGameVote | LaunchResumeGameVote | LaunchExtendPlayerClocksVote;
+    | LaunchPauseGameVote | LaunchResumeGameVote | LaunchExtendPlayerClocksVote | LaunchSwapHousesVote;
 
 interface Ping {
     type: "ping";
@@ -321,4 +321,9 @@ interface LaunchResumeGameVote {
 
 interface CallForSupportAgainstNeutralForce {
     type: "call-for-support-against-neutral-force";
+}
+
+interface LaunchSwapHousesVote {
+    type: "launch-swap-houses-vote";
+    swappingUser: string;
 }

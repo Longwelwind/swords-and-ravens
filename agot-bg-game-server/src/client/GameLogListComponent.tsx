@@ -1965,6 +1965,18 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         : <>would support House <b>{house.name}</b></>} to attack the Neutral Force in <b>{region.name}</b>.
                 </p>;
             }
+            case "houses-swapped": {
+                const initiator = this.ingame.entireGame.users.get(data.initiator);
+                const swappingUser = this.ingame.entireGame.users.get(data.swappingUser);
+                const initiatorHouse = this.game.houses.get(data.initiatorHouse);
+                const swappingHouse = this.game.houses.get(data.swappingHouse);
+                const newUserLabel = getIngameUserLinkOrLabel(this.ingame, swappingUser, this.ingame.players.tryGet(swappingUser, null));
+
+                return <>
+                    <b>{getIngameUserLinkOrLabel(this.ingame, initiator, this.ingame.players.tryGet(initiator, null))}</b> (House <b>{initiatorHouse.name}</b>) swapped
+                    houses with {<b>{newUserLabel}</b>} (House <b>{swappingHouse.name}</b>).
+                </>;
+            }
         }
     }
 

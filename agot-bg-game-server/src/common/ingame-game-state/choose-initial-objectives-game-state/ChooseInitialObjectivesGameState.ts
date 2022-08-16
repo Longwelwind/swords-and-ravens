@@ -12,6 +12,8 @@ import _ from "lodash";
 import getShuffledObjectivesDeck from "../game-data-structure/static-data-structure/objectiveCards";
 import popRandom from "../../../utils/popRandom";
 import shuffleInPlace from "../../../utils/shuffleInPlace";
+import { VoteState } from "../vote-system/Vote";
+import { SwapHouses } from "../vote-system/VoteType";
 
 export default class ChooseInitialObjectivesGameState extends GameState<IngameGameState, SelectObjectiveCardsGameState<ChooseInitialObjectivesGameState>> {
     get ingame(): IngameGameState {
@@ -64,6 +66,7 @@ export default class ChooseInitialObjectivesGameState extends GameState<IngameGa
         });
 
         this.ingame.broadcastObjectives();
+        this.cancelPendingSwapHousesVotes(house);
     }
 
     onSelectObjectiveCardsFinish(): void {
@@ -71,8 +74,15 @@ export default class ChooseInitialObjectivesGameState extends GameState<IngameGa
         this.ingame.onChooseInitialObjectivesGameStateEnd();
     }
 
-    getNotReadyPlayers(): Player[] {
-        return this.participatingHouses.filter(h => h.houseCards.size < 7).map(h => this.ingame.getControllerOfHouse(h));
+    cancelPendingSwapHousesVotes(readyHouse: House): void {
+        this.ingame.votes.values.forEach(v => {
+            if (v.state == VoteState.ONGOING && v.type instanceof SwapHouses) {
+                const swapHouses = v.type;
+                if (readyHouse == swapHouses.initiatorHouse || readyHouse == swapHouses.swappingHouse) {
+                    v.cancelVote();
+                }
+            }
+        });
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
