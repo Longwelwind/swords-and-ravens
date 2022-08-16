@@ -22,7 +22,7 @@ import GameEndedGameState, {SerializedGameEndedGameState} from "./game-ended-gam
 import UnitType from "./game-data-structure/UnitType";
 import WesterosCard from "./game-data-structure/westeros-card/WesterosCard";
 import Vote, { SerializedVote, VoteState } from "./vote-system/Vote";
-import VoteType, { CancelGame, EndGame, ExtendPlayerClocks, PauseGame, ReplacePlayer, ReplacePlayerByVassal, ReplaceVassalByPlayer, ResumeGame } from "./vote-system/VoteType";
+import VoteType, { CancelGame, EndGame, ExtendPlayerClocks, PauseGame, ReplacePlayer, ReplacePlayerByVassal, ReplaceVassalByPlayer, ResumeGame, SwapHouses } from "./vote-system/VoteType";
 import { v4 } from "uuid";
 import CancelledGameState, { SerializedCancelledGameState } from "../cancelled-game-state/CancelledGameState";
 import HouseCard from "./game-data-structure/house-card/HouseCard";
@@ -424,6 +424,14 @@ export default class IngameGameState extends GameState<
         }
         else if (message.type == "update-note") {
             player.user.note = message.note.substring(0, NOTE_MAX_LENGTH);
+        } else if (message.type == "launch-swap-houses-vote") {
+            const swappingPlayer = this.players.get(this.entireGame.users.get(message.swappingUser));
+            if (this.canLaunchSwapHousesVote(player.user, swappingPlayer).result) {
+                this.createVote(
+                    player.user,
+                    new SwapHouses(player.user, swappingPlayer.user, player.house, swappingPlayer.house)
+                );
+            }
         }
 
         if (this.paused) {
@@ -1137,10 +1145,19 @@ export default class IngameGameState extends GameState<
             this.paused = null;
             this.willBeAutoResumedAt = null;
         } else if (message.type == "preemptive-raid-new-attack" && this.onPreemptiveRaidNewAttack) {
+            // Todo: Handle this in WildlingAttackGameState
             const biddings = message.biddings.map(([bid, hids]) =>
                 [bid, hids.map(hid => this.game.houses.get(hid))] as [number, House[]]);
             const highestBidder = this.game.houses.get(message.highestBidder);
             this.onPreemptiveRaidNewAttack(biddings, highestBidder);
+        } else if (message.type == "houses-swapped") {
+            const initiator = this.players.get(this.entireGame.users.get(message.initiator));
+            const swappingPlayer = this.players.get(this.entireGame.users.get(message.swappingUser));
+
+            const swappingHouse = swappingPlayer.house;
+            swappingPlayer.house = initiator.house;
+            initiator.house = swappingHouse;
+            this.forceRerender();
         }
         else {
             this.childGameState.onServerMessage(message);
@@ -1419,6 +1436,47 @@ export default class IngameGameState extends GameState<
         return {result: true, reason: ""};
     }
 
+    canLaunchSwapHousesVote(initiator: User | null, swappingPlayer: Player): {result: boolean; reason: string} {
+        if (!initiator || !this.players.keys.includes(initiator)) {
+            return {result: false, reason: "only-players-can-vote"};
+        }
+
+        if (initiator == swappingPlayer.user) {
+            return {result: false, reason: "cannot-swap-with-yourself"};
+        }
+
+        const player = this.players.get(initiator);
+
+        if (this.entireGame.isFeastForCrows) {
+            if (this.game.turn != 0) {
+                return {result: false, reason: "secret-objectives-chosen"};
+            }
+
+            if (this.hasChildGameState(ChooseInitialObjectivesGameState)) {
+                const chooseInitialObjectives = this.getChildGameState(ChooseInitialObjectivesGameState) as ChooseInitialObjectivesGameState;
+                if (chooseInitialObjectives.childGameState.readyHouses.keys.some(h => player.house == h || swappingPlayer.house == h)) {
+                    return {result: false, reason: "secret-objectives-chosen"};
+                }
+            }
+        }
+
+        const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof SwapHouses);
+
+        if (existingVotes.length > 0) {
+            return {result: false, reason: "ongoing-vote"};
+        }
+
+        if (this.isCancelled) {
+            return {result: false, reason: "game-cancelled"};
+        }
+
+        if (this.isEnded) {
+            return {result: false, reason: "game-ended"};
+        }
+
+        return {result: true, reason: ""};
+    }
+
     canLaunchReplaceVassalVote(fromUser: User | null, forHouse: House): {result: boolean; reason: string} {
         if (this.entireGame.gameSettings.onlyLive) {
             return {result: false, reason: "forbidden-in-clock-games"};
@@ -1488,6 +1546,13 @@ export default class IngameGameState extends GameState<
         this.entireGame.sendMessageToServer({
             type: "launch-replace-vassal-by-player-vote",
             house: house.id
+        });
+    }
+
+    launchSwapHousesVote(player: Player): void {
+        this.entireGame.sendMessageToServer({
+            type: "launch-swap-houses-vote",
+            swappingUser: player.user.id
         });
     }
 

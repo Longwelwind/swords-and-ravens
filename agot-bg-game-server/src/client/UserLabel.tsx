@@ -86,6 +86,7 @@ export default class UserLabel extends Component<UserLabelProps> {
     renderIngameDropdownItems(ingame: IngameGameState): ReactNode {
         const {result: canLaunchReplacePlayerVote, reason: canLaunchReplacePlayerVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser);
         const {result: canLaunchReplacePlayerByVassalVote, reason: canLaunchReplacePlayerByVassalVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser, true, this.player.house);
+        const {result: canLaunchSwapHousesVote, reason: canLaunchSwapHousesVoteReason} = ingame.canLaunchSwapHousesVote(this.props.gameClient.authenticatedUser, this.player);
         return (
             <>
                 <NavDropdown.Divider />
@@ -126,7 +127,6 @@ export default class UserLabel extends Component<UserLabelProps> {
                     </div>
                 </ConditionalWrap>
                 <NavDropdown.Divider />
-                {/* Add a button to replace a place */}
                 <ConditionalWrap
                     condition={!canLaunchReplacePlayerByVassalVote}
                     wrap={children =>
@@ -170,6 +170,44 @@ export default class UserLabel extends Component<UserLabelProps> {
                         </NavDropdown.Item>
                     </div>
                 </ConditionalWrap>
+                <NavDropdown.Divider />
+                <ConditionalWrap
+                    condition={!canLaunchSwapHousesVote}
+                    wrap={children =>
+                        <OverlayTrigger
+                            overlay={
+                                <Tooltip id="swap-houses-tooltip">
+                                    {canLaunchSwapHousesVoteReason == "ongoing-vote" ?
+                                            "A vote is already ongoing"
+                                        : canLaunchSwapHousesVoteReason == "game-cancelled" ?
+                                            "The game has been cancelled"
+                                        : canLaunchSwapHousesVoteReason == "game-ended" ?
+                                            "The game has ended"
+                                        : canLaunchSwapHousesVoteReason == "only-players-can-vote" ?
+                                            "Only players can vote"
+                                        : canLaunchSwapHousesVoteReason == "cannot-swap-with-yourself" ?
+                                            "You cannot swap houses with yourself"
+                                        : canLaunchSwapHousesVoteReason == "secret-objectives-chosen" ?
+                                            `You or ${this.player.user.name} has already chosen their secret objectives`
+                                        : "Vote not possible"
+                                    }
+                                </Tooltip>
+                            }
+                            placement="auto"
+                        >
+                            {children}
+                        </OverlayTrigger>
+                    }
+                >
+                    <div id="swap-houses-tooltip-wrapper">
+                        <NavDropdown.Item
+                            onClick={() => this.onLaunchSwapHousesVoteClick()}
+                            disabled={!canLaunchSwapHousesVote}
+                        >
+                            Launch a vote to swap houses with this player
+                        </NavDropdown.Item>
+                    </div>
+                </ConditionalWrap>
             </>
         );
     }
@@ -191,6 +229,16 @@ export default class UserLabel extends Component<UserLabelProps> {
 
         if (window.confirm(`Do you want to launch a vote to replace ${this.player.user.name} who controls house ${this.player.house.name} by a vassal?`)) {
             this.props.gameState.launchReplacePlayerByVassalVote(this.player);
+        }
+    }
+
+    onLaunchSwapHousesVoteClick(): void {
+        if (!(this.props.gameState instanceof IngameGameState)) {
+            throw new Error("`onLaunchSwapHousesVoteClick` called when the game was not in IngameGameState");
+        }
+
+        if (window.confirm(`Do you want to launch a vote to swap houses with ${this.player.user.name} who controls house ${this.player.house.name}?`)) {
+            this.props.gameState.launchSwapHousesVote(this.player);
         }
     }
 }

@@ -1,6 +1,6 @@
 import User from "../../../server/User";
 import BetterMap from "../../../utils/BetterMap";
-import VoteType, { ReplacePlayer, ReplacePlayerByVassal, ReplaceVassalByPlayer, ResumeGame, SerializedVoteType } from "./VoteType";
+import VoteType, { ReplacePlayer, ReplacePlayerByVassal, ReplaceVassalByPlayer, ResumeGame, SerializedVoteType, SwapHouses } from "./VoteType";
 import IngameGameState from "../IngameGameState";
 import { observable } from "mobx";
 import House from "../game-data-structure/House";
@@ -8,6 +8,8 @@ import Player from "../Player";
 import CombatGameState from "../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import ClaimVassalsGameState from "../planning-game-state/claim-vassals-game-state/ClaimVassalsGameState";
 import { getTimeDeltaInSeconds } from "../../../utils/getElapsedSeconds";
+import BiddingGameState from "../westeros-game-state/bidding-game-state/BiddingGameState";
+import PlaceOrdersGameState from "../planning-game-state/place-orders-game-state/PlaceOrdersGameState";
 
 export enum VoteState {
     ONGOING,
@@ -64,6 +66,27 @@ export default class Vote {
         if (this.type instanceof ResumeGame && this.ingame.willBeAutoResumedAt) {
             if (getTimeDeltaInSeconds(this.ingame.willBeAutoResumedAt, new Date()) <= 5) {
                 return { result: false, reason: "wait-for-auto-resume" };
+            }
+        }
+
+        if (this.type instanceof SwapHouses) {
+            if (this.ingame.hasChildGameState(CombatGameState)) {
+                return { result: false, reason: "ongoing-combat" };
+            }
+
+            if (this.ingame.hasChildGameState(BiddingGameState)) {
+                return { result: false, reason: "ongoing-bidding" };
+            }
+
+            const swapHousesVoteType = this.type;
+            if (this.ingame.hasChildGameState(PlaceOrdersGameState)) {
+                const placeOrders = this.ingame.getChildGameState(PlaceOrdersGameState) as PlaceOrdersGameState;
+                if (placeOrders.placedOrders.keys.some(r => {
+                        const controller = r.getController();
+                        return controller == swapHousesVoteType.initiatorHouse || controller == swapHousesVoteType.swappingHouse})
+                ) {
+                    return { result: false, reason: "secret-orders-placed" };
+                }
             }
         }
 

@@ -17,6 +17,7 @@ import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { preventOverflow } from "@popperjs/core";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import getIngameUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
+import { observer } from "mobx-react";
 
 interface VoteComponentProps {
     vote: Vote;
@@ -24,6 +25,7 @@ interface VoteComponentProps {
     gameClient: GameClient;
 }
 
+@observer
 export default class VoteComponent extends Component<VoteComponentProps> {
     get vote(): Vote {
         return this.props.vote;
@@ -40,24 +42,24 @@ export default class VoteComponent extends Component<VoteComponentProps> {
                     <OverlayTrigger
                         placement="auto"
                         overlay={<Tooltip id={"vote-date-" + this.vote.id}>{this.vote.createdAt.toLocaleString()}</Tooltip>}
-                        popperConfig={{modifiers: [preventOverflow]}}
+                        popperConfig={{ modifiers: [preventOverflow] }}
                     >
-                        <img src={voteImage} width={32}/>
+                        <img src={voteImage} width={32} />
                     </OverlayTrigger>
                 </Col>
                 <Col>
                     <b>{getIngameUserLinkOrLabel(this.vote.ingame, this.vote.initiator, this.vote.ingame.players.tryGet(this.vote.initiator, null))}</b> initiated a vote to <b>{this.vote.type.verb()}</b>. {this.vote.positiveCountToPass} player{this.vote.positiveCountToPass != 1 ? "s" : ""} must accept to pass the vote.
                     <Row className="mt-1">
-                        <Col xs="auto" className={classNames({"display-none": state != VoteState.ONGOING || this.props.gameClient.authenticatedPlayer == null})}>
-                            <Button className="mb-1" variant="success" size="sm" style={{minWidth: "60px"}} disabled={disabled} onClick={() => this.vote.vote(true)}>{this.wrapVoteButtons(<>Accept</>, disabled, reason)}</Button><br/>
-                            <Button variant="danger" size="sm" style={{minWidth: "60px"}} disabled={disabled} onClick={() => this.vote.vote(false)}>{this.wrapVoteButtons(<>Refuse</>, disabled, reason)}</Button>
+                        <Col xs="auto" className={classNames({ "display-none": state != VoteState.ONGOING || this.props.gameClient.authenticatedPlayer == null })}>
+                            <Button className="mb-1" variant="success" size="sm" style={{ minWidth: "60px" }} disabled={disabled} onClick={() => this.vote.vote(true)}>{this.wrapVoteButtons(<>Accept</>, disabled, reason)}</Button><br />
+                            <Button variant="danger" size="sm" style={{ minWidth: "60px" }} disabled={disabled} onClick={() => this.vote.vote(false)}>{this.wrapVoteButtons(<>Refuse</>, disabled, reason)}</Button>
                         </Col>
                         <Col>
                             <Row>
                                 {this.vote.participatingHouses.map(h => (
                                     <Col xs={"auto"} key={`vote-${this.vote.id}-${h.id}`}>
                                         <div className="mb-2">
-                                            <HouseIconComponent house={h}/>
+                                            <HouseIconComponent house={h} />
                                         </div>
                                         <div className="text-center">
                                             {this.vote.votes.has(h) ? (
@@ -93,6 +95,10 @@ export default class VoteComponent extends Component<VoteComponentProps> {
                                 "You cannot vote during combat phase"
                                 : reason == "ongoing-claim-vassals" ?
                                 "You cannot vote during claim vassals phase"
+                                : reason == "ongoing-bidding" ?
+                                "You cannot vote during bidding phase"
+                                : reason == "secret-orders-placed" ?
+                                "You cannot vote because the houses to be swapped have already placed orders"
                                 : "Voting is currently not possible"
                             }
                         </Tooltip>
