@@ -1883,7 +1883,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
         migrate: (serializedGame: any) => {
             if (serializedGame.childGameState.type == "ingame" && serializedGame.gameSettings.setupId == "a-dance-with-mother-of-dragons") {
                 const ingame = serializedGame.childGameState;
-                
+
                 if (ingame.childGameState.type == "westeros") {
                     const westeros = ingame.childGameState;
 
