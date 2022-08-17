@@ -26,7 +26,7 @@ export default class Vote {
     type: VoteType;
     @observable votes: BetterMap<House, boolean>;
     createdAt: Date;
-    cancelled: boolean;
+    @observable cancelled: boolean;
     participatingHouses: House[];
 
     get positiveCountToPass(): number {

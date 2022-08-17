@@ -43,12 +43,15 @@ export default class SelectObjectiveCardsGameState<P extends ParentGameState> ex
             throw new Error("SelectObjectiveCardsGameState called with objectiveCards.length == 0!");
         }
 
-        if (!this.canBeSkipped && this.selectableCardsPerHouse.keys.every(h => this.selectableCardsPerHouse.get(h).length == count)) {
+        if (!this.canBeSkipped) {
             this.selectableCardsPerHouse.keys.forEach(h => {
-                this.parentGameState.onObjectiveCardsSelected(h, this.selectableCardsPerHouse.get(h), true);
+                if (this.selectableCardsPerHouse.get(h).length == count) {
+                    this.parentGameState.onObjectiveCardsSelected(h, this.selectableCardsPerHouse.get(h), true);
+                    this.readyHouses.set(h, this.selectableCardsPerHouse.get(h));
+                }
             });
 
-            this.parentGameState.onSelectObjectiveCardsFinish();
+            this.checkAndProceedEndOfSelectObjectives();
         }
     }
 
