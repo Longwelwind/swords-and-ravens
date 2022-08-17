@@ -48,6 +48,10 @@ export default class ChooseInitialObjectivesGameState extends GameState<IngameGa
             h.secretObjectives = _.sortBy(h.secretObjectives, oc => oc.name);
         });
 
+        this.proceedToSelectObjectiveCardsGameState();
+    }
+
+    proceedToSelectObjectiveCardsGameState(): void {
         this.setChildGameState(new SelectObjectiveCardsGameState(this)).firstStart(
             this.game.nonVassalHouses.map(h => [h, h.secretObjectives]),
             3,
@@ -55,15 +59,19 @@ export default class ChooseInitialObjectivesGameState extends GameState<IngameGa
         );
     }
 
-    onObjectiveCardsSelected(house: House, selectedObjectiveCards: ObjectiveCard[]): void {
+    onObjectiveCardsSelected(house: House, selectedObjectiveCards: ObjectiveCard[], resolvedAutomatically: boolean): void {
         const notSelected = _.difference(house.secretObjectives, selectedObjectiveCards);
         house.secretObjectives = _.sortBy(selectedObjectiveCards, oc => oc.name);
         this.game.objectiveDeck.push(...notSelected);
 
-        this.ingame.log({
-            type: "objectives-chosen",
-            house: house.id
-        });
+        if (!resolvedAutomatically) {
+            // This will be resolved automatically only if we restart ChooseObjectives due to Swap houses vote.
+            // Then we automatically choose the 3 cards the house already has chosen and therefore we don't need to log it again.
+            this.ingame.log({
+                type: "objectives-chosen",
+                house: house.id
+            });
+        }
 
         this.ingame.broadcastObjectives();
         this.cancelPendingSwapHousesVotes(house);

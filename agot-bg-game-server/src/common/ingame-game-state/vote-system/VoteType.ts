@@ -10,6 +10,7 @@ import Region from "../game-data-structure/Region";
 import Order from "../game-data-structure/Order";
 import _ from "lodash";
 import GameEndedGameState from "../game-ended-game-state/GameEndedGameState";
+import ChooseInitialObjectivesGameState from "../choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
 
 export type SerializedVoteType = SerializedCancelGame | SerializedEndGame
     | SerializedReplacePlayer | SerializedReplacePlayerByVassal | SerializedReplaceVassalByPlayer
@@ -598,6 +599,15 @@ export class SwapHouses extends VoteType {
         const initiator = vote.ingame.players.get(this.initiator);
         const swappingPlayer = vote.ingame.players.get(this.swappingUser);
 
+        const initiatorKnowsNextWildlingCard = this.initiatorHouse.knowsNextWildlingCard;
+        const initiatorSecretObjectives = [...this.initiatorHouse.secretObjectives];
+
+        initiator.house.knowsNextWildlingCard = this.swappingHouse.knowsNextWildlingCard;
+        initiator.house.secretObjectives = [...this.swappingHouse.secretObjectives];
+
+        swappingPlayer.house.knowsNextWildlingCard = initiatorKnowsNextWildlingCard;
+        swappingPlayer.house.secretObjectives = initiatorSecretObjectives;
+
         initiator.house = this.swappingHouse;
         swappingPlayer.house = this.initiatorHouse;
 
@@ -620,6 +630,13 @@ export class SwapHouses extends VoteType {
             game: vote.ingame.entireGame.serializeToClient(swappingPlayer.user),
             userId: swappingPlayer.user.id
         });
+
+        if (vote.ingame.hasChildGameState(ChooseInitialObjectivesGameState)) {
+            // In case players are choosing their objectives we have to restart ChooseInitialObjectivesGameState
+            // so the child state SelectObjectiveCards now has the correct set for each house
+            const chooseInitialObjectives = vote.ingame.getChildGameState(ChooseInitialObjectivesGameState) as ChooseInitialObjectivesGameState;
+            chooseInitialObjectives.proceedToSelectObjectiveCardsGameState();
+        }
 
         vote.ingame.log({
             type: "houses-swapped",
