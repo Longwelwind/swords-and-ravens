@@ -392,6 +392,21 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
         return _.difference(region.units.values, recruitments.map(({from}) => from).filter(f => f) as Unit[]);
     }
 
+    actionAfterVassalReplacement(newVassal: House): void {
+        // The new vassal may not be able to muster because he may have lost his home area already,
+        // but the game waits for input now as the previous player was able to muster somewhere else.
+        // So we have to proceed the game with no musterings now.
+        if (newVassal == this.house && !this.anyUsablePointsLeft(new BetterMap())) {
+            this.parentGameState.ingame.log({
+                type: "player-mustered",
+                house: this.house.id,
+                musterings: []
+            }, true);
+
+            this.proceedToParentGameState();
+        }
+    }
+
     serializeToClient(_: boolean, __: Player | null): SerializedPlayerMusteringGameState {
         return {
             type: "player-mustering",
