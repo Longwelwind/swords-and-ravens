@@ -62,8 +62,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     onSaveGame: (updateLastActive: boolean) => void;
     onGameStarted: (() => void) | null = null;
 
-    // Debounced saveGame so we don't spam the website client
-    saveGame: (updateLastActive: boolean) => void = _.debounce(this.privateSaveGame, 2000);
+    // Throttled saveGame so we don't spam the website client
+    saveGame: (updateLastActive: boolean) => void = _.throttle(this.privateSaveGame, 2000);
 
     publicChatRoomId: string;
     // Keys are the two users participating in the private chat.
