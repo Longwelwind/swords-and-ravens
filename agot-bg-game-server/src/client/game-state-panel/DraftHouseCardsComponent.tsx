@@ -87,7 +87,7 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                             </Row>
                             <Row className="justify-content-center">
                                 {this.props.gameState.getAllHouseCards().map(hc => (
-                                    (this.nameFilter == "" || hc.name.toLowerCase().includes(this.nameFilter.toLowerCase())) && <Col xs="auto" key={hc.id}>
+                                    (this.nameFilter == "" || hc.name.toLowerCase().includes(this.nameFilter.toLowerCase())) && <Col xs="auto" key={`draft_${hc.id}`}>
                                         <HouseCardComponent
                                             houseCard={hc}
                                             size="small"
@@ -104,7 +104,7 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                             <Col xs="12">
                                 <Row className="justify-content-center">
                                     {remainingCardsForSpectators.map(hc => (
-                                        <Col xs="auto" key={hc.id}>
+                                        <Col xs="auto" key={`draft-spectator_${hc.id}`}>
                                             <HouseCardComponent
                                                 houseCard={hc}
                                                 size="small"

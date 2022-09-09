@@ -37,7 +37,8 @@ export default class RobertArrynAbilityComponent extends Component<GameStateComp
                 {this.simpleChoice && (
                     <Col xs={12} className="text-center">
                         <b>Robert Arryn</b>: House <b>{this.house.name}</b> may
-                        remove <b>Robert Arryn</b> {possibleHouseCardToRemove && <>and {joinReactNodes(possibleHouseCardToRemove.map(hc => <b key={`robert_arryn_${hc.id}`}>{hc.name}</b>), " or ")} </>}from the game.
+                        remove <b>Robert Arryn</b> and {joinReactNodes(possibleHouseCardToRemove.map(hc => <b key={`robert-arryn_${hc.id}`}>{hc.name}</b>), " or ")} from
+                        the game.
                     </Col>
                 )}
                 {this.selectHouseCard && (

@@ -33,7 +33,7 @@ export default class SelectUnitsComponent extends Component<GameStateComponentPr
                                         <div className="mb-2 text-center">Selected units:</div>
                                         <ul className="pl-0">
                                             {this.selectedUnits.entries.map(([region, units]) => (
-                                                <li key={`select_units_${region.id}`}>{joinReactNodes(units.map((u, i) => <b key={`${region.id}_${u.id}_${i}`}>{u.type.name}</b>), ", ")} in <b>{region.name}</b></li>
+                                                <li key={`select-units_${region.id}`}>{joinReactNodes(units.map((u, i) => <b key={`select-units_${region.id}_${u.id}_${i}`}>{u.type.name}</b>), ", ")} in <b>{region.name}</b></li>
                                             ))}
                                         </ul>
                                     </div>

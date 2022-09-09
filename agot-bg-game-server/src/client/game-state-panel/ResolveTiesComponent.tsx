@@ -38,11 +38,11 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
                         <Col xs={12}>
                             <Row className="justify-content-center align-items-center">
                                 {this.currentOrdering.map((h, i) => (
-                                    <Col xs="auto" key={h.id}>
+                                    <Col xs="auto" key={`resolve-ties_${h.id}`}>
                                         {this.props.gameState.stars && (
                                             <div className="resolve-ties-tracker-star-container">
                                                 {_.range(0, this.props.gameState.game.starredOrderRestrictions[i]).map(j => (
-                                                    <div key={`stars_${h?.id ?? i}_${j}`}>
+                                                    <div key={`resolve-ties_stars_${h?.id ?? i}_${j}`}>
                                                         <FontAwesomeIcon
                                                             style={{ color: "#ffc107", fontSize: "9px" }}
                                                             icon={faStar} />

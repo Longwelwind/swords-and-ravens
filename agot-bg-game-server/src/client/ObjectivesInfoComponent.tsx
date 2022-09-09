@@ -40,7 +40,7 @@ export default class ObjectivesInfoComponent extends Component<ObjectivesInfoCom
             {playersSecretObjectives.length > 0 && <Row className="justify-content-center">
                 <Col xs={12}><h5 className="mb-0 text-center">Your Secret Objectives</h5></Col>
                 {playersSecretObjectives.map(oc =>
-                    <Col xs="auto" key={oc.id}>
+                    <Col xs="auto" key={`secret-objective_${oc.id}`}>
                         <ObjectiveCardComponent
                             objectiveCard={oc}
                             size="medium"
@@ -50,7 +50,7 @@ export default class ObjectivesInfoComponent extends Component<ObjectivesInfoCom
             <Row className="justify-content-center mt-4">
                 <Col xs={12}><h5 className="mb-0 text-center">All Special Objectives</h5></Col>
                 {specialObjectiveCards.values.map(oc =>
-                    <Col xs="auto" key={oc.id}>
+                    <Col xs="auto" key={`special-objective_${oc.id}`}>
                         <ObjectiveCardComponent
                             objectiveCard={oc}
                             size="smedium"
@@ -58,10 +58,10 @@ export default class ObjectivesInfoComponent extends Component<ObjectivesInfoCom
                     </Col>)}
             </Row>
             {this.game.houses.values.filter(h => h.completedObjectives.length > 0).map(h =>
-            <Row className="justify-content-center mt-4" key={`completed_objectives_${h.id}`}>
+            <Row className="justify-content-center mt-4" key={`completed-objectives_${h.id}`}>
                 <Col xs={12}><h5 className="mb-0 text-center">{h.name}&apos;s Completed Objectives</h5></Col>
                 {h.completedObjectives.map(oc =>
-                    <Col xs="auto" key={oc.id}>
+                    <Col xs="auto" key={`completed-objective_${h.id}_${oc.id}`}>
                         <ObjectiveCardComponent
                             objectiveCard={oc}
                             size="tiny"
@@ -71,7 +71,7 @@ export default class ObjectivesInfoComponent extends Component<ObjectivesInfoCom
             <Row className="justify-content-center mt-4">
                 <Col xs={12}><h5 className="mb-0 text-center">{this.authenticatedPlayer || allCompletedObjectives.length > 0 ? "Remaining Objectives" : "All Objectives"}</h5></Col>
                 {allAvailableObjectives.map(oc =>
-                    <Col xs="auto" key={oc.id}>
+                    <Col xs="auto" key={`all-objectives_${oc.id}`}>
                         <ObjectiveCardComponent
                             objectiveCard={oc}
                             size="tiny"

@@ -22,7 +22,7 @@ export default class OrderGridComponent extends Component<OrderGridProps> {
                     <Row style={{width: "180px"}} className="justify-content-center m-3">
                         {this.props.orders.map(o => (
                             <OverlayTrigger
-                                key={"order-overlay-" + o.id}
+                                key={"order-overlay_" + o.id}
                                 placement="right"
                                 overlay={
                                     <Tooltip id={"order-tooltip-" + o.id}><b>{o.type.name}</b>{this.props.restrictedOrders.includes(o) &&
@@ -30,7 +30,7 @@ export default class OrderGridComponent extends Component<OrderGridProps> {
                                 }
                                 delay={{ show: 250, hide: 100 }}
                             >
-                                <Col xs="auto" className="p-1" key={o.id}>
+                                <Col xs="auto" className="p-1" key={`order-icon-container_${o.id}`}>
                                     <div className={classNames(
                                             "order-icon",
                                             {"clickable": this.isOrderAvailable(o)},
@@ -45,7 +45,7 @@ export default class OrderGridComponent extends Component<OrderGridProps> {
                                             backgroundImage: `url(${orderImages.get(o.type.id)})`
                                         }}
                                         onClick={() => this.onOrderClick(o)}
-                                        key={o.id}/>
+                                        key={`order-icon_${o.id}`}/>
                                 </Col>
                             </OverlayTrigger>
                         ))}

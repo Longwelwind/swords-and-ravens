@@ -34,7 +34,7 @@ export default class ThematicDraftHouseCardsComponent extends Component<GameStat
                                 <Col xs="12">
                                     <Row className="justify-content-center">
                                         {this.props.gameState.getFilteredHouseCardsForHouse(this.player.house).map(hc => (
-                                            <Col xs="auto" key={hc.id}>
+                                            <Col xs="auto" key={`thematic-draft-${hc.id}`}>
                                                 <HouseCardComponent
                                                     houseCard={hc}
                                                     size="small"

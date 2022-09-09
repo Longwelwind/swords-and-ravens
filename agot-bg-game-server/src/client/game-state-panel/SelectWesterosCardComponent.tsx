@@ -23,7 +23,7 @@ export default class SelectWesterosCardComponent extends Component<GameStateComp
                             <Col xs="12">
                                 <Row className="justify-content-center">
                                     {this.props.gameState.selectableCards.map(wc => (
-                                        <Col xs="auto" key={wc.id}>
+                                        <Col xs="auto" key={`select-westeros-card_${wc.id}`}>
                                             <WesterosCardComponent
                                                 tooltip={true}
                                                 cardType={wc.type}

@@ -40,7 +40,7 @@ export default class SelectObjectiveCardsComponent extends Component<GameStateCo
                         <Col xs="12">
                             <Row className="justify-content-center">
                                 {this.choosableObjectives.map(oc => (
-                                    <Col xs="auto" key={oc.id}>
+                                    <Col xs="auto" key={`select-objectives_${oc.id}`}>
                                         <ObjectiveCardComponent
                                             objectiveCard={oc}
                                             size="smedium"

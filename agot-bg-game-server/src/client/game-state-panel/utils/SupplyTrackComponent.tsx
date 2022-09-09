@@ -51,7 +51,7 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
                 <Col>
                     <Row className="justify-content-center">
                         {this.props.supplyRestrictions.map((allowedArmies, i) => (
-                            <Col xs="auto" key={i} className="d-flex flex-column align-items-center">
+                            <Col xs="auto" key={`supply-track_${i}`} className="d-flex flex-column align-items-center">
                                 <div>
                                     <OverlayTrigger
                                         overlay={
@@ -106,7 +106,7 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
                                     <div style={{width: "18px", marginRight: "6px", marginTop: "10px"}}>
                                         {this.getHousesAtSupplyLevel(i).map(h => (
                                             <OverlayTrigger
-                                                key={h.id}
+                                                key={`supply-for-house-tooltip_${h.id}`}
                                                 overlay={
                                                     <Tooltip id={`supply-house-${h.id}`}>
                                                         {h.name}
@@ -114,7 +114,7 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
                                                 }
                                                 placement="auto">
                                                     <div
-                                                        key={h.id}
+                                                        key={`supply-for-house_${h.id}`}
                                                         className="supply-icon hover-weak-outline"
                                                         style={{
                                                             backgroundImage: `url(${houseInfluenceImages.get(h.id)})`,
@@ -128,7 +128,7 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
                                     </div>
                                     <div>
                                         {allowedArmies.map((size, i) => (
-                                            <div style={{marginBottom: "-6px"}} key={i}>
+                                            <div style={{marginBottom: "-6px"}} key={`allowed-army-size_${i}`}>
                                                 {size}
                                             </div>
                                         ))}

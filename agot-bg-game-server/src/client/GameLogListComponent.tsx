@@ -265,8 +265,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                                 </p>
                                 <ul>
                                     {moves.map(([region, unitTypes]) => (
-                                        <li key={region.id}>
-                                            {joinReactNodes(unitTypes.map((ut, i) => <b key={`march_${ut.id}_${i}`}>{ut.name}</b>), ", ")} to <b>{region.name}</b>
+                                        <li key={`march-resolved_${region.id}`}>
+                                            {joinReactNodes(unitTypes.map((ut, i) => <b key={`march_${region.id}_${ut.id}_${i}`}>{ut.name}</b>), ", ")} to <b>{region.name}</b>
                                         </li>
                                     ))}
                                 </ul>
@@ -670,7 +670,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <ul>
                         {houseCards.map(([h, hc]) => (
-                            <li key={`housecard_${h.id}_${hc.id}`}>House <b>{h.name}</b> chose <b>{hc.name}</b></li>
+                            <li key={`housecard-chosen_${h.id}_${hc.id}`}>House <b>{h.name}</b> chose <b>{hc.name}</b></li>
                         ))}
                     </ul>;
 
@@ -682,7 +682,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         Final order of <b>{this.game.getNameInfluenceTrack(data.trackerI)}</b> track:
                     </p>
                     <Row className="mb-2 mt-1">
-                        {finalOrder.map(h => <Col xs="auto" key={`cok_final_${h.id}`}><SimpleInfluenceIconComponent house={h}/></Col>)}
+                        {finalOrder.map(h => <Col xs="auto" key={`cok_final_${data.trackerI}_${h.id}`}><SimpleInfluenceIconComponent house={h}/></Col>)}
                     </Row>
                 </>;
 
@@ -736,7 +736,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>
                     <ul>
                         {armies.map(([region, unitTypes]) => (
-                            <li key={`reconciling_${region.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`${region.id}_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></li>
+                            <li key={`armies-reconciled_${region.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`armies-reconciled_${region.id}_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></li>
                         ))}
                     </ul>
                 </>;
@@ -1034,7 +1034,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const units = data.units.map(ut => unitTypes.get(ut).name);
                 return <p>
-                    House <b>{house.name}</b> suffered casualties from the retreat and chose these units to be destroyed: <>{joinReactNodes(units.map((unitType, i) => <b key={`retreat_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.
+                    House <b>{house.name}</b> suffered casualties from the retreat and chose these units to be destroyed: <>
+                        {joinReactNodes(units.map((unitType, i) => <b key={`retreat-casualties-suffered_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.
                 </p>;
             }
             case "enemy-port-taken": {
@@ -1094,8 +1095,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))] as [Region, UnitType[]]);
 
                 return <p>
-                    House <b>{house.name}</b>{units.length > 0 ? (<> chose to
-                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <span key={`preemptive_${region.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`preemptive_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), " and ")}.</>)
+                    House <b>{house.name}</b>{units.length > 0
+                    ? (<> chose to destroy {joinReactNodes(units.map(([region, unitTypes]) => <span key={`preemptive_${region.id}`}>
+                        {joinReactNodes(unitTypes.map((ut, i) => <b key={`preemptive_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), " and ")}.</>)
                     : <> had no units to destroy.</>}
                 </p>;
             }
@@ -1167,8 +1169,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]) as [Region, UnitType[]][];
 
                 return <p>
-                    <b>Mammoth Riders</b>: House <b>{house.name}</b>{units.length > 0 ? (<> chose to
-                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <span key={`mammoth-riders_${region.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`mammoth-riders_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), ", ")}.</>)
+                    <b>Mammoth Riders</b>: House <b>{house.name}</b>{units.length > 0
+                    ? (<> chose to destroy {joinReactNodes(units.map(([region, unitTypes]) => <span key={`mammoth-riders_${region.id}`}>
+                        {joinReactNodes(unitTypes.map((ut, i) => <b key={`mammoth-riders_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), ", ")}.</>)
                     : <> had no units to destroy.</>}
                 </p>;
             }
@@ -1194,8 +1197,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]) as [Region, UnitType[]][];
 
                 return <p>
-                    <b>The Horde Descends</b>: House <b>{house.name}</b>{units.length > 0 ? (<> chose to
-                    destroy {joinReactNodes(units.map(([region, unitTypes]) => <span key={`the-horde-descends_${region.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`the-horde-descends_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), ", ")}.</>)
+                    <b>The Horde Descends</b>: House <b>{house.name}</b>{units.length > 0
+                        ? (<> chose to destroy {joinReactNodes(units.map(([region, unitTypes]) => <span key={`the-horde-descends_${region.id}`}>
+                            {joinReactNodes(unitTypes.map((ut, i) => <b key={`the-horde-descends_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), ", ")}.</>)
                     : <> had no units to destroy.</>}
                 </p>;
             }
@@ -1245,7 +1249,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>
                     <ul>
                         {powerTokensLost.map(([house, amount]) => (
-                            <li key={`skinchanger-scout_${house.id}`}>House <b>{house.name}</b> lost <b>{amount}</b> Power&nbsp;token{amount != 1 ? "s" : ""}.</li>
+                            <li key={`skinchanger-scout_${house.id}_${amount}`}>House <b>{house.name}</b> lost <b>{amount}</b> Power&nbsp;token{amount != 1 ? "s" : ""}.</li>
                         ))}
                     </ul>
                 </>;
@@ -1267,7 +1271,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     all other houses lost 1 levels of supply.
                     <ul>
                         {newSupply.map(([house, supply]) => (
-                            <li key={`rattleshirts-raiders_${house.id}`}>House <b>{house.name}</b> is now at <b>{supply}</b>.</li>
+                            <li key={`rattleshirts-raiders_${house.id}_${supply}`}>House <b>{house.name}</b> is now at <b>{supply}</b>.</li>
                         ))}
                     </ul>
                 </>;
@@ -1278,7 +1282,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <>
                     <ul>
                         {gains.map(([house, gain]) => (
-                            <li key={`got-${house.id}`}>House <b>{house.name}</b> gained <b>{gain}</b> Power&nbsp;token{gain != 1 ? "s" : ""}.</li>
+                            <li key={`got_${house.id}_${gain}`}>House <b>{house.name}</b> gained <b>{gain}</b> Power&nbsp;token{gain != 1 ? "s" : ""}.</li>
                         ))}
                     </ul>
                 </>;
@@ -1340,7 +1344,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     const house = this.game.houses.get(data.house);
 
                     return <p>{vassals.length > 0
-                        ? (<>House <b>{house.name}</b> claimed {joinReactNodes(vassals.map(v => <b key={v.id}>{v.name}</b>), ", ")} as
+                        ? (<>House <b>{house.name}</b> claimed {joinReactNodes(vassals.map(v => <b key={`vassals-claimed_${v.id}`}>{v.name}</b>), ", ")} as
                                 vassal{vassals.length > 0 && "s"}.</>)
                         : (<>House <b>{house.name}</b> passed their vassal marker set.</>)
                     }</p>;
@@ -1414,7 +1418,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <p><b>Anya Waynwood</b>:</p>
                     <ul>
                         {gains.map(([house, gain]) => (
-                            <li key={`anya-waynwood-${house.id}`}>House <b>{house.name}</b> gained <b>{gain}</b> Power&nbsp;token{gain != 1 ? "s" : ""}.</li>
+                            <li key={`anya-waynwood_${house.id}_${gain}`}>House <b>{house.name}</b> gained <b>{gain}</b> Power&nbsp;token{gain != 1 ? "s" : ""}.</li>
                         ))}
                     </ul>
                 </p>;
@@ -1621,7 +1625,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <p>
                     <b>Debts to the Iron&nbsp;Bank</b>: {units.length > 0
                     ? (<>House <b>{resolver.name}</b> chose to destroy {joinReactNodes(units.map(([region, unitTypes]) =>
-                            <span key={`pay-debt_${region.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`pay-debt_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), ", ")} of House <b>{house.name}</b>.</>)
+                            <span key={`pay-debt_${region.id}_${house.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`pay-debt_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), ", ")} of House <b>{house.name}</b>.</>)
                     : <>House <b>{house.name} </b> had no units to destroy.</>}
                 </p>;
             }
@@ -1637,8 +1641,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const loan = loanCardTypes.get(data.loanType);
                 return <p>
                     <b>{loan.name}</b>: House <b>{house.name}</b>{placedSellswords.length > 0 ? (<> chose to
-                        place {joinReactNodes(placedSellswords.map(([region, unitTypes]) => <span key={`place_sellsword_${region.id}`}>
-                            {joinReactNodes(unitTypes.map((ut, i) => <b key={`place_sellsword${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), " and ")}.</>)
+                        place {joinReactNodes(placedSellswords.map(([region, unitTypes]) => <span key={`place-sellsword_${region.id}`}>
+                            {joinReactNodes(unitTypes.map((ut, i) => <b key={`place-sellsword_${region.id}_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), " and ")}.</>)
                         : <> placed no sellswords.</>}
                 </p>;
             }
@@ -1651,7 +1655,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 }));
                 return <p>
                     <b>The Faceless Men</b>: House <b>{house.name}</b> chose {destroyedUnits.length > 0 ? (<>to destroy {joinReactNodes(
-                        destroyedUnits.map(unitInfo => <span key={`the-faceless-men_${unitInfo.region.id}`}>a <b>{unitInfo.unitType.name}</b> of <b>{unitInfo.house?.name ?? "Unknown"}</b> in <b>{unitInfo.region.name}</b></span>), " and ")}.</>)
+                        destroyedUnits.map(unitInfo => <span key={`the-faceless-men_${unitInfo.region.id}_${unitInfo.unitType.id}`}>a <b>{unitInfo.unitType.name}</b> of <b>{unitInfo.house?.name ?? "Unknown"}</b> in <b>{unitInfo.region.name}</b></span>), " and ")}.</>)
                         : <>not to destroy any units.</>}
                 </p>;
             }
@@ -1779,7 +1783,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     this.game.houses.get(hid), ocids.map(ocid => objectiveCards.get(ocid))
                 ] as [House, ObjectiveCard[]]);
 
-                return objectivesOfHouses.map(([house, objectives]) => <Col xs={12} key={`objectives-of-house-${house.id}`}>
+                return objectivesOfHouses.map(([house, objectives]) => <Col xs={12} key={`objectives-of-house_${house.id}`}>
                     <Col xs={12} className="text-center">
                         Remaining Objectives of House <b>{house.name}</b>.
                     </Col>
@@ -1836,7 +1840,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     House <b>{house.name}</b> took back their discarded House
-                    cards ({joinReactNodes(returnedHouseCards.map(hc => <b key={`roose_${hc.id}`}>{hc.name}</b>), ", ")}).
+                    cards ({joinReactNodes(returnedHouseCards.map(hc => <b key={`house-cards-returned_${hc.id}`}>{hc.name}</b>), ", ")}).
                     {houseCardDiscarded ? <><br/><b>{houseCardDiscarded.name}</b> was played as the last card and remains discarded.</> : <></>}
                 </p>;
             }

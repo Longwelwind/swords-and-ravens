@@ -58,7 +58,9 @@ export function renderRegionTooltip(region: Region): OverlayChildren {
                 )}
             </div>
             {region.units.size > 0 && (
-                <div className="mt-2">{joinReactNodes(region.units.values.map(u => u.wounded ? <span key={u.id}><s>{u.type.name}</s></span> : <span key={u.id}>{u.type.name}</span>), ", ")}</div>
+                <div className="mt-2">{joinReactNodes(region.units.values.map((u, i) => u.wounded
+                        ? <span key={`region-tooltip_wounded_${u.id}_${i}`}><s>{u.type.name}</s></span>
+                        : <span key={`region-tooltip_unit_${u.id}_${i}`}>{u.type.name}</span>), ", ")}</div>
             )}
         </Col>
     </Tooltip>;

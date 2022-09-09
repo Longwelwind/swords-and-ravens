@@ -29,7 +29,7 @@ export default class ShiftingAmbitionsComponent extends Component<GameStateCompo
                 {drawPool && <Col xs="12">
                     <Row className="justify-content-center">
                         {this.gameState.objectiveCardPool.map(oc => (
-                            <Col xs="auto" key={oc.id}>
+                            <Col xs="auto" key={`shifting-ambitions_${oc.id}`}>
                                 <ObjectiveCardComponent
                                     objectiveCard={oc}
                                     size="smedium"

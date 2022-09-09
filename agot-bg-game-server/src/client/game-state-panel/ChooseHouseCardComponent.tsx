@@ -91,7 +91,7 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
                         <Col xs={12}>
                             <Row className="justify-content-center">
                                 {this.getChoosableHouseCards().map(hc => (
-                                    <Col xs="auto" key={hc.id} style={{paddingRight: 6, paddingLeft: 6, paddingBottom: 4, paddingTop: 4}}>
+                                    <Col xs="auto" key={`choose-hc_${hc.id}`} style={{paddingRight: 6, paddingLeft: 6, paddingBottom: 4, paddingTop: 4}}>
                                         <HouseCardComponent
                                             houseCard={hc}
                                             size="small"

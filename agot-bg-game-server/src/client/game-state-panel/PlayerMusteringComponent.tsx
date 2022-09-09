@@ -65,11 +65,11 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                                 <>
                                     {this.musterings.values[0].length > 0 && <p>Your recruitments:</p>}
                                     {this.musterings.entries.map(([r, musterings]) => (
-                                        <div key={`recruitments-${r.id}`}>
+                                        <div key={`planned-recruitments_${r.id}`}>
                                             From <b>{r.name}</b>
                                             <ul>
                                                 {musterings.map(({region, from, to}, i) => (
-                                                    <li onClick={() => this.removeMustering(musterings, i)} key={i}>
+                                                    <li onClick={() => this.removeMustering(musterings, i)} key={`planned-mustering_${i}`}>
                                                         {from ? "Upgrading to " : "Recruiting "} a {to.name}{r != region && (" in " + region.name)}
                                                     </li>
                                                 ))}
@@ -222,7 +222,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
     }
 
     private renderMusteringPopover(modifiedRegion: Region): OverlayChildren {
-        return <Popover id={"region-mustring-popover-" + modifiedRegion.id} className="p-3">
+        return <Popover id={"region-mustering-popover-" + modifiedRegion.id} className="p-3">
             <Row className="justify-content-center align-items-center">
                 <Col xs="auto"><h5><b>{modifiedRegion.name}</b><small> ({this.props.gameState.getUsedPointsForRegion(modifiedRegion, this.musterings)} / {modifiedRegion.castleLevel})</small></h5></Col>
                 <Col xs="auto">

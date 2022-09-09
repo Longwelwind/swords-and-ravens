@@ -14,6 +14,6 @@ export default class VotesListComponent extends Component<VotesListComponentProp
     render(): ReactNode {
         const votes = _.sortBy(this.props.ingame.votes.values, v => v.createdAt);
 
-        return votes.map(v => <VoteComponent key={v.id} vote={v} gameClient={this.props.gameClient} ingame={this.props.ingame} />);
+        return votes.map(v => <VoteComponent key={`vote-container_${v.id}`} vote={v} gameClient={this.props.gameClient} ingame={this.props.ingame} />);
     }
 }
