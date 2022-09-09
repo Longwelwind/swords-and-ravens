@@ -257,7 +257,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                 <Row className="justify-content-center">
                     {!isVassal ?
                         _.sortBy(this.house.houseCards.values, hc => hc.combatStrength).map(hc => (
-                        <Col xs="auto" key={hc.id}>
+                        <Col xs="auto" key={`house-card_${this.house.id}_${hc.id}`}>
                             {hc.state == HouseCardState.AVAILABLE ? (
                                 <HouseCardComponent
                                     houseCard={hc}
@@ -273,7 +273,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         </Col>
                     ))
                     :  _.sortBy(this.game.vassalHouseCards.values, hc => hc.combatStrength).map(hc => (
-                        <Col xs="auto" key={hc.id}>
+                        <Col xs="auto" key={`vassal-cards_${this.house.id}_${hc.id}`}>
                             <HouseCardComponent
                                     houseCard={hc}
                                     size="tiny"
@@ -284,7 +284,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                 {this.house.laterHouseCards != null && !isVassal &&
                 <Row className="justify-content-center">
                     {_.sortBy(this.house.laterHouseCards.values, hc => hc.combatStrength).map(hc => (
-                        <Col xs="auto" key={hc.id}>
+                        <Col xs="auto" key={`later-cards_${this.house.id}_${hc.id}`}>
                             <HouseCardComponent
                                 houseCard={hc}
                                 size="tiny"

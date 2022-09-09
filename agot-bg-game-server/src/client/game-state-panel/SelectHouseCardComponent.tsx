@@ -36,7 +36,7 @@ export default class SelectHouseCardComponent extends Component<GameStateCompone
                                 {this.props.gameState.houseCards.map(hc => (
                                     // The house argument is used to decide which card-back is used
                                     // Since we will never show a back-card here, we can give whatever value fits.
-                                    (this.nameFilter == "" || hc.name.toLowerCase().includes(this.nameFilter.toLowerCase())) && <Col xs="auto" key={hc.id}>
+                                    (this.nameFilter == "" || hc.name.toLowerCase().includes(this.nameFilter.toLowerCase())) && <Col xs="auto" key={`select-house-card_${hc.id}`}>
                                         <HouseCardComponent
                                             houseCard={hc}
                                             size="small"

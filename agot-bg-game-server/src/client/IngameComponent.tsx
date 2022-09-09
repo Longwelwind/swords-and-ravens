@@ -306,73 +306,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             <div className={this.mapScrollbarEnabled ? "flex-ratio-container" : ""}>
                 <Card className={this.mapScrollbarEnabled ? "flex-sized-to-content" : ""} style={{marginBottom: "10px"}}>
                     <ListGroup variant="flush">
-                        {this.tracks.map(({ name, trackToShow, realTrack, stars }, i) => (
-                            <ListGroupItem key={`influence-track-${i}`} style={{ minHeight: "61px" }}>
-                                <Row className="align-items-center">
-                                    <Col xs="auto" className="text-center" style={{ width: "46px" }}>
-                                        <OverlayTrigger
-                                            overlay={
-                                                <Tooltip id={`tooltip-tracker-${i}`}>
-                                                    {i == 0 ? (
-                                                        <>
-                                                            <b>Iron Throne Track</b><br />
-                                                            All ties (except military ones) are decided by the holder
-                                                            of the Iron Throne.<br />
-                                                            Turn order is decided by this tracker.
-                                                        </>
-                                                    ) : i == 1 ? (
-                                                        <>
-                                                            <b>Fiefdoms Track</b><br />
-                                                            Once per round, the holder of Valyrian Steel Blade can use the blade
-                                                            to increase by one the combat strength of his army in a combat.<br />
-                                                            In case of a tie in a combat, the winner is the house which is
-                                                            the highest in this tracker.<br /><br />
-                                                            {this.game.valyrianSteelBladeUsed ? (
-                                                                <>The Valyrian Steel Blade has been used this round.</>
-                                                            ) : (
-                                                                <>The Valyrian Steel Blade is available.</>
-                                                            )}
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <b>Kings&apos;s Court Track</b><br />
-                                                            At the end of the Planning Phase, the holder of the Raven may choose
-                                                            to either change one of his placed order, or to look at the top card of the
-                                                            Wildling deck and decide whether to leave it at the top or to
-                                                            place it at the bottom of the deck.
-                                                        </>
-                                                    )}
-                                                </Tooltip>
-                                            }
-                                            placement="right"
-                                        >
-                                            <img src={i == 0 ? stoneThroneImage : i == 1 ? this.game.valyrianSteelBladeUsed ? diamondHiltUsedImage : diamondHiltImage : ravenImage} width={32} />
-                                        </OverlayTrigger>
-                                    </Col>
-                                    {trackToShow.map((h, j) => (
-                                        <Col xs="auto" key={`track_${i}_${h?.id ?? j}`}>
-                                            <InfluenceIconComponent
-                                                house={h}
-                                                ingame={this.ingame}
-                                                track={realTrack}
-                                                name={name}
-                                            />
-                                            <div className="tracker-star-container">
-                                                {stars && (
-                                                    _.range(0, this.game.starredOrderRestrictions[j]).map(k => (
-                                                        <div key={`stars_${h?.id ?? j}_${k}`}>
-                                                            <FontAwesomeIcon
-                                                                style={{ color: "#ffc107", fontSize: "9px" }}
-                                                                icon={faStar} />
-                                                        </div>
-                                                    ))
-                                                )}
-                                            </div>
-                                        </Col>
-                                    ))}
-                                </Row>
-                            </ListGroupItem>
-                        ))}
+                        {this.renderInfluenceTracks()}
                         <ListGroupItem style={{ minHeight: "130px" }}>
                             <SupplyTrackComponent
                                 supplyRestrictions={this.game.supplyRestrictions}
@@ -400,7 +334,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         <ListGroup variant="flush">
                             {this.game.getPotentialWinners().map(h => (
                                 <HouseRowComponent
-                                    key={h.id}
+                                    key={`house-row_${h.id}`}
                                     gameClient={this.gameClient}
                                     ingame={this.ingame}
                                     house={h}
@@ -410,7 +344,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             <ListGroupItem className="text-center font-italic" style={{ maxWidth: 500 }}>
                                 <>
                                     {connectedSpectators.length > 0 ? (
-                                        <>Spectators: {joinReactNodes(this.getConnectedSpectators().map(u => <b key={u.id}>{getIngameUserLinkOrLabel(this.ingame, u, null)}</b>), ", ")}</>
+                                        <>Spectators: {joinReactNodes(this.getConnectedSpectators().map(u => <b key={`specatator_${u.id}`}>{getIngameUserLinkOrLabel(this.ingame, u, null)}</b>), ", ")}</>
                                     ) : (
                                         <>No spectators</>
                                     )}
@@ -602,6 +536,73 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             </div>)
     }
 
+    private renderInfluenceTracks(): React.ReactNode {
+        return this.tracks.map(({ name, trackToShow, realTrack, stars }, i) => (
+            <ListGroupItem key={`influence-track-container_${i}`} style={{ minHeight: "61px" }}>
+                <Row className="align-items-center">
+                    <Col xs="auto" className="text-center" style={{ width: "46px" }}>
+                        <OverlayTrigger
+                            overlay={<Tooltip id={`tooltip-tracker-${i}`}>
+                                {i == 0 ? (
+                                    <>
+                                        <b>Iron Throne Track</b><br />
+                                        All ties (except military ones) are decided by the holder
+                                        of the Iron Throne.<br />
+                                        Turn order is decided by this tracker.
+                                    </>
+                                ) : i == 1 ? (
+                                    <>
+                                        <b>Fiefdoms Track</b><br />
+                                        Once per round, the holder of Valyrian Steel Blade can use the blade
+                                        to increase by one the combat strength of his army in a combat.<br />
+                                        In case of a tie in a combat, the winner is the house which is
+                                        the highest in this tracker.<br /><br />
+                                        {this.game.valyrianSteelBladeUsed ? (
+                                            <>The Valyrian Steel Blade has been used this round.</>
+                                        ) : (
+                                            <>The Valyrian Steel Blade is available.</>
+                                        )}
+                                    </>
+                                ) : (
+                                    <>
+                                        <b>Kings&apos;s Court Track</b><br />
+                                        At the end of the Planning Phase, the holder of the Raven may choose
+                                        to either change one of his placed order, or to look at the top card of the
+                                        Wildling deck and decide whether to leave it at the top or to
+                                        place it at the bottom of the deck.
+                                    </>
+                                )}
+                            </Tooltip>}
+                            placement="right"
+                        >
+                            <img src={i == 0 ? stoneThroneImage : i == 1 ? this.game.valyrianSteelBladeUsed ? diamondHiltUsedImage : diamondHiltImage : ravenImage} width={32} />
+                        </OverlayTrigger>
+                    </Col>
+                    {trackToShow.map((h, j) => (
+                        <Col xs="auto" key={`influence-track_${i}_${h?.id ?? j}`}>
+                            <InfluenceIconComponent
+                                house={h}
+                                ingame={this.ingame}
+                                track={realTrack}
+                                name={name} />
+                            <div className="tracker-star-container">
+                                {stars && (
+                                    _.range(0, this.game.starredOrderRestrictions[j]).map(k => (
+                                        <div key={`stars_${h?.id ?? j}_${k}`}>
+                                            <FontAwesomeIcon
+                                                style={{ color: "#ffc107", fontSize: "9px" }}
+                                                icon={faStar} />
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </Col>
+                    ))}
+                </Row>
+            </ListGroupItem>
+        ));
+    }
+
     renderGameStateColumn(): ReactNode {
         const phases: GameStatePhaseProps[] = [
             {name: "Westeros", gameState: WesterosGameState, component: WesterosGameStateComponent},
@@ -652,7 +653,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 <ListGroupItem>
                                     <Row className="justify-content-between">
                                         {phases.map((phase, i) => (
-                                            <Col xs="auto" key={i}>
+                                            <Col xs="auto" key={`${phase.name}_${i}`}>
                                                 <ConditionalWrap
                                                         condition={phase.name == "Westeros"}
                                                         wrap={child => <OverlayTrigger
@@ -883,7 +884,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     </Dropdown.Toggle>
                                     <Dropdown.Menu>
                                         {this.getOtherPlayers().map(p => (
-                                            <Dropdown.Item onClick={() => this.onNewPrivateChatRoomClick(p)} key={p.user.id}>
+                                            <Dropdown.Item onClick={() => this.onNewPrivateChatRoomClick(p)} key={`new-chat_${p.user.id}`}>
                                                 {this.getUserDisplayNameLabel(p.user)}
                                             </Dropdown.Item>
                                         ))}
@@ -946,7 +947,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 <NoteComponent gameClient={this.gameClient} ingame={this.ingame} />
                             </Tab.Pane>
                             {this.getPrivateChatRooms().map(({ roomId }) => (
-                                <Tab.Pane eventKey={roomId} key={roomId} className="h-100">
+                                <Tab.Pane eventKey={roomId} key={`chat_${roomId}`} className="h-100">
                                     <ChatComponent gameClient={this.gameClient}
                                         entireGame={this.ingame.entireGame}
                                         roomId={roomId}

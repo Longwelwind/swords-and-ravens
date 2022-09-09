@@ -71,7 +71,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                         <Card.Body id="lobby-houses-list" className="no-space-around">
                             <ListGroup variant="flush">
                                 {this.lobby.lobbyHouses.values.map((h, i) => (
-                                    <ListGroupItem key={h.id} style={{minHeight: "62px"}}>
+                                    <ListGroupItem key={`lobby-house_${h.id}`} style={{minHeight: "62px"}}>
                                         <Row className="align-items-center" style={{opacity: this.isHouseAvailable(h) ? 1 : 0.3}}>
                                             {!this.randomHouses && <Col xs="auto" className="no-gutters">
                                                 <HouseIconComponent house={h}/>

@@ -44,7 +44,7 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
                 <ListGroupItem className="px-2">
                     <Row className="justify-content-around">
                         {this.props.gameState.revealedCards.map((wc, i) => (
-                            <Col xs="auto" key={i}>
+                            <Col xs="auto" key={`westeros-state_${wc.id}_${i}`}>
                                 <WesterosCardComponent
                                     cardType={wc.type}
                                     westerosDeckI={this.props.gameState.revealAndResolveTop2WesterosDeck4Cards ? 3 : i}

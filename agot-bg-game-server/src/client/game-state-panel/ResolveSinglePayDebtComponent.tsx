@@ -65,7 +65,7 @@ export default class ResolveSinglePayDebtComponent extends Component<GameStateCo
                                 <Row className="justify-content-center" style={{paddingBottom: 10}}>
                                     <ul>
                                         {this.unitsToRemove.entries.map(([region, units]) => (
-                                            <li key={`pay-single-debt_${region.id}`}>{joinReactNodes(units.map((u, i) => <b key={`${region.id}_${u.id}_${i}`}>{u.type.name}</b>), ", ")} in <b>{region.name}</b></li>
+                                            <li key={`pay-single-debt_${region.id}`}>{joinReactNodes(units.map((u, i) => <b key={`pay-single-debt_${region.id}_${u.id}_${i}`}>{u.type.name}</b>), ", ")} in <b>{region.name}</b></li>
                                         ))}
                                     </ul>
                                 </Row>

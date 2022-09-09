@@ -26,7 +26,7 @@ export default class PlanningComponent extends Component<GameStateComponentProps
                 <ListGroupItem className="px-2">
                     <Row className="justify-content-around">
                         {this.props.gameState.revealeadWesterosCards.map((wc, i) => (
-                            <Col xs="auto" key={i}>
+                            <Col xs="auto" key={`planning_revealed-wcs_${wc.id}_${i}`}>
                                 <WesterosCardComponent
                                     cardType={wc.type}
                                     westerosDeckI={i}

@@ -23,7 +23,7 @@ export default class ClaimVassalComponent extends Component<GameStateComponentPr
                         <>
                             <Col xs={12}>
                                 {this.props.gameState.claimableVassals.map(h => (
-                                    <Row key={h.id} className="mb-1">
+                                    <Row key={`claim-vassal_${h.id}`} className="mb-1">
                                         <FormCheck
                                             type="checkbox"
                                             id={"vassal-" + h.id}

@@ -44,11 +44,11 @@ export default class PlaceSellswordsComponent extends Component<GameStateCompone
                                 <>
                                     {this.placedSellswords.size > 0 && <p>Your placements:</p>}
                                     {this.placedSellswords.entries.map(([r, placements]) => (
-                                        <div key={`placements-${r.id}`}>
+                                        <div key={`sellsword-placements_${r.id}`}>
                                             <b>{r.name}</b>
                                             <ul>
                                                 {placements.map((unit, i) => (
-                                                    <li onClick={() => this.removePlacement(placements, i)} key={i}>
+                                                    <li onClick={() => this.removePlacement(placements, i)} key={`sellsword-placements_${r.id}_${i}`}>
                                                         {unit.type.name}
                                                     </li>
                                                 ))}

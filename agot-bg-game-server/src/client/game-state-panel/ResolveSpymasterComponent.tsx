@@ -32,7 +32,7 @@ export default class ResolveSpymasterComponent extends Component<GameStateCompon
                                 </Row>
                                 <Row className="justify-content-center mt-1">
                                     {this.drawnWesterosCards.map(wc => (
-                                        <Col xs="auto" key={wc.id}>
+                                        <Col xs="auto" key={`spymaster-westeros-cards_${wc.id}`}>
                                             <WesterosCardComponent
                                                 tooltip={true}
                                                 cardType={wc.type}

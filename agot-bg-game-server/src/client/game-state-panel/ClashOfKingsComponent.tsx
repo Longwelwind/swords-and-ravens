@@ -39,7 +39,7 @@ export default class ClashOfKingsComponent extends Component<GameStateComponentP
                         Houses bid for the <strong>
                         {this.props.gameState.game.getNameInfluenceTrack(currentTrackI)}</strong> track.
                     </Col>
-                    <Fragment key={currentTrackI}>
+                    <Fragment key={`clash-of-kings-comp_${currentTrackI}`}>
                         {renderChildGameState(this.props, [
                             [BiddingGameState, BiddingComponent],
                             [ResolveTiesGameState, ResolveTiesComponent],

@@ -130,7 +130,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                 style={{ backgroundImage: `url(${this.backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem" }}>
                 <div style={{ position: "relative" }}>
                     {this.props.ingameGameState.world.regions.values.map(r => (
-                        <div key={r.id}>
+                        <div key={`map_${r.id}`}>
                             {castleModifiers.has(r.id) && (
                                 <OverlayTrigger
                                     overlay={renderRegionTooltip(r)}
@@ -237,7 +237,7 @@ export default class MapComponent extends Component<MapComponentProps> {
     private renderLoanCardSlots(ironBankView: StaticIronBankView | null): ReactNode {
         return ironBankView && this.ingame.game.ironBank && this.ingame.game.ironBank.loanSlots.map((lc, i) => (
             <OverlayTrigger
-                key={`loan-slot-${i}`}
+                key={`loan-slot_${i}`}
                 overlay={<ImagePopover className="vertical-game-card bring-to-front" style={{ backgroundImage: lc ? `url(${loanCardImages.get(lc.type.id)})` : "none" }} />}
                 popperConfig={{ modifiers: [preventOverflow] }}
                 delay={{ show: 250, hide: 0 }}
@@ -289,7 +289,7 @@ export default class MapComponent extends Component<MapComponentProps> {
 
             return (
                 <ConditionalWrap condition={!region.isBlocked}
-                    key={region.id}
+                    key={`map-region-polygon_${region.id}`}
                     wrap={wrap ? wrap : child =>
                         <OverlayTrigger
                             overlay={renderRegionTooltip(region)}
@@ -354,7 +354,7 @@ export default class MapComponent extends Component<MapComponentProps> {
 
             const controller = r.getController();
             return <div
-                key={r.id}
+                key={`map-units_${r.id}`}
                 className={classNames("units-container", { "disable-pointer-events": disablePointerEventsForCurrentRegion })}
                 style={{ left: r.unitSlot.point.x, top: r.unitSlot.point.y, width: r.unitSlot.width, flexWrap: r.type == land ? "wrap-reverse" : "wrap" }}
             >
@@ -379,7 +379,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                         overlay={<Tooltip id={"unit-tooltip-" + u.id} className="tooltip-w-100">
                             <Col className="text-center"><h6>{u.type.name}<small> of <b>{controller?.name ?? "Unknown"}</b><br /><b>{r.name}</b></small></h6></Col>
                         </Tooltip>}
-                        key={"unit-overlay-" + u.id}
+                        key={`map-unit-_${controller?.id ?? "must-be-controlled"}_${u.id}`}
                         delay={{ show: 500, hide: 100 }}
                         placement="auto"
                         popperConfig={{ modifiers: [preventOverflow] }}
@@ -427,7 +427,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                                 </h6>
                             </Col>
                         </Tooltip>}
-                        key={"garrison-overlay-" + r.id}
+                        key={"map-garrison_" + r.id}
                         delay={{ show: 500, hide: 100 }}
                         placement="auto"
                         popperConfig={{ modifiers: [preventOverflow] }}
@@ -447,7 +447,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                         overlay={<Tooltip id={"loyalty-tooltip-" + r.id}>
                             <Col className="text-center"><h6>Loyalty token<br /><small><b>{r.name}</b></small></h6></Col>
                         </Tooltip>}
-                        key={"loyalty-overlay-" + r.id}
+                        key={"map-loyalty-token-" + r.id}
                         delay={{ show: 500, hide: 100 }}
                         placement="auto"
                         popperConfig={{ modifiers: [preventOverflow] }}
@@ -480,14 +480,13 @@ export default class MapComponent extends Component<MapComponentProps> {
         >
             {_.range(0, region.barrelModifier).map((_, i) => {
                 return <OverlayTrigger
-                    key={`barrel-${region.id}-${i}`}
+                    key={`map-barrel-${region.id}-${i}`}
                     overlay={renderRegionTooltip(region)}
                     delay={{ show: 750, hide: 100 }}
                     placement="auto"
                     popperConfig={{ modifiers: [preventOverflow] }}
                 >
-                    <div key={`barrel-${region.id}-${i}`}
-                        className="unit-icon medium"
+                    <div className="unit-icon medium"
                         style={{
                             backgroundImage: `url(${barrelImage})`,
                         }}
@@ -496,14 +495,13 @@ export default class MapComponent extends Component<MapComponentProps> {
             })}
             {_.range(0, region.crownModifier).map((_, i) => {
                 return <OverlayTrigger
-                    key={`crown-${region.id}-${i}`}
+                    key={`map-crown-${region.id}-${i}`}
                     overlay={renderRegionTooltip(region)}
                     delay={{ show: 750, hide: 100 }}
                     placement="auto"
                     popperConfig={{ modifiers: [preventOverflow] }}
                 >
-                    <div key={`crown-${region.id}-${i}`}
-                        className="unit-icon medium"
+                    <div className="unit-icon medium"
                         style={{
                             backgroundImage: `url(${crownImage})`,
                         }}
@@ -602,7 +600,7 @@ export default class MapComponent extends Component<MapComponentProps> {
 
         return (
             <ConditionalWrap condition={true}
-                    key={region.id}
+                    key={`map-order_${region.id}`}
                     wrap={wrap ? wrap : child =>
                         <OverlayTrigger overlay={this.renderOrderTooltip(order, region)}
                             delay={{ show: 500, hide: 100 }}
@@ -623,7 +621,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                     )}
                         style={{ left: region.orderSlot.x, top: region.orderSlot.y}}
                         onClick={properties.onClick ? properties.onClick : undefined}
-                        key={"region-" + region.id}
+                        key={`map-order-container_${region.id}`}
                     >
                         <div className={classNames("order-icon", { "order-border": drawBorder } )}
                             style={{ backgroundImage: `url(${backgroundUrl})`, borderColor: color }} />

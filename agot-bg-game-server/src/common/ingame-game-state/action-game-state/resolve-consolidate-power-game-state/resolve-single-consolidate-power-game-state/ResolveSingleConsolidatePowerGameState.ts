@@ -97,6 +97,15 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
             const region = ironBankOrders[0][0];
             this.actionGameState.removeOrderFromRegion(region, true, this.house, true);
             this.onResolveSingleConsolidatePowerFinish();
+            return;
+        }
+
+        // If there is an Iron Bank order but all loan slots are empty and no CP* can be used for mustering
+        // (players might want to delay the mustering or muster immediately), the Iron Bank order can be removed automatically
+        if (ironBankOrders.length == 1 && !consolidatePowerOrders.entries.some(([r, ot]) => ot.starred && r.hasStructure) && this.ironBank?.loanSlots.every(lc => lc == null)) {
+            const region = ironBankOrders[0][0];
+            this.actionGameState.removeOrderFromRegion(region, true, this.house, true);
+            this.onResolveSingleConsolidatePowerFinish();
         }
     }
 

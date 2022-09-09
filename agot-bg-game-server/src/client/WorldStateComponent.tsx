@@ -66,7 +66,7 @@ export default class WorldStateComponent extends Component<WorldStateComponentPr
                 style={{ backgroundImage: `url(${this.backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem" }}>
                 <div style={{ position: "relative" }}>
                     {this.props.worldState.map(r => (
-                        <div key={r.id}>
+                        <div key={`world-state_${r.id}`}>
                             {r.castleModifier !== undefined && (
                                 <div
                                     className="castle-modification"
@@ -113,7 +113,7 @@ export default class WorldStateComponent extends Component<WorldStateComponentPr
         const regions = this.ingame.world.regions;
         return this.props.worldState.map(region => {
             const blocked = region.garrison == 1000;
-            return <polygon key={`render-region-${region.id}`}
+            return <polygon key={`world-state_region-polygon_${region.id}`}
                         points={this.getRegionPath(regions.get(region.id))}
                         fill={blocked ? "black" : undefined}
                         fillRule="evenodd"
@@ -127,7 +127,7 @@ export default class WorldStateComponent extends Component<WorldStateComponentPr
 
         return this.props.worldState.map(r => {
             return <div
-                key={r.id}
+                key={`world-state_units-container_${r.id}`}
                 className="units-container"
                 style={{ left: regions.get(r.id).unitSlot.point.x, top: regions.get(r.id).unitSlot.point.y, width: regions.get(r.id).unitSlot.width,
                     flexWrap: regions.get(r.id).type.id == "land" ? "wrap-reverse" : "wrap" }}
@@ -149,7 +149,7 @@ export default class WorldStateComponent extends Component<WorldStateComponentPr
                     }
 
                     return <div
-                        key={`unit-${i}-in-${r.id}`}
+                        key={`world-state_unit-${u.type}-${u.house}-${i}-in-${r.id}`}
                         className="unit-icon"
                         style={{
                             backgroundImage: `url(${unitImages.get(u.house).get(u.type)})`,
@@ -194,7 +194,7 @@ export default class WorldStateComponent extends Component<WorldStateComponentPr
             style={{ left: region.improvementSlot.point.x, top: region.improvementSlot.point.y, width: region.improvementSlot.width, flexWrap: "wrap" }}
         >
             {_.range(0, region.barrelModifier).map((_, i) => {
-                return <div key={`barrel-${region.id}-${i}`}
+                return <div key={`world-state_barrel-${region.id}-${i}`}
                     className="unit-icon medium"
                     style={{
                         backgroundImage: `url(${barrelImage})`,
@@ -202,7 +202,7 @@ export default class WorldStateComponent extends Component<WorldStateComponentPr
                 />
             })}
             {_.range(0, region.crownModifier).map((_, i) => {
-                return <div key={`crown-${region.id}-${i}`}
+                return <div key={`world-state_crown-${region.id}-${i}`}
                     className="unit-icon medium"
                     style={{
                         backgroundImage: `url(${crownImage})`,
@@ -242,7 +242,7 @@ export default class WorldStateComponent extends Component<WorldStateComponentPr
                 }
             )}
                 style={{ left: region.orderSlot.x, top: region.orderSlot.y}}
-                key={"order-in-region-" + region.id}
+                key={"world-state_order-in-region-" + region.id}
             >
                 <div className={classNames("order-icon", { "order-border": drawBorder } )}
                     style={{ backgroundImage: `url(${backgroundUrl})`, borderColor: color }} />

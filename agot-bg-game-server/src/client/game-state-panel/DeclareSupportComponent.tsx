@@ -24,7 +24,7 @@ export default class DeclareSupportComponent extends Component<GameStateComponen
                     {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
                         <Row className="justify-content-center">
                             {this.props.gameState.combatGameState.houseCombatDatas.keys.map(h => (
-                                <Col xs="auto" key={h.id}>
+                                <Col xs="auto" key={`declare-support_${h.id}`}>
                                     <ConditionalWrap
                                         condition={!this.canChoose(h)}
                                         wrap={c =>

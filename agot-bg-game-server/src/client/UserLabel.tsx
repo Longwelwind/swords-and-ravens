@@ -73,7 +73,7 @@ export default class UserLabel extends Component<UserLabelProps> {
                 overlay={<Tooltip id={`${this.user.id}-other-users-with-same-ip-tooltip`}>
                     <Col>
                         These users {this.props.gameState instanceof IngameGameState ? "play" : "joined"} from the same network as {this.user.name}:
-                        <br /><br />{this.user.otherUsersFromSameNetwork.map(usr => <div key={usr}>{usr}</div>)}
+                        <br /><br />{this.user.otherUsersFromSameNetwork.map(usr => <div key={`same-network-user_${usr}`}>{usr}</div>)}
                     </Col>
                 </Tooltip>}>
                 {child}

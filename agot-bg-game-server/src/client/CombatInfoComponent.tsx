@@ -59,7 +59,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                     {this.attacker.region.name}<br/>
                     <div>
                         {this.attacker.armyUnits.map((ut, i) =>
-                            <UnitIconComponent key={`combat_info_units_${this.attacker.house.id}_${i}`}
+                            <UnitIconComponent key={`combat-info-units-${this.attacker.house.id}_${i}`}
                                 house={this.attacker.house}
                                 unitType={ut}
                                 size="smedium"
@@ -77,7 +77,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                     {this.defender.region.name}<br/>
                     <div>
                         {this.defender.armyUnits.map((ut, i) =>
-                            <UnitIconComponent key={`combat_info_units_${this.defender.house.id}_${i}`}
+                            <UnitIconComponent key={`combat-info-units-${this.defender.house.id}_${i}`}
                                 house={this.defender.house}
                                 unitType={ut}
                                 size="smedium"
@@ -85,7 +85,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                             />
                         )}
                         {this.defender.woundedUnits.map((ut, i) =>
-                            <UnitIconComponent key={`combat_info_units_${this.defender.house.id}_${i}`}
+                            <UnitIconComponent key={`combat-info-wounded-units-${this.defender.house.id}_${i}`}
                                 house={this.defender.house}
                                 unitType={ut}
                                 size="smedium"

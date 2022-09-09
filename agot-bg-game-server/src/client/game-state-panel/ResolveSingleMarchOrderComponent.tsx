@@ -69,7 +69,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                     {this.plannedMoves.entries.map(([region, units]) => (
                                         <div key={`planned-moves_${region.id}`} style={{marginLeft: "20px"}}>
                                             {units.map((unit, i) =>
-                                                <div key={`planned_units_${this.house.id}_${i}`} style={{display: "inline"}}>
+                                                <div key={`planned_units_${this.house.id}_${unit.id}_${i}`} style={{display: "inline"}}>
                                                     <UnitIconComponent
                                                         house={this.house}
                                                         unitType={unit.type}

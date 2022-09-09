@@ -47,7 +47,7 @@ export default class TheFacelessMenComponent extends Component<GameStateComponen
                 <>
                     <Col xs={12} className="mt-3">
                         {this.unitsToRemove.entries.map(([region, unit]) => (
-                            <Row key={region.id} className="justify-content-center" style={{ paddingBottom: 10 }}>
+                            <Row key={`the-faceless-men_${region.id}`} className="justify-content-center" style={{ paddingBottom: 10 }}>
                                 <div><b>{unit.type.name} <small>of {unit.allegiance.name}</small></b> in <b>{region.name}</b></div>
                             </Row>
                         ))}
