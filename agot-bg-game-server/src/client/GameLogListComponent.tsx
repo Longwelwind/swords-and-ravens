@@ -56,6 +56,8 @@ interface GameLogListComponentProps {
 @observer
 export default class GameLogListComponent extends Component<GameLogListComponentProps> {
     allHouseCards = new BetterMap(this.getAllHouseCards());
+    allHouseCardsByAbilityId = new BetterMap(this.allHouseCards.values.filter(hc => hc.ability != null)
+        .map(hc => [hc.ability?.id ?? "ability-never-null-here", hc]));
 
     get ingame(): IngameGameState {
         return this.props.ingameGameState;
@@ -741,7 +743,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             }
             case "house-card-ability-not-used": {
                 const house = this.game.houses.get(data.house);
-                const houseCard = this.allHouseCards.get(data.houseCard);
+                const houseCard = this.allHouseCardsByAbilityId.get(data.houseCard);
 
                 return <p>
                     House <b>{house.name}</b> did not use <b>{houseCard.name}&apos;s</b> ability.

@@ -23,6 +23,6 @@ export default class LysaArrynModHouseCardAbility extends HouseCardAbility {
     }
 
     doesPreventDiscardingHouseCardAfterCombat(postCombat: PostCombatGameState, _house: House, houseCard: HouseCard): boolean {
-        return postCombat.notDiscardedHouseCardIds.includes(houseCard.id);
+        return houseCard.ability != null && postCombat.notDiscardedHouseCardIds.includes(houseCard.ability.id);
     }
 }
