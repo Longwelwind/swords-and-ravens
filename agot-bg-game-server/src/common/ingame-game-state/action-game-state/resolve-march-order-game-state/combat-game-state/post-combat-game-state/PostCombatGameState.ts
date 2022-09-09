@@ -203,7 +203,7 @@ export default class PostCombatGameState extends GameState<
         this.proceedSkullIconHandling();
     }
 
-    destroyUnitsWhichCannotRetreatOrAreWounded() {
+    destroyUnitsWhichCannotRetreatOrAreWounded(): void {
         const loserArmy = this.loserCombatData.army;
         const locationLoserArmy = this.loserCombatData.region;
         const immediatelyKilledLoserUnits = loserArmy.filter(u => u.wounded || !u.type.canRetreat);
@@ -279,7 +279,7 @@ export default class PostCombatGameState extends GameState<
         // Unassign the house cards from vassals again
         this.combat.houseCombatDatas.forEach(({houseCard}, house) => {
             if (this.combat.ingameGameState.isVassalHouse(house)) {
-                if (houseCard && house.hasBeenReplacedByVassal && !this.game.vassalHouseCards.values.includes(houseCard)) {
+                if (houseCard && house.hasBeenReplacedByVassal && !this.game.vassalHouseCards.has(houseCard.id)) {
                     this.markHouseAsUsed(house, houseCard);
                     this.game.oldPlayerHouseCards.set(house, house.houseCards);
 
