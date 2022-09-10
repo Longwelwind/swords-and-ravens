@@ -258,8 +258,7 @@ export default class GlobalServer {
             ingame.players.values.forEach(p => p.liveClockData = {
                 remainingSeconds: entireGame.gameSettings.initialLiveClock * 60,
                 timerStartedAt: null,
-                serverTimer: null,
-                clientIntervalId: -1,
+                serverTimer: null
             });
             ingame.willBeAutoResumedAt = null;
             ingame.paused = now;
@@ -313,8 +312,7 @@ export default class GlobalServer {
                 timerStartedAt: clockData.timerStartedAt ? now : null,
                 serverTimer: clockData.timerStartedAt
                     ? setTimeout(() => ingame.onPlayerClockTimeout(p), clockData.totalRemainingSeconds * 1000)
-                    : null,
-                clientIntervalId: -1
+                    : null
             };
         });
     }

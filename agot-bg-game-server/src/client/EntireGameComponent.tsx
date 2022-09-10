@@ -23,15 +23,12 @@ import { observable } from "mobx";
 import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamation, faLock } from "@fortawesome/free-solid-svg-icons";
-import _ from "lodash";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
-import { secondsToString } from "./utils/secondsToString";
 import introSound from "../../public/sounds/game-of-thrones-intro.ogg";
 import CombatGameState from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
-import { GameResumed } from "../common/ingame-game-state/game-data-structure/GameLog";
-import { getTimeDeltaInSeconds } from "../utils/getElapsedSeconds";
 import { toast } from "react-toastify";
 import { cssTransition } from "react-toastify";
+import ClockComponent from "./ClockComponent";
 
 const yourTurnToastAnimation = cssTransition({
     enter: "slide-in-elliptic-top-fwd",
@@ -46,10 +43,7 @@ interface EntireGameComponentProps {
 @observer
 export default class EntireGameComponent extends Component<EntireGameComponentProps> {
     @observable showMapWhenDrafting = false;
-    @observable rerender = 0;
     @observable playWelcomeSound = false;
-
-    setIntervalId = -1;
 
     get ingame(): IngameGameState | null {
         return this.props.entireGame.ingameGameState;
@@ -75,7 +69,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             </Helmet>
             <Col xs={12} className={this.props.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
                 <Row className="justify-content-center align-items-center">
-                    {this.rerender >= 0 && this.renderClock()}
+                    <ClockComponent entireGame={this.props.entireGame} />
                     {this.renderHouseIcon()}
                     <Col xs="auto" className="px-3">
                         <h4>{this.props.entireGame.name}</h4>
@@ -193,91 +187,6 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         </>;
     }
 
-    renderClock(): ReactNode {
-        if (this.ingame?.willBeAutoResumedAt) {
-            // Show a 10 minutes countdown
-            const countdown = secondsToString(getTimeDeltaInSeconds(this.ingame?.willBeAutoResumedAt, new Date()), true);
-
-            return <Col xs="auto">
-                <OverlayTrigger
-                    placement="bottom"
-                    overlay={
-                        <Tooltip id="game-resumes-tooltip">
-                            <b>Countdown until game resumes</b>
-                        </Tooltip>}
-                    popperConfig={{ modifiers: [preventOverflow] }}
-                >
-                    <h4><Badge variant="secondary">{countdown}</Badge></h4>
-                </OverlayTrigger>
-            </Col>;
-        } else if (this.ingame) {
-            let totalPlayingTime: string | null = null;
-            const gameLogManager = this.props.entireGame.ingameGameState?.gameLogManager;
-            const firstLog = _.first(gameLogManager?.logs ?? []);
-
-            if (firstLog) {
-                const lastTimeStamp = this.ingame.paused
-                    ? this.ingame.paused
-                    : this.isGameEnded
-                        ? _.last(gameLogManager?.logs ?? [])?.time ?? new Date()
-                        : new Date();
-
-                // Remove pause times:
-                const totalPauseTime = _.sum(gameLogManager?.logs.filter(l => l.data.type == "game-resumed")
-                    .map(l => (l.data as GameResumed).pauseTimeInSeconds));
-
-                let elapsed = getTimeDeltaInSeconds(lastTimeStamp, firstLog.time);
-                elapsed -= totalPauseTime;
-
-                totalPlayingTime = secondsToString(elapsed);
-            }
-
-            return totalPlayingTime && <Col xs="auto">
-                <OverlayTrigger
-                    placement="bottom"
-                    overlay={
-                        <Tooltip id="total-playing-time-tooltip">
-                            <b>Total playing time</b>
-                        </Tooltip>}
-                    popperConfig={{ modifiers: [preventOverflow] }}
-                >
-                    <h4><Badge variant="secondary">{totalPlayingTime}</Badge></h4>
-                </OverlayTrigger>
-            </Col>;
-        } else if (this.lobby && this.lobby.readyCheckWillTimeoutAt) {
-            // Show a 30 seconds countdown
-            const countdown = getTimeDeltaInSeconds(this.lobby.readyCheckWillTimeoutAt, new Date());
-
-            return <Col xs="auto">
-                <OverlayTrigger
-                    placement="bottom"
-                    overlay={
-                        <Tooltip id="ready-check-countdown-tooltip">
-                            <b>Countdown for Ready Check</b>
-                        </Tooltip>}
-                    popperConfig={{ modifiers: [preventOverflow] }}
-                >
-                    <h4><Badge variant="secondary">{countdown}</Badge></h4>
-                </OverlayTrigger>
-            </Col>;
-        }else if (this.lobby) {
-            return <Col xs="auto">
-                <OverlayTrigger
-                    placement="bottom"
-                    overlay={
-                        <Tooltip id="westeros-time-tooltip">
-                            <b>Westeros time <small>(basically UTC)</small></b>
-                        </Tooltip>}
-                    popperConfig={{ modifiers: [preventOverflow] }}
-                >
-                    <h4><Badge variant="secondary">{new Date().toISOString().slice(11, 16)}</Badge></h4>
-                </OverlayTrigger>
-            </Col>
-        }
-
-        return null;
-    }
-
     renderHouseIcon(): ReactNode {
         // Hack for ADWD Bolton as the Ingame c'tor is not called here yet:
         const house = this.props.gameClient.authenticatedPlayer?.house;
@@ -318,14 +227,6 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         user.syncSettings();
     }
 
-    forceClockRerender(): void {
-        if (this.rerender > 0) {
-            this.rerender--;
-        } else {
-            this.rerender++;
-        }
-    }
-
     componentDidMount(): void {
         document.title = this.props.entireGame.name;
 
@@ -339,8 +240,6 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         if (this.props.gameClient.authenticatedUser) {
             this.showMapWhenDrafting = this.props.gameClient.authenticatedUser.settings.showMapWhenDrafting;
         }
-
-        this.setIntervalId = window.setInterval(() => this.forceClockRerender(), 1000);
 
         if (!this.isInCombat) {
             this.playWelcomeSound = true;
@@ -393,9 +292,5 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     componentWillUnmount(): void {
         this.props.entireGame.onClientGameStateChange = null;
         this.props.entireGame.onGameStarted = null;
-        if (this.setIntervalId >= 0) {
-            window.clearInterval(this.setIntervalId);
-            this.setIntervalId = -1;
-        }
     }
 }

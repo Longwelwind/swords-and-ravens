@@ -72,7 +72,7 @@ export default class IngameGameState extends GameState<
 
     // Client-side only
     @observable rerender = 0;
-    @observable clockUpdate = 0;
+    @observable now = new Date();
     @observable marchMarkers: BetterMap<Unit, Region> = new BetterMap();
 
     onVoteStarted: (() => void) | null = null;
@@ -118,8 +118,7 @@ export default class IngameGameState extends GameState<
             this.players.values.forEach(p => p.liveClockData = {
                 remainingSeconds: this.entireGame.gameSettings.initialLiveClock * 60,
                 timerStartedAt: null,
-                serverTimer: null,
-                clientIntervalId: -1,
+                serverTimer: null
             });
         }
 
@@ -788,7 +787,6 @@ export default class IngameGameState extends GameState<
         const avg = Math.floor(_.sum(otherPlayers.map(p => p.totalRemainingSeconds)) / otherPlayers.length);
         newPlayer.liveClockData = {
             remainingSeconds: avg,
-            clientIntervalId: -1,
             serverTimer: null,
             timerStartedAt: null
         }
@@ -1024,7 +1022,6 @@ export default class IngameGameState extends GameState<
 
             if (newPlayer && message.liveClockRemainingSeconds !== undefined) {
                 newPlayer.liveClockData = {
-                    clientIntervalId: -1,
                     remainingSeconds: message.liveClockRemainingSeconds,
                     serverTimer: null,
                     timerStartedAt: null
@@ -1048,7 +1045,6 @@ export default class IngameGameState extends GameState<
 
             if (message.liveClockRemainingSeconds !== undefined) {
                 newPlayer.liveClockData = {
-                    clientIntervalId: -1,
                     remainingSeconds: message.liveClockRemainingSeconds,
                     serverTimer: null,
                     timerStartedAt: null
@@ -1123,8 +1119,6 @@ export default class IngameGameState extends GameState<
 
             player.liveClockData.remainingSeconds = message.remainingSeconds;
             player.liveClockData.timerStartedAt = new Date(message.timerStartedAt);
-
-            player.startClientClockInterval();
         } else if (message.type == "stop-player-clock") {
             const player = this.players.get(this.entireGame.users.get(message.userId));
 
@@ -1134,8 +1128,6 @@ export default class IngameGameState extends GameState<
 
             player.liveClockData.remainingSeconds = message.remainingSeconds;
             player.liveClockData.timerStartedAt = null;
-
-            player.stopClientClockInterval();
         } else if (message.type == "game-paused") {
             this.paused = new Date();
             if (message.willBeAutoResumedAt) {
@@ -1169,14 +1161,6 @@ export default class IngameGameState extends GameState<
             this.rerender--;
         } else {
             this.rerender++;
-        }
-    }
-
-    forceClockUpdate(): void {
-        if (this.clockUpdate > 0) {
-            this.clockUpdate--;
-        } else {
-            this.clockUpdate++;
         }
     }
 

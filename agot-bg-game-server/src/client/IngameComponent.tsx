@@ -139,6 +139,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     @observable columnSwapAnimationClassName = "";
     modifyRegionsOnMapCallback: any;
     onVisibilityChangedCallback: (() => void) | null = null;
+    setIntervalId = -1;
 
     get game(): Game {
         return this.ingame.game;
@@ -1250,6 +1251,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             </div>;
     }
 
+    setNow(): void {
+        this.ingame.now = new Date();
+    }
+
     componentDidMount(): void {
         this.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
         this.ingame.entireGame.onNewPrivateChatRoomCreated = (roomId: string) => this.onNewPrivateChatRoomCreated(roomId);
@@ -1283,6 +1288,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 audio.play();
             }
         }
+
+        if (this.ingame.entireGame.gameSettings.onlyLive) {
+            this.setIntervalId = window.setInterval(() => this.setNow(), 1000);
+        }
     }
 
     componentWillUnmount(): void {
@@ -1298,6 +1307,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         this.ingame.entireGame.onCombatFastTracked = null;
         this.ingame.onPreemptiveRaidNewAttack = null;
         this.ingame.onVoteStarted = null;
+
+        if (this.setIntervalId >= 0) {
+            window.clearInterval(this.setIntervalId);
+            this.setIntervalId = -1;
+        }
     }
 
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {

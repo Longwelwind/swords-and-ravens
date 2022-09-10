@@ -104,7 +104,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                 player = this.player;
                 isWaitedFor = this.ingame.getWaitedUsers().includes(player.user);
 
-                clock = player.liveClockData ? player.totalRemainingSeconds : null;
+                clock = player.liveClockData ? player.clientGetTotalRemainingSeconds(this.ingame.now) : null;
 
                 if (clock != null) {
                     clockCritical = gameRunning && clock > 0 && clock < (10 * 60);
@@ -243,7 +243,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         </OverlayTrigger>
                     </Col>
                 </Row>
-                {clock != null && this.ingame.clockUpdate >= 0 &&
+                {clock != null &&
                 <Row className="justify-content-center mb-2">
                     <img src={stopwatchImage} width={24}
                         className={classNames(
