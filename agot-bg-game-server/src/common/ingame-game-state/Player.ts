@@ -3,7 +3,7 @@ import User from "../../server/User";
 import IngameGameState from "./IngameGameState";
 import { VoteState } from "./vote-system/Vote";
 import { observable } from "mobx";
-import getElapsedSeconds from "../../utils/getElapsedSeconds";
+import getElapsedSeconds, { getTimeDeltaInSeconds } from "../../utils/getElapsedSeconds";
 
 export default class Player {
     user: User;
@@ -23,6 +23,20 @@ export default class Player {
         let total = this.liveClockData.remainingSeconds;
         if (this.liveClockData.timerStartedAt) {
             total -= getElapsedSeconds(this.liveClockData.timerStartedAt);
+            total = Math.max(0, total);
+        }
+
+        return total;
+    }
+
+    clientGetTotalRemainingSeconds(now: Date): number {
+        if (!this.liveClockData) {
+            throw new Error("totalRemainingSeconds requested but no liveClockData present");
+        }
+
+        let total = this.liveClockData.remainingSeconds;
+        if (this.liveClockData.timerStartedAt) {
+            total -= getTimeDeltaInSeconds(now, this.liveClockData.timerStartedAt);
             total = Math.max(0, total);
         }
 
@@ -72,19 +86,6 @@ export default class Player {
         this.waitedForData.handled = true;
     }
 
-    startClientClockInterval(): void {
-        if (this.liveClockData?.timerStartedAt) {
-            this.liveClockData.clientIntervalId = window.setInterval(() => this.user.entireGame.ingameGameState?.forceClockUpdate(), 1000);
-        }
-    }
-
-    stopClientClockInterval(): void {
-        if (this.liveClockData && this.liveClockData.clientIntervalId >= 0) {
-            window.clearInterval(this.liveClockData.clientIntervalId);
-            this.liveClockData.clientIntervalId = -1;
-        }
-    }
-
     serializeToClient(): SerializedPlayer {
         return {
             userId: this.user.id,
@@ -115,8 +116,7 @@ export default class Player {
             data.liveClockData ? {
                 remainingSeconds: data.liveClockData.remainingSeconds,
                 serverTimer: null,
-                timerStartedAt: data.liveClockData.timerStartedAt ? new Date(data.liveClockData.timerStartedAt) : null,
-                clientIntervalId: -1
+                timerStartedAt: data.liveClockData.timerStartedAt ? new Date(data.liveClockData.timerStartedAt) : null
             } : null
         );
     }
@@ -140,7 +140,6 @@ export interface LiveClockData {
     remainingSeconds: number;
     serverTimer: NodeJS.Timeout | null;
     timerStartedAt: Date | null;
-    clientIntervalId: number;
 }
 
 export interface SerializedLiveClockData {

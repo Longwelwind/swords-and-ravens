@@ -547,13 +547,6 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         }
     }
 
-    startClientClockIntervals(): void {
-        if (this.gameSettings.onlyLive && this.childGameState instanceof IngameGameState) {
-            const ingame = this.childGameState;
-            ingame.players.values.forEach(p => p.startClientClockInterval());
-        }
-    }
-
     getViewOfGame(): any {
         // Creating a view of the current turn of the game
         const turn = this.ingameGameState?.game.turn ?? -1;
