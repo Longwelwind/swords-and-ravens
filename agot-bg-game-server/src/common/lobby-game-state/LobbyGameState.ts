@@ -238,11 +238,6 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.thematicDraft = false;
             }
 
-            if (settings.blindDraft) {
-                settings.draftHouseCards = true;
-                settings.thematicDraft = false;
-            }
-
             // Allow disabling MoD options but enable them when switching to this setup
             if (!this.entireGame.isMotherOfDragons && settings.setupId == "mother-of-dragons") {
                 settings.vassals = true;
@@ -275,6 +270,13 @@ export default class LobbyGameState extends GameState<EntireGame> {
             if ((!this.entireGame.isDanceWithDragons && !this.entireGame.isDanceWithMotherOfDragons) &&
                 (settings.setupId == "a-dance-with-dragons" || settings.setupId == "a-dance-with-mother-of-dragons")) {
                 settings.adwdHouseCards = true;
+                settings.asosHouseCards = false;
+            }
+
+            if (settings.blindDraft) {
+                settings.draftHouseCards = true;
+                settings.thematicDraft = false;
+                settings.adwdHouseCards = false;
                 settings.asosHouseCards = false;
             }
 
