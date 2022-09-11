@@ -127,7 +127,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                     </>
                 ) : (
                     <Col xs={12} className="text-center">
-                        Waiting for {this.house.name}...
+                        Waiting for {this.props.gameState.ingame.getControllerOfHouse(this.house).house.name}...
                     </Col>
                 )}
             </>

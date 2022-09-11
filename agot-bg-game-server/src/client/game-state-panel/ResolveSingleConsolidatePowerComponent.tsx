@@ -136,7 +136,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<Ga
                         : <Col xs={12} className="text-center"><p>Click the order you want to resolve.</p></Col>
                     :
                     <Col xs={12} className="text-center">
-                        Waiting for {this.house.name}...
+                        Waiting for {this.gameState.ingame.getControllerOfHouse(this.house).house.name}...
                     </Col>}
             </>
         );

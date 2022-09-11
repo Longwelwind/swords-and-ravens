@@ -538,6 +538,14 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         game.ironBank = null;
     }
 
+    if (gameSettings.adwdHouseCards) {
+        const boltons = game.houses.tryGet("stark", null);
+        if (boltons) {
+            boltons.name = "Bolton";
+            boltons.color = "#c59699"
+        }
+    }
+
     return game;
 }
 

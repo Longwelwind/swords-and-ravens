@@ -41,7 +41,7 @@ export default class SelectRegionComponent extends Component<GameStateComponentP
                             </Row>
                         </>
                     ) : (
-                        <div className="text-center">Waiting for {this.props.gameState.house.name}...</div>
+                        <div className="text-center">Waiting for {this.props.gameState.ingame.getControllerOfHouse(this.props.gameState.house).house.name}...</div>
                     )}
                 </Col>
             </>

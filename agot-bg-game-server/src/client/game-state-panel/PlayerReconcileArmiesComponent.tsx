@@ -88,7 +88,7 @@ export default class PlayerReconcileArmiesComponent extends Component<GameStateC
                             </Col>
                         </>
                     ) : (
-                            <Col xs={12} className="text-center">Waiting for {this.house.name}...</Col>
+                            <Col xs={12} className="text-center">Waiting for {this.props.gameState.parentGameState.ingame.getControllerOfHouse(this.house).house.name}...</Col>
                         )}
                 </Row>
         );

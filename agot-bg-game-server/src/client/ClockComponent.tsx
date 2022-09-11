@@ -124,7 +124,6 @@ export default class ClockComponent extends Component<ClockComponentProps> {
         return null;
     }
 
-    
     setNow(): void {
         this.now = new Date();
     }

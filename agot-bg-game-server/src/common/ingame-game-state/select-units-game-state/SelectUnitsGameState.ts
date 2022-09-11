@@ -29,6 +29,10 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
         return this.parentGameState.game;
     }
 
+    get ingame(): IngameGameState {
+        return this.parentGameState.ingame;
+    }
+
     firstStart(house: House, possibleUnits: Unit[], count: number, canBeSkipped = false, unitsMustBeOfSameRegion = false): void {
         this.house = house;
         this.possibleUnits = possibleUnits;

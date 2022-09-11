@@ -65,7 +65,7 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
                     )
                 ) : (
                     <Col xs={12} className="text-center">
-                        Waiting for {this.house.name}...
+                        Waiting for {this.props.gameState.ingameGameState.getControllerOfHouse(this.house).house.name}...
                     </Col>
                 )}
             </>

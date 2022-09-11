@@ -54,7 +54,7 @@ export default class SelectUnitsComponent extends Component<GameStateComponentPr
                         </>
                     ) : (
                         <div className="text-center">
-                            Waiting for {this.props.gameState.house.name}...
+                            Waiting for {this.props.gameState.ingame.getControllerOfHouse(this.props.gameState.house).house.name}...
                         </div>
                     )}
                 </Col>

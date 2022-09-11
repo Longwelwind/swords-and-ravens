@@ -1892,6 +1892,19 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "90",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame" && serializedGame.gameSettings.adwdHouseCards) {
+                const boltons = serializedGame.childGameState.game.houses.find((h: any) => h.id == "stark");
+                if (boltons) {
+                    boltons.name = "Bolton";
+                    boltons.color = "#c59699"
+                }
+            }
+            return serializedGame;
+        }
     }
 ];
 

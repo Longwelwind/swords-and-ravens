@@ -24,6 +24,10 @@ export default class SelectRegionGameState<P extends ParentGameState> extends Ga
         return this.parentGameState.game;
     }
 
+    get ingame(): IngameGameState {
+        return this.parentGameState.ingame;
+    }
+
     firstStart(house: House, regions: Region[]): void {
         this.house = house;
         this.regions = regions;
