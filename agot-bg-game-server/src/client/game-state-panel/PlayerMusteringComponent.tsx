@@ -49,7 +49,9 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                     {this.isStarredConsolidatePowerMusteringType ? (
                         <>House <b>{this.house.name}</b> can resolve their Special Consolidate Power order in {this.props.gameState.regions[0]?.name ?? "Unknown"}.</>
                     ) : this.props.gameState.type == PlayerMusteringType.MUSTERING_WESTEROS_CARD ? (
-                        <>Players can muster units in their controlled Strongholds and Castles.</>
+                        this.props.gameState.ingame.isVassalHouse(this.house)
+                            ? <>Vassal House <b>{this.house.name}</b> can muster units in their home area.</>
+                            : <>Players can muster units in their controlled Strongholds and Castles.</>
                     ) : this.props.gameState.type == PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD ? (
                         <>House <b>{this.house.name}</b> can muster units in one of their controlled Strongholds or Castles.</>
                     ) : this.props.gameState.type == PlayerMusteringType.DEFENSE_MUSTER_ORDER ? (
