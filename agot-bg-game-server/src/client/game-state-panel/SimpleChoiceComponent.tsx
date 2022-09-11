@@ -25,7 +25,7 @@ export default class SimpleChoiceComponent extends Component<GameStateComponentP
                             ))}
                         </Row>
                     ) : (
-                        <>Waiting for {this.props.gameState.house.name}...</>
+                        <>Waiting for {this.props.gameState.parentGameState.ingame.getControllerOfHouse(this.props.gameState.house).house.name}...</>
                     )}
                 </Col>
             </>

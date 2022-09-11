@@ -56,7 +56,7 @@ export default class DeclareSupportComponent extends Component<GameStateComponen
                         </Row>
                     ) : (
                         <div className="text-center">
-                            Waiting for {this.props.gameState.house.name} to declare its support...
+                            Waiting for {this.props.gameState.ingameGameState.getControllerOfHouse(this.props.gameState.house).house.name} to declare its support...
                         </div>
                     )}
                 </Col>
