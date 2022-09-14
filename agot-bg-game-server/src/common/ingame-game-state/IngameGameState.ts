@@ -301,6 +301,10 @@ export default class IngameGameState extends GameState<
         // Unwound each units
         this.world.regions.forEach(r => r.units.forEach(u => u.wounded = false));
 
+        for (let i = 0; i < this.game.winterIsComingHappened.length; i++) {
+            this.game.winterIsComingHappened[i] = false;
+        }
+
         this.entireGame.broadcastToClients({
             type: "new-turn"
         });
@@ -995,6 +999,7 @@ export default class IngameGameState extends GameState<
             }
         } else if (message.type == "update-westeros-decks") {
             this.game.westerosDecks = message.westerosDecks.map(wd => wd.map(wc => WesterosCard.deserializeFromServer(wc)));
+            this.game.winterIsComingHappened = message.winterIsComingHappened;
         } else if (message.type == "hide-top-wildling-card") {
             this.game.houses.forEach(h => h.knowsNextWildlingCard = false);
             this.game.clientNextWildlingCardId = null;
@@ -1628,7 +1633,8 @@ export default class IngameGameState extends GameState<
         this.entireGame.broadcastToClients({
             type: "update-westeros-decks",
             westerosDecks: this.game.westerosDecks.map(wd => wd.slice(0, this.game.revealedWesterosCards)
-                .concat(shuffleInPlace(wd.slice(this.game.revealedWesterosCards))).map(wc => wc.serializeToClient()))
+                .concat(shuffleInPlace(wd.slice(this.game.revealedWesterosCards))).map(wc => wc.serializeToClient())),
+            winterIsComingHappened: this.game.winterIsComingHappened
         });
     }
 

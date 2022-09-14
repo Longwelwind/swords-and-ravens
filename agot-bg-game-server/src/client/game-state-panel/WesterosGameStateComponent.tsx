@@ -48,6 +48,7 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
                                 <WesterosCardComponent
                                     cardType={wc.type}
                                     westerosDeckI={this.props.gameState.revealAndResolveTop2WesterosDeck4Cards ? 3 : i}
+                                    wasReshuffled={this.props.gameState.game.winterIsComingHappened[i]}
                                     size={"small"}
                                     tooltip={true}
                                     classNames={classNames({"medium-outline": this.props.gameState.currentCardI == i})}

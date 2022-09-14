@@ -453,6 +453,9 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         game.westerosDecks[0] = cards;
     }
 
+    game.winterIsComingHappened = [];
+    game.westerosDecks.forEach(_wd => game.winterIsComingHappened.push(false));
+
     // Load Wildling deck
     let lastWildlingCardId = 0;
     game.wildlingDeck = baseGameData.wildlingCards.map(wildlingCardData => {

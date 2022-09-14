@@ -1905,6 +1905,17 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "91",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const game = serializedGame.childGameState.game;
+                game.winterIsComingHappened = [];
+                game.westerosDecks.forEach((_wd: any) => game.winterIsComingHappened.push(false));
+            }
+            return serializedGame;
+        }
     }
 ];
 
