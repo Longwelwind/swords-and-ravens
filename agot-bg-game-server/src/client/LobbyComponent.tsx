@@ -14,7 +14,7 @@ import ChatComponent from "./chat-client/ChatComponent";
 import GameSettingsComponent from "./GameSettingsComponent";
 import User from "../server/User";
 import ConditionalWrap from "./utils/ConditionalWrap";
-import { Badge, OverlayTrigger } from "react-bootstrap";
+import { Badge, OverlayTrigger, Spinner } from "react-bootstrap";
 import Tooltip from "react-bootstrap/Tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faTimes} from "@fortawesome/free-solid-svg-icons/faTimes";
@@ -254,19 +254,22 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
 
         if (this.lobby.readyUsers != null) {
             // Ready-check ongoing
-            if (!this.lobby.players.has(h)) {
+            if (!this.lobby.players.has(h) || invisible) {
                 return null;
             }
             return  (
-                this.lobby.readyUsers.includes(this.lobby.players.get(h)) ? (
-                    <Col xs="auto" className={invisible ? "invisible" : ""}>
+                this.lobby.readyUsers.includes(this.lobby.players.get(h))
+                    ? <Col xs="auto">
                         <Badge variant="success"><FontAwesomeIcon icon={faCheck} size="2x" /></Badge>
                     </Col>
-                ) : this.lobby.players.get(h) == this.authenticatedUser ? (
-                    <Col xs="auto" className={invisible ? "invisible" : ""}>
-                        <Button variant="outline-success" onClick={() => this.ready()}>Set Ready</Button>
-                    </Col>
-                ) : null
+                    : this.lobby.players.get(h) == this.authenticatedUser
+                        ? <Col xs="auto">
+                            <Button variant="outline-success" onClick={() => this.ready()} style={{verticalAlign: 6}}>Ready</Button>
+                            <Spinner className="ml-3" animation="border" variant="info" />
+                        </Col>
+                        : <Col xs="auto">
+                            <Spinner animation="border" variant="info" />
+                        </Col>
             );
         }
 
