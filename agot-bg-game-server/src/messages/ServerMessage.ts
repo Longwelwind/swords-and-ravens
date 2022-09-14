@@ -277,6 +277,7 @@ interface GameSettingsChanged {
 interface UpdateWesterosDecks {
     type: "update-westeros-decks";
     westerosDecks: SerializedWesterosCard[][];
+    winterIsComingHappened: boolean[];
 }
 
 interface UpdateConnectionStatus {

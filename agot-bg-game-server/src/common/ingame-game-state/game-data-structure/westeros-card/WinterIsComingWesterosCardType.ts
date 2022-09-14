@@ -12,6 +12,8 @@ export default class WinterIsComingWesterosCardType extends WesterosCardType {
             westerosDeckI: currentDeckI
         });
 
+        westerosGameState.game.winterIsComingHappened[currentDeckI] = true;
+
         let deck = westerosGameState.game.westerosDecks[currentDeckI];
         const dontShuffle = Math.max(0,westerosGameState.game.revealedWesterosCards - 1);
 

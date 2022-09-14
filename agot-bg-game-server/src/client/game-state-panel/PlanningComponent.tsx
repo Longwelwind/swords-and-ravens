@@ -30,6 +30,7 @@ export default class PlanningComponent extends Component<GameStateComponentProps
                                 <WesterosCardComponent
                                     cardType={wc.type}
                                     westerosDeckI={i}
+                                    wasReshuffled={this.props.gameState.game.winterIsComingHappened[i]}
                                     size={"small"}
                                     tooltip={true}
                                 />

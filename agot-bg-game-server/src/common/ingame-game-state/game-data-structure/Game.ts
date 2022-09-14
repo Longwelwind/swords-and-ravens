@@ -45,6 +45,7 @@ export default class Game {
     supplyRestrictions: number[][];
     starredOrderRestrictions: number[];
     westerosDecks: WesterosCard[][];
+    winterIsComingHappened: boolean[];
     victoryPointsCountNeededToWin: number;
     @observable maxTurns: number;
     vassalHouseCards: BetterMap<string, HouseCard> = new BetterMap<string, HouseCard>();
@@ -540,6 +541,7 @@ export default class Game {
                 : this.westerosDecks.map(wd => wd.slice(0, this.revealedWesterosCards)
                     .concat(shuffleInPlace(wd.slice(this.revealedWesterosCards)))
                     .map(wc => wc.serializeToClient())),
+            winterIsComingHappened: this.winterIsComingHappened,
             // Same for the wildling deck
             wildlingDeck: admin
                 ? this.wildlingDeck.map(c => c.serializeToClient())
@@ -577,6 +579,7 @@ export default class Game {
         game.fiefdomsTrack = data.fiefdomsTrack.map(hid => game.houses.get(hid));
         game.kingsCourtTrack = data.kingsCourtTrack.map(hid => game.houses.get(hid));
         game.westerosDecks = data.westerosDecks.map(wd => wd.map(wc => WesterosCard.deserializeFromServer(wc)));
+        game.winterIsComingHappened = data.winterIsComingHappened;
         game.wildlingStrength = data.wildlingStrength;
         game.supplyRestrictions = data.supplyRestrictions;
         game.valyrianSteelBladeUsed = data.valyrianSteelBladeUsed;
@@ -612,6 +615,7 @@ export interface SerializedGame {
     fiefdomsTrack: string[];
     kingsCourtTrack: string[];
     westerosDecks: SerializedWesterosCard[][];
+    winterIsComingHappened: boolean[];
     starredOrderRestrictions: number[];
     wildlingStrength: number;
     valyrianSteelBladeUsed: boolean;
