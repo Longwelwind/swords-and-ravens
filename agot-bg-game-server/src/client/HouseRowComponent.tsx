@@ -166,7 +166,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                 </Navbar>
                             : (
                                 this.suzerainHouse ?
-                                    <>Commanded by {this.suzerainHouse.name}</>
+                                    <>Commanded by <span style={{color: this.suzerainHouse.color}}>{this.suzerainHouse.name}</span></>
                                 :
                                     <>Up for grab</>
                             )
