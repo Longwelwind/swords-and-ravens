@@ -277,7 +277,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                         </Card.Body>
                     </Card>
                 </div>, {
-                    autoClose: 4000,
+                    autoClose: 3000,
                     toastId: "your-turn-toast",
                     pauseOnHover: false,
                     theme: "light",
