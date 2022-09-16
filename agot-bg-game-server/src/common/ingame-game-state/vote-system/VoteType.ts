@@ -235,6 +235,10 @@ export class CancelGame extends VoteType {
         return "cancel the game";
     }
 
+    getPositiveCountToPass(vote: Vote): number {
+        return vote.participatingHouses.length;
+    }
+
     executeAccepted(vote: Vote): void {
         vote.ingame.setChildGameState(new CancelledGameState(vote.ingame)).firstStart();
     }
