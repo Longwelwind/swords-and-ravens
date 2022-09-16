@@ -96,7 +96,7 @@ import PartialRecursive from "../utils/PartialRecursive";
 import ChooseInitialObjectivesGameState from "../common/ingame-game-state/choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
 import ChooseInitialObjectivesComponent from "./game-state-panel/ChooseInitialObjectivesComponent";
 import ObjectivesInfoComponent from "./ObjectivesInfoComponent";
-import { Button, FormCheck, Modal, Popover } from "react-bootstrap";
+import { Button, FormCheck, Modal, Popover, Spinner } from "react-bootstrap";
 import WesterosCardComponent from "./game-state-panel/utils/WesterosCardComponent";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import WildlingCardType from "../common/ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
@@ -104,7 +104,6 @@ import WildlingCardComponent from "./game-state-panel/utils/WildlingCardComponen
 import getIngameUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 import IronBankTabComponent from "./IronBankTabComponent";
 import { CombatStats } from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
-import sleep from "../utils/sleep";
 import CombatInfoComponent from "./CombatInfoComponent";
 import HouseNumberResultsComponent from "./HouseNumberResultsComponent";
 import houseIconImages from "./houseIconImages";
@@ -311,12 +310,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             />
                         </ListGroupItem>
                     </ListGroup>
-                    <button className="btn btn-outline-light btn-sm" onClick={async() => {
+                    <button className="btn btn-outline-light btn-sm" onClick={() => {
                             if (this.user && this.columnSwapAnimationClassName == "") {
                                 this.columnSwapAnimationClassName = "animate__animated animate__fadeIn"
                                 this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
-                                await sleep(950);
-                                this.columnSwapAnimationClassName = "";
+                                window.setTimeout(() => this.columnSwapAnimationClassName = "", 950);
                             }
                         }}
                         style={{position: "absolute", left: "0px", padding: "8px", borderStyle: "none"}}
@@ -732,18 +730,18 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         </Col>
                     </Col>
                 </Row>
-                <button className="btn btn-outline-light btm-sm" onClick={async() => {
+                <button className="btn btn-outline-light btm-sm" onClick={() => {
                         if (this.user && this.columnSwapAnimationClassName == "") {
                             this.columnSwapAnimationClassName = "animate__animated animate__fadeIn"
                             this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
-                            await sleep(950);
-                            this.columnSwapAnimationClassName = "";
+                            window.setTimeout(() => this.columnSwapAnimationClassName = "", 950);
                         }
                     }}
                     style={{position: "absolute", left: "0px", padding: "8px", borderStyle: "none"}}
                 >
                     <FontAwesomeIcon icon={faRightLeft} style={{color: "white"}}/>
                 </button>
+                {this.gameClient.isOwnTurn() && <Spinner animation="grow" variant="warning" size="sm" style={{position: "absolute", bottom: "4px", left: "4px" }}/>}
             </Card>
             <Card style={{height: this.mapScrollbarEnabled ? "auto" : "800px"}} className={this.mapScrollbarEnabled ? "flex-fill-remaining" : ""}>
                 <Tab.Container activeKey={this.currentOpenedTab}
