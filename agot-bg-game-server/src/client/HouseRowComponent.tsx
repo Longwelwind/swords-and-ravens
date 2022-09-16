@@ -77,11 +77,9 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         const victoryPointsCritical = gameRunning && (this.game.victoryPointsCountNeededToWin - 1 == victoryPoints || this.game.victoryPointsCountNeededToWin == victoryPoints);
         let isWaitedFor = false;
 
-        const vassalTitle = <span className="userlabel">
-            {this.suzerainHouse
-                ? `Commanded by ${this.suzerainHouse.name}`
-                : "Up for grab"}
-        </span>;
+        const vassalTitle = this.suzerainHouse
+                ? <>Commanded by <span style={{color: this.suzerainHouse.color}}>{this.suzerainHouse.name}</span></>
+                : <>Up for grab</>;
 
         const victoryImage = this.props.ingame.entireGame.isFeastForCrows
             ? laurelCrownImage :
@@ -158,18 +156,13 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                 <Navbar variant="dark" className="no-space-around">
                                     <Navbar.Collapse id={`vassal-navbar-${this.house.id}`} className="no-space-around">
                                         <Nav className="no-space-around">
-                                            <NavDropdown id={`vassal-nav-dropdown-${this.house.id}`} className="no-gutters" title={vassalTitle}>
+                                            <NavDropdown id={`vassal-nav-dropdown-${this.house.id}`} className="no-gutters" title={<span className="userlabel">{vassalTitle}</span>}>
                                                 {this.renderVassalDropDownItems()}
                                             </NavDropdown>
                                         </Nav>
                                     </Navbar.Collapse>
                                 </Navbar>
-                            : (
-                                this.suzerainHouse ?
-                                    <>Commanded by <span style={{color: this.suzerainHouse.color}}>{this.suzerainHouse.name}</span></>
-                                :
-                                    <>Up for grab</>
-                            )
+                            : vassalTitle
                         )}
                     </Col>
                     <Col xs="auto">
