@@ -699,7 +699,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     </div>
                                 </OverlayTrigger>
                             </Row>
-                            <Row className="mx-0 clickable-no-underline hover-weak-text-outline">
+                            <Row className="mx-0 clickable">
                                 <OverlayTrigger overlay={this.renderWildlingDeckPopover(knowsWildlingCard, nextWildlingCard?.type)}
                                     trigger="click"
                                     placement="auto"
