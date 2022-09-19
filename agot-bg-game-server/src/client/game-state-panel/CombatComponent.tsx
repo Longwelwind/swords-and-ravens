@@ -184,7 +184,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
         const selectUnits = this.combat.hasChildGameState(SelectUnitsGameState) ? this.combat.getChildGameState(SelectUnitsGameState) as SelectUnitsGameState<any>: null;
 
         if (!selectUnits || !this.props.gameClient.doesControlHouse(selectUnits.house)) {
-            return this.combat.attackingArmy.map(u => ([u, {highlight: {active: false, color: "red"}, targetRegion: drawMarchMarkers ? this.combat.defendingRegion : null}]));
+            return this.combat.attackingArmy.map(u => ([u, {highlight: {active: true, color: "red"}, targetRegion: drawMarchMarkers ? this.combat.defendingRegion : null}]));
         } else if (this.props.gameClient.doesControlHouse(selectUnits.house)) {
             return [];
         } else {

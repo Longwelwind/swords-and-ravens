@@ -7,7 +7,7 @@ import Region from "../../common/ingame-game-state/game-data-structure/Region";
 import Unit from "../../common/ingame-game-state/game-data-structure/Unit";
 import * as _ from "lodash";
 import {observer} from "mobx-react";
-import {Button, Form} from "react-bootstrap";
+import {Button, Form, OverlayTrigger, Tooltip} from "react-bootstrap";
 import BetterMap from "../../utils/BetterMap";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Row from "react-bootstrap/Row";
@@ -16,6 +16,10 @@ import {OrderOnMapProperties, RegionOnMapProperties, UnitOnMapProperties} from "
 import PartialRecursive from "../../utils/PartialRecursive";
 import House from "../../common/ingame-game-state/game-data-structure/House";
 import UnitIconComponent from "../UnitIconComponent";
+import { preventOverflow } from "@popperjs/core";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 
 @observer
 export default class ResolveSingleMarchOrderComponent extends Component<GameStateComponentProps<ResolveSingleMarchOrderGameState>> {
@@ -38,13 +42,31 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         return this.props.gameState.ingame.isVassalHouse(this.house);
     }
 
+    get attackingUnits(): Unit[] {
+        return _.flatMap(this.plannedMoves.entries.filter(([r, _u]) => this.props.gameState.doesMoveTriggerAttack(r)).map(([_r, u]) => u));
+    }
+
+    get usedButStillValidTargetRegions(): Region[] {
+        return this.selectedMarchOrderRegion != null && this.selectedUnits.length > 0
+            ? this.props.gameState.getUsedButStillValidTargetRegions(this.selectedMarchOrderRegion, this.plannedMoves, this.selectedUnits)
+            : [];
+    }
+
+    get validTargetRegions(): Region[] {
+        return this.selectedMarchOrderRegion != null && this.selectedUnits.length > 0
+            ? this.props.gameState.getValidTargetRegions(this.selectedMarchOrderRegion, this.plannedMoves.entries, this.selectedUnits)
+            : [];
+    }
+
     constructor(props: GameStateComponentProps<ResolveSingleMarchOrderGameState>) {
         super(props);
         this.UNSAFE_componentWillUpdate();
     }
 
     render(): ReactNode {
-        const allUnitsWillLeaveStartingRegion = this.selectedMarchOrderRegion ? this.props.gameState.haveAllUnitsLeft(this.selectedMarchOrderRegion, this.plannedMoves) : false;
+        const movingUnits = _.flatMap(this.plannedMoves.values);
+        const allUnitsWillLeaveStartingRegion = this.selectedMarchOrderRegion ? this.selectedMarchOrderRegion.units.size == movingUnits.length : false;
+        const allUnitsSelected = this.selectedMarchOrderRegion?.allUnits.length == this.selectedUnits.length;
         return (
             <>
                 <Col xs={12} className="text-center">
@@ -53,14 +75,29 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                 </Col>
                 {this.props.gameClient.doesControlHouse(this.house) ? (
                     <>
-                        <Col xs={12} className="text-center">
-                            {this.selectedMarchOrderRegion == null ? (
-                                "Click on one of your March Orders."
-                            ) : this.selectedUnits.length == 0 && !allUnitsWillLeaveStartingRegion ? (
-                                <>Click on a subset of the troops in <b>{this.selectedMarchOrderRegion.name}</b>.</>
-                            ) : !allUnitsWillLeaveStartingRegion ? (
-                                <>Click on a neighbouring region, or click on other units in <b>{this.selectedMarchOrderRegion.name}</b>.</>
-                            ) : (<></>)}
+                        <Col xs={12}>
+                            <Row className="d-flex justify-content-center align-items-center">
+                                <Col xs="auto" className="text-center">
+                                    {this.selectedMarchOrderRegion == null ? (
+                                        <>Click on one of your March Orders.<br/>Double-click the order to select all units in that area.</>
+                                    ) : this.selectedUnits.length == 0 && !allUnitsWillLeaveStartingRegion ? (
+                                        <>Click on a subset of the troops in <b>{this.selectedMarchOrderRegion.name}</b>.</>
+                                    ) : this.selectedUnits.length != 0 && this.validTargetRegions.length == 0 && this.usedButStillValidTargetRegions.length == 0 ? (
+                                        <>There are no valid target areas for your current selection!</>
+                                    ) : !allUnitsWillLeaveStartingRegion ? (
+                                        <>Click on a neighbouring area{!allUnitsSelected && <>, or click on other units in <b>{this.selectedMarchOrderRegion.name}</b></>}.</>
+                                    ) : (<></>)}
+                                </Col>
+                                {!allUnitsWillLeaveStartingRegion && <Col xs="auto">
+                                    <OverlayTrigger overlay={this.renderColorLegendTooltip()}
+                                        popperConfig={{ modifiers: [preventOverflow] }}
+                                        placement="auto">
+                                        <FontAwesomeIcon
+                                            style={{ fontSize: "24px" }}
+                                            icon={faInfoCircle} />
+                                    </OverlayTrigger>
+                                </Col>}
+                            </Row>
                         </Col>
                         {this.selectedMarchOrderRegion && this.plannedMoves.size > 0 && (
                             <Col xs={12} className="mt-2">
@@ -132,6 +169,17 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                 )}
             </>
         );
+    }
+
+    renderColorLegendTooltip(): OverlayChildren {
+        return <Tooltip id={`color-legend-tooltip`} className="tooltip-w-100">
+            <Col>
+                <h6>Highlighted units legend</h6>
+                <div><b>White</b>: Selectable</div>
+                <div><b style={{color: "yellow"}}>Yellow</b>: Selected</div>
+                <div><b style={{color: "red"}}>Red</b>: Attacking</div>
+            </Col>
+        </Tooltip>;
     }
 
     callForSupportAgainstNeutralForces(): void {
@@ -239,24 +287,16 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         this.leavePowerToken = leaveToken;
     }
 
-    onUnitClick(region: Region, unit: Unit): void {
-        this.selectedUnits.push(unit);
-    }
-
-    isUnitAvailable(unit: Unit): boolean {
-        if (this.selectedUnits.indexOf(unit) != -1) {
-            return false;
+    onUnitClick(_region: Region, unit: Unit): void {
+        if (this.selectedUnits.includes(unit)) {
+            _.pull(this.selectedUnits, unit);
+        } else {
+            this.selectedUnits.push(unit);
         }
-
-        if (this.plannedMoves.values.some(units => units.indexOf(unit) != -1)) {
-            return false;
-        }
-
-        return true;
     }
 
     onRegionClick(region: Region): void {
-        const alreadyGoingUnits = this.plannedMoves.has(region) ? this.plannedMoves.get(region) as Unit[] : [];
+        const alreadyGoingUnits: Unit[] = this.plannedMoves.has(region) ? this.plannedMoves.get(region) : [];
 
         const newGoingArmy = alreadyGoingUnits.concat(this.selectedUnits);
 
@@ -271,8 +311,12 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         this.selectedUnits = [];
     }
 
-    onOrderClick(region: Region): void {
-        this.selectedMarchOrderRegion = region;
+    onOrderClick(event: React.MouseEvent<HTMLDivElement>, region: Region): void {
+        if (event.detail != 1) {
+            this.selectedUnits = region.allUnits;
+        }
+
+        window.setTimeout(() => this.selectedMarchOrderRegion = region, 250);
     }
 
     reset(): void {
@@ -316,9 +360,11 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
             if (this.selectedMarchOrderRegion == null) {
                 return this.props.gameState.getRegionsWithMarchOrder().map(r => [
                     r,
-                    {highlight: {active: true}, onClick: () => this.onOrderClick(r)}
+                    {highlight: {active: true}, onClick: (e: React.MouseEvent<HTMLDivElement>) => this.onOrderClick(e, r)}
                 ]);
             }
+
+            return [[this.selectedMarchOrderRegion, {highlight: {active: true}, onClick: () => this.reset()}]]
         }
 
         return [];
@@ -326,14 +372,23 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
 
     modifyUnitsOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.house)) {
-            const marchableUnits = this.selectedMarchOrderRegion != null ? this.props.gameState.getValidMarchUnits(this.selectedMarchOrderRegion).filter(u => this.isUnitAvailable(u)) : [];
-            const attackingUnits = _.flatMap(this.plannedMoves.entries.filter(([r, _u]) => this.props.gameState.doesMoveTriggerAttack(r)).map(([_r, u]) => u));
+            if (!this.selectedMarchOrderRegion) {
+                return [];
+            }
 
-            return _.concat(marchableUnits, attackingUnits).map(u => [
+            const attackingUnits = this.attackingUnits;
+
+            return this.selectedMarchOrderRegion.allUnits.map(u => [
                 u,
                 {
-                    highlight: { active: true, color: attackingUnits.includes(u) ? "red" : "white"},
-                    onClick: () => marchableUnits.includes(u) && !attackingUnits.includes(u) ? this.onUnitClick(this.selectedMarchOrderRegion as Region, u) : null
+                    highlight: {
+                        active: true,
+                        color: attackingUnits.includes(u)
+                            ? "red"
+                            : this.selectedUnits.includes(u)
+                                ? "yellow"
+                                : "white"},
+                    onClick: !attackingUnits.includes(u) ? () => this.onUnitClick(this.selectedMarchOrderRegion as Region, u) : undefined
                 }
             ]);
         }
@@ -343,14 +398,15 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
 
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.house)) {
-            const targetRegions = this.selectedMarchOrderRegion != null && this.selectedUnits.length > 0 ? this.props.gameState.getValidTargetRegions(this.selectedMarchOrderRegion, this.plannedMoves.entries, this.selectedUnits) : [];
+            const targetRegions = this.validTargetRegions;
+            const usedButStillValidTargetRegions = this.usedButStillValidTargetRegions;
             const combatRegions = this.plannedMoves.keys.filter(r => this.props.gameState.doesMoveTriggerAttack(r));
 
-            return _.concat(targetRegions, combatRegions).map(r => [
+            return _.concat(targetRegions, usedButStillValidTargetRegions, combatRegions).map(r => [
                 r,
                 {
                     highlight: {active: true, color: combatRegions.includes(r) ? "yellow" : "white"},
-                    onClick: () => targetRegions.includes(r) ? this.onRegionClick(r) : null
+                    onClick: targetRegions.includes(r) || usedButStillValidTargetRegions.includes(r) ? () => this.onRegionClick(r) : undefined
                 }
             ]);
         }
