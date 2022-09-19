@@ -14,20 +14,20 @@ interface HighlightProperties {
 
 export interface RegionOnMapProperties {
     highlight: HighlightProperties;
-    onClick: (() => void) | null;
-    wrap: ((child: ReactElement) => ReactElement) | null;
+    onClick?: () => void;
+    wrap?: (child: ReactElement) => ReactElement;
 }
 
 export interface UnitOnMapProperties {
     highlight: HighlightProperties;
-    onClick: (() => void) | null;
+    onClick?: () => void;
     targetRegion: Region | null;
 }
 
 export interface OrderOnMapProperties {
     highlight: HighlightProperties;
-    onClick: (() => void) | null;
-    wrap: ((child: ReactElement) => ReactElement) | null;
+    onClick?: () => void;
+    wrap?: (child: ReactElement) => ReactElement;
 }
 
 export default class MapControls {

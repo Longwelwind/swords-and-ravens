@@ -348,6 +348,16 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             .filter(r => r.type == port ? !this.ingame.isVassalHouse(this.house) : true);
     }
 
+    // Client-side only
+    getUsedButStillValidTargetRegions(startingRegion: Region, moves: BetterMap<Region, Unit[]>, movingArmy: Unit[]): Region[] {
+        return moves.keys.filter(region => {
+            const oldArmy = moves.get(region);
+            const movesWithoutOldArmy = moves.entries.filter(([r, _u]) => r != region);
+            // If valid target regions still include the region, the selected units can march into it
+            return this.getValidTargetRegions(startingRegion, movesWithoutOldArmy, _.concat(oldArmy, movingArmy)).includes(region);
+        });
+    }
+
     getReachableNeutralForces(): Region[] {
         return _.flatMap(this.getRegionsWithMarchOrder()
             // Neutral forces just can be taken by land units

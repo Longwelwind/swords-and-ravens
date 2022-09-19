@@ -110,19 +110,19 @@ export default class MapComponent extends Component<MapComponentProps> {
         const propertiesForRegions = this.getModifiedPropertiesForEntities<Region, RegionOnMapProperties>(
             this.ingame.world.regions.values,
             this.props.mapControls.modifyRegionsOnMap,
-            { highlight: { active: false, color: "white" }, onClick: null, wrap: null }
+            { highlight: { active: false, color: "white" } }
         );
 
         // If the user is to select a region, we disable the pointer events for units to forward the click event to the region.
         // This makes it easier to hit the ports!
         const disablePointerEventsForUnits = this.props.gameClient.authenticatedUser != null &&
                 this.props.ingameGameState.leafState.getWaitedUsers().includes(this.props.gameClient.authenticatedUser) &&
-                propertiesForRegions.values.some(p => p.onClick != null || p.wrap != null);
+                propertiesForRegions.values.some(p => p.onClick != undefined || p.wrap != undefined);
 
         const propertiesForUnits = this.getModifiedPropertiesForEntities<Unit, UnitOnMapProperties>(
             _.flatMap(this.props.ingameGameState.world.regions.values.map(r => r.allUnits)),
             this.props.mapControls.modifyUnitsOnMap,
-            { highlight: { active: false, color: "white" }, onClick: null, targetRegion: null }
+            { highlight: { active: false, color: "white" }, targetRegion: null }
         );
 
         return (
@@ -307,8 +307,8 @@ export default class MapComponent extends Component<MapComponentProps> {
                         fillRule="evenodd"
                         className={classNames(
                             region.isBlocked ? "blocked-region" : "region-area",
+                            { "clickable" : properties.onClick != undefined || properties.wrap != undefined },
                             properties.highlight.active && {
-                                "clickable": true,
                                 // Whatever the strength of the highlight defined, show the same
                                 // highlightness
                                 "highlighted-region-area": true,
@@ -316,7 +316,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                                 "highlighted-region-area-strong": properties.highlight.strong
                             }
                         )}
-                        onClick={properties.onClick != null ? properties.onClick : undefined} />
+                        onClick={properties.onClick} />
                 </ConditionalWrap>
             );
         });
@@ -348,7 +348,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         return this.props.ingameGameState.world.regions.values.map(r => {
             let disablePointerEventsForCurrentRegion = disablePointerEvents;
             // If there is a clickable unit (e.g. during mustering), don't disable pointer events!
-            if (r.allUnits.map(u => propertiesForUnits.get(u)).some(p => p.onClick != null)) {
+            if (r.allUnits.map(u => propertiesForUnits.get(u)).some(p => p.onClick != undefined)) {
                 disablePointerEventsForCurrentRegion = false;
             }
 
@@ -369,7 +369,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                         transform = `none`;
                     } else if (u.type == ship) {
                         opacity = 0.5;
-                        transform = `none`;
+                        transform = `rotate(-38deg)`;
                     } else {
                         opacity = 0.7;
                         transform = `rotate(90deg)`;
@@ -386,21 +386,33 @@ export default class MapComponent extends Component<MapComponentProps> {
                     >
                         <div onClick={property.onClick ? property.onClick : undefined}
                             className={classNames(
-                                "unit-icon hover-weak-outline",
+                                "unit-icon",
                                 {
-                                    "clickable": property.onClick != null
+                                    "hover-weak-outline": !property.highlight.active
                                 },
                                 {
-                                    "medium-outline hover-strong-outline": property.highlight.active
+                                    "clickable hover-strong-outline": property.onClick != undefined
                                 },
                                 {
-                                    "attacking-army-highlight": property.highlight.color == "red"
+                                    "medium-outline": property.highlight.active
+                                },
+                                {
+                                    "unit-highlight-red": property.highlight.color == "red"
                                 },
                                 {
                                     "unit-highlight-yellow": property.highlight.color == "yellow"
                                 },
                                 {
                                     "unit-highlight-green": property.highlight.color == "green"
+                                },
+                                {
+                                    "hover-strong-outline-red": property.highlight.color == "red" && property.onClick != undefined
+                                },
+                                {
+                                    "hover-strong-outline-yellow": property.highlight.color == "yellow" && property.onClick != undefined
+                                },
+                                {
+                                    "hover-strong-outline-green": property.highlight.color == "green" && property.onClick != undefined
                                 },
                                 {
                                     "disable-pointer-events": disablePointerEventsForCurrentRegion
@@ -515,7 +527,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         const propertiesForOrders = this.getModifiedPropertiesForEntities<Region, OrderOnMapProperties>(
             _.flatMap(this.props.ingameGameState.world.regions.values),
             this.props.mapControls.modifyOrdersOnMap,
-            { highlight: { active: false, color: "white" }, onClick: null, wrap: null }
+            { highlight: { active: false, color: "white" } }
         );
 
         return propertiesForOrders.map((region, properties) => {
@@ -615,12 +627,13 @@ export default class MapComponent extends Component<MapComponentProps> {
                         "order-container",
                         {
                             "hover-weak-outline": order != null,
-                            "medium-outline hover-strong-outline clickable": order && properties.highlight.active,
-                            "restricted-order": planningOrAction && order && this.ingame.game.isOrderRestricted(region, order, planningOrAction.planningRestrictions)
+                            "medium-outline hover-strong-outline": order && properties.highlight.active,
+                            "restricted-order": planningOrAction && order && this.ingame.game.isOrderRestricted(region, order, planningOrAction.planningRestrictions),
+                            "clickable": properties.onClick != undefined || properties.wrap != undefined
                         }
                     )}
                         style={{ left: region.orderSlot.x, top: region.orderSlot.y}}
-                        onClick={properties.onClick ? properties.onClick : undefined}
+                        onClick={properties.onClick}
                         key={`map-order-container_${region.id}`}
                     >
                         <div className={classNames("order-icon", { "order-border": drawBorder } )}

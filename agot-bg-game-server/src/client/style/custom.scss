@@ -378,19 +378,31 @@ $medium-outline: rgba($outline-color, 0.6);
   transition: all 0.12s linear;
 }
 
-$attacking-army-outline: red;
-.attacking-army-highlight {
-  filter: drop-shadow(3px 3px 3px $attacking-army-outline) drop-shadow(-3px -3px 3px $attacking-army-outline) drop-shadow(3px -3px 3px $attacking-army-outline) drop-shadow(-3px 3px 3px $attacking-army-outline);
+.unit-highlight-red {
+  filter: drop-shadow(3px 3px 3px red) drop-shadow(-3px -3px 3px red) drop-shadow(3px -3px 3px red) drop-shadow(-3px 3px 3px red);
 }
 
-$unit-highlight-outline-yellow: yellow;
+.hover-strong-outline-red:hover {
+  filter: drop-shadow(5px 5px 6px red) drop-shadow(-5px -5px 6px red) drop-shadow(5px -5px 6px red) drop-shadow(-5px 5px 6px red);
+  transition: all 0.12s linear;
+}
+
 .unit-highlight-yellow {
-  filter: drop-shadow(3px 3px 3px $unit-highlight-outline-yellow) drop-shadow(-3px -3px 3px $unit-highlight-outline-yellow) drop-shadow(3px -3px 3px $unit-highlight-outline-yellow) drop-shadow(-3px 3px 3px $unit-highlight-outline-yellow);
+  filter: drop-shadow(3px 3px 3px yellow) drop-shadow(-3px -3px 3px yellow) drop-shadow(3px -3px 3px yellow) drop-shadow(-3px 3px 3px yellow);
 }
 
-$unit-highlight-outline-green: green;
+.hover-strong-outline-yellow:hover {
+  filter: drop-shadow(5px 5px 6px yellow) drop-shadow(-5px -5px 6px yellow) drop-shadow(5px -5px 6px yellow) drop-shadow(-5px 5px 6px yellow);
+  transition: all 0.12s linear;
+}
+
 .unit-highlight-green {
-  filter: drop-shadow(3px 3px 3px $unit-highlight-outline-green) drop-shadow(-3px -3px 3px $unit-highlight-outline-green) drop-shadow(3px -3px 3px $unit-highlight-outline-green) drop-shadow(-3px 3px 3px $unit-highlight-outline-green);
+  filter: drop-shadow(3px 3px 3px green) drop-shadow(-3px -3px 3px green) drop-shadow(3px -3px 3px green) drop-shadow(-3px 3px 3px green);
+}
+
+.hover-strong-outline-green:hover {
+  filter: drop-shadow(5px 5px 6px green) drop-shadow(-5px -5px 6px green) drop-shadow(5px -5px 6px green) drop-shadow(-5px 5px 6px green);
+  transition: all 0.12s linear;
 }
 
 $wildling-outline: rgba(yellow, 0.6);
