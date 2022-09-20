@@ -378,7 +378,7 @@ $medium-outline: rgba($outline-color, 0.6);
   transition: all 0.12s linear;
 }
 
-.unit-highlight-red {
+.highlight-red {
   filter: drop-shadow(3px 3px 3px red) drop-shadow(-3px -3px 3px red) drop-shadow(3px -3px 3px red) drop-shadow(-3px 3px 3px red);
 }
 
@@ -387,7 +387,7 @@ $medium-outline: rgba($outline-color, 0.6);
   transition: all 0.12s linear;
 }
 
-.unit-highlight-yellow {
+.highlight-yellow {
   filter: drop-shadow(3px 3px 3px yellow) drop-shadow(-3px -3px 3px yellow) drop-shadow(3px -3px 3px yellow) drop-shadow(-3px 3px 3px yellow);
 }
 
@@ -396,7 +396,7 @@ $medium-outline: rgba($outline-color, 0.6);
   transition: all 0.12s linear;
 }
 
-.unit-highlight-green {
+.highlight-green {
   filter: drop-shadow(3px 3px 3px green) drop-shadow(-3px -3px 3px green) drop-shadow(3px -3px 3px green) drop-shadow(-3px 3px 3px green);
 }
 
@@ -405,7 +405,7 @@ $medium-outline: rgba($outline-color, 0.6);
   transition: all 0.12s linear;
 }
 
-$wildling-outline: rgba(yellow, 0.6);
+$wildling-outline: rgba(yellow, 0.5);
 .wildling-highlight {
   filter: drop-shadow(2px 2px 2px $wildling-outline) drop-shadow(-2px -2px 2px $wildling-outline) drop-shadow(2px -2px 2px $wildling-outline) drop-shadow(-2px 2px 2px $wildling-outline);
 }
@@ -556,11 +556,11 @@ div.disconnected {
 }
 
 .dye-warning-highlight {
-  filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(565%) hue-rotate(353deg) brightness(98%) contrast(94%) drop-shadow(1px 1px 3px $wildling-outline) drop-shadow(-1px -1px 3px $wildling-outline);
+  filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(565%) hue-rotate(353deg) brightness(98%) contrast(94%) drop-shadow(2px 2px 4px $wildling-outline) drop-shadow(-2px -2px 4px $wildling-outline);
 }
 
 .dye-warning-highlight:hover {
-  filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(565%) hue-rotate(353deg) brightness(98%) contrast(94%) drop-shadow(1px 1px 3px $wildling-outline) drop-shadow(-1px -1px 3px $wildling-outline);
+  filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(565%) hue-rotate(353deg) brightness(98%) contrast(94%) drop-shadow(2px 2px 4px $wildling-outline) drop-shadow(-2px -2px 4px $wildling-outline);
 }
 
 .dye-critical {
@@ -572,11 +572,11 @@ div.disconnected {
 }
 
 .dye-critical-highlight {
-  filter: brightness(0) saturate(100%) invert(11%) sepia(82%) saturate(7445%) hue-rotate(4deg) brightness(109%) contrast(114%) drop-shadow(1px 1px 3px $wildling-outline) drop-shadow(-1px -1px 3px $wildling-outline);
+  filter: brightness(0) saturate(100%) invert(11%) sepia(82%) saturate(7445%) hue-rotate(4deg) brightness(109%) contrast(114%) drop-shadow(2px 2px 3px $wildling-outline) drop-shadow(-2px -2px 3px $wildling-outline);
 }
 
 .dye-critical-highlight:hover {
-  filter: brightness(0) saturate(100%) invert(11%) sepia(82%) saturate(7445%) hue-rotate(4deg) brightness(109%) contrast(114%) drop-shadow(1px 1px 3px $wildling-outline) drop-shadow(-1px -1px 3px $wildling-outline);
+  filter: brightness(0) saturate(100%) invert(11%) sepia(82%) saturate(7445%) hue-rotate(4deg) brightness(109%) contrast(114%) drop-shadow(2px 2px 3px $wildling-outline) drop-shadow(-2px -2px 3px $wildling-outline);
 }
 
 .unavailable-monotone {

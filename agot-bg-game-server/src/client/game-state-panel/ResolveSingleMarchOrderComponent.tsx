@@ -34,6 +34,8 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     modifyUnitsOnMapCallback: any;
     modifyOrdersOnMapCallback: any;
 
+    resetTimeoutId = -1;
+
     get house(): House {
         return this.props.gameState.house;
     }
@@ -81,11 +83,15 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                     {this.selectedMarchOrderRegion == null ? (
                                         <>Click on one of your March Orders.<br/>Double-click the order to select all units in that area.</>
                                     ) : this.selectedUnits.length == 0 && !allUnitsWillLeaveStartingRegion ? (
-                                        <>Click on a subset of the troops in <b>{this.selectedMarchOrderRegion.name}</b>.</>
+                                        <>Click on a subset of the troops in <b>{this.selectedMarchOrderRegion.name}</b>.
+                                        <br/>Double-click the march order to select all units in that area.</>
                                     ) : this.selectedUnits.length != 0 && this.validTargetRegions.length == 0 && this.usedButStillValidTargetRegions.length == 0 ? (
                                         <>There are no valid target areas for your current selection!</>
                                     ) : !allUnitsWillLeaveStartingRegion ? (
-                                        <>Click on a neighbouring area{!allUnitsSelected && <>, or click on other units in <b>{this.selectedMarchOrderRegion.name}</b></>}.</>
+                                        <>
+                                            Click on a neighbouring area{!allUnitsSelected && <>, or click on other units in <b>{this.selectedMarchOrderRegion.name}</b></>}.
+                                            {!allUnitsSelected && <><br/>Double-click the march order to select all units in that area.</>}
+                                        </>
                                     ) : (<></>)}
                                 </Col>
                                 {!allUnitsWillLeaveStartingRegion && <Col xs="auto">
@@ -312,11 +318,30 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     }
 
     onOrderClick(event: React.MouseEvent<HTMLDivElement>, region: Region): void {
-        if (event.detail != 1) {
-            this.selectedUnits = region.allUnits;
-        }
+        if (this.selectedMarchOrderRegion == region) {
+            if (event.detail == 1) {
+                this.resetTimeoutId = window.setTimeout(() => {
+                    this.reset();
+                    this.resetTimeoutId = -1;
+                }, 500);
+            } else if (event.detail > 1) {
+                if (this.resetTimeoutId > -1) {
+                    window.clearTimeout(this.resetTimeoutId);
+                    this.resetTimeoutId  = -1;
+                }
+                this.selectAllUnits(this.selectedMarchOrderRegion);
+            }
+        } else { // this.selectedMarchOrderRegion == null
+            if (event.detail > 1) {
+                this.selectAllUnits(region);
+            }
 
-        window.setTimeout(() => this.selectedMarchOrderRegion = region, 250);
+            this.selectedMarchOrderRegion = region;
+        }
+    }
+
+    selectAllUnits(region: Region): void {
+        this.selectedUnits = _.difference(region.allUnits, this.attackingUnits);
     }
 
     reset(): void {
@@ -357,14 +382,12 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
 
     modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.house)) {
-            if (this.selectedMarchOrderRegion == null) {
-                return this.props.gameState.getRegionsWithMarchOrder().map(r => [
-                    r,
-                    {highlight: {active: true}, onClick: (e: React.MouseEvent<HTMLDivElement>) => this.onOrderClick(e, r)}
-                ]);
-            }
+            const regions = this.selectedMarchOrderRegion ? [this.selectedMarchOrderRegion] : this.props.gameState.getRegionsWithMarchOrder();
 
-            return [[this.selectedMarchOrderRegion, {highlight: {active: true}, onClick: () => this.reset()}]]
+            return regions.map(r => [
+                r,
+                {highlight: {active: true, color: this.selectedMarchOrderRegion != null ? "yellow" : "white"}, onClick: (e: React.MouseEvent<HTMLDivElement>) => this.onOrderClick(e, r)}
+            ]);
         }
 
         return [];

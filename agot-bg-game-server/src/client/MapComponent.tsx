@@ -375,6 +375,8 @@ export default class MapComponent extends Component<MapComponentProps> {
                         transform = `rotate(90deg)`;
                     }
 
+                    const clickable = property.onClick != undefined;
+
                     return <OverlayTrigger
                         overlay={<Tooltip id={"unit-tooltip-" + u.id} className="tooltip-w-100">
                             <Col className="text-center"><h6>{u.type.name}<small> of <b>{controller?.name ?? "Unknown"}</b><br /><b>{r.name}</b></small></h6></Col>
@@ -388,33 +390,15 @@ export default class MapComponent extends Component<MapComponentProps> {
                             className={classNames(
                                 "unit-icon",
                                 {
-                                    "hover-weak-outline": !property.highlight.active
-                                },
-                                {
-                                    "clickable hover-strong-outline": property.onClick != undefined
-                                },
-                                {
-                                    "medium-outline": property.highlight.active
-                                },
-                                {
-                                    "unit-highlight-red": property.highlight.color == "red"
-                                },
-                                {
-                                    "unit-highlight-yellow": property.highlight.color == "yellow"
-                                },
-                                {
-                                    "unit-highlight-green": property.highlight.color == "green"
-                                },
-                                {
-                                    "hover-strong-outline-red": property.highlight.color == "red" && property.onClick != undefined
-                                },
-                                {
-                                    "hover-strong-outline-yellow": property.highlight.color == "yellow" && property.onClick != undefined
-                                },
-                                {
-                                    "hover-strong-outline-green": property.highlight.color == "green" && property.onClick != undefined
-                                },
-                                {
+                                    "hover-weak-outline": !property.highlight.active,
+                                    "clickable hover-strong-outline": clickable,
+                                    "medium-outline": property.highlight.active,
+                                    "highlight-red": property.highlight.color == "red",
+                                    "highlight-yellow": property.highlight.color == "yellow",
+                                    "highlight-green": property.highlight.color == "green",
+                                    "hover-strong-outline-red": property.highlight.color == "red" && clickable,
+                                    "hover-strong-outline-yellow": property.highlight.color == "yellow" && clickable,
+                                    "hover-strong-outline-green": property.highlight.color == "green" && clickable,
                                     "disable-pointer-events": disablePointerEventsForCurrentRegion
                                 }
                             )}
@@ -609,6 +593,7 @@ export default class MapComponent extends Component<MapComponentProps> {
             : undefined;
 
         const wrap = properties.wrap;
+        const clickable = properties.onClick != undefined || wrap != undefined;
 
         return (
             <ConditionalWrap condition={true}
@@ -626,10 +611,11 @@ export default class MapComponent extends Component<MapComponentProps> {
                     <div className={classNames(
                         "order-container",
                         {
-                            "hover-weak-outline": order != null,
+                            "hover-weak-outline": order != null && !properties.highlight.active,
                             "medium-outline hover-strong-outline": order && properties.highlight.active,
+                            "highlight-yellow hover-strong-outline-yellow": order && properties.highlight.active && properties.highlight.color == "yellow",
                             "restricted-order": planningOrAction && order && this.ingame.game.isOrderRestricted(region, order, planningOrAction.planningRestrictions),
-                            "clickable": properties.onClick != undefined || properties.wrap != undefined
+                            "clickable": clickable
                         }
                     )}
                         style={{ left: region.orderSlot.x, top: region.orderSlot.y}}
