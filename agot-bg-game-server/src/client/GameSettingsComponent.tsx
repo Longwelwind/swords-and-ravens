@@ -539,7 +539,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             <OverlayTrigger overlay={
                                 <Tooltip id="thematic-draft-tooltip">
                                     Players will draft their House cards simultaneously from the available decks of their house.
-                                    Afterwards players will draft the Influence tracks step by step in a randomly chosen order.
                                 </Tooltip>}>
                                 <label htmlFor="thematic-draft-setting">Thematic Draft</label>
                             </OverlayTrigger>}
