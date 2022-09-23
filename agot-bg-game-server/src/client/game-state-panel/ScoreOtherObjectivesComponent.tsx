@@ -4,7 +4,7 @@ import renderChildGameState from "../utils/renderChildGameState";
 import GameStateComponentProps from "./GameStateComponentProps";
 import SelectObjectiveCardsGameState from "../../common/ingame-game-state/select-objective-cards-game-state/SelectObjectiveCardsGameState";
 import React from "react";
-import { Col } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 import SelectObjectiveCardsComponent from "./SelectObjectiveCardsComponent";
 import ScoreOtherObjectivesGameState from "../../common/ingame-game-state/action-game-state/score-objectives-game-state/score-other-objectives-game-state/ScoreOtherObjectivesGameState";
 
@@ -62,15 +62,24 @@ export default class ScoreOtherObjectivesComponent extends Component<GameStateCo
     }
 
     render(): ReactNode {
-        return <>
+        const player = this.props.gameClient.authenticatedPlayer;
+        const noCardsToScore = player
+            && this.selectObjectivesState.getWaitedUsers().includes(player.user)
+            && this.selectObjectivesState.selectableCardsPerHouse.get(player.house).length == 0;
+        return <Row className="justify-content-center">
             <Col xs={12} className="text-center">
                 Each house may choose to score one Objective card of their choice from their objective hand if the criterion described is fulfilled.
                 {this.raiseBackdoorPoliticsWarning && <><br/><br/><b style={{color: "red"}}>WARNING:</b> You hold <b>Backdoor Politics</b> in your Objectives hand, and you may be able to score it
                 if the other players score before you. You should wait with your decision!</>}
             </Col>
+            {noCardsToScore && <Col xs={10} className="text-center">
+                <>
+                    <b>Note:</b> You can&apos;t score any of your secret objectives right now. Nevertheless, you have to click <i>Confirm</i> manually as you don&apos;t want to reaveal that you can&apos;t score.
+                </>
+            </Col>}
             {renderChildGameState(this.props, [
                 [SelectObjectiveCardsGameState, SelectObjectiveCardsComponent]
             ])}
-        </>;
+        </Row>;
     }
 }

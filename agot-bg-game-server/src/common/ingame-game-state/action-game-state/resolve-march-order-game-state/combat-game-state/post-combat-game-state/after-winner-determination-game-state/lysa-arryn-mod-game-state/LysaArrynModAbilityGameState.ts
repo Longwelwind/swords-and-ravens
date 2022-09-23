@@ -44,7 +44,12 @@ export default class LysaArrynModAbilityGameState extends GameState<
         const house = this.childGameState.house;
 
         if (choice == 0) {
-            this.parentGameState.parentGameState.parentGameState.notDiscardedHouseCardIds.push(lysaArrynMod.id);
+            const lysaHc = this.combatGameState.houseCombatDatas.values.find(hcd => hcd.houseCard?.ability?.id == lysaArrynMod.id)?.houseCard;
+
+            if (!lysaHc) {
+                throw new Error("Lysa not found!");
+            }
+            this.parentGameState.parentGameState.parentGameState.markHouseCardAsAvailable(house, lysaHc);
             this.ingame.log({
                 type: "lysa-arryn-mod-used",
                 house: house.id

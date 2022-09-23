@@ -44,7 +44,12 @@ export default class ReekAbilityGameState extends GameState<
         const house = this.childGameState.house;
 
         if (choice == 0) {
-            this.parentGameState.parentGameState.parentGameState.notDiscardedHouseCardIds.push(reek.id);
+            const reekHc = this.combatGameState.houseCombatDatas.values.find(hcd => hcd.houseCard?.ability?.id == reek.id)?.houseCard;
+
+            if (!reekHc) {
+                throw new Error("Reek not found!");
+            }
+            this.parentGameState.parentGameState.parentGameState.markHouseCardAsAvailable(house, reekHc);
             this.ingame.log({
                 type: "reek-used",
                 house: house.id
