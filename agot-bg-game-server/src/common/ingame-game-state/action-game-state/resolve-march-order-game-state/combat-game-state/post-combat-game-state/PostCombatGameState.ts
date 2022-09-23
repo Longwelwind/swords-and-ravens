@@ -29,7 +29,6 @@ export default class PostCombatGameState extends GameState<
     loser: House;
     originalLoser: House | null = null;
     resolvedSkullIcons: House[] = [];
-    notDiscardedHouseCardIds: string[] = [];
 
     get combat(): CombatGameState {
         return this.parentGameState;
@@ -102,6 +101,10 @@ export default class PostCombatGameState extends GameState<
             type: "combat-result",
             winner: this.winner.id,
             stats: this.combat.stats
+        });
+
+        this.combat.houseCombatDatas.forEach(({houseCard}, house) => {
+            this.markHouseCardAsUsed(house, houseCard);
         });
 
         this.proceedAfterWinnerDetermination();
@@ -280,7 +283,7 @@ export default class PostCombatGameState extends GameState<
         this.combat.houseCombatDatas.forEach(({houseCard}, house) => {
             if (this.combat.ingameGameState.isVassalHouse(house)) {
                 if (houseCard && house.hasBeenReplacedByVassal && !this.game.vassalHouseCards.has(houseCard.id)) {
-                    this.markHouseAsUsed(house, houseCard);
+                    this.checkAndPerformHouseCardHandlingPerHouse(house, houseCard);
                     this.game.oldPlayerHouseCards.set(house, house.houseCards);
 
                     this.entireGame.broadcastToClients({
@@ -296,7 +299,7 @@ export default class PostCombatGameState extends GameState<
                     houseCards: []
                 });
             } else {
-                this.markHouseAsUsed(house, houseCard);
+                this.checkAndPerformHouseCardHandlingPerHouse(house, houseCard);
             }
         });
 
@@ -434,12 +437,8 @@ export default class PostCombatGameState extends GameState<
         this.combat.resolveMarchOrderGameState.onResolveSingleMarchOrderGameStateFinish(this.attacker);
     }
 
-    markHouseAsUsed(house: House, houseCard: HouseCard | null, forceDiscard = false): void {
+    markHouseCardAsUsed(house: House, houseCard: HouseCard | null): void {
         if (houseCard) {
-            if (!forceDiscard && houseCard.ability?.doesPreventDiscardingHouseCardAfterCombat(this, house, houseCard)) {
-                return;
-            }
-
             houseCard.state = HouseCardState.USED;
 
             this.entireGame.broadcastToClients({
@@ -449,7 +448,22 @@ export default class PostCombatGameState extends GameState<
                 state: HouseCardState.USED
             });
         }
+    }
 
+    markHouseCardAsAvailable(house: House, houseCard: HouseCard | null): void {
+        if (houseCard) {
+            houseCard.state = HouseCardState.AVAILABLE;
+
+            this.entireGame.broadcastToClients({
+                type: "change-state-house-card",
+                houseId: house.id,
+                cardIds: [houseCard.id],
+                state: HouseCardState.AVAILABLE
+            });
+        }
+    }
+
+    checkAndPerformHouseCardHandlingPerHouse(house: House, houseCard: HouseCard | null): void {
         // If all cards are used or discarded, put all used as available,
         // except the one that has been used.
         if (house.houseCards.values.every(hc => hc.state == HouseCardState.USED)) {
@@ -517,7 +531,6 @@ export default class PostCombatGameState extends GameState<
             loser: this.loser.id,
             originalLoser: this.originalLoser ? this.originalLoser.id : null,
             resolvedSkullIcons: this.resolvedSkullIcons.map(h => h.id),
-            notDiscardedHouseCardIds: this.notDiscardedHouseCardIds,
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -529,7 +542,6 @@ export default class PostCombatGameState extends GameState<
         postCombat.loser = combat.game.houses.get(data.loser);
         postCombat.originalLoser = data.originalLoser ? combat.game.houses.get(data.originalLoser) : null;
         postCombat.resolvedSkullIcons = data.resolvedSkullIcons.map(hid => combat.game.houses.get(hid));
-        postCombat.notDiscardedHouseCardIds = data.notDiscardedHouseCardIds;
         postCombat.childGameState = postCombat.deserializeChildGameState(data.childGameState);
 
         return postCombat;
@@ -555,7 +567,6 @@ export interface SerializedPostCombatGameState {
     loser: string;
     originalLoser: string | null;
     resolvedSkullIcons: string[];
-    notDiscardedHouseCardIds: string[];
     childGameState: SerializedResolveRetreatGameState
         | SerializedChooseCasualtiesGameState
         | SerializedAfterWinnerDeterminationGameState

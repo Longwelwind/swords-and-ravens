@@ -76,7 +76,8 @@ export default class PatchfaceAbilityGameState extends GameState<
             houseCard: houseCard.id
         }, resolvedAutomatically);
 
-        this.parentGameState.parentGameState.parentGameState.markHouseAsUsed(affectedHouse, houseCard, true);
+        this.parentGameState.parentGameState.parentGameState.markHouseCardAsUsed(affectedHouse, houseCard);
+        this.parentGameState.parentGameState.parentGameState.checkAndPerformHouseCardHandlingPerHouse(affectedHouse, houseCard);
 
         this.parentGameState.onHouseCardResolutionFinish(house);
     }
