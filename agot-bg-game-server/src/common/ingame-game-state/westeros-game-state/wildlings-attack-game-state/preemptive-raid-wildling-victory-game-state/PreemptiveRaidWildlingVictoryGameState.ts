@@ -11,7 +11,6 @@ import SelectUnitsGameState, {SerializedSelectUnitsGameState} from "../../../sel
 import Unit from "../../../game-data-structure/Unit";
 import Region from "../../../game-data-structure/Region";
 import IngameGameState from "../../../IngameGameState";
-import { findOrphanedShipsAndDestroyThem } from "../../../port-helper/PortHelper";
 
 enum PreemptiveRaidStep {
     CHOOSING,
@@ -138,9 +137,6 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
             house: house.id,
             units: units.map(([region, units]) => [region.id, units.map(u => u.type.id)])
         }, resolvedAutomatically);
-
-        // After destroying a unit an orphaned ship may be present here, so try to find it and destroy it in that case
-        findOrphanedShipsAndDestroyThem(this.ingame);
 
         this.parentGameState.onWildlingCardExecuteEnd();
     }

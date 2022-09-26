@@ -67,7 +67,7 @@ export default class PatchfaceAbilityGameState extends GameState<
     }
 
     onSelectHouseCardFinish(house: House, houseCard: HouseCard, resolvedAutomatically: boolean): void {
-        const affectedHouse = this.game.houses.values.find(h => h.houseCards.values.includes(houseCard)) as House;
+        const affectedHouse = this.game.houses.values.find(h => h.houseCards.has(houseCard.id)) as House;
 
         this.ingame.log({
             type: "patchface-used",

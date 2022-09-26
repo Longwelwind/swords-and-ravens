@@ -49,6 +49,8 @@ import House from "../../../common/ingame-game-state/game-data-structure/House";
 import _ from "lodash";
 import HouseNumberResultsComponent from "../../../client/HouseNumberResultsComponent";
 import mammothImage from "../../../../public/images/icons/mammoth.svg";
+import TakeControlOfEnemyPortGameState from "../../../common/ingame-game-state/take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
+import TakeControlOfEnemyPortComponent from "../TakeControlOfEnemyPortComponent";
 
 @observer
 export default class WildlingsAttackComponent extends Component<GameStateComponentProps<WildlingsAttackGameState>> {
@@ -114,6 +116,7 @@ export default class WildlingsAttackComponent extends Component<GameStateCompone
                             [MammothRidersNightsWatchVictoryGameState, MammothRidersNightsWatchVictoryComponent],
                             [TheHordeDescendsWildlingVictoryGameState, TheHordeDescendsWildlingVictoryComponent],
                             [TheHordeDescendsNightsWatchVictoryGameState, TheHordeDescendsNightsWatchVictoryComponent],
+                            [TakeControlOfEnemyPortGameState, TakeControlOfEnemyPortComponent]
                         ])}
                     </Row>
                 </ListGroupItem>

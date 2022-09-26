@@ -10,9 +10,13 @@ import Unit from "../../../game-data-structure/Unit";
 import House from "../../../game-data-structure/House";
 import _ from "lodash";
 import IngameGameState from "../../../IngameGameState";
+import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameState } from "../../../take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
+import { TakeControlOfEnemyPortResult } from "../../../port-helper/PortHelper";
+import ActionGameState from "../../../action-game-state/ActionGameState";
+
 
 export default class TheHordeDescendsWildlingVictoryGameState extends WildlingCardEffectInTurnOrderGameState<
-    SelectUnitsGameState<TheHordeDescendsWildlingVictoryGameState>
+    SelectUnitsGameState<TheHordeDescendsWildlingVictoryGameState> | TakeControlOfEnemyPortGameState
 > {
     get game(): Game {
         return this.parentGameState.game;
@@ -24,6 +28,10 @@ export default class TheHordeDescendsWildlingVictoryGameState extends WildlingCa
 
     get ingame(): IngameGameState {
         return this.parentGameState.parentGameState.ingame;
+    }
+
+    get action(): ActionGameState | null {
+        return null;
     }
 
     executeForLowestBidder(house: House): void {
@@ -98,6 +106,18 @@ export default class TheHordeDescendsWildlingVictoryGameState extends WildlingCa
         this.proceedNextHouse(house);
     }
 
+    onTakeControlOfEnemyPortGameStateRequired(takeControlOfEnemyPortResult: TakeControlOfEnemyPortResult, previousHouse: House): void {
+        this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(takeControlOfEnemyPortResult.port, takeControlOfEnemyPortResult.newController, previousHouse);
+    }
+
+    onTakeControlOfEnemyPortFinish(previousHouse: House | null): void {
+        if (!previousHouse) {
+            throw new Error("previousHouse must be set here!");
+        }
+        this.proceedNextHouse(previousHouse);
+    }
+
+
     serializeToClient(admin: boolean, player: Player | null): SerializedTheHordeDescendsWildlingVictoryGameState {
         return {
             type: "the-horde-descends-wildling-victory",
@@ -114,11 +134,16 @@ export default class TheHordeDescendsWildlingVictoryGameState extends WildlingCa
     }
 
     deserializeChildGameState(data: SerializedTheHordeDescendsWildlingVictoryGameState["childGameState"]): TheHordeDescendsWildlingVictoryGameState["childGameState"] {
-        return SelectUnitsGameState.deserializeFromServer(this, data);
+        switch (data.type) {
+            case "select-units":
+                return SelectUnitsGameState.deserializeFromServer(this, data);
+            case "take-control-of-enemy-port":
+                return TakeControlOfEnemyPortGameState.deserializeFromServer(this, data);
+        }
     }
 }
 
 export interface SerializedTheHordeDescendsWildlingVictoryGameState {
     type: "the-horde-descends-wildling-victory";
-    childGameState: SerializedSelectUnitsGameState;
+    childGameState: SerializedSelectUnitsGameState | SerializedTakeControlOfEnemyPortGameState;
 }

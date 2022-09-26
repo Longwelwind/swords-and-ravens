@@ -11,13 +11,16 @@ import {ServerMessage} from "../../../../../messages/ServerMessage";
 import WildlingsAttackGameState from "../WildlingsAttackGameState";
 import IngameGameState from "../../../IngameGameState";
 import { observable } from "mobx";
+import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameState } from "../../../take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
+import { TakeControlOfEnemyPortResult } from "../../../port-helper/PortHelper";
+import ActionGameState from "../../../action-game-state/ActionGameState";
 
 export enum CrowKillersStep {
     DEGRADING_KNIGHTS,
     DESTROYING_KNIGHTS
 }
 
-export default class CrowKillersWildlingVictoryGameState extends WildlingCardEffectInTurnOrderGameState<SelectUnitsGameState<CrowKillersWildlingVictoryGameState>> {
+export default class CrowKillersWildlingVictoryGameState extends WildlingCardEffectInTurnOrderGameState<SelectUnitsGameState<CrowKillersWildlingVictoryGameState> | TakeControlOfEnemyPortGameState> {
     @observable
     step: CrowKillersStep = CrowKillersStep.DEGRADING_KNIGHTS;
 
@@ -25,6 +28,10 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
 
     get ingame(): IngameGameState {
         return this.parentGameState.parentGameState.ingame;
+    }
+
+    get action(): ActionGameState | null {
+        return null;
     }
 
     executeForLowestBidder(house: House): void {
@@ -169,6 +176,17 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
         this.proceedNextHouse(house);
     }
 
+    onTakeControlOfEnemyPortGameStateRequired(takeControlOfEnemyPortResult: TakeControlOfEnemyPortResult, previousHouse: House): void {
+        this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(takeControlOfEnemyPortResult.port, takeControlOfEnemyPortResult.newController, previousHouse);
+    }
+
+    onTakeControlOfEnemyPortFinish(previousHouse: House | null): void {
+        if (!previousHouse) {
+            throw new Error("previousHouse must be set here!");
+        }
+        this.proceedNextHouse(previousHouse);
+    }
+
     serializeToClient(admin: boolean, player: Player | null): SerializedCrowKillersWildlingVictoryGameState {
         return {
             type: "crow-killers-wildling-victory",
@@ -187,12 +205,17 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
     }
 
     deserializeChildGameState(data: SerializedCrowKillersWildlingVictoryGameState["childGameState"]): CrowKillersWildlingVictoryGameState["childGameState"] {
-        return SelectUnitsGameState.deserializeFromServer(this, data);
+        switch (data.type) {
+            case "select-units":
+                return SelectUnitsGameState.deserializeFromServer(this, data);
+            case "take-control-of-enemy-port":
+                return TakeControlOfEnemyPortGameState.deserializeFromServer(this, data);
+        }
     }
 }
 
 export interface SerializedCrowKillersWildlingVictoryGameState {
     type: "crow-killers-wildling-victory";
-    childGameState: SerializedSelectUnitsGameState;
+    childGameState: SerializedSelectUnitsGameState | SerializedTakeControlOfEnemyPortGameState;
     step: CrowKillersStep;
 }

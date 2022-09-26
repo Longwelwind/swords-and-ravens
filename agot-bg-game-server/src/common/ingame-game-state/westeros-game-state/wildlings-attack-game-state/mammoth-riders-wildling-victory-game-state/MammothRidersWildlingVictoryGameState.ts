@@ -8,10 +8,17 @@ import {ClientMessage} from "../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../messages/ServerMessage";
 import WildlingsAttackGameState from "../WildlingsAttackGameState";
 import IngameGameState from "../../../IngameGameState";
+import { TakeControlOfEnemyPortResult } from "../../../port-helper/PortHelper";
+import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameState } from "../../../take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
+import ActionGameState from "../../../action-game-state/ActionGameState";
 
-export default class MammothRidersWildlingVictoryGameState extends WildlingCardEffectInTurnOrderGameState<SelectUnitsGameState<MammothRidersWildlingVictoryGameState>> {
+export default class MammothRidersWildlingVictoryGameState extends WildlingCardEffectInTurnOrderGameState<SelectUnitsGameState<MammothRidersWildlingVictoryGameState> | TakeControlOfEnemyPortGameState> {
     get ingame(): IngameGameState {
         return this.parentGameState.parentGameState.ingame;
+    }
+
+    get action(): ActionGameState | null {
+        return null;
     }
 
     executeForLowestBidder(house: House): void {
@@ -38,6 +45,17 @@ export default class MammothRidersWildlingVictoryGameState extends WildlingCardE
 
             this.proceedNextHouse(house);
         }
+    }
+
+    onTakeControlOfEnemyPortGameStateRequired(takeControlOfEnemyPortResult: TakeControlOfEnemyPortResult, previousHouse: House): void {
+        this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(takeControlOfEnemyPortResult.port, takeControlOfEnemyPortResult.newController, previousHouse);
+    }
+
+    onTakeControlOfEnemyPortFinish(previousHouse: House | null): void {
+        if (!previousHouse) {
+            throw new Error("previousHouse must be set here!");
+        }
+        this.proceedNextHouse(previousHouse);
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -82,11 +100,16 @@ export default class MammothRidersWildlingVictoryGameState extends WildlingCardE
     }
 
     deserializeChildGameState(data: SerializedMammothRidersWildlingVictoryGameState["childGameState"]): MammothRidersWildlingVictoryGameState["childGameState"] {
-        return SelectUnitsGameState.deserializeFromServer(this, data);
+        switch (data.type) {
+            case "select-units":
+                return SelectUnitsGameState.deserializeFromServer(this, data);
+            case "take-control-of-enemy-port":
+                return TakeControlOfEnemyPortGameState.deserializeFromServer(this, data);
+        }
     }
 }
 
 export interface SerializedMammothRidersWildlingVictoryGameState {
     type: "mammoth-riders-wildling-victory";
-    childGameState: SerializedSelectUnitsGameState;
+    childGameState: SerializedSelectUnitsGameState | SerializedTakeControlOfEnemyPortGameState;
 }

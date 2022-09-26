@@ -10,7 +10,7 @@ import CombatGameState
 import CombatComponent from "./CombatComponent";
 import GameStateComponentProps from "./GameStateComponentProps";
 import renderChildGameState from "../utils/renderChildGameState";
-import TakeControlOfEnemyPortGameState from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
+import TakeControlOfEnemyPortGameState from "../../common/ingame-game-state/take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
 import TakeControlOfEnemyPortComponent from "./TakeControlOfEnemyPortComponent";
 import CallForSupportAgainstNeutralForceGameState from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/call-for-support-against-neutral-force-game-state/CallForSupportAgainstNeutralForceGameState";
 import CallForSupportAgainstNeutralForcesComponent from "./CallForSupportAgainstNeutralForcesComponent";

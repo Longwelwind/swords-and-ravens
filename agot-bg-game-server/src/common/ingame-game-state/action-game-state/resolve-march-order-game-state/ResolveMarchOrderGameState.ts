@@ -13,9 +13,8 @@ import Region from "../../game-data-structure/Region";
 import Unit from "../../game-data-structure/Unit";
 import Game from "../../game-data-structure/Game";
 import Order from "../../game-data-structure/Order";
-import { port } from "../../game-data-structure/regionTypes";
-import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameState } from "./take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
-import { findOrphanedShipsAndDestroyThem } from "../../port-helper/PortHelper";
+import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameState } from "../../take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
+import { findOrphanedShipsAndDestroyThem, isTakeControlOfEnemyPortGameStateRequired } from "../../port-helper/PortHelper";
 import _ from "lodash";
 import houseCardAbilities from "../../game-data-structure/house-card/houseCardAbilities";
 import BetterMap from "../../../../utils/BetterMap";
@@ -29,8 +28,16 @@ export default class ResolveMarchOrderGameState extends GameState<
         return this.parentGameState;
     }
 
+    get action(): ActionGameState {
+        return this.actionGameState;
+    }
+
     get ingameGameState(): IngameGameState {
         return this.actionGameState.ingame;
+    }
+
+    get ingame(): IngameGameState {
+        return this.ingameGameState;
     }
 
     get entireGame(): EntireGame {
@@ -108,7 +115,7 @@ export default class ResolveMarchOrderGameState extends GameState<
         //   ... destroy orphaned ships (e.g. caused by Arianne)
         findOrphanedShipsAndDestroyThem(this.ingameGameState, this.actionGameState);
         //   ... check if ships can be converted
-        const analyzePortResult = this.isTakeControlOfEnemyPortGameStateRequired();
+        const analyzePortResult = isTakeControlOfEnemyPortGameStateRequired(this.ingameGameState);
         if (analyzePortResult) {
             this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(analyzePortResult.port, analyzePortResult.newController, house);
             return;
@@ -123,9 +130,12 @@ export default class ResolveMarchOrderGameState extends GameState<
         this.proceedNextResolveSingleMarchOrder();
     }
 
-    onTakeControlOfEnemyPortFinish(lastHouseThatResolvedMarchOrder: House): void {
+    onTakeControlOfEnemyPortFinish(previousHouse: House | null): void {
+        if (!previousHouse) {
+            throw new Error("previousHouse must be set here!");
+        }
         // Check if an other march order can be resolved
-        this.onResolveSingleMarchOrderGameStateFinish(lastHouseThatResolvedMarchOrder);
+        this.onResolveSingleMarchOrderGameStateFinish(previousHouse);
     }
 
     onCallForSupportAgainstNeutralForceGameStateEnd(houseThatResolvesMarchOrder: House, supportersAgainstNeutralForce: BetterMap<Region, House[]>): void {
@@ -204,32 +214,6 @@ export default class ResolveMarchOrderGameState extends GameState<
             to: to.id,
             units: units.map(u => u.id)
         });
-    }
-
-    private isTakeControlOfEnemyPortGameStateRequired(): { port: Region; newController: House } | null {
-        // Find ports with enemy ships
-        const portsWithEnemyShips = this.world.regions.values.filter(r => r.type == port
-            && r.units.size > 0
-            && r.getController() != this.world.getAdjacentLandOfPort(r).getController());
-
-        if (portsWithEnemyShips.length == 0) {
-            return null;
-        }
-
-        const portRegion = portsWithEnemyShips[0];
-        const adjacentCastle = this.world.getAdjacentLandOfPort(portRegion);
-        const adjacentCastleController = adjacentCastle.getController();
-
-        if (adjacentCastleController) {
-            // return TakeControlOfEnemyPortGameState required
-            return {
-                port: portRegion,
-                newController: adjacentCastleController
-            }
-        }
-
-        // We should never reach this line because we removed orphaned ships earlier.
-        throw new Error(`$Port with id '{portRegion.id}' contains orphaned ships which should have been removed before!`);
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
