@@ -15,7 +15,13 @@ import { Col } from "react-bootstrap";
 export default class PreemptiveRaidWildlingVictoryComponent extends Component<GameStateComponentProps<PreemptiveRaidWildlingVictoryGameState>> {
     render(): ReactNode {
         return <>
-            <Col xs={12} className="text-center">The lowest bidder destroys units or is reduced 2 positions on their highest influence track.</Col>
+            {this.props.gameState.childGameState instanceof SelectUnitsGameState
+            ?   <Col xs={12} className="text-center">
+                    The lowest bidder destroys 2 units anywhere.
+                </Col>
+            :   <Col xs={12} className="text-center">
+                    The lowest bidder destroys 2 units or is reduced 2 positions on their highest influence track.
+                </Col>}
             {renderChildGameState(this.props, [
                 [SimpleChoiceGameState, SimpleChoiceComponent],
                 [SelectUnitsGameState, SelectUnitsComponent]
