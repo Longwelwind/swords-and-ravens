@@ -30,6 +30,9 @@ import IngameGameState from "../../IngameGameState";
 import { observable } from "mobx";
 import BetterMap from "../../../../utils/BetterMap";
 import User from "../../../../server/User";
+import { findOrphanedShipsAndDestroyThem, isTakeControlOfEnemyPortGameStateRequired } from "../../port-helper/PortHelper";
+import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameState } from "../../take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
+import ActionGameState from "../../action-game-state/ActionGameState";
 
 export default class WildlingsAttackGameState extends GameState<WesterosGameState,
     BiddingGameState<WildlingsAttackGameState> | SimpleChoiceGameState | PreemptiveRaidWildlingVictoryGameState
@@ -38,6 +41,7 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
     | AKingBeyondTheWallWildlingVictoryGameState | AKingBeyondTheWallNightsWatchVictoryGameState
     | MammothRidersWildlingVictoryGameState | MammothRidersNightsWatchVictoryGameState
     | TheHordeDescendsWildlingVictoryGameState | TheHordeDescendsNightsWatchVictoryGameState
+    | TakeControlOfEnemyPortGameState
 > {
     @observable  participatingHouses: House[];
 
@@ -48,6 +52,14 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
     _highestBidder: House | null;
     _lowestBidder: House | null;
     @observable biddingResults: [number, House[]][] | null;
+
+    get westerosGameState(): WesterosGameState {
+        return this.parentGameState;
+    }
+
+    get action(): ActionGameState | null {
+        return null;
+    }
 
     get participatingHousesWithoutVassals(): House[] {
         return this.participatingHouses.filter(h => !this.ingame.isVassalHouse(h));
@@ -67,10 +79,6 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
 
     get nightsWatchWon(): boolean {
         return this.totalBid >= this.wildlingStrength;
-    }
-
-    get westerosGameState(): WesterosGameState {
-        return this.parentGameState;
     }
 
     get highestBidders(): House[] {
@@ -303,6 +311,25 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
             wildlingStrength: this.game.wildlingStrength
         });
 
+        // Orphaned units may be present here, remove them
+        findOrphanedShipsAndDestroyThem(this.ingame);
+        //   ... check if ships can be converted
+        const analyzePortResult = isTakeControlOfEnemyPortGameStateRequired(this.parentGameState.ingame);
+        if (analyzePortResult) {
+            this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(analyzePortResult.port, analyzePortResult.newController);
+            return;
+        }
+
+        this.westerosGameState.onWildlingsAttackGameStateEnd();
+    }
+
+    onTakeControlOfEnemyPortFinish(_previousHouse: House | null): void {
+        const analyzePortResult = isTakeControlOfEnemyPortGameStateRequired(this.parentGameState.ingame);
+        if (analyzePortResult) {
+            this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(analyzePortResult.port, analyzePortResult.newController);
+            return;
+        }
+
         this.westerosGameState.onWildlingsAttackGameStateEnd();
     }
 
@@ -373,6 +400,8 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
                 return TheHordeDescendsWildlingVictoryGameState.deserializeFromServer(this, data);
             case "the-horde-descends-nights-watch-victory":
                 return TheHordeDescendsNightsWatchVictoryGameState.deserializeFromServer(this, data);
+            case "take-control-of-enemy-port":
+                return TakeControlOfEnemyPortGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -386,7 +415,8 @@ export interface SerializedWildlingsAttackGameState {
         | SerializedRattleshirtsRaidersWildlingVictoryGameState | SerializedMassingOnTheMilkwaterWildlingVictoryGameState
         | SerializedAKingBeyondTheWallWildlingVictoryGameState | SerializedAKingBeyondTheWallNightsWatchVictoryGameState
         | SerializedMammothRidersWildlingVictoryGameState | SerializedMammothRidersNightsWatchVictoryGameState
-        | SerializedTheHordeDescendsWildlingVictoryGameState | SerializedTheHordeDescendsNightsWatchVictoryGameState;
+        | SerializedTheHordeDescendsWildlingVictoryGameState | SerializedTheHordeDescendsNightsWatchVictoryGameState
+        | SerializedTakeControlOfEnemyPortGameState;
     wildlingCard: number | null;
     biddingResults: [number, string[]][] | null;
     highestBidder: string | null;

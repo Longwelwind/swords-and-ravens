@@ -87,7 +87,7 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
                 return;
             }
 
-            if (this.selectedUnitsMustBeOfSameRegion) {
+            if (this.selectedUnitsMustBeOfSameRegion && units.length > 0) {
                 const region = units[0][0];
 
                 if (!units.every(([r, _u]) => region == r)) {

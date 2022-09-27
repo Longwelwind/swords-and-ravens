@@ -1916,6 +1916,20 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "92",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                if (ingame.childGameState.type == "action" && ingame.childGameState.childGameState.type == "resolve-march-order"
+                && ingame.childGameState.childGameState.childGameState.type == "take-control-of-enemy-port") {
+                    const takeControlOfEnemyPort = ingame.childGameState.childGameState.childGameState;
+                    takeControlOfEnemyPort.previousHouseId = takeControlOfEnemyPort.lastHouseThatResolvedMarchOrderId;
+                }
+            }
+            return serializedGame;
+        }
     }
 ];
 

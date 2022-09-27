@@ -6,7 +6,7 @@ import SimpleChoiceGameState from "../../common/ingame-game-state/simple-choice-
 import GameStateComponentProps from "./GameStateComponentProps";
 import SimpleChoiceComponent from "./SimpleChoiceComponent";
 import renderChildGameState from "../utils/renderChildGameState";
-import TakeControlOfEnemyPortGameState from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
+import TakeControlOfEnemyPortGameState from "../../common/ingame-game-state/take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
 
 @observer
 export default class TakeControlOfEnemyPortComponent extends Component<GameStateComponentProps<TakeControlOfEnemyPortGameState>> {

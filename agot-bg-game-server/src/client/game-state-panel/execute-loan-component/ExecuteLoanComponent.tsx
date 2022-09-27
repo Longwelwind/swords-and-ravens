@@ -23,6 +23,8 @@ import SavvyStewardComponent from "../SavvyStewardComponent";
 import SpymasterGameState from "../../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/execute-loan-game-state/spymaster-game-state/SpymasterGameState";
 import SpymasterComponent from "../SpymasterComponent";
 import buyCardImage from "../../../../public/images/icons/buy-card.svg";
+import TakeControlOfEnemyPortGameState from "../../../common/ingame-game-state/take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
+import TakeControlOfEnemyPortComponent from "../TakeControlOfEnemyPortComponent";
 
 @observer
 export default class ExecuteLoanComponent extends Component<GameStateComponentProps<ExecuteLoanGameState>> {
@@ -59,7 +61,8 @@ export default class ExecuteLoanComponent extends Component<GameStateComponentPr
                     [LoyalMaesterGameState, LoyalMaesterComponent],
                     [MasterAtArmsGameState, MasterAtArmsComponent],
                     [SavvyStewardGameState, SavvyStewardComponent],
-                    [SpymasterGameState, SpymasterComponent]
+                    [SpymasterGameState, SpymasterComponent],
+                    [TakeControlOfEnemyPortGameState, TakeControlOfEnemyPortComponent]
                 ])}
             </Row>
         </Col>;

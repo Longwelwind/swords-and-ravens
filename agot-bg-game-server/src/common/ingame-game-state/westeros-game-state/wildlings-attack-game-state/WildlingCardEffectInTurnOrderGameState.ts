@@ -2,7 +2,8 @@ import GameState from "../../../GameState";
 import WildlingsAttackGameState from "./WildlingsAttackGameState";
 import Game from "../../game-data-structure/Game";
 import House from "../../game-data-structure/House";
-import { findOrphanedShipsAndDestroyThem } from "../../port-helper/PortHelper";
+import { findOrphanedShipsAndDestroyThem, isTakeControlOfEnemyPortGameStateRequired, TakeControlOfEnemyPortResult } from "../../port-helper/PortHelper";
+import IngameGameState from "../../IngameGameState";
 
 /**
  * A lot of Wildling Cards have the same logic where the lowest bidder
@@ -21,6 +22,10 @@ export default abstract class WildlingCardEffectInTurnOrderGameState<C extends G
         return this.parentGameState.game;
     }
 
+    get ingame(): IngameGameState {
+        return this.parentGameState.ingame;
+    }
+
     firstStart(): void {
         this.proceedNextHouse(null);
     }
@@ -30,12 +35,18 @@ export default abstract class WildlingCardEffectInTurnOrderGameState<C extends G
     }
 
     proceedNextHouse(previousHouse: House | null): void {
+        if (previousHouse == null) {
+            this.executeForLowestBidder(this.parentGameState.lowestBidder);
+            return;
+        }
+
         // Some wildlings effects may cause units to be killed.
         // Therefore an orphaned ship may be present here. Try to find it and destroy it in that case
         findOrphanedShipsAndDestroyThem(this.parentGameState.ingame);
-
-        if (previousHouse == null) {
-            this.executeForLowestBidder(this.parentGameState.lowestBidder);
+        //   ... check if ships can be converted
+        const analyzePortResult = isTakeControlOfEnemyPortGameStateRequired(this.parentGameState.ingame);
+        if (analyzePortResult) {
+            this.onTakeControlOfEnemyPortGameStateRequired(analyzePortResult, previousHouse);
             return;
         }
 
@@ -88,6 +99,10 @@ export default abstract class WildlingCardEffectInTurnOrderGameState<C extends G
         }
 
         return turnOrder[i + 1];
+    }
+
+    onTakeControlOfEnemyPortGameStateRequired(_takeControlOfEnemyPortResult: TakeControlOfEnemyPortResult, _previousHouse: House): void {
+        throw new Error("If necessary, child states must override onTakeControlOfEnemyPortGameStateRequired!");
     }
 
     abstract executeForLowestBidder(house: House): void;

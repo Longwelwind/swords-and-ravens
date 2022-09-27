@@ -11,7 +11,6 @@ import groupBy from "../../../../utils/groupBy";
 import BetterMap from "../../../../utils/BetterMap";
 import Region from "../../game-data-structure/Region";
 import _ from "lodash";
-import { findOrphanedShipsAndDestroyThem } from "../../port-helper/PortHelper";
 
 export default class ResolveSinglePayDebtGameState extends GameState<PayDebtsGameState> {
     house: House;
@@ -62,7 +61,6 @@ export default class ResolveSinglePayDebtGameState extends GameState<PayDebtsGam
             units: unitsPerRegion.map((r, us) => [r.id, us.map(u => u.type.id)])
         }, resolvedAutomatically);
 
-        findOrphanedShipsAndDestroyThem(this.ingame);
         this.parentGameState.proceedNextResolve();
     }
 
@@ -102,7 +100,7 @@ export default class ResolveSinglePayDebtGameState extends GameState<PayDebtsGam
         return [this.parentGameState.ingame.getControllerOfHouse(this.resolver).user];
     }
 
-    serializeToClient(): SerializedResolveSinglePayDebtGameState {
+    serializeToClient(_admin: boolean, _player: Player | null): SerializedResolveSinglePayDebtGameState {
         return {
             type: "resolve-single-pay-debt",
             house: this.house.id,

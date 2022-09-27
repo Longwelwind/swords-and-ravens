@@ -92,8 +92,6 @@ export default class TheFacelessMenGameState extends GameState<ExecuteLoanGameSt
                 }))
             });
 
-            // There might be orphaned CP* orders now so we remove them.
-            this.executeLoanGameState.parentGameState.actionGameState.findOrphanedOrdersAndRemoveThem();
             this.parentGameState.onExecuteLoanFinish(this.house);
         }
     }

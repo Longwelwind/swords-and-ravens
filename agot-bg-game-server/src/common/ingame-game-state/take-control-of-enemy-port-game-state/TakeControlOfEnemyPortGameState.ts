@@ -1,27 +1,34 @@
-import GameState from "../../../../GameState";
-import Region from "../../../game-data-structure/Region";
-import Player from "../../../Player";
-import {ServerMessage} from "../../../../../messages/ServerMessage";
-import {ClientMessage} from "../../../../../messages/ClientMessage";
-import IngameGameState from "../../../IngameGameState";
-import EntireGame from "../../../../EntireGame";
-import House from "../../../game-data-structure/House";
-import Game from "../../../game-data-structure/Game";
-import SimpleChoiceGameState, { SerializedSimpleChoiceGameState } from "../../../simple-choice-game-state/SimpleChoiceGameState";
-import { ship } from "../../../game-data-structure/unitTypes";
-import BetterMap from "../../../../../utils/BetterMap";
-import UnitType from "../../../game-data-structure/UnitType";
-import Unit from "../../../game-data-structure/Unit";
-import ResolveMarchOrderGameState from "../ResolveMarchOrderGameState";
-import { destroyAllShipsInPort } from "../../../port-helper/PortHelper";
+import GameState from "../../GameState";
+import Region from "../game-data-structure/Region";
+import Player from "../Player";
+import {ServerMessage} from "../../../messages/ServerMessage";
+import {ClientMessage} from "../../../messages/ClientMessage";
+import IngameGameState from "../IngameGameState";
+import EntireGame from "../../EntireGame";
+import House from "../game-data-structure/House";
+import Game from "../game-data-structure/Game";
+import SimpleChoiceGameState, { SerializedSimpleChoiceGameState } from "../simple-choice-game-state/SimpleChoiceGameState";
+import { ship } from "../game-data-structure/unitTypes";
+import BetterMap from "../../../utils/BetterMap";
+import UnitType from "../game-data-structure/UnitType";
+import Unit from "../game-data-structure/Unit";
+import { destroyAllShipsInPort } from "../port-helper/PortHelper";
+import ActionGameState from "../action-game-state/ActionGameState";
 
-export default class TakeControlOfEnemyPortGameState extends GameState<ResolveMarchOrderGameState, SimpleChoiceGameState> {
+interface ParentGameState extends GameState<any, any> {
+    ingame: IngameGameState;
+    action: ActionGameState | null;
+
+    onTakeControlOfEnemyPortFinish(previousHouse: House | null): void;
+}
+
+export default class TakeControlOfEnemyPortGameState extends GameState<ParentGameState, SimpleChoiceGameState> {
     port: Region;
     newController: House;
-    lastHouseThatResolvedMarchOrder: House;
+    previousHouse: House | null;
 
     get ingame(): IngameGameState {
-        return this.parentGameState.ingameGameState;
+        return this.parentGameState.ingame;
     }
 
     get entireGame(): EntireGame {
@@ -32,7 +39,7 @@ export default class TakeControlOfEnemyPortGameState extends GameState<ResolveMa
         return this.ingame.game;
     }
 
-    firstStart(port: Region, newController: House, lastHouseThatResolvedMarchOrder: House): void {
+    firstStart(port: Region, newController: House, previousHouse: House | null = null): void {
         if (!port.units.values.every(u => u.type == ship)) {
             throw new Error(`A non ship unit is present in ${port.name}`);
         }
@@ -43,7 +50,7 @@ export default class TakeControlOfEnemyPortGameState extends GameState<ResolveMa
 
         this.port = port;
         this.newController = newController;
-        this.lastHouseThatResolvedMarchOrder = lastHouseThatResolvedMarchOrder;
+        this.previousHouse = previousHouse;
 
         const availableShips = this.game.getAvailableUnitsOfType(newController, ship);
         const choices: string[] = [];
@@ -71,7 +78,7 @@ export default class TakeControlOfEnemyPortGameState extends GameState<ResolveMa
     onSimpleChoiceGameStateEnd(choice: number, resolvedAutomatically: boolean): void {
         // Remove ships from old controller
         const oldController = this.port.units.values[0].allegiance;
-        destroyAllShipsInPort(this.port, this.entireGame, this.parentGameState.actionGameState);
+        destroyAllShipsInPort(this.port, this.entireGame, this.parentGameState.action);
 
         if(choice > 0) {
             // Add ships for new controller
@@ -96,7 +103,7 @@ export default class TakeControlOfEnemyPortGameState extends GameState<ResolveMa
             port: this.port.id,
         }, resolvedAutomatically);
 
-        this.parentGameState.onTakeControlOfEnemyPortFinish(this.lastHouseThatResolvedMarchOrder);
+        this.parentGameState.onTakeControlOfEnemyPortFinish(this.previousHouse);
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedTakeControlOfEnemyPortGameState {
@@ -105,7 +112,7 @@ export default class TakeControlOfEnemyPortGameState extends GameState<ResolveMa
             childGameState: this.childGameState.serializeToClient(admin, player),
             portId: this.port.id,
             newControllerId: this.newController.id,
-            lastHouseThatResolvedMarchOrderId: this.lastHouseThatResolvedMarchOrder.id
+            previousHouseId: this.previousHouse ? this.previousHouse.id : null
         };
     }
 
@@ -116,11 +123,11 @@ export default class TakeControlOfEnemyPortGameState extends GameState<ResolveMa
     onServerMessage(_message: ServerMessage): void {
     }
 
-    static deserializeFromServer(parentGameState: ResolveMarchOrderGameState, data: SerializedTakeControlOfEnemyPortGameState): TakeControlOfEnemyPortGameState {
+    static deserializeFromServer(parentGameState: ParentGameState, data: SerializedTakeControlOfEnemyPortGameState): TakeControlOfEnemyPortGameState {
         const takeControlOfEnemyPortGameState = new TakeControlOfEnemyPortGameState(parentGameState);
-        takeControlOfEnemyPortGameState.port = parentGameState.world.regions.get(data.portId);
-        takeControlOfEnemyPortGameState.newController = parentGameState.game.houses.get(data.newControllerId);
-        takeControlOfEnemyPortGameState.lastHouseThatResolvedMarchOrder = parentGameState.game.houses.get(data.newControllerId);
+        takeControlOfEnemyPortGameState.port = parentGameState.ingame.world.regions.get(data.portId);
+        takeControlOfEnemyPortGameState.newController = parentGameState.ingame.game.houses.get(data.newControllerId);
+        takeControlOfEnemyPortGameState.previousHouse = data.previousHouseId ? parentGameState.ingame.game.houses.get(data.previousHouseId) : null;
         takeControlOfEnemyPortGameState.childGameState = takeControlOfEnemyPortGameState.deserializeChildGameState(data.childGameState);
         return takeControlOfEnemyPortGameState;
     }
@@ -135,5 +142,5 @@ export interface SerializedTakeControlOfEnemyPortGameState {
     childGameState: SerializedSimpleChoiceGameState;
     portId: string;
     newControllerId: string;
-    lastHouseThatResolvedMarchOrderId: string;
+    previousHouseId: string | null;
 }

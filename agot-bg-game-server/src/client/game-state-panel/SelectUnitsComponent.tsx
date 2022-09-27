@@ -46,7 +46,7 @@ export default class SelectUnitsComponent extends Component<GameStateComponentPr
                                     </Button>
                                 </Col>
                                 <Col xs="auto">
-                                    <Button onClick={() => this.reset()} variant="danger" disabled={this.countSelectedUnits() == 0}>
+                                    <Button onClick={() => this.reset()} variant="danger" disabled={this.selectedUnits.size == 0}>
                                         Reset
                                     </Button>
                                 </Col>
@@ -78,11 +78,9 @@ export default class SelectUnitsComponent extends Component<GameStateComponentPr
     }
 
     getSelectableUnits(): Unit[] {
-        if (this.countSelectedUnits() == this.props.gameState.count) {
-            return [];
-        }
-
-        let result = _.difference(this.props.gameState.possibleUnits, _.flatMap(this.selectedUnits.map((_r, us) => us)));
+        let result = this.countSelectedUnits() == this.props.gameState.count
+            ? _.flatMap(this.selectedUnits.values)
+            : [...this.props.gameState.possibleUnits];
 
         if (this.props.gameState.selectedUnitsMustBeOfSameRegion && this.selectedUnits.size > 0) {
             const selectedRegion = this.selectedUnits.entries[0][0];
@@ -95,9 +93,16 @@ export default class SelectUnitsComponent extends Component<GameStateComponentPr
 
     modifyUnitOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {
         if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
+            const selectedUnits = _.flatMap(this.selectedUnits.values);
             return this.getSelectableUnits().map(u => [
                 u,
-                {highlight: {active: true}, onClick: () => this.onUnitClick(u.region, u)}
+                {
+                    highlight: {
+                    active: true,
+                    color: selectedUnits.includes(u)
+                        ? "yellow"
+                        : "white"
+                }, onClick: () => this.onUnitClick(u.region, u)}
             ] as [Unit, PartialRecursive<UnitOnMapProperties>]);
         }
 
@@ -105,7 +110,18 @@ export default class SelectUnitsComponent extends Component<GameStateComponentPr
     }
 
     onUnitClick(region: Region, unit: Unit): void {
-        if (this.getSelectableUnits().includes(unit)) {
+        let found = false;
+        this.selectedUnits.forEach((units, region) => {
+            if (units.includes(unit)) {
+                found = true;
+                this.selectedUnits.set(region, _.difference(units, [unit]));
+                if (this.selectedUnits.get(region).length == 0) {
+                    this.selectedUnits.delete(region);
+                }
+            }
+        });
+
+        if (!found) {
             if (!this.selectedUnits.has(region)) {
                 this.selectedUnits.set(region, []);
             }

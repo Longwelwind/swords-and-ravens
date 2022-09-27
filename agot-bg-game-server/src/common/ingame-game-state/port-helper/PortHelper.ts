@@ -3,6 +3,7 @@ import Region from "../game-data-structure/Region";
 import ActionGameState from "../action-game-state/ActionGameState";
 import IngameGameState from "../IngameGameState";
 import EntireGame from "../../../common/EntireGame";
+import House from "../game-data-structure/House";
 
 function removePossibleOrdersInPort(portRegion: Region, actionGameState: ActionGameState | null): void {
     if (portRegion.type != port) {
@@ -62,4 +63,35 @@ export function findOrphanedShipsAndDestroyThem(ingame: IngameGameState, actionG
             shipCount: destroyedShipCount
         });
     })
+}
+
+export function isTakeControlOfEnemyPortGameStateRequired(ingame: IngameGameState): TakeControlOfEnemyPortResult | null {
+    // Find ports with enemy ships
+    const portsWithEnemyShips = ingame.world.regions.values.filter(r => r.type == port
+        && r.units.size > 0
+        && r.getController() != ingame.world.getAdjacentLandOfPort(r).getController());
+
+    if (portsWithEnemyShips.length == 0) {
+        return null;
+    }
+
+    const portRegion = portsWithEnemyShips[0];
+    const adjacentCastle = ingame.world.getAdjacentLandOfPort(portRegion);
+    const adjacentCastleController = adjacentCastle.getController();
+
+    if (adjacentCastleController) {
+        // return TakeControlOfEnemyPortGameState required
+        return {
+            port: portRegion,
+            newController: adjacentCastleController
+        }
+    }
+
+    // We should never reach this line because we removed orphaned ships earlier.
+    throw new Error(`$Port with id '{portRegion.id}' contains orphaned ships which should have been removed before!`);
+}
+
+export interface TakeControlOfEnemyPortResult {
+    port: Region;
+    newController: House;
 }

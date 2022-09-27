@@ -17,11 +17,13 @@ import LoyalMaesterGameState, { SerializedLoyalMaesterGameState } from "./loyal-
 import MasterAtArmsGameState, { SerializedMasterAtArmsGameState } from "./master-at-arms-game-state/MasterAtArmsGameState";
 import SavvyStewardGameState, { SerializedSavvyStewardGameState } from "./savvy-steward-game-state/SavvyStewardGameState";
 import SpymasterGameState, { SerializedSpymasterGameState } from "./spymaster-game-state/SpymasterGameState";
-import { findOrphanedShipsAndDestroyThem } from "../../../../../common/ingame-game-state/port-helper/PortHelper";
+import { findOrphanedShipsAndDestroyThem, isTakeControlOfEnemyPortGameStateRequired } from "../../../../../common/ingame-game-state/port-helper/PortHelper";
+import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameState } from "../../../take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
+import ActionGameState from "../../ActionGameState";
 
 export default class ExecuteLoanGameState extends GameState<ResolveConsolidatePowerGameState,
     PlaceSellswordsGameState | TheFacelessMenGameState | PyromancerGameState | ExpertArtificerGameState | LoyalMaesterGameState
-    | MasterAtArmsGameState | SavvyStewardGameState | SpymasterGameState> {
+    | MasterAtArmsGameState | SavvyStewardGameState | SpymasterGameState | TakeControlOfEnemyPortGameState> {
     loanCardType: LoanCardType;
 
     get ingame(): IngameGameState {
@@ -30,6 +32,10 @@ export default class ExecuteLoanGameState extends GameState<ResolveConsolidatePo
 
     get game(): Game {
         return this.ingame.game;
+    }
+
+    get action(): ActionGameState | null {
+        return this.parentGameState.actionGameState;
     }
 
     firstStart(house: House, loan: LoanCardType): void {
@@ -80,8 +86,28 @@ export default class ExecuteLoanGameState extends GameState<ResolveConsolidatePo
     }
 
     onExecuteLoanFinish(house: House): void {
+        // There might be orphaned CP* orders now so we remove them.
+        this.parentGameState.actionGameState.findOrphanedOrdersAndRemoveThem();
         findOrphanedShipsAndDestroyThem(this.ingame, this.parentGameState.actionGameState);
+        //   ... check if ships can be converted
+        const analyzePortResult = isTakeControlOfEnemyPortGameStateRequired(this.parentGameState.ingame);
+        if (analyzePortResult) {
+            this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(analyzePortResult.port, analyzePortResult.newController, house);
+            return;
+        }
         this.parentGameState.proceedNextResolve(house);
+    }
+
+    onTakeControlOfEnemyPortFinish(previousHouse: House | null): void {
+        if (!previousHouse) {
+            throw new Error("previousHouse must be set here!");
+        }
+        const analyzePortResult = isTakeControlOfEnemyPortGameStateRequired(this.parentGameState.ingame);
+        if (analyzePortResult) {
+            this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(analyzePortResult.port, analyzePortResult.newController, previousHouse);
+            return;
+        }
+        this.parentGameState.proceedNextResolve(previousHouse);
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -126,6 +152,8 @@ export default class ExecuteLoanGameState extends GameState<ResolveConsolidatePo
             return SavvyStewardGameState.deserializeFromServer(this, data);
         } else if (data.type == "spymaster") {
             return SpymasterGameState.deserializeFromServer(this, data);
+        } else if (data.type == "take-control-of-enemy-port") {
+            return TakeControlOfEnemyPortGameState.deserializeFromServer(this, data);
         } else {
             throw new Error();
         }
@@ -136,5 +164,6 @@ export interface SerializedExecuteLoanGameState {
     type: "execute-loan";
     loanCardType: string;
     childGameState: SerializedPlaceSellswordsGameState | SerializedTheFacelessMenGameState | SerializedPyromancerGameState
-        | SerializedExpertArtificerGameState | SerializedLoyalMaesterGameState | SerializedMasterAtArmsGameState | SerializedSavvyStewardGameState | SerializedSpymasterGameState;
+        | SerializedExpertArtificerGameState | SerializedLoyalMaesterGameState | SerializedMasterAtArmsGameState | SerializedSavvyStewardGameState | SerializedSpymasterGameState
+        | SerializedTakeControlOfEnemyPortGameState;
 }
