@@ -11,12 +11,13 @@ import ChatClient, {Channel, Message} from "./ChatClient";
 import EntireGame from "../../common/EntireGame";
 // @ts-expect-error Somehow ts complains that this module cannot be found while it is
 import ScrollToBottom from "react-scroll-to-bottom";
-import { Alert, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Alert, OverlayTrigger, Popover, Tooltip } from "react-bootstrap";
 import User from "../../server/User";
 import { preventOverflow } from "@popperjs/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSyncAlt } from "@fortawesome/free-solid-svg-icons";
+import { faFaceSmile, faSyncAlt } from "@fortawesome/free-solid-svg-icons";
 import notificationSound from "../../../public/sounds/raven_call.ogg";
+import EmojiPicker, { EmojiStyle, SuggestionMode, Theme } from 'emoji-picker-react';
 
 interface ChatComponentProps {
     gameClient: GameClient;
@@ -59,7 +60,12 @@ export default class ChatComponent extends Component<ChatComponentProps> {
 
     render(): ReactNode {
         const messages = this.channel.messages;
-
+        // const messages = [{
+        //     createdAt: new Date(),
+        //     id: "1",
+        //     text: "Hello 😬 my friend",
+        //     user: this.props.entireGame.users.values[0]
+        // }];
         return (
             <div className="d-flex flex-column h-100">
                 {/* Setting a fixed height seems to be the only solution to make ScrollToBottom work */}
@@ -79,7 +85,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                 </React.Fragment>
                             )}
                             <Row noGutters={true} className="flex-nowrap" key={m.id}>
-                                <Col xs="auto" style={{width: "38px"}} className="text-center">
+                                <Col xs="auto" style={{width: "38px", fontSize: "large"}} className="text-center">
                                     <OverlayTrigger
                                         placement="auto"
                                         overlay={<Tooltip id={"message-date-" + m.id}>{m.createdAt.toLocaleString()}</Tooltip>}
@@ -90,10 +96,10 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                         </small>
                                     </OverlayTrigger>
                                 </Col>
-                                <Col xs="auto" className="mx-1">
+                                <Col xs="auto" className="mx-1" style={{fontSize: "large"}}>
                                     {this.props.getUserDisplayName(m.user)}
                                 </Col>
-                                <Col style={{overflowWrap: "anywhere"}}>
+                                <Col style={{overflowWrap: "anywhere", fontSize: "large"}}>
                                     {m.text}
                                 </Col>
                             </Row>
@@ -112,12 +118,33 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                 </Row>}
                 <div>
                     <Form>
-                        <Row>
+                        <Row className="d-flex align-items-center">
                             <Col>
-                                <Form.Control type="text" maxLength={200} value={this.inputText} onChange={(e: any) => this.inputText = e.target.value} />
+                                <Form.Control size="lg" id={`chat-client-input-${this.channel.id}`} type="text" maxLength={200} value={this.inputText} onChange={(e: any) => this.inputText = e.target.value} />
                             </Col>
                             <Col xs="auto">
-                                <Button type="submit" onClick={(e: any) => {this.send(); e.preventDefault()}}>Send</Button>
+                                <OverlayTrigger
+                                    overlay={<Popover id="emoji-picker" className="px-3 pt-2">
+                                        <EmojiPicker theme={Theme.DARK} emojiStyle={EmojiStyle.NATIVE} suggestedEmojisMode={SuggestionMode.FREQUENT} onEmojiClick={(emoji) => {
+                                            const input = document.getElementById(`chat-client-input-${this.channel.id}`) as HTMLInputElement;
+                                            const position = input.selectionStart ?? this.inputText.length;
+                                            this.inputText = [this.inputText.slice(0, position),
+                                                emoji.emoji,
+                                                this.inputText.slice(position)
+                                            ].join('');
+                                        }} />
+                                    </Popover>}
+                                    placement="auto"
+                                    trigger="click"
+                                    rootClose
+                                >
+                                    <div  className="btn btn-outline-light">
+                                        <FontAwesomeIcon icon={faFaceSmile} size="2x"/>
+                                    </div>
+                                </OverlayTrigger>
+                            </Col>
+                            <Col xs="auto">
+                                <Button type="submit" size="lg" onClick={(e: any) => {this.send(); e.preventDefault()}}>Send</Button>
                             </Col>
                             <Col xs="auto">
                                 <button className="btn btn-outline-light btn-sm" onClick={(e: any) => { this.loadMoreMessages(); e.preventDefault() }} disabled={this.noMoreMessages}>
