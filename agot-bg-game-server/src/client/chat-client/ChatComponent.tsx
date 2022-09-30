@@ -18,6 +18,18 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFaceSmile, faSyncAlt } from "@fortawesome/free-solid-svg-icons";
 import notificationSound from "../../../public/sounds/raven_call.ogg";
 import EmojiPicker, { EmojiStyle, SuggestionMode, Theme } from 'emoji-picker-react';
+import { Props } from "react-emoji-render";
+import Emoji from "react-emoji-render";
+
+class AppleEmojiComponent extends Component<Props> {
+    render(): ReactNode {
+        return <Emoji options={{protocol: "https",
+            baseUrl: "//cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/",
+            ext: "png",
+            size: ""}}
+            {...this.props} />;
+    }
+}
 
 interface ChatComponentProps {
     gameClient: GameClient;
@@ -60,12 +72,18 @@ export default class ChatComponent extends Component<ChatComponentProps> {
 
     render(): ReactNode {
         const messages = this.channel.messages;
-        // const messages = [{
-        //     createdAt: new Date(),
-        //     id: "1",
-        //     text: "Hello 😬 my friend",
-        //     user: this.props.entireGame.users.values[0]
-        // }];
+        /* const messages = [{
+            createdAt: new Date(),
+            id: "1",
+            text: "Hello 😬 my friend :smile:",
+            user: this.props.entireGame.users.values[0]
+        },
+        {
+            createdAt: new Date(),
+            id: "2",
+            text: "😬",
+            user: this.props.entireGame.users.values[0]
+        }]; */
         return (
             <div className="d-flex flex-column h-100">
                 {/* Setting a fixed height seems to be the only solution to make ScrollToBottom work */}
@@ -84,7 +102,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                     {this.props.injectBetweenMessages(null, m)}
                                 </React.Fragment>
                             )}
-                            <Row noGutters={true} className="flex-nowrap" key={m.id}>
+                            <Row noGutters={true} className="flex-nowrap align-items-center" key={m.id}>
                                 <Col xs="auto" style={{width: "38px", fontSize: "large"}} className="text-center">
                                     <OverlayTrigger
                                         placement="auto"
@@ -100,7 +118,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                     {this.props.getUserDisplayName(m.user)}
                                 </Col>
                                 <Col style={{overflowWrap: "anywhere", fontSize: "large"}}>
-                                    {m.text}
+                                    <AppleEmojiComponent text={m.text} onlyEmojiClassName="make-emojis-large"/>
                                 </Col>
                             </Row>
                             {/* Inject between all messages and after the last */}
@@ -120,7 +138,14 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                     <Form>
                         <Row className="d-flex align-items-center">
                             <Col>
-                                <Form.Control size="lg" id={`chat-client-input-${this.channel.id}`} type="text" maxLength={200} value={this.inputText} onChange={(e: any) => this.inputText = e.target.value} />
+                                <Form.Control
+                                    size="lg"
+                                    id={`chat-client-input-${this.channel.id}`}
+                                    type="text"
+                                    maxLength={200}
+                                    value={this.inputText}
+                                    onChange={(e: any) => this.inputText = e.target.value}
+                                />
                             </Col>
                             <Col xs="auto">
                                 <OverlayTrigger
@@ -128,8 +153,9 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                         <EmojiPicker
                                             theme={Theme.DARK}
                                             autoFocusSearch={false}
-                                            emojiStyle={EmojiStyle.NATIVE}
+                                            emojiStyle={EmojiStyle.APPLE}
                                             suggestedEmojisMode={SuggestionMode.FREQUENT}
+                                            lazyLoadEmojis={true}
                                             onEmojiClick={(emoji) => {
                                                 const input = document.getElementById(`chat-client-input-${this.channel.id}`) as HTMLInputElement;
                                                 const position = input.selectionStart ?? this.inputText.length;
