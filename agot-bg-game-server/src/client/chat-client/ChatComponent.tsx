@@ -125,14 +125,20 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                             <Col xs="auto">
                                 <OverlayTrigger
                                     overlay={<Popover id="emoji-picker" className="px-3 pt-2">
-                                        <EmojiPicker theme={Theme.DARK} emojiStyle={EmojiStyle.NATIVE} suggestedEmojisMode={SuggestionMode.FREQUENT} onEmojiClick={(emoji) => {
-                                            const input = document.getElementById(`chat-client-input-${this.channel.id}`) as HTMLInputElement;
-                                            const position = input.selectionStart ?? this.inputText.length;
-                                            this.inputText = [this.inputText.slice(0, position),
-                                                emoji.emoji,
-                                                this.inputText.slice(position)
-                                            ].join('');
-                                        }} />
+                                        <EmojiPicker
+                                            theme={Theme.DARK}
+                                            autoFocusSearch={false}
+                                            emojiStyle={EmojiStyle.NATIVE}
+                                            suggestedEmojisMode={SuggestionMode.FREQUENT}
+                                            onEmojiClick={(emoji) => {
+                                                const input = document.getElementById(`chat-client-input-${this.channel.id}`) as HTMLInputElement;
+                                                const position = input.selectionStart ?? this.inputText.length;
+                                                this.inputText = [this.inputText.slice(0, position),
+                                                    emoji.emoji,
+                                                    this.inputText.slice(position)
+                                                ].join('');
+                                            }}
+                                        />
                                     </Popover>}
                                     placement="auto"
                                     trigger="click"
