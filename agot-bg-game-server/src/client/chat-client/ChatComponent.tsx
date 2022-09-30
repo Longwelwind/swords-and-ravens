@@ -103,7 +103,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                 </React.Fragment>
                             )}
                             <Row noGutters={true} className="flex-nowrap align-items-center" key={m.id}>
-                                <Col xs="auto" style={{width: "38px", fontSize: "large"}} className="text-center">
+                                <Col xs="auto" style={{width: "46px", fontSize: "large"}} className="text-center">
                                     <OverlayTrigger
                                         placement="auto"
                                         overlay={<Tooltip id={"message-date-" + m.id}>{m.createdAt.toLocaleString()}</Tooltip>}
