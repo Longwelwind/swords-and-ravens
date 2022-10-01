@@ -18,6 +18,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFaceSmile, faSyncAlt } from "@fortawesome/free-solid-svg-icons";
 import notificationSound from "../../../public/sounds/raven_call.ogg";
 import EmojiPicker, { EmojiStyle, SuggestionMode, Theme } from 'emoji-picker-react';
+import { isMobile } from "react-device-detect";
 
 interface ChatComponentProps {
     gameClient: GameClient;
@@ -106,7 +107,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                     {this.props.getUserDisplayName(m.user)}
                                 </Col>
                                 <Col style={{overflowWrap: "anywhere", fontSize: "large"}}>
-                                    <span className={this.onlyContainsEmojis(m.text) ? "make-emojis-large" : ""}>{m.text}</span>
+                                    <span className={this.containsOnlyEmojis(m.text) ? "make-emojis-large" : ""}>{m.text}</span>
                                 </Col>
                             </Row>
                             {/* Inject between all messages and after the last */}
@@ -137,11 +138,11 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                             </Col>
                             <Col xs="auto">
                                 <OverlayTrigger
-                                    overlay={<Popover id="emoji-picker" className="px-3 pt-2">
+                                    overlay={<Popover id="emoji-picker" style={{maxWidth: "100%", maxHeight: "100%", borderStyle: "none"}}>
                                         <EmojiPicker
                                             theme={Theme.DARK}
-                                            autoFocusSearch={false}
-                                            emojiStyle={EmojiStyle.APPLE}
+                                            autoFocusSearch={!isMobile}
+                                            emojiStyle={isMobile ? EmojiStyle.NATIVE : EmojiStyle.APPLE}
                                             suggestedEmojisMode={SuggestionMode.FREQUENT}
                                             lazyLoadEmojis={true}
                                             onEmojiClick={(emoji) => {
@@ -201,8 +202,10 @@ export default class ChatComponent extends Component<ChatComponentProps> {
         }
     }
 
-    onlyContainsEmojis(str: string): boolean {
-        return /^(\s|\p{Extended_Pictographic})+$/u.test(str);
+    containsOnlyEmojis(str: string): boolean {
+        const stringToTest = str.replace(/ /g,'');
+        const emojiRegex = /^(?:(?:\p{RI}\p{RI}|\p{Emoji}(?:\p{Emoji_Modifier}|\u{FE0F}\u{20E3}?|[\u{E0020}-\u{E007E}]+\u{E007F})?(?:\u{200D}\p{Emoji}(?:\p{Emoji_Modifier}|\u{FE0F}\u{20E3}?|[\u{E0020}-\u{E007E}]+\u{E007F})?)*)|[\u{1f900}-\u{1f9ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}])+$/u;
+        return emojiRegex.test(stringToTest) && Number.isNaN(Number(stringToTest));
     }
 
     componentDidMount(): void {
