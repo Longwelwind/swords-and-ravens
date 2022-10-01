@@ -18,18 +18,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFaceSmile, faSyncAlt } from "@fortawesome/free-solid-svg-icons";
 import notificationSound from "../../../public/sounds/raven_call.ogg";
 import EmojiPicker, { EmojiStyle, SuggestionMode, Theme } from 'emoji-picker-react';
-import { Props } from "react-emoji-render";
-import Emoji from "react-emoji-render";
-
-class AppleEmojiComponent extends Component<Props> {
-    render(): ReactNode {
-        return <Emoji options={{protocol: "https",
-            baseUrl: "//cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/",
-            ext: "png",
-            size: ""}}
-            {...this.props} />;
-    }
-}
 
 interface ChatComponentProps {
     gameClient: GameClient;
@@ -118,7 +106,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                     {this.props.getUserDisplayName(m.user)}
                                 </Col>
                                 <Col style={{overflowWrap: "anywhere", fontSize: "large"}}>
-                                    <AppleEmojiComponent text={m.text} onlyEmojiClassName="make-emojis-large"/>
+                                    <span className={this.onlyContainsEmojis(m.text) ? "make-emojis-large" : ""}>{m.text}</span>
                                 </Col>
                             </Row>
                             {/* Inject between all messages and after the last */}
@@ -211,6 +199,10 @@ export default class ChatComponent extends Component<ChatComponentProps> {
         if (!this.chatClient.loadMoreMessages(this.channel)) {
             this.noMoreMessages = true;
         }
+    }
+
+    onlyContainsEmojis(str: string): boolean {
+        return /^(\s|\p{Extended_Pictographic})+$/u.test(str);
     }
 
     componentDidMount(): void {
