@@ -1,13 +1,12 @@
-import {Component, ReactNode} from "react";
+import { Component, ReactNode } from "react";
 import ActionGameState from "../../common/ingame-game-state/action-game-state/ActionGameState";
 import ResolveMarchOrderGameState
     from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/ResolveMarchOrderGameState";
 import * as React from "react";
-import {observer} from "mobx-react";
+import { observer } from "mobx-react";
 import ResolveMarchOrderComponent from "./ResolveMarchOrderComponent";
 import UseRavenGameState from "../../common/ingame-game-state/action-game-state/use-raven-game-state/UseRavenGameState";
 import UseRavenGameStatePanelComponent from "./UseRavenGameStatePanelComponent";
-import ListGroupItem from "react-bootstrap/ListGroupItem";
 import renderChildGameState from "../utils/renderChildGameState";
 import GameStateComponentProps from "./GameStateComponentProps";
 import ResolveConsolidatePowerGameState
@@ -26,20 +25,16 @@ import ScoreObjectivesComponent from "./ScoreObjectivesComponent";
 export default class ActionComponent extends Component<GameStateComponentProps<ActionGameState>> {
     render(): ReactNode {
         return (
-            <>
-                <ListGroupItem className="px-2">
-                    <Row>
-                        {renderChildGameState(this.props, [
-                            [UseRavenGameState, UseRavenGameStatePanelComponent],
-                            [ResolveMarchOrderGameState, ResolveMarchOrderComponent],
-                            [ResolveConsolidatePowerGameState, ResolveConsolidatePowerComponent],
-                            [ResolveRaidOrderGameState, ResolveRaidOrderComponent],
-                            [ReconcileArmiesGameState, ReconcileArmiesComponent],
-                            [ScoreObjectivesGameState, ScoreObjectivesComponent]
-                        ])}
-                    </Row>
-                </ListGroupItem>
-            </>
+            <Row>
+                {renderChildGameState(this.props, [
+                    [UseRavenGameState, UseRavenGameStatePanelComponent],
+                    [ResolveMarchOrderGameState, ResolveMarchOrderComponent],
+                    [ResolveConsolidatePowerGameState, ResolveConsolidatePowerComponent],
+                    [ResolveRaidOrderGameState, ResolveRaidOrderComponent],
+                    [ReconcileArmiesGameState, ReconcileArmiesComponent],
+                    [ScoreObjectivesGameState, ScoreObjectivesComponent]
+                ])}
+            </Row>
         );
     }
 }

@@ -1,7 +1,6 @@
 import { Component, ReactNode } from "react";
 import * as React from "react";
 import { observer } from "mobx-react";
-import ListGroupItem from "react-bootstrap/ListGroupItem";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Row from "react-bootstrap/Row";
 import Player from "../../common/ingame-game-state/Player";
@@ -22,43 +21,41 @@ export default class ThematicDraftHouseCardsComponent extends Component<GameStat
     render(): ReactNode {
         return (
             <>
-                <ListGroupItem>
-                    {this.player && this.props.gameState.getNotReadyPlayers().includes(this.player) &&
-                        <>
-                            <Row  className="justify-content-center">
-                                <Col xs="12" className="text-center">
-                                    Please select a House card:
-                                </Col>
-                            </Row>
-                            <Row className="justify-content-center">
-                                <Col xs="12">
-                                    <Row className="justify-content-center">
-                                        {this.props.gameState.getFilteredHouseCardsForHouse(this.player.house).map(hc => (
-                                            <Col xs="auto" key={`thematic-draft-${hc.id}`}>
-                                                <HouseCardComponent
-                                                    houseCard={hc}
-                                                    size="small"
-                                                    selected={this.selectedHouseCard == hc}
-                                                    onClick={() => this.selectedHouseCard = this.selectedHouseCard != hc ? hc : null}
-                                                />
-                                            </Col>
-                                        ))}
-                                    </Row>
-                                </Col>
-                                <Col xs="auto">
-                                    <Button variant="success" onClick={() => this.confirm()} disabled={this.selectedHouseCard == null}>
-                                        Confirm
-                                    </Button>
-                                </Col>
-                            </Row>
+                {this.player && this.props.gameState.getNotReadyPlayers().includes(this.player) &&
+                    <>
+                        <Row  className="justify-content-center">
+                            <Col xs="12" className="text-center">
+                                Please select a House card:
+                            </Col>
+                        </Row>
+                        <Row className="justify-content-center">
+                            <Col xs="12">
+                                <Row className="justify-content-center">
+                                    {this.props.gameState.getFilteredHouseCardsForHouse(this.player.house).map(hc => (
+                                        <Col xs="auto" key={`thematic-draft-${hc.id}`}>
+                                            <HouseCardComponent
+                                                houseCard={hc}
+                                                size="small"
+                                                selected={this.selectedHouseCard == hc}
+                                                onClick={() => this.selectedHouseCard = this.selectedHouseCard != hc ? hc : null}
+                                            />
+                                        </Col>
+                                    ))}
+                                </Row>
+                            </Col>
+                            <Col xs="auto">
+                                <Button variant="success" onClick={() => this.confirm()} disabled={this.selectedHouseCard == null}>
+                                    Confirm
+                                </Button>
+                            </Col>
+                        </Row>
 
-                        </>}
-                    <Row className="mt-3 justify-content-center">
-                        <Col xs={12} className="text-center">
-                            Waiting for {this.props.gameState.getNotReadyPlayers().map(p => p.house.name).join(", ")}...
-                        </Col>
-                    </Row>
-                </ListGroupItem>
+                    </>}
+                <Row className="mt-3 justify-content-center">
+                    <Col xs={12} className="text-center">
+                        Waiting for {this.props.gameState.getNotReadyPlayers().map(p => p.house.name).join(", ")}...
+                    </Col>
+                </Row>
             </>
         );
     }

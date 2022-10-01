@@ -54,7 +54,7 @@ export default class WesterosCardComponent extends Component<WesterosCardProps> 
                 {this.props.wasReshuffled &&
                 <div className="mt-1 text-center">
                     <OverlayTrigger
-                        overlay={<Tooltip id={`was-reshuffled-${this.props.westerosDeckI}`}>Drawn after <b>Winter is Coming</b> was executed</Tooltip>}
+                        overlay={<Tooltip id={`was-reshuffled-${this.props.westerosDeckI}`}>Drawn after <b>Winter&nbsp;is&nbsp;Coming</b> was executed</Tooltip>}
                         popperConfig={{modifiers: [preventOverflow]}}
                         delay={{show: 250, hide: 0}}
                         placement="auto"

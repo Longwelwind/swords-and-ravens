@@ -1,8 +1,7 @@
-import {Component, ReactNode} from "react";
+import { Component, ReactNode } from "react";
 import PlanningGameState from "../../common/ingame-game-state/planning-game-state/PlanningGameState";
-import {observer} from "mobx-react";
+import { observer } from "mobx-react";
 import React from "react";
-import ListGroupItem from "react-bootstrap/ListGroupItem";
 import GameStateComponentProps from "./GameStateComponentProps";
 import ClaimVassalsGameState from "../../common/ingame-game-state/planning-game-state/claim-vassals-game-state/ClaimVassalsGameState";
 import PlaceOrdersGameState from "../../common/ingame-game-state/planning-game-state/place-orders-game-state/PlaceOrdersGameState";
@@ -23,8 +22,7 @@ export default class PlanningComponent extends Component<GameStateComponentProps
         return (
             <>
                 {this.props.gameState.revealeadWesterosCards.length > 0 && (
-                <ListGroupItem className="px-2">
-                    <Row className="justify-content-around">
+                    <Row className="justify-content-around mb-2">
                         {this.props.gameState.revealeadWesterosCards.map((wc, i) => (
                             <Col xs="auto" key={`planning_revealed-wcs_${wc.id}_${i}`}>
                                 <WesterosCardComponent
@@ -36,17 +34,14 @@ export default class PlanningComponent extends Component<GameStateComponentProps
                                 />
                             </Col>
                         ))}
-                    </Row>
-                </ListGroupItem>)}
-                <ListGroupItem className="px-2">
-                    <Row className="justify-content-center">
-                        {renderChildGameState(this.props, [
-                            [PlaceOrdersGameState, PlaceOrdersComponent],
-                            [ClaimVassalsGameState, ClaimVassalsComponent],
-                            [MusteringGameState, MusteringComponent]
-                        ])}
-                    </Row>
-                </ListGroupItem>
+                    </Row>)}
+                <Row className="justify-content-center">
+                    {renderChildGameState(this.props, [
+                        [PlaceOrdersGameState, PlaceOrdersComponent],
+                        [ClaimVassalsGameState, ClaimVassalsComponent],
+                        [MusteringGameState, MusteringComponent]
+                    ])}
+                </Row>
             </>
         );
     }

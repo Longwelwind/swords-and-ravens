@@ -666,19 +666,21 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     </Row>
                                 </ListGroupItem>
                             )}
-                            {renderChildGameState(
-                                { mapControls: this.mapControls, ...this.props },
-                                _.concat(
-                                    phases.map(phase => [phase.gameState, phase.component] as [any, typeof Component]),
-                                    [[ThematicDraftHouseCardsGameState, ThematicDraftHouseCardsComponent]],
-                                    [[DraftHouseCardsGameState, DraftHouseCardsComponent]],
-                                    [[DraftInfluencePositionsGameState, DraftInfluencePositionsComponent]],
-                                    [[GameEndedGameState, GameEndedComponent]],
-                                    [[CancelledGameState, IngameCancelledComponent]],
-                                    [[PayDebtsGameState, PayDebtsComponent]],
-                                    [[ChooseInitialObjectivesGameState, ChooseInitialObjectivesComponent]]
-                                )
-                            )}
+                            <ListGroupItem className="text-large">
+                                {renderChildGameState(
+                                    { mapControls: this.mapControls, ...this.props },
+                                    _.concat(
+                                        phases.map(phase => [phase.gameState, phase.component] as [any, typeof Component]),
+                                        [[ThematicDraftHouseCardsGameState, ThematicDraftHouseCardsComponent]],
+                                        [[DraftHouseCardsGameState, DraftHouseCardsComponent]],
+                                        [[DraftInfluencePositionsGameState, DraftInfluencePositionsComponent]],
+                                        [[GameEndedGameState, GameEndedComponent]],
+                                        [[CancelledGameState, IngameCancelledComponent]],
+                                        [[PayDebtsGameState, PayDebtsComponent]],
+                                        [[ChooseInitialObjectivesGameState, ChooseInitialObjectivesComponent]]
+                                    )
+                                )}
+                            </ListGroupItem>
                         </ListGroup>
                     </Col>
                     <Col xs="auto" className="mx-1 px-0">
@@ -743,7 +745,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 </button>
                 {this.gameClient.isOwnTurn() && <Spinner animation="grow" variant="warning" size="sm" style={{position: "absolute", bottom: "4px", left: "4px" }}/>}
             </Card>
-            <Card style={{height: this.mapScrollbarEnabled ? "auto" : "800px"}} className={this.mapScrollbarEnabled ? "flex-fill-remaining" : ""}>
+            <Card style={{height: this.mapScrollbarEnabled ? "auto" : "800px"}} className={classNames(
+                {"flex-fill-remaining": this.mapScrollbarEnabled},
+                "text-large"
+            )}>
                 <Tab.Container activeKey={this.currentOpenedTab}
                     onSelect={k => {
                         if (k) {

@@ -16,12 +16,12 @@ export default class ClaimVassalComponent extends Component<GameStateComponentPr
         return (
             <>
                 <Col xs={12} className="text-center">
-                    <strong>{this.props.gameState.house.name}</strong> may command <b>{this.props.gameState.count}</b> Vassal house{this.props.gameState.count != 1 ? "s" : ""} this turn.
+                    <b>{this.props.gameState.house.name}</b> may command <b>{this.props.gameState.count}</b> Vassal house{this.props.gameState.count != 1 ? "s" : ""} this turn.
                 </Col>
                 <Col xs={12}>
                     {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
-                        <>
-                            <Col xs={12}>
+                        <Row className="justify-content-center">
+                            <Col xs="auto">
                                 {this.props.gameState.claimableVassals.map(h => (
                                     <Row key={`claim-vassal_${h.id}`} className="mb-1">
                                         <FormCheck
@@ -43,9 +43,11 @@ export default class ClaimVassalComponent extends Component<GameStateComponentPr
                                     </Col>
                                 </Row>
                             </Col>
-                        </>
+                        </Row>
                     ) : (
-                        <>Waiting for {this.props.gameState.house.name}...</>
+                        <Col xs={12} className="text-center">
+                            Waiting for {this.props.gameState.house.name}...
+                        </Col>
                     )}
                 </Col>
             </>

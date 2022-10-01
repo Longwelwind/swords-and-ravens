@@ -1,5 +1,5 @@
-import {observer} from "mobx-react";
-import {Component, default as React, ReactNode} from "react";
+import { observer } from "mobx-react";
+import { Component, default as React, ReactNode } from "react";
 import WildlingsAttackGameState
     from "../../../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
 import BiddingGameState from "../../../common/ingame-game-state/westeros-game-state/bidding-game-state/BiddingGameState";
@@ -17,7 +17,7 @@ import CrowKillersWildlingVictoryComponent from "./CrowKillersWildlingVictoryCom
 import CrowKillersNightsWatchVictoryGameState
     from "../../../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/crow-killers-nights-watch-victory-game-state/CrowKillersNightsWatchVictoryGameState";
 import CrowKillersNigthsWatchVictoryComponent from "./CrowKillersNigthsWatchVictoryComponent";
-import {Col, Row} from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 import RattleshirtsRaidersWildlingVictoryGameState
     from "../../../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/rattleshirts-raiders-wildling-victory-game-state/RattleshirtsRaidersWildlingVictoryGameState";
 import RattleshirtsRaidersWildlingVictoryComponent from "./RattleshirtsRaidersWildlingVictoryComponent";
@@ -42,7 +42,6 @@ import TheHordeDescendsWildlingVictoryComponent from "./TheHordeDescendsWildling
 import TheHordeDescendsNightsWatchVictoryGameState
     from "../../../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/the-horde-descends-nights-watch-victory-game-state/TheHordeDescendsNightsWatchVictoryGameState";
 import TheHordeDescendsNightsWatchVictoryComponent from "./TheHordeDescendsNightsWatchVictoryComponent";
-import ListGroupItem from "react-bootstrap/ListGroupItem";
 import WildlingCardComponent from "../utils/WildlingCardComponent";
 import joinReactNodes from "../../../client/utils/joinReactNodes";
 import House from "../../../common/ingame-game-state/game-data-structure/House";
@@ -62,7 +61,7 @@ export default class WildlingsAttackComponent extends Component<GameStateCompone
         return (
             <>
                 {!this.props.gameState.biddingResults && <Row className="justify-content-center mt-2 mb-1">
-                    <img src={mammothImage} width="40px" className="mr-2"/><h4 className="mt-2">Wildlings Attack</h4><img src={mammothImage} width="40px" className="ml-2"/>
+                    <img src={mammothImage} width="40px" className="mr-2" /><h4 className="mt-2">Wildlings Attack</h4><img src={mammothImage} width="40px" className="ml-2" />
                 </Row>}
                 {this.props.gameState.biddingResults && <h5 className="text-center mt-1">
                     {this.props.gameState.nightsWatchWon ? "Night's Watch Victory" : "Wildling Victory"}
@@ -74,52 +73,50 @@ export default class WildlingsAttackComponent extends Component<GameStateCompone
                         </Col>
                     </Row>
                 )}
-                <ListGroupItem className="px-2">
-                    <Row>
-                        {this.props.gameState.childGameState instanceof BiddingGameState ? (
-                            <Col xs={12} className="text-center mb-3">
-                                <b>All player houses</b>{this.props.gameState.excludedHouses.length > 0 &&
+                <Row>
+                    {this.props.gameState.childGameState instanceof BiddingGameState ? (
+                        <Col xs={12} className="text-center mb-3">
+                            <b>All player houses</b>{this.props.gameState.excludedHouses.length > 0 &&
                                 (<> except {joinReactNodes(this.props.gameState.excludedHouses.map(h =>
-                                <b key={`wildling_excluded-house_${h.id}`}>{h.name}</b>), ", ")}</>)} bid Power tokens to overcome the Wildlings<br/>
-                                which are attacking with a strength
-                                of <h3 className="mx-2" style={{display: "inline", verticalAlign: "-6px"}}>{this.props.gameState.wildlingStrength}</h3>!
-                            </Col>
-                        ) : results ?
-                            <Col xs={12} className="no-space-around">
-                                <div className="text-center mb-1">Bidding results:</div>
-                                <div className="d-flex justify-content-center">
-                                    <HouseNumberResultsComponent results={results} keyPrefix="wildlings"/>
-                                </div>
-                            </Col>
+                                    <b key={`wildling_excluded-house_${h.id}`}>{h.name}</b>), ", ")}</>)} bid Power tokens to overcome the Wildlings<br />
+                            which are attacking with a strength
+                            of <h3 className="mx-2" style={{ display: "inline", verticalAlign: "-6px" }}>{this.props.gameState.wildlingStrength}</h3>!
+                        </Col>
+                    ) : results ?
+                        <Col xs={12} className="no-space-around">
+                            <div className="text-center mb-1">Bidding results:</div>
+                            <div className="d-flex justify-content-center">
+                                <HouseNumberResultsComponent results={results} keyPrefix="wildlings" />
+                            </div>
+                        </Col>
                         : <></>}
-                        {this.props.gameState._highestBidder && <Col xs={12} className="justify-content-center">
-                            <div className="text-center mt-1">
-                                Highest Bidder: <b style={{"color": this.props.gameState._highestBidder.color}}>{this.props.gameState._highestBidder.name}</b>
-                            </div>
-                        </Col>}
-                        {this.props.gameState._lowestBidder && <Col xs={12} className="justify-content-center">
-                            <div className="text-center mt-1">
-                                Lowest Bidder: <b style={{"color": this.props.gameState._lowestBidder.color}}>{this.props.gameState._lowestBidder.name}</b>
-                            </div>
-                        </Col>}
-                        {this.props.gameState.childGameState && renderChildGameState<WildlingsAttackGameState>(this.props, [
-                            [SimpleChoiceGameState, SimpleChoiceComponent],
-                            [BiddingGameState, BiddingComponent],
-                            [PreemptiveRaidWildlingVictoryGameState, PreemptiveRaidWildlingVictoryComponent],
-                            [CrowKillersWildlingVictoryGameState, CrowKillersWildlingVictoryComponent],
-                            [CrowKillersNightsWatchVictoryGameState, CrowKillersNigthsWatchVictoryComponent],
-                            [RattleshirtsRaidersWildlingVictoryGameState, RattleshirtsRaidersWildlingVictoryComponent],
-                            [MassingOnTheMilkwaterWildlingVictoryGameState, MassingOnTheMilkwaterWildlingVictoryComponent],
-                            [AKingBeyondTheWallWildlingVictoryGameState, AKingBeyondTheWallWildlingVictoryComponent],
-                            [AKingBeyondTheWallNightsWatchVictoryGameState, AKingBeyondTheWallNightsWatchVictoryComponent],
-                            [MammothRidersWildlingVictoryGameState, MammothRidersWildlingVictoryComponent],
-                            [MammothRidersNightsWatchVictoryGameState, MammothRidersNightsWatchVictoryComponent],
-                            [TheHordeDescendsWildlingVictoryGameState, TheHordeDescendsWildlingVictoryComponent],
-                            [TheHordeDescendsNightsWatchVictoryGameState, TheHordeDescendsNightsWatchVictoryComponent],
-                            [TakeControlOfEnemyPortGameState, TakeControlOfEnemyPortComponent]
-                        ])}
-                    </Row>
-                </ListGroupItem>
+                    {this.props.gameState._highestBidder && <Col xs={12} className="justify-content-center">
+                        <div className="text-center mt-1">
+                            Highest Bidder: <b style={{ "color": this.props.gameState._highestBidder.color }}>{this.props.gameState._highestBidder.name}</b>
+                        </div>
+                    </Col>}
+                    {this.props.gameState._lowestBidder && <Col xs={12} className="justify-content-center">
+                        <div className="text-center mt-1">
+                            Lowest Bidder: <b style={{ "color": this.props.gameState._lowestBidder.color }}>{this.props.gameState._lowestBidder.name}</b>
+                        </div>
+                    </Col>}
+                    {this.props.gameState.childGameState && renderChildGameState<WildlingsAttackGameState>(this.props, [
+                        [SimpleChoiceGameState, SimpleChoiceComponent],
+                        [BiddingGameState, BiddingComponent],
+                        [PreemptiveRaidWildlingVictoryGameState, PreemptiveRaidWildlingVictoryComponent],
+                        [CrowKillersWildlingVictoryGameState, CrowKillersWildlingVictoryComponent],
+                        [CrowKillersNightsWatchVictoryGameState, CrowKillersNigthsWatchVictoryComponent],
+                        [RattleshirtsRaidersWildlingVictoryGameState, RattleshirtsRaidersWildlingVictoryComponent],
+                        [MassingOnTheMilkwaterWildlingVictoryGameState, MassingOnTheMilkwaterWildlingVictoryComponent],
+                        [AKingBeyondTheWallWildlingVictoryGameState, AKingBeyondTheWallWildlingVictoryComponent],
+                        [AKingBeyondTheWallNightsWatchVictoryGameState, AKingBeyondTheWallNightsWatchVictoryComponent],
+                        [MammothRidersWildlingVictoryGameState, MammothRidersWildlingVictoryComponent],
+                        [MammothRidersNightsWatchVictoryGameState, MammothRidersNightsWatchVictoryComponent],
+                        [TheHordeDescendsWildlingVictoryGameState, TheHordeDescendsWildlingVictoryComponent],
+                        [TheHordeDescendsNightsWatchVictoryGameState, TheHordeDescendsNightsWatchVictoryComponent],
+                        [TakeControlOfEnemyPortGameState, TakeControlOfEnemyPortComponent]
+                    ])}
+                </Row>
             </>
         );
     }

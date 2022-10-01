@@ -1,6 +1,4 @@
-import React, { Component, ReactNode } from "react";
-import ListGroupItem from "react-bootstrap/ListGroupItem";
-import Row from "react-bootstrap/Row";
+import { Component, ReactNode } from "react";
 import { observer } from "mobx-react";
 import GameStateComponentProps from "./GameStateComponentProps";
 import renderChildGameState from "../utils/renderChildGameState";
@@ -11,16 +9,8 @@ import ClaimVassalsGameState from "../../common/ingame-game-state/planning-game-
 @observer
 export default class ClaimVassalsComponent extends Component<GameStateComponentProps<ClaimVassalsGameState>> {
     render(): ReactNode {
-        return (
-            <>
-                <ListGroupItem style={{borderStyle: "none"}}>
-                    <Row>
-                        {renderChildGameState(this.props, [
-                            [ClaimVassalGameState, ClaimVassalComponent],
-                        ])}
-                    </Row>
-                </ListGroupItem>
-            </>
-        );
+        return renderChildGameState(this.props, [
+            [ClaimVassalGameState, ClaimVassalComponent],
+        ]);
     }
 }
