@@ -297,6 +297,11 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             return false;
         }
 
+        // Check if each unit is assigned to only one target region
+        if (movingUnits.length != _.uniqBy(movingUnits, u => u.id).length) {
+            return false;
+        }
+
         return moves.every(
             ([regionToward, army], i) => this.getValidTargetRegions(startingRegion, moves.slice(0, i), army).includes(regionToward)
         );
