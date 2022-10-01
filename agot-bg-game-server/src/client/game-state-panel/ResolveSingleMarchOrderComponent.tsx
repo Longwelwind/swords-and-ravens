@@ -65,6 +65,10 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         this.UNSAFE_componentWillUpdate();
     }
 
+    getMarchableUnits(region: Region): Unit[] {
+        return _.intersection(region.allUnits, this.props.gameState.getValidMarchUnits(region));
+    }
+
     render(): ReactNode {
         const movingUnits = _.flatMap(this.plannedMoves.values);
         const allUnitsWillLeaveStartingRegion = this.selectedMarchOrderRegion ? this.selectedMarchOrderRegion.units.size == movingUnits.length : false;
@@ -341,7 +345,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     }
 
     selectAllUnits(region: Region): void {
-        this.selectedUnits = _.difference(region.allUnits, this.attackingUnits);
+        this.selectedUnits = _.difference(this.getMarchableUnits(region), this.attackingUnits);
     }
 
     reset(): void {
@@ -401,7 +405,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
 
             const attackingUnits = this.attackingUnits;
 
-            return this.selectedMarchOrderRegion.allUnits.map(u => [
+            return this.getMarchableUnits(this.selectedMarchOrderRegion).map(u => [
                 u,
                 {
                     highlight: {
