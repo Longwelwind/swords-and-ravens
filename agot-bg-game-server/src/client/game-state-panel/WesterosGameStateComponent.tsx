@@ -1,5 +1,5 @@
-import {observer} from "mobx-react";
-import {Component, ReactNode} from "react";
+import { observer } from "mobx-react";
+import { Component, ReactNode } from "react";
 import WesterosGameState from "../../common/ingame-game-state/westeros-game-state/WesterosGameState";
 import WildlingsAttackGameState
     from "../../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
@@ -14,7 +14,6 @@ import ClashOfKingsComponent from "./ClashOfKingsComponent";
 import MusteringGameState
     from "../../common/ingame-game-state/westeros-game-state/mustering-game-state/MusteringGameState";
 import MusteringComponent from "./MusteringComponent";
-import ListGroupItem from "react-bootstrap/ListGroupItem";
 import PutToTheSwordGameState
     from "../../common/ingame-game-state/westeros-game-state/put-to-the-swords-game-state/PutToTheSwordGameState";
 import SimpleChoiceComponent from "./SimpleChoiceComponent";
@@ -41,33 +40,29 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
     render(): ReactNode {
         return (
             <>
-                <ListGroupItem className="px-2">
-                    <Row className="justify-content-around">
-                        {this.props.gameState.revealedCards.map((wc, i) => (
-                            <Col xs="auto" key={`westeros-state_${wc.id}_${i}`}>
-                                <WesterosCardComponent
-                                    cardType={wc.type}
-                                    westerosDeckI={this.props.gameState.revealAndResolveTop2WesterosDeck4Cards ? 3 : i}
-                                    wasReshuffled={this.props.gameState.game.winterIsComingHappened[i]}
-                                    size={"small"}
-                                    tooltip={true}
-                                    classNames={classNames({"medium-outline": this.props.gameState.currentCardI == i})}
-                                />
-                            </Col>
-                        ))}
-                    </Row>
-                </ListGroupItem>
+                <Row className="justify-content-around mb-3">
+                    {this.props.gameState.revealedCards.map((wc, i) => (
+                        <Col xs="auto" key={`westeros-state_${wc.id}_${i}`}>
+                            <WesterosCardComponent
+                                cardType={wc.type}
+                                westerosDeckI={this.props.gameState.revealAndResolveTop2WesterosDeck4Cards ? 3 : i}
+                                wasReshuffled={this.props.gameState.game.winterIsComingHappened[i]}
+                                size={"small"}
+                                tooltip={true}
+                                classNames={classNames({ "medium-outline": this.props.gameState.currentCardI == i })}
+                            />
+                        </Col>
+                    ))}
+                </Row>
                 {(this.props.gameState.childGameState instanceof PutToTheSwordGameState ||
                     this.props.gameState.childGameState instanceof DarkWingsDarkWordsGameState ||
                     this.props.gameState.childGameState instanceof AThroneOfBladesGameState ||
                     this.props.gameState.childGameState instanceof TheBurdenOfPowerGameState) ? (
-                    <ListGroupItem className="px-2">
-                        <Row>
-                            <SimpleChoiceComponent gameClient={this.props.gameClient}
-                                                   gameState={this.props.gameState.childGameState.childGameState}
-                                                   mapControls={this.props.mapControls}/>
-                        </Row>
-                    </ListGroupItem>
+                    <Row>
+                        <SimpleChoiceComponent gameClient={this.props.gameClient}
+                            gameState={this.props.gameState.childGameState.childGameState}
+                            mapControls={this.props.mapControls} />
+                    </Row>
                 ) : renderChildGameState(this.props, [
                     [WildlingsAttackGameState, WildlingsAttackComponent],
                     [ReconcileArmiesGameState, ReconcileArmiesComponent],

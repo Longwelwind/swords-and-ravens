@@ -1,7 +1,6 @@
-import {Component, ReactNode} from "react";
+import { Component, ReactNode } from "react";
 import * as React from "react";
-import {observer} from "mobx-react";
-import ListGroupItem from "react-bootstrap/ListGroupItem";
+import { observer } from "mobx-react";
 import renderChildGameState from "../utils/renderChildGameState";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Row from "react-bootstrap/Row";
@@ -41,39 +40,38 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
         const availableCards = this.player && showCardsPreview ? this.props.gameState.getFilteredHouseCardsForHouse(this.player.house) : [];
         const remainingCardsForSpectators = !this.player ? _.sortBy(this.props.gameState.ingame.game.houseCardsForDrafting.values, hc => -hc.combatStrength, hc => hc.houseId) : [];
         return (
+            this.props.gameState.currentColumnIndex > -1 && this.props.gameState.currentRowIndex > -1 &&
             <>
-                {this.props.gameState.currentColumnIndex > -1 && this.props.gameState.currentRowIndex > -1 &&
-                <ListGroupItem>
-                    <Row className="mt-1 mb-3 justify-content-center">
-                        {this.draftStep == DraftStep.DECIDE
+                <Row className="mt-1 mb-3 justify-content-center">
+                    {this.draftStep == DraftStep.DECIDE
                         ? <div className="text-center"><b>{this.house.name}</b> must decide whether to select a House card or an Influence track position.</div>
                         : this.draftStep == DraftStep.HOUSE_CARD
-                        ? <div className="text-center"><b>{this.house.name}</b> must select a House card.</div>
-                        : this.draftStep == DraftStep.INFLUENCE_TRACK
-                        ? <div className="text-center"><b>{this.house.name}</b> must choose an Influence track.</div>
-                        : <></>}
-                    </Row>
-                    <Row>
-                        <p>
-                            <b>Note</b>: All House cards work in a generic way.<br/>
-                            That means House card abilities (e.g. Salladhor) referring to specific houses are always available for any house you use.<br/>
-                            Character references are equivalent to the same-strength character in your hand (e.g. Reek and any 3-strength card).<br/>
-                            References to capitals always refer to your house&apos;s home territory (e.g. Littlefinger).
-                        </p>
-                    </Row>
-                    <Row>
-                        <p>
-                            These are the next houses: {this.props.gameState.getNextHouses().map(h => h.name).join(", ")}
-                        </p>
-                    </Row>
-                    {this.doesControlHouse &&
+                            ? <div className="text-center"><b>{this.house.name}</b> must select a House card.</div>
+                            : this.draftStep == DraftStep.INFLUENCE_TRACK
+                                ? <div className="text-center"><b>{this.house.name}</b> must choose an Influence track.</div>
+                                : <></>}
+                </Row>
+                <Row>
+                    <p>
+                        <b>Note</b>: All House cards work in a generic way.<br />
+                        That means House card abilities (e.g. Salladhor) referring to specific houses are always available for any house you use.<br />
+                        Character references are equivalent to the same-strength character in your hand (e.g. Reek and any 3-strength card).<br />
+                        References to capitals always refer to your house&apos;s home territory (e.g. Littlefinger).
+                    </p>
+                </Row>
+                <Row>
+                    <p>
+                        These are the next houses: {this.props.gameState.getNextHouses().map(h => h.name).join(", ")}
+                    </p>
+                </Row>
+                {this.doesControlHouse &&
                     <Row>
                         {renderChildGameState(this.props, [
                             [SelectHouseCardGameState, SelectHouseCardComponent],
                             [SimpleChoiceGameState, SimpleChoiceComponent]
                         ])}
                     </Row>}
-                    {showCardsPreview &&
+                {showCardsPreview &&
                     <Row>
                         <Col xs="12" className="text-center">These are the House cards from which you may choose one on your next turn:</Col>
                         <Col xs="12">
@@ -98,23 +96,22 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                             </Row>
                         </Col>
                     </Row>}
-                    {!this.player &&
+                {!this.player &&
                     <Row>
                         <Col xs="12" className="text-center">These are all remaining House cards:</Col>
-                            <Col xs="12">
-                                <Row className="justify-content-center">
-                                    {remainingCardsForSpectators.map(hc => (
-                                        <Col xs="auto" key={`draft-spectator_${hc.id}`}>
-                                            <HouseCardComponent
-                                                houseCard={hc}
-                                                size="small"
-                                            />
-                                        </Col>
-                                    ))}
-                                </Row>
-                            </Col>
+                        <Col xs="12">
+                            <Row className="justify-content-center">
+                                {remainingCardsForSpectators.map(hc => (
+                                    <Col xs="auto" key={`draft-spectator_${hc.id}`}>
+                                        <HouseCardComponent
+                                            houseCard={hc}
+                                            size="small"
+                                        />
+                                    </Col>
+                                ))}
+                            </Row>
+                        </Col>
                     </Row>}
-                </ListGroupItem>}
             </>
         );
     }

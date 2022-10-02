@@ -72,6 +72,18 @@ export default class ChatComponent extends Component<ChatComponentProps> {
             id: "2",
             text: "😬",
             user: this.props.entireGame.users.values[0]
+        },
+        {
+            createdAt: new Date(),
+            id: "3",
+            text: "😶‍🌫️🥳👨‍👩‍👧‍👦7️⃣🇩🇪",
+            user: this.props.entireGame.users.values[0]
+        },
+        {
+            createdAt: new Date(),
+            id: "4",
+            text: "😶‍🌫️Party!!!🥳👨‍👩‍👧‍👦7️⃣🇩🇪",
+            user: this.props.entireGame.users.values[0]
         }]; */
         return (
             <div className="d-flex flex-column h-100">
@@ -92,7 +104,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                 </React.Fragment>
                             )}
                             <Row noGutters={true} className="flex-nowrap align-items-center" key={m.id}>
-                                <Col xs="auto" style={{width: "46px", fontSize: "large"}} className="text-center">
+                                <Col xs="auto" style={{width: "46px"}} className="text-center">
                                     <OverlayTrigger
                                         placement="auto"
                                         overlay={<Tooltip id={"message-date-" + m.id}>{m.createdAt.toLocaleString()}</Tooltip>}
@@ -103,10 +115,10 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                         </small>
                                     </OverlayTrigger>
                                 </Col>
-                                <Col xs="auto" className="mx-1" style={{fontSize: "large"}}>
+                                <Col xs="auto" className="mx-1">
                                     {this.props.getUserDisplayName(m.user)}
                                 </Col>
-                                <Col style={{overflowWrap: "anywhere", fontSize: "large"}}>
+                                <Col style={{overflowWrap: "anywhere"}}>
                                     <span className={this.containsOnlyEmojis(m.text) ? "make-emojis-large" : ""}>{m.text}</span>
                                 </Col>
                             </Row>

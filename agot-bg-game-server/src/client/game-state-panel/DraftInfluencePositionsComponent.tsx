@@ -1,7 +1,6 @@
-import {Component, ReactNode} from "react";
+import { Component, ReactNode } from "react";
 import * as React from "react";
-import {observer} from "mobx-react";
-import ListGroupItem from "react-bootstrap/ListGroupItem";
+import { observer } from "mobx-react";
 import renderChildGameState from "../utils/renderChildGameState";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Row from "react-bootstrap/Row";
@@ -27,24 +26,22 @@ export default class DraftInfluencePositionsComponent extends Component<GameStat
 
     render(): ReactNode {
         return (
+            this.props.gameState.currentColumnIndex > -1 && this.props.gameState.currentRowIndex > -1 &&
             <>
-                {this.props.gameState.currentColumnIndex > -1 && this.props.gameState.currentRowIndex > -1 &&
-                <ListGroupItem>
-                    <Row className="mt-1 mb-3 justify-content-center">
-                        <div className="text-center"><b>{this.house.name}</b> must choose one Influence track.</div>
-                    </Row>
-                    <Row>
-                        <p>
-                            These are the next houses: {this.props.gameState.getNextHouses().map(h => h.name).join(", ")}
-                        </p>
-                    </Row>
-                    {this.doesControlHouse &&
+                <Row className="mt-1 mb-3 justify-content-center">
+                    <div className="text-center"><b>{this.house.name}</b> must choose one Influence track.</div>
+                </Row>
+                <Row>
+                    <p>
+                        These are the next houses: {this.props.gameState.getNextHouses().map(h => h.name).join(", ")}
+                    </p>
+                </Row>
+                {this.doesControlHouse &&
                     <Row>
                         {renderChildGameState(this.props, [
                             [SimpleChoiceGameState, SimpleChoiceComponent]
                         ])}
                     </Row>}
-                </ListGroupItem>}
             </>
         );
     }
