@@ -141,6 +141,10 @@ export class ResumeGame extends VoteType {
         return "resume the game";
     }
 
+    getPositiveCountToPass(vote: Vote): number {
+        return vote.participatingHouses.length;
+    }
+
     executeAccepted(vote: Vote): void {
         const ingame = vote.ingame;
 
