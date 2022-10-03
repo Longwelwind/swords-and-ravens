@@ -291,13 +291,6 @@ export default class PostCombatGameState extends GameState<
                         houseCards: this.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.serializeToClient())])
                     });
                 }
-
-                house.houseCards = new BetterMap();
-                this.entireGame.broadcastToClients({
-                    type: "update-house-cards",
-                    house: house.id,
-                    houseCards: []
-                });
             } else {
                 this.checkAndPerformHouseCardHandlingPerHouse(house, houseCard);
             }
@@ -422,10 +415,19 @@ export default class PostCombatGameState extends GameState<
             this.combat.ingameGameState.getControllerOfHouse(h).user), NotificationType.BATTLE_RESULTS);
 
         this.combat.houseCombatDatas.keys.forEach(house => {
-            // In case one of the combatants has been replaced by a vassal during
-            // AfterCombatHouseCardAbilitiesGameState we have missed to remove
-            // the house cards from the new vassal. So remove them now:
-            if (this.combat.ingameGameState.isVassalHouse(house) && house.houseCards.size > 0) {
+            // Remove house cards of vassals now
+            if (this.combat.ingameGameState.isVassalHouse(house)) {
+                const houseCard = this.combat.houseCombatDatas.get(house).houseCard;
+                if (houseCard && house.hasBeenReplacedByVassal && !this.game.vassalHouseCards.has(houseCard.id)) {
+                    // Player house cards may have changed again due to abilities like Robert Arryn, so we save the old hand again
+                    this.game.oldPlayerHouseCards.set(house, house.houseCards);
+
+                    this.entireGame.broadcastToClients({
+                        type: "update-old-player-house-cards",
+                        houseCards: this.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.serializeToClient())])
+                    });
+                }
+
                 house.houseCards = new BetterMap();
                 this.entireGame.broadcastToClients({
                     type: "update-house-cards",
