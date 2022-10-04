@@ -178,7 +178,7 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
                 if (message.gainPowerTokens) {
                     this.parentGameState.resolveConsolidatePowerOrderForPt(regionOfOrder, this.house);
                     // Remove the order from the board
-                    this.actionGameState.removeOrderFromRegion(regionOfOrder);
+                    this.actionGameState.removeOrderFromRegion(regionOfOrder, false, this.house, false, true);
                     this.onResolveSingleConsolidatePowerFinish();
                     return;
                 } else if (order.type.starred && message.musterUnits) {
@@ -195,7 +195,7 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
                 }
 
                 // Remove the order from the board
-                this.actionGameState.removeOrderFromRegion(regionOfOrder);
+                this.actionGameState.removeOrderFromRegion(regionOfOrder, false, this.house, false, true);
                 loan.execute(this, this.house);
             } else if (message.ignoreAndRemoveOrder) {
                 // Remove the order from the board
@@ -205,7 +205,7 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
                     order: order.type.id,
                     region: regionOfOrder.id
                 });
-                this.actionGameState.removeOrderFromRegion(regionOfOrder);
+                this.actionGameState.removeOrderFromRegion(regionOfOrder, false, this.house, false, true);
                 this.onResolveSingleConsolidatePowerFinish();
             }
         }
