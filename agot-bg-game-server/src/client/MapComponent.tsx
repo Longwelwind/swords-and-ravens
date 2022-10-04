@@ -515,7 +515,6 @@ export default class MapComponent extends Component<MapComponentProps> {
         );
 
         return propertiesForOrders.map((region, properties) => {
-
             if (this.props.ingameGameState.childGameState instanceof PlanningGameState && this.props.ingameGameState.childGameState.childGameState instanceof PlaceOrdersGameState) {
                 const planningGameState = this.props.ingameGameState.childGameState.childGameState;
                 const orderPresent = planningGameState.placedOrders.has(region);
@@ -614,8 +613,10 @@ export default class MapComponent extends Component<MapComponentProps> {
                             "hover-weak-outline": order != null && !properties.highlight.active,
                             "medium-outline hover-strong-outline": order && properties.highlight.active,
                             "highlight-yellow hover-strong-outline-yellow": order && properties.highlight.active && properties.highlight.color == "yellow",
+                            "highlight-red hover-strong-outline-red": order && properties.highlight.active && properties.highlight.color == "red",
                             "restricted-order": planningOrAction && order && this.ingame.game.isOrderRestricted(region, order, planningOrAction.planningRestrictions),
-                            "clickable": clickable
+                            "clickable": clickable,
+                            "pulsate-fwd": this.ingame.actionState?.ordersToBeRemoved?.has(region)
                         }
                     )}
                         style={{ left: region.orderSlot.x, top: region.orderSlot.y}}

@@ -20,9 +20,15 @@ import ReconcileArmiesGameState from "../../common/ingame-game-state/westeros-ga
 import ReconcileArmiesComponent from "./ReconcileArmiesComponent";
 import ScoreObjectivesGameState from "../../common/ingame-game-state/action-game-state/score-objectives-game-state/ScoreObjectivesGameState";
 import ScoreObjectivesComponent from "./ScoreObjectivesComponent";
+import PartialRecursive from "../../utils/PartialRecursive";
+import Region from "../../common/ingame-game-state/game-data-structure/Region";
+import { OrderOnMapProperties } from "../MapControls";
+import _ from "lodash";
 
 @observer
 export default class ActionComponent extends Component<GameStateComponentProps<ActionGameState>> {
+    modifyOrdersOnMapCallback: any;
+
     render(): ReactNode {
         return (
             <Row>
@@ -36,5 +42,20 @@ export default class ActionComponent extends Component<GameStateComponentProps<A
                 ])}
             </Row>
         );
+    }
+
+    modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
+        return this.props.gameState.ordersToBeRemoved.map((r, color) => [
+            r,
+            {highlight: {active: true, color: color}}
+        ]);
+    }
+
+    componentDidMount(): void {
+        this.props.mapControls.modifyOrdersOnMap.push(this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap());
+    }
+
+    componentWillUnmount(): void {
+        _.pull(this.props.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
     }
 }

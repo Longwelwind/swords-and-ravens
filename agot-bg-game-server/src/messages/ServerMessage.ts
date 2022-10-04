@@ -227,6 +227,7 @@ interface ActionPhaseChangeOrder {
     type: "action-phase-change-order";
     region: string;
     order: number | null;
+    animate?: "yellow" | "red";
 }
 
 interface ChangeGarrison {

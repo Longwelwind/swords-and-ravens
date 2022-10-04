@@ -19,13 +19,20 @@ import House from "../../common/ingame-game-state/game-data-structure/House";
 @observer
 export default class ResolveSingleRaidOrderComponent extends Component<GameStateComponentProps<ResolveSingleRaidOrderGameState>> {
     @observable selectedOrderRegion: Region | null;
-    @observable orderInOrderRegion: RaidOrderType | RaidSupportOrderType | null;
     @observable selectedTargetRegion: Region | null;
 
     modifyOrdersOnMapCallback: any;
 
     get house(): House {
         return this.props.gameState.house;
+    }
+
+    get orderInOrderRegion(): RaidOrderType | RaidSupportOrderType | null {
+        if (!this.selectedOrderRegion) {
+            return null;
+        }
+
+        return this.props.gameState.actionGameState.ordersOnBoard.get(this.selectedOrderRegion).type as RaidOrderType | RaidSupportOrderType;
     }
 
     render(): ReactNode {
@@ -42,10 +49,10 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
                     ) : (
                         <>
                             <Col xs={12} className="text-center">
+                                <p>Chosen Raid order: <b>{this.selectedOrderRegion.name}</b></p>
                                 {this.selectedTargetRegion == null ? (
                                     <>
-                                        <p>Chosen Raid order: <b>{this.selectedOrderRegion.name}</b></p>
-                                        <p>Click the target order to raid it, or click on <b>Confirm</b> to remove your Raid order.</p>
+                                        <p>Click the target order to raid it, or click on <b>Confirm</b> to {this.orderInOrderRegion instanceof RaidSupportOrderType ? "use the order as Support+1 order" : "remove your Raid order"}.</p>
                                     </>
                                 ) : (
                                     <>Target: {this.selectedTargetRegion.name}</>
@@ -87,15 +94,13 @@ export default class ResolveSingleRaidOrderComponent extends Component<GameState
 
     reset(): void {
         this.selectedOrderRegion = null;
-        this.orderInOrderRegion = null;
         this.selectedTargetRegion = null;
     }
 
-    onOrderClick(r: Region, orderType: RaidOrderType | RaidSupportOrderType | null): void {
+    onOrderClick(r: Region, _orderType: RaidOrderType | RaidSupportOrderType | null): void {
         if (this.props.gameClient.doesControlHouse(this.house)) {
-            if (this.selectedOrderRegion == null || this.orderInOrderRegion == null) {
+            if (this.selectedOrderRegion == null) {
                 this.selectedOrderRegion = r;
-                this.orderInOrderRegion = orderType;
             } else {
                 this.selectedTargetRegion = r;
             }
