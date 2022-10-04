@@ -74,9 +74,12 @@ export default class IngameGameState extends GameState<
     @observable rerender = 0;
     @observable now = new Date();
     @observable marchMarkers: BetterMap<Unit, Region> = new BetterMap();
+    @observable unitsToBeRemoved: BetterMap<Region, Unit[]> = new BetterMap();
+    @observable unitsToBeAdded: BetterMap<number, "green" | "yellow"> = new BetterMap();
 
     onVoteStarted: (() => void) | null = null;
     onPreemptiveRaidNewAttack: ((biddings: [number, House[]][], highestBidder: House) => void) | null = null;
+    onLogReceived: ((log: GameLogData) => void) | null = null;
 
     get entireGame(): EntireGame {
         return this.parentGameState;
@@ -642,11 +645,7 @@ export default class IngameGameState extends GameState<
     }
 
     transformUnits(region: Region, units: Unit[], targetType: UnitType): Unit[] {
-        this.entireGame.broadcastToClients({
-            type: "remove-units",
-            regionId: region.id,
-            unitIds: units.map(u => u.id)
-        });
+        this.broadcastRemoveUnits(region, units, false);
 
         const transformed = units.map(unit => {
             unit.region.units.delete(unit.id);
@@ -661,10 +660,20 @@ export default class IngameGameState extends GameState<
 
         this.entireGame.broadcastToClients({
             type: "add-units",
-            units: [[region.id, transformed.map(u => u.serializeToClient())]]
+            units: [[region.id, transformed.map(u => u.serializeToClient())]],
+            animate: "yellow"
         });
 
         return transformed;
+    }
+
+    broadcastRemoveUnits(region: Region, units: Unit[], animate = true): void {
+        this.entireGame.broadcastToClients({
+            type: "remove-units",
+            regionId: region.id,
+            unitIds: units.map(u => u.id),
+            animate: animate
+        });
     }
 
     checkVictoryConditions(): boolean {
@@ -934,13 +943,23 @@ export default class IngameGameState extends GameState<
         } else if (message.type == "add-units") {
             message.units.forEach(([regionId, dataUnits]) => {
                 const region = this.world.regions.get(regionId);
+                const units = dataUnits.map(u => Unit.deserializeFromServer(this.game, u));
 
-                dataUnits.forEach(dataUnit => {
-                    const unit = Unit.deserializeFromServer(this.game, dataUnit);
+                units.forEach(unit => {
                     unit.region = region;
-
                     region.units.set(unit.id, unit);
                 });
+
+                if (message.animate) {
+                    units.forEach(unit => {
+                        this.unitsToBeAdded.set(unit.id, message.animate as "green" | "yellow");
+                    });
+                    window.setTimeout(() => {
+                        units.forEach(unit => {
+                            this.unitsToBeAdded.delete(unit.id);
+                        });
+                    }, 4000);
+                }
             });
         } else if (message.type == "change-garrison") {
             const region = this.world.regions.get(message.region);
@@ -948,10 +967,17 @@ export default class IngameGameState extends GameState<
             region.garrison = message.newGarrison;
         } else if (message.type == "remove-units") {
             const region = this.world.regions.get(message.regionId);
-
             const units = message.unitIds.map(uid => region.units.get(uid));
 
-            units.forEach(unit => region.units.delete(unit.id));
+            if (message.animate) {
+                this.unitsToBeRemoved.set(region, units);
+                window.setTimeout(() => {
+                    this.unitsToBeRemoved.delete(region);
+                    units.forEach(unit => region.units.delete(unit.id));
+                }, 4000);
+            } else {
+                units.forEach(unit => region.units.delete(unit.id));
+            }
         } else if (message.type == "change-state-house-card") {
             const house = this.game.houses.get(message.houseId);
             const cards = message.cardIds.map(cid => house.houseCards.get(cid));
@@ -991,6 +1017,9 @@ export default class IngameGameState extends GameState<
             this.world.regions.forEach(r => r.units.forEach(u => u.wounded = false));
         } else if (message.type == "add-game-log") {
             this.gameLogManager.logs.push({data: message.data, time: new Date(message.time * 1000), resolvedAutomatically: message.resolvedAutomatically});
+            if (this.onLogReceived) {
+                this.onLogReceived(message.data);
+            }
         } else if (message.type == "change-tracker") {
             const newOrder = message.tracker.map(hid => this.game.houses.get(hid));
 

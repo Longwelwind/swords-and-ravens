@@ -274,7 +274,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
         }
 
         // User really left a castle with ships empty. The ships must be destroyed.
-        const destroyedShipCount = destroyAllShipsInPort(portOfStartingRegion, this.entireGame, this.parentGameState.actionGameState);
+        const destroyedShipCount = destroyAllShipsInPort(portOfStartingRegion, this.ingame, this.parentGameState.actionGameState);
 
         this.parentGameState.ingameGameState.log({
             type: "ships-destroyed-by-empty-castle",

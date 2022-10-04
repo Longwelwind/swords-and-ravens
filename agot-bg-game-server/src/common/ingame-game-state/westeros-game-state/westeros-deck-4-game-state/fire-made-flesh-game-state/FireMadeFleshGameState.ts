@@ -107,7 +107,8 @@ export default class FireMadeFleshGameState extends GameState<WesterosDeck4GameS
                     capital.units.set(newDragon.id, newDragon);
                     this.entireGame.broadcastToClients({
                         type: "add-units",
-                        units: [[capital.id, [newDragon.serializeToClient()]]]
+                        units: [[capital.id, [newDragon.serializeToClient()]]],
+                        animate: "green"
                     });
 
                     this.ingame.log({
@@ -150,11 +151,7 @@ export default class FireMadeFleshGameState extends GameState<WesterosDeck4GameS
 
         // Remove the dragon
         selectedRegion.units.delete(selectedUnit.id);
-        this.entireGame.broadcastToClients({
-            type: "remove-units",
-            regionId: selectedRegion.id,
-            unitIds: [selectedUnit.id]
-        });
+        this.ingame.broadcastRemoveUnits(selectedRegion, [selectedUnit]);
 
         this.step = FIRE_MADE_FLESH_STEP.CHOOSE_DRAGON_STRENGTH_TOKEN;
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(house, `House ${house.name} must choose a dragon strength token from the round track and place it to the current dragon strength box.`, this.getChoices(house).keys);

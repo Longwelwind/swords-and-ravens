@@ -92,11 +92,7 @@ export default class SerIlynPayneASoSAbilityGameState extends GameState<
                 region.units.delete(unit.id);
             });
 
-            this.entireGame.broadcastToClients({
-                type: "remove-units",
-                regionId: region.id,
-                unitIds: units.map(u => u.id)
-            });
+            this.ingame.broadcastRemoveUnits(region, units);
 
             this.ingame.log({
                 type: "ser-ilyn-payne-asos-casualty-suffered",

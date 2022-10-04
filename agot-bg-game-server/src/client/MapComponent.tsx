@@ -377,6 +377,10 @@ export default class MapComponent extends Component<MapComponentProps> {
 
                     const clickable = property.onClick != undefined;
 
+                    const willBeRemoved = this.props.ingameGameState.unitsToBeRemoved?.has(r) && this.props.ingameGameState.unitsToBeRemoved.get(r).includes(u);
+                    const highlightGreen = this.props.ingameGameState.unitsToBeAdded?.has(u.id) && this.props.ingameGameState.unitsToBeAdded.get(u.id) == "green";
+                    const highlightYellow = this.props.ingameGameState.unitsToBeAdded?.has(u.id) && this.props.ingameGameState.unitsToBeAdded.get(u.id) == "yellow";
+
                     return <OverlayTrigger
                         overlay={<Tooltip id={"unit-tooltip-" + u.id} className="tooltip-w-100">
                             <Col className="text-center"><h6>{u.type.name}<small> of <b>{controller?.name ?? "Unknown"}</b><br /><b>{r.name}</b></small></h6></Col>
@@ -393,13 +397,14 @@ export default class MapComponent extends Component<MapComponentProps> {
                                     "hover-weak-outline": !property.highlight.active,
                                     "clickable hover-strong-outline": clickable,
                                     "medium-outline": property.highlight.active,
-                                    "highlight-red": property.highlight.color == "red",
-                                    "highlight-yellow": property.highlight.color == "yellow",
-                                    "highlight-green": property.highlight.color == "green",
+                                    "highlight-red": (property.highlight.active && property.highlight.color == "red") || willBeRemoved,
+                                    "highlight-yellow": (property.highlight.active && property.highlight.color == "yellow") || highlightYellow,
+                                    "highlight-green": (property.highlight.active && property.highlight.color == "green") || highlightGreen,
                                     "hover-strong-outline-red": property.highlight.color == "red" && clickable,
                                     "hover-strong-outline-yellow": property.highlight.color == "yellow" && clickable,
                                     "hover-strong-outline-green": property.highlight.color == "green" && clickable,
-                                    "disable-pointer-events": disablePointerEventsForCurrentRegion
+                                    "disable-pointer-events": disablePointerEventsForCurrentRegion,
+                                    "pulsate-fwd": willBeRemoved || highlightYellow || highlightGreen
                                 }
                             )}
                             style={{

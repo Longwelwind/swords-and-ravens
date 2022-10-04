@@ -104,11 +104,7 @@ export default class ResolveRetreatGameState extends GameState<
             army: houseCombatData.army.map(u => u.id)
         });
 
-        this.entireGame.broadcastToClients({
-            type: "remove-units",
-            regionId: region.id,
-            unitIds: unitsToKill.map(u => u.id)
-        });
+        this.ingame.broadcastRemoveUnits(region, unitsToKill)
 
         this.ingame.log({
             type: "retreat-failed",
@@ -164,11 +160,7 @@ export default class ResolveRetreatGameState extends GameState<
                 army: this.postCombat.loserCombatData.army.map(u => u.id)
             });
 
-            this.entireGame.broadcastToClients({
-                type: "remove-units",
-                regionId: this.postCombat.loserCombatData.region.id,
-                unitIds: units.map(u => u.id)
-            });
+            this.ingame.broadcastRemoveUnits(region, units);
 
             this.ingame.log({
                 type: "retreat-casualties-suffered",
