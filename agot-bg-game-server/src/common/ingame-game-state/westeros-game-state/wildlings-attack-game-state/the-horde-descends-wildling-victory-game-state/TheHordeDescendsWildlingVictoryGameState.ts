@@ -89,12 +89,7 @@ export default class TheHordeDescendsWildlingVictoryGameState extends WildlingCa
     onSelectUnitsEnd(house: House, selectedUnits: [Region, Unit[]][], resolvedAutomatically: boolean): void {
         selectedUnits.forEach(([region, units]) => {
             units.forEach(u => region.units.delete(u.id));
-
-            this.entireGame.broadcastToClients({
-                type: "remove-units",
-                unitIds: units.map(u => u.id),
-                regionId: region.id
-            });
+            this.ingame.broadcastRemoveUnits(region, units);
         });
 
         this.ingame.log({

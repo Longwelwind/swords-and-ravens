@@ -86,11 +86,7 @@ export default class MaceTyrellAbilityGameState extends GameState<
                 army: houseCombatData.army.map(u => u.id)
             });
 
-            this.entireGame.broadcastToClients({
-                type: "remove-units",
-                regionId: region.id,
-                unitIds: units.map(u => u.id)
-            });
+            this.ingame.broadcastRemoveUnits(region, units);
 
             this.ingame.log({
                 type: "mace-tyrell-footman-killed",

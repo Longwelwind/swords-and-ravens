@@ -139,14 +139,8 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
         let count = 0;
         selectedUnits.forEach(([region, units]) => {
             count += units.length;
-            const unitIdsToDestroy = units.map(u => u.id);
-            unitIdsToDestroy.forEach(uid => region.units.delete(uid));
-
-            this.entireGame.broadcastToClients({
-                type: "remove-units",
-                regionId: region.id,
-                unitIds: unitIdsToDestroy
-            });
+            units.forEach(u => region.units.delete(u.id));
+            this.ingame.broadcastRemoveUnits(region, units);
         });
 
         this.ingame.log({

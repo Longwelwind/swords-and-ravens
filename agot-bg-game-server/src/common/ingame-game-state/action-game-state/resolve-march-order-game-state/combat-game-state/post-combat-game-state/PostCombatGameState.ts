@@ -133,11 +133,7 @@ export default class PostCombatGameState extends GameState<
                 army: hcd.army.map(u => u.id)
             });
 
-            this.entireGame.broadcastToClients({
-                type: "remove-units",
-                regionId: region.id,
-                unitIds: selectedCasualties.map(u => u.id)
-            });
+            this.combat.ingameGameState.broadcastRemoveUnits(region, selectedCasualties);
         }
 
         this.proceedSkullIconHandling();
@@ -221,22 +217,16 @@ export default class PostCombatGameState extends GameState<
                 }
             );
 
-            immediatelyKilledLoserUnits.forEach(u => locationLoserArmy.units.delete(u.id));
             this.loserCombatData.army = _.difference(this.loserCombatData.army, immediatelyKilledLoserUnits);
-
-            // TODO: This packet should be replaced by RemoveUnits
-            this.entireGame.broadcastToClients({
-                type: "combat-immediately-killed-units",
-                regionId: locationLoserArmy.id,
-                unitIds: immediatelyKilledLoserUnits.map(u => u.id)
-            });
-
             this.entireGame.broadcastToClients({
                 type: "combat-change-army",
                 house: this.loser.id,
                 region: locationLoserArmy.id,
                 army: this.loserCombatData.army.map(u => u.id)
             });
+
+            immediatelyKilledLoserUnits.forEach(u => locationLoserArmy.units.delete(u.id));
+            this.combat.ingameGameState.broadcastRemoveUnits(locationLoserArmy, immediatelyKilledLoserUnits);
         }
     }
 

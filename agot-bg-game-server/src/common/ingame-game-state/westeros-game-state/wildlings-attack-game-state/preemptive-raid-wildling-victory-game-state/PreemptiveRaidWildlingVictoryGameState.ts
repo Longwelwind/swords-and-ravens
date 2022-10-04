@@ -124,12 +124,7 @@ export default class PreemptiveRaidWildlingVictoryGameState extends GameState<Wi
         // Kill those 2 units
         units.forEach(([region, units]) => {
             units.forEach(u => region.units.delete(u.id));
-
-            this.entireGame.broadcastToClients({
-                type: "remove-units",
-                regionId: region.id,
-                unitIds: units.map(u => u.id)
-            });
+            this.ingame.broadcastRemoveUnits(region, units);
         });
 
         this.ingame.log({

@@ -46,12 +46,7 @@ export default class ResolveSinglePayDebtGameState extends GameState<PayDebtsGam
 
         unitsPerRegion.forEach((units, region) => {
             units.forEach(u => region.units.delete(u.id));
-
-            this.entireGame.broadcastToClients({
-                type: "remove-units",
-                regionId: region.id,
-                unitIds: units.map(u => u.id)
-            });
+            this.ingame.broadcastRemoveUnits(region, units);
         });
 
         this.parentGameState.ingame.log({

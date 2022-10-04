@@ -68,11 +68,7 @@ export default class BericDondarrionAbilityGameState extends GameState<
             army: loserCombatData.army.map(u => u.id)
         });
 
-        this.entireGame.broadcastToClients({
-            type: "remove-units",
-            regionId: selectedRegion.id,
-            unitIds: [selectedUnit.id]
-        });
+        this.ingame.broadcastRemoveUnits(selectedRegion, [selectedUnit]);
 
         this.parentGameState.onHouseCardResolutionFinish(house);
     }

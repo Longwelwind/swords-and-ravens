@@ -14,7 +14,7 @@ import { DraftStep } from "../common/ingame-game-state/draft-house-cards-game-st
 import { SerializedLoanCard } from "../common/ingame-game-state/game-data-structure/loan-card/LoanCard";
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady | PlayerUnready
-    | HouseCardChosen | CombatImmediatelyKilledUnits | SupportDeclared | SupportRefused | NewTurn | RemovePlacedOrder
+    | HouseCardChosen | SupportDeclared | SupportRefused | NewTurn | RemovePlacedOrder
     | MoveUnits | CombatChangeArmy
     | UnitsWounded | ChangeCombatHouseCard | BeginSeeTopWildlingCard
     | RavenOrderReplaced | RevealTopWildlingCard | HideTopWildlingCard | ProceedWesterosCard | ChangeGarrison
@@ -110,12 +110,6 @@ interface ManipulateCombatHouseCard {
     manipulatedHouseCards: [string, SerializedHouseCard][];
 }
 
-interface CombatImmediatelyKilledUnits {
-    type: "combat-immediately-killed-units";
-    regionId: string;
-    unitIds: number[];
-}
-
 interface CombatChangeArmy {
     type: "combat-change-army";
     house: string;
@@ -199,6 +193,7 @@ interface ChangePowerToken {
 interface AddUnits {
     type: "add-units";
     units: [string, SerializedUnit[]][];
+    animate?: "green" | "yellow";
 }
 
 interface ChangeWildlingStrength {
@@ -215,6 +210,7 @@ interface RemoveUnits {
     type: "remove-units";
     regionId: string;
     unitIds: number[];
+    animate: boolean;
 }
 
 interface ChangeTracker {

@@ -2,7 +2,6 @@ import { port } from "../game-data-structure/regionTypes";
 import Region from "../game-data-structure/Region";
 import ActionGameState from "../action-game-state/ActionGameState";
 import IngameGameState from "../IngameGameState";
-import EntireGame from "../../../common/EntireGame";
 import House from "../game-data-structure/House";
 
 function removePossibleOrdersInPort(portRegion: Region, actionGameState: ActionGameState | null): void {
@@ -17,7 +16,7 @@ function removePossibleOrdersInPort(portRegion: Region, actionGameState: ActionG
     actionGameState.removeOrderFromRegion(portRegion, true);
 }
 
-export function destroyAllShipsInPort(portRegion: Region, entireGame: EntireGame, actionGameState: ActionGameState | null): number {
+export function destroyAllShipsInPort(portRegion: Region, ingame: IngameGameState, actionGameState: ActionGameState | null, animateRemoval = true): number {
     if (portRegion.type != port) {
         throw new Error("This method is intended to only be used for destroying ships in ports")
     }
@@ -25,11 +24,11 @@ export function destroyAllShipsInPort(portRegion: Region, entireGame: EntireGame
     removePossibleOrdersInPort(portRegion, actionGameState);
 
     const house = portRegion.units.size > 0 ? portRegion.units.values[0].allegiance : null;
-    const shipsToDestroy = portRegion.units.map((id, _unit) => id);
-    shipsToDestroy.forEach(id => portRegion.units.delete(id));
+    const shipsToDestroy = portRegion.units.values;
+    shipsToDestroy.forEach(u => portRegion.units.delete(u.id));
 
     if (house) {
-        entireGame.broadcastToClients({
+        ingame.entireGame.broadcastToClients({
             type: "combat-change-army",
             region: portRegion.id,
             house: house.id,
@@ -37,12 +36,7 @@ export function destroyAllShipsInPort(portRegion: Region, entireGame: EntireGame
         });
     }
 
-    entireGame.broadcastToClients({
-        type: "remove-units",
-        regionId: portRegion.id,
-        unitIds: shipsToDestroy
-    });
-
+    ingame.broadcastRemoveUnits(portRegion, shipsToDestroy, animateRemoval);
     return shipsToDestroy.length;
 }
 
@@ -54,7 +48,7 @@ export function findOrphanedShipsAndDestroyThem(ingame: IngameGameState, actionG
 
     portsWithOrphanedShips.forEach(portRegion => {
         const houseThatLostShips = portRegion.units.values[0].allegiance;
-        const destroyedShipCount = destroyAllShipsInPort(portRegion, ingame.entireGame, actionGameState);
+        const destroyedShipCount = destroyAllShipsInPort(portRegion, ingame, actionGameState);
         ingame.log({
             type: "ships-destroyed-by-empty-castle",
             castle: world.getAdjacentLandOfPort(portRegion).id,

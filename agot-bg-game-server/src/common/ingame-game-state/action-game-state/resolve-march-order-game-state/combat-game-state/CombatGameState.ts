@@ -511,12 +511,7 @@ export default class CombatGameState extends GameState<
     }
 
     onServerMessage(message: ServerMessage): void {
-        if (message.type == "combat-immediately-killed-units") {
-            const region = this.world.regions.get(message.regionId);
-            const killedUnits = message.unitIds.map(uid => region.units.get(uid));
-
-            killedUnits.forEach(u => region.units.delete(u.id));
-        } else if (message.type == "change-combat-house-card") {
+        if (message.type == "change-combat-house-card") {
             const houseCards: [House, HouseCard | null][] = message.houseCardIds.map(([houseId, houseCardId]) => [
                 this.game.houses.get(houseId),
                 houseCardId ? this.ingameGameState.game.getHouseCardById(houseCardId) : null
