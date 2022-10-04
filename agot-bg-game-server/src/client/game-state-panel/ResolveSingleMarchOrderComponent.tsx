@@ -20,10 +20,15 @@ import { preventOverflow } from "@popperjs/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { knight } from "../../common/ingame-game-state/game-data-structure/unitTypes";
+import intenseHorseStallionNeighSound from "../../../public/sounds/intense-horse-stallion-neigh.ogg";
+import footmainYesMyLordSound from "../../../public/sounds/footman-yes-my-lord.ogg";
+import roarSound from "../../../public/sounds/roar.ogg";
+import popRandom from "../../utils/popRandom";
 
 @observer
 export default class ResolveSingleMarchOrderComponent extends Component<GameStateComponentProps<ResolveSingleMarchOrderGameState>> {
-    @observable selectedMarchOrderRegion: Region | null;
+    @observable private _selectedMarchOrderRegion: Region | null;
     @observable selectedUnits: Unit[] = [];
     @observable plannedMoves = new BetterMap<Region, Unit[]>();
     @observable leavePowerToken: boolean | undefined = undefined;
@@ -35,6 +40,23 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     modifyOrdersOnMapCallback: any;
 
     resetTimeoutId = -1;
+
+    get selectedMarchOrderRegion(): Region | null {
+        return this._selectedMarchOrderRegion;
+    }
+
+    set selectedMarchOrderRegion(val: Region | null) {
+        if (val && this._selectedMarchOrderRegion == null) {
+            if (!this.props.gameClient.musicMuted) {
+                const hasKnights = val.units.values.some(u => u.type == knight);
+                const audio = new Audio(hasKnights
+                    ? popRandom([intenseHorseStallionNeighSound, roarSound]) ?? intenseHorseStallionNeighSound
+                    : popRandom([footmainYesMyLordSound, roarSound]) ?? footmainYesMyLordSound);
+                audio.play();
+            }
+        }
+        this._selectedMarchOrderRegion = val;
+    }
 
     get house(): House {
         return this.props.gameState.house;
