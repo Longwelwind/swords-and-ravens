@@ -45,9 +45,9 @@ export default class ActionComponent extends Component<GameStateComponentProps<A
     }
 
     modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
-        return this.props.gameState.ordersToBeRemoved.map(r => [
+        return this.props.gameState.ordersToBeRemoved.map((r, color) => [
             r,
-            {highlight: {active: true, color: "yellow"}}
+            {highlight: {active: true, color: color}}
         ]);
     }
 

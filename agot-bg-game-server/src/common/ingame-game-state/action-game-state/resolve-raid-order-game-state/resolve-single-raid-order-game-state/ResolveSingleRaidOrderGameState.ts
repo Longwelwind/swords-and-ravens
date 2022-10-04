@@ -114,7 +114,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
                 }
             }
 
-            this.actionGameState.removeOrderFromRegion(targetRegion);
+            this.actionGameState.removeOrderFromRegion(targetRegion, false, this.house, false, !resolvedAutomatically ? "red" : undefined);
 
             this.ingameGameState.log({
                 type: "raid-done",
@@ -141,7 +141,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
 
         // Keep an unresolved RaidSupportOrder to use it as support later
         if (orderType instanceof RaidOrderType || targetRegion != null) {
-            this.actionGameState.removeOrderFromRegion(orderRegion);
+            this.actionGameState.removeOrderFromRegion(orderRegion, false, this.house, false, !resolvedAutomatically ? "yellow" : undefined);
         } else if (orderType instanceof RaidSupportOrderType && targetRegion == null) {
             this.parentGameState.resolvedRaidSupportOrderRegions.push(orderRegion);
         }

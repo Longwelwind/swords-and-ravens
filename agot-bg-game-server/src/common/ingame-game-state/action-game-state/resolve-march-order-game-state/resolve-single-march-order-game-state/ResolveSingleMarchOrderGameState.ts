@@ -230,7 +230,7 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
             }
 
             // Remove the order
-            this.actionGameState.removeOrderFromRegion(startingRegion, false, this.house, false, true);
+            this.actionGameState.removeOrderFromRegion(startingRegion, false, this.house, false, "yellow");
             this.resolveMarchOrderGameState.onResolveSingleMarchOrderGameStateFinish(this.house);
         }
     }

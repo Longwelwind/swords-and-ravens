@@ -41,7 +41,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
     @observable ordersOnBoard: BetterMap<Region, Order>;
 
     // Client-side only
-    @observable ordersToBeRemoved: Region[] = [];
+    @observable ordersToBeRemoved: BetterMap<Region, "yellow" | "red"> = new BetterMap();
 
     get ingame(): IngameGameState {
         return this.parentGameState;
@@ -114,7 +114,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
         });
     }
 
-    removeOrderFromRegion(region: Region, log = false, house: (House | undefined) = undefined, resolvedAutomatically = false, animate = false): Order | null {
+    removeOrderFromRegion(region: Region, log = false, house: (House | undefined) = undefined, resolvedAutomatically = false, animate: "yellow" | "red" | undefined = undefined): Order | null {
         if (this.ordersOnBoard.has(region)) {
             const order = this.ordersOnBoard.get(region);
             this.ordersOnBoard.delete(region);
@@ -212,9 +212,9 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
             } else {
                 if (this.ordersOnBoard.has(region)) {
                     if (message.animate) {
-                        this.ordersToBeRemoved.push(region);
+                        this.ordersToBeRemoved.set(region, message.animate);
                         window.setTimeout(() => {
-                            _.pull(this.ordersToBeRemoved, region);
+                            this.ordersToBeRemoved.delete(region);
                             this.ordersOnBoard.delete(region);
                         }, 4000);
                     } else {
