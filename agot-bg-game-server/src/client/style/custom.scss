@@ -396,15 +396,6 @@ $medium-outline: rgba($outline-color, 0.6);
   transition: all 0.12s linear;
 }
 
-.highlight-red {
-  filter: drop-shadow(3px 3px 3px yellow) drop-shadow(-3px -3px 3px red) drop-shadow(3px -3px 3px red) drop-shadow(-3px 3px 3px red);
-}
-
-.hover-strong-red-yellow:hover {
-  filter: drop-shadow(5px 5px 6px yellow) drop-shadow(-5px -5px 6px red) drop-shadow(5px -5px 6px red) drop-shadow(-5px 5px 6px red);
-  transition: all 0.12s linear;
-}
-
 .highlight-green {
   filter: drop-shadow(3px 3px 3px green) drop-shadow(-3px -3px 3px green) drop-shadow(3px -3px 3px green) drop-shadow(-3px 3px 3px green);
 }
