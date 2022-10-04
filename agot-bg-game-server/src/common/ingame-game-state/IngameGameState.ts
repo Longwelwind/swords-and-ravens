@@ -86,6 +86,10 @@ export default class IngameGameState extends GameState<
         return this.game.world;
     }
 
+    get actionState(): ActionGameState | null {
+        return this.childGameState as ActionGameState;
+    }
+
     get sortedByLeadingPlayers(): Player[] {
         return this.game.getPotentialWinners().map(h => this.getControllerOfHouse(h));
     }

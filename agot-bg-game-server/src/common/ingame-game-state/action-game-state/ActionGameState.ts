@@ -40,6 +40,9 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
     planningRestrictions: PlanningRestriction[];
     @observable ordersOnBoard: BetterMap<Region, Order>;
 
+    // Client-side only
+    @observable ordersToBeRemoved: Region[] = [];
+
     get ingame(): IngameGameState {
         return this.parentGameState;
     }
@@ -111,14 +114,15 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
         });
     }
 
-    removeOrderFromRegion(region: Region, log = false, house: (House | undefined) = undefined, resolvedAutomatically = false): Order | null {
+    removeOrderFromRegion(region: Region, log = false, house: (House | undefined) = undefined, resolvedAutomatically = false, animate = false): Order | null {
         if (this.ordersOnBoard.has(region)) {
             const order = this.ordersOnBoard.get(region);
             this.ordersOnBoard.delete(region);
             this.entireGame.broadcastToClients({
                 type: "action-phase-change-order",
                 region: region.id,
-                order: null
+                order: null,
+                animate: animate
             });
 
             if (log) {
@@ -206,7 +210,17 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
             if (order) {
                 this.ordersOnBoard.set(region, order);
             } else {
-                try { this.ordersOnBoard.delete(region); } catch { }
+                if (this.ordersOnBoard.has(region)) {
+                    if (message.animate) {
+                        this.ordersToBeRemoved.push(region);
+                        window.setTimeout(() => {
+                            _.pull(this.ordersToBeRemoved, region);
+                            this.ordersOnBoard.delete(region);
+                        }, 4000);
+                    } else {
+                        this.ordersOnBoard.delete(region);
+                    }
+                }
             }
         } else {
             this.childGameState.onServerMessage(message);
