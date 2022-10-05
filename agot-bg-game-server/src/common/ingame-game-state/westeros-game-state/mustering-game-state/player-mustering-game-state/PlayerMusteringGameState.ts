@@ -202,8 +202,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                     this.entireGame.broadcastToClients({
                         type: "add-units",
                         regionId: region.id,
-                        units: createdUnits.map(u => u.serializeToClient()),
-                        animate: "green"
+                        units: createdUnits.map(u => u.serializeToClient())
                     });
                 }
             });

@@ -377,9 +377,9 @@ export default class MapComponent extends Component<MapComponentProps> {
 
                     const clickable = property.onClick != undefined;
 
-                    const willBeRemoved = this.ingame.unitsToBeRemoved?.has(r) && this.ingame.unitsToBeRemoved.get(r).includes(u);
-                    const hasBeenAdded = this.ingame.unitsToBeAdded?.has(u.id) && this.ingame.unitsToBeAdded.get(u.id) == "green";
-                    const hasBeenTransformed = this.ingame.unitsToBeAdded?.has(u.id) && this.ingame.unitsToBeAdded.get(u.id) == "yellow";
+                    const willBeRemoved = this.ingame.unitsToBeRemoved?.includes(u);
+                    const hasBeenAdded = this.ingame.createdUnits?.includes(u);
+                    const hasBeenTransformed = this.ingame.transformedUnits?.includes(u);
 
                     return <OverlayTrigger
                         overlay={<Tooltip id={"unit-tooltip-" + u.id} className="tooltip-w-100">
