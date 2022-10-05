@@ -110,6 +110,7 @@ export default class GameClient {
         };
         this.socket.onerror = () => {
             this.onError();
+            this.onClose();
         };
         this.socket.onmessage = (data: MessageEvent) => {
             this.onMessage(data.data as string);
@@ -117,6 +118,11 @@ export default class GameClient {
         this.socket.onclose = () => {
             window.clearInterval(this.pingInterval);
             this.onClose();
+
+            //reconnection on close
+            setTimeout(() => {
+                this.start();
+            }, 1000);
         }
     }
 
