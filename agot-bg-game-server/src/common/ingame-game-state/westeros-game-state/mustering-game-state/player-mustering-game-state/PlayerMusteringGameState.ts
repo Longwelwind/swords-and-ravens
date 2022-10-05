@@ -17,6 +17,7 @@ import {ServerMessage} from "../../../../../messages/ServerMessage";
 import RegionKind from "../../../game-data-structure/RegionKind";
 import IngameGameState from "../../../IngameGameState";
 import User from "../../../../../server/User";
+import groupBy from "../../../../../utils/groupBy";
 
 type MusteringRule = (Mustering & {cost: number});
 
@@ -180,21 +181,31 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
             }
 
             // Remove units that will be used to upgrade, and add mustered units
-            musterings.entries.forEach(([_, recruitments]) => {
-                recruitments.forEach(({from, to, region}) => {
-                    if (from) {
-                        this.ingame.transformUnits(region, [from], to);
-                    } else {
-                        const unit = this.game.createUnit(region, to, this.house);
+            const recruitments = _.flatMap(musterings.values);
+            const grouped = groupBy(recruitments, m => m.region);
 
-                        region.units.set(unit.id, unit);
-                        this.entireGame.broadcastToClients({
-                            type: "add-units",
-                            units: [[region.id, [unit.serializeToClient()]]],
-                            animate: "green"
-                        });
-                    }
+            grouped.entries.forEach(([region, musteringsOfRegion]) => {
+                const transforms = musteringsOfRegion.filter(m => m.from != null);
+                const newUnits = musteringsOfRegion.filter(m => m.from == null);
+
+                transforms.forEach(m => {
+                    this.ingame.transformUnits(m.region, [m.from as Unit], m.to);
                 });
+
+                const createdUnits = newUnits.map(m => {
+                    const unit = this.game.createUnit(m.region, m.to, this.house);
+                    m.region.units.set(unit.id, unit);
+                    return unit;
+                });
+
+                if (createdUnits.length > 0) {
+                    this.entireGame.broadcastToClients({
+                        type: "add-units",
+                        regionId: region.id,
+                        units: createdUnits.map(u => u.serializeToClient()),
+                        animate: "green"
+                    });
+                }
             });
 
             if (this.isStarredConsolidatePowerMusteringType && musterings.size == 0 && this.regions.length > 0) {

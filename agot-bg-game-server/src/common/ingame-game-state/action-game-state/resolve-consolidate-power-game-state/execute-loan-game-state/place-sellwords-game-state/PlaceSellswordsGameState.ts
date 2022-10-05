@@ -67,15 +67,17 @@ export default class PlaceSellswordsGameState extends GameState<ExecuteLoanGameS
             }
 
             placedSellswords.keys.forEach(region => {
-                const newUnits = placedSellswords.get(region);
-                newUnits.forEach(ut => {
+                const addedUnitTypes = placedSellswords.get(region);
+                const addedUnits = addedUnitTypes.map(ut => {
                     const unit = this.game.createUnit(region, ut, this.house);
                     region.units.set(unit.id, unit);
-                    this.entireGame.broadcastToClients({
-                        type: "add-units",
-                        units: [[region.id, [unit.serializeToClient()]]],
-                        animate: "green"
-                    });
+                    return unit;
+                });
+                this.entireGame.broadcastToClients({
+                    type: "add-units",
+                    regionId: region.id,
+                    units: addedUnits.map(u => u.serializeToClient()),
+                    animate: "green"
                 });
             });
 

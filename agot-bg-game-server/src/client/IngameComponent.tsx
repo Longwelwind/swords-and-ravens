@@ -4,7 +4,7 @@ import GameClient from "./GameClient";
 import {observer} from "mobx-react";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import MapComponent, { MAP_HEIGHT } from "./MapComponent";
-import MapControls, { RegionOnMapProperties } from "./MapControls";
+import MapControls, { OrderOnMapProperties, RegionOnMapProperties } from "./MapControls";
 import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import Card from "react-bootstrap/Card";
@@ -138,6 +138,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     @observable showMapScrollbarInfo = false;
     @observable columnSwapAnimationClassName = "";
     modifyRegionsOnMapCallback: any;
+    modifyOrdersOnMapCallback: any;
     onVisibilityChangedCallback: (() => void) | null = null;
     setIntervalId = -1;
 
@@ -1255,6 +1256,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     componentDidMount(): void {
         this.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
+        this.mapControls.modifyOrdersOnMap.push(this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap());
+
         this.ingame.entireGame.onNewPrivateChatRoomCreated = (roomId: string) => this.onNewPrivateChatRoomCreated(roomId);
 
         const visibilityChangedCallback = (): void => this.onVisibilityChanged();
@@ -1302,6 +1305,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     componentWillUnmount(): void {
         this.ingame.entireGame.onNewPrivateChatRoomCreated = null;
         _.pull(this.mapControls.modifyRegionsOnMap, this.modifyRegionsOnMapCallback);
+        _.pull(this.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
 
         const visibilityChangedCallback = this.onVisibilityChangedCallback;
         if (visibilityChangedCallback) {
@@ -1317,6 +1321,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             window.clearInterval(this.setIntervalId);
             this.setIntervalId = -1;
         }
+    }
+
+    modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
+        return this.props.gameState.ordersToBeRemoved.map((r, color) => [
+            r,
+            {highlight: {active: true, color: color}}
+        ]);
     }
 
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
