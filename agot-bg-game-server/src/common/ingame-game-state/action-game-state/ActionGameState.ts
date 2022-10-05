@@ -51,7 +51,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
     }
 
     get ordersOnBoard(): BetterMap<Region, Order> {
-        return this.ingame.ordersOnBoard;
+        return this.ingame.ordersOnBoard as BetterMap<Region, Order>;
     }
 
     constructor(ingameGameState: IngameGameState) {

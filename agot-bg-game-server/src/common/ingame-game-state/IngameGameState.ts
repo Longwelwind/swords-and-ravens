@@ -64,7 +64,8 @@ export default class IngameGameState extends GameState<
     timeoutPlayerIds: string[] = [];
     game: Game;
     gameLogManager: GameLogManager = new GameLogManager(this);
-    @observable ordersOnBoard: BetterMap<Region, Order> = new BetterMap();
+    // Support Order | null client side to animate order swap
+    @observable ordersOnBoard: BetterMap<Region, Order | null> = new BetterMap();
 
     votes: BetterMap<string, Vote> = new BetterMap();
     @observable paused: Date | null;
@@ -271,7 +272,7 @@ export default class IngameGameState extends GameState<
 
         this.entireGame.broadcastToClients({
             type: "reveal-orders",
-            orders: this.ordersOnBoard.mapOver(r => r.id, o => o.id)
+            orders: placedOrders.mapOver(r => r.id, o => o.id)
         });
 
         this.setChildGameState(new ActionGameState(this)).firstStart(planningRestrictions);
@@ -1207,10 +1208,15 @@ export default class IngameGameState extends GameState<
             this.forceRerender();
         } else if (message.type == "reveal-orders") {
             this.ordersOnBoard = new BetterMap(message.orders.map(
-                ([rid, oid]) => [this.world.regions.get(rid), orders.get(oid)]
+                ([rid, _oid]) => [this.world.regions.get(rid), null]
             ));
             this.ordersRevealed = true;
-            window.setTimeout(() => this.ordersRevealed = false, 1700);
+            window.setTimeout(() => {
+                this.ordersRevealed = false;
+                this.ordersOnBoard = new BetterMap(message.orders.map(
+                    ([rid, oid]) => [this.world.regions.get(rid), orders.get(oid)]
+                ));
+            }, 1500);
         } else if (message.type == "remove-orders") {
             message.regions.map(rid => this.world.regions.get(rid)).forEach(r => {
                 this.ordersOnBoard.delete(r);
@@ -1733,7 +1739,7 @@ export default class IngameGameState extends GameState<
             timeoutPlayerIds: this.timeoutPlayerIds,
             game: this.game.serializeToClient(admin, player),
             gameLogManager: this.gameLogManager.serializeToClient(admin, user),
-            ordersOnBoard: this.ordersOnBoard.mapOver(r => r.id, o => o.id),
+            ordersOnBoard: this.ordersOnBoard.mapOver(r => r.id, o => o?.id ?? -1),
             votes: this.votes.values.map(v => v.serializeToClient(admin, player)),
             paused: this.paused ? this.paused.getTime() : null,
             willBeAutoResumedAt: this.willBeAutoResumedAt ? this.willBeAutoResumedAt.getTime() : null,

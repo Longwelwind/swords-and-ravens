@@ -522,34 +522,31 @@ export default class MapComponent extends Component<MapComponentProps> {
         );
 
         return propertiesForOrders.map((region, properties) => {
+            let order: Order | null = null;
+            let orderPresent = false;
             if (this.ingame.childGameState instanceof PlanningGameState && this.ingame.childGameState.childGameState instanceof PlaceOrdersGameState) {
-                const planningGameState = this.ingame.childGameState.childGameState;
-                const orderPresent = planningGameState.placedOrders.has(region);
-                const order = orderPresent ? planningGameState.placedOrders.get(region) : null;
-
-                if (orderPresent) {
-                    const controller = region.getController();
-
-                    if (!controller) {
-                        // Should never happen. If there's an order, there's a controller.
-                        throw new Error("Should never happen. If there's an order, there's a controller.");
-                    }
-
-                    const backgroundUrl = order ? orderImages.get(order.type.id) : houseOrderImages.get(controller.id);
-
-                    return this.renderOrder(region, order, backgroundUrl, properties, false);
-                }
+                const placeOrders = this.ingame.childGameState.childGameState;
+                orderPresent = placeOrders.placedOrders.has(region);
+                order = orderPresent ? placeOrders.placedOrders.get(region) : null;
             } else {
-                if (!this.ingame.ordersOnBoard.has(region)) {
-                    return;
-                }
-
-                const order = this.ingame.ordersOnBoard.get(region);
-
-                return this.renderOrder(region, order, orderImages.get(order.type.id), properties, true);
+                orderPresent = this.ingame.ordersOnBoard.has(region);
+                order = orderPresent ? this.ingame.ordersOnBoard.get(region) : null;
             }
 
-            return false;
+            if (orderPresent) {
+                const controller = region.getController();
+
+                if (!controller) {
+                    // Should never happen. If there's an order, there's a controller.
+                    throw new Error("Should never happen. If there's an order, there's a controller.");
+                }
+
+                const backgroundUrl = order ? orderImages.get(order.type.id) : houseOrderImages.get(controller.id);
+
+                return this.renderOrder(region, order, backgroundUrl, properties);
+            }
+
+            return null;
         });
     }
 
@@ -580,7 +577,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         return propertiesForEntities;
     }
 
-    renderOrder(region: Region, order: Order | null, backgroundUrl: string, properties: OrderOnMapProperties, _isActionGameState: boolean): ReactNode {
+    renderOrder(region: Region, order: Order | null, backgroundUrl: string, properties: OrderOnMapProperties): ReactNode {
         let planningOrAction = (this.ingame.childGameState instanceof PlanningGameState || this.ingame.childGameState instanceof ActionGameState) ? this.ingame.childGameState : null;
 
         if (planningOrAction instanceof ActionGameState && !(planningOrAction.childGameState instanceof UseRavenGameState)) {
@@ -631,7 +628,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                             className={classNames("order-icon", {
                                 "order-border": drawBorder,
                                 "pulsate-bck_fade-out": this.ingame.ordersToBeRemoved.has(region),
-                                "rotate-vert-center": this.ingame.ordersRevealed
+                                "flip-vertical-right": this.ingame.ordersRevealed
                             } )}
                         />
                     </div>
