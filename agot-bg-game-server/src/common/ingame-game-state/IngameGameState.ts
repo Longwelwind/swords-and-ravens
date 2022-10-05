@@ -677,7 +677,8 @@ export default class IngameGameState extends GameState<
 
         this.entireGame.broadcastToClients({
             type: "add-units",
-            units: [[region.id, transformed.map(u => u.serializeToClient())]],
+            regionId: region.id,
+            units: transformed.map(u => u.serializeToClient()),
             animate: "yellow"
         });
 
@@ -958,26 +959,24 @@ export default class IngameGameState extends GameState<
         } else if (message.type == "change-wildling-strength") {
             this.game.wildlingStrength = message.wildlingStrength;
         } else if (message.type == "add-units") {
-            message.units.forEach(([regionId, dataUnits]) => {
-                const region = this.world.regions.get(regionId);
-                const units = dataUnits.map(u => Unit.deserializeFromServer(this.game, u));
-
-                units.forEach(unit => {
-                    unit.region = region;
-                    region.units.set(unit.id, unit);
-                });
-
-                if (message.animate) {
-                    units.forEach(unit => {
-                        this.unitsToBeAdded.set(unit.id, message.animate as "green" | "yellow");
-                    });
-                    window.setTimeout(() => {
-                        units.forEach(unit => {
-                            this.unitsToBeAdded.delete(unit.id);
-                        });
-                    }, 4000);
-                }
+            const region = this.world.regions.get(message.regionId);
+            const units = message.units.map(u => {
+                const unit = Unit.deserializeFromServer(this.game, u);
+                unit.region = region;
+                region.units.set(unit.id, unit);
+                return unit;
             });
+
+            if (message.animate) {
+                units.forEach(unit => {
+                    this.unitsToBeAdded.set(unit.id, message.animate as "green" | "yellow");
+                });
+                window.setTimeout(() => {
+                    units.forEach(unit => {
+                        this.unitsToBeAdded.delete(unit.id);
+                    });
+                }, 4000);
+            }
         } else if (message.type == "change-garrison") {
             const region = this.world.regions.get(message.region);
 

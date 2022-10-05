@@ -107,7 +107,8 @@ export default class FireMadeFleshGameState extends GameState<WesterosDeck4GameS
                     capital.units.set(newDragon.id, newDragon);
                     this.entireGame.broadcastToClients({
                         type: "add-units",
-                        units: [[capital.id, [newDragon.serializeToClient()]]],
+                        regionId: capital.id,
+                        units: [newDragon.serializeToClient()],
                         animate: "green"
                     });
 

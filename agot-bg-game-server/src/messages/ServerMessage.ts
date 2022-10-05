@@ -193,7 +193,8 @@ interface ChangePowerToken {
 
 interface AddUnits {
     type: "add-units";
-    units: [string, SerializedUnit[]][];
+    regionId: string;
+    units: SerializedUnit[];
     animate?: "green" | "yellow";
 }
 
