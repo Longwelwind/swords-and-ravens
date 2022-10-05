@@ -378,8 +378,8 @@ export default class MapComponent extends Component<MapComponentProps> {
                     const clickable = property.onClick != undefined;
 
                     const willBeRemoved = this.props.ingameGameState.unitsToBeRemoved?.has(r) && this.props.ingameGameState.unitsToBeRemoved.get(r).includes(u);
-                    const highlightGreen = this.props.ingameGameState.unitsToBeAdded?.has(u.id) && this.props.ingameGameState.unitsToBeAdded.get(u.id) == "green";
-                    const highlightYellow = this.props.ingameGameState.unitsToBeAdded?.has(u.id) && this.props.ingameGameState.unitsToBeAdded.get(u.id) == "yellow";
+                    const hasBeenAdded = this.props.ingameGameState.unitsToBeAdded?.has(u.id) && this.props.ingameGameState.unitsToBeAdded.get(u.id) == "green";
+                    const hasBeenTransformed = this.props.ingameGameState.unitsToBeAdded?.has(u.id) && this.props.ingameGameState.unitsToBeAdded.get(u.id) == "yellow";
 
                     return <OverlayTrigger
                         overlay={<Tooltip id={"unit-tooltip-" + u.id} className="tooltip-w-100">
@@ -398,13 +398,15 @@ export default class MapComponent extends Component<MapComponentProps> {
                                     "clickable hover-strong-outline": clickable,
                                     "medium-outline": property.highlight.active,
                                     "highlight-red": (property.highlight.active && property.highlight.color == "red") || willBeRemoved,
-                                    "highlight-yellow": (property.highlight.active && property.highlight.color == "yellow") || highlightYellow,
-                                    "highlight-green": (property.highlight.active && property.highlight.color == "green") || highlightGreen,
+                                    "highlight-yellow": (property.highlight.active && property.highlight.color == "yellow") || hasBeenTransformed,
+                                    "highlight-green": (property.highlight.active && property.highlight.color == "green") || hasBeenAdded,
                                     "hover-strong-outline-red": property.highlight.color == "red" && clickable,
                                     "hover-strong-outline-yellow": property.highlight.color == "yellow" && clickable,
                                     "hover-strong-outline-green": property.highlight.color == "green" && clickable,
                                     "disable-pointer-events": disablePointerEventsForCurrentRegion,
-                                    "pulsate-fwd": willBeRemoved || highlightYellow || highlightGreen
+                                    "pulsate-bck": hasBeenTransformed,
+                                    "pulsate-bck_fade-in": hasBeenAdded,
+                                    "pulsate-bck_fade-out": willBeRemoved
                                 }
                             )}
                             style={{
@@ -621,7 +623,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                             "highlight-red hover-strong-outline-red": order && properties.highlight.active && properties.highlight.color == "red",
                             "restricted-order": planningOrAction && order && this.ingame.game.isOrderRestricted(region, order, planningOrAction.planningRestrictions),
                             "clickable": clickable,
-                            "pulsate-fwd": this.ingame.actionState?.ordersToBeRemoved?.has(region)
+                            "pulsate-bck_fade-out": this.ingame.actionState?.ordersToBeRemoved?.has(region)
                         }
                     )}
                         style={{ left: region.orderSlot.x, top: region.orderSlot.y}}
