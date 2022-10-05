@@ -620,16 +620,20 @@ export default class MapComponent extends Component<MapComponentProps> {
                             "highlight-yellow hover-strong-outline-yellow": order && properties.highlight.active && properties.highlight.color == "yellow",
                             "highlight-red hover-strong-outline-red": order && properties.highlight.active && properties.highlight.color == "red",
                             "restricted-order": planningOrAction && order && this.ingame.game.isOrderRestricted(region, order, planningOrAction.planningRestrictions),
-                            "clickable": clickable,
-                            "pulsate-bck_fade-out": this.ingame.ordersToBeRemoved.has(region)
+                            "clickable": clickable
                         }
                     )}
                         style={{ left: region.orderSlot.x, top: region.orderSlot.y}}
                         onClick={properties.onClick}
                         key={`map-order-container_${region.id}`}
                     >
-                        <div className={classNames("order-icon", { "order-border": drawBorder } )}
-                            style={{ backgroundImage: `url(${backgroundUrl})`, borderColor: color }} />
+                        <div style={{ backgroundImage: `url(${backgroundUrl})`, borderColor: color }}
+                            className={classNames("order-icon", {
+                                "order-border": drawBorder,
+                                "pulsate-bck_fade-out": this.ingame.ordersToBeRemoved.has(region),
+                                "rotate-vert-center": this.ingame.ordersRevealed
+                            } )}
+                        />
                     </div>
                 </ConditionalWrap>
         );

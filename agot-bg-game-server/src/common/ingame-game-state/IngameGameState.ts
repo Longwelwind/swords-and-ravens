@@ -80,6 +80,7 @@ export default class IngameGameState extends GameState<
     @observable unitsToBeRemoved: BetterMap<Region, Unit[]> = new BetterMap();
     @observable unitsToBeAdded: BetterMap<number, "green" | "yellow"> = new BetterMap();
     @observable ordersToBeRemoved: BetterMap<Region, "yellow" | "red"> = new BetterMap();
+    @observable ordersRevealed = false;
 
     onVoteStarted: (() => void) | null = null;
     onPreemptiveRaidNewAttack: ((biddings: [number, House[]][], highestBidder: House) => void) | null = null;
@@ -1208,6 +1209,8 @@ export default class IngameGameState extends GameState<
             this.ordersOnBoard = new BetterMap(message.orders.map(
                 ([rid, oid]) => [this.world.regions.get(rid), orders.get(oid)]
             ));
+            this.ordersRevealed = true;
+            window.setTimeout(() => this.ordersRevealed = false, 1700);
         } else if (message.type == "remove-orders") {
             message.regions.map(rid => this.world.regions.get(rid)).forEach(r => {
                 this.ordersOnBoard.delete(r);
