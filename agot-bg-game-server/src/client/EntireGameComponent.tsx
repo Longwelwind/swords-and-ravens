@@ -241,9 +241,9 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             this.showMapWhenDrafting = this.props.gameClient.authenticatedUser.settings.showMapWhenDrafting;
         }
 
-        if (!this.isInCombat) {
+        /* if (!this.isInCombat) {
             this.playWelcomeSound = true;
-        }
+        } */
     }
 
     onGameStarted(): void {
