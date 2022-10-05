@@ -1930,6 +1930,21 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "93",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                if (ingame.childGameState.type == "action") {
+                    const action = ingame.childGameState;
+                    ingame.ordersOnBoard = action.ordersOnBoard;
+                } else {
+                    ingame.ordersOnBoard = [];
+                }
+            }
+            return serializedGame;
+        }
     }
 ];
 

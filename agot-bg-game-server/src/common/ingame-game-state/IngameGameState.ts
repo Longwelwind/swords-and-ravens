@@ -43,6 +43,7 @@ import ChooseInitialObjectivesGameState, { SerializedChooseInitialObjectivesGame
 import facelessMenNames from "../../../data/facelessMenNames.json";
 import WildlingCardEffectInTurnOrderGameState from "./westeros-game-state/wildlings-attack-game-state/WildlingCardEffectInTurnOrderGameState";
 import getElapsedSeconds from "../../utils/getElapsedSeconds";
+import orders from "./game-data-structure/orders";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -57,12 +58,14 @@ export default class IngameGameState extends GameState<
     | DraftHouseCardsGameState | ThematicDraftHouseCardsGameState | DraftInfluencePositionsGameState | PayDebtsGameState
     | ChooseInitialObjectivesGameState
 > {
-    players: BetterMap<User, Player> = new BetterMap<User, Player>();
+    players: BetterMap<User, Player> = new BetterMap();
     oldPlayerIds: string[] = [];
     replacerIds: string[] = [];
     timeoutPlayerIds: string[] = [];
     game: Game;
     gameLogManager: GameLogManager = new GameLogManager(this);
+    @observable ordersOnBoard: BetterMap<Region, Order> = new BetterMap();
+
     votes: BetterMap<string, Vote> = new BetterMap();
     @observable paused: Date | null;
     @observable willBeAutoResumedAt: Date | null;
@@ -76,6 +79,7 @@ export default class IngameGameState extends GameState<
     @observable marchMarkers: BetterMap<Unit, Region> = new BetterMap();
     @observable unitsToBeRemoved: BetterMap<Region, Unit[]> = new BetterMap();
     @observable unitsToBeAdded: BetterMap<number, "green" | "yellow"> = new BetterMap();
+    @observable ordersToBeRemoved: BetterMap<Region, "yellow" | "red"> = new BetterMap();
 
     onVoteStarted: (() => void) | null = null;
     onPreemptiveRaidNewAttack: ((biddings: [number, House[]][], highestBidder: House) => void) | null = null;
@@ -262,10 +266,14 @@ export default class IngameGameState extends GameState<
     }
 
     proceedToActionGameState(placedOrders: BetterMap<Region, Order>, planningRestrictions: PlanningRestriction[]): void {
-        // this.placedOrders is of type Map<Region, Order | null> but ActionGameState.firstStart
-        // accepts Map<Region, Order>. Server-side, there should never be null values in the map,
-        // so it can be converted safely.
-        this.setChildGameState(new ActionGameState(this)).firstStart(placedOrders, planningRestrictions);
+        this.ordersOnBoard = placedOrders;
+
+        this.entireGame.broadcastToClients({
+            type: "reveal-orders",
+            orders: this.ordersOnBoard.mapOver(r => r.id, o => o.id)
+        });
+
+        this.setChildGameState(new ActionGameState(this)).firstStart(planningRestrictions);
     }
 
     beginNewRound(): void {
@@ -273,6 +281,15 @@ export default class IngameGameState extends GameState<
             const winner = this.game.getPotentialWinner(true);
             this.setChildGameState(new GameEndedGameState(this)).firstStart(winner);
             return;
+        }
+
+        if (this.ordersOnBoard.size > 0) {
+            this.entireGame.broadcastToClients({
+                type: "remove-orders",
+                regions: this.ordersOnBoard.keys.map(r => r.id)
+            });
+
+            this.ordersOnBoard.clear();
         }
 
         if (this.game.ironBank) {
@@ -1188,6 +1205,14 @@ export default class IngameGameState extends GameState<
             swappingPlayer.house = initiator.house;
             initiator.house = swappingHouse;
             this.forceRerender();
+        } else if (message.type == "reveal-orders") {
+            this.ordersOnBoard = new BetterMap(message.orders.map(
+                ([rid, oid]) => [this.world.regions.get(rid), orders.get(oid)]
+            ));
+        } else if (message.type == "remove-orders") {
+            message.regions.map(rid => this.world.regions.get(rid)).forEach(r => {
+                this.ordersOnBoard.delete(r);
+            });
         }
         else {
             this.childGameState.onServerMessage(message);
@@ -1706,6 +1731,7 @@ export default class IngameGameState extends GameState<
             timeoutPlayerIds: this.timeoutPlayerIds,
             game: this.game.serializeToClient(admin, player),
             gameLogManager: this.gameLogManager.serializeToClient(admin, user),
+            ordersOnBoard: this.ordersOnBoard.mapOver(r => r.id, o => o.id),
             votes: this.votes.values.map(v => v.serializeToClient(admin, player)),
             paused: this.paused ? this.paused.getTime() : null,
             willBeAutoResumedAt: this.willBeAutoResumedAt ? this.willBeAutoResumedAt.getTime() : null,
@@ -1724,6 +1750,11 @@ export default class IngameGameState extends GameState<
         ingameGameState.replacerIds = data.replacerIds;
         ingameGameState.timeoutPlayerIds = data.timeoutPlayerIds;
         ingameGameState.votes = new BetterMap(data.votes.map(sv => [sv.id, Vote.deserializeFromServer(ingameGameState, sv)]));
+        ingameGameState.ordersOnBoard = new BetterMap(
+            data.ordersOnBoard.map(([regionId, orderId]) => (
+                [ingameGameState.world.regions.get(regionId), orders.get(orderId)]
+            ))
+        );
         ingameGameState.gameLogManager = GameLogManager.deserializeFromServer(ingameGameState, data.gameLogManager);
         ingameGameState.paused = data.paused ? new Date(data.paused) : null;
         ingameGameState.willBeAutoResumedAt = data.willBeAutoResumedAt ? new Date(data.willBeAutoResumedAt) : null;
@@ -1767,6 +1798,7 @@ export interface SerializedIngameGameState {
     game: SerializedGame;
     votes: SerializedVote[];
     gameLogManager: SerializedGameLogManager;
+    ordersOnBoard: [string, number][];
     paused: number | null;
     willBeAutoResumedAt: number | null;
     childGameState: SerializedPlanningGameState | SerializedActionGameState | SerializedWesterosGameState

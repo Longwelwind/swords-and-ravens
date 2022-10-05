@@ -88,7 +88,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         const barrelModifiers = new BetterMap<string, number>();
         const crownModifiers = new BetterMap<string, number>();
 
-        for (const region of this.props.ingameGameState.world.regions.values) {
+        for (const region of this.ingame.world.regions.values) {
             if (region.garrison > 0 && !region.isBlocked) {
                 garrisons.set(region.id, getGarrisonToken(region.garrison));
             }
@@ -116,11 +116,11 @@ export default class MapComponent extends Component<MapComponentProps> {
         // If the user is to select a region, we disable the pointer events for units to forward the click event to the region.
         // This makes it easier to hit the ports!
         const disablePointerEventsForUnits = this.props.gameClient.authenticatedUser != null &&
-                this.props.ingameGameState.leafState.getWaitedUsers().includes(this.props.gameClient.authenticatedUser) &&
+                this.ingame.leafState.getWaitedUsers().includes(this.props.gameClient.authenticatedUser) &&
                 propertiesForRegions.values.some(p => p.onClick != undefined || p.wrap != undefined);
 
         const propertiesForUnits = this.getModifiedPropertiesForEntities<Unit, UnitOnMapProperties>(
-            _.flatMap(this.props.ingameGameState.world.regions.values.map(r => r.allUnits)),
+            _.flatMap(this.ingame.world.regions.values.map(r => r.allUnits)),
             this.props.mapControls.modifyUnitsOnMap,
             { highlight: { active: false, color: "white" }, targetRegion: null }
         );
@@ -129,7 +129,7 @@ export default class MapComponent extends Component<MapComponentProps> {
             <div className="map"
                 style={{ backgroundImage: `url(${this.backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem" }}>
                 <div style={{ position: "relative" }}>
-                    {this.props.ingameGameState.world.regions.values.map(r => (
+                    {this.ingame.world.regions.values.map(r => (
                         <div key={`map_${r.id}`}>
                             {castleModifiers.has(r.id) && (
                                 <OverlayTrigger
@@ -343,9 +343,9 @@ export default class MapComponent extends Component<MapComponentProps> {
     }
 
     renderUnits(propertiesForUnits: BetterMap<Unit, UnitOnMapProperties>, garrisons: BetterMap<string, string | null>, disablePointerEvents: boolean): ReactNode {
-        const garrisonControllers = new BetterMap(garrisons.keys.map(rid => [rid, this.props.ingameGameState.world.regions.get(rid).getController()]));
+        const garrisonControllers = new BetterMap(garrisons.keys.map(rid => [rid, this.ingame.world.regions.get(rid).getController()]));
 
-        return this.props.ingameGameState.world.regions.values.map(r => {
+        return this.ingame.world.regions.values.map(r => {
             let disablePointerEventsForCurrentRegion = disablePointerEvents;
             // If there is a clickable unit (e.g. during mustering), don't disable pointer events!
             if (r.allUnits.map(u => propertiesForUnits.get(u)).some(p => p.onClick != undefined)) {
@@ -377,9 +377,9 @@ export default class MapComponent extends Component<MapComponentProps> {
 
                     const clickable = property.onClick != undefined;
 
-                    const willBeRemoved = this.props.ingameGameState.unitsToBeRemoved?.has(r) && this.props.ingameGameState.unitsToBeRemoved.get(r).includes(u);
-                    const hasBeenAdded = this.props.ingameGameState.unitsToBeAdded?.has(u.id) && this.props.ingameGameState.unitsToBeAdded.get(u.id) == "green";
-                    const hasBeenTransformed = this.props.ingameGameState.unitsToBeAdded?.has(u.id) && this.props.ingameGameState.unitsToBeAdded.get(u.id) == "yellow";
+                    const willBeRemoved = this.ingame.unitsToBeRemoved?.has(r) && this.ingame.unitsToBeRemoved.get(r).includes(u);
+                    const hasBeenAdded = this.ingame.unitsToBeAdded?.has(u.id) && this.ingame.unitsToBeAdded.get(u.id) == "green";
+                    const hasBeenTransformed = this.ingame.unitsToBeAdded?.has(u.id) && this.ingame.unitsToBeAdded.get(u.id) == "yellow";
 
                     return <OverlayTrigger
                         overlay={<Tooltip id={"unit-tooltip-" + u.id} className="tooltip-w-100">
@@ -516,14 +516,14 @@ export default class MapComponent extends Component<MapComponentProps> {
 
     renderOrders(): ReactNode {
         const propertiesForOrders = this.getModifiedPropertiesForEntities<Region, OrderOnMapProperties>(
-            _.flatMap(this.props.ingameGameState.world.regions.values),
+            _.flatMap(this.ingame.world.regions.values),
             this.props.mapControls.modifyOrdersOnMap,
             { highlight: { active: false, color: "white" } }
         );
 
         return propertiesForOrders.map((region, properties) => {
-            if (this.props.ingameGameState.childGameState instanceof PlanningGameState && this.props.ingameGameState.childGameState.childGameState instanceof PlaceOrdersGameState) {
-                const planningGameState = this.props.ingameGameState.childGameState.childGameState;
+            if (this.ingame.childGameState instanceof PlanningGameState && this.ingame.childGameState.childGameState instanceof PlaceOrdersGameState) {
+                const planningGameState = this.ingame.childGameState.childGameState;
                 const orderPresent = planningGameState.placedOrders.has(region);
                 const order = orderPresent ? planningGameState.placedOrders.get(region) : null;
 
@@ -539,14 +539,12 @@ export default class MapComponent extends Component<MapComponentProps> {
 
                     return this.renderOrder(region, order, backgroundUrl, properties, false);
                 }
-            } else if (this.props.ingameGameState.childGameState instanceof ActionGameState) {
-                const actionGameState = this.props.ingameGameState.childGameState;
-
-                if (!actionGameState.ordersOnBoard.has(region)) {
+            } else {
+                if (!this.ingame.ordersOnBoard.has(region)) {
                     return;
                 }
 
-                const order = actionGameState.ordersOnBoard.get(region);
+                const order = this.ingame.ordersOnBoard.get(region);
 
                 return this.renderOrder(region, order, orderImages.get(order.type.id), properties, true);
             }
@@ -623,7 +621,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                             "highlight-red hover-strong-outline-red": order && properties.highlight.active && properties.highlight.color == "red",
                             "restricted-order": planningOrAction && order && this.ingame.game.isOrderRestricted(region, order, planningOrAction.planningRestrictions),
                             "clickable": clickable,
-                            "pulsate-bck_fade-out": this.ingame.actionState?.ordersToBeRemoved?.has(region)
+                            "pulsate-bck_fade-out": this.ingame.ordersToBeRemoved.has(region)
                         }
                     )}
                         style={{ left: region.orderSlot.x, top: region.orderSlot.y}}
@@ -646,7 +644,7 @@ export default class MapComponent extends Component<MapComponentProps> {
     }
 
     getRegionPath(region: Region): string {
-        const points = this.props.ingameGameState.world.getContinuousBorder(region);
+        const points = this.ingame.world.getContinuousBorder(region);
 
         return points.map(p => p.x + "," + p.y).join(" ");
     }

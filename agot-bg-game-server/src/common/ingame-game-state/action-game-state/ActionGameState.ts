@@ -5,7 +5,6 @@ import Order from "../game-data-structure/Order";
 import EntireGame from "../../EntireGame";
 import ResolveMarchOrderGameState, {SerializedResolveMarchOrderGameState} from "./resolve-march-order-game-state/ResolveMarchOrderGameState";
 import orders from "../game-data-structure/orders";
-import {observable} from "mobx";
 import Player from "../Player";
 import {ClientMessage} from "../../../messages/ClientMessage";
 import {ServerMessage} from "../../../messages/ServerMessage";
@@ -38,10 +37,6 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
                                                                         | ReconcileArmiesGameState<ActionGameState> | ScoreObjectivesGameState>
 {
     planningRestrictions: PlanningRestriction[];
-    @observable ordersOnBoard: BetterMap<Region, Order>;
-
-    // Client-side only
-    @observable ordersToBeRemoved: BetterMap<Region, "yellow" | "red"> = new BetterMap();
 
     get ingame(): IngameGameState {
         return this.parentGameState;
@@ -55,13 +50,16 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
         return this.ingame.entireGame;
     }
 
+    get ordersOnBoard(): BetterMap<Region, Order> {
+        return this.ingame.ordersOnBoard;
+    }
+
     constructor(ingameGameState: IngameGameState) {
         super(ingameGameState);
     }
 
-    firstStart(ordersOnBoard: BetterMap<Region, Order>, planningRestrictions: PlanningRestriction[]): void {
+    firstStart(planningRestrictions: PlanningRestriction[]): void {
         this.planningRestrictions = planningRestrictions;
-        this.ordersOnBoard = ordersOnBoard;
 
         this.ingame.log({
             type: "action-phase-began"
@@ -212,9 +210,9 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
             } else {
                 if (this.ordersOnBoard.has(region)) {
                     if (message.animate) {
-                        this.ordersToBeRemoved.set(region, message.animate);
+                        this.ingame.ordersToBeRemoved.set(region, message.animate);
                         window.setTimeout(() => {
-                            this.ordersToBeRemoved.delete(region);
+                            this.ingame.ordersToBeRemoved.delete(region);
                             this.ordersOnBoard.delete(region);
                         }, 4000);
                     } else {
@@ -295,7 +293,6 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
     serializeToClient(admin: boolean, player: Player | null): SerializedActionGameState {
         return {
             type: "action",
-            ordersOnBoard: this.ordersOnBoard.mapOver(r => r.id, o => o.id),
             planningRestrictions: this.planningRestrictions.map(r => r.id),
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
@@ -304,11 +301,6 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
     static deserializeFromServer(ingameGameState: IngameGameState, data: SerializedActionGameState): ActionGameState {
         const actionGameState = new ActionGameState(ingameGameState);
 
-        actionGameState.ordersOnBoard = new BetterMap(
-            data.ordersOnBoard.map(([regionId, orderId]) => (
-                [ingameGameState.world.regions.get(regionId), orders.get(orderId)]
-            ))
-        );
         actionGameState.planningRestrictions = data.planningRestrictions ? data.planningRestrictions.map(id => planningRestrictions.get(id)) : [];
         actionGameState.childGameState = actionGameState.deserializeChildGameState(data.childGameState);
 
@@ -336,7 +328,6 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
 export interface SerializedActionGameState {
     type: "action";
     planningRestrictions: string[];
-    ordersOnBoard: [string, number][];
     childGameState: SerializedUseRavenGameState | SerializedResolveMarchOrderGameState | SerializedResolveRaidOrderGameState
         | SerializedResolveConsolidatePowerGameState | SerializedReconcileArmiesGameState | SerializedScoreObjectivesGameState;
 }

@@ -31,7 +31,8 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | UpdateCompletedObjectives | UpdateSecretObjectives | SyncShiftingAmbitionsGameState | HideOrRevealUserNames | ClearChatRoom
     | UpdateSelectableObjectives | UpdateSpecialHouseCardModifier | UpdateUsurper
     | StartPlayerClock | StopPlayerClock | GamePaused | GameResumed | LaterHouseCardsApplied
-    | WildlingTiesResolved | PreemptiveRaidNewAttack | GameStarted | ReadyCheck | HousesSwapped;
+    | WildlingTiesResolved | PreemptiveRaidNewAttack | GameStarted | ReadyCheck | HousesSwapped
+    | RevealOrders | RemoveOrders;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -520,4 +521,14 @@ interface HousesSwapped {
     type: "houses-swapped";
     initiator: string;
     swappingUser: string;
+}
+
+interface RevealOrders {
+    type: "reveal-orders";
+    orders: [string, number][];
+}
+
+interface RemoveOrders {
+    type: "remove-orders";
+    regions: string[];
 }
