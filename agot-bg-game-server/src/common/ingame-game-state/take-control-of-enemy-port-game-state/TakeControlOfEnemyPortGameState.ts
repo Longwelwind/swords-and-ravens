@@ -93,7 +93,7 @@ export default class TakeControlOfEnemyPortGameState extends GameState<ParentGam
                 type: "add-units",
                 regionId: this.port.id,
                 units: shipsToAdd.map(ship => ship.serializeToClient()),
-                animate: "yellow"
+                isTransform: true
             });
         }
 

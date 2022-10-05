@@ -195,7 +195,7 @@ interface AddUnits {
     type: "add-units";
     regionId: string;
     units: SerializedUnit[];
-    animate?: "green" | "yellow";
+    isTransform?: boolean;
 }
 
 interface ChangeWildlingStrength {

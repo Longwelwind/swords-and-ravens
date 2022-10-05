@@ -115,8 +115,7 @@ export default class JonConningtonAbilityGameState extends GameState<
                 this.entireGame.broadcastToClients({
                     type: "add-units",
                     regionId: region.id,
-                    units: [unit.serializeToClient()],
-                    animate: "green"
+                    units: [unit.serializeToClient()]
                 });
             }
 

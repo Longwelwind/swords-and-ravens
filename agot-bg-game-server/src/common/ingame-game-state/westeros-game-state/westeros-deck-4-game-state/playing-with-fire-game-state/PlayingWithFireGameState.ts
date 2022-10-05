@@ -121,8 +121,7 @@ export default class PlayingWithFireGameState extends GameState<WesterosDeck4Gam
             this.entireGame.broadcastToClients({
                 type: "add-units",
                 regionId: this.region.id,
-                units: [newUnit.serializeToClient()],
-                animate: "green"
+                units: [newUnit.serializeToClient()]
             });
 
             this.ingame.log({

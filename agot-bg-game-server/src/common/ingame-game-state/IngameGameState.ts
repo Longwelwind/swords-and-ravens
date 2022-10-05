@@ -78,8 +78,9 @@ export default class IngameGameState extends GameState<
     @observable rerender = 0;
     @observable now = new Date();
     @observable marchMarkers: BetterMap<Unit, Region> = new BetterMap();
-    @observable unitsToBeRemoved: BetterMap<Region, Unit[]> = new BetterMap();
-    @observable unitsToBeAdded: BetterMap<number, "green" | "yellow"> = new BetterMap();
+    @observable unitsToBeRemoved: Unit[] = [];
+    @observable createdUnits: Unit[] = [];
+    @observable transformedUnits: Unit[] = [];
     @observable ordersToBeRemoved: BetterMap<Region, "yellow" | "red"> = new BetterMap();
     @observable ordersRevealed = false;
 
@@ -681,7 +682,7 @@ export default class IngameGameState extends GameState<
             type: "add-units",
             regionId: region.id,
             units: transformed.map(u => u.serializeToClient()),
-            animate: "yellow"
+            isTransform: true
         });
 
         return transformed;
@@ -969,16 +970,18 @@ export default class IngameGameState extends GameState<
                 return unit;
             });
 
-            if (message.animate) {
-                units.forEach(unit => {
-                    this.unitsToBeAdded.set(unit.id, message.animate as "green" | "yellow");
-                });
-                window.setTimeout(() => {
-                    units.forEach(unit => {
-                        this.unitsToBeAdded.delete(unit.id);
-                    });
-                }, 4000);
+            if (message.isTransform) {
+                this.transformedUnits.push(...units);
+            } else {
+                this.createdUnits.push(...units);
             }
+            window.setTimeout(() => {
+                if (message.isTransform) {
+                    _.pull(this.transformedUnits, ...units);
+                } else {
+                    _.pull(this.createdUnits, ...units);
+                }
+            }, 4000);
         } else if (message.type == "change-garrison") {
             const region = this.world.regions.get(message.region);
 
@@ -988,9 +991,9 @@ export default class IngameGameState extends GameState<
             const units = message.unitIds.map(uid => region.units.get(uid));
 
             if (message.animate) {
-                this.unitsToBeRemoved.set(region, units);
+                this.unitsToBeRemoved.push(...units);
                 window.setTimeout(() => {
-                    this.unitsToBeRemoved.delete(region);
+                    _.pull(this.unitsToBeRemoved, ...units);
                     units.forEach(unit => region.units.delete(unit.id));
                 }, 4000);
             } else {
