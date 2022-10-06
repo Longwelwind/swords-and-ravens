@@ -17,7 +17,7 @@ export default class ViserysTargaryenHouseCardAbility extends HouseCardAbility {
     }
 
     afterWinnerDetermination(afterWinnerDetermination: AfterWinnerDeterminationGameState, house: House, houseCard: HouseCard): void {
-        if (afterWinnerDetermination.postCombatGameState.loser == house && house.houseCards.has(houseCard.id)) {
+        if (afterWinnerDetermination.postCombatGameState.loser == house) {
             afterWinnerDetermination.game.deletedHouseCards.set(houseCard.id, houseCard);
             afterWinnerDetermination.entireGame.broadcastToClients({
                 type: "update-deleted-house-cards",

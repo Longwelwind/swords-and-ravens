@@ -17,7 +17,7 @@ export default class IllyrioMopatisHouseCardAbility extends HouseCardAbility {
             powerTokensGained: powerTokensGained
         });
 
-        if (house.powerTokens >= 5 && house.houseCards.has(houseCard.id)) {
+        if (house.powerTokens >= 5) {
             // Opponent house card may have been removed from game already
             afterCombat.game.deletedHouseCards.set(houseCard.id, houseCard);
             afterCombat.entireGame.broadcastToClients({

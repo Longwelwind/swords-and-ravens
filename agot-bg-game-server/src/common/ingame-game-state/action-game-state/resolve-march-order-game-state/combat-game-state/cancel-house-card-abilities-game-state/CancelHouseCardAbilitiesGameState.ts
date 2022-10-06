@@ -39,12 +39,7 @@ export default class CancelHouseCardAbilitiesGameState extends GameState<
     }
 
     resolveHouseCard(house: House, houseCard: HouseCard): void {
-        if (!houseCard.ability) {
-            this.childGameState.onHouseCardResolutionFinish(house);
-            return;
-        }
-
-        houseCard.ability.cancel(this, house, houseCard);
+        houseCard.ability?.cancel(this, house, houseCard);
     }
 
     onHouseCardResolutionFinish(): void {
