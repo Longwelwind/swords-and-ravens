@@ -120,6 +120,9 @@ export default class World {
     }
 
     getReachableRegions(startingRegion: Region, house: House, army: Unit[], viaTransportOnly = false, retreat = false): Region[] {
+        if (army.length == 0) {
+            return [];
+        }
         let regionsToCheck: Region[] = this.getNeighbouringRegions(startingRegion);
         const checkedRegions: Region[] = [];
         const reachableRegions: Region[] = [];
@@ -127,7 +130,7 @@ export default class World {
         // Check that all units of the army are of the same kind
         const regionKindOfArmy = army[0].type.walksOn;
         if (!army.every(u => u.type.walksOn == regionKindOfArmy)) {
-            throw new Error();
+            throw new Error(`Different walksOn unit types present in '${startingRegion.name}'`);
         }
 
         if (army.every(u => u.type == dragon) && !retreat && !viaTransportOnly) {

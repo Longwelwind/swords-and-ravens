@@ -80,7 +80,8 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                 houseCard: houseCard,
                 armyUnits: stat.armyUnits.map(ut => unitTypes.get(ut)),
                 woundedUnits: stat.woundedUnits.map(ut => unitTypes.get(ut)),
-                tidesOfBattleCard: tidesOfBattleCard};
+                tidesOfBattleCard: tidesOfBattleCard,
+                houseCardBackId: this.getHouseCardBackId(house)};
             })
             : [
                 {

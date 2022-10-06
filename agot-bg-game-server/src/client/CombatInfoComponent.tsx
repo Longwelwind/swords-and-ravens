@@ -11,6 +11,7 @@ import houseCardsBackImages from "./houseCardsBackImages";
 import { TidesOfBattleCard } from "../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
 import TidesOfBattleCardComponent from "./game-state-panel/utils/TidesOfBattleCardComponent";
 import UnitIconComponent from "./UnitIconComponent";
+import classNames from "classnames";
 
 interface HouseCombatData {
     house: House;
@@ -97,31 +98,33 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                 </div>
 
                 <div style={{gridRow: "2 / span 4", gridColumn: "1"}}>
-                    {this.attacker.houseCard ? (
-                        <HouseCardComponent houseCard={this.attacker.houseCard}
-                                            size="small" />
-                    ) : this.attacker.houseCardBackId
-                    ? <div
-                            className="vertical-game-card small"
-                            style={{
-                                backgroundImage: `url(${houseCardsBackImages.get(this.attacker.houseCardBackId)})`
-                            }}
-                        />
+                    {this.attacker.houseCard
+                        ? <HouseCardComponent houseCard={this.attacker.houseCard} size="small" />
+                        : this.attacker.houseCardBackId
+                            ? <div className={classNames(
+                                "vertical-game-card small",
+                                {
+                                    "flip-vertical-right": this.props.housesCombatData.every(hcd => hcd.houseCardBackId)
+                                })}
+                                style={{
+                                    backgroundImage: `url(${houseCardsBackImages.get(this.attacker.houseCardBackId)})`
+                                }}/>
                     : <div className="vertical-game-card game-card-slot small"/>}
 
                 </div>
 
                 <div style={{gridRow: "2 / span 4", gridColumn: "5"}}>
-                    {this.defender.houseCard ? (
-                        <HouseCardComponent houseCard={this.defender.houseCard}
-                                            size="small" />
-                    ) : this.defender.houseCardBackId
-                    ? <div
-                            className="vertical-game-card small"
-                            style={{
-                                backgroundImage: `url(${houseCardsBackImages.get(this.defender.houseCardBackId)})`
-                            }}
-                        />
+                    {this.defender.houseCard
+                        ? <HouseCardComponent houseCard={this.defender.houseCard} size="small" />
+                        : this.defender.houseCardBackId
+                            ? <div className={classNames(
+                                "vertical-game-card small",
+                                {
+                                    "flip-vertical-right": this.props.housesCombatData.every(hcd => hcd.houseCardBackId)
+                                })}
+                                style={{
+                                    backgroundImage: `url(${houseCardsBackImages.get(this.defender.houseCardBackId)})`
+                                }}/>
                     : <div className="vertical-game-card game-card-slot small"/>}
                 </div>
 
