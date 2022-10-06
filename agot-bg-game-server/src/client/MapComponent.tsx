@@ -538,7 +538,8 @@ export default class MapComponent extends Component<MapComponentProps> {
 
                 if (!controller) {
                     // Should never happen. If there's an order, there's a controller.
-                    throw new Error("Should never happen. If there's an order, there's a controller.");
+                    console.warn(`Region '${region.name}' has order but no controller!`);
+                    return null;
                 }
 
                 const backgroundUrl = order ? orderImages.get(order.type.id) : houseOrderImages.get(controller.id);
