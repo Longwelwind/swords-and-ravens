@@ -528,23 +528,28 @@ export default class MapComponent extends Component<MapComponentProps> {
                 const placeOrders = this.ingame.childGameState.childGameState;
                 orderPresent = placeOrders.placedOrders.has(region);
                 order = orderPresent ? placeOrders.placedOrders.get(region) : null;
+            } else if (this.ingame.hiddenOrdersToBeRevealed.length > 0) {
+                orderPresent = this.ingame.hiddenOrdersToBeRevealed.includes(region);
             } else {
                 orderPresent = this.ingame.ordersOnBoard.has(region);
                 order = orderPresent ? this.ingame.ordersOnBoard.get(region) : null;
             }
 
             if (orderPresent) {
-                const controller = region.getController();
+                let backgroundUrl: string | null = null;
 
-                if (!controller) {
-                    // Should never happen. If there's an order, there's a controller.
-                    console.warn(`Region '${region.name}' has order but no controller!`);
-                    return null;
+                if (order != null) {
+                    backgroundUrl = orderImages.get(order.type.id);
+                } else {
+                    const controller = region.getController();
+                    if (controller) {
+                        backgroundUrl = houseOrderImages.get(controller.id);
+                    }
                 }
 
-                const backgroundUrl = order ? orderImages.get(order.type.id) : houseOrderImages.get(controller.id);
-
-                return this.renderOrder(region, order, backgroundUrl, properties);
+                if (backgroundUrl) {
+                    return this.renderOrder(region, order, backgroundUrl, properties);
+                }
             }
 
             return null;
@@ -629,7 +634,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                             className={classNames("order-icon", {
                                 "order-border": drawBorder,
                                 "pulsate-bck_fade-out": this.ingame.ordersToBeRemoved.has(region),
-                                "flip-vertical-right": this.ingame.ordersRevealed
+                                "flip-vertical-right": this.ingame.hiddenOrdersToBeRevealed.length > 0
                             } )}
                         />
                     </div>
