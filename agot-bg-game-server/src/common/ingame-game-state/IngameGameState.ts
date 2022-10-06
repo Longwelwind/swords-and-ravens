@@ -64,12 +64,11 @@ export default class IngameGameState extends GameState<
     timeoutPlayerIds: string[] = [];
     game: Game;
     gameLogManager: GameLogManager = new GameLogManager(this);
-    // Support Order | null client side to animate order swap
-    @observable ordersOnBoard: BetterMap<Region, Order | null> = new BetterMap();
+    @observable ordersOnBoard: BetterMap<Region, Order> = new BetterMap();
 
     votes: BetterMap<string, Vote> = new BetterMap();
-    @observable paused: Date | null;
-    @observable willBeAutoResumedAt: Date | null;
+    @observable paused: Date | null = null;
+    @observable willBeAutoResumedAt: Date | null = null;
 
     // Server-side only
     autoResumeTimeout: NodeJS.Timeout | null = null;
@@ -82,7 +81,7 @@ export default class IngameGameState extends GameState<
     @observable createdUnits: Unit[] = [];
     @observable transformedUnits: Unit[] = [];
     @observable ordersToBeRemoved: BetterMap<Region, "yellow" | "red"> = new BetterMap();
-    @observable ordersRevealed = false;
+    @observable hiddenOrdersToBeRevealed: Region[] = [];
 
     onVoteStarted: (() => void) | null = null;
     onPreemptiveRaidNewAttack: ((biddings: [number, House[]][], highestBidder: House) => void) | null = null;
@@ -1210,15 +1209,13 @@ export default class IngameGameState extends GameState<
             initiator.house = swappingHouse;
             this.forceRerender();
         } else if (message.type == "reveal-orders") {
-            this.ordersOnBoard = new BetterMap(message.orders.map(
-                ([rid, _oid]) => [this.world.regions.get(rid), null]
-            ));
-            this.ordersRevealed = true;
+            this.hiddenOrdersToBeRevealed = message.orders.map(
+                ([rid, _oid]) => this.world.regions.get(rid));
             window.setTimeout(() => {
-                this.ordersRevealed = false;
                 this.ordersOnBoard = new BetterMap(message.orders.map(
                     ([rid, oid]) => [this.world.regions.get(rid), orders.get(oid)]
                 ));
+                this.hiddenOrdersToBeRevealed = [];
             }, 1500);
         } else if (message.type == "remove-orders") {
             message.regions.map(rid => this.world.regions.get(rid)).forEach(r => {
@@ -1742,7 +1739,7 @@ export default class IngameGameState extends GameState<
             timeoutPlayerIds: this.timeoutPlayerIds,
             game: this.game.serializeToClient(admin, player),
             gameLogManager: this.gameLogManager.serializeToClient(admin, user),
-            ordersOnBoard: this.ordersOnBoard.mapOver(r => r.id, o => o?.id ?? -1),
+            ordersOnBoard: this.ordersOnBoard.mapOver(r => r.id, o => o.id),
             votes: this.votes.values.map(v => v.serializeToClient(admin, player)),
             paused: this.paused ? this.paused.getTime() : null,
             willBeAutoResumedAt: this.willBeAutoResumedAt ? this.willBeAutoResumedAt.getTime() : null,
