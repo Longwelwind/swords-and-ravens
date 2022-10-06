@@ -45,12 +45,7 @@ export default class ImmediatelyHouseCardAbilitiesResolutionGameState extends Ga
     }
 
     resolveHouseCard(house: House, houseCard: HouseCard): void {
-        if (!houseCard.ability) {
-            this.childGameState.onHouseCardResolutionFinish(house);
-            return;
-        }
-
-        houseCard.ability.immediatelyResolution(this, house, houseCard);
+        houseCard.ability?.immediatelyResolution(this, house, houseCard);
     }
 
     onHouseCardResolutionFinish(): void {

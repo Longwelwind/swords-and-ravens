@@ -46,12 +46,7 @@ export default class BeforeCombatHouseCardAbilitiesGameState extends GameState<
     }
 
     resolveHouseCard(house: House, houseCard: HouseCard): void {
-        if (!houseCard.ability) {
-            this.childGameState.onHouseCardResolutionFinish(house);
-            return;
-        }
-
-        houseCard.ability.beforeCombatResolution(this, house, houseCard);
+        houseCard.ability?.beforeCombatResolution(this, house, houseCard);
     }
 
     onHouseCardResolutionFinish(): void {

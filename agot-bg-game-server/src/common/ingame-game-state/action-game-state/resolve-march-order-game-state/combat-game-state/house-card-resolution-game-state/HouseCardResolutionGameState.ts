@@ -58,7 +58,7 @@ export default class HouseCardResolutionGameState<P extends ParentGameState, C e
 
         const houseCard = this.combatGameState.houseCombatDatas.get(nextHouse).houseCard;
 
-        if (houseCard == null) {
+        if (houseCard == null || houseCard.ability == null || !nextHouse.houseCards.has(houseCard.id)) {
             this.resolvedHouses.push(nextHouse);
             this.resolveNextHouseCard();
             return;

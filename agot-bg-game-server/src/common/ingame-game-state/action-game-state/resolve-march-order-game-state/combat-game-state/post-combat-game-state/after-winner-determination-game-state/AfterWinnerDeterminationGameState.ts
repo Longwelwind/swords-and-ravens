@@ -56,12 +56,7 @@ export default class AfterWinnerDeterminationGameState extends GameState<
     }
 
     resolveHouseCard(house: House, houseCard: HouseCard): void {
-        if (!houseCard.ability) {
-            this.childGameState.onHouseCardResolutionFinish(house);
-            return;
-        }
-
-        houseCard.ability.afterWinnerDetermination(this, house, houseCard);
+        houseCard.ability?.afterWinnerDetermination(this, house, houseCard);
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {

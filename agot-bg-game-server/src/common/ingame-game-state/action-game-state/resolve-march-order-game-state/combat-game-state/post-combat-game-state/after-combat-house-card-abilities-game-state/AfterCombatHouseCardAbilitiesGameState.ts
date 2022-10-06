@@ -47,12 +47,7 @@ export default class AfterCombatHouseCardAbilitiesGameState extends GameState<
     }
 
     resolveHouseCard(house: House, houseCard: HouseCard): void {
-        if (!houseCard.ability) {
-            this.childGameState.onHouseCardResolutionFinish(house);
-            return;
-        }
-
-        houseCard.ability.afterCombat(this, house, houseCard);
+        houseCard.ability?.afterCombat(this, house, houseCard);
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
