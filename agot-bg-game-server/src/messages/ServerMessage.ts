@@ -240,6 +240,7 @@ interface MoveUnits {
     from: string;
     to: string;
     units: number[];
+    isRetreat?: boolean;
 }
 
 interface NewTurn {

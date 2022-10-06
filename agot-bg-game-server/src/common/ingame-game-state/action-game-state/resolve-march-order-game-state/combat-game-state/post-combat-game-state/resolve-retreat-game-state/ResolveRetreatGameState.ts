@@ -184,15 +184,18 @@ export default class ResolveRetreatGameState extends GameState<
             }
 
             // Retreat those unit to this location
-            armyLeft.forEach(u => this.postCombat.loserCombatData.region.units.delete(u.id));
-            armyLeft.forEach(u => this.retreatRegion?.units.set(u.id, u));
-            armyLeft.forEach(u => u.region = this.retreatRegion as Region);
+            armyLeft.forEach(u => {
+                this.postCombat.loserCombatData.region.units.delete(u.id);
+                this.retreatRegion?.units.set(u.id, u);
+                u.region = this.retreatRegion as Region;
+            });
 
             this.entireGame.broadcastToClients({
                 type: "move-units",
                 from: this.postCombat.loserCombatData.region.id,
                 to: this.retreatRegion.id,
-                units: armyLeft.map(u => u.id)
+                units: armyLeft.map(u => u.id),
+                isRetreat: true
             });
         }
 

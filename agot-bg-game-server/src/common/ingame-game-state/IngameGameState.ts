@@ -1022,7 +1022,7 @@ export default class IngameGameState extends GameState<
                     to.units.set(u.id, u);
                     u.region = to;
                 });
-            }, 5000);
+            }, message.isRetreat ? 4500 : 5000);
         } else if (message.type == "units-wounded") {
             const region = this.world.regions.get(message.regionId);
             const units = message.unitIds.map(uid => region.units.get(uid));
