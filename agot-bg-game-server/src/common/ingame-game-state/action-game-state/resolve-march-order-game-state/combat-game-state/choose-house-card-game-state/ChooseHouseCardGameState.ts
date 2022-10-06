@@ -263,7 +263,8 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                 type: "change-combat-house-card",
                 // Same here, the houseCards will always be non-null
                 // @ts-expect-error House card is never null here
-                houseCardIds: this.combatGameState.houseCombatDatas.map((h, hcd) => [h.id, hcd.houseCard.id])
+                houseCardIds: this.combatGameState.houseCombatDatas.map((h, hcd) => [h.id, hcd.houseCard.id]),
+                animate: true
             });
 
             this.combatGameState.onChooseHouseCardGameStateEnd();

@@ -516,14 +516,27 @@ export default class CombatGameState extends GameState<
                 this.game.houses.get(houseId),
                 houseCardId ? this.ingameGameState.game.getHouseCardById(houseCardId) : null
             ]);
+            const action = (): void => {
+                houseCards.forEach(([house, houseCard]) => {
+                    this.houseCombatDatas.get(house).houseCard = houseCard;
+                    if (houseCard == null) {
+                        this.houseCombatDatas.get(house).houseCardChosen = false;
+                    }
+                });
+                this.rerender++;
+            };
 
-            houseCards.forEach(([house, houseCard]) => {
-                this.houseCombatDatas.get(house).houseCard = houseCard;
-                if (houseCard == null) {
-                    this.houseCombatDatas.get(house).houseCardChosen = false;
-                }
-            });
-            this.rerender++;
+            if (message.animate) {
+                houseCards.forEach(([house, _houseCard]) => {
+                    const hcd = this.houseCombatDatas.get(house);
+                    hcd.houseCard = null;
+                    hcd.houseCardChosen = true;
+                });
+                this.rerender++;
+                window.setTimeout(action, 1500);
+            } else {
+                action();
+            }
         } else if (message.type == "change-combat-tides-of-battle-card") {
             const drawnTidesOfBattleCards: [House, TidesOfBattleCard | null][] = message.tidesOfBattleCardIds.map(([houseId, tobId]) => [
                 this.game.houses.get(houseId),

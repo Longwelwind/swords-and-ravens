@@ -99,6 +99,7 @@ interface HouseCardChosen {
 interface ChangeCombatHouseCard {
     type: "change-combat-house-card";
     houseCardIds: [string, string | null][];
+    animate?: boolean;
 }
 
 interface ChangeCombatTidesOfBattleCard {
