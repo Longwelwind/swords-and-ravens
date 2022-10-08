@@ -20,9 +20,10 @@ import { preventOverflow } from "@popperjs/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
-import { knight } from "../../common/ingame-game-state/game-data-structure/unitTypes";
+import { knight, ship } from "../../common/ingame-game-state/game-data-structure/unitTypes";
 import intenseHorseStallionNeighSound from "../../../public/sounds/intense-horse-stallion-neigh.ogg";
-import footmainYesMyLordSound from "../../../public/sounds/footman-yes-my-lord.ogg";
+import footmanYesMyLordSound from "../../../public/sounds/footman-yes-my-lord.ogg";
+import ayeAyeCaptainSound from "../../../public/sounds/aye-aye-captain.ogg";
 import roarSound from "../../../public/sounds/roar.ogg";
 import popRandom from "../../utils/popRandom";
 
@@ -49,9 +50,12 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
         if (val && this._selectedMarchOrderRegion == null) {
             if (!this.props.gameClient.musicMuted) {
                 const hasKnights = val.units.values.some(u => u.type == knight);
+                const hasShips = val.units.values.some(u => u.type == ship);
                 const audio = new Audio(hasKnights
-                    ? popRandom([intenseHorseStallionNeighSound, roarSound]) ?? intenseHorseStallionNeighSound
-                    : popRandom([footmainYesMyLordSound, roarSound]) ?? footmainYesMyLordSound);
+                    ? popRandom([intenseHorseStallionNeighSound, footmanYesMyLordSound]) ?? intenseHorseStallionNeighSound
+                    : hasShips
+                        ? popRandom([ayeAyeCaptainSound, footmanYesMyLordSound]) ?? ayeAyeCaptainSound
+                        : popRandom([roarSound, footmanYesMyLordSound]) ?? footmanYesMyLordSound);
                 audio.play();
             }
         }
