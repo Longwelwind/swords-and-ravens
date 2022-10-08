@@ -19,6 +19,7 @@ import { faFaceSmile, faSyncAlt } from "@fortawesome/free-solid-svg-icons";
 import notificationSound from "../../../public/sounds/raven_call.ogg";
 import EmojiPicker, { EmojiStyle, SuggestionMode, Theme } from 'emoji-picker-react';
 import { isMobile } from "react-device-detect";
+import classNames from "classnames";
 
 interface ChatComponentProps {
     gameClient: GameClient;
@@ -95,15 +96,16 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                             {this.props.injectBetweenMessages(null, null)}
                         </React.Fragment>
                     )}
-                    {messages.map((m, i) => (
-                        <>
+                    {messages.map((m, i) => {
+                        const onlyEmojis = this.containsOnlyEmojis(m.text);
+                        return <>
                             {/* Inject before the first message */}
                             {i == 0 && (
                                 <React.Fragment key={"injected-before-" + m.id}>
                                     {this.props.injectBetweenMessages(null, m)}
                                 </React.Fragment>
                             )}
-                            <Row noGutters={true} className="flex-nowrap align-items-center" key={m.id}>
+                            <Row noGutters={true} className={classNames("flex-nowrap", {"align-items-center": onlyEmojis})} key={m.id}>
                                 <Col xs="auto" style={{width: "46px"}} className="text-center">
                                     <OverlayTrigger
                                         placement="auto"
@@ -119,7 +121,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                     {this.props.getUserDisplayName(m.user)}
                                 </Col>
                                 <Col style={{overflowWrap: "anywhere"}}>
-                                    <span className={this.containsOnlyEmojis(m.text) ? "make-emojis-large" : ""}>{m.text}</span>
+                                    <span className={onlyEmojis ? "make-emojis-large" : ""}>{m.text}</span>
                                 </Col>
                             </Row>
                             {/* Inject between all messages and after the last */}
@@ -127,7 +129,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                 {this.props.injectBetweenMessages(m, messages.length > i + 1 ? messages[i + 1] : null)}
                             </React.Fragment >
                         </>
-                    ))}
+                    })}
                 </ScrollToBottom>
                 {!this.channel.connected &&
                 <Row noGutters={true} className="flex-nowrap justify-content-center">
