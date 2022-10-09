@@ -69,17 +69,24 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             </Helmet>
             <Col xs={12} className={this.props.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
                 <Row className="justify-content-center align-items-center">
-                    <ClockComponent entireGame={this.props.entireGame} />
-                    {this.renderHouseIcon()}
-                    <Col xs="auto" className="px-3">
-                        <h4>{this.props.entireGame.name}</h4>
-                    </Col>
-                    {this.renderGameTypeBadge()}
-                    {this.renderTidesOfBattleImage()}
-                    {this.renderHouseCardsEvolutionImage()}
-                    {this.renderMapSwitch()}
-                    {this.renderWarnings()}
-                    {this.renderPrivateBadge()}
+                    {(this.ingame?.replayWorldState?.length ?? 0) > 0
+                        ? <>{this.renderReplaySwitch()}
+                            <Col xs="auto" className="px-3">
+                                <h4>{this.props.entireGame.name}</h4>
+                            </Col>
+                        </>
+                        : <><ClockComponent entireGame={this.props.entireGame} />
+                            {this.renderHouseIcon()}
+                            <Col xs="auto" className="px-3">
+                                <h4>{this.props.entireGame.name}</h4>
+                            </Col>
+                            {this.renderGameTypeBadge()}
+                            {this.renderTidesOfBattleImage()}
+                            {this.renderHouseCardsEvolutionImage()}
+                            {this.renderMapSwitch()}
+                            {this.renderWarnings()}
+                            {this.renderPrivateBadge()}
+                        </>}
                 </Row>
             </Col>
             {
@@ -216,6 +223,23 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     }}
                 />
             </Col>;
+    }
+
+    renderReplaySwitch(): ReactNode {
+        return <Col xs="auto">
+            <FormCheck
+                id="replay-mode-switch"
+                type="switch"
+                label={<label htmlFor="replay-mode-switch"><Badge variant="warning">REPLAY MODE</Badge></label>}
+                style={{ marginTop: "-6px" }}
+                checked={(this.props.entireGame.ingameGameState?.replayWorldState?.length ?? 0) > 0}
+                onChange={() => {
+                    if (this.props.entireGame.ingameGameState) {
+                        this.props.entireGame.ingameGameState.replayWorldState = null;
+                    }
+                }}
+            />
+        </Col>;
     }
 
     changeUserSettings(): void {

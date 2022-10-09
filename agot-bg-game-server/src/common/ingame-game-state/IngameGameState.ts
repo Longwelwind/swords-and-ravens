@@ -5,7 +5,7 @@ import {ServerMessage} from "../../messages/ServerMessage";
 import User from "../../server/User";
 import World from "./game-data-structure/World";
 import Player, {SerializedPlayer} from "./Player";
-import Region from "./game-data-structure/Region";
+import Region, { RegionState } from "./game-data-structure/Region";
 import PlanningGameState, {SerializedPlanningGameState} from "./planning-game-state/PlanningGameState";
 import ActionGameState, {SerializedActionGameState} from "./action-game-state/ActionGameState";
 import Order from "./game-data-structure/Order";
@@ -82,6 +82,7 @@ export default class IngameGameState extends GameState<
     @observable transformedUnits: Unit[] = [];
     @observable ordersToBeRemoved: BetterMap<Region, "yellow" | "red"> = new BetterMap();
     @observable hiddenOrdersToBeRevealed: Region[] = [];
+    @observable replayWorldState: RegionState[] | null = null;
 
     onVoteStarted: (() => void) | null = null;
     onPreemptiveRaidNewAttack: ((biddings: [number, House[]][], highestBidder: House) => void) | null = null;

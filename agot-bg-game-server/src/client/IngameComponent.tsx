@@ -111,6 +111,7 @@ import { preemptiveRaid } from "../common/ingame-game-state/game-data-structure/
 import VotesListComponent from "./VotesListComponent";
 import voteSound from "../../public/sounds/vote-started.ogg";
 import swordCuttingAndKillingSound from "../../public/sounds/sword-cutting-and-killing.ogg";
+import WorldStateComponent from "./WorldStateComponent";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -234,16 +235,18 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         {this.renderGameStateColumn()}
                     </Col>
                     {showMap && <Col xs={{span: "auto", order: columnOrders.mapColumn}} style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none"}}>
-                        <div id="map-component" style={{height: this.mapScrollbarEnabled ? "100%" : "auto", overflowY: "auto", overflowX: "hidden", maxHeight: MAP_HEIGHT}}>
-                            <MapComponent
+                    <div id="map-component" style={{ height: this.mapScrollbarEnabled ? "100%" : "auto", overflowY: "auto", overflowX: "hidden", maxHeight: MAP_HEIGHT }}>
+                        {this.ingame.replayWorldState
+                            ? <WorldStateComponent ingameGameState={this.ingame} worldState={this.ingame.replayWorldState} />
+                            : <MapComponent
                                 gameClient={this.gameClient}
                                 ingameGameState={this.ingame}
                                 mapControls={this.mapControls}
                                 collapseClicked={() => this.housesInfosCollapsed = !this.housesInfosCollapsed}
-                            />
-                        </div>
+                            />}
+                    </div>
                     </Col>}
-                    {(!this.housesInfosCollapsed || isMobile) && (
+                    {(!this.housesInfosCollapsed || isMobile) && !this.ingame.replayWorldState && (
                     <Col xs={{ span: "auto", order: columnOrders.housesInfosColumn }} className={this.columnSwapAnimationClassName}
                         style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none"}}
                     >

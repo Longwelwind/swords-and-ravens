@@ -18,6 +18,7 @@ import BetterMap from "../utils/BetterMap";
 import _ from "lodash";
 import getGarrisonToken from "./garrisonTokens";
 import loyaltyTokenImage from "../../public/images/power-tokens/Loyalty.png"
+import { isMobile } from "react-device-detect";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -62,8 +63,9 @@ export default class WorldStateComponent extends Component<WorldStateComponentPr
         }
 
         return (
-            <div className="map"
-                style={{ backgroundImage: `url(${this.backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem" }}>
+            <div className={classNames("map", "animate__animated", "animate__fadeIn", {"clickable-no-underline": !isMobile})}
+                style={{ backgroundImage: `url(${this.backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem" }}
+                onClick={!isMobile ? () => this.ingame.replayWorldState = null : undefined}>
                 <div style={{ position: "relative" }}>
                     {this.props.worldState.map(r => (
                         <div key={`world-state_${r.id}`}>
