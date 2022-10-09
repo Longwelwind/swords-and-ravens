@@ -9,7 +9,7 @@ import House from "../common/ingame-game-state/game-data-structure/House";
 import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
 import World from "../common/ingame-game-state/game-data-structure/World";
 import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
-import Region, { RegionState } from "../common/ingame-game-state/game-data-structure/Region";
+import Region from "../common/ingame-game-state/game-data-structure/Region";
 import {westerosCardTypes} from "../common/ingame-game-state/game-data-structure/westeros-card/westerosCardTypes";
 import {observer} from "mobx-react";
 import WildlingCardComponent from "./game-state-panel/utils/WildlingCardComponent";
@@ -19,7 +19,7 @@ import _ from "lodash";
 import joinReactNodes from "./utils/joinReactNodes";
 import orders from "../common/ingame-game-state/game-data-structure/orders";
 import CombatInfoComponent from "./CombatInfoComponent";
-import { OverlayTrigger, Popover, Tooltip } from "react-bootstrap";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import User from "../server/User";
 import { baseHouseCardsData, adwdHouseCardsData, ffcHouseCardsData, modBHouseCardsData , HouseCardData, asosHouseCardsData } from "../common/ingame-game-state/game-data-structure/createGame";
 import HouseCard from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
@@ -39,8 +39,6 @@ import { ObjectiveCard } from "../common/ingame-game-state/game-data-structure/s
 import crossedSwordsImage from "../../public/images/icons/crossed-swords.svg";
 import mammothImage from "../../public/images/icons/mammoth.svg";
 import getIngameUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
-import WorldStateComponent from "./WorldStateComponent";
 import GameClient from "./GameClient";
 import GameLogManager, { ticksToTime, timeToTicks } from "../common/ingame-game-state/game-data-structure/GameLogManager";
 import { secondsToString } from "./utils/secondsToString";
@@ -1824,15 +1822,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 </p>;
             }
             case "orders-revealed": {
-                return <OverlayTrigger overlay={this.renderOrdersRevealedPopover(data.worldState)}
-                        trigger="click"
-                        placement="auto"
-                        rootClose
-                    >
-                    <p className="clickable link-color">
-                        Orders were revealed.
-                    </p>
-                </OverlayTrigger>;
+                return <p className="clickable link-color" onClick={() => this.props.ingameGameState.replayWorldState = data.worldState}>
+                    Orders were revealed.
+                </p>;
             }
             case "house-cards-returned": {
                 const house = this.game.houses.get(data.house);
@@ -1985,14 +1977,6 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 </>;
             }
         }
-    }
-
-    private renderOrdersRevealedPopover(worldState: RegionState[]): OverlayChildren {
-        return <Popover id="orders-revealed-popover" className="scrollable-popover">
-            <Col className="p-3">
-                <WorldStateComponent ingameGameState={this.ingame} worldState={worldState}/>
-            </Col>
-        </Popover>;
     }
 
     debounceSendGameLogSeen = _.debounce(time => {
