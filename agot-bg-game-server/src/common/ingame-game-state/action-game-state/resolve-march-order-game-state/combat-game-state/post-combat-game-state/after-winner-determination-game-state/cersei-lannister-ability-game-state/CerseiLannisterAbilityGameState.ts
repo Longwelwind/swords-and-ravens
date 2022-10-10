@@ -82,7 +82,7 @@ export default class CerseiLannisterAbilityGameState extends GameState<
     onSelectOrdersFinish(regions: Region[], resolvedAutomatically: boolean): void {
         // Remove the order
         regions.forEach(r => {
-            const order = this.actionGameState.removeOrderFromRegion(r) as Order;
+            const order = this.actionGameState.removeOrderFromRegion(r, false, undefined, undefined, "red") as Order;
 
             this.ingame.log({
                 type: "cersei-lannister-order-removed",

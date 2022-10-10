@@ -431,7 +431,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
 
             const attackingUnits = this.attackingUnits;
 
-            return this.getMarchableUnits(this.selectedMarchOrderRegion).map(u => [
+            const marchableUnits = this.getMarchableUnits(this.selectedMarchOrderRegion).map(u => [
                 u,
                 {
                     highlight: {
@@ -443,7 +443,19 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                 : "white"},
                     onClick: !attackingUnits.includes(u) ? () => this.onUnitClick(this.selectedMarchOrderRegion as Region, u) : undefined
                 }
-            ]);
+            ] as [Unit, PartialRecursive<UnitOnMapProperties>]);
+
+            const movedUnits = _.flatMap(this.props.gameState.world.regions.values.map(r => r.newUnits)).map(u => [
+                u,
+                {
+                    highlight: {
+                        active: true,
+                        color: "yellow"
+                    }
+                }
+            ] as [Unit, PartialRecursive<UnitOnMapProperties>]);
+
+            return _.concat(marchableUnits, movedUnits);
         }
 
         return [];

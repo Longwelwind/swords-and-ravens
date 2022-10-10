@@ -105,8 +105,7 @@ export default class ResolveConsolidatePowerGameState extends GameState<ActionGa
 
     onPlayerMusteringEnd(house: House, regions: Region[]): void {
         // Remove CP* order token
-        // Todo: probably not necessary anymore
-        regions.forEach(r => this.actionGameState.removeOrderFromRegion(r));
+        regions.forEach(r => this.actionGameState.removeOrderFromRegion(r, false, undefined, undefined, "yellow"));
         this.proceedNextResolve(house);
     }
 

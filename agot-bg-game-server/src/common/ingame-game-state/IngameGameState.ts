@@ -80,7 +80,8 @@ export default class IngameGameState extends GameState<
     @observable unitsToBeRemoved: Unit[] = [];
     @observable createdUnits: Unit[] = [];
     @observable transformedUnits: Unit[] = [];
-    @observable ordersToBeRemoved: BetterMap<Region, "yellow" | "red"> = new BetterMap();
+    @observable ordersToBeRemoved: BetterMap<Region, "yellow" | "red" | "white"> = new BetterMap();
+    @observable ordersToBeHighlighted: BetterMap<Region, "yellow" | "red" | "white"> = new BetterMap();
     @observable hiddenOrdersToBeRevealed: Region[] = [];
     @observable replayWorldState: RegionState[] | null = null;
 

@@ -633,6 +633,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                         <div style={{ backgroundImage: `url(${backgroundUrl})`, borderColor: color }}
                             className={classNames("order-icon", {
                                 "order-border": drawBorder,
+                                "pulsate-bck": this.ingame.ordersToBeHighlighted.has(region),
                                 "pulsate-bck_fade-out": this.ingame.ordersToBeRemoved.has(region),
                                 "flip-vertical-right": this.ingame.hiddenOrdersToBeRevealed.length > 0
                             } )}

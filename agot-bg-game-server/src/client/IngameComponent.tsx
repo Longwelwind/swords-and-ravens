@@ -319,7 +319,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             if (this.user && this.columnSwapAnimationClassName == "") {
                                 this.columnSwapAnimationClassName = "animate__animated animate__fadeIn"
                                 this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
-                                window.setTimeout(() => this.columnSwapAnimationClassName = "", 950);
+                                window.setTimeout(() => this.columnSwapAnimationClassName = "", 2050);
                             }
                         }}
                         style={{position: "absolute", left: "0px", padding: "8px", borderStyle: "none"}}
@@ -741,7 +741,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         if (this.user && this.columnSwapAnimationClassName == "") {
                             this.columnSwapAnimationClassName = "animate__animated animate__fadeIn"
                             this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
-                            window.setTimeout(() => this.columnSwapAnimationClassName = "", 950);
+                            window.setTimeout(() => this.columnSwapAnimationClassName = "", 2050);
                         }
                     }}
                     style={{position: "absolute", left: "0px", padding: "8px", borderStyle: "none"}}
@@ -1327,7 +1327,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
-        return this.props.gameState.ordersToBeRemoved.map((r, color) => [
+        return _.concat(this.props.gameState.ordersToBeRemoved.entries, this.props.gameState.ordersToBeHighlighted.entries).map(([r, color]) => [
             r,
             {highlight: {active: true, color: color}}
         ]);

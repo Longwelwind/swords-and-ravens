@@ -704,8 +704,8 @@ hr.red {
   animation-name: fadeIn;
 }
 .animate__animated {
-  -webkit-animation-duration: 1s;
-  animation-duration: 1s;
+  -webkit-animation-duration: 2s;
+  animation-duration: 2s;
   -webkit-animation-fill-mode: both;
   animation-fill-mode: both;
 }
@@ -870,7 +870,7 @@ hr.red {
  * ----------------------------------------
  */
  @-webkit-keyframes fade-out {
-  0% {
+  25% {
     opacity: 1;
   }
   100% {
@@ -878,7 +878,7 @@ hr.red {
   }
 }
 @keyframes fade-out {
-  0% {
+  25% {
     opacity: 1;
   }
   100% {
