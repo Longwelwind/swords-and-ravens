@@ -122,7 +122,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         const propertiesForUnits = this.getModifiedPropertiesForEntities<Unit, UnitOnMapProperties>(
             _.flatMap(this.ingame.world.regions.values.map(r => r.allUnits)),
             this.props.mapControls.modifyUnitsOnMap,
-            { highlight: { active: false, color: "white" }, targetRegion: null }
+            { }
         );
 
         return (
@@ -216,7 +216,7 @@ export default class MapComponent extends Component<MapComponentProps> {
 
     renderMarchMarkers(propertiesForUnits: BetterMap<Unit, UnitOnMapProperties>): ReactNode[] {
         const markers = _.unionBy(
-            propertiesForUnits.entries.filter(([_u, uprop]) => uprop.targetRegion != null).map(([u, uprop]) => [u, uprop.targetRegion] as [Unit, Region]),
+            propertiesForUnits.entries.filter(([_u, uprop]) => uprop.targetRegion != undefined).map(([u, uprop]) => [u, uprop.targetRegion] as [Unit, Region]),
             this.ingame.marchMarkers.entries, ([u, _r]) => u.id)
             .filter(([u, r]) => u.region != r);
 
@@ -377,10 +377,6 @@ export default class MapComponent extends Component<MapComponentProps> {
 
                     const clickable = property.onClick != undefined;
 
-                    const willBeRemoved = this.ingame.unitsToBeRemoved?.includes(u);
-                    const hasBeenAdded = this.ingame.createdUnits?.includes(u);
-                    const hasBeenTransformed = this.ingame.transformedUnits?.includes(u);
-
                     return <OverlayTrigger
                         overlay={<Tooltip id={"unit-tooltip-" + u.id} className="tooltip-w-100">
                             <Col className="text-center"><h6>{u.type.name}<small> of <b>{controller?.name ?? "Unknown"}</b><br /><b>{r.name}</b></small></h6></Col>
@@ -394,19 +390,19 @@ export default class MapComponent extends Component<MapComponentProps> {
                             className={classNames(
                                 "unit-icon",
                                 {
-                                    "hover-weak-outline": !property.highlight.active,
+                                    "hover-weak-outline": !property.highlight?.active,
                                     "clickable hover-strong-outline": clickable,
-                                    "medium-outline": property.highlight.active,
-                                    "highlight-red": (property.highlight.active && property.highlight.color == "red") || willBeRemoved,
-                                    "highlight-yellow": (property.highlight.active && property.highlight.color == "yellow") || hasBeenTransformed,
-                                    "highlight-green": (property.highlight.active && property.highlight.color == "green") || hasBeenAdded,
-                                    "hover-strong-outline-red": property.highlight.color == "red" && clickable,
-                                    "hover-strong-outline-yellow": property.highlight.color == "yellow" && clickable,
-                                    "hover-strong-outline-green": property.highlight.color == "green" && clickable,
+                                    "medium-outline": property.highlight?.active,
+                                    "highlight-red": property.highlight?.active && property.highlight.color == "red",
+                                    "highlight-yellow": property.highlight?.active && property.highlight.color == "yellow",
+                                    "highlight-green": property.highlight?.active && property.highlight.color == "green",
+                                    "hover-strong-outline-red": property.highlight?.active && property.highlight.color == "red" && clickable,
+                                    "hover-strong-outline-yellow": property.highlight?.active && property.highlight.color == "yellow" && clickable,
+                                    "hover-strong-outline-green": property.highlight?.active && property.highlight.color == "green" && clickable,
                                     "disable-pointer-events": disablePointerEventsForCurrentRegion,
-                                    "pulsate-bck": hasBeenTransformed,
-                                    "pulsate-bck_fade-in": hasBeenAdded,
-                                    "pulsate-bck_fade-out": willBeRemoved
+                                    "pulsate-bck": property.animateAttention,
+                                    "pulsate-bck_fade-in": property.animateFadeIn,
+                                    "pulsate-bck_fade-out": property.animateFadeOut
                                 }
                             )}
                             style={{
