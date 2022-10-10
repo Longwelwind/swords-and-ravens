@@ -78,7 +78,7 @@ export default class QueenOfThornsAbilityGameState extends GameState<
 
     onSelectOrdersFinish(regions: Region[], resolvedAutomatically: boolean): void {
         regions.forEach(region => {
-            const removedOrder = this.actionGameState.removeOrderFromRegion(region) as Order;
+            const removedOrder = this.actionGameState.removeOrderFromRegion(region, false, undefined, undefined, "red") as Order;
 
             this.ingame.log({
                 type: "queen-of-thorns-order-removed",

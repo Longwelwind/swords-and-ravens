@@ -4,7 +4,7 @@ import GameClient from "./GameClient";
 import {observer} from "mobx-react";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import MapComponent, { MAP_HEIGHT } from "./MapComponent";
-import MapControls, { OrderOnMapProperties, RegionOnMapProperties } from "./MapControls";
+import MapControls, { OrderOnMapProperties, RegionOnMapProperties, UnitOnMapProperties } from "./MapControls";
 import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import Card from "react-bootstrap/Card";
@@ -92,6 +92,7 @@ import PayDebtsGameState from "../common/ingame-game-state/pay-debts-game-state/
 import PayDebtsComponent from "./game-state-panel/PayDebtsComponent";
 import BetterMap from "../utils/BetterMap";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
+import Unit from "../common/ingame-game-state/game-data-structure/Unit";
 import PartialRecursive from "../utils/PartialRecursive";
 import ChooseInitialObjectivesGameState from "../common/ingame-game-state/choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
 import ChooseInitialObjectivesComponent from "./game-state-panel/ChooseInitialObjectivesComponent";
@@ -135,11 +136,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
     @observable currentOpenedTab = this.user?.settings.lastOpenedTab ?? (this.gameSettings.pbem ? "game-logs" : "chat");
     @observable housesInfosCollapsed = this.user?.settings.tracksColumnCollapsed ?? false;
-    @observable highlightedRegions = new BetterMap<Region, PartialRecursive<RegionOnMapProperties>>();
+    @observable highlightedRegions = new BetterMap<Region, RegionOnMapProperties>();
     @observable showMapScrollbarInfo = false;
     @observable columnSwapAnimationClassName = "";
     modifyRegionsOnMapCallback: any;
     modifyOrdersOnMapCallback: any;
+    modifyUnitsOnMapCallback: any;
     onVisibilityChangedCallback: (() => void) | null = null;
     setIntervalId = -1;
 
@@ -319,7 +321,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             if (this.user && this.columnSwapAnimationClassName == "") {
                                 this.columnSwapAnimationClassName = "animate__animated animate__fadeIn"
                                 this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
-                                window.setTimeout(() => this.columnSwapAnimationClassName = "", 950);
+                                window.setTimeout(() => this.columnSwapAnimationClassName = "", 2050);
                             }
                         }}
                         style={{position: "absolute", left: "0px", padding: "8px", borderStyle: "none"}}
@@ -741,7 +743,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         if (this.user && this.columnSwapAnimationClassName == "") {
                             this.columnSwapAnimationClassName = "animate__animated animate__fadeIn"
                             this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
-                            window.setTimeout(() => this.columnSwapAnimationClassName = "", 950);
+                            window.setTimeout(() => this.columnSwapAnimationClassName = "", 2050);
                         }
                     }}
                     style={{position: "absolute", left: "0px", padding: "8px", borderStyle: "none"}}
@@ -1260,6 +1262,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     componentDidMount(): void {
         this.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
         this.mapControls.modifyOrdersOnMap.push(this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap());
+        this.mapControls.modifyUnitsOnMap.push(this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap());
 
         this.ingame.entireGame.onNewPrivateChatRoomCreated = (roomId: string) => this.onNewPrivateChatRoomCreated(roomId);
 
@@ -1309,6 +1312,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         this.ingame.entireGame.onNewPrivateChatRoomCreated = null;
         _.pull(this.mapControls.modifyRegionsOnMap, this.modifyRegionsOnMapCallback);
         _.pull(this.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
+        _.pull(this.mapControls.modifyUnitsOnMap, this.modifyUnitsOnMapCallback);
 
         const visibilityChangedCallback = this.onVisibilityChangedCallback;
         if (visibilityChangedCallback) {
@@ -1327,13 +1331,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
-        return this.props.gameState.ordersToBeRemoved.map((r, color) => [
-            r,
-            {highlight: {active: true, color: color}}
-        ]);
+        return this.ingame.ordersToBeAnimated.entries;
     }
 
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
         return this.highlightedRegions.entries;
+    }
+
+    modifyUnitsOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {
+        return this.ingame.unitsToBeAnimated.entries;
     }
 }

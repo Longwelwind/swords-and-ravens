@@ -199,13 +199,7 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
                 loan.execute(this, this.house);
             } else if (message.ignoreAndRemoveOrder) {
                 // Remove the order from the board
-                this.ingame.log({
-                    type: "order-removed",
-                    house: this.house.id,
-                    order: order.type.id,
-                    region: regionOfOrder.id
-                });
-                this.actionGameState.removeOrderFromRegion(regionOfOrder, false, this.house, false, "yellow");
+                this.actionGameState.removeOrderFromRegion(regionOfOrder, true, this.house, false, "yellow");
                 this.onResolveSingleConsolidatePowerFinish();
             }
         }

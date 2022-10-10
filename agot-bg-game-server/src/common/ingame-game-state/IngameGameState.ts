@@ -44,6 +44,7 @@ import facelessMenNames from "../../../data/facelessMenNames.json";
 import WildlingCardEffectInTurnOrderGameState from "./westeros-game-state/wildlings-attack-game-state/WildlingCardEffectInTurnOrderGameState";
 import getElapsedSeconds from "../../utils/getElapsedSeconds";
 import orders from "./game-data-structure/orders";
+import { OrderOnMapProperties, UnitOnMapProperties } from "../../client/MapControls";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -77,11 +78,8 @@ export default class IngameGameState extends GameState<
     @observable rerender = 0;
     @observable now = new Date();
     @observable marchMarkers: BetterMap<Unit, Region> = new BetterMap();
-    @observable unitsToBeRemoved: Unit[] = [];
-    @observable createdUnits: Unit[] = [];
-    @observable transformedUnits: Unit[] = [];
-    @observable ordersToBeRemoved: BetterMap<Region, "yellow" | "red"> = new BetterMap();
-    @observable hiddenOrdersToBeRevealed: Region[] = [];
+    @observable unitsToBeAnimated: BetterMap<Unit, UnitOnMapProperties> = new BetterMap();
+    @observable ordersToBeAnimated: BetterMap<Region, OrderOnMapProperties> = new BetterMap();
     @observable replayWorldState: RegionState[] | null = null;
 
     onVoteStarted: (() => void) | null = null;
@@ -970,18 +968,13 @@ export default class IngameGameState extends GameState<
                 return unit;
             });
 
-            if (message.isTransform) {
-                this.transformedUnits.push(...units);
-            } else {
-                this.createdUnits.push(...units);
-            }
-            window.setTimeout(() => {
-                if (message.isTransform) {
-                    _.pull(this.transformedUnits, ...units);
-                } else {
-                    _.pull(this.createdUnits, ...units);
-                }
-            }, 4000);
+            units.forEach(u =>
+                this.unitsToBeAnimated.set(u, {
+                    highlight: {active: true, color: message.isTransform ? "yellow": "green"},
+                    animateAttention: message.isTransform,
+                    animateFadeIn: !message.isTransform
+                }));
+            window.setTimeout(() => units.forEach(u => this.unitsToBeAnimated.delete(u)), 4000);
         } else if (message.type == "change-garrison") {
             const region = this.world.regions.get(message.region);
 
@@ -991,11 +984,15 @@ export default class IngameGameState extends GameState<
             const units = message.unitIds.map(uid => region.units.get(uid));
 
             if (message.animate) {
-                this.unitsToBeRemoved.push(...units);
-                window.setTimeout(() => {
-                    _.pull(this.unitsToBeRemoved, ...units);
-                    units.forEach(unit => region.units.delete(unit.id));
-                }, 4000);
+                units.forEach(u =>
+                    this.unitsToBeAnimated.set(u, {
+                        highlight: {active: true, color: "red"},
+                        animateFadeOut: true
+                    }));
+                window.setTimeout(() => units.forEach(unit => {
+                    region.units.delete(unit.id);
+                    this.unitsToBeAnimated.delete(unit);
+                }), 4000);
             } else {
                 units.forEach(unit => region.units.delete(unit.id));
             }
@@ -1210,13 +1207,16 @@ export default class IngameGameState extends GameState<
             initiator.house = swappingHouse;
             this.forceRerender();
         } else if (message.type == "reveal-orders") {
-            this.hiddenOrdersToBeRevealed = message.orders.map(
-                ([rid, _oid]) => this.world.regions.get(rid));
+            message.orders.forEach(([rid, _oid]) => {
+                const r = this.world.regions.get(rid);
+                this.ordersToBeAnimated.set(r, {animateFlip: true })
+            });
             window.setTimeout(() => {
-                this.ordersOnBoard = new BetterMap(message.orders.map(
-                    ([rid, oid]) => [this.world.regions.get(rid), orders.get(oid)]
-                ));
-                this.hiddenOrdersToBeRevealed = [];
+                this.ordersOnBoard = new BetterMap(message.orders.map(([rid, oid]) => {
+                    const r = this.world.regions.get(rid);
+                    this.ordersToBeAnimated.delete(r);
+                    return [r, orders.get(oid)];
+                }));
             }, 1500);
         } else if (message.type == "remove-orders") {
             message.regions.map(rid => this.world.regions.get(rid)).forEach(r => {

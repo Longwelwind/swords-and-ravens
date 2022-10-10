@@ -96,7 +96,8 @@ export default class MaceTyrellASoSAbilityGameState extends GameState<
             this.combatGameState.entireGame.broadcastToClients({
                 type: "action-phase-change-order",
                 region: this.combatGameState.defendingRegion.id,
-                order: chosenOrder.id
+                order: chosenOrder.id,
+                animate: "white"
             });
             this.ingame.log({
                 type: "mace-tyrell-asos-order-placed",

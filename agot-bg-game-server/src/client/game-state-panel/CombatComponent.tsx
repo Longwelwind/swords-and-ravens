@@ -28,7 +28,7 @@ import CancelHouseCardAbilitiesComponent from "./house-card-abilities/CancelHous
 import Col from "react-bootstrap/Col";
 import CombatInfoComponent from "../CombatInfoComponent";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
-import { RegionOnMapProperties, UnitOnMapProperties } from "../MapControls";
+import { OrderOnMapProperties, RegionOnMapProperties, UnitOnMapProperties } from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
 import _ from "lodash";
 import Unit from "../../common/ingame-game-state/game-data-structure/Unit";
@@ -45,6 +45,7 @@ import combatSound from "../../../public/sounds/combat.ogg";
 export default class CombatComponent extends Component<GameStateComponentProps<CombatGameState>> {
     modifyRegionsOnMapCallback: any;
     modifyUnitsOnMapCallback: any;
+    modifyOrdersOnMapCallback: any;
 
     get combat(): CombatGameState {
         return this.props.gameState;
@@ -185,21 +186,30 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
         const selectUnits = this.combat.hasChildGameState(SelectUnitsGameState) ? this.combat.getChildGameState(SelectUnitsGameState) as SelectUnitsGameState<any>: null;
 
         if (!selectUnits || !this.props.gameClient.doesControlHouse(selectUnits.house)) {
-            return this.combat.attackingArmy.map(u => ([u, {highlight: {active: true, color: "red"}, targetRegion: drawMarchMarkers ? this.combat.defendingRegion : null}]));
+            return this.combat.attackingArmy.map(u => ([u, {highlight: {active: true, color: "red"}, targetRegion: drawMarchMarkers ? this.combat.defendingRegion : undefined}]));
         } else if (this.props.gameClient.doesControlHouse(selectUnits.house)) {
             return [];
         } else {
-            return this.combat.attackingArmy.map(u => ([u, {targetRegion: drawMarchMarkers ? this.combat.defendingRegion : null}]));
+            return this.combat.attackingArmy.map(u => ([u, {targetRegion: drawMarchMarkers ? this.combat.defendingRegion : undefined}]));
         }
+    }
+
+    modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
+        return [this.props.gameState.attackingRegion].map(r => [
+            r,
+            {highlight: {active: true, color: "red"}}
+        ]);
     }
 
     componentDidMount(): void {
         this.props.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
         this.props.mapControls.modifyUnitsOnMap.push(this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap());
+        this.props.mapControls.modifyOrdersOnMap.push(this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap());
     }
 
     componentWillUnmount(): void {
         _.pull(this.props.mapControls.modifyRegionsOnMap, this.modifyRegionsOnMapCallback);
         _.pull(this.props.mapControls.modifyUnitsOnMap, this.modifyUnitsOnMapCallback);
+        _.pull(this.props.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
     }
 }

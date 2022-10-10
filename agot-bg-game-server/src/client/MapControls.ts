@@ -19,15 +19,21 @@ export interface RegionOnMapProperties {
 }
 
 export interface UnitOnMapProperties {
-    highlight: HighlightProperties;
+    highlight?: HighlightProperties;
     onClick?: () => void;
-    targetRegion: Region | null;
+    targetRegion?: Region;
+    animateFadeIn?: boolean;
+    animateFadeOut?: boolean;
+    animateAttention?: boolean;
 }
 
 export interface OrderOnMapProperties {
-    highlight: HighlightProperties;
+    highlight?: HighlightProperties;
     onClick?: () => void;
     wrap?: (child: ReactElement) => ReactElement;
+    animateAttention?: boolean;
+    animateFadeOut?: boolean;
+    animateFlip?: boolean;
 }
 
 export default class MapControls {
