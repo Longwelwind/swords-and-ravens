@@ -130,8 +130,8 @@ export default class ReplaceOrderGameState extends GameState<UseRavenGameState> 
             const order = orders.get(message.orderId);
 
             this.actionGameState.ordersOnBoard.set(region, order);
-            this.ingameGameState.ordersToBeHighlighted.set(region, "white");
-            window.setTimeout(() => this.ingameGameState.ordersToBeHighlighted.delete(region), 3000);
+            this.ingameGameState.ordersToBeAnimated.set(region, {highlight: {active: true, color: "white"}, animateAttention: true});
+            window.setTimeout(() => this.ingameGameState.ordersToBeAnimated.delete(region), 3000);
         }
     }
 

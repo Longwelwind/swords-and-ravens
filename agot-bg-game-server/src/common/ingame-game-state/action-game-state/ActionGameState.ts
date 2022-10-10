@@ -208,17 +208,19 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
             if (order) {
                 this.ordersOnBoard.set(region, order);
                 if (message.animate) {
-                    this.ingame.ordersToBeHighlighted.set(region, message.animate);
+                    this.ingame.ordersToBeAnimated.set(region,
+                        {highlight: {active: true, color: message.animate}, animateAttention: true});
                     window.setTimeout(() => {
-                        this.ingame.ordersToBeHighlighted.delete(region);
+                        this.ingame.ordersToBeAnimated.delete(region);
                     }, 3000);
                 }
             } else {
                 if (this.ordersOnBoard.has(region)) {
                     if (message.animate) {
-                        this.ingame.ordersToBeRemoved.set(region, message.animate);
+                        this.ingame.ordersToBeAnimated.set(region,
+                            {highlight: {active: true, color: message.animate}, animateFadeOut: true});
                         window.setTimeout(() => {
-                            this.ingame.ordersToBeRemoved.delete(region);
+                            this.ingame.ordersToBeAnimated.delete(region);
                             this.ordersOnBoard.delete(region);
                         }, 4000);
                     } else {

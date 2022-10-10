@@ -1327,10 +1327,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
-        return _.concat(this.props.gameState.ordersToBeRemoved.entries, this.props.gameState.ordersToBeHighlighted.entries).map(([r, color]) => [
-            r,
-            {highlight: {active: true, color: color}}
-        ]);
+        return this.ingame.ordersToBeAnimated.entries;
     }
 
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {

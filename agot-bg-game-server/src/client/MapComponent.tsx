@@ -518,7 +518,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         const propertiesForOrders = this.getModifiedPropertiesForEntities<Region, OrderOnMapProperties>(
             _.flatMap(this.ingame.world.regions.values),
             this.props.mapControls.modifyOrdersOnMap,
-            { highlight: { active: false, color: "white" } }
+            { }
         );
 
         return propertiesForOrders.map((region, properties) => {
@@ -528,11 +528,14 @@ export default class MapComponent extends Component<MapComponentProps> {
                 const placeOrders = this.ingame.childGameState.childGameState;
                 orderPresent = placeOrders.placedOrders.has(region);
                 order = orderPresent ? placeOrders.placedOrders.get(region) : null;
-            } else if (this.ingame.hiddenOrdersToBeRevealed.length > 0) {
-                orderPresent = this.ingame.hiddenOrdersToBeRevealed.includes(region);
             } else {
                 orderPresent = this.ingame.ordersOnBoard.has(region);
                 order = orderPresent ? this.ingame.ordersOnBoard.get(region) : null;
+            }
+
+            // Check if we need to animate flip:
+            if (!orderPresent) {
+                orderPresent = this.ingame.ordersToBeAnimated.tryGet(region, null)?.animateFlip ?? false;
             }
 
             if (orderPresent) {
@@ -618,10 +621,10 @@ export default class MapComponent extends Component<MapComponentProps> {
                     <div className={classNames(
                         "order-container",
                         {
-                            "hover-weak-outline": order != null && !properties.highlight.active,
-                            "medium-outline hover-strong-outline": order && properties.highlight.active,
-                            "highlight-yellow hover-strong-outline-yellow": order && properties.highlight.active && properties.highlight.color == "yellow",
-                            "highlight-red hover-strong-outline-red": order && properties.highlight.active && properties.highlight.color == "red",
+                            "hover-weak-outline": order != null && !properties.highlight?.active,
+                            "medium-outline hover-strong-outline": order && properties.highlight?.active,
+                            "highlight-yellow hover-strong-outline-yellow": order && properties.highlight?.active && properties.highlight.color == "yellow",
+                            "highlight-red hover-strong-outline-red": order && properties.highlight?.active && properties.highlight.color == "red",
                             "restricted-order": planningOrAction && order && this.ingame.game.isOrderRestricted(region, order, planningOrAction.planningRestrictions),
                             "clickable": clickable
                         }
@@ -633,9 +636,9 @@ export default class MapComponent extends Component<MapComponentProps> {
                         <div style={{ backgroundImage: `url(${backgroundUrl})`, borderColor: color }}
                             className={classNames("order-icon", {
                                 "order-border": drawBorder,
-                                "pulsate-bck": this.ingame.ordersToBeHighlighted.has(region),
-                                "pulsate-bck_fade-out": this.ingame.ordersToBeRemoved.has(region),
-                                "flip-vertical-right": this.ingame.hiddenOrdersToBeRevealed.length > 0
+                                "pulsate-bck": properties.animateAttention,
+                                "pulsate-bck_fade-out": properties.animateFadeOut,
+                                "flip-vertical-right": properties.animateFlip
                             } )}
                         />
                     </div>
