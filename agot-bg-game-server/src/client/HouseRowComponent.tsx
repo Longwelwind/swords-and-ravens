@@ -121,35 +121,24 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                 <div className={isWaitedFor ? "new-event" : ""} style={{paddingLeft: "8px", paddingRight: "10px", paddingTop: "12px", paddingBottom: "12px"}}>
                 <Row className="align-items-center flex-nowrap">
                     <Col xs="auto" className="pr-0" style={{ width: "32px" }} onMouseEnter={() => this.setHighlightedRegions()} onMouseLeave={() => this.highlightedRegions.clear()}>
-                        {player && player.house.knowsNextWildlingCard
-                            ? <OverlayTrigger
+                        {player
+                            ? <div className={classNames({ "display-none": !currentUserIsCommandingHouse })}>
+                                <div style={{ margin: "-4px" }}>
+                                    <HouseIconComponent house={this.house} small={true}/>
+                                </div>
+                            </div>
+                            : <OverlayTrigger
                                 placement="right"
                                 overlay={
-                                    <Tooltip id={"knows-things-house-" + this.house.id}>
-                                        <b>{this.house.name}</b> knows things.
+                                    <Tooltip id={"vassal-house-" + this.house.id}>
+                                        <b>Vassal</b><br />
+                                        At the beginning of the Planning Phase,
+                                        each player, in order, can pick a vassal to command this turn.
                                     </Tooltip>
                                 }
                             >
-                                <img src={thirdEyeImage} width={28} style={{ margin: "-4px", filter: currentUserIsCommandingHouse ? houseColorFilters.get(this.house.id) : undefined}} />
+                                <img src={battleGearImage} width={32} style={{ margin: "-4px" }} />
                             </OverlayTrigger>
-                            : player
-                                ? <div className={classNames({ "display-none": !currentUserIsCommandingHouse })}>
-                                    <div style={{ margin: "-4px" }}>
-                                        <HouseIconComponent house={this.house} small={true}/>
-                                    </div>
-                                </div>
-                                : <OverlayTrigger
-                                    placement="right"
-                                    overlay={
-                                        <Tooltip id={"vassal-house-" + this.house.id}>
-                                            <b>Vassal</b><br />
-                                            At the beginning of the Planning Phase,
-                                            each player, in order, can pick a vassal to command this turn.
-                                        </Tooltip>
-                                    }
-                                >
-                                    <img src={battleGearImage} width={32} style={{ margin: "-4px" }} />
-                                </OverlayTrigger>
                         }
                     </Col>
                     <Col onMouseEnter={() => this.setHighlightedRegions()} onMouseLeave={() => this.highlightedRegions.clear()} className="pr-0">
@@ -259,46 +248,69 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         <b>{new Date(clock * 1000).toISOString().slice(12,19)}</b>
                     </div>
                 </Row>}
-                <Row className="justify-content-center">
-                    {!isVassal ?
-                        _.sortBy(this.house.houseCards.values, hc => hc.combatStrength).map(hc => (
-                        <Col xs="auto" key={`house-card_${this.house.id}_${hc.id}`}>
-                            {hc.state == HouseCardState.AVAILABLE ? (
-                                <HouseCardComponent
-                                    houseCard={hc}
-                                    size="tiny"
-                                />
-                            ) : (
-                                <HouseCardBackComponent
-                                    house={this.house}
-                                    houseCard={hc}
-                                    size="tiny"
-                                />
-                            )}
+                <Row className="justify-content-around align-items-center">
+                    {player && player.house.knowsNextWildlingCard && (
+                        <Col xs="auto">
+                            <OverlayTrigger
+                                placement="right"
+                                overlay={
+                                    <Tooltip id={"knows-things-house-" + this.house.id}>
+                                        <b>{this.house.name}</b> knows things.
+                                    </Tooltip>
+                                }
+                            >
+                                <img src={thirdEyeImage} width={28} style={{ margin: "-4px", filter: currentUserIsCommandingHouse ? houseColorFilters.get(this.house.id) : undefined }} />
+                            </OverlayTrigger>
                         </Col>
-                    ))
-                    :  _.sortBy(this.game.vassalHouseCards.values, hc => hc.combatStrength).map(hc => (
-                        <Col xs="auto" key={`vassal-cards_${this.house.id}_${hc.id}`}>
-                            <HouseCardComponent
-                                    houseCard={hc}
-                                    size="tiny"
-                            />
-                        </Col>
-                    ))}
-                </Row>
-                {this.house.laterHouseCards != null && !isVassal &&
-                <Row className="justify-content-center">
-                    {_.sortBy(this.house.laterHouseCards.values, hc => hc.combatStrength).map(hc => (
-                        <Col xs="auto" key={`later-cards_${this.house.id}_${hc.id}`}>
-                            <HouseCardComponent
-                                houseCard={hc}
-                                size="tiny"
-                                unavailable
-                            />
-                        </Col>
-                    )
                     )}
-                </Row>}
+                    <Col xs="auto">
+                        <Row className="justify-content-center">
+                            {!isVassal ?
+                                _.sortBy(this.house.houseCards.values, hc => hc.combatStrength).map(hc => (
+                                    <Col xs="auto" key={`house-card_${this.house.id}_${hc.id}`}>
+                                        {hc.state == HouseCardState.AVAILABLE ? (
+                                            <HouseCardComponent
+                                                houseCard={hc}
+                                                size="tiny"
+                                            />
+                                        ) : (
+                                            <HouseCardBackComponent
+                                                house={this.house}
+                                                houseCard={hc}
+                                                size="tiny"
+                                            />
+                                        )}
+                                    </Col>
+                                ))
+                                : _.sortBy(this.game.vassalHouseCards.values, hc => hc.combatStrength).map(hc => (
+                                    <Col xs="auto" key={`vassal-cards_${this.house.id}_${hc.id}`}>
+                                        <HouseCardComponent
+                                            houseCard={hc}
+                                            size="tiny"
+                                        />
+                                    </Col>
+                                ))}
+                        </Row>
+                        {this.house.laterHouseCards != null && !isVassal &&
+                            <Row className="justify-content-center">
+                                {_.sortBy(this.house.laterHouseCards.values, hc => hc.combatStrength).map(hc => (
+                                    <Col xs="auto" key={`later-cards_${this.house.id}_${hc.id}`}>
+                                        <HouseCardComponent
+                                            houseCard={hc}
+                                            size="tiny"
+                                            unavailable
+                                        />
+                                    </Col>
+                                ))}
+                            </Row>
+                        }
+                    </Col>
+                    {player && player.house.knowsNextWildlingCard && (
+                        <Col xs="auto">
+                            <img src={thirdEyeImage} width={28} className="invisible" />
+                        </Col>
+                    )}
+                </Row>
                 </div>
             </ListGroupItem>
         </>;
