@@ -78,7 +78,7 @@ export default class TakeControlOfEnemyPortGameState extends GameState<ParentGam
     onSimpleChoiceGameStateEnd(choice: number, resolvedAutomatically: boolean): void {
         // Remove ships from old controller
         const oldController = this.port.units.values[0].allegiance;
-        destroyAllShipsInPort(this.port, this.ingame, this.parentGameState.action, false);
+        destroyAllShipsInPort(this.port, this.ingame, this.parentGameState.action, choice == 0);
 
         if(choice > 0) {
             // Add ships for new controller
