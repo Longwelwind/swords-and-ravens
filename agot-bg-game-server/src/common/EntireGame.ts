@@ -511,8 +511,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         }
     }
 
-    broadcastToClients(message: ServerMessage): void {
-        this.sendMessageToClients(this.users.values, message);
+    broadcastToClients(message: ServerMessage, except: User[] = []): void {
+        this.sendMessageToClients(_.difference(this.users.values, except), message);
     }
 
     sendMessageToServer(message: ClientMessage): void {

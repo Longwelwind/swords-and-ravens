@@ -113,6 +113,7 @@ import VotesListComponent from "./VotesListComponent";
 import voteSound from "../../public/sounds/vote-started.ogg";
 import swordCuttingAndKillingSound from "../../public/sounds/sword-cutting-and-killing.ogg";
 import WorldStateComponent from "./WorldStateComponent";
+import { houseColorFilters } from "./houseColorFilters";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -209,6 +210,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             housePowerTokensImages.set("stark", housePowerTokensImages.get("bolton"));
             unitImages.set("stark", unitImages.get("bolton"));
             houseIconImages.set("stark", houseIconImages.get("bolton"));
+            houseColorFilters.set("stark", houseColorFilters.get("bolton"));
         }
     }
 
@@ -714,7 +716,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     placement="auto"
                                     rootClose
                                 >
-                                    <div>
+                                    <div className={classNames({"txt-warning": wildlingsWarning, "txt-critical" : wildlingsCritical})}>
                                         <img src={mammothImage} width={28} className={classNames(
                                             { "dye-warning": wildlingsWarning && !warningAndKnowsNextWildingCard },
                                             { "dye-critical": wildlingsCritical && !criticalAndKnowsNextWildingCard },
@@ -723,7 +725,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                             { "dye-critical-highlight": criticalAndKnowsNextWildingCard}
                                             )}
                                         />
-                                        <div style={{ color: wildlingsWarning ? "#F39C12" : wildlingsCritical ? "#FF0000" : undefined }}>{this.game.wildlingStrength}</div>
+                                        <div>{this.game.wildlingStrength}</div>
                                     </div>
                                 </OverlayTrigger>
                             </Row>

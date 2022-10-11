@@ -40,8 +40,8 @@ export default class ResolveRetreatComponent extends Component<GameStateComponen
                 ) : this.props.gameState.childGameState instanceof SelectUnitsGameState ? (
                     <Col xs={12} className="text-center">
                         House <b>{this.props.gameState.childGameState.house.name}</b> must
-                        choose <b>{this.props.gameState.childGameState.count}</b> casualt{this.props.gameState.childGameState.count > 1 ? "ies" : "y"} to
-                        retreat to <b>{this.props.gameState.retreatRegion?.name ?? "Unknown"}</b>.
+                        choose <b>{this.props.gameState.childGameState.count}</b> unit{this.props.gameState.childGameState.count > 1 ? "s" : ""} as
+                        casualties, for remaining units to retreat to <b>{this.props.gameState.retreatRegion?.name ?? "Unknown"}</b>.
                     </Col>
                 ) : null}
                 {renderChildGameState(this.props, [

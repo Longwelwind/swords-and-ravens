@@ -145,7 +145,7 @@ interface RavenOrderReplaced {
 
 interface RevealTopWildlingCard {
     type: "reveal-top-wildling-card";
-    cardId: number;
+    cardId: number | null;
     houseId: string;
 }
 
