@@ -486,134 +486,134 @@
                 "unitType": "footman",
                 "house": "stark",
                 "quantity": 1,
-                "quantityVassal": 0
+                "quantityVassal": 1
               },
               {
                 "unitType": "knight",
                 "house": "stark",
                 "quantity": 1,
-                "quantityVassal": 0
+                "quantityVassal": 1
               }
             ],
             "port-of-winterfell": [{
               "unitType": "ship",
               "house": "stark",
               "quantity": 1,
-              "quantityVassal": 0
+              "quantityVassal": 1
             }],
             "white-harbor": [{
               "unitType": "knight",
               "house": "stark",
               "quantity": 1,
-              "quantityVassal": 0
+              "quantityVassal": 1
             }],
             "moat-cailin": [{
                 "unitType": "footman",
                 "house": "stark",
                 "quantity": 1,
-                "quantityVassal": 0
+                "quantityVassal": 1
               },
               {
                 "unitType": "siege-engine",
                 "house": "stark",
                 "quantity": 1,
-                "quantityVassal": 0
+                "quantityVassal": 1
               }
             ],
             "seagard": [{
               "unitType": "knight",
               "house": "stark",
               "quantity": 1,
-              "quantityVassal": 0
+              "quantityVassal": 1
             }],
             "the-shivering-sea": [{
               "unitType": "ship",
               "house": "stark",
               "quantity": 1,
-              "quantityVassal": 0
+              "quantityVassal": 1
             }],
             "lannisport": [{
               "unitType": "footman",
               "house": "lannister",
               "quantity": 2,
-              "quantityVassal": 0
+              "quantityVassal": 2
             }],
             "the-golden-sound": [{
               "unitType": "ship",
               "house": "lannister",
               "quantity": 1,
-              "quantityVassal": 0
+              "quantityVassal": 1
             }],
             "stoney-sept": [
               {
                 "unitType": "footman",
                 "house": "lannister",
                 "quantity": 1,
-                "quantityVassal": 0
+                "quantityVassal": 1
               }
             ],
             "harrenhal": [{
               "unitType": "footman",
               "house": "lannister",
               "quantity": 1,
-              "quantityVassal": 0
+              "quantityVassal": 1
             }, {
               "unitType": "knight",
               "house": "lannister",
               "quantity": 1,
-              "quantityVassal": 0
+              "quantityVassal": 1
             }],
             "kings-landing": [{
               "unitType": "footman",
               "house": "lannister",
               "quantity": 2,
-              "quantityVassal": 0
+              "quantityVassal": 2
             }],
             "blackwater-bay": [
               {
                 "unitType": "ship",
                 "house": "lannister",
                 "quantity": 1,
-                "quantityVassal": 0
+                "quantityVassal": 1
               }
             ],
             "dragonstone": [{
               "unitType": "footman",
               "house": "baratheon",
               "quantity": 1,
-              "quantityVassal": 0
+              "quantityVassal": 1
             }],
             "shipbreaker-bay": [{
               "unitType": "ship",
               "house": "baratheon",
               "quantity": 2,
-              "quantityVassal": 0
+              "quantityVassal": 2
             }],
             "kingswood": [{
                 "unitType": "footman",
                 "house": "baratheon",
                 "quantity": 1,
-                "quantityVassal": 0
+                "quantityVassal": 1
               },
               {
                 "unitType": "siege-engine",
                 "house": "baratheon",
                 "quantity": 1,
-                "quantityVassal": 0
+                "quantityVassal": 1
               }
             ],
             "storms-end": [{
               "unitType": "knight",
               "house": "baratheon",
               "quantity": 1,
-              "quantityVassal": 0
+              "quantityVassal": 1
             }],
             "the-eyrie": [
               {
                 "unitType": "knight",
                 "house": "arryn",
                 "quantity": 1,
-                "quantityVassal": 0
+                "quantityVassal": 1
               }
             ],
             "the-mountains-of-the-moon": [
@@ -621,13 +621,13 @@
                 "unitType": "footman",
                 "house": "arryn",
                 "quantity": 2,
-                "quantityVassal": 0
+                "quantityVassal": 2
               },
               {
                 "unitType": "knight",
                 "house": "arryn",
                 "quantity": 1,
-                "quantityVassal": 0
+                "quantityVassal": 1
               }
             ],
             "the-twins": [
@@ -635,7 +635,7 @@
                 "unitType": "footman",
                 "house": "arryn",
                 "quantity": 1,
-                "quantityVassal": 0
+                "quantityVassal": 1
               }
             ],
             "the-fingers": [
@@ -643,7 +643,7 @@
                 "unitType": "footman",
                 "house": "arryn",
                 "quantity": 1,
-                "quantityVassal": 0
+                "quantityVassal": 1
               }
             ],
             "the-narrow-sea": [
@@ -651,7 +651,7 @@
                 "unitType": "ship",
                 "house": "arryn",
                 "quantity": 1,
-                "quantityVassal": 0
+                "quantityVassal": 1
               }
             ]
           },
