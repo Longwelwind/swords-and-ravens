@@ -56,6 +56,12 @@ export default class SeeTopWildlingCardGameState extends GameState<UseRavenGameS
                 this.ravenHolder.knowsNextWildlingCard = true;
 
                 const ravenUser = this.ingameGameState.players.entries.filter(entry => entry[1].house == this.ravenHolder)[0][0];
+                this.entireGame.broadcastToClients({
+                    type: "reveal-top-wildling-card",
+                    cardId: null,
+                    houseId: this.ravenHolder.id
+                }, [ravenUser]);
+
                 ravenUser.send({
                     type: "reveal-top-wildling-card",
                     cardId: wildlingCard.id,

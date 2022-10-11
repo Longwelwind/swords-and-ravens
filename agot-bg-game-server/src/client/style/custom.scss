@@ -578,6 +578,24 @@ div.disconnected {
   filter: brightness(0) saturate(100%) invert(11%) sepia(82%) saturate(7445%) hue-rotate(4deg) brightness(109%) contrast(114%) drop-shadow(2px 2px 3px $wildling-outline) drop-shadow(-2px -2px 3px $wildling-outline);
 }
 
+.txt-warning {
+  color: #F39C12;
+}
+
+.txt-warning:hover {
+  text-decoration: underline;
+  text-decoration-color: #F39C12;
+}
+
+.txt-critical {
+  color: #FF0000;
+}
+
+.txt-critical:hover {
+  text-decoration: underline;
+  text-decoration-color: #FF0000;
+}
+
 .unavailable-monotone {
   -webkit-filter: grayscale(100%);
   filter: grayscale(100%);

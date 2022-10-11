@@ -4,9 +4,7 @@ import React from "react";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import { ListGroupItem, Row, Col, OverlayTrigger, Tooltip, Popover, Navbar, Nav, NavDropdown } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
-import { faStar } from "@fortawesome/free-solid-svg-icons/faStar";
 import unitTypes from "..//common/ingame-game-state/game-data-structure/unitTypes";
 import unitImages from "./unitImages";
 import housePowerTokensImages from "./housePowerTokensImages";
@@ -20,6 +18,7 @@ import stopwatchImage from "../../public/images/icons/stopwatch.svg";
 import battleGearImage from "../../public/images/icons/battle-gear.svg";
 import verticalBanner from "../../public/images/icons/vertical-banner.svg"
 import laurelCrownImage from "../../public/images/icons/laurel-crown.svg";
+import thirdEyeImage from "../../public/images/icons/third-eye.svg";
 import Player from "../common/ingame-game-state/Player";
 import UserLabel from "./UserLabel";
 import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
@@ -33,6 +32,8 @@ import BetterMap from "../utils/BetterMap";
 import { observable } from "mobx";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import { port, sea } from "../common/ingame-game-state/game-data-structure/regionTypes";
+import { houseColorFilters } from "./houseColorFilters";
+import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
 
 interface HouseRowComponentProps {
     house: House;
@@ -113,32 +114,43 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
             console.warn("getControllerOfHouse has thrown an error but we should never see this error anymore!");
         }
 
+        const currentUserIsCommandingHouse = player && this.props.gameClient.isAuthenticatedUser(player.user);
+
         return this.ingame.rerender >= 0 && <>
             <ListGroupItem style={{padding: 0, margin: 0}}>
                 <div className={isWaitedFor ? "new-event" : ""} style={{paddingLeft: "8px", paddingRight: "10px", paddingTop: "12px", paddingBottom: "12px"}}>
                 <Row className="align-items-center flex-nowrap">
                     <Col xs="auto" className="pr-0" style={{ width: "32px" }} onMouseEnter={() => this.setHighlightedRegions()} onMouseLeave={() => this.highlightedRegions.clear()}>
-                        {player ? (
-                            <FontAwesomeIcon
-                                className={classNames({ "invisible": !this.props.gameClient.isAuthenticatedUser(player.user) })}
-                                style={{ color: this.house.color }}
-                                icon={faStar}
-                                size="lg"
-                            />
-                        ) : (
-                            <OverlayTrigger
+                        {player && player.house.knowsNextWildlingCard
+                            ? <OverlayTrigger
                                 placement="right"
                                 overlay={
-                                    <Tooltip id={"vassal-house-" + this.house.id}>
-                                        <strong>Vassal</strong><br />
-                                        At the beginning of the Planning Phase,
-                                        each player, in order, can pick a vassal to command this turn.
+                                    <Tooltip id={"knows-things-house-" + this.house.id}>
+                                        <b>{this.house.name}</b> knows things.
                                     </Tooltip>
                                 }
                             >
-                                <img src={battleGearImage} width={32} style={{ margin: "-4px" }} />
+                                <img src={thirdEyeImage} width={28} style={{ margin: "-4px", filter: currentUserIsCommandingHouse ? houseColorFilters.get(this.house.id) : undefined}} />
                             </OverlayTrigger>
-                        )}
+                            : player
+                                ? <div className={classNames({ "display-none": !currentUserIsCommandingHouse })}>
+                                    <div style={{ margin: "-4px" }}>
+                                        <HouseIconComponent house={this.house} small={true}/>
+                                    </div>
+                                </div>
+                                : <OverlayTrigger
+                                    placement="right"
+                                    overlay={
+                                        <Tooltip id={"vassal-house-" + this.house.id}>
+                                            <b>Vassal</b><br />
+                                            At the beginning of the Planning Phase,
+                                            each player, in order, can pick a vassal to command this turn.
+                                        </Tooltip>
+                                    }
+                                >
+                                    <img src={battleGearImage} width={32} style={{ margin: "-4px" }} />
+                                </OverlayTrigger>
+                        }
                     </Col>
                     <Col onMouseEnter={() => this.setHighlightedRegions()} onMouseLeave={() => this.highlightedRegions.clear()} className="pr-0">
                         <h5 style={{ margin: 0, padding: 0 }}><b style={{ "color": this.house.color }}>{this.house.name}</b><br /></h5>
