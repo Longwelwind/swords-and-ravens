@@ -195,17 +195,17 @@ export default class Game {
         }
 
         if (this.ingame.entireGame.gameSettings.seaOrderTokens) {
-            return _.concat(playerHousesOrders, seaOrders);
+            return _.union(playerHousesOrders, seaOrders);
         }
 
         if (this.ingame.entireGame.gameSettings.ironBank) {
-            return _.concat(playerHousesOrders, ironBankOrder);
+            return _.union(playerHousesOrders, [ironBankOrder]);
         }
 
         return playerHousesOrders;
     }
 
-    isOrderRestricted(region: Region, order: Order, planningRestrictions: PlanningRestriction[]): boolean {
+    isOrderRestricted(region: Region, order: Order, planningRestrictions: PlanningRestriction[], ignoreRegionKind = false): boolean {
         const controller = region.getController();
         if (!controller) {
             console.error("An order without a controller should never happen");
@@ -214,17 +214,17 @@ export default class Game {
 
         return planningRestrictions.some(restriction => restriction.restriction(order.type))
             || (this.getAllowedCountOfStarredOrders(controller) == 0 && order.type.starred)
-            || (order.type.restrictedTo != null && order.type.restrictedTo != region.type.kind)
-            || (order.type.id == "sea-iron-bank" && !this.ironBank);
+            || (!ignoreRegionKind && order.type.restrictedTo != null && order.type.restrictedTo != region.type.kind)
+            || (!ignoreRegionKind && order.type.id == "sea-iron-bank" && !this.ironBank);
     }
 
-    getRestrictedOrders(region: Region, planningRestrictions: PlanningRestriction[]): Order[] {
+    getRestrictedOrders(region: Region, planningRestrictions: PlanningRestriction[], ignoreRegionKind: boolean): Order[] {
         const controller = region.getController();
         if (!controller) {
             return [];
         }
 
-        return this.getOrdersListForHouse(controller).filter(o => this.isOrderRestricted(region, o, planningRestrictions));
+        return this.getOrdersListForHouse(controller).filter(o => this.isOrderRestricted(region, o, planningRestrictions, ignoreRegionKind));
     }
 
     getPlacedOrders(allPlacedOrders: BetterMap<Region, Order | null>, house: House): BetterMap<Region, Order> {

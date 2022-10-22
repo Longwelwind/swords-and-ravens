@@ -143,7 +143,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
         this.ordersOnBoard.keys.forEach(region => {
             const order = this.ordersOnBoard.get(region);
             if (this.game.isOrderRestricted(region, order, this.planningRestrictions)) {
-                this.removeOrderFromRegion(region);
+                this.removeOrderFromRegion(region, false, undefined, true, "red");
             }
         });
 

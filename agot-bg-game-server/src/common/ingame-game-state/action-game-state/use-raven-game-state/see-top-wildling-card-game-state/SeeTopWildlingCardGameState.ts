@@ -60,7 +60,7 @@ export default class SeeTopWildlingCardGameState extends GameState<UseRavenGameS
                     type: "reveal-top-wildling-card",
                     cardId: null,
                     houseId: this.ravenHolder.id
-                }, [ravenUser]);
+                }, ravenUser);
 
                 ravenUser.send({
                     type: "reveal-top-wildling-card",
