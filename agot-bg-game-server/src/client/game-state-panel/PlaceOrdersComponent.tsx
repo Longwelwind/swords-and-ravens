@@ -157,7 +157,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                                             availableOrders={
                                                 this.placeOrders.getAvailableOrders(r.getController() as House)
                                             }
-                                            restrictedOrders={this.placeOrders.ingame.game.getRestrictedOrders(r, this.placeOrders.planningGameState.planningRestrictions)}
+                                            restrictedOrders={this.placeOrders.ingame.game.getRestrictedOrders(r, this.placeOrders.planningGameState.planningRestrictions, true)}
                                             onOrderClick={o => {
                                                 this.placeOrders.assignOrder(r, o);
                                                 document.body.click();

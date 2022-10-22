@@ -38,7 +38,7 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
                                 <OrderGridComponent orders={this.props.gameState.ingameGameState.game.getOrdersListForHouse(this.props.gameState.ravenHolder)}
                                                     selectedOrder={this.selectedOrder}
                                                     availableOrders={this.props.gameState.getAvailableOrders(this.selectedRegion)}
-                                                    restrictedOrders={this.props.gameState.ingameGameState.game.getRestrictedOrders(this.selectedRegion, this.props.gameState.parentGameState.parentGameState.planningRestrictions)}
+                                                    restrictedOrders={this.props.gameState.ingameGameState.game.getRestrictedOrders(this.selectedRegion, this.props.gameState.parentGameState.parentGameState.planningRestrictions, true)}
                                                     onOrderClick={o => this.selectOrder(o)}/>
                             </Col>
                         )}
