@@ -244,6 +244,14 @@ export class CancelGame extends VoteType {
     }
 
     executeAccepted(vote: Vote): void {
+        if (vote.ingame.hasChildGameState(PlaceOrdersGameState)) {
+            const placeOrders = vote.ingame.getChildGameState(PlaceOrdersGameState) as PlaceOrdersGameState;
+            vote.ingame.ordersOnBoard = placeOrders.placedOrders as BetterMap<Region, Order>;
+            vote.ingame.entireGame.broadcastToClients({
+                type: "reveal-orders",
+                orders: vote.ingame.ordersOnBoard.mapOver(r => r.id, o => o.id)
+            });
+        }
         vote.ingame.setChildGameState(new CancelledGameState(vote.ingame)).firstStart();
     }
 

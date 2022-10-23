@@ -1217,7 +1217,7 @@ export default class IngameGameState extends GameState<
                     this.ordersToBeAnimated.delete(r);
                     return [r, orders.get(oid)];
                 }));
-            }, 1500);
+            }, 1200);
         } else if (message.type == "remove-orders") {
             message.regions.map(rid => this.world.regions.get(rid)).forEach(r => {
                 this.ordersOnBoard.delete(r);
