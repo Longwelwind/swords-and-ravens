@@ -1413,12 +1413,13 @@ export default class IngameGameState extends GameState<
 
         const acceptedVotes = this.votes.values.filter(v => v.state == VoteState.ACCEPTED && v.type instanceof ExtendPlayerClocks);
 
-        if (acceptedVotes.length > 0) {
+        const allowedVotesCount = this.game.turn == this.game.maxTurns ? 2 : 1;
+        if (acceptedVotes.length >= allowedVotesCount) {
             return {result: false, reason: "already-extended"};
         }
 
         const refusedVotes = this.votes.values.filter(v => v.state == VoteState.REFUSED && v.type instanceof ExtendPlayerClocks);
-        if (refusedVotes.length > 1) {
+        if (this.game.turn != this.game.maxTurns && refusedVotes.length > 1) {
             return {result: false, reason: "max-vote-count-reached"};
         }
 
