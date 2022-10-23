@@ -209,6 +209,12 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
         }
     }
 
+    getPlacedOrdersOfHouse(house: House): [Region, Order][] {
+        const possibleRegions = this.game.world.regions.values.filter(r => r.units.size > 0 && r.getController() == house);
+
+        return possibleRegions.filter(r => this.placedOrders.tryGet(r, null) != null).map(r => [r, this.placedOrders.get(r) as Order]);
+    }
+
     getPossibleRegionsForOrders(house: House): Region[] {
         const possibleRegions = this.game.world.regions.values.filter(r => r.units.size > 0 && r.getController() == house);
 
@@ -261,14 +267,20 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
         // return {status: true, reason: "bypassed"};
 
         // Return false if player is already ready
-        if ((this.forVassals && this.ingame.getVassalsControlledByPlayer(player).every(h => this.isReady(h)))
-            || (!this.forVassals && this.isReady(player.house))) {
+        if ((!this.forVassals && this.isReady(player.house))
+            || (this.forVassals && this.ingame.getVassalsControlledByPlayer(player).every(h => this.isReady(h))))
+        {
             return {status: false, reason: "already-ready"};
         }
 
         // Iterate over all the houses the player should put orders for to find
         // an error in one of the houses.
         const possibleError = this.getHousesToPutOrdersForPlayer(player).reduce((state, house) => {
+            const orderList = this.getOrdersList(house);
+            if (this.getPlacedOrdersOfHouse(house).some(([_r, o]) => !orderList.includes(o))){
+                return {status: false, reason: "invalid-orders-placed"};
+            }
+
             const possibleRegions = this.getPossibleRegionsForOrders(house);
 
             if (this.forVassals) {
@@ -395,6 +407,16 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
     */
 
     actionAfterVassalReplacement(newVassal: House): void {
+        // Remove already placed orders of house:
+        const placedOrders = this.getPlacedOrdersOfHouse(newVassal);
+        placedOrders.forEach(([r, _o]) => {
+            this.placedOrders.delete(r);
+            this.entireGame.broadcastToClients({
+                type: "remove-placed-order",
+                regionId: r.id
+            });
+        });
+
         this.readyHouses = _.without(this.readyHouses, newVassal);
         this.checkAndProceedEndOfPlaceOrdersGameState();
     }
