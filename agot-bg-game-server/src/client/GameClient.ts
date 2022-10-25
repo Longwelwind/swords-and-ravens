@@ -9,6 +9,7 @@ import House from "../common/ingame-game-state/game-data-structure/House";
 import ChatClient from "./chat-client/ChatClient";
 import BetterMap from "../utils/BetterMap";
 import { compress, decompress } from "./utils/compression";
+import { playSoundWhenClickingMarchOrder, playSoundForLogEvent, stopRunningSoundEffect } from "./utils/sound-effects";
 
 export interface AuthData {
     userId: string;
@@ -33,6 +34,10 @@ export default class GameClient {
     @observable authenticated = false;
     @observable authenticatedUser: User | null = null;
     chatClient: ChatClient = new ChatClient(this);
+
+    public playSoundWhenClickingMarchOrder = playSoundWhenClickingMarchOrder;
+    public playSoundForLogEvent = playSoundForLogEvent;
+    public stopRunningSoundEffect = stopRunningSoundEffect;
 
     get muted(): boolean {
         if (!this.authenticatedUser) {
