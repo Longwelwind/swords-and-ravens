@@ -111,7 +111,6 @@ import houseIconImages from "./houseIconImages";
 import { preemptiveRaid } from "../common/ingame-game-state/game-data-structure/wildling-card/wildlingCardTypes";
 import VotesListComponent from "./VotesListComponent";
 import voteSound from "../../public/sounds/vote-started.ogg";
-import swordCuttingAndKillingSound from "../../public/sounds/sword-cutting-and-killing.ogg";
 import WorldStateComponent from "./WorldStateComponent";
 import { houseColorFilters } from "./houseColorFilters";
 
@@ -377,8 +376,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 overlay={
                                     <Tooltip id="mute-tooltip">
                                         {this.gameClient.musicMuted
-                                            ? "Unmute music"
-                                            : "Mute music"}
+                                            ? "Unmute music and sound effects"
+                                            : "Mute music and sound effects"}
                                     </Tooltip>
                                 }
                             >
@@ -1305,10 +1304,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         }
 
         this.ingame.onLogReceived = log => {
-            if (!this.gameClient.muted && log.type == "killed-after-combat") {
-                const audio = new Audio(swordCuttingAndKillingSound);
-                audio.play();
-            }
+            this.gameClient.playSoundForLogEvent(log);
         }
 
         if (this.ingame.entireGame.gameSettings.onlyLive) {
