@@ -702,6 +702,22 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         onChange={() => this.changeGameSettings(() => this.gameSettings.useVassalPositions = !this.gameSettings.useVassalPositions)}
                     />
                 </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="tournament-mode-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="tournament-mode-tooltip">
+                                    This option is intended for tournaments. It disables the possibility to launch the following votes:<br/>
+                                    Offer replacement, Replace vassal, Swap houses, Extend player clocks, Abort game and End game.
+                                </Tooltip>}>
+                                <label htmlFor="tournament-mode-setting">Tournament mode</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.tournamentMode}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.tournamentMode = !this.gameSettings.tournamentMode)}
+                    />
+                </Col>
             </Col>
         </Row>
     }

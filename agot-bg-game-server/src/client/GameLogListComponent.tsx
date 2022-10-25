@@ -192,7 +192,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const assignments = data.assignments.map(([houseId, userId]) =>
                     [this.game.houses.get(houseId), this.ingame.entireGame.users.get(userId)]) as [House, User][];
                 return <>
-                    <div className="text-center"><h5>The fight for the Iron Throne has begun!</h5></div>
+                    <div className="text-center"><h5>The war of the {assignments.length} kings has begun!</h5></div>
                     {assignments.map(([house, user]) =>
                         <p  key={`${house.id}_${user.id}`}>House <b>{house.name}</b> is controlled by <b>{getIngameUserLinkOrLabel(this.ingame, user, this.ingame.players.tryGet(user, null))}</b>.</p>
                     )}
@@ -440,7 +440,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "winner-declared": {
                 const winner = this.game.houses.get(data.winner);
                 return (
-                    <h5 className="text-center">Game has ended.<br/>House <b style={{color: winner.color}}>{winner.name}</b> wins this Game of Thrones!</h5>
+                    <h5 className="text-center">Game has ended.<br/>House <b style={{color: winner.color}}>{winner.name}</b> has won this Game of Thrones!</h5>
                 );
             }
             case "raven-holder-wildling-card-put-bottom": {

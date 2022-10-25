@@ -408,6 +408,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 "Game has already been cancelled"
                                             ) : canLaunchCancelGameVoteReason == "already-ended" ? (
                                                 "Game has already ended"
+                                            ) : canLaunchCancelGameVoteReason == "forbidden-in-tournament-mode" ? (
+                                                "Canceling games is not allowed in tournaments"
                                             ) : "Vote not possible"}
                                         </Tooltip>
                                     }
@@ -439,6 +441,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 "Game has already been cancelled"
                                             ) : canLaunchEndGameVoteReason == "already-ended" ? (
                                                 "Game has already ended"
+                                            ) : canLaunchEndGameVoteReason == "forbidden-in-tournament-mode" ? (
+                                                "Early end is not allowed in tournaments"
                                             ) : "Vote not possible"}
                                         </Tooltip>}
                                 >
@@ -526,6 +530,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                                 "Game has already been cancelled"
                                             ) : canLaunchExtendPlayerClocksVoteReason == "already-ended" ? (
                                                 "Game has already ended"
+                                            ) : canLaunchExtendPlayerClocksVoteReason == "forbidden-in-tournament-mode" ? (
+                                                "Extending player clocks is not allowed in tournaments"
                                             ) : "Vote not possible"}
                                         </Tooltip>}
                                 >

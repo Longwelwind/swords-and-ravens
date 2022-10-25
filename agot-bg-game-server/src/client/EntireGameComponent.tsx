@@ -15,6 +15,7 @@ import faviconNormal from "../../public/images/favicon.ico";
 import faviconAlert from "../../public/images/favicon-alert.ico";
 import rollingDicesImage from "../../public/images/icons/rolling-dices.svg";
 import cardExchangeImage from "../../public/images/icons/card-exchange.svg";
+import trophyCupImage from "../../public/images/icons/trophy-cup.svg";
 import {Helmet} from "react-helmet";
 import { Card, FormCheck, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import { preventOverflow } from "@popperjs/core";
@@ -75,7 +76,8 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                                 <h4>{this.props.entireGame.name}</h4>
                             </Col>
                         </>
-                        : <><ClockComponent entireGame={this.props.entireGame} />
+                        : <>{this.renderTournamentImage()}
+                            <ClockComponent entireGame={this.props.entireGame} />
                             {this.renderHouseIcon()}
                             <Col xs="auto" className="px-3">
                                 <h4>{this.props.entireGame.name}</h4>
@@ -192,6 +194,22 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 <h4><Badge variant="warning">BETA</Badge></h4>
             </Col>}
         </>;
+    }
+
+    renderTournamentImage(): ReactNode {
+        return this.props.entireGame.gameSettings.tournamentMode &&
+            <Col xs="auto">
+                <OverlayTrigger
+                    placement="auto"
+                    overlay={
+                        <Tooltip id="tournament-game-tooltip">
+                            This is a tournament game
+                        </Tooltip>}
+                    popperConfig={{ modifiers: [preventOverflow] }}
+                >
+                    <img src={trophyCupImage} width="30" />
+                </OverlayTrigger>
+            </Col>;
     }
 
     renderHouseIcon(): ReactNode {

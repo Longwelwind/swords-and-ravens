@@ -105,8 +105,10 @@ export default class UserLabel extends Component<UserLabelProps> {
                                         "The game has been cancelled"
                                         : canLaunchReplacePlayerVoteReason == "game-ended" ?
                                         "The game has ended"
-                                        : canLaunchReplacePlayerByVassalVoteReason == "game-paused" ?
+                                        : canLaunchReplacePlayerVoteReason == "game-paused" ?
                                         "The game must be resumed first"
+                                        : canLaunchReplacePlayerVoteReason == "forbidden-in-tournament-mode" ?
+                                        "Replacing players is not allowed in tournaments"
                                         : "Vote not possible"
                                     }
                                 </Tooltip>
@@ -189,6 +191,8 @@ export default class UserLabel extends Component<UserLabelProps> {
                                             "You cannot swap houses with yourself"
                                         : canLaunchSwapHousesVoteReason == "secret-objectives-chosen" ?
                                             `You or ${this.player.user.name} has already chosen their secret objectives`
+                                        : canLaunchSwapHousesVoteReason == "forbidden-in-tournament-mode" ?
+                                            "Swapping houses is not allowed in tournaments"
                                         : "Vote not possible"
                                     }
                                 </Tooltip>
