@@ -339,8 +339,10 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                         "The game has been cancelled"
                                         : reason == "game-ended" ?
                                         "The game has ended"
-                                        : reason == "not-a-vassal" || "not-a-replaced-vassal" ?
+                                        : reason == "not-a-vassal" || reason == "not-a-replaced-vassal" ?
                                         "Only vassals who have replaced a player can be replaced by a player again"
+                                        : reason == "forbidden-in-tournament-mode" ?
+                                        "Undoing vassal replacement is not allowed in tournaments"
                                         : "Vote not possible"
                                     }
                                 </Tooltip>

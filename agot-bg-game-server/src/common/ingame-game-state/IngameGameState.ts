@@ -1281,6 +1281,10 @@ export default class IngameGameState extends GameState<
     }
 
     canLaunchCancelGameVote(player: Player | null): {result: boolean; reason: string} {
+        if (this.entireGame.gameSettings.tournamentMode) {
+            return {result: false, reason: "forbidden-in-tournament-mode"};
+        }
+
         if (this.paused) {
             return {result: false, reason: "game-paused"};
         }
@@ -1307,6 +1311,10 @@ export default class IngameGameState extends GameState<
     }
 
     canLaunchEndGameVote(player: Player | null): {result: boolean; reason: string} {
+        if (this.entireGame.gameSettings.tournamentMode) {
+            return {result: false, reason: "forbidden-in-tournament-mode"};
+        }
+
         if (this.paused) {
             return {result: false, reason: "game-paused"};
         }
@@ -1397,6 +1405,10 @@ export default class IngameGameState extends GameState<
     }
 
     canLaunchExtendPlayerClocksVote(player: Player | null): {result: boolean; reason: string} {
+        if (this.entireGame.gameSettings.tournamentMode) {
+            return {result: false, reason: "forbidden-in-tournament-mode"};
+        }
+
         if (this.paused) {
             return {result: false, reason: "game-paused"};
         }
@@ -1438,6 +1450,10 @@ export default class IngameGameState extends GameState<
     }
 
     canLaunchReplacePlayerVote(fromUser: User | null, replaceWithVassal = false, forHouse: House | null = null): {result: boolean; reason: string} {
+        if (this.entireGame.gameSettings.tournamentMode && !replaceWithVassal) {
+            return {result: false, reason: "forbidden-in-tournament-mode"};
+        }
+
         if (this.paused) {
             return {result: false, reason: "game-paused"};
         }
@@ -1493,6 +1509,10 @@ export default class IngameGameState extends GameState<
     }
 
     canLaunchSwapHousesVote(initiator: User | null, swappingPlayer: Player): {result: boolean; reason: string} {
+        if (this.entireGame.gameSettings.tournamentMode) {
+            return {result: false, reason: "forbidden-in-tournament-mode"};
+        }
+
         if (!initiator || !this.players.keys.includes(initiator)) {
             return {result: false, reason: "only-players-can-vote"};
         }
@@ -1534,6 +1554,10 @@ export default class IngameGameState extends GameState<
     }
 
     canLaunchReplaceVassalVote(fromUser: User | null, forHouse: House): {result: boolean; reason: string} {
+        if (this.entireGame.gameSettings.tournamentMode) {
+            return {result: false, reason: "forbidden-in-tournament-mode"};
+        }
+
         if (this.entireGame.gameSettings.onlyLive) {
             return {result: false, reason: "forbidden-in-clock-games"};
         }

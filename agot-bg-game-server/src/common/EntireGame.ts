@@ -46,7 +46,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         draftHouseCards: false, thematicDraft: false, limitedDraft: false, blindDraft: false,
         mixedWesterosDeck1: false, cokWesterosPhase: false, reduceVictoryPointsCountNeededToWinTo6: false, endless: false,  faceless: false,
         useVassalPositions: false, precedingMustering: false, randomStartPositions: false, initialLiveClock: 60,
-        noPrivateChats: false
+        noPrivateChats: false, tournamentMode: false
     };
     onSendClientMessage: (message: ClientMessage) => void;
     onSendServerMessage: (users: User[], message: ServerMessage) => void;
@@ -754,4 +754,5 @@ export interface GameSettings {
     houseCardsEvolution: boolean;
     initialLiveClock: number;
     noPrivateChats: boolean;
+    tournamentMode: boolean;
 }
