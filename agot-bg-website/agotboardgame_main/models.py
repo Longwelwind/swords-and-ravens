@@ -117,6 +117,7 @@ class Game(models.Model):
             ("cancel_game", "Can cancel a game")
         ]
         ordering = ("-last_active_at", )
+        get_latest_by = "last_active_at"
 
 
 class PlayerInGame(models.Model):
