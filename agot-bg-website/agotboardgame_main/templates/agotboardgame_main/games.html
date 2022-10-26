@@ -9,6 +9,10 @@ Games -
 {% block content %}
     <div class="row justify-content-center">
         <div class="col-lg-11 mb-4">
+            <span class="float-left">Last finished game:&nbsp;</span>
+            <a target="_blank" href="/play/{{ last_finished_game.id }}" class="float-left">{{ last_finished_game.name }} ({{ last_finished_game.players_count }}/{{ last_finished_game.view_of_game.maxPlayerCount }})</a>
+        </div>
+        <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Online Users
@@ -18,9 +22,7 @@ Games -
                             data-toggle="tooltip"
                             data-html="true"
                             title="<b>Westerosi time</b> ...<small>basically, UTC</small>"
-                        >
-
-                        </span>
+                        ></span>
                         <script type="text/javascript">
                             let element = document.getElementById("westerosi-time");
                             function update() {

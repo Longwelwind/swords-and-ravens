@@ -164,6 +164,7 @@ def about(request):
 
 def games(request):
     if request.method == "GET":
+        last_finished_game = Game.objects.filter(state=FINISHED).annotate(players_count=Count('players')).latest()
         # Fetch the list of open or ongoing games.
         # Pre-fetch the PlayerInGame entry related to the authenticated player
         # This means that "game.players" will only contain one entry, the one related to the authenticated player.
@@ -265,7 +266,8 @@ def games(request):
             "open_live_games": open_live_games,
             "replacement_needed_games": replacement_needed_games,
             "inactive_private_games": inactive_private_games,
-            "public_room_id": public_room_id
+            "public_room_id": public_room_id,
+            "last_finished_game": last_finished_game
         })
     elif request.method == "POST":
         if not request.user.has_perm("agotboardgame_main.add_game"):
