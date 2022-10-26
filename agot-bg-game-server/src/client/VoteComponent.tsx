@@ -16,7 +16,7 @@ import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { preventOverflow } from "@popperjs/core";
 import ConditionalWrap from "./utils/ConditionalWrap";
-import getIngameUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
+import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 import { observer } from "mobx-react";
 
 interface VoteComponentProps {
@@ -48,7 +48,7 @@ export default class VoteComponent extends Component<VoteComponentProps> {
                     </OverlayTrigger>
                 </Col>
                 <Col>
-                    <b>{getIngameUserLinkOrLabel(this.vote.ingame, this.vote.initiator, this.vote.ingame.players.tryGet(this.vote.initiator, null))}</b> initiated a vote to <b>{this.vote.type.verb()}</b>. {this.vote.positiveCountToPass} player{this.vote.positiveCountToPass != 1 ? "s" : ""} must accept to pass the vote.
+                    <b>{getUserLinkOrLabel(this.vote.ingame.entireGame, this.vote.initiator, this.vote.ingame.players.tryGet(this.vote.initiator, null))}</b> initiated a vote to <b>{this.vote.type.verb()}</b>. {this.vote.positiveCountToPass} player{this.vote.positiveCountToPass != 1 ? "s" : ""} must accept to pass the vote.
                     <Row className="mt-1">
                         <Col xs="auto" className={classNames({ "display-none": state != VoteState.ONGOING || this.props.gameClient.authenticatedPlayer == null })}>
                             <Button className="mb-1" variant="success" size="sm" style={{ minWidth: "60px" }} disabled={disabled} onClick={() => this.vote.vote(true)}>{this.wrapVoteButtons(<>Accept</>, disabled, reason)}</Button><br />

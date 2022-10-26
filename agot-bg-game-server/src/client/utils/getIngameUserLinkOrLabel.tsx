@@ -1,11 +1,12 @@
 import * as React from 'react';
 import User from "../../server/User";
-import IngameGameState from "../../common/ingame-game-state/IngameGameState";
+import EntireGame from '../../common/EntireGame';
 import Player from '../../common/ingame-game-state/Player';
 import ConditionalWrap from './ConditionalWrap';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
-export default function getIngameUserLinkOrLabel(ingame: IngameGameState, user: User, player: Player | null, houseNames: boolean | undefined = false): JSX.Element {
+
+export default function getUserLinkOrLabel(entireGame: EntireGame, user: User, player: Player | null, houseNames: boolean | undefined = false): JSX.Element {
     const displayName = !houseNames || !player
         ? user.name
         : player.house.name;
@@ -27,7 +28,7 @@ export default function getIngameUserLinkOrLabel(ingame: IngameGameState, user: 
         }
     >
         {   /* Spectators are shown in burlywood brown: #deb887 */
-            !ingame.entireGame.gameSettings.faceless
+            !entireGame.gameSettings.faceless
                 ? <a href={`/user/${user.id}`} target="_blank" rel="noopener noreferrer" style={{ color: player?.house.color ?? "#deb887" }}>{displayName}</a>
                 : <span style={{ color: player?.house.color ?? "#deb887" }}>{displayName}</span>
         }
