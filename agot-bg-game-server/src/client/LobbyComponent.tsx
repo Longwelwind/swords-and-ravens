@@ -28,6 +28,10 @@ import { setBoltonIconImage, setStarkIconImage } from "./houseIconImages";
 import megaphoneImage from "../../public/images/icons/megaphone.svg";
 import speakerOffImage from "../../public/images/icons/speaker-off.svg";
 import musicalNotesImage from "../../public/images/icons/musical-notes.svg";
+import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
+// @ts-expect-error Somehow ts complains that this module cannot be found while it is
+import ScrollToBottom from "react-scroll-to-bottom";
+import _ from "lodash";
 
 
 interface LobbyComponentProps {
@@ -65,6 +69,8 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
         const {success: canStartGame, reason: canStartGameReason} = this.lobby.canStartGame(this.authenticatedUser);
         const {success: canCancelGame, reason: canCancelGameReason} = this.lobby.canCancel(this.authenticatedUser);
 
+        const connectedSpectators = this.getConnectedSpectators();
+
         return <>
                 <Col xs={10} xl={4} className="mb-3">
                     <Card>
@@ -95,19 +101,35 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col xs={10} xl={6} className="mb-3">
-                    <Card>
-                        <Card.Body style={{height: this.chatHeight}}>
-                            <ChatComponent gameClient={this.props.gameClient}
-                                        entireGame={this.lobby.entireGame}
-                                        roomId={this.lobby.entireGame.publicChatRoomId}
-                                        currentlyViewed={true}
-                                        getUserDisplayName={u =>
-                                            <a href={`/user/${u.id}`} target="_blank" rel="noopener noreferrer" style={{color: "white"}}><b>{u.name}</b></a>
-                                        }
-                            />
-                        </Card.Body>
-                    </Card>
+                <Col xs={10} xl={8} className="mb-3">
+                    <Row className="no-space-around">
+                        <Col xs={connectedSpectators.length > 0 ? 9 : 12} className="no-space-around">
+                            <Card>
+                                <Card.Body style={{height: this.chatHeight}}>
+                                    <ChatComponent gameClient={this.props.gameClient}
+                                                entireGame={this.lobby.entireGame}
+                                                roomId={this.lobby.entireGame.publicChatRoomId}
+                                                currentlyViewed={true}
+                                                getUserDisplayName={u =>
+                                                    <a href={`/user/${u.id}`} target="_blank" rel="noopener noreferrer" style={{color: "white"}}><b>{u.name}</b></a>
+                                                }
+                                    />
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                        {connectedSpectators.length > 0 && <Col className="no-space-around">
+                            <Card className="ml-2">
+                                <Card.Body style={{height: this.chatHeight, padding: "1rem"}}>
+                                    <div className="d-flex flex-column h-100">
+                                        <span>Spectators:</span>
+                                        <ScrollToBottom className="mb-2 h-90 chat-scroll-to-bottom" scrollViewClassName="overflow-x-hidden">
+                                            {connectedSpectators.map(u => <div key={`specatator_${u.id}`}><b>{getUserLinkOrLabel(this.entireGame, u, null)}</b></div>)}
+                                        </ScrollToBottom>
+                                    </div>
+                                </Card.Body>
+                            </Card>
+                        </Col>}
+                    </Row>
                 </Col>
                 <Col xs={11}>
                     <Row className="justify-content-center no-space-around">
@@ -239,18 +261,12 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
         </>;
     }
 
+    getConnectedSpectators(): User[] {
+        return _.difference(this.entireGame.users.values.filter(u => u.connected), this.lobby.players.values);
+    }
+
     renderLobbyHouseButtons(h: LobbyHouse): React.ReactNode {
         const invisible = !this.isHouseAvailable(h);
-
-        if (!this.props.gameClient.isRealOwner() &&
-            this.lobby.password != "" &&
-            this.password != this.lobby.password &&
-            // If user is already seated, allow them to "Leave"
-            (!this.lobby.players.has(h) || this.lobby.players.get(h) != this.authenticatedUser)) {
-            return <Col xs="auto" className={invisible ? "invisible" : ""}>
-                <FontAwesomeIcon icon={faLock} size="2x"/>
-            </Col>;
-        }
 
         if (this.lobby.readyUsers != null) {
             // Ready-check ongoing
@@ -271,6 +287,16 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                             <Spinner animation="border" variant="info" />
                         </Col>
             );
+        }
+
+        if (!this.props.gameClient.isRealOwner() &&
+            this.lobby.password != "" &&
+            this.password != this.lobby.password &&
+            // If user is already seated, allow them to "Leave"
+            (!this.lobby.players.has(h) || this.lobby.players.get(h) != this.authenticatedUser)) {
+            return <Col xs="auto" className={invisible ? "invisible" : ""}>
+                <FontAwesomeIcon icon={faLock} size="2x"/>
+            </Col>;
         }
 
         return  (

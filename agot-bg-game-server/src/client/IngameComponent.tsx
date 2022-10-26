@@ -102,7 +102,7 @@ import WesterosCardComponent from "./game-state-panel/utils/WesterosCardComponen
 import ConditionalWrap from "./utils/ConditionalWrap";
 import WildlingCardType from "../common/ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
 import WildlingCardComponent from "./game-state-panel/utils/WildlingCardComponent";
-import getIngameUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
+import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 import IronBankTabComponent from "./IronBankTabComponent";
 import { CombatStats } from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import CombatInfoComponent from "./CombatInfoComponent";
@@ -345,7 +345,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             <ListGroupItem className="text-center font-italic" style={{ maxWidth: 500 }}>
                                 <>
                                     {connectedSpectators.length > 0 ? (
-                                        <>Spectators: {joinReactNodes(this.getConnectedSpectators().map(u => <b key={`specatator_${u.id}`}>{getIngameUserLinkOrLabel(this.ingame, u, null)}</b>), ", ")}</>
+                                        <>Spectators: {joinReactNodes(connectedSpectators.map(u => <b key={`specatator_${u.id}`}>{getUserLinkOrLabel(this.ingame.entireGame, u, null)}</b>), ", ")}</>
                                     ) : (
                                         <>No spectators</>
                                     )}
@@ -924,7 +924,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     roomId={this.ingame.entireGame.publicChatRoomId}
                                     currentlyViewed={this.currentOpenedTab == "chat"}
                                     injectBetweenMessages={(p, n) => this.injectBetweenMessages(p, n)}
-                                    getUserDisplayName={u => <b>{getIngameUserLinkOrLabel(this.ingame, u, this.ingame.players.tryGet(u, null), this.user?.settings.chatHouseNames)}</b>} />
+                                    getUserDisplayName={u => <b>{getUserLinkOrLabel(this.ingame.entireGame, u, this.ingame.players.tryGet(u, null), this.user?.settings.chatHouseNames)}</b>} />
                             </Tab.Pane>
                             {this.ingame.votes.size > 0 && <Tab.Pane eventKey="votes" className="h-100">
                                 <ScrollToBottom className="h-100" scrollViewClassName="overflow-x-hidden">
@@ -964,7 +964,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         entireGame={this.ingame.entireGame}
                                         roomId={roomId}
                                         currentlyViewed={this.currentOpenedTab == roomId}
-                                        getUserDisplayName={u => <b>{getIngameUserLinkOrLabel(this.ingame, u, this.ingame.players.tryGet(u, null), this.user?.settings.chatHouseNames)}</b>} />
+                                        getUserDisplayName={u => <b>{getUserLinkOrLabel(this.ingame.entireGame, u, this.ingame.players.tryGet(u, null), this.user?.settings.chatHouseNames)}</b>} />
                                 </Tab.Pane>
                             ))}
                         </Tab.Content>
@@ -1140,7 +1140,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     getConnectedSpectators(): User[] {
-        return this.ingame.getSpectators().filter(u => u.connected);
+        return _.difference(this.ingame.entireGame.users.values.filter(u => u.connected), this.ingame.players.keys);
     }
 
     onNewPrivateChatRoomClick(p: Player): void {

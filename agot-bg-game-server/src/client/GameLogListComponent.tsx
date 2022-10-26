@@ -38,7 +38,7 @@ import ObjectiveCardComponent from "./game-state-panel/utils/ObjectiveCardCompon
 import { ObjectiveCard } from "../common/ingame-game-state/game-data-structure/static-data-structure/ObjectiveCard";
 import crossedSwordsImage from "../../public/images/icons/crossed-swords.svg";
 import mammothImage from "../../public/images/icons/mammoth.svg";
-import getIngameUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
+import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 import GameClient from "./GameClient";
 import GameLogManager, { ticksToTime, timeToTicks } from "../common/ingame-game-state/game-data-structure/GameLogManager";
 import { secondsToString } from "./utils/secondsToString";
@@ -194,7 +194,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <>
                     <div className="text-center"><h5>The war of the {assignments.length} kings has begun!</h5></div>
                     {assignments.map(([house, user]) =>
-                        <p  key={`${house.id}_${user.id}`}>House <b>{house.name}</b> is controlled by <b>{getIngameUserLinkOrLabel(this.ingame, user, this.ingame.players.tryGet(user, null))}</b>.</p>
+                        <p  key={`${house.id}_${user.id}`}>House <b>{house.name}</b> is controlled by <b>{getUserLinkOrLabel(this.ingame.entireGame, user, this.ingame.players.tryGet(user, null))}</b>.</p>
                     )}
                 </>;
             case "turn-begin":
@@ -1315,7 +1315,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const oldUser = this.ingame.entireGame.users.get(data.oldUser);
                 const newUser = data.newUser ? this.ingame.entireGame.users.get(data.newUser) : null;
                 const house = this.game.houses.get(data.house);
-                const newUserLabel = newUser ? getIngameUserLinkOrLabel(this.ingame, newUser, this.ingame.players.tryGet(newUser, null)) : null;
+                const newUserLabel = newUser ? getUserLinkOrLabel(this.ingame.entireGame, newUser, this.ingame.players.tryGet(newUser, null)) : null;
                 const reason = data.reason == ReplacementReason.CLOCK_TIMEOUT
                     ? " due to clock timeout"
                     : data.reason == ReplacementReason.VOTE
@@ -1323,7 +1323,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         : "";
 
                 return <>
-                    <b>{getIngameUserLinkOrLabel(this.ingame, oldUser, this.ingame.players.tryGet(oldUser, null))}</b> (House <b>{house.name}</b>) was
+                    <b>{getUserLinkOrLabel(this.ingame.entireGame, oldUser, this.ingame.players.tryGet(oldUser, null))}</b> (House <b>{house.name}</b>) was
                     replaced by {newUserLabel ? <b>{newUserLabel}</b> : " a vassal"}{reason}.
                 </>;
             }
@@ -1333,7 +1333,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <>
-                        Vassal House <b>{house.name}</b> was replaced by <b>{getIngameUserLinkOrLabel(this.ingame, user, this.ingame.players.tryGet(user, null))}</b>.
+                        Vassal House <b>{house.name}</b> was replaced by <b>{getUserLinkOrLabel(this.ingame.entireGame, user, this.ingame.players.tryGet(user, null))}</b>.
                     </>
                 );
             }
@@ -1969,10 +1969,10 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const swappingUser = this.ingame.entireGame.users.get(data.swappingUser);
                 const initiatorHouse = this.game.houses.get(data.initiatorHouse);
                 const swappingHouse = this.game.houses.get(data.swappingHouse);
-                const newUserLabel = getIngameUserLinkOrLabel(this.ingame, swappingUser, this.ingame.players.tryGet(swappingUser, null));
+                const newUserLabel = getUserLinkOrLabel(this.ingame.entireGame, swappingUser, this.ingame.players.tryGet(swappingUser, null));
 
                 return <>
-                    <b>{getIngameUserLinkOrLabel(this.ingame, initiator, this.ingame.players.tryGet(initiator, null))}</b> (House <b>{initiatorHouse.name}</b>) swapped
+                    <b>{getUserLinkOrLabel(this.ingame.entireGame, initiator, this.ingame.players.tryGet(initiator, null))}</b> (House <b>{initiatorHouse.name}</b>) swapped
                     houses with {<b>{newUserLabel}</b>} (House <b>{swappingHouse.name}</b>).
                 </>;
             }
