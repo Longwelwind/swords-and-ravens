@@ -484,7 +484,7 @@ export class ReplaceVassalByPlayer extends VoteType {
     }
 
     verb(): string {
-        return `replace vassal house ${this.forHouse.name}`;
+        return `replace Vassal house ${this.forHouse.name}`;
     }
 
     executeAccepted(vote: Vote): void {

@@ -1957,6 +1957,18 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "95",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                if (ingame.childGameState.type != "draft-house-cards" && ingame.childGameState.type != "thematic-draft-house-cards") {
+                    ingame.game.houseCardsForDrafting = [];
+                }
+            }
+            return serializedGame;
+        }
     }
 ];
 

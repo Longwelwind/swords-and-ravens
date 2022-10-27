@@ -184,7 +184,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 }
                 return <p>
                     House <b>{house.name}</b> {text}{forHouses
-                        ? <> for {joinReactNodes(forHouses.map(h => <b key={`for_vassal_house_${h.id}`}>{h.name}</b>), ', ')}</>
+                        ? <> for {forHouses.length == 1
+                            ? <>Vassal house <b key={`for_vassal_house_${forHouses[0].id}`}>{forHouses[0].name}</b></>
+                            : joinReactNodes(forHouses.map(h => <b key={`for_vassal_house_${h.id}`}>{h.name}</b>), ', ')}</>
                         : <></>}.
                 </p>;
             }
@@ -1333,7 +1335,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <>
-                        Vassal House <b>{house.name}</b> was replaced by <b>{getUserLinkOrLabel(this.ingame.entireGame, user, this.ingame.players.tryGet(user, null))}</b>.
+                        Vassal house <b>{house.name}</b> was replaced by <b>{getUserLinkOrLabel(this.ingame.entireGame, user, this.ingame.players.tryGet(user, null))}</b>.
                     </>
                 );
             }

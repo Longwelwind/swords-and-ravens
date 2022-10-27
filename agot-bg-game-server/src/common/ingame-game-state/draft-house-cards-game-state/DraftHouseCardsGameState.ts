@@ -131,7 +131,7 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
         const houseToResolve = this.getNextHouse();
 
         if (houseToResolve == null) {
-            this.game.houseCardsForDrafting = new BetterMap();
+            this.game.houseCardsForDrafting.clear();
             // Append vassals back to the tracks:
             for(let i=0; i<this.vassalsOnInfluenceTracks.length; i++) {
                 const newInfluenceTrack = _.concat(this.game.influenceTracks[i], this.vassalsOnInfluenceTracks[i]);

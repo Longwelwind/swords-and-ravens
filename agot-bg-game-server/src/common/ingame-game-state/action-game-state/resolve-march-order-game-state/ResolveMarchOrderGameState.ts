@@ -15,7 +15,6 @@ import Game from "../../game-data-structure/Game";
 import Order from "../../game-data-structure/Order";
 import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameState } from "../../take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
 import { findOrphanedShipsAndDestroyThem, isTakeControlOfEnemyPortGameStateRequired } from "../../port-helper/PortHelper";
-import _ from "lodash";
 import houseCardAbilities from "../../game-data-structure/house-card/houseCardAbilities";
 import BetterMap from "../../../../utils/BetterMap";
 import CallForSupportAgainstNeutralForceGameState, { SerializedCallForSupportAgainstNeutralForceGameState } from "./call-for-support-against-neutral-force-game-state/CallForSupportAgainstNeutralForceGameState";
@@ -69,8 +68,8 @@ export default class ResolveMarchOrderGameState extends GameState<
         this.actionGameState.findOrphanedOrdersAndRemoveThem();
 
         // Reset all card abilities (e.g. due to DWD Queen of Thorns)
-        const allHouseCards = _.concat(_.flatMap(this.game.houses.values.map(h => h.houseCards.values)), this.game.vassalHouseCards.values);
-        const manipulatedHouseCards = allHouseCards.filter(hc => hc.disabled || hc.originalCombatStrength !== undefined);
+        const manipulatedHouseCards = this.game.getAllHouseCardsInGame().values
+            .filter(hc => hc.disabled || hc.originalCombatStrength !== undefined);
 
         manipulatedHouseCards.forEach(card => {
             if (card.disabled) {
@@ -243,20 +242,13 @@ export default class ResolveMarchOrderGameState extends GameState<
 
     onServerMessage(message: ServerMessage): void {
         if (message.type == "manipulate-combat-house-card") {
-            const allHouseCards = _.concat(
-                _.flatMap(this.game.houses.values.map(h => h.houseCards.values)),
-                _.flatMap(this.game.oldPlayerHouseCards.values.map(houseCardsPerOldPlayer => houseCardsPerOldPlayer.values)),
-                this.game.deletedHouseCards.values
-            );
             message.manipulatedHouseCards.forEach(([hcid, shc]) => {
-                const found = allHouseCards.find(hc => hc.id == hcid);
-                if (found) {
-                    found.ability = shc.abilityId ? houseCardAbilities.get(shc.abilityId) : null;
-                    found.disabled = shc.disabled;
-                    found.disabledAbility = shc.disabledAbilityId ? houseCardAbilities.get(shc.disabledAbilityId) : null;
-                    found.combatStrength = shc.combatStrength;
-                    found.originalCombatStrength = shc.originalCombatStrength;
-                }
+                const houseCard = this.ingame.game.getHouseCardById(hcid);
+                houseCard.ability = shc.abilityId ? houseCardAbilities.get(shc.abilityId) : null;
+                houseCard.disabled = shc.disabled;
+                houseCard.disabledAbility = shc.disabledAbilityId ? houseCardAbilities.get(shc.disabledAbilityId) : null;
+                houseCard.combatStrength = shc.combatStrength;
+                houseCard.originalCombatStrength = shc.originalCombatStrength;
             });
 
             if (this.childGameState instanceof CombatGameState) {

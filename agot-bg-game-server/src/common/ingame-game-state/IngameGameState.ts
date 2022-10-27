@@ -32,7 +32,6 @@ import DraftHouseCardsGameState, { houseCardCombatStrengthAllocations, Serialize
 import CombatGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import DeclareSupportGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/declare-support-game-state/DeclareSupportGameState";
 import ThematicDraftHouseCardsGameState, { SerializedThematicDraftHouseCardsGameState } from "./thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
-import DraftInfluencePositionsGameState, { SerializedDraftInfluencePositionsGameState } from "./draft-influence-positions-game-state/DraftInfluencePositionsGameState";
 import shuffle from "../../utils/shuffle";
 import shuffleInPlace from "../../utils/shuffleInPlace";
 import popRandom from "../../utils/popRandom";
@@ -56,7 +55,7 @@ export const enum ReplacementReason {
 export default class IngameGameState extends GameState<
     EntireGame,
     WesterosGameState | PlanningGameState | ActionGameState | CancelledGameState | GameEndedGameState
-    | DraftHouseCardsGameState | ThematicDraftHouseCardsGameState | DraftInfluencePositionsGameState | PayDebtsGameState
+    | DraftHouseCardsGameState | ThematicDraftHouseCardsGameState | PayDebtsGameState
     | ChooseInitialObjectivesGameState
 > {
     players: BetterMap<User, Player> = new BetterMap();
@@ -188,7 +187,7 @@ export default class IngameGameState extends GameState<
                 }
             });
 
-            this.game.houseCardsForDrafting = new BetterMap();
+            this.game.houseCardsForDrafting.clear();
 
             this.setInfluenceTrack(0, this.getRandomTrackOrder());
             this.setInfluenceTrack(1, this.getRandomTrackOrder());
@@ -234,10 +233,6 @@ export default class IngameGameState extends GameState<
         const vassalHouses = _.without(this.game.houses.values, ...playerHouses);
 
         return _.concat(shuffleInPlace(playerHouses), shuffleInPlace(vassalHouses));
-    }
-
-    proceedDraftingInfluencePositions(vassalsOnInfluenceTracks: House[][]): void {
-        this.setChildGameState(new DraftInfluencePositionsGameState(this)).firstStart(vassalsOnInfluenceTracks);
     }
 
     log(data: GameLogData, resolvedAutomatically = false): void {
@@ -1483,10 +1478,6 @@ export default class IngameGameState extends GameState<
             if (this.childGameState instanceof ThematicDraftHouseCardsGameState) {
                 return {result: false, reason: "ongoing-house-card-drafting"}
             }
-
-            if (this.entireGame.isFeastForCrows && !this.isHouseDefeated(forHouse) && !this.entireGame.gameSettings.onlyLive) {
-                return {result: false, reason: "only-possible-when-defeated"}
-            }
         }
 
         const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && ((!replaceWithVassal && v.type instanceof ReplacePlayer) || v.type instanceof ReplacePlayerByVassal));
@@ -1809,8 +1800,6 @@ export default class IngameGameState extends GameState<
                 return DraftHouseCardsGameState.deserializeFromServer(this, data);
             case "thematic-draft-house-cards":
                 return ThematicDraftHouseCardsGameState.deserializeFromServer(this, data);
-            case "draft-influence-positions":
-                return DraftInfluencePositionsGameState.deserializeFromServer(this, data);
             case "pay-debts":
                 return PayDebtsGameState.deserializeFromServer(this, data);
             case "choose-initial-objectives":
@@ -1833,6 +1822,6 @@ export interface SerializedIngameGameState {
     willBeAutoResumedAt: number | null;
     childGameState: SerializedPlanningGameState | SerializedActionGameState | SerializedWesterosGameState
         | SerializedGameEndedGameState | SerializedCancelledGameState | SerializedDraftHouseCardsGameState
-        | SerializedThematicDraftHouseCardsGameState | SerializedDraftInfluencePositionsGameState | SerializedPayDebtsGameState
+        | SerializedThematicDraftHouseCardsGameState | SerializedPayDebtsGameState
         | SerializedChooseInitialObjectivesGameState;
 }

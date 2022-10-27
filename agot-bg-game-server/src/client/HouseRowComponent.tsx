@@ -375,7 +375,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     }
 
     onLaunchReplaceVassalVoteClick(): void {
-        if (window.confirm(`Do you want to launch a vote to replace Vassal House ${this.house.name}?`)) {
+        if (window.confirm(`Do you want to launch a vote to replace Vassal house ${this.house.name}?`)) {
             this.props.ingame.launchReplaceVassalByPlayerVote(this.house);
         }
     }
