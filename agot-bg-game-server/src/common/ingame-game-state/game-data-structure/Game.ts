@@ -392,33 +392,30 @@ export default class Game {
         return _.sortBy(armySizes.values.filter(s => s > 0), s => -s);
     }
 
+    getAllHouseCardsInGame(): BetterMap<string, HouseCard> {
+        const allCards = new BetterMap<string, HouseCard>();
+
+        this.houses.values.forEach(h => {
+            allCards.setRange(h.houseCards.entries);
+        });
+
+        allCards.setRange(this.vassalHouseCards.entries);
+        allCards.setRange(this.houseCardsForDrafting.entries);
+        allCards.setRange(this.deletedHouseCards.entries);
+
+        this.oldPlayerHouseCards.values.forEach(hcs => {
+            allCards.setRange(hcs.entries);
+        });
+
+        return allCards;
+    }
+
     getHouseCardById(id: string): HouseCard {
-        let houseCard = _.flatMap(this.houses.values, h => h.houseCards.values).find(hc => hc.id == id);
-
-        if (!houseCard) {
-            houseCard = this.vassalHouseCards.has(id)
-                ? this.vassalHouseCards.get(id)
-                : this.houseCardsForDrafting.has(id)
-                ? this.houseCardsForDrafting.get(id)
-                : this.deletedHouseCards.has(id)
-                ? this.deletedHouseCards.get(id)
-                : undefined;
-        }
-
-        if (!houseCard) {
-            // Check oldPlayerHouseCards
-            this.oldPlayerHouseCards.keys.forEach(h => {
-                if (this.oldPlayerHouseCards.get(h).has(id)) {
-                    houseCard = this.oldPlayerHouseCards.get(h).get(id);
-                }
-            });
-        }
-
-        if (!houseCard) {
+        const allCards = this.getAllHouseCardsInGame();
+        if (!allCards.has(id)) {
             throw new Error(`House card ${id} not found`);
         }
-
-        return houseCard;
+        return allCards.get(id);
     }
 
     getWesterosCardById(id: number, deckId: number): WesterosCard {
