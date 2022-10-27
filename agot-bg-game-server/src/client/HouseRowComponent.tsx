@@ -284,10 +284,18 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                 ))
                                 : _.sortBy(this.game.vassalHouseCards.values, hc => hc.combatStrength).map(hc => (
                                     <Col xs="auto" key={`vassal-cards_${this.house.id}_${hc.id}`}>
-                                        <HouseCardComponent
-                                            houseCard={hc}
-                                            size="tiny"
-                                        />
+                                        {hc.state == HouseCardState.AVAILABLE ? (
+                                            <HouseCardComponent
+                                                houseCard={hc}
+                                                size="tiny"
+                                            />
+                                        ) : (
+                                            <HouseCardBackComponent
+                                                house={null}
+                                                houseCard={hc}
+                                                size="tiny"
+                                            />
+                                        )}
                                     </Col>
                                 ))}
                         </Row>

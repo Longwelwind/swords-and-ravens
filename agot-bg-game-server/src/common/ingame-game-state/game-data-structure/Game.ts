@@ -572,6 +572,7 @@ export default class Game {
         const game = new Game(ingame);
 
         game.lastUnitId = data.lastUnitId;
+        game.vassalHouseCards = new BetterMap(data.vassalHouseCards.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
         game.houses = new BetterMap(data.houses.map(h => [h.id, House.deserializeFromServer(game, h)]));
         game.world = World.deserializeFromServer(game, data.world);
         game.turn = data.turn;
@@ -590,7 +591,6 @@ export default class Game {
         game.revealedWesterosCards = data.revealedWesterosCards;
         game.clientNextWildlingCardId = data.clientNextWildlingCardId;
         game.vassalRelations = new BetterMap(data.vassalRelations.map(([vid, hid]) => [game.houses.get(vid), game.houses.get(hid)]));
-        game.vassalHouseCards = new BetterMap(data.vassalHouseCards.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
         game.houseCardsForDrafting = new BetterMap(data.houseCardsForDrafting.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
         game.deletedHouseCards = new BetterMap(data.deletedHouseCards.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
         game.oldPlayerHouseCards = new BetterMap(data.oldPlayerHouseCards.map(([hid, hcs]) =>

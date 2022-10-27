@@ -39,7 +39,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         // Setup the choosable house cards
         let vassalHouseCards = shuffleInPlace(this.ingameGameState.game.vassalHouseCards.values);
         if (choosableHouseCards) {
-            vassalHouseCards = _.without(vassalHouseCards, ...(_.flatMap(choosableHouseCards.values)));
+            vassalHouseCards = _.difference(vassalHouseCards, _.flatMap(choosableHouseCards.values));
         }
 
         this.choosableHouseCards = new BetterMap(this.combatGameState.houseCombatDatas.keys.map(h => {
@@ -57,6 +57,12 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
             // Assign the chosen house cards to the vassal house as some abilities require a hand during resolution
             if (this.ingameGameState.isVassalHouse(h)) {
                 h.houseCards = new BetterMap(houseCards.map(hc => [hc.id, hc]));
+                h.houseCards.values.forEach(hc => {
+                    if (hc.state == HouseCardState.USED) {
+                        this.entireGame.onCaptureSentryMessage(`Vassal house card ${hc.id} is marked as USED`, "error");
+                        hc.state = HouseCardState.AVAILABLE;
+                    }
+                });
             }
 
             return [h, houseCards];

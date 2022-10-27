@@ -88,7 +88,7 @@ export default class House {
         };
     }
 
-    static deserializeFromServer(_game: Game, data: SerializedHouse): House {
+    static deserializeFromServer(game: Game, data: SerializedHouse): House {
         const house = new House(
             data.id,
             data.name,
@@ -100,7 +100,12 @@ export default class House {
             data.maxPowerTokens,
             data.supplyLevel,
             new BetterMap<string, HouseCard>(
-                data.houseCards.map(([string, data]) => [string, HouseCard.deserializeFromServer(data)])),
+                data.houseCards.map(([hcid, data]) => {
+                    if (game.vassalHouseCards.has(hcid)) {
+                        return [hcid, game.vassalHouseCards.get(hcid)];
+                    }
+                    return [hcid, HouseCard.deserializeFromServer(data)] })
+                ),
             data.laterHouseCards
                 ? new BetterMap<string, HouseCard>(data.laterHouseCards.map(([string, data]) => [string, HouseCard.deserializeFromServer(data)]))
                 : null,
