@@ -14,7 +14,6 @@ import { observable } from "mobx";
 
 export default class ThematicDraftHouseCardsGameState extends GameState<IngameGameState> {
     @observable readyHouses: House[];
-    vassalsOnInfluenceTracks: House[][];
 
     get ingame(): IngameGameState {
         return this.parentGameState;
@@ -42,11 +41,6 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
         });
 
         this.readyHouses = [];
-
-        // Don't draft influence positions anymore but keep "vassalsOnInfluenceTracks" and
-        // DraftInfluencePositionsGameState as possible Ingame child to not crash running drafts.
-        // Todo: Remove this in 3 months
-        this.vassalsOnInfluenceTracks = [];
     }
 
     getFilteredHouseCardsForHouse(house: House): HouseCard[] {
@@ -121,6 +115,7 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
             }
 
             if (this.participatingHouses.every(h => h.houseCards.size == 7)) {
+                this.game.houseCardsForDrafting.clear();
                 this.participatingHouses.forEach(h => {
                     this.entireGame.broadcastToClients({
                         type: "update-house-cards",
@@ -128,12 +123,7 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
                         houseCards: h.houseCards.values.map(hc => hc.serializeToClient())
                     });
                 });
-                if (this.vassalsOnInfluenceTracks.length == 0) {
-                    this.ingame.onDraftingFinish();
-                } else {
-                    // Todo: Remove this in 3 months as well
-                    this.ingame.proceedDraftingInfluencePositions(this.vassalsOnInfluenceTracks);
-                }
+                this.ingame.onDraftingFinish();
             }
         }
     }
@@ -148,15 +138,13 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
     serializeToClient(_admin: boolean, _player: Player | null): SerializedThematicDraftHouseCardsGameState {
         return {
             type: "thematic-draft-house-cards",
-            readyHouses: this.readyHouses.map(h => h.id),
-            vassalsOnInfluenceTracks: this.vassalsOnInfluenceTracks.map(track => track.map(h => h.id))
+            readyHouses: this.readyHouses.map(h => h.id)
         };
     }
 
     static deserializeFromServer(ingame: IngameGameState, data: SerializedThematicDraftHouseCardsGameState): ThematicDraftHouseCardsGameState {
         const thematicDraftHouseCardsGameState = new ThematicDraftHouseCardsGameState(ingame);
         thematicDraftHouseCardsGameState.readyHouses = data.readyHouses.map(hid => ingame.game.houses.get(hid));
-        thematicDraftHouseCardsGameState.vassalsOnInfluenceTracks = data.vassalsOnInfluenceTracks.map(track => track.map(hid => ingame.game.houses.get(hid)))
         return thematicDraftHouseCardsGameState;
     }
 }
@@ -164,5 +152,4 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
 export interface SerializedThematicDraftHouseCardsGameState {
     type: "thematic-draft-house-cards";
     readyHouses: string[];
-    vassalsOnInfluenceTracks: string[][];
 }

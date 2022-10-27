@@ -83,8 +83,6 @@ import housePowerTokensImages from "./housePowerTokensImages";
 import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
 import unitImages from "./unitImages";
 import { tidesOfBattleCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
-import DraftInfluencePositionsGameState from "../common/ingame-game-state/draft-influence-positions-game-state/DraftInfluencePositionsGameState";
-import DraftInfluencePositionsComponent from "./game-state-panel/DraftInfluencePositionsComponent";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import { faCheckToSlot, faRightLeft, faUniversity } from "@fortawesome/free-solid-svg-icons";
 import joinNaturalLanguage from "./utils/joinNaturalLanguage";
@@ -180,7 +178,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             for (let i = cok.currentTrackI; i < influenceTracks.length; i++) {
                 influenceTracks[i] = this.clientGetFixedInfluenceTrack(influenceTracks[i].map(h => (i == 0 && h == this.game.ironThroneHolder) || h == this.game.targaryen ? h : null));
             }
-        } else if(this.ingame.hasChildGameState(DraftHouseCardsGameState) || this.ingame.hasChildGameState(DraftInfluencePositionsGameState) || this.ingame.hasChildGameState(ThematicDraftHouseCardsGameState)) {
+        } else if(this.ingame.hasChildGameState(DraftHouseCardsGameState)) {
             for (let i = 0; i < influenceTracks.length; i++) {
                 while (influenceTracks[i].length < this.game.houses.size) {
                     influenceTracks[i].push(null);
@@ -687,7 +685,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         phases.map(phase => [phase.gameState, phase.component] as [any, typeof Component]),
                                         [[ThematicDraftHouseCardsGameState, ThematicDraftHouseCardsComponent]],
                                         [[DraftHouseCardsGameState, DraftHouseCardsComponent]],
-                                        [[DraftInfluencePositionsGameState, DraftInfluencePositionsComponent]],
                                         [[GameEndedGameState, GameEndedComponent]],
                                         [[CancelledGameState, IngameCancelledComponent]],
                                         [[PayDebtsGameState, PayDebtsComponent]],
