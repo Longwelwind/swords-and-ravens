@@ -430,7 +430,7 @@ export default class PostCombatGameState extends GameState<
     }
 
     markHouseCardAsUsed(house: House, houseCard: HouseCard | null): void {
-        if (houseCard) {
+        if (houseCard && !this.combat.ingameGameState.game.vassalHouseCards.has(houseCard.id)) {
             houseCard.state = HouseCardState.USED;
 
             this.entireGame.broadcastToClients({

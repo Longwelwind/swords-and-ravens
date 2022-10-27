@@ -1945,6 +1945,18 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "94",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.game.vassalHouseCards.forEach(([_hcid, shc]: any) => {
+                    shc.state = 0;
+                });
+            }
+            return serializedGame;
+        }
     }
 ];
 

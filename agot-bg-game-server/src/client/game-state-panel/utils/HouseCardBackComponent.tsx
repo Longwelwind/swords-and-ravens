@@ -10,7 +10,7 @@ import { preventOverflow } from "@popperjs/core";
 import ImagePopover from "../../utils/ImagePopover";
 
 interface HouseCardBackComponentProps {
-    house: House;
+    house: House | null;
     houseCard: HouseCard;
     size?: "small" | "medium" | "tiny";
 }
@@ -35,7 +35,7 @@ export default class HouseCardBackComponent extends Component<HouseCardBackCompo
                         this.props.size
                     )}
                     style={{
-                        backgroundImage: `url(${houseCardsBackImages.get(this.props.house.id)})`
+                        backgroundImage: `url(${houseCardsBackImages.get(this.props.house ? this.props.house.id : "vassal")})`
                     }}
                 />
             </OverlayTrigger>
