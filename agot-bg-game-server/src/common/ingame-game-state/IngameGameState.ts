@@ -1483,10 +1483,6 @@ export default class IngameGameState extends GameState<
             if (this.childGameState instanceof ThematicDraftHouseCardsGameState) {
                 return {result: false, reason: "ongoing-house-card-drafting"}
             }
-
-            if (this.entireGame.isFeastForCrows && !this.isHouseDefeated(forHouse) && !this.entireGame.gameSettings.onlyLive) {
-                return {result: false, reason: "only-possible-when-defeated"}
-            }
         }
 
         const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && ((!replaceWithVassal && v.type instanceof ReplacePlayer) || v.type instanceof ReplacePlayerByVassal));
