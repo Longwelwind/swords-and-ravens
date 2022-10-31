@@ -103,7 +103,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                 </Col>
                 <Col xs={10} xl={8} className="mb-3">
                     <Row className="no-space-around">
-                        <Col xs={connectedSpectators.length > 0 ? 9 : 12} className="no-space-around">
+                        <Col xs={connectedSpectators.length > 0 ? 8 : 12} className="no-space-around">
                             <Card>
                                 <Card.Body style={{height: this.chatHeight}}>
                                     <ChatComponent gameClient={this.props.gameClient}
@@ -135,33 +135,17 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                     <Row className="justify-content-center no-space-around">
                         <Card>
                             <Card.Body style={{paddingTop: "10px", paddingBottom: "10px"}}>
+                                {!this.props.gameClient.isRealOwner() && this.lobby.password != "" && !this.readyCheckOngoing &&
+                                    this.renderPasswordInput()
+                                }
                                 <Row>
                                     <GameSettingsComponent
                                         gameClient={this.props.gameClient}
                                         entireGame={this.lobby.entireGame} />
                                 </Row>
-                                {(this.props.gameClient.isRealOwner() || this.lobby.password != "") && !this.readyCheckOngoing &&
-                                <Row className="mt-2">
-                                    <Col>
-                                        <Row className="justify-content-center">
-                                            <DebouncedPasswordComponent
-                                                password={this.password}
-                                                onChangeCallback={newPassword => {
-                                                    this.password = newPassword;
-                                                    this.lobby.sendPassword(newPassword);
-                                                }}
-                                                tooltip={
-                                                    <Tooltip id="game-password-tooltip">
-                                                        {this.props.gameClient.isRealOwner()
-                                                            ? <>You can set a password here to prevent strangers from joining your game.</>
-                                                            : this.lobby.password != ""
-                                                                ? <>Enter the password here to unlock and join the game.</>
-                                                                : <></>}
-                                                    </Tooltip>}
-                                            />
-                                        </Row>
-                                    </Col>
-                                </Row>}
+                                {this.props.gameClient.isRealOwner() && !this.readyCheckOngoing &&
+                                    this.renderPasswordInput()
+                                }
                                 <Row className="mt-3">
                                     <Col>
                                         <Button
@@ -259,6 +243,28 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                     </Row>
                 </Col>
         </>;
+    }
+
+    renderPasswordInput(): ReactNode {
+        return <Row className="mt-2">
+            <Col>
+                <Row className="justify-content-center">
+                    <DebouncedPasswordComponent
+                        password={this.password}
+                        onChangeCallback={newPassword => {
+                            this.password = newPassword;
+                            this.lobby.sendPassword(newPassword);
+                        } }
+                        tooltip={<Tooltip id="game-password-tooltip">
+                            {this.props.gameClient.isRealOwner()
+                                ? <>You can set a password here to prevent strangers from joining your game.</>
+                                : this.lobby.password != ""
+                                    ? <>Enter the password here to unlock and join the game.</>
+                                    : <></>}
+                        </Tooltip>} />
+                </Row>
+            </Col>
+        </Row>;
     }
 
     getConnectedSpectators(): User[] {
