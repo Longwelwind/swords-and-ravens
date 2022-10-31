@@ -85,11 +85,18 @@ export default class ChatComponent extends Component<ChatComponentProps> {
             id: "4",
             text: "😶‍🌫️Party!!!🥳👨‍👩‍👧‍👦7️⃣🇩🇪",
             user: this.props.entireGame.users.values[0]
-        }]; */
+        }];
+
+        for(let i=0; i<5; i++) {
+            const length = messages.length;
+            for(let j=0; j<length; j++) {
+                messages.push(messages[j]);
+            }
+        } */
         return (
             <div className="d-flex flex-column h-100">
                 {/* Setting a fixed height seems to be the only solution to make ScrollToBottom work */}
-                <ScrollToBottom className="mb-2 h-90 chat-scroll-to-bottom" scrollViewClassName="overflow-x-hidden">
+                <ScrollToBottom className="mb-2 h-90 chat-scroll-to-bottom" scrollViewClassName="overflow-x-auto">
                     {/* In case there's no messages yet, inject with no messages as arguments */}
                     {messages.length == 0 && (
                         <React.Fragment key={"injected-for-all"}>
@@ -117,10 +124,10 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                         </small>
                                     </OverlayTrigger>
                                 </Col>
-                                <Col xs="auto" className="mx-1">
+                                <Col xs="auto" style={{maxWidth: 180}} className="mx-1">
                                     {this.props.getUserDisplayName(m.user)}
                                 </Col>
-                                <Col style={{overflowWrap: "anywhere"}}>
+                                <Col style={{overflowWrap: "anywhere", minWidth: 200}}>
                                     <span className={onlyEmojis ? "make-emojis-large" : ""}>{m.text}</span>
                                 </Col>
                             </Row>
@@ -130,15 +137,29 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                             </React.Fragment >
                         </>
                     })}
+                    <button className="btn btn-outline-light btn-sm"
+                        style={{position: "absolute", right: 12, top: 0}}
+                        onClick={(e: any) => { this.loadMoreMessages(); e.preventDefault() }}
+                        disabled={this.noMoreMessages}
+                        >
+                            <OverlayTrigger
+                                overlay={
+                                    <Tooltip id="mute-tooltip">
+                                        {this.noMoreMessages ? <>There are no more messages</> : <>Load more messages</>}
+                                    </Tooltip>
+                                }
+                            >
+                                <FontAwesomeIcon icon={faSyncAlt} />
+                            </OverlayTrigger>
+                    </button>
                 </ScrollToBottom>
-                {!this.channel.connected &&
-                <Row noGutters={true} className="flex-nowrap justify-content-center">
-                    <Alert variant="warning" className="text-center">
-                        This chat is not connected. Please wait until the connection is established or reload the page.
-                    </Alert>
-                </Row>}
-                <div>
-                    <Form>
+                {!this.channel.connected ?
+                    <Row noGutters={true} className="flex-nowrap justify-content-center">
+                        <Alert variant="warning" className="text-center">
+                            This chat is not connected. Please wait until the connection is established or reload the page.
+                        </Alert>
+                    </Row>
+                    : <Form>
                         <Row className="d-flex align-items-center">
                             <Col>
                                 <Form.Control
@@ -181,22 +202,9 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                             <Col xs="auto">
                                 <Button type="submit" size="lg" onClick={(e: any) => {this.send(); e.preventDefault()}}>Send</Button>
                             </Col>
-                            <Col xs="auto">
-                                <button className="btn btn-outline-light btn-sm" onClick={(e: any) => { this.loadMoreMessages(); e.preventDefault() }} disabled={this.noMoreMessages}>
-                                    <OverlayTrigger
-                                        overlay={
-                                            <Tooltip id="mute-tooltip">
-                                                {this.noMoreMessages ? <>There are no more messages</> : <>Load more messages</>}
-                                            </Tooltip>
-                                        }
-                                    >
-                                        <FontAwesomeIcon icon={faSyncAlt} size="2x"/>
-                                    </OverlayTrigger>
-                                </button>
-                            </Col>
                         </Row>
                     </Form>
-                </div>
+                }
             </div>
         );
     }
