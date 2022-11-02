@@ -192,6 +192,10 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.initialLiveClock = 120;
             }
 
+            if (settings.victoryPointsCountNeededToWin < 6 || settings.victoryPointsCountNeededToWin > 10) {
+                settings.victoryPointsCountNeededToWin = 7;
+            }
+
             if (settings.houseCardsEvolution) {
                 settings.adwdHouseCards = false;
                 settings.asosHouseCards = false;

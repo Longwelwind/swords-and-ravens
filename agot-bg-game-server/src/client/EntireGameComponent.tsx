@@ -23,7 +23,7 @@ import DraftHouseCardsGameState from "../common/ingame-game-state/draft-house-ca
 import { observable } from "mobx";
 import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faExclamation, faLock } from "@fortawesome/free-solid-svg-icons";
+import { faLock, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
 import introSound from "../../public/sounds/game-of-thrones-intro.ogg";
 import CombatGameState from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
@@ -174,19 +174,20 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             <Col xs="auto">
                 <h4><Badge variant="danger">PAUSED</Badge></h4>
             </Col>}
-            {this.props.entireGame.gameSettings.reduceVictoryPointsCountNeededToWinTo6 &&
+            {this.props.entireGame.gameSettings.victoryPointsCountNeededToWin != 7 &&
             <Col xs="auto">
                 <OverlayTrigger
                     placement="auto"
                     overlay={
-                        <Tooltip id="vp-counts-reduced-tooltip">
+                        <Tooltip id="vp-counts-modified-tooltip">
                             <Col className="text-center">
-                                The number of victory points required for winning is reduced to <b>6</b> instead of 7!
+                            The number of victory points needed to win has been modified
+                            to <b>{this.props.entireGame.gameSettings.victoryPointsCountNeededToWin}</b>!
                             </Col>
                         </Tooltip>}
                     popperConfig={{ modifiers: [preventOverflow] }}
                 >
-                    <h4><Badge variant="warning"><FontAwesomeIcon icon={faExclamation} size="sm"/></Badge></h4>
+                    <h4><Badge variant="primary"><FontAwesomeIcon icon={faTriangleExclamation} /></Badge></h4>
                 </OverlayTrigger>
             </Col>}
             {this.props.entireGame.isDanceWithMotherOfDragons &&

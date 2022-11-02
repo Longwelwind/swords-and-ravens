@@ -104,7 +104,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             )}
                             {this.gameSettings.onlyLive && !(this.props.entireGame.childGameState instanceof IngameGameState) &&
                             <div>
-                                <select id="initial-live-clock" name="initialLiveClock"
+                                <select id="initial-live-clock"
                                     value={this.gameSettings.initialLiveClock}
                                     onChange={e => this.onInitialLiveClockChange(e.target.value)}
                                 >
@@ -236,14 +236,29 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         </select>
                     </OverlayTrigger>
                 </Col>
-                <Col xs="auto">
-                    <select id="player-count" name="playerCount"
-                        value={this.gameSettings.playerCount}
-                        onChange={e => this.onPlayerCountChange(e.target.value)}
-                        style={{marginBottom: "8px"}}
-                    >
-                        {this.createPlayerCountItems()}
-                    </select>&nbsp;&nbsp;Players
+                <Col xs="auto" className="d-flex justify-content-between">
+                    <div>
+                        <select id="player-count" name="playerCount"
+                            value={this.gameSettings.playerCount}
+                            onChange={e => this.onPlayerCountChange(e.target.value)}
+                            style={{marginBottom: "8px"}}
+                        >
+                            {this.createPlayerCountItems()}
+                        </select>&nbsp;Players
+                    </div>
+                    <div>
+                        <select id="vp-count-setting"
+                            value={this.gameSettings.victoryPointsCountNeededToWin}
+                            onChange={e => this.onVpCountChange(e.target.value)}
+                            style={{marginBottom: "8px"}}
+                        >
+                            <option key="6" value={6}>6</option>
+                            <option key="7" value={7}>7</option>
+                            <option key="8" value={8}>8</option>
+                            <option key="9" value={9}>9</option>
+                            <option key="10" value={10}>10</option>
+                        </select>&nbsp;Victory points needed
+                    </div>
                 </Col>
                 {this.props.entireGame.isFeastForCrows && <Col xs="12">
                     <FormCheck
@@ -597,21 +612,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 </Col>
                 <Col xs="12">
                     <FormCheck
-                        id="reduce-vp-count-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="reduce-vp-count-setting-tooltip">
-                                    When this option is enabled, the number of victory points required for winning is reduced to <b>6</b> instead of 7.
-                                </Tooltip>}>
-                                <label htmlFor="reduce-vp-count-setting">Reduce VP count to 6</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.reduceVictoryPointsCountNeededToWinTo6}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.reduceVictoryPointsCountNeededToWinTo6 = !this.gameSettings.reduceVictoryPointsCountNeededToWinTo6)}
-                    />
-                </Col>
-                <Col xs="12">
-                    <FormCheck
                         id="endless-setting"
                         type="switch"
                         label={
@@ -776,6 +776,16 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
         }
 
         this.gameSettings.initialLiveClock = parseInt(newVal);
+
+        this.changeGameSettings();
+    }
+
+    onVpCountChange(newVal: string): void {
+        if (!this.canChangeGameSettings) {
+            return;
+        }
+
+        this.gameSettings.victoryPointsCountNeededToWin = parseInt(newVal);
 
         this.changeGameSettings();
     }
