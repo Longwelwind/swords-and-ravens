@@ -283,7 +283,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         game.maxTurns = 1000;
     }
 
-    game.victoryPointsCountNeededToWin = gameSettings.reduceVictoryPointsCountNeededToWinTo6 ? 6 : baseGameData.victoryPointsCountNeededToWin;
+    game.victoryPointsCountNeededToWin = gameSettings.victoryPointsCountNeededToWin;
 
     game.supplyRestrictions = baseGameData.supplyRestrictions;
     game.revealedWesterosCards = gameSettings.cokWesterosPhase ? 3 : 0;

@@ -1969,6 +1969,17 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "96",
+        migrate: (serializedGame: any) => {
+            serializedGame.gameSettings.victoryPointsCountNeededToWin = 7;
+            if (serializedGame.gameSettings.reduceVictoryPointsCountNeededToWinTo6) {
+                serializedGame.gameSettings.victoryPointsCountNeededToWin = 6;
+            }
+
+            return serializedGame;
+        }
     }
 ];
 
