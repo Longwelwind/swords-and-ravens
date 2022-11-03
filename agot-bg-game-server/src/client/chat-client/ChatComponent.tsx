@@ -138,19 +138,18 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                         </>
                     })}
                     <button className="btn btn-outline-light btn-sm"
-                        style={{position: "absolute", right: 12, top: 0}}
+                        style={{position: "absolute", right: 12, top: 0, display: this.noMoreMessages ? "none" : "inline"}}
                         onClick={(e: any) => { this.loadMoreMessages(); e.preventDefault() }}
-                        disabled={this.noMoreMessages}
+                    >
+                        <OverlayTrigger
+                            overlay={
+                                <Tooltip id="mute-tooltip">
+                                    {this.noMoreMessages ? <>There are no more messages</> : <>Load more messages</>}
+                                </Tooltip>
+                            }
                         >
-                            <OverlayTrigger
-                                overlay={
-                                    <Tooltip id="mute-tooltip">
-                                        {this.noMoreMessages ? <>There are no more messages</> : <>Load more messages</>}
-                                    </Tooltip>
-                                }
-                            >
-                                <FontAwesomeIcon icon={faSyncAlt} />
-                            </OverlayTrigger>
+                            <FontAwesomeIcon icon={faSyncAlt} />
+                        </OverlayTrigger>
                     </button>
                 </ScrollToBottom>
                 {!this.channel.connected ?
