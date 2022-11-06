@@ -218,7 +218,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
 
     renderLobbySettings(): ReactNode {
         return <Row className="mt-2 justify-content-center">
-            <Col md="12" lg="auto" id="base-settings-col" className="no-gutters">
+            <Col xs="6" lg="auto" id="base-settings-col" className="no-gutters" style={{maxWidth: 338, minWidth: 338}}>
                 <Col xs="12">
                     <OverlayTrigger overlay={
                         <Tooltip id="game-setups-tooltip" className="tooltip-w-100">
@@ -322,7 +322,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     />
                 </Col>
             </Col>
-            <Col md="12" lg="auto" id="mod-settings-col" className="no-gutters">
+            <Col xs="6" lg="auto" id="mod-settings-col" className="no-gutters">
                 <Col xs="12">
                     <FormCheck
                         id="vassals-setting"
@@ -420,7 +420,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     />
                 </Col>}
             </Col>
-            <Col md="12" lg="auto" id="extended-base-settings-col" className="no-gutters">
+            <Col xs="6" lg="auto" id="extended-base-settings-col" className="no-gutters">
                 <Col xs="12">
                     <FormCheck
                         id="random-houses-setting"
@@ -513,7 +513,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     />
                 </Col>
             </Col>
-            <Col md="12" lg="auto" id="draft-settings-col" className="no-gutters">
+            <Col xs="6" lg="auto" id="draft-settings-col" className="no-gutters">
                 <Col xs="12">
                     <FormCheck
                         id="draft-house-cards-settings"
@@ -577,7 +577,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     />
                 </Col>
             </Col>
-            <Col md="12" lg="auto" id="custom-settings-col" className="no-gutters">
+            <Col xs="6" lg="auto" id="custom-settings-col" className="no-gutters">
                 <Col xs="12">
                     <FormCheck
                         id="mixed-wd1-setting"
@@ -656,7 +656,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     />
                 </Col>
             </Col>
-            <Col md="12" lg="auto" id="custom-settings-2-col" className="no-gutters">
+            <Col xs="6" lg="auto" id="custom-settings-2-col" className="no-gutters">
                 <Col xs="12">
                     <FormCheck
                         id="preceding-mustering-setting"
