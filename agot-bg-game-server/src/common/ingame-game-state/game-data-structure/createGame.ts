@@ -5,7 +5,7 @@ import Region from "./Region";
 import World from "./World";
 import WesterosCard from "./westeros-card/WesterosCard";
 import {fireMadeFlesh, westerosCardTypes} from "./westeros-card/westerosCardTypes";
-import unitTypes from "./unitTypes";
+import unitTypes, { ship } from "./unitTypes";
 import Game from "./Game";
 import WildlingCard from "./wildling-card/WildlingCard";
 import wildlingCardTypes from "./wildling-card/wildlingCardTypes";
@@ -92,7 +92,7 @@ function getTrackWithAdjustedVassalPositions(track: House[], playerHouses: strin
 
     if (areVassalsInTopThreeSpaces) {
         const vassalsAndTargaryen = track.filter(h => !playerHouses.includes(h.id) || h.id == "targaryen");
-        const newTrack = _.without(track, ...vassalsAndTargaryen);
+        const newTrack = _.difference(track, vassalsAndTargaryen);
         newTrack.push(...vassalsAndTargaryen);
         return newTrack;
     }
@@ -486,7 +486,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         });
     });
 
-    if (gameSettings.customModBalancing) {
+    if (gameSettings.customBalancing && gameSettings.setupId == "mother-of-dragons" && gameSettings.playerCount == 8) {
         // Apply the new starting positions
         Object.entries(baseGameData.customModBalancing as {[key: string]: UnitData[]}).forEach(([regionId, data]) => {
             data.filter(unitData => housesToCreate.includes(unitData.house)).forEach(unitData => {
@@ -507,6 +507,12 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
 
         // Apply alternate dragon strength tokens
         game.dragonStrengthTokens = baseGameData.alternateDragonStrengthTokens;
+    } else if (gameSettings.customBalancing && gameSettings.setupId == "base-game" && gameSettings.playerCount == 6) {
+        if (playerHouses.includes("tyrell")) {
+            const redwyneStraights = game.world.regions.get("redwyne-straights");
+            const newShip = game.createUnit(redwyneStraights, ship, game.houses.get("tyrell"));
+            redwyneStraights.units.set(newShip.id, newShip);
+        }
     }
 
     game.starredOrderRestrictions = baseGameData.starredOrderRestrictions[baseGameData.starredOrderRestrictions.findIndex(

@@ -41,7 +41,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
     @observable gameSettings: GameSettings = { setupId: "mother-of-dragons", playerCount: 8, pbem: true, onlyLive: false, startWhenFull: false, private: false,
         addPortToTheEyrie: false, adwdHouseCards: false, asosHouseCards: false, houseCardsEvolution: false,
-        vassals: true, ironBank: true, seaOrderTokens: true, allowGiftingPowerTokens: true, randomVassalAssignment: false, customModBalancing: false,
+        vassals: true, ironBank: true, seaOrderTokens: true, allowGiftingPowerTokens: true, randomVassalAssignment: false, customBalancing: false,
         randomHouses: false, randomChosenHouses: false, tidesOfBattle: false, removeTob3: false, removeTobSkulls: false, limitTob2: false,
         draftHouseCards: false, thematicDraft: false, limitedDraft: false, blindDraft: false,
         mixedWesterosDeck1: false, cokWesterosPhase: false, victoryPointsCountNeededToWin: 7, endless: false,  faceless: false,
@@ -309,6 +309,11 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         });
 
         return user;
+    }
+
+    isCustomBalancingOptionAvailable(settings: GameSettings): boolean {
+        return (settings.setupId == "mother-of-dragons" && settings.playerCount == 8)
+            || (settings.setupId == "base-game" && settings.playerCount == 6);
     }
 
     onClientMessage(user: User, message: ClientMessage): void {
@@ -750,7 +755,7 @@ export interface GameSettings {
     addPortToTheEyrie: boolean;
     victoryPointsCountNeededToWin: number;
     randomVassalAssignment: boolean;
-    customModBalancing: boolean;
+    customBalancing: boolean;
     houseCardsEvolution: boolean;
     initialLiveClock: number;
     noPrivateChats: boolean;

@@ -321,6 +321,27 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         onChange={() => this.changeGameSettings(() => this.gameSettings.houseCardsEvolution = !this.gameSettings.houseCardsEvolution)}
                     />
                 </Col>
+                {this.props.entireGame.isCustomBalancingOptionAvailable(this.gameSettings) && <Col xs="12">
+                    <FormCheck
+                        id="custom-balancing-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="custom-balancing-tooltip">
+                                    A community proposal to {this.props.entireGame.isMotherOfDragons ?
+                                        "avoid an early gang up against Targaryen" :
+                                        "improve Tyrell's starting position"}. For details see<br/>
+                                    <a href="https://community.swordsandravens.net/viewtopic.php?t=6" target="_blank" rel="noopener noreferrer">
+                                        Tex&apos;s balance proposal
+                                    </a>.
+                                </Tooltip>}
+                                delay={{show: 0, hide: 1500}}>
+                                <label htmlFor="custom-balancing-setting">Custom Balancing</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.customBalancing}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.customBalancing = !this.gameSettings.customBalancing)}
+                    />
+                </Col>}
             </Col>
             <Col xs="6" lg="auto" id="mod-settings-col" className="no-gutters">
                 <Col xs="12">
@@ -400,25 +421,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         onChange={() => this.changeGameSettings(() => this.gameSettings.randomVassalAssignment = !this.gameSettings.randomVassalAssignment)}
                     />
                 </Col>
-                {this.props.entireGame.isMotherOfDragons && this.props.entireGame.gameSettings.playerCount >= 8 && <Col xs="12">
-                    <FormCheck
-                        id="custom-mod-balancing-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="custom-mod-balancing-tooltip">
-                                    A community proposal to avoid an early gang up against Targaryen. For details see<br/>
-                                    <a href="https://community.swordsandravens.net/viewtopic.php?t=6" target="_blank" rel="noopener noreferrer">
-                                        Tex&apos;s balance proposal
-                                    </a>.
-                                </Tooltip>}
-                                delay={{show: 0, hide: 1500}}>
-                                <label htmlFor="custom-mod-balancing-setting">Custom MoD Balancing</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.customModBalancing}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.customModBalancing = !this.gameSettings.customModBalancing)}
-                    />
-                </Col>}
             </Col>
             <Col xs="6" lg="auto" id="extended-base-settings-col" className="no-gutters">
                 <Col xs="12">

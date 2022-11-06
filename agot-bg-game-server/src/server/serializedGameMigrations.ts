@@ -1980,6 +1980,13 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "97",
+        migrate: (serializedGame: any) => {
+            serializedGame.gameSettings.customBalancing = serializedGame.gameSettings.customModBalancing ? true : false;
+            return serializedGame;
+        }
     }
 ];
 

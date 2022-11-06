@@ -1671,7 +1671,7 @@
     ],
     "volantis": [
       {
-        "unitType": "knight",
+        "unitType": "footman",
         "house": "targaryen",
         "quantity": 0,
         "quantityVassal": 1
@@ -1692,7 +1692,7 @@
         "unitType": "ship",
         "house": "targaryen",
         "quantity": 0,
-        "quantityVassal": 1
+        "quantityVassal": 0
       }
     ],
     "blackwater-bay": [
