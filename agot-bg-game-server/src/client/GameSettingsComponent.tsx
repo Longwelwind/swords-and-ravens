@@ -218,7 +218,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
 
     renderLobbySettings(): ReactNode {
         return <Row className="mt-2 justify-content-center">
-            <Col xs="6" lg="auto" id="base-settings-col" className="no-gutters" style={{maxWidth: 338, minWidth: 338}}>
+            <Col xs="12" lg="auto" id="base-settings-col" className="no-gutters" style={{maxWidth: 338, minWidth: 338}}>
                 <Col xs="12">
                     <OverlayTrigger overlay={
                         <Tooltip id="game-setups-tooltip" className="tooltip-w-100">
