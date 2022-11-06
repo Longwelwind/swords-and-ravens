@@ -538,7 +538,7 @@ export class ReplaceVassalByPlayer extends VoteType {
         });
 
         const placeOrders = vote.ingame.leafState instanceof PlaceOrdersGameState ? vote.ingame.leafState : null;
-        if (placeOrders && placeOrders.forVassals) {
+        if (placeOrders) {
             const planning = placeOrders.parentGameState;
             const placedPlayerOrders = placeOrders.placedOrders.entries.filter(([r, o]) => {
                 const ctrl = r.getController();

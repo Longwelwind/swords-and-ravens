@@ -265,8 +265,8 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.ironBank = false;
             }
 
-            if (settings.playerCount < 8 || settings.setupId == "a-dance-with-mother-of-dragons") {
-                settings.customModBalancing = false;
+            if (!this.entireGame.isCustomBalancingOptionAvailable(settings)) {
+                settings.customBalancing = false;
             }
 
             // Allow disabling DwD cards but enable them when switching to this setup
