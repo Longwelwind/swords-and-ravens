@@ -307,8 +307,13 @@ def play(request, game_id, user_id=None):
     if not game:
         return HttpResponseNotFound()
 
-    if request.user.is_in_one_group(["On probation", "Banned"]) and game.players.filter(user=request.user).count() == 0:
-        # Members on probation or banned only can join their current running games
+    if request.user.is_in_group("Banned"):
+        # Force logout of banned members
+        logout(request)
+        return HttpResponseRedirect("/games")
+
+    if request.user.is_in_group("On probation") and game.players.filter(user=request.user).count() == 0:
+        # Members on probation only can join their current running games
         return HttpResponseRedirect("/games")
 
     # Specifying a user_id allows users to impersonate other players in a game
