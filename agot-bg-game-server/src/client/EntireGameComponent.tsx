@@ -27,9 +27,10 @@ import { faLock, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
 import introSound from "../../public/sounds/game-of-thrones-intro.ogg";
 import CombatGameState from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { cssTransition } from "react-toastify";
 import ClockComponent from "./ClockComponent";
+import { isMobile } from 'react-device-detect';
 
 const yourTurnToastAnimation = cssTransition({
     enter: "slide-in-elliptic-top-fwd",
@@ -103,6 +104,18 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             {this.playWelcomeSound && !this.props.gameClient.musicMuted &&
                 <audio id="welcome-sound" src={introSound} autoPlay onEnded={() => this.playWelcomeSound = false} />
             }
+            <ToastContainer
+                autoClose={7500}
+                position="top-center"
+                closeOnClick={!isMobile}
+                pauseOnFocusLoss
+                pauseOnHover
+                draggable={isMobile}
+                draggablePercent={60}
+                limit={3}
+                theme="dark"
+                style={{width: "auto", height: "auto"}}
+            />
         </>;
     }
 

@@ -3,6 +3,7 @@ import { Component, ReactNode } from "react";
 import { observer } from "mobx-react";
 import GameClient, { ConnectionState } from "./GameClient";
 import Container from "react-bootstrap/Container";
+import { Modal, ProgressBar } from "react-bootstrap";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import EntireGameComponent from "./EntireGameComponent";
@@ -11,7 +12,6 @@ import User from "../server/User";
 import { isMobile } from 'react-device-detect';
 import EntireGame from "../common/EntireGame";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
-import { ToastContainer } from 'react-toastify';
 
 interface AppProps {
     gameClient: GameClient;
@@ -25,6 +25,16 @@ export default class App extends Component<AppProps> {
 
     get entireGame(): EntireGame | null {
         return this.props.gameClient.entireGame;
+    }
+
+    get isConnecting(): boolean {
+        return this.props.gameClient.connectionState == ConnectionState.INITIALIZING ||
+            this.props.gameClient.connectionState == ConnectionState.AUTHENTICATING ||
+            this.props.gameClient.connectionState == ConnectionState.CONNECTING ;
+    }
+  
+    get isReconnecting(): boolean {
+        return this.props.gameClient.previousReconnectAttempts > 0;
     }
 
     get isConnected(): boolean {
@@ -52,46 +62,53 @@ export default class App extends Component<AppProps> {
                 overflowX: "hidden"
             }}>
                 <Row className="justify-content-center">
-                    {this.props.gameClient.connectionState == ConnectionState.INITIALIZING ? (
-                        <Col xs={3}>
-                            Initializing
-                        </Col>
-                    ) : this.props.gameClient.connectionState == ConnectionState.CONNECTING ? (
-                        <Col xs={3}>
-                            Connecting
-                        </Col>
-                    ) : this.props.gameClient.connectionState == ConnectionState.AUTHENTICATING ? (
-                        <Col xs={3}>
-                            Authenticating
-                        </Col>
-                    ) : this.isConnected ? (
+                    {this.isConnected  && this.props.gameClient.entireGame ? (
                         <EntireGameComponent gameClient={this.props.gameClient} entireGame={this.props.gameClient.entireGame as EntireGame} />
-                    ) : this.props.gameClient.connectionState == ConnectionState.CLOSED ? (
-                        <Col xs={12} md={3}>
-                            <Alert variant="danger">
-                                <p>
-                                    Disconnection with the server.
-                                </p>
-                                <p>
-                                    Please refresh this page.
-                                </p>
+                    ) : this.props.gameClient.connectionState == ConnectionState.CLOSED && (
+                        <Col xs="auto" className="m-4 p-3">
+                            <Alert variant="danger" className="text-center">
+                                <h4>The connection to the server is lost.<br/>
+                                Please reload this page.</h4>
                             </Alert>
                         </Col>
-                    ) : (function () { throw "Should never happen" })()}
+                    )}
                 </Row>
             </Container>
-            <ToastContainer
-                autoClose={7500}
-                position="top-center"
-                closeOnClick={!isMobile}
-                pauseOnFocusLoss
-                pauseOnHover
-                draggable={isMobile}
-                draggablePercent={60}
-                limit={3}
-                theme="dark"
-                style={{width: "auto", height: "auto"}}
-            />
+            <Modal
+                    show={this.isConnecting || this.isReconnecting}
+                    animation={true}
+                    backdrop="static"
+                    keyboard={false}
+                >
+                    <Modal.Body>
+                        {this.renderConnectingModalBody()}
+                    </Modal.Body>
+                </Modal>
         </>;
+    }
+
+    renderConnectingModalBody(): ReactNode {
+        return <Row className="justify-content-center text-center">
+            {this.isReconnecting &&
+                <Col xs="12">
+                    <Alert variant="warning" className="mb-0">
+                        <h5>The connection to the server is interrupted.<br/>
+                        We&apos;re trying to reconnect!</h5>
+                    </Alert>
+                </Col>
+            }
+            <Col xs="12" className="text-large">
+                {this.props.gameClient.connectionState == ConnectionState.INITIALIZING 
+                    ? "Initializing ..."
+                    : this.props.gameClient.connectionState == ConnectionState.CONNECTING
+                        ? "Connecting ..."
+                        :  this.props.gameClient.connectionState == ConnectionState.AUTHENTICATING
+                            ? "Authenticating ..." 
+                            : <div className="invisible">Initializing ...</div>}
+            </Col>
+            <Col>
+                <ProgressBar animated variant="warning" now={100} />
+            </Col>
+        </Row>;
     }
 }

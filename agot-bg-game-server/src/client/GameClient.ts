@@ -26,7 +26,7 @@ export enum ConnectionState {
 }
 
 export default class GameClient {
-    socket: WebSocket;
+    socket: WebSocket | null;
     @observable connectionState: ConnectionState = ConnectionState.INITIALIZING;
 
     @observable entireGame: EntireGame | null = null;
@@ -38,6 +38,9 @@ export default class GameClient {
     public playSoundWhenClickingMarchOrder = playSoundWhenClickingMarchOrder;
     public playSoundForLogEvent = playSoundForLogEvent;
     public stopRunningSoundEffect = stopRunningSoundEffect;
+
+    @observable previousReconnectAttempts = 0;
+    nextRetryDelays = [0.1, 1, 2, 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5];
 
     get muted(): boolean {
         if (!this.authenticatedUser) {
@@ -95,6 +98,18 @@ export default class GameClient {
 
     constructor(authData: AuthData) {
         this.authData = authData;
+
+        window.onbeforeunload = () => this.close();
+    }
+
+    close(): void {
+        if (this.socket == null) {
+            return;
+        }
+        this.connectionState = ConnectionState.CLOSED;
+        this.socket.onclose = null;
+        this.socket.close();
+        this.socket = null;
     }
 
     start(): void {
@@ -103,6 +118,10 @@ export default class GameClient {
             : "wss://play." + location.hostname;
 
         console.log(`Connecting to ${websocketHost}`);
+
+        if (this.socket != null) {
+            this.close();
+        }
 
         this.socket = new WebSocket(websocketHost);
         this.connectionState = ConnectionState.CONNECTING;
@@ -205,6 +224,7 @@ export default class GameClient {
         //console.debug(message);
 
         if (message.type == "authenticate-response") {
+            this.previousReconnectAttempts = 0;
             this.entireGame = EntireGame.deserializeFromServer(message.game);
             this.entireGame.onSendClientMessage = (message: ClientMessage) => {
                 this.send(message);
@@ -268,7 +288,17 @@ export default class GameClient {
     }
 
     onClose(): void {
-        this.connectionState = ConnectionState.CLOSED;
+        if (this.previousReconnectAttempts < this.nextRetryDelays.length) {
+            this.connectionState = ConnectionState.INITIALIZING;
+            const nextRetryDelay = this.nextRetryDelays[this.previousReconnectAttempts];
+            this.previousReconnectAttempts++;
+            window.setTimeout(() => {
+                this.start();
+            }, nextRetryDelay * 1000);
+        } else {
+            this.previousReconnectAttempts = 0;
+            this.close();
+        }
     }
 
     send(message: ClientMessage): void {
@@ -276,7 +306,7 @@ export default class GameClient {
         //console.debug(message);
         const compressedData = compress(JSON.stringify(message));
 
-        this.socket.send(compressedData);
+        this.socket?.send(compressedData);
     }
 
     isAuthenticatedUser(user: User): boolean {
