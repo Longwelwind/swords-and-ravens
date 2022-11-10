@@ -10,6 +10,7 @@ import ChatClient from "./chat-client/ChatClient";
 import BetterMap from "../utils/BetterMap";
 import { compress, decompress } from "./utils/compression";
 import { playSoundWhenClickingMarchOrder, playSoundForLogEvent, stopRunningSoundEffect } from "./utils/sound-effects";
+import ReconnectingWebSocket from "./utils/reconnecting-websocket/reconnecting-websocket";
 
 export interface AuthData {
     userId: string;
@@ -26,21 +27,17 @@ export enum ConnectionState {
 }
 
 export default class GameClient {
-    socket: WebSocket | null;
-    @observable connectionState: ConnectionState = ConnectionState.INITIALIZING;
+    socket: ReconnectingWebSocket | null;
+    authData: AuthData;
+    pingInterval = -1;
 
+    @observable connectionState: ConnectionState = ConnectionState.INITIALIZING;
     @observable entireGame: EntireGame | null = null;
 
     @observable authenticated = false;
     @observable authenticatedUser: User | null = null;
+
     chatClient: ChatClient = new ChatClient(this);
-
-    public playSoundWhenClickingMarchOrder = playSoundWhenClickingMarchOrder;
-    public playSoundForLogEvent = playSoundForLogEvent;
-    public stopRunningSoundEffect = stopRunningSoundEffect;
-
-    @observable previousReconnectAttempts = 0;
-    nextRetryDelays = [0.1, 1, 2, 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5];
 
     get muted(): boolean {
         if (!this.authenticatedUser) {
@@ -76,10 +73,6 @@ export default class GameClient {
         this.authenticatedUser.syncSettings();
     }
 
-    authData: AuthData;
-
-    pingInterval: number;
-
     get authenticatedPlayer(): Player | null {
         if (!this.authenticatedUser) {
             throw new Error("Game client must have an authenticated user");
@@ -99,17 +92,7 @@ export default class GameClient {
     constructor(authData: AuthData) {
         this.authData = authData;
 
-        window.onbeforeunload = () => this.close();
-    }
-
-    close(): void {
-        if (this.socket == null) {
-            return;
-        }
-        this.connectionState = ConnectionState.CLOSED;
-        this.socket.onclose = null;
-        this.socket.close();
-        this.socket = null;
+        window.onbeforeunload = () => this.socket?.close();
     }
 
     start(): void {
@@ -119,11 +102,7 @@ export default class GameClient {
 
         console.log(`Connecting to ${websocketHost}`);
 
-        if (this.socket != null) {
-            this.close();
-        }
-
-        this.socket = new WebSocket(websocketHost);
+        this.socket = new ReconnectingWebSocket(websocketHost);
         this.connectionState = ConnectionState.CONNECTING;
 
         this.socket.onopen = () => {
@@ -133,14 +112,22 @@ export default class GameClient {
             this.onOpen();
         };
         this.socket.onerror = () => {
+            this.clearPingInterval();
             this.onError();
         };
         this.socket.onmessage = (data: MessageEvent) => {
             this.onMessage(data.data as string);
         };
         this.socket.onclose = () => {
-            window.clearInterval(this.pingInterval);
+            this.clearPingInterval();
             this.onClose();
+        }
+    }
+
+    clearPingInterval(): void {
+        if (this.pingInterval > -1) {
+            window.clearInterval(this.pingInterval);
+            this.pingInterval = -1;
         }
     }
 
@@ -224,7 +211,6 @@ export default class GameClient {
         //console.debug(message);
 
         if (message.type == "authenticate-response") {
-            this.previousReconnectAttempts = 0;
             this.entireGame = EntireGame.deserializeFromServer(message.game);
             this.entireGame.onSendClientMessage = (message: ClientMessage) => {
                 this.send(message);
@@ -288,17 +274,7 @@ export default class GameClient {
     }
 
     onClose(): void {
-        if (this.previousReconnectAttempts < this.nextRetryDelays.length) {
-            this.connectionState = ConnectionState.INITIALIZING;
-            const nextRetryDelay = this.nextRetryDelays[this.previousReconnectAttempts];
-            this.previousReconnectAttempts++;
-            window.setTimeout(() => {
-                this.start();
-            }, nextRetryDelay * 1000);
-        } else {
-            this.previousReconnectAttempts = 0;
-            this.close();
-        }
+        this.connectionState = ConnectionState.CLOSED;
     }
 
     send(message: ClientMessage): void {
@@ -312,4 +288,8 @@ export default class GameClient {
     isAuthenticatedUser(user: User): boolean {
         return this.authenticatedUser == user;
     }
+
+    public playSoundWhenClickingMarchOrder = playSoundWhenClickingMarchOrder;
+    public playSoundForLogEvent = playSoundForLogEvent;
+    public stopRunningSoundEffect = stopRunningSoundEffect;
 }
