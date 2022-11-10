@@ -269,6 +269,10 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.customBalancing = false;
             }
 
+            if (settings.customBalancing) {
+                settings.useVassalPositions = false;
+            }
+
             // Allow disabling DwD cards but enable them when switching to this setup
             if ((!this.entireGame.isDanceWithDragons && !this.entireGame.isDanceWithMotherOfDragons) &&
                 (settings.setupId == "a-dance-with-dragons" || settings.setupId == "a-dance-with-mother-of-dragons")) {
