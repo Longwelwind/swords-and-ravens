@@ -64,7 +64,7 @@ export default class App extends Component<AppProps> {
                                 ? <EntireGameComponent gameClient={this.props.gameClient} entireGame={this.props.gameClient.entireGame as EntireGame} />
                                 : this.props.gameClient.connectionState == ConnectionState.CLOSED
                                     ? <Col xs="auto" className="m-4 p-3 text-center">
-                                        {this.props.gameClient.socket?.isReconnecting
+                                        {this.props.gameClient.isReconnecting
                                             ? <Alert variant="warning">
                                                     <h4>The connection to the server is interrupted.<br/>
                                                     <span className="loader">Trying to reconnect</span></h4>

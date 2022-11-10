@@ -10,7 +10,6 @@ import ChatClient from "./chat-client/ChatClient";
 import BetterMap from "../utils/BetterMap";
 import { compress, decompress } from "./utils/compression";
 import { playSoundWhenClickingMarchOrder, playSoundForLogEvent, stopRunningSoundEffect } from "./utils/sound-effects";
-import ReconnectingWebSocket from "./utils/reconnecting-websocket/reconnecting-websocket";
 
 export interface AuthData {
     userId: string;
@@ -27,7 +26,7 @@ export enum ConnectionState {
 }
 
 export default class GameClient {
-    socket: ReconnectingWebSocket | null;
+    socket: WebSocket | null = null;
     authData: AuthData;
     pingInterval = -1;
 
@@ -89,10 +88,15 @@ export default class GameClient {
         }
     }
 
+    get isReconnecting(): boolean {
+        // Todo: For future use
+        return false;
+    }
+
     constructor(authData: AuthData) {
         this.authData = authData;
 
-        window.onbeforeunload = () => this.socket?.close();
+        //window.onbeforeunload = () => this.socket?.close();
     }
 
     start(): void {
@@ -102,7 +106,7 @@ export default class GameClient {
 
         console.log(`Connecting to ${websocketHost}`);
 
-        this.socket = new ReconnectingWebSocket(websocketHost);
+        this.socket = new WebSocket(websocketHost);
         this.connectionState = ConnectionState.CONNECTING;
 
         this.socket.onopen = () => {
