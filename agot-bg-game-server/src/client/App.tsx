@@ -26,18 +26,12 @@ export default class App extends Component<AppProps> {
         return this.props.gameClient.entireGame;
     }
 
-    get isConnecting(): boolean {
-        return this.props.gameClient.connectionState == ConnectionState.INITIALIZING ||
-            this.props.gameClient.connectionState == ConnectionState.AUTHENTICATING ||
-            this.props.gameClient.connectionState == ConnectionState.CONNECTING ;
-    }
-  
     get isConnected(): boolean {
         return this.props.gameClient.connectionState == ConnectionState.SYNCED && this.entireGame != null;
     }
 
     get isGameRunning(): boolean {
-        return this.entireGame?.childGameState instanceof IngameGameState;
+        return this.isConnected && this.entireGame?.childGameState instanceof IngameGameState;
     }
 
     get is8pGame(): boolean {
@@ -45,7 +39,11 @@ export default class App extends Component<AppProps> {
     }
 
     render(): ReactNode {
-        const minWidth = isMobile && this.isGameRunning ? this.is8pGame ? "2550px" : "2000px" : "auto";
+        const minWidth = isMobile && this.isGameRunning
+            ? this.is8pGame
+                ? "2550px"
+                : "2000px"
+            : "auto";
         return <Container fluid={false} style={{
             paddingTop: "0.5rem",
             paddingBottom: "1rem",

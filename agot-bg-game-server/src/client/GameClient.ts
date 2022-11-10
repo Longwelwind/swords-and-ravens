@@ -254,7 +254,7 @@ export default class GameClient {
         } else {
             if (!this.entireGame) {
                 console.error("Message other than \"authenticate-response\" received but entireGame == null");
-                return
+                return;
             }
 
             this.entireGame.onServerMessage(message);
@@ -263,18 +263,18 @@ export default class GameClient {
 
     isOwnTurn(): boolean {
         if (!this.entireGame || !this.authenticatedUser) {
-            throw new Error();
+            throw new Error("isOwnTurn() requires entireGame and authenticatedUser");
         }
 
         return this.entireGame.getWaitedUsers().includes(this.authenticatedUser);
     }
 
     onError(): void {
-        this.connectionState = ConnectionState.CLOSED;
+        this.setDisconnectedState();
     }
 
     onClose(): void {
-        this.connectionState = ConnectionState.CLOSED;
+        this.setDisconnectedState();
     }
 
     send(message: ClientMessage): void {
@@ -287,6 +287,13 @@ export default class GameClient {
 
     isAuthenticatedUser(user: User): boolean {
         return this.authenticatedUser == user;
+    }
+
+    setDisconnectedState(): void {
+        this.connectionState = ConnectionState.CLOSED;
+        this.entireGame = null;
+        this.authenticated = false;
+        this.authenticatedUser = null;
     }
 
     public playSoundWhenClickingMarchOrder = playSoundWhenClickingMarchOrder;
