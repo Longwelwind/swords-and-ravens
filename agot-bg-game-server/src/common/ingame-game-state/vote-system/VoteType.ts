@@ -275,6 +275,10 @@ export class EndGame extends VoteType {
         return "end the game after the current round";
     }
 
+    getPositiveCountToPass(vote: Vote): number {
+        return vote.participatingHouses.length;
+    }
+
     executeAccepted(vote: Vote): void {
         vote.ingame.game.maxTurns = vote.ingame.game.turn;
         vote.ingame.entireGame.broadcastToClients({
