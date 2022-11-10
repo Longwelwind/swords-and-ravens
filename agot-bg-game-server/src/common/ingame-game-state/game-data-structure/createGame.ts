@@ -508,9 +508,10 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         // Apply alternate dragon strength tokens
         game.dragonStrengthTokens = baseGameData.alternateDragonStrengthTokens;
     } else if (gameSettings.customBalancing && gameSettings.setupId == "base-game" && gameSettings.playerCount == 6) {
-        if (playerHouses.includes("tyrell")) {
-            const redwyneStraights = game.world.regions.get("redwyne-straights");
-            const newShip = game.createUnit(redwyneStraights, ship, game.houses.get("tyrell"));
+        const redwyneStraights = game.world.regions.get("redwyne-straights");
+        const house = redwyneStraights.units.size > 0 ? redwyneStraights.units.values[0].allegiance : null;
+        if (house && playerHouses.includes(house.id)) {
+            const newShip = game.createUnit(redwyneStraights, ship, house);
             redwyneStraights.units.set(newShip.id, newShip);
         }
     }
