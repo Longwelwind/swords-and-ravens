@@ -13,7 +13,6 @@ import { Col, Dropdown, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import Player from "../common/ingame-game-state/Player";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import clonesImage from "../../public/images/icons/clones.svg"
 
 interface UserLabelProps {
@@ -65,22 +64,22 @@ export default class UserLabel extends Component<UserLabelProps> {
         );
     }
 
-    renderOtherUsersFromSameNetworkTooltip(): OverlayChildren {
-        // As we force random houses now, we can show the icon, but hide the Tooltip
-        return <ConditionalWrap
-            condition={!this.props.gameState.entireGame.gameSettings.faceless}
-            wrap={child => <OverlayTrigger placement="auto"
-                overlay={<Tooltip id={`${this.user.id}-other-users-with-same-ip-tooltip`}>
+    renderOtherUsersFromSameNetworkTooltip(): ReactNode {
+        if (this.props.gameState.entireGame.gameSettings.faceless && this.props.gameState instanceof IngameGameState) {
+            return null;
+        }
+
+        return <OverlayTrigger placement="auto"
+            overlay={
+                <Tooltip id={`${this.user.id}-other-users-with-same-ip-tooltip`}>
                     <Col>
                         These users {this.props.gameState instanceof IngameGameState ? "play" : "joined"} from the same network as {this.user.name}:
                         <br /><br />{this.user.otherUsersFromSameNetwork.map(usr => <div key={`same-network-user_${usr}`}>{usr}</div>)}
                     </Col>
-                </Tooltip>}>
-                {child}
-            </OverlayTrigger>}
+                </Tooltip>}
             >
-            <img src={clonesImage} width="18" style={{ marginLeft: 5, marginTop: -3 }} />
-        </ConditionalWrap>;
+                <img src={clonesImage} width="18" style={{ marginLeft: 5, marginTop: -3 }} />
+            </OverlayTrigger>;
     }
 
     renderIngameDropdownItems(ingame: IngameGameState): ReactNode {
