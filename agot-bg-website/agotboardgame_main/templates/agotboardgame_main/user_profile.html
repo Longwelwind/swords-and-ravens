@@ -155,7 +155,7 @@
                             <td class="text-center">
                                 {{ player.players_count }}{% if player.players_count != player.game.view_of_game.maxPlayerCount %}/{{ player.game.view_of_game.maxPlayerCount }}{% endif %}
                             </td>
-                            {% if not banned_or_on_probation %}
+                            {% if not on_probation %}
                             <td style="width: 1px">
                                 <a class="btn btn-primary btn-sm"
                                     href="/play/{{ player.game.id }}"
@@ -239,7 +239,7 @@
                             <td class="text-center">
                                 {{ player.players_count }}{% if player.players_count != player.game.view_of_game.maxPlayerCount %}/{{ player.game.view_of_game.maxPlayerCount }}{% endif %}
                             </td>
-                            {% if not banned_or_on_probation %}
+                            {% if not on_probation %}
                             <td style="width: 1px">
                                 <a class="btn btn-primary btn-sm"
                                     href="/play/{{ player.game.id }}"

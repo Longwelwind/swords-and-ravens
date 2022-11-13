@@ -112,7 +112,7 @@ Games -
                 <div class="card-body">
                     <h4 class="card-title">Games where last move was more than 5 days ago</h4>
                     <div style="max-height: 300px; overflow-y: auto">
-                        {% games_table inactive_games user perms %}
+                        {% games_table inactive_games user perms True %}
                     </div>
                 </div>
             </div>
@@ -129,7 +129,7 @@ Games -
                         Games waiting for inactive players
                     </h4>
                     <div style="max-height: 300px; overflow-y: auto">
-                        {% games_table replacement_needed_games user perms %}
+                        {% games_table replacement_needed_games user perms True %}
                     </div>
                 </div>
             </div>

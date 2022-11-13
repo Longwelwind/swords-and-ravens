@@ -11,7 +11,7 @@
             <th style="width: 1px">
                 Players
             </th>
-            <th style="width: 120px"></th>
+            <th style="width: 170px"></th>
         </tr>
     </thead>
     <tbody>
@@ -110,7 +110,7 @@
                     {{ game.players_count }}{% if game.players_count != game.view_of_game.maxPlayerCount %}/{{ game.view_of_game.maxPlayerCount }}{% endif %}
                 </td>
                 <td class="text-right">
-                    {%if not banned_or_on_probation or game.player_in_game %}
+                    {%if not on_probation or game.player_in_game %}
                     <a
                         target="_blank"
                         href="/play/{{ game.id }}"
@@ -133,6 +133,17 @@
                             {% endif %}
                         {% endif %}
                     </a>
+                    {% endif %}
+                    {% if show_join_as and game.inactive_user_id and perms.agotboardgame_main.can_play_as_another_player %}
+                        <a class="btn btn-primary btn-sm"
+                            href="/play/{{ game.id }}/{{ game.inactive_user_id }}"
+                            target="_blank"
+                            data-toggle="tooltip"
+                            data-placement="right"
+                            title="Join as the waited for player"
+                        >
+                            Join as ...
+                        </a>
                     {% endif %}
                     {% if perms.agotboardgame_main.cancel_game %}
                         <form action="/game/{{ game.id }}/cancel" method="POST" class="d-inline" onsubmit="return confirm('Do you really want to cancel this game?');">

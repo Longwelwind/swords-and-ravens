@@ -242,6 +242,8 @@ def games(request):
 
             if game.inactive_players is not None:
                 replacement_needed_games.append(game)
+                if game.view_of_game.get("waitingForIds", None) and len(game.view_of_game.get("waitingForIds")) > 0:
+                    game.inactive_user_id = game.view_of_game.get("waitingForIds")[0]
 
             if game.is_private and game.inactive_21:
                 inactive_private_games.append(game)
@@ -250,6 +252,8 @@ def games(request):
                 active_games.append(game)
             elif game not in replacement_needed_games and not game.is_private:
                 inactive_games.append(game)
+                if game.view_of_game.get("waitingForIds", None) and len(game.view_of_game.get("waitingForIds")) > 0:
+                    game.inactive_user_id = game.view_of_game.get("waitingForIds")[0]
 
             if game.player_in_game:
                 my_games.append(game)
@@ -429,7 +433,7 @@ def user_profile(request, user_id):
         "viewed_user": user,
         "group_name": group_name,
         "group_color": group_color,
-        "banned_or_on_probation": request.user.is_authenticated and request.user.is_in_one_group(["On probation", "Banned"])
+        "on_probation": request.user.is_authenticated and request.user.is_in_group("On probation")
     })
 
 
