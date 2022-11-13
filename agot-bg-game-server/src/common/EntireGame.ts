@@ -266,15 +266,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     isOwner(user: User): boolean {
-        if (this.lobbyGameState) {
-            // If owner is not seated every player becomes owner
-            // and can kick players, change settings, start the game, etc. in LobbyGameState
-            return this.lobbyGameState.players.values.map(u => u.id).includes(this.ownerUserId)
-                ? this.isRealOwner(user)
-                : this.isRealOwner(user) || this.lobbyGameState.players.values.includes(user);
-        }
-
-        if (this.ingameGameState) {
+        if (this.ingameGameState && !this.gameSettings.tournamentMode) {
             // If owner is not present ingame
             // every player becomes owner to be able to toggle PBEM
             return this.ingameGameState.players.keys.map(u => u.id).includes(this.ownerUserId)
