@@ -553,9 +553,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             this.ingameGameState?.players.tryGet(u, null) ?? null)
                 .filter(p => p != null).map((p: Player) => ({
                     house: p.house.name,
-                    user: p.user.name
+                    user: p.user
                 })) ?? []);
-        const waitingFor = _waitingFor.map(wf => `${wf.house}${this.gameSettings.faceless ? "" : (` (${wf.user})`)}`).join(", ");
+        const waitingFor = _waitingFor.map(wf => `${wf.house}${this.gameSettings.faceless ? "" : (` (${wf.user.name})`)}`).join(", ");
+        const waitingForIds = _waitingFor.map(wf => wf.user.id);
         let winner=null;
         if (this.ingameGameState?.leafState instanceof GameEndedGameState) {
             const user = this.ingameGameState.getControllerOfHouse(this.ingameGameState.leafState.winner).user;
@@ -569,7 +570,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         const timeoutPlayerIds = this.entireGame.ingameGameState?.timeoutPlayerIds ?? [];
         const replacerIds = this.entireGame.ingameGameState?.replacerIds ?? [];
 
-        return {turn, maxPlayerCount, settings, waitingFor, winner, replacePlayerVoteOngoing, oldPlayerIds, timeoutPlayerIds, replacerIds};
+        return {turn, maxPlayerCount, settings, waitingFor, waitingForIds, winner, replacePlayerVoteOngoing, oldPlayerIds, timeoutPlayerIds, replacerIds};
     }
 
     // eslint-disable-next-line @typescript-eslint/ban-types
