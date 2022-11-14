@@ -11,7 +11,13 @@
             <th style="width: 1px">
                 Players
             </th>
-            <th style="width: 170px"></th>
+            {% if show_join_as and perms.agotboardgame_main.can_play_as_another_player %}
+                <th style="width: 190px"></th>
+            {% elif perms.agotboardgame_main.cancel_game %}
+                <th style="width: 120px"></th>
+            {% else %}
+                <th style="width: 90px"></th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
