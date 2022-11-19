@@ -36,6 +36,8 @@ export default class GameClient {
     @observable authenticated = false;
     @observable authenticatedUser: User | null = null;
 
+    @observable isReconnecting = false;
+
     chatClient: ChatClient = new ChatClient(this);
 
     get muted(): boolean {
@@ -88,15 +90,8 @@ export default class GameClient {
         }
     }
 
-    get isReconnecting(): boolean {
-        // Todo: For future use
-        return false;
-    }
-
     constructor(authData: AuthData) {
         this.authData = authData;
-
-        //window.onbeforeunload = () => this.socket?.close();
     }
 
     start(): void {
@@ -118,6 +113,7 @@ export default class GameClient {
         this.socket.onerror = () => {
             this.clearPingInterval();
             this.onError();
+            this.isReconnecting = false;
         };
         this.socket.onmessage = (data: MessageEvent) => {
             this.onMessage(data.data as string);
@@ -125,6 +121,14 @@ export default class GameClient {
         this.socket.onclose = () => {
             this.clearPingInterval();
             this.onClose();
+            this.isReconnecting = false;
+        }
+    }
+
+    reconnect(): void {
+        if (this.connectionState == ConnectionState.CLOSED) {
+            this.isReconnecting = true;
+            this.start();
         }
     }
 
@@ -230,6 +234,7 @@ export default class GameClient {
             this.entireGame.getPrivateChatRoomsOf(this.authenticatedUser).forEach(({roomId}) => this.chatClient.addChannel(roomId));
 
             this.connectionState = ConnectionState.SYNCED;
+            this.isReconnecting = false;
         } else if (message.type == "new-private-chat-room") {
             if (this.entireGame == null) {
                 return;
@@ -298,6 +303,7 @@ export default class GameClient {
         this.entireGame = null;
         this.authenticated = false;
         this.authenticatedUser = null;
+        this.isReconnecting = false;
     }
 
     public playSoundWhenClickingMarchOrder = playSoundWhenClickingMarchOrder;
