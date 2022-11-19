@@ -18,6 +18,8 @@ interface AppProps {
 
 @observer
 export default class App extends Component<AppProps> {
+    onVisibilityChangedCallback: (() => void) | null = null;
+
     get user(): User | null {
         return this.props.gameClient.authenticatedUser;
     }
@@ -54,7 +56,14 @@ export default class App extends Component<AppProps> {
             overflowX: "hidden"
         }}>
             <Row className="justify-content-center">
-                {this.props.gameClient.connectionState == ConnectionState.INITIALIZING
+            {this.props.gameClient.isReconnecting
+                ? <Col xs="auto" className="m-4 p-3 text-center">
+                    <Alert variant="warning">
+                        <h4>The connection to the server is interrupted.<br/>
+                        <span className="loader">Trying to reconnect</span></h4>
+                    </Alert>
+                </Col>
+                : this.props.gameClient.connectionState == ConnectionState.INITIALIZING
                     ? <Col xs="auto" className="m-4 p-3 text-center"><h4><span className="loader">Initializing</span></h4></Col>
                     : this.props.gameClient.connectionState == ConnectionState.CONNECTING
                         ? <Col xs="auto" className="m-4 p-3 text-center"><h4><span className="loader">Connecting</span></h4></Col>
@@ -64,19 +73,34 @@ export default class App extends Component<AppProps> {
                                 ? <EntireGameComponent gameClient={this.props.gameClient} entireGame={this.props.gameClient.entireGame as EntireGame} />
                                 : this.props.gameClient.connectionState == ConnectionState.CLOSED
                                     ? <Col xs="auto" className="m-4 p-3 text-center">
-                                        {this.props.gameClient.isReconnecting
-                                            ? <Alert variant="warning">
-                                                    <h4>The connection to the server is interrupted.<br/>
-                                                    <span className="loader">Trying to reconnect</span></h4>
-                                                </Alert>
-                                            : <Alert variant="danger">
-                                                <h4>The connection to the server is lost.<br/>
-                                                Please reload this page.</h4>
-                                            </Alert>
-                                            }
+                                        <Alert variant="danger">
+                                            <h4>The connection to the server is lost.<br/>
+                                            Please reload this page.</h4>
+                                        </Alert>
                                     </Col>
                                     : <Col xs="auto" className="m-4 p-3 text-center"><span className="loader">Error</span></Col>}
             </Row>
         </Container>;
+    }
+
+    onVisibilityChanged(): void {
+        if (document.visibilityState != "visible") {
+            return;
+        }
+
+        this.props.gameClient.reconnect();
+    }
+
+    componentDidMount(): void {
+        const visibilityChangedCallback = (): void => this.onVisibilityChanged();
+        document.addEventListener("visibilitychange", visibilityChangedCallback);
+        this.onVisibilityChangedCallback = visibilityChangedCallback;
+    }
+
+    componentWillUnmount(): void {
+        const visibilityChangedCallback = this.onVisibilityChangedCallback;
+        if (visibilityChangedCallback) {
+            document.removeEventListener("visibilitychange", visibilityChangedCallback);
+        }
     }
 }
