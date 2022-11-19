@@ -88,7 +88,9 @@ export default class App extends Component<AppProps> {
             return;
         }
 
-        this.props.gameClient.reconnect();
+        window.setTimeout(() => {
+            this.props.gameClient.reconnect();
+        }, 500);
     }
 
     componentDidMount(): void {

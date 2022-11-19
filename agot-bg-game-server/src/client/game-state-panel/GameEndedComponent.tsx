@@ -18,25 +18,28 @@ export default class GameEndedComponent extends Component<GameStateComponentProp
             To center the crown we need to apply a margin of 16px on the left, and a custom value for non-centered house icons
         */
         let crownMarginLeft = "16px";
-        switch(winner.id) {
-            case "lannister":
+        switch(winner.name) {
+            case "Lannister":
                 crownMarginLeft = "-12px";
                 break;
-            case "tyrell":
+            case "Tyrell":
                 crownMarginLeft = "36px";
                 break;
-            case "stark":
+            case "Stark":
                 crownMarginLeft = "0px";
+            case "Bolton":
+                crownMarginLeft = "8px";
                 break;
         }
 
         let crownMarginBottom = "-72px";
-        switch(winner.id) {
-            case "arryn":
-            case "targaryen":
+        switch(winner.name) {
+            case "Arryn":
+            case "Targaryen":
+            case "Bolton":
                 crownMarginBottom = "-45px";
                 break;
-            case "martell":
+            case "Martell":
                 crownMarginBottom = "-55px";
                 break;
         }
