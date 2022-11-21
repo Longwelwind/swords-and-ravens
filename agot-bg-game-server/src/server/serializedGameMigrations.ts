@@ -12,7 +12,7 @@ import shuffleInPlace from "../utils/shuffleInPlace";
 import { v4 } from "uuid";
 import facelessMenNames from "../../data/facelessMenNames.json";
 import popRandom from "../utils/popRandom";
-//import { SerializedEntireGame } from "../common/EntireGame";
+import { SerializedEntireGame } from "../common/EntireGame";
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
     {
@@ -1985,6 +1985,27 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
         version: "97",
         migrate: (serializedGame: any) => {
             serializedGame.gameSettings.customBalancing = serializedGame.gameSettings.customModBalancing ? true : false;
+            return serializedGame;
+        }
+    },
+    {
+        version: "98",
+        migrate: (serializedGame: SerializedEntireGame) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const game = serializedGame.childGameState.game;
+                const allHouseCards = _.flatMap(game.houses.map(h => h.houseCards.map(([_hcid, shc]) => shc)));
+
+                allHouseCards.push(...game.houseCardsForDrafting.map(([_hcid, shc]) => shc));
+                allHouseCards.push(...game.deletedHouseCards.map(([_hcid, shc]) => shc));
+
+                const oldPlayerHouseCards = (_.flatMap(game.oldPlayerHouseCards.map(([_hid, hcs]) => hcs))).map(([_hcid, shc]) => shc);
+                allHouseCards.push(...oldPlayerHouseCards);
+
+                const walderFrey = allHouseCards.find(shc => shc.id == "walder-frey");
+                if (walderFrey) {
+                    walderFrey.name = "Walder Frey";
+                }
+            }
             return serializedGame;
         }
     }
