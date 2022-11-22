@@ -1978,6 +1978,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     houses with {<b>{newUserLabel}</b>} (House <b>{swappingHouse.name}</b>).
                 </>;
             }
+            case "westeros-deck-4-skipped": {
+                const westerosCardType = westerosCardTypes.get(data.westerosCardType);
+                return <>
+                    The execution of the Westeros card <b>{westerosCardType.name}</b> was skipped because House <b>Targaryen</b> is <b>{data.reason}</b>.
+                </>;
+            }
         }
     }
 
