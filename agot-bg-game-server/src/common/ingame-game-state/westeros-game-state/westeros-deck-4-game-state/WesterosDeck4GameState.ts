@@ -31,6 +31,11 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
 
     firstStart(type: WesterosCardType): void {
         if (this.ingame.isHouseDefeated(this.game.targaryen) || !this.game.targaryen || this.ingame.isVassalHouse(this.game.targaryen)) {
+            this.ingame.log({
+                type: "westeros-deck-4-skipped",
+                westerosCardType: type.id,
+                reason: this.ingame.isHouseDefeated(this.game.targaryen) ? "defeated" : "vassalized"
+            }, true);
             this.parentGameState.onWesterosCardEnd();
             return;
         }
