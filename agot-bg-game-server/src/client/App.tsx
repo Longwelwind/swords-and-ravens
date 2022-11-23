@@ -46,7 +46,7 @@ export default class App extends Component<AppProps> {
                 ? "2550px"
                 : "2000px"
             : "auto";
-        return <Container fluid={false} style={{
+        return <Container id="game-container" fluid={false} style={{
             paddingTop: "0.5rem",
             paddingBottom: "1rem",
             paddingRight: "3rem",

@@ -136,6 +136,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     @observable housesInfosCollapsed = this.user?.settings.tracksColumnCollapsed ?? false;
     @observable highlightedRegions = new BetterMap<Region, RegionOnMapProperties>();
     @observable showMapScrollbarInfo = false;
+    @observable showBrowserZoomInfo = false;
     @observable columnSwapAnimationClassName = "";
     modifyRegionsOnMapCallback: any;
     modifyOrdersOnMapCallback: any;
@@ -255,21 +256,26 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </Col>)}
                 </Row>
                 <Modal
-                    show={this.showMapScrollbarInfo}
-                    onHide={() => this.showMapScrollbarInfo = false} animation={false}
+                    show={this.showMapScrollbarInfo || this.showBrowserZoomInfo}
+                    onHide={() => this.closeModal()} animation={false}
                     backdrop="static"
                     keyboard={false}
                     centered
                 >
                     <Modal.Body>
-                        <div className="text-center">
-                            The game is optimized for HD resolutions.<br/>
-                            You are using a lower resolution and for a pleasant gaming experience you should
-                            play around with the zoom level of your browser and the <b>Map scrollbar</b> setting.
-                            You can find it by clicking on the gear icon.<br/><br/>
-                            <small><i>In your profile settings you can change the default behavior for this setting<br/>
-                            for all <b>future</b> games.</i></small>
-                        </div>
+                        {this.showMapScrollbarInfo
+                            ? <div className="text-center">
+                                The game is optimized for HD resolutions.<br/>
+                                You are using a lower display resolution and should try different combinations of your
+                                browser&apos;s zoom level and the <b>Map scrollbar</b> setting to ensure
+                                a pleasent gaming experience. The setting can be found in the tab with the gear icon.<br/><br/>
+                                <small><i>In your profile settings you can change the default behavior for this setting<br/>
+                                for all <b>future</b> games.</i></small>
+                            </div>
+                            : <div className="text-center">
+                                Unfortunately, your display resolution is too low to show all elements in a row.
+                                Use the function of your browser to zoom out and avoid scrolling all the time.
+                            </div>}
                     </Modal.Body>
                     <Modal.Footer style={{display: "flex", flexDirection: "column", justifyContent: "center"}}>
                         <FormCheck
@@ -285,12 +291,17 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 this.user.syncSettings();
                             }}
                         />
-                        <Button variant="primary" onClick={() => this.showMapScrollbarInfo = false}>
+                        <Button variant="primary" onClick={() => this.closeModal()}>
                             Ok
                         </Button>
                     </Modal.Footer>
                 </Modal>
         </>;
+    }
+
+    closeModal(): void {
+        this.showMapScrollbarInfo = false;
+        this.showBrowserZoomInfo = false;
     }
 
     renderHousesColumn(): ReactNode {
@@ -1274,9 +1285,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         document.addEventListener("visibilitychange", visibilityChangedCallback);
         this.onVisibilityChangedCallback = visibilityChangedCallback;
 
-        const dontShowAgain = this.user?.settings.dontShowMapScrollbarInfoAgain ?? false;
+        const dontShowAgain = isMobile || (this.user?.settings.dontShowMapScrollbarInfoAgain ?? false);
         if (screen.width < 1920 && screen.height < 1080 && this.mapScrollbarEnabled && !dontShowAgain) {
             this.showMapScrollbarInfo = true;
+        } else if (this.hasVerticalScrollbar() && !dontShowAgain) {
+            this.showBrowserZoomInfo = true;
         }
 
         this.ingame.entireGame.onCombatFastTracked = (stats) => {
@@ -1307,6 +1320,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         if (this.ingame.entireGame.gameSettings.onlyLive) {
             this.setIntervalId = window.setInterval(() => this.setNow(), 1000);
         }
+    }
+
+    hasVerticalScrollbar(): boolean {
+        const gameContainer = document.getElementById("game-container") as HTMLElement;
+        return gameContainer.scrollHeight > gameContainer.clientHeight;
     }
 
     componentWillUnmount(): void {
