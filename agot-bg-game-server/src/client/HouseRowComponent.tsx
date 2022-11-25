@@ -70,10 +70,14 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     render(): ReactNode {
         const isVassal = this.ingame.isVassalHouse(this.house);
         const gameRunning = !this.ingame.isEnded && !this.ingame.isCancelled;
-        // We limit the victory points to 7 but in the UI we wan't to show if a player controls more than 7 castles
-        const victoryPoints = !this.ingame.entireGame.isFeastForCrows && this.house.id != "targaryen"
-            ? this.game.getControlledStrongholdAndCastleCount(this.house)
-            : this.game.getVictoryPoints(this.house);
+
+        // We crop the victory points to victoryCountsNeededToWin but in the UI we want to show if a player was able to gain more VPs
+        const victoryPoints = this.ingame.entireGame.isFeastForCrows
+            ? this.game.getVictoryPoints(this.house)
+            : this.house.id == "targaryen"
+                ? this.game.getTotalLoyaltyTokenCount(this.house)
+                : this.game.getControlledStrongholdAndCastleCount(this.house);
+
         const victoryPointsWarning = gameRunning && (this.game.victoryPointsCountNeededToWin - 2 == victoryPoints);
         const victoryPointsCritical = gameRunning && (this.game.victoryPointsCountNeededToWin - 1 == victoryPoints || this.game.victoryPointsCountNeededToWin == victoryPoints);
         let isWaitedFor = false;
