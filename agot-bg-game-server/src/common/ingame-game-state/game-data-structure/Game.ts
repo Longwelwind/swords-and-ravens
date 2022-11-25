@@ -288,14 +288,14 @@ export default class Game {
         } else if (!lastRound) {
             victoryConditions = [
                 (h: House) => this.ingame.isVassalHouse(h) ? 1 : -1,
-                (h: House) => -this.getVictoryPoints(h),
+                (h: House) => -Math.min(this.getVictoryPoints(h), this.victoryPointsCountNeededToWin),
                 (h: House) => -this.getTotalControlledLandRegions(h),
                 (h: House) => this.ironThroneTrack.indexOf(h)
             ]
         } else {
             victoryConditions = [
                 (h: House) => this.ingame.isVassalHouse(h) ? 1 : -1,
-                (h: House) => -this.getVictoryPoints(h),
+                (h: House) => -Math.min(this.getVictoryPoints(h), this.victoryPointsCountNeededToWin),
                 (h: House) => this.ironThroneTrack.indexOf(h)
             ]
         }
@@ -445,12 +445,11 @@ export default class Game {
     }
 
     getVictoryPoints(house: House): number {
-        const victoryPoints = !this.ingame.entireGame.isFeastForCrows
+        return !this.ingame.entireGame.isFeastForCrows
             ? house.id == "targaryen"
                 ? this.getTotalLoyaltyTokenCount(house)
                 : this.getControlledStrongholdAndCastleCount(house)
             : house.victoryPoints;
-        return Math.min(victoryPoints, this.victoryPointsCountNeededToWin);
     }
 
     getTotalLoyaltyTokenCount(house: House): number {
