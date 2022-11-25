@@ -347,6 +347,12 @@ export default class IngameGameState extends GameState<
     }
 
     onPayDebtsGameStateFinish(): void {
+        // The decider may remove a unit in an enemy home town.
+        // If the enemy regains this castle, he might win the game.
+        if (this.checkVictoryConditions()) {
+            return;
+        }
+
         this.setChildGameState(new WesterosGameState(this)).firstStart();
     }
 
