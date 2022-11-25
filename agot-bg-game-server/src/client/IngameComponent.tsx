@@ -262,6 +262,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     keyboard={false}
                     centered
                 >
+                    <Modal.Header style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
+                        <h3 className="text-center" style={{color: "red"}}>Useful hint!<br/><small>Please read...</small></h3>
+                    </Modal.Header>
                     <Modal.Body>
                         {this.showMapScrollbarInfo
                             ? <div className="text-center">
@@ -277,7 +280,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 Use the function of your browser to zoom out and avoid scrolling all the time.
                             </div>}
                     </Modal.Body>
-                    <Modal.Footer style={{display: "flex", flexDirection: "column", justifyContent: "center"}}>
+                    <Modal.Footer style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
                         <FormCheck
                             id="dont-show-again-setting"
                             type="switch"
