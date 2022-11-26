@@ -95,6 +95,13 @@ export default class ExecuteLoanGameState extends GameState<ResolveConsolidatePo
             this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(analyzePortResult.port, analyzePortResult.newController, house);
             return;
         }
+
+        // Faceless men may remove a unit in an enemy home town.
+        // If the enemy regains this castle, he might win the game.
+        if (this.ingame.checkVictoryConditions()) {
+            return;
+        }
+
         this.parentGameState.proceedNextResolve(house);
     }
 
@@ -107,6 +114,13 @@ export default class ExecuteLoanGameState extends GameState<ResolveConsolidatePo
             this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(analyzePortResult.port, analyzePortResult.newController, previousHouse);
             return;
         }
+
+        // Faceless men may remove a unit in an enemy home town.
+        // If the enemy regains this castle, he might win the game.
+        if (this.ingame.checkVictoryConditions()) {
+            return;
+        }
+
         this.parentGameState.proceedNextResolve(previousHouse);
     }
 
