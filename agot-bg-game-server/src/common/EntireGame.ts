@@ -384,6 +384,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         }
 
         const waitedPlayers = this.leafState.getWaitedUsers().map(u => (this.ingameGameState as IngameGameState).players.get(u));
+        const notWaitedPlayers = _.difference(this.ingameGameState.players.values, waitedPlayers);
 
         if (!this.ingameGameState.paused) {
             waitedPlayers.forEach(p => {
@@ -392,21 +393,23 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 }
 
                 // If timer is already running but player is still active, do nothing
-                if (p.liveClockData.timerStartedAt == null && p.liveClockData.remainingSeconds > 0) {
-                    p.liveClockData.serverTimer = setTimeout(() => { this.ingameGameState?.onPlayerClockTimeout(p) }, p.liveClockData.remainingSeconds * 1000);
-                    p.liveClockData.timerStartedAt = new Date();
+                if (p.liveClockData.timerStartedAt == null) {
+                    if (p.liveClockData.remainingSeconds > 0) {
+                        p.liveClockData.serverTimer = setTimeout(() => { this.ingameGameState?.onPlayerClockTimeout(p) }, p.liveClockData.remainingSeconds * 1000);
+                        p.liveClockData.timerStartedAt = new Date();
 
-                    this.broadcastToClients({
-                        type: "start-player-clock",
-                        remainingSeconds: p.liveClockData.remainingSeconds,
-                        timerStartedAt: p.liveClockData.timerStartedAt.getTime(),
-                        userId: p.user.id
-                    });
+                        this.broadcastToClients({
+                            type: "start-player-clock",
+                            remainingSeconds: p.liveClockData.remainingSeconds,
+                            timerStartedAt: p.liveClockData.timerStartedAt.getTime(),
+                            userId: p.user.id
+                        });
+                    } else {
+                        this.ingameGameState?.onPlayerClockTimeout(p);
+                    }
                 }
             });
         }
-
-        const notWaitedPlayers = _.difference(this.ingameGameState.players.values, waitedPlayers);
 
         notWaitedPlayers.forEach(p => {
             if (!p.liveClockData) {
@@ -433,10 +436,6 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                     remainingSeconds: p.liveClockData.remainingSeconds,
                     userId: p.user.id
                 });
-
-                if (p.liveClockData.remainingSeconds == 0) {
-                    this.ingameGameState?.onPlayerClockTimeout(p);
-                }
             }
         });
     }
