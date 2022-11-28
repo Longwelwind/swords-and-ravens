@@ -379,60 +379,66 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     doPlayerClocksHandling(): void {
-        if (this.gameSettings.onlyLive && this.ingameGameState) {
-            const waitedPlayers = this.leafState.getWaitedUsers().map(u => (this.ingameGameState as IngameGameState).players.get(u));
+        if (!this.gameSettings.onlyLive || !this.ingameGameState) {
+            return;
+        }
 
-            if (!this.ingameGameState.paused) {
-                waitedPlayers.forEach(p => {
-                    if (!p.liveClockData) {
-                        throw new Error("LiveClockData must be present in doPlayerClocksHandling");
-                    }
+        const waitedPlayers = this.leafState.getWaitedUsers().map(u => (this.ingameGameState as IngameGameState).players.get(u));
 
-                    // If timer is already running but player is still active, do nothing
-                    if (p.liveClockData.timerStartedAt == null && p.liveClockData.remainingSeconds > 0) {
-                        p.liveClockData.serverTimer = setTimeout(() => { this.ingameGameState?.onPlayerClockTimeout(p) }, p.liveClockData.remainingSeconds * 1000);
-                        p.liveClockData.timerStartedAt = new Date();
-
-                        this.broadcastToClients({
-                            type: "start-player-clock",
-                            remainingSeconds: p.liveClockData.remainingSeconds,
-                            timerStartedAt: p.liveClockData.timerStartedAt.getTime(),
-                            userId: p.user.id
-                        });
-                    }
-                });
-            }
-
-            const notWaitedPlayers = _.difference(this.ingameGameState.players.values, waitedPlayers);
-
-            notWaitedPlayers.forEach(p => {
+        if (!this.ingameGameState.paused) {
+            waitedPlayers.forEach(p => {
                 if (!p.liveClockData) {
                     throw new Error("LiveClockData must be present in doPlayerClocksHandling");
                 }
 
-                if (p.liveClockData.timerStartedAt) {
-                    if (!p.liveClockData.serverTimer) {
-                        throw new Error("serverTimer must be present in doPlayerClocksHandling");
-                    }
-
-                    // Stop the timer
-                    clearTimeout(p.liveClockData.serverTimer);
-                    p.liveClockData.serverTimer = null;
-
-                    // This user is no longer waited for
-                    // Calculate new remainingSeconds and broadcast to clients
-                    p.liveClockData.remainingSeconds -= getElapsedSeconds(p.liveClockData.timerStartedAt);
-                    p.liveClockData.remainingSeconds = Math.max(0, p.liveClockData.remainingSeconds);
-                    p.liveClockData.timerStartedAt = null;
+                // If timer is already running but player is still active, do nothing
+                if (p.liveClockData.timerStartedAt == null && p.liveClockData.remainingSeconds > 0) {
+                    p.liveClockData.serverTimer = setTimeout(() => { this.ingameGameState?.onPlayerClockTimeout(p) }, p.liveClockData.remainingSeconds * 1000);
+                    p.liveClockData.timerStartedAt = new Date();
 
                     this.broadcastToClients({
-                        type: "stop-player-clock",
+                        type: "start-player-clock",
                         remainingSeconds: p.liveClockData.remainingSeconds,
+                        timerStartedAt: p.liveClockData.timerStartedAt.getTime(),
                         userId: p.user.id
                     });
                 }
             });
         }
+
+        const notWaitedPlayers = _.difference(this.ingameGameState.players.values, waitedPlayers);
+
+        notWaitedPlayers.forEach(p => {
+            if (!p.liveClockData) {
+                throw new Error("LiveClockData must be present in doPlayerClocksHandling");
+            }
+
+            if (p.liveClockData.timerStartedAt) {
+                if (!p.liveClockData.serverTimer) {
+                    throw new Error("serverTimer must be present in doPlayerClocksHandling");
+                }
+
+                // Stop the timer
+                clearTimeout(p.liveClockData.serverTimer);
+                p.liveClockData.serverTimer = null;
+
+                // This user is no longer waited for
+                // Calculate new remainingSeconds and broadcast to clients
+                p.liveClockData.remainingSeconds -= getElapsedSeconds(p.liveClockData.timerStartedAt);
+                p.liveClockData.remainingSeconds = Math.max(0, p.liveClockData.remainingSeconds);
+                p.liveClockData.timerStartedAt = null;
+
+                this.broadcastToClients({
+                    type: "stop-player-clock",
+                    remainingSeconds: p.liveClockData.remainingSeconds,
+                    userId: p.user.id
+                });
+
+                if (p.liveClockData.remainingSeconds == 0) {
+                    this.ingameGameState?.onPlayerClockTimeout(p);
+                }
+            }
+        });
     }
 
     onServerMessage(message: ServerMessage): void {
