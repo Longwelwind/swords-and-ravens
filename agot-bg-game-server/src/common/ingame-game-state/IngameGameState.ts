@@ -707,6 +707,14 @@ export default class IngameGameState extends GameState<
     }
 
     onPlayerClockTimeout(player: Player): void {
+        // Avoid this method to be called twice on the same player
+        if (!this.players.has(player.user)) {
+            this.entireGame.onCaptureSentryMessage(
+                `onPlayerClockTimeout was called twice for user ${player.user.name} (${player.user.id}). LiveClockData.remainingSeconds: ${player.liveClockData?.remainingSeconds}`,
+                "warning");
+            return;
+        }
+
         // Use a try catch here as an exception in a timer callback seems to crash the server
         let updateLastActive = false;
 
@@ -729,8 +737,11 @@ export default class IngameGameState extends GameState<
                 this.entireGame.checkGameStateChanged();
             }
 
+            // Vassal replacement during drafting would crash the game!
+            // It's unlikely to happen, but if it does, let's handle it gracefully by ending the game
+            // and declaring the player with the most time remaining the winner ...
             if (this.hasChildGameState(ThematicDraftHouseCardsGameState) || this.hasChildGameState(DraftHouseCardsGameState)) {
-                // Determine winner by finding the one with the most time left. On draw apply normal tie breaker.
+                // Determine winner by finding the one with the most time left. On draw normal tie breaker is applied.
                 const winner = _.orderBy(this.game.getPotentialWinners().filter(h => h != player.house && !this.isVassalHouse(h)),
                     h => this.getControllerOfHouse(h).liveClockData?.remainingSeconds, "desc")[0];
 
