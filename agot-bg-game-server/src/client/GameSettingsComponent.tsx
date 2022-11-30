@@ -28,7 +28,12 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
     }
 
     get canChangeGameSettings(): boolean {
-        return this.props.gameClient.isOwner();
+        if (this.entireGame.lobbyGameState) {
+            return this.props.gameClient.isRealOwner();
+        } else if (this.entireGame.ingameGameState) {
+            return this.props.gameClient.canActAsOwner();
+        }
+        return false;
     }
 
     get selectedGameSetupName(): string {

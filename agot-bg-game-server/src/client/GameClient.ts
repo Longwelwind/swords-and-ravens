@@ -146,7 +146,7 @@ export default class GameClient {
      */
     doesControlHouse(house: House | null): boolean {
         if (this.entireGame == null || !(this.entireGame.childGameState instanceof IngameGameState)) {
-            throw new Error();
+            throw new Error("EntireGame with IngameGameState is required");
         }
 
         const ingame = this.entireGame.childGameState;
@@ -170,25 +170,19 @@ export default class GameClient {
         }
     }
 
-    isOwner(): boolean {
-        if (!this.entireGame) {
-            throw new Error();
+    canActAsOwner(): boolean {
+        if (!this.entireGame || !this.authenticatedUser) {
+            console.error("EntireGame and authenticated user are required");
+            return false;
         }
 
-        if (!this.authenticatedUser) {
-            throw new Error();
-        }
-
-        return this.entireGame.isOwner(this.authenticatedUser);
+        return this.entireGame.canActAsOwner(this.authenticatedUser);
     }
 
     isRealOwner(): boolean {
-        if (!this.entireGame) {
-            throw new Error();
-        }
-
-        if (!this.authenticatedUser) {
-            throw new Error();
+        if (!this.entireGame || !this.authenticatedUser) {
+            console.error("EntireGame and authenticated user are required");
+            return false;
         }
 
         return this.entireGame.isRealOwner(this.authenticatedUser);

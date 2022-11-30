@@ -12,7 +12,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { Col, Dropdown, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import Player from "../common/ingame-game-state/Player";
 import ConditionalWrap from "./utils/ConditionalWrap";
-import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { faUserGear } from "@fortawesome/free-solid-svg-icons";
 import clonesImage from "../../public/images/icons/clones.svg"
 
 interface UserLabelProps {
@@ -37,14 +37,15 @@ export default class UserLabel extends Component<UserLabelProps> {
     }
 
     render(): ReactNode {
-        const isOwner = this.props.gameState.entireGame.isOwner(this.user) && !this.props.gameState.entireGame.gameSettings.faceless;
+        const canActAsOwner = this.props.gameState.entireGame.canActAsOwner(this.user) && !this.props.gameState.entireGame.gameSettings.faceless;
+        const isRealOwner = this.props.gameState.entireGame.isRealOwner(this.user);
         return (
             <Navbar variant="dark" className="no-space-around">
                 <Navbar.Brand className="no-space-around">
                     <small>
-                        {isOwner &&
-                                <><OverlayTrigger overlay={<Tooltip id={`${this.user.id}-owner-tooltip`}>Owner</Tooltip>}>
-                                    <FontAwesomeIcon icon={faUser}/>
+                        {canActAsOwner &&
+                                <><OverlayTrigger overlay={<Tooltip id={`${this.user.id}-owner-tooltip`}>Game host{!isRealOwner ? " deputy" : ""}</Tooltip>}>
+                                    <FontAwesomeIcon icon={faUserGear}/>
                                 </OverlayTrigger>&nbsp;&nbsp;</>}
                         <OverlayTrigger overlay={<Tooltip id={`${this.user.id}-connection-tooltip`}>{this.user.connected ? "Connected" : "Disconnected"}</Tooltip>}>
                             <FontAwesomeIcon icon={faWifi} className={this.user.connected ? "text-success" : "text-danger"} />
