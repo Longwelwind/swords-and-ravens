@@ -315,7 +315,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                     <Button variant="danger" onClick={() => this.leave()}>Leave</Button>
                 </Col>
             ) : (
-                this.props.gameClient.isOwner() && (
+                this.props.gameClient.isRealOwner() && (
                     <Col xs="auto" className={invisible ? "invisible" : ""}>
                         <Button variant="danger" onClick={() => this.kick(h)}>Kick</Button>
                     </Col>

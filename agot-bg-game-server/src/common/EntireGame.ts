@@ -265,13 +265,21 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         }
     }
 
-    isOwner(user: User): boolean {
+    canActAsOwner(user: User): boolean {
         if (this.ingameGameState && !this.gameSettings.tournamentMode) {
             // If owner is not present ingame
             // every player becomes owner to be able to toggle PBEM
             return this.ingameGameState.players.keys.map(u => u.id).includes(this.ownerUserId)
                 ? this.isRealOwner(user)
                 : this.ingameGameState.players.keys.includes(user);
+        }
+
+        // In case real owner is not seated, at least everybody should be allowed to start the game if it is full
+        if (this.lobbyGameState) {
+            const seatedUserIds = this.lobbyGameState.players.values.map(u => u.id);
+            if (!seatedUserIds.includes(this.ownerUserId) && seatedUserIds.includes(user.id) && seatedUserIds.length >= this.gameSettings.playerCount) {
+                return true;
+            }
         }
 
         return this.isRealOwner(user);
@@ -319,7 +327,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 settings: user.settings
             });
         } else if (message.type == "change-game-settings") {
-            if (!this.isOwner(user)) {
+            if (!this.canActAsOwner(user)) {
                 return;
             }
 
@@ -358,8 +366,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 settings.onlyLive = false;
             }
 
-            // For changing settings other than PBEM or Private pass the message to the client game state
-            this.childGameState.onClientMessage(user, message);
+            if (this.isRealOwner(user)) {
+                // For changing settings other than PBEM or Private pass the message to the client game state
+                this.childGameState.onClientMessage(user, message);
+            }
 
             this.broadcastToClients({
                 type: "game-settings-changed",

@@ -112,14 +112,14 @@ export default class LobbyGameState extends GameState<EntireGame> {
         } else if (message.type == "kick-player") {
             const kickedUser = this.entireGame.users.get(message.user);
 
-            if (!this.entireGame.isOwner(user) || kickedUser == user) {
+            if (!this.entireGame.isRealOwner(user) || kickedUser == user) {
                 return false;
             }
 
             this.setUserForLobbyHouse(null, kickedUser);
             updateLastActive = true;
         } else if (message.type == "cancel-game") {
-            if (!this.entireGame.isOwner(user)) {
+            if (!this.entireGame.isRealOwner(user)) {
                 return false;
             }
 
@@ -422,7 +422,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
     }
 
     canStartGame(user: User): {success: boolean; reason: string} {
-        if (!this.entireGame.isOwner(user)) {
+        if (!this.entireGame.canActAsOwner(user)) {
             return {success: false, reason: "not-owner"};
         }
 
