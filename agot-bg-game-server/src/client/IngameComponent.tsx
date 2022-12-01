@@ -133,7 +133,7 @@ interface IngameComponentProps {
 @observer
 export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
-    @observable currentOpenedTab = this.user?.settings.lastOpenedTab ?? (this.gameSettings.pbem ? "game-logs" : "chat");
+    @observable currentOpenedTab = this.user?.settings.lastOpenedTab ?? "chat";
     @observable housesInfosCollapsed = this.user?.settings.tracksColumnCollapsed ?? false;
     @observable highlightedRegions = new BetterMap<Region, RegionOnMapProperties>();
     @observable showMapScrollbarInfo = false;
@@ -939,9 +939,21 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </ScrollToBottom>
                             </Tab.Pane>}
                             <Tab.Pane eventKey="game-logs" className="h-100">
-                                <ScrollToBottom className="h-100" scrollViewClassName="overflow-x-hidden">
-                                    <GameLogListComponent ingameGameState={this.ingame} gameClient={this.gameClient} currentlyViewed={this.currentOpenedTab == "game-logs"}/>
-                                </ScrollToBottom>
+                                <div className="d-flex flex-column h-100">
+                                    <div className="d-flex flex-column align-items-center">
+                                        <Dropdown className="mb-2">
+                                            <Dropdown.Toggle variant="secondary" size="sm">
+                                                Jump to
+                                            </Dropdown.Toggle>
+                                            <Dropdown.Menu>
+                                                {this.renderGameLogRoundsDropDownItems()}
+                                            </Dropdown.Menu>
+                                        </Dropdown>
+                                    </div>
+                                    <ScrollToBottom className="flex-fill-remaining" scrollViewClassName="overflow-x-hidden">
+                                        <GameLogListComponent ingameGameState={this.ingame} gameClient={this.gameClient} currentlyViewed={this.currentOpenedTab == "game-logs"}/>
+                                    </ScrollToBottom>
+                                </div>
                             </Tab.Pane>
                             <Tab.Pane eventKey="settings" className="h-100">
                                 <GameSettingsComponent gameClient={this.gameClient}
@@ -979,6 +991,17 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 </Tab.Container>
             </Card>
         </div>
+    }
+
+    renderGameLogRoundsDropDownItems(): JSX.Element[] {
+        const gameRoundElements = document.querySelectorAll('*[id^="gamelog-round-"]');
+        const result: JSX.Element[] = [];
+
+        gameRoundElements.forEach(elem => {
+            result.push(<Dropdown.Item key={`dropdownitem-for-${elem.id}`} onClick={() => elem.scrollIntoView()}>Round {elem.id.replace("gamelog-round-", "")}</Dropdown.Item>);
+        });
+
+        return result;
     }
 
     highlightRegionsOfHouses(): void {

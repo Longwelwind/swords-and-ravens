@@ -179,8 +179,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     <h5>The unofficial <i>A Dance with Mother of Dragons</i> variant</h5>
                     This is a community-created variant and combines A Dance with Dragons and Mother with Dragons.<br/>
                     So it also <i>lasts only <b>6</b> rounds</i>, offers new starting positions and is played with the<br/>
-                    Dance with Dragons / Feast for Crows house cards and the Mother of Dragons B deck for Targaryen.<br/>
-                    It is still in the test phase and can be adapted from time to time.
+                    Dance with Dragons / Feast for Crows house cards and the Mother of Dragons B deck for Targaryen.
                 </>;
             case "struggle-in-the-north":
                 return <>
@@ -232,7 +231,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         placement="top"
                         delay={{show: 500, hide: 0}}
                     >
-                        <select id="game-setups" name="setups"
+                        <select className="custom-select" id="game-setups" name="setups"
                             value={this.gameSettings.setupId}
                             onChange={e => this.onSetupChange(e.target.value)}
                             style={{marginBottom: "8px"}}
@@ -242,7 +241,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     </OverlayTrigger>
                 </Col>
                 <Col xs="auto" className="d-flex justify-content-between">
-                    <div>
+                    <div className="mr-2">
                         <select id="player-count" name="playerCount"
                             value={this.gameSettings.playerCount}
                             onChange={e => this.onPlayerCountChange(e.target.value)}

@@ -194,7 +194,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const assignments = data.assignments.map(([houseId, userId]) =>
                     [this.game.houses.get(houseId), this.ingame.entireGame.users.get(userId)]) as [House, User][];
                 return <>
-                    <div className="text-center"><h5>The war of the {assignments.length} kings has begun!</h5></div>
+                    <div id="gamelog-round-0" className="text-center"><h5>The war of the {assignments.length} kings has begun!</h5></div>
                     {assignments.map(([house, user]) =>
                         <p  key={`${house.id}_${user.id}`}>House <b>{house.name}</b> is controlled by <b>{getUserLinkOrLabel(this.ingame.entireGame, user, this.ingame.players.tryGet(user, null))}</b>.</p>
                     )}
@@ -203,7 +203,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <Row className="justify-content-center">
                     <Col xs={true}><hr/></Col>
                     <Col xs="auto">
-                        <h4>Round <b>{data.turn}</b></h4>
+                        <h4 id={`gamelog-round-${data.turn}`}>Round <b>{data.turn}</b></h4>
                     </Col>
                     <Col xs={true}><hr/></Col>
                 </Row>;

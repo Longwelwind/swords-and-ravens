@@ -511,10 +511,6 @@ div.disconnected {
   border-width: 3px;
 }
 
-.chat-scroll-to-bottom {
-  height: 258px;
-}
-
 .tooltip-inner {
   text-align: left;
 }
@@ -1031,4 +1027,9 @@ hr.red {
   100% {
     box-shadow: 10px 0, 20px 0;
   }
+}
+
+select {
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
 }
