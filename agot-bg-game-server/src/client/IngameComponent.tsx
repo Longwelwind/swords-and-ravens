@@ -111,6 +111,7 @@ import VotesListComponent from "./VotesListComponent";
 import voteSound from "../../public/sounds/vote-started.ogg";
 import WorldStateComponent from "./WorldStateComponent";
 import { houseColorFilters } from "./houseColorFilters";
+import LocalStorageService from "./utils/localStorageService";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -285,13 +286,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             id="dont-show-again-setting"
                             type="switch"
                             label={<label htmlFor="dont-show-again-setting">Don&apos;t show again</label>}
-                            checked={this.user?.settings.dontShowMapScrollbarInfoAgain}
-                            onChange={() => {
-                                if (!this.user) {
-                                    return;
-                                }
-                                this.user.settings.dontShowMapScrollbarInfoAgain = !this.user.settings.dontShowMapScrollbarInfoAgain;
-                                this.user.syncSettings();
+                            onChange={evt => {
+                                LocalStorageService.setWithExpiry<boolean>("dontShowScrollbarHintsAgain", evt.target.checked, 30 * 24 * 60 * 60);
                             }}
                         />
                         <Button variant="primary" onClick={() => this.closeModal()}>
@@ -1288,7 +1284,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         document.addEventListener("visibilitychange", visibilityChangedCallback);
         this.onVisibilityChangedCallback = visibilityChangedCallback;
 
-        const dontShowAgain = isMobile || (this.user?.settings.dontShowMapScrollbarInfoAgain ?? false);
+        const dontShowAgainFromStorage = LocalStorageService.getWithExpiry<boolean>("dontShowScrollbarHintsAgain");
+
+        const dontShowAgain = isMobile || (dontShowAgainFromStorage ?? false);
         if (screen.width < 1920 && screen.height < 1080 && this.mapScrollbarEnabled && !dontShowAgain) {
             this.showMapScrollbarInfo = true;
         } else if (this.hasVerticalScrollbar() && !dontShowAgain) {
