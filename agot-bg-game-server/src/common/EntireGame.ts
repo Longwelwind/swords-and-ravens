@@ -266,16 +266,21 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     canActAsOwner(user: User): boolean {
-        if (this.ingameGameState && !this.gameSettings.tournamentMode) {
-            // If owner is not present ingame
-            // every player becomes owner to be able to toggle PBEM
+        if (this.gameSettings.tournamentMode) {
+            // Tournament games can only be changed and started by the game owner (creator)
+            return this.isRealOwner(user);
+        }
+
+        if (this.ingameGameState) {
+            // If game owner is not present ingame
+            // every player can toggle between PBEM and Live
             return this.ingameGameState.players.keys.map(u => u.id).includes(this.ownerUserId)
                 ? this.isRealOwner(user)
                 : this.ingameGameState.players.keys.includes(user);
         }
 
-        // In case real owner is not seated, at least everybody should be allowed to start the game if it is full
         if (this.lobbyGameState) {
+            // In case game owner is not seated, every player is allowed to start the game when it is full
             const seatedUserIds = this.lobbyGameState.players.values.map(u => u.id);
             if (!seatedUserIds.includes(this.ownerUserId) && seatedUserIds.includes(user.id) && seatedUserIds.length >= this.gameSettings.playerCount) {
                 return true;

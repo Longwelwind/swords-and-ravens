@@ -1806,14 +1806,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const region = this.world.regions.get(data.region);
 
                 return <p>
-                    A garrison token with strength <b>{data.strength}</b> was removed from <b>{region.name}</b>.
+                    A <b>garrison token</b> with strength <b>{data.strength}</b> was <b>removed</b> from <b>{region.name}</b>.
                 </p>;
             }
             case "garrison-returned": {
                 const region = this.world.regions.get(data.region);
 
                 return <p>
-                    A garrison token with strength <b>{data.strength}</b> was returned to <b>{region.name}</b>.
+                    A <b>garrison token</b> with strength <b>{data.strength}</b> was <b>returned</b> to <b>{region.name}</b>.
                 </p>;
             }
             case "objective-deck-empty": {
@@ -1942,7 +1942,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.houseId);
 
                 return <p>
-                    A Power token of House <b>{house.name}</b> was removed from <b>{region.name}</b>.
+                    A <b>Power token</b> of House <b>{house.name}</b> was removed from <b>{region.name}</b>.
                 </p>;
             }
             case "game-paused": {
