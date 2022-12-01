@@ -183,7 +183,6 @@ export interface UserSettings {
     muted: boolean;
     tracksColumnCollapsed: boolean;
     showMapWhenDrafting: boolean;
-    dontShowMapScrollbarInfoAgain: boolean;
     musicMuted: boolean;
 }
 

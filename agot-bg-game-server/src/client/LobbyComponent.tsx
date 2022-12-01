@@ -122,7 +122,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                 <Card.Body style={{height: this.chatHeight, padding: "1rem"}}>
                                     <div className="d-flex flex-column h-100">
                                         <span>Spectators:</span>
-                                        <ScrollToBottom className="mb-2 h-90 chat-scroll-to-bottom" scrollViewClassName="overflow-x-hidden">
+                                        <ScrollToBottom className="mb-2 flex-fill-remaining" scrollViewClassName="overflow-x-hidden">
                                             {connectedSpectators.map(u => <div key={`specatator_${u.id}`}><b>{getUserLinkOrLabel(this.entireGame, u, null)}</b></div>)}
                                         </ScrollToBottom>
                                     </div>

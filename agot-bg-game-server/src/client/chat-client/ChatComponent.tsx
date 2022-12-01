@@ -96,7 +96,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
         return (
             <div className="d-flex flex-column h-100">
                 {/* Setting a fixed height seems to be the only solution to make ScrollToBottom work */}
-                <ScrollToBottom className="mb-2 h-90 chat-scroll-to-bottom" scrollViewClassName="overflow-x-auto">
+                <ScrollToBottom className="mb-2 flex-fill-remaining" scrollViewClassName="overflow-x-auto" style={{height: 300}}>
                     {/* In case there's no messages yet, inject with no messages as arguments */}
                     {messages.length == 0 && (
                         <React.Fragment key={"injected-for-all"}>
@@ -153,11 +153,11 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                     </button>
                 </ScrollToBottom>
                 {!this.channel.connected ?
-                    <Row noGutters={true} className="flex-nowrap justify-content-center">
+                    <div className="flex-nowrap justify-content-center">
                         <Alert variant="warning" className="text-center">
                             This chat is not connected. Please wait until the connection is established or reload the page.
                         </Alert>
-                    </Row>
+                    </div>
                     : <Form>
                         <Row className="d-flex align-items-center">
                             <Col>
