@@ -248,6 +248,11 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.allowGiftingPowerTokens = true;
             }
 
+            // Disable Iron Bank when switching to 7P MoD
+            if (this.settings.playerCount != 7 && settings.setupId == "mother-of-dragons" && settings.playerCount == 7) {
+                settings.ironBank = false;
+            }
+
             // Lock MoD settings for 8p
             if ((settings.setupId == "mother-of-dragons" || settings.setupId == "a-dance-with-mother-of-dragons") && settings.playerCount >= 8) {
                 settings.vassals = true;
