@@ -1,0 +1,76 @@
+{% extends "./base.html" %}
+{% load games_table %}
+
+{% block title %}
+Your Games -
+{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-lg-11 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Online Users
+                        <span
+                            id="westerosi-time"
+                            class="float-right badge badge-secondary"
+                            data-toggle="tooltip"
+                            data-html="true"
+                            title="<b>Westerosi time</b> ...<small>basically, UTC</small>"
+                        ></span>
+                        <script type="text/javascript">
+                            let element = document.getElementById("westerosi-time");
+                            function update() {
+                                let time = new Date();
+                                element.innerHTML = time.getUTCHours().toString().padStart(2, "0") + ":" + time.getUTCMinutes().toString().padStart(2, "0");
+                            }
+                            update();
+                            setInterval(update, 1000);
+                        </script>
+                    </h4>
+                    {% for user in request.online_now %}
+                    {% if user.is_admin %}
+                        <a style="margin-right: 10px; font-size: 1.125rem; color:brown" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">{{ user.username }}</a>
+                    {% elif user.is_high_member %}
+                        <a style="margin-right: 10px; font-size: 1.125rem; color:darkgoldenrod" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">{{ user.username }}</a>
+                    {% else %}
+                        <a style="margin-right: 10px; font-size: 1.125rem;" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">{{ user.username }}</a>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-11 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    {% include "./components/games_chat.html" %}
+                </div>
+            </div>
+        </div>
+        {% if my_games %}
+        <div class="col-lg-11 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Your Games</h4>
+                    {% games_table my_games user perms %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-lg-11 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <p class="mb-0">You currently have no running games!</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        <div class="col-lg-11 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-0"><a href="/games">All Games</a></h4>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
