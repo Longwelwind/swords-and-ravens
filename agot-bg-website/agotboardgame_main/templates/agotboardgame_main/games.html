@@ -62,16 +62,13 @@ Games -
             </div>
         </div>
         {% endif %}
-        {% if my_games %}
         <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Your Games</h4>
-                    {% games_table my_games user perms %}
+                    <h4 class="card-title mb-0"><a href="/my_games">Your Games</a></h4>
                 </div>
             </div>
         </div>
-        {% endif %}
         <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
@@ -106,7 +103,7 @@ Games -
             </div>
         </div>
         {% endif %}
-        {% if inactive_games %}
+        {% if perms.agotboardgame_main.can_play_as_another_player and inactive_games %}
         <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
@@ -135,7 +132,7 @@ Games -
             </div>
         </div>
         {% endif %}
-        {% if inactive_private_games %}
+        {% if perms.agotboardgame_main.cancel_game and inactive_private_games %}
         <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">

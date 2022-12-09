@@ -162,6 +162,74 @@ def about(request):
     return render(request, "agotboardgame_main/about.html", {"game_tasks": game_tasks, "meta_tasks": meta_tasks})
 
 
+@login_required
+def my_games(request):
+    two_days_past = timezone.now() - timedelta(days=2)
+    games_query = Game.objects.annotate(players_count=Count('players'),\
+        replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()),\
+        is_faceless=Cast(KeyTextTransform('faceless', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
+        is_private=Cast(KeyTextTransform('private', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
+        inactive_2=ExpressionWrapper(Q(last_active_at__lt=two_days_past), output_field=BooleanField()))\
+        .prefetch_related('owner')\
+        .prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user=request.user), to_attr="player_in_game"))
+
+    eight_days_past = timezone.now() - timedelta(days=8)
+    games = games_query.filter(Q(state=IN_LOBBY) | Q(state=ONGOING)).prefetch_related(\
+        Prefetch('players', queryset=PlayerInGame.objects.filter(user__last_activity__lt=eight_days_past), to_attr="inactive_players"))
+
+    # It seems to be hard to ask Postgres to order the list correctly.
+    # It is done in Python
+    games = sorted(games, key=lambda game: ([IN_LOBBY, ONGOING].index(game.state), -datetime.timestamp(game.last_active_at)))
+
+    my_games = []
+
+    for game in games:
+        # "game.player_in_game" contains a list of one or zero element, depending on whether the authenticated
+        # player is in the game.
+        # Transform that into a single field that can be None.
+        game.player_in_game = game.player_in_game[0] if len(game.player_in_game) > 0 else None
+
+        if game.player_in_game:
+            if game.state == ONGOING and not game.is_private and game.inactive_2 and len(game.inactive_players) > 0 and not game.replace_player_vote_ongoing:
+                inactive_players = ""
+                for inactive_player in game.inactive_players:
+                    house = inactive_player.data.get("house", "Unknown House").capitalize()
+                    if house in game.view_of_game.get("waitingFor", ""):
+                        inactive_players = inactive_players + house + (" (" + inactive_player.user.username + ")" if not game.is_faceless else "") + ", "
+                game.inactive_players = inactive_players[:-2] if len(inactive_players) >= 2 else None
+            else:
+                game.inactive_players = None
+
+            my_games.append(game)
+
+        # Check whether there is an unseen message in
+        if game.player_in_game and "important_chat_rooms" in game.player_in_game.data:
+            # `important_chat_rooms` will contain a list of room ids that must trigger a warning
+            # if there are unseen messages.
+            important_chat_rooms = game.player_in_game.data["important_chat_rooms"]
+
+            # This is a query inside a loop, not super good for performance,
+            # but since this only applies to games of the player, it should not impact performance that much.
+            unread_messages = UserInRoom.objects.filter(
+                Q(room__messages__created_at__gt=F("last_viewed_message__created_at"))
+                | Q(last_viewed_message__isnull=True),
+                user=game.player_in_game.user,
+                room__in=important_chat_rooms,
+                room__messages__isnull=False
+            ).exists()
+
+            game.unread_messages = unread_messages
+        else:
+            game.unread_messages = False
+
+    public_room_id = Room.objects.get(name='public').id
+
+    return render(request, "agotboardgame_main/my_games.html", {
+        "my_games": my_games,
+        "public_room_id": public_room_id
+    })
+
+
 def games(request):
     if request.method == "GET":
         last_finished_game = Game.objects.filter(state=FINISHED).annotate(players_count=Count('players')).latest()
@@ -180,9 +248,6 @@ def games(request):
             inactive_21=ExpressionWrapper(Q(last_active_at__lt=three_weeks_past), output_field=BooleanField())\
             ).prefetch_related('owner')
 
-        if request.user.is_authenticated:
-            games_query = games_query.prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user=request.user), to_attr="player_in_game"))
-
         eight_days_past = timezone.now() - timedelta(days=8)
         if request.user.is_authenticated:
             games = games_query.filter(Q(state=IN_LOBBY) | Q(state=ONGOING)).prefetch_related(\
@@ -193,7 +258,6 @@ def games(request):
         # It is done in Python
         games = sorted(games, key=lambda game: ([IN_LOBBY, ONGOING].index(game.state), -datetime.timestamp(game.last_active_at)))
 
-        my_games = []
         active_games = []
         inactive_games = []
         replacement_needed_games = []
@@ -205,8 +269,6 @@ def games(request):
             # player is in the game.
             # Transform that into a single field that can be None.
             if request.user.is_authenticated:
-                game.player_in_game = game.player_in_game[0] if len(game.player_in_game) > 0 else None
-
                 if game.state == ONGOING and not game.is_private and game.inactive_2 and len(game.inactive_players) > 0 and not game.replace_player_vote_ongoing:
                     inactive_players = ""
                     for inactive_player in game.inactive_players:
@@ -217,28 +279,7 @@ def games(request):
                 else:
                     game.inactive_players = None
             else:
-                game.player_in_game = None
                 game.inactive_players = None
-
-            # Check whether there is an unseen message in
-            if game.player_in_game and "important_chat_rooms" in game.player_in_game.data:
-                # `important_chat_rooms` will contain a list of room ids that must trigger a warning
-                # if there are unseen messages.
-                important_chat_rooms = game.player_in_game.data["important_chat_rooms"]
-
-                # This is a query inside a loop, not super good for performance,
-                # but since this only applies to games of the player, it should not impact performance that much.
-                unread_messages = UserInRoom.objects.filter(
-                    Q(room__messages__created_at__gt=F("last_viewed_message__created_at"))
-                    | Q(last_viewed_message__isnull=True),
-                    user=game.player_in_game.user,
-                    room__in=important_chat_rooms,
-                    room__messages__isnull=False
-                ).exists()
-
-                game.unread_messages = unread_messages
-            else:
-                game.unread_messages = False
 
             if game.inactive_players is not None:
                 replacement_needed_games.append(game)
@@ -255,9 +296,6 @@ def games(request):
                 if game.view_of_game.get("waitingForIds", None) and len(game.view_of_game.get("waitingForIds")) > 0:
                     game.inactive_user_id = game.view_of_game.get("waitingForIds")[0]
 
-            if game.player_in_game:
-                my_games.append(game)
-
             if game.state == IN_LOBBY and game.players_count > 0 and game.view_of_game.get("settings", False) and game.view_of_game.get("settings").get("pbem", True) == False:
                 open_live_games.append(game)
 
@@ -266,7 +304,6 @@ def games(request):
         return render(request, "agotboardgame_main/games.html", {
             "active_games": active_games,
             "inactive_games": inactive_games,
-            "my_games": my_games,
             "open_live_games": open_live_games,
             "replacement_needed_games": replacement_needed_games,
             "inactive_private_games": inactive_private_games,
@@ -288,7 +325,6 @@ def games(request):
             return HttpResponseRedirect("/games")
 
         return HttpResponseRedirect(f"/play/{game.id}")
-
 
 def cancel_game(request, game_id):
     if not request.user.has_perm("agotboardgame_main.cancel_game"):
