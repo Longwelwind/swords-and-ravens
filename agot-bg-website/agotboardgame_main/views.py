@@ -165,45 +165,40 @@ def about(request):
 @login_required
 def my_games(request):
     two_days_past = timezone.now() - timedelta(days=2)
-    games_query = Game.objects.annotate(players_count=Count('players'),\
+    eight_days_past = timezone.now() - timedelta(days=8)
+    games_query = Game.objects.annotate(user_is_in_game=Count('players', filter=Q(players__user=request.user)),\
+        players_count=Count('players'),\
         replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()),\
         is_faceless=Cast(KeyTextTransform('faceless', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
         is_private=Cast(KeyTextTransform('private', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
         inactive_2=ExpressionWrapper(Q(last_active_at__lt=two_days_past), output_field=BooleanField()))\
         .prefetch_related('owner')\
-        .prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user=request.user), to_attr="player_in_game"))
+        .prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user=request.user), to_attr="player_in_game"))\
+        .prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user__last_activity__lt=eight_days_past), to_attr="inactive_players"))
 
-    eight_days_past = timezone.now() - timedelta(days=8)
-    games = games_query.filter(Q(state=IN_LOBBY) | Q(state=ONGOING)).prefetch_related(\
-        Prefetch('players', queryset=PlayerInGame.objects.filter(user__last_activity__lt=eight_days_past), to_attr="inactive_players"))
+    my_games = games_query.filter((Q(state=IN_LOBBY) | Q(state=ONGOING)) & Q(user_is_in_game=1))
 
     # It seems to be hard to ask Postgres to order the list correctly.
     # It is done in Python
-    games = sorted(games, key=lambda game: ([IN_LOBBY, ONGOING].index(game.state), -datetime.timestamp(game.last_active_at)))
+    my_games = sorted(my_games, key=lambda game: ([IN_LOBBY, ONGOING].index(game.state), -datetime.timestamp(game.last_active_at)))
 
-    my_games = []
+    for game in my_games:
+        # "game.player_in_game" contains a list of one element, the authenticated player in the game.
+        # Transform that into a single field
+        game.player_in_game = game.player_in_game[0]
 
-    for game in games:
-        # "game.player_in_game" contains a list of one or zero element, depending on whether the authenticated
-        # player is in the game.
-        # Transform that into a single field that can be None.
-        game.player_in_game = game.player_in_game[0] if len(game.player_in_game) > 0 else None
-
-        if game.player_in_game:
-            if game.state == ONGOING and not game.is_private and game.inactive_2 and len(game.inactive_players) > 0 and not game.replace_player_vote_ongoing:
-                inactive_players = ""
-                for inactive_player in game.inactive_players:
-                    house = inactive_player.data.get("house", "Unknown House").capitalize()
-                    if house in game.view_of_game.get("waitingFor", ""):
-                        inactive_players = inactive_players + house + (" (" + inactive_player.user.username + ")" if not game.is_faceless else "") + ", "
-                game.inactive_players = inactive_players[:-2] if len(inactive_players) >= 2 else None
-            else:
-                game.inactive_players = None
-
-            my_games.append(game)
+        if game.state == ONGOING and not game.is_private and game.inactive_2 and len(game.inactive_players) > 0 and not game.replace_player_vote_ongoing:
+            inactive_players = ""
+            for inactive_player in game.inactive_players:
+                house = inactive_player.data.get("house", "Unknown House").capitalize()
+                if house in game.view_of_game.get("waitingFor", ""):
+                    inactive_players = inactive_players + house + (" (" + inactive_player.user.username + ")" if not game.is_faceless else "") + ", "
+            game.inactive_players = inactive_players[:-2] if len(inactive_players) >= 2 else None
+        else:
+            game.inactive_players = None
 
         # Check whether there is an unseen message in
-        if game.player_in_game and "important_chat_rooms" in game.player_in_game.data:
+        if "important_chat_rooms" in game.player_in_game.data:
             # `important_chat_rooms` will contain a list of room ids that must trigger a warning
             # if there are unseen messages.
             important_chat_rooms = game.player_in_game.data["important_chat_rooms"]
