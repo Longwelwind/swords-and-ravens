@@ -62,6 +62,7 @@ export default class IngameGameState extends GameState<
     oldPlayerIds: string[] = [];
     replacerIds: string[] = [];
     timeoutPlayerIds: string[] = [];
+    @observable housesTimedOut: House[] = [];
     game: Game;
     gameLogManager: GameLogManager = new GameLogManager(this);
     @observable ordersOnBoard: BetterMap<Region, Order> = new BetterMap();
@@ -832,7 +833,13 @@ export default class IngameGameState extends GameState<
         const otherPlayers = this.players.values;
         _.pull(otherPlayers, newPlayer, oldPlayer);
 
-        const avg = Math.floor(_.sum(otherPlayers.map(p => p.totalRemainingSeconds)) / otherPlayers.length);
+        const values = otherPlayers.map(p => p.totalRemainingSeconds).sort((a, b) => a - b);
+        if (values.length > 2) {
+            // Remove value of the fastest player
+            values.pop();
+        }
+
+        const avg = Math.round(_.sum(values) / values.length);
         newPlayer.liveClockData = {
             remainingSeconds: avg,
             serverTimer: null,
@@ -874,9 +881,13 @@ export default class IngameGameState extends GameState<
 
         if (reason == ReplacementReason.VOTE && !this.oldPlayerIds.includes(player.user.id)) {
             this.oldPlayerIds.push(player.user.id);
-        } else if (reason == ReplacementReason.CLOCK_TIMEOUT && !this.timeoutPlayerIds.includes(player.user.id)) {
-            this.timeoutPlayerIds.push(player.user.id);
+        } else if (reason == ReplacementReason.CLOCK_TIMEOUT) {
+            this.housesTimedOut.push(player.house);
+            if (!this.timeoutPlayerIds.includes(player.user.id)) {
+                this.timeoutPlayerIds.push(player.user.id);
+            }
         }
+
         // Delete the old player so the house is a vassal now
         this.players.delete(player.user);
 
@@ -910,7 +921,8 @@ export default class IngameGameState extends GameState<
 
         this.entireGame.broadcastToClients({
             type: "player-replaced",
-            oldUser: player.user.id
+            oldUser: player.user.id,
+            timedOut: reason == ReplacementReason.CLOCK_TIMEOUT
         });
 
         this.log({
@@ -1100,6 +1112,10 @@ export default class IngameGameState extends GameState<
                 this.players.set(newUser, newPlayer);
             } else {
                 oldPlayer.house.hasBeenReplacedByVassal = true;
+            }
+
+            if (message.timedOut) {
+                this.housesTimedOut.push(oldPlayer.house);
             }
 
             this.players.delete(oldPlayer.user);
@@ -1563,8 +1579,8 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "forbidden-in-tournament-mode"};
         }
 
-        if (this.entireGame.gameSettings.onlyLive) {
-            return {result: false, reason: "forbidden-in-clock-games"};
+        if (this.entireGame.gameSettings.onlyLive && this.housesTimedOut.includes(forHouse)) {
+            return {result: false, reason: "house-timed-out"};
         }
 
         if (this.paused) {
@@ -1767,6 +1783,7 @@ export default class IngameGameState extends GameState<
             oldPlayerIds: this.oldPlayerIds,
             replacerIds: this.replacerIds,
             timeoutPlayerIds: this.timeoutPlayerIds,
+            housesTimedOut: this.housesTimedOut.map(h => h.id),
             game: this.game.serializeToClient(admin, player),
             gameLogManager: this.gameLogManager.serializeToClient(admin, user),
             ordersOnBoard: this.ordersOnBoard.mapOver(r => r.id, o => o.id),
@@ -1787,6 +1804,7 @@ export default class IngameGameState extends GameState<
         ingameGameState.oldPlayerIds = data.oldPlayerIds;
         ingameGameState.replacerIds = data.replacerIds;
         ingameGameState.timeoutPlayerIds = data.timeoutPlayerIds;
+        ingameGameState.housesTimedOut = data.housesTimedOut.map(hid => ingameGameState.game.houses.get(hid));
         ingameGameState.votes = new BetterMap(data.votes.map(sv => [sv.id, Vote.deserializeFromServer(ingameGameState, sv)]));
         ingameGameState.ordersOnBoard = new BetterMap(
             data.ordersOnBoard.map(([regionId, orderId]) => (
@@ -1831,6 +1849,7 @@ export interface SerializedIngameGameState {
     oldPlayerIds: string[];
     replacerIds: string[];
     timeoutPlayerIds: string[];
+    housesTimedOut: string[];
     game: SerializedGame;
     votes: SerializedVote[];
     gameLogManager: SerializedGameLogManager;

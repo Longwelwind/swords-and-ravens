@@ -315,6 +315,7 @@ interface PlayerReplaced {
     oldUser: string;
     newUser?: string;
     liveClockRemainingSeconds?: number;
+    timedOut?: boolean;
 }
 
 interface VassalReplaced {
