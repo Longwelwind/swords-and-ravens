@@ -77,6 +77,7 @@ export default class GlobalServer {
             client.on("close", () => {
                 this.onClose(client);
             });
+            client.on("error", console.error);
         });
     }
 
@@ -91,7 +92,7 @@ export default class GlobalServer {
                     this.send(connectedClient, message);
                 }
             });
-        })
+        });
     }
 
     async onMessage(client: WebSocket, data: Buffer, clientIp: string, socketId: string): Promise<void> {
