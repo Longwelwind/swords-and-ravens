@@ -37,7 +37,13 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     @observable users = new BetterMap<string, User>();
     ownerUserId: string;
     name: string;
+    publicChatRoomId: string;
+    // Keys are the two users participating in the private chat.
+    // A pair of user is sorted alphabetically by their id when used as a key.
+    @observable privateChatRoomsIds: BetterMap<User, BetterMap<User, string>> = new BetterMap();
+    // Client-side callback fired whenever a new private chat-window was created
     leafStateId = v4();
+    lastMessageReceivedAt: Date | null = null;
 
     @observable gameSettings: GameSettings = { setupId: "mother-of-dragons", playerCount: 8, pbem: true, onlyLive: false, startWhenFull: false, private: false,
         addPortToTheEyrie: false, adwdHouseCards: false, asosHouseCards: false, houseCardsEvolution: false,
@@ -48,37 +54,32 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         useVassalPositions: false, precedingMustering: false, randomStartPositions: false, initialLiveClock: 60,
         noPrivateChats: false, tournamentMode: false
     };
-    onSendClientMessage: (message: ClientMessage) => void;
-    onSendServerMessage: (users: User[], message: ServerMessage) => void;
-    onWaitedUsers: (users: User[]) => void;
-    onReadyToStart: (users: User[]) => void;
-    onNewVoteStarted: (users: User[]) => void;
-    onBribeForSupport: (users: User[]) => void;
-    onBattleResults: (users: User[]) => void;
-    onGameEnded: (users: User[]) => void;
-    onNewPbemResponseTime: (user: User, responseTimeInSeconds: number) => void;
-    onClearChatRoom: (roomId: string) => void;
-    onCaptureSentryMessage: (message: string, severity: "info" | "warning" | "error" | "fatal") => void;
-    onSaveGame: (updateLastActive: boolean) => void;
-    onGameStarted: (() => void) | null = null;
+
+    onSendClientMessage?: (message: ClientMessage) => void;
+    onSendServerMessage?: (users: User[], message: ServerMessage) => void;
+    onWaitedUsers?: (users: User[]) => void;
+    onReadyToStart?: (users: User[]) => void;
+    onNewVoteStarted?: (users: User[]) => void;
+    onBribeForSupport?: (users: User[]) => void;
+    onBattleResults?: (users: User[]) => void;
+    onGameEnded?: (users: User[]) => void;
+    onNewPbemResponseTime?: (user: User, responseTimeInSeconds: number) => void;
+    onClearChatRoom?: (roomId: string) => void;
+    onCaptureSentryMessage?: (message: string, severity: "info" | "warning" | "error" | "fatal") => void;
+    onSaveGame?: (updateLastActive: boolean) => void;
 
     // Throttled saveGame so we don't spam the website client
     saveGame: (updateLastActive: boolean) => void = _.throttle(this.privateSaveGame, 2000);
 
-    publicChatRoomId: string;
-    // Keys are the two users participating in the private chat.
-    // A pair of user is sorted alphabetically by their id when used as a key.
-    @observable privateChatRoomsIds: BetterMap<User, BetterMap<User, string>> = new BetterMap();
-    // Client-side callback fired whenever a new private chat-window was created
-    onNewPrivateChatRoomCreated: ((roomId: string) => void) | null;
-    // Client-side callback fired whenever the current GameState changes.
-    onClientGameStateChange: (() => void) | null;
-
-    onCombatFastTracked: ((stats: CombatStats[]) => void) | null;
+    // Client-side callbacks
+    onNewPrivateChatRoomCreated: ((roomId: string) => void) | null = null;
+    onGameStarted: (() => void) | null = null;
+    onClientGameStateChange: (() => void) | null = null;
+    onCombatFastTracked: ((stats: CombatStats[]) => void) | null = null;
     onWildingsAttackFastTracked: ((wildingCard: WildlingCardType,
         biddings: [number, House[]][] | null,
         highestBidder: House | null,
-        lowestBidder: House | null) => void) | null;
+        lowestBidder: House | null) => void) | null = null;
 
     get lobbyGameState(): LobbyGameState | null {
         return this.childGameState instanceof LobbyGameState ? this.childGameState : null;
@@ -390,6 +391,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         this.doPlayerClocksHandling();
 
         this.saveGame(updateLastActive);
+
+        this.lastMessageReceivedAt = new Date();
     }
 
     doPlayerClocksHandling(): void {
@@ -532,7 +535,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     sendMessageToServer(message: ClientMessage): void {
-        this.onSendClientMessage(message);
+        if (this.onSendClientMessage) {
+            this.onSendClientMessage(message);
+        }
     }
 
     broadcastCustomToClients(craftMessage: (u: User) => ServerMessage): void {
@@ -544,7 +549,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     }
 
     sendMessageToClients(users: User[], message: ServerMessage): void {
-        this.onSendServerMessage(users, message);
+        if (this.onSendServerMessage) {
+            this.onSendServerMessage(users, message);
+        }
     }
 
     getStateOfGame(): string {
@@ -687,7 +694,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             gameSettings: this.gameSettings,
             privateChatRoomIds: this.privateChatRoomsIds.map((u1, v) => [u1.id, v.map((u2, rid) => [u2.id, rid])]),
             leafStateId: this.leafStateId,
-            childGameState: this.childGameState.serializeToClient(admin, user),
+            childGameState: this.childGameState.serializeToClient(admin, user)
         };
     }
 

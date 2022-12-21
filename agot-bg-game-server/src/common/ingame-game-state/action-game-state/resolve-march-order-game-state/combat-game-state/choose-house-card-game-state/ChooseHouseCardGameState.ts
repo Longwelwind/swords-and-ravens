@@ -59,8 +59,10 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                 h.houseCards = new BetterMap(houseCards.map(hc => [hc.id, hc]));
                 h.houseCards.values.forEach(hc => {
                     if (hc.state == HouseCardState.USED) {
-                        this.entireGame.onCaptureSentryMessage(`Vassal house card ${hc.id} is marked as USED`, "error");
                         hc.state = HouseCardState.AVAILABLE;
+                        if (this.entireGame.onCaptureSentryMessage) {
+                            this.entireGame.onCaptureSentryMessage(`Vassal house card ${hc.id} is marked as USED`, "error");
+                        }
                     }
                 });
             }
