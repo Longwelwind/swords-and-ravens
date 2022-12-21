@@ -11,6 +11,8 @@ import User from "../server/User";
 import { isMobile } from 'react-device-detect';
 import EntireGame from "../common/EntireGame";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRotateRight } from "@fortawesome/free-solid-svg-icons";
 
 interface AppProps {
     gameClient: GameClient;
@@ -18,7 +20,7 @@ interface AppProps {
 
 @observer
 export default class App extends Component<AppProps> {
-    onVisibilityChangedCallback: (() => void) | null = null;
+    //onVisibilityChangedCallback: (() => void) | null = null;
 
     get user(): User | null {
         return this.props.gameClient.authenticatedUser;
@@ -72,17 +74,25 @@ export default class App extends Component<AppProps> {
                             : this.isConnected && this.props.gameClient.entireGame
                                 ? <EntireGameComponent gameClient={this.props.gameClient} entireGame={this.props.gameClient.entireGame as EntireGame} />
                                 : this.props.gameClient.connectionState == ConnectionState.CLOSED
-                                    ? <Col xs="auto" className="m-4 p-3 text-center">
-                                        <Alert variant="danger">
-                                            <h4>The connection to the server is lost.<br/>
-                                            Please reload this page.</h4>
-                                        </Alert>
-                                    </Col>
+                                    ? <>
+                                        <Col xs="auto" className="m-4 p-3 text-center">
+                                            <Alert variant="danger">
+                                                <h4>The connection to the server is lost.<br/>
+                                                Please reload this page.</h4>
+                                                <button className="btn btn-outline-dark mt-3"
+                                                    onClick={() => { window.location.reload() }}
+                                                >
+                                                    <FontAwesomeIcon icon={faRotateRight} size="lg" /><h5 className="ml-2 d-inline">Reload</h5>
+                                                </button>
+                                            </Alert>
+                                        </Col>
+                                    </>
                                     : <Col xs="auto" className="m-4 p-3 text-center"><span className="loader">Error</span></Col>}
             </Row>
         </Container>;
     }
 
+/*
     onVisibilityChanged(): void {
         if (document.visibilityState != "visible") {
             return;
@@ -105,4 +115,5 @@ export default class App extends Component<AppProps> {
             document.removeEventListener("visibilitychange", visibilityChangedCallback);
         }
     }
+*/
 }
