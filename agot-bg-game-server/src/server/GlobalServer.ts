@@ -18,6 +18,7 @@ import sleep from "../utils/sleep";
 import { compress, decompress } from "./utils/compression";
 import * as Sentry from "@sentry/node"
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
+import { getTimeDeltaInSeconds } from "../utils/getElapsedSeconds";
 
 interface UserConnectionInfo {
     userId: string;
@@ -133,6 +134,8 @@ export default class GlobalServer {
                 console.warn("Authentication with a wrong gameId");
                 return;
             }
+
+            entireGame.lastMessageReceivedAt = new Date();
 
             // Check if the game already contains this user
             const user = entireGame.users.has(userData.id)
@@ -294,7 +297,7 @@ export default class GlobalServer {
                 });
             } else {
                 // Apply average to the players with active timer
-                const avg = Math.floor(_.sum(playersWithNoActiveTimer.map(([_p, clockData]) => clockData.totalRemainingSeconds)) / playersWithNoActiveTimer.length);
+                const avg = Math.round(_.sum(playersWithNoActiveTimer.map(([_p, clockData]) => clockData.totalRemainingSeconds)) / playersWithNoActiveTimer.length);
                 clockDataPerPlayer.entries.forEach(([p, clockData]) => {
                     if (clockData.timerStartedAt != null) {
                         clockDataPerPlayer.set(p, {
@@ -483,8 +486,6 @@ export default class GlobalServer {
     }
 
     onClose(client: WebSocket): void {
-        console.log("Connection closed.");
-
         if (this.clientToUser.has(client)) {
             const user = this.clientToUser.get(client) as User;
             user.connectedClients.splice(user.connectedClients.indexOf(client), 1);
@@ -526,16 +527,64 @@ export default class GlobalServer {
         return otherUsersWithSameIp.map(uci => uci.userName);
     }
 
-    async invalidateOutdatedIpEntries(): Promise<void> {
+    unloadGame(entireGame: EntireGame) {
+        if (!this.loadedGames.has(entireGame.id)) {
+            return;
+        }
+
+        console.log("Unloading game " + entireGame.id);
+
+        entireGame.users.values.forEach(u => {
+            u.connectedClients.forEach(ws => {
+                ws.close();
+                setTimeout(() => {
+                    if (ws.readyState == WebSocket.OPEN || ws.readyState == WebSocket.CLOSING) {
+                        ws.terminate();
+                    }
+                  }, 10000);
+            });
+        });
+
+        entireGame.onSendClientMessage = undefined;
+        entireGame.onSendServerMessage = undefined;
+        entireGame.onReadyToStart = undefined;
+        entireGame.onWaitedUsers = undefined;
+        entireGame.onBattleResults = undefined;
+        entireGame.onBribeForSupport = undefined;
+        entireGame.onNewVoteStarted = undefined;
+        entireGame.onGameEnded = undefined;
+        entireGame.onNewPbemResponseTime = undefined
+        entireGame.onClearChatRoom = undefined;
+        entireGame.onCaptureSentryMessage = undefined;
+        entireGame.onSaveGame = undefined;
+
+        this.loadedGames.delete(entireGame.id);
+    }
+
+    async performLongRunningOperations(): Promise<void> {
         while (true) {
+            await sleep(10 * 60 * 1000);
+
             const now = new Date();
-            // console.log(`multiAccountingProtection values: ${JSON.stringify(this.multiAccountingProtection.values, null, 1)}`);
+
+            // Unload inactive games:
+            this.loadedGames.values.filter(game => game.lastMessageReceivedAt != null).forEach(game => {
+                const secondsSinceLastIncomingMessage = getTimeDeltaInSeconds(now, game.lastMessageReceivedAt as Date);
+                if (game.gameSettings.pbem && secondsSinceLastIncomingMessage > (60 * 60)) {
+                    // If a PBEM game was not active for one hour, unload it
+                    this.unloadGame(game);
+                } else if (!game.gameSettings.pbem && secondsSinceLastIncomingMessage > (6 * 60 * 60)) {
+                    // If a live game was not active for 6 hours, unload it
+                    this.unloadGame(game);
+                }
+            });
+
+            // Invalidate outdated Ip entries:
             this.multiAccountingProtection.keys.forEach(entireGameId => {
                 const userConnectionInfos = this.multiAccountingProtection.get(entireGameId);
                 userConnectionInfos.keys.forEach(socketId => {
                     const uci = userConnectionInfos.get(socketId);
                     if (uci.invalidatesAt && now.getTime() > uci.invalidatesAt.getTime()) {
-                        // console.log(`Invalidated ${JSON.stringify(uci, null, 1)}`);
                         userConnectionInfos.delete(socketId);
                     }
                 });
@@ -544,7 +593,6 @@ export default class GlobalServer {
                     this.multiAccountingProtection.delete(entireGameId);
                 }
             });
-            await sleep(60000);
         }
     }
 }

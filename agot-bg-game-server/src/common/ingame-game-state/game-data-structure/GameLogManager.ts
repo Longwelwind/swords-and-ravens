@@ -5,7 +5,7 @@ import BetterMap from "../../../utils/BetterMap";
 import User from "../../../server/User";
 
 export function timeToTicks(time: Date): number {
-    return Math.floor(time.getTime() / 1000);
+    return Math.round(time.getTime() / 1000);
 }
 
 export function ticksToTime(ticks: number): Date {
@@ -28,7 +28,7 @@ export default class GameLogManager {
         this.ingameGameState.entireGame.broadcastToClients({
             type: "add-game-log",
             data: data,
-            time: Math.floor(time.getTime() / 1000),
+            time: Math.round(time.getTime() / 1000),
             resolvedAutomatically: resolvedAutomatically
         });
     }

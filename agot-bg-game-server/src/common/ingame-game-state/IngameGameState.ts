@@ -710,9 +710,11 @@ export default class IngameGameState extends GameState<
     onPlayerClockTimeout(player: Player): void {
         // Avoid this method to be called twice on the same player
         if (!this.players.has(player.user)) {
-            this.entireGame.onCaptureSentryMessage(
-                `onPlayerClockTimeout was called twice for user ${player.user.name} (${player.user.id}). LiveClockData.remainingSeconds: ${player.liveClockData?.remainingSeconds}`,
-                "warning");
+            if (this.entireGame.onCaptureSentryMessage) {
+                this.entireGame.onCaptureSentryMessage(
+                    `onPlayerClockTimeout was called twice for user ${player.user.name} (${player.user.id}). LiveClockData.remainingSeconds: ${player.liveClockData?.remainingSeconds}`,
+                    "warning");
+            }
             return;
         }
 
@@ -759,7 +761,9 @@ export default class IngameGameState extends GameState<
                     ? e.message
                     : "Unknown error in onPlayerClockTimeout";
             console.error(message);
-            this.entireGame.onCaptureSentryMessage(`onPlayerClockTimeout failed for user ${player.user.name} (${player.user.id}): ${message}`, "fatal");
+            if (this.entireGame.onCaptureSentryMessage) {
+                this.entireGame.onCaptureSentryMessage(`onPlayerClockTimeout failed for user ${player.user.name} (${player.user.id}): ${message}`, "fatal");
+            }
         } finally {
             this.entireGame.checkGameStateChanged();
             this.entireGame.doPlayerClocksHandling();
@@ -821,7 +825,9 @@ export default class IngameGameState extends GameState<
                     ? e.message
                     : "Unknown error in resumeGame";
             console.error(message);
-            this.entireGame.onCaptureSentryMessage(`resumeGame failed: ${message}`, "fatal");
+            if (this.entireGame.onCaptureSentryMessage) {
+                this.entireGame.onCaptureSentryMessage(`resumeGame failed: ${message}`, "fatal");
+            }
         }
     }
 
