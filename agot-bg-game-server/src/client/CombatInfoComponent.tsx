@@ -56,15 +56,15 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
         return <div style={{maxWidth: "336px", minWidth: "336px"}}>
             <div style={{display: "grid", gridGap: "5px", gridTemplateColumns: "50% 50%"}}>
                 <div style={{gridRow: "1", gridColumn: "1"}}>
-                    {this.attacker.isWinner && <img src={knightBannerImage} width="30" style={{marginRight: 2, marginBottom: 5, filter: houseColorFilters.get(this.attacker.house.id) }} />}
+                    {this.attacker.isWinner && <img src={knightBannerImage} width="28" style={{marginRight: 2, marginBottom: 5, filter: houseColorFilters.get(this.attacker.house.id) }} />}
                     <b style={{"color": this.attacker.house.color, fontSize: "1.25rem"}}>{this.attacker.house.name}</b>
-                    {this.attacker.isWinner && <img src={knightBannerImage} width="30" style={{marginLeft: 2, marginBottom: 5, filter: houseColorFilters.get(this.attacker.house.id) }} />}
+                    {this.attacker.isWinner && <img src={knightBannerImage} width="28" style={{marginLeft: 2, marginBottom: 5, filter: houseColorFilters.get(this.attacker.house.id) }} />}
                 </div>
 
                 <div style={{gridRow: "1", gridColumn: "2"}} className="text-right">
-                    {this.defender.isWinner && <img src={knightBannerImage} width="30" style={{marginRight: 2, marginBottom: 5, filter: houseColorFilters.get(this.defender.house.id) }} />}
+                    {this.defender.isWinner && <img src={knightBannerImage} width="28" style={{marginRight: 2, marginBottom: 5, filter: houseColorFilters.get(this.defender.house.id) }} />}
                     <b style={{"color": this.defender.house.color, fontSize: "1.25rem"}}>{this.defender.house.name}</b>
-                    {this.defender.isWinner && <img src={knightBannerImage} width="30" style={{marginLeft: 2, marginBottom: 5, filter: houseColorFilters.get(this.defender.house.id) }} />}
+                    {this.defender.isWinner && <img src={knightBannerImage} width="28" style={{marginLeft: 2, marginBottom: 5, filter: houseColorFilters.get(this.defender.house.id) }} />}
                 </div>
             </div>
             <div style={{display: "grid", gridGap: "5px", gridTemplateColumns: "auto 1fr auto 1fr auto", justifyItems: "center", alignItems: "center"}} className="text-center">
