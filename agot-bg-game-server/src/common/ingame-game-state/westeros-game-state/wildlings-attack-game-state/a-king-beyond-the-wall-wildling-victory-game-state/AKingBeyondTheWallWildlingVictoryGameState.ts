@@ -43,7 +43,7 @@ export default class AKingBeyondTheWallWildlingVictoryGameState extends Wildling
             this.proceedNextHouse(house);
         } else {
             this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(house, "", [
-                "Fiefdoms Track", "King's Court Track"
+                "Fiefdoms Track (Sword)", "King's Court Track (Raven)"
             ]);
         }
     }

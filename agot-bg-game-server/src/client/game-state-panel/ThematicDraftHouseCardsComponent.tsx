@@ -21,9 +21,14 @@ export default class ThematicDraftHouseCardsComponent extends Component<GameStat
     render(): ReactNode {
         return (
             <>
+                <Row className="justify-content-center">
+                    <Col xs={12} className="text-center">
+                        All houses choose their House cards.
+                    </Col>
+                </Row>
                 {this.player && this.props.gameState.getNotReadyPlayers().includes(this.player) &&
                     <>
-                        <Row  className="justify-content-center">
+                        <Row className="mt-3 justify-content-center">
                             <Col xs="12" className="text-center">
                                 Please select a House card:
                             </Col>

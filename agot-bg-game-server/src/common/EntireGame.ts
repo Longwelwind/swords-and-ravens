@@ -23,6 +23,7 @@ import SimpleChoiceGameState from "./ingame-game-state/simple-choice-game-state/
 import getElapsedSeconds from "../utils/getElapsedSeconds";
 import WildlingCardType from "./ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
 import House from "./ingame-game-state/game-data-structure/House";
+import memoizeThrottle from "../utils/momoizeThrottle";
 
 export enum NotificationType {
     READY_TO_START,
@@ -69,7 +70,12 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     onSaveGame?: (updateLastActive: boolean) => void;
 
     // Throttled saveGame so we don't spam the website client
-    saveGame: (updateLastActive: boolean) => void = _.throttle(this.privateSaveGame, 2000);
+    saveGame = memoizeThrottle(
+        (updateLastActive: boolean) => { this.privateSaveGame(updateLastActive); },
+        2000,
+        {},
+        (updateLastActive) => updateLastActive
+    );
 
     // Client-side callbacks
     onNewPrivateChatRoomCreated: ((roomId: string) => void) | null = null;
