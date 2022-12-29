@@ -380,6 +380,8 @@ export class ReplacePlayer extends VoteType {
             newPlayer.setWaitedFor();
             vote.ingame.entireGame.notifyWaitedUsers([newPlayer.user]);
         }
+
+        vote.ingame.entireGame.saveGame(true);
     }
 
     serializeToClient(): SerializedReplacePlayer {
@@ -448,6 +450,7 @@ export class ReplacePlayerByVassal extends VoteType {
         }
 
         ingame.replacePlayerByVassal(oldPlayer, ReplacementReason.VOTE);
+        vote.ingame.entireGame.saveGame(true);
     }
 
     serializeToClient(): SerializedReplacePlayerByVassal {
@@ -567,6 +570,8 @@ export class ReplaceVassalByPlayer extends VoteType {
             game: vote.ingame.entireGame.serializeToClient(newPlayer.user),
             userId: newPlayer.user.id
         });
+
+        vote.ingame.entireGame.saveGame(true);
     }
 
     serializeToClient(): SerializedReplaceVassalByPlayer {
