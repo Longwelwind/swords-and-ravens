@@ -87,20 +87,21 @@ export default class ClashOfKingsGameState extends GameState<WesterosGameState, 
     }
 
     proceedCheckForTies(results: [number, House[]][]): void {
+        // Remove a possible bid of Targaryen:
+        results.forEach(([_bid, houses]) => {
+            const targIndex = houses.findIndex(h => h.id == "targaryen");
+            if (targIndex > -1) {
+                houses.splice(targIndex, 1);
+            }
+        });
+
+        // Due to the possible previous splice a bid result may have an empty houses list now,
+        // if Targaryen was the only bidder with that value ...
+        // So we filter for houses.length > 0 here:
+        results = results.filter(([_, houses]) => houses.length > 0);
+
         // Check if there's at least one tie.
         if (results.some(([_, houses]) => houses.length > 1)) {
-            // Remove a possible bid of Targaryen:
-            results.forEach(([_bid, houses]) => {
-                const targIndex = houses.findIndex(h => h.id == "targaryen");
-                if (targIndex > -1) {
-                    houses.splice(targIndex, 1);
-                }
-            });
-
-            // Due to the possible previous splice a bid result may have an empty houses list now (if Targaryen was the only bidder with that value)
-            // So we filter for houses.length > 0 here
-            results = results.filter(([_, houses]) => houses.length > 0);
-
             // Ask the Iron Throne holder to resolve them
             this.setChildGameState(new ResolveTiesGameState(this)).firstStart(results);
         } else {
