@@ -2032,6 +2032,26 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             return serializedGame;
         }
     },
+    {
+        version: "101",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame" && serializedGame.gameSettings.setupId == "a-feast-for-crows") {
+                const ingame = serializedGame.childGameState;
+                const objectiveScoredLogs = ingame.gameLogManager.logs.filter((l: any) => l.data.type == "objective-scored" || l.data.type == "special-objective-scored");
+
+                objectiveScoredLogs.forEach((l: any) => {
+                    if (l.data.type == "objective-scored" || l.data.type == "special-objective-scored") {
+                        const house = ingame.game.houses.find((h: any) => h.id == l.data.house);
+                        if (house && l.data.newTotal > house.victoryPoints) {
+                            house.victoryPoints = l.data.newTotal;
+                        }
+                    }
+                });
+            }
+
+            return serializedGame;
+        }
+    }
 ];
 
 export default serializedGameMigrations;
