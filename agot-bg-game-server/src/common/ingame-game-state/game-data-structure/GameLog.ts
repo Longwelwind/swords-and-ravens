@@ -839,7 +839,6 @@ interface LoyaltyTokenPlaced {
 
 interface LoyaltyTokenGained {
     type: "loyalty-token-gained";
-    house: string;
     count: number;
     region: string;
 }

@@ -1512,10 +1512,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 </p>;
             }
             case "loyalty-token-gained": {
-                const house = this.game.houses.get(data.house);
                 const region = this.world.regions.get(data.region);
                 return <p>
-                    House <b>{house.name}</b> gained {data.count} Loyalty&nbsp;token{data.count != 1 ? "s" : ""} in <b>{region.name}</b>.
+                    House <b>{this.game.targaryen?.name ?? "Targaryen"}</b> gained {data.count} Loyalty&nbsp;token{data.count != 1 ? "s" : ""} in <b>{region.name}</b>.
                 </p>
             }
             case "fire-made-flesh-choice": {

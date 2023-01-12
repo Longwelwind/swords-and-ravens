@@ -401,7 +401,6 @@ interface UpdateOldPlayerHouseCards {
 
 interface LoyaltyTokenGained {
     type: "loyalty-token-gained";
-    house: string;
     newLoyaltyTokenCount: number;
     region: string;
 }

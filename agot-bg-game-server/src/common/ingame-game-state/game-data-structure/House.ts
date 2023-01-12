@@ -20,7 +20,6 @@ export default class House {
     @observable powerTokens: number;
     @observable supplyLevel: number;
     @observable knowsNextWildlingCard: boolean;
-    @observable gainedLoyaltyTokens: number;
     @observable hasBeenReplacedByVassal: boolean;
     specialObjective: SpecialObjectiveCard | null;
     @observable secretObjectives: ObjectiveCard[];
@@ -29,8 +28,7 @@ export default class House {
 
     constructor(id: string, name: string, color: string, unitLimits: BetterMap<UnitType, number>,
         powerTokens: number, maxPowerTokens: number, supplyLevel: number, houseCards: BetterMap<string, HouseCard>,
-        laterHouseCards: BetterMap<string, HouseCard> | null = null,
-        gainedLoyaltyTokens = 0, hasBeenReplacedByVassal = false, victoryPoints = 0) {
+        laterHouseCards: BetterMap<string, HouseCard> | null = null, victoryPoints = 0, hasBeenReplacedByVassal = false) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -40,7 +38,6 @@ export default class House {
         this.supplyLevel = supplyLevel;
         this.houseCards = houseCards;
         this.laterHouseCards = laterHouseCards;
-        this.gainedLoyaltyTokens = gainedLoyaltyTokens;
         this.hasBeenReplacedByVassal = hasBeenReplacedByVassal;
         this.maxPowerTokens = maxPowerTokens;
         this.victoryPoints = victoryPoints;
@@ -79,7 +76,6 @@ export default class House {
             powerTokens: this.powerTokens,
             maxPowerTokens: this.maxPowerTokens,
             supplyLevel: this.supplyLevel,
-            gainedLoyaltyTokens: this.gainedLoyaltyTokens,
             hasBeenReplacedByVassal: this.hasBeenReplacedByVassal,
             specialObjective: this.specialObjective ? this.specialObjective.id : null,
             victoryPoints: this.victoryPoints,
@@ -109,9 +105,8 @@ export default class House {
             data.laterHouseCards
                 ? new BetterMap<string, HouseCard>(data.laterHouseCards.map(([string, data]) => [string, HouseCard.deserializeFromServer(data)]))
                 : null,
-            data.gainedLoyaltyTokens,
-            data.hasBeenReplacedByVassal,
-            data.victoryPoints
+            data.victoryPoints,
+            data.hasBeenReplacedByVassal
         );
 
         house.knowsNextWildlingCard = data.knowsNextWildlingCard;
@@ -133,10 +128,9 @@ export interface SerializedHouse {
     powerTokens: number;
     maxPowerTokens: number;
     supplyLevel: number;
-    gainedLoyaltyTokens: number;
+    victoryPoints: number;
     hasBeenReplacedByVassal: boolean;
     specialObjective: string | null;
     secretObjectives: string[];
     completedObjectives: string[];
-    victoryPoints: number;
 }
