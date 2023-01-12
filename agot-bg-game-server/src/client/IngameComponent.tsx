@@ -405,8 +405,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         <Tooltip id="cancel-game-vote-tooltip">
                                             {canLaunchCancelGameVote ? (
                                                 "Launch a vote to cancel the game"
-                                            ) : canLaunchCancelGameVoteReason == "game-paused" ? (
-                                                "The game must be resumed first"
                                             ) : canLaunchCancelGameVoteReason == "only-players-can-vote" ? (
                                                 "Only participating players can vote"
                                             ) : canLaunchCancelGameVoteReason == "already-existing" ? (

@@ -14,7 +14,8 @@ import ChooseInitialObjectivesGameState from "../choose-initial-objectives-game-
 
 export type SerializedVoteType = SerializedCancelGame | SerializedEndGame
     | SerializedReplacePlayer | SerializedReplacePlayerByVassal | SerializedReplaceVassalByPlayer
-    | SerializedPauseGame | SerializedResumeGame | SerializedExtendPlayerClocks | SerializedSwapHouses;
+    | SerializedPauseGame | SerializedResumeGame | SerializedExtendPlayerClocks | SerializedSwapHouses
+    | SerializedDeclareWinner;
 
 export default abstract class VoteType {
     abstract serializeToClient(): SerializedVoteType;
@@ -67,6 +68,10 @@ export default abstract class VoteType {
                 // Same than above
                 // eslint-disable-next-line @typescript-eslint/no-use-before-define
                 return SwapHouses.deserializeFromServer(ingame, data);
+            case "declare-winner":
+                // Same than above
+                // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                return DeclareWinner.deserializeFromServer(ingame, data);
         }
     }
 }
@@ -244,15 +249,26 @@ export class CancelGame extends VoteType {
     }
 
     executeAccepted(vote: Vote): void {
-        if (vote.ingame.hasChildGameState(PlaceOrdersGameState)) {
+        const ingame = vote.ingame;
+        if (ingame.paused) {
+            if (ingame.autoResumeTimeout) {
+                clearTimeout(ingame.autoResumeTimeout);
+                ingame.autoResumeTimeout = null;
+            }
+
+            ingame.resumeGame(true);
+        }
+
+        if (ingame.hasChildGameState(PlaceOrdersGameState)) {
             const placeOrders = vote.ingame.getChildGameState(PlaceOrdersGameState) as PlaceOrdersGameState;
-            vote.ingame.ordersOnBoard = placeOrders.placedOrders as BetterMap<Region, Order>;
-            vote.ingame.entireGame.broadcastToClients({
+            ingame.ordersOnBoard = placeOrders.placedOrders as BetterMap<Region, Order>;
+            ingame.entireGame.broadcastToClients({
                 type: "reveal-orders",
                 orders: vote.ingame.ordersOnBoard.mapOver(r => r.id, o => o.id)
             });
         }
-        vote.ingame.setChildGameState(new CancelledGameState(vote.ingame)).firstStart();
+
+        ingame.setChildGameState(new CancelledGameState(vote.ingame)).firstStart();
     }
 
     serializeToClient(): SerializedCancelGame {
@@ -300,6 +316,55 @@ export class EndGame extends VoteType {
 
 export interface SerializedEndGame {
     type: "end-game";
+}
+
+export class DeclareWinner extends VoteType {
+    winner: House;
+
+    constructor(winner: House) {
+        super();
+        this.winner = winner;
+    }
+
+    verb(): string {
+        return `declare House ${this.winner.name} the winner`;
+    }
+
+    getPositiveCountToPass(vote: Vote): number {
+        return vote.participatingHouses.length;
+    }
+
+    executeAccepted(vote: Vote): void {
+        const ingame = vote.ingame;
+        if (ingame.paused) {
+            if (ingame.autoResumeTimeout) {
+                clearTimeout(ingame.autoResumeTimeout);
+                ingame.autoResumeTimeout = null;
+            }
+
+            ingame.resumeGame(true);
+        }
+
+        ingame.setChildGameState(new GameEndedGameState(vote.ingame)).firstStart(this.winner);
+        ingame.entireGame.saveGame(true);
+    }
+
+    serializeToClient(): SerializedDeclareWinner {
+        return {
+            type: "declare-winner",
+            winner: this.winner.id
+        };
+    }
+
+    static deserializeFromServer(ingame: IngameGameState, data: SerializedDeclareWinner): DeclareWinner {
+        const voteWinner = new DeclareWinner(ingame.game.houses.get(data.winner));
+        return voteWinner;
+    }
+}
+
+export interface SerializedDeclareWinner {
+    type: "declare-winner";
+    winner: string;
 }
 
 export class ReplacePlayer extends VoteType {

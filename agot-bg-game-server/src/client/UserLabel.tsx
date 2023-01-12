@@ -14,6 +14,7 @@ import Player from "../common/ingame-game-state/Player";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import { faUserGear } from "@fortawesome/free-solid-svg-icons";
 import clonesImage from "../../public/images/icons/clones.svg"
+import House from "../common/ingame-game-state/game-data-structure/House";
 
 interface UserLabelProps {
     gameClient: GameClient;
@@ -87,10 +88,10 @@ export default class UserLabel extends Component<UserLabelProps> {
         const {result: canLaunchReplacePlayerVote, reason: canLaunchReplacePlayerVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser);
         const {result: canLaunchReplacePlayerByVassalVote, reason: canLaunchReplacePlayerByVassalVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser, true, this.player.house);
         const {result: canLaunchSwapHousesVote, reason: canLaunchSwapHousesVoteReason} = ingame.canLaunchSwapHousesVote(this.props.gameClient.authenticatedUser, this.player);
+        const {result: canLaunchDeclareWinnerVote, reason: canLaunchDeclareWinnerVoteReason} = ingame.canLaunchDeclareWinnerVote(this.props.gameClient.authenticatedUser, this.player.house);
         return (
             <>
-                <NavDropdown.Divider />
-                {/* Add a button to replace a place */}
+                {!this.props.gameState.entireGame.gameSettings.faceless && <NavDropdown.Divider />}
                 <ConditionalWrap
                     condition={!canLaunchReplacePlayerVote}
                     wrap={children =>
@@ -212,6 +213,42 @@ export default class UserLabel extends Component<UserLabelProps> {
                         </NavDropdown.Item>
                     </div>
                 </ConditionalWrap>
+                <NavDropdown.Divider />
+                <ConditionalWrap
+                    condition={!canLaunchDeclareWinnerVote}
+                    wrap={children =>
+                        <OverlayTrigger
+                            overlay={
+                                <Tooltip id="declare-winner-tooltip">
+                                    {canLaunchDeclareWinnerVoteReason == "ongoing-vote" ?
+                                            "A vote is already ongoing"
+                                        : canLaunchDeclareWinnerVoteReason == "game-cancelled" ?
+                                            "The game has been cancelled"
+                                        : canLaunchDeclareWinnerVoteReason == "game-ended" ?
+                                            "The game has ended"
+                                        : canLaunchDeclareWinnerVoteReason == "only-players-can-vote" ?
+                                            "Only players can vote"
+                                        : canLaunchDeclareWinnerVoteReason == "forbidden-in-tournament-mode" ?
+                                            "Declaring a winner is not allowed in tournaments"
+                                        : "Vote not possible"
+                                    }
+                                </Tooltip>
+                            }
+                            placement="auto"
+                        >
+                            {children}
+                        </OverlayTrigger>
+                    }
+                >
+                    <div id="declare-winner-tooltip-wrapper">
+                        <NavDropdown.Item
+                            onClick={() => this.onLaunchDeclareWinnerClick()}
+                            disabled={!canLaunchDeclareWinnerVote}
+                        >
+                            Launch a vote to declare House {this.player.house.name} the winner
+                        </NavDropdown.Item>
+                    </div>
+                </ConditionalWrap>
             </>
         );
     }
@@ -243,6 +280,16 @@ export default class UserLabel extends Component<UserLabelProps> {
 
         if (window.confirm(`Do you want to launch a vote to swap houses with ${this.player.user.name} who controls house ${this.player.house.name}?`)) {
             this.props.gameState.launchSwapHousesVote(this.player);
+        }
+    }
+
+    onLaunchDeclareWinnerClick(): void {
+        if (!(this.props.gameState instanceof IngameGameState)) {
+            throw new Error("`onLaunchDeclareWinnerClick` called when the game was not in IngameGameState");
+        }
+
+        if (window.confirm(`Do you want to launch a vote to declare House ${this.player.house.name} the winner?`)) {
+            this.props.gameState.launchDeclareWinnerVote(this.player.house);
         }
     }
 }

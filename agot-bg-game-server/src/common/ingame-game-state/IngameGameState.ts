@@ -22,7 +22,7 @@ import GameEndedGameState, {SerializedGameEndedGameState} from "./game-ended-gam
 import UnitType from "./game-data-structure/UnitType";
 import WesterosCard from "./game-data-structure/westeros-card/WesterosCard";
 import Vote, { SerializedVote, VoteState } from "./vote-system/Vote";
-import VoteType, { CancelGame, EndGame, ExtendPlayerClocks, PauseGame, ReplacePlayer, ReplacePlayerByVassal, ReplaceVassalByPlayer, ResumeGame, SwapHouses } from "./vote-system/VoteType";
+import VoteType, { CancelGame, EndGame, ExtendPlayerClocks, PauseGame, ReplacePlayer, ReplacePlayerByVassal, ReplaceVassalByPlayer, ResumeGame, SwapHouses, DeclareWinner } from "./vote-system/VoteType";
 import { v4 } from "uuid";
 import CancelledGameState, { SerializedCancelledGameState } from "../cancelled-game-state/CancelledGameState";
 import HouseCard from "./game-data-structure/house-card/HouseCard";
@@ -460,6 +460,21 @@ export default class IngameGameState extends GameState<
                     new SwapHouses(player.user, swappingPlayer.user, player.house, swappingPlayer.house)
                 );
             }
+        } else  if (message.type == "launch-cancel-game-vote") {
+            if (this.canLaunchCancelGameVote(player).result) {
+                this.createVote(
+                    player.user,
+                    new CancelGame()
+                );
+            }
+        } else if (message.type == "launch-declare-winner-vote") {
+            const winner = this.game.houses.get(message.winner);
+            if (this.canLaunchDeclareWinnerVote(player.user, winner)) {
+                this.createVote(
+                    player.user,
+                    new DeclareWinner(winner)
+                )
+            }
         }
 
         if (this.paused) {
@@ -471,13 +486,6 @@ export default class IngameGameState extends GameState<
                 this.createVote(
                     player.user,
                     new PauseGame()
-                );
-            }
-        } else  if (message.type == "launch-cancel-game-vote") {
-            if (this.canLaunchCancelGameVote(player).result) {
-                this.createVote(
-                    player.user,
-                    new CancelGame()
                 );
             }
         } else if (message.type == "launch-end-game-vote") {
@@ -1314,10 +1322,6 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "forbidden-in-tournament-mode"};
         }
 
-        if (this.paused) {
-            return {result: false, reason: "game-paused"};
-        }
-
         const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof CancelGame);
 
         if (existingVotes.length > 0) {
@@ -1579,6 +1583,32 @@ export default class IngameGameState extends GameState<
         return {result: true, reason: ""};
     }
 
+    canLaunchDeclareWinnerVote(initiator: User | null, winner: House): {result: boolean; reason: string} {
+        if (this.entireGame.gameSettings.tournamentMode) {
+            return {result: false, reason: "forbidden-in-tournament-mode"};
+        }
+
+        if (!initiator || !this.players.keys.includes(initiator)) {
+            return {result: false, reason: "only-players-can-vote"};
+        }
+
+        const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && v.type instanceof DeclareWinner);
+
+        if (existingVotes.length > 0) {
+            return {result: false, reason: "ongoing-vote"};
+        }
+
+        if (this.isCancelled) {
+            return {result: false, reason: "game-cancelled"};
+        }
+
+        if (this.isEnded) {
+            return {result: false, reason: "game-ended"};
+        }
+
+        return {result: true, reason: ""};
+    }
+
     canLaunchReplaceVassalVote(fromUser: User | null, forHouse: House): {result: boolean; reason: string} {
         if (this.entireGame.gameSettings.tournamentMode) {
             return {result: false, reason: "forbidden-in-tournament-mode"};
@@ -1659,6 +1689,13 @@ export default class IngameGameState extends GameState<
         this.entireGame.sendMessageToServer({
             type: "launch-swap-houses-vote",
             swappingUser: player.user.id
+        });
+    }
+
+    launchDeclareWinnerVote(winner: House): void {
+        this.entireGame.sendMessageToServer({
+            type: "launch-declare-winner-vote",
+            winner: winner.id
         });
     }
 
