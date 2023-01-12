@@ -324,22 +324,30 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         if (gameSettings.limitedDraft) {
             let limitedHouseCards: HouseCard[] = [];
 
-            if (gameSettings.setupId == 'mother-of-dragons') {
+            if (gameSettings.setupId == 'a-feast-for-crows') {
                 if (gameSettings.adwdHouseCards) {
-                    limitedHouseCards = _.concat(adwdHouseCards, modBHouseCards, ffcHouseCards);
+                    limitedHouseCards = _.concat(adwdHouseCards, ffcHouseCards);
                 } else if (gameSettings.asosHouseCards) {
-                    limitedHouseCards = _.concat(asosHouseCards, modBHouseCards, ffcHouseCards);
+                    limitedHouseCards = _.concat(asosHouseCards, ffcHouseCards);
+                } else {
+                    limitedHouseCards = _.concat(baseGameHouseCards, ffcHouseCards);
+                }
+            } else {
+                if (gameSettings.adwdHouseCards) {
+                    limitedHouseCards = _.concat(adwdHouseCards, ffcHouseCards, modBHouseCards);
+                } else if (gameSettings.asosHouseCards) {
+                    limitedHouseCards = _.concat(asosHouseCards, baseGameHouseCards.filter(hc => hc.houseId == "arryn" || hc.houseId == "targaryen"));
                 } else {
                     limitedHouseCards = baseGameHouseCards;
                 }
-            } else if (gameSettings.adwdHouseCards) {
-                limitedHouseCards = adwdHouseCards;
-            } else if (gameSettings.asosHouseCards) {
-                limitedHouseCards = asosHouseCards;
-            } else {
-                const excludeArrynAndTargaryen = baseGameHouseCards.filter(hc => hc.houseId != "arryn" && hc.houseId != "targaryen");
-                limitedHouseCards = excludeArrynAndTargaryen;
             }
+
+            limitedHouseCards = limitedHouseCards.filter(hc => {
+                if (!hc.houseId) {
+                    return false;
+                }
+                return housesToCreate.includes(hc.houseId);
+            });
             game.houseCardsForDrafting = new BetterMap(limitedHouseCards.map(hc => [hc.id, hc]));
         } else {
             const allHouseCards = _.concat(baseGameHouseCards, adwdHouseCards, ffcHouseCards, modBHouseCards, asosHouseCards);
