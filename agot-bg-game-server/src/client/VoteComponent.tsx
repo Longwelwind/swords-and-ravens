@@ -10,6 +10,7 @@ import voteImage from "../../public/images/icons/vote.svg";
 import Button from "react-bootstrap/Button";
 import {faCheck} from "@fortawesome/free-solid-svg-icons/faCheck";
 import {faBan} from "@fortawesome/free-solid-svg-icons/faBan";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
 import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
@@ -44,7 +45,16 @@ export default class VoteComponent extends Component<VoteComponentProps> {
                         overlay={<Tooltip id={"vote-date-" + this.vote.id}>{this.vote.createdAt.toLocaleString()}</Tooltip>}
                         popperConfig={{ modifiers: [preventOverflow] }}
                     >
-                        <img src={voteImage} width={32} />
+                        <div>
+                            <img src={voteImage} width={32} />
+                            {this.vote.state == VoteState.ACCEPTED
+                                ? <FontAwesomeIcon className="text-success" icon={faCheck} size="2x" style={{position: "absolute", top: 8, left: 8}} />
+                                : this.vote.state == VoteState.REFUSED
+                                    ? <FontAwesomeIcon className="text-danger" icon={faBan} size="2x" style={{position: "absolute", top: 8, left: 8}} />
+                                    : this.vote.state == VoteState.CANCELLED
+                                        ? <FontAwesomeIcon className="text-warning" icon={faXmark} size="2x" style={{position: "absolute", top: 8, left: 12}} />
+                                        : <></>}
+                        </div>
                     </OverlayTrigger>
                 </Col>
                 <Col>
