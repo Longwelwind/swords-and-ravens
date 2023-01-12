@@ -7,7 +7,6 @@
     "fiefdoms": ["greyjoy", "tyrell", "martell", "stark", "baratheon", "lannister"],
     "kingsCourt": ["lannister", "stark", "martell", "baratheon", "tyrell", "greyjoy"]
   },
-  "alternateDragonStrengthTokens": [2, 4, 7, 9, 10],
   "setups": {
     "base-game": {
       "name": "2nd Edition Base Game (3p/6p)",
@@ -87,7 +86,9 @@
                 "type": "word-spreads-quickly"
               }
             ]
-          ]
+          ],
+          "dragonStrengthTokens": [2, 4, 6, 8, 10],
+          "alternateDragonStrengthTokens": [2, 4, 7, 9, 10]
         }
       ]
     },
@@ -1144,7 +1145,9 @@
                 "quantityVassal": 1
               }
             ]
-          }
+          },
+          "dragonStrengthTokens": [2, 4, 5, 6],
+          "alternateDragonStrengthTokens": [2, 4, 5, 6]
         }
       ]
     },
