@@ -45,6 +45,8 @@ export default class Game {
     supplyRestrictions: number[][];
     starredOrderRestrictions: number[];
     westerosDecks: WesterosCard[][];
+    // No need to declare this as @observable. It will be set by WiC card and then transmitted with
+    // game-state-changed and won't change until next time we draw Westeros cards...
     winterIsComingHappened: boolean[];
     victoryPointsCountNeededToWin: number;
     @observable maxTurns: number;
@@ -52,7 +54,7 @@ export default class Game {
     @observable houseCardsForDrafting: BetterMap<string, HouseCard> = new BetterMap();
     deletedHouseCards: BetterMap<string, HouseCard> = new BetterMap();
     oldPlayerHouseCards: BetterMap<House, BetterMap<string, HouseCard>> = new BetterMap();
-    @observable dragonStrengthTokens = [2, 4, 6, 8, 10];
+    @observable dragonStrengthTokens: number[] = [];
     @observable removedDragonStrengthToken = 0;
     ironBank: IronBank | null;
     @observable objectiveDeck: ObjectiveCard[] = [];
@@ -118,6 +120,10 @@ export default class Game {
     }
 
     get currentDragonStrength(): number {
+        if (this.dragonStrengthTokens.length == 0) {
+            return -1;
+        }
+
         if (this.turn > (_.last(this.dragonStrengthTokens) as number)) {
             return 5;
         }
@@ -455,7 +461,7 @@ export default class Game {
 
     getTotalLoyaltyTokenCount(house: House): number {
         const superLoyaltyTokens = this.world.regions.values.filter(r => r.superLoyaltyToken && r.getController() == house).length;
-        return superLoyaltyTokens + house.gainedLoyaltyTokens;
+        return superLoyaltyTokens + house.victoryPoints;
     }
 
     getAllowedArmySizes(house: House): number[] {

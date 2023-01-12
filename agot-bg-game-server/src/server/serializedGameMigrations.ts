@@ -35,7 +35,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                     ["mustering", 0],
                     ["winter-is-coming", 0],
                     ["a-throne-of-blades", 0],
-                    ["supply", 0],
+                    ["supply", 0]
                 ]);
                 // The goal is to find a deckI for each card referenced
                 // in "(westeros-card-exe)cuted". Anyone will do, as long
@@ -2017,7 +2017,21 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
-    }
+    },
+    {
+        version: "100",
+        migrate: (serializedGame: any) => {
+            // Add migration to merge gainedLoyaltyTokens and victoryPoints
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.game.houses.forEach((h: any) => {
+                    h.victoryPoints = h.gainedLoyaltyTokens;
+                });
+            }
+
+            return serializedGame;
+        }
+    },
 ];
 
 export default serializedGameMigrations;

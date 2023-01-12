@@ -361,18 +361,16 @@ export default class IngameGameState extends GameState<
         const targaryen = this.game.targaryen;
         if (targaryen) {
             this.world.regions.values.filter(r => r.loyaltyTokens > 0 && r.getController() == targaryen).forEach(r => {
-                targaryen.gainedLoyaltyTokens += r.loyaltyTokens;
+                targaryen.victoryPoints += r.loyaltyTokens;
 
                 this.entireGame.broadcastToClients({
                     type: "loyalty-token-gained",
-                    house: targaryen.id,
-                    newLoyaltyTokenCount: targaryen.gainedLoyaltyTokens,
+                    newLoyaltyTokenCount: targaryen.victoryPoints,
                     region: r.id
                 });
 
                 this.log({
                     type: "loyalty-token-gained",
-                    house: targaryen.id,
                     count: r.loyaltyTokens,
                     region: r.id
                 });
@@ -1162,9 +1160,10 @@ export default class IngameGameState extends GameState<
         } else if (message.type == "update-max-turns") {
             this.game.maxTurns = message.maxTurns;
         } else if (message.type == "loyalty-token-gained") {
-            const house = this.game.houses.get(message.house);
             const region = this.world.regions.get(message.region);
-            house.gainedLoyaltyTokens = message.newLoyaltyTokenCount;
+            if (this.game.targaryen) {
+                this.game.targaryen.victoryPoints = message.newLoyaltyTokenCount;
+            }
             region.loyaltyTokens = 0;
         } else if (message.type == "loyalty-token-placed") {
             const region = this.world.regions.get(message.region);

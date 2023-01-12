@@ -72,6 +72,8 @@ export interface GameSetup {
     westerosCards?: WesterosCardData[][];
     maxPowerTokens?: {[key: string]: number};
     superPowerTokens?: {[key: string]: string};
+    dragonStrengthTokens?: number[];
+    alternateDragonStrengthTokens?: number[];
 }
 
 export interface GameSetupContainer {
@@ -486,6 +488,13 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         });
     });
 
+    // Apply dragon strength tokens
+    game.dragonStrengthTokens = gameSettings.customBalancing && selectedGameSetup.alternateDragonStrengthTokens
+        ? selectedGameSetup.alternateDragonStrengthTokens
+        : selectedGameSetup.dragonStrengthTokens
+            ? selectedGameSetup.dragonStrengthTokens
+            : [];
+
     if (gameSettings.customBalancing && gameSettings.setupId == "mother-of-dragons" && gameSettings.playerCount == 8) {
         // Apply the new starting positions
         Object.entries(baseGameData.customModBalancing as {[key: string]: UnitData[]}).forEach(([regionId, data]) => {
@@ -504,9 +513,6 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
                 }
             });
         });
-
-        // Apply alternate dragon strength tokens
-        game.dragonStrengthTokens = baseGameData.alternateDragonStrengthTokens;
     } else if (gameSettings.customBalancing && gameSettings.setupId == "base-game" && gameSettings.playerCount == 6) {
         const redwyneStraights = game.world.regions.get("redwyne-straights");
         const house = redwyneStraights.units.size > 0 ? redwyneStraights.units.values[0].allegiance : null;
@@ -579,6 +585,4 @@ export function applyChangesForDanceWithMotherOfDragons(ingame: IngameGameState)
     while (_.some(_.take(game.westerosDecks[3], 2), wc => wc.type == fireMadeFlesh)) {
         shuffleInPlace(game.westerosDecks[3]);
     }
-
-    game.dragonStrengthTokens = [2, 4, 5, 6];
 }
