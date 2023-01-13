@@ -74,12 +74,21 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         // We crop the victory points to victoryCountsNeededToWin but in the UI we want to show if a player was able to gain more VPs
         const victoryPoints = this.ingame.entireGame.isFeastForCrows
             ? this.game.getVictoryPoints(this.house)
-            : this.house.id == "targaryen"
+            : this.house == this.game.targaryen
                 ? this.game.getTotalLoyaltyTokenCount(this.house)
                 : this.game.getControlledStrongholdAndCastleCount(this.house);
 
-        const victoryPointsWarning = gameRunning && (this.game.victoryPointsCountNeededToWin - 2 == victoryPoints);
-        const victoryPointsCritical = gameRunning && (this.game.victoryPointsCountNeededToWin - 1 == victoryPoints || this.game.victoryPointsCountNeededToWin == victoryPoints);
+        let victoryPointsWarning = false;
+        let victoryPointsCritical = false;
+
+        if (this.house == this.game.targaryen) {
+            victoryPointsWarning = gameRunning && (this.game.loyaltyTokenCountNeededToWin - 2 == victoryPoints);
+            victoryPointsCritical = gameRunning && (this.game.loyaltyTokenCountNeededToWin - 1 == victoryPoints || this.game.loyaltyTokenCountNeededToWin == victoryPoints);
+        } else {
+            victoryPointsWarning = gameRunning && (this.game.victoryPointsCountNeededToWin - 2 == victoryPoints);
+            victoryPointsCritical = gameRunning && (this.game.victoryPointsCountNeededToWin - 1 == victoryPoints || this.game.victoryPointsCountNeededToWin == victoryPoints);
+        }
+
         let isWaitedFor = false;
 
         const vassalTitle = this.suzerainHouse
@@ -88,7 +97,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
 
         const victoryImage = this.props.ingame.entireGame.isFeastForCrows
             ? laurelCrownImage :
-                this.house.id == "targaryen"
+                this.house == this.game.targaryen
                     ? verticalBanner
                     : castleImage;
 
@@ -202,7 +211,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         placement="auto"
                     >
                         <Col xs="auto" className="d-flex align-items-center"
-                            onMouseEnter={() => this.setHighlightedRegions(this.house.id == "targaryen" ? "with-loyalty-tokens-only" : "with-castles-only")}
+                            onMouseEnter={() => this.setHighlightedRegions(this.house == this.game.targaryen ? "with-loyalty-tokens-only" : "with-castles-only")}
                             onMouseLeave={() => this.highlightedRegions.clear()}>
                             <div style={{ fontSize: "20px", color: victoryPointsWarning ? "#F39C12" : victoryPointsCritical ? "#FF0000" : undefined }}><b>{victoryPoints}</b></div>
                             <img
