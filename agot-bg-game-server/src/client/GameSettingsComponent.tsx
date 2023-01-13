@@ -250,19 +250,42 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             {this.createPlayerCountItems()}
                         </select>&nbsp;Players
                     </div>
-                    <div>
-                        <select id="vp-count-setting"
-                            value={this.gameSettings.victoryPointsCountNeededToWin}
-                            onChange={e => this.onVpCountChange(e.target.value)}
-                            style={{marginBottom: "8px"}}
-                        >
-                            <option key="6" value={6}>6</option>
-                            <option key="7" value={7}>7</option>
-                            <option key="8" value={8}>8</option>
-                            <option key="9" value={9}>9</option>
-                            <option key="10" value={10}>10</option>
-                        </select>&nbsp;Victory points needed
-                    </div>
+                    <OverlayTrigger overlay={
+                        <Tooltip id="vp-count-setting-tooltip">
+                            Defines the number of Victory&nbsp;points needed to win the game.
+                        </Tooltip>}>
+                        <div>
+                            <select id="vp-count-setting"
+                                value={this.gameSettings.victoryPointsCountNeededToWin}
+                                onChange={e => this.onVpCountChange(e.target.value)}
+                                style={{marginBottom: "8px"}}
+                            >
+                                <option key="6" value={6}>6</option>
+                                <option key="7" value={7}>7</option>
+                                <option key="8" value={8}>8</option>
+                                <option key="9" value={9}>9</option>
+                                <option key="10" value={10}>10</option>
+                            </select>&nbsp;VPs
+                        </div>
+                    </OverlayTrigger>
+                    {this.props.entireGame.gameSettings.playerCount >= 8 && <OverlayTrigger overlay={
+                        <Tooltip id="lt-count-setting-tooltip">
+                            Defines the number of Loyalty&nbsp;tokens needed to win the game.
+                        </Tooltip>}>
+                        <div>
+                            <select id="lt-count-setting"
+                                value={this.gameSettings.loyaltyTokenCountNeededToWin}
+                                onChange={e => this.onLtCountChange(e.target.value)}
+                                style={{marginBottom: "8px"}}
+                            >
+                                <option key="6" value={6}>6</option>
+                                <option key="7" value={7}>7</option>
+                                <option key="8" value={8}>8</option>
+                                <option key="9" value={9}>9</option>
+                                <option key="10" value={10}>10</option>
+                            </select>&nbsp;LTs
+                        </div>
+                    </OverlayTrigger>}
                 </Col>
                 {this.props.entireGame.isFeastForCrows && <Col xs="12">
                     <FormCheck
@@ -792,6 +815,16 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
         }
 
         this.gameSettings.victoryPointsCountNeededToWin = parseInt(newVal);
+
+        this.changeGameSettings();
+    }
+
+    onLtCountChange(newVal: string): void {
+        if (!this.canChangeGameSettings) {
+            return;
+        }
+
+        this.gameSettings.loyaltyTokenCountNeededToWin = parseInt(newVal);
 
         this.changeGameSettings();
     }

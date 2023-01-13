@@ -2022,7 +2022,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
         version: "100",
         migrate: (serializedGame: any) => {
             // Add migration to merge gainedLoyaltyTokens and victoryPoints
-            if (serializedGame.childGameState.type == "ingame") {
+            if (serializedGame.childGameState.type == "ingame" && serializedGame.gameSettings.setupId != "a-feast-for-crows") {
                 const ingame = serializedGame.childGameState;
                 ingame.game.houses.forEach((h: any) => {
                     h.victoryPoints = h.gainedLoyaltyTokens;
@@ -2047,6 +2047,17 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         }
                     }
                 });
+            }
+
+            return serializedGame;
+        }
+    },
+    {
+        version: "102",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.game.loyaltyTokenCountNeededToWin = ingame.game.victoryPointsCountNeededToWin;
             }
 
             return serializedGame;

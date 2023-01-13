@@ -286,6 +286,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     }
 
     game.victoryPointsCountNeededToWin = gameSettings.victoryPointsCountNeededToWin;
+    game.loyaltyTokenCountNeededToWin = gameSettings.loyaltyTokenCountNeededToWin;
 
     game.supplyRestrictions = baseGameData.supplyRestrictions;
     game.revealedWesterosCards = gameSettings.cokWesterosPhase ? 3 : 0;

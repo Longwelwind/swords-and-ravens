@@ -187,15 +187,21 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             <Col xs="auto">
                 <h4><Badge variant="danger">PAUSED</Badge></h4>
             </Col>}
-            {this.props.entireGame.gameSettings.victoryPointsCountNeededToWin != 7 &&
+            {(this.props.entireGame.gameSettings.victoryPointsCountNeededToWin != 7 || this.props.entireGame.gameSettings.loyaltyTokenCountNeededToWin != 7) &&
             <Col xs="auto">
                 <OverlayTrigger
                     placement="auto"
                     overlay={
                         <Tooltip id="vp-counts-modified-tooltip">
                             <Col className="text-center">
-                            The number of victory points needed to win has been modified
-                            to <b>{this.props.entireGame.gameSettings.victoryPointsCountNeededToWin}</b>!
+                                {this.props.entireGame.gameSettings.victoryPointsCountNeededToWin != 7 && <>
+                                    The number of victory points needed to win has been modified
+                                    to <b>{this.props.entireGame.gameSettings.victoryPointsCountNeededToWin}</b>!<br/>
+                                </>}
+                                {this.props.entireGame.gameSettings.loyaltyTokenCountNeededToWin != 7 && <>
+                                    The number of loyalty tokens needed to win has been modified
+                                    to <b>{this.props.entireGame.gameSettings.loyaltyTokenCountNeededToWin}</b>!
+                                </>}
                             </Col>
                         </Tooltip>}
                     popperConfig={{ modifiers: [preventOverflow] }}

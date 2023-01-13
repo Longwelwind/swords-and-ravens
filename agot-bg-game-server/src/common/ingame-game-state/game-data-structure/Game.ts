@@ -49,6 +49,7 @@ export default class Game {
     // game-state-changed and won't change until next time we draw Westeros cards...
     winterIsComingHappened: boolean[];
     victoryPointsCountNeededToWin: number;
+    loyaltyTokenCountNeededToWin: number;
     @observable maxTurns: number;
     vassalHouseCards: BetterMap<string, HouseCard> = new BetterMap<string, HouseCard>();
     @observable houseCardsForDrafting: BetterMap<string, HouseCard> = new BetterMap();
@@ -275,9 +276,13 @@ export default class Game {
     }
 
     areVictoryConditionsFulfilled(): boolean {
-        const numberVictoryPointsPerHouse = this.nonVassalHouses.map(h => this.getVictoryPoints(h));
+        const numberVictoryPointsPerHouse = this.nonVassalHouses.map(h => [h, this.getVictoryPoints(h)] as [House, number]);
 
-        return numberVictoryPointsPerHouse.some(n => n >= this.victoryPointsCountNeededToWin);
+        return numberVictoryPointsPerHouse.some(([h, n]) => {
+            return h != this.targaryen
+                ? n >= this.victoryPointsCountNeededToWin
+                : n >= this.loyaltyTokenCountNeededToWin;
+        });
     }
 
     getPotentialWinners(lastRound = false): House[] {
@@ -452,11 +457,13 @@ export default class Game {
 
     getVictoryPoints(house: House): number {
         const victoryPoints = !this.ingame.entireGame.isFeastForCrows
-            ? house.id == "targaryen"
+            ? house == this.targaryen
                 ? this.getTotalLoyaltyTokenCount(house)
                 : this.getControlledStrongholdAndCastleCount(house)
             : house.victoryPoints;
-        return Math.min(victoryPoints, this.victoryPointsCountNeededToWin);
+        return house == this.targaryen
+            ? Math.min(victoryPoints, this.loyaltyTokenCountNeededToWin)
+            : Math.min(victoryPoints, this.victoryPointsCountNeededToWin);
     }
 
     getTotalLoyaltyTokenCount(house: House): number {
@@ -553,6 +560,7 @@ export default class Game {
             supplyRestrictions: this.supplyRestrictions,
             starredOrderRestrictions: this.starredOrderRestrictions,
             victoryPointsCountNeededToWin: this.victoryPointsCountNeededToWin,
+            loyaltyTokenCountNeededToWin: this.loyaltyTokenCountNeededToWin,
             maxTurns: this.maxTurns,
             clientNextWildlingCardId: (admin || player?.house.knowsNextWildlingCard) ? this.wildlingDeck[0].id : null,
             revealedWesterosCards: this.revealedWesterosCards,
@@ -590,6 +598,7 @@ export default class Game {
         game.wildlingDeck = data.wildlingDeck.map(c => WildlingCard.deserializeFromServer(c));
         game.starredOrderRestrictions = data.starredOrderRestrictions;
         game.victoryPointsCountNeededToWin = data.victoryPointsCountNeededToWin;
+        game.loyaltyTokenCountNeededToWin = data.loyaltyTokenCountNeededToWin;
         game.maxTurns = data.maxTurns;
         game.revealedWesterosCards = data.revealedWesterosCards;
         game.clientNextWildlingCardId = data.clientNextWildlingCardId;
@@ -625,6 +634,7 @@ export interface SerializedGame {
     wildlingDeck: SerializedWildlingCard[];
     supplyRestrictions: number[][];
     victoryPointsCountNeededToWin: number;
+    loyaltyTokenCountNeededToWin: number;
     maxTurns: number;
     revealedWesterosCards: number;
     clientNextWildlingCardId: number | null;
