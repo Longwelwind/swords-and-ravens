@@ -2062,6 +2062,16 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "103",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                serializedGame.gameSettings.loyaltyTokenCountNeededToWin = serializedGame.gameSettings.victoryPointsCountNeededToWin;
+            }
+
+            return serializedGame;
+        }
     }
 ];
 
