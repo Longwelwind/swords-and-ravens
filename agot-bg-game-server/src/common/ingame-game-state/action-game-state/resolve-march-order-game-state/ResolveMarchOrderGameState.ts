@@ -241,22 +241,7 @@ export default class ResolveMarchOrderGameState extends GameState<
     }
 
     onServerMessage(message: ServerMessage): void {
-        if (message.type == "manipulate-combat-house-card") {
-            message.manipulatedHouseCards.forEach(([hcid, shc]) => {
-                const houseCard = this.ingame.game.getHouseCardById(hcid);
-                houseCard.ability = shc.abilityId ? houseCardAbilities.get(shc.abilityId) : null;
-                houseCard.disabled = shc.disabled;
-                houseCard.disabledAbility = shc.disabledAbilityId ? houseCardAbilities.get(shc.disabledAbilityId) : null;
-                houseCard.combatStrength = shc.combatStrength;
-                houseCard.originalCombatStrength = shc.originalCombatStrength;
-            });
-
-            if (this.childGameState instanceof CombatGameState) {
-                this.childGameState.rerender++;
-            }
-        } else {
-            this.childGameState.onServerMessage(message);
-        }
+        this.childGameState.onServerMessage(message);
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedResolveMarchOrderGameState {

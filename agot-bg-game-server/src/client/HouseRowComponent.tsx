@@ -34,6 +34,7 @@ import ConditionalWrap from "./utils/ConditionalWrap";
 import { port, sea } from "../common/ingame-game-state/game-data-structure/regionTypes";
 import { houseColorFilters } from "./houseColorFilters";
 import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
+import ThematicDraftHouseCardsGameState from "../common/ingame-game-state/thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 
 interface HouseRowComponentProps {
     house: House;
@@ -110,6 +111,8 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
 
         let player: Player | null = null;
         let clock: number | null = null;
+
+        const showAllOtherPlayerHouseCards = !this.ingame.hasChildGameState(ThematicDraftHouseCardsGameState);
 
         try {
             if (!isVassal) {
@@ -279,6 +282,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     <Col xs="auto">
                         <Row className="justify-content-center">
                             {!isVassal ?
+                                (showAllOtherPlayerHouseCards || this.props.gameClient.doesControlHouse(this.house)) &&
                                 _.sortBy(this.house.houseCards.values, hc => hc.combatStrength).map(hc => (
                                     <Col xs="auto" key={`house-card_${this.house.id}_${hc.id}`}>
                                         {hc.state == HouseCardState.AVAILABLE ? (

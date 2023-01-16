@@ -274,11 +274,11 @@ export default class PostCombatGameState extends GameState<
             if (this.combat.ingameGameState.isVassalHouse(house)) {
                 if (houseCard && house.hasBeenReplacedByVassal && !this.game.vassalHouseCards.has(houseCard.id)) {
                     this.checkAndPerformHouseCardHandlingPerHouse(house, houseCard);
-                    this.game.oldPlayerHouseCards.set(house, house.houseCards);
 
+                    this.game.oldPlayerHouseCards.set(house, house.houseCards);
                     this.entireGame.broadcastToClients({
                         type: "update-old-player-house-cards",
-                        houseCards: this.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.serializeToClient())])
+                        houseCards: this.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.id)])
                     });
                 }
             } else {
@@ -410,11 +410,11 @@ export default class PostCombatGameState extends GameState<
                 const houseCard = this.combat.houseCombatDatas.get(house).houseCard;
                 if (houseCard && house.hasBeenReplacedByVassal && !this.game.vassalHouseCards.has(houseCard.id)) {
                     // Player house cards may have changed again due to abilities like Robert Arryn, so we save the old hand again
-                    this.game.oldPlayerHouseCards.set(house, house.houseCards);
 
+                    this.game.oldPlayerHouseCards.set(house, house.houseCards);
                     this.entireGame.broadcastToClients({
                         type: "update-old-player-house-cards",
-                        houseCards: this.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.serializeToClient())])
+                        houseCards: this.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.id)])
                     });
                 }
 

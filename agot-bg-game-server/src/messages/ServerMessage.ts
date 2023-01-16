@@ -25,7 +25,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | UpdateWesterosDecks | UpdateConnectionStatus | UpdateOtherUsersFromSameNetwork
     | VoteStarted | VoteCancelled | VoteDone | PlayerReplaced | VassalReplaced
     | CrowKillersStepChanged | ManipulateCombatHouseCard | ChangeCombatTidesOfBattleCard
-    | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateHouseCardsForDrafting | UpdateCombatStats
+    | VassalRelations | UpdateHouseCardModifier | UpdateHouseCards | UpdateDraftableHouseCards | UpdateCombatStats
     | UpdateDraftState | RevealBids | UpdateMaxTurns | PasswordResponse | ReplacedByVassal | UpdateDeletedHouseCards | UpdateOldPlayerHouseCards
     | LoyaltyTokenGained | LoyaltyTokenPlaced | DrangonStrengthTokenRemoved | UpdateLoanCards | UpdateRegionModifiers
     | UpdateCompletedObjectives | UpdateSecretObjectives | SyncShiftingAmbitionsGameState | HideOrRevealUserNames | ClearChatRoom
@@ -350,12 +350,12 @@ interface UpdateSpecialHouseCardModifier {
 interface UpdateHouseCards {
     type: "update-house-cards";
     house: string;
-    houseCards: SerializedHouseCard[];
+    houseCards: string[];
 }
 
-interface UpdateHouseCardsForDrafting {
-    type: "update-house-cards-for-drafting";
-    houseCards: SerializedHouseCard[];
+interface UpdateDraftableHouseCards {
+    type: "update-draftable-house-cards";
+    houseCards: string[];
 }
 
 interface UpdateCombatStats {
@@ -391,12 +391,12 @@ interface ReplacedByVassal {
 
 interface UpdateDeletedHouseCards {
     type: "update-deleted-house-cards";
-    houseCards: SerializedHouseCard[];
+    houseCards: string[];
 }
 
 interface UpdateOldPlayerHouseCards {
     type: "update-old-player-house-cards";
-    houseCards: [string, SerializedHouseCard[]][];
+    houseCards: [string, string[]][];
 }
 
 interface LoyaltyTokenGained {

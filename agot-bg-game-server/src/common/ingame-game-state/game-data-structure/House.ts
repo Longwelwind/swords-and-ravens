@@ -48,27 +48,14 @@ export default class House {
 
     serializeToClient(admin: boolean, player: Player | null, game: Game): SerializedHouse {
         // Only serialize house cards to all clients if house is no vassal house to not reveal the created hand of vassals during combat
-        const isVassalHouse = game.ingame.isVassalHouse(this);
-
-        // During thematic draft only serialize own house cards to players
-        const isThematicDraft = game.ingame.childGameState instanceof ThematicDraftHouseCardsGameState;
-
-        const serializedHouseCards = this.houseCards.entries.map(([houseCardId, houseCard]) => [houseCardId, houseCard.serializeToClient()] as [string, SerializedHouseCard]);
-
         return {
             id: this.id,
             name: this.name,
             color: this.color,
             knowsNextWildlingCard: this.knowsNextWildlingCard,
-            houseCards: admin
-                ? serializedHouseCards
-                : isThematicDraft
-                    ? player?.house == this
-                        ? serializedHouseCards
-                        : []
-                    : !isVassalHouse
-                        ? serializedHouseCards
-                        : [],
+            houseCards: admin || !game.ingame.isVassalHouse(this)
+                ? this.houseCards.entries.map(([houseCardId, houseCard]) => [houseCardId, houseCard.serializeToClient()] as [string, SerializedHouseCard])
+                : [],
             laterHouseCards: this.laterHouseCards != null
                 ? this.laterHouseCards.entries.map(([houseCardId, houseCard]) => [houseCardId, houseCard.serializeToClient()] as [string, SerializedHouseCard])
                 : null,

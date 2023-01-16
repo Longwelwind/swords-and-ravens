@@ -596,17 +596,16 @@ export class ReplaceVassalByPlayer extends VoteType {
 
         // Reset original house cards
         this.forHouse.houseCards = vote.ingame.game.oldPlayerHouseCards.get(this.forHouse);
-        vote.ingame.game.oldPlayerHouseCards.delete(this.forHouse);
-
-        vote.ingame.entireGame.broadcastToClients({
-            type: "update-old-player-house-cards",
-            houseCards: vote.ingame.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.serializeToClient())])
-        });
-
         vote.ingame.entireGame.broadcastToClients({
             type: "update-house-cards",
             house: this.forHouse.id,
-            houseCards: this.forHouse.houseCards.values.map(hc => hc.serializeToClient())
+            houseCards: this.forHouse.houseCards.values.map(hc => hc.id)
+        });
+
+        vote.ingame.game.oldPlayerHouseCards.delete(this.forHouse);
+        vote.ingame.entireGame.broadcastToClients({
+            type: "update-old-player-house-cards",
+            houseCards: vote.ingame.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.id)])
         });
 
         const placeOrders = vote.ingame.leafState instanceof PlaceOrdersGameState ? vote.ingame.leafState : null;

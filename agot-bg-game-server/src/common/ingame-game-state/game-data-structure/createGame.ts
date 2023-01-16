@@ -349,10 +349,10 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
                 }
                 return housesToCreate.includes(hc.houseId);
             });
-            game.houseCardsForDrafting = new BetterMap(limitedHouseCards.map(hc => [hc.id, hc]));
+            game.draftableHouseCards = new BetterMap(limitedHouseCards.map(hc => [hc.id, hc]));
         } else {
             const allHouseCards = _.concat(baseGameHouseCards, adwdHouseCards, ffcHouseCards, modBHouseCards, asosHouseCards);
-            game.houseCardsForDrafting = new BetterMap(allHouseCards.map(hc => [hc.id, hc]));
+            game.draftableHouseCards = new BetterMap(allHouseCards.map(hc => [hc.id, hc]));
         }
 
         game.houses.forEach(h => {

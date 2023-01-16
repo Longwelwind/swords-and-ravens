@@ -22,14 +22,16 @@ export default class IllyrioMopatisHouseCardAbility extends HouseCardAbility {
             afterCombat.game.deletedHouseCards.set(houseCard.id, houseCard);
             afterCombat.entireGame.broadcastToClients({
                 type: "update-deleted-house-cards",
-                houseCards: afterCombat.game.deletedHouseCards.values.map(hc => hc.serializeToClient())
+                houseCards: afterCombat.game.deletedHouseCards.values.map(hc => hc.id)
             });
+
             house.houseCards.delete(houseCard.id);
             afterCombat.entireGame.broadcastToClients({
                 type: "update-house-cards",
                 house: house.id,
-                houseCards: house.houseCards.values.map(hc => hc.serializeToClient())
+                houseCards: house.houseCards.values.map(hc => hc.id)
             });
+
             afterCombat.combatGameState.ingameGameState.log({
                 type: "house-card-removed-from-game",
                 house: house.id,

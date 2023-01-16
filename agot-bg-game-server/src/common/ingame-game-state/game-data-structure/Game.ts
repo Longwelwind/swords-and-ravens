@@ -52,7 +52,7 @@ export default class Game {
     loyaltyTokenCountNeededToWin: number;
     @observable maxTurns: number;
     vassalHouseCards: BetterMap<string, HouseCard> = new BetterMap<string, HouseCard>();
-    @observable houseCardsForDrafting: BetterMap<string, HouseCard> = new BetterMap();
+    @observable draftableHouseCards: BetterMap<string, HouseCard> = new BetterMap();
     deletedHouseCards: BetterMap<string, HouseCard> = new BetterMap();
     oldPlayerHouseCards: BetterMap<House, BetterMap<string, HouseCard>> = new BetterMap();
     previousPlayerHouseCards: BetterMap<House, BetterMap<string, HouseCard>> = new BetterMap();
@@ -412,7 +412,7 @@ export default class Game {
         });
 
         allCards.setRange(this.vassalHouseCards.entries);
-        allCards.setRange(this.houseCardsForDrafting.entries);
+        allCards.setRange(this.draftableHouseCards.entries);
         allCards.setRange(this.deletedHouseCards.entries);
 
         this.oldPlayerHouseCards.values.forEach(hcs => {
@@ -538,7 +538,6 @@ export default class Game {
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedGame {
-        const isThematicDraft = this.ingame.childGameState instanceof ThematicDraftHouseCardsGameState;
         return {
             lastUnitId: this.lastUnitId,
             houses: this.houses.values.map(h => h.serializeToClient(admin, player, this)),
@@ -571,9 +570,10 @@ export default class Game {
             revealedWesterosCards: this.revealedWesterosCards,
             vassalRelations: this.vassalRelations.map((key, value) => [key.id, value.id]),
             vassalHouseCards: this.vassalHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
-            houseCardsForDrafting: admin || !isThematicDraft
-                ? this.houseCardsForDrafting.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])
-                : this.houseCardsForDrafting.entries.filter(([_hcid, hc]) => hc.houseId == player?.house.id).map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
+            // The game state tree reveals already chosen cards by other houses during Thematic Draft.
+            // But as the info is not super critical and as it's easier this was to reveal all cards once drafting is done,
+            // hiding other player cards by the UI must be sufficient.
+            draftableHouseCards: this.draftableHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
             deletedHouseCards: this.deletedHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
             oldPlayerHouseCards: this.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])]),
             previousPlayerHouseCards: this.previousPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])]),
@@ -609,7 +609,7 @@ export default class Game {
         game.revealedWesterosCards = data.revealedWesterosCards;
         game.clientNextWildlingCardId = data.clientNextWildlingCardId;
         game.vassalRelations = new BetterMap(data.vassalRelations.map(([vid, hid]) => [game.houses.get(vid), game.houses.get(hid)]));
-        game.houseCardsForDrafting = new BetterMap(data.houseCardsForDrafting.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
+        game.draftableHouseCards = new BetterMap(data.draftableHouseCards.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
         game.deletedHouseCards = new BetterMap(data.deletedHouseCards.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]));
         game.oldPlayerHouseCards = new BetterMap(data.oldPlayerHouseCards.map(([hid, hcs]) =>
             [game.houses.get(hid), new BetterMap(hcs.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]))]
@@ -649,7 +649,7 @@ export interface SerializedGame {
     clientNextWildlingCardId: number | null;
     vassalRelations: [string, string][];
     vassalHouseCards: [string, SerializedHouseCard][];
-    houseCardsForDrafting: [string, SerializedHouseCard][];
+    draftableHouseCards: [string, SerializedHouseCard][];
     deletedHouseCards: [string, SerializedHouseCard][];
     oldPlayerHouseCards: [string, [string, SerializedHouseCard][]][];
     previousPlayerHouseCards: [string, [string, SerializedHouseCard][]][];
