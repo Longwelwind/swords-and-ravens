@@ -55,6 +55,7 @@ export default class Game {
     @observable houseCardsForDrafting: BetterMap<string, HouseCard> = new BetterMap();
     deletedHouseCards: BetterMap<string, HouseCard> = new BetterMap();
     oldPlayerHouseCards: BetterMap<House, BetterMap<string, HouseCard>> = new BetterMap();
+    previousPlayerHouseCards: BetterMap<House, BetterMap<string, HouseCard>> = new BetterMap();
     @observable dragonStrengthTokens: number[] = [];
     @observable removedDragonStrengthToken = 0;
     ironBank: IronBank | null;
@@ -418,6 +419,10 @@ export default class Game {
             allCards.setRange(hcs.entries);
         });
 
+        this.previousPlayerHouseCards.values.forEach(hcs => {
+            allCards.setRange(hcs.entries);
+        });
+
         return allCards;
     }
 
@@ -571,6 +576,7 @@ export default class Game {
                 : this.houseCardsForDrafting.entries.filter(([_hcid, hc]) => hc.houseId == player?.house.id).map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
             deletedHouseCards: this.deletedHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
             oldPlayerHouseCards: this.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])]),
+            previousPlayerHouseCards: this.previousPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])]),
             dragonStrengthTokens: this.dragonStrengthTokens,
             removedDragonStrengthToken: this.removedDragonStrengthToken,
             ironBank: this.ironBank ? this.ironBank.serializeToClient(admin) : null,
@@ -608,6 +614,9 @@ export default class Game {
         game.oldPlayerHouseCards = new BetterMap(data.oldPlayerHouseCards.map(([hid, hcs]) =>
             [game.houses.get(hid), new BetterMap(hcs.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]))]
         ));
+        game.previousPlayerHouseCards = new BetterMap(data.previousPlayerHouseCards.map(([hid, hcs]) =>
+            [game.houses.get(hid), new BetterMap(hcs.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]))]
+        ));
         game.dragonStrengthTokens = data.dragonStrengthTokens;
         game.removedDragonStrengthToken = data.removedDragonStrengthToken;
         game.ironBank = data.ironBank ? IronBank.deserializeFromServer(game, data.ironBank) : null;
@@ -643,6 +652,7 @@ export interface SerializedGame {
     houseCardsForDrafting: [string, SerializedHouseCard][];
     deletedHouseCards: [string, SerializedHouseCard][];
     oldPlayerHouseCards: [string, [string, SerializedHouseCard][]][];
+    previousPlayerHouseCards: [string, [string, SerializedHouseCard][]][];
     dragonStrengthTokens: number[];
     removedDragonStrengthToken: number;
     ironBank: SerializedIronBank | null;

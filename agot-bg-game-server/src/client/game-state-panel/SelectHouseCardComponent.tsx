@@ -11,6 +11,7 @@ import SelectHouseCardGameState
 import HouseCard from "../../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import HouseCardComponent from "./utils/HouseCardComponent";
 import DraftHouseCardsGameState from "../../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
+import _ from "lodash";
 
 @observer
 export default class SelectHouseCardComponent extends Component<GameStateComponentProps<SelectHouseCardGameState<any>>> {
@@ -33,7 +34,7 @@ export default class SelectHouseCardComponent extends Component<GameStateCompone
                     <Row className="justify-content-center">
                         <Col xs="12">
                             <Row className="justify-content-center">
-                                {this.props.gameState.houseCards.map(hc => (
+                                {_.sortBy(this.props.gameState.houseCards, hc => -hc.combatStrength).map(hc => (
                                     // The house argument is used to decide which card-back is used
                                     // Since we will never show a back-card here, we can give whatever value fits.
                                     (this.nameFilter == "" || hc.name.toLowerCase().includes(this.nameFilter.toLowerCase())) && <Col xs="auto" key={`select-house-card_${hc.id}`}>

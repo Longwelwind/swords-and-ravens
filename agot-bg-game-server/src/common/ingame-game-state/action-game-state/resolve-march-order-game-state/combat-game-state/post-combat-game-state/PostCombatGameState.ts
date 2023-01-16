@@ -464,24 +464,14 @@ export default class PostCombatGameState extends GameState<
                 && this.combat.ingameGameState.game.turn >= 5) {
 
                 // We need to swap to the new deck now
+                this.game.previousPlayerHouseCards.set(house, new BetterMap());
                 house.houseCards.keys.forEach(hcid => {
-                    this.game.deletedHouseCards.set(hcid, house.houseCards.get(hcid));
+                    this.game.previousPlayerHouseCards.get(house).set(hcid, house.houseCards.get(hcid));
                     house.houseCards.delete(hcid);
                 });
 
                 house.laterHouseCards.entries.forEach(([hcid, hc]) => house.houseCards.set(hcid, hc));
                 house.laterHouseCards = null;
-
-                this.entireGame.broadcastToClients({
-                    type: "update-deleted-house-cards",
-                    houseCards: this.game.deletedHouseCards.values.map(hc => hc.serializeToClient())
-                });
-
-                this.entireGame.broadcastToClients({
-                    type: "update-house-cards",
-                    house: house.id,
-                    houseCards: house.houseCards.values.map(hc => hc.serializeToClient())
-                });
 
                 this.entireGame.broadcastToClients({
                     type: "later-house-cards-applied",

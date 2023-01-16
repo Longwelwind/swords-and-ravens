@@ -1158,6 +1158,16 @@ export default class IngameGameState extends GameState<
             house.houseCards = new BetterMap(message.houseCards.map(hc => [hc.id, HouseCard.deserializeFromServer(hc)]));
         } else if (message.type == "later-house-cards-applied") {
             const house = this.game.houses.get(message.house);
+            this.game.previousPlayerHouseCards.set(house, new BetterMap());
+            house.houseCards.values.forEach(hc => {
+                this.game.previousPlayerHouseCards.get(house).set(hc.id, hc);
+                house.houseCards.delete(hc.id);
+            });
+
+            house.laterHouseCards?.values.forEach(hc => {
+                house.houseCards.set(hc.id, hc);
+            });
+
             house.laterHouseCards = null;
         } else if (message.type == "update-house-cards-for-drafting") {
             this.game.houseCardsForDrafting = new BetterMap(message.houseCards.map(hc => [hc.id, HouseCard.deserializeFromServer(hc)]));
