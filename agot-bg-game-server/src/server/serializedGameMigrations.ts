@@ -2078,6 +2078,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
         migrate: (serializedGame: any) => {
             if (serializedGame.childGameState.type == "ingame") {
                 const game = serializedGame.childGameState.game;
+                game.previousPlayerHouseCards = [];
                 game.draftableHouseCards = game.houseCardsForDrafting;
             }
 
