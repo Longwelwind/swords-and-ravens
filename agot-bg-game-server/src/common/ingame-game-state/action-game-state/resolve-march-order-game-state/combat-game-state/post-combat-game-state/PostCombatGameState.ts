@@ -274,11 +274,11 @@ export default class PostCombatGameState extends GameState<
             if (this.combat.ingameGameState.isVassalHouse(house)) {
                 if (houseCard && house.hasBeenReplacedByVassal && !this.game.vassalHouseCards.has(houseCard.id)) {
                     this.checkAndPerformHouseCardHandlingPerHouse(house, houseCard);
-                    this.game.oldPlayerHouseCards.set(house, house.houseCards);
 
+                    this.game.oldPlayerHouseCards.set(house, house.houseCards);
                     this.entireGame.broadcastToClients({
                         type: "update-old-player-house-cards",
-                        houseCards: this.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.serializeToClient())])
+                        houseCards: this.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.id)])
                     });
                 }
             } else {
@@ -410,11 +410,11 @@ export default class PostCombatGameState extends GameState<
                 const houseCard = this.combat.houseCombatDatas.get(house).houseCard;
                 if (houseCard && house.hasBeenReplacedByVassal && !this.game.vassalHouseCards.has(houseCard.id)) {
                     // Player house cards may have changed again due to abilities like Robert Arryn, so we save the old hand again
-                    this.game.oldPlayerHouseCards.set(house, house.houseCards);
 
+                    this.game.oldPlayerHouseCards.set(house, house.houseCards);
                     this.entireGame.broadcastToClients({
                         type: "update-old-player-house-cards",
-                        houseCards: this.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.serializeToClient())])
+                        houseCards: this.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.id)])
                     });
                 }
 
@@ -464,24 +464,14 @@ export default class PostCombatGameState extends GameState<
                 && this.combat.ingameGameState.game.turn >= 5) {
 
                 // We need to swap to the new deck now
+                this.game.previousPlayerHouseCards.set(house, new BetterMap());
                 house.houseCards.keys.forEach(hcid => {
-                    this.game.deletedHouseCards.set(hcid, house.houseCards.get(hcid));
+                    this.game.previousPlayerHouseCards.get(house).set(hcid, house.houseCards.get(hcid));
                     house.houseCards.delete(hcid);
                 });
 
                 house.laterHouseCards.entries.forEach(([hcid, hc]) => house.houseCards.set(hcid, hc));
                 house.laterHouseCards = null;
-
-                this.entireGame.broadcastToClients({
-                    type: "update-deleted-house-cards",
-                    houseCards: this.game.deletedHouseCards.values.map(hc => hc.serializeToClient())
-                });
-
-                this.entireGame.broadcastToClients({
-                    type: "update-house-cards",
-                    house: house.id,
-                    houseCards: house.houseCards.values.map(hc => hc.serializeToClient())
-                });
 
                 this.entireGame.broadcastToClients({
                     type: "later-house-cards-applied",

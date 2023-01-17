@@ -38,7 +38,7 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
     render(): ReactNode {
         const showCardsPreview = this.player && (!this.doesControlHouse || this.draftStep == DraftStep.DECIDE);
         const availableCards = this.player && showCardsPreview ? this.props.gameState.getFilteredHouseCardsForHouse(this.player.house) : [];
-        const remainingCardsForSpectators = !this.player ? _.sortBy(this.props.gameState.ingame.game.houseCardsForDrafting.values, hc => -hc.combatStrength, hc => hc.houseId) : [];
+        const remainingCardsForSpectators = !this.player ? _.sortBy(this.props.gameState.ingame.game.draftableHouseCards.values, hc => -hc.combatStrength, hc => hc.houseId) : [];
         return (
             this.props.gameState.currentColumnIndex > -1 && this.props.gameState.currentRowIndex > -1 &&
             <>

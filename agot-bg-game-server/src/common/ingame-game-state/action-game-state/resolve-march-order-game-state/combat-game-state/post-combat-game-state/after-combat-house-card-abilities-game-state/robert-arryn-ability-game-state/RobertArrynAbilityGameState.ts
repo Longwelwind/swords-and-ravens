@@ -80,27 +80,36 @@ export default class RobertArrynAbilityGameState extends GameState<
         const enemy = this.combat.getEnemy(this.house);
         if (enemyHouseCardToRemove) {
             this.game.deletedHouseCards.set(enemyHouseCardToRemove.id, enemyHouseCardToRemove);
+            this.entireGame.broadcastToClients({
+                type: "update-deleted-house-cards",
+                houseCards: this.game.deletedHouseCards.values.map(hc => hc.id)
+            });
+
             enemy.houseCards.delete(enemyHouseCardToRemove.id);
             this.entireGame.broadcastToClients({
                 type: "update-house-cards",
                 house: enemy.id,
-                houseCards: enemy.houseCards.values.map(hc => hc.serializeToClient())
+                houseCards: enemy.houseCards.values.map(hc => hc.id)
             });
         }
 
-        const robertArrynHc = this.house.houseCards.get("robert-arryn");
-        this.game.deletedHouseCards.set(robertArrynHc.id, robertArrynHc);
-        this.house.houseCards.delete(robertArrynHc.id);
+        const robertArrynHc = this.combat.houseCombatDatas.values.find(hcd => hcd.houseCard?.ability?.id == robertArryn.id)?.houseCard;
 
+        if (!robertArrynHc) {
+            throw new Error("executeRobertsAbility(): Should be unreachable: Robert Arryn House card not found!");
+        }
+
+        this.game.deletedHouseCards.set(robertArrynHc.id, robertArrynHc);
         this.entireGame.broadcastToClients({
             type: "update-deleted-house-cards",
-            houseCards: this.game.deletedHouseCards.values.map(hc => hc.serializeToClient())
+            houseCards: this.game.deletedHouseCards.values.map(hc => hc.id)
         });
 
+        this.house.houseCards.delete(robertArrynHc.id);
         this.entireGame.broadcastToClients({
             type: "update-house-cards",
             house: this.house.id,
-            houseCards: this.house.houseCards.values.map(hc => hc.serializeToClient())
+            houseCards: this.house.houseCards.values.map(hc => hc.id)
         });
 
         this.ingame.log({

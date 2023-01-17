@@ -21,13 +21,14 @@ export default class ViserysTargaryenHouseCardAbility extends HouseCardAbility {
             afterWinnerDetermination.game.deletedHouseCards.set(houseCard.id, houseCard);
             afterWinnerDetermination.entireGame.broadcastToClients({
                 type: "update-deleted-house-cards",
-                houseCards: afterWinnerDetermination.game.deletedHouseCards.values.map(hc => hc.serializeToClient())
+                houseCards: afterWinnerDetermination.game.deletedHouseCards.values.map(hc => hc.id)
             });
+
             house.houseCards.delete(houseCard.id);
             afterWinnerDetermination.entireGame.broadcastToClients({
                 type: "update-house-cards",
                 house: house.id,
-                houseCards: house.houseCards.values.map(hc => hc.serializeToClient())
+                houseCards: house.houseCards.values.map(hc => hc.id)
             });
 
             afterWinnerDetermination.combatGameState.ingameGameState.log({

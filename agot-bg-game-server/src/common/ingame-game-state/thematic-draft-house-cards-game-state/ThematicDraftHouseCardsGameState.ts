@@ -48,7 +48,7 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
             throw new Error("getFilteredHouseCardsForHouse() called for a vassal house!");
         }
 
-        let availableCards = _.sortBy(this.game.houseCardsForDrafting.values.filter(hc => hc.houseId == house.id), hc => -hc.combatStrength);
+        let availableCards = _.sortBy(this.game.draftableHouseCards.values.filter(hc => hc.houseId == house.id), hc => -hc.combatStrength);
         house.houseCards.forEach(card => {
             const countOfCardsWithThisCombatStrength = house.houseCards.values.filter(hc => hc.combatStrength == card.combatStrength).length;
             if (houseCardCombatStrengthAllocations.get(card.combatStrength) == countOfCardsWithThisCombatStrength) {
@@ -88,17 +88,16 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
             }
 
             house.houseCards.set(houseCard.id, houseCard);
-            this.game.houseCardsForDrafting.delete(houseCard.id);
-
-            player.user.send({
+            this.entireGame.broadcastToClients({
                 type: "update-house-cards",
                 house: house.id,
-                houseCards: house.houseCards.values.map(hc => hc.serializeToClient())
+                houseCards: house.houseCards.values.map(hc => hc.id)
             });
 
-            player.user.send({
-                type: "update-house-cards-for-drafting",
-                houseCards: this.game.houseCardsForDrafting.values.filter(hc => hc.houseId == house.id).map(hc => hc.serializeToClient())
+            this.game.draftableHouseCards.delete(houseCard.id);
+            this.entireGame.broadcastToClients({
+                type: "update-draftable-house-cards",
+                houseCards: this.game.draftableHouseCards.values.map(hc => hc.id)
             });
 
             if (house.houseCards.size == 7) {
@@ -115,14 +114,12 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
             }
 
             if (this.participatingHouses.every(h => h.houseCards.size == 7)) {
-                this.game.houseCardsForDrafting.clear();
-                this.participatingHouses.forEach(h => {
-                    this.entireGame.broadcastToClients({
-                        type: "update-house-cards",
-                        house: h.id,
-                        houseCards: h.houseCards.values.map(hc => hc.serializeToClient())
-                    });
+                this.game.draftableHouseCards.clear();
+                this.entireGame.broadcastToClients({
+                    type: "update-draftable-house-cards",
+                    houseCards: []
                 });
+
                 this.ingame.onDraftingFinish();
             }
         }

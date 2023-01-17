@@ -44,6 +44,7 @@ import WildlingCardEffectInTurnOrderGameState from "./westeros-game-state/wildli
 import getElapsedSeconds from "../../utils/getElapsedSeconds";
 import orders from "./game-data-structure/orders";
 import { OrderOnMapProperties, UnitOnMapProperties } from "../../client/MapControls";
+import houseCardAbilities from "./game-data-structure/house-card/houseCardAbilities";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -180,15 +181,15 @@ export default class IngameGameState extends GameState<
                 for(let i=0; i<count; i++) {
                     this.players.values.forEach(p => {
                         const house = p.house;
-                        const availableCards = this.game.houseCardsForDrafting.values.filter(hc => hc.combatStrength == hcStrength);
+                        const availableCards = this.game.draftableHouseCards.values.filter(hc => hc.combatStrength == hcStrength);
                         const houseCard = popRandom(availableCards) as HouseCard;
                         house.houseCards.set(houseCard.id, houseCard);
-                        this.game.houseCardsForDrafting.delete(houseCard.id);
+                        this.game.draftableHouseCards.delete(houseCard.id);
                     });
                 }
             });
 
-            this.game.houseCardsForDrafting.clear();
+            this.game.draftableHouseCards.clear();
 
             this.setInfluenceTrack(0, this.getRandomTrackOrder());
             this.setInfluenceTrack(1, this.getRandomTrackOrder());
@@ -948,7 +949,7 @@ export default class IngameGameState extends GameState<
         this.game.oldPlayerHouseCards.set(newVassalHouse, newVassalHouse.houseCards);
         this.entireGame.broadcastToClients({
             type: "update-old-player-house-cards",
-            houseCards: this.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.serializeToClient())])
+            houseCards: this.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.id)])
         });
 
         // In case we are in combat we will do proceedHouseCardHandling() where we eventually recycle the deck,
@@ -956,7 +957,6 @@ export default class IngameGameState extends GameState<
         if (!this.hasChildGameState(CombatGameState)) {
             // If we're not in combat, we have to remove the house cards from the new vassal now
             newVassalHouse.houseCards = new BetterMap();
-
             this.entireGame.broadcastToClients({
                 type: "update-house-cards",
                 house: newVassalHouse.id,
@@ -1155,16 +1155,44 @@ export default class IngameGameState extends GameState<
             this.forceRerender();
         } else if (message.type == "update-house-cards") {
             const house = this.game.houses.get(message.house);
-            house.houseCards = new BetterMap(message.houseCards.map(hc => [hc.id, HouseCard.deserializeFromServer(hc)]));
+            const allHouseCardsInGame = this.game.getAllHouseCardsInGame();
+            house.houseCards = new BetterMap(message.houseCards.map(hcid => {
+                const hc = allHouseCardsInGame.get(hcid);
+                return [hcid, hc];
+            }));
         } else if (message.type == "later-house-cards-applied") {
             const house = this.game.houses.get(message.house);
+            this.game.previousPlayerHouseCards.set(house, new BetterMap());
+            house.houseCards.values.forEach(hc => {
+                this.game.previousPlayerHouseCards.get(house).set(hc.id, hc);
+                house.houseCards.delete(hc.id);
+            });
+
+            house.laterHouseCards?.values.forEach(hc => {
+                house.houseCards.set(hc.id, hc);
+            });
+
             house.laterHouseCards = null;
-        } else if (message.type == "update-house-cards-for-drafting") {
-            this.game.houseCardsForDrafting = new BetterMap(message.houseCards.map(hc => [hc.id, HouseCard.deserializeFromServer(hc)]));
+        } else if (message.type == "update-draftable-house-cards") {
+            const allHouseCardsInGame = this.game.getAllHouseCardsInGame();
+            this.game.draftableHouseCards = new BetterMap(message.houseCards.map(hcid => {
+                const hc = allHouseCardsInGame.get(hcid);
+                return [hcid, hc];
+            }));
         } else if (message.type == "update-deleted-house-cards") {
-            this.game.deletedHouseCards = new BetterMap(message.houseCards.map(hc => [hc.id, HouseCard.deserializeFromServer(hc)]));
+            const allHouseCardsInGame = this.game.getAllHouseCardsInGame();
+            this.game.deletedHouseCards = new BetterMap(message.houseCards.map(hcid => {
+                const hc = allHouseCardsInGame.get(hcid);
+                return [hcid, hc];
+            }));
         } else if (message.type == "update-old-player-house-cards") {
-            this.game.oldPlayerHouseCards = new BetterMap(message.houseCards.map(([hid, hcs]) => [this.game.houses.get(hid), new BetterMap(hcs.map(hc => [hc.id, HouseCard.deserializeFromServer(hc)]))]));
+            const allHouseCardsInGame = this.game.getAllHouseCardsInGame();
+            this.game.oldPlayerHouseCards = new BetterMap(message.houseCards.map(([hid, hcs]) =>
+                [this.game.houses.get(hid), new BetterMap(hcs.map(hcid => {
+                    const hc = allHouseCardsInGame.get(hcid);
+                    return [hcid, hc];
+                }))]
+            ));
         } else if (message.type == "update-max-turns") {
             this.game.maxTurns = message.maxTurns;
         } else if (message.type == "loyalty-token-gained") {
@@ -1263,8 +1291,21 @@ export default class IngameGameState extends GameState<
             message.regions.map(rid => this.world.regions.get(rid)).forEach(r => {
                 this.ordersOnBoard.delete(r);
             });
-        }
-        else {
+        } else if (message.type == "manipulate-combat-house-card") {
+            message.manipulatedHouseCards.forEach(([hcid, shc]) => {
+                const houseCard = this.game.getHouseCardById(hcid);
+                houseCard.ability = shc.abilityId ? houseCardAbilities.get(shc.abilityId) : null;
+                houseCard.disabled = shc.disabled;
+                houseCard.disabledAbility = shc.disabledAbilityId ? houseCardAbilities.get(shc.disabledAbilityId) : null;
+                houseCard.combatStrength = shc.combatStrength;
+                houseCard.originalCombatStrength = shc.originalCombatStrength;
+            });
+
+            if (this.hasChildGameState(CombatGameState)) {
+                const combat = this.getChildGameState(CombatGameState) as CombatGameState;
+                combat.rerender++;
+            }
+        } else {
             this.childGameState.onServerMessage(message);
         }
     }

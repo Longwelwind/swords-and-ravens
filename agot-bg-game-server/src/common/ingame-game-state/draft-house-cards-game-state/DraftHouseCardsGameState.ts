@@ -131,7 +131,7 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
         const houseToResolve = this.getNextHouse();
 
         if (houseToResolve == null) {
-            this.game.houseCardsForDrafting.clear();
+            this.game.draftableHouseCards.clear();
             // Append vassals back to the tracks:
             for(let i=0; i<this.vassalsOnInfluenceTracks.length; i++) {
                 const newInfluenceTrack = _.concat(this.game.influenceTracks[i], this.vassalsOnInfluenceTracks[i]);
@@ -204,12 +204,12 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
     // So getAllHouseCards needs a unionBy to really have a unique list of house cards!
     getAllHouseCards(): HouseCard[] {
         return _.sortBy(_.unionBy(
-                this.game.houseCardsForDrafting.values,
+                this.game.draftableHouseCards.values,
                 _.flatMap(this.game.houses.values.map(h => h.houseCards.values)), hc => hc.id), hc => -hc.combatStrength, hc => hc.houseId);
     }
 
     getFilteredHouseCardsForHouse(house: House): HouseCard[] {
-        let availableCards = _.sortBy(this.game.houseCardsForDrafting.values, hc => -hc.combatStrength, hc => hc.houseId);
+        let availableCards = _.sortBy(this.game.draftableHouseCards.values, hc => -hc.combatStrength, hc => hc.houseId);
         house.houseCards.forEach(card => {
             const countOfCardsWithThisCombatStrength = house.houseCards.values.filter(hc => hc.combatStrength == card.combatStrength).length;
             if (houseCardCombatStrengthAllocations.get(card.combatStrength) == countOfCardsWithThisCombatStrength) {
@@ -284,17 +284,16 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
 
     onSelectHouseCardFinish(house: House, houseCard: HouseCard, resolvedAutomatically: boolean): void {
         house.houseCards.set(houseCard.id, houseCard);
-        this.game.houseCardsForDrafting.delete(houseCard.id);
-
         this.entireGame.broadcastToClients({
             type: "update-house-cards",
             house: house.id,
-            houseCards: house.houseCards.values.map(hc => hc.serializeToClient())
+            houseCards: house.houseCards.values.map(hc => hc.id)
         });
 
+        this.game.draftableHouseCards.delete(houseCard.id);
         this.entireGame.broadcastToClients({
-            type: "update-house-cards-for-drafting",
-            houseCards: this.game.houseCardsForDrafting.values.map(hc => hc.serializeToClient())
+            type: "update-draftable-house-cards",
+            houseCards: this.game.draftableHouseCards.values.map(hc => hc.id)
         });
 
         this.ingame.log({
