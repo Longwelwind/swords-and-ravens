@@ -144,8 +144,8 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
         );
     }
 
-    renderGameSetupsTooltipContent(selectedSetupId: string): ReactNode {
-        switch(selectedSetupId) {
+    renderGameSetupsTooltipContent(): ReactNode {
+        switch(this.gameSettings.setupId) {
             case "base-game":
                 return <>
                     <h5>The official <i>A Game of Thrones Board Game - 2nd edition</i></h5>
@@ -223,14 +223,14 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
     renderLobbySettings(): ReactNode {
         return <Row className="mt-2 justify-content-center">
             <Col xs="auto" id="base-settings-col" className="no-gutters">
-                <Col xs="12">
-                    <OverlayTrigger overlay={
-                        <Tooltip id="game-setups-tooltip" className="tooltip-w-100">
-                            {this.renderGameSetupsTooltipContent((document.getElementById("game-setups") as HTMLInputElement)?.value ?? "")}
-                        </Tooltip>}
-                        placement="top"
-                        delay={{show: 500, hide: 0}}
-                    >
+                <OverlayTrigger overlay={
+                    <Tooltip id="game-setups-tooltip" className="tooltip-w-100">
+                        {this.renderGameSetupsTooltipContent()}
+                    </Tooltip>}
+                    placement="top"
+                    delay={{show: 500, hide: 0}}
+                >
+                    <Col xs="12">
                         <select className="custom-select" id="game-setups" name="setups"
                             value={this.gameSettings.setupId}
                             onChange={e => this.onSetupChange(e.target.value)}
@@ -238,8 +238,8 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         >
                             {this.createSetupItems()}
                         </select>
-                    </OverlayTrigger>
-                </Col>
+                    </Col>
+                </OverlayTrigger>
                 <Col xs="auto" className="d-flex justify-content-between">
                     <div className="mr-2">
                         <select id="player-count" name="playerCount"
