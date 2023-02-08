@@ -5,9 +5,6 @@ import Player from "../../Player";
 import {ClientMessage} from "../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../messages/ServerMessage";
 import IngameGameState from "../../IngameGameState";
-import House from "../../game-data-structure/House";
-import BetterMap from "../../../../utils/BetterMap";
-import Region from "../../game-data-structure/Region";
 import WesterosCardType from "../../game-data-structure/westeros-card/WesterosCardType";
 import ChooseRegionForLoyaltyTokenGameState, { SerializedChooseRegionForLoyaltyTokenGameState } from "./choose-region-for-loyalty-token-game-state/ChooseRegionForLoyaltyTokenGameState";
 import { domesticDisputes, emptyPromises, fireMadeFlesh, playingWithFire, scatteringDissent, southronAmbitions, strongholdsOfResistance, theLongPlan, wateringTheSeed, wordSpreadsQuickly } from "../../game-data-structure/westeros-card/westerosCardTypes";
@@ -20,7 +17,7 @@ import MoveLoyaltyTokensGameState, { SerializedMoveLoyaltyTokensGameState } from
 export default class WesterosDeck4GameState extends GameState<WesterosGameState,
     ChooseRegionForLoyaltyTokenGameState | ChooseMultipleRegionsForLoyaltyTokenGameState
     | FireMadeFleshGameState | PlayingWithFireGameState | TheLongPlanGameState | MoveLoyaltyTokensGameState> {
-    possbileRegionForLoyaltyToken?: Region;
+
     get game(): Game {
         return this.parentGameState.game;
     }
@@ -30,11 +27,12 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
     }
 
     firstStart(type: WesterosCardType): void {
-        if (this.ingame.isHouseDefeated(this.game.targaryen) || !this.game.targaryen || this.ingame.isVassalHouse(this.game.targaryen)) {
+        const isVassal = this.game.targaryen && this.ingame.isVassalHouse(this.game.targaryen);
+        if (isVassal || this.ingame.isHouseDefeated(this.game.targaryen) || !this.game.targaryen) {
             this.ingame.log({
                 type: "westeros-deck-4-skipped",
                 westerosCardType: type.id,
-                reason: this.ingame.isHouseDefeated(this.game.targaryen) ? "defeated" : "vassalized"
+                reason: isVassal ? "vassalized" : "defeated"
             }, true);
             this.parentGameState.onWesterosCardEnd();
             return;
@@ -92,30 +90,6 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
         }
     }
 
-    getChoices(house: House): BetterMap<string, number> {
-        const result = new BetterMap<string, number>();
-        result.set("Ignore", 0);
-        if (house.powerTokens <= 0) {
-            return result;
-        }
-
-        const available = this.ingame.game.isLoyaltyTokenAvailable;
-
-        if (this.possbileRegionForLoyaltyToken && available) {
-            result.set(`Discard 1 Power token to place a loyalty\xa0token in ${this.possbileRegionForLoyaltyToken.name}`, 1);
-        }
-
-        if (house.powerTokens >= 2 && available) {
-            result.set(`Discard 2 Power tokens to place a loyalty\xa0token in a random region`, 2);
-        }
-
-        if (this.game.turn % 2 == 0 && house.powerTokens >= 4 && available) {
-            result.set(`Discard 4 Power tokens to place two loyalty\xa0tokens in random regions`, 4);
-        }
-
-        return result;
-    }
-
     onPlayerMessage(player: Player, message: ClientMessage): void {
         this.childGameState.onPlayerMessage(player, message);
     }
@@ -127,7 +101,6 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
     serializeToClient(admin: boolean, player: Player | null): SerializedWesterosDeck4GameState {
         return {
             type: "westeros-deck-4",
-            possbileRegionForLoyaltyToken: this.possbileRegionForLoyaltyToken?.id,
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -135,7 +108,6 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
     static deserializeFromServer(westeros: WesterosGameState, data: SerializedWesterosDeck4GameState): WesterosDeck4GameState {
         const westerosDeck4 = new WesterosDeck4GameState(westeros);
 
-        westerosDeck4.possbileRegionForLoyaltyToken = data.possbileRegionForLoyaltyToken ? westeros.world.regions.get(data.possbileRegionForLoyaltyToken) : undefined;
         westerosDeck4.childGameState = westerosDeck4.deserializeChildGameState(data.childGameState);
 
         return westerosDeck4;
@@ -162,7 +134,6 @@ export default class WesterosDeck4GameState extends GameState<WesterosGameState,
 
 export interface SerializedWesterosDeck4GameState {
     type: "westeros-deck-4";
-    possbileRegionForLoyaltyToken?: string;
     childGameState: SerializedChooseRegionForLoyaltyTokenGameState | SerializedChooseMultipleRegionsForLoyaltyTokenGameState
         | SerializedFireMadeFleshGameState | SerializedPlayingWithFireGameState | SerializedTheLongPlanGameState | SerializedMoveLoyaltyTokensGameState;
 }
