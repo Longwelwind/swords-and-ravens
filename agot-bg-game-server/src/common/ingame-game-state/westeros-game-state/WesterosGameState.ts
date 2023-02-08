@@ -230,6 +230,11 @@ export default class WesterosGameState extends GameState<IngameGameState,
                 type: "loyalty-token-placed",
                 region: region.id
             });
+        } else {
+            this.ingame.log({
+                type: "no-loyalty-token-available",
+                region: region.id
+            });
         }
     }
 
