@@ -449,6 +449,8 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     }
 
     private renderVictoryTrackTooltip(house: House): OverlayChildren {
+        const loyaltyTokensOnBoardCount = house == this.game.targaryen ? this.game.loyaltyTokensOnBoardCount : 0;
+        const regions = this.ingame.entireGame.isFeastForCrows ? this.ingame.world.regions.values : [];
         return <Tooltip id={house.id + "-victory-tooltip"} className="tooltip-w-100">
             <Col>
                 <h5 className="text-center">&nbsp;&nbsp;Total&nbsp;Land&nbsp;Areas&nbsp;&nbsp;</h5>
@@ -458,16 +460,16 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     <br/>
                     <h5 className="text-center">Additional Information<br/><small>&nbsp;&nbsp;(Does not count in case of a tie)&nbsp;&nbsp;</small></h5>
                     <br/>
-                    <h5 className="text-center">Castles: <b>{this.ingame.world.regions.values.filter(r => r.castleLevel == 1 && r.getController() == house).length}</b></h5>
-                    <h5 className="text-center">Strongholds: <b>{this.ingame.world.regions.values.filter(r => r.castleLevel == 2 && r.getController() == house).length}</b></h5>
-                    <h5 className="text-center">Sea Areas: <b>{this.ingame.world.regions.values.filter(r => r.type == sea && r.getController() == house).length}</b></h5>
-                    <h5 className="text-center">Ports: <b>{this.ingame.world.regions.values.filter(r => r.type == port && r.getController() == house).length}</b></h5>
+                    <h5 className="text-center">Castles: <b>{regions.filter(r => r.castleLevel == 1 && r.getController() == house).length}</b></h5>
+                    <h5 className="text-center">Strongholds: <b>{regions.filter(r => r.castleLevel == 2 && r.getController() == house).length}</b></h5>
+                    <h5 className="text-center">Sea Areas: <b>{regions.filter(r => r.type == sea && r.getController() == house).length}</b></h5>
+                    <h5 className="text-center">Ports: <b>{regions.filter(r => r.type == port && r.getController() == house).length}</b></h5>
                 </>}
                 {house == this.game.targaryen && <>
                     <br/>
                     <h5 className="text-center">Loyalty tokens</h5>
-                    <h6>On the board: <b>{this.game.loyaltyTokensOnBoardCount}</b></h6>
-                    <h6>Loyalty Pool: <b>{MAX_LOYALTY_TOKEN_COUNT - this.game.loyaltyTokensOnBoardCount}</b></h6>
+                    <h6>On the board: <b>{loyaltyTokensOnBoardCount}</b></h6>
+                    <h6>Loyalty Pool: <b>{MAX_LOYALTY_TOKEN_COUNT - loyaltyTokensOnBoardCount}</b></h6>
                 </>}
             </Col>
         </Tooltip>;

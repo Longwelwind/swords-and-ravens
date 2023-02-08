@@ -42,7 +42,7 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
                         <Col xs={12}>
                             <Row className="justify-content-center">
                                 {this.currentBidResults.entries.map(([h, bid]) => (
-                                    <Col xs="auto" key={`distribute-power_${h.id}`} className="d-flex flex-md-column align-items-center">
+                                    <Col xs="auto" key={`distribute-power_${h.id}`} className="d-flex flex-column align-items-center mb-4">
                                         <div className="mb-2">
                                             <HouseIconComponent house={h}/>
                                         </div>
@@ -66,7 +66,7 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
                                     </Col>
                                 ))}
                             </Row>
-                            <Row className="justify-content-center mt-3">
+                            <Row className="justify-content-center mt-5">
                                 <Col xs="auto">
                                     <Button variant="success" onClick={() => this.submit()}>Submit</Button>
                                 </Col>

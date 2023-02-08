@@ -131,7 +131,7 @@ export default class ChooseMultipleRegionsForLoyaltyTokenGameState extends GameS
         gameState.costs = data.costs;
         gameState.regions = data.regions.map(r => westerosDeck4.parentGameState.world.regions.get(r));
         gameState.count = data.count;
-        gameState.placedCount = data.count;
+        gameState.placedCount = data.placedCount;
         gameState.hasAlreadyPaid = data.hasAlreadyPaid;
         gameState.canBeSkipped = data.canBeSkipped;
         gameState.childGameState = gameState.deserializeChildGameState(data.childGameState);

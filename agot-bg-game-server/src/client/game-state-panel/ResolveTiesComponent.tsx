@@ -38,7 +38,7 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
                         <Col xs={12}>
                             <Row className="justify-content-center align-items-center">
                                 {this.currentOrdering.map((h, i) => (
-                                    <Col xs="auto" key={`resolve-ties_${h.id}`}>
+                                    <Col xs="auto" key={`resolve-ties_${h.id}`} className="mb-4">
                                         {this.props.gameState.stars && (
                                             <div className="resolve-ties-tracker-star-container">
                                                 {_.range(0, this.props.gameState.game.starredOrderRestrictions[i]).map(j => (
@@ -72,7 +72,7 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
                                     </Col>
                                 ))}
                             </Row>
-                            <Row className="justify-content-center mt-3">
+                            <Row className="justify-content-center mt-5">
                                 <Col xs="auto">
                                     <Button variant="success" onClick={() => this.submit()}>Resolve</Button>
                                 </Col>

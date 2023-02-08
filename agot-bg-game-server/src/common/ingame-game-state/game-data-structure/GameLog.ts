@@ -27,13 +27,11 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | CerseiLannisterNoOrderAvailable | CerseiLannisterOrderRemoved | RobbStarkRetreatRegionOverriden
     | RetreatRegionChosen | RetreatCasualtiesSuffered | RetreatFailed | SilenceAtTheWallExecuted
     | PreemptiveRaidChoiceDone | PreemptiveRaidTrackReduced | PreemptiveRaidUnitsKilled | PreemptiveRaidWildlingsAttack
-    | MassingOnTheMilkwaterHouseCardsBack | MassingOnTheMilkwaterWildlingVictory
-    | MassingOnTheMilkwaterHouseCardsRemoved
+    | MassingOnTheMilkwaterHouseCardsBack | MassingOnTheMilkwaterWildlingVictory | MassingOnTheMilkwaterHouseCardsRemoved
     | AKingBeyondTheWallHighestTopTrack | AKingBeyondTheWallHouseReduceTrack | AKingBeyondTheWallLowestReduceTracks
     | MammothRidersDestroyUnits | MammothRidersReturnCard | TheHordeDescendsHighestMuster | TheHordeDescendsUnitsKilled
     | CrowKillersFootmanUpgraded | CrowKillersKnightsReplaced | CrowKillersKnightsKilled
-    | SkinchangerScoutNightsWatchVictory | SkinchangerScoutWildlingVictory
-    | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory
+    | SkinchangerScoutNightsWatchVictory | SkinchangerScoutWildlingVictory | RattleshirtsRaidersNightsWatchVictory | RattleshirtsRaidersWildlingVictory
     | GameOfThronesPowerTokensGained | ImmediatelyBattleCasualtiesSuffered | BattleCasualtiesSuffered
     | SupplyAdjusted | PlayerReplaced | VassalReplaced | UserHouseAssignments | PlayerAction | JonSnowUsed
     | QarlTheMaidPowerTokensGained | AeronDamhairUsed | QyburnUsed | MelisandreDwDUsed | SerIlynPayneFootmanKilled | RodrikTheReaderUsed
@@ -51,7 +49,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | BalonGreyjoyASoSPowerTokensGained | MaceTyrellASoSOrderPlaced | BranStarkUsed | CerseiLannisterASoSPowerTokensDiscarded
     | DoranMartellASoSUsed | MelisandreOfAsshaiPowerTokensGained | SalladharSaanASoSPowerTokensChanged | SerDavosSeaworthASoSFortificationGained
     | CasualtiesPrevented | SerIlynPayneASoSCasualtySuffered | StannisBaratheonASoSUsed | AeronDamphairHouseCardChanged | ControlPowerTokenRemoved
-    | GamePaused | GameResumed | SupportAttackAgainstNeutralForce | HousesSwapped;
+    | GamePaused | GameResumed | SupportAttackAgainstNeutralForce | HousesSwapped | NoLoyaltyTokenAvailable;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -1167,4 +1165,9 @@ export interface WesterosDeck4Skipped {
     type: "westeros-deck-4-skipped";
     westerosCardType: string;
     reason: "defeated" | "vassalized"
+}
+
+export interface NoLoyaltyTokenAvailable {
+    type: "no-loyalty-token-available";
+    region: string;
 }

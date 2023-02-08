@@ -1983,6 +1983,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     The execution of the Westeros card <b>{westerosCardType.name}</b> was skipped because House <b>Targaryen</b> is <b>{data.reason}</b>.
                 </>;
             }
+            case "no-loyalty-token-available": {
+                const region = this.world.regions.get(data.region);
+
+                return <p>
+                    There was no further loyalty token available that could have been placed in <b>{region.name}</b>.
+                </p>;
+            }
         }
     }
 
