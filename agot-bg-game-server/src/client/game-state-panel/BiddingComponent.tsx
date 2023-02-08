@@ -44,7 +44,7 @@ export default class BiddingComponent<ParentGameState extends BiddingGameStatePa
                 {this.authenticatedPlayer && this.gameState.participatingHouses.includes(this.authenticatedPlayer.house) && (
                     <>
                         <Col xs={12}>
-                            <Row className="justify-content-center">
+                            <Row className="justify-content-center mb-1">
                                 <Col xs="auto">
                                     <input
                                         type="range"
@@ -70,6 +70,7 @@ export default class BiddingComponent<ParentGameState extends BiddingGameStatePa
                                 onClick={() => this.bid(this.powerTokensToBid)}
                                 disabled={!this.dirty}
                                 variant="success"
+                                className="mt-4"
                             >
                                 Confirm
                             </Button>
