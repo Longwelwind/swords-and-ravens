@@ -62,13 +62,16 @@ Games -
             </div>
         </div>
         {% endif %}
+        {% if user.is_authenticated %}
         <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title mb-0"><a href="/my_games">Your Games</a></h4>
+                    <h4 class="card-title"><a href="/my_games">Your Games</a></h4>
+                    {% games_table my_games user perms %}
                 </div>
             </div>
         </div>
+        {% endif %}
         <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
