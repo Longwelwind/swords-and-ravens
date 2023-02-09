@@ -9,8 +9,15 @@ Games -
 {% block content %}
     <div class="row justify-content-center">
         <div class="col-lg-11 mb-4">
-            <span class="float-left">Last finished game:&nbsp;</span>
-            <a target="_blank" href="/play/{{ last_finished_game.id }}" class="float-left">{{ last_finished_game.name }} ({{ last_finished_game.players_count }}/{{ last_finished_game.view_of_game.maxPlayerCount }})</a>
+            <div class="row justify-content-between align-items-center">
+                <div class="col">
+                    <span>Last finished game:&nbsp;</span>
+                    <a target="_blank" href="/play/{{ last_finished_game.id }}">{{ last_finished_game.name }} ({{ last_finished_game.players_count }}/{{ last_finished_game.view_of_game.maxPlayerCount }})</a>
+                </div>
+                <div class="col-auto">
+                    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Support S&R on Ko-fi', '#29abe0', 'Z8Z1CIRKH');kofiwidget2.draw();</script>
+                </div>
+            </div>
         </div>
         <div class="col-lg-11 mb-4">
             <div class="card">
@@ -62,13 +69,16 @@ Games -
             </div>
         </div>
         {% endif %}
+        {% if user.is_authenticated %}
         <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title mb-0"><a href="/my_games">Your Games</a></h4>
+                    <h4 class="card-title"><a href="/my_games">Your Games</a></h4>
+                    {% games_table my_games user perms %}
                 </div>
             </div>
         </div>
+        {% endif %}
         <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
@@ -110,6 +120,18 @@ Games -
                     <h4 class="card-title">Games where last move was more than 5 days ago</h4>
                     <div style="max-height: 300px; overflow-y: auto">
                         {% games_table inactive_games user perms True %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if perms.agotboardgame_main.can_play_as_another_player and inactive_tournament_games %}
+        <div class="col-lg-11 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Tournament Games where last move was more than 2 days ago</h4>
+                    <div style="max-height: 300px; overflow-y: auto">
+                        {% games_table inactive_tournament_games user perms True %}
                     </div>
                 </div>
             </div>

@@ -238,8 +238,9 @@ def games(request):
             replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()),\
             is_faceless=Cast(KeyTextTransform('faceless', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
             is_private=Cast(KeyTextTransform('private', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
-            inactive_5=ExpressionWrapper(Q(last_active_at__lt=five_days_past), output_field=BooleanField()),\
+            is_tournament_mode=Cast(KeyTextTransform('tournamentMode', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
             inactive_2=ExpressionWrapper(Q(last_active_at__lt=two_days_past), output_field=BooleanField()),\
+            inactive_5=ExpressionWrapper(Q(last_active_at__lt=five_days_past), output_field=BooleanField()),\
             inactive_21=ExpressionWrapper(Q(last_active_at__lt=three_weeks_past), output_field=BooleanField())\
             ).prefetch_related('owner')
 
@@ -257,7 +258,10 @@ def games(request):
         inactive_games = []
         replacement_needed_games = []
         inactive_private_games = []
+        inactive_tournament_games = []
         open_live_games = []
+
+        can_play_as_another_player = request.user.has_perm("agotboardgame_main.can_play_as_another_player")
 
         for game in games:
             # "game.player_in_game" contains a list of one or zero element, depending on whether the authenticated
@@ -286,8 +290,13 @@ def games(request):
 
             if (game.is_private and game not in inactive_private_games) or not game.inactive_5 or game.state == IN_LOBBY:
                 active_games.append(game)
-            elif game not in replacement_needed_games and not game.is_private:
+            elif can_play_as_another_player and game not in replacement_needed_games and not game.is_private:
                 inactive_games.append(game)
+                if game.view_of_game.get("waitingForIds", None) and len(game.view_of_game.get("waitingForIds")) > 0:
+                    game.inactive_user_id = game.view_of_game.get("waitingForIds")[0]
+
+            if can_play_as_another_player and game.is_tournament_mode and game.inactive_2:
+                inactive_tournament_games.append(game)
                 if game.view_of_game.get("waitingForIds", None) and len(game.view_of_game.get("waitingForIds")) > 0:
                     game.inactive_user_id = game.view_of_game.get("waitingForIds")[0]
 
@@ -296,12 +305,68 @@ def games(request):
 
         public_room_id = Room.objects.get(name='public').id
 
+        if request.user.is_authenticated:
+            my_games_query = Game.objects.annotate(user_is_in_game=Count('players', filter=Q(players__user=request.user)),\
+                players_count=Count('players'),\
+                replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()),\
+                is_faceless=Cast(KeyTextTransform('faceless', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
+                is_private=Cast(KeyTextTransform('private', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
+                inactive_2=ExpressionWrapper(Q(last_active_at__lt=two_days_past), output_field=BooleanField()))\
+                .prefetch_related('owner')\
+                .prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user=request.user), to_attr="player_in_game"))\
+                .prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user__last_activity__lt=eight_days_past), to_attr="inactive_players"))
+
+            my_games = my_games_query.filter((Q(state=IN_LOBBY) | Q(state=ONGOING)) & Q(user_is_in_game=1))
+
+            # It seems to be hard to ask Postgres to order the list correctly.
+            # It is done in Python
+            my_games = sorted(my_games, key=lambda game: ([IN_LOBBY, ONGOING].index(game.state), -datetime.timestamp(game.last_active_at)))
+
+            for game in my_games:
+                # "game.player_in_game" contains a list of one element, the authenticated player in the game.
+                # Transform that into a single field
+                game.player_in_game = game.player_in_game[0]
+
+                if game.state == ONGOING and not game.is_private and game.inactive_2 and len(game.inactive_players) > 0 and not game.replace_player_vote_ongoing:
+                    inactive_players = ""
+                    for inactive_player in game.inactive_players:
+                        house = inactive_player.data.get("house", "Unknown House").capitalize()
+                        if house in game.view_of_game.get("waitingFor", ""):
+                            inactive_players = inactive_players + house + (" (" + inactive_player.user.username + ")" if not game.is_faceless else "") + ", "
+                    game.inactive_players = inactive_players[:-2] if len(inactive_players) >= 2 else None
+                else:
+                    game.inactive_players = None
+
+                # Check whether there is an unseen message in
+                if "important_chat_rooms" in game.player_in_game.data:
+                    # `important_chat_rooms` will contain a list of room ids that must trigger a warning
+                    # if there are unseen messages.
+                    important_chat_rooms = game.player_in_game.data["important_chat_rooms"]
+
+                    # This is a query inside a loop, not super good for performance,
+                    # but since this only applies to games of the player, it should not impact performance that much.
+                    unread_messages = UserInRoom.objects.filter(
+                        Q(room__messages__created_at__gt=F("last_viewed_message__created_at"))
+                        | Q(last_viewed_message__isnull=True),
+                        user=game.player_in_game.user,
+                        room__in=important_chat_rooms,
+                        room__messages__isnull=False
+                    ).exists()
+
+                    game.unread_messages = unread_messages
+                else:
+                    game.unread_messages = False
+        else:
+            my_games = []
+
         return render(request, "agotboardgame_main/games.html", {
+            "my_games": my_games,
             "active_games": active_games,
             "inactive_games": inactive_games,
             "open_live_games": open_live_games,
             "replacement_needed_games": replacement_needed_games,
             "inactive_private_games": inactive_private_games,
+            "inactive_tournament_games": inactive_tournament_games,
             "public_room_id": public_room_id,
             "last_finished_game": last_finished_game
         })
