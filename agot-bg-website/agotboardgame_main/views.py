@@ -238,8 +238,9 @@ def games(request):
             replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()),\
             is_faceless=Cast(KeyTextTransform('faceless', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
             is_private=Cast(KeyTextTransform('private', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
-            inactive_5=ExpressionWrapper(Q(last_active_at__lt=five_days_past), output_field=BooleanField()),\
+            is_tournament_mode=Cast(KeyTextTransform('tournamentMode', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
             inactive_2=ExpressionWrapper(Q(last_active_at__lt=two_days_past), output_field=BooleanField()),\
+            inactive_5=ExpressionWrapper(Q(last_active_at__lt=five_days_past), output_field=BooleanField()),\
             inactive_21=ExpressionWrapper(Q(last_active_at__lt=three_weeks_past), output_field=BooleanField())\
             ).prefetch_related('owner')
 
@@ -257,7 +258,10 @@ def games(request):
         inactive_games = []
         replacement_needed_games = []
         inactive_private_games = []
+        inactive_tournament_games = []
         open_live_games = []
+
+        can_play_as_another_player = request.user.has_perm("agotboardgame_main.can_play_as_another_player")
 
         for game in games:
             # "game.player_in_game" contains a list of one or zero element, depending on whether the authenticated
@@ -286,8 +290,13 @@ def games(request):
 
             if (game.is_private and game not in inactive_private_games) or not game.inactive_5 or game.state == IN_LOBBY:
                 active_games.append(game)
-            elif game not in replacement_needed_games and not game.is_private:
+            elif can_play_as_another_player and game not in replacement_needed_games and not game.is_private:
                 inactive_games.append(game)
+                if game.view_of_game.get("waitingForIds", None) and len(game.view_of_game.get("waitingForIds")) > 0:
+                    game.inactive_user_id = game.view_of_game.get("waitingForIds")[0]
+
+            if can_play_as_another_player and game.is_tournament_mode and game.inactive_2:
+                inactive_tournament_games.append(game)
                 if game.view_of_game.get("waitingForIds", None) and len(game.view_of_game.get("waitingForIds")) > 0:
                     game.inactive_user_id = game.view_of_game.get("waitingForIds")[0]
 
@@ -357,6 +366,7 @@ def games(request):
             "open_live_games": open_live_games,
             "replacement_needed_games": replacement_needed_games,
             "inactive_private_games": inactive_private_games,
+            "inactive_tournament_games": inactive_tournament_games,
             "public_room_id": public_room_id,
             "last_finished_game": last_finished_game
         })
