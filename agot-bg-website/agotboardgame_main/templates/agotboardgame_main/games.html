@@ -9,8 +9,15 @@ Games -
 {% block content %}
     <div class="row justify-content-center">
         <div class="col-lg-11 mb-4">
-            <span class="float-left">Last finished game:&nbsp;</span>
-            <a target="_blank" href="/play/{{ last_finished_game.id }}" class="float-left">{{ last_finished_game.name }} ({{ last_finished_game.players_count }}/{{ last_finished_game.view_of_game.maxPlayerCount }})</a>
+            <div class="row justify-content-between align-items-center">
+                <div class="col">
+                    <span>Last finished game:&nbsp;</span>
+                    <a target="_blank" href="/play/{{ last_finished_game.id }}">{{ last_finished_game.name }} ({{ last_finished_game.players_count }}/{{ last_finished_game.view_of_game.maxPlayerCount }})</a>
+                </div>
+                <div class="col-auto">
+                    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Support S&R on Ko-fi', '#29abe0', 'Z8Z1CIRKH');kofiwidget2.draw();</script>
+                </div>
+            </div>
         </div>
         <div class="col-lg-11 mb-4">
             <div class="card">
