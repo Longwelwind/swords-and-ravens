@@ -15,6 +15,7 @@ import SimpleChoiceGameState from "../../common/ingame-game-state/simple-choice-
 import SimpleChoiceComponent from "./SimpleChoiceComponent";
 import _ from "lodash";
 import { observable } from "mobx";
+import joinReactNodes from "../utils/joinReactNodes";
 
 @observer
 export default class DraftHouseCardsComponent extends Component<GameStateComponentProps<DraftHouseCardsGameState>> {
@@ -44,24 +45,22 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
             <>
                 <Row className="mt-1 mb-3 justify-content-center">
                     {this.draftStep == DraftStep.DECIDE
-                        ? <div className="text-center"><b>{this.house.name}</b> must decide whether to select a House card or an Influence track position.</div>
+                        ? <div className="text-center">House <b>{this.house.name}</b> must decide whether to select a House card or an Influence track position.</div>
                         : this.draftStep == DraftStep.HOUSE_CARD
-                            ? <div className="text-center"><b>{this.house.name}</b> must select a House card.</div>
+                            ? <div className="text-center">House <b>{this.house.name}</b> must select a House card.</div>
                             : this.draftStep == DraftStep.INFLUENCE_TRACK
-                                ? <div className="text-center"><b>{this.house.name}</b> must choose an Influence track.</div>
+                                ? <div className="text-center">House <b>{this.house.name}</b> must choose an Influence track.</div>
                                 : <></>}
                 </Row>
                 <Row>
-                    <p>
-                        <b>Note</b>: All House cards work in a generic way.<br />
+                    <small>
+                        <b>Note</b>: All House cards work in a generic way!<br />
                         That means House card abilities (e.g. Salladhor) referring to specific houses are always available for any house you use.<br />
                         Character references are equivalent to the same-strength character in your hand (e.g. Reek and any 3-strength card).<br />
                         References to capitals always refer to your house&apos;s home territory (e.g. Littlefinger).
-                    </p>
-                </Row>
-                <Row>
-                    <p>
-                        These are the next houses: {this.props.gameState.getNextHouses().map(h => h.name).join(", ")}
+                    </small>
+                    <p className="mt-2">
+                        These are the next houses: {joinReactNodes(this.props.gameState.getNextHouses().map((h, i) => <b key={`next-house_${h.id}_${i}`} style={{color: h.color}}>{h.name}</b>), ", ")}
                     </p>
                 </Row>
                 {this.doesControlHouse &&
@@ -77,15 +76,18 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                         <Col xs="12">
                             <Row className="justify-content-center mb-2">
                                 <input
-                                    placeholder="Filter for name"
+                                    className="form-control"
+                                    placeholder="Filter by house card name or strength"
                                     type="text"
                                     value={this.nameFilter}
                                     onChange={e => this.nameFilter = e.target.value}
+                                    style={{width: 275}}
                                 />
                             </Row>
                             <Row className="justify-content-center">
                                 {this.props.gameState.getAllHouseCards().map(hc => (
-                                    (this.nameFilter == "" || hc.name.toLowerCase().includes(this.nameFilter.toLowerCase())) && <Col xs="auto" key={`draft_${hc.id}`}>
+                                    (this.nameFilter == "" || hc.name.toLowerCase().includes(this.nameFilter.toLowerCase()) || hc.combatStrength.toString().includes(this.nameFilter)) &&
+                                    <Col xs="auto" key={`draft_${hc.id}`}>
                                         <HouseCardComponent
                                             houseCard={hc}
                                             size="small"
@@ -100,8 +102,19 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                     <Row>
                         <Col xs="12" className="text-center">These are all remaining House cards:</Col>
                         <Col xs="12">
+                            <Row className="justify-content-center mb-2">
+                                <input
+                                    className="form-control"
+                                    placeholder="Filter by house card name or strength"
+                                    type="text"
+                                    value={this.nameFilter}
+                                    onChange={e => this.nameFilter = e.target.value}
+                                    style={{width: 275}}
+                                />
+                            </Row>
                             <Row className="justify-content-center">
                                 {remainingCardsForSpectators.map(hc => (
+                                    (this.nameFilter == "" || hc.name.toLowerCase().includes(this.nameFilter.toLowerCase()) || hc.combatStrength.toString().includes(this.nameFilter)) &&
                                     <Col xs="auto" key={`draft-spectator_${hc.id}`}>
                                         <HouseCardComponent
                                             houseCard={hc}

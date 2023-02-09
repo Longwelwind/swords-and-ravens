@@ -25,10 +25,12 @@ export default class SelectHouseCardComponent extends Component<GameStateCompone
                 <Col xs={12}>
                     {this.props.gameState.entireGame.hasChildGameState(DraftHouseCardsGameState) && <Row className="justify-content-center mb-2">
                         <input
-                            placeholder="Filter for name"
+                            className="form-control"
+                            placeholder="Filter by house card name or strength"
                             type="text"
                             value={this.nameFilter}
                             onChange={e => this.nameFilter = e.target.value}
+                            style={{width: 275}}
                         />
                     </Row>}
                     <Row className="justify-content-center">
@@ -37,7 +39,8 @@ export default class SelectHouseCardComponent extends Component<GameStateCompone
                                 {_.sortBy(this.props.gameState.houseCards, hc => -hc.combatStrength).map(hc => (
                                     // The house argument is used to decide which card-back is used
                                     // Since we will never show a back-card here, we can give whatever value fits.
-                                    (this.nameFilter == "" || hc.name.toLowerCase().includes(this.nameFilter.toLowerCase())) && <Col xs="auto" key={`select-house-card_${hc.id}`}>
+                                    (this.nameFilter == "" || hc.name.toLowerCase().includes(this.nameFilter.toLowerCase()) || hc.combatStrength.toString().includes(this.nameFilter)) &&
+                                    <Col xs="auto" key={`select-house-card_${hc.id}`}>
                                         <HouseCardComponent
                                             houseCard={hc}
                                             size="small"
@@ -48,7 +51,7 @@ export default class SelectHouseCardComponent extends Component<GameStateCompone
                                 ))}
                             </Row>
                         </Col>
-                        <Col xs="auto">
+                        <Col xs="auto" className="mt-3">
                             <Button variant="success" onClick={() => this.confirm()} disabled={this.selectedHouseCard == null}>
                                 Confirm
                             </Button>
