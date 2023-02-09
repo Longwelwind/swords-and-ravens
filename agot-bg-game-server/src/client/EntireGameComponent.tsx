@@ -79,6 +79,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                         </>
                         : <>{this.renderTournamentImage()}
                             <ClockComponent entireGame={this.props.entireGame} />
+                            {this.renderLockedBadge()}
                             {this.renderHouseIcon()}
                             <Col xs="auto" className="px-3">
                                 <h4>{this.props.entireGame.name}</h4>
@@ -166,16 +167,34 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         return !this.props.entireGame.gameSettings.private ? <></> :
             <Col xs="auto">
                 <h4>
-                    <Badge variant="primary"><FontAwesomeIcon icon={faLock} className="mr-2" size="sm"/>PRIVATE</Badge>
+                    <Badge variant="primary">PRIVATE</Badge>
                 </h4>
             </Col>;
+    }
+
+    renderLockedBadge(): ReactNode {
+        return this.lobby?.password
+            ? <Col xs="auto">
+                <h4>
+                    <OverlayTrigger overlay={<Tooltip id="locked-badge-tooltip">Game is locked by password</Tooltip>}
+                        placement="bottom"
+                    >
+                        <Badge variant="danger"><FontAwesomeIcon icon={faLock} size="sm"/></Badge>
+                    </OverlayTrigger>
+                </h4>
+            </Col>
+            : <></>;
     }
 
     renderGameTypeBadge(): ReactNode {
         return <Col xs="auto">
             <h4>
                 {this.props.entireGame.gameSettings.pbem
-                    ? <Badge variant="primary">PBEM</Badge>
+                    ? <OverlayTrigger overlay={<Tooltip id="pbem-badge-tooltip"><b>P</b>lay <b>B</b>y <b>E</b>-<b>M</b>ail</Tooltip>}
+                        placement="bottom"
+                    >
+                        <Badge variant="primary">PBEM</Badge>
+                    </OverlayTrigger>
                     : <Badge variant="success">Live</Badge>}
             </h4>
         </Col>;

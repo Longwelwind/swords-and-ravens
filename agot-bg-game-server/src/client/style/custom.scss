@@ -1037,3 +1037,8 @@ select {
 .d-inline {
   display: inline;
 }
+
+.circle-border {
+  border-radius: 50%;
+  border: 2px solid;
+}

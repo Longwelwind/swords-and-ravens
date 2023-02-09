@@ -44,6 +44,7 @@ import megaphoneImage from "../../public/images/icons/megaphone.svg";
 import speakerOffImage from "../../public/images/icons/speaker-off.svg";
 import musicalNotesImage from "../../public/images/icons/musical-notes.svg";
 import cardRandomImage from "../../public/images/icons/card-random.svg";
+import podiumWinnerImage from "../../public/images/icons/podium-winner.svg";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import GameLogListComponent from "./GameLogListComponent";
 import Game, { MAX_WILDLING_STRENGTH } from "../common/ingame-game-state/game-data-structure/Game";
@@ -341,6 +342,20 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 <Card className={this.mapScrollbarEnabled ? "flex-fill-remaining" : ""} style={{marginBottom: "10px"}}>
                     <Card.Body id="houses-panel" className="no-space-around">
                         <ListGroup variant="flush">
+                            <ListGroupItem className="d-flex justify-content-center p-2">
+                                <OverlayTrigger
+                                    overlay={
+                                        <Tooltip id="cancel-game-vote-tooltip" className="tooltip-w-100">
+                                            The houses info list is always reordered by score and thus acts as the victory track.<br/>
+                                            If you hover the mouse pointer over the victory point counter, a tooltip appears<br/>
+                                            that shows you the total number of land areas, which is important for breaking ties.
+                                        </Tooltip>
+                                    }
+                                    placement="top"
+                                >
+                                    <img src={podiumWinnerImage} width={40} />
+                                </OverlayTrigger>
+                            </ListGroupItem>
                             {this.game.getPotentialWinners().map(h => (
                                 <HouseRowComponent
                                     key={`house-row_${h.id}`}
@@ -654,8 +669,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             "danger" : undefined;
 
         const getPhaseHeader = (phase: GameStatePhaseProps): JSX.Element => this.ingame.childGameState instanceof phase.gameState
-                ? <b className={classNames("weak-text-outline", { "clickable dropdown-toggle": phase.name == "Westeros" })}>{phase.name} phase</b>
-                : <span className={classNames("text-muted", { "clickable dropdown-toggle": phase.name == "Westeros" })}>{phase.name} phase</span>;
+                ? <b className={classNames("weak-text-outline", { "clickable btn btn-sm btn-secondary dropdown-toggle": phase.name == "Westeros" })}>{phase.name} phase</b>
+                : <span className={classNames("text-muted", { "clickable btn btn-sm btn-secondary dropdown-toggle": phase.name == "Westeros" })}>{phase.name} phase</span>;
 
         return <div className={this.mapScrollbarEnabled ? "flex-ratio-container" : ""}>
             <Card id="game-state-panel" className={this.mapScrollbarEnabled ? "flex-sized-to-content" : ""} border={border} style={{maxHeight: this.mapScrollbarEnabled ? "70%" : "none", paddingRight: "10px", marginBottom: "10px", borderWidth: "3px", overflowY: "scroll" }}>
@@ -664,7 +679,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         <ListGroup variant="flush">
                             {phases.some(phase => this.ingame.childGameState instanceof phase.gameState) && (
                                 <ListGroupItem>
-                                    <Row className="justify-content-between">
+                                    <Row className="justify-content-between align-items-center">
                                         {phases.map((phase, i) => (
                                             <Col xs="auto" key={`${phase.name}_${i}`}>
                                                 <ConditionalWrap

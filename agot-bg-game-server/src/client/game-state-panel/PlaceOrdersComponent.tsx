@@ -23,7 +23,7 @@ import { rainsOfAutumn, stormOfSwords, webOfLies, seaOfStorms, feastForCrows } f
 import { renderRegionTooltip } from "../regionTooltip";
 import { preventOverflow } from "@popperjs/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faInfoCircle } from "@fortawesome/free-solid-svg-icons/faInfoCircle";
+import { faInfo } from "@fortawesome/free-solid-svg-icons";
 
 @observer
 export default class PlaceOrdersComponent extends Component<GameStateComponentProps<PlaceOrdersGameState>> {
@@ -138,16 +138,17 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                             trigger="click"
                             rootClose
                             overlay={
-                                <Popover id={"region" + r.id}>
-                                    <Row className="justify-content-center align-items-center mt-2">
-                                        <Col xs="auto"><h6>{r.name}</h6></Col>
+                                <Popover id={"place-order-popover_region_" + r.id} className="p-3">
+                                    <Row className="justify-content-center align-items-center mb-2">
+                                        <Col xs="auto"><h5 className="my-0"><b>{r.name}</b></h5></Col>
                                         <Col xs="auto">
                                             <OverlayTrigger overlay={renderRegionTooltip(r)}
                                                 popperConfig={{ modifiers: [preventOverflow] }}
-                                                placement="auto">
-                                                <FontAwesomeIcon
-                                                    style={{ fontSize: "24px" }}
-                                                    icon={faInfoCircle} />
+                                                placement="auto"
+                                            >
+                                                <div style={{width: 28, height: 28}} className="circle-border d-flex justify-content-center align-items-center">
+                                                    <FontAwesomeIcon icon={faInfo} fontSize="16px" />
+                                                </div>
                                             </OverlayTrigger>
                                         </Col>
                                     </Row>

@@ -18,7 +18,7 @@ import PartialRecursive from "../../utils/PartialRecursive";
 import Unit from "../../common/ingame-game-state/game-data-structure/Unit";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import { renderRegionTooltip } from "../regionTooltip";
-import { faInfoCircle } from "@fortawesome/free-solid-svg-icons/faInfoCircle";
+import { faInfo } from "@fortawesome/free-solid-svg-icons";
 import { preventOverflow } from "@popperjs/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -225,15 +225,16 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
 
     private renderMusteringPopover(modifiedRegion: Region): OverlayChildren {
         return <Popover id={"region-mustering-popover-" + modifiedRegion.id} className="p-3">
-            <Row className="justify-content-center align-items-center">
-                <Col xs="auto"><h5><b>{modifiedRegion.name}</b><small> ({this.props.gameState.getUsedPointsForRegion(modifiedRegion, this.musterings)} / {modifiedRegion.castleLevel})</small></h5></Col>
+            <Row className="justify-content-center align-items-center mb-2">
+                <Col xs="auto"><h5 className="my-0"><b>{modifiedRegion.name}</b> <small>({this.props.gameState.getUsedPointsForRegion(modifiedRegion, this.musterings)} / {modifiedRegion.castleLevel})</small></h5></Col>
                 <Col xs="auto">
                     <OverlayTrigger overlay={renderRegionTooltip(modifiedRegion)}
                         popperConfig={{ modifiers: [preventOverflow] }}
-                        placement="auto">
-                        <FontAwesomeIcon
-                            style={{ fontSize: "24px" }}
-                            icon={faInfoCircle} />
+                        placement="auto"
+                    >
+                        <div style={{width: 28, height: 28}} className="circle-border d-flex justify-content-center align-items-center">
+                            <FontAwesomeIcon icon={faInfo} fontSize="16px" />
+                        </div>
                     </OverlayTrigger>
                 </Col>
             </Row>

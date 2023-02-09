@@ -18,7 +18,7 @@ import House from "../../common/ingame-game-state/game-data-structure/House";
 import UnitIconComponent from "../UnitIconComponent";
 import { preventOverflow } from "@popperjs/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { faInfo } from "@fortawesome/free-solid-svg-icons";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 
 @observer
@@ -117,10 +117,11 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                 {!allUnitsWillLeaveStartingRegion && <Col xs="auto">
                                     <OverlayTrigger overlay={this.renderColorLegendTooltip()}
                                         popperConfig={{ modifiers: [preventOverflow] }}
-                                        placement="auto">
-                                        <FontAwesomeIcon
-                                            style={{ fontSize: "24px" }}
-                                            icon={faInfoCircle} />
+                                        placement="auto"
+                                    >
+                                        <div style={{width: 32, height: 32}} className="circle-border d-flex justify-content-center align-items-center">
+                                            <FontAwesomeIcon icon={faInfo} />
+                                        </div>
                                     </OverlayTrigger>
                                 </Col>}
                             </Row>

@@ -134,7 +134,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                 <Col xs={11}>
                     <Row className="justify-content-center no-space-around">
                         <Card>
-                            <Card.Body style={{paddingTop: "10px", paddingBottom: "10px"}}>
+                            <Card.Body className="py-2">
                                 {!this.props.gameClient.isRealOwner() && this.lobby.password != "" && !this.readyCheckOngoing &&
                                     this.renderPasswordInput()
                                 }
@@ -146,7 +146,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                 {this.props.gameClient.isRealOwner() && !this.readyCheckOngoing &&
                                     this.renderPasswordInput()
                                 }
-                                <Row className="mt-3">
+                                <Row className="mt-2">
                                     <Col>
                                         <Button
                                             block
@@ -246,24 +246,24 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
     }
 
     renderPasswordInput(): ReactNode {
-        return <Row className="mt-2">
-            <Col>
-                <Row className="justify-content-center">
-                    <DebouncedPasswordComponent
-                        password={this.password}
-                        onChangeCallback={newPassword => {
-                            this.password = newPassword;
-                            this.lobby.sendPassword(newPassword);
-                        } }
-                        tooltip={<Tooltip id="game-password-tooltip">
-                            {this.props.gameClient.isRealOwner()
-                                ? <>You can set a password here to prevent strangers from joining your game.</>
-                                : this.lobby.password != ""
-                                    ? <>Enter the password here to unlock and join the game.</>
-                                    : <></>}
-                        </Tooltip>} />
-                </Row>
-            </Col>
+        const isOwner = this.props.gameClient.isRealOwner();
+        return <Row className="justify-content-center mt-0">
+            <DebouncedPasswordComponent
+                password={this.password}
+                onChangeCallback={newPassword => {
+                    this.password = newPassword;
+                    this.lobby.sendPassword(newPassword);
+                } }
+                tooltip={<Tooltip id="game-password-tooltip">
+                    {isOwner
+                        ? <>You can set a password here to prevent strangers from joining your game.</>
+                        : this.lobby.password != ""
+                            ? <>Enter the password here to unlock and join the game.</>
+                            : <></>}
+                </Tooltip>}
+                placeHolder={isOwner ? "Set password" : "Enter the password to unlock the game"}
+                width={300}
+            />
         </Row>;
     }
 
