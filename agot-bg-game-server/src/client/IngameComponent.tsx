@@ -646,57 +646,55 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const roundWarning = gameRunning && (this.game.maxTurns - this.game.turn) == 1;
         const roundCritical = gameRunning && (this.game.turn == this.game.maxTurns);
 
-        let wildlingsWarning = gameRunning && (this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 2 || this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 4);
-        let wildlingsCritical = gameRunning && this.game.wildlingStrength == MAX_WILDLING_STRENGTH;
-
-        let warningAndKnowsNextWildingCard = false;
-        let criticalAndKnowsNextWildingCard = false;
-
-        if (knowsWildlingCard && nextWildlingCard) {
-            if (wildlingsWarning) {
-                warningAndKnowsNextWildingCard = true;
-                wildlingsWarning = false;
-            }
-
-            if (wildlingsCritical) {
-                criticalAndKnowsNextWildingCard = true;
-                wildlingsCritical = false;
-            }
-        }
+        const wildlingsWarning = gameRunning && (this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 2 || this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 4);
+        const wildlingsCritical = gameRunning && this.game.wildlingStrength == MAX_WILDLING_STRENGTH;
 
         const border = this.gameClient.isOwnTurn() ?
             "warning" : this.ingame.childGameState instanceof CancelledGameState ?
             "danger" : undefined;
 
-        const getPhaseHeader = (phase: GameStatePhaseProps): JSX.Element => this.ingame.childGameState instanceof phase.gameState
-                ? <b className={classNames("weak-text-outline", { "clickable btn btn-sm btn-secondary dropdown-toggle": phase.name == "Westeros" })}>{phase.name} phase</b>
-                : <span className={classNames("text-muted", { "clickable btn btn-sm btn-secondary dropdown-toggle": phase.name == "Westeros" })}>{phase.name} phase</span>;
+        const isPhaseActive = (phase: GameStatePhaseProps): boolean => this.ingame.childGameState instanceof phase.gameState;
 
         return <div className={this.mapScrollbarEnabled ? "flex-ratio-container" : ""}>
-            <Card id="game-state-panel" className={this.mapScrollbarEnabled ? "flex-sized-to-content" : ""} border={border} style={{maxHeight: this.mapScrollbarEnabled ? "70%" : "none", paddingRight: "10px", marginBottom: "10px", borderWidth: "3px", overflowY: "scroll" }}>
+            <Card id="game-state-panel" className={this.mapScrollbarEnabled ? "flex-sized-to-content" : ""} border={border} style={{maxHeight: this.mapScrollbarEnabled ? "70%" : "none", paddingRight: "2px", marginBottom: "10px", borderWidth: "3px", overflowY: "scroll" }}>
                 <Row className="no-space-around">
                     <Col>
                         <ListGroup variant="flush">
-                            {phases.some(phase => this.ingame.childGameState instanceof phase.gameState) && (
+                            {phases.some(phase => isPhaseActive(phase)) && (
                                 <ListGroupItem>
                                     <Row className="justify-content-between align-items-center">
-                                        {phases.map((phase, i) => (
-                                            <Col xs="auto" key={`${phase.name}_${i}`}>
-                                                <ConditionalWrap
-                                                        condition={phase.name == "Westeros"}
-                                                        wrap={child => <OverlayTrigger
-                                                                overlay={this.renderRemainingWesterosCards()}
-                                                                trigger="click"
-                                                                placement="bottom-start"
-                                                                rootClose
-                                                            >
-                                                                {child}
-                                                            </OverlayTrigger>
-                                                        }
+                                        <Col xs="auto" key={phases[0].name + "_phase"} className="px-1">
+                                            <OverlayTrigger
+                                                overlay={this.renderRemainingWesterosCards()}
+                                                trigger="click"
+                                                placement="bottom-start"
+                                                rootClose
+                                            >
+                                                <div className={classNames("clickable btn btn-sm btn-secondary dropdown-toggle", {
+                                                    "weak-box-outline": isPhaseActive(phases[0]),
+                                                    "text-muted": !isPhaseActive(phases[0])
+                                                })}>
+                                                    <ConditionalWrap condition={isPhaseActive(phases[0])}
+                                                        wrap={child => <b>{child}</b>}
                                                     >
-                                                        {getPhaseHeader(phase)}
+                                                        <>{phases[0].name} phase</>
                                                     </ConditionalWrap>
-                                            </Col>)
+                                                </div>
+                                            </OverlayTrigger>
+                                        </Col>
+                                        {_.drop(phases).map(phase => <Col xs="auto" key={`${phase.name}_phase`} className="px-1">
+                                            <div className={classNames({
+                                                "p-1": true,
+                                                "weak-box-outline": isPhaseActive(phase),
+                                                "text-muted": !isPhaseActive(phase)
+                                            })}>
+                                                <ConditionalWrap condition={isPhaseActive(phase)}
+                                                    wrap={child => <b>{child}</b>}
+                                                >
+                                                    <>{phase.name} phase</>
+                                                </ConditionalWrap>
+                                            </div>
+                                        </Col>
                                         )}
                                     </Row>
                                 </ListGroupItem>
@@ -735,24 +733,27 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     </div>
                                 </OverlayTrigger>
                             </Row>
-                            <Row className="mx-0 clickable">
-                                <OverlayTrigger overlay={this.renderWildlingDeckPopover(knowsWildlingCard, nextWildlingCard?.type)}
-                                    trigger="click"
-                                    placement="auto"
-                                    rootClose
-                                >
-                                    <div className={classNames({"txt-warning": wildlingsWarning, "txt-critical" : wildlingsCritical})}>
-                                        <img src={mammothImage} width={28} className={classNames(
-                                            { "dye-warning": wildlingsWarning && !warningAndKnowsNextWildingCard },
-                                            { "dye-critical": wildlingsCritical && !criticalAndKnowsNextWildingCard },
-                                            { "wildling-highlight": knowsWildlingCard && !warningAndKnowsNextWildingCard && !criticalAndKnowsNextWildingCard},
-                                            { "dye-warning-highlight": warningAndKnowsNextWildingCard},
-                                            { "dye-critical-highlight": criticalAndKnowsNextWildingCard}
-                                            )}
-                                        />
-                                        <div>{this.game.wildlingStrength}</div>
+                            <Row className="mr-0">
+                                <div>
+                                    <OverlayTrigger overlay={this.renderWildlingDeckPopover(knowsWildlingCard, nextWildlingCard?.type)}
+                                        trigger="click"
+                                        placement="auto"
+                                        rootClose
+                                    >
+                                        <div className={classNames("clickable btn btn-sm btn-secondary p-1", { "weak-box-outline": knowsWildlingCard })}>
+                                            <img src={mammothImage} width={28} className={classNames(
+                                                { "dye-warning": wildlingsWarning },
+                                                { "dye-critical": wildlingsCritical }
+                                            )} />
+                                        </div>
+                                    </OverlayTrigger>
+                                    <div className={classNames({
+                                        "txt-warning": wildlingsWarning,
+                                        "txt-critical" : wildlingsCritical
+                                    })}>
+                                        {this.game.wildlingStrength}
                                     </div>
-                                </OverlayTrigger>
+                                </div>
                             </Row>
                             {this.gameSettings.playerCount >= 8 && <Row className="mx-0 mt-3">
                                 <OverlayTrigger overlay={this.renderDragonStrengthTooltip()}

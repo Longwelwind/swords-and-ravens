@@ -333,6 +333,14 @@ $tiny-scale: 0.12;
 $outline-color: white;
 $medium-outline: rgba($outline-color, 0.6);
 
+.weak-box-outline {
+  border-radius: 0.5rem;
+  box-shadow: 2px 2px 2px $medium-outline, -2px -2px 2px $medium-outline, 2px -2px 2px $medium-outline, -2px 2px 2px $medium-outline;
+  -moz-box-shadow: 2px 2px 2px $medium-outline, -2px -2px 2px $medium-outline, 2px -2px 2px $medium-outline, -2px 2px 2px $medium-outline;
+  -webkit-box-shadow: 2px 2px 2px $medium-outline, -2px -2px 2px $medium-outline, 2px -2px 2px $medium-outline, -2px 2px 2px $medium-outline;
+  -o-box-shadow: 2px 2px 2px $medium-outline, -2px -2px 2px $medium-outline, 2px -2px 2px $medium-outline, -2px 2px 2px $medium-outline;
+}
+
 .weak-text-outline {
   filter: drop-shadow(1px 1px 2px $medium-outline) drop-shadow(-1px -1px 2px $medium-outline);
 }
@@ -582,18 +590,8 @@ div.disconnected {
   color: #F39C12;
 }
 
-.txt-warning:hover {
-  text-decoration: underline;
-  text-decoration-color: #F39C12;
-}
-
 .txt-critical {
   color: #FF0000;
-}
-
-.txt-critical:hover {
-  text-decoration: underline;
-  text-decoration-color: #FF0000;
 }
 
 .unavailable-monotone {
@@ -948,7 +946,7 @@ hr.red {
 	        animation: fade-out 4.5s ease-out both, pulsate-bck 0.5s ease-in-out infinite both;
 }
 
-.btn-outline-light:focus, .btn-outline-light.focus {
+.btn-secondary:focus, .btn-secondary.focus {
   box-shadow: none !important;
 }
 
@@ -1041,4 +1039,14 @@ select {
 .circle-border {
   border-radius: 50%;
   border: 2px solid;
+}
+
+.btn-sm {
+  border-radius: 0.5rem;
+}
+
+.btn-secondary:hover {
+  color: #fff !important;
+  background-color: #999;
+  border-color: #999;
 }

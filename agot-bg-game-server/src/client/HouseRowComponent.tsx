@@ -243,13 +243,14 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                             trigger="click"
                             rootClose
                         >
-                            <div
-                                className="house-power-token hover-weak-outline clickable"
-                                style={{
-                                    backgroundImage: `url(${housePowerTokensImages.get(this.house.id)})`,
-                                    marginLeft: "10px"
-                                }}
-                            />
+                            <div className="clickable btn btn-sm btn-secondary ml-2 p-1">
+                                <div
+                                    className="house-power-token"
+                                    style={{
+                                        backgroundImage: `url(${housePowerTokensImages.get(this.house.id)})`,
+                                    }}
+                                />
+                            </div>
                         </OverlayTrigger>
                     </Col>
                 </Row>
