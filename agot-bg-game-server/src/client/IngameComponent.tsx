@@ -646,8 +646,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const roundWarning = gameRunning && (this.game.maxTurns - this.game.turn) == 1;
         const roundCritical = gameRunning && (this.game.turn == this.game.maxTurns);
 
-        const wildlingsWarning = gameRunning && (this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 2 || this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 4);
-        const wildlingsCritical = gameRunning && this.game.wildlingStrength == MAX_WILDLING_STRENGTH;
+        const wildlingsWarning = gameRunning && (this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 4);
+        const wildlingsCritical = gameRunning && (this.game.wildlingStrength == MAX_WILDLING_STRENGTH || this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 2);
 
         const border = this.gameClient.isOwnTurn() ?
             "warning" : this.ingame.childGameState instanceof CancelledGameState ?
