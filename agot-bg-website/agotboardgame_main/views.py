@@ -172,7 +172,8 @@ def my_games(request):
     games_query_base = Game.objects.annotate(players_count=Count('players'))\
         .prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user=request.user), to_attr="player_in_game"), 'owner')
 
-    open_live_games = games_query_base.filter(Q(state=IN_LOBBY) & Q(view_of_game__settings__contains={'pbem': False}) & Q(players_count__gt=0))
+    open_live_games = games_query_base.annotate(pbem=Cast(KeyTextTransform('pbem', KeyTextTransform('settings', 'view_of_game')), BooleanField()))\
+        .filter(Q(state=IN_LOBBY) & Q(pbem=False) & Q(players_count__gt=0))
     enrich_games(request, open_live_games, True, False, False, False)
 
     games_query = games_query_base.annotate(user_is_in_game=Count('players', filter=Q(players__user=request.user)),\
@@ -217,7 +218,8 @@ def games(request):
         all_games = games_query_base.filter(Q(state=IN_LOBBY) | Q(state=ONGOING)).order_by("state", "-last_active_at")
         enrich_games(request, all_games, True, False, False, False)
 
-        open_live_games = games_query_base.filter(Q(state=IN_LOBBY) & Q(view_of_game__settings__contains={'pbem': False}) & Q(players_count__gt=0))
+        open_live_games = games_query_base.annotate(pbem=Cast(KeyTextTransform('pbem', KeyTextTransform('settings', 'view_of_game')), BooleanField()))\
+            .filter(Q(state=IN_LOBBY) & Q(pbem=False) & Q(players_count__gt=0))
         enrich_games(request, open_live_games, True, False, False, False)
 
         games_query = games_query_base\
