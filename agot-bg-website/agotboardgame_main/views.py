@@ -230,7 +230,9 @@ def games(request):
                       is_faceless=Cast(KeyTextTransform('faceless', KeyTextTransform('settings', 'view_of_game')), BooleanField()))\
             .prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user__last_activity__lt=eight_days_past), to_attr="inactive_players"))
 
-        replacement_needed_games = games_query.filter(Q(state=ONGOING) & Q(is_private=False) & Q(has_inactive_players__gt=0) & Q(replace_player_vote_ongoing=False)).order_by("state", "-last_active_at")
+        replacement_needed_games = games_query.filter(\
+            Q(state=ONGOING) & Q(is_private=False) & Q(inactive_2=True) & Q(has_inactive_players__gt=0) & Q(replace_player_vote_ongoing=False)\
+        ).order_by("state", "-last_active_at")
         enrich_games(request, replacement_needed_games, True, True, True, False)
 
         inactive_games = []
