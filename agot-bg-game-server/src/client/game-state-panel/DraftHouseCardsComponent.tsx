@@ -81,7 +81,7 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                                     type="text"
                                     value={this.nameFilter}
                                     onChange={e => this.nameFilter = e.target.value}
-                                    style={{width: 275}}
+                                    style={{width: 300}}
                                 />
                             </Row>
                             <Row className="justify-content-center">
@@ -109,7 +109,7 @@ export default class DraftHouseCardsComponent extends Component<GameStateCompone
                                     type="text"
                                     value={this.nameFilter}
                                     onChange={e => this.nameFilter = e.target.value}
-                                    style={{width: 275}}
+                                    style={{width: 300}}
                                 />
                             </Row>
                             <Row className="justify-content-center">
