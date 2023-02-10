@@ -24,6 +24,9 @@
         }
 
         componentDidMount() {
+            if (!publicRoomId) {
+                return;
+            }
             const url = window.location;
             chatWebsocket = new WebSocket((url.protocol == 'http:' ? 'ws:' : 'wss:') + '//' + url.host + '/ws/chat/room/' + publicRoomId);
             chatWebsocket.onopen = () => {
@@ -40,7 +43,7 @@
                     data.messages.forEach(d => this.addMessage(d));
                 } else if (data.type == 'more_chat_messages_retrieved') {
                     if (data.messages.length == 0) {
-                        this.setState({ noMoreMessages: true, input: this.state.input });
+                        this.setState({ noMoreMessages: true });
                         return;
                     }
                     data.messages.forEach(d => this.addMessage(d, true));
@@ -56,7 +59,7 @@
                     ? state.messages.concat(parsedMsg)
                     : [parsedMsg].concat(state.messages);
 
-                return {messages: messages, input: this.state.input};
+                return {messages: messages};
             });
         }
 
@@ -70,7 +73,7 @@
         loadMoreMessages(e) {
             e.preventDefault();
             if (this.state.messages.length == 0) {
-                this.setState({ noMoreMessages: true, input: this.state.input });
+                this.setState({ noMoreMessages: true });
                 return;
             }
 

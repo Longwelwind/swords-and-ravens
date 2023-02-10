@@ -20,6 +20,7 @@ from agotboardgame.settings import GROUP_COLORS
 from agotboardgame_main.models import Game, ONGOING, IN_LOBBY, PbemResponseTime, User, CANCELLED, FINISHED, PlayerInGame
 from chat.models import Room, UserInRoom
 from agotboardgame_main.forms import UpdateUsernameForm, UpdateSettingsForm
+from agotboardgame_main.views_helpers import enrich_games
 
 logger = logging.getLogger(__name__)
 
@@ -164,204 +165,120 @@ def about(request):
 
 @login_required
 def my_games(request):
-    two_days_past = timezone.now() - timedelta(days=2)
-    eight_days_past = timezone.now() - timedelta(days=8)
-    games_query = Game.objects.annotate(user_is_in_game=Count('players', filter=Q(players__user=request.user)),\
-        players_count=Count('players'),\
+    now = timezone.now()
+    two_days_past = now - timedelta(days=2)
+    eight_days_past = now - timedelta(days=8)
+
+    games_query_base = Game.objects.annotate(players_count=Count('players'))\
+        .prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user=request.user), to_attr="player_in_game"), 'owner')
+
+    open_live_games = games_query_base.filter(Q(state=IN_LOBBY) & Q(view_of_game__settings__contains={'pbem': False}) & Q(players_count__gt=0))
+    enrich_games(request, open_live_games, True, False, False, False)
+
+    games_query = games_query_base.annotate(user_is_in_game=Count('players', filter=Q(players__user=request.user)),\
         replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()),\
         is_faceless=Cast(KeyTextTransform('faceless', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
         is_private=Cast(KeyTextTransform('private', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
         inactive_2=ExpressionWrapper(Q(last_active_at__lt=two_days_past), output_field=BooleanField()))\
-        .prefetch_related('owner')\
-        .prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user=request.user), to_attr="player_in_game"))\
         .prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user__last_activity__lt=eight_days_past), to_attr="inactive_players"))
 
-    my_games = games_query.filter((Q(state=IN_LOBBY) | Q(state=ONGOING)) & Q(user_is_in_game=1))
+    my_games = games_query.filter((Q(state=IN_LOBBY) | Q(state=ONGOING)) & Q(user_is_in_game=1)).order_by("state", "-last_active_at")
+    enrich_games(request, my_games, True, True, False, True)
 
-    # It seems to be hard to ask Postgres to order the list correctly.
-    # It is done in Python
-    my_games = sorted(my_games, key=lambda game: ([IN_LOBBY, ONGOING].index(game.state), -datetime.timestamp(game.last_active_at)))
-
-    for game in my_games:
-        # "game.player_in_game" contains a list of one element, the authenticated player in the game.
-        # Transform that into a single field
-        game.player_in_game = game.player_in_game[0]
-
-        if game.state == ONGOING and not game.is_private and game.inactive_2 and len(game.inactive_players) > 0 and not game.replace_player_vote_ongoing:
-            inactive_players = ""
-            for inactive_player in game.inactive_players:
-                house = inactive_player.data.get("house", "Unknown House").capitalize()
-                if house in game.view_of_game.get("waitingFor", ""):
-                    inactive_players = inactive_players + house + (" (" + inactive_player.user.username + ")" if not game.is_faceless else "") + ", "
-            game.inactive_players = inactive_players[:-2] if len(inactive_players) >= 2 else None
-        else:
-            game.inactive_players = None
-
-        # Check whether there is an unseen message in
-        if "important_chat_rooms" in game.player_in_game.data:
-            # `important_chat_rooms` will contain a list of room ids that must trigger a warning
-            # if there are unseen messages.
-            important_chat_rooms = game.player_in_game.data["important_chat_rooms"]
-
-            # This is a query inside a loop, not super good for performance,
-            # but since this only applies to games of the player, it should not impact performance that much.
-            unread_messages = UserInRoom.objects.filter(
-                Q(room__messages__created_at__gt=F("last_viewed_message__created_at"))
-                | Q(last_viewed_message__isnull=True),
-                user=game.player_in_game.user,
-                room__in=important_chat_rooms,
-                room__messages__isnull=False
-            ).exists()
-
-            game.unread_messages = unread_messages
-        else:
-            game.unread_messages = False
-
+    last_finished_game = Game.objects.filter(state=FINISHED).annotate(players_count=Count('players')).latest()
     public_room_id = Room.objects.get(name='public').id
 
     return render(request, "agotboardgame_main/my_games.html", {
         "my_games": my_games,
+        "open_live_games": open_live_games,
+        "last_finished_game": last_finished_game,
         "public_room_id": public_room_id
     })
 
 
 def games(request):
     if request.method == "GET":
-        last_finished_game = Game.objects.filter(state=FINISHED).annotate(players_count=Count('players')).latest()
         # Fetch the list of open or ongoing games.
         # Pre-fetch the PlayerInGame entry related to the authenticated player
         # This means that "game.players" will only contain one entry, the one related to the authenticated player.
-        five_days_past = timezone.now() - timedelta(days=5)
-        two_days_past = timezone.now() - timedelta(days=2)
-        three_weeks_past = timezone.now() - timedelta(days=21)
-        games_query = Game.objects.annotate(players_count=Count('players'),\
-            replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()),\
-            is_faceless=Cast(KeyTextTransform('faceless', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
-            is_private=Cast(KeyTextTransform('private', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
-            is_tournament_mode=Cast(KeyTextTransform('tournamentMode', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
-            inactive_2=ExpressionWrapper(Q(last_active_at__lt=two_days_past), output_field=BooleanField()),\
-            inactive_5=ExpressionWrapper(Q(last_active_at__lt=five_days_past), output_field=BooleanField()),\
-            inactive_21=ExpressionWrapper(Q(last_active_at__lt=three_weeks_past), output_field=BooleanField())\
-            ).prefetch_related('owner')
+        now = timezone.now()
+        two_days_past = now - timedelta(days=2)
+        five_days_past = now - timedelta(days=5)
+        eight_days_past = now - timedelta(days=8)
+        three_weeks_past = now - timedelta(days=21)
 
-        eight_days_past = timezone.now() - timedelta(days=8)
-        if request.user.is_authenticated:
-            games = games_query.filter(Q(state=IN_LOBBY) | Q(state=ONGOING)).prefetch_related(\
-                Prefetch('players', queryset=PlayerInGame.objects.filter(user__last_activity__lt=eight_days_past), to_attr="inactive_players"))
+        if (request.user.is_authenticated):
+            games_query_base = Game.objects.prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user=request.user), to_attr="player_in_game"))
         else:
-            games = games_query.filter(Q(state=IN_LOBBY) | Q(state=ONGOING))
-        # It seems to be hard to ask Postgres to order the list correctly.
-        # It is done in Python
-        games = sorted(games, key=lambda game: ([IN_LOBBY, ONGOING].index(game.state), -datetime.timestamp(game.last_active_at)))
+            games_query_base = Game.objects.prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user=0), to_attr="player_in_game"))
 
-        active_games = []
+        games_query_base = games_query_base.prefetch_related('owner').annotate(players_count=Count('players'))
+
+        all_games = games_query_base.filter(Q(state=IN_LOBBY) | Q(state=ONGOING)).order_by("state", "-last_active_at")
+        enrich_games(request, all_games, True, False, False, False)
+
+        open_live_games = games_query_base.filter(Q(state=IN_LOBBY) & Q(view_of_game__settings__contains={'pbem': False}) & Q(players_count__gt=0))
+        enrich_games(request, open_live_games, True, False, False, False)
+
+        games_query = games_query_base\
+            .annotate(has_inactive_players=Count('players', filter=Q(players__user__last_activity__lt=eight_days_past)),\
+                      replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()),\
+                      is_private=Cast(KeyTextTransform('private', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
+                      inactive_2=ExpressionWrapper(Q(last_active_at__lt=two_days_past), output_field=BooleanField()),\
+                      is_faceless=Cast(KeyTextTransform('faceless', KeyTextTransform('settings', 'view_of_game')), BooleanField()))\
+            .prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user__last_activity__lt=eight_days_past), to_attr="inactive_players"))
+
+        replacement_needed_games = games_query.filter(Q(state=ONGOING) & Q(is_private=False) & Q(has_inactive_players__gt=0) & Q(replace_player_vote_ongoing=False)).order_by("state", "-last_active_at")
+        enrich_games(request, replacement_needed_games, True, True, True, False)
+
         inactive_games = []
-        replacement_needed_games = []
-        inactive_private_games = []
         inactive_tournament_games = []
-        open_live_games = []
+        if request.user.has_perm("agotboardgame_main.can_play_as_another_player"):
+            games_query = games_query_base\
+                .annotate(has_inactive_players=Count('players', filter=Q(players__user__last_activity__lt=eight_days_past)),\
+                          inactive_5=ExpressionWrapper(Q(last_active_at__lt=five_days_past), output_field=BooleanField()),\
+                          is_private=Cast(KeyTextTransform('private', KeyTextTransform('settings', 'view_of_game')), BooleanField()))
 
-        can_play_as_another_player = request.user.has_perm("agotboardgame_main.can_play_as_another_player")
+            inactive_games = games_query.filter(Q(state=ONGOING) & Q(inactive_5=True) & Q(is_private=False) & Q(has_inactive_players=0)).order_by("state", "-last_active_at")
+            enrich_games(request, inactive_games, True, False, True, False)
 
-        for game in games:
-            # "game.player_in_game" contains a list of one or zero element, depending on whether the authenticated
-            # player is in the game.
-            # Transform that into a single field that can be None.
-            if request.user.is_authenticated:
-                if game.state == ONGOING and not game.is_private and game.inactive_2 and len(game.inactive_players) > 0 and not game.replace_player_vote_ongoing:
-                    inactive_players = ""
-                    for inactive_player in game.inactive_players:
-                        house = inactive_player.data.get("house", "Unknown House").capitalize()
-                        if house in game.view_of_game.get("waitingFor", ""):
-                            inactive_players = inactive_players + house + (" (" + inactive_player.user.username + ")" if not game.is_faceless else "") + ", "
-                    game.inactive_players = inactive_players[:-2] if len(inactive_players) >= 2 else None
-                else:
-                    game.inactive_players = None
-            else:
-                game.inactive_players = None
+            games_query = games_query_base\
+                .annotate(inactive_2=ExpressionWrapper(Q(last_active_at__lt=two_days_past), output_field=BooleanField()),\
+                          is_tournament_mode=Cast(KeyTextTransform('tournamentMode', KeyTextTransform('settings', 'view_of_game')), BooleanField()))
 
-            if game.inactive_players is not None:
-                replacement_needed_games.append(game)
-                if game.view_of_game.get("waitingForIds", None) and len(game.view_of_game.get("waitingForIds")) > 0:
-                    game.inactive_user_id = game.view_of_game.get("waitingForIds")[0]
+            inactive_tournament_games = games_query.filter(Q(state=ONGOING) & Q(inactive_2=True) & Q(is_tournament_mode=True)).order_by("state", "-last_active_at")
+            enrich_games(request, inactive_tournament_games, True, False, True, False)
 
-            if game.is_private and game.inactive_21:
-                inactive_private_games.append(game)
+        inactive_private_games = []
+        if request.user.has_perm("agotboardgame_main.cancel_game"):
+            games_query = games_query_base\
+                .annotate(inactive_21=ExpressionWrapper(Q(last_active_at__lt=three_weeks_past), output_field=BooleanField()),\
+                          is_private=Cast(KeyTextTransform('private', KeyTextTransform('settings', 'view_of_game')), BooleanField()))
 
-            if (game.is_private and game not in inactive_private_games) or not game.inactive_5 or game.state == IN_LOBBY:
-                active_games.append(game)
-            elif can_play_as_another_player and game not in replacement_needed_games and not game.is_private:
-                inactive_games.append(game)
-                if game.view_of_game.get("waitingForIds", None) and len(game.view_of_game.get("waitingForIds")) > 0:
-                    game.inactive_user_id = game.view_of_game.get("waitingForIds")[0]
+            inactive_private_games = games_query.filter(Q(state=ONGOING) & Q(inactive_21=True) & Q(is_private=True)).order_by("state", "-last_active_at")
+            enrich_games(request, inactive_private_games, True, False, True, False)
 
-            if can_play_as_another_player and game.is_tournament_mode and game.inactive_2:
-                inactive_tournament_games.append(game)
-                if game.view_of_game.get("waitingForIds", None) and len(game.view_of_game.get("waitingForIds")) > 0:
-                    game.inactive_user_id = game.view_of_game.get("waitingForIds")[0]
-
-            if game.state == IN_LOBBY and game.players_count > 0 and game.view_of_game.get("settings", False) and game.view_of_game.get("settings").get("pbem", True) == False:
-                open_live_games.append(game)
-
-        public_room_id = Room.objects.get(name='public').id
+        public_room_id = ""
 
         if request.user.is_authenticated:
-            my_games_query = Game.objects.annotate(user_is_in_game=Count('players', filter=Q(players__user=request.user)),\
-                players_count=Count('players'),\
+            public_room_id = Room.objects.get(name='public').id
+            games_query = games_query_base.annotate(user_is_in_game=Count('players', filter=Q(players__user=request.user)),\
                 replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()),\
                 is_faceless=Cast(KeyTextTransform('faceless', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
                 is_private=Cast(KeyTextTransform('private', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
                 inactive_2=ExpressionWrapper(Q(last_active_at__lt=two_days_past), output_field=BooleanField()))\
-                .prefetch_related('owner')\
-                .prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user=request.user), to_attr="player_in_game"))\
                 .prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user__last_activity__lt=eight_days_past), to_attr="inactive_players"))
 
-            my_games = my_games_query.filter((Q(state=IN_LOBBY) | Q(state=ONGOING)) & Q(user_is_in_game=1))
-
-            # It seems to be hard to ask Postgres to order the list correctly.
-            # It is done in Python
-            my_games = sorted(my_games, key=lambda game: ([IN_LOBBY, ONGOING].index(game.state), -datetime.timestamp(game.last_active_at)))
-
-            for game in my_games:
-                # "game.player_in_game" contains a list of one element, the authenticated player in the game.
-                # Transform that into a single field
-                game.player_in_game = game.player_in_game[0]
-
-                if game.state == ONGOING and not game.is_private and game.inactive_2 and len(game.inactive_players) > 0 and not game.replace_player_vote_ongoing:
-                    inactive_players = ""
-                    for inactive_player in game.inactive_players:
-                        house = inactive_player.data.get("house", "Unknown House").capitalize()
-                        if house in game.view_of_game.get("waitingFor", ""):
-                            inactive_players = inactive_players + house + (" (" + inactive_player.user.username + ")" if not game.is_faceless else "") + ", "
-                    game.inactive_players = inactive_players[:-2] if len(inactive_players) >= 2 else None
-                else:
-                    game.inactive_players = None
-
-                # Check whether there is an unseen message in
-                if "important_chat_rooms" in game.player_in_game.data:
-                    # `important_chat_rooms` will contain a list of room ids that must trigger a warning
-                    # if there are unseen messages.
-                    important_chat_rooms = game.player_in_game.data["important_chat_rooms"]
-
-                    # This is a query inside a loop, not super good for performance,
-                    # but since this only applies to games of the player, it should not impact performance that much.
-                    unread_messages = UserInRoom.objects.filter(
-                        Q(room__messages__created_at__gt=F("last_viewed_message__created_at"))
-                        | Q(last_viewed_message__isnull=True),
-                        user=game.player_in_game.user,
-                        room__in=important_chat_rooms,
-                        room__messages__isnull=False
-                    ).exists()
-
-                    game.unread_messages = unread_messages
-                else:
-                    game.unread_messages = False
+            my_games = games_query.filter((Q(state=IN_LOBBY) | Q(state=ONGOING)) & Q(user_is_in_game=1)).order_by("state", "-last_active_at")
+            enrich_games(request, my_games, True, True, False, True)
         else:
             my_games = []
 
+        last_finished_game = Game.objects.filter(state=FINISHED).annotate(players_count=Count('players')).latest()
+
         return render(request, "agotboardgame_main/games.html", {
             "my_games": my_games,
-            "active_games": active_games,
+            "all_games": all_games,
             "inactive_games": inactive_games,
             "open_live_games": open_live_games,
             "replacement_needed_games": replacement_needed_games,
