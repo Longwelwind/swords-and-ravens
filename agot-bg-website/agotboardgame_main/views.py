@@ -174,7 +174,6 @@ def my_games(request):
 
     open_live_games = games_query_base.annotate(pbem=Cast(KeyTextTransform('pbem', KeyTextTransform('settings', 'view_of_game')), BooleanField()))\
         .filter(Q(state=IN_LOBBY) & Q(pbem=False) & Q(players_count__gt=0))
-    enrich_games(request, open_live_games, True, False, False, False)
 
     games_query = games_query_base.annotate(user_is_in_game=Count('players', filter=Q(players__user=request.user)),\
         replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()),\
@@ -184,7 +183,7 @@ def my_games(request):
         .prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user__last_activity__lt=eight_days_past), to_attr="inactive_players"))
 
     my_games = games_query.filter((Q(state=IN_LOBBY) | Q(state=ONGOING)) & Q(user_is_in_game=1)).order_by("state", "-last_active_at")
-    enrich_games(request, my_games, True, True, False, True)
+    enrich_games(request, my_games, True, False, True)
 
     last_finished_game = Game.objects.filter(state=FINISHED).annotate(players_count=Count('players')).latest()
     public_room_id = Room.objects.get(name='public').id
@@ -215,13 +214,14 @@ def games(request):
 
         games_query_base = games_query_base.prefetch_related('owner').annotate(players_count=Count('players'))
 
+        # QUERY ALL GAMES
         all_games = games_query_base.filter(Q(state=IN_LOBBY) | Q(state=ONGOING)).order_by("state", "-last_active_at")
-        enrich_games(request, all_games, True, False, False, False)
 
+        # QUERY OPEN LIVE GAMES
         open_live_games = games_query_base.annotate(pbem=Cast(KeyTextTransform('pbem', KeyTextTransform('settings', 'view_of_game')), BooleanField()))\
             .filter(Q(state=IN_LOBBY) & Q(pbem=False) & Q(players_count__gt=0))
-        enrich_games(request, open_live_games, True, False, False, False)
 
+        # QUERY REPLACEMENT NEEDED GAMES
         games_query = games_query_base\
             .annotate(has_inactive_players=Count('players', filter=Q(players__user__last_activity__lt=eight_days_past)),\
                       replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()),\
@@ -233,39 +233,43 @@ def games(request):
         replacement_needed_games = games_query.filter(\
             Q(state=ONGOING) & Q(is_private=False) & Q(inactive_2=True) & Q(has_inactive_players__gt=0) & Q(replace_player_vote_ongoing=False)\
         ).order_by("state", "-last_active_at")
-        enrich_games(request, replacement_needed_games, True, True, True, False)
+        enrich_games(request, replacement_needed_games, True, True, False)
 
         inactive_games = []
         inactive_tournament_games = []
         if request.user.has_perm("agotboardgame_main.can_play_as_another_player"):
+            # QUERY INACTIVE GAMES
             games_query = games_query_base\
                 .annotate(has_inactive_players=Count('players', filter=Q(players__user__last_activity__lt=eight_days_past)),\
                           inactive_5=ExpressionWrapper(Q(last_active_at__lt=five_days_past), output_field=BooleanField()),\
                           is_private=Cast(KeyTextTransform('private', KeyTextTransform('settings', 'view_of_game')), BooleanField()))
 
             inactive_games = games_query.filter(Q(state=ONGOING) & Q(inactive_5=True) & Q(is_private=False) & Q(has_inactive_players=0)).order_by("state", "-last_active_at")
-            enrich_games(request, inactive_games, True, False, True, False)
+            enrich_games(request, inactive_games, False, True, False)
 
+            # QUERY INACTIVE TOURNAMENT GAMES
             games_query = games_query_base\
                 .annotate(inactive_2=ExpressionWrapper(Q(last_active_at__lt=two_days_past), output_field=BooleanField()),\
                           is_tournament_mode=Cast(KeyTextTransform('tournamentMode', KeyTextTransform('settings', 'view_of_game')), BooleanField()))
 
             inactive_tournament_games = games_query.filter(Q(state=ONGOING) & Q(inactive_2=True) & Q(is_tournament_mode=True)).order_by("state", "-last_active_at")
-            enrich_games(request, inactive_tournament_games, True, False, True, False)
+            enrich_games(request, inactive_tournament_games, False, True, False)
 
         inactive_private_games = []
         if request.user.has_perm("agotboardgame_main.cancel_game"):
+            # QUERY INACTIVE PRIVATE GAMES
             games_query = games_query_base\
                 .annotate(inactive_21=ExpressionWrapper(Q(last_active_at__lt=three_weeks_past), output_field=BooleanField()),\
                           is_private=Cast(KeyTextTransform('private', KeyTextTransform('settings', 'view_of_game')), BooleanField()))
 
             inactive_private_games = games_query.filter(Q(state=ONGOING) & Q(inactive_21=True) & Q(is_private=True)).order_by("state", "-last_active_at")
-            enrich_games(request, inactive_private_games, True, False, True, False)
+            enrich_games(request, inactive_private_games, False, True, False)
 
         public_room_id = ""
 
         if request.user.is_authenticated:
             public_room_id = Room.objects.get(name='public').id
+            # QUERY MY GAMES
             games_query = games_query_base.annotate(user_is_in_game=Count('players', filter=Q(players__user=request.user)),\
                 replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()),\
                 is_faceless=Cast(KeyTextTransform('faceless', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
@@ -274,7 +278,7 @@ def games(request):
                 .prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user__last_activity__lt=eight_days_past), to_attr="inactive_players"))
 
             my_games = games_query.filter((Q(state=IN_LOBBY) | Q(state=ONGOING)) & Q(user_is_in_game=1)).order_by("state", "-last_active_at")
-            enrich_games(request, my_games, True, True, False, True)
+            enrich_games(request, my_games, True, False, True)
         else:
             my_games = []
 

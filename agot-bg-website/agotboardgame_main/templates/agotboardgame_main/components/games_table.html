@@ -74,14 +74,14 @@
                             Live
                         </span>
                     {% endif %}
-                    {% if game.player_in_game %}
-                        {% if game.player_in_game.data.waited_for %}
+                    {% if game.player_in_game.0 %}
+                        {% if game.player_in_game.0.data.waited_for %}
                             <span class="badge badge-danger">
-                                {% if game.player_in_game.data.house %}{% house_icon game.player_in_game.data.house %}{% endif %} YOUR TURN
+                                {% if game.player_in_game.0.data.house %}{% house_icon game.player_in_game.0.data.house %}{% endif %} YOUR TURN
                             </span>
                         {% else %}
                             <span class="badge badge-info">
-                                {% if game.player_in_game.data.house %}{% house_icon game.player_in_game.data.house %}{% endif %} Playing
+                                {% if game.player_in_game.0.data.house %}{% house_icon game.player_in_game.0.data.house %}{% endif %} Playing
                             </span>
                         {% endif %}
                         {% if game.unread_messages %}
@@ -92,7 +92,7 @@
                                 <i class="fas fa-envelope"></i>
                             </span>
                         {% endif %}
-                        {% if game.player_in_game.data.needed_for_vote %}
+                        {% if game.player_in_game.0.data.needed_for_vote %}
                             <span class="badge badge-danger"
                                 data-toggle="tooltip"
                                 title="There is an ongoing vote"
@@ -116,7 +116,7 @@
                     {{ game.players_count }}{% if game.players_count != game.view_of_game.maxPlayerCount %}/{{ game.view_of_game.maxPlayerCount }}{% endif %}
                 </td>
                 <td class="text-right">
-                    {%if not on_probation or game.player_in_game %}
+                    {%if not on_probation or game.player_in_game.0 %}
                     <a
                         target="_blank"
                         href="/play/{{ game.id }}"
@@ -126,13 +126,13 @@
                         {% endif %}
                     >
                         {% if game.state == "IN_LOBBY" %}
-                            {% if not game.player_in_game %}
+                            {% if not game.player_in_game.0 %}
                                 Join
                             {% else %}
                                 Rejoin
                             {% endif %}
                         {% else %}
-                            {% if not game.player_in_game %}
+                            {% if not game.player_in_game.0 %}
                                 Spectate
                             {% else %}
                                 Rejoin
