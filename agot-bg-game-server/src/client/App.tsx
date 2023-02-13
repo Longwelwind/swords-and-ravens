@@ -20,7 +20,7 @@ interface AppProps {
 
 @observer
 export default class App extends Component<AppProps> {
-    onVisibilityChangedCallback: (() => void) | null = null;
+    //onVisibilityChangedCallback: (() => void) | null = null;
 
     get user(): User | null {
         return this.props.gameClient.authenticatedUser;
@@ -92,7 +92,7 @@ export default class App extends Component<AppProps> {
         </Container>;
     }
 
-    onVisibilityChanged(): void {
+    /* onVisibilityChanged(): void {
         if (document.visibilityState != "visible") {
             return;
         }
@@ -113,5 +113,5 @@ export default class App extends Component<AppProps> {
         if (visibilityChangedCallback) {
             document.removeEventListener("visibilitychange", visibilityChangedCallback);
         }
-    }
+    } */
 }
