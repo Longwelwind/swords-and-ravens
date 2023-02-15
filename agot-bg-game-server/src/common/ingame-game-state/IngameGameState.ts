@@ -470,7 +470,7 @@ export default class IngameGameState extends GameState<
             }
         } else if (message.type == "launch-declare-winner-vote") {
             const winner = this.game.houses.get(message.winner);
-            if (this.canLaunchDeclareWinnerVote(player.user, winner)) {
+            if (this.canLaunchDeclareWinnerVote(player.user)) {
                 this.createVote(
                     player.user,
                     new DeclareWinner(winner)
@@ -1624,7 +1624,7 @@ export default class IngameGameState extends GameState<
         return {result: true, reason: ""};
     }
 
-    canLaunchDeclareWinnerVote(initiator: User | null, winner: House): {result: boolean; reason: string} {
+    canLaunchDeclareWinnerVote(initiator: User | null): {result: boolean; reason: string} {
         if (this.entireGame.gameSettings.tournamentMode) {
             return {result: false, reason: "forbidden-in-tournament-mode"};
         }

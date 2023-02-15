@@ -31,7 +31,7 @@ export default class RobertArrynAbilityGameState extends GameState<
     }
 
     get possibleEnemyHouseCards(): HouseCard[] {
-        // Due to Roose Bolton and vassals the enemy discard pile may be empty
+        // Due to Roose Bolton, vassals and HC evo the enemy discard pile may be empty
         const enemy = this.combat.getEnemy(this.house);
         const enemyDiscardPile = _.sortBy(enemy.houseCards.values.filter(hc => hc.state == HouseCardState.USED), sorted => sorted.combatStrength);
         if (enemyDiscardPile.length == 0) {
@@ -78,6 +78,14 @@ export default class RobertArrynAbilityGameState extends GameState<
 
     executeRobertsAbility(enemyHouseCardToRemove: HouseCard | null): void {
         const enemy = this.combat.getEnemy(this.house);
+
+        this.ingame.log({
+            type: "robert-arryn-used",
+            house: this.house.id,
+            affectedHouse: enemy.id,
+            removedHouseCard: enemyHouseCardToRemove ? enemyHouseCardToRemove.id : null
+        });
+
         if (enemyHouseCardToRemove) {
             this.game.deletedHouseCards.set(enemyHouseCardToRemove.id, enemyHouseCardToRemove);
             this.entireGame.broadcastToClients({
@@ -93,39 +101,26 @@ export default class RobertArrynAbilityGameState extends GameState<
             });
         }
 
-        const robertArrynHc = this.combat.houseCombatDatas.values.find(hcd => hcd.houseCard?.ability?.id == robertArryn.id)?.houseCard;
+        const robertArrynHc = this.house.houseCards.values.find(hc => hc.ability?.id == robertArryn.id);
 
-        if (!robertArrynHc) {
-            throw new Error("executeRobertsAbility(): Should be unreachable: Robert Arryn House card not found!");
+        // Due to HC evo, Robert Arryn may no longer be present in players house card deck
+        if (robertArrynHc) {
+            this.game.deletedHouseCards.set(robertArrynHc.id, robertArrynHc);
+            this.entireGame.broadcastToClients({
+                type: "update-deleted-house-cards",
+                houseCards: this.game.deletedHouseCards.values.map(hc => hc.id)
+            });
+
+            this.house.houseCards.delete(robertArrynHc.id);
+            this.entireGame.broadcastToClients({
+                type: "update-house-cards",
+                house: this.house.id,
+                houseCards: this.house.houseCards.values.map(hc => hc.id)
+            });
         }
-
-        this.game.deletedHouseCards.set(robertArrynHc.id, robertArrynHc);
-        this.entireGame.broadcastToClients({
-            type: "update-deleted-house-cards",
-            houseCards: this.game.deletedHouseCards.values.map(hc => hc.id)
-        });
-
-        this.house.houseCards.delete(robertArrynHc.id);
-        this.entireGame.broadcastToClients({
-            type: "update-house-cards",
-            house: this.house.id,
-            houseCards: this.house.houseCards.values.map(hc => hc.id)
-        });
-
-        this.ingame.log({
-            type: "robert-arryn-used",
-            house: this.house.id,
-            affectedHouse: enemy.id,
-            removedHouseCard: enemyHouseCardToRemove ? enemyHouseCardToRemove.id : null
-        });
     }
 
-    onSelectHouseCardFinish(_ironThroneHolder: House, houseCard: HouseCard | null): void {
-        this.ingame.log({
-            type: "ties-decided",
-            house: this.game.ironThroneHolder.id
-        });
-
+    onSelectHouseCardFinish(_house: House, houseCard: HouseCard | null): void {
         this.executeRobertsAbility(houseCard);
         this.parentGameState.onHouseCardResolutionFinish(this.house);
     }
