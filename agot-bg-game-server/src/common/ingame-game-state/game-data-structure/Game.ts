@@ -21,7 +21,6 @@ import IronBank, { SerializedIronBank } from "./IronBank";
 import Player from "../Player";
 import { ObjectiveCard } from "./static-data-structure/ObjectiveCard";
 import { objectiveCards } from "./static-data-structure/objectiveCards";
-import ThematicDraftHouseCardsGameState from "../thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 
 export const MAX_WILDLING_STRENGTH = 12;
 export const MAX_LOYALTY_TOKEN_COUNT = 20;

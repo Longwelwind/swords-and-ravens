@@ -14,7 +14,6 @@ import Player from "../common/ingame-game-state/Player";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import { faUserGear } from "@fortawesome/free-solid-svg-icons";
 import clonesImage from "../../public/images/icons/clones.svg"
-import House from "../common/ingame-game-state/game-data-structure/House";
 
 interface UserLabelProps {
     gameClient: GameClient;
@@ -88,7 +87,7 @@ export default class UserLabel extends Component<UserLabelProps> {
         const {result: canLaunchReplacePlayerVote, reason: canLaunchReplacePlayerVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser);
         const {result: canLaunchReplacePlayerByVassalVote, reason: canLaunchReplacePlayerByVassalVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser, true, this.player.house);
         const {result: canLaunchSwapHousesVote, reason: canLaunchSwapHousesVoteReason} = ingame.canLaunchSwapHousesVote(this.props.gameClient.authenticatedUser, this.player);
-        const {result: canLaunchDeclareWinnerVote, reason: canLaunchDeclareWinnerVoteReason} = ingame.canLaunchDeclareWinnerVote(this.props.gameClient.authenticatedUser, this.player.house);
+        const {result: canLaunchDeclareWinnerVote, reason: canLaunchDeclareWinnerVoteReason} = ingame.canLaunchDeclareWinnerVote(this.props.gameClient.authenticatedUser);
         return (
             <>
                 {!this.props.gameState.entireGame.gameSettings.faceless && <NavDropdown.Divider />}
