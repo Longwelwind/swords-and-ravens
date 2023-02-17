@@ -184,6 +184,11 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 return updateLastActive;
             }
 
+            if (this.settings.playerCount != settings.playerCount) {
+                settings.victoryPointsCountNeededToWin = 7;
+                settings.loyaltyTokenCountNeededToWin = 7;
+            }
+
             if (settings.initialLiveClock < 45) {
                 settings.initialLiveClock = 45;
             }

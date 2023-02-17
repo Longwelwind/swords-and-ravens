@@ -46,7 +46,7 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
                                         <div className="mb-2">
                                             <HouseIconComponent house={h}/>
                                         </div>
-                                        <div className="text-center" style={{fontSize: "18px", marginBottom: "5px"}}>{bid + (this.additionalPowerTokens.has(h) ? this.additionalPowerTokens.get(h) : 0)}</div>
+                                        <div className="text-center" style={{fontSize: "1.125rem", marginBottom: "5px"}}>{bid + (this.additionalPowerTokens.has(h) ? this.additionalPowerTokens.get(h) : 0)}</div>
                                         <div className="btn-group btn-group-xs">
                                             <button
                                                 className="btn btn-primary"

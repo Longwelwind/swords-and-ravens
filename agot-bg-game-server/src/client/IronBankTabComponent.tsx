@@ -52,7 +52,7 @@ export default class IronBankTabComponent extends Component<IronBankTabComponent
                             <FontAwesomeIcon className="ml-2" icon={faCaretLeft} size="2x" />
                         </div>
                     </OverlayTrigger>
-                    <Badge variant="secondary" style={{fontSize: "18px", marginTop: "10px", marginLeft: "35px"}}>{this.ironBank.loanCosts.slice().reverse()[i]}</Badge>
+                    <Badge variant="secondary" style={{fontSize: "1.125rem", marginTop: "10px", marginLeft: "35px"}}>{this.ironBank.loanCosts.slice().reverse()[i]}</Badge>
                 </Col>)}
                 <Col xs="auto">
                     <OverlayTrigger

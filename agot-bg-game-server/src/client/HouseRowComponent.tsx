@@ -216,7 +216,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         <Col xs="auto" className="d-flex align-items-center"
                             onMouseEnter={() => this.setHighlightedRegions(this.house == this.game.targaryen ? "with-loyalty-tokens-only" : "with-castles-only")}
                             onMouseLeave={() => this.highlightedRegions.clear()}>
-                            <div style={{ fontSize: "20px", color: victoryPointsWarning ? "#F39C12" : victoryPointsCritical ? "#FF0000" : undefined }}><b>{victoryPoints}</b></div>
+                            <div style={{ fontSize: "1.25rem", color: victoryPointsWarning ? "#F39C12" : victoryPointsCritical ? "#FF0000" : undefined }}><b>{victoryPoints}</b></div>
                             <img
                                 className={classNames(
                                     { "dye-warning": victoryPointsWarning },
@@ -235,7 +235,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                             delay={{ show: 250, hide: 100 }}
                             placement="auto"
                         >
-                            <b style={{ fontSize: "18px", color: powerInPool == 0 ? "red" : undefined }}>{this.house.powerTokens}</b>
+                            <b style={{ fontSize: "1.125rem", color: powerInPool == 0 ? "red" : undefined }}>{this.house.powerTokens}</b>
                         </OverlayTrigger>
                         <OverlayTrigger
                             overlay={this.renderPowerPopover(availablePower, powerTokensOnBoard, powerInPool)}
@@ -261,7 +261,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                             { "dye-warning": clockWarning },
                             { "dye-critical": clockCritical })}
                     />
-                    <div style={{ fontSize: "18px", color: clockWarning ? "#F39C12" : clockCritical ? "#FF0000" : undefined, marginLeft: "4px" }}>
+                    <div style={{ fontSize: "1.125rem", color: clockWarning ? "#F39C12" : clockCritical ? "#FF0000" : undefined, marginLeft: "4px" }}>
                         <b>{new Date(clock * 1000).toISOString().slice(12,19)}</b>
                     </div>
                 </Row>}

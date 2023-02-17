@@ -97,7 +97,7 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
                                         }
                                         placement="auto"
                                     >
-                                        <Badge variant="secondary" style={{fontSize: "14px"}}>
+                                        <Badge variant="secondary" style={{fontSize: "1rem"}}>
                                             {i}
                                         </Badge>
                                     </OverlayTrigger>
