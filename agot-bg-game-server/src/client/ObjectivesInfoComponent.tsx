@@ -86,11 +86,11 @@ export default class ObjectivesInfoComponent extends Component<ObjectivesInfoCom
                         placement="auto">
                             <h5 className="mb-0 text-center">
                                 <FontAwesomeIcon
-                                    style={{ fontSize: "20px" }}
+                                    style={{ fontSize: "1.25rem" }}
                                     icon={faBookReader} />
                                 <span className="px-2">Rules</span>
                                 <FontAwesomeIcon
-                                    style={{ fontSize: "20px" }}
+                                    style={{ fontSize: "1.25rem" }}
                                     icon={faQuestionCircle} />
                             </h5>
                     </OverlayTrigger>

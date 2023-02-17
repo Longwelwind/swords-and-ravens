@@ -1,6 +1,6 @@
 import {observer} from "mobx-react";
 import {Component, default as React, ReactNode} from "react";
-import EntireGame from "../common/EntireGame";
+import EntireGame, { GameSettings } from "../common/EntireGame";
 import GameClient from "./GameClient";
 import LobbyGameState from "../common/lobby-game-state/LobbyGameState";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
@@ -47,21 +47,29 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     @observable showMapWhenDrafting = false;
     @observable playWelcomeSound = false;
 
+    get entireGame(): EntireGame {
+        return this.props.entireGame;
+    }
+
     get ingame(): IngameGameState | null {
-        return this.props.entireGame.ingameGameState;
+        return this.entireGame.ingameGameState;
     }
 
     get lobby(): LobbyGameState | null {
-        return this.props.entireGame.lobbyGameState;
+        return this.entireGame.lobbyGameState;
     }
 
     get isGameEnded(): boolean {
-        return this.props.entireGame.leafState instanceof CancelledGameState ||
-            this.props.entireGame.leafState instanceof GameEndedGameState;
+        return this.entireGame.leafState instanceof CancelledGameState ||
+            this.entireGame.leafState instanceof GameEndedGameState;
     }
 
-    get isInCombat (): boolean {
-        return this.props.entireGame.hasChildGameState(CombatGameState);
+    get isInCombat(): boolean {
+        return this.entireGame.hasChildGameState(CombatGameState);
+    }
+
+    get settings(): GameSettings {
+        return this.entireGame.gameSettings;
     }
 
     render(): ReactNode {
@@ -69,20 +77,20 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             <Helmet>
                 <link rel="icon" href={this.props.gameClient.isOwnTurn() ? faviconAlert : faviconNormal} sizes="16x16" />
             </Helmet>
-            <Col xs={12} className={this.props.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
+            <Col xs={12} className={this.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
                 <Row className="justify-content-center align-items-center">
                     {(this.ingame?.replayWorldState?.length ?? 0) > 0
                         ? <>{this.renderReplaySwitch()}
                             <Col xs="auto" className="px-3">
-                                <h4>{this.props.entireGame.name}</h4>
+                                <h4>{this.entireGame.name}</h4>
                             </Col>
                         </>
                         : <>{this.renderTournamentImage()}
-                            <ClockComponent entireGame={this.props.entireGame} />
+                            <ClockComponent entireGame={this.entireGame} />
                             {this.renderLockedBadge()}
                             {this.renderHouseIcon()}
                             <Col xs="auto" className="px-3">
-                                <h4>{this.props.entireGame.name}</h4>
+                                <h4>{this.entireGame.name}</h4>
                             </Col>
                             {this.renderGameTypeBadge()}
                             {this.renderTidesOfBattleImage()}
@@ -94,12 +102,12 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 </Row>
             </Col>
             {
-                this.props.entireGame.childGameState instanceof LobbyGameState ? (
-                    <LobbyComponent gameClient={this.props.gameClient} gameState={this.props.entireGame.childGameState} />
-                ) : this.props.entireGame.childGameState instanceof IngameGameState ? (
-                    <IngameComponent gameClient={this.props.gameClient} gameState={this.props.entireGame.childGameState} />
-                ) : this.props.entireGame.childGameState instanceof CancelledGameState && (
-                    <CancelledComponent gameClient={this.props.gameClient} gameState={this.props.entireGame.childGameState} />
+                this.entireGame.childGameState instanceof LobbyGameState ? (
+                    <LobbyComponent gameClient={this.props.gameClient} gameState={this.entireGame.childGameState} />
+                ) : this.entireGame.childGameState instanceof IngameGameState ? (
+                    <IngameComponent gameClient={this.props.gameClient} gameState={this.entireGame.childGameState} />
+                ) : this.entireGame.childGameState instanceof CancelledGameState && (
+                    <CancelledComponent gameClient={this.props.gameClient} gameState={this.entireGame.childGameState} />
                 )
             }
             {this.playWelcomeSound && !this.props.gameClient.musicMuted &&
@@ -121,7 +129,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     renderTidesOfBattleImage(): ReactNode {
-        return this.props.entireGame.gameSettings.tidesOfBattle &&
+        return this.settings.tidesOfBattle &&
             <Col xs="auto">
                 <OverlayTrigger
                     placement="auto"
@@ -129,13 +137,13 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                         <Tooltip id="tob-active-tooltip">
                             <Col className="text-center">
                                 Tides of Battle
-                                {this.props.entireGame.gameSettings.removeTob3 && <>
+                                {this.settings.removeTob3 && <>
                                     <br/><small>No 3s</small>
                                 </>}
-                                {this.props.entireGame.gameSettings.removeTobSkulls && <>
+                                {this.settings.removeTobSkulls && <>
                                     <br/><small>No skulls</small>
                                 </>}
-                                {this.props.entireGame.gameSettings.limitTob2 && <>
+                                {this.settings.limitTob2 && <>
                                     <br/><small>Only two 2s</small>
                                 </>}
                             </Col>
@@ -148,7 +156,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     renderHouseCardsEvolutionImage(): ReactNode {
-        return this.props.entireGame.gameSettings.houseCardsEvolution &&
+        return this.settings.houseCardsEvolution &&
             <Col xs="auto">
                 <OverlayTrigger
                     placement="auto"
@@ -164,7 +172,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     renderPrivateBadge(): ReactNode {
-        return !this.props.entireGame.gameSettings.private ? <></> :
+        return !this.settings.private ? <></> :
             <Col xs="auto">
                 <h4>
                     <Badge variant="primary">PRIVATE</Badge>
@@ -189,7 +197,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     renderGameTypeBadge(): ReactNode {
         return <Col xs="auto">
             <h4>
-                {this.props.entireGame.gameSettings.pbem
+                {this.settings.pbem
                     ? <OverlayTrigger overlay={<Tooltip id="pbem-badge-tooltip"><b>P</b>lay <b>B</b>y <b>E</b>-<b>M</b>ail</Tooltip>}
                         placement="bottom"
                     >
@@ -202,25 +210,22 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
 
     renderWarnings(): ReactNode {
         return <>
-            {this.props.entireGame.ingameGameState?.paused &&
+            {this.entireGame.ingameGameState?.paused &&
             <Col xs="auto">
                 <h4><Badge variant="danger">PAUSED</Badge></h4>
             </Col>}
-            {(this.props.entireGame.gameSettings.victoryPointsCountNeededToWin != 7 || this.props.entireGame.gameSettings.loyaltyTokenCountNeededToWin != 7) &&
+            {(this.settings.victoryPointsCountNeededToWin != 7 || this.settings.loyaltyTokenCountNeededToWin != 7) &&
             <Col xs="auto">
                 <OverlayTrigger
                     placement="auto"
                     overlay={
-                        <Tooltip id="vp-counts-modified-tooltip">
+                        <Tooltip id="vp-counts-modified-tooltip" className="tooltip-w-100">
                             <Col className="text-center">
-                                {this.props.entireGame.gameSettings.victoryPointsCountNeededToWin != 7 && <>
-                                    The number of victory points needed to win has been modified
-                                    to <b>{this.props.entireGame.gameSettings.victoryPointsCountNeededToWin}</b>!<br/>
-                                </>}
-                                {this.props.entireGame.gameSettings.loyaltyTokenCountNeededToWin != 7 && <>
-                                    The number of loyalty tokens needed to win has been modified
-                                    to <b>{this.props.entireGame.gameSettings.loyaltyTokenCountNeededToWin}</b>!
-                                </>}
+                                {(this.settings.victoryPointsCountNeededToWin != 7 || this.settings.loyaltyTokenCountNeededToWin != 7) && <p><h6>
+                                    The victory conditions<br/>have been modified!
+                                </h6></p>}
+                                <>Required victory points: <b className="text-large">{this.settings.victoryPointsCountNeededToWin}</b></>
+                                {this.settings.playerCount >= 8 && <><br/>Required loyalty tokens: <b className="text-large">{this.settings.loyaltyTokenCountNeededToWin}</b></>}
                             </Col>
                         </Tooltip>}
                     popperConfig={{ modifiers: [preventOverflow] }}
@@ -236,7 +241,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     renderTournamentImage(): ReactNode {
-        return this.props.entireGame.gameSettings.tournamentMode &&
+        return this.settings.tournamentMode &&
             <Col xs="auto">
                 <OverlayTrigger
                     placement="auto"
@@ -254,7 +259,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     renderHouseIcon(): ReactNode {
         // Hack for ADWD Bolton as the Ingame c'tor is not called here yet:
         const house = this.props.gameClient.authenticatedPlayer?.house;
-        if (house && this.props.entireGame.gameSettings.adwdHouseCards && house.id == "stark") {
+        if (house && this.settings.adwdHouseCards && house.id == "stark") {
             house.name = "Bolton";
         }
         return house &&
@@ -266,7 +271,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     renderMapSwitch(): ReactNode {
-        return this.props.entireGame.hasChildGameState(DraftHouseCardsGameState) &&
+        return this.entireGame.hasChildGameState(DraftHouseCardsGameState) &&
             <Col xs="auto">
                 <FormCheck
                     id="show-hide-map-setting"
@@ -289,10 +294,10 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 type="switch"
                 label={<label htmlFor="replay-mode-switch"><Badge variant="warning">REPLAY MODE</Badge></label>}
                 style={{ marginTop: "-6px" }}
-                checked={(this.props.entireGame.ingameGameState?.replayWorldState?.length ?? 0) > 0}
+                checked={(this.entireGame.ingameGameState?.replayWorldState?.length ?? 0) > 0}
                 onChange={() => {
-                    if (this.props.entireGame.ingameGameState) {
-                        this.props.entireGame.ingameGameState.replayWorldState = null;
+                    if (this.entireGame.ingameGameState) {
+                        this.entireGame.ingameGameState.replayWorldState = null;
                     }
                 }}
             />
@@ -309,14 +314,14 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     componentDidMount(): void {
-        document.title = this.props.entireGame.name;
+        document.title = this.entireGame.name;
 
         if (this.isGameEnded) {
             return;
         }
 
-        this.props.entireGame.onClientGameStateChange = () => this.onClientGameStateChange();
-        this.props.entireGame.onGameStarted = () => this.onGameStarted();
+        this.entireGame.onClientGameStateChange = () => this.onClientGameStateChange();
+        this.entireGame.onGameStarted = () => this.onGameStarted();
 
         if (this.props.gameClient.authenticatedUser) {
             this.showMapWhenDrafting = this.props.gameClient.authenticatedUser.settings.showMapWhenDrafting;
@@ -371,7 +376,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     componentWillUnmount(): void {
-        this.props.entireGame.onClientGameStateChange = null;
-        this.props.entireGame.onGameStarted = null;
+        this.entireGame.onClientGameStateChange = null;
+        this.entireGame.onGameStarted = null;
     }
 }

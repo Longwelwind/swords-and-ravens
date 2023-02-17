@@ -27,7 +27,7 @@ export default class HouseNumberResultsComponent extends Component<HouseNumberRe
                                 {children}
                             </b>
                         }>
-                        <div className="text-center" style={{ fontSize: "18px", marginBottom: "5px" }}>
+                        <div className="text-center" style={{ fontSize: "1.125rem", marginBottom: "5px" }}>
                             {result}
                         </div>
                     </ConditionalWrap>

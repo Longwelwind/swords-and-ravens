@@ -716,7 +716,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         </ListGroup>
                     </Col>
                     <Col xs="auto" className="mx-1 px-0">
-                        <Col style={{ width: "28px", fontSize: "22px" }} className="px-0 text-center">
+                        <Col style={{ width: "28px", fontSize: "1.375rem" }} className="px-0 text-center">
                             <Row className="mb-3 mx-0" onMouseEnter={() => this.highlightRegionsOfHouses()} onMouseLeave={() => this.highlightedRegions.clear()}>
                                 <OverlayTrigger overlay={
                                     <Tooltip id="round-tooltip">
