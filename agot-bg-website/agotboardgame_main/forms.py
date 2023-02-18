@@ -8,6 +8,11 @@ class UpdateUsernameForm(ModelForm):
         model = User
         fields = ["username"]
 
+class UpdateProfileTextForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ["profile_text"]
+
 # As use_responsive_layout_on_mobile became obsolete with the Essos map, we reuse it now for "Align the game state column on the right"
 
 class UpdateSettingsForm(ModelForm):

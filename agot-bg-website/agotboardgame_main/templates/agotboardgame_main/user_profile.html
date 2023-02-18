@@ -9,8 +9,8 @@
 
 {% block content %}
 <div class="row decrease-container-margin">
-    <div class="col">
-        <h3 class="mb-4">
+    <div class="col-12">
+        <h3>
             {% if group_name %}
                 <span class="badge badge badge-{{ group_color }}">{{ group_name }}</span>
             {% endif %}
@@ -26,8 +26,13 @@
             {% endif %}
         </h3>
     </div>
+    {% if viewed_user.profile_text %}
+    <div class="col-12">
+        <b>Personal profile text:</b> {{ viewed_user.profile_text }}
+    </div>
+    {% endif %}
 </div>
-<div class="row decrease-container-margin">
+<div class="row decrease-container-margin mt-3">
     <div class="col-lg-3">
         <div class="card">
             <div class="card-body">
