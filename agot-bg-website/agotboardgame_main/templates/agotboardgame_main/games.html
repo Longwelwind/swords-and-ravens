@@ -42,11 +42,44 @@ Games -
                     </h4>
                     {% for user in request.online_now %}
                     {% if user.is_admin %}
-                        <a style="margin-right: 10px; font-size: 1.125rem; color:brown" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">{{ user.username }}</a>
+                        <a style="margin-right: 10px; font-size: 1.125rem; color:brown" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">
+                            {{ user.username }}
+                            {% if user.last_won_tournament %}
+                                <span style="color: goldenrod"
+                                    data-toggle="tooltip"
+                                    data-html="true"
+                                    title="Winner of </br><b>{{ user.last_won_tournament }}</b>"
+                                >
+                                    <i class="fas fa-trophy"></i>
+                                </span>
+                            {% endif %}
+                        </a>
                     {% elif user.is_high_member %}
-                        <a style="margin-right: 10px; font-size: 1.125rem; color:darkgoldenrod" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">{{ user.username }}</a>
+                        <a style="margin-right: 10px; font-size: 1.125rem; color:darkgoldenrod" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">
+                            {{ user.username }}
+                            {% if user.last_won_tournament %}
+                                <span style="color: goldenrod"
+                                    data-toggle="tooltip"
+                                    data-html="true"
+                                    title="Winner of </br><b>{{ user.last_won_tournament }}</b>"
+                                >
+                                    <i class="fas fa-trophy"></i>
+                                </span>
+                            {% endif %}
+                        </a>
                     {% else %}
-                        <a style="margin-right: 10px; font-size: 1.125rem;" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">{{ user.username }}</a>
+                        <a style="margin-right: 10px; font-size: 1.125rem;" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">
+                            {{ user.username }}
+                            {% if user.last_won_tournament %}
+                                <span style="color: goldenrod"
+                                    data-toggle="tooltip"
+                                    data-html="true"
+                                    title="Winner of </br><b>{{ user.last_won_tournament }}</b>"
+                                >
+                                    <i class="fas fa-trophy"></i>
+                                </span>
+                            {% endif %}
+                        </a>
                     {% endif %}
                     {% endfor %}
                 </div>

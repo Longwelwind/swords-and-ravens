@@ -19,7 +19,7 @@ from django.utils import timezone
 from agotboardgame.settings import GROUP_COLORS
 from agotboardgame_main.models import Game, ONGOING, IN_LOBBY, PbemResponseTime, User, CANCELLED, FINISHED, PlayerInGame
 from chat.models import Room, UserInRoom
-from agotboardgame_main.forms import UpdateUsernameForm, UpdateSettingsForm
+from agotboardgame_main.forms import UpdateProfileTextForm, UpdateUsernameForm, UpdateSettingsForm
 from agotboardgame_main.views_helpers import enrich_games
 
 logger = logging.getLogger(__name__)
@@ -370,6 +370,7 @@ def settings(request):
     # Initialize all forms used in the settings page
     update_username_form = UpdateUsernameForm(instance=request.user)
     update_settings_form = UpdateSettingsForm(instance=request.user)
+    update_profile_text_form = UpdateProfileTextForm(instance=request.user)
 
     # Possibly treat a form if a POST request was sent
     if request.method == "POST":
@@ -403,8 +404,22 @@ def settings(request):
                 messages.success(request, "Settings changed!")
 
                 return HttpResponseRedirect('/settings/')
+        elif form_type == 'update_profile_text':
+            update_profile_text_form = UpdateProfileTextForm(request.POST, instance=request.user)
 
-    return render(request, "agotboardgame_main/settings.html", {"update_username_form": update_username_form, "update_settings_form": update_settings_form})
+            if update_profile_text_form.is_valid():
+                update_profile_text_form.save()
+
+                messages.success(request, "Profile text successfully changed!")
+
+                return HttpResponseRedirect('/settings/')
+        
+
+    return render(request, "agotboardgame_main/settings.html", {
+        "update_username_form": update_username_form, 
+        "update_settings_form": update_settings_form,
+        "update_profile_text_form": update_profile_text_form
+    })
 
 
 def user_profile(request, user_id):
