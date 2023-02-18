@@ -147,6 +147,16 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
+        migrations.AddField(
+            model_name='user',
+            name='profile_text',
+            field=models.CharField(blank=True, default=None, max_length=255, null=True),
+        ),
+        migrations.AddField(
+            model_name='user',
+            name='last_won_tournament',
+            field=models.CharField(blank=True, default=None, max_length=200, null=True),
+        ),
         migrations.RunPython(create_default_group, delete_default_group),
         migrations.RunPython(create_public_room, delete_public_room),
         migrations.RunPython(vanilla_forward, vanilla_reverse)

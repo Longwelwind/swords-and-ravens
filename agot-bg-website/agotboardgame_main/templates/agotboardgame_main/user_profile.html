@@ -10,7 +10,21 @@
 {% block content %}
 <div class="row decrease-container-margin">
     <div class="col">
-        <h3 class="mb-4">{% if group_name %}<span class="badge badge badge-{{ group_color }}">{{ group_name }}</span>{% endif %} {{ viewed_user.username }}</h3>
+        <h3 class="mb-4">
+            {% if group_name %}
+                <span class="badge badge badge-{{ group_color }}">{{ group_name }}</span>
+            {% endif %}
+            {{ viewed_user.username }}
+            {% if viewed_user.last_won_tournament %}
+                <span style="color: goldenrod"
+                    data-toggle="tooltip"
+                    data-html="true"
+                    title="Winner of </br><b>{{ viewed_user.last_won_tournament }}</b>"
+                >
+                    <i class="fas fa-trophy"></i>
+                </span>
+            {% endif %}
+        </h3>
     </div>
 </div>
 <div class="row decrease-container-margin">
