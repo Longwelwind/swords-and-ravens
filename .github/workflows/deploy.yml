@@ -43,6 +43,7 @@ jobs:
         working-directory: ./agot-bg-game-server
     env:
       ASSET_PATH: https://swords-and-ravens.ams3.cdn.digitaloceanspaces.com/
+      NODE_OPTIONS: --openssl-legacy-provider
     steps:
     - uses: actions/checkout@v1
     - name: Install dependencies
