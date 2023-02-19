@@ -21,7 +21,7 @@ There a multiple ways to run the code, depending on what components on what you 
 
 ### Launching the Game Only
 
-Requires `NodeJS v14` and `yarn`. Install the dependencies and initialize the environment variables by executing:
+Requires `NodeJS v16` and `yarn`. Install the dependencies and initialize the environment variables by executing:
 
 ```bash
 cd agot-bg-game-server/

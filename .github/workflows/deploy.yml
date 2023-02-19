@@ -37,7 +37,7 @@ jobs:
       run: docker push $GITHUB_PACKAGES_WEBSITE_DOCKER_IMAGE
   build-assets:
     name: Build game assets
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     defaults:
       run:
         working-directory: ./agot-bg-game-server
