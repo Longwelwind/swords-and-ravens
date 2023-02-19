@@ -250,6 +250,9 @@ export class CancelGame extends VoteType {
 
     executeAccepted(vote: Vote): void {
         const ingame = vote.ingame;
+
+        ingame.resetAllWaitedForData();
+
         if (ingame.paused) {
             if (ingame.autoResumeTimeout) {
                 clearTimeout(ingame.autoResumeTimeout);
