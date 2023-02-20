@@ -1,4 +1,4 @@
-import Region, {RegionState, SerializedRegion} from "./Region";
+import Region, {RegionSnapshot, SerializedRegion} from "./Region";
 import Point, {distanceSquared} from "../../../utils/Point";
 import Unit from "./Unit";
 import House from "./House";
@@ -239,8 +239,8 @@ export default class World {
         return capital.length == 1 ? capital[0] : null;
     }
 
-    getWorldState(): RegionState[] {
-        return this.regions.values.map(r => r.getRegionState());
+    getSnapshot(): RegionSnapshot[] {
+        return this.regions.values.map(r => r.getSnapshot());
     }
 
     serializeToClient(): SerializedWorld {

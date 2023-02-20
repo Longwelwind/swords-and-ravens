@@ -1,6 +1,7 @@
 import { CombatStats } from "../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import { ReplacementReason } from "../IngameGameState";
-import { RegionState } from "./Region";
+import { GameSnapshot } from "./Game";
+import { RegionSnapshot } from "./Region";
 
 export default interface GameLog {
     time: Date;
@@ -1035,7 +1036,8 @@ interface ObjectiveDeckEmpty {
 
 interface OrdersRevealed {
     type: "orders-revealed";
-    worldState: RegionState[];
+    worldState: RegionSnapshot[];
+    gameSnapshot?: GameSnapshot;
 }
 
 interface HouseCardsReturned {

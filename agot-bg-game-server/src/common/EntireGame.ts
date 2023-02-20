@@ -24,6 +24,7 @@ import getElapsedSeconds from "../utils/getElapsedSeconds";
 import WildlingCardType from "./ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
 import House from "./ingame-game-state/game-data-structure/House";
 import memoizeThrottle from "../utils/momoizeThrottle";
+import { EntireGameSnapshot } from "./ingame-game-state/game-data-structure/Game";
 
 export enum NotificationType {
     READY_TO_START,
@@ -86,6 +87,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         biddings: [number, House[]][] | null,
         highestBidder: House | null,
         lowestBidder: House | null) => void) | null = null;
+
+    @observable
+    replaySnapshot: EntireGameSnapshot | null = null;
 
     get lobbyGameState(): LobbyGameState | null {
         return this.childGameState instanceof LobbyGameState ? this.childGameState : null;

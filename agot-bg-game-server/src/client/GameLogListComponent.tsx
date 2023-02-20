@@ -57,6 +57,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
     allHouseCardsByAbilityId = new BetterMap(this.allHouseCards.values.filter(hc => hc.ability != null)
         .map(hc => [hc.ability?.id ?? "ability-never-null-here", hc]));
 
+    currentRound = 0;
+
     get ingame(): IngameGameState {
         return this.props.ingameGameState;
     }
@@ -105,6 +107,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         const lastSeenLogTime = lastSeenLogTicks ? ticksToTime(lastSeenLogTicks) : null;
 
+        this.currentRound = 0;
+
         return this.logManager.logs.map((l, i) => (
             <div key={`log_${i}`}>
                 {lastSeenLogTime == null && i == 0 && (
@@ -144,7 +148,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </Col>}
                     <Col>
                         <div className="game-log-content">
-                            {this.renderGameLogData(l.data)}
+                            {this.renderGameLogData(l.data, this.currentRound)}
                         </div>
                     </Col>
                 </Row>
@@ -161,7 +165,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         ));
     }
 
-    renderGameLogData(data: GameLogData): ReactNode {
+    renderGameLogData(data: GameLogData, currentRound: number): ReactNode {
         switch (data.type) {
             case "player-action": {
                 const house = this.game.houses.get(data.house);
@@ -200,6 +204,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     )}
                 </>;
             case "turn-begin":
+                this.currentRound = data.turn;
                 return <Row className="justify-content-center">
                     <Col xs={true}><hr/></Col>
                     <Col xs="auto">
@@ -1823,7 +1828,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 </p>;
             }
             case "orders-revealed": {
-                return <p className="clickable link-color" onClick={() => this.props.ingameGameState.replayWorldState = data.worldState}>
+                return <p id={`gamelog-orders-revealed-round-${currentRound}`} className="clickable link-color" onClick={() => {
+                        this.props.ingameGameState.entireGame.replaySnapshot = {
+                            worldSnapshot: data.worldState,
+                            gameSnapshot: data.gameSnapshot
+                        };
+                    }}>
                     Orders were revealed.
                 </p>;
             }

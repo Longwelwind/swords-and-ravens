@@ -5,7 +5,7 @@ import {ServerMessage} from "../../messages/ServerMessage";
 import User from "../../server/User";
 import World from "./game-data-structure/World";
 import Player, {SerializedPlayer} from "./Player";
-import Region, { RegionState } from "./game-data-structure/Region";
+import Region, { RegionSnapshot } from "./game-data-structure/Region";
 import PlanningGameState, {SerializedPlanningGameState} from "./planning-game-state/PlanningGameState";
 import ActionGameState, {SerializedActionGameState} from "./action-game-state/ActionGameState";
 import Order from "./game-data-structure/Order";
@@ -81,7 +81,6 @@ export default class IngameGameState extends GameState<
     @observable marchMarkers: BetterMap<Unit, Region> = new BetterMap();
     @observable unitsToBeAnimated: BetterMap<Unit, UnitOnMapProperties> = new BetterMap();
     @observable ordersToBeAnimated: BetterMap<Region, OrderOnMapProperties> = new BetterMap();
-    @observable replayWorldState: RegionState[] | null = null;
 
     onVoteStarted: (() => void) | null = null;
     onPreemptiveRaidNewAttack: ((biddings: [number, House[]][], highestBidder: House) => void) | null = null;
@@ -1847,6 +1846,21 @@ export default class IngameGameState extends GameState<
         }
 
         return !this.isVassalHouse(house);
+    }
+
+    getWorldSnapshotWithOrdersOnBoard(planningRestrictions: PlanningRestriction[] = []): RegionSnapshot[] {
+        const worldSnapshot = _.orderBy(this.world.getSnapshot(), [r => r.controller, r => r.id]);
+        worldSnapshot.forEach(r => {
+            const region =  this.world.regions.get(r.id);
+            if (region && this.ordersOnBoard.has(region)) {
+                const order = this.ordersOnBoard.get(region);
+                r.order = { type: order.type.id };
+                if (this.game.isOrderRestricted(region, order, planningRestrictions)) {
+                    r.order.restricted = true;
+                }
+            }
+        });
+        return worldSnapshot;
     }
 
     serializeToClient(admin: boolean, user: User | null): SerializedIngameGameState {

@@ -110,7 +110,6 @@ import houseIconImages from "./houseIconImages";
 import { preemptiveRaid } from "../common/ingame-game-state/game-data-structure/wildling-card/wildlingCardTypes";
 import VotesListComponent from "./VotesListComponent";
 import voteSound from "../../public/sounds/vote-started.ogg";
-import WorldStateComponent from "./WorldStateComponent";
 import { houseColorFilters } from "./houseColorFilters";
 import LocalStorageService from "./utils/localStorageService";
 
@@ -134,7 +133,7 @@ interface IngameComponentProps {
 @observer
 export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
-    @observable currentOpenedTab = this.user?.settings.lastOpenedTab ?? "chat";
+    @observable currentOpenedTab = this.user?.settings.lastOpenedTab ?? (this.gameSettings.pbem ? "game-logs" : "chat");
     @observable housesInfosCollapsed = this.user?.settings.tracksColumnCollapsed ?? false;
     @observable highlightedRegions = new BetterMap<Region, RegionOnMapProperties>();
     @observable showMapScrollbarInfo = false;
@@ -195,7 +194,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         return [
             {name: "Iron Throne", trackToShow: influenceTracks[0], realTrack: this.game.influenceTracks[0], stars: false},
             {name: "Fiefdoms", trackToShow: influenceTracks[1], realTrack: this.game.influenceTracks[1], stars: false},
-            {name: "King's Court", trackToShow: influenceTracks[2], realTrack: this.game.influenceTracks[2], stars: true},
+            {name: "King's Court", trackToShow: influenceTracks[2], realTrack: this.game.influenceTracks[2], stars: true}
         ]
     }
 
@@ -240,17 +239,15 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </Col>
                     {showMap && <Col xs={{span: "auto", order: columnOrders.mapColumn}} style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none"}}>
                     <div id="map-component" style={{ height: this.mapScrollbarEnabled ? "100%" : "auto", overflowY: "auto", overflowX: "hidden", maxHeight: MAP_HEIGHT }}>
-                        {this.ingame.replayWorldState
-                            ? <WorldStateComponent ingameGameState={this.ingame} worldState={this.ingame.replayWorldState} />
-                            : <MapComponent
-                                gameClient={this.gameClient}
-                                ingameGameState={this.ingame}
-                                mapControls={this.mapControls}
-                                collapseClicked={() => this.housesInfosCollapsed = !this.housesInfosCollapsed}
-                            />}
+                        <MapComponent
+                            gameClient={this.gameClient}
+                            ingameGameState={this.ingame}
+                            mapControls={this.mapControls}
+                            collapseClicked={() => this.housesInfosCollapsed = !this.housesInfosCollapsed}
+                        />
                     </div>
                     </Col>}
-                    {(!this.housesInfosCollapsed || isMobile) && !this.ingame.replayWorldState && (
+                    {(!this.housesInfosCollapsed || isMobile) && (
                     <Col xs={{ span: "auto", order: columnOrders.housesInfosColumn }} className={this.columnSwapAnimationClassName}
                         style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none"}}
                     >
@@ -315,13 +312,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         return (
             <div className={this.mapScrollbarEnabled ? "flex-ratio-container" : ""}>
-                <Card className={this.mapScrollbarEnabled ? "flex-sized-to-content" : ""} style={{marginBottom: "10px"}}>
+                <Card className={this.mapScrollbarEnabled ? "flex-sized-to-content mb-2" : ""}>
                     <ListGroup variant="flush">
                         {this.renderInfluenceTracks()}
                         <ListGroupItem style={{ minHeight: "130px" }}>
                             <SupplyTrackComponent
                                 supplyRestrictions={this.game.supplyRestrictions}
-                                houses={this.game.houses}
+                                houses={this.game.houses.values}
                                 ingame={this.ingame}
                                 mapControls={this.mapControls}
                             />
@@ -339,7 +336,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         <FontAwesomeIcon icon={faRightLeft} style={{color: "white"}}/>
                     </button>
                 </Card>
-                <Card className={this.mapScrollbarEnabled ? "flex-fill-remaining" : ""} style={{marginBottom: "10px"}}>
+                <Card className={this.mapScrollbarEnabled ? "flex-fill-remaining mb-2" : "mb-2"}>
                     <Card.Body id="houses-panel" className="no-space-around">
                         <ListGroup variant="flush">
                             <ListGroupItem className="d-flex justify-content-center p-2">
@@ -649,14 +646,17 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const wildlingsWarning = gameRunning && (this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 4);
         const wildlingsCritical = gameRunning && (this.game.wildlingStrength == MAX_WILDLING_STRENGTH || this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 2);
 
-        const border = this.gameClient.isOwnTurn() ?
-            "warning" : this.ingame.childGameState instanceof CancelledGameState ?
-            "danger" : undefined;
+        const isOwnTurn = this.gameClient.isOwnTurn();
+        const border = isOwnTurn
+            ? "warning"
+            : this.ingame.childGameState instanceof CancelledGameState
+                ? "danger"
+                : undefined;
 
         const isPhaseActive = (phase: GameStatePhaseProps): boolean => this.ingame.childGameState instanceof phase.gameState;
 
         return <div className={this.mapScrollbarEnabled ? "flex-ratio-container" : ""}>
-            <Card id="game-state-panel" className={this.mapScrollbarEnabled ? "flex-sized-to-content" : ""} border={border} style={{maxHeight: this.mapScrollbarEnabled ? "70%" : "none", paddingRight: "2px", marginBottom: "10px", borderWidth: "3px", overflowY: "scroll" }}>
+            <Card id="game-state-panel" className={this.mapScrollbarEnabled ? "flex-sized-to-content mb-2" : "mb-2"} border={border} style={{maxHeight: this.mapScrollbarEnabled ? "70%" : "none", paddingRight: "2px", borderWidth: "3px", overflowY: "scroll" }}>
                 <Row className="no-space-around">
                     <Col>
                         <ListGroup variant="flush">
@@ -778,7 +778,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 >
                     <FontAwesomeIcon icon={faRightLeft} style={{color: "white"}}/>
                 </button>
-                {this.gameClient.isOwnTurn() && <Spinner animation="grow" variant="warning" size="sm" style={{position: "absolute", bottom: "4px", left: "4px" }}/>}
+                {isOwnTurn && <Spinner animation="grow" variant="warning" size="sm" style={{position: "absolute", bottom: "4px", left: "4px" }}/>}
             </Card>
             <Card style={{height: this.mapScrollbarEnabled ? "auto" : "800px"}} className={classNames(
                 {"flex-fill-remaining": this.mapScrollbarEnabled},
@@ -1009,10 +1009,28 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     renderGameLogRoundsDropDownItems(): JSX.Element[] {
         const gameRoundElements = document.querySelectorAll('*[id^="gamelog-round-"]');
+        const ordersReveleadElements = Array.from(document.querySelectorAll('*[id^="gamelog-orders-revealed-round-"]'));
         const result: JSX.Element[] = [];
 
-        gameRoundElements.forEach(elem => {
-            result.push(<Dropdown.Item key={`dropdownitem-for-${elem.id}`} onClick={() => elem.scrollIntoView()}>Round {elem.id.replace("gamelog-round-", "")}</Dropdown.Item>);
+        gameRoundElements.forEach(gameRoundElem => {
+            const round = gameRoundElem.id.replace("gamelog-round-", "");
+
+            result.push(<Dropdown.Item className="text-center" key={`dropdownitem-for-${gameRoundElem.id}`} onClick={() => {
+                // When game log is the active tab, items get rendered before this logic here can work
+                // Therefore we search the item during onClick again to make it work
+                const elemToScroll = document.getElementById(gameRoundElem.id);
+                elemToScroll?.scrollIntoView();
+            }}>Round {round}</Dropdown.Item>);
+
+            const ordersRevealedElem = ordersReveleadElements.find(elem => elem.id == `gamelog-orders-revealed-round-${round}`);
+            if (ordersRevealedElem) {
+                result.push(<Dropdown.Item className="text-center" key={`dropdownitem-for-${ordersRevealedElem.id}`} onClick={() => {
+                    // When game log is the active tab, items get rendered before this logic here can work
+                    // Therefore we search the item during onClick again to make it work
+                    const elemToScroll = document.getElementById(ordersRevealedElem.id);
+                    elemToScroll?.scrollIntoView();
+                }}>Orders were revealed</Dropdown.Item>);
+            }
         });
 
         return result;

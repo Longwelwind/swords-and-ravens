@@ -219,10 +219,10 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                             <div style={{ fontSize: "1.25rem", color: victoryPointsWarning ? "#F39C12" : victoryPointsCritical ? "#FF0000" : undefined }}><b>{victoryPoints}</b></div>
                             <img
                                 className={classNames(
+                                    "ml-2",
                                     { "dye-warning": victoryPointsWarning },
                                     { "dye-critical": victoryPointsCritical })}
                                 src={victoryImage} width={40}
-                                style={{ marginLeft: "10px" }}
                             />
                         </Col>
                     </OverlayTrigger>)}
@@ -454,7 +454,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         const regions = this.ingame.entireGame.isFeastForCrows ? this.ingame.world.regions.values : [];
         return <Tooltip id={house.id + "-victory-tooltip"} className="tooltip-w-100">
             <Col>
-                <h5 className="text-center">&nbsp;&nbsp;Total&nbsp;Land&nbsp;Areas&nbsp;&nbsp;</h5>
+            <h5 className="text-center mx-2">Total Land Areas</h5>
                 <h4 className="text-center"><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
                 {this.ingame.entireGame.isFeastForCrows && <>
                     <br/>
