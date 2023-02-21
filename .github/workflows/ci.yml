@@ -18,3 +18,18 @@ jobs:
     - uses: actions/checkout@v1
     - name: Build website Docker image
       run: docker build . -f ./website.Dockerfile
+  # build-assets:
+  #   name: Build game assets
+  #   runs-on: ubuntu-latest
+  #   defaults:
+  #     run:
+  #       working-directory: ./agot-bg-game-server
+  #   steps:
+  #   - uses: actions/checkout@v1
+  #   - uses: actions/setup-node@v3
+  #     with:
+  #       node-version: 16
+  #   - name: Install dependencies
+  #     run: yarn install --frozen-lockfile
+  #   - name: Build assets
+  #     run: yarn run generate-json-schemas && yarn run build-client
