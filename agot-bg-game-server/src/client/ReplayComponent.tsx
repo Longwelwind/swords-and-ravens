@@ -25,7 +25,6 @@ import podiumWinnerImage from "../../public/images/icons/podium-winner.svg";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import GameLogListComponent from "./GameLogListComponent";
 import Game, { EntireGameSnapshot as EntireGameSnapshot, GameSnapshot, MAX_WILDLING_STRENGTH } from "../common/ingame-game-state/game-data-structure/Game";
-import InfluenceIconComponent from "./game-state-panel/utils/InfluenceIconComponent";
 import SupplyTrackComponent from "./game-state-panel/utils/SupplyTrackComponent";
 import Dropdown from "react-bootstrap/Dropdown";
 import User from "../server/User";
@@ -41,16 +40,19 @@ import houseInfluenceImages from "./houseInfluenceImages";
 import houseOrderImages from "./houseOrderImages";
 import housePowerTokensImages from "./housePowerTokensImages";
 import unitImages from "./unitImages";
-import { faRightLeft } from "@fortawesome/free-solid-svg-icons";
+import { faCog, faHistory, faRightLeft, faUniversity } from "@fortawesome/free-solid-svg-icons";
 import BetterMap from "../utils/BetterMap";
-import { Spinner } from "react-bootstrap";
+import { Nav, Spinner, Tab } from "react-bootstrap";
 import houseIconImages from "./houseIconImages";
 import WorldSnapshotComponent from "./WorldSnapshotComponent";
 import { houseColorFilters } from "./houseColorFilters";
 import HouseCard from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
-import HouseReplayComponent from "./HouseReplayComponent";
+import HouseSnapshotComponent from "./HouseSnapshotComponent";
 import { RegionSnapshot } from "../common/ingame-game-state/game-data-structure/Region";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
+import GameSettingsComponent from "./GameSettingsComponent";
+import UserSettingsComponent from "./UserSettingsComponent";
+import IronBankSnapshotTabComponent from "./IronBankSnapshotTabComponent";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -66,6 +68,7 @@ interface ReplayComponentProps {
 
 @observer
 export default class ReplayComponent extends Component<ReplayComponentProps> {
+    @observable currentOpenedTab = "game-logs";
     @observable housesInfosCollapsed = this.user?.settings.tracksColumnCollapsed ?? false;
     @observable columnSwapAnimationClassName = "";
 
@@ -105,7 +108,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
         return this.props.gameClient;
     }
 
-    get tracks(): {name: string; trackToShow: (House | null)[]; realTrack: House[]; stars: boolean}[] {
+    get tracks(): {track: (House | null)[]; stars: boolean}[] {
         if (!this.gameSnapshot) {
             return [];
         }
@@ -114,9 +117,9 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
         const kingsCourt = this.gameSnapshot.kingsCourtTrack.map(h => this.game.houses.get(h));
 
         return [
-            {name: "Iron Throne", trackToShow: ironThrone, realTrack: ironThrone, stars: false},
-            {name: "Fiefdoms", trackToShow: fiefdoms, realTrack: fiefdoms, stars: false},
-            {name: "King's Court", trackToShow: kingsCourt, realTrack: kingsCourt, stars: true}
+            { track: ironThrone, stars: false},
+            { track: fiefdoms, stars: false},
+            { track: kingsCourt, stars: true}
         ]
     }
 
@@ -148,7 +151,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
             </Col>
             <Col xs={{span: "auto", order: columnOrders.mapColumn}} style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none"}}>
                 <div id="map-component" style={{ height: this.mapScrollbarEnabled ? "100%" : "auto", overflowY: "auto", overflowX: "hidden", maxHeight: MAP_HEIGHT }}>
-                    <WorldSnapshotComponent ingameGameState={this.ingame} worldSnapshot={this.worldSnapshot} />
+                    <WorldSnapshotComponent ingameGameState={this.ingame} worldSnapshot={this.worldSnapshot} ironBank={this.gameSnapshot?.ironBank}/>
                 </div>
             </Col>
             {(!this.housesInfosCollapsed || isMobile) && <Col
@@ -219,7 +222,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
                                 </OverlayTrigger>
                             </ListGroupItem>
                             {houses.entries.map(([data, h]) => (
-                                <HouseReplayComponent
+                                <HouseSnapshotComponent
                                     key={`house-row_${h.id}`}
                                     gameClient={this.gameClient}
                                     ingame={this.ingame}
@@ -236,7 +239,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
     }
 
     private renderInfluenceTracks(): React.ReactNode {
-        return this.tracks.map(({ name, trackToShow, realTrack, stars }, i) => (
+        return this.tracks.map(({ track, stars }, i) => (
             <ListGroupItem key={`influence-track-container_${i}`} style={{ minHeight: "61px" }}>
                 <Row className="align-items-center">
                     <Col xs="auto" className="text-center" style={{ width: "46px" }}>
@@ -277,7 +280,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
                             <img src={i == 0 ? stoneThroneImage : i == 1 ? this.gameSnapshot?.vsbUsed ? diamondHiltUsedImage : diamondHiltImage : ravenImage} width={32} />
                         </OverlayTrigger>
                     </Col>
-                    {trackToShow.map((h, j) => (
+                    {track.map((h, j) => (
                         <Col xs="auto" key={`influence-track_${i}_${h?.id ?? j}`}>
                             <SimpleInfluenceIconComponent house={h} />
                             <div className="tracker-star-container">
@@ -369,25 +372,100 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
                 {"flex-fill-remaining": this.mapScrollbarEnabled},
                 "text-large"
             )}>
-                <Card.Body id="game-log-panel">
-                    {/* This is an invisible div to force the parent to stretch to its remaining width */}
-                    <div style={{visibility: "hidden", width: "850px"}} />
-                    <div className="d-flex flex-column h-100">
-                                <div className="d-flex flex-column align-items-center">
-                                    <Dropdown className="mb-2">
-                                        <Dropdown.Toggle variant="secondary" size="sm">
-                                            Jump to
-                                        </Dropdown.Toggle>
-                                        <Dropdown.Menu>
-                                            {this.renderGameLogRoundsDropDownItems()}
-                                        </Dropdown.Menu>
-                                    </Dropdown>
+                <Tab.Container activeKey={this.currentOpenedTab}
+                    onSelect={k => {
+                        if (k) {
+                            this.currentOpenedTab = k;
+                        }
+                    }}>
+                    <Card.Header>
+                        <Nav variant="tabs">
+                            <Nav.Item>
+                                <Nav.Link eventKey="game-logs">
+                                    <OverlayTrigger
+                                        overlay={<Tooltip id="logs-tooltip">Game Logs</Tooltip>}
+                                        placement="top"
+                                    >
+                                        <span>
+                                            <FontAwesomeIcon
+                                                style={{ color: "white" }}
+                                                icon={faHistory} />
+                                        </span>
+                                    </OverlayTrigger>
+                                </Nav.Link>
+                            </Nav.Item>
+                            {this.gameSnapshot?.ironBank && this.gameSettings.playerCount < 8 && (
+                                <Nav.Item>
+                                    <Nav.Link eventKey="iron-bank">
+                                        <OverlayTrigger
+                                            overlay={<Tooltip id="iron-bank-tooltip">The Iron Bank</Tooltip>}
+                                            placement="top"
+                                        >
+                                            <span>
+                                                <FontAwesomeIcon
+                                                    style={{ color: "white" }}
+                                                    icon={faUniversity} />
+                                            </span>
+                                        </OverlayTrigger>
+                                    </Nav.Link>
+                                </Nav.Item>
+                            )}
+                            <Nav.Item>
+                                <Nav.Link eventKey="settings">
+                                    <OverlayTrigger
+                                        overlay={<Tooltip id="settings-tooltip">Settings</Tooltip>}
+                                        placement="top"
+                                    >
+                                        <span>
+                                            <FontAwesomeIcon
+                                                style={{ color: "white" }}
+                                                icon={faCog} />
+
+                                            {/* &nbsp;Settings */}
+                                        </span>
+                                    </OverlayTrigger>
+                                </Nav.Link>
+                            </Nav.Item>
+                        </Nav>
+                    </Card.Header>
+                    <Card.Body id="game-log-panel">
+                        {/* This is an invisible div to force the parent to stretch to its remaining width */}
+                        <div style={{visibility: "hidden", width: "850px"}} />
+                        <Tab.Content className="h-100">
+                            <Tab.Pane eventKey="game-logs" className="h-100">
+                                <div className="d-flex flex-column h-100">
+                                    <div className="d-flex flex-column align-items-center">
+                                        <Dropdown className="mb-2">
+                                            <Dropdown.Toggle variant="secondary" size="sm">
+                                                Jump to
+                                            </Dropdown.Toggle>
+                                            <Dropdown.Menu>
+                                                {this.renderGameLogRoundsDropDownItems()}
+                                            </Dropdown.Menu>
+                                        </Dropdown>
+                                    </div>
+                                    <ScrollToBottom className="flex-fill-remaining" scrollViewClassName="overflow-x-hidden">
+                                        <GameLogListComponent ingameGameState={this.ingame} gameClient={this.gameClient} currentlyViewed={true} />
+                                    </ScrollToBottom>
                                 </div>
-                                <ScrollToBottom className="flex-fill-remaining" scrollViewClassName="overflow-x-hidden">
-                                    <GameLogListComponent ingameGameState={this.ingame} gameClient={this.gameClient} currentlyViewed={true} />
-                                </ScrollToBottom>
-                            </div>
+                            </Tab.Pane>
+                            {this.game.ironBank && this.gameSnapshot?.ironBank && <Tab.Pane eventKey="iron-bank" className="h-100">
+                                <div className="d-flex flex-column h-100" style={{overflowY: "scroll"}}>
+                                    <IronBankSnapshotTabComponent ingame={this.ingame} ironBank={this.gameSnapshot?.ironBank} />
+                                </div>
+                            </Tab.Pane>}
+                            <Tab.Pane eventKey="settings" className="h-100">
+                                <GameSettingsComponent gameClient={this.gameClient}
+                                    entireGame={this.ingame.entireGame} />
+                                <div style={{marginTop: -20}} >
+                                    <UserSettingsComponent user={this.user}
+                                        entireGame={this.ingame.entireGame}
+                                    />
+                                </div>
+                            </Tab.Pane>
+                        </Tab.Content>
                     </Card.Body>
+                </Tab.Container>
             </Card>
         </div>
     }

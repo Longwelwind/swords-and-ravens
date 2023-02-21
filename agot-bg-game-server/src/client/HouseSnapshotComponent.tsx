@@ -5,8 +5,6 @@ import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import { ListGroupItem, Row, Col, OverlayTrigger, Tooltip } from "react-bootstrap";
 import classNames from "classnames";
-import unitTypes from "..//common/ingame-game-state/game-data-structure/unitTypes";
-import unitImages from "./unitImages";
 import housePowerTokensImages from "./housePowerTokensImages";
 import _ from "lodash";
 import { HouseCardState } from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
@@ -21,9 +19,9 @@ import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
 import { observer } from "mobx-react";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 
-interface HouseReplayComponentProps {
+interface HouseSnapshotComponentProps {
     house: House;
-    isVassal: boolean;
+    isVassal?: boolean;
     suzerainHouseId?: string;
     totalLandAreas: number;
     gameClient: GameClient;
@@ -31,7 +29,7 @@ interface HouseReplayComponentProps {
 }
 
 @observer
-export default class HouseReplayComponent extends Component<HouseReplayComponentProps> {
+export default class HouseSnapshotComponent extends Component<HouseSnapshotComponentProps> {
     get house(): House {
         return this.props.house;
     }
