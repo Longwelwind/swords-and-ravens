@@ -133,7 +133,7 @@ interface IngameComponentProps {
 @observer
 export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
-    @observable currentOpenedTab = this.user?.settings.lastOpenedTab ?? (this.gameSettings.pbem ? "game-logs" : "chat");
+    @observable currentOpenedTab = this.user?.settings.lastOpenedTab ?? "chat";
     @observable housesInfosCollapsed = this.user?.settings.tracksColumnCollapsed ?? false;
     @observable highlightedRegions = new BetterMap<Region, RegionOnMapProperties>();
     @observable showMapScrollbarInfo = false;

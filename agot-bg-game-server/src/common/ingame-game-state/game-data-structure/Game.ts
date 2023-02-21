@@ -17,7 +17,7 @@ import PlanningRestriction from "./westeros-card/planning-restriction/PlanningRe
 import WesterosCardType from "./westeros-card/WesterosCardType";
 import IngameGameState from "../IngameGameState";
 import { vassalHousesOrders, playerHousesOrders, seaOrders, ironBankOrder } from "./orders";
-import IronBank, { SerializedIronBank } from "./IronBank";
+import IronBank, { IronBankSnapshot, SerializedIronBank } from "./IronBank";
 import Player from "../Player";
 import { ObjectiveCard } from "./static-data-structure/ObjectiveCard";
 import { objectiveCards } from "./static-data-structure/objectiveCards";
@@ -543,8 +543,8 @@ export default class Game {
             kingsCourtTrack: this.kingsCourtTrack.map(h => h.id),
             round: this.turn,
             wildlingStrength: this.wildlingStrength,
-            dragonStrength: this.currentDragonStrength,
-            vsbUsed: this.valyrianSteelBladeUsed,
+            dragonStrength: this.currentDragonStrength > -1 ? this.currentDragonStrength : undefined,
+            vsbUsed: this.valyrianSteelBladeUsed ? this.valyrianSteelBladeUsed : undefined,
             housesOnVictoryTrack: this.getPotentialWinners().map(h => {
                 return {
                     id: h.id,
@@ -558,10 +558,11 @@ export default class Game {
                         }
                     }),
                     powerTokens: h.powerTokens,
-                    isVassal: this.ingame.isVassalHouse(h),
+                    isVassal: this.ingame.isVassalHouse ? this.ingame.isVassalHouse(h): undefined,
                     suzerainHouseId: this.ingame.game.vassalRelations.tryGet(h, undefined)?.id
                 }
-            })
+            }),
+            ironBank: this.ironBank?.getSnapshot()
         }
     }
 
@@ -698,19 +699,20 @@ export interface HouseSnapshot {
         state: HouseCardState;
     }[];
     powerTokens: number;
-    isVassal: boolean;
+    isVassal?: boolean;
     suzerainHouseId?: string;
 }
 
 export interface GameSnapshot {
     round: number;
     wildlingStrength: number;
-    dragonStrength: number;
+    dragonStrength?: number;
     ironThroneTrack: string[];
     fiefdomsTrack: string[];
     kingsCourtTrack: string[];
-    vsbUsed: boolean;
     housesOnVictoryTrack: HouseSnapshot[];
+    vsbUsed?: boolean;
+    ironBank?: IronBankSnapshot;
 }
 
 export interface EntireGameSnapshot {

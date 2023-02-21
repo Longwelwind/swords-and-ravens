@@ -105,6 +105,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                 crownModifiers.set(region.id, region.crownModifier);
             }
         }
+
         const ironBankView = this.ingame.world.ironBankView;
 
         const propertiesForRegions = this.getModifiedPropertiesForEntities<Region, RegionOnMapProperties>(

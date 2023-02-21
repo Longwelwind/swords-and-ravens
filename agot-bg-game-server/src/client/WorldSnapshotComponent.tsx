@@ -18,7 +18,13 @@ import BetterMap from "../utils/BetterMap";
 import _ from "lodash";
 import getGarrisonToken from "./garrisonTokens";
 import loyaltyTokenImage from "../../public/images/power-tokens/Loyalty.png"
-import { isMobile } from "react-device-detect";
+import { IronBankSnapshot } from "../common/ingame-game-state/game-data-structure/IronBank";
+import StaticIronBankView from "../common/ingame-game-state/game-data-structure/static-data-structure/StaticIronBankView";
+import { OverlayTrigger } from "react-bootstrap";
+import ImagePopover from "./utils/ImagePopover";
+import preventOverflow from "@popperjs/core/lib/modifiers/preventOverflow";
+import loanCardImages from "./loanCardImages";
+import IronBankSnapshotComponent from "./IronBankSnapshotComponent";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -27,6 +33,7 @@ export const DELUXE_MAT_WIDTH = 1204;
 interface WorldSnapshotComponentProps {
     ingameGameState: IngameGameState;
     worldSnapshot: RegionSnapshot[];
+    ironBank?: IronBankSnapshot;
 }
 
 export default class WorldSnapshotComponent extends Component<WorldSnapshotComponentProps> {
@@ -62,10 +69,11 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
             }
         }
 
+        const ironBankView = this.ingame.world.ironBankView;
+
         return (
-            <div className={classNames("map", "animate__animated", "animate__fadeIn", {"clickable-no-underline": !isMobile})}
+            <div className="map animate__animated animate__fadeIn"
                 style={{ backgroundImage: `url(${this.backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem" }}
-                onClick={!isMobile ? () => this.ingame.entireGame.replaySnapshot = null : undefined}
             >
                 <div style={{ position: "relative" }}>
                     {this.props.worldSnapshot.map(r => (
@@ -104,12 +112,56 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
                     ))}
                     {this.renderUnits(garrisons)}
                     {this.renderOrders()}
+                    {this.renderIronBankInfos(ironBankView)}
+                    {this.renderLoanCardDeck(ironBankView)}
+                    {this.renderLoanCardSlots(ironBankView)}
                 </div>
                 <svg style={{ width: `${this.mapWidth}px`, height: `${MAP_HEIGHT}px` }}>
                     {this.renderRegions()}
                 </svg>
             </div>
         )
+    }
+
+    private renderLoanCardSlots(ironBankView: StaticIronBankView | null): ReactNode {
+        return ironBankView && this.props.ironBank && this.props.ironBank.loanSlots.map((lc, i) => (
+            <OverlayTrigger
+                key={`loan-slot_${i}`}
+                overlay={<ImagePopover className="vertical-game-card bring-to-front" style={{ backgroundImage: lc ? `url(${loanCardImages.get(lc)})` : "none" }} />}
+                popperConfig={{ modifiers: [preventOverflow] }}
+                delay={{ show: 250, hide: 0 }}
+                placement="auto"
+            >
+                <div className="order-container" style={{
+                    left: ironBankView.loanSlots[i].point.x,
+                    top: ironBankView.loanSlots[i].point.y
+                }}
+                >
+                    <div className="iron-bank-content hover-weak-outline" style={{ backgroundImage: lc ? `url(${loanCardImages.get(lc)})` : "none", width: ironBankView.loanSlots[i].width, height: ironBankView.loanSlots[i].height }} />
+                </div>
+            </OverlayTrigger>
+        ));
+    }
+
+    private renderLoanCardDeck(ironBankView: StaticIronBankView | null): ReactNode {
+        return ironBankView && <div id="loan-card-deck" className="order-container" style={{
+            left: ironBankView.deckSlot.point.x,
+            top: ironBankView.deckSlot.point.y
+        }}>
+            <div className="iron-bank-content" style={{ backgroundImage: `url(${loanCardImages.get("back")})`, width: ironBankView.deckSlot.width, height: ironBankView.deckSlot.height }} />
+        </div>;
+    }
+
+    private renderIronBankInfos(ironBankView: StaticIronBankView | null): ReactNode {
+        return ironBankView && this.props.ironBank && <div id="iron-bank-info" style={{
+            position: "absolute",
+            left: ironBankView.infoComponentSlot.point.x,
+            top: ironBankView.infoComponentSlot.point.y,
+            height: ironBankView.infoComponentSlot.height,
+            width: ironBankView.infoComponentSlot.width
+        }}>
+            <IronBankSnapshotComponent ingame={this.ingame} ironBank={this.props.ironBank} />
+        </div>;
     }
 
     renderRegions(): ReactNode {

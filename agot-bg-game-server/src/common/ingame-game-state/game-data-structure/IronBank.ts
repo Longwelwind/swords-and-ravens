@@ -24,7 +24,7 @@ export default class IronBank {
         return groupBy(this.purchasedLoans, lc => lc.purchasedBy) as BetterMap<House, LoanCard[]>;
     }
 
-    get interestCost(): [House, number][] {
+    get interestCostPerHouse(): [House, number][] {
         return this.purchasedLoansPerHouse.entries.map(([house, lcs]) => [house, lcs.length]);
     }
 
@@ -116,7 +116,7 @@ export default class IronBank {
     // Returns the amount of unpaid interest
     payInterest(): [House, number][] {
         const result = new BetterMap<House, number>();
-        this.interestCost.filter(([house, _]) => !this.game.ingame.isVassalHouse(house)).forEach(([house, cost]) => {
+        this.interestCostPerHouse.filter(([house, _]) => !this.game.ingame.isVassalHouse(house)).forEach(([house, cost]) => {
             const reallyPaid = this.game.ingame.changePowerTokens(house, -cost);
 
             const delta = cost + reallyPaid;
@@ -139,6 +139,14 @@ export default class IronBank {
             }
         })
         return sortedByTurnOrder.entries;
+    }
+
+    getSnapshot(): IronBankSnapshot {
+        return {
+            loanSlots: this.loanSlots.map(lc => lc != null ? lc.type.id : null),
+            interestCosts: this.interestCostPerHouse.length > 0 ? this.interestCostPerHouse.map(([h, cost]) => [h.id, cost]) : undefined,
+            braavosController: this.controllerOfBraavos ? this.controllerOfBraavos.id : undefined
+        }
     }
 
     serializeToClient(admin: boolean): SerializedIronBank {
@@ -166,4 +174,10 @@ export interface SerializedIronBank {
     loanCardDeck: SerializedLoanCard[];
     purchasedLoans: SerializedLoanCard[];
     loanSlots: (SerializedLoanCard | null)[];
+}
+
+export interface IronBankSnapshot {
+    loanSlots: (string | null)[];
+    interestCosts?: [string, number][];
+    braavosController?: string;
 }
