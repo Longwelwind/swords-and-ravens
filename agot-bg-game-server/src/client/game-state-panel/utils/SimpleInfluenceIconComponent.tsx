@@ -4,14 +4,15 @@ import houseInfluenceImages from "../../houseInfluenceImages";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import { LobbyHouse } from "../../../common/lobby-game-state/LobbyGameState";
 import { preventOverflow } from "@popperjs/core";
+import classNames from "classnames";
 
 interface SimpleInfluenceIconComponentProps {
-    house: LobbyHouse;
+    house: LobbyHouse | null;
     small?: boolean;
 }
 
 export default class SimpleInfluenceIconComponent extends Component<SimpleInfluenceIconComponentProps> {
-    get house(): LobbyHouse {
+    get house(): LobbyHouse | null {
         return this.props.house;
     }
 
@@ -19,14 +20,15 @@ export default class SimpleInfluenceIconComponent extends Component<SimpleInflue
         const height = this.props.small ? "28px" : undefined;
         return <OverlayTrigger overlay={
                 <Tooltip id="influence-icon">
-                    <b>{this.house.name}</b>
+                    <b>{this.house?.name ?? "Unknown house"}</b>
                 </Tooltip>
             }
             placement="bottom"
             popperConfig={{modifiers: [preventOverflow]}}
         >
-            <div className="influence-icon"
-                style={{backgroundImage: `url(${houseInfluenceImages.get(this.house.id)})`, height: height}}/>
+            <div className={classNames("influence-icon", {"invisible": this.house == null})}
+                style={{backgroundImage: this.house ? `url(${houseInfluenceImages.get(this.house.id)})` : "none", height: height}}>
+            </div>
         </OverlayTrigger>;
     }
 }

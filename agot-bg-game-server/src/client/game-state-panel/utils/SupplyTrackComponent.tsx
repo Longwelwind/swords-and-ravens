@@ -18,9 +18,9 @@ import _ from "lodash";
 
 interface SupplyTrackComponentProps {
     supplyRestrictions: number[][];
-    houses: BetterMap<string, House>;
-    ingame: IngameGameState;
-    mapControls: MapControls;
+    houses: House[];
+    ingame?: IngameGameState;
+    mapControls?: MapControls;
 }
 
 @observer
@@ -143,6 +143,10 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
     }
 
     setHighlightedRegions(house: House): void {
+        if (!this.props.ingame) {
+            return;
+        }
+
         const regions = this.props.ingame.world.regions.values.filter(r => r.supplyIcons > 0 && r.getController() == house);
         this.highlightedRegions.clear();
 
@@ -166,7 +170,7 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
     }
 
     getHousesAtSupplyLevel(supplyLevel: number): House[] {
-        return this.props.houses.values.filter(h => h.supplyLevel == supplyLevel);
+        return this.props.houses.filter(h => h.supplyLevel == supplyLevel);
     }
 
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
@@ -174,10 +178,18 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
     }
 
     componentDidMount(): void {
+        if (!this.props.mapControls) {
+            return;
+        }
+
         this.props.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
     }
 
     componentWillUnmount(): void {
+        if (!this.props.mapControls) {
+            return;
+        }
+
         _.pull(this.props.mapControls.modifyRegionsOnMap, this.modifyRegionsOnMapCallback);
     }
 }

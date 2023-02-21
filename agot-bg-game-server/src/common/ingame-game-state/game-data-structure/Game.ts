@@ -1,6 +1,6 @@
 import House, {SerializedHouse} from "./House";
 import World, {SerializedWorld} from "./World";
-import Region from "./Region";
+import Region, { RegionSnapshot } from "./Region";
 import UnitType from "./UnitType";
 import Unit from "./Unit";
 import Order from "./Order";
@@ -11,7 +11,7 @@ import shuffleInPlace from "../../../utils/shuffleInPlace";
 import shuffle from "../../../utils/shuffle";
 import WildlingCard, {SerializedWildlingCard} from "./wildling-card/WildlingCard";
 import BetterMap from "../../../utils/BetterMap";
-import HouseCard, { SerializedHouseCard } from "./house-card/HouseCard";
+import HouseCard, { HouseCardState, SerializedHouseCard } from "./house-card/HouseCard";
 import {land, port} from "./regionTypes";
 import PlanningRestriction from "./westeros-card/planning-restriction/PlanningRestriction";
 import WesterosCardType from "./westeros-card/WesterosCardType";
@@ -536,6 +536,35 @@ export default class Game {
         });
     }
 
+    getSnapshot(): GameSnapshot {
+        return {
+            ironThroneTrack: this.ironThroneTrack.map(h => h.id),
+            fiefdomsTrack: this.fiefdomsTrack.map(h => h.id),
+            kingsCourtTrack: this.kingsCourtTrack.map(h => h.id),
+            round: this.turn,
+            wildlingStrength: this.wildlingStrength,
+            dragonStrength: this.currentDragonStrength,
+            vsbUsed: this.valyrianSteelBladeUsed,
+            housesOnVictoryTrack: this.getPotentialWinners().map(h => {
+                return {
+                    id: h.id,
+                    victoryPoints: this.getVictoryPoints(h),
+                    landAreaCount: this.getTotalControlledLandRegions(h),
+                    supply: h.supplyLevel,
+                    houseCards: _.orderBy(h.houseCards.values, hc => hc.combatStrength).map(hc => {
+                        return {
+                            id: hc.id,
+                            state: hc.state
+                        }
+                    }),
+                    powerTokens: h.powerTokens,
+                    isVassal: this.ingame.isVassalHouse(h),
+                    suzerainHouseId: this.ingame.game.vassalRelations.tryGet(h, undefined)?.id
+                }
+            })
+        }
+    }
+
     serializeToClient(admin: boolean, player: Player | null): SerializedGame {
         return {
             lastUnitId: this.lastUnitId,
@@ -657,4 +686,34 @@ export interface SerializedGame {
     ironBank: SerializedIronBank | null;
     objectiveDeck: string[];
     usurper: string | null;
+}
+
+export interface HouseSnapshot {
+    id: string;
+    victoryPoints: number;
+    landAreaCount: number;
+    supply: number;
+    houseCards: {
+        id: string;
+        state: HouseCardState;
+    }[];
+    powerTokens: number;
+    isVassal: boolean;
+    suzerainHouseId?: string;
+}
+
+export interface GameSnapshot {
+    round: number;
+    wildlingStrength: number;
+    dragonStrength: number;
+    ironThroneTrack: string[];
+    fiefdomsTrack: string[];
+    kingsCourtTrack: string[];
+    vsbUsed: boolean;
+    housesOnVictoryTrack: HouseSnapshot[];
+}
+
+export interface EntireGameSnapshot {
+    worldSnapshot: RegionSnapshot[];
+    gameSnapshot?: GameSnapshot;
 }

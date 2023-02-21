@@ -1,7 +1,7 @@
 import { Component, ReactNode } from "react";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import * as React from "react";
-import Region, { RegionState } from "../common/ingame-game-state/game-data-structure/Region";
+import Region, { RegionSnapshot } from "../common/ingame-game-state/game-data-structure/Region";
 import westerosImage from "../../public/images/westeros.jpg";
 import westeros7pImage from "../../public/images/westeros-7p.jpg";
 import westerosWithEssosImage from "../../public/images/westeros-with-essos.jpg";
@@ -24,12 +24,12 @@ export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
 export const DELUXE_MAT_WIDTH = 1204;
 
-interface WorldStateComponentProps {
+interface WorldSnapshotComponentProps {
     ingameGameState: IngameGameState;
-    worldState: RegionState[];
+    worldSnapshot: RegionSnapshot[];
 }
 
-export default class WorldStateComponent extends Component<WorldStateComponentProps> {
+export default class WorldSnapshotComponent extends Component<WorldSnapshotComponentProps> {
     backgroundImage: string = westerosImage;
     mapWidth: number = MAP_WIDTH;
 
@@ -37,7 +37,7 @@ export default class WorldStateComponent extends Component<WorldStateComponentPr
         return this.props.ingameGameState;
     }
 
-    constructor(props: WorldStateComponentProps) {
+    constructor(props: WorldSnapshotComponentProps) {
         super(props);
         const settings = this.ingame.entireGame.gameSettings;
 
@@ -56,7 +56,7 @@ export default class WorldStateComponent extends Component<WorldStateComponentPr
         const regions = this.ingame.world.regions;
         const garrisons = new BetterMap<string, string | null>();
 
-        for (const region of this.props.worldState) {
+        for (const region of this.props.worldSnapshot) {
             if (region.garrison && region.garrison > 0 && region.garrison != 1000) {
                 garrisons.set(region.id, getGarrisonToken(region.garrison));
             }
@@ -65,9 +65,10 @@ export default class WorldStateComponent extends Component<WorldStateComponentPr
         return (
             <div className={classNames("map", "animate__animated", "animate__fadeIn", {"clickable-no-underline": !isMobile})}
                 style={{ backgroundImage: `url(${this.backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem" }}
-                onClick={!isMobile ? () => this.ingame.replayWorldState = null : undefined}>
+                onClick={!isMobile ? () => this.ingame.entireGame.replaySnapshot = null : undefined}
+            >
                 <div style={{ position: "relative" }}>
-                    {this.props.worldState.map(r => (
+                    {this.props.worldSnapshot.map(r => (
                         <div key={`world-state_${r.id}`}>
                             {r.castleModifier !== undefined && (
                                 <div
@@ -113,7 +114,7 @@ export default class WorldStateComponent extends Component<WorldStateComponentPr
 
     renderRegions(): ReactNode {
         const regions = this.ingame.world.regions;
-        return this.props.worldState.map(region => {
+        return this.props.worldSnapshot.map(region => {
             const blocked = region.garrison == 1000;
             return <polygon key={`world-state_region-polygon_${region.id}`}
                         points={this.getRegionPath(regions.get(region.id))}
@@ -127,7 +128,7 @@ export default class WorldStateComponent extends Component<WorldStateComponentPr
     renderUnits(garrisons: BetterMap<string, string | null>): ReactNode {
         const regions = this.ingame.world.regions;
 
-        return this.props.worldState.map(r => {
+        return this.props.worldSnapshot.map(r => {
             return <div
                 key={`world-state_units-container_${r.id}`}
                 className="units-container"
@@ -215,21 +216,21 @@ export default class WorldStateComponent extends Component<WorldStateComponentPr
     }
 
     renderOrders(): ReactNode {
-        return this.props.worldState.map(region => {
+        return this.props.worldSnapshot.map(region => {
             return region.order ? this.renderOrder(region) : null;
         });
     }
 
-    renderOrder(regionState: RegionState): ReactNode {
-        if (!regionState.order) {
+    renderOrder(regionSnapshot: RegionSnapshot): ReactNode {
+        if (!regionSnapshot.order) {
             return null;
         }
 
-        const region = this.ingame.world.regions.get(regionState.id);
-        const backgroundUrl = orderImages.get(regionState.order.type);
+        const region = this.ingame.world.regions.get(regionSnapshot.id);
+        const backgroundUrl = orderImages.get(regionSnapshot.order.type);
 
-        const drawBorder = regionState.order.type.includes("sea-");
-        const controller = regionState.controller ? this.ingame.game.houses.get(regionState.controller) : null;
+        const drawBorder = regionSnapshot.order.type.includes("sea-");
+        const controller = regionSnapshot.controller ? this.ingame.game.houses.get(regionSnapshot.controller) : null;
         const color = drawBorder && controller
             ? controller.id != "greyjoy"
                 ? controller.color
@@ -240,7 +241,7 @@ export default class WorldStateComponent extends Component<WorldStateComponentPr
             <div className={classNames(
                 "order-container",
                 {
-                    "restricted-order": regionState.order.restricted
+                    "restricted-order": regionSnapshot.order.restricted
                 }
             )}
                 style={{ left: region.orderSlot.x, top: region.orderSlot.y}}

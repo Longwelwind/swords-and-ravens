@@ -31,6 +31,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { cssTransition } from "react-toastify";
 import ClockComponent from "./ClockComponent";
 import { isMobile } from 'react-device-detect';
+import ReplayComponent from "./ReplayComponent";
 
 const yourTurnToastAnimation = cssTransition({
     enter: "slide-in-elliptic-top-fwd",
@@ -79,7 +80,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             </Helmet>
             <Col xs={12} className={this.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
                 <Row className="justify-content-center align-items-center">
-                    {(this.ingame?.replayWorldState?.length ?? 0) > 0
+                    {this.props.entireGame.replaySnapshot != null
                         ? <>{this.renderReplaySwitch()}
                             <Col xs="auto" className="px-3">
                                 <h4>{this.entireGame.name}</h4>
@@ -102,13 +103,17 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 </Row>
             </Col>
             {
-                this.entireGame.childGameState instanceof LobbyGameState ? (
-                    <LobbyComponent gameClient={this.props.gameClient} gameState={this.entireGame.childGameState} />
-                ) : this.entireGame.childGameState instanceof IngameGameState ? (
-                    <IngameComponent gameClient={this.props.gameClient} gameState={this.entireGame.childGameState} />
-                ) : this.entireGame.childGameState instanceof CancelledGameState && (
-                    <CancelledComponent gameClient={this.props.gameClient} gameState={this.entireGame.childGameState} />
-                )
+                this.entireGame.childGameState instanceof LobbyGameState
+                    ? <LobbyComponent gameClient={this.props.gameClient} gameState={this.entireGame.childGameState} />
+                    : this.entireGame.childGameState instanceof IngameGameState && this.entireGame.replaySnapshot != null
+                        ? <ReplayComponent
+                            gameClient={this.props.gameClient}
+                            ingame={this.entireGame.childGameState}
+                            entireGameSnapshot={this.entireGame.replaySnapshot}
+                        />
+                        : this.entireGame.childGameState instanceof IngameGameState
+                            ? <IngameComponent gameClient={this.props.gameClient} gameState={this.entireGame.childGameState} />
+                            : this.entireGame.childGameState instanceof CancelledGameState && <CancelledComponent gameClient={this.props.gameClient} gameState={this.entireGame.childGameState} />
             }
             {this.playWelcomeSound && !this.props.gameClient.musicMuted &&
                 <audio id="welcome-sound" src={introSound} autoPlay onEnded={() => this.playWelcomeSound = false} />
@@ -294,11 +299,9 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 type="switch"
                 label={<label htmlFor="replay-mode-switch"><Badge variant="warning">REPLAY MODE</Badge></label>}
                 style={{ marginTop: "-6px" }}
-                checked={(this.entireGame.ingameGameState?.replayWorldState?.length ?? 0) > 0}
+                checked={this.entireGame.replaySnapshot != null}
                 onChange={() => {
-                    if (this.entireGame.ingameGameState) {
-                        this.entireGame.ingameGameState.replayWorldState = null;
-                    }
+                    this.entireGame.replaySnapshot = null;
                 }}
             />
         </Col>;

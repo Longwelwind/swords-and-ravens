@@ -142,8 +142,8 @@ export default class Region {
         }
     }
 
-    getRegionState(): RegionState {
-        const result: RegionState = {
+    getSnapshot(): RegionSnapshot {
+        const result: RegionSnapshot = {
             id: this.id
         };
 
@@ -233,7 +233,7 @@ export interface SerializedRegion {
     overwrittenSuperControlPowerToken: string | null;
 }
 
-export interface RegionState {
+export interface RegionSnapshot {
     id: string;
     controller?: string;
     units?: UnitState[];

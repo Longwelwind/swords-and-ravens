@@ -1,6 +1,6 @@
 import IngameGameState from "../IngameGameState";
 import GameState from "../../GameState";
-import Region, { RegionState } from "../game-data-structure/Region";
+import Region, { RegionSnapshot } from "../game-data-structure/Region";
 import Order from "../game-data-structure/Order";
 import EntireGame from "../../EntireGame";
 import ResolveMarchOrderGameState, {SerializedResolveMarchOrderGameState} from "./resolve-march-order-game-state/ResolveMarchOrderGameState";
@@ -14,7 +14,7 @@ import RaidOrderType from "../game-data-structure/order-types/RaidOrderType";
 import UseRavenGameState, {SerializedUseRavenGameState} from "./use-raven-game-state/UseRavenGameState";
 import ResolveRaidOrderGameState, {SerializedResolveRaidOrderGameState} from "./resolve-raid-order-game-state/ResolveRaidOrderGameState";
 import BetterMap from "../../../utils/BetterMap";
-import Game from "../game-data-structure/Game";
+import Game, { GameSnapshot } from "../game-data-structure/Game";
 import ResolveConsolidatePowerGameState, {SerializedResolveConsolidatePowerGameState} from "./resolve-consolidate-power-game-state/ResolveConsolidatePowerGameState";
 import ConsolidatePowerOrderType from "../game-data-structure/order-types/ConsolidatePowerOrderType";
 import SupportOrderType from "../game-data-structure/order-types/SupportOrderType";
@@ -65,24 +65,10 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
             type: "action-phase-began"
         });
 
-        const worldState = _.orderBy(this.ingame.world.getWorldState(), [r => r.controller, r => r.id]);
-        const enrichedWorldState: RegionState[] = [];
-        worldState.forEach(r => {
-            //const region = this.ingame.world.regions.tryGet(r.id, null);
-            const region =  this.ingame.world.regions.get(r.id);
-            if (region && this.ordersOnBoard.has(region)) {
-                const order = this.ordersOnBoard.get(region);
-                r.order = { type: order.type.id };
-                if (this.game.isOrderRestricted(region, order, this.planningRestrictions)) {
-                    r.order.restricted = true;
-                }
-            }
-            enrichedWorldState.push(r);
-        });
-
         this.ingame.log({
             type: "orders-revealed",
-            worldState: enrichedWorldState
+            worldState: this.ingame.getWorldSnapshotWithOrdersOnBoard(planningRestrictions),
+            gameSnapshot: this.game.getSnapshot()
         });
 
         this.setChildGameState(new UseRavenGameState(this)).firstStart();
