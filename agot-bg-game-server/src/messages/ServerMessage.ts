@@ -32,7 +32,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | UpdateSelectableObjectives | UpdateSpecialHouseCardModifier | UpdateUsurper
     | StartPlayerClock | StopPlayerClock | GamePaused | GameResumed | LaterHouseCardsApplied
     | WildlingTiesResolved | PreemptiveRaidNewAttack | GameStarted | ReadyCheck | HousesSwapped
-    | RevealOrders | RemoveOrders;
+    | RevealOrders | RemoveOrders | AcceptAllLoyaltyTokenMovementsChanged;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -534,4 +534,9 @@ interface RevealOrders {
 interface RemoveOrders {
     type: "remove-orders";
     regions: string[];
+}
+
+interface AcceptAllLoyaltyTokenMovementsChanged {
+    type: "accept-all-loyalty-token-movements-changed";
+    newValue: boolean;
 }

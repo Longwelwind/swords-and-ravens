@@ -25,7 +25,7 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<GameStat
         return (
             <>
                 <Col xs={12} className="text-center">
-                    <p>House <b>{this.gameState.house.name}</b> must move a loyalty&nbsp;token to an adjacent land area.</p>
+                    House <b>{this.gameState.house.name}</b> must move a loyalty&nbsp;token to an adjacent land area.
                 </Col>
                 <Col xs={12} className="mt-2">
                     {this.props.gameClient.doesControlHouse(this.gameState.house) ? (

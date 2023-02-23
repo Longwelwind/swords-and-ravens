@@ -159,7 +159,7 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "resolve-consolidate-power-choice") {
-            if (this.ingame.getControllerOfHouse(this.house).user != player.user) {
+            if (this.ingame.getControllerOfHouse(this.house) != player) {
                 return;
             }
 

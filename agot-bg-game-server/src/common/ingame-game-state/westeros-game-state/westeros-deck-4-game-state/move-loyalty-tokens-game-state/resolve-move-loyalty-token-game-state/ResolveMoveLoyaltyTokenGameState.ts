@@ -55,7 +55,19 @@ export default class ResolveMoveLoyaltyTokenGameState extends GameState<MoveLoya
                 from: regionFrom,
                 to: regionTo
             };
-            this.moveLoyaltyTokensState.setChooseCancelLastMoveGameState(this.house);
+
+            this.ingame.log({
+                type: "move-loyalty-token-choice",
+                house: this.house.id,
+                regionFrom: regionFrom.id,
+                regionTo: regionTo.id
+            });
+
+            if (this.moveLoyaltyTokensState.acceptAllMovements) {
+                this.moveLoyaltyTokensState.onSimpleChoiceGameStateEnd(0, false);
+            } else {
+                this.moveLoyaltyTokensState.setChooseCancelLastMoveGameState(this.house);
+            }
         }
     }
 
