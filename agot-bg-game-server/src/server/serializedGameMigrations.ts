@@ -2084,6 +2084,23 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "105",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                if (ingame.childGameState.type == "westeros" && ingame.childGameState.childGameState.type == "westeros-deck-4") {
+                    const wd4 = ingame.childGameState.childGameState;
+                    if (wd4.childGameState.type == "move-loyalty-tokens") {
+                        wd4.childGameState.acceptAllMovements = false;
+                    }
+                }
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

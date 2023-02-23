@@ -77,7 +77,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     label={
                                         <OverlayTrigger overlay={
                                             <Tooltip id="start-when-full-setting-tooltip">
-                                                When this option is enabled, the game will start automatically once all seats are taken.
+                                                If this option is enabled, the game will start automatically once all seats are taken.
                                             </Tooltip>}>
                                             <label htmlFor="start-when-full-setting">Start when full</label>
                                         </OverlayTrigger>}
@@ -93,7 +93,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     label={
                                         <OverlayTrigger overlay={
                                             <Tooltip id="only-live-setting-tooltip" className="tooltip-w-100">
-                                                When this option is enabled each player will have a game clock of 45, 60, 75, 90 or 120 minutes.<br/>
+                                                If this option is enabled each player will have a game clock of 45, 60, 75, 90 or 120 minutes.<br/>
                                                 When a player&apos;s time runs out, he is automatically turned into a vassal and this cannot be undone!<br/>
                                                 The last remaining player immediately wins the game.<br/>
                                                 All player clocks can be extended by vote once for 15 minutes and a second time in the last round.<br/>
@@ -294,7 +294,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="add-port-to-the-eyrie-setting-tooltip">
-                                    When this option is enabled, the Eyrie has a port and House Arryn scores
+                                    If this option is enabled, the Eyrie has a port and House Arryn scores
                                     only 1 victory point for Mercantile Ventures (the objective about ports).
                                 </Tooltip>}>
                                 <label htmlFor="add-port-to-the-eyrie-setting">Add a port to The Eyrie</label>
@@ -310,7 +310,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="adwd-house-cards-tooltip">
-                                    When this option is enabled, the House cards from the <i>A Dance with Dragons</i> and <i>A Feast for Crows</i> expansions are used.
+                                    If this option is enabled, the House cards from the <i>A Dance with Dragons</i> and <i>A Feast for Crows</i> expansions are used.
                                 </Tooltip>}>
                                 <label htmlFor="adwd-house-cards">Use <i>ADwD</i> House cards</label>
                             </OverlayTrigger>}
@@ -325,7 +325,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="asos-house-cards-setting-tooltip">
-                                    When this option is enabled, the House cards from the 1st edition expansion <i>A Storm of Swords</i> are used.
+                                    If this option is enabled, the House cards from the 1st edition expansion <i>A Storm of Swords</i> are used.
                                 </Tooltip>}>
                                 <label htmlFor="asos-house-cards-setting">Use <i>ASoS</i> House cards</label>
                             </OverlayTrigger>}
@@ -503,7 +503,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="remove-tob3-setting-tooltip">
-                                    When this option is enabled, 3s cards will be removed from the Tides of Battle deck.
+                                    If this option is enabled, 3s cards will be removed from the Tides of Battle deck.
                                 </Tooltip>}>
                                 <label htmlFor="remove-tob3-setting">Remove 3s cards from ToB</label>
                             </OverlayTrigger>}
@@ -518,7 +518,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="remove-tob-skulls-setting-tooltip">
-                                    When this option is enabled, skull cards will be removed from the Tides of Battle deck.
+                                    If this option is enabled, skull cards will be removed from the Tides of Battle deck.
                                 </Tooltip>}>
                                 <label htmlFor="remove-tob-skulls-setting">Remove skulls from ToB</label>
                             </OverlayTrigger>}
@@ -533,7 +533,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="limit-tob2-setting-tooltip">
-                                    When this option is enabled, the Tides of Battle deck will only contain two 2s cards instead of four.
+                                    If this option is enabled, the Tides of Battle deck will only contain two 2s cards instead of four.
                                 </Tooltip>}>
                                 <label htmlFor="limit-tob2-setting">Limit ToB 2s cards</label>
                             </OverlayTrigger>}
@@ -614,7 +614,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="mixed-wd1-setting-tooltip">
-                                    When this option is enabled, one <i>Mustering</i> card will be replaced by <i>Rally&nbsp;The&nbsp;Men</i>,{" "}
+                                    If this option is enabled, one <i>Mustering</i> card will be replaced by <i>Rally&nbsp;The&nbsp;Men</i>,{" "}
                                     one <i>A&nbsp;Throne&nbsp;of&nbsp;Blades</i> card by <i>The&nbsp;Burden&nbsp;of&nbsp;Power</i> and the{" "}
                                     <i>Last&nbsp;Days&nbsp;of&nbsp;Summer</i> card by <i>Famine</i>.
                                 </Tooltip>}>

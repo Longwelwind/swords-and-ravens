@@ -413,10 +413,9 @@ def settings(request):
                 messages.success(request, "Profile text successfully changed!")
 
                 return HttpResponseRedirect('/settings/')
-        
 
     return render(request, "agotboardgame_main/settings.html", {
-        "update_username_form": update_username_form, 
+        "update_username_form": update_username_form,
         "update_settings_form": update_settings_form,
         "update_profile_text_form": update_profile_text_form
     })
