@@ -8,7 +8,7 @@ import getElapsedSeconds, { getTimeDeltaInSeconds } from "../../utils/getElapsed
 export default class Player {
     user: User;
     house: House;
-    waitedForData: WaitedForData | null;
+    @observable waitedForData: WaitedForData | null;
     @observable liveClockData: LiveClockData | null;
 
     get isNeededForVote(): boolean {
@@ -62,11 +62,28 @@ export default class Player {
             hasBeenReactivated: hasBeenReactivatedAgain
         };
 
+        this.user.entireGame.broadcastToClients({
+            type: "update-waited-for-data",
+            userId: this.user.id,
+            waitedForData: this.waitedForData ? {
+                date: this.waitedForData.date.getTime(),
+                leafStateId: this.waitedForData.leafStateId,
+                handled: this.waitedForData.handled,
+                hasBeenReactivated: this.waitedForData.hasBeenReactivated
+            } : null
+        });
+
         // console.log(`Now waiting for ${this.user.name} in state ${this.waitedForData.leafStateId}`);
     }
 
     resetWaitedFor(): void {
         this.waitedForData = null;
+
+        this.user.entireGame.broadcastToClients({
+            type: "update-waited-for-data",
+            userId: this.user.id,
+            waitedForData: null
+        });
     }
 
     sendPbemResponseTime(): void {
@@ -84,6 +101,12 @@ export default class Player {
         }
 
         this.waitedForData.handled = true;
+
+        this.user.entireGame.broadcastToClients({
+            type: "update-waited-for-data",
+            userId: this.user.id,
+            waitedForData: null
+        });
     }
 
     serializeToClient(): SerializedPlayer {

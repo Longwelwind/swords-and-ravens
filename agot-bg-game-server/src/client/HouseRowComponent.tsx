@@ -119,7 +119,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                 player = this.player;
                 isWaitedFor = this.ingame.getWaitedUsers().includes(player.user);
 
-                clock = player.liveClockData ? player.clientGetTotalRemainingSeconds(this.ingame.now) : null;
+                clock = player.liveClockData ? player.clientGetTotalRemainingSeconds(this.ingame.entireGame.now) : null;
 
                 if (clock != null) {
                     clockCritical = gameRunning && clock > 0 && clock < (10 * 60);
@@ -160,14 +160,11 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     <Col onMouseEnter={() => this.setHighlightedRegions()} onMouseLeave={() => this.highlightedRegions.clear()} className="pr-0">
                         <h5 style={{ margin: 0, padding: 0 }}><b style={{ "color": this.house.color }}>{this.house.name}</b><br /></h5>
                         {player ? (
-                            <>
-                                {" "}
-                                <UserLabel
-                                    user={player.user}
-                                    gameState={this.ingame}
-                                    gameClient={this.props.gameClient}
-                                />
-                            </>
+                            <UserLabel
+                                user={player.user}
+                                gameState={this.ingame}
+                                gameClient={this.props.gameClient}
+                            />
                         ) : (
                             this.house.hasBeenReplacedByVassal ?
                                 <Navbar variant="dark" className="no-space-around">
@@ -453,11 +450,9 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         const loyaltyTokensOnBoardCount = house == this.game.targaryen ? this.game.loyaltyTokensOnBoardCount : 0;
         const regions = this.ingame.entireGame.isFeastForCrows ? this.ingame.world.regions.values : [];
         return <Tooltip id={house.id + "-victory-tooltip"} className="tooltip-w-100">
-            <Col>
             <h5 className="text-center mx-2">Total Land Areas</h5>
                 <h4 className="text-center"><b>{this.game.getTotalControlledLandRegions(house)}</b></h4>
                 {this.ingame.entireGame.isFeastForCrows && <>
-                    <br/>
                     <br/>
                     <h5 className="text-center">Additional Information<br/><small>&nbsp;&nbsp;(Does not count in case of a tie)&nbsp;&nbsp;</small></h5>
                     <br/>
@@ -466,13 +461,12 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     <h5 className="text-center">Sea Areas: <b>{regions.filter(r => r.type == sea && r.getController() == house).length}</b></h5>
                     <h5 className="text-center">Ports: <b>{regions.filter(r => r.type == port && r.getController() == house).length}</b></h5>
                 </>}
-                {house == this.game.targaryen && <>
+                {house == this.game.targaryen && <div className="text-center">
                     <br/>
-                    <h5 className="text-center">Loyalty tokens</h5>
+                    <h5>Loyalty tokens</h5>
                     <h6>On the board: <b>{loyaltyTokensOnBoardCount}</b></h6>
                     <h6>Loyalty Pool: <b>{MAX_LOYALTY_TOKEN_COUNT - loyaltyTokensOnBoardCount}</b></h6>
-                </>}
-            </Col>
+                </div>}
         </Tooltip>;
     }
 
@@ -502,18 +496,12 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
 
     private renderPowerTooltip(availablePower: number, powerTokensOnBoard: number, powerInPool: number): OverlayChildren {
         return <Tooltip id={this.house.id + "-power-tooltip"} className="tooltip-w-100">
-            <Col>
-                <Row className="justify-content-center">
-                    <h4>{this.house.name}&apos;s Power</h4>
-                </Row>
-                <Row className="justify-content-center">
-                    <Col xs="auto">
-                        <h5><small>Available:</small> <b>{availablePower}</b></h5>
-                        <h5><small>On the board:</small> <b>{powerTokensOnBoard}</b></h5>
-                        <h5><small>Power Pool:</small> <b>{powerInPool}</b></h5>
-                    </Col>
-                </Row>
-            </Col>
+            <h4>{this.house.name}&apos;s Power</h4>
+            <div className="text-center">
+                <h5><small>Available:</small> <b>{availablePower}</b></h5>
+                <h5><small>On the board:</small> <b>{powerTokensOnBoard}</b></h5>
+                <h5><small>Power Pool:</small> <b>{powerInPool}</b></h5>
+            </div>
         </Tooltip>;
     }
 

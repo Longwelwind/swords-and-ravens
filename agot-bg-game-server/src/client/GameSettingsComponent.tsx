@@ -148,70 +148,70 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
         switch(this.gameSettings.setupId) {
             case "base-game":
                 return <>
-                    <h5>The official <i>A Game of Thrones Board Game - 2nd edition</i></h5>
+                    <h5>The official <i>A&nbsp;Game&nbsp;of&nbsp;Thrones&nbsp;Board&nbsp;Game&nbsp;-&nbsp;2nd&nbsp;edition</i></h5>
                     This setup supports 3-player and 6-player modes. The rulebook is available online.<br/>
                     The Neutral Force tokens for 4 and 5 players are not implemented, as the unoffical variants<br/>
-                    and the Vassals of Mother of Dragons expansion are much better.
+                    and the Vassals of Mother&nbsp;of&nbsp;Dragons expansion are much better.
                 </>;
             case "mother-of-dragons":
                 return <>
-                    <h5>The official <i>Mother of Dragons</i> expansion</h5>
+                    <h5>The official <i>Mother&nbsp;of&nbsp;Dragons</i> expansion</h5>
                     This expansion adds 2 additional houses: Arryn and Targaryen, as well as some more interesting mechanics:<br/>
                     Vassals, Sea Orders and the Iron Bank. If the game is selected with 8 players and House Targaryen,<br/>
                     a completely new map part &apos;Essos&apos; is also added. The rulebook is available online.
                 </>;
             case "a-dance-with-dragons":
                 return <>
-                    <h5>The official <i>Dance with Dragons</i> expansion</h5>
+                    <h5>The official <i>Dance&nbsp;with&nbsp;Dragons</i> expansion</h5>
                     This expansion thematically reflects a later point in the Game of Thrones story<br/>
                     and therefore <i>lasts only <b>6</b> rounds!</i> It adds new house cards and new starting positions<br/>
                     for all 6 houses from the base game.
                 </>;
             case "a-feast-for-crows":
                 return <>
-                    <h5>The official <i>Feast for Crows</i> expansion</h5>
+                    <h5>The official <i>A&nbsp;Feast&nbsp;for&nbsp;Crows</i> expansion</h5>
                     This is a 4 player expansion. It adds House Arryn and a completely new way to score victory points.<br/>
                     Instead of capturing castles you have to complete secret objectives.<br/>
                     The exact rules can be found in the game as a tooltip in the Objectives tab.
                 </>;
             case "a-dance-with-mother-of-dragons":
                 return <>
-                    <h5>The unofficial <i>A Dance with Mother of Dragons</i> variant</h5>
-                    This is a community-created variant and combines A Dance with Dragons and Mother with Dragons.<br/>
+                    <h5>The unofficial <i>A&nbsp;Dance&nbsp;with&nbsp;Mother&nbsp;of&nbsp;Dragons</i> variant</h5>
+                    This is a community-created variant and combines <i>A&nbsp;Dance&nbsp;with&nbsp;Dragons</i> and Mother&nbsp;with&nbsp;Dragons.<br/>
                     So it also <i>lasts only <b>6</b> rounds</i>, offers new starting positions and is played with the<br/>
-                    Dance with Dragons / Feast for Crows house cards and the Mother of Dragons B deck for Targaryen.
+                    Dance&nbsp;with&nbsp;Dragons / Feast&nbsp;for&nbsp;Crows house cards and the Mother&nbsp;of&nbsp;Dragons B deck for Targaryen.
                 </>;
             case "struggle-in-the-north":
                 return <>
-                    <h5>The unofficial <i>Struggle in the North</i> variant</h5>
+                    <h5>The unofficial <i>Struggle&nbsp;in&nbsp;the&nbsp;North</i> variant</h5>
                     This is a community-created variant for 4 and 5 players only.<br/>
                     It is very similar to the base game with fewer players, but instead of Neutral Force tokens,<br/>
                     the southern territories of House Martell and House Tyrell, respectively, are blocked areas.
                 </>;
             case "rumble-in-the-south":
                 return <>
-                    <h5>The unofficial <i>Rumbe in the South</i> variant</h5>
+                    <h5>The unofficial <i>Rumbe&nbsp;in&nbsp;the&nbsp;South</i> variant</h5>
                     This is a community-created variant for 4 players only.<br/>
                     House Stark and House Greyjoy do not participate and thus Pyke is blocked<br/>
                     as well as almost all of North.
                 </>;
             case "race-to-kings-landing":
                 return <>
-                    <h5>The unofficial <i>Race to Kings Landing</i> variant</h5>
+                    <h5>The unofficial <i>Race&nbsp;to&nbsp;Kings&nbsp;Landing</i> variant</h5>
                     This is a community-created variant for 5 players only.<br/>
                     House Baratheon does not participate and thus Dragonstone is blocked.
                 </>;
             case "no-kraken-for-dinner":
                 return <>
-                    <h5>The unofficial <i>No Kraken for Dinner</i> variant</h5>
+                    <h5>The unofficial <i>No&nbsp;Kraken&nbsp;for&nbsp;Dinner</i> variant</h5>
                     This is a community-created variant for 5 players only.<br/>
                     House Greyjoy does not participate and thus Pyke is blocked.
                 </>;
             case "learn-the-game":
                 return <>
-                    <h5>Teach the Game mode</h5>
+                    <h5>Teach&nbsp;the&nbsp;Game&nbsp;mode</h5>
                     This mode allows you to start the game with only 2 players to explain the basic mechanics to a friend.<br/>
-                    Additionally, the mode can be used with vassals from the Mother of Dragons expansion<br/>
+                    Additionally, the mode can be used with vassals from the Mother&nbsp;of&nbsp;Dragons expansion<br/>
                     and the &apos;Random vassal assignment&apos; option to make the game semi-playable with two players.<br/>
                     However, victories do not count towards the win rate.
                 </>;
@@ -228,7 +228,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         {this.renderGameSetupsTooltipContent()}
                     </Tooltip>}
                     placement="top"
-                    delay={{show: 500, hide: 0}}
+                    delay={{show: 250, hide: 750}}
                 >
                     <Col xs="12">
                         <select className="custom-select" id="game-setups" name="setups"
@@ -310,7 +310,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="adwd-house-cards-tooltip">
-                                    If this option is enabled, the House cards from the <i>A Dance with Dragons</i> and <i>A Feast for Crows</i> expansions are used.
+                                    If this option is enabled, the House cards from the <i>A&nbsp;Dance&nbsp;with&nbsp;Dragons</i> and <i>A&nbsp;Feast&nbsp;for&nbsp;Crows</i> expansions are used.
                                 </Tooltip>}>
                                 <label htmlFor="adwd-house-cards">Use <i>ADwD</i> House cards</label>
                             </OverlayTrigger>}
@@ -325,7 +325,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="asos-house-cards-setting-tooltip">
-                                    If this option is enabled, the House cards from the 1st edition expansion <i>A Storm of Swords</i> are used.
+                                    If this option is enabled, the House cards from the 1st edition expansion <i>A&nbsp;Storm&nbsp;of&nbsp;Swords</i> are used.
                                 </Tooltip>}>
                                 <label htmlFor="asos-house-cards-setting">Use <i>ASoS</i> House cards</label>
                             </OverlayTrigger>}
@@ -378,7 +378,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="vassals-tooltip">
-                                    Unassigned houses will be vassals introduced by the <i>Mother of Dragons</i> expansion.
+                                    Unassigned houses will be vassals introduced by the <i>Mother&nbsp;of&nbsp;Dragons</i> expansion.
                                 </Tooltip>}>
                                 <label htmlFor="vassals-setting">MoD Vassals</label>
                             </OverlayTrigger>}
@@ -393,7 +393,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="iron-bank-setting-tooltip">
-                                    Enable the Iron&nbsp;Bank from the <i>Mother of Dragons</i> expansion. All player houses start with 7 Power tokens instead of 5.
+                                    Enable the Iron&nbsp;Bank from the <i>Mother&nbsp;of&nbsp;Dragons</i> expansion. All player houses start with 7 Power tokens instead of 5.
                                     <br/><br/>
                                     <i>Note: Enabling the Iron&nbsp;Bank makes the Iron&nbsp;Bank sea order available, even if sea orders are deactivated.</i>
                                 </Tooltip>}>
@@ -410,7 +410,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="sea-orders-tooltip">
-                                    Enable Sea Order tokens from the <i>Mother of Dragons</i> expansion.
+                                    Enable Sea&nbsp;Order tokens from the <i>Mother&nbsp;of&nbsp;Dragons</i> expansion.
                                 </Tooltip>}>
                                 <label htmlFor="sea-orders-setting">MoD Sea Order Tokens</label>
                             </OverlayTrigger>}
@@ -739,7 +739,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             <OverlayTrigger overlay={
                                 <Tooltip id="tournament-mode-tooltip">
                                     This option is intended for tournaments. It disables the possibility to launch the following votes:<br/>
-                                    Offer replacement, Replace vassal, Swap houses, Extend player clocks, Abort game and End game.
+                                    Offer replacement, Replace vassal, Swap houses, Extend player clocks, Declare winner, Abort game and End game.
                                 </Tooltip>}>
                                 <label htmlFor="tournament-mode-setting">Tournament mode</label>
                             </OverlayTrigger>}

@@ -512,6 +512,9 @@ div.disconnected {
 
 .tooltip-inner {
   text-align: left;
+  font-size: 1.125rem;
+  padding: 0.5rem;
+  max-width: 350px;
 }
 
 .overflow-x-hidden {
@@ -523,7 +526,7 @@ div.disconnected {
 }
 
 .tooltip-w-100 > .tooltip-inner {
-  max-width: 100%;
+  max-width: 100% !important;
 }
 
 .display-none {

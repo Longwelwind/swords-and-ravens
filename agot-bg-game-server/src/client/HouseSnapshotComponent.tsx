@@ -93,10 +93,10 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
                 </Col>
                 {!isVassal && <OverlayTrigger
                         overlay={<Tooltip id={this.house.id + "-victory-tooltip"} className="tooltip-w-100">
-                            <Col>
-                                <h5 className="text-center mx-2">Total Land Areas</h5>
-                                <h4 className="text-center"><b>{this.props.totalLandAreas}</b></h4>
-                            </Col>
+                            <div className="text-center">
+                                <h5 className="mx-2">Total Land Areas</h5>
+                                <h4><b>{this.props.totalLandAreas}</b></h4>
+                            </div>
                         </Tooltip>}
                         delay={{ show: 250, hide: 100 }}
                         placement="auto"

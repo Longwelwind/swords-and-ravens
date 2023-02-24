@@ -8,7 +8,6 @@ import Col from "react-bootstrap/Col";
 import Badge from "react-bootstrap/Badge";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { preventOverflow } from "@popperjs/core";
-import { observable } from "mobx";
 import _ from "lodash";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
 import { secondsToString } from "./utils/secondsToString";
@@ -22,9 +21,9 @@ interface ClockComponentProps {
 
 @observer
 export default class ClockComponent extends Component<ClockComponentProps> {
-    @observable now = new Date();
-    setIntervalId = -1;
-
+    get now(): Date {
+        return this.props.entireGame.now;
+    }
 
     get ingame(): IngameGameState | null {
         return this.props.entireGame.ingameGameState;
@@ -122,20 +121,5 @@ export default class ClockComponent extends Component<ClockComponentProps> {
         }
 
         return null;
-    }
-
-    setNow(): void {
-        this.now = new Date();
-    }
-
-    componentDidMount(): void {
-        this.setIntervalId = window.setInterval(() => this.setNow(), 1000);
-    }
-
-    componentWillUnmount(): void {
-        if (this.setIntervalId >= 0) {
-            window.clearInterval(this.setIntervalId);
-            this.setIntervalId = -1;
-        }
     }
 }

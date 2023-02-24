@@ -319,7 +319,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
                     <Col xs="auto" className="mx-2 px-2">
                         <OverlayTrigger overlay={
                             <Tooltip id="round-tooltip">
-                                <h6>Round {this.gameSnapshot?.round} / {this.game.maxTurns}</h6>
+                                <h5>Round {this.gameSnapshot?.round} / {this.game.maxTurns}</h5>
                             </Tooltip>}
                             placement="auto"
                         >
