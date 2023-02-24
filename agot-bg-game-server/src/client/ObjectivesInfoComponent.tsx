@@ -101,39 +101,37 @@ export default class ObjectivesInfoComponent extends Component<ObjectivesInfoCom
 
     renderRulesTooltip(): OverlayChildren {
         return <Tooltip id="affc-rules-tooltip" className="tooltip-w-100">
-            <Col>
-                <h5 className="text-center">Objectives</h5>
-                The A Feast for Crows scenario introduces a new way for players to score victory points.<br/>
-                Players no longer use the Victory track to record the number of Castles and Strongholds they control.<br/>
-                Instead, each player now advances on the Victory track by completing the objectives described<br/>
-                on his Objective cards, with the goal of being the first and only player to reach position 7.
-                <br/><br/>
-                <h5 className="text-center">Scoring and Supply</h5>
-                After each Action phase, players resolve these additional steps:<br/>
-                <ol className="mb-0 mt-1">
-                    <li><b>Update Supply:</b> In turn order, all players update their supply levels (as if they were resolving<br/>
-                    the &quot;Supply&quot; Westeros card in the core game) and then reconcile their armies.</li>
-                    <li><b>Score Special Objectives:</b> Each round, during this step, each player may choose to score his<br/>
-                    Special Objective card (if the criterion described is fulfilled), moving his Victory Point token forward one space.</li>
-                    <li><b>Score Other Objectives:</b> In turn order, each player may choose to score one Objective card of his choice<br/>
-                    from his objective hand (if the criterion described is fulfilled), placing the scored card faceup in his play areas<br/>
-                    and moving his Victory Point token forward a number of spaces equal to the number next to his House sigil<br/>
-                    on the scored card. Scored Objective cards remain faceup in a player&apos;s play area for the remainder of the game.
-                    <br/>Note, unlike Special Objective cards, these cards can only be scored once.</li>
-                    <li><b>Draw Objective Cards:</b> Any player who does not have 3 Objective cards in his objective hand<br/>
-                    draws 1 new Objective card and adds it to his objective hand.</li>
-                </ol>
-                <br/>
-                <h5 className="text-center">Winning the Game</h5>
-                After the Draw Objective Cards step, if any one player occupies position 7 of the Victory track, that player wins the game.<br/>
-                If, at this time, two or more players tie by occupying position 7 of the Victory track, the tied player who controls<br/>
-                more total land areas wins. If there is still a tie, the tied player who is highest on the Iron Throne Influence track wins.
-                <br/><br/>
-                <h5 className="text-center">FAQ</h5>
-                <i>Q: When playing A Feast for Crows, what are the tiebreakers at the end of Round 10?</i><br/>
-                A: If at the end of Round 10 no player has 7 victory points, the player with the most victory points<br/>
-                who is in the highest position on the Iron Throne is the winner.
-            </Col>
+            <h5 className="text-center">Objectives</h5>
+            The A Feast for Crows scenario introduces a new way for players to score victory points.<br/>
+            Players no longer use the Victory track to record the number of Castles and Strongholds they control.<br/>
+            Instead, each player now advances on the Victory track by completing the objectives described<br/>
+            on his Objective cards, with the goal of being the first and only player to reach position 7.
+            <br/><br/>
+            <h5 className="text-center">Scoring and Supply</h5>
+            After each Action phase, players resolve these additional steps:<br/>
+            <ol className="mb-0 mt-1">
+                <li><b>Update Supply:</b> In turn order, all players update their supply levels (as if they were resolving<br/>
+                the &quot;Supply&quot; Westeros card in the core game) and then reconcile their armies.</li>
+                <li><b>Score Special Objectives:</b> Each round, during this step, each player may choose to score his<br/>
+                Special Objective card (if the criterion described is fulfilled), moving his Victory Point token forward one space.</li>
+                <li><b>Score Other Objectives:</b> In turn order, each player may choose to score one Objective card of his choice<br/>
+                from his objective hand (if the criterion described is fulfilled), placing the scored card faceup in his play areas<br/>
+                and moving his Victory Point token forward a number of spaces equal to the number next to his House sigil<br/>
+                on the scored card. Scored Objective cards remain faceup in a player&apos;s play area for the remainder of the game.
+                <br/>Note, unlike Special Objective cards, these cards can only be scored once.</li>
+                <li><b>Draw Objective Cards:</b> Any player who does not have 3 Objective cards in his objective hand<br/>
+                draws 1 new Objective card and adds it to his objective hand.</li>
+            </ol>
+            <br/>
+            <h5 className="text-center">Winning the Game</h5>
+            After the Draw Objective Cards step, if any one player occupies position 7 of the Victory track, that player wins the game.<br/>
+            If, at this time, two or more players tie by occupying position 7 of the Victory track, the tied player who controls<br/>
+            more total land areas wins. If there is still a tie, the tied player who is highest on the Iron Throne Influence track wins.
+            <br/><br/>
+            <h5 className="text-center">FAQ</h5>
+            <i>Q: When playing A Feast for Crows, what are the tiebreakers at the end of Round 10?</i><br/>
+            A: If at the end of Round 10 no player has 7 victory points, the player with the most victory points<br/>
+            who is in the highest position on the Iron Throne is the winner.
         </Tooltip>;
     }
 }

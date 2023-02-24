@@ -143,7 +143,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     modifyOrdersOnMapCallback: any;
     modifyUnitsOnMapCallback: any;
     onVisibilityChangedCallback: (() => void) | null = null;
-    setIntervalId = -1;
 
     get game(): Game {
         return this.ingame.game;
@@ -720,7 +719,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             <Row className="mb-3 mx-0" onMouseEnter={() => this.highlightRegionsOfHouses()} onMouseLeave={() => this.highlightedRegions.clear()}>
                                 <OverlayTrigger overlay={
                                     <Tooltip id="round-tooltip">
-                                        <h6>Round {this.game.turn} / {this.game.maxTurns}</h6>
+                                        <h5>Round {this.game.turn} / {this.game.maxTurns}</h5>
                                     </Tooltip>
                                 }
                                     placement="auto">
@@ -1056,7 +1055,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const roundsWhenIncreased = this.game.dragonStrengthTokens.filter(onRound => onRound > this.game.turn);
         return <Tooltip id="dragon-strength-tooltip">
             <div className="m-1 text-center">
-                <h6>Current Dragon Strength</h6>
+                <h5>Current Dragon Strength</h5>
                 {roundsWhenIncreased.length > 0 && <p>Will increase in round<br/>{joinNaturalLanguage(roundsWhenIncreased)}</p>}
             </div>
         </Tooltip>
@@ -1324,10 +1323,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             </div>;
     }
 
-    setNow(): void {
-        this.ingame.now = new Date();
-    }
-
     componentDidMount(): void {
         this.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
         this.mapControls.modifyOrdersOnMap.push(this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap());
@@ -1372,10 +1367,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         this.ingame.onLogReceived = log => {
             this.gameClient.playSoundForLogEvent(log);
         }
-
-        if (this.ingame.entireGame.gameSettings.onlyLive) {
-            this.setIntervalId = window.setInterval(() => this.setNow(), 1000);
-        }
     }
 
     hasVerticalScrollbar(): boolean {
@@ -1398,11 +1389,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         this.ingame.entireGame.onCombatFastTracked = null;
         this.ingame.onPreemptiveRaidNewAttack = null;
         this.ingame.onVoteStarted = null;
-
-        if (this.setIntervalId >= 0) {
-            window.clearInterval(this.setIntervalId);
-            this.setIntervalId = -1;
-        }
     }
 
     modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {

@@ -77,7 +77,6 @@ export default class IngameGameState extends GameState<
 
     // Client-side only
     @observable rerender = 0;
-    @observable now = new Date();
     @observable marchMarkers: BetterMap<Unit, Region> = new BetterMap();
     @observable unitsToBeAnimated: BetterMap<Unit, UnitOnMapProperties> = new BetterMap();
     @observable ordersToBeAnimated: BetterMap<Region, OrderOnMapProperties> = new BetterMap();
@@ -1304,6 +1303,16 @@ export default class IngameGameState extends GameState<
                 const combat = this.getChildGameState(CombatGameState) as CombatGameState;
                 combat.rerender++;
             }
+        } else if (message.type == "update-waited-for-data") {
+            const player = this.players.get(this.entireGame.users.get(message.userId));
+            player.waitedForData = message.waitedForData ?
+                {
+                    date: new Date(message.waitedForData.date),
+                    leafStateId: message.waitedForData.leafStateId,
+                    handled: message.waitedForData.handled,
+                    hasBeenReactivated: message.waitedForData.hasBeenReactivated
+                }
+                : null;
         } else {
             this.childGameState.onServerMessage(message);
         }

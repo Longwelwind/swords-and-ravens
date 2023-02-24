@@ -91,6 +91,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     @observable
     replaySnapshot: EntireGameSnapshot | null = null;
 
+    @observable
+    now = new Date();
+
     get lobbyGameState(): LobbyGameState | null {
         return this.childGameState instanceof LobbyGameState ? this.childGameState : null;
     }

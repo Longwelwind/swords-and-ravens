@@ -22,7 +22,7 @@ import orderImages from "./orderImages";
 import unitImages from "./unitImages";
 import classNames from "classnames";
 import housePowerTokensImages from "./housePowerTokensImages";
-import { Col, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import BetterMap from "../utils/BetterMap";
 import _ from "lodash";
@@ -152,7 +152,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                             {r.overwrittenSuperControlPowerToken &&
                                 <OverlayTrigger
                                     overlay={<Tooltip id={"power-token-" + r.id}>
-                                        <Col className="text-center"><h6>Printed Power token<small> of <b>{r.getController()?.name ?? "Unknown"}<br />{r.name}</b></small></h6></Col>
+                                        <div className="text-center"><b>Printed Power token</b><small> of <b>{r.getController()?.name ?? "Unknown"}<br />{r.name}</b></small></div>
                                     </Tooltip>}
                                     key={"super-power-token-overlay-" + r.id}
                                     delay={{ show: 500, hide: 100 }}
@@ -173,7 +173,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                             {r.controlPowerToken && (
                                 <OverlayTrigger
                                     overlay={<Tooltip id={"power-token-" + r.id}>
-                                        <Col className="text-center"><h6>Power token<small> of <b>{r.getController()?.name ?? "Unknown"}<br />{r.name}</b></small></h6></Col>
+                                        <div className="text-center"><b>Power token</b><small> of <b>{r.getController()?.name ?? "Unknown"}<br />{r.name}</b></small></div>
                                     </Tooltip>}
                                     key={"power-token-overlay-" + r.id}
                                     delay={{ show: 500, hide: 100 }}
@@ -380,7 +380,7 @@ export default class MapComponent extends Component<MapComponentProps> {
 
                     return <OverlayTrigger
                         overlay={<Tooltip id={"unit-tooltip-" + u.id} className="tooltip-w-100">
-                            <Col className="text-center"><h6>{u.type.name}<small> of <b>{controller?.name ?? "Unknown"}</b><br /><b>{r.name}</b></small></h6></Col>
+                            <div className="text-center"><b>{u.type.name}</b><small> of <b>{controller?.name ?? "Unknown"}</b><br /><b>{r.name}</b></small></div>
                         </Tooltip>}
                         key={`map-unit-_${controller?.id ?? "must-be-controlled"}_${u.id}`}
                         delay={{ show: 500, hide: 100 }}
@@ -419,13 +419,12 @@ export default class MapComponent extends Component<MapComponentProps> {
                 {garrisons.has(r.id) && (
                     <OverlayTrigger
                         overlay={<Tooltip id={"garrison-tooltip-" + r.id}>
-                            <Col className="text-center">
-                                <h6>{garrisonControllers.get(r.id) == null
-                                        ? <>Neutral Force token</>
-                                        : <>Garrison<small> of <b>{garrisonControllers.get(r.id)?.name ?? "Unknown"}</b></small></>}
+                            <div className="text-center">
+                                {garrisonControllers.get(r.id) == null
+                                        ? <b>Neutral Force token</b>
+                                        : <><b>Garrison</b><small> of <b>{garrisonControllers.get(r.id)?.name ?? "Unknown"}</b></small></>}
                                     <br /><small><b>{r.name}</b></small>
-                                </h6>
-                            </Col>
+                            </div>
                         </Tooltip>}
                         key={"map-garrison_" + r.id}
                         delay={{ show: 500, hide: 100 }}
@@ -445,7 +444,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                 {r.loyaltyTokens > 0 && (
                     <OverlayTrigger
                         overlay={<Tooltip id={"loyalty-tooltip-" + r.id}>
-                            <Col className="text-center"><h6>Loyalty token<br /><small><b>{r.name}</b></small></h6></Col>
+                            <div className="text-center"><b>Loyalty token</b><br /><small><b>{r.name}</b></small></div>
                         </Tooltip>}
                         key={"map-loyalty-token-" + r.id}
                         delay={{ show: 500, hide: 100 }}
@@ -645,9 +644,9 @@ export default class MapComponent extends Component<MapComponentProps> {
 
     private renderOrderTooltip(order: Order | null, region: Region): OverlayChildren {
         return <Tooltip id={"order-info"} className="tooltip-w-100">
-            <Col className="text-center">
-                <h6>{order ? order.type.name : "Order token"}<small> of <b>{region.getController()?.name ?? "Unknown"}<br />{region.name}</b></small></h6>
-            </Col>
+            <div className="text-center">
+                <b>{order ? order.type.name : "Order token"}</b><small> of <b>{region.getController()?.name ?? "Unknown"}<br />{region.name}</b></small>
+            </div>
         </Tooltip>;
     }
 

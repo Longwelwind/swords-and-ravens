@@ -1,6 +1,6 @@
 import _ from "lodash";
 import React from "react";
-import { Col, Tooltip } from "react-bootstrap";
+import { Tooltip } from "react-bootstrap";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
 import joinReactNodes from "./utils/joinReactNodes";
@@ -15,8 +15,8 @@ export function renderRegionTooltip(region: Region): OverlayChildren {
     const loyaltyTokenCount = region.loyaltyTokens > 0 ? region.loyaltyTokens : region.superLoyaltyToken ? 1 : 0;
 
     return <Tooltip id={`region-${region.id}-details`} className="tooltip-w-100">
-        <Col className="text-center">
-            <h5 style={{display: "inline"}}>{region.name}{controller && (<small> of <b>{controller.name}</b></small>)}</h5>
+        <div className="text-center">
+            <b>{region.name}</b>{controller && (<small> of <b>{controller.name}</b></small>)}
             {region.castleLevel > 0 && <><br/>{region.castleLevel == 1 ? "Castle" : "Stronghold"}</>}
             {region.superControlPowerToken && region.superControlPowerToken == controller
             ? <>
@@ -58,10 +58,11 @@ export function renderRegionTooltip(region: Region): OverlayChildren {
                 )}
             </div>
             {region.units.size > 0 && (
-                <div className="mt-2">{joinReactNodes(region.units.values.map((u, i) => u.wounded
+                <small className="mt-2">{joinReactNodes(region.units.values.map((u, i) => u.wounded
                         ? <span key={`region-tooltip_wounded_${u.id}_${i}`}><s>{u.type.name}</s></span>
-                        : <span key={`region-tooltip_unit_${u.id}_${i}`}>{u.type.name}</span>), ", ")}</div>
+                        : <span key={`region-tooltip_unit_${u.id}_${i}`}>{u.type.name}</span>), ", ")}
+                </small>
             )}
-        </Col>
+        </div>
     </Tooltip>;
 }

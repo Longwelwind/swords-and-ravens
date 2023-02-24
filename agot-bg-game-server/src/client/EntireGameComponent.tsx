@@ -47,6 +47,7 @@ interface EntireGameComponentProps {
 export default class EntireGameComponent extends Component<EntireGameComponentProps> {
     @observable showMapWhenDrafting = false;
     @observable playWelcomeSound = false;
+    setIntervalId = -1;
 
     get entireGame(): EntireGame {
         return this.props.entireGame;
@@ -140,7 +141,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     placement="auto"
                     overlay={
                         <Tooltip id="tob-active-tooltip">
-                            <Col className="text-center">
+                            <div className="text-center">
                                 Tides of Battle
                                 {this.settings.removeTob3 && <>
                                     <br/><small>No 3s</small>
@@ -151,7 +152,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                                 {this.settings.limitTob2 && <>
                                     <br/><small>Only two 2s</small>
                                 </>}
-                            </Col>
+                            </div>
                         </Tooltip>}
                     popperConfig={{ modifiers: [preventOverflow] }}
                 >
@@ -225,13 +226,13 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     placement="auto"
                     overlay={
                         <Tooltip id="vp-counts-modified-tooltip" className="tooltip-w-100">
-                            <Col className="text-center">
+                            <div className="text-center">
                                 {(this.settings.victoryPointsCountNeededToWin != 7 || this.settings.loyaltyTokenCountNeededToWin != 7) && <p><h6>
                                     The victory conditions<br/>have been modified!
                                 </h6></p>}
                                 <>Required victory points: <b className="text-large">{this.settings.victoryPointsCountNeededToWin}</b></>
                                 {this.settings.playerCount >= 8 && <><br/>Required loyalty tokens: <b className="text-large">{this.settings.loyaltyTokenCountNeededToWin}</b></>}
-                            </Col>
+                            </div>
                         </Tooltip>}
                     popperConfig={{ modifiers: [preventOverflow] }}
                 >
@@ -316,25 +317,6 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         user.syncSettings();
     }
 
-    componentDidMount(): void {
-        document.title = this.entireGame.name;
-
-        if (this.isGameEnded) {
-            return;
-        }
-
-        this.entireGame.onClientGameStateChange = () => this.onClientGameStateChange();
-        this.entireGame.onGameStarted = () => this.onGameStarted();
-
-        if (this.props.gameClient.authenticatedUser) {
-            this.showMapWhenDrafting = this.props.gameClient.authenticatedUser.settings.showMapWhenDrafting;
-        }
-
-        /* if (!this.isInCombat) {
-            this.playWelcomeSound = true;
-        } */
-    }
-
     onGameStarted(): void {
         const audio = document.getElementById("welcome-sound") as HTMLAudioElement;
         // Make sure it's not playing right now
@@ -378,8 +360,38 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         }
     }
 
+    setNow(): void {
+        this.entireGame.now = new Date();
+    }
+
+    componentDidMount(): void {
+        document.title = this.entireGame.name;
+
+        if (this.isGameEnded) {
+            return;
+        }
+
+        this.entireGame.onClientGameStateChange = () => this.onClientGameStateChange();
+        this.entireGame.onGameStarted = () => this.onGameStarted();
+
+        if (this.props.gameClient.authenticatedUser) {
+            this.showMapWhenDrafting = this.props.gameClient.authenticatedUser.settings.showMapWhenDrafting;
+        }
+
+        this.setIntervalId = window.setInterval(() => this.setNow(), 1000);
+
+        /* if (!this.isInCombat) {
+            this.playWelcomeSound = true;
+        } */
+    }
+
     componentWillUnmount(): void {
         this.entireGame.onClientGameStateChange = null;
         this.entireGame.onGameStarted = null;
+
+        if (this.setIntervalId >= 0) {
+            window.clearInterval(this.setIntervalId);
+            this.setIntervalId = -1;
+        }
     }
 }

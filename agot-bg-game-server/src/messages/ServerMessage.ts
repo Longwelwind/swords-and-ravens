@@ -12,6 +12,7 @@ import HouseCardModifier from "../common/ingame-game-state/game-data-structure/h
 import { CombatStats } from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import { DraftStep } from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import { SerializedLoanCard } from "../common/ingame-game-state/game-data-structure/loan-card/LoanCard";
+import { SerializedWaitedForData } from "../common/ingame-game-state/Player";
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady | PlayerUnready
     | HouseCardChosen | SupportDeclared | SupportRefused | NewTurn | RemovePlacedOrder
@@ -32,7 +33,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | UpdateSelectableObjectives | UpdateSpecialHouseCardModifier | UpdateUsurper
     | StartPlayerClock | StopPlayerClock | GamePaused | GameResumed | LaterHouseCardsApplied
     | WildlingTiesResolved | PreemptiveRaidNewAttack | GameStarted | ReadyCheck | HousesSwapped
-    | RevealOrders | RemoveOrders | AcceptAllLoyaltyTokenMovementsChanged;
+    | RevealOrders | RemoveOrders | AcceptAllLoyaltyTokenMovementsChanged | UpdateWaitedForData;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -539,4 +540,10 @@ interface RemoveOrders {
 interface AcceptAllLoyaltyTokenMovementsChanged {
     type: "accept-all-loyalty-token-movements-changed";
     newValue: boolean;
+}
+
+interface UpdateWaitedForData {
+    type: "update-waited-for-data";
+    userId: string;
+    waitedForData: SerializedWaitedForData | null;
 }
