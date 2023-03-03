@@ -537,7 +537,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     // Apply Power tokens from game setup
     if (selectedGameSetup.powerTokensOnBoard != undefined) {
         Object.entries(selectedGameSetup.powerTokensOnBoard).forEach(([houseId, regions]) => {
-            const house = game.houses.tryGet(houseId, null);
+            const house = gameSettings.randomStartPositions && startingPositionsMap.has(houseId) ? game.houses.tryGet(startingPositionsMap.get(houseId), null) : game.houses.tryGet(houseId, null);
             regions.forEach(r => game.world.regions.get(r).controlPowerToken = house);
         });
     }
