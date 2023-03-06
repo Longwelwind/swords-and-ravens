@@ -15,7 +15,6 @@ import Game from "../../game-data-structure/Game";
 import Order from "../../game-data-structure/Order";
 import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameState } from "../../take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
 import { findOrphanedShipsAndDestroyThem, isTakeControlOfEnemyPortGameStateRequired } from "../../port-helper/PortHelper";
-import houseCardAbilities from "../../game-data-structure/house-card/houseCardAbilities";
 import BetterMap from "../../../../utils/BetterMap";
 import CallForSupportAgainstNeutralForceGameState, { SerializedCallForSupportAgainstNeutralForceGameState } from "./call-for-support-against-neutral-force-game-state/CallForSupportAgainstNeutralForceGameState";
 
@@ -219,7 +218,7 @@ export default class ResolveMarchOrderGameState extends GameState<
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
         if (message.type == "call-for-support-against-neutral-force") {
-            const resolveSingleMarch = this.childGameState as ResolveSingleMarchOrderGameState;
+            const resolveSingleMarch = this.childGameState instanceof ResolveSingleMarchOrderGameState ? this.childGameState : null;
             if (!resolveSingleMarch || this.ingameGameState.getControllerOfHouse(resolveSingleMarch.house) != player) {
                 return;
             }
