@@ -46,8 +46,4 @@ export default class StaticRegion {
         this.improvementSlot = improvementSlot;
         this.castleSlot = castleSlot;
     }
-
-    get hasStructure(): boolean {
-        return this.castleLevel > 0;
-    }
 }

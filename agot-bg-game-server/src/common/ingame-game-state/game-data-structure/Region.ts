@@ -34,7 +34,7 @@ export default class Region {
     }
 
     get hasStructure(): boolean {
-        return this.staticRegion.hasStructure;
+        return this.castleLevel > 0;
     }
 
     get superControlPowerToken(): House | null {
