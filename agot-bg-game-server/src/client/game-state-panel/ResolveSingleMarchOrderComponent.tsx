@@ -210,9 +210,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
     }
 
     callForSupportAgainstNeutralForces(): void {
-        this.props.gameState.entireGame.sendMessageToServer({
-            type: "call-for-support-against-neutral-force"
-        });
+        this.props.gameState.callForSupportAgainstNeutralForces();
     }
 
     UNSAFE_componentWillUpdate(): any {

@@ -517,6 +517,12 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
         return _.sum(moves.values.map(us => us.length)) == startingRegion.units.size;
     }
 
+    callForSupportAgainstNeutralForces(): void {
+        this.entireGame.sendMessageToServer({
+            type: "call-for-support-against-neutral-force"
+        });
+    }
+
     serializeToClient(_admin: boolean, _player: Player | null): SerializedResolveSingleMarchOrderGameState {
         return {
             type: "resolve-single-march",
