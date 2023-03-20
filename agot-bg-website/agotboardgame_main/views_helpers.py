@@ -8,7 +8,8 @@ from agotboardgame_main.models import Game, ONGOING
 def enrich_games(request, games: List[Game],
                  enrich_inactive_players: bool,
                  enrich_inactive_user_id: bool,
-                 enrich_important_messages: bool):
+                 enrich_important_messages: bool,
+                 cleanup_replacement_needed_games = False):
     for game in games:
         if enrich_inactive_players and game.state == ONGOING and not game.is_private and game.inactive_2 and len(game.inactive_players) > 0 and not game.replace_player_vote_ongoing:
             inactive_players = ""
@@ -44,3 +45,6 @@ def enrich_games(request, games: List[Game],
             game.unread_messages = unread_messages
         else:
             game.unread_messages = False
+
+    if cleanup_replacement_needed_games:
+        games = [game for game in games if game.inactive_players is not None]
