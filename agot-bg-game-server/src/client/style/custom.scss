@@ -4,9 +4,16 @@ $grid-breakpoints: (
         sm: 576px,
         md: 768px,
         lg: 992px,
-        xl: 1565px,
-        xxl: 1768px,
-        xxxl: 1875px
+        xl: 1920px,
+        xxl: 2400px
+);
+
+$container-max-widths: (
+        sm: 540px,
+        md: 720px,
+        lg: 960px,
+        xl: 1900px,
+        xxl: 2380px
 );
 
 @import './theme/_variables';
@@ -644,10 +651,18 @@ ul {
 }
 
 .scrollable-popover {
-  max-height: 850px;
-  max-width: 1250px;
+  max-height: 99vh;
+  max-width: 100%;
   overflow-y: auto;
-  overflow-x: auto;
+  overflow-x: hidden;
+  white-space: pre-wrap;
+}
+
+.scrollable-tooltip > .tooltip-inner {
+  max-height: 99vh;
+  max-width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
   white-space: pre-wrap;
 }
 
@@ -1050,8 +1065,12 @@ select {
 }
 
 .might-overflow {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100ch;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.ingame-userlabel {
+  float: left;
+  max-width: 210px;
 }

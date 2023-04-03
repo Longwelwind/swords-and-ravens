@@ -9,6 +9,7 @@ import classNames from "classnames";
 interface SimpleInfluenceIconComponentProps {
     house: LobbyHouse | null;
     small?: boolean;
+    xsmall?: boolean;
 }
 
 export default class SimpleInfluenceIconComponent extends Component<SimpleInfluenceIconComponentProps> {
@@ -17,7 +18,10 @@ export default class SimpleInfluenceIconComponent extends Component<SimpleInflue
     }
 
     render(): ReactNode {
-        const height = this.props.small ? "28px" : undefined;
+        const height = this.props.xsmall
+            ? "24px"
+            : this.props.small
+                ? "28px" : undefined;
         return <OverlayTrigger overlay={
                 <Tooltip id="influence-icon">
                     <b>{this.house?.name ?? "Unknown house"}</b>

@@ -43,9 +43,6 @@ import invertColor from "./utils/invertColor";
 import ImagePopover from "./utils/ImagePopover";
 import renderLoanCardsToolTip from "./loanCardsTooltip";
 import Xarrow from "react-xarrows";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAlignJustify } from "@fortawesome/free-solid-svg-icons";
-import { isMobile } from "react-device-detect";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -55,7 +52,6 @@ interface MapComponentProps {
     gameClient: GameClient;
     ingameGameState: IngameGameState;
     mapControls: MapControls;
-    collapseClicked?: () => void;
 }
 
 @observer
@@ -204,13 +200,6 @@ export default class MapComponent extends Component<MapComponentProps> {
                 <svg style={{ width: `${this.mapWidth}px`, height: `${MAP_HEIGHT}px` }}>
                     {this.renderRegions(propertiesForRegions)}
                 </svg>
-                {!isMobile &&
-                <button className="btn btn-outline-light btn-sm"
-                    onClick={() => { if (this.props.collapseClicked) this.props.collapseClicked(); }}
-                    style={{position: "absolute", left: "10px", padding: "8px", borderStyle: "none"}}
-                >
-                    <FontAwesomeIcon icon={faAlignJustify} style={{color: "white"}} size="lg"/>
-                </button>}
             </div>
         )
     }

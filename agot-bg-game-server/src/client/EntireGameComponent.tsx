@@ -81,7 +81,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 <link rel="icon" href={this.props.gameClient.isOwnTurn() ? faviconAlert : faviconNormal} sizes="16x16" />
             </Helmet>
             <Col xs={12} className={this.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
-                <Row className="justify-content-center align-items-center">
+                <Row className="justify-content-center align-items-center flex-nowrap">
                     {this.props.entireGame.replaySnapshot != null
                         ? <>{this.renderReplaySwitch()}
                             {this.renderGameName()}
@@ -134,7 +134,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     private renderGameName() {
         return <Col xs="auto" className="px-3">
             <ConditionalWrap
-                condition={this.entireGame.name.length >= 100}
+                condition={this.entireGame.name.length >= 90}
                 wrap={children => <OverlayTrigger
                     overlay={<Tooltip id="game-name-tooltip">
                         <Col>
@@ -146,7 +146,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     {children}
                 </OverlayTrigger>}
             >
-                <h4 className="might-overflow">{this.entireGame.name}</h4>
+                <h4 className="might-overflow" style={{maxWidth: "90ch"}}>{this.entireGame.name}</h4>
             </ConditionalWrap>
         </Col>;
     }
