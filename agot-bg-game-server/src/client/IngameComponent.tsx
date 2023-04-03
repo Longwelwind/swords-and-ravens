@@ -28,15 +28,16 @@ import {faCog} from "@fortawesome/free-solid-svg-icons/faCog";
 import {faComments} from "@fortawesome/free-solid-svg-icons/faComments";
 import {faComment} from "@fortawesome/free-solid-svg-icons/faComment";
 import Tooltip from "react-bootstrap/Tooltip";
-import stoneThroneImage from "../../public/images/icons/stone-throne.svg";
 import cancelImage from "../../public/images/icons/cancel.svg";
 import truceImage from "../../public/images/icons/truce.svg";
 import stopwatchPlus15Image from "../../public/images/icons/stopwatch-plus-15.svg";
 import pauseImage from "../../public/images/icons/pause-button.svg";
 import playImage from "../../public/images/icons/play-button.svg";
-import ravenImage from "../../public/images/icons/raven.svg";
+import stoneThroneImage from "../../public/images/icons/stone-throne.svg";
 import diamondHiltImage from "../../public/images/icons/diamond-hilt.svg";
 import diamondHiltUsedImage from "../../public/images/icons/diamond-hilt-used.svg";
+import ravenImage from "../../public/images/icons/raven.svg";
+import settingsKnobsImage from "../../public/images/icons/settings-knobs.svg";
 import hourglassImage from "../../public/images/icons/hourglass.svg";
 import mammothImage from "../../public/images/icons/mammoth.svg";
 import spikedDragonHeadImage from "../../public/images/icons/spiked-dragon-head.svg";
@@ -112,6 +113,7 @@ import VotesListComponent from "./VotesListComponent";
 import voteSound from "../../public/sounds/vote-started.ogg";
 import { houseColorFilters } from "./houseColorFilters";
 import LocalStorageService from "./utils/localStorageService";
+import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -130,11 +132,17 @@ interface IngameComponentProps {
     gameState: IngameGameState;
 }
 
+interface InfluenceTrackDetails {
+    name: string;
+    trackToShow: (House | null)[];
+    realTrack: House[];
+    stars: boolean;
+}
+
 @observer
 export default class IngameComponent extends Component<IngameComponentProps> {
     mapControls: MapControls = new MapControls();
     @observable currentOpenedTab = this.user?.settings.lastOpenedTab ?? "chat";
-    @observable housesInfosCollapsed = this.user?.settings.tracksColumnCollapsed ?? false;
     @observable highlightedRegions = new BetterMap<Region, RegionOnMapProperties>();
     @observable showMapScrollbarInfo = false;
     @observable showBrowserZoomInfo = false;
@@ -172,7 +180,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         return this.props.gameClient;
     }
 
-    get tracks(): {name: string; trackToShow: (House | null)[]; realTrack: House[]; stars: boolean}[] {
+    get tracks(): InfluenceTrackDetails[] {
         const influenceTracks: (House | null)[][] = this.game.influenceTracks.map(track => Array.from(track));
         if (this.ingame.hasChildGameState(ClashOfKingsGameState)) {
             const cok = this.ingame.getChildGameState(ClashOfKingsGameState) as ClashOfKingsGameState;
@@ -229,6 +237,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         const col1MinWidth = this.gameSettings.playerCount >= 8 ? "485px" : "470px";
 
+        const tracks = this.tracks;
+
         return <>
                 <Row className="justify-content-center" style={{maxHeight: this.mapScrollbarEnabled ? "95vh" : "none"}}>
                     <Col xs={{order: columnOrders.gameStateColumn}} className={this.columnSwapAnimationClassName}
@@ -242,57 +252,143 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             gameClient={this.gameClient}
                             ingameGameState={this.ingame}
                             mapControls={this.mapControls}
-                            collapseClicked={() => this.housesInfosCollapsed = !this.housesInfosCollapsed}
                         />
                     </div>
                     </Col>}
-                    {(!this.housesInfosCollapsed || isMobile) && (
-                    <Col xs={{ span: "auto", order: columnOrders.housesInfosColumn }} className={this.columnSwapAnimationClassName}
-                        style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none"}}
+                    <Col xs={{ span: "auto", order: columnOrders.housesInfosColumn }}
+                        style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none", maxWidth: "600px"}}
+                        className={classNames(
+                            this.columnSwapAnimationClassName,
+                            { "d-none d-xl-block": !isMobile && this.gameSettings.playerCount < 8,
+                              "d-none d-xxl-block": !isMobile && this.gameSettings.playerCount >= 8 }
+                        )}
                     >
-                        {this.renderHousesColumn()}
-                    </Col>)}
+                        {this.renderHousesColumn(true, tracks)}
+                    </Col>
                 </Row>
-                <Modal
-                    show={this.showMapScrollbarInfo || this.showBrowserZoomInfo}
-                    onHide={() => this.closeModal()} animation={false}
-                    backdrop="static"
-                    keyboard={false}
-                    centered
-                >
-                    <Modal.Header style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
-                        <h3 className="text-center" style={{color: "red"}}>Useful hint!<br/><small>Please read...</small></h3>
-                    </Modal.Header>
-                    <Modal.Body>
-                        {this.showMapScrollbarInfo
-                            ? <div className="text-center">
-                                The game is optimized for HD resolutions.<br/>
-                                You are using a lower display resolution and should try different combinations of your
-                                browser&apos;s zoom level and the <b>Map scrollbar</b> setting to ensure
-                                a pleasent gaming experience. The setting can be found in the tab with the gear icon.<br/><br/>
-                                <small><i>In your profile settings you can change the default behavior for this setting<br/>
-                                for all <b>future</b> games.</i></small>
-                            </div>
-                            : <div className="text-center">
-                                Unfortunately, your display resolution is too low to show all elements in a row.
-                                Use the function of your browser to zoom out and avoid scrolling all the time.
-                            </div>}
-                    </Modal.Body>
-                    <Modal.Footer style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
-                        <FormCheck
-                            id="dont-show-again-setting"
-                            type="switch"
-                            label={<label htmlFor="dont-show-again-setting">Don&apos;t show again</label>}
-                            onChange={evt => {
-                                LocalStorageService.setWithExpiry<boolean>("dontShowScrollbarHintsAgain", evt.target.checked, 30 * 24 * 60 * 60);
-                            }}
-                        />
-                        <Button variant="primary" onClick={() => this.closeModal()}>
-                            Ok
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
+                {this.renderScrollbarModal()}
+                {this.renderTracksButton(tracks)}
+                {this.renderGameControlsButton()}
         </>;
+    }
+    renderGameControlsButton(): ReactNode {
+        if (isMobile) {
+            return null;
+        }
+
+        return <OverlayTrigger
+            overlay={<Popover id="game-controls-popover">
+                <Col>
+                    {this.renderGameControlsRow(false)}
+                </Col>
+            </Popover>}
+            placement="auto"
+            trigger="click"
+            rootClose
+        >
+            <div className={classNames("clickable btn btn-sm btn-secondary p-1", {
+                "d-xl-none d-xxl-none": !isMobile && this.gameSettings.playerCount < 8,
+                "d-xxl-none": !isMobile && this.gameSettings.playerCount >= 8
+            })}
+                onClick={() => { }}
+                style={{ position: "fixed", right: this.user?.settings.responsiveLayout ? "auto" : "4px", left: this.user?.settings.responsiveLayout ? "4px" : "auto", top: "45px", padding: "4px", borderStyle: "none" }}
+            >
+                <img src={settingsKnobsImage} width={24} />
+            </div>
+        </OverlayTrigger>;
+    }
+
+    renderTracksButton(tracks: InfluenceTrackDetails[]): ReactNode {
+        if (isMobile) {
+            return null;
+        }
+
+        const ironThroneHolder = _.first(tracks[0].trackToShow.filter(h => h == this.game.ironThroneHolder)) ?? null;
+        const vsbHolder = _.first(tracks[1].trackToShow.filter(h => h == this.game.valyrianSteelBladeHolder)) ?? null;
+        const ravenHolder = _.first(tracks[2].trackToShow.filter(h => h == this.game.ravenHolder)) ?? null;
+
+        return <OverlayTrigger
+            overlay={<Popover id="tracks-popover" className="scrollable-popover">
+                <Col>
+                    {this.renderHousesColumn(false, tracks)}
+                </Col>
+            </Popover>}
+            placement="auto"
+            trigger="click"
+            rootClose
+        >
+            <div className={classNames("clickable btn btn-sm btn-secondary p-1", {
+                "d-xl-none d-xxl-none": !isMobile && this.gameSettings.playerCount < 8,
+                "d-xxl-none": !isMobile && this.gameSettings.playerCount >= 8
+            })}
+                onClick={() => { }}
+                style={{ position: "fixed", right: this.user?.settings.responsiveLayout ? "auto" : "4px", left: this.user?.settings.responsiveLayout ? "4px" : "auto", top: "6px", padding: "4px", borderStyle: "none" }}
+            >
+                <div>
+                    <Row className="px-2">
+                        <Col className="px-0">
+                            <img src={stoneThroneImage} width={24} />
+                        </Col>
+                        <Col className="pl-0 pr-1">
+                            <SimpleInfluenceIconComponent house={ironThroneHolder} xsmall />
+                        </Col>
+                        <Col className="pl-1 pr-0">
+                            <img src={this.game.valyrianSteelBladeUsed ? diamondHiltUsedImage : diamondHiltImage} width={24} />
+                        </Col>
+                        <Col className="pl-0 pr-1">
+                            <SimpleInfluenceIconComponent house={vsbHolder} xsmall />
+                        </Col>
+                        <Col className="pl-1 pr-0">
+                            <img src={ravenImage} width={24} />
+                        </Col>
+                        <Col className="px-0">
+                            <SimpleInfluenceIconComponent house={ravenHolder} xsmall />
+                        </Col>
+                    </Row>
+                </div>
+            </div>
+        </OverlayTrigger>;
+    }
+
+    renderScrollbarModal(): ReactNode {
+        return <Modal
+            show={this.showMapScrollbarInfo || this.showBrowserZoomInfo}
+            onHide={() => this.closeModal()} animation={false}
+            backdrop="static"
+            keyboard={false}
+            centered
+        >
+            <Modal.Header style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
+                <h3 className="text-center" style={{ color: "red" }}>Useful hint!<br /><small>Please read...</small></h3>
+            </Modal.Header>
+            <Modal.Body>
+                {this.showMapScrollbarInfo
+                    ? <div className="text-center">
+                        The game is optimized for HD resolutions.<br />
+                        You are using a lower display resolution and should try different combinations of your
+                        browser&apos;s zoom level and the <b>Map scrollbar</b> setting to ensure
+                        a pleasent gaming experience. The setting can be found in the tab with the gear icon.<br /><br />
+                        <small><i>In your profile settings you can change the default behavior for this setting<br />
+                            for all <b>future</b> games.</i></small>
+                    </div>
+                    : <div className="text-center">
+                        Unfortunately, your display resolution is too low to show all elements in a row.
+                        Use the function of your browser to zoom out and avoid scrolling all the time.
+                    </div>}
+            </Modal.Body>
+            <Modal.Footer style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
+                <FormCheck
+                    id="dont-show-again-setting"
+                    type="switch"
+                    label={<label htmlFor="dont-show-again-setting">Don&apos;t show again</label>}
+                    onChange={evt => {
+                        LocalStorageService.setWithExpiry<boolean>("dontShowScrollbarHintsAgain", evt.target.checked, 30 * 24 * 60 * 60);
+                    } } />
+                <Button variant="primary" onClick={() => this.closeModal()}>
+                    Ok
+                </Button>
+            </Modal.Footer>
+        </Modal>;
     }
 
     closeModal(): void {
@@ -300,20 +396,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         this.showBrowserZoomInfo = false;
     }
 
-    renderHousesColumn(): ReactNode {
-        const {result: canLaunchCancelGameVote, reason: canLaunchCancelGameVoteReason} = this.ingame.canLaunchCancelGameVote(this.authenticatedPlayer);
-        const {result: canLaunchEndGameVote, reason: canLaunchEndGameVoteReason} = this.ingame.canLaunchEndGameVote(this.authenticatedPlayer);
-        const {result: canLaunchPauseGameVote, reason: canLaunchPauseGameVoteReason} = this.ingame.canLaunchPauseGameVote(this.authenticatedPlayer);
-        const {result: canLaunchResumeGameVote, reason: canLaunchResumeGameVoteReason} = this.ingame.canLaunchResumeGameVote(this.authenticatedPlayer);
-        const {result: canLaunchExtendPlayerClocksVote, reason: canLaunchExtendPlayerClocksVoteReason} = this.ingame.canLaunchExtendPlayerClocksVote(this.authenticatedPlayer);
-
+    renderHousesColumn(renderGameControls: boolean, tracks: InfluenceTrackDetails[]): ReactNode {
         const connectedSpectators = this.getConnectedSpectators();
 
         return (
             <div className={this.mapScrollbarEnabled ? "flex-ratio-container" : ""}>
                 <Card className={this.mapScrollbarEnabled ? "flex-sized-to-content mb-2" : ""}>
                     <ListGroup variant="flush">
-                        {this.renderInfluenceTracks()}
+                        {this.renderInfluenceTracks(tracks)}
                         <ListGroupItem style={{ minHeight: "130px" }}>
                             <SupplyTrackComponent
                                 supplyRestrictions={this.game.supplyRestrictions}
@@ -373,195 +463,202 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         </ListGroup>
                     </Card.Body>
                 </Card>
-                <Row className={this.mapScrollbarEnabled ? "flex-footer" : ""} id="game-controls">
-                    <Col xs="auto">
-                        <button className="btn btn-outline-light btn-sm" onClick={() => this.gameClient.muted = !this.gameClient.muted}>
-                            <OverlayTrigger
-                                overlay={
-                                    <Tooltip id="mute-tooltip">
-                                        {this.gameClient.muted
-                                            ? "Unmute notifications"
-                                            : "Mute notifications"}
-                                    </Tooltip>
-                                }
-                            >
-                                <img src={this.gameClient.muted ? speakerOffImage : megaphoneImage} width={32} />
-                            </OverlayTrigger>
-                        </button>
-                    </Col>
-                    <Col xs="auto">
-                        <button className="btn btn-outline-light btn-sm" onClick={() => this.gameClient.musicMuted = !this.gameClient.musicMuted}>
-                            <OverlayTrigger
-                                overlay={
-                                    <Tooltip id="mute-tooltip">
-                                        {this.gameClient.musicMuted
-                                            ? "Unmute music and sound effects"
-                                            : "Mute music and sound effects"}
-                                    </Tooltip>
-                                }
-                            >
-                                <img src={this.gameClient.musicMuted ? speakerOffImage : musicalNotesImage} width={32} />
-                            </OverlayTrigger>
-                        </button>
-                    </Col>
-                    {this.authenticatedPlayer && <>
-                        <Col xs="auto">
-                            <button
-                                className="btn btn-outline-light btn-sm"
-                                onClick={() => this.ingame.launchCancelGameVote()}
-                                disabled={!canLaunchCancelGameVote}
-                            >
-                                <OverlayTrigger
-                                    overlay={
-                                        <Tooltip id="cancel-game-vote-tooltip">
-                                            {canLaunchCancelGameVote ? (
-                                                "Launch a vote to cancel the game"
-                                            ) : canLaunchCancelGameVoteReason == "only-players-can-vote" ? (
-                                                "Only participating players can vote"
-                                            ) : canLaunchCancelGameVoteReason == "already-existing" ? (
-                                                "A vote to cancel the game is already ongoing"
-                                            ) : canLaunchCancelGameVoteReason == "already-cancelled" ? (
-                                                "Game has already been cancelled"
-                                            ) : canLaunchCancelGameVoteReason == "already-ended" ? (
-                                                "Game has already ended"
-                                            ) : canLaunchCancelGameVoteReason == "forbidden-in-tournament-mode" ? (
-                                                "Canceling games is not allowed in tournaments"
-                                            ) : "Vote not possible"}
-                                        </Tooltip>
-                                    }
-                                >
-                                    <img src={cancelImage} width={32} />
-                                </OverlayTrigger>
-                            </button>
-                        </Col>
-                        <Col xs="auto">
-                            <button
-                                className="btn btn-outline-light btn-sm"
-                                onClick={() => this.ingame.launchEndGameVote()}
-                                disabled={!canLaunchEndGameVote}
-                            >
-                                <OverlayTrigger
-                                    overlay={
-                                        <Tooltip id="end-game-vote-tooltip">
-                                            {canLaunchEndGameVote ? (
-                                                "Launch a vote to end the game after the current round"
-                                            ) : canLaunchEndGameVoteReason == "game-paused" ? (
-                                                "The game must be resumed first"
-                                            ) : canLaunchEndGameVoteReason == "only-players-can-vote" ? (
-                                                "Only participating players can vote"
-                                            ) : canLaunchEndGameVoteReason == "already-last-turn" ? (
-                                                "It is already the last round"
-                                            ) : canLaunchEndGameVoteReason == "already-existing" ? (
-                                                "A vote to end the game is already ongoing"
-                                            ) : canLaunchEndGameVoteReason == "already-cancelled" ? (
-                                                "Game has already been cancelled"
-                                            ) : canLaunchEndGameVoteReason == "already-ended" ? (
-                                                "Game has already ended"
-                                            ) : canLaunchEndGameVoteReason == "forbidden-in-tournament-mode" ? (
-                                                "Early end is not allowed in tournaments"
-                                            ) : "Vote not possible"}
-                                        </Tooltip>}
-                                >
-                                    <img src={truceImage} width={32} />
-                                </OverlayTrigger>
-                            </button>
-                        </Col>
-                        {this.gameSettings.onlyLive && !this.ingame.paused &&
-                        <Col xs="auto">
-                            <button
-                                className="btn btn-outline-light btn-sm"
-                                onClick={() => this.ingame.launchPauseGameVote()}
-                                disabled={!canLaunchPauseGameVote}
-                            >
-                                <OverlayTrigger
-                                    overlay={
-                                        <Tooltip id="pause-game-vote-tooltip">
-                                            {canLaunchPauseGameVote ? (
-                                                "Launch a vote to pause the game"
-                                            ) : canLaunchPauseGameVoteReason == "only-players-can-vote" ? (
-                                                "Only participating players can vote"
-                                            ) : canLaunchPauseGameVoteReason == "already-existing" ? (
-                                                "A vote to pause the game is already ongoing"
-                                            ) : canLaunchPauseGameVoteReason == "already-cancelled" ? (
-                                                "Game has already been cancelled"
-                                            ) : canLaunchPauseGameVoteReason == "already-ended" ? (
-                                                "Game has already ended"
-                                            ) : "Vote not possible"}
-                                        </Tooltip>}
-                                >
-                                    <img src={pauseImage} width={32} />
-                                </OverlayTrigger>
-                            </button>
-                        </Col>}
-                        {this.gameSettings.onlyLive && this.ingame.paused &&
-                        <Col xs="auto">
-                            <button
-                                className="btn btn-outline-light btn-sm"
-                                onClick={() => this.ingame.launchResumeGameVote()}
-                                disabled={!canLaunchResumeGameVote}
-                            >
-                                <OverlayTrigger
-                                    overlay={
-                                        <Tooltip id="resume-game-vote-tooltip">
-                                            {canLaunchResumeGameVote ? (
-                                                "Launch a vote to resume the game"
-                                            ) : canLaunchResumeGameVoteReason == "only-players-can-vote" ? (
-                                                "Only participating players can vote"
-                                            ) : canLaunchResumeGameVoteReason == "already-existing" ? (
-                                                "A vote to resume the game is already ongoing"
-                                            ) : canLaunchResumeGameVoteReason == "already-cancelled" ? (
-                                                "Game has already been cancelled"
-                                            ) : canLaunchResumeGameVoteReason == "already-ended" ? (
-                                                "Game has already ended"
-                                            ) : "Vote not possible"}
-                                        </Tooltip>}
-                                >
-                                    <img src={playImage} width={32} />
-                                </OverlayTrigger>
-                            </button>
-                        </Col>}
-                        {this.gameSettings.onlyLive &&
-                        <Col xs="auto">
-                            <button
-                                className="btn btn-outline-light btn-sm"
-                                onClick={() => this.ingame.launchExtendPlayerClocksVote()}
-                                disabled={!canLaunchExtendPlayerClocksVote}
-                            >
-                                <OverlayTrigger
-                                    overlay={
-                                        <Tooltip id="extend-clocks-vote-tooltip">
-                                            {canLaunchExtendPlayerClocksVote ? (
-                                                "Launch a vote to extend all player clocks by 15 minutes"
-                                            ) : canLaunchExtendPlayerClocksVoteReason == "game-paused" ? (
-                                                "The game must be resumed first"
-                                            ) : canLaunchExtendPlayerClocksVoteReason == "only-players-can-vote" ? (
-                                                "Only participating players can vote"
-                                            ) : canLaunchExtendPlayerClocksVoteReason == "already-existing" ? (
-                                                "A vote to extend all clocks is already ongoing"
-                                            ) : canLaunchExtendPlayerClocksVoteReason == "already-extended" ? (
-                                                "Player clocks have already been extended"
-                                            ) : canLaunchExtendPlayerClocksVoteReason == "max-vote-count-reached" ? (
-                                                "The maximum amount of votes was reached"
-                                            ) : canLaunchExtendPlayerClocksVoteReason == "already-cancelled" ? (
-                                                "Game has already been cancelled"
-                                            ) : canLaunchExtendPlayerClocksVoteReason == "already-ended" ? (
-                                                "Game has already ended"
-                                            ) : canLaunchExtendPlayerClocksVoteReason == "forbidden-in-tournament-mode" ? (
-                                                "Extending player clocks is not allowed in tournaments"
-                                            ) : "Vote not possible"}
-                                        </Tooltip>}
-                                >
-                                    <img src={stopwatchPlus15Image} width={32} />
-                                </OverlayTrigger>
-                            </button>
-                        </Col>}
-                    </>}
-                </Row>
+                {renderGameControls && this.renderGameControlsRow(true)}
             </div>)
     }
 
-    private renderInfluenceTracks(): React.ReactNode {
-        return this.tracks.map(({ name, trackToShow, realTrack, stars }, i) => (
+    private renderGameControlsRow(applyFlexFooter: boolean): React.ReactNode {
+        const {result: canLaunchCancelGameVote, reason: canLaunchCancelGameVoteReason} = this.ingame.canLaunchCancelGameVote(this.authenticatedPlayer);
+        const {result: canLaunchEndGameVote, reason: canLaunchEndGameVoteReason} = this.ingame.canLaunchEndGameVote(this.authenticatedPlayer);
+        const {result: canLaunchPauseGameVote, reason: canLaunchPauseGameVoteReason} = this.ingame.canLaunchPauseGameVote(this.authenticatedPlayer);
+        const {result: canLaunchResumeGameVote, reason: canLaunchResumeGameVoteReason} = this.ingame.canLaunchResumeGameVote(this.authenticatedPlayer);
+        const {result: canLaunchExtendPlayerClocksVote, reason: canLaunchExtendPlayerClocksVoteReason} = this.ingame.canLaunchExtendPlayerClocksVote(this.authenticatedPlayer);
+
+        return <Row className={applyFlexFooter && this.mapScrollbarEnabled ? "flex-footer" : ""} id="game-controls">
+            <Col xs="auto">
+                <button className="btn btn-outline-light btn-sm" onClick={() => this.gameClient.muted = !this.gameClient.muted}>
+                    <OverlayTrigger
+                        placement="auto"
+                        overlay={<Tooltip id="mute-tooltip">
+                            {this.gameClient.muted
+                                ? "Unmute notifications"
+                                : "Mute notifications"}
+                        </Tooltip>}
+                    >
+                        <img src={this.gameClient.muted ? speakerOffImage : megaphoneImage} width={32} />
+                    </OverlayTrigger>
+                </button>
+            </Col>
+            <Col xs="auto">
+                <button className="btn btn-outline-light btn-sm" onClick={() => this.gameClient.musicMuted = !this.gameClient.musicMuted}>
+                    <OverlayTrigger
+                        placement="auto"
+                        overlay={<Tooltip id="mute-tooltip">
+                            {this.gameClient.musicMuted
+                                ? "Unmute music and sound effects"
+                                : "Mute music and sound effects"}
+                        </Tooltip>}
+                    >
+                        <img src={this.gameClient.musicMuted ? speakerOffImage : musicalNotesImage} width={32} />
+                    </OverlayTrigger>
+                </button>
+            </Col>
+            {this.authenticatedPlayer && <>
+                <Col xs="auto">
+                    <button
+                        className="btn btn-outline-light btn-sm"
+                        onClick={() => this.ingame.launchCancelGameVote()}
+                        disabled={!canLaunchCancelGameVote}
+                    >
+                        <OverlayTrigger
+                            placement="auto"
+                            overlay={<Tooltip id="cancel-game-vote-tooltip">
+                                {canLaunchCancelGameVote ? (
+                                    "Launch a vote to cancel the game"
+                                ) : canLaunchCancelGameVoteReason == "only-players-can-vote" ? (
+                                    "Only participating players can vote"
+                                ) : canLaunchCancelGameVoteReason == "already-existing" ? (
+                                    "A vote to cancel the game is already ongoing"
+                                ) : canLaunchCancelGameVoteReason == "already-cancelled" ? (
+                                    "Game has already been cancelled"
+                                ) : canLaunchCancelGameVoteReason == "already-ended" ? (
+                                    "Game has already ended"
+                                ) : canLaunchCancelGameVoteReason == "forbidden-in-tournament-mode" ? (
+                                    "Canceling games is not allowed in tournaments"
+                                ) : "Vote not possible"}
+                            </Tooltip>}
+                        >
+                            <img src={cancelImage} width={32} />
+                        </OverlayTrigger>
+                    </button>
+                </Col>
+                <Col xs="auto">
+                    <button
+                        className="btn btn-outline-light btn-sm"
+                        onClick={() => this.ingame.launchEndGameVote()}
+                        disabled={!canLaunchEndGameVote}
+                    >
+                        <OverlayTrigger
+                            placement="auto"
+                            overlay={<Tooltip id="end-game-vote-tooltip">
+                                {canLaunchEndGameVote ? (
+                                    "Launch a vote to end the game after the current round"
+                                ) : canLaunchEndGameVoteReason == "game-paused" ? (
+                                    "The game must be resumed first"
+                                ) : canLaunchEndGameVoteReason == "only-players-can-vote" ? (
+                                    "Only participating players can vote"
+                                ) : canLaunchEndGameVoteReason == "already-last-turn" ? (
+                                    "It is already the last round"
+                                ) : canLaunchEndGameVoteReason == "already-existing" ? (
+                                    "A vote to end the game is already ongoing"
+                                ) : canLaunchEndGameVoteReason == "already-cancelled" ? (
+                                    "Game has already been cancelled"
+                                ) : canLaunchEndGameVoteReason == "already-ended" ? (
+                                    "Game has already ended"
+                                ) : canLaunchEndGameVoteReason == "forbidden-in-tournament-mode" ? (
+                                    "Early end is not allowed in tournaments"
+                                ) : "Vote not possible"}
+                            </Tooltip>}
+                        >
+                            <img src={truceImage} width={32} />
+                        </OverlayTrigger>
+                    </button>
+                </Col>
+                {this.gameSettings.onlyLive && !this.ingame.paused &&
+                    <Col xs="auto">
+                        <button
+                            className="btn btn-outline-light btn-sm"
+                            onClick={() => this.ingame.launchPauseGameVote()}
+                            disabled={!canLaunchPauseGameVote}
+                        >
+                            <OverlayTrigger
+                                placement="auto"
+                                overlay={<Tooltip id="pause-game-vote-tooltip">
+                                    {canLaunchPauseGameVote ? (
+                                        "Launch a vote to pause the game"
+                                    ) : canLaunchPauseGameVoteReason == "only-players-can-vote" ? (
+                                        "Only participating players can vote"
+                                    ) : canLaunchPauseGameVoteReason == "already-existing" ? (
+                                        "A vote to pause the game is already ongoing"
+                                    ) : canLaunchPauseGameVoteReason == "already-cancelled" ? (
+                                        "Game has already been cancelled"
+                                    ) : canLaunchPauseGameVoteReason == "already-ended" ? (
+                                        "Game has already ended"
+                                    ) : "Vote not possible"}
+                                </Tooltip>}
+                            >
+                                <img src={pauseImage} width={32} />
+                            </OverlayTrigger>
+                        </button>
+                    </Col>}
+                {this.gameSettings.onlyLive && this.ingame.paused &&
+                    <Col xs="auto">
+                        <button
+                            className="btn btn-outline-light btn-sm"
+                            onClick={() => this.ingame.launchResumeGameVote()}
+                            disabled={!canLaunchResumeGameVote}
+                        >
+                            <OverlayTrigger
+                                placement="auto"
+                                overlay={<Tooltip id="resume-game-vote-tooltip">
+                                    {canLaunchResumeGameVote ? (
+                                        "Launch a vote to resume the game"
+                                    ) : canLaunchResumeGameVoteReason == "only-players-can-vote" ? (
+                                        "Only participating players can vote"
+                                    ) : canLaunchResumeGameVoteReason == "already-existing" ? (
+                                        "A vote to resume the game is already ongoing"
+                                    ) : canLaunchResumeGameVoteReason == "already-cancelled" ? (
+                                        "Game has already been cancelled"
+                                    ) : canLaunchResumeGameVoteReason == "already-ended" ? (
+                                        "Game has already ended"
+                                    ) : "Vote not possible"}
+                                </Tooltip>}
+                            >
+                                <img src={playImage} width={32} />
+                            </OverlayTrigger>
+                        </button>
+                    </Col>}
+                {this.gameSettings.onlyLive &&
+                    <Col xs="auto">
+                        <button
+                            className="btn btn-outline-light btn-sm"
+                            onClick={() => this.ingame.launchExtendPlayerClocksVote()}
+                            disabled={!canLaunchExtendPlayerClocksVote}
+                        >
+                            <OverlayTrigger
+                                placement="auto"
+                                overlay={<Tooltip id="extend-clocks-vote-tooltip">
+                                    {canLaunchExtendPlayerClocksVote ? (
+                                        "Launch a vote to extend all player clocks by 15 minutes"
+                                    ) : canLaunchExtendPlayerClocksVoteReason == "game-paused" ? (
+                                        "The game must be resumed first"
+                                    ) : canLaunchExtendPlayerClocksVoteReason == "only-players-can-vote" ? (
+                                        "Only participating players can vote"
+                                    ) : canLaunchExtendPlayerClocksVoteReason == "already-existing" ? (
+                                        "A vote to extend all clocks is already ongoing"
+                                    ) : canLaunchExtendPlayerClocksVoteReason == "already-extended" ? (
+                                        "Player clocks have already been extended"
+                                    ) : canLaunchExtendPlayerClocksVoteReason == "max-vote-count-reached" ? (
+                                        "The maximum amount of votes was reached"
+                                    ) : canLaunchExtendPlayerClocksVoteReason == "already-cancelled" ? (
+                                        "Game has already been cancelled"
+                                    ) : canLaunchExtendPlayerClocksVoteReason == "already-ended" ? (
+                                        "Game has already ended"
+                                    ) : canLaunchExtendPlayerClocksVoteReason == "forbidden-in-tournament-mode" ? (
+                                        "Extending player clocks is not allowed in tournaments"
+                                    ) : "Vote not possible"}
+                                </Tooltip>}
+                            >
+                                <img src={stopwatchPlus15Image} width={32} />
+                            </OverlayTrigger>
+                        </button>
+                    </Col>}
+            </>}
+        </Row>;
+    }
+
+    private renderInfluenceTracks(tracks: InfluenceTrackDetails[]): React.ReactNode {
+        return tracks.map(({ name, trackToShow, realTrack, stars }, i) => (
             <ListGroupItem key={`influence-track-container_${i}`} style={{ minHeight: "61px" }}>
                 <Row className="align-items-center">
                     <Col xs="auto" className="text-center" style={{ width: "46px" }}>
@@ -655,7 +752,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const isPhaseActive = (phase: GameStatePhaseProps): boolean => this.ingame.childGameState instanceof phase.gameState;
 
         return <div className={this.mapScrollbarEnabled ? "flex-ratio-container" : ""}>
-            <Card id="game-state-panel" className={this.mapScrollbarEnabled ? "flex-sized-to-content mb-2" : "mb-2"} border={border} style={{maxHeight: this.mapScrollbarEnabled ? "70%" : "none", paddingRight: "2px", borderWidth: "3px", overflowY: "scroll" }}>
+            <Card id="game-state-panel" className={this.mapScrollbarEnabled ? "flex-sized-to-content mb-2" : "mb-2"} border={border} style={{maxHeight: this.mapScrollbarEnabled ? "65%" : "none", paddingRight: "2px", borderWidth: "3px", overflowY: "scroll" }}>
                 <Row className="no-space-around">
                     <Col>
                         <ListGroup variant="flush">
@@ -1249,10 +1346,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             return;
         }
 
-        if (this.currentOpenedTab != this.user.settings.lastOpenedTab ||
-            this.housesInfosCollapsed != this.user.settings.tracksColumnCollapsed) {
+        if (this.currentOpenedTab != this.user.settings.lastOpenedTab) {
                 this.user.settings.lastOpenedTab = this.currentOpenedTab;
-                this.user.settings.tracksColumnCollapsed = this.housesInfosCollapsed;
                 this.user.syncSettings();
         }
     }
@@ -1396,7 +1491,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
-        return this.highlightedRegions.entries;
+        return this.highlightedRegions.
+        entries;
     }
 
     modifyUnitsOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {

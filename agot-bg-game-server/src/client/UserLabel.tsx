@@ -9,13 +9,14 @@ import GameClient from "./GameClient";
 import LobbyGameState from "../common/lobby-game-state/LobbyGameState";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import { Dropdown, Nav, Navbar, NavDropdown } from "react-bootstrap";
+import { Col, Dropdown, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import Player from "../common/ingame-game-state/Player";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import { faUserGear } from "@fortawesome/free-solid-svg-icons";
 import clonesImage from "../../public/images/icons/clones.svg"
 import getElapsedSeconds from "../utils/getElapsedSeconds";
 import { secondsToString } from "./utils/secondsToString";
+import classNames from "classnames";
 
 interface UserLabelProps {
     gameClient: GameClient;
@@ -37,9 +38,9 @@ export default class UserLabel extends Component<UserLabelProps> {
         return null;
     }
 
-    get player(): Player {
+    get player(): Player | null {
         if (!this.ingame) {
-            throw new Error("`player` called when the game was not in IngameGameState");
+            return null
         }
 
         return this.ingame.players.get(this.user);
@@ -48,10 +49,9 @@ export default class UserLabel extends Component<UserLabelProps> {
     render(): ReactNode {
         const canActAsOwner = this.props.gameState.entireGame.canActAsOwner(this.user) && !this.props.gameState.entireGame.gameSettings.faceless;
         const isRealOwner = this.props.gameState.entireGame.isRealOwner(this.user);
-        const ingame = this.ingame;
 
         return (
-            <Navbar variant="dark" className="no-space-around">
+            <Navbar variant="dark" className="no-space-around pr-0">
                 <Navbar.Brand className="no-space-around">
                     <small>
                         {canActAsOwner &&
@@ -67,20 +67,20 @@ export default class UserLabel extends Component<UserLabelProps> {
                 <Navbar.Collapse id={`navbar-${this.user.id}`} className="no-space-around">
                     <Nav className="no-space-around">
                         <NavDropdown id={`nav-dropdown-${this.user.id}`} className="no-gutters" title={
-                            (this.props.gameState.entireGame.now.getTime() > 0) && <ConditionalWrap
-                                condition={ingame != null && this.player.waitedForData != null && !this.player.waitedForData.handled}
-                                wrap={children => <OverlayTrigger
-                                    overlay={<Tooltip id={`waited-for-${this.player.user.id}-tooltip`}>
-                                        Waited for since {secondsToString(getElapsedSeconds(this.player.waitedForData?.date ?? new Date()))}
-                                    </Tooltip>}
-                                    delay={{ show: 250, hide: 100 }}
-                                    placement="auto"
-                                >
-                                    {children}
-                                </OverlayTrigger>}
+                            <OverlayTrigger
+                                overlay={<Tooltip id={`waited-for-${this.user.id}-tooltip`}>
+                                    <Col className="text-center">
+                                        <h5>{this.user.name}</h5>
+                                        {this.player?.waitedForData != null && !this.player.waitedForData.handled && this.props.gameState.entireGame.now.getTime() > 0 && <p>
+                                            Waited for since {secondsToString(getElapsedSeconds(this.player.waitedForData.date))}
+                                        </p>}
+                                    </Col>
+                                </Tooltip>}
+                                delay={{ show: 150, hide: 100 }}
+                                placement="auto"
                             >
-                                <span className="userlabel">{this.user.name}</span>
-                            </ConditionalWrap>}
+                                <span className={classNames("userlabel", {"might-overflow ingame-userlabel" : this.ingame != null})}>{this.user.name}</span>
+                            </OverlayTrigger>}
                         >
                             {!this.props.gameState.entireGame.gameSettings.faceless && <Dropdown.Item href={`/user/${this.user.id}`} target="_blank" rel="noopener noreferrer">See Profile</Dropdown.Item>}
                             {this.renderIngameDropdownItems()}
@@ -115,8 +115,8 @@ export default class UserLabel extends Component<UserLabelProps> {
         const ingame = this.ingame;
 
         const {result: canLaunchReplacePlayerVote, reason: canLaunchReplacePlayerVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser);
-        const {result: canLaunchReplacePlayerByVassalVote, reason: canLaunchReplacePlayerByVassalVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser, true, this.player.house);
-        const {result: canLaunchSwapHousesVote, reason: canLaunchSwapHousesVoteReason} = ingame.canLaunchSwapHousesVote(this.props.gameClient.authenticatedUser, this.player);
+        const {result: canLaunchReplacePlayerByVassalVote, reason: canLaunchReplacePlayerByVassalVoteReason} = ingame.canLaunchReplacePlayerVote(this.props.gameClient.authenticatedUser, true, this.player!.house);
+        const {result: canLaunchSwapHousesVote, reason: canLaunchSwapHousesVoteReason} = ingame.canLaunchSwapHousesVote(this.props.gameClient.authenticatedUser, this.player!);
         const {result: canLaunchDeclareWinnerVote, reason: canLaunchDeclareWinnerVoteReason} = ingame.canLaunchDeclareWinnerVote(this.props.gameClient.authenticatedUser);
         return (
             <>
@@ -220,7 +220,7 @@ export default class UserLabel extends Component<UserLabelProps> {
                                         : canLaunchSwapHousesVoteReason == "cannot-swap-with-yourself" ?
                                             "You cannot swap houses with yourself"
                                         : canLaunchSwapHousesVoteReason == "secret-objectives-chosen" ?
-                                            `You or ${this.player.user.name} has already chosen their secret objectives`
+                                            `You or ${this.player!.user.name} has already chosen their secret objectives`
                                         : canLaunchSwapHousesVoteReason == "forbidden-in-tournament-mode" ?
                                             "Swapping houses is not allowed in tournaments"
                                         : "Vote not possible"
@@ -274,7 +274,7 @@ export default class UserLabel extends Component<UserLabelProps> {
                             onClick={() => this.onLaunchDeclareWinnerClick()}
                             disabled={!canLaunchDeclareWinnerVote}
                         >
-                            Launch a vote to declare House {this.player.house.name} the winner
+                            Launch a vote to declare House {this.player!.house.name} the winner
                         </NavDropdown.Item>
                     </div>
                 </ConditionalWrap>
@@ -287,8 +287,8 @@ export default class UserLabel extends Component<UserLabelProps> {
             throw new Error("`launchReplacePlayerVote` called when the game was not in IngameGameState");
         }
 
-        if (window.confirm(`Do you want to launch a vote to replace ${this.player.user.name} who controls house ${this.player.house.name}?`)) {
-            this.ingame.launchReplacePlayerVote(this.player);
+        if (window.confirm(`Do you want to launch a vote to replace ${this.player!.user.name} who controls house ${this.player!.house.name}?`)) {
+            this.ingame.launchReplacePlayerVote(this.player!);
         }
     }
 
@@ -297,8 +297,8 @@ export default class UserLabel extends Component<UserLabelProps> {
             throw new Error("`launchReplacePlayerVote` called when the game was not in IngameGameState");
         }
 
-        if (window.confirm(`Do you want to launch a vote to replace ${this.player.user.name} who controls house ${this.player.house.name} by a vassal?`)) {
-            this.ingame.launchReplacePlayerByVassalVote(this.player);
+        if (window.confirm(`Do you want to launch a vote to replace ${this.player!.user.name} who controls house ${this.player!.house.name} by a vassal?`)) {
+            this.ingame.launchReplacePlayerByVassalVote(this.player!);
         }
     }
 
@@ -307,8 +307,8 @@ export default class UserLabel extends Component<UserLabelProps> {
             throw new Error("`onLaunchSwapHousesVoteClick` called when the game was not in IngameGameState");
         }
 
-        if (window.confirm(`Do you want to launch a vote to swap houses with ${this.player.user.name} who controls house ${this.player.house.name}?`)) {
-            this.ingame.launchSwapHousesVote(this.player);
+        if (window.confirm(`Do you want to launch a vote to swap houses with ${this.player!.user.name} who controls house ${this.player!.house.name}?`)) {
+            this.ingame.launchSwapHousesVote(this.player!);
         }
     }
 
@@ -317,8 +317,8 @@ export default class UserLabel extends Component<UserLabelProps> {
             throw new Error("`onLaunchDeclareWinnerClick` called when the game was not in IngameGameState");
         }
 
-        if (window.confirm(`Do you want to launch a vote to declare House ${this.player.house.name} the winner?`)) {
-            this.ingame.launchDeclareWinnerVote(this.player.house);
+        if (window.confirm(`Do you want to launch a vote to declare House ${this.player!.house.name} the winner?`)) {
+            this.ingame.launchDeclareWinnerVote(this.player!.house);
         }
     }
 }

@@ -91,46 +91,50 @@ export default class IronBankInfosComponent extends Component<IronBankInfosCompo
     }
 
     renderIronBankTooltip(): OverlayChildren {
-        return <Tooltip id="iron-bank-tooltip" className="tooltip-w-100">
-            <h4 className="text-center">The Iron&nbsp;Bank of Braavos</h4>
-            Nestled in a seemingly impenetrable northern bay, the free city of Braavos lays claim to<br/>
-            one of the most powerful institutions in the Known World: the Iron&nbsp;Bank of Braavos.<br/><br/>
-            <h5>Purchasing Loans</h5>
-            The Iron&nbsp;Bank provides a service to the lords of Westeros by offering them favorable bank loans.<br/>
-            Each loan allows the lord to purchase useful aides for their cause.<br/>
-            When resolving the special Iron&nbsp;Bank sea order during the <i>Resolve Consolidate Power Order</i> step,<br/>
-            a player may take one loan.<br/>
-            <i>The Iron&nbsp;Bank order token can be raided, but does not allow the raiding player<br/>
-            to steal a Power token (pillaging).</i><br/><br/>
-            To take a loan, a player follows these steps:<br/>
-            <ol className="mb-0 mt-1">
-                <li>The player chooses a faceup loan from one of the three slots of the Iron&nbsp;Bank.</li>
-                <li>The player pays the loan&apos;s <b>initial cost</b> by discarding a number of available<br/>
-                Power tokens equal to the value shown {this.isEssosMapUsed ? "above" : "below"} that loan card&apos;s current slot.</li>
-                <li>The player resolves the effect of their chosen loan.<br/>
-                <i>(Click on the loan deck to explore all the loan effects)</i></li>
-            </ol>
-            <br/>
-            <h5>Paying Interest</h5>
-            The shrewd money-lenders of the great institution of The Iron&nbsp;Bank do not easily forgive debt.<br/>
-            After purchasing a loan, a house must pay an interest cost to the Iron&nbsp;Bank for the remainder<br/>
-            of the game. At the beginning of the Westeros Phase, in turn order, each player with a loan<br/>
-            must discard one of their available Power tokens for each loan they have purchased.<br/>
-            If that player is not able to discard the requisite  number of power, for each power they are short,<br/>
-            the player who holds the Valyrian Steel Blade chooses one of that player&apos;s units anywhere<br/>
-            and destroys it. If the player who cannot pay their interest is the holder of the Blade,<br/>
-            the next highest player on that track makes this choice.<br/>
-            {this.isEssosMapUsed &&
-            <>
-                <br/>
-                <h5>Controlling Braavos</h5>
-                Though no easy task, it is possible to gain the upper hand in negotiating with the Iron&nbsp;Bank<br/>
-                by controlling the city it resides in. The first player to defeat the 5-strength Neutral Force token<br/>
-                on Braavos places that token facedown in front of them. While a player has this token,<br/>
-                that token acts as a reminder that the player receives a <b>–1</b> to the <b>initial cost</b> of the loan<br/>
-                (but not the interest).<br/>
-                If another player takes control of Braavos they immediately receive the Braavos Neutral Force token.
-            </>}
+        return <Tooltip id="iron-bank-tooltip" className="scrollable-tooltip">
+            <Row>
+                <Col className="p-2 m-2">
+                    <h4 className="text-center">The Iron&nbsp;Bank of Braavos</h4>
+                    Nestled in a seemingly impenetrable northern bay, the free city of Braavos lays claim to<br/>
+                    one of the most powerful institutions in the Known World: the Iron&nbsp;Bank of Braavos.<br/><br/>
+                    <h5>Purchasing Loans</h5>
+                    The Iron&nbsp;Bank provides a service to the lords of Westeros by offering them favorable bank loans.<br/>
+                    Each loan allows the lord to purchase useful aides for their cause.<br/>
+                    When resolving the special Iron&nbsp;Bank sea order during the <i>Resolve Consolidate Power Order</i> step,<br/>
+                    a player may take one loan.<br/>
+                    <i>The Iron&nbsp;Bank order token can be raided, but does not allow the raiding player<br/>
+                    to steal a Power token (pillaging).</i><br/><br/>
+                    To take a loan, a player follows these steps:<br/>
+                    <ol className="mb-0 mt-1">
+                        <li>The player chooses a faceup loan from one of the three slots of the Iron&nbsp;Bank.</li>
+                        <li>The player pays the loan&apos;s <b>initial cost</b> by discarding a number of available<br/>
+                        Power tokens equal to the value shown {this.isEssosMapUsed ? "above" : "below"} that loan card&apos;s current slot.</li>
+                        <li>The player resolves the effect of their chosen loan.<br/>
+                        <i>(Click on the loan deck to explore all the loan effects)</i></li>
+                    </ol>
+                    <br/>
+                    <h5>Paying Interest</h5>
+                    The shrewd money-lenders of the great institution of The Iron&nbsp;Bank do not easily forgive debt.<br/>
+                    After purchasing a loan, a house must pay an interest cost to the Iron&nbsp;Bank for the remainder<br/>
+                    of the game. At the beginning of the Westeros Phase, in turn order, each player with a loan<br/>
+                    must discard one of their available Power tokens for each loan they have purchased.<br/>
+                    If that player is not able to discard the requisite  number of power, for each power they are short,<br/>
+                    the player who holds the Valyrian Steel Blade chooses one of that player&apos;s units anywhere<br/>
+                    and destroys it. If the player who cannot pay their interest is the holder of the Blade,<br/>
+                    the next highest player on that track makes this choice.<br/>
+                    {this.isEssosMapUsed &&
+                    <>
+                        <br/>
+                        <h5>Controlling Braavos</h5>
+                        Though no easy task, it is possible to gain the upper hand in negotiating with the Iron&nbsp;Bank<br/>
+                        by controlling the city it resides in. The first player to defeat the 5-strength Neutral Force token<br/>
+                        on Braavos places that token facedown in front of them. While a player has this token,<br/>
+                        that token acts as a reminder that the player receives a <b>–1</b> to the <b>initial cost</b> of the loan<br/>
+                        (but not the interest).<br/>
+                        If another player takes control of Braavos they immediately receive the Braavos Neutral Force token.
+                    </>}
+                </Col>
+            </Row>
         </Tooltip>;
     }
 }

@@ -112,6 +112,11 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
     }
 
     submit(): void {
+        if (this.availablePowerTokensForDistribution > 0) {
+            if (!window.confirm("You haven't distributed all your Power tokens yet. Continue anyway?")) {
+                return;
+            }
+        }
         this.props.gameState.distributePowerTokens(this.additionalPowerTokens.entries);
     }
 }

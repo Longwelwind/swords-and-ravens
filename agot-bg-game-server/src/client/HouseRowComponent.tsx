@@ -210,13 +210,13 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         delay={{ show: 250, hide: 100 }}
                         placement="auto"
                     >
-                        <Col xs="auto" className="d-flex align-items-center"
+                        <Col xs="auto" className="d-flex align-items-center pl-1"
                             onMouseEnter={() => this.setHighlightedRegions(this.house == this.game.targaryen ? "with-loyalty-tokens-only" : "with-castles-only")}
                             onMouseLeave={() => this.highlightedRegions.clear()}>
                             <div style={{ fontSize: "1.25rem", color: victoryPointsWarning ? "#F39C12" : victoryPointsCritical ? "#FF0000" : undefined }}><b>{victoryPoints}</b></div>
                             <img
                                 className={classNames(
-                                    "ml-2",
+                                    "ml-1",
                                     { "dye-warning": victoryPointsWarning },
                                     { "dye-critical": victoryPointsCritical })}
                                 src={victoryImage} width={40}
@@ -240,7 +240,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                             trigger="click"
                             rootClose
                         >
-                            <div className="clickable btn btn-sm btn-secondary ml-2 p-1">
+                            <div className="clickable btn btn-sm btn-secondary ml-1 p-1">
                                 <div
                                     className="house-power-token"
                                     style={{

@@ -20,7 +20,7 @@ interface CancelledComponentProps {
 export default class CancelledComponent extends Component<CancelledComponentProps> {
     render(): ReactNode {
         return (
-            <Col xs={12} sm={10} md={8} lg={6} xl={3}>
+            <Col xs={12} sm={10} md={8} lg={6}>
                 <Row>
                     <Col className="text-center">
                         <Card border="danger" bg="danger">

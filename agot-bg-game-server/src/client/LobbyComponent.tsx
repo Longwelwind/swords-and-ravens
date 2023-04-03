@@ -72,7 +72,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
         const connectedSpectators = this.getConnectedSpectators();
 
         return <>
-                <Col xs={10} xl={4} className="mb-3">
+                <Col xs={10} lg={4} className="mb-3">
                     <Card>
                         <Card.Body id="lobby-houses-list" className="no-space-around">
                             <ListGroup variant="flush">
@@ -101,7 +101,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col xs={10} xl={8} className="mb-3">
+                <Col xs={10} lg={8} className="mb-3">
                     <Row className="no-space-around">
                         <Col xs={connectedSpectators.length > 0 ? 8 : 12} className="no-space-around">
                             <Card>

@@ -32,6 +32,7 @@ import { cssTransition } from "react-toastify";
 import ClockComponent from "./ClockComponent";
 import { isMobile } from 'react-device-detect';
 import ReplayComponent from "./ReplayComponent";
+import ConditionalWrap from "./utils/ConditionalWrap";
 
 const yourTurnToastAnimation = cssTransition({
     enter: "slide-in-elliptic-top-fwd",
@@ -80,20 +81,16 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 <link rel="icon" href={this.props.gameClient.isOwnTurn() ? faviconAlert : faviconNormal} sizes="16x16" />
             </Helmet>
             <Col xs={12} className={this.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
-                <Row className="justify-content-center align-items-center">
+                <Row className="justify-content-center align-items-center flex-nowrap">
                     {this.props.entireGame.replaySnapshot != null
                         ? <>{this.renderReplaySwitch()}
-                            <Col xs="auto" className="px-3">
-                                <h4>{this.entireGame.name}</h4>
-                            </Col>
+                            {this.renderGameName()}
                         </>
                         : <>{this.renderTournamentImage()}
                             <ClockComponent entireGame={this.entireGame} />
                             {this.renderLockedBadge()}
                             {this.renderHouseIcon()}
-                            <Col xs="auto" className="px-3">
-                                <h4>{this.entireGame.name}</h4>
-                            </Col>
+                            {this.renderGameName()}
                             {this.renderGameTypeBadge()}
                             {this.renderTidesOfBattleImage()}
                             {this.renderHouseCardsEvolutionImage()}
@@ -132,6 +129,26 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 style={{width: "auto", height: "auto"}}
             />
         </>;
+    }
+
+    private renderGameName() {
+        return <Col xs="auto" className="px-3">
+            <ConditionalWrap
+                condition={this.entireGame.name.length >= 90}
+                wrap={children => <OverlayTrigger
+                    overlay={<Tooltip id="game-name-tooltip">
+                        <Col>
+                            <h4>{this.entireGame.name}</h4>
+                        </Col>
+                    </Tooltip>}
+                    placement="auto"
+                >
+                    {children}
+                </OverlayTrigger>}
+            >
+                <h4 className="might-overflow" style={{maxWidth: "90ch"}}>{this.entireGame.name}</h4>
+            </ConditionalWrap>
+        </Col>;
     }
 
     renderTidesOfBattleImage(): ReactNode {
