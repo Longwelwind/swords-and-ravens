@@ -73,6 +73,12 @@ export default class SelectUnitsComponent extends Component<GameStateComponentPr
             }
         }
 
+        if (this.props.gameState.canBeSkipped && this.selectedUnits.size < this.props.gameState.count) {
+            if (!window.confirm("You haven't selected all possible units yet. Continue anyway?")) {
+                return;
+            }
+        }
+
         this.props.gameState.selectUnits(this.selectedUnits);
         this.selectedUnits = new BetterMap();
     }
