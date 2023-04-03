@@ -1048,3 +1048,10 @@ select {
   background-color: #999;
   border-color: #999;
 }
+
+.might-overflow {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100ch;
+}
