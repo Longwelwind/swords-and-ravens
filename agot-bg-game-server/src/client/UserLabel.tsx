@@ -66,29 +66,40 @@ export default class UserLabel extends Component<UserLabelProps> {
                 </Navbar.Brand>
                 <Navbar.Collapse id={`navbar-${this.user.id}`} className="no-space-around">
                     <Nav className="no-space-around">
-                        <NavDropdown id={`nav-dropdown-${this.user.id}`} className="no-gutters" title={
-                            <OverlayTrigger
-                                overlay={<Tooltip id={`waited-for-${this.user.id}-tooltip`}>
-                                    <Col className="text-center">
-                                        <h5>{this.user.name}</h5>
-                                        {this.player?.waitedForData != null && !this.player.waitedForData.handled && this.props.gameState.entireGame.now.getTime() > 0 && <p>
-                                            Waited for since {secondsToString(getElapsedSeconds(this.player.waitedForData.date))}
-                                        </p>}
-                                    </Col>
-                                </Tooltip>}
-                                delay={{ show: 150, hide: 100 }}
-                                placement="auto"
-                            >
-                                <span className={classNames("userlabel", {"might-overflow ingame-userlabel" : this.ingame != null})}>{this.user.name}</span>
-                            </OverlayTrigger>}
+                        <NavDropdown id={`nav-dropdown-${this.user.id}`} style={{ position: "static" }} className="no-gutters"
+                            title={<span className={classNames("userlabel", { "might-overflow ingame-userlabel": this.ingame != null })}>{this.user.name}</span>}
                         >
-                            {!this.props.gameState.entireGame.gameSettings.faceless && <Dropdown.Item href={`/user/${this.user.id}`} target="_blank" rel="noopener noreferrer">See Profile</Dropdown.Item>}
+                            {this.props.gameState.entireGame.gameSettings.faceless ? (
+                                <NavDropdown.Item className="text-center px-2 enabled" disabled>
+                                    {this.renderNameAndTimeElapsedDropDownItem()}
+                                </NavDropdown.Item>
+                            ) : (
+                                <NavDropdown.Item className="text-center px-2" href={`/user/${this.user.id}`} target="_blank" rel="noopener noreferrer">
+                                    Show profile of
+                                    {this.renderNameAndTimeElapsedDropDownItem()}
+                                </NavDropdown.Item>
+                            )}
                             {this.renderIngameDropdownItems()}
                         </NavDropdown>
                     </Nav>
                 </Navbar.Collapse>
             </Navbar>
         );
+    }
+
+    private renderNameAndTimeElapsedDropDownItem(): ReactNode {
+        return <>
+            <div className="text-larger"><b>{this.user.name}</b></div>
+            {this.player?.waitedForData != null &&
+                !this.player.waitedForData.handled &&
+                this.props.gameState.entireGame.now.getTime() > 0 && (
+                    <OverlayTrigger overlay={<Tooltip id={`waiting-for-user-${this.user.id}-action-tooltip`}>
+                        <small>Time elapsed since waiting for player action <i>(hh:mm)</i></small>
+                    </Tooltip>}
+                    >
+                        <small>{secondsToString(getElapsedSeconds(this.player.waitedForData.date))}</small>
+                    </OverlayTrigger>)}
+        </>;
     }
 
     renderOtherUsersFromSameNetworkTooltip(): ReactNode {
@@ -120,7 +131,7 @@ export default class UserLabel extends Component<UserLabelProps> {
         const {result: canLaunchDeclareWinnerVote, reason: canLaunchDeclareWinnerVoteReason} = ingame.canLaunchDeclareWinnerVote(this.props.gameClient.authenticatedUser);
         return (
             <>
-                {!this.props.gameState.entireGame.gameSettings.faceless && <NavDropdown.Divider />}
+                <NavDropdown.Divider />
                 <ConditionalWrap
                     condition={!canLaunchReplacePlayerVote}
                     wrap={children =>
@@ -151,6 +162,7 @@ export default class UserLabel extends Component<UserLabelProps> {
                 >
                     <div id="replace-player-tooltip-wrapper">
                         <NavDropdown.Item
+                            className="px-2"
                             onClick={() => this.onLaunchReplacePlayerVoteClick()}
                             disabled={!canLaunchReplacePlayerVote}
                         >
@@ -195,6 +207,7 @@ export default class UserLabel extends Component<UserLabelProps> {
                 >
                     <div id="replace-by-vassal-tooltip-wrapper">
                         <NavDropdown.Item
+                            className="px-2"
                             onClick={() => this.onLaunchReplacePlayerByVassalVoteClick()}
                             disabled={!canLaunchReplacePlayerByVassalVote}
                         >
@@ -235,6 +248,7 @@ export default class UserLabel extends Component<UserLabelProps> {
                 >
                     <div id="swap-houses-tooltip-wrapper">
                         <NavDropdown.Item
+                            className="px-2"
                             onClick={() => this.onLaunchSwapHousesVoteClick()}
                             disabled={!canLaunchSwapHousesVote}
                         >
@@ -271,10 +285,11 @@ export default class UserLabel extends Component<UserLabelProps> {
                 >
                     <div id="declare-winner-tooltip-wrapper">
                         <NavDropdown.Item
+                            className="px-2"
                             onClick={() => this.onLaunchDeclareWinnerClick()}
                             disabled={!canLaunchDeclareWinnerVote}
                         >
-                            Launch a vote to declare House {this.player!.house.name} the winner
+                            Launch a vote to declare {this.player!.house.name} the winner
                         </NavDropdown.Item>
                     </div>
                 </ConditionalWrap>
