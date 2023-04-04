@@ -48,7 +48,7 @@ export default class ClockComponent extends Component<ClockComponentProps> {
                     placement="bottom"
                     overlay={
                         <Tooltip id="game-resumes-tooltip">
-                            <b>Countdown until game resumes</b>
+                            <b>Countdown until game resumes</b> <small><i>(hh:mm:ss)</i></small>
                         </Tooltip>}
                     popperConfig={{ modifiers: [preventOverflow] }}
                 >
@@ -82,7 +82,7 @@ export default class ClockComponent extends Component<ClockComponentProps> {
                     placement="bottom"
                     overlay={
                         <Tooltip id="total-playing-time-tooltip">
-                            <b>Total playing time</b>
+                            <b>Total playing time</b> <small><i>(hh:mm)</i></small>
                         </Tooltip>}
                     popperConfig={{ modifiers: [preventOverflow] }}
                 >
@@ -111,7 +111,7 @@ export default class ClockComponent extends Component<ClockComponentProps> {
                     placement="bottom"
                     overlay={
                         <Tooltip id="westeros-time-tooltip">
-                            <b>Westeros time <small>(basically UTC)</small></b>
+                            <b>Current UTC time</b> <small><i>(hh:mm)</i></small>
                         </Tooltip>}
                     popperConfig={{ modifiers: [preventOverflow] }}
                 >

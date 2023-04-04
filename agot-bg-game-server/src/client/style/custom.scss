@@ -521,7 +521,7 @@ div.disconnected {
   text-align: left;
   font-size: 1.125rem;
   padding: 0.5rem;
-  max-width: 350px;
+  max-width: 400px;
 }
 
 .overflow-x-hidden {
@@ -967,6 +967,10 @@ hr.red {
   font-size: 1.125rem;
 }
 
+.text-larger {
+  font-size: 1.05rem;
+}
+
 .text-normal {
   font-size: 1rem;
 }
@@ -1073,4 +1077,10 @@ select {
 .ingame-userlabel {
   float: left;
   max-width: 210px;
+}
+
+.enabled {
+  color: white !important;
+  pointer-events: auto !important;
+  cursor: default !important;
 }

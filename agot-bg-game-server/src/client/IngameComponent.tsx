@@ -256,7 +256,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </div>
                     </Col>}
                     <Col xs={{ span: "auto", order: columnOrders.housesInfosColumn }}
-                        style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none", maxWidth: "600px"}}
+                        style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none", maxWidth: "600px",
+                            minWidth: this.gameSettings.playerCount >= 8 ? "520px" : "420px"
+                        }}
                         className={classNames(
                             this.columnSwapAnimationClassName,
                             { "d-none d-xl-block": !isMobile && this.gameSettings.playerCount < 8,
@@ -271,13 +273,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 {this.renderGameControlsButton()}
         </>;
     }
+
     renderGameControlsButton(): ReactNode {
         if (isMobile) {
             return null;
         }
 
         return <OverlayTrigger
-            overlay={<Popover id="game-controls-popover">
+            overlay={<Popover id="game-controls-popover" style={{maxWidth: "100%"}}>
                 <Col>
                     {this.renderGameControlsRow(false)}
                 </Col>
@@ -309,7 +312,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         return <OverlayTrigger
             overlay={<Popover id="tracks-popover" className="scrollable-popover">
-                <Col>
+                <Col style={{minWidth: this.gameSettings.playerCount >= 8 ? "520px" : "420px" }}>
                     {this.renderHousesColumn(false, tracks)}
                 </Col>
             </Popover>}
