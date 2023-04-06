@@ -23,6 +23,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         user = self.scope['user']
         room_id = self.scope['url_route']['kwargs']['room_id']
 
+        if not user.is_authenticated:
+            await self.close()
+            return
+
         # Check if the channel exists
         try:
             room = await database_sync_to_async(lambda: Room.objects.get(id=room_id))()
@@ -30,23 +34,15 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.close()
             return
 
-        if user.is_authenticated:
-            self.user_in_room = await database_sync_to_async(lambda: room.users.prefetch_related('last_viewed_message').filter(user=user).first())()
-        else:
-            self.user_in_room = None
+        self.user_in_room = await database_sync_to_async(lambda: room.users.prefetch_related('last_viewed_message').filter(user=user).first())()
 
         # Check if the user has access to this channel
-        if not room.public:
-            if not user.is_authenticated:
-                await self.close()
-                return
-
-            if not self.user_in_room:
-                await self.close()
-                return
+        if not room.public and not self.user_in_room:
+            await self.close()
+            return
 
         # Always create a UserInRoom entity for each user that connected to this channel
-        if not self.user_in_room and user.is_authenticated:
+        if not self.user_in_room:
             self.user_in_room = await database_sync_to_async(lambda: UserInRoom.objects.create(user=user, room=room))()
 
         self.room = room
