@@ -411,14 +411,16 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
         const placedOrders = this.getPlacedOrdersOfHouse(newVassal);
         placedOrders.forEach(([r, _o]) => {
             this.placedOrders.delete(r);
-            this.entireGame.broadcastToClients({
-                type: "remove-placed-order",
-                regionId: r.id
-            });
         });
 
-        this.readyHouses = _.without(this.readyHouses, newVassal);
-        this.checkAndProceedEndOfPlaceOrdersGameState();
+        // A new vassal may want players to change their orders.
+        // So we restart planning phase to force players to commit their orders again
+
+        // Reset waitedFor data, to properly call ingame.setWaitedForPlayers() by the game-state-change
+        this.ingame.resetAllWaitedForData();
+
+        // game-state-change will notify all waited users, no need to do it explicitly
+        this.parentGameState.setChildGameState(new PlaceOrdersGameState(this.parentGameState)).firstStart(this.placedOrders as BetterMap<Region, Order>);
     }
 
     static deserializeFromServer(planning: PlanningGameState, data: SerializedPlaceOrdersGameState): PlaceOrdersGameState {
