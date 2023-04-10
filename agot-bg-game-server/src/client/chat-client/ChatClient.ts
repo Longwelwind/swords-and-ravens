@@ -78,7 +78,7 @@ export default class ChatClient {
             channel.connected = true;
             // Ask for the first 15 messages with a delay of 100ms to decrease pressure
             window.setTimeout(() => {
-                channel.websocket.send(JSON.stringify({type: 'chat_retrieve', count: 15, first_message_id: null }))
+                channel.websocket.send(JSON.stringify({type: 'chat_retrieve', count: 15, first_message_id: null, faceless: this.gameClient.entireGame?.gameSettings.faceless ?? false }))
             }, 100);
         };
         websocket.onclose = () => channel.connected = false;
@@ -118,7 +118,7 @@ export default class ChatClient {
             return;
         }
         const fromHouse = this.gameClient.entireGame.ingameGameState?.players.tryGet(authenticatedUser, null)?.house.name ?? "Unknown";
-        channel.websocket.send(JSON.stringify({type: 'chat_message', text, gameId: this.gameClient.entireGame.id, fromHouse: fromHouse }));
+        channel.websocket.send(JSON.stringify({type: 'chat_message', text, gameId: this.gameClient.entireGame.id, fromHouse: fromHouse, faceless: this.gameClient.entireGame.gameSettings.faceless }));
     }
 
     onMessage(channel: Channel, message: ChatServerMessage): void {
@@ -166,7 +166,7 @@ export default class ChatClient {
             return false;
         }
 
-        channel.websocket.send(JSON.stringify({type: 'chat_retrieve', count: 50, first_message_id: channel.messages[0].id }));
+        channel.websocket.send(JSON.stringify({type: 'chat_retrieve', count: 50, first_message_id: channel.messages[0].id, faceless: this.gameClient.entireGame.gameSettings.faceless }));
         return true;
     }
 
