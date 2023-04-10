@@ -269,7 +269,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </Col>
                 </Row>
                 {this.renderScrollbarModal()}
-                {this.renderTracksButton(tracks)}
+                {this.renderTracksPopoverButton(tracks)}
                 {this.renderGameControlsButton()}
         </>;
     }
@@ -301,14 +301,32 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         </OverlayTrigger>;
     }
 
-    renderTracksButton(tracks: InfluenceTrackDetails[]): ReactNode {
+    renderTracksPopoverButton(tracks: InfluenceTrackDetails[]): ReactNode {
         if (isMobile) {
             return null;
         }
 
-        const ironThroneHolder = _.first(tracks[0].trackToShow.filter(h => h == this.game.ironThroneHolder)) ?? null;
-        const vsbHolder = _.first(tracks[1].trackToShow.filter(h => h == this.game.valyrianSteelBladeHolder)) ?? null;
-        const ravenHolder = _.first(tracks[2].trackToShow.filter(h => h == this.game.ravenHolder)) ?? null;
+        let ironThroneHolder: House | null = null;
+        let vsbHolder: House | null = null;
+        let ravenHolder: House | null = null;
+
+        try {
+            ironThroneHolder = _.first(tracks[0].trackToShow.filter(h => h == this.game.ironThroneHolder)) ?? null;
+        } catch {
+            // Swallow possible exceptions thrown by getTokenHolder, e.g. during drafting. ironThroneHolder simply stays null then.
+        }
+
+        try {
+            vsbHolder = _.first(tracks[1].trackToShow.filter(h => h == this.game.valyrianSteelBladeHolder)) ?? null;
+        } catch {
+            // Swallow possible exceptions thrown by getTokenHolder, e.g. during drafting. vsbHolder simply stays null then.
+        }
+
+        try {
+            ravenHolder = _.first(tracks[2].trackToShow.filter(h => h == this.game.ravenHolder)) ?? null;
+        } catch {
+            // Swallow possible exceptions thrown by getTokenHolder, e.g. during drafting. ravenHolder simply stays null then.
+        }
 
         return <OverlayTrigger
             overlay={<Popover id="tracks-popover" className="scrollable-popover">
