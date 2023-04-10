@@ -321,6 +321,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         });
         this.users.set(user.id, user);
 
+        this.saveGame(false);
+
         this.broadcastToClients({
             type: "new-user",
             user: user.serializeToClient(false, user, this.gameSettings.faceless)
