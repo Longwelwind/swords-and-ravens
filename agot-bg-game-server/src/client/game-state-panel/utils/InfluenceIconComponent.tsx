@@ -42,7 +42,7 @@ export default class InfluenceIconComponent extends Component<InfluenceIconCompo
                 }
             }
         } catch {
-            // just swallow this
+            // Swallow possible exceptions thrown by getTokenHolder, e.g. during drafting. isTokenHolder simply stays false then.
         }
         return this.props.ingame.rerender >= 0 && <OverlayTrigger overlay={
                 <Tooltip id="influence-icon">
