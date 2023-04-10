@@ -31,7 +31,7 @@
             chatWebsocket = new WebSocket((url.protocol == 'http:' ? 'ws:' : 'wss:') + '//' + url.host + '/ws/chat/room/' + publicRoomId);
             chatWebsocket.onopen = () => {
                 this.setState({state: 1});
-                chatWebsocket.send(JSON.stringify({type: 'chat_retrieve', count: 20, first_message_id: null}));
+                chatWebsocket.send(JSON.stringify({type: 'chat_retrieve', count: 20, first_message_id: null, faceless: false}));
             };
             chatWebsocket.onmessage = m => {
                 const data = JSON.parse(m.data);
@@ -65,7 +65,7 @@
 
         sendMessage(e) {
             e.preventDefault();
-            const data = {type: 'chat_message', text: this.state.input};
+            const data = {type: 'chat_message', text: this.state.input, faceless: false};
             chatWebsocket.send(JSON.stringify(data));
             this.setState({input: ''});
         }
@@ -77,7 +77,7 @@
                 return;
             }
 
-            const data = {type: 'chat_retrieve', count: 50, first_message_id: this.state.messages[0].id};
+            const data = {type: 'chat_retrieve', count: 50, first_message_id: this.state.messages[0].id, faceless: false};
             chatWebsocket.send(JSON.stringify(data));
         }
 

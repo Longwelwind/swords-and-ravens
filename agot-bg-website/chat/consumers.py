@@ -66,8 +66,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def receive_json(self, data):
         user = self.scope['user']
         type = data['type']
+
         if type == 'chat_message':
             text = data['text']
+            faceless = data['faceless']
 
             if not text:
                 logger.warning(f'A user tried to send an empty message to room "{self.room.id}"')
@@ -94,7 +96,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                     'id': message.id,
                     'text': message.text,
                     'user_id': str(message.user.id),
-                    'user_username': user.username,
+                    'user_username': '' if faceless else user.username,
                     'created_at': message.created_at.isoformat()
                 }
             )
@@ -105,8 +107,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             # notify the other user about a new private message
 
             await database_sync_to_async(lambda: self.notify_chat_partner(user, message, data['gameId'], data['fromHouse']))()
-
-        if type == 'chat_view_message':
+        elif type == 'chat_view_message':
             message_id = data['message_id']
 
             if not self.user_in_room:
@@ -123,6 +124,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         elif type == 'chat_retrieve':
             count = data['count']
             first_message_id = data['first_message_id']
+            faceless = data['faceless']
 
             if first_message_id is not None:
                 first_message = await database_sync_to_async(lambda: Message.objects.get(id=first_message_id))()
@@ -133,7 +135,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             if self.room.max_retrieve_count is not None:
                 count = min(self.room.max_retrieve_count, count)
 
-            messages = await database_sync_to_async(lambda: self.get_and_transform_messages(count, first_message_created_at))()
+            messages = await database_sync_to_async(lambda: self.get_and_transform_messages(count, first_message_created_at, faceless))()
 
             # Also include the last message viewed in the response
             last_viewed_message = self.user_in_room.last_viewed_message if first_message_id is None and self.user_in_room else None
@@ -160,14 +162,19 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             'created_at': created_at
         })
 
-    def get_and_transform_messages(self, count, first_message_created_at):
+    def get_and_transform_messages(self, count, first_message_created_at, faceless):
         if first_message_created_at is None:
             messages = Message.objects.filter(room=self.room).prefetch_related('user').order_by('-created_at')[0:count:-1]
         else:
             messages = Message.objects.filter(Q(room=self.room) & Q(created_at__lt=first_message_created_at)).prefetch_related('user').order_by('-created_at')[:count]
 
-        return [{'id': message.id, 'text': message.text, 'user_id': str(message.user.id), 'user_username': message.user.username, 'created_at': message.created_at.isoformat()}
-                    for message in messages]
+        return [{
+                    'id': message.id,
+                    'text': message.text,
+                    'user_id': str(message.user.id),
+                    'user_username': '' if faceless else message.user.username,
+                    'created_at': message.created_at.isoformat()
+                 } for message in messages]
 
     def notify_chat_partner(self, user, message, game_id, from_house):
         game = Game.objects.get(id=game_id)
