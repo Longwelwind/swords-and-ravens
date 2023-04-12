@@ -3,7 +3,7 @@ import { Component, ReactNode } from "react";
 import React from "react";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import House from "../common/ingame-game-state/game-data-structure/House";
-import { ListGroupItem, Row, Col, OverlayTrigger, Tooltip, Popover, Navbar, Nav, NavDropdown } from "react-bootstrap";
+import { ListGroupItem, Row, Col, OverlayTrigger, Tooltip, Popover, Navbar, Nav, NavDropdown, Card } from "react-bootstrap";
 import classNames from "classnames";
 import unitTypes from "..//common/ingame-game-state/game-data-structure/unitTypes";
 import unitImages from "./unitImages";
@@ -35,6 +35,8 @@ import { port, sea } from "../common/ingame-game-state/game-data-structure/regio
 import { houseColorFilters } from "./houseColorFilters";
 import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
 import ThematicDraftHouseCardsGameState from "../common/ingame-game-state/thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
+import { toast } from "react-toastify";
+import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 
 interface HouseRowComponentProps {
     house: House;
@@ -124,6 +126,23 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                 if (clock != null) {
                     clockCritical = gameRunning && clock > 0 && clock < (10 * 60);
                     clockWarning = gameRunning && !clockCritical && clock > 0 && clock < (20 * 60);
+
+                    if (clock == (5 * 60)) {
+                        toast(<div>
+                            <Card>
+                                <Card.Body className="d-flex align-items-center">
+                                    <img src={stopwatchImage} width={64} className="dye-critical" />
+                                    <h4 className="d-inline ml-3" style={{ color: "white" }}>
+                                        {getUserLinkOrLabel(this.props.ingame.entireGame, player.user, player)} is runnig out of time!
+                                    </h4>
+                                </Card.Body>
+                            </Card>
+                        </div>, {
+                            autoClose: 3000,
+                            toastId: `${player.user.id}-timeout-warning`,
+                            theme: "light"
+                        });
+                    }
                 }
             }
         } catch {
