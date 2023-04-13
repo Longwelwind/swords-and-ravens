@@ -13,6 +13,7 @@ function getAuthData(): AuthData {
         const urlContent = location.hash.substr(1);
         const urlData = urlContent.split('.');
         const userId = urlData[0];
+        const requestUserId = urlData[0];
         const authToken = urlData.length > 1 ? urlData[1] : userId;
         const gameId = urlData.length > 2 ? urlData[2] : "1";
 
@@ -20,7 +21,7 @@ function getAuthData(): AuthData {
             throw new Error("No user id in the URL");
         }
 
-        return {userId, gameId, authToken}
+        return {userId, requestUserId, gameId, authToken}
     } else if (process.env.NODE_ENV == "production") {
         // Find the data that has been included in the HTML by Django
         const authDataElement = document.getElementById("auth-data");

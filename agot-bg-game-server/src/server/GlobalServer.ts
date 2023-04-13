@@ -112,7 +112,7 @@ export default class GlobalServer {
         }
 
         if (message.type == "authenticate") {
-            const {userId, gameId, authToken} = message.authData;
+            const {userId, requestUserId, gameId, authToken} = message.authData;
 
             // Check that the user exists
             const userData = await this.websiteClient.getUser(userId);
@@ -140,6 +140,15 @@ export default class GlobalServer {
             const user = entireGame.users.has(userData.id)
                 ? entireGame.users.get(userData.id)
                 : entireGame.addUser(userData.id, userData.name, userData.profileSettings);
+
+            // In case a user plays for another player, make sure to register the original request user
+            // to the game as well to avoid chat messages from unknown users
+            if (!entireGame.users.has(requestUserId)) {
+                const requestUserData = await this.websiteClient.getUser(requestUserId);
+                if (requestUserData) {
+                    entireGame.addUser(requestUserData.id, requestUserData.name, requestUserData.profileSettings);
+                }
+            }
 
             const oldOtherUsersFromSameNetworkLength = user.otherUsersFromSameNetwork.length;
             user.otherUsersFromSameNetwork = _.union(user.otherUsersFromSameNetwork, this.getOtherUsersFromSameNetworkInSameGame(entireGame, userData, socketId, clientIp));

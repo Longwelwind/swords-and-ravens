@@ -352,8 +352,9 @@ def play(request, game_id, user_id=None):
         user = request.user
 
     auth_data = {
-        "gameId": game_id,
         "userId": user.id,
+        "requestUserId": request.user.id,
+        "gameId": game_id,
         "authToken": user.game_token
     }
 

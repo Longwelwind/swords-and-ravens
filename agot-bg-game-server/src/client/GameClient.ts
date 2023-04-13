@@ -13,6 +13,7 @@ import { playSoundWhenClickingMarchOrder, playSoundForLogEvent, stopRunningSound
 
 export interface AuthData {
     userId: string;
+    requestUserId: string;
     gameId: string;
     authToken: string;
 }
