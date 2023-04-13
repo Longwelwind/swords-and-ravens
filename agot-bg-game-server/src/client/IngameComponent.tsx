@@ -667,6 +667,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                         "Game has already ended"
                                     ) : canLaunchExtendPlayerClocksVoteReason == "forbidden-in-tournament-mode" ? (
                                         "Extending player clocks is not allowed in tournaments"
+                                    ) : canLaunchExtendPlayerClocksVoteReason == "forbidden-by-host" ? (
+                                        "Extension of player clocks was deactivated by the game host"
                                     ) : "Vote not possible"}
                                 </Tooltip>}
                             >

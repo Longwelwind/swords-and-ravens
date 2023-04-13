@@ -42,17 +42,18 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
     }
 
     render(): ReactNode {
+        const isIngame = this.props.entireGame.childGameState instanceof IngameGameState;
         return (
             <Col id="game-settings-container" xs={12} className="mt-2">
                 <Row id="live-pbem-row" className="justify-content-center mb-3">
-                    {this.props.entireGame.childGameState instanceof IngameGameState && (
+                    {isIngame && (
                         <Col xs={12} className="text-center mb-2">
                             {this.selectedGameSetupName}
                         </Col>
                     )}
                     <Row className="justify-content-center">
                         <Col xs={12} className="d-flex align-items-center">
-                            {this.props.entireGame.entireGame.childGameState instanceof IngameGameState && this.props.entireGame.gameSettings.onlyLive ? <></> : <OverlayTrigger overlay={
+                            {isIngame && this.props.entireGame.gameSettings.onlyLive ? <></> : <OverlayTrigger overlay={
                                 <Tooltip id="pbem-tooltip">
                                     <b>Live Game</b><br />
                                     A live game can be played when all players are online.
@@ -69,7 +70,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     <option key="PBEM" value="PBEM">Play By E-Mail</option>
                                 </select>
                             </OverlayTrigger>}
-                            {this.gameSettings.pbem && !(this.props.entireGame.childGameState instanceof IngameGameState) && (
+                            {this.gameSettings.pbem && !isIngame && (
                                 <FormCheck
                                     id="start-when-full-setting"
                                     className="mx-3 mt-2"
@@ -85,7 +86,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.startWhenFull = !this.gameSettings.startWhenFull)}
                                 />
                             )}
-                            {!this.gameSettings.pbem && !(this.props.entireGame.childGameState instanceof IngameGameState) && (
+                            {!this.gameSettings.pbem && !isIngame && (
                                 <FormCheck
                                     id="only-live-setting"
                                     className="mx-3 mt-2"
@@ -99,7 +100,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                                 All player clocks can be extended by vote once for 15 minutes and a second time in the last round.<br/>
                                                 After 2 failed voting attempts, no further voting can be initiated.<br/>
                                                 In addition, these games can be paused, but public games will automatically resume after 10 minutes<br/>
-                                                and the owner of the game will not be able to switch to PBEM in-game.
+                                                and the game host will not be able to switch to PBEM in-game.
                                             </Tooltip>}>
                                             <label htmlFor="only-live-setting">Game clock</label>
                                         </OverlayTrigger>}
@@ -107,7 +108,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     onChange={() => this.changeGameSettings(() => this.gameSettings.onlyLive = !this.gameSettings.onlyLive)}
                                 />
                             )}
-                            {this.gameSettings.onlyLive && !(this.props.entireGame.childGameState instanceof IngameGameState) &&
+                            {this.gameSettings.onlyLive && !isIngame &&
                             <div>
                                 <select id="initial-live-clock"
                                     value={this.gameSettings.initialLiveClock}
@@ -120,7 +121,22 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     <option key="120" value={120}>120</option>
                                 </select>&nbsp;min
                             </div>}
-                            {!(this.props.entireGame.childGameState instanceof IngameGameState) &&
+                            {this.gameSettings.onlyLive && !isIngame &&
+                            <FormCheck
+                                id="fixed-clock-setting"
+                                className="mx-3 mt-2"
+                                type="switch"
+                                label={
+                                    <OverlayTrigger overlay={
+                                        <Tooltip id="fixed-clock-setting-tooltip">
+                                            If this option is enabled, players will not be able to vote to extend their clocks.
+                                        </Tooltip>}>
+                                        <label htmlFor="fixed-clock-setting">Fixed clock</label>
+                                    </OverlayTrigger>}
+                                checked={this.gameSettings.fixedClock}
+                                onChange={() => this.changeGameSettings(() => this.gameSettings.fixedClock = !this.gameSettings.fixedClock)}
+                            />}
+                            {!isIngame &&
                             <FormCheck
                                 id="private-game-setting"
                                 className="mx-3 mt-2"
