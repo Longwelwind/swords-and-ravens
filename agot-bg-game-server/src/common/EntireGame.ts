@@ -603,7 +603,19 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         const timeoutPlayerIds = this.entireGame.ingameGameState?.timeoutPlayerIds ?? [];
         const replacerIds = this.entireGame.ingameGameState?.replacerIds ?? [];
 
-        return {turn, maxPlayerCount, settings, waitingFor, waitingForIds, winner, replacePlayerVoteOngoing, oldPlayerIds, timeoutPlayerIds, replacerIds};
+        return {
+            turn,
+            maxPlayerCount,
+            settings,
+            waitingFor,
+            waitingForIds,
+            winner,
+            replacePlayerVoteOngoing,
+            oldPlayerIds,
+            timeoutPlayerIds,
+            replacerIds,
+            publicChatRoomId: this.publicChatRoomId
+        };
     }
 
     // eslint-disable-next-line @typescript-eslint/ban-types
@@ -641,7 +653,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                     data: {
                         "house": player.house.id,
                         "waited_for": waitedForUsers.includes(user),
-                        "important_chat_rooms": _.concat(importantChatRooms.map(cr => cr.roomId), this.publicChatRoomId),
+                        "important_chat_rooms": importantChatRooms.map(cr => cr.roomId),
                         "is_winner": ingame.childGameState instanceof GameEndedGameState ? ingame.childGameState.winner == player.house : false,
                         "needed_for_vote": player.isNeededForVote
                     }

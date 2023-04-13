@@ -84,10 +84,18 @@
                                 {% if game.player_in_game.0.data.house %}{% house_icon game.player_in_game.0.data.house %}{% endif %} Playing
                             </span>
                         {% endif %}
+                        {% if game.unread_public_messages %}
+                            <span class="badge badge-warning"
+                              data-toggle="tooltip"
+                              title="There are new unread public messages"
+                            >
+                                <i class="fas fa-envelope"></i>
+                            </span>
+                        {% endif %}
                         {% if game.unread_messages %}
                             <span class="badge badge-danger"
                               data-toggle="tooltip"
-                              title="There are new unread messages"
+                              title="There are new unread private messages"
                             >
                                 <i class="fas fa-envelope"></i>
                             </span>

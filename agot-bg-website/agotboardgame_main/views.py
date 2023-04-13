@@ -233,7 +233,7 @@ def games(request):
         replacement_needed_games = games_query.filter(\
             Q(state=ONGOING) & Q(is_private=False) & Q(inactive_2=True) & Q(has_inactive_players__gt=0) & Q(replace_player_vote_ongoing=False)\
         ).order_by("state", "-last_active_at")
-        enrich_games(request, replacement_needed_games, True, True, False)
+        enrich_games(request, replacement_needed_games, True, True, False, True)
 
         inactive_games = []
         inactive_tournament_games = []
