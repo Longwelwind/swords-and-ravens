@@ -1,7 +1,7 @@
 # Powers
 
 This is a listing of all the special powers on House Cards present in the game.
-Having such a listing is useful when coding logic related to the execution of the a House Card power,
+Having such a listing is useful when coding logic related to the execution of a House Card power,
 when you need an overview of the possible interactions that could occur with other cards.
 
 ## Base game
