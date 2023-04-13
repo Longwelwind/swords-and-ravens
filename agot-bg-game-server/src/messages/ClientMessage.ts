@@ -19,6 +19,7 @@ interface Authenticate {
     type: "authenticate";
     authData: {
         userId: string;
+        requestUserId: string;
         gameId: string;
         authToken: string;
     };
