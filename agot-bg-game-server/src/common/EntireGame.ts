@@ -23,7 +23,6 @@ import SimpleChoiceGameState from "./ingame-game-state/simple-choice-game-state/
 import getElapsedSeconds from "../utils/getElapsedSeconds";
 import WildlingCardType from "./ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
 import House from "./ingame-game-state/game-data-structure/House";
-import memoizeThrottle from "../utils/momoizeThrottle";
 import { EntireGameSnapshot } from "./ingame-game-state/game-data-structure/Game";
 
 export enum NotificationType {
@@ -54,7 +53,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         draftHouseCards: false, thematicDraft: false, limitedDraft: false, blindDraft: false,
         mixedWesterosDeck1: false, cokWesterosPhase: false, victoryPointsCountNeededToWin: 7, loyaltyTokenCountNeededToWin: 7, endless: false,  faceless: false,
         useVassalPositions: false, precedingMustering: false, randomStartPositions: false, initialLiveClock: 60,
-        noPrivateChats: false, tournamentMode: false
+        noPrivateChats: false, tournamentMode: false, fixedClock: false
     };
 
     onSendClientMessage?: (message: ClientMessage) => void;
@@ -71,12 +70,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     onSaveGame?: (updateLastActive: boolean) => void;
 
     // Throttled saveGame so we don't spam the website client
-    saveGame = memoizeThrottle(
-        (updateLastActive: boolean) => { this.privateSaveGame(updateLastActive); },
-        2000,
-        {},
-        (updateLastActive) => updateLastActive
-    );
+    saveGame: (updateLastActive: boolean) => void = _.throttle(this.privateSaveGame, 2000);
 
     // Client-side callbacks
     onNewPrivateChatRoomCreated: ((roomId: string) => void) | null = null;
@@ -321,13 +315,13 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         });
         this.users.set(user.id, user);
 
-        this.saveGame(false);
-
         this.broadcastToClients({
             type: "new-user",
-            user: user.serializeToClient(false, user, this.gameSettings.faceless)
+            user: user.serializeToClient(false, null, this.gameSettings.faceless)
         });
 
+        // Save the new user to the database
+        this.saveGame(false);
         return user;
     }
 
@@ -406,8 +400,6 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         this.doPlayerClocksHandling();
 
         this.saveGame(updateLastActive);
-
-        this.lastMessageReceivedAt = new Date();
     }
 
     doPlayerClocksHandling(): void {
@@ -716,7 +708,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     static deserializeFromServer(data: SerializedEntireGame): EntireGame {
         const entireGame = new EntireGame(data.id, data.ownerUserId, data.name);
 
-        entireGame.users = new BetterMap<string, User>(data.users.map((ur: any) => [ur.id, User.deserializeFromServer(entireGame, ur)]));
+        entireGame.users = new BetterMap<string, User>(data.users.map(ur => [ur.id, User.deserializeFromServer(entireGame, ur)]));
         entireGame.ownerUserId = data.ownerUserId;
         entireGame.publicChatRoomId = data.publicChatRoomId;
         entireGame.gameSettings = data.gameSettings;
@@ -795,4 +787,5 @@ export interface GameSettings {
     initialLiveClock: number;
     noPrivateChats: boolean;
     tournamentMode: boolean;
+    fixedClock: boolean;
 }

@@ -1491,6 +1491,10 @@ export default class IngameGameState extends GameState<
             return {result: false, reason: "forbidden-in-tournament-mode"};
         }
 
+        if (this.entireGame.gameSettings.fixedClock) {
+            return {result: false, reason: "forbidden-by-host"};
+        }
+
         if (this.paused) {
             return {result: false, reason: "game-paused"};
         }

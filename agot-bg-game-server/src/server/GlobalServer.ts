@@ -136,8 +136,6 @@ export default class GlobalServer {
                 return;
             }
 
-            entireGame.lastMessageReceivedAt = new Date();
-
             // Check if the game already contains this user
             const user = entireGame.users.has(userData.id)
                 ? entireGame.users.get(userData.id)
@@ -221,6 +219,11 @@ export default class GlobalServer {
             } else {
                 entireGame.onClientMessage(user, message);
             }
+        }
+
+        const user = this.clientToUser.get(client);
+        if (user) {
+            user.entireGame.lastMessageReceivedAt = new Date();
         }
     }
 
@@ -530,11 +533,26 @@ export default class GlobalServer {
 
     unloadGame(entireGame: EntireGame) {
         if (!this.loadedGames.has(entireGame.id)) {
+            console.warn("Tried to unload game that was not loaded: " + entireGame.id);
             return;
+        }
+
+        if (entireGame.gameSettings.onlyLive && entireGame.ingameGameState) {
+            const ingame = entireGame.ingameGameState;
+            if (!ingame.isEnded && !ingame.isCancelled) {
+                // Do not unload running clock games until they are finished
+                return;
+            }
         }
 
         console.log("Unloading game " + entireGame.id);
 
+        // Save the game before unloading:
+        if (entireGame.onSaveGame) {
+            entireGame.onSaveGame(false);
+        }
+
+        // As we keep the game active as long as we receive "ping" this is only kept for safety
         entireGame.users.values.forEach(u => {
             u.connectedClients.forEach(ws => {
                 ws.close();
@@ -571,11 +589,7 @@ export default class GlobalServer {
             // Unload inactive games:
             this.loadedGames.values.filter(game => game.lastMessageReceivedAt != null).forEach(game => {
                 const secondsSinceLastIncomingMessage = getTimeDeltaInSeconds(now, game.lastMessageReceivedAt as Date);
-                if (game.gameSettings.pbem && secondsSinceLastIncomingMessage > (60 * 60)) {
-                    // If a PBEM game was not active for one hour, unload it
-                    this.unloadGame(game);
-                } else if (!game.gameSettings.pbem && secondsSinceLastIncomingMessage > (6 * 60 * 60)) {
-                    // If a live game was not active for 6 hours, unload it
+                if (secondsSinceLastIncomingMessage >= (60 * 60)) {
                     this.unloadGame(game);
                 }
             });
