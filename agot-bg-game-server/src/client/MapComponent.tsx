@@ -148,7 +148,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                             {r.overwrittenSuperControlPowerToken &&
                                 <OverlayTrigger
                                     overlay={<Tooltip id={"power-token-" + r.id}>
-                                        <div className="text-center"><b>Printed Power token</b><small> of <b>{r.getController()?.name ?? "Unknown"}<br />{r.name}</b></small></div>
+                                        <div className="text-center"><b>Printed Power token</b><small> of <b>{r.overwrittenSuperControlPowerToken.name}<br />{r.name}</b></small></div>
                                     </Tooltip>}
                                     key={"super-power-token-overlay-" + r.id}
                                     delay={{ show: 500, hide: 100 }}
@@ -169,7 +169,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                             {r.controlPowerToken && (
                                 <OverlayTrigger
                                     overlay={<Tooltip id={"power-token-" + r.id}>
-                                        <div className="text-center"><b>Power token</b><small> of <b>{r.getController()?.name ?? "Unknown"}<br />{r.name}</b></small></div>
+                                        <div className="text-center"><b>Power token</b><small> of <b>{r.controlPowerToken.name}<br />{r.name}</b></small></div>
                                     </Tooltip>}
                                     key={"power-token-overlay-" + r.id}
                                     delay={{ show: 500, hide: 100 }}
