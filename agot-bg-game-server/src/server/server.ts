@@ -6,7 +6,7 @@ dotenv.config();
 
 // Setup Sentry
 if (process.env.SENTRY_DSN) {
-    const SENTRY_DSN = process.env.SENTRY_DNS;
+    const SENTRY_DSN = process.env.SENTRY_DSN;
     Sentry.init({dsn: SENTRY_DSN});
 }
 
