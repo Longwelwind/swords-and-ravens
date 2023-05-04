@@ -147,6 +147,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     @observable showMapScrollbarInfo = false;
     @observable showBrowserZoomInfo = false;
     @observable columnSwapAnimationClassName = "";
+    @observable unseenNotes = false;
     modifyRegionsOnMapCallback: any;
     modifyOrdersOnMapCallback: any;
     modifyUnitsOnMapCallback: any;
@@ -990,19 +991,21 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 </Nav.Item>
                             )}
                             <Nav.Item>
-                                <Nav.Link eventKey="note">
-                                    <OverlayTrigger
-                                        overlay={<Tooltip id="note-tooltip">Personal note</Tooltip>}
-                                        placement="top"
-                                    >
-                                        <span>
-                                            <FontAwesomeIcon
-                                                style={{ color: "white" }}
-                                                icon={faEdit} />
-                                            {/* &nbsp;Notes */}
-                                        </span>
-                                    </OverlayTrigger>
-                                </Nav.Link>
+                                <div className={classNames({ "new-event": this.unseenNotes })}>
+                                    <Nav.Link eventKey="note">
+                                        <OverlayTrigger
+                                            overlay={<Tooltip id="note-tooltip">Personal note</Tooltip>}
+                                            placement="top"
+                                        >
+                                            <span>
+                                                <FontAwesomeIcon
+                                                    style={{ color: "white" }}
+                                                    icon={faEdit} />
+                                                {/* &nbsp;Notes */}
+                                            </span>
+                                        </OverlayTrigger>
+                                    </Nav.Link>
+                                </div>
                             </Nav.Item>
                             <Nav.Item>
                                 <Nav.Link eventKey="settings">
@@ -1485,6 +1488,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         this.ingame.onLogReceived = log => {
             this.gameClient.playSoundForLogEvent(log);
         }
+
+        if (this.gameClient.authenticatedUser?.note.length ?? 0 > 0) {
+            this.unseenNotes = true;
+        }
     }
 
     hasVerticalScrollbar(): boolean {
@@ -1507,6 +1514,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         this.ingame.entireGame.onCombatFastTracked = null;
         this.ingame.onPreemptiveRaidNewAttack = null;
         this.ingame.onVoteStarted = null;
+    }
+
+    componentDidUpdate(prevProps: Readonly<IngameComponentProps>, prevState: Readonly<{}>, snapshot?: any): void {
+        if (this.currentOpenedTab == "note") {
+            this.unseenNotes = false;
+        }
     }
 
     modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {

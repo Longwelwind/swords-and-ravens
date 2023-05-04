@@ -33,6 +33,7 @@ import ClockComponent from "./ClockComponent";
 import { isMobile } from 'react-device-detect';
 import ReplayComponent from "./ReplayComponent";
 import ConditionalWrap from "./utils/ConditionalWrap";
+import classNames from "classnames";
 
 const yourTurnToastAnimation = cssTransition({
     enter: "slide-in-elliptic-top-fwd",
@@ -81,7 +82,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 <link rel="icon" href={this.props.gameClient.isOwnTurn() ? faviconAlert : faviconNormal} sizes="16x16" />
             </Helmet>
             <Col xs={12} className={this.entireGame.childGameState instanceof IngameGameState ? "pb-0" : "pb-2"}>
-                <Row className="justify-content-center align-items-center flex-nowrap">
+                <Row className={classNames("justify-content-center align-items-center",  {"flex-nowrap" : !isMobile && this.entireGame.name.length > 90})}>
                     {this.props.entireGame.replaySnapshot != null
                         ? <>{this.renderReplaySwitch()}
                             {this.renderGameName()}
@@ -132,6 +133,11 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     private renderGameName() {
+        if (this.entireGame.name.length < 90 || isMobile) {
+            return <Col xs="auto" className="px-3">
+                <h4>{this.entireGame.name}</h4>
+            </Col>;
+        }
         return <Col xs="auto" className="px-3">
             <ConditionalWrap
                 condition={this.entireGame.name.length >= 90}
