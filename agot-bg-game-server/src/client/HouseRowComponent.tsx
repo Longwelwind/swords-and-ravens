@@ -251,7 +251,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                             delay={{ show: 250, hide: 100 }}
                             placement="auto"
                         >
-                            <b style={{ fontSize: "1.125rem", color: powerInPool == 0 ? "red" : undefined }}>{this.house.powerTokens}</b>
+                            <b style={{ fontSize: "1.125rem", color: gameRunning && powerInPool == 0 ? "red" : undefined }}>{this.house.powerTokens}</b>
                         </OverlayTrigger>
                         <OverlayTrigger
                             overlay={this.renderPowerPopover(availablePower, powerTokensOnBoard, powerInPool)}
