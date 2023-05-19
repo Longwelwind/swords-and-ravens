@@ -117,7 +117,7 @@ export default class AeronDamphairAbilityGameState extends GameState<
             reducedCombatStrength: this.reduceCombatStrengthOfNewHouseCard
         });
 
-        this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);
+        this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house, false);
     }
 
     getAvailableHouseCards(house: House): HouseCard[] {
