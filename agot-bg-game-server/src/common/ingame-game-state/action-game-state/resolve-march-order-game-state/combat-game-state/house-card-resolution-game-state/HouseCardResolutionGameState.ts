@@ -67,8 +67,10 @@ export default class HouseCardResolutionGameState<P extends ParentGameState, C e
         this.parentGameState.resolveHouseCard(nextHouse, houseCard);
     }
 
-    onHouseCardResolutionFinish(house: House): void {
-        this.resolvedHouses.push(house);
+    onHouseCardResolutionFinish(house: House, markHouseAsResolved = true): void {
+        if (markHouseAsResolved) {
+            this.resolvedHouses.push(house);
+        }
         this.resolveNextHouseCard();
     }
 

@@ -1,6 +1,6 @@
 import { Component, ReactNode } from "react";
 import React from "react";
-import present from "../../public/images/icons/present.svg"
+import presentImage from "../../public/images/icons/present.svg"
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import { Button, Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
@@ -47,7 +47,7 @@ export default class GiftPowerTokensComponent extends Component<GiftPowerTokensC
                             </Tooltip>}
                             popperConfig={{modifiers: [preventOverflow]}}
                             placement="auto">
-                            <div style={{backgroundImage: `url(${present})`, width: 24, height: 24}}/>
+                            <div style={{backgroundImage: `url(${presentImage})`, width: 24, height: 24}}/>
                         </OverlayTrigger>
                     </Col>
                     <Col xs="auto">
