@@ -44,6 +44,7 @@ import GameLogManager, { ticksToTime, timeToTicks } from "../common/ingame-game-
 import { secondsToString } from "./utils/secondsToString";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
 import orderImages from "./orderImages";
+import presentImage from "../../public/images/icons/present.svg"
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -1482,9 +1483,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "power-tokens-gifted": {
                 const house = this.game.houses.get(data.house);
                 const affectedHouse = this.game.houses.get(data.affectedHouse);
-                return <p>
-                    House <b>{house.name}</b> gifted <b>{data.powerTokens}</b> Power&nbsp;token{data.powerTokens != 1 ? "s" : ""} to House <b>{affectedHouse.name}</b>.
-                </p>;
+
+                return <Row className="align-items-center">
+                    <Col xs="auto">
+                        <img src={presentImage} width="32px"/>
+                    </Col>
+                    <Col>
+                        House <b>{house.name}</b> gifted <b>{data.powerTokens}</b> Power&nbsp;token{data.powerTokens != 1 ? "s" : ""} to House <b>{affectedHouse.name}</b>.
+                    </Col>
+                </Row>;
             }
             case "influence-track-position-chosen": {
                 const house = this.game.houses.get(data.house);

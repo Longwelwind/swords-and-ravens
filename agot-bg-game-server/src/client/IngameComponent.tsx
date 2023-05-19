@@ -148,6 +148,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     @observable showBrowserZoomInfo = false;
     @observable columnSwapAnimationClassName = "";
     @observable unseenNotes = false;
+    @observable tracksPopoverVisible = false;
+
     modifyRegionsOnMapCallback: any;
     modifyOrdersOnMapCallback: any;
     modifyUnitsOnMapCallback: any;
@@ -294,7 +296,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 "d-xl-none d-xxl-none": !isMobile && this.gameSettings.playerCount < 8,
                 "d-xxl-none": !isMobile && this.gameSettings.playerCount >= 8
             })}
-                onClick={() => { }}
                 style={{ position: "fixed", right: this.user?.settings.responsiveLayout ? "auto" : "4px", left: this.user?.settings.responsiveLayout ? "4px" : "auto", top: "45px", padding: "4px", borderStyle: "none" }}
             >
                 <img src={settingsKnobsImage} width={24} />
@@ -333,17 +334,25 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             overlay={<Popover id="tracks-popover" className="scrollable-popover">
                 <Col style={{minWidth: this.gameSettings.playerCount >= 8 ? "520px" : "420px" }}>
                     {this.renderHousesColumn(false, tracks)}
+                    <button type="button" className="close" aria-label="Close" onClick={() => {
+                            this.tracksPopoverVisible = false;
+                        }}
+                        style={{position: "absolute", right: "4px", top: "4px", padding: "4px"}}
+                    >
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </Col>
             </Popover>}
             placement="auto"
-            trigger="click"
-            rootClose
+            show={this.tracksPopoverVisible}
         >
             <div className={classNames("clickable btn btn-sm btn-secondary p-1", {
-                "d-xl-none d-xxl-none": !isMobile && this.gameSettings.playerCount < 8,
-                "d-xxl-none": !isMobile && this.gameSettings.playerCount >= 8
-            })}
-                onClick={() => { }}
+                    "d-xl-none d-xxl-none": !isMobile && this.gameSettings.playerCount < 8,
+                    "d-xxl-none": !isMobile && this.gameSettings.playerCount >= 8
+                })}
+                onClick={() => {
+                    this.tracksPopoverVisible = !this.tracksPopoverVisible;
+                }}
                 style={{ position: "fixed", right: this.user?.settings.responsiveLayout ? "auto" : "4px", left: this.user?.settings.responsiveLayout ? "4px" : "auto", top: "6px", padding: "4px", borderStyle: "none" }}
             >
                 <div>
