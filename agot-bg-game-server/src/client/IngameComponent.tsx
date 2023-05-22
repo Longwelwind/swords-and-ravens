@@ -259,9 +259,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </div>
                     </Col>}
                     <Col xs={{ span: "auto", order: columnOrders.housesInfosColumn }}
-                        style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none", maxWidth: "600px",
-                            minWidth: this.gameSettings.playerCount >= 8 ? "520px" : "420px"
-                        }}
+                        style={{ maxHeight: this.mapScrollbarEnabled ? "100%" : "none", maxWidth: "600px" }}
                         className={classNames(
                             this.columnSwapAnimationClassName,
                             { "d-none d-xl-block": !isMobile && this.gameSettings.playerCount < 8,
@@ -332,7 +330,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         return <OverlayTrigger
             overlay={<Popover id="tracks-popover" className="scrollable-popover">
-                <Col style={{minWidth: this.gameSettings.playerCount >= 8 ? "520px" : "420px" }}>
+                <Col>
                     {this.renderHousesColumn(false, tracks)}
                     <button type="button" className="close" aria-label="Close" onClick={() => {
                             this.tracksPopoverVisible = false;
@@ -693,7 +691,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     private renderInfluenceTracks(tracks: InfluenceTrackDetails[]): React.ReactNode {
         return tracks.map(({ name, trackToShow, realTrack, stars }, i) => (
             <ListGroupItem key={`influence-track-container_${i}`} style={{ minHeight: "61px" }}>
-                <Row className="align-items-center">
+                <Row className="align-items-center d-flex flex-nowrap">
                     <Col xs="auto" className="text-center" style={{ width: "46px" }}>
                         <OverlayTrigger
                             overlay={<Tooltip id={`tooltip-tracker-${i}`}>
