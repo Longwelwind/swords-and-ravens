@@ -68,10 +68,10 @@ export default class PlaceSellswordsComponent extends Component<GameStateCompone
                         <Col xs={12}>
                             <Row className="justify-content-center">
                                 <Col xs="auto">
-                                    <Button variant="success" disabled={!this.canSubmit()} onClick={() => this.submit()}>Submit</Button>
+                                    <Button type="button" variant="success" disabled={!this.canSubmit()} onClick={() => this.submit()}>Submit</Button>
                                 </Col>
                                 <Col xs="auto">
-                                    <Button
+                                    <Button type="button"
                                         variant="danger"
                                         disabled={this.placedSellswords.size == 0}
                                         onClick={() => this.reset()}
@@ -142,7 +142,7 @@ export default class PlaceSellswordsComponent extends Component<GameStateCompone
                                             <>
                                                 {this.props.gameState.getValidUnitsForRegion(modifiedRegion, this.placedSellswordTypes).map((ut, i) =>
                                                     <Col key={modifiedRegion.id + "_sellsword_" + i}>
-                                                        <Button onClick={() => this.addPlacement(modifiedRegion, ut)}>
+                                                        <Button type="button" onClick={() => this.addPlacement(modifiedRegion, ut)}>
                                                             {ut.name}
                                                         </Button>
                                                     </Col>)

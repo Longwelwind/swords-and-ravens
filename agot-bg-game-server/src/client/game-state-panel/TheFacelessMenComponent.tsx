@@ -53,10 +53,10 @@ export default class TheFacelessMenComponent extends Component<GameStateComponen
                         ))}
                         <Row className="justify-content-center mt-3">
                             <Col xs="auto">
-                                <Button variant="success" onClick={() => this.confirm()}>Confirm</Button>
+                                <Button type="button" variant="success" onClick={() => this.confirm()}>Confirm</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button variant="danger" disabled={this.unitsToRemove.size == 0} onClick={() => this.reset()}>Reset</Button>
+                                <Button type="button" variant="danger" disabled={this.unitsToRemove.size == 0} onClick={() => this.reset()}>Reset</Button>
                             </Col>
                         </Row>
                     </Col>

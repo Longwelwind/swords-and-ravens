@@ -52,14 +52,14 @@ export default class ResolveSpymasterComponent extends Component<GameStateCompon
                                 </Row>
                                 <Row className="justify-content-center">
                                     <Col xs="auto">
-                                        <Button onClick={() => this.drawnWesterosCards = _.reverse(this.drawnWesterosCards)}>
+                                        <Button type="button" onClick={() => this.drawnWesterosCards = _.reverse(this.drawnWesterosCards)}>
                                             <FontAwesomeIcon icon={faArrowsAltH}/>
                                         </Button>
                                     </Col>
                                 </Row>
                                 <Row className="justify-content-center mt-4">
                                     <Col xs="auto">
-                                        <Button variant="success" onClick={() => this.confirm()}>
+                                        <Button type="button" variant="success" onClick={() => this.confirm()}>
                                             Put selected cards to bottom of the deck
                                         </Button>
                                     </Col>

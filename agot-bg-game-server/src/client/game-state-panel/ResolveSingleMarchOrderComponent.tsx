@@ -154,7 +154,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                 <Col xs={12}>
                                     <Row className="justify-content-center">
                                         <Col xs="auto">
-                                            <Button
+                                            <Button type="button"
                                                 variant="success"
                                                 onClick={() => this.confirm()}
                                                 disabled={this.leavePowerToken == undefined}
@@ -163,7 +163,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                                             </Button>
                                         </Col>
                                         <Col xs="auto">
-                                            <Button
+                                            <Button type="button"
                                                 variant="danger"
                                                 onClick={() => this.reset()}
                                             >
@@ -179,7 +179,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
                         <Col xs={12}>
                             <Row className="justify-content-center">
                                 <Col xs="auto">
-                                    <Button
+                                    <Button type="button"
                                         variant="primary"
                                         onClick={() => this.callForSupportAgainstNeutralForces()}
                                     >

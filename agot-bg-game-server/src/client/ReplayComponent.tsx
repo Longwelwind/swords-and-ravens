@@ -192,7 +192,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
                             />
                         </ListGroupItem>
                     </ListGroup>
-                    <button className="btn btn-outline-light btn-sm" onClick={() => {
+                    <button type="button" className="btn btn-outline-light btn-sm" onClick={() => {
                             if (this.user && this.columnSwapAnimationClassName == "") {
                                 this.columnSwapAnimationClassName = "animate__animated animate__fadeIn"
                                 this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
@@ -355,7 +355,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
                         </div>
                     </Col>}
                 </Row>
-                <button className="btn btn-outline-light btm-sm" onClick={() => {
+                <button type="button" className="btn btn-outline-light btm-sm" onClick={() => {
                         if (this.user && this.columnSwapAnimationClassName == "") {
                             this.columnSwapAnimationClassName = "animate__animated animate__fadeIn"
                             this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;

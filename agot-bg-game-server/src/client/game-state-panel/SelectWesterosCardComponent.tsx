@@ -37,7 +37,7 @@ export default class SelectWesterosCardComponent extends Component<GameStateComp
                                 </Row>
                             </Col>
                             <Col xs="auto">
-                                <Button variant="success" onClick={() => this.confirm()} disabled={this.selectedWesterosCard == null}>
+                                <Button type="button" variant="success" onClick={() => this.confirm()} disabled={this.selectedWesterosCard == null}>
                                     Confirm
                                 </Button>
                             </Col>

@@ -52,7 +52,7 @@ export default class SelectHouseCardComponent extends Component<GameStateCompone
                             </Row>
                         </Col>
                         <Col xs="auto" className="mt-3">
-                            <Button variant="success" onClick={() => this.confirm()} disabled={this.selectedHouseCard == null}>
+                            <Button type="button" variant="success" onClick={() => this.confirm()} disabled={this.selectedHouseCard == null}>
                                 Confirm
                             </Button>
                         </Col>

@@ -54,14 +54,14 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
                                         </div>
                                         <div className="text-center" style={{fontSize: "1.125rem", marginBottom: "5px"}}>{this.props.gameState.getBidOfHouse(h)}</div>
                                         <div className="btn-group btn-group-xs">
-                                            <button
+                                            <button type="button"
                                                 className="btn btn-primary"
                                                 style={{visibility: this.displayArrow(i, -1) ? "initial": "hidden"}}
                                                 onClick={() => this.changeOrder(i, -1)}
                                             >
                                                 <FontAwesomeIcon icon={faAngleLeft}/>
                                             </button>
-                                            <button
+                                            <button type="button"
                                                 className="btn btn-primary"
                                                 style={{visibility: this.displayArrow(i, 1) ? "initial": "hidden"}}
                                                 onClick={() => this.changeOrder(i, 1)}
@@ -74,7 +74,7 @@ export default class ResolveTiesComponent extends Component<GameStateComponentPr
                             </Row>
                             <Row className="justify-content-center mt-5">
                                 <Col xs="auto">
-                                    <Button variant="success" onClick={() => this.submit()}>Resolve</Button>
+                                    <Button type="button" variant="success" onClick={() => this.submit()}>Resolve</Button>
                                 </Col>
                             </Row>
                         </Col>

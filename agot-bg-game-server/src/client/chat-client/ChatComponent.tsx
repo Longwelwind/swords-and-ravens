@@ -137,9 +137,10 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                             </React.Fragment >
                         </>
                     })}
-                    <button className="btn btn-outline-light btn-sm"
+                    <button type="button"
+                        className="close"
                         style={{position: "absolute", right: 12, top: 0, display: this.noMoreMessages ? "none" : "inline"}}
-                        onClick={(e: any) => { this.loadMoreMessages(); e.preventDefault() }}
+                        onClick={(e: any) => { e.currentTarget.blur(); this.loadMoreMessages(); e.preventDefault(); }}
                     >
                         <OverlayTrigger
                             overlay={
@@ -148,7 +149,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                 </Tooltip>
                             }
                         >
-                            <FontAwesomeIcon icon={faSyncAlt} />
+                            <FontAwesomeIcon icon={faSyncAlt} size="2xs"/>
                         </OverlayTrigger>
                     </button>
                 </ScrollToBottom>
@@ -199,7 +200,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                 </OverlayTrigger>
                             </Col>
                             <Col xs="auto">
-                                <Button type="submit" size="lg" onClick={(e: any) => {this.send(); e.preventDefault()}}>Send</Button>
+                                <Button type="submit" size="lg" onClick={(e: any) => { e.currentTarget.blur(); this.send(); e.preventDefault();} }>Send</Button>
                             </Col>
                         </Row>
                     </Form>

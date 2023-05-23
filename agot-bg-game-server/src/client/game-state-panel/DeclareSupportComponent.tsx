@@ -39,7 +39,7 @@ export default class DeclareSupportComponent extends Component<GameStateComponen
                                             </OverlayTrigger>
                                         }
                                     >
-                                        <Button
+                                        <Button type="button"
                                             onClick={() => this.choose(h)}
                                             disabled={!this.canChoose(h)}
                                         >
@@ -49,7 +49,7 @@ export default class DeclareSupportComponent extends Component<GameStateComponen
                                 </Col>
                             ))}
                             <Col xs="auto">
-                                <Button variant="danger" onClick={() => this.choose(null)}>
+                                <Button type="button" variant="danger" onClick={() => this.choose(null)}>
                                     None
                                 </Button>
                             </Col>

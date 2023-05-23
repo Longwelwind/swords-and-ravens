@@ -61,8 +61,8 @@ export default class VoteComponent extends Component<VoteComponentProps> {
                     <b>{getUserLinkOrLabel(this.vote.ingame.entireGame, this.vote.initiator, this.vote.ingame.players.tryGet(this.vote.initiator, null))}</b> initiated a vote to <b>{this.vote.type.verb()}</b>. {this.vote.positiveCountToPass} player{this.vote.positiveCountToPass != 1 ? "s" : ""} must accept to pass the vote.
                     <Row className="mt-1">
                         <Col xs="auto" className={classNames({ "display-none": state != VoteState.ONGOING || this.props.gameClient.authenticatedPlayer == null })}>
-                            <Button className="mb-1" variant="success" size="sm" style={{ minWidth: "60px" }} disabled={disabled} onClick={() => this.vote.vote(true)}>{this.wrapVoteButtons(<>Accept</>, disabled, reason)}</Button><br />
-                            <Button variant="danger" size="sm" style={{ minWidth: "60px" }} disabled={disabled} onClick={() => this.vote.vote(false)}>{this.wrapVoteButtons(<>Refuse</>, disabled, reason)}</Button>
+                            <Button type="button" className="mb-1" variant="success" size="sm" style={{ minWidth: "60px" }} disabled={disabled} onClick={() => this.vote.vote(true)}>{this.wrapVoteButtons(<>Accept</>, disabled, reason)}</Button><br />
+                            <Button type="button" variant="danger" size="sm" style={{ minWidth: "60px" }} disabled={disabled} onClick={() => this.vote.vote(false)}>{this.wrapVoteButtons(<>Refuse</>, disabled, reason)}</Button>
                         </Col>
                         <Col>
                             <Row>

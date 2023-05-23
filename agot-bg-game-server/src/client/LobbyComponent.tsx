@@ -148,7 +148,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                 }
                                 <Row className="mt-2">
                                     <Col>
-                                        <Button
+                                        <Button type="button"
                                             block
                                             onClick={() => this.lobby.start()}
                                             disabled={!canStartGame || this.readyCheckOngoing}
@@ -180,7 +180,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                         </Button>
                                     </Col>
                                     <Col xs="auto">
-                                        <Button
+                                        <Button type="button"
                                             variant="danger"
                                             onClick={() => this.cancel()}
                                             disabled={!canCancelGame || this.readyCheckOngoing}
@@ -208,7 +208,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                         </Button>
                                     </Col>
                                     <Col xs="auto">
-                                        <button className="btn btn-outline-light btn-sm" onClick={() => this.props.gameClient.muted = !this.props.gameClient.muted}>
+                                        <button type="button" className="btn btn-outline-light btn-sm" onClick={() => this.props.gameClient.muted = !this.props.gameClient.muted}>
                                             <OverlayTrigger
                                                 overlay={
                                                     <Tooltip id="mute-tooltip">
@@ -223,7 +223,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                         </button>
                                     </Col>
                                     <Col xs="auto">
-                                        <button className="btn btn-outline-light btn-sm" onClick={() => this.props.gameClient.musicMuted = !this.props.gameClient.musicMuted}>
+                                        <button type="button" className="btn btn-outline-light btn-sm" onClick={() => this.props.gameClient.musicMuted = !this.props.gameClient.musicMuted}>
                                             <OverlayTrigger
                                                 overlay={
                                                     <Tooltip id="mute-tooltip">
@@ -286,7 +286,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                     </Col>
                     : this.lobby.players.get(h) == this.authenticatedUser
                         ? <Col xs="auto">
-                            <Button variant="outline-success" onClick={() => this.ready()} style={{verticalAlign: 6}}>Ready</Button>
+                            <Button type="button" variant="outline-success" onClick={() => this.ready()} style={{verticalAlign: 6}}>Ready</Button>
                             <Spinner className="ml-3" animation="border" variant="info" />
                         </Col>
                         : <Col xs="auto">
@@ -308,16 +308,16 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
         return  (
             !this.lobby.players.has(h) ? (
                 <Col xs="auto" className={invisible ? "invisible" : ""}>
-                    <Button onClick={() => this.choose(h)}>Choose</Button>
+                    <Button type="button" onClick={() => this.choose(h)}>Choose</Button>
                 </Col>
             ) : this.lobby.players.get(h) == this.authenticatedUser ? (
                 <Col xs="auto" className={invisible ? "invisible" : ""}>
-                    <Button variant="danger" onClick={() => this.leave()}>Leave</Button>
+                    <Button type="button" variant="danger" onClick={() => this.leave()}>Leave</Button>
                 </Col>
             ) : (
                 this.props.gameClient.isRealOwner() && (
                     <Col xs="auto" className={invisible ? "invisible" : ""}>
-                        <Button variant="danger" onClick={() => this.kick(h)}>Kick</Button>
+                        <Button type="button" variant="danger" onClick={() => this.kick(h)}>Kick</Button>
                     </Col>
                 )
             )

@@ -92,10 +92,10 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                         <Col xs={12}>
                             <Row className="justify-content-center">
                                 <Col xs="auto">
-                                    <Button variant="success" disabled={!this.canSubmit()} onClick={() => this.submit()}>Submit</Button>
+                                    <Button type="button" variant="success" disabled={!this.canSubmit()} onClick={() => this.submit()}>Submit</Button>
                                 </Col>
                                 <Col xs="auto">
-                                    <Button
+                                    <Button type="button"
                                         variant="danger"
                                         disabled={this.musterings.size == 0}
                                         onClick={() => this.reset()}
@@ -245,7 +245,7 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                             {this.props.gameState.getValidMusteringRules(modifiedRegion, this.musterings).map(({ region, rules }) => (
                                 rules.map((rule, i) => (
                                     <Col xs={12} key={modifiedRegion.id + "_muster-rule_" + i}>
-                                        <Button onClick={() => this.addMustering(modifiedRegion, rule)}>
+                                        <Button type="button" onClick={() => this.addMustering(modifiedRegion, rule)}>
                                             {rule.from ? "Upgrade to " : "Recruit "} a {rule.to.name}{region != modifiedRegion && (" in " + region.name)} [{rule.cost}]
                                         </Button>
                                     </Col>

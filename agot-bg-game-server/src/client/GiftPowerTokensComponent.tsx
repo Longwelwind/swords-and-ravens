@@ -69,7 +69,7 @@ export default class GiftPowerTokensComponent extends Component<GiftPowerTokensC
                 </Row>
                 <Row className="justify-content-center">
                     <Col xs="auto">
-                        <Button
+                        <Button type="button"
                             onClick={() => {
                                 this.props.ingame.entireGame.sendMessageToServer({
                                     type: "gift-power-tokens",

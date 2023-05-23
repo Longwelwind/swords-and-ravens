@@ -20,7 +20,7 @@ export default class SimpleChoiceComponent extends Component<GameStateComponentP
                         <Row className="justify-content-center">
                             {this.props.gameState.choices.map((s, i) => (
                                 <Col xs="auto" key={`simple-choice_${i}`}>
-                                    <Button onClick={() => this.choose(i)}>{s}</Button>
+                                    <Button type="button" onClick={() => this.choose(i)}>{s}</Button>
                                 </Col>
                             ))}
                         </Row>

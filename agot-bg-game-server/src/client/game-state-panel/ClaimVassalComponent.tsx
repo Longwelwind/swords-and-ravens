@@ -36,10 +36,10 @@ export default class ClaimVassalComponent extends Component<GameStateComponentPr
                             <Col xs={12}>
                                 <Row className="justify-content-center">
                                     <Col xs="auto">
-                                        <Button variant="success" disabled={this.selectedVassals.length == 0} onClick={() => this.onClaimClick()}>Claim</Button>
+                                        <Button type="button" variant="success" disabled={this.selectedVassals.length == 0} onClick={() => this.onClaimClick()}>Claim</Button>
                                     </Col>
                                     <Col xs="auto">
-                                        <Button variant="danger" onClick={() => this.onPassClick()}>Pass</Button>
+                                        <Button type="button" variant="danger" onClick={() => this.onPassClick()}>Pass</Button>
                                     </Col>
                                 </Row>
                             </Col>
