@@ -69,10 +69,10 @@ export default class ResolveSinglePayDebtComponent extends Component<GameStateCo
                             </Row>
                             <Row className="justify-content-center">
                                 <Col xs="auto">
-                                    <Button variant="success" disabled={notEnough} onClick={() => this.confirm()}>Confirm</Button>
+                                    <Button type="button" variant="success" disabled={notEnough} onClick={() => this.confirm()}>Confirm</Button>
                                 </Col>
                                 <Col xs="auto">
-                                    <Button variant="danger" disabled={this.unitsToRemove.size == 0} onClick={() => this.reset()}>Reset</Button>
+                                    <Button type="button" variant="danger" disabled={this.unitsToRemove.size == 0} onClick={() => this.reset()}>Reset</Button>
                                 </Col>
                             </Row>
                         </Col>

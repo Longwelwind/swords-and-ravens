@@ -79,7 +79,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                         {this.props.gameClient.authenticatedPlayer && this.showButtons() && (
                             <Row className="justify-content-center">
                                 <Col xs="auto">
-                                    <Button
+                                    <Button type="button"
                                         disabled={!this.placeOrders.canReady(this.props.gameClient.authenticatedPlayer).status}
                                         onClick={() => this.onReadyClick()}
                                         variant="success"
@@ -88,7 +88,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
                                     </Button>
                                 </Col>
                                 <Col xs="auto">
-                                    <Button
+                                    <Button type="button"
                                         disabled={!this.placeOrders.canUnready(this.props.gameClient.authenticatedPlayer).status}
                                         onClick={() => this.onUnreadyClick()}
                                         variant="danger"

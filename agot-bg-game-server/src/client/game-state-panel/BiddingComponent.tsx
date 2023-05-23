@@ -66,7 +66,7 @@ export default class BiddingComponent<ParentGameState extends BiddingGameStatePa
                             </Row>
                         </Col>
                         <Col xs={12} className="text-center">
-                            <Button
+                            <Button type="button"
                                 onClick={() => this.bid(this.powerTokensToBid)}
                                 disabled={!this.dirty}
                                 variant="success"

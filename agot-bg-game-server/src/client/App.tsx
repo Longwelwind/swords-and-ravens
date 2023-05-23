@@ -79,7 +79,7 @@ export default class App extends Component<AppProps> {
                                             <Alert variant="danger">
                                                 <h4>The connection to the server is lost.<br/>
                                                 Please reload this page.</h4>
-                                                <button className="btn btn-outline-dark mt-3"
+                                                <button type="submit" className="btn btn-outline-dark mt-3"
                                                     onClick={() => { window.location.reload() }}
                                                 >
                                                     <FontAwesomeIcon icon={faRotateRight} size="lg" /><h5 className="ml-2 d-inline">Reload</h5>

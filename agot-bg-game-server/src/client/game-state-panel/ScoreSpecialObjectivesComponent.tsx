@@ -28,10 +28,10 @@ export default class ScoreSpecialObjectivesComponent extends Component<GameState
             {this.authenticatedPlayer && this.mustChoose && <Col xs={12}>
                 <Row className="justify-content-center">
                     <Col xs="auto">
-                        <Button onClick={() => this.choose(true)}>Score</Button>
+                        <Button type="button" onClick={() => this.choose(true)}>Score</Button>
                     </Col>
                     <Col xs="auto">
-                        <Button onClick={() => this.choose(false)}>Don&apos;t score</Button>
+                        <Button type="button" onClick={() => this.choose(false)}>Don&apos;t score</Button>
                     </Col>
                 </Row>
             </Col>}

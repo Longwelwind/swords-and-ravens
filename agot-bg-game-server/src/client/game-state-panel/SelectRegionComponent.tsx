@@ -29,12 +29,12 @@ export default class SelectRegionComponent extends Component<GameStateComponentP
                             )}
                             <Row className="justify-content-center">
                                 <Col xs="auto">
-                                    <Button variant="success" onClick={() => this.confirm()} disabled={this.selectedRegion == null}>
+                                    <Button type="button" variant="success" onClick={() => this.confirm()} disabled={this.selectedRegion == null}>
                                         Confirm
                                     </Button>
                                 </Col>
                                 <Col xs="auto">
-                                    <Button variant="danger" onClick={() => this.reset()} disabled={this.selectedRegion == null}>
+                                    <Button type="button" variant="danger" onClick={() => this.reset()} disabled={this.selectedRegion == null}>
                                         Reset
                                     </Button>
                                 </Col>

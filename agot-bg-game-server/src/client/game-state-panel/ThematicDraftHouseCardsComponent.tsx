@@ -49,7 +49,7 @@ export default class ThematicDraftHouseCardsComponent extends Component<GameStat
                                 </Row>
                             </Col>
                             <Col xs="auto">
-                                <Button variant="success" onClick={() => this.confirm()} disabled={this.selectedHouseCard == null}>
+                                <Button type="button" variant="success" onClick={() => this.confirm()} disabled={this.selectedHouseCard == null}>
                                     Confirm
                                 </Button>
                             </Col>

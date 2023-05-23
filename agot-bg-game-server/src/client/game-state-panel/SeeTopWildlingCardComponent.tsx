@@ -35,10 +35,10 @@ export default class SeeTopWildlingCardComponent extends Component<GameStateComp
                     {this.props.gameClient.doesControlHouse(this.props.gameState.ravenHolder) ? (
                         <Row className="justify-content-center">
                             <Col xs="auto">
-                                <Button onClick={() => this.choose(SeeTopWildlingCardAction.LEAVE_AT_THE_TOP)}>Keep at the Top</Button>
+                                <Button type="button" onClick={() => this.choose(SeeTopWildlingCardAction.LEAVE_AT_THE_TOP)}>Keep at the Top</Button>
                             </Col>
                             <Col xs="auto">
-                                <Button onClick={() => this.choose(SeeTopWildlingCardAction.PUT_AT_BOTTOM)}>Put at the Bottom</Button>
+                                <Button type="button" onClick={() => this.choose(SeeTopWildlingCardAction.PUT_AT_BOTTOM)}>Put at the Bottom</Button>
                             </Col>
                         </Row>
                     ) : (

@@ -332,12 +332,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             overlay={<Popover id="tracks-popover" className="scrollable-popover">
                 <Col>
                     {this.renderHousesColumn(false, tracks)}
-                    <button type="button" className="close" aria-label="Close" onClick={() => {
-                            this.tracksPopoverVisible = false;
-                        }}
+                    <button type="button"
+                        className="close"
+                        onClick={() => this.tracksPopoverVisible = false }
                         style={{position: "absolute", right: "4px", top: "4px", padding: "4px"}}
                     >
-                        <span aria-hidden="true">&times;</span>
+                        <span>&times;</span>
                     </button>
                 </Col>
             </Popover>}
@@ -413,7 +413,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     onChange={evt => {
                         LocalStorageService.setWithExpiry<boolean>("dontShowScrollbarHintsAgain", evt.target.checked, 30 * 24 * 60 * 60);
                     } } />
-                <Button variant="primary" onClick={() => this.closeModal()}>
+                <Button type="submit" variant="primary" onClick={() => this.closeModal()}>
                     Ok
                 </Button>
             </Modal.Footer>
@@ -442,16 +442,20 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             />
                         </ListGroupItem>
                     </ListGroup>
-                    <button className="btn btn-outline-light btn-sm" onClick={() => {
+                    <button type="button"
+                        className="close"
+                        onClick={(e: any) => {
                             if (this.user && this.columnSwapAnimationClassName == "") {
+                                e.currentTarget.blur();
                                 this.columnSwapAnimationClassName = "animate__animated animate__fadeIn"
                                 this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
+                                this.tracksPopoverVisible = false;
                                 window.setTimeout(() => this.columnSwapAnimationClassName = "", 2050);
                             }
                         }}
-                        style={{position: "absolute", left: "0px", padding: "8px", borderStyle: "none"}}
+                        style={{position: "absolute", left: "0px", padding: "4px" }}
                     >
-                        <FontAwesomeIcon icon={faRightLeft} style={{color: "white"}}/>
+                        <FontAwesomeIcon icon={faRightLeft} style={{color: "white"}} size="2xs"/>
                     </button>
                 </Card>
                 <Card className={this.mapScrollbarEnabled ? "flex-fill-remaining mb-2" : "mb-2"}>
@@ -505,7 +509,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         return <Row className={applyFlexFooter && this.mapScrollbarEnabled ? "flex-footer" : ""} id="game-controls">
             <Col xs="auto">
-                <button className="btn btn-outline-light btn-sm" onClick={() => this.gameClient.muted = !this.gameClient.muted}>
+                <button type="button" className="btn btn-outline-light btn-sm" onClick={() => this.gameClient.muted = !this.gameClient.muted}>
                     <OverlayTrigger
                         placement="auto"
                         overlay={<Tooltip id="mute-tooltip">
@@ -519,7 +523,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 </button>
             </Col>
             <Col xs="auto">
-                <button className="btn btn-outline-light btn-sm" onClick={() => this.gameClient.musicMuted = !this.gameClient.musicMuted}>
+                <button type="button" className="btn btn-outline-light btn-sm" onClick={() => this.gameClient.musicMuted = !this.gameClient.musicMuted}>
                     <OverlayTrigger
                         placement="auto"
                         overlay={<Tooltip id="mute-tooltip">
@@ -534,7 +538,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             </Col>
             {this.authenticatedPlayer && <>
                 <Col xs="auto">
-                    <button
+                    <button type="button"
                         className="btn btn-outline-light btn-sm"
                         onClick={() => this.ingame.launchCancelGameVote()}
                         disabled={!canLaunchCancelGameVote}
@@ -562,7 +566,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </button>
                 </Col>
                 <Col xs="auto">
-                    <button
+                    <button type="button"
                         className="btn btn-outline-light btn-sm"
                         onClick={() => this.ingame.launchEndGameVote()}
                         disabled={!canLaunchEndGameVote}
@@ -595,7 +599,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 </Col>
                 {this.gameSettings.onlyLive && !this.ingame.paused &&
                     <Col xs="auto">
-                        <button
+                        <button type="button"
                             className="btn btn-outline-light btn-sm"
                             onClick={() => this.ingame.launchPauseGameVote()}
                             disabled={!canLaunchPauseGameVote}
@@ -622,7 +626,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </Col>}
                 {this.gameSettings.onlyLive && this.ingame.paused &&
                     <Col xs="auto">
-                        <button
+                        <button type="button"
                             className="btn btn-outline-light btn-sm"
                             onClick={() => this.ingame.launchResumeGameVote()}
                             disabled={!canLaunchResumeGameVote}
@@ -649,7 +653,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     </Col>}
                 {this.gameSettings.onlyLive &&
                     <Col xs="auto">
-                        <button
+                        <button type="button"
                             className="btn btn-outline-light btn-sm"
                             onClick={() => this.ingame.launchExtendPlayerClocksVote()}
                             disabled={!canLaunchExtendPlayerClocksVote}
@@ -894,16 +898,20 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         </Col>
                     </Col>
                 </Row>
-                <button className="btn btn-outline-light btm-sm" onClick={() => {
+                <button type="button"
+                    className="close"
+                    onClick={(e: any) => {
                         if (this.user && this.columnSwapAnimationClassName == "") {
+                            e.currentTarget.blur();
                             this.columnSwapAnimationClassName = "animate__animated animate__fadeIn"
                             this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
+                            this.tracksPopoverVisible = false;
                             window.setTimeout(() => this.columnSwapAnimationClassName = "", 2050);
                         }
                     }}
-                    style={{position: "absolute", left: "0px", padding: "8px", borderStyle: "none"}}
+                    style={{ position: "absolute", left: "0px", padding: "4px" }}
                 >
-                    <FontAwesomeIcon icon={faRightLeft} style={{color: "white"}}/>
+                    <FontAwesomeIcon icon={faRightLeft} style={{color: "white"}} size="2xs"/>
                 </button>
                 {isOwnTurn && <Spinner animation="grow" variant="warning" size="sm" style={{position: "absolute", bottom: "4px", left: "4px" }}/>}
             </Card>

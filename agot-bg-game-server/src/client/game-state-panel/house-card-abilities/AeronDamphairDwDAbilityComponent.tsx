@@ -47,7 +47,7 @@ export default class AeronDamphairAbilityComponent extends Component<GameStateCo
                             </Row>
                         </Col>
                         <Col xs={12} className="text-center">
-                            <Button variant="success"
+                            <Button type="button" variant="success"
                                 onClick={() => this.props.gameState.sendPowerTokens(this.powerTokens)}
                             >
                                 Confirm

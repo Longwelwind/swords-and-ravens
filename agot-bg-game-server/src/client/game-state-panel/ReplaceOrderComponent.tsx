@@ -44,13 +44,13 @@ export default class ReplaceOrderComponent extends Component<GameStateComponentP
                         )}
                         <Col xs={12}>
                             <Col xs={12} className="d-flex justify-content-center">
-                                <Button variant="success" onClick={() => this.replaceOrder()} disabled={this.selectedOrder == null || this.selectedRegion == null}>Confirm Order token replacement</Button>
+                                <Button type="button" variant="success" onClick={() => this.replaceOrder()} disabled={this.selectedOrder == null || this.selectedRegion == null}>Confirm Order token replacement</Button>
                             </Col>
                             <Col xs={12} className="d-flex justify-content-center">
-                                <Button onClick={() => this.seeTopWildlingCardInstead()} disabled={this.selectedOrder != null}>Look at the Top Wildling Card instead</Button>
+                                <Button type="button" onClick={() => this.seeTopWildlingCardInstead()} disabled={this.selectedOrder != null}>Look at the Top Wildling Card instead</Button>
                             </Col>
                             <Col xs={12} className="d-flex justify-content-center">
-                                <Button variant="danger" disabled={this.selectedOrder == null && this.selectedRegion == null} onClick={() => this.reset()}>Reset</Button>
+                                <Button type="button" variant="danger" disabled={this.selectedOrder == null && this.selectedRegion == null} onClick={() => this.reset()}>Reset</Button>
                             </Col>
                         </Col>
                     </>
