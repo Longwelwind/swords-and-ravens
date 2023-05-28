@@ -1531,7 +1531,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         this.ingame.onVoteStarted = null;
     }
 
-    componentDidUpdate(prevProps: Readonly<IngameComponentProps>, prevState: Readonly<{}>, snapshot?: any): void {
+    componentDidUpdate(_prevProps: Readonly<IngameComponentProps>, _prevState: Readonly<{}>, _snapshot?: any): void {
         if (this.currentOpenedTab == "note") {
             this.unseenNotes = false;
         }
