@@ -10,6 +10,7 @@ interface SimpleInfluenceIconComponentProps {
     house: LobbyHouse | null;
     small?: boolean;
     xsmall?: boolean;
+    style?: React.CSSProperties;
 }
 
 export default class SimpleInfluenceIconComponent extends Component<SimpleInfluenceIconComponentProps> {
@@ -22,6 +23,7 @@ export default class SimpleInfluenceIconComponent extends Component<SimpleInflue
             ? "24px"
             : this.props.small
                 ? "28px" : undefined;
+
         return <OverlayTrigger overlay={
                 <Tooltip id="influence-icon">
                     <b>{this.house?.name ?? "Unknown house"}</b>
@@ -31,8 +33,9 @@ export default class SimpleInfluenceIconComponent extends Component<SimpleInflue
             popperConfig={{modifiers: [preventOverflow]}}
         >
             <div className={classNames("influence-icon", {"invisible": this.house == null})}
-                style={{backgroundImage: this.house ? `url(${houseInfluenceImages.get(this.house.id)})` : "none", height: height}}>
-            </div>
+                style={{...{ backgroundImage: this.house ? `url(${houseInfluenceImages.get(this.house.id)})` : "none", height: height },
+                    ...this.props.style}}
+            />
         </OverlayTrigger>;
     }
 }

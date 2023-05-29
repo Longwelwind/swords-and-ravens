@@ -328,6 +328,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             // Swallow possible exceptions thrown by getTokenHolder, e.g. during drafting. ravenHolder simply stays null then.
         }
 
+        const potentialWinner = this.ingame.game.getPotentialWinner();
+        const victoryPoints = this.ingame.game.getVictoryPoints(potentialWinner);
+
         return <OverlayTrigger
             overlay={<Popover id="tracks-popover" className="scrollable-popover">
                 <Col>
@@ -353,27 +356,16 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 }}
                 style={{ position: "fixed", right: this.user?.settings.responsiveLayout ? "auto" : "4px", left: this.user?.settings.responsiveLayout ? "4px" : "auto", top: "6px", padding: "4px", borderStyle: "none" }}
             >
-                <div>
-                    <Row className="px-2">
-                        <Col className="px-0">
-                            <img src={stoneThroneImage} width={24} />
-                        </Col>
-                        <Col className="pl-0 pr-1">
-                            <SimpleInfluenceIconComponent house={ironThroneHolder} xsmall />
-                        </Col>
-                        <Col className="pl-1 pr-0">
-                            <img src={this.game.valyrianSteelBladeUsed ? diamondHiltUsedImage : diamondHiltImage} width={24} />
-                        </Col>
-                        <Col className="pl-0 pr-1">
-                            <SimpleInfluenceIconComponent house={vsbHolder} xsmall />
-                        </Col>
-                        <Col className="pl-1 pr-0">
-                            <img src={ravenImage} width={24} />
-                        </Col>
-                        <Col className="px-0">
-                            <SimpleInfluenceIconComponent house={ravenHolder} xsmall />
-                        </Col>
-                    </Row>
+                <div className="d-flex flex-row flex-nowrap">
+                    <img src={stoneThroneImage} width={24} />
+                    <SimpleInfluenceIconComponent house={ironThroneHolder} xsmall style={{ marginLeft: "-18px", opacity: 0.85 }} />
+                    <img src={this.game.valyrianSteelBladeUsed ? diamondHiltUsedImage : diamondHiltImage} width={24} />
+                    <SimpleInfluenceIconComponent house={vsbHolder} xsmall style={{ marginLeft: "-18px", opacity: 0.85 }} />
+                    <img src={ravenImage} width={24} />
+                    <SimpleInfluenceIconComponent house={ravenHolder} xsmall style={{ marginLeft: "-16px", opacity: 0.85 }} />
+                    <img src={podiumWinnerImage} width={24} />
+                    <SimpleInfluenceIconComponent house={potentialWinner} xsmall style={{ marginLeft: "-18px", opacity: 0.85 }} />
+                    <div style={{marginLeft: "-3px"}}>{victoryPoints}</div>
                 </div>
             </div>
         </OverlayTrigger>;
