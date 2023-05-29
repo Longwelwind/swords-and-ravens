@@ -210,7 +210,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     }
 
     // Overwrite supply levels
-    if (selectedGameSetup.supplyLevels != undefined) {
+    if (selectedGameSetup.supplyLevels !== undefined) {
         Object.entries(selectedGameSetup.supplyLevels)
             .filter(([hid, _]) => housesToCreate.includes(hid))
             .forEach(([hid, level]) => {
@@ -225,7 +225,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     // But for max power tokens it just doesn't work though I verified selectedGameSetup contains the maxPowerTokens node with
     // console.log(JSON.stringify(selectedGameSetup, null, 2));
 
-    // const maxPowerTokensPerHouse = new BetterMap(selectedGameSetup.maxPowerTokens != undefined ? Object.entries(selectedGameSetup.maxPowerTokens) : []);
+    // const maxPowerTokensPerHouse = new BetterMap(selectedGameSetup.maxPowerTokens !== undefined ? Object.entries(selectedGameSetup.maxPowerTokens) : []);
 
     // So for now the only work around is to hard code it:
     const maxPowerTokensPerHouse = new BetterMap(entireGame.isFeastForCrows ? [["arryn", 19]] : []);
@@ -292,19 +292,19 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     game.revealedWesterosCards = gameSettings.cokWesterosPhase ? 3 : 0;
 
     // Load tracks starting positions
-    if (selectedGameSetup.tracks != undefined && selectedGameSetup.tracks.ironThrone != undefined) {
+    if (selectedGameSetup.tracks !== undefined && selectedGameSetup.tracks.ironThrone !== undefined) {
         game.ironThroneTrack = selectedGameSetup.tracks.ironThrone.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     } else {
         game.ironThroneTrack = baseGameData.tracks.ironThrone.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     }
 
-    if (selectedGameSetup.tracks != undefined && selectedGameSetup.tracks.fiefdoms != undefined) {
+    if (selectedGameSetup.tracks !== undefined && selectedGameSetup.tracks.fiefdoms !== undefined) {
         game.fiefdomsTrack = selectedGameSetup.tracks.fiefdoms.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     } else {
         game.fiefdomsTrack = baseGameData.tracks.fiefdoms.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     }
 
-    if (selectedGameSetup.tracks != undefined && selectedGameSetup.tracks.kingsCourt != undefined) {
+    if (selectedGameSetup.tracks !== undefined && selectedGameSetup.tracks.kingsCourt !== undefined) {
         game.kingsCourtTrack = selectedGameSetup.tracks.kingsCourt.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
     } else {
         game.kingsCourtTrack = baseGameData.tracks.kingsCourt.filter(hid => housesToCreate.includes(hid)).map(hid => game.houses.get(hid));
@@ -374,7 +374,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     const garrisonsFromGameSetup = selectedGameSetup.garrisons ? new BetterMap(Object.entries(selectedGameSetup.garrisons)) : null;
     const blockedRegions = selectedGameSetup.blockedRegions;
 
-    const overwrittenSuperControlPowerToken = new BetterMap(selectedGameSetup.superPowerTokens != undefined ? Object.entries(selectedGameSetup.superPowerTokens) : []);
+    const overwrittenSuperControlPowerToken = new BetterMap(selectedGameSetup.superPowerTokens !== undefined ? Object.entries(selectedGameSetup.superPowerTokens) : []);
 
     const regions = new BetterMap(getStaticWorld(gameSettings).staticRegions.values.map(staticRegion => {
         const blocked = blockedRegions ? blockedRegions.includes(staticRegion.id) : false;
@@ -420,16 +420,16 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     });
 
     // Apply Westeros deck changes
-    if (selectedGameSetup.westerosCards != undefined) {
+    if (selectedGameSetup.westerosCards !== undefined) {
         const westerosCards = selectedGameSetup.westerosCards;
 
         for (let i=0; i< westerosCards.length; i++) {
-            if (westerosCards[i] != undefined) {
+            if (westerosCards[i] != null) {
                 const cards: WesterosCard[] = [];
                 westerosCards[i].forEach((westerosCardData: WesterosCardData) => {
                     const westerosCardType = westerosCardTypes.get(westerosCardData.type);
                     const quantity = westerosCardData.quantity ? westerosCardData.quantity : 1;
-                    for (let i = 0;i < quantity;i++) {
+                    for (let j = 0;j < quantity;j++) {
                         const id = ++lastWesterosCardId;
 
                         cards.push(new WesterosCard(id, westerosCardType));
@@ -475,7 +475,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     // Shuffle the deck
     game.wildlingDeck = shuffleInPlace(game.wildlingDeck);
 
-    const units = selectedGameSetup.units != undefined ? selectedGameSetup.units : baseGameData.units;
+    const units = selectedGameSetup.units !== undefined ? selectedGameSetup.units : baseGameData.units;
 
     // Initialize the starting positions
     Object.entries(units).forEach(([regionId, data]) => {
@@ -498,9 +498,9 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     });
 
     // Apply dragon strength tokens
-    game.dragonStrengthTokens = gameSettings.customBalancing && selectedGameSetup.alternateDragonStrengthTokens
+    game.dragonStrengthTokens = gameSettings.customBalancing && selectedGameSetup.alternateDragonStrengthTokens !== undefined
         ? selectedGameSetup.alternateDragonStrengthTokens
-        : selectedGameSetup.dragonStrengthTokens
+        : selectedGameSetup.dragonStrengthTokens !== undefined
             ? selectedGameSetup.dragonStrengthTokens
             : [];
 
@@ -535,7 +535,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         restrictions => game.houses.size <= restrictions.length)];
 
     // Apply Power tokens from game setup
-    if (selectedGameSetup.powerTokensOnBoard != undefined) {
+    if (selectedGameSetup.powerTokensOnBoard !== undefined) {
         Object.entries(selectedGameSetup.powerTokensOnBoard).forEach(([houseId, regions]) => {
             const house = gameSettings.randomStartPositions && startingPositionsMap.has(houseId) ? game.houses.tryGet(startingPositionsMap.get(houseId), null) : game.houses.tryGet(houseId, null);
             regions.forEach(r => game.world.regions.get(r).controlPowerToken = house);
@@ -543,7 +543,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     }
 
     // Apply loyalty tokens
-    if (selectedGameSetup.loyaltyTokens != undefined) {
+    if (selectedGameSetup.loyaltyTokens !== undefined) {
         const loyaltyTokens = new BetterMap(Object.entries(selectedGameSetup.loyaltyTokens));
         loyaltyTokens.entries.forEach(([regionId, count]) => {
             regions.get(regionId).loyaltyTokens = count;
