@@ -2101,6 +2101,22 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "106",
+        migrate: (serializedGame: any) => {
+            const settings = serializedGame.gameSettings;
+            // Fix corrupted Dragon Strength games
+            if (serializedGame.childGameState.type == "ingame" && settings.setupId == "mother-of-dragons" && settings.playerCount == 8) {
+                const game = serializedGame.childGameState.game;
+
+                if (game.removedDragonStrengthToken == 0 && _.isEqual([2, 4, 6], _.sortBy(game.dragonStrengthTokens))) {
+                    game.dragonStrengthTokens = [2, 4, 6, 8, 10];
+                }
+            }
+
+            return serializedGame;
+        }
     }
 ];
 
