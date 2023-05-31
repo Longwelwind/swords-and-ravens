@@ -72,6 +72,8 @@ export default class IngameGameState extends GameState<
     @observable paused: Date | null = null;
     @observable willBeAutoResumedAt: Date | null = null;
 
+    @observable bannedUsers: Set<string> = new Set();
+
     // Server-side only
     autoResumeTimeout: NodeJS.Timeout | null = null;
 
@@ -411,6 +413,28 @@ export default class IngameGameState extends GameState<
             this.createVote(user, new ReplaceVassalByPlayer(user, house));
         } else if (message.type == "game-log-seen") {
             this.gameLogManager.lastSeenLogTimes.set(user, message.time);
+        } else if (message.type == "ban-user") {
+            if (this.entireGame.onGetUser != null && this.entireGame.canActAsOwner(user) && !this.players.keys.map(u => u.id).includes(message.userId)) {
+                this.entireGame.onGetUser(message.userId).then(storedData => {
+                    if (!storedData || storedData.groups.some(g => g.name == "Admin" || g.name == "High Member")) {
+                        return;
+                    }
+
+                    this.bannedUsers.add(message.userId);
+                    this.entireGame.broadcastToClients({
+                        type: "user-banned",
+                        userId: message.userId
+                    });
+                });
+            }
+        } else if (message.type == "unban-user") {
+            if (this.entireGame.canActAsOwner(user)) {
+                this.bannedUsers.delete(message.userId);
+                this.entireGame.broadcastToClients({
+                    type: "user-unbanned",
+                    userId: message.userId
+                });
+            }
         } else if (this.players.has(user)) {
             const player = this.players.get(user);
 
@@ -1313,6 +1337,10 @@ export default class IngameGameState extends GameState<
                     hasBeenReactivated: message.waitedForData.hasBeenReactivated
                 }
                 : null;
+        } else if (message.type == "user-banned") {
+            this.bannedUsers.add(message.userId);
+        } else if (message.type == "user-unbanned") {
+            this.bannedUsers.delete(message.userId);
         } else {
             this.childGameState.onServerMessage(message);
         }
@@ -1900,6 +1928,7 @@ export default class IngameGameState extends GameState<
             votes: this.votes.values.map(v => v.serializeToClient(admin, player)),
             paused: this.paused ? this.paused.getTime() : null,
             willBeAutoResumedAt: this.willBeAutoResumedAt ? this.willBeAutoResumedAt.getTime() : null,
+            bannedUsers: Array.from(this.bannedUsers.values()),
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -1924,6 +1953,7 @@ export default class IngameGameState extends GameState<
         ingameGameState.gameLogManager = GameLogManager.deserializeFromServer(ingameGameState, data.gameLogManager);
         ingameGameState.paused = data.paused ? new Date(data.paused) : null;
         ingameGameState.willBeAutoResumedAt = data.willBeAutoResumedAt ? new Date(data.willBeAutoResumedAt) : null;
+        ingameGameState.bannedUsers = new Set(data.bannedUsers);
         ingameGameState.childGameState = ingameGameState.deserializeChildGameState(data.childGameState);
 
         return ingameGameState;
@@ -1966,6 +1996,7 @@ export interface SerializedIngameGameState {
     ordersOnBoard: [string, number][];
     paused: number | null;
     willBeAutoResumedAt: number | null;
+    bannedUsers: string[];
     childGameState: SerializedPlanningGameState | SerializedActionGameState | SerializedWesterosGameState
         | SerializedGameEndedGameState | SerializedCancelledGameState | SerializedDraftHouseCardsGameState
         | SerializedThematicDraftHouseCardsGameState | SerializedPayDebtsGameState

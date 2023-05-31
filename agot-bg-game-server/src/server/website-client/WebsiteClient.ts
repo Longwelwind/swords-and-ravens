@@ -20,6 +20,7 @@ export interface StoredUserData {
     id: string;
     name: string;
     token: string;
+    groups: {"name": string}[];
     profileSettings: StoredProfileSettings;
 }
 

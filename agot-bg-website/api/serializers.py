@@ -2,7 +2,7 @@ import django.utils.timezone
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer, BooleanField
 
-from agotboardgame_main.models import User, Game, PlayerInGame, PbemResponseTime
+from agotboardgame_main.models import User, Group, Game, PlayerInGame, PbemResponseTime
 from chat.models import Room, UserInRoom
 
 
@@ -12,12 +12,19 @@ class PbemResponseTimeSerializer(ModelSerializer):
         fields = ['id', 'user', 'response_time', 'created_at']
 
 
+class GroupSerializer(ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ('name',)
+
+
 class UserSerializer(ModelSerializer):
     #pbem_response_times = PbemResponseTimeSerializer(many=True)
     #Don't do it that way when we request a player. Get the PBEM response times of a player on demand when the profile is openend
+    groups = GroupSerializer(many=True)
     class Meta:
         model = User
-        fields = ['id', 'username', 'game_token', 'is_staff', 'mute_games', 'use_house_names_for_chat', 'use_map_scrollbar', 'use_responsive_layout_on_mobile']
+        fields = ['id', 'username', 'game_token', 'is_staff', 'mute_games', 'use_house_names_for_chat', 'use_map_scrollbar', 'use_responsive_layout_on_mobile', 'groups']
 
 
 class PlayerInGameSerializer(ModelSerializer):

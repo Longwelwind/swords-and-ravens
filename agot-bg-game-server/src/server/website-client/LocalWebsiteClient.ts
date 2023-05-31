@@ -21,6 +21,7 @@ export default class LocalWebsiteClient implements WebsiteClient {
             id: userId,
             name: `Super Long Player Name #${userId}`,
             token: userId,
+            groups: [{"name": "Member"}],
             profileSettings: {
                 muted: true,
                 houseNamesForChat: true,

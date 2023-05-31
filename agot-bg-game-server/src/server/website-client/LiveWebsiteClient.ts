@@ -57,6 +57,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
                 id: response.id,
                 name: response.username,
                 token: response.game_token,
+                groups: response.groups,
                 profileSettings: {
                     muted: response.mute_games,
                     houseNamesForChat: response.use_house_names_for_chat,

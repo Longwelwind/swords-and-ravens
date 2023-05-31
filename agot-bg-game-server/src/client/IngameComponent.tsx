@@ -418,7 +418,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     renderHousesColumn(renderGameControls: boolean, tracks: InfluenceTrackDetails[]): ReactNode {
-        const connectedSpectators = this.getConnectedSpectators();
+        const bannedUsers = this.getBannedUsers();
+        const connectedSpectators = _.difference(this.getConnectedSpectators(), bannedUsers);
 
         return (
             <div className={this.mapScrollbarEnabled ? "flex-ratio-container" : ""}>
@@ -476,20 +477,87 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     mapControls={this.mapControls}
                                 />
                             ))}
-                            <ListGroupItem className="text-center font-italic" style={{ maxWidth: 500 }}>
-                                <>
-                                    {connectedSpectators.length > 0 ? (
-                                        <>Spectators: {joinReactNodes(connectedSpectators.map(u => <b key={`specatator_${u.id}`}>{getUserLinkOrLabel(this.ingame.entireGame, u, null)}</b>), ", ")}</>
-                                    ) : (
-                                        <>No spectators</>
-                                    )}
-                                </>
+                            <ListGroupItem className="font-italic">
+                                {connectedSpectators.length > 0 ? (
+                                    <>
+                                        <Row className="justify-content-center">
+                                            <Col xs="auto">
+                                                Spectators:
+                                            </Col>
+                                        </Row>
+                                        <Row className="justify-content-center" style={{ maxWidth: 500 }}>
+                                            {connectedSpectators.map(u =>
+                                                <Col xs="auto" key={`specatator_${u.id}`}>
+                                                    <b>{getUserLinkOrLabel(this.ingame.entireGame, u, null)}</b>
+                                                    <button type="button"
+                                                        className={classNames("close", !this.gameClient.canActAsOwner() ? "d-none" : "")}
+                                                        onClick={() => this.banUser(u) }
+                                                    >
+                                                        <span>&times;</span>
+                                                    </button>
+                                                </Col>)
+                                            }
+                                        </Row>
+                                    </>
+                                ) : (
+                                    <Row className="justify-content-center">
+                                        <Col xs="auto">
+                                            No spectators
+                                        </Col>
+                                    </Row>
+                                )}
                             </ListGroupItem>
+                            {bannedUsers.length > 0 && <ListGroupItem className="font-italic">
+                                <Row className="justify-content-center">
+                                    <Col xs="auto">
+                                        Banned users:
+                                    </Col>
+                                </Row>
+                                <Row className="justify-content-center" style={{ maxWidth: 500 }}>
+                                    {bannedUsers.map(u =>
+                                        <Col xs="auto" key={`banned_${u.id}`}>
+                                            <b>{getUserLinkOrLabel(this.ingame.entireGame, u, null)}</b>
+                                            <button type="button"
+                                                className={classNames("close", !this.gameClient.canActAsOwner() ? "d-none" : "")}
+                                                onClick={() => this.unbanUser(u) }
+                                            >
+                                                <span>&#x2713;</span>
+                                            </button>
+                                        </Col>)
+                                    }
+                                </Row>
+                            </ListGroupItem>}
                         </ListGroup>
                     </Card.Body>
                 </Card>
                 {renderGameControls && this.renderGameControlsRow(true)}
             </div>)
+    }
+
+    private banUser(user: User): void {
+        if (this.gameClient.canActAsOwner()) {
+            if (!window.confirm("Do you want to ban " + user.name + " from your game?")) {
+                return;
+            }
+
+            this.ingame.entireGame.sendMessageToServer({
+                type: "ban-user",
+                userId: user.id
+            });
+        }
+    }
+
+    private unbanUser(user: User): void {
+        if (this.gameClient.canActAsOwner()) {
+            if (!window.confirm("Do you want to unban " + user.name + "?")) {
+                return;
+            }
+
+            this.ingame.entireGame.sendMessageToServer({
+                type: "unban-user",
+                userId: user.id
+            });
+        }
     }
 
     private renderGameControlsRow(applyFlexFooter: boolean): React.ReactNode {
@@ -1332,6 +1400,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     getConnectedSpectators(): User[] {
         return _.difference(this.ingame.entireGame.users.values.filter(u => u.connected), this.ingame.players.keys);
+    }
+
+    getBannedUsers(): User[] {
+        return Array.from(this.ingame.bannedUsers.values()).filter(uid => this.ingame.entireGame.users.has(uid)).map(uid => this.ingame.entireGame.users.get(uid));
     }
 
     onNewPrivateChatRoomClick(p: Player): void {
