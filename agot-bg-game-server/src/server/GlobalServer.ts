@@ -136,6 +136,10 @@ export default class GlobalServer {
                 return;
             }
 
+            if (entireGame.ingameGameState?.bannedUsers.has(userData.id)) {
+                return;
+            }
+
             // Check if the game already contains this user
             const user = entireGame.users.has(userData.id)
                 ? entireGame.users.get(userData.id)
@@ -376,6 +380,7 @@ export default class GlobalServer {
         entireGame.onClearChatRoom = (roomId) => this.onClearChatRoom(roomId);
         entireGame.onCaptureSentryMessage = (message, severity) => this.onCaptureSentryMessage(`${entireGame.id}: ${message}`, severity);
         entireGame.onSaveGame = (updateLastActive: boolean) => this.saveGame(entireGame, updateLastActive);
+        entireGame.onGetUser = (userId) => this.websiteClient.getUser(userId);
 
         // Set the connection status of all users to false
         entireGame.users.values.forEach(u => u.connected = false);
@@ -585,6 +590,7 @@ export default class GlobalServer {
         entireGame.onClearChatRoom = undefined;
         entireGame.onCaptureSentryMessage = undefined;
         entireGame.onSaveGame = undefined;
+        entireGame.onGetUser = undefined;
 
         this.loadedGames.delete(entireGame.id);
     }

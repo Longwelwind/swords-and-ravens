@@ -2117,6 +2117,16 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "107",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                serializedGame.childGameState.bannedUsers = [];
+            }
+
+            return serializedGame;
+        }
     }
 ];
 

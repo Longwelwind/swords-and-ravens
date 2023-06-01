@@ -35,7 +35,6 @@
             };
             chatWebsocket.onmessage = m => {
                 const data = JSON.parse(m.data);
-                console.log(data);
 
                 if (data.type == 'chat_message') {
                     this.addMessage(data);

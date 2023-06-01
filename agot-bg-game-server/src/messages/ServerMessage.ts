@@ -33,7 +33,8 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | UpdateSelectableObjectives | UpdateSpecialHouseCardModifier | UpdateUsurper
     | StartPlayerClock | StopPlayerClock | GamePaused | GameResumed | LaterHouseCardsApplied
     | WildlingTiesResolved | PreemptiveRaidNewAttack | GameStarted | ReadyCheck | HousesSwapped
-    | RevealOrders | RemoveOrders | AcceptAllLoyaltyTokenMovementsChanged | UpdateWaitedForData;
+    | RevealOrders | RemoveOrders | AcceptAllLoyaltyTokenMovementsChanged | UpdateWaitedForData
+    | UserBanned | UserUnbanned;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -546,4 +547,14 @@ interface UpdateWaitedForData {
     type: "update-waited-for-data";
     userId: string;
     waitedForData: SerializedWaitedForData | null;
+}
+
+interface UserBanned {
+    type: "user-banned";
+    userId: string;
+}
+
+interface UserUnbanned {
+    type: "user-unbanned";
+    userId: string;
 }

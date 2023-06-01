@@ -13,7 +13,7 @@ import CancelledGameState, { SerializedCancelledGameState } from "./cancelled-ga
 import { VoteState } from "./ingame-game-state/vote-system/Vote";
 import CombatGameState, { CombatStats } from "./ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import PostCombatGameState from "./ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState";
-import { StoredProfileSettings } from "../server/website-client/WebsiteClient";
+import { StoredProfileSettings, StoredUserData } from "../server/website-client/WebsiteClient";
 import Player from "./ingame-game-state/Player";
 import { v4 } from "uuid";
 import { ReplacePlayer, ReplacePlayerByVassal } from "./ingame-game-state/vote-system/VoteType";
@@ -68,6 +68,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     onClearChatRoom?: (roomId: string) => void;
     onCaptureSentryMessage?: (message: string, severity: "info" | "warning" | "error" | "fatal") => void;
     onSaveGame?: (updateLastActive: boolean) => void;
+    onGetUser?: (userId: string) => Promise<StoredUserData | null>;
 
     // Throttled saveGame so we don't spam the website client
     saveGame: (updateLastActive: boolean) => void = _.throttle(this.privateSaveGame, 2000);

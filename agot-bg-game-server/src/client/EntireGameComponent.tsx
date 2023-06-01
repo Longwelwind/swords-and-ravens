@@ -17,7 +17,7 @@ import rollingDicesImage from "../../public/images/icons/rolling-dices.svg";
 import cardExchangeImage from "../../public/images/icons/card-exchange.svg";
 import trophyCupImage from "../../public/images/icons/trophy-cup.svg";
 import {Helmet} from "react-helmet";
-import { Card, FormCheck, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
+import { Alert, Card, FormCheck, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import { preventOverflow } from "@popperjs/core";
 import DraftHouseCardsGameState from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import { observable } from "mobx";
@@ -77,6 +77,13 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     render(): ReactNode {
+        if (this.props.gameClient.authenticatedUser && this.ingame?.bannedUsers.has(this.props.gameClient.authenticatedUser?.id)) {
+            return <Col xs="auto" className="m-4 p-3 text-center">
+                <Alert variant="danger">
+                    <h4>You have been banned from the game.</h4>
+                </Alert>
+            </Col>;
+        }
         return <>
             <Helmet>
                 <link rel="icon" href={this.props.gameClient.isOwnTurn() ? faviconAlert : faviconNormal} sizes="16x16" />
@@ -132,12 +139,13 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         </>;
     }
 
-    private renderGameName() {
+    private renderGameName(): ReactNode {
         if (this.entireGame.name.length < 90 || isMobile) {
             return <Col xs="auto" className="px-3">
                 <h4>{this.entireGame.name}</h4>
             </Col>;
         }
+
         return <Col xs="auto" className="px-3">
             <ConditionalWrap
                 condition={this.entireGame.name.length >= 90}

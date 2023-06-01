@@ -9,7 +9,7 @@ export type ClientMessage = Ping | Authenticate | PlaceOrder | Ready | Unready |
     | DistributePowerTokens | DropPowerTokens | MoveLoyaltyToken | ResolveConsolidatePowerChoice | PlaceSellswords
     | ResolveSpymaster | SelectObjectives | ScoreObjective | GameLogSeen | CallForSupportAgainstNeutralForce
     | LaunchPauseGameVote | LaunchResumeGameVote | LaunchExtendPlayerClocksVote | LaunchSwapHousesVote
-    | LaunchDeclareWinnerVote | ChangeAcceptAllLoyaltyTokenMovements;
+    | LaunchDeclareWinnerVote | ChangeAcceptAllLoyaltyTokenMovements | BanUser | UnbanUser;
 
 interface Ping {
     type: "ping";
@@ -337,4 +337,14 @@ interface LaunchDeclareWinnerVote {
 interface ChangeAcceptAllLoyaltyTokenMovements {
     type: "change-accept-all-loyalty-token-movements";
     newValue: boolean;
+}
+
+interface BanUser {
+    type: "ban-user";
+    userId: string;
+}
+
+interface UnbanUser {
+    type: "unban-user";
+    userId: string;
 }
