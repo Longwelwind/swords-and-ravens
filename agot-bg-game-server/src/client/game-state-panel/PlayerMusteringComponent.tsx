@@ -305,12 +305,32 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
     }
 
     componentDidMount(): void {
+        if (!this.doesControlCurrentHouse) {
+            return;
+        }
+
         this.props.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
         this.props.mapControls.modifyOrdersOnMap.push(this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap());
         this.props.mapControls.modifyUnitsOnMap.push(this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap());
+
+        if (this.props.gameState.regions.length != 1) {
+            return;
+        }
+
+        setTimeout(() => {
+            const orderElem = document.getElementById(`map-order-container_${this.props.gameState.regions[0]?.id}`);
+            if (orderElem != null) {
+                orderElem.click();
+            }
+
+        }, 100);
     }
 
     componentWillUnmount(): void {
+        if (!this.doesControlCurrentHouse) {
+            return;
+        }
+
         _.pull(this.props.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
         _.pull(this.props.mapControls.modifyRegionsOnMap, this.modifyRegionsOnMapCallback);
         _.pull(this.props.mapControls.modifyUnitsOnMap, this.modifyUnitsOnMapCallback);

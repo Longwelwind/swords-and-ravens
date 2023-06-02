@@ -192,16 +192,19 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
                             />
                         </ListGroupItem>
                     </ListGroup>
-                    <button type="button" className="btn btn-outline-light btn-sm" onClick={() => {
+                    <button type="button"
+                        className="close"
+                        onClick={(e: any) => {
                             if (this.user && this.columnSwapAnimationClassName == "") {
+                                e.currentTarget.blur();
                                 this.columnSwapAnimationClassName = "animate__animated animate__fadeIn"
                                 this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
                                 window.setTimeout(() => this.columnSwapAnimationClassName = "", 2050);
                             }
                         }}
-                        style={{position: "absolute", left: "0px", padding: "8px", borderStyle: "none"}}
+                        style={{position: "absolute", left: "0px", padding: "4px" }}
                     >
-                        <FontAwesomeIcon icon={faRightLeft} style={{color: "white"}}/>
+                        <FontAwesomeIcon icon={faRightLeft} style={{color: "white"}} size="2xs"/>
                     </button>
                 </Card>
                 <Card className={this.mapScrollbarEnabled ? "flex-fill-remaining" : ""}>
@@ -355,16 +358,19 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
                         </div>
                     </Col>}
                 </Row>
-                <button type="button" className="btn btn-outline-light btm-sm" onClick={() => {
+                <button type="button"
+                    className="close"
+                    onClick={(e: any) => {
                         if (this.user && this.columnSwapAnimationClassName == "") {
+                            e.currentTarget.blur();
                             this.columnSwapAnimationClassName = "animate__animated animate__fadeIn"
                             this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
                             window.setTimeout(() => this.columnSwapAnimationClassName = "", 2050);
                         }
                     }}
-                    style={{position: "absolute", left: "0px", padding: "8px", borderStyle: "none"}}
+                    style={{ position: "absolute", left: "0px", padding: "4px" }}
                 >
-                    <FontAwesomeIcon icon={faRightLeft} style={{color: "white"}}/>
+                    <FontAwesomeIcon icon={faRightLeft} style={{color: "white"}} size="2xs"/>
                 </button>
                 {isOwnTurn && <Spinner animation="grow" variant="warning" size="sm" style={{position: "absolute", bottom: "4px", left: "4px" }}/>}
             </Card>
