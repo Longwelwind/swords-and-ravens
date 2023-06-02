@@ -33,6 +33,10 @@ export default class IronBank {
     }
 
     getPurchasableLoans(house: House): {loan: LoanCardType, slotIndex: number, costs: number}[] {
+        if (this.game.ingame.isVassalHouse(house)) {
+            return [];
+        }
+
         const costsForHouse = this.getLoanCostsForHouse(house);
 
         const result: {loan: LoanCardType, slotIndex: number, costs: number}[] = [];

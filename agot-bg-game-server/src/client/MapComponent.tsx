@@ -617,6 +617,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                         style={{ left: region.orderSlot.x, top: region.orderSlot.y}}
                         onClick={properties.onClick}
                         key={`map-order-container_${region.id}`}
+                        id={`map-order-container_${region.id}`}
                     >
                         <div style={{ backgroundImage: `url(${backgroundUrl})`, borderColor: color }}
                             className={classNames("order-icon", {

@@ -67,7 +67,6 @@ import ScrollToBottom from "react-scroll-to-bottom";
 import GameSettingsComponent from "./GameSettingsComponent";
 import IngameCancelledComponent from "./game-state-panel/IngameCancelledComponent";
 import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
-import joinReactNodes from "./utils/joinReactNodes";
 import NoteComponent from "./NoteComponent";
 import HouseRowComponent from "./HouseRowComponent";
 import UserSettingsComponent from "./UserSettingsComponent";
@@ -334,14 +333,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         return <OverlayTrigger
             overlay={<Popover id="tracks-popover" className="scrollable-popover">
                 <Col>
-                    {this.renderHousesColumn(false, tracks)}
                     <button type="button"
                         className="close"
                         onClick={() => this.tracksPopoverVisible = false }
-                        style={{position: "absolute", right: "4px", top: "4px", padding: "4px"}}
+                        style={{ position: "sticky", top: 0 }}
                     >
                         <span>&times;</span>
                     </button>
+                    {this.renderHousesColumn(false, tracks)}
                 </Col>
             </Popover>}
             placement="auto"
@@ -357,14 +356,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 style={{ position: "fixed", right: this.user?.settings.responsiveLayout ? "auto" : "4px", left: this.user?.settings.responsiveLayout ? "4px" : "auto", top: "6px", padding: "4px", borderStyle: "none" }}
             >
                 <div className="d-flex flex-row flex-nowrap">
-                    <img src={stoneThroneImage} width={24} />
-                    <SimpleInfluenceIconComponent house={ironThroneHolder} xsmall style={{ marginLeft: "-18px", opacity: 0.85 }} />
+                    <img src={stoneThroneImage} width={24} style={{ opacity: 0.8 }} />
+                    <SimpleInfluenceIconComponent house={ironThroneHolder} xsmall style={{ marginLeft: "-16px", zIndex: -1 }} />
                     <img src={this.game.valyrianSteelBladeUsed ? diamondHiltUsedImage : diamondHiltImage} width={24} />
-                    <SimpleInfluenceIconComponent house={vsbHolder} xsmall style={{ marginLeft: "-18px", opacity: 0.85 }} />
-                    <img src={ravenImage} width={24} />
-                    <SimpleInfluenceIconComponent house={ravenHolder} xsmall style={{ marginLeft: "-16px", opacity: 0.85 }} />
-                    <img src={podiumWinnerImage} width={24} />
-                    <SimpleInfluenceIconComponent house={potentialWinner} xsmall style={{ marginLeft: "-18px", opacity: 0.85 }} />
+                    <SimpleInfluenceIconComponent house={vsbHolder} xsmall style={{ marginLeft: "-16px", zIndex: -1 }} />
+                    <img src={ravenImage} width={24} style={{ opacity: 0.8 }} />
+                    <SimpleInfluenceIconComponent house={ravenHolder} xsmall style={{ marginLeft: "-16px", zIndex: -1 }} />
+                    <img src={podiumWinnerImage} width={24} style={{ opacity: 0.8 }} />
+                    <SimpleInfluenceIconComponent house={potentialWinner} xsmall style={{ marginLeft: "-16px", zIndex: -1 }} />
                     <div style={{marginLeft: "-3px"}}>{victoryPoints}</div>
                 </div>
             </div>

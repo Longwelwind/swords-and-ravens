@@ -16,12 +16,11 @@ import User from "../../../../../server/User";
 import DefenseMusterOrderType from "../../../game-data-structure/order-types/DefenseMusterOrderType";
 import PlayerMusteringGameState, { PlayerMusteringType } from "../../../westeros-game-state/mustering-game-state/player-mustering-game-state/PlayerMusteringGameState";
 import IronBank from "../../../game-data-structure/IronBank";
-import { observable } from "mobx";
 import BetterMap from "../../../../../utils/BetterMap";
 import _ from "lodash";
 
 export default class ResolveSingleConsolidatePowerGameState extends GameState<ResolveConsolidatePowerGameState> {
-    @observable house: House;
+    house: House;
 
     get game(): Game {
         return this.actionGameState.game;
@@ -102,7 +101,10 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
 
         // If there is an Iron Bank order but all loan slots are empty and no CP* can be used for mustering
         // (players might want to delay the mustering or muster immediately), the Iron Bank order can be removed automatically
-        if (ironBankOrders.length == 1 && !consolidatePowerOrders.entries.some(([r, ot]) => ot.starred && r.hasStructure) && this.ironBank?.loanSlots.every(lc => lc == null)) {
+        if (ironBankOrders.length == 1
+            && !consolidatePowerOrders.entries.some(([r, ot]) => ot.starred && r.hasStructure)
+            && (this.ironBank?.loanSlots.every(lc => lc == null) || this.ingame.isVassalHouse(this.house))
+        ) {
             const region = ironBankOrders[0][0];
             this.actionGameState.removeOrderFromRegion(region, true, this.house, true);
             this.onResolveSingleConsolidatePowerFinish();
@@ -189,6 +191,10 @@ export default class ResolveSingleConsolidatePowerGameState extends GameState<Re
                 this.parentGameState.setChildGameState(new PlayerMusteringGameState(this.parentGameState)).firstStart(this.house, PlayerMusteringType.DEFENSE_MUSTER_ORDER);
                 return;
             } else if (order.type instanceof IronBankOrderType && this.ironBank && message.purchaseLoan !== undefined) {
+                if (this.ingame.isVassalHouse(this.house)) {
+                    return;
+                }
+
                 const loan = this.ironBank.purchaseLoan(this.house, message.purchaseLoan, regionOfOrder.id);
                 if (!loan) {
                     return;
