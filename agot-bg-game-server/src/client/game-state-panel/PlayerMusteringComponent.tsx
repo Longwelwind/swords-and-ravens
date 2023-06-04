@@ -305,15 +305,11 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
     }
 
     componentDidMount(): void {
-        if (!this.doesControlCurrentHouse) {
-            return;
-        }
-
         this.props.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
         this.props.mapControls.modifyOrdersOnMap.push(this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap());
         this.props.mapControls.modifyUnitsOnMap.push(this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap());
 
-        if (this.props.gameState.regions.length != 1) {
+        if (this.props.gameState.regions.length != 1 || !this.doesControlCurrentHouse) {
             return;
         }
 
@@ -327,10 +323,6 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
     }
 
     componentWillUnmount(): void {
-        if (!this.doesControlCurrentHouse) {
-            return;
-        }
-
         _.pull(this.props.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
         _.pull(this.props.mapControls.modifyRegionsOnMap, this.modifyRegionsOnMapCallback);
         _.pull(this.props.mapControls.modifyUnitsOnMap, this.modifyUnitsOnMapCallback);
