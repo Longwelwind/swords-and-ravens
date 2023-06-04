@@ -4,6 +4,7 @@ import CancelHouseCardAbilitiesGameState
 import House from "../House";
 import HouseCard, { HouseCardState } from "./HouseCard";
 import shuffleInPlace from "../../../../utils/shuffleInPlace";
+import _ from "lodash";
 
 export default class JaqenHGharHouseCardAbility extends HouseCardAbility {
     cancel(cancelResolutionState: CancelHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {
@@ -25,9 +26,15 @@ export default class JaqenHGharHouseCardAbility extends HouseCardAbility {
         combat.houseCombatDatas.get(enemy).houseCard = newHouseCard;
         combat.entireGame.broadcastToClients({
             type: "change-combat-house-card",
-            houseCardIds: [[enemy.id, newHouseCard.id]]
+            houseCardIds: [[house.id, combat.houseCombatDatas.get(house).houseCard?.id ?? null],[enemy.id, newHouseCard.id]],
+            animate: true
         });
 
+        _.pull(cancelResolutionState.childGameState.resolvedHouses, enemy);
         cancelResolutionState.childGameState.onHouseCardResolutionFinish(house);
+    }
+
+    changesEnemyHouseCardImmediately(): boolean {
+        return true;
     }
 }
