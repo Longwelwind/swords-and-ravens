@@ -12,6 +12,7 @@ import HouseCard, {HouseCardState} from "../../../../../game-data-structure/hous
 import SimpleChoiceGameState, {SerializedSimpleChoiceGameState} from "../../../../../simple-choice-game-state/SimpleChoiceGameState";
 import IngameGameState from "../../../../../IngameGameState";
 import ImmediatelyHouseCardAbilitiesResolutionGameState from "../../immediately-house-card-abilities-resolution-game-state/ImmediatelyHouseCardAbilitiesResolutionGameState";
+import _ from "lodash";
 
 export default class TyrionLannisterAbilityGameState extends GameState<
     CancelHouseCardAbilitiesGameState["childGameState"] | ImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"],
@@ -114,6 +115,7 @@ export default class TyrionLannisterAbilityGameState extends GameState<
     }
 
     changeHouseCardEnemy(enemy: House, houseCard: HouseCard | null): void {
+        _.pull(this.parentGameState.resolvedHouses, enemy);
         this.combatGameState.houseCombatDatas.get(enemy).houseCard = houseCard;
 
         this.entireGame.broadcastToClients({

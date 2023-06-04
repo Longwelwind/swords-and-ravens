@@ -95,4 +95,8 @@ export default class HouseCardAbility {
     forcesRetreatOfVictoriousDefender(_postCombat: PostCombatGameState, _house: House, _houseCard: HouseCard): boolean {
         return false;
     }
+
+    changesEnemyHouseCardImmediately(): boolean {
+        return false;
+    }
 }

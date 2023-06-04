@@ -37,9 +37,9 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
     // we allow passing the previous chosen house cards
     firstStart(choosableHouseCards: BetterMap<House, HouseCard[]> | null = null): void {
         // Setup the choosable house cards
-        let vassalHouseCards = shuffleInPlace(this.ingameGameState.game.vassalHouseCards.values);
+        const vassalHouseCards = shuffleInPlace(this.ingameGameState.game.vassalHouseCards.values);
         if (choosableHouseCards) {
-            vassalHouseCards = _.difference(vassalHouseCards, _.flatMap(choosableHouseCards.values));
+            _.pull(vassalHouseCards, ..._.flatMap(choosableHouseCards.values));
         }
 
         this.choosableHouseCards = new BetterMap(this.combatGameState.houseCombatDatas.keys.map(h => {
@@ -272,7 +272,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
                 // Same here, the houseCards will always be non-null
                 // @ts-expect-error House card is never null here
                 houseCardIds: this.combatGameState.houseCombatDatas.map((h, hcd) => [h.id, hcd.houseCard.id]),
-                animate: true
+                animate: _.every(this.combatGameState.houseCombatDatas.values, hcd => hcd.houseCard?.ability == null || !hcd.houseCard.ability.changesEnemyHouseCardImmediately())
             });
 
             this.combatGameState.onChooseHouseCardGameStateEnd();
