@@ -166,6 +166,7 @@ def about(request):
 @login_required
 def my_games(request):
     now = timezone.now()
+    thirty_minutes_past = now - timedelta(minutes=30)
     two_days_past = now - timedelta(days=2)
     eight_days_past = now - timedelta(days=8)
 
@@ -174,6 +175,11 @@ def my_games(request):
 
     open_live_games = games_query_base.annotate(pbem=Cast(KeyTextTransform('pbem', KeyTextTransform('settings', 'view_of_game')), BooleanField()))\
         .filter(Q(state=IN_LOBBY) & Q(pbem=False) & Q(players_count__gt=0))
+
+    # QUERY RUNNING LIVE GAMES
+    running_live_games = games_query_base.annotate(pbem=Cast(KeyTextTransform('pbem', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
+                                                    still_active=ExpressionWrapper(Q(last_active_at__gt=thirty_minutes_past), output_field=BooleanField()))\
+        .filter(Q(state=ONGOING) & Q(pbem=False) & Q(still_active=True))
 
     games_query = games_query_base.annotate(user_is_in_game=Count('players', filter=Q(players__user=request.user)),\
         replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()),\
@@ -191,6 +197,7 @@ def my_games(request):
     return render(request, "agotboardgame_main/my_games.html", {
         "my_games": my_games,
         "open_live_games": open_live_games,
+        "running_live_games": running_live_games,
         "last_finished_game": last_finished_game,
         "public_room_id": public_room_id
     })
@@ -202,6 +209,7 @@ def games(request):
         # Pre-fetch the PlayerInGame entry related to the authenticated player
         # This means that "game.players" will only contain one entry, the one related to the authenticated player.
         now = timezone.now()
+        thirty_minutes_past = now - timedelta(minutes=30)
         two_days_past = now - timedelta(days=2)
         five_days_past = now - timedelta(days=5)
         eight_days_past = now - timedelta(days=8)
@@ -220,6 +228,11 @@ def games(request):
         # QUERY OPEN LIVE GAMES
         open_live_games = games_query_base.annotate(pbem=Cast(KeyTextTransform('pbem', KeyTextTransform('settings', 'view_of_game')), BooleanField()))\
             .filter(Q(state=IN_LOBBY) & Q(pbem=False) & Q(players_count__gt=0))
+
+        # QUERY RUNNING LIVE GAMES
+        running_live_games = games_query_base.annotate(pbem=Cast(KeyTextTransform('pbem', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
+                                                       still_active=ExpressionWrapper(Q(last_active_at__gt=thirty_minutes_past), output_field=BooleanField()))\
+            .filter(Q(state=ONGOING) & Q(pbem=False) & Q(still_active=True))
 
         # QUERY REPLACEMENT NEEDED GAMES
         games_query = games_query_base\
@@ -288,8 +301,9 @@ def games(request):
         return render(request, "agotboardgame_main/games.html", {
             "my_games": my_games,
             "all_games": all_games,
-            "inactive_games": inactive_games,
             "open_live_games": open_live_games,
+            "running_live_games": running_live_games,
+            "inactive_games": inactive_games,
             "replacement_needed_games": replacement_needed_games,
             "inactive_private_games": inactive_private_games,
             "inactive_tournament_games": inactive_tournament_games,

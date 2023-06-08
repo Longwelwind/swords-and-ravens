@@ -102,6 +102,16 @@ Games -
             </div>
         </div>
         {% endif %}
+        {% if running_live_games %}
+        <div class="col-lg-11 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Running Live Games</h4>
+                    {% games_table running_live_games user perms %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
         {% if user.is_authenticated %}
         <div class="col-lg-11 mb-4">
             <div class="card">
