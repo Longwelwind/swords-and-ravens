@@ -2127,6 +2127,19 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "108",
+        migrate: (serializedGame: any) => {
+            // Fix undefined notes
+            serializedGame.users.forEach((u: any) => {
+                if (u.note === undefined) {
+                    u.note = "";
+                }
+            });
+
+            return serializedGame;
+        }
     }
 ];
 
