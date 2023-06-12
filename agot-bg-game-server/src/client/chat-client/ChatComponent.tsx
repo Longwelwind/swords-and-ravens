@@ -20,6 +20,9 @@ import notificationSound from "../../../public/sounds/raven_call.ogg";
 import EmojiPicker, { EmojiStyle, SuggestionMode, Theme } from 'emoji-picker-react';
 import { isMobile } from "react-device-detect";
 import classNames from "classnames";
+import moment from "moment";
+import ConditionalWrap from "../utils/ConditionalWrap";
+import getElapsedSeconds, { getTimeDeltaInSeconds } from "../../utils/getElapsedSeconds";
 
 interface ChatComponentProps {
     gameClient: GameClient;
@@ -45,7 +48,12 @@ interface ChatComponentProps {
 export default class ChatComponent extends Component<ChatComponentProps> {
     @observable inputText = "";
     @observable noMoreMessages = false;
+    @observable selectedMessageId: string | null = null;
+    @observable containerWidth: number | undefined = 600;
+
+    onResizeCallback: (() => void) | null = null;
     audioPlayed = false;
+    debounceTimeout?: number;
 
     static defaultProps = {
         injectBetweenMessages: (): any => <></>,
@@ -94,7 +102,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
             }
         } */
         return (
-            <div className="d-flex flex-column h-100">
+            <div id={`chat-container-${this.props.roomId}`} className="d-flex flex-column h-100">
                 {/* Setting a fixed height seems to be the only solution to make ScrollToBottom work */}
                 <ScrollToBottom className="mb-2 flex-fill-remaining" scrollViewClassName="overflow-x-auto" style={{height: 300}}>
                     {/* In case there's no messages yet, inject with no messages as arguments */}
@@ -105,6 +113,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                     )}
                     {messages.map((m, i) => {
                         const onlyEmojis = this.containsOnlyEmojis(m.text);
+                        const divideOwnAndForeignMessages: boolean = this.containerWidth != null && this.containerWidth > 550;
                         return <>
                             {/* Inject before the first message */}
                             {i == 0 && (
@@ -112,24 +121,13 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                     {this.props.injectBetweenMessages(null, m)}
                                 </React.Fragment>
                             )}
-                            <Row noGutters={true} className={classNames("flex-nowrap", {"align-items-center": onlyEmojis})} key={m.id}>
-                                <Col xs="auto" style={{width: "46px"}} className="text-center">
-                                    <OverlayTrigger
-                                        placement="auto"
-                                        overlay={<Tooltip id={"message-date-" + m.id}>{m.createdAt.toLocaleString()}</Tooltip>}
-                                        popperConfig={{modifiers: [preventOverflow]}}
-                                    >
-                                        <small className="text-muted">
-                                            {('0' + m.createdAt.getHours()).slice(-2)}:{('0' + m.createdAt.getMinutes()).slice(-2)}
-                                        </small>
-                                    </OverlayTrigger>
-                                </Col>
-                                <Col xs="auto" style={{maxWidth: 180}} className="mx-1">
-                                    {this.props.getUserDisplayName(m.user)}
-                                </Col>
-                                <Col style={{overflowWrap: "anywhere", minWidth: 200}}>
-                                    <span className={onlyEmojis ? "make-emojis-large" : ""}>{m.text}</span>
-                                </Col>
+                            <Row key={m.id} className={classNames(
+                                "mb-1 mt-0 mx-0 p-0",
+                                {
+                                    "align-items-center": onlyEmojis
+                                })}
+                            >
+                                {this.renderMessage(divideOwnAndForeignMessages, i, messages, m, onlyEmojis)}
                             </Row>
                             {/* Inject between all messages and after the last */}
                             <React.Fragment key={"injected-after-" + m.id}>
@@ -209,6 +207,97 @@ export default class ChatComponent extends Component<ChatComponentProps> {
         );
     }
 
+    private renderMessage(divideOwnAndForeignMessages: boolean, currentMsgIndex: number, messages: Message[], currentMessage: Message, onlyEmojis: boolean): ReactNode {
+        if (!divideOwnAndForeignMessages) {
+            return <Col className={classNames(
+                {
+                    "own-message": this.props.gameClient.authenticatedUser == currentMessage.user,
+                    "foreign-message": this.props.gameClient.authenticatedUser != currentMessage.user
+                })}>
+                <div className={currentMsgIndex > 0 && messages[currentMsgIndex - 1].user == currentMessage.user && getTimeDeltaInSeconds(currentMessage.createdAt, messages[currentMsgIndex - 1].createdAt) <= 180 ? "d-none" : ""}>
+                    {this.props.getUserDisplayName(currentMessage.user)}{this.getMoment(currentMessage)}
+                </div>
+                <OverlayTrigger
+                    overlay={<Tooltip id={"current-message-date-" + currentMessage.id}>{currentMessage.createdAt.toLocaleString()}</Tooltip>}
+                    placement="auto"
+                    popperConfig={{modifiers: [preventOverflow]}}
+                    delay={{hide: 0, show: 400}}
+                >
+                    <div className={onlyEmojis ? "make-emojis-large" : ""}
+                        style={{ minWidth: 200, overflowWrap: "anywhere" }}
+                    >
+                        {currentMessage.text}
+                    </div>
+                </OverlayTrigger>
+            </Col>;
+        } else {
+            return <>
+                <Col xs="12" className={classNames("p-0 m-0", {
+                    "px-2": this.props.gameClient.authenticatedUser == currentMessage.user,
+                    "d-none": currentMsgIndex > 0 && messages[currentMsgIndex - 1].user == currentMessage.user && getTimeDeltaInSeconds(currentMessage.createdAt, messages[currentMsgIndex - 1].createdAt) <= 90
+                })}>
+                    <div style={{width: "fit-content"}} className={classNames("p-1 pl-2", {
+                        "float-right": this.props.gameClient.authenticatedUser == currentMessage.user,
+                        "own-message": this.props.gameClient.authenticatedUser == currentMessage.user,
+                        "foreign-message": this.props.gameClient.authenticatedUser != currentMessage.user
+                    })}>
+                        {this.props.getUserDisplayName(currentMessage.user)}{this.getMoment(currentMessage)}
+                    </div>
+                </Col>
+                {this.props.gameClient.authenticatedUser == currentMessage.user && <Col xs="4"/>}
+                <OverlayTrigger
+                    overlay={<Tooltip id={"current-message-date-" + currentMessage.id}>{currentMessage.createdAt.toLocaleString()}</Tooltip>}
+                    placement="auto"
+                    popperConfig={{modifiers: [preventOverflow]}}
+                    delay={{hide: 0, show: 400}}
+                >
+                    <Col xs="8"className={classNames("px-0", {
+                        "px-2": this.props.gameClient.authenticatedUser == currentMessage.user,
+                    })}
+                    >
+                        <div style={{width: "fit-content", overflowWrap: "anywhere"}} className={classNames("p-1 px-2", {
+                            "make-emojis-large": onlyEmojis,
+                            "float-right": this.props.gameClient.authenticatedUser == currentMessage.user,
+                            "own-message": this.props.gameClient.authenticatedUser == currentMessage.user,
+                            "foreign-message": this.props.gameClient.authenticatedUser != currentMessage.user
+                        })}>
+                            {currentMessage.text}
+                        </div>
+                    </Col>
+                </OverlayTrigger>
+            </>;
+        }
+    }
+
+    getMoment(message: Message): ReactNode {
+        const elapsed = getElapsedSeconds(message.createdAt);
+        const S_PER_DAY = 60 * 60 * 24;
+        const S_PER_H = 60 * 60;
+
+        const diffDays = Math.round(elapsed / S_PER_DAY);
+        const diffH = Math.round(elapsed / S_PER_H);
+
+        const result = diffH <= 12
+            ? moment(message.createdAt).fromNow()
+            : diffDays <= 5
+                ? moment(message.createdAt).calendar()
+                : message.createdAt.toLocaleString();
+
+        return <ConditionalWrap
+            condition={diffH <= 12 || diffDays <= 5}
+            wrap={children => <OverlayTrigger
+                overlay={<Tooltip id={"message-date-" + message.id}>{message.createdAt.toLocaleString()}</Tooltip>}
+                placement="auto"
+                popperConfig={{modifiers: [preventOverflow]}}
+                delay={{hide: 0, show: 400}}
+            >
+                {children}
+            </OverlayTrigger>}
+        >
+            <small className="text-muted mx-2">{result}</small>
+        </ConditionalWrap>;
+    }
+
     send(): void {
         if (this.inputText.length == 0) {
             return;
@@ -230,18 +319,51 @@ export default class ChatComponent extends Component<ChatComponentProps> {
         return emojiRegex.test(stringToTest) && Number.isNaN(Number(stringToTest));
     }
 
+    onResize(): void {
+        const width = document.getElementById(`chat-container-${this.props.roomId}`)?.getBoundingClientRect()?.width;
+        if (width && width > 0) {
+            this.containerWidth = width;
+        }
+    }
+
+    debouncedOnResize(): void {
+        if (this.debounceTimeout) {
+            window.clearTimeout(this.debounceTimeout);
+        }
+
+        this.debounceTimeout = window.setTimeout(() => {
+            this.onResize();
+            this.debounceTimeout = undefined;
+        }, 100);
+    }
+
     componentDidMount(): void {
         this.channel.onMessage = (singleMessageRetrieved, noMoreMessages) => this.onMessage(singleMessageRetrieved, noMoreMessages);
+        this.onResize();
+        const resizeCallback = (): void => this.debouncedOnResize();
+        window.addEventListener('resize', resizeCallback);
+        this.onResizeCallback = resizeCallback;
     }
 
     componentWillUnmount(): void {
         this.channel.onMessage = null;
+
+        const resizeCallback = this.onResizeCallback;
+        if (resizeCallback) {
+            window.removeEventListener('resize', resizeCallback);
+        }
+
+        this.onResizeCallback = null;
     }
 
-    componentDidUpdate(_prevProps: Readonly<ChatComponentProps>, _prevState: Readonly<Record<string, unknown>>): void {
+    componentDidUpdate(prevProps: Readonly<ChatComponentProps>, _prevState: Readonly<Record<string, unknown>>): void {
         if (this.props.currentlyViewed) {
             this.chatClient.markAsViewed(this.channel);
             this.audioPlayed = false;
+        }
+
+        if (!prevProps.currentlyViewed && this.props.currentlyViewed) {
+            this.onResize();
         }
     }
 
