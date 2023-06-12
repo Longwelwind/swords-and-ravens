@@ -1084,3 +1084,17 @@ select {
   pointer-events: auto !important;
   cursor: default !important;
 }
+
+.own-message {
+  background-color: #242735;
+  border-radius: 10px;
+}
+
+.foreign-message {
+  background-color: #1c1c1c;
+  border-radius: 10px;
+}
+
+.float-right {
+  float: right;
+}
