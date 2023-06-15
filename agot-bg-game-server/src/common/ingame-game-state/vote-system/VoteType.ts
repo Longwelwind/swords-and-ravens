@@ -382,16 +382,6 @@ export class ReplacePlayer extends VoteType {
         this.forHouse = forHouse;
     }
 
-    onVoteCreated(vote: Vote): void {
-        if (!this.replaced.connected && vote.ingame.entireGame.gameSettings.pbem && vote.ingame.players.size >= 5) {
-            // Let the player to be replaced automatically vote with accept when he is offline
-            // to make it easier to replace quitters. But only do it if there are more than 4 players
-            // left in game because with 4 players only and one auto vote, just one other vote would be required
-            vote.votes.set(this.forHouse, true);
-            vote.checkVoteFinished();
-        }
-    }
-
     verb(): string {
         return `replace ${this.replaced.name} (${this.forHouse.name})`;
     }
@@ -485,16 +475,6 @@ export class ReplacePlayerByVassal extends VoteType {
         super();
         this.replaced = replaced;
         this.forHouse = forHouse;
-    }
-
-    onVoteCreated(vote: Vote): void {
-        if (!this.replaced.connected && vote.ingame.entireGame.gameSettings.pbem && vote.ingame.players.size >= 5) {
-            // Let the player to be replaced automatically vote with accept when he is offline
-            // to make it easier to replace quitters. But only do it if there are more than 4 players
-            // left in game because with 4 players only and one auto vote, just one other vote would be required
-            vote.votes.set(this.forHouse, true);
-            vote.checkVoteFinished();
-        }
     }
 
     verb(): string {
