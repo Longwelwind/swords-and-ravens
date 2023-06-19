@@ -1,4 +1,4 @@
-FROM node:14 AS build-client
+FROM node:16 AS build-client
 # Build the client of the game
 WORKDIR /app
 
@@ -13,7 +13,7 @@ ENV ASSET_PATH=https://swords-and-ravens.ams3.cdn.digitaloceanspaces.com/
 RUN yarn run generate-json-schemas
 RUN yarn run build-client
 
-FROM python:3.8-slim
+FROM python:3.8-slim@sha256:8f9d73f3f3ffcabcfbe7c8a0330c8cb054bde96dd46992e97539d43153434dba
 
 RUN apt-get update && apt-get install -y gcc libpq-dev
 
