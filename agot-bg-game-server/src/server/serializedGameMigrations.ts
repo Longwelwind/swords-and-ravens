@@ -2140,6 +2140,21 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "109",
+        migrate: (serializedGame: any) => {
+            // Don't track PBEM response times after interal server error over several days
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                ingame.players.forEach((p: any) => {
+                    p.waitedForData = null;
+                });
+            }
+
+            return serializedGame;
+        }
     }
 ];
 
