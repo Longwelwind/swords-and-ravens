@@ -55,7 +55,7 @@ export default class Game {
     deletedHouseCards: BetterMap<string, HouseCard> = new BetterMap();
     oldPlayerHouseCards: BetterMap<House, BetterMap<string, HouseCard>> = new BetterMap();
     previousPlayerHouseCards: BetterMap<House, BetterMap<string, HouseCard>> = new BetterMap();
-    @observable dragonStrengthTokens: number[] = [];
+    dragonStrengthTokens: number[] = [];
     @observable removedDragonStrengthToken = 0;
     ironBank: IronBank | null;
     @observable objectiveDeck: ObjectiveCard[] = [];
@@ -123,6 +123,11 @@ export default class Game {
     get currentDragonStrength(): number {
         if (this.dragonStrengthTokens.length == 0) {
             return -1;
+        }
+
+        if ((this.removedDragonStrengthToken == 0 && this.dragonStrengthTokens.length != 5) 
+            || (this.removedDragonStrengthToken != 0 && this.dragonStrengthTokens.length != 4)) {
+            throw new Error("Dragon strength tokens array is corrupted");
         }
 
         if (this.turn > (_.last(this.dragonStrengthTokens) as number)) {
@@ -567,6 +572,8 @@ export default class Game {
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedGame {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const forceDragonStrengthValidation = this.currentDragonStrength;
         return {
             lastUnitId: this.lastUnitId,
             houses: this.houses.values.map(h => h.serializeToClient(admin, player, this)),
