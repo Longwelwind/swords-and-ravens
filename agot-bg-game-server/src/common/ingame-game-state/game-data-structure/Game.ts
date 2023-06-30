@@ -125,9 +125,16 @@ export default class Game {
             return -1;
         }
 
-        if ((this.removedDragonStrengthToken == 0 && this.dragonStrengthTokens.length != 5) 
-            || (this.removedDragonStrengthToken != 0 && this.dragonStrengthTokens.length != 4)) {
-            throw new Error("Dragon strength tokens array is corrupted");
+        if (this.ingame.entireGame.isMotherOfDragons) {
+            if ((this.removedDragonStrengthToken == 0 && this.dragonStrengthTokens.length != 5)
+                || (this.removedDragonStrengthToken != 0 && this.dragonStrengthTokens.length != 4)) {
+                throw new Error("Dragon strength tokens array is corrupted");
+            }
+        } else if (this.ingame.entireGame.isDanceWithMotherOfDragons) {
+            if ((this.removedDragonStrengthToken == 0 && this.dragonStrengthTokens.length != 4)
+                || (this.removedDragonStrengthToken != 0 && this.dragonStrengthTokens.length != 3)) {
+                throw new Error("Dragon strength tokens array is corrupted");
+            }
         }
 
         if (this.turn > (_.last(this.dragonStrengthTokens) as number)) {
