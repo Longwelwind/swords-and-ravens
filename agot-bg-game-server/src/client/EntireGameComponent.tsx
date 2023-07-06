@@ -251,7 +251,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             <Col xs="auto">
                 <h4><Badge variant="danger">PAUSED</Badge></h4>
             </Col>}
-            {(this.settings.victoryPointsCountNeededToWin != 7 || this.settings.loyaltyTokenCountNeededToWin != 7) &&
+            {(this.settings.victoryPointsCountNeededToWin != 7 || this.settings.loyaltyTokenCountNeededToWin != 7 || this.settings.holdVictoryPointsUntilEndOfRound) &&
             <Col xs="auto">
                 <OverlayTrigger
                     placement="auto"
@@ -263,6 +263,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                                 </h6></p>}
                                 <>Required victory points: <b className="text-large">{this.settings.victoryPointsCountNeededToWin}</b></>
                                 {this.settings.playerCount >= 8 && <><br/>Required loyalty tokens: <b className="text-large">{this.settings.loyaltyTokenCountNeededToWin}</b></>}
+                                {this.settings.holdVictoryPointsUntilEndOfRound && <><br/>Players have to hold {this.settings.victoryPointsCountNeededToWin} victory points until the end of the round to win the game!</>}
                             </div>
                         </Tooltip>}
                     popperConfig={{ modifiers: [preventOverflow] }}

@@ -749,6 +749,22 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 </Col>
                 <Col xs="12">
                     <FormCheck
+                        id="hold-vps-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="hold-vps-setting-tooltip">
+                                    When this option is enabled, players do not win immediately when they score their 7th victory point.
+                                    Instead, to win the game, players must hold 7 victory points until the end of the round.
+                                </Tooltip>}>
+                                <label htmlFor="hold-vps-setting">Hold victory points</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.holdVictoryPointsUntilEndOfRound}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.holdVictoryPointsUntilEndOfRound = !this.gameSettings.holdVictoryPointsUntilEndOfRound)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
                         id="tournament-mode-setting"
                         type="switch"
                         label={

@@ -275,6 +275,10 @@ export default class IngameGameState extends GameState<
     }
 
     beginNewRound(): void {
+        if (this.checkVictoryConditions(true)) {
+            return;
+        }
+
         if (this.game.turn == this.game.maxTurns) {
             const winner = this.game.getPotentialWinner(true);
             this.setChildGameState(new GameEndedGameState(this)).firstStart(winner);
@@ -726,7 +730,11 @@ export default class IngameGameState extends GameState<
         });
     }
 
-    checkVictoryConditions(): boolean {
+    checkVictoryConditions(isCheckAtEndOfRound = false): boolean {
+        if (this.entireGame.gameSettings.holdVictoryPointsUntilEndOfRound && !isCheckAtEndOfRound) {
+            return false;
+        }
+
         if (this.game.areVictoryConditionsFulfilled()) {
             // Game is finished
             this.setChildGameState(new GameEndedGameState(this)).firstStart(this.game.getPotentialWinner());
