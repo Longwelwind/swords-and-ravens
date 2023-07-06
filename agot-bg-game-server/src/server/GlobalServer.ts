@@ -595,7 +595,7 @@ export default class GlobalServer {
         this.loadedGames.delete(entireGame.id);
     }
 
-    async performLongRunningOperations(): Promise<void> {
+    async runBackgroundTasks(): Promise<void> {
         while (true) {
             await sleep(10 * 60 * 1000);
 
