@@ -597,14 +597,15 @@ export default class GlobalServer {
 
     async runBackgroundTasks(): Promise<void> {
         while (true) {
-            await sleep(10 * 60 * 1000);
+            await sleep(3 * 60 * 1000);
 
             const now = new Date();
 
             // Unload inactive games:
             this.loadedGames.values.filter(game => game.lastMessageReceivedAt != null).forEach(game => {
                 const secondsSinceLastIncomingMessage = getTimeDeltaInSeconds(now, game.lastMessageReceivedAt as Date);
-                if (secondsSinceLastIncomingMessage >= (60 * 60)) {
+                if ((game.gameSettings.pbem && secondsSinceLastIncomingMessage >= 60) ||
+                    (!game.gameSettings.pbem && secondsSinceLastIncomingMessage >= (35 * 60))) {
                     this.unloadGame(game);
                 }
             });
