@@ -45,6 +45,7 @@ import getElapsedSeconds from "../../utils/getElapsedSeconds";
 import orders from "./game-data-structure/orders";
 import { OrderOnMapProperties, UnitOnMapProperties } from "../../client/MapControls";
 import houseCardAbilities from "./game-data-structure/house-card/houseCardAbilities";
+import SnrError from "../../utils/snrError";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -632,7 +633,7 @@ export default class IngameGameState extends GameState<
             const suzerainHouse = this.game.vassalRelations.tryGet(house, null);
 
             if (suzerainHouse == null) {
-                throw new Error(`getControllerOfHouse(${house.name}) failed as there is no suzerainHouse`);
+                throw new SnrError(this.entireGame, `getControllerOfHouse(${house.name}) failed as there is no suzerainHouse`);
             }
 
             return this.getControllerOfHouse(suzerainHouse);
@@ -640,7 +641,7 @@ export default class IngameGameState extends GameState<
             const player = this.players.values.find(p => p.house == house);
 
             if (player == null) {
-                throw new Error(`getControllerOfHouse(${house.name}) failed due to a fatal error`);
+                throw new SnrError(this.entireGame, `getControllerOfHouse(${house.name}) failed due to a fatal error`);
             }
 
             return player;
@@ -760,7 +761,7 @@ export default class IngameGameState extends GameState<
 
         try {
             if (!player.liveClockData) {
-                throw new Error("LiveClockData must be present in onPlayerClockTimeout");
+                throw new SnrError(this.entireGame, "LiveClockData must be present in onPlayerClockTimeout");
             }
 
             this.endPlayerClock(player, false);
@@ -944,7 +945,7 @@ export default class IngameGameState extends GameState<
         }
 
         if (!newCommander) {
-            throw new Error("Unable to determine new commander");
+            throw new SnrError(this.entireGame, "Unable to determine new commander");
         }
 
         // It may happen that you replace a player which commands vassals. Assign them to the potential winner.
@@ -1794,7 +1795,7 @@ export default class IngameGameState extends GameState<
 
     isVassalControlledByPlayer(vassal: House, player: Player): boolean {
         if (!this.isVassalHouse(vassal)) {
-            throw new Error();
+            throw new SnrError(this.entireGame);
         }
 
         return this.game.vassalRelations.tryGet(vassal, null) == player.house;

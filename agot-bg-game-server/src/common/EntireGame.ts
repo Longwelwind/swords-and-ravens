@@ -24,6 +24,7 @@ import getElapsedSeconds from "../utils/getElapsedSeconds";
 import WildlingCardType from "./ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
 import House from "./ingame-game-state/game-data-structure/House";
 import { EntireGameSnapshot } from "./ingame-game-state/game-data-structure/Game";
+import SnrError from "../utils/snrError";
 
 export enum NotificationType {
     READY_TO_START,
@@ -105,7 +106,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         const gameSetup = playerSetups.find(gameSetup => this.gameSettings.playerCount == gameSetup.playerCount);
 
         if (gameSetup == undefined) {
-            throw new Error(`Invalid playerCount ${this.gameSettings.playerCount} for setupId ${this.gameSettings.setupId}`);
+            throw new SnrError(this, `Invalid playerCount ${this.gameSettings.playerCount} for setupId ${this.gameSettings.setupId}`);
         }
 
         return gameSetup;
@@ -180,7 +181,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 const serializedGameState = _.range(level).reduce((s, _) => s.childGameState, serializedEntireGame as SerializedGameState);
 
                 if (!serializedGameState) {
-                    throw new Error();
+                    throw new SnrError(this);
                 }
 
                 return {
@@ -438,12 +439,12 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
         notWaitedPlayers.forEach(p => {
             if (!p.liveClockData) {
-                throw new Error("LiveClockData must be present in doPlayerClocksHandling");
+                throw new SnrError(this, "LiveClockData must be present in doPlayerClocksHandling");
             }
 
             if (p.liveClockData.timerStartedAt) {
                 if (!p.liveClockData.serverTimer) {
-                    throw new Error("serverTimer must be present in doPlayerClocksHandling");
+                    throw new SnrError(this, "serverTimer must be present in doPlayerClocksHandling");
                 }
 
                 // Stop the timer

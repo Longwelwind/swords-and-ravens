@@ -82,7 +82,7 @@ export function isTakeControlOfEnemyPortGameStateRequired(ingame: IngameGameStat
     }
 
     // We should never reach this line because we removed orphaned ships earlier.
-    throw new Error(`$Port with id '{portRegion.id}' contains orphaned ships which should have been removed before!`);
+    throw new Error(`Port with id '${portRegion.id}' contains orphaned ships which should have been removed before!`);
 }
 
 export interface TakeControlOfEnemyPortResult {

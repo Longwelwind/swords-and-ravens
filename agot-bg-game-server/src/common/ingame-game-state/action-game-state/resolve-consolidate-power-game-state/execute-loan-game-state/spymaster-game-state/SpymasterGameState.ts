@@ -11,6 +11,7 @@ import BetterMap from "../../../../../../utils/BetterMap";
 import ResolveSpymasterGameState, { SerializedResolveSpymasterGameState } from "./resolve-spymaster-game-state/ResolveSpymasterGameState";
 import WesterosCard from "../../../../../ingame-game-state/game-data-structure/westeros-card/WesterosCard";
 import _ from "lodash";
+import SnrError from "../../../../../../utils/snrError";
 
 export default class SpymasterGameState extends GameState<ExecuteLoanGameState,
     SimpleChoiceGameState | ResolveSpymasterGameState<SpymasterGameState>> {
@@ -58,7 +59,7 @@ export default class SpymasterGameState extends GameState<ExecuteLoanGameState,
         const concatenatedForCheck = westerosCardsForTopOfDeck.concat(westerosCardsForBottomOfDeck);
 
         if(_.intersection(topTwoCardsOfDeck, concatenatedForCheck).length != topTwoCardsOfDeck.length) {
-            throw new Error(`Spymaster crashed due to an inconsistent deck ${westerosDeckId}!`);
+            throw new SnrError(this.entireGame, `Spymaster crashed due to an inconsistent deck ${westerosDeckId}!`);
         }
 
         const discardedCards = westerosDeck.filter(wc => wc.discarded);
@@ -67,7 +68,7 @@ export default class SpymasterGameState extends GameState<ExecuteLoanGameState,
 
         const newWesterosDeck = _.concat(westerosCardsForTopOfDeck, availableCards, westerosCardsForBottomOfDeck, discardedCards);
         if (westerosDeck.length != newWesterosDeck.length) {
-            throw new Error(`Spymaster corrupted deck ${westerosDeckId}`);
+            throw new SnrError(this.entireGame, `Spymaster corrupted deck ${westerosDeckId}`);
         }
         this.game.westerosDecks[westerosDeckId] = newWesterosDeck;
         // Broadcast manipulated deck for "CoK Westeros Phase Variant"

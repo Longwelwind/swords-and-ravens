@@ -21,6 +21,7 @@ import IronBank, { IronBankSnapshot, SerializedIronBank } from "./IronBank";
 import Player from "../Player";
 import { ObjectiveCard } from "./static-data-structure/ObjectiveCard";
 import { objectiveCards } from "./static-data-structure/objectiveCards";
+import SnrError from "../../../utils/snrError";
 
 export const MAX_WILDLING_STRENGTH = 12;
 export const MAX_LOYALTY_TOKEN_COUNT = 20;
@@ -94,7 +95,7 @@ export default class Game {
 
     get theIronBank(): IronBank {
         if (this.ironBank == null) {
-            throw new Error("Iron Bank must be initalized when this is called!");
+            throw new SnrError(this.ingame.entireGame, "Iron Bank must be initalized when this is called!");
         }
 
         return this.ironBank;
@@ -128,12 +129,12 @@ export default class Game {
         if (this.ingame.entireGame.isMotherOfDragons) {
             if ((this.removedDragonStrengthToken == 0 && this.dragonStrengthTokens.length != 5)
                 || (this.removedDragonStrengthToken != 0 && this.dragonStrengthTokens.length != 4)) {
-                throw new Error("Dragon strength tokens array is corrupted");
+                throw new SnrError(this.ingame.entireGame, "Dragon strength tokens array is corrupted");
             }
         } else if (this.ingame.entireGame.isDanceWithMotherOfDragons) {
             if ((this.removedDragonStrengthToken == 0 && this.dragonStrengthTokens.length != 4)
                 || (this.removedDragonStrengthToken != 0 && this.dragonStrengthTokens.length != 3)) {
-                throw new Error("Dragon strength tokens array is corrupted");
+                throw new SnrError(this.ingame.entireGame, "Dragon strength tokens array is corrupted");
             }
         }
 
@@ -162,7 +163,7 @@ export default class Game {
             }
         }
 
-        throw new Error("Error in calculating currentDragonStrength");
+        throw new SnrError(this.ingame.entireGame, "Error in calculating currentDragonStrength");
     }
 
     get loyaltyTokensOnBoardCount(): number {
@@ -202,7 +203,7 @@ export default class Game {
         const nonVassalTrack = track.filter(h => !this.ingame.isVassalHouse(h));
 
         if (nonVassalTrack.length == 0) {
-            throw new Error("There must be at least one non-vassal in the track");
+            throw new SnrError(this.ingame.entireGame, "There must be at least one non-vassal in the track");
         }
 
         return nonVassalTrack[0];
@@ -440,7 +441,7 @@ export default class Game {
     getHouseCardById(id: string): HouseCard {
         const allCards = this.getAllHouseCardsInGame();
         if (!allCards.has(id)) {
-            throw new Error(`House card ${id} not found`);
+            throw new SnrError(this.ingame.entireGame, `House card ${id} not found`);
         }
         return allCards.get(id);
     }
