@@ -148,7 +148,7 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
         });
     }
 
-    setChooseCancelLastMoveGameState(houseWhichMovedLoyaltyTokens: House): void {
+    setChooseCancelLastMoveGameState(_houseWhichMovedLoyaltyTokens: House): void {
         if (!this.game.targaryen) {
             throw new Error("Targaryen must be available here!");
         }
@@ -162,7 +162,7 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
             this.getChoices(this.game.targaryen));
     }
 
-    sendAcceptAllMovements(newValue: boolean) {
+    sendAcceptAllMovements(newValue: boolean): void {
         this.entireGame.sendMessageToServer({
             type: "change-accept-all-loyalty-token-movements",
             newValue: newValue

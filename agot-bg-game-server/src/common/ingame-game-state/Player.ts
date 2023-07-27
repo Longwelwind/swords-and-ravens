@@ -4,6 +4,7 @@ import IngameGameState from "./IngameGameState";
 import { VoteState } from "./vote-system/Vote";
 import { observable } from "mobx";
 import getElapsedSeconds, { getTimeDeltaInSeconds } from "../../utils/getElapsedSeconds";
+import SnrError from "../../utils/snrError";
 
 export default class Player {
     user: User;
@@ -17,7 +18,7 @@ export default class Player {
 
     get totalRemainingSeconds(): number {
         if (!this.liveClockData) {
-            throw new Error("totalRemainingSeconds requested but no liveClockData present");
+            throw new SnrError(this.user.entireGame, "totalRemainingSeconds requested but no liveClockData present");
         }
 
         let total = this.liveClockData.remainingSeconds;
@@ -31,7 +32,7 @@ export default class Player {
 
     clientGetTotalRemainingSeconds(now: Date): number {
         if (!this.liveClockData) {
-            throw new Error("totalRemainingSeconds requested but no liveClockData present");
+            throw new SnrError(this.user.entireGame, "totalRemainingSeconds requested but no liveClockData present");
         }
 
         let total = this.liveClockData.remainingSeconds;

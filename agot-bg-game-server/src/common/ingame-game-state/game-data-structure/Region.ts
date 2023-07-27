@@ -10,6 +10,7 @@ import UnitSlot from "../../../utils/unitSlot";
 import _ from "lodash";
 import getStaticWorld from "./static-data-structure/getStaticWorld";
 import { port } from "./regionTypes";
+import SnrError from "../../../utils/snrError";
 
 export default class Region {
     game: Game;
@@ -123,7 +124,7 @@ export default class Region {
             // have the same allegiance.
             const possibleController = this.units.values[0].allegiance;
             if (!this.units.values.every(u => u.allegiance == possibleController)) {
-                throw new Error(
+                throw new SnrError(this.game.ingame.entireGame,
                     "getController was called on region \"" + this.id + "\" but multiple units of different allegiance are present in the region"
                 );
             }

@@ -14,6 +14,7 @@ import AfterWinnerDeterminationGameState from "../AfterWinnerDeterminationGameSt
 import _ from "lodash";
 import shuffleInPlace from "../../../../../../../../utils/shuffle";
 import BetterMap from "../../../../../../../../utils/BetterMap";
+import SnrError from "../../../../../../../../utils/snrError";
 
 export default class RodrikTheReaderAbilityGameState extends GameState<
     AfterWinnerDeterminationGameState["childGameState"],
@@ -85,7 +86,7 @@ export default class RodrikTheReaderAbilityGameState extends GameState<
         unusedCards.unshift(westerosCard);
         const newWesterosDeck = _.concat(unusedCards, discardedCards);
         if (westerosDeck.length != newWesterosDeck.length) {
-            throw new Error(`Westeros deck ${deckId} is corrupt`);
+            throw new SnrError(this.entireGame, `Westeros deck ${deckId} is corrupt`);
         }
         this.game.westerosDecks[deckId] = newWesterosDeck;
         // Broadcast manipulated deck for "CoK Westeros Phase Variant"
