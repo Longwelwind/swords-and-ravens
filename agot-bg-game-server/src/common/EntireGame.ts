@@ -48,7 +48,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     lastMessageReceivedAt: Date | null = null;
 
     @observable gameSettings: GameSettings = { setupId: "mother-of-dragons", playerCount: 8, pbem: true, onlyLive: false, startWhenFull: false, private: false,
-        addPortToTheEyrie: false, adwdHouseCards: false, asosHouseCards: false, houseCardsEvolution: false,
+        addPortToTheEyrie: false, adwdHouseCards: false, asosHouseCards: false, houseCardsEvolution: false, houseCardsEvolutionRound: 5,
         vassals: true, ironBank: true, seaOrderTokens: true, allowGiftingPowerTokens: true, randomVassalAssignment: false, customBalancing: false,
         randomHouses: false, randomChosenHouses: false, tidesOfBattle: false, removeTob3: false, removeTobSkulls: false, limitTob2: false,
         draftHouseCards: false, thematicDraft: false, limitedDraft: false, blindDraft: false,
@@ -802,6 +802,7 @@ export interface GameSettings {
     randomVassalAssignment: boolean;
     customBalancing: boolean;
     houseCardsEvolution: boolean;
+    houseCardsEvolutionRound: number;
     initialLiveClock: number;
     noPrivateChats: boolean;
     tournamentMode: boolean;

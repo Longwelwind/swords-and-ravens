@@ -199,7 +199,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     placement="auto"
                     overlay={
                         <Tooltip id="evolution-active-tooltip">
-                            From round <b>5</b> onwards, each house returns its alternative deck when the last house card has been played.
+                            From round <b>{this.settings.houseCardsEvolutionRound}</b> onwards, each house returns its alternative deck when the last house card has been played.
                         </Tooltip>}
                     popperConfig={{ modifiers: [preventOverflow] }}
                 >
