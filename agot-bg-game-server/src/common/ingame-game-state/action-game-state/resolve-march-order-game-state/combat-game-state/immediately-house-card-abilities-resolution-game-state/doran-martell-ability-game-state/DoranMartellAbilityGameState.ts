@@ -28,11 +28,9 @@ export default class DoranMartellAbilityGameState extends GameState<
 
     onSimpleChoiceGameStateEnd(choice: number, resolvedAutomatically: boolean): void {
         const enemy = this.combatGameState.getEnemy(this.childGameState.house);
-
+        
         // Put the enemy at the end of the influence track
         const influenceTrack = this.game.getInfluenceTrackByI(choice);
-        const newInfluenceTrack = _.concat(_.without(influenceTrack, enemy), enemy);
-        this.ingame.setInfluenceTrack(choice, newInfluenceTrack);
 
         this.ingame.log({
             type: "doran-used",
@@ -40,6 +38,31 @@ export default class DoranMartellAbilityGameState extends GameState<
             affectedHouse: enemy.id,
             influenceTrack: choice
         }, resolvedAutomatically);
+
+        if (choice === 0) {
+            // Add the 'doran-delayed-turn' notification if next player in order loses their turn.
+            const indexOfCurrentHouse = _.indexOf(influenceTrack, this.childGameState.house)
+
+            const nextHouse = influenceTrack.at(indexOfCurrentHouse + 1);
+
+            const hasTargPlayer = !!this.game.targaryen
+
+            const isNotLastNonTargPlayer = (hasTargPlayer && indexOfCurrentHouse < influenceTrack.length - 2) 
+            || (!hasTargPlayer && indexOfCurrentHouse < influenceTrack.length - 1)
+
+            // Notification is not required if the current house is last in turn order when effect is triggered.
+            if (nextHouse && isNotLastNonTargPlayer) {
+                this.ingame.log({
+                    type: "doran-delayed-turn",
+                    house: this.childGameState.house.id,
+                    affectedHouse: nextHouse.id,
+                    influenceTrack: choice
+                }, resolvedAutomatically);
+            }
+        }
+
+        const newInfluenceTrack = _.concat(_.without(influenceTrack, enemy), enemy);
+        this.ingame.setInfluenceTrack(choice, newInfluenceTrack);
 
         this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);
     }

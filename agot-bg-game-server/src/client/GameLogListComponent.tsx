@@ -816,6 +816,18 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         {affectedHouse.name}</b> to the bottom of the <b>{influenceTrack}</b> track.
                 </p>;
             }
+            case "doran-delayed-turn": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+                const influenceTrack = this.game.getNameInfluenceTrack(data.influenceTrack);
+
+                return (
+                    <p>
+                        <b>Doran Martell</b>: House <b>{house.name}</b> delayed the turn of House <b>
+                        {affectedHouse.name}</b> until the next pass of the <b>{influenceTrack}</b> track.
+                    </p>
+                )
+            }
             case "ser-gerris-drinkwater-used": {
                 const house = this.game.houses.get(data.house);
                 const influenceTrack = this.game.getNameInfluenceTrack(data.influenceTrack);
