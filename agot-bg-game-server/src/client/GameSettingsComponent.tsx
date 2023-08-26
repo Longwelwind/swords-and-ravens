@@ -364,6 +364,29 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         onChange={() => this.changeGameSettings(() => this.gameSettings.houseCardsEvolution = !this.gameSettings.houseCardsEvolution)}
                     />
                 </Col>
+                {
+                    this.gameSettings.houseCardsEvolution && (
+                        <Col xs="12">
+                            <div>
+                                <select id="decks-evolution-setting-round"
+                                    value={this.gameSettings.houseCardsEvolutionRound}
+                                    onChange={(e) => this.onHouseCardsEvolutionRoundChange(e.target.value)}
+                                    style={{marginBottom: "8px"}}
+                                >
+                                    <option key="2" value={2}>2</option>
+                                    <option key="3" value={3}>3</option>
+                                    <option key="4" value={4}>4</option>
+                                    <option key="5" value={5}>5</option>
+                                    <option key="6" value={6}>6</option>
+                                    <option key="7" value={7}>7</option>
+                                    <option key="8" value={8}>8</option>
+                                    <option key="9" value={9}>9</option>
+                                    <option key="10" value={10}>10</option>
+                                </select>&nbsp;House Card Evolution Round
+                            </div>
+                        </Col>
+                    )
+                }
                 {this.props.entireGame.isCustomBalancingOptionAvailable(this.gameSettings) && <Col xs="12">
                     <FormCheck
                         id="custom-balancing-setting"
@@ -987,6 +1010,20 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
         }
 
         this.gameSettings.loyaltyTokenCountNeededToWin = parseInt(newVal);
+
+        this.changeGameSettings();
+    }
+
+    onHouseCardsEvolutionRoundChange(newVal: string): void {
+        if (!this.canChangeGameSettings) {
+            return;
+        }
+
+        if (!this.gameSettings.houseCardsEvolution) {
+            return;
+        }
+
+        this.gameSettings.houseCardsEvolutionRound = parseInt(newVal);
 
         this.changeGameSettings();
     }
