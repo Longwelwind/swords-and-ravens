@@ -9,8 +9,7 @@ import Form from "react-bootstrap/Form";
 import {observable} from "mobx";
 import ChatClient, {Channel, Message} from "./ChatClient";
 import EntireGame from "../../common/EntireGame";
-// @ts-expect-error Somehow ts complains that this module cannot be found while it is
-import ScrollToBottom from "react-scroll-to-bottom";
+import { ScrollToBottom } from "react-scroll-to-bottom";
 import { Alert, OverlayTrigger, Popover, Tooltip } from "react-bootstrap";
 import User from "../../server/User";
 import { preventOverflow } from "@popperjs/core";

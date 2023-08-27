@@ -44,7 +44,7 @@ export default class ChooseMultipleRegionsForLoyaltyTokenGameState extends GameS
     }
 
     getChoices(house: House): string[] {
-        const result = [];
+        const result: string[] = [];
         result.push("Ignore");
         if (house.powerTokens < this.costs || !this.game.isLoyaltyTokenAvailable || this.regions.length == 0) {
             return result;

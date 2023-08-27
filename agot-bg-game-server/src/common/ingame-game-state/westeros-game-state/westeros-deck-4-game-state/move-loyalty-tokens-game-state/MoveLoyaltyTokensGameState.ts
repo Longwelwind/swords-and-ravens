@@ -82,7 +82,7 @@ export default class MoveLoyaltyTokensGameState extends GameState<WesterosDeck4G
     }
 
     getChoices(house: House): string[] {
-        const result = [];
+        const result: string[] = [];
         result.push("Ignore");
         if (house.powerTokens < this.costsToCancelPreviousMovement) {
             return result;

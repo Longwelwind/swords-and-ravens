@@ -1180,7 +1180,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                     purchasedBy: null,
                     discarded: false
                 })));
-                const loanSlots = [];
+                const loanSlots: ({ id: number; type: string; purchasedBy: null; discarded: boolean; } | undefined)[] = [];
 
                 // Normally, a new loan card is drawn before the start of each Westeros phase.
                 // So, if we are in any state of Westeros, we can now reveal the top card.

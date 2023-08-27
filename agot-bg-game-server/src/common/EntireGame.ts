@@ -592,7 +592,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 })) ?? []);
         const waitingFor = _waitingFor.map(wf => `${wf.house}${this.gameSettings.faceless ? "" : (` (${wf.user.name})`)}`).join(", ");
         const waitingForIds = _waitingFor.map(wf => wf.user.id);
-        let winner=null;
+        let winner: any = null;
         if (this.ingameGameState?.leafState instanceof GameEndedGameState) {
             const user = this.ingameGameState.getControllerOfHouse(this.ingameGameState.leafState.winner).user;
             winner = `${user.name} (${this.ingameGameState.leafState.winner.name})`;

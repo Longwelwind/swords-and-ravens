@@ -50,14 +50,14 @@ export default class GlobalServer {
         return lastMigration.version;
     }
 
-    constructor(server: Server) {
+    constructor(server: Server, port) {
         this.server = server;
 
         if (process.env.MASTER_API_ENABLED != null) {
-            console.log("Launching with live-website client");
+            console.log(`Launching with live-website client on port ${port}`);
             this.websiteClient = new LiveWebsiteClient();
         } else {
-            console.log("Launching with local-website client");
+            console.log(`Launching with local-website client on port ${port}`);
             this.websiteClient = new LocalWebsiteClient();
             this.debug = true;
         }
@@ -66,6 +66,8 @@ export default class GlobalServer {
     }
 
     async start(): Promise<void> {
+        console.log('Started Global Server');
+
         this.server.on("connection", (client: WebSocket, incomingMsg: http.IncomingMessage) => {
             const clientIp = this.parseClientIp(incomingMsg);
             console.log("New user connected: " + clientIp);

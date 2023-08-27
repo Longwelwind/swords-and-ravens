@@ -10,8 +10,10 @@ if (process.env.SENTRY_DSN) {
     Sentry.init({dsn: SENTRY_DSN});
 }
 
-const wsServer = new Server({port: parseInt(process.env.PORT || "5000")});
+const port = parseInt(process.env.PORT || "5000")
 
-const globalServer = new GlobalServer(wsServer);
+const wsServer = new Server({port});
+
+const globalServer = new GlobalServer(wsServer, port);
 globalServer.start();
 globalServer.runBackgroundTasks();

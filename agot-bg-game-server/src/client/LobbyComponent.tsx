@@ -29,8 +29,7 @@ import megaphoneImage from "../../public/images/icons/megaphone.svg";
 import speakerOffImage from "../../public/images/icons/speaker-off.svg";
 import musicalNotesImage from "../../public/images/icons/musical-notes.svg";
 import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
-// @ts-expect-error Somehow ts complains that this module cannot be found while it is
-import ScrollToBottom from "react-scroll-to-bottom";
+import { ScrollToBottom } from "react-scroll-to-bottom";
 import _ from "lodash";
 
 

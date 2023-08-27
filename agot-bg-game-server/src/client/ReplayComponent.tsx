@@ -31,8 +31,7 @@ import User from "../server/User";
 import Player from "../common/ingame-game-state/Player";
 import {observable} from "mobx";
 import classNames from "classnames";
-// @ts-expect-error Somehow this module cannot be found while it is
-import ScrollToBottom from "react-scroll-to-bottom";
+import { ScrollToBottom } from "react-scroll-to-bottom";
 import { GameSettings } from '../common/EntireGame';
 import {isMobile} from 'react-device-detect';
 import houseCardsBackImages from "./houseCardsBackImages";

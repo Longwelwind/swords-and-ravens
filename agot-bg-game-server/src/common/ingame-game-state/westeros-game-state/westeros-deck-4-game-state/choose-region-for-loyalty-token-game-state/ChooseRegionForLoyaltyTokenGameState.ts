@@ -32,7 +32,7 @@ export default class ChooseRegionForLoyaltyTokenGameState extends GameState<West
     }
 
     getChoices(house: House): string[] {
-        const result = [];
+        const result: string[] = [];
         result.push("Ignore");
         if (house.powerTokens < 1 || !this.game.isLoyaltyTokenAvailable) {
             return result;
