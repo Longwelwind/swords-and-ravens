@@ -43,6 +43,7 @@ import invertColor from "./utils/invertColor";
 import ImagePopover from "./utils/ImagePopover";
 import renderLoanCardsToolTip from "./loanCardsTooltip";
 import Xarrow from "react-xarrows";
+import Player from "../common/ingame-game-state/Player";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -52,12 +53,14 @@ interface MapComponentProps {
     gameClient: GameClient;
     ingameGameState: IngameGameState;
     mapControls: MapControls;
+    authenticatedPlayer: Player | null;
 }
 
 @observer
 export default class MapComponent extends Component<MapComponentProps> {
     backgroundImage: string = westerosImage;
     mapWidth: number = MAP_WIDTH;
+    fogOfWar = false;
 
     get ingame(): IngameGameState {
         return this.props.ingameGameState;
@@ -76,6 +79,8 @@ export default class MapComponent extends Component<MapComponentProps> {
                     : westerosImage;
 
         this.mapWidth = this.ingame.entireGame.gameSettings.playerCount >= 8 ? DELUXE_MAT_WIDTH : MAP_WIDTH;
+
+        this.fogOfWar = this.ingame.entireGame.gameSettings.fogOfWar;
     }
 
     render(): ReactNode {
@@ -274,8 +279,14 @@ export default class MapComponent extends Component<MapComponentProps> {
     }
 
     renderRegions(propertiesForRegions: BetterMap<Region, RegionOnMapProperties>): ReactNode {
+        const nonFoggedRegions = this.props.authenticatedPlayer ? this.ingame.world.getRegionIdsAdjacentToControlled(this.props.authenticatedPlayer.house) : [];
+
         return propertiesForRegions.entries.map(([region, properties]) => {
             const wrap = properties.wrap;
+            const isFoggedRegion = this.fogOfWar ? (!nonFoggedRegions.includes(region.id)) : false;
+
+            const fillColor = isFoggedRegion ? '#333333' 
+            : (region.isBlocked || isFoggedRegion ? "black" : properties.highlight.color)
 
             return (
                 <ConditionalWrap condition={!region.isBlocked}
@@ -293,10 +304,11 @@ export default class MapComponent extends Component<MapComponentProps> {
                 >
                     <polygon
                         points={this.getRegionPath(region)}
-                        fill={region.isBlocked ? "black" : properties.highlight.color}
+                        fill={fillColor}
                         fillRule="evenodd"
                         className={classNames(
                             region.isBlocked ? "blocked-region" : "region-area",
+                            isFoggedRegion ? "region-area-fogged" : "",
                             { "clickable" : properties.onClick != undefined || properties.wrap != undefined },
                             properties.highlight.active && {
                                 // Whatever the strength of the highlight defined, show the same

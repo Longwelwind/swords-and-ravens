@@ -151,7 +151,12 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
             </Col>
             <Col xs={{span: "auto", order: columnOrders.mapColumn}} style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none"}}>
                 <div id="map-component" style={{ height: this.mapScrollbarEnabled ? "100%" : "auto", overflowY: "auto", overflowX: "hidden", maxHeight: MAP_HEIGHT }}>
-                    <WorldSnapshotComponent ingameGameState={this.ingame} worldSnapshot={this.worldSnapshot} ironBank={this.gameSnapshot?.ironBank}/>
+                    <WorldSnapshotComponent 
+                        ingameGameState={this.ingame} 
+                        worldSnapshot={this.worldSnapshot} 
+                        ironBank={this.gameSnapshot?.ironBank}
+                        authenticatedPlayer={this.authenticatedPlayer}
+                    />
                 </div>
             </Col>
             {(!this.housesInfosCollapsed || isMobile) && <Col

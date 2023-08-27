@@ -5,7 +5,7 @@
     "baseUrl": ".",
     "paths": { "*": ["types/*"] },
     "sourceMap": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "strictNullChecks": true,

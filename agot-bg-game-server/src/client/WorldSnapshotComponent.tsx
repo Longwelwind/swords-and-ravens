@@ -25,6 +25,7 @@ import ImagePopover from "./utils/ImagePopover";
 import preventOverflow from "@popperjs/core/lib/modifiers/preventOverflow";
 import loanCardImages from "./loanCardImages";
 import IronBankSnapshotComponent from "./IronBankSnapshotComponent";
+import Player from "../common/ingame-game-state/Player";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -34,11 +35,13 @@ interface WorldSnapshotComponentProps {
     ingameGameState: IngameGameState;
     worldSnapshot: RegionSnapshot[];
     ironBank?: IronBankSnapshot;
+    authenticatedPlayer: Player | null;
 }
 
 export default class WorldSnapshotComponent extends Component<WorldSnapshotComponentProps> {
     backgroundImage: string = westerosImage;
     mapWidth: number = MAP_WIDTH;
+    fogOfWar = false;
 
     get ingame(): IngameGameState {
         return this.props.ingameGameState;
@@ -57,6 +60,8 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
                     : westerosImage;
 
         this.mapWidth = this.ingame.entireGame.gameSettings.playerCount >= 8 ? DELUXE_MAT_WIDTH : MAP_WIDTH;
+
+        this.fogOfWar = settings.fogOfWar;
     }
 
     render(): ReactNode {
@@ -179,15 +184,23 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
 
     renderUnits(garrisons: BetterMap<string, string | null>): ReactNode {
         const regions = this.ingame.world.regions;
+        const nonFoggedRegions = this.props.authenticatedPlayer ? this.ingame.world.getRegionIdsAdjacentToControlled(this.props.authenticatedPlayer.house) : [];
 
         return this.props.worldSnapshot.map(r => {
+            const isFoggedRegion = this.fogOfWar ? (!nonFoggedRegions.includes(r.id)) : false;
+
             return <div
                 key={`world-state_units-container_${r.id}`}
                 className="units-container"
-                style={{ left: regions.get(r.id).unitSlot.point.x, top: regions.get(r.id).unitSlot.point.y, width: regions.get(r.id).unitSlot.width,
-                    flexWrap: regions.get(r.id).type.id == "land" ? "wrap-reverse" : "wrap" }}
+                style={{ 
+                    left: regions.get(r.id).unitSlot.point.x, 
+                    top: regions.get(r.id).unitSlot.point.y, 
+                    width: regions.get(r.id).unitSlot.width,
+                    flexWrap: regions.get(r.id).type.id == "land" ? "wrap-reverse" : "wrap"
+
+                }}
             >
-                {r.units !== undefined && r.units.map((u, i) => {
+                {r.units !== undefined && !isFoggedRegion && r.units.map((u, i) => {
                     let opacity: number;
                     // css transform
                     let transform: string;
@@ -213,7 +226,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
                         }}
                     />;
                 })}
-                {garrisons.has(r.id) && (
+                {garrisons.has(r.id) && !isFoggedRegion && (
                     <div
                         className="garrison-icon"
                         style={{
@@ -222,7 +235,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
                         }}
                     />
                 )}
-                {r.loyaltyTokens !== undefined && (
+                {r.loyaltyTokens !== undefined && !isFoggedRegion && (
                     <div
                         className="loyalty-icon"
                         style={{

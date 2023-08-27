@@ -45,6 +45,7 @@ import { secondsToString } from "./utils/secondsToString";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
 import orderImages from "./orderImages";
 import presentImage from "../../public/images/icons/present.svg"
+import { gameLogsFogOfWarMap } from "../common/ingame-game-state/game-data-structure/FogofWar";
 
 interface GameLogListComponentProps {
     ingameGameState: IngameGameState;
@@ -54,6 +55,8 @@ interface GameLogListComponentProps {
 
 @observer
 export default class GameLogListComponent extends Component<GameLogListComponentProps> {
+    fogOfWar = true
+    
     allHouseCards = new BetterMap(this.getAllHouseCards());
     allHouseCardsByAbilityId = new BetterMap(this.allHouseCards.values.filter(hc => hc.ability != null)
         .map(hc => [hc.ability?.id ?? "ability-never-null-here", hc]));
@@ -110,6 +113,10 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         this.currentRound = 0;
 
+        const todayDate = new Date()
+
+        const currentDay = todayDate.getDay()
+
         return this.logManager.logs.map((l, i) => (
             <div key={`log_${i}`}>
                 {lastSeenLogTime == null && i == 0 && (
@@ -129,6 +136,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                             popperConfig={{modifiers: [preventOverflow]}}
                         >
                             <small>
+                                {
+                                    l.time.getDay() === currentDay ?
+                                    (
+                                        `${l.time.getHours().toString().padStart(2, "0")}:${l.time.getMinutes().toString().padStart(2, "0")}`
+                                    )
+                                    :
+                                    (
+                                        `${l.time.getMonth}/${l.time.getDate()} ${l.time.getHours().toString().padStart(2, "0")}:${l.time.getMinutes().toString().padStart(2, "0")}`
+                                    )
+                                }
                                 {l.time.getHours().toString().padStart(2, "0")}
                                 :{l.time.getMinutes().toString().padStart(2, "0")}
                             </small>
@@ -167,6 +184,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
     }
 
     renderGameLogData(data: GameLogData, currentRound: number): ReactNode {
+        if (this.fogOfWar && gameLogsFogOfWarMap[data.type]) {
+            // Replace the existing log type with its fog of war version, which removes all mentions of unit types and regions.
+            data.type = gameLogsFogOfWarMap[data.type]
+        }
+
         switch (data.type) {
             case "player-action": {
                 const house = this.game.houses.get(data.house);
@@ -228,7 +250,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <p>House <b>{house.name}</b> chose to refuse all the support they received.</p>;
             }
 
-            case "attack":
+            case "attack": {
                 const attacker = this.game.houses.get(data.attacker);
                 // A "null" for "attacked" means it was an attack against a neutral force
                 const attacked = data.attacked ? this.game.houses.get(data.attacked) : null;
@@ -237,20 +259,20 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const army = data.units.map(utid => unitTypes.get(utid));
                 const orderImgUrl = data.orderType ? orderImages.get(data.orderType) : null;
 
-                return (
-                    <Row className="align-items-center">
-                        {orderImgUrl && <Col xs="auto">
-                            <img src={orderImgUrl} width="42px"/>
-                        </Col>}
-                        <Col xs="auto">
-                            <img src={crossedSwordsImage} width="32px"/>
-                        </Col>
-                        <Col>
-                            House <b>{attacker.name}</b> attacked {attacked ? <>House <b>{attacked.name}</b></> : <>a <b>Neutral Force</b></>} from <b>{attackingRegion.name}</b> to <b>
-                            {attackedRegion.name}</b> with <>{joinReactNodes(army.map((ut, i) => <b key={`attack_${ut.id}_${i}`}>{ut.name}</b>), ', ')}</>.
-                        </Col>
-                    </Row>
-                );
+                return <Row className="align-items-center">
+                    {orderImgUrl && <Col xs="auto">
+                        <img src={orderImgUrl} width="42px"/>
+                    </Col>}
+                    <Col xs="auto">
+                        <img src={crossedSwordsImage} width="32px"/>
+                    </Col>
+                    <Col>
+                        House <b>{attacker.name}</b> attacked {attacked ? <>House <b>{attacked.name}</b></> : <>a <b>Neutral Force</b></>} from <b>{attackingRegion.name}</b> to <b>
+                        {attackedRegion.name}</b> with <>{joinReactNodes(army.map((ut, i) => <b key={`attack_${ut.id}_${i}`}>{ut.name}</b>), ', ')}</>.
+                    </Col>
+                </Row>
+            }
+               
 
             case "march-resolved": {
                 const house = this.game.houses.get(data.house);
@@ -286,12 +308,42 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </Row>
                 );
             }
+
+            case "attack-fogofwar":
+                const attacker = this.game.houses.get(data.attacker);
+                // A "null" for "attacked" means it was an attack against a neutral force
+                const attacked = data.attacked ? this.game.houses.get(data.attacked) : null;
+                const attackingRegion = this.game.world.regions.get(data.attackingRegion);
+                const attackedRegion = this.game.world.regions.get(data.attackedRegion);
+                const army = data.units.map(utid => unitTypes.get(utid));
+                const orderImgUrl = data.orderType ? orderImages.get(data.orderType) : null;
+
+                return <Row className="align-items-center">
+                    {orderImgUrl && <Col xs="auto">
+                        <img src={orderImgUrl} width="42px"/>
+                    </Col>}
+                    <Col xs="auto">
+                        <img src={crossedSwordsImage} width="32px"/>
+                    </Col>
+                    <Col>
+                        House <b>{attacker.name}</b> attacked {attacked ? <>House <b>{attacked.name}</b></> : <>a <b>Neutral Force</b></>} from <b>{attackingRegion.name}</b> to <b>
+                        {attackedRegion.name}</b> with <>{joinReactNodes(army.map((ut, i) => <b key={`attack_${ut.id}_${i}`}>{ut.name}</b>), ', ')}</>.
+                    </Col>
+                </Row>
+
             case "leave-power-token-choice": {
                 const house = this.game.houses.get(data.house);
                 const region = this.world.regions.get(data.region);
 
                 return <p>
                     House <b>{house.name}</b> left {data.leftPowerToken ? <>behind a</> : <b>no</b>} Power&nbsp;token in <b>{region.name}</b>.
+                </p>;
+            }
+            case "leave-power-token-choice-fogofwar": {
+                const house = this.game.houses.get(data.house);
+
+                return <p>
+                    House <b>{house.name}</b> left {data.leftPowerToken ? <>behind a</> : <b>no</b>} Power&nbsp;token.
                 </p>;
             }
             case "westeros-card-executed":
@@ -445,6 +497,39 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </>
                 );
             }
+
+            case "player-mustered-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                const musterings = data.musterings.map(([originatingRegion, recruitments]) =>
+                    [this.game.world.regions.get(originatingRegion), recruitments.map(({region, from, to}) => ({
+                        region: this.game.world.regions.get(region),
+                        from: from ? unitTypes.get(from) : null,
+                        to: unitTypes.get(to)
+                    }))] as [Region, {region: Region; from: UnitType | null; to: UnitType}[]]
+                );
+
+                return (
+                    <>
+                        {musterings.length == 0 && (
+                            <p>
+                                House <b>{house.name}</b> mustered nothing.
+                            </p>
+                        )}
+                        {musterings.length > 0 && (
+                            <>
+                                {musterings.map(([originatingRegion]) => (
+                                    <div key={`$mustering_${originatingRegion.id}`}>
+                                        <p>
+                                            House <b>{house.name}</b> mustered.
+                                        </p>
+                                    </div>)
+                                )}
+                            </>
+                        )}
+                    </>
+                );
+            }
+
             case "winner-declared": {
                 const winner = this.game.houses.get(data.winner);
                 return (
@@ -485,13 +570,23 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>
                 );
             }
+            case "raven-holder-replace-order-fogofwar": {
+                const house = this.game.houses.get(data.ravenHolder);
+
+                return (
+                    <p>
+                        House <b>{house.name}</b>, holder of the Messenger Raven token, chose to replace
+                        an order.
+                    </p>
+                );
+            }
             case "raven-not-used":{
                 const house = this.game.houses.get(data.ravenHolder);
 
                 return <p>House <b>{house.name}</b> did not use the Messenger Raven token.</p>;
             }
 
-            case "raid-done":
+            case "raid-done":{
                 const raider = this.game.houses.get(data.raider);
                 const raiderRegion = this.world.regions.get(data.raiderRegion);
                 const raidee = data.raidee ? this.game.houses.get(data.raidee) : null;
@@ -521,6 +616,37 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         </p>
                     );
                 }
+            }
+                
+            case "raid-done-fogofwar":{
+                const raider = this.game.houses.get(data.raider);
+                const raidee = data.raidee ? this.game.houses.get(data.raidee) : null;
+                const raidedRegion = data.raidedRegion ? this.world.regions.get(data.raidedRegion) : null;
+                const orderRaided = data.orderRaided ? orders.get(data.orderRaided) : null;
+
+                // Those 3 variables will always be all null or all non-null
+                if (raidee && raidedRegion && orderRaided) {
+                    return (
+                        <>
+                            <p>
+                                House <b>{raider.name}</b> raided House <b>{raidee.name}</b>&apos;s order.
+                            </p>
+                            {data.raiderGainedPowerToken &&
+                                <p>House <b>{raider.name}</b> gained {data.raiderGainedPowerToken ? "a" : "no"} Power&nbsp;token
+                                    from this raid.</p>}
+                            {data.raidedHouseLostPowerToken != null
+                                && <p>House <b>{raidee.name}</b> lost {data.raidedHouseLostPowerToken ? "a" : "no"} Power&nbsp;token
+                                    from this raid.</p>}
+                        </>
+                    );
+                } else {
+                    return (
+                        <p>
+                            <b>House {raider.name}</b> raided nothing.
+                        </p>
+                    );
+                }
+            }
 
             case "a-throne-of-blades-choice": {
                 const house = this.game.houses.get(data.house);
@@ -732,6 +858,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     in <b>{region.name}</b> to gain <b>{countPowerToken}</b> Power&nbsp;token{countPowerToken != 1 ? "s" : ""}.
                 </p>;
             }
+            case "consolidate-power-order-resolved-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                const countPowerToken = data.powerTokenCount;
+
+                return <p>
+                    House <b>{house.name}</b> resolved a <b>{data.starred && "Special "}Consolidate Power</b> order to gain <b>{countPowerToken}</b> Power&nbsp;token{countPowerToken != 1 ? "s" : ""}.
+                </p>;
+            }
             case "armies-reconciled": {
                 const house = this.game.houses.get(data.house);
                 const armies = data.armies.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))] as [Region, UnitType[]]);
@@ -745,6 +879,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                             <li key={`armies-reconciled_${region.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`armies-reconciled_${region.id}_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></li>
                         ))}
                     </ul>
+                </>;
+            }
+            case "armies-reconciled-fogofwar": {
+                const house = this.game.houses.get(data.house);
+
+                return <>
+                    <p>
+                        House <b>{house.name}</b> reconciled their armies by destroying units.
+                    </p>
                 </>;
             }
             case "house-card-ability-not-used": {
@@ -895,13 +1038,20 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 </p>
                 : <p><b>Roose Bolton</b>: House <b>{house.name}</b> had no discarded House cards.</p>;
             }
-            case "loras-tyrell-attack-order-moved":
+            case "loras-tyrell-attack-order-moved":{
                 const order = orders.get(data.order);
                 const embattledRegion = this.world.regions.get(data.region);
 
                 return <p>
                     <b>Loras Tyrell</b>: The <b>{order.type.name}</b> Order was moved
                     to <b>{embattledRegion.name}</b>.
+                </p>;
+            }
+            case "loras-tyrell-attack-order-moved-fogofwar":
+                const order = orders.get(data.order);
+
+                return <p>
+                    <b>Loras Tyrell</b>: The <b>{order.type.name}</b> Order was moved.
                 </p>;
 
             case "queen-of-thorns-no-order-available": {
@@ -921,6 +1071,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <p>
                     <b>Queen of Thorns</b>: House <b>{house.name}</b> removed
                     a <b>{removedOrder.type.name}</b> Order of House <b>{affectedHouse.name}</b> in <b>{region.name}</b>.
+                </p>;
+            }
+            case "queen-of-thorns-order-removed-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+
+                return <p>
+                    <b>Queen of Thorns</b>: House <b>{house.name}</b> removed
+                    an order of House <b>{affectedHouse.name}</b>.
                 </p>;
             }
             case "tywin-lannister-power-tokens-gained": {
@@ -962,6 +1121,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     in <b>{region.name}</b>.
                 </p>;
             }
+            case "renly-baratheon-footman-upgraded-to-knight-fogofwar": {
+                const house = this.game.houses.get(data.house);
+
+                return <p>
+                    <b>Renly Baratheon</b>: House <b>{house.name}</b> upgraded a Footman to a Knight.
+                </p>;
+            }
             case "mace-tyrell-casualties-prevented": {
                 return <p>
                     <b>Mace Tyrell</b>: Casualties were prevented by <b>The Blackfish</b>.
@@ -981,6 +1147,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     in <b>{region.name}</b>.
                 </p>;
             }
+            case "mace-tyrell-footman-killed-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                return <p>
+                    <b>Mace Tyrell</b>: House <b>{house.name}</b> destroyed an enemy Footman.
+                </p>;
+            }
             case "ser-ilyn-payne-footman-killed": {
                 const house = this.game.houses.get(data.house);
                 const region = this.world.regions.get(data.region);
@@ -988,6 +1160,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <p>
                     <b>Ser Ilyn Payne</b>: House <b>{house.name}</b> destroyed an enemy Footman
                     in <b>{region.name}</b>.
+                </p>;
+            }
+            case "ser-ilyn-payne-footman-killed-fogofwar": {
+                const house = this.game.houses.get(data.house);
+
+                return <p>
+                    <b>Ser Ilyn Payne</b>: House <b>{house.name}</b> destroyed an enemy Footman.
                 </p>;
             }
             case "cersei-lannister-no-order-available":
@@ -1005,6 +1184,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Cersei Lannister</b>: House <b>{house.name}</b> removed
                     a <b>{removedOrder.type.name}</b> Order
                     of <b>{affectedHouse.name}</b> in <b>{region.name}</b>.
+                </p>;
+            }
+            case "cersei-lannister-order-removed-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+
+                return <p>
+                    <b>Cersei Lannister</b>: House <b>{house.name}</b> removed an order of <b>{affectedHouse.name}</b>.
                 </p>;
             }
             case "robb-stark-retreat-location-overriden": {
@@ -1026,6 +1213,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         {regionFrom.name}</b> to <b>{regionTo.name}</b>.
                 </p>;
             }
+            case "retreat-region-chosen-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                return <p>
+                        House <b>{house.name}</b> retreats.
+                </p>;
+            }
             case "retreat-failed": {
                 const house = this.game.houses.get(data.house);
                 const region = this.world.regions.get(data.region);
@@ -1036,12 +1229,24 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         <>House <b>{house.name}</b> was not able to retreat from <b>{region.name}</b>.</>
                 }</p>;
             }
+            case "retreat-failed-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                return <p>{
+                    <>House <b>{house.name}</b> was not able to retreat.</>
+                }</p>;
+            }
             case "retreat-casualties-suffered": {
                 const house = this.game.houses.get(data.house);
                 const units = data.units.map(ut => unitTypes.get(ut).name);
                 return <p>
                     House <b>{house.name}</b> suffered casualties from the retreat and chose these units to be destroyed: <>
                         {joinReactNodes(units.map((unitType, i) => <b key={`retreat-casualties-suffered_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.
+                </p>;
+            }
+            case "retreat-casualties-suffered-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                return <p>
+                    House <b>{house.name}</b> suffered casualties from the retreat.
                 </p>;
             }
             case "enemy-port-taken": {
@@ -1054,12 +1259,27 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         : <>House <b>{newController.name}</b> destroyed all <b>{oldController.name}</b> ships in <b>{port.name}</b>.</>}
                 </p>;
             }
+            case "enemy-port-taken-fogofwar": {
+                const newController = this.game.houses.get(data.newController);
+                const oldController = this.game.houses.get(data.oldController);
+                return <p>
+                    {data.shipCount > 0
+                        ? <>House <b>{newController.name}</b> converted {data.shipCount} ship{data.shipCount == 1 ? "" : "s"} from House <b>{oldController.name}</b>.</>
+                        : <>House <b>{newController.name}</b> destroyed all <b>{oldController.name}</b> ships.</>}
+                </p>;
+            }
             case "ships-destroyed-by-empty-castle": {
                 const house = this.game.houses.get(data.house);
                 const port = this.game.world.regions.get(data.port);
                 const castle = this.game.world.regions.get(data.castle);
                 return <p>
                     <>House <b>{house.name}</b> lost {data.shipCount} Ship{data.shipCount>1?"s":""} in <b>{port.name}</b> because <b>{castle.name}</b> is empty now.</>
+                </p>;
+            }
+            case "ships-destroyed-by-empty-castle-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                return <p>
+                    <>House <b>{house.name}</b> lost Ship{data.shipCount>1?"s":""} because a castle is empty now.</>
                 </p>;
             }
             case "silence-at-the-wall-executed":
@@ -1105,6 +1325,17 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     ? (<> chose to destroy {joinReactNodes(units.map(([region, unitTypes]) => <span key={`preemptive_${region.id}`}>
                         {joinReactNodes(unitTypes.map((ut, i) => <b key={`preemptive_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), " and ")}.</>)
                     : <> had no units to destroy.</>}
+                </p>;
+            }
+            case "preemptive-raid-units-killed-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))] as [Region, UnitType[]]);
+
+                return <p>
+                    House <b>{house.name}</b>{units.length > 0
+                    ? <> chose to destroy units.</>
+                    : <> had no units to destroy.</>
+                    }
                 </p>;
             }
             case "preemptive-raid-wildlings-attack": {
@@ -1181,6 +1412,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     : <> had no units to destroy.</>}
                 </p>;
             }
+            case "mammoth-riders-destroy-units-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]) as [Region, UnitType[]][];
+
+                return <p>
+                    <b>Mammoth Riders</b>: House <b>{house.name}</b>{units.length > 0
+                    ? (<> chose to destroy units.</>)
+                    : <> had no units to destroy.</>}
+                </p>;
+            }
             case "mammoth-riders-return-card": {
                 const house = this.game.houses.get(data.house);
                 const houseCard = this.allHouseCards.get(data.houseCard);
@@ -1209,6 +1450,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     : <> had no units to destroy.</>}
                 </p>;
             }
+            case "the-horde-descends-units-killed-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]) as [Region, UnitType[]][];
+
+                return <p>
+                    <b>The Horde Descends</b>: House <b>{house.name}</b>{units.length > 0
+                        ? (<> chose to destroy units.</>)
+                    : <> had no units to destroy.</>}
+                </p>;
+            }
             case "crow-killers-knights-replaced": {
                 const house = this.game.houses.get(data.house);
                 const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]) as [Region, UnitType[]][];
@@ -1219,11 +1470,26 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     : (<><b>Crow Killers</b>: House <b>{house.name}</b> had no Knights to replace with Footmen.</>)}
                 </p>;
             }
+            case "crow-killers-knights-replaced-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]) as [Region, UnitType[]][];
+
+                return <p>
+                    {units.length > 0
+                    ? (<><b>Crow Killers</b>: House <b>{house.name}</b> replaced Knights with Footmen.</>)
+                    : (<><b>Crow Killers</b>: House <b>{house.name}</b> had no Knights to replace with Footmen.</>)}
+                </p>;
+            }
             case "crow-killers-knights-killed": {
                 const house = this.game.houses.get(data.house);
                 const units: [Region, UnitType[]][] = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
 
                 return <p><b>Crow Killers</b>: House <b>{house.name}</b> had to destroy {joinReactNodes(units.map(([region, unitTypes], i) => <span key={`crow-killers-kill_${i}`}><b>{unitTypes.length}</b> Knight{unitTypes.length != 1 ? "s" : ""} in <b>{region.name}</b></span>), ", ")}.</p>;
+            }
+            case "crow-killers-knights-killed-fogofwar": {
+                const house = this.game.houses.get(data.house);
+
+                return <p><b>Crow Killers</b>: House <b>{house.name}</b> had to destroy one or more Knights.</p>;
             }
 
             case "crow-killers-footman-upgraded": {
@@ -1233,6 +1499,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <p>
                     {units.length > 0
                     ? (<><b>Crow Killers</b>: House <b>{house.name}</b> replaced {joinReactNodes(units.map(([region, unitTypes], i) => <span key={`crow-killers-upgrade_${i}`}><b>{unitTypes.length}</b> Footm{unitTypes.length == 1 ? "a" : "e"}n in <b>{region.name}</b></span>), ", ")} with Knights.</>)
+                    : (<><b>Crow Killers</b>: House <b>{house.name}</b> was not able to replace any Footman with Knights.</>)}
+                </p>;
+            }
+            case "crow-killers-footman-upgraded-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]) as [Region, UnitType[]][];
+
+                return <p>
+                    {units.length > 0
+                    ? (<><b>Crow Killers</b>: House <b>{house.name}</b> replaced one or more Footmen with Knights.</>)
                     : (<><b>Crow Killers</b>: House <b>{house.name}</b> was not able to replace any Footman with Knights.</>)}
                 </p>;
             }
@@ -1302,12 +1578,31 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     {killedBecauseCantRetreat.length > 0 && (<>House <b>{house.name}</b> suffered battle casualties because these units can&apos;t retreat: <>{joinReactNodes(killedBecauseCantRetreat.map((unitType, i) => <b key={`cant-retreat_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.</>)}
                 </p>;
             }
+            case "immediatly-killed-after-combat-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                const killedBecauseWounded = data.killedBecauseWounded.map(utid => unitTypes.get(utid).name);
+                const killedBecauseCantRetreat = data.killedBecauseCantRetreat.map(utid => unitTypes.get(utid).name);
+                return <p>
+                    {killedBecauseWounded.length > 0 && (<>House <b>{house.name}</b> suffered battle casualties because one or more units were wounded.</>)}
+                    {killedBecauseWounded.length > 0 && killedBecauseCantRetreat.length > 0 && (<br/>)}
+                    {killedBecauseCantRetreat.length > 0 && (<>House <b>{house.name}</b> suffered battle casualties because one or more units can&apos;t retreat.</>)}
+                </p>;
+            }
             case "killed-after-combat": {
                 const house = this.game.houses.get(data.house);
                 const killed = data.killed.map(utid => unitTypes.get(utid).name);
                 return killed.length > 0 ?
                 <>
                     House <b>{house.name}</b> suffered battle casualties and chose these units to be destroyed: <>{joinReactNodes(killed.map((unitType, i) => <b key={`casualties_${unitType}_${i}`}>{unitType}</b>), ', ')}</>.
+                </> :
+                <></>;
+            }
+            case "killed-after-combat-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                const killed = data.killed.map(utid => unitTypes.get(utid).name);
+                return killed.length > 0 ?
+                <>
+                    House <b>{house.name}</b> suffered battle casualties and chose one or more units to be killed.
                 </> :
                 <></>;
             }
@@ -1523,10 +1818,20 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     A loyalty&nbsp;token has been placed in <b>{region.name}</b>.
                 </p>;
             }
+            case "loyalty-token-placed-fogofwar": {
+                return <p>
+                    A loyalty&nbsp;token has been placed.
+                </p>;
+            }
             case "loyalty-token-gained": {
                 const region = this.world.regions.get(data.region);
                 return <p>
                     House <b>{this.game.targaryen?.name ?? "Targaryen"}</b> gained {data.count} Loyalty&nbsp;token{data.count != 1 ? "s" : ""} in <b>{region.name}</b>.
+                </p>
+            }
+            case "loyalty-token-gained-fogofwar": {
+                return <p>
+                    House <b>{this.game.targaryen?.name ?? "Targaryen"}</b> gained {data.count} Loyalty&nbsp;token{data.count != 1 ? "s" : ""}.
                 </p>
             }
             case "fire-made-flesh-choice": {
@@ -1554,6 +1859,29 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     return <></>;
                 }
             }
+            case "fire-made-flesh-choice-fogofwar": {
+                const house = this.game.houses.get(data.house);
+
+                if (data.ignored) {
+                    return <p>
+                        <b>Fire Made Flesh</b>: House <b>{house.name}</b> decided to do nothing.
+                    </p>
+                } else if (data.dragonKilledInRegion) {
+                    return <p>
+                        <b>Fire Made Flesh</b>: House <b>{house.name}</b> decided to destroy a dragon.
+                    </p>
+                } else if (data.removedDragonStrengthToken) {
+                    return <p>
+                        <b>Fire Made Flesh</b>: House <b>{house.name}</b> decided to remove the dragon strength token from round {data.removedDragonStrengthToken}.
+                    </p>
+                } else if (data.regainedDragonRegion) {
+                    return <p>
+                        <b>Fire Made Flesh</b>: House <b>{house.name}</b> decided to place a dragon.
+                    </p>
+                } else {
+                    return <></>;
+                }
+            }
             case "playing-with-fire-choice": {
                 const house = this.game.houses.get(data.house);
                 const region = this.world.regions.get(data.region);
@@ -1561,6 +1889,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     <b>Playing with Fire</b>: House <b>{house.name}</b> chose to place a <b>{unitType.name}</b> in <b>{region.name}</b>.
+                </p>
+            }
+            case "playing-with-fire-choice-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                return <p>
+                    <b>Playing with Fire</b>: House <b>{house.name}</b> chose to place a unit.
                 </p>
             }
             case "the-long-plan-choice": {
@@ -1588,6 +1922,25 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                     return <p>
                         House <b>{house.name}</b> moved a loyalty&nbsp;token from <b>{regionFrom.name}</b> to <b>{regionTo.name}</b>.
+                    </p>
+                } else {
+                    return <></>;
+                }
+            }
+            case "move-loyalty-token-choice-fogofwar": {
+                const house = this.game.houses.get(data.house);
+
+                if (data.powerTokensDiscardedToCancelMovement == 0) {
+                    return <p>
+                        House <b>{house.name}</b> chose not to cancel the previous movement.
+                    </p>
+                } else if (data.powerTokensDiscardedToCancelMovement &&  data.powerTokensDiscardedToCancelMovement > 0) {
+                    return <p>
+                        House <b>{house.name}</b> discarded <b>{data.powerTokensDiscardedToCancelMovement}</b> Power&nbsp;token{data.powerTokensDiscardedToCancelMovement != 1 ? "s" : ""} to cancel the previous movement.
+                    </p>
+                } else if (data.regionFrom && data.regionTo) {
+                    return <p>
+                        House <b>{house.name}</b> moved a loyalty&nbsp;token.
                     </p>
                 } else {
                     return <></>;
@@ -1622,6 +1975,19 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         A <b>{orderType.name}</b> order has been removed from <b>{region.name}</b>.
                     </p>
             }
+            case "order-removed-fogofwar": {
+                const house = data.house ? this.game.houses.get(data.house) : null;
+                const orderType = orderTypes.get(data.order);
+
+                return house ?
+                    <p>
+                        House <b>{house.name}</b> removed an order.
+                    </p>
+                    :
+                    <p>
+                        A <b>{orderType.name}</b> order has been removed.
+                    </p>
+            }
             case "interest-paid": {
                 const house = this.game.houses.get(data.house);
                 const debt = data.cost + data.paid;
@@ -1638,6 +2004,17 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Debts to the Iron&nbsp;Bank</b>: {units.length > 0
                     ? (<>House <b>{resolver.name}</b> chose to destroy {joinReactNodes(units.map(([region, unitTypes]) =>
                             <span key={`pay-debt_${region.id}_${house.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`pay-debt_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), ", ")} of House <b>{house.name}</b>.</>)
+                    : <>House <b>{house.name} </b> had no units to destroy.</>}
+                </p>;
+            }
+            case "debt-paid-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                const resolver = this.game.houses.get(data.resolver);
+                const units = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]) as [Region, UnitType[]][];
+
+                return <p>
+                    <b>Debts to the Iron&nbsp;Bank</b>: {units.length > 0
+                    ? (<>House <b>{resolver.name}</b> chose to destroy one or more units of House <b>{house.name}</b>.</>)
                     : <>House <b>{house.name} </b> had no units to destroy.</>}
                 </p>;
             }
@@ -1658,6 +2035,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         : <> placed no sellswords.</>}
                 </p>;
             }
+            case "sellswords-placed-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                const placedSellswords = data.units.map(([regionId, units]) => [this.world.regions.get(regionId), units.map(ut => unitTypes.get(ut))] as [Region, UnitType[]]);
+                const loan = loanCardTypes.get(data.loanType);
+                return <p>
+                    <b>{loan.name}</b>: House <b>{house.name}</b>{placedSellswords.length > 0 ? (<> chose to
+                        place one or more sellswords.</>)
+                        : <> placed no sellswords.</>}
+                </p>;
+            }
             case "the-faceless-men-units-destroyed": {
                 const house = this.game.houses.get(data.house);
                 const destroyedUnits = data.units.map(unitInfo => ({
@@ -1671,11 +2058,30 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         : <>not to destroy any units.</>}
                 </p>;
             }
+            case "the-faceless-men-units-destroyed-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                const destroyedUnits = data.units.map(unitInfo => ({
+                    region: this.world.regions.get(unitInfo.regionId),
+                    house: unitInfo.houseId ? this.game.houses.get(unitInfo.houseId) : null,
+                    unitType: unitTypes.get(unitInfo.unitTypeId)
+                }));
+                return <p>
+                    <b>The Faceless Men</b>: House <b>{house.name}</b> chose {destroyedUnits.length > 0 ? (<>to destroy {joinReactNodes(
+                        destroyedUnits.map(unitInfo => <span key={`the-faceless-men_${unitInfo.region.id}_${unitInfo.unitType.id}`}>a unit of <b>{unitInfo.house?.name ?? "Unknown"}</b></span>), " and ")}.</>)
+                        : <>not to destroy any units.</>}
+                </p>;
+            }
             case "pyromancer-executed": {
                 const house = this.game.houses.get(data.house);
                 const region = this.world.regions.get(data.region);
                 return <p>
                     <b>Pyromancer</b>: House <b>{house.name}</b> chose to degrade <b>{region.name}</b> and place a <b>{data.upgradeType}</b> there.
+                </p>;
+            }
+            case "pyromancer-executed-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                return <p>
+                    <b>Pyromancer</b>: House <b>{house.name}</b> chose to degrade a region and place a <b>{data.upgradeType}</b> there.
                 </p>;
             }
             case "expert-artificer-executed": {
@@ -1685,11 +2091,23 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Expert Artificer</b>: House <b>{house.name}</b> chose to place a <b>Crown</b> in <b>{region.name}</b> and gained <b>{data.gainedPowerTokens}</b> Power token{data.gainedPowerTokens != 1 ? "s" : ""}.
                 </p>;
             }
+            case "expert-artificer-executed-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                return <p>
+                    <b>Expert Artificer</b>: House <b>{house.name}</b> chose to place a <b>Crown</b> and gained <b>{data.gainedPowerTokens}</b> Power token{data.gainedPowerTokens != 1 ? "s" : ""}.
+                </p>;
+            }
             case "loyal-maester-executed": {
                 const house = this.game.houses.get(data.house);
                 const regions = data.regions.map(rid => this.world.regions.get(rid));
                 return <p>
                     <b>Loyal Maester</b>: House <b>{house.name}</b> chose to place a <b>Barrel</b> in {joinReactNodes(regions.map(r => <b key={`loyal_maester_${r.id}`}>{r.name}</b>), ' and in ')}.
+                </p>;
+            }
+            case "loyal-maester-executed-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                return <p>
+                    <b>Loyal Maester</b>: House <b>{house.name}</b> chose to place a <b>Barrel</b>.
                 </p>;
             }
             case "master-at-arms-executed": {
@@ -1699,11 +2117,23 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Master-at-Arms</b>: House <b>{house.name}</b> chose to upgrade the castles in {joinReactNodes(regions.map(r => <b key={`master-at-arms_${r.id}`}>{r.name}</b>), ' and in ')}.
                 </p>;
             }
+            case "master-at-arms-executed-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                return <p>
+                    <b>Master-at-Arms</b>: House <b>{house.name}</b> chose to upgrade one or more castles.
+                </p>;
+            }
             case "savvy-steward-executed": {
                 const house = this.game.houses.get(data.house);
                 const region = this.world.regions.get(data.region);
                 return <p>
                     <b>Savvy Steward</b>: House <b>{house.name}</b> chose to place a <b>Barrel</b> in <b>{region.name}</b>. Their new supply level is <b>{data.newSupply}</b>.
+                </p>;
+            }
+            case "savvy-steward-executed-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                return <p>
+                    <b>Savvy Steward</b>: House <b>{house.name}</b> chose to place a <b>Barrel</b>. Their new supply level is <b>{data.newSupply}</b>.
                 </p>;
             }
             case "spymaster-executed": {
@@ -1820,11 +2250,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     A <b>garrison token</b> with strength <b>{data.strength}</b> was <b>removed</b> from <b>{region.name}</b>.
                 </p>;
             }
+            case "garrison-removed-fogofwar": {
+                return <p>
+                    A <b>garrison token</b> with strength <b>{data.strength}</b> was <b>removed</b>.
+                </p>;
+            }
             case "garrison-returned": {
                 const region = this.world.regions.get(data.region);
 
                 return <p>
                     A <b>garrison token</b> with strength <b>{data.strength}</b> was <b>returned</b> to <b>{region.name}</b>.
+                </p>;
+            }
+            case "garrison-returned-fogofwar": {
+                return <p>
+                    A <b>garrison token</b> with strength <b>{data.strength}</b> was <b>returned</b>.
                 </p>;
             }
             case "objective-deck-empty": {
@@ -1870,6 +2310,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     <b>Mace Tyrell</b>: House <b>{house.name}</b> decided to place a <b>{order.type.name}</b> order in <b>{region.name}</b>.
+                </p>;
+            }
+            case "mace-tyrell-asos-order-placed-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                return <p>
+                    <b>Mace Tyrell</b>: House <b>{house.name}</b> decided to place an order.
                 </p>;
             }
             case "bran-stark-used": {
@@ -1936,6 +2382,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         {affectedHouse.name}</b> chose a <b>{unitType.name}</b>.
                 </p>;
             }
+            case "ser-ilyn-payne-asos-casualty-suffered-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                const affectedHouse = this.game.houses.get(data.affectedHouse);
+                return <p>
+                    <b>Ser Ilyn Payne</b>: House <b>{house.name}</b> forced House <b>{affectedHouse.name}</b> to lose a casualty.
+                </p>;
+            }
             case "stannis-baratheon-asos-used": {
                 const house = this.game.houses.get(data.house);
                 const oldThroneOwner = this.game.houses.get(data.oldThroneOwner);
@@ -1961,6 +2414,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     A <b>Power token</b> of House <b>{house.name}</b> was removed from <b>{region.name}</b>.
                 </p>;
             }
+            case "control-power-token-removed-fogofwar": {
+                const house = this.game.houses.get(data.houseId);
+
+                return <p>
+                    A <b>Power token</b> of House <b>{house.name}</b> was removed.
+                </p>;
+            }
             case "game-paused": {
                 return <p>
                     The game was paused by vote.
@@ -1980,6 +2440,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     House <b>{supporter.name}</b> {data.refused
                         ? <>refused to grant support to House <b>{house.name}</b></>
                         : <>would support House <b>{house.name}</b></>} to attack the Neutral Force in <b>{region.name}</b>.
+                </p>;
+            }
+            case "support-attack-against-neutral-force-fogofwar": {
+                const house = this.game.houses.get(data.house);
+                const supporter = this.game.houses.get(data.supporter);
+
+                return <p>
+                    House <b>{supporter.name}</b> {data.refused
+                        ? <>refused to grant support to House <b>{house.name}</b></>
+                        : <>would support House <b>{house.name}</b></>} to attack a Neutral Force.
                 </p>;
             }
             case "houses-swapped": {
@@ -2005,6 +2475,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     There was no further loyalty token available that could have been placed in <b>{region.name}</b>.
+                </p>;
+            }
+            case "no-loyalty-token-available-fogofwar": {
+                return <p>
+                    There was no further loyalty token available that could have been placed.
                 </p>;
             }
         }

@@ -52,7 +52,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         vassals: true, ironBank: true, seaOrderTokens: true, allowGiftingPowerTokens: true, randomVassalAssignment: false, customBalancing: false,
         randomHouses: false, randomChosenHouses: false, tidesOfBattle: false, removeTob3: false, removeTobSkulls: false, limitTob2: false,
         draftHouseCards: false, thematicDraft: false, limitedDraft: false, blindDraft: false,
-        mixedWesterosDeck1: false, cokWesterosPhase: false, victoryPointsCountNeededToWin: 7, loyaltyTokenCountNeededToWin: 7, endless: false,  faceless: false,
+        mixedWesterosDeck1: false, cokWesterosPhase: false, fogOfWar: false, victoryPointsCountNeededToWin: 7, loyaltyTokenCountNeededToWin: 7, endless: false,  faceless: false,
         useVassalPositions: false, precedingMustering: false, randomStartPositions: false, initialLiveClock: 60,
         noPrivateChats: false, tournamentMode: false, fixedClock: false, holdVictoryPointsUntilEndOfRound: false
     };
@@ -803,4 +803,5 @@ export interface GameSettings {
     tournamentMode: boolean;
     fixedClock: boolean;
     holdVictoryPointsUntilEndOfRound: boolean;
+    fogOfWar: boolean;
 }

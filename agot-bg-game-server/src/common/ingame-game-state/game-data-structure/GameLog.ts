@@ -50,7 +50,18 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | BalonGreyjoyASoSPowerTokensGained | MaceTyrellASoSOrderPlaced | BranStarkUsed | CerseiLannisterASoSPowerTokensDiscarded
     | DoranMartellASoSUsed | MelisandreOfAsshaiPowerTokensGained | SalladharSaanASoSPowerTokensChanged | SerDavosSeaworthASoSFortificationGained
     | CasualtiesPrevented | SerIlynPayneASoSCasualtySuffered | StannisBaratheonASoSUsed | AeronDamphairHouseCardChanged | ControlPowerTokenRemoved
-    | GamePaused | GameResumed | SupportAttackAgainstNeutralForce | HousesSwapped | NoLoyaltyTokenAvailable;
+    | GamePaused | GameResumed | SupportAttackAgainstNeutralForce | HousesSwapped | NoLoyaltyTokenAvailable
+    | AttackFogOfWar | LeavePowerTokenChoiceFogOfWar | PlayerMusteredFogOfWar | RaidDoneFogOfWar | RavenHolderReplaceOrderFogOfWar 
+    | ConsolidatePowerOrderResolvedFogOfWar | ArmiesReconciledFogOfWar | LorasTyrellAttackOrderMovedFogOfWar | QueenOfThornsOrderRemovedFogOfWar 
+    | RenlyBaratheonFootmanUpgradedToKnightFogOfWar | MaceTyrellFootmanKilledFogOfWar | SerIlynPayneFootmanKilledFogOfWar
+    | CerseiLannisterOrderRemovedFogOfWar | RetreatRegionChosenFogOfWar | RetreatFailedFogOfWar | RetreatCasualtiesSufferedFogOfWar
+    | EnemyPortTakenFogOfWar | ShipsDestroyedByEmptyCastleFogOfWar | PreemptiveRaidUnitsKilledFogOfWar | MammothRidersDestroyUnitsFogOfWar 
+    | TheHordeDescendsUnitsKilledFogOfWar | CrowKillersKnightsReplacedFogOfWar | CrowKillersKnightsKilledFogOfWar  | CrowKillersFootmanUpgradedFogOfWar
+    | ImmediatelyBattleCasualtiesSufferedFogOfWar | BattleCasualtiesSufferedFogOfWar | FireMadeFleshChoiceFogOfWar | PlayWithFireChoiceFogOfWar
+    | MoveLoyaltyTokenChoiceFogOfWar | OrderRemovedFogOfWar | DebtPaidFogOfWar | SellswordsPlacedFogOfWar | TheFacelessMenUnitsDestroyedFogOfWar
+    | PyromancerExecutedFogOfWar | ExpertArtificerExecutedFogOfWar | LoyalMaesterExecutedFogOfWar | MasterAtArmsExecutedFogOfWar | SavvyStewardExecutedFogOfWar
+    | GarrisonRemovedFogOfWar | GarrisonReturnedFogOfWar | MaceTyrellASoSOrderPlacedFogOfWar | SerIlynPayneASoSCasualtySufferedFogOfWar | ControlPowerTokenRemovedFogOfWar
+    | SupportAttackAgainstNeutralForceFogOfWar | NoLoyaltyTokenAvailableFogOfWar | LoyaltyTokenPlacedFogOfWar | LoyaltyTokenGainedFogOfWar;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -94,6 +105,10 @@ interface Attack {
     attackedRegion: string;
     units: string[];
     orderType?: string;
+}
+
+interface AttackFogOfWar extends Omit<Attack, 'type'> {
+    type: `attack-fogofwar`;
 }
 
 interface MarchResolved {
@@ -151,6 +166,10 @@ interface PlayerMustered {
     musterings: [string, {from: string | null; to: string; region: string}[]][];
 }
 
+interface PlayerMusteredFogOfWar extends Omit<PlayerMustered, 'type'> {
+    type: "player-mustered-fogofwar";
+}
+
 interface WinnerDeclared {
     type: "winner-declared";
     winner: string;
@@ -174,6 +193,10 @@ interface RavenHolderReplaceOrder {
     newOrder: number;
 }
 
+interface RavenHolderReplaceOrderFogOfWar extends Omit<RavenHolderReplaceOrder, 'type'> {
+    type: "raven-holder-replace-order-fogofwar";
+}
+
 interface RavenNotUsed {
     type: "raven-not-used";
     ravenHolder: string;
@@ -188,6 +211,10 @@ interface RaidDone {
     orderRaided: number | null;
     raiderGainedPowerToken: boolean | null;
     raidedHouseLostPowerToken: boolean | null;
+}
+
+interface RaidDoneFogOfWar extends Omit<RaidDone, 'type'> {
+    type: "raid-done-fogofwar";
 }
 
 interface DarkWingsDarkWordsChoice {
@@ -286,10 +313,18 @@ interface ConsolidatePowerOrderResolved {
     powerTokenCount: number;
 }
 
+interface ConsolidatePowerOrderResolvedFogOfWar extends Omit<ConsolidatePowerOrderResolved, 'type'> {
+    type: "consolidate-power-order-resolved-fogofwar";
+}
+
 interface ArmiesReconciled {
     type: "armies-reconciled";
     house: string;
     armies: [string, string[]][];
+}
+
+interface ArmiesReconciledFogOfWar extends Omit<ArmiesReconciled, 'type'> {
+    type: "armies-reconciled-fogofwar";
 }
 
 interface HouseCardAbilityNotUsed {
@@ -403,6 +438,10 @@ interface LorasTyrellAttackOrderMoved {
     region: string;
 }
 
+interface LorasTyrellAttackOrderMovedFogOfWar extends Omit<LorasTyrellAttackOrderMoved, 'type'> {
+    type: "loras-tyrell-attack-order-moved-fogofwar";
+}
+
 interface QueenOfThornsNoOrderAvailable {
     type: "queen-of-thorns-no-order-available";
     house: string;
@@ -415,6 +454,10 @@ interface QueenOfThornsOrderRemoved {
     affectedHouse: string;
     orderRemoved: number;
     region: string;
+}
+
+interface QueenOfThornsOrderRemovedFogOfWar extends Omit<QueenOfThornsOrderRemoved, 'type'> {
+    type: "queen-of-thorns-order-removed-fogofwar";
 }
 
 interface TywinLannisterPowerTokensGained {
@@ -445,6 +488,10 @@ interface RenlyBaratheonFootmanUpgradedToKnight {
     region: string;
 }
 
+interface RenlyBaratheonFootmanUpgradedToKnightFogOfWar extends Omit<RenlyBaratheonFootmanUpgradedToKnight, 'type'> {
+    type: "renly-baratheon-footman-upgraded-to-knight-fogofwar";
+}
+
 interface MaceTyrellNoFootmanAvailable {
     type: "mace-tyrell-no-footman-available";
     house: string;
@@ -461,10 +508,18 @@ interface MaceTyrellFootmanKilled {
     region: string;
 }
 
+interface MaceTyrellFootmanKilledFogOfWar extends Omit<MaceTyrellFootmanKilled, 'type'> {
+    type: "mace-tyrell-footman-killed-fogofwar";
+}
+
 interface SerIlynPayneFootmanKilled {
     type: "ser-ilyn-payne-footman-killed";
     house: string;
     region: string;
+}
+
+interface SerIlynPayneFootmanKilledFogOfWar extends Omit<SerIlynPayneFootmanKilled, 'type'> {
+    type: "ser-ilyn-payne-footman-killed-fogofwar";
 }
 
 interface CerseiLannisterNoOrderAvailable {
@@ -477,6 +532,10 @@ interface CerseiLannisterOrderRemoved {
     affectedHouse: string;
     region: string;
     order: number;
+}
+
+interface CerseiLannisterOrderRemovedFogOfWar extends Omit<CerseiLannisterOrderRemoved, 'type'> {
+    type: "cersei-lannister-order-removed-fogofwar";
 }
 
 interface RobbStarkRetreatRegionOverriden {
@@ -493,6 +552,10 @@ interface RetreatRegionChosen {
     regionTo: string;
 }
 
+interface RetreatRegionChosenFogOfWar extends Omit<RetreatRegionChosen, 'type'> {
+    type: "retreat-region-chosen-fogofwar";
+}
+
 interface RetreatFailed {
     type: "retreat-failed";
     house: string;
@@ -500,10 +563,18 @@ interface RetreatFailed {
     region: string;
 }
 
+interface RetreatFailedFogOfWar extends Omit<RetreatFailed, 'type'> {
+    type: "retreat-failed-fogofwar";
+}
+
 interface RetreatCasualtiesSuffered {
     type: "retreat-casualties-suffered";
     house: string;
     units: string[];
+}
+
+interface RetreatCasualtiesSufferedFogOfWar extends Omit<RetreatCasualtiesSuffered, 'type'> {
+    type: "retreat-casualties-suffered-fogofwar";
 }
 
 interface EnemyPortTaken {
@@ -514,12 +585,20 @@ interface EnemyPortTaken {
     port: string;
 }
 
+interface EnemyPortTakenFogOfWar extends Omit<EnemyPortTaken, 'type'> {
+    type: "enemy-port-taken-fogofwar";
+}
+
 interface ShipsDestroyedByEmptyCastle {
     type: "ships-destroyed-by-empty-castle";
     house: string;
     castle: string;
     port: string;
     shipCount: number;
+}
+
+interface ShipsDestroyedByEmptyCastleFogOfWar extends Omit<ShipsDestroyedByEmptyCastle, 'type'> {
+    type: "ships-destroyed-by-empty-castle-fogofwar";
 }
 
 interface SilenceAtTheWallExecuted {
@@ -536,6 +615,10 @@ interface PreemptiveRaidUnitsKilled {
     type: "preemptive-raid-units-killed";
     house: string;
     units: [string, string[]][];
+}
+
+interface PreemptiveRaidUnitsKilledFogOfWar extends Omit<PreemptiveRaidUnitsKilled, 'type'> {
+    type: "preemptive-raid-units-killed-fogofwar";
 }
 
 interface PreemptiveRaidTrackReduced {
@@ -591,6 +674,10 @@ interface MammothRidersDestroyUnits {
     units: [string, string[]][];
 }
 
+interface MammothRidersDestroyUnitsFogOfWar extends Omit<MammothRidersDestroyUnits, 'type'> {
+    type: "mammoth-riders-destroy-units-fogofwar";
+}
+
 interface MammothRidersReturnCard {
     type: "mammoth-riders-return-card";
     house: string;
@@ -608,10 +695,18 @@ interface TheHordeDescendsUnitsKilled {
     units: [string, string[]][];
 }
 
+interface TheHordeDescendsUnitsKilledFogOfWar extends Omit<TheHordeDescendsUnitsKilled, 'type'> {
+    type: "the-horde-descends-units-killed-fogofwar";
+}
+
 interface CrowKillersKnightsReplaced {
     type: "crow-killers-knights-replaced";
     house: string;
     units: [string, string[]][];
+}
+
+interface CrowKillersKnightsReplacedFogOfWar extends Omit<CrowKillersKnightsReplaced, 'type'> {
+    type: "crow-killers-knights-replaced-fogofwar";
 }
 
 interface CrowKillersKnightsKilled {
@@ -620,10 +715,18 @@ interface CrowKillersKnightsKilled {
     units: [string, string[]][];
 }
 
+interface CrowKillersKnightsKilledFogOfWar extends Omit<CrowKillersKnightsKilled, 'type'> {
+    type: "crow-killers-knights-killed-fogofwar";
+}
+
 interface CrowKillersFootmanUpgraded {
     type: "crow-killers-footman-upgraded";
     house: string;
     units: [string, string[]][];
+}
+
+interface CrowKillersFootmanUpgradedFogOfWar extends Omit<CrowKillersFootmanUpgraded, 'type'> {
+    type: "crow-killers-footman-upgraded-fogofwar";
 }
 
 interface SkinchangerScoutNightsWatchVictory {
@@ -662,10 +765,18 @@ interface ImmediatelyBattleCasualtiesSuffered {
     killedBecauseCantRetreat: string[];
 }
 
+interface ImmediatelyBattleCasualtiesSufferedFogOfWar extends Omit<ImmediatelyBattleCasualtiesSuffered, 'type'> {
+    type: "immediatly-killed-after-combat-fogofwar";
+}
+
 interface BattleCasualtiesSuffered {
     type: "killed-after-combat";
     house: string;
     killed: string[];
+}
+
+interface BattleCasualtiesSufferedFogOfWar extends Omit<BattleCasualtiesSuffered, 'type'> {
+    type: "killed-after-combat-fogofwar";
 }
 
 interface SupplyAdjusted {
@@ -836,10 +947,18 @@ interface LoyaltyTokenPlaced {
     region: string;
 }
 
+interface LoyaltyTokenPlacedFogOfWar extends Omit<LoyaltyTokenPlaced, 'type'> {
+    type: "loyalty-token-placed-fogofwar";
+}
+
 interface LoyaltyTokenGained {
     type: "loyalty-token-gained";
     count: number;
     region: string;
+}
+
+interface LoyaltyTokenGainedFogOfWar extends Omit<LoyaltyTokenGained, 'type'> {
+    type: "loyalty-token-gained-fogofwar";
 }
 
 interface FireMadeFleshChoice {
@@ -851,11 +970,19 @@ interface FireMadeFleshChoice {
     regainedDragonRegion?: string;
 }
 
+interface FireMadeFleshChoiceFogOfWar extends Omit<FireMadeFleshChoice, 'type'> {
+    type: "fire-made-flesh-choice-fogofwar";
+}
+
 interface PlayWithFireChoice {
     type: "playing-with-fire-choice";
     house: string;
     unitType: string;
     region: string;
+}
+
+interface PlayWithFireChoiceFogOfWar extends Omit<PlayWithFireChoice, 'type'> {
+    type: "playing-with-fire-choice-fogofwar";
 }
 
 interface TheLongPlanChoice {
@@ -870,6 +997,10 @@ interface MoveLoyaltyTokenChoice {
     regionFrom?: string;
     regionTo?: string;
     powerTokensDiscardedToCancelMovement?: number;
+}
+
+interface MoveLoyaltyTokenChoiceFogOfWar extends Omit<MoveLoyaltyTokenChoice, 'type'> {
+    type: "move-loyalty-token-choice-fogofwar";
 }
 
 interface LoanPurchased {
@@ -887,6 +1018,10 @@ interface OrderRemoved {
     order: string;
 }
 
+interface OrderRemovedFogOfWar extends Omit<OrderRemoved, 'type'> {
+    type: "order-removed-fogofwar";
+}
+
 interface InterestPaid {
     type: "interest-paid";
     house: string;
@@ -899,6 +1034,10 @@ interface DebtPaid {
     house: string;
     resolver: string;
     units: [string, string[]][];
+}
+
+interface DebtPaidFogOfWar extends Omit<DebtPaid, 'type'> {
+    type: "debt-paid-fogofwar";
 }
 
 interface CustomsOfficerPowerTokensGained {
@@ -914,6 +1053,10 @@ interface SellswordsPlaced {
     loanType: string;
 }
 
+interface SellswordsPlacedFogOfWar extends Omit<SellswordsPlaced, 'type'> {
+    type: "sellswords-placed-fogofwar";
+}
+
 interface TheFacelessMenUnitsDestroyed {
     type: "the-faceless-men-units-destroyed";
     house: string;
@@ -924,11 +1067,19 @@ interface TheFacelessMenUnitsDestroyed {
     }[];
 }
 
+interface TheFacelessMenUnitsDestroyedFogOfWar extends Omit<TheFacelessMenUnitsDestroyed, 'type'> {
+    type: "the-faceless-men-units-destroyed-fogofwar";
+}
+
 interface PyromancerExecuted {
     type: "pyromancer-executed";
     house: string;
     region: string;
     upgradeType: string;
+}
+
+interface PyromancerExecutedFogOfWar extends Omit<PyromancerExecuted, 'type'> {
+    type: "pyromancer-executed-fogofwar";
 }
 
 interface ExpertArtificerExecuted {
@@ -938,10 +1089,18 @@ interface ExpertArtificerExecuted {
     gainedPowerTokens: number;
 }
 
+interface ExpertArtificerExecutedFogOfWar extends Omit<ExpertArtificerExecuted, 'type'> {
+    type: "expert-artificer-executed-fogofwar";
+}
+
 interface LoyalMaesterExecuted {
     type: "loyal-maester-executed";
     house: string;
     regions: string[];
+}
+
+interface LoyalMaesterExecutedFogOfWar extends Omit<LoyalMaesterExecuted, 'type'> {
+    type: "loyal-maester-executed-fogofwar";
 }
 
 interface MasterAtArmsExecuted {
@@ -950,11 +1109,19 @@ interface MasterAtArmsExecuted {
     regions: string[];
 }
 
+interface MasterAtArmsExecutedFogOfWar extends Omit<MasterAtArmsExecuted, 'type'> {
+    type: "master-at-arms-executed-fogofwar";
+}
+
 interface SavvyStewardExecuted {
     type: "savvy-steward-executed";
     house: string;
     region: string;
     newSupply: number;
+}
+
+interface SavvyStewardExecutedFogOfWar extends Omit<SavvyStewardExecuted, 'type'> {
+    type: "savvy-steward-executed-fogofwar";
 }
 
 interface SpymasterExecuted {
@@ -1023,10 +1190,18 @@ interface GarrisonRemoved {
     strength: number;
 }
 
+interface GarrisonRemovedFogOfWar extends Omit<GarrisonRemoved, 'type'> {
+    type: "garrison-removed-fogofwar";
+}
+
 interface GarrisonReturned {
     type: "garrison-returned";
     region: string;
     strength: number;
+}
+
+interface GarrisonReturnedFogOfWar extends Omit<GarrisonRemoved, 'type'> {
+    type: "garrison-returned-fogofwar";
 }
 
 interface ObjectiveDeckEmpty {
@@ -1054,6 +1229,13 @@ interface LeavePowerTokenChoice {
     leftPowerToken: boolean;
 }
 
+interface LeavePowerTokenChoiceFogOfWar {
+    type: "leave-power-token-choice-fogofwar";
+    house: string;
+    region: string;
+    leftPowerToken: boolean;
+}
+
 interface BalonGreyjoyASoSPowerTokensGained {
     type: "balon-greyjoy-asos-power-tokens-gained";
     house: string;
@@ -1065,6 +1247,10 @@ interface MaceTyrellASoSOrderPlaced {
     house: string;
     region: string;
     order: number;
+}
+
+interface MaceTyrellASoSOrderPlacedFogOfWar extends Omit<MaceTyrellASoSOrderPlaced, 'type'> {
+    type: "mace-tyrell-asos-order-placed-fogofwar";
 }
 
 interface BranStarkUsed {
@@ -1118,6 +1304,10 @@ interface SerIlynPayneASoSCasualtySuffered {
     unit: string;
 }
 
+interface SerIlynPayneASoSCasualtySufferedFogOfWar extends Omit<SerIlynPayneASoSCasualtySuffered, 'type'> {
+    type: "ser-ilyn-payne-asos-casualty-suffered-fogofwar";
+}
+
 interface StannisBaratheonASoSUsed {
     type: "stannis-baratheon-asos-used";
     house: string;
@@ -1135,6 +1325,10 @@ interface ControlPowerTokenRemoved {
     type: "control-power-token-removed";
     regionId: string;
     houseId: string;
+}
+
+interface ControlPowerTokenRemovedFogOfWar extends Omit<ControlPowerTokenRemoved, 'type'> {
+    type: "control-power-token-removed-fogofwar";
 }
 
 interface GamePaused {
@@ -1155,6 +1349,10 @@ export interface SupportAttackAgainstNeutralForce {
     refused?: boolean;
 }
 
+export interface SupportAttackAgainstNeutralForceFogOfWar extends Omit<SupportAttackAgainstNeutralForce, 'type'> {
+    type: "support-attack-against-neutral-force-fogofwar";
+}
+
 export interface HousesSwapped {
     type: "houses-swapped";
     initiator: string;
@@ -1172,4 +1370,8 @@ export interface WesterosDeck4Skipped {
 export interface NoLoyaltyTokenAvailable {
     type: "no-loyalty-token-available";
     region: string;
+}
+
+export interface NoLoyaltyTokenAvailableFogOfWar extends Omit<NoLoyaltyTokenAvailable, 'type'> {
+    type: "no-loyalty-token-available-fogofwar";
 }

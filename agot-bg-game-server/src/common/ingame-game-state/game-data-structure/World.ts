@@ -173,6 +173,14 @@ export default class World {
         return this.regions.values.filter(r => r.getController() == house);
     }
 
+    getRegionIdsAdjacentToControlled(house: House): string[] {
+        // Find regions controlled by house.
+        const controlledRegions = this.getControlledRegions(house);
+        return controlledRegions.map((region) => this.getNeighbouringRegions(region))
+        .flat(1)
+        .map(region => region.id)
+    }
+
     getValidRetreatRegions(startingRegion: Region, house: House, army: Unit[]): Region[] {
         return this.getReachableRegions(startingRegion, house, army, false, true)
             // A retreat can be done in a port only if the adjacent land area is controlled

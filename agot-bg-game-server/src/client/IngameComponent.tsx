@@ -62,8 +62,7 @@ import Player from "../common/ingame-game-state/Player";
 import {observable} from "mobx";
 import classNames from "classnames";
 import {Channel, Message} from "./chat-client/ChatClient";
-// @ts-expect-error Somehow this module cannot be found while it is
-import ScrollToBottom from "react-scroll-to-bottom";
+import { ScrollToBottom } from "react-scroll-to-bottom";
 import GameSettingsComponent from "./GameSettingsComponent";
 import IngameCancelledComponent from "./game-state-panel/IngameCancelledComponent";
 import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
@@ -254,6 +253,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             gameClient={this.gameClient}
                             ingameGameState={this.ingame}
                             mapControls={this.mapControls}
+                            authenticatedPlayer={this.authenticatedPlayer}
                         />
                     </div>
                     </Col>}
@@ -1594,7 +1594,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         this.ingame.onVoteStarted = null;
     }
 
-    componentDidUpdate(_prevProps: Readonly<IngameComponentProps>, _prevState: Readonly<{}>, _snapshot?: any): void {
+    componentDidUpdate(_prevProps: Readonly<IngameComponentProps>, _prevState: Readonly<Record<string, unknown>>, _snapshot?: any): void {
         if (this.currentOpenedTab == "note") {
             this.unseenNotes = false;
         }
