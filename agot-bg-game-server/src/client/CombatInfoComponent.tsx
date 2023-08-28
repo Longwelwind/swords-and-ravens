@@ -34,6 +34,7 @@ interface HouseCombatData {
 
 interface CombatInfoComponentProps {
     housesCombatData: HouseCombatData[];
+    fogOfWar?: boolean
 }
 
 @observer
@@ -68,17 +69,25 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                 </div>
             </div>
             <div style={{display: "grid", gridGap: "5px", gridTemplateColumns: "auto 1fr auto 1fr auto", justifyItems: "center", alignItems: "center"}} className="text-center">
-                <div style={{gridRow: "1", gridColumn: "1 / span 2"}}>
-                    <small>{this.attacker.region.name}</small>
-                </div>
+                {
+                    !this.props.fogOfWar && (
+                        <div style={{gridRow: "1", gridColumn: "1 / span 2"}}>
+                            <small>{this.attacker.region.name}</small>
+                        </div>
+                    )
+                }
 
                 <div style={{gridRow: "1 / span 2", gridColumn: "3"}}>
                     <img src={crossedSwordsImage} width={this.SIZE_MIDDLE_COLUMN}/>
                 </div>
 
-                <div style={{gridRow: "1", gridColumn: "4 / span 2"}}>
-                    <small>{this.defender.region.name}</small>
-                </div>
+                {
+                    !this.props.fogOfWar && (
+                        <div style={{gridRow: "1", gridColumn: "4 / span 2"}}>
+                            <small>{this.defender.region.name}</small>
+                        </div>
+                    )
+                }
 
                 <div style={{gridRow: "2", gridColumn: "1 / span 2"}}>
                     {this.attacker.armyUnits.map((ut, i) =>

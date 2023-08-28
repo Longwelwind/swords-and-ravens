@@ -441,6 +441,10 @@ $wildling-outline: rgba(yellow, 0.5);
   transition: all 0.12s linear;
 }
 
+.region-area-fogged {
+  opacity: .6;
+}
+
 .region-area-no-hover {
   opacity: 0;
   transition: all 0.12s linear;
