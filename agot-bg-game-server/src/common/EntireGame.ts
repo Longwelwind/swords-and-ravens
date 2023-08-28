@@ -52,7 +52,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         vassals: true, ironBank: true, seaOrderTokens: true, allowGiftingPowerTokens: true, randomVassalAssignment: false, customBalancing: false,
         randomHouses: false, randomChosenHouses: false, tidesOfBattle: false, removeTob3: false, removeTobSkulls: false, limitTob2: false,
         draftHouseCards: false, thematicDraft: false, limitedDraft: false, blindDraft: false,
-        mixedWesterosDeck1: false, cokWesterosPhase: false, victoryPointsCountNeededToWin: 7, loyaltyTokenCountNeededToWin: 7, endless: false,  faceless: false,
+        mixedWesterosDeck1: false, cokWesterosPhase: false, fogOfWar: false, victoryPointsCountNeededToWin: 7, loyaltyTokenCountNeededToWin: 7, endless: false,  faceless: false,
         useVassalPositions: false, precedingMustering: false, randomStartPositions: false, initialLiveClock: 60,
         noPrivateChats: false, tournamentMode: false, fixedClock: false, holdVictoryPointsUntilEndOfRound: false
     };
@@ -592,7 +592,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 })) ?? []);
         const waitingFor = _waitingFor.map(wf => `${wf.house}${this.gameSettings.faceless ? "" : (` (${wf.user.name})`)}`).join(", ");
         const waitingForIds = _waitingFor.map(wf => wf.user.id);
-        let winner=null;
+        let winner: any = null;
         if (this.ingameGameState?.leafState instanceof GameEndedGameState) {
             const user = this.ingameGameState.getControllerOfHouse(this.ingameGameState.leafState.winner).user;
             winner = `${user.name} (${this.ingameGameState.leafState.winner.name})`;
@@ -803,4 +803,5 @@ export interface GameSettings {
     tournamentMode: boolean;
     fixedClock: boolean;
     holdVictoryPointsUntilEndOfRound: boolean;
+    fogOfWar: boolean;
 }

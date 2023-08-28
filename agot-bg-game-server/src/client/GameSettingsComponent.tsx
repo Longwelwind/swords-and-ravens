@@ -687,6 +687,21 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 </Col>
                 <Col xs="12">
                     <FormCheck
+                        id="fog-of-war-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="fog-of-war-setting-tooltip">
+                                    Limit visibility to controlled regions, adjacent regions, and regions you attack or are attacked from.
+                                </Tooltip>}>
+                                <label htmlFor="fog-of-war-setting">Fog of War</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.fogOfWar}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.fogOfWar = !this.gameSettings.fogOfWar)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
                         id="no-private-chats-setting"
                         type="switch"
                         label={

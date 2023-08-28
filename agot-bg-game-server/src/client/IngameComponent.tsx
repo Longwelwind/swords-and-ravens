@@ -254,6 +254,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                             gameClient={this.gameClient}
                             ingameGameState={this.ingame}
                             mapControls={this.mapControls}
+                            authenticatedPlayer={this.authenticatedPlayer}
                         />
                     </div>
                     </Col>}
@@ -1234,18 +1235,34 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     highlightRegionsOfHouses(): void {
         const regions = new BetterMap(this.ingame.world.regions.values.map(r => [r, r.getController()]));
+
+        let adjacentRegionIds: string[] = []
+
+        if (this.authenticatedPlayer) {
+            adjacentRegionIds = this.ingame.world.getRegionIdsAdjacent(
+                this.authenticatedPlayer?.house
+            )
+        }
+        
         this.highlightedRegions.clear();
 
-        regions.entries.forEach(([r, controller]) => {
-            this.highlightedRegions.set(r, {
-                highlight: {
-                    active: controller != null ? true : false,
-                    color: controller?.id != "greyjoy" ? controller?.color ?? "#000000" : "#000000",
-                    light: r.type.id == "sea",
-                    strong: r.type.id == "land"
+        regions.entries
+            .filter(([r]) => {
+                if (!this.ingame.entireGame.gameSettings.fogOfWar) {
+                    return true
                 }
+                return adjacentRegionIds.includes(r.id)
+            })
+            .forEach(([r, controller]) => {
+                this.highlightedRegions.set(r, {
+                    highlight: {
+                        active: controller != null ? true : false,
+                        color: controller?.id != "greyjoy" ? controller?.color ?? "#000000" : "#000000",
+                        light: r.type.id == "sea",
+                        strong: r.type.id == "land"
+                    }
+                });
             });
-        });
     }
 
     renderDragonStrengthTooltip(): OverlayChildren {
