@@ -8,6 +8,8 @@ import House from "../../../../game-data-structure/House";
 import Region from "../../../../game-data-structure/Region";
 import User from "../../../../../../server/User";
 import MoveLoyaltyTokensGameState from "../MoveLoyaltyTokensGameState";
+import { land } from "../../../../game-data-structure/regionTypes";
+import _ from "lodash";
 
 export default class ResolveMoveLoyaltyTokenGameState extends GameState<MoveLoyaltyTokensGameState> {
     house: House;
@@ -76,6 +78,14 @@ export default class ResolveMoveLoyaltyTokenGameState extends GameState<MoveLoya
 
     getWaitedUsers(): User[] {
         return [this.ingame.getControllerOfHouse(this.house).user];
+    }
+
+    getRequiredVisibleRegionsForPlayer(_player: Player): Region[] {
+        const regionsWithLT = this.ingame.world.regions.values.filter(r => r.loyaltyTokens > 0);
+
+        const adjacentRegions = _.flatMap(regionsWithLT.map(r => this.ingame.world.getNeighbouringRegions(r).filter(r2 => r2.type == land)));
+
+        return _.uniq(_.concat(regionsWithLT, adjacentRegions));
     }
 
     serializeToClient(_admin: boolean, _player: Player | null): SerializedResolveMoveLoyaltyTokenGameState {

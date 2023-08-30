@@ -176,11 +176,11 @@ export default class ResolveRetreatGameState extends GameState<
                 // Mark those as wounded
                 armyLeft.forEach(u => u.wounded = true);
 
-                this.entireGame.broadcastToClients({
+                this.ingame.sendMessageToPlayersWhoCanSeeRegion({
                     type: "units-wounded",
                     regionId: this.postCombat.loserCombatData.region.id,
                     unitIds: armyLeft.map(u => u.id)
-                });
+                }, this.postCombat.loserCombatData.region);
             }
 
             // Retreat those unit to this location
@@ -190,13 +190,33 @@ export default class ResolveRetreatGameState extends GameState<
                 u.region = this.retreatRegion as Region;
             });
 
-            this.entireGame.broadcastToClients({
-                type: "move-units",
-                from: this.postCombat.loserCombatData.region.id,
-                to: this.retreatRegion.id,
-                units: armyLeft.map(u => u.id),
-                isRetreat: true
-            });
+            const from = this.postCombat.loserCombatData.region;
+
+            if (!this.ingame.fogOfWar) {
+                this.entireGame.broadcastToClients({
+                    type: "move-units",
+                    from: from.id,
+                    to: this.retreatRegion.id,
+                    units: armyLeft.map(u => u.id),
+                    isRetreat: true
+                });
+            } else {
+                this.ingame.players.values.forEach(p => {
+                    const visibleRegions = this.ingame.getVisibleRegionsForPlayer(p);
+                    if (visibleRegions.includes(from) && visibleRegions.includes(this.retreatRegion as Region)) {
+                        this.entireGame.sendMessageToClients([p.user], {
+                            type: "move-units",
+                            isRetreat: true,
+                            from: from.id,
+                            to: (this.retreatRegion as Region).id,
+                            units: armyLeft.map(u => u.id)
+                        });
+                    } else {
+                        this.ingame.broadcastRemoveUnits(from, armyLeft, false)
+                        this.ingame.broadcastAddUnits(this.retreatRegion as Region, armyLeft);
+                    }
+                });
+            }
         }
 
         this.postCombat.onResolveRetreatFinish();

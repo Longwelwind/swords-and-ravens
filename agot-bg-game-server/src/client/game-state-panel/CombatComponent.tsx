@@ -63,10 +63,6 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
         return this.combat.stats;
     }
 
-    get fogOfWar(): boolean {
-        return this.props.gameClient.entireGame?.gameSettings.fogOfWar || false
-    }
-
     render(): ReactNode {
         // If combatStats have been set by PostCombatState show the fixed dialog, otherwise the dynamic one!
         const winners = this.combatStats.filter(cs => cs.isWinner);
@@ -127,28 +123,12 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                 <Col xs={12}>
                     {this.combat.rerender >= 0 && (
                         <>
-                            {
-                                this.fogOfWar ? 
-                                (
-                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                        <h5>
-                                            Battle {this.combatStats.length > 0 && "results "}
-                                        </h5>
-                                    </div>
-                                )
-                                :
-                                (
-                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                        <h5>
-                                            Battle {this.combatStats.length > 0 && "results "} for <b>{this.combat.defendingRegion.name}</b>
-                                        </h5>
-                                    </div>
-                                )
-                            }
+                            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                <h5>Battle {this.combatStats.length > 0 && "results "} for <b>{this.combat.defendingRegion.name}</b></h5>
+                            </div>
                             <div style={{ display: 'flex', justifyContent: 'center' }}>
                                 <CombatInfoComponent
                                     housesCombatData={houseCombatDatas}
-                                    fogOfWar={this.fogOfWar}
                                 />
                             </div>
                         </>
@@ -202,7 +182,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
         // or the user does not control the house to select units but never show march markers when attacker lost the combat
         // (but post combat may be still active for abilties)
         const postCombat = this.combat.childGameState instanceof PostCombatGameState ? this.combat.childGameState : null;
-        const drawMarchMarkers = !postCombat || (!postCombat.hasChildGameState(AfterCombatHouseCardAbilitiesGameState) && postCombat.winner == this.combat.attacker);
+        const drawMarchMarkers = !this.combat.ingameGameState.fogOfWar && (!postCombat || (!postCombat.hasChildGameState(AfterCombatHouseCardAbilitiesGameState) && postCombat.winner == this.combat.attacker));
         const selectUnits = this.combat.hasChildGameState(SelectUnitsGameState) ? this.combat.getChildGameState(SelectUnitsGameState) as SelectUnitsGameState<any>: null;
 
         if (!selectUnits || !this.props.gameClient.doesControlHouse(selectUnits.house)) {

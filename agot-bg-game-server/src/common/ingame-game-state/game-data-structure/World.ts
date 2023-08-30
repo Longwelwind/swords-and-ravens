@@ -14,6 +14,7 @@ import { dragon } from "./unitTypes";
 import staticWorld7p from "./static-data-structure/globalStaticWorld7p";
 import StaticIronBankView from "./static-data-structure/StaticIronBankView";
 import { GameSettings } from "../../../common/EntireGame";
+import Player from "../Player";
 
 export default class World {
     settings: GameSettings;
@@ -173,43 +174,8 @@ export default class World {
         return this.regions.values.filter(r => r.getController() == house);
     }
 
-    hasUnitsInRegion(
-        regionId: string,
-        house?: House,
-    ): boolean {
-        if (!house) return false
-
-        // Find regions controlled by house.
-        const controlledRegions = this.getControlledRegions(house);
-
-        const [controlledWithUnits] = _.partition(
-            controlledRegions,
-            (region) => (region.units.entries.length)
-        )
-
-        return controlledWithUnits
-            .map((region) => region.id)
-            .includes(regionId)
-    }
-    
-    getRegionIdsAdjacent(
-        house: House,
-    ): string[] {
-        // Find regions controlled by house.
-        const controlledRegions = this.getControlledRegions(house);
-
-        const [controlledWithUnits, controlledWithoutUnits] = _.partition(
-            controlledRegions,
-            (region) => (region.units.entries.length)
-        )
-
-        const neighboring = controlledWithUnits.map((region) => this.getNeighbouringRegions(region)).flat(1)
-
-        return [
-            ...controlledWithUnits.map(region => region.id),
-            ...controlledWithoutUnits.map(region => region.id),
-            ...neighboring.map(region => region.id),
-        ]
+    getAllRegionsWithControllers(): [Region, House | null][] {
+        return this.regions.values.map(r => [r, r.getController()]);
     }
 
     getValidRetreatRegions(startingRegion: Region, house: House, army: Unit[]): Region[] {
@@ -282,9 +248,9 @@ export default class World {
         return this.regions.values.map(r => r.getSnapshot());
     }
 
-    serializeToClient(): SerializedWorld {
+    serializeToClient(admin: boolean, player: Player | null): SerializedWorld {
         return {
-            regions: this.regions.values.map(r => r.serializeToClient()),
+            regions: this.regions.values.map(r => r.serializeToClient(admin, player)),
             settings: this.settings
         };
     }

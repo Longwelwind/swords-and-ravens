@@ -4,6 +4,8 @@ import EntireGame from "./EntireGame";
 import User from "../server/User";
 import House from "./ingame-game-state/game-data-structure/House";
 import { v4 } from "uuid";
+import Region from "./ingame-game-state/game-data-structure/Region";
+import Player from "./ingame-game-state/Player";
 
 type AnyGameState = GameState<any, any> | null;
 
@@ -117,6 +119,10 @@ export default class GameState<ParentGameState extends AnyGameState, ChildGameSt
     }
 
     actionAfterVassalReplacement(_newVassal: House): void {
+    }
+
+    getRequiredVisibleRegionsForPlayer(_player: Player): Region[] {
+        return [];
     }
 }
 

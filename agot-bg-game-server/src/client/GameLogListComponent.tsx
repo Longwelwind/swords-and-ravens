@@ -76,6 +76,10 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         return this.ingame.gameLogManager;
     }
 
+    get fogOfWar(): boolean {
+        return !this.ingame.isEnded && !this.ingame.isCancelled && this.ingame.fogOfWar;
+    }
+
     createHouseCards(data: [string, HouseCardData][]): [string, HouseCard][] {
         return data.map(([houseCardId, houseCardData]) => {
             const houseCard = new HouseCard(
@@ -254,6 +258,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
             case "march-resolved": {
                 const house = this.game.houses.get(data.house);
+
+                if (this.fogOfWar) {
+                    return <p>
+                        House <b>{house.name}</b> resolved a <b>March</b> order.
+                    </p>;
+                }
+
                 const startingRegion = this.world.regions.get(data.startingRegion);
                 const moves: [Region, UnitType[]][] = data.moves.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
                 const orderImgUrl = data.orderType ? orderImages.get(data.orderType) : null;
@@ -291,7 +302,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const region = this.world.regions.get(data.region);
 
                 return <p>
-                    House <b>{house.name}</b> left {data.leftPowerToken ? <>behind a</> : <b>no</b>} Power&nbsp;token in <b>{region.name}</b>.
+                    House <b>{house.name}</b> left {data.leftPowerToken ? <>behind a</> : <b>no</b>} Power&nbsp;token in <b>{this.fogOfWar ? "somewhere" : region.name }</b>.
                 </p>;
             }
             case "westeros-card-executed":
@@ -423,17 +434,17 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                                 {musterings.map(([originatingRegion, recruitments]) => (
                                     <div key={`$mustering_${originatingRegion.id}`}>
                                         <p>
-                                            House <b>{house.name}</b> mustered in <b>{originatingRegion.name}</b>
+                                            House <b>{house.name}</b> mustered in <b>{this.fogOfWar ? "somewhere" : originatingRegion.name}</b>
                                         </p>
                                         <ul>
                                             {recruitments.map(({ region, from, to }, i) => (
                                                 <li key={"recruitment-" + region.id + "-" + i}>
                                                     {from ? (
                                                         <>
-                                                            A <b>{to.name}</b> from a <b>{from.name}</b>{originatingRegion != region && (<> to <b>{region.name}</b></>)}
+                                                            A <b>{to.name}</b> from a <b>{from.name}</b>{originatingRegion != region && (<> to <b>{this.fogOfWar ? "somewhere" : region.name}</b></>)}
                                                         </>
                                                     ) : (
-                                                            <>A <b>{to.name}</b>{originatingRegion != region && (<> to <b>{region.name}</b></>)}</>
+                                                            <>A <b>{to.name}</b>{originatingRegion != region && (<> to <b>{this.fogOfWar ? "somewhere" : region.name}</b></>)}</>
                                                         )}
                                                 </li>
                                             ))}
@@ -480,8 +491,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return (
                     <p>
                         House <b>{house.name}</b>, holder of the Messenger Raven token, chose to replace
-                        a <b>{originalOrder.type.name} Order</b> with a <b>{newOrder.type.name} Order
-                        </b> in <b>{orderRegion.name}</b>.
+                        a <b>{this.fogOfWar ? "" : originalOrder.type.name}</b> order with a <b>{this.fogOfWar ? "" : newOrder.type.name}
+                        </b> order in <b>{this.fogOfWar ? "somewhere" : orderRegion.name}</b>.
                     </p>
                 );
             }
@@ -497,6 +508,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const raidee = data.raidee ? this.game.houses.get(data.raidee) : null;
                 const raidedRegion = data.raidedRegion ? this.world.regions.get(data.raidedRegion) : null;
                 const orderRaided = data.orderRaided ? orders.get(data.orderRaided) : null;
+
+                if (this.fogOfWar) {
+                    return <p>
+                        <b>House {raider.name}</b> resolved a <b>Raid</b> order.
+                    </p>;
+                }
 
                 // Those 3 variables will always be all null or all non-null
                 if (raidee && raidedRegion && orderRaided) {
@@ -727,6 +744,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const region = this.world.regions.get(data.region);
                 const countPowerToken = data.powerTokenCount;
 
+                if (this.fogOfWar) {
+                    return <p>
+                        House <b>{house.name}</b> resolved a <b>Consolidate Power</b> order.
+                    </p>;
+                }
+
                 return <p>
                     House <b>{house.name}</b> resolved a <b>{data.starred && "Special "}Consolidate Power</b> order
                     in <b>{region.name}</b> to gain <b>{countPowerToken}</b> Power&nbsp;token{countPowerToken != 1 ? "s" : ""}.
@@ -742,7 +765,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </p>
                     <ul>
                         {armies.map(([region, unitTypes]) => (
-                            <li key={`armies-reconciled_${region.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`armies-reconciled_${region.id}_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></li>
+                            <li key={`armies-reconciled_${region.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`armies-reconciled_${region.id}_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{this.fogOfWar ? "somewhere" : region.name}</b></li>
                         ))}
                     </ul>
                 </>;
@@ -901,7 +924,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     <b>Loras Tyrell</b>: The <b>{order.type.name}</b> Order was moved
-                    to <b>{embattledRegion.name}</b>.
+                    to <b>{this.fogOfWar ? "somewhere" : embattledRegion.name}</b>.
                 </p>;
 
             case "queen-of-thorns-no-order-available": {
@@ -920,7 +943,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     <b>Queen of Thorns</b>: House <b>{house.name}</b> removed
-                    a <b>{removedOrder.type.name}</b> Order of House <b>{affectedHouse.name}</b> in <b>{region.name}</b>.
+                    a <b>{removedOrder.type.name}</b> Order of House <b>{affectedHouse.name}</b> in <b>{this.fogOfWar ? "somewhere" : region.name}</b>.
                 </p>;
             }
             case "tywin-lannister-power-tokens-gained": {
@@ -959,7 +982,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     <b>Renly Baratheon</b>: House <b>{house.name}</b> upgraded a Footman to a Knight
-                    in <b>{region.name}</b>.
+                    in <b>{this.fogOfWar ? "somewhere" : region.name}</b>.
                 </p>;
             }
             case "mace-tyrell-casualties-prevented": {
@@ -978,7 +1001,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     <b>Mace Tyrell</b>: House <b>{house.name}</b> destroyed an enemy Footman
-                    in <b>{region.name}</b>.
+                    in <b>{this.fogOfWar ? "somewhere" : region.name}</b>.
                 </p>;
             }
             case "ser-ilyn-payne-footman-killed": {
@@ -987,7 +1010,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     <b>Ser Ilyn Payne</b>: House <b>{house.name}</b> destroyed an enemy Footman
-                    in <b>{region.name}</b>.
+                    in <b>{this.fogOfWar ? "somewhere" : region.name}</b>.
                 </p>;
             }
             case "cersei-lannister-no-order-available":
@@ -1004,7 +1027,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <p>
                     <b>Cersei Lannister</b>: House <b>{house.name}</b> removed
                     a <b>{removedOrder.type.name}</b> Order
-                    of <b>{affectedHouse.name}</b> in <b>{region.name}</b>.
+                    of <b>{affectedHouse.name}</b> in <b>{this.fogOfWar ? "somewhere" : region.name}</b>.
                 </p>;
             }
             case "robb-stark-retreat-location-overriden": {
@@ -1023,7 +1046,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const regionTo = this.game.world.regions.get(data.regionTo);
                 return <p>
                         House <b>{house.name}</b> retreats from <b>
-                        {regionFrom.name}</b> to <b>{regionTo.name}</b>.
+                        {this.fogOfWar ? "somewhere" : regionFrom.name}</b> to <b>{this.fogOfWar ? "somewhere" : regionTo.name}</b>.
                 </p>;
             }
             case "retreat-failed": {
@@ -1103,7 +1126,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <p>
                     House <b>{house.name}</b>{units.length > 0
                     ? (<> chose to destroy {joinReactNodes(units.map(([region, unitTypes]) => <span key={`preemptive_${region.id}`}>
-                        {joinReactNodes(unitTypes.map((ut, i) => <b key={`preemptive_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), " and ")}.</>)
+                        {joinReactNodes(unitTypes.map((ut, i) => <b key={`preemptive_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{this.fogOfWar ? "somewhere" : region.name}</b></span>), " and ")}.</>)
                     : <> had no units to destroy.</>}
                 </p>;
             }
@@ -1177,7 +1200,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <p>
                     <b>Mammoth Riders</b>: House <b>{house.name}</b>{units.length > 0
                     ? (<> chose to destroy {joinReactNodes(units.map(([region, unitTypes]) => <span key={`mammoth-riders_${region.id}`}>
-                        {joinReactNodes(unitTypes.map((ut, i) => <b key={`mammoth-riders_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), ", ")}.</>)
+                        {joinReactNodes(unitTypes.map((ut, i) => <b key={`mammoth-riders_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{this.fogOfWar ? "somewhere" : region.name}</b></span>), ", ")}.</>)
                     : <> had no units to destroy.</>}
                 </p>;
             }
@@ -1205,7 +1228,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <p>
                     <b>The Horde Descends</b>: House <b>{house.name}</b>{units.length > 0
                         ? (<> chose to destroy {joinReactNodes(units.map(([region, unitTypes]) => <span key={`the-horde-descends_${region.id}`}>
-                            {joinReactNodes(unitTypes.map((ut, i) => <b key={`the-horde-descends_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), ", ")}.</>)
+                            {joinReactNodes(unitTypes.map((ut, i) => <b key={`the-horde-descends_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{this.fogOfWar ? "somewhere" : region.name}</b></span>), ", ")}.</>)
                     : <> had no units to destroy.</>}
                 </p>;
             }
@@ -1215,7 +1238,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     {units.length > 0
-                    ? (<><b>Crow Killers</b>: House <b>{house.name}</b> replaced {joinReactNodes(units.map(([region, unitTypes], i) => <span key={`crow-killers-replace_${i}`}><b>{unitTypes.length}</b> Knight{unitTypes.length != 1 ? "s" : ""} in <b>{region.name}</b></span>), ", ")} with Footmen.</>)
+                    ? (<><b>Crow Killers</b>: House <b>{house.name}</b> replaced {joinReactNodes(units.map(([region, unitTypes], i) => <span key={`crow-killers-replace_${i}`}><b>{unitTypes.length}</b> Knight{unitTypes.length != 1 ? "s" : ""} in <b>{this.fogOfWar ? "somewhere" : region.name}</b></span>), ", ")} with Footmen.</>)
                     : (<><b>Crow Killers</b>: House <b>{house.name}</b> had no Knights to replace with Footmen.</>)}
                 </p>;
             }
@@ -1223,7 +1246,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const units: [Region, UnitType[]][] = data.units.map(([rid, utids]) => [this.world.regions.get(rid), utids.map(utid => unitTypes.get(utid))]);
 
-                return <p><b>Crow Killers</b>: House <b>{house.name}</b> had to destroy {joinReactNodes(units.map(([region, unitTypes], i) => <span key={`crow-killers-kill_${i}`}><b>{unitTypes.length}</b> Knight{unitTypes.length != 1 ? "s" : ""} in <b>{region.name}</b></span>), ", ")}.</p>;
+                return <p><b>Crow Killers</b>: House <b>{house.name}</b> had to destroy {joinReactNodes(units.map(([region, unitTypes], i) => <span key={`crow-killers-kill_${i}`}><b>{unitTypes.length}</b> Knight{unitTypes.length != 1 ? "s" : ""} in <b>{this.fogOfWar ? "somewhere" : region.name}</b></span>), ", ")}.</p>;
             }
 
             case "crow-killers-footman-upgraded": {
@@ -1232,7 +1255,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     {units.length > 0
-                    ? (<><b>Crow Killers</b>: House <b>{house.name}</b> replaced {joinReactNodes(units.map(([region, unitTypes], i) => <span key={`crow-killers-upgrade_${i}`}><b>{unitTypes.length}</b> Footm{unitTypes.length == 1 ? "a" : "e"}n in <b>{region.name}</b></span>), ", ")} with Knights.</>)
+                    ? (<><b>Crow Killers</b>: House <b>{house.name}</b> replaced {joinReactNodes(units.map(([region, unitTypes], i) => <span key={`crow-killers-upgrade_${i}`}><b>{unitTypes.length}</b> Footm{unitTypes.length == 1 ? "a" : "e"}n in <b>{this.fogOfWar ? "somewhere" : region.name}</b></span>), ", ")} with Knights.</>)
                     : (<><b>Crow Killers</b>: House <b>{house.name}</b> was not able to replace any Footman with Knights.</>)}
                 </p>;
             }
@@ -1389,7 +1412,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const region = this.game.world.regions.get(data.region);
                 return <p>
-                    <b>Jon Conningtion</b>: House <b>{house.name}</b> chose to recruit a knight in <b>{region.name}</b>.
+                    <b>Jon Conningtion</b>: House <b>{house.name}</b> chose to recruit a Knight in <b>{this.fogOfWar ? "somewhere" : region.name}</b>.
                 </p>;
             }
             case "bronn-used": {
@@ -1520,13 +1543,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "loyalty-token-placed": {
                 const region = this.world.regions.get(data.region);
                 return <p>
-                    A loyalty&nbsp;token has been placed in <b>{region.name}</b>.
+                    A loyalty&nbsp;token has been placed in <b>{this.fogOfWar ? "somewhere" : region.name}</b>.
                 </p>;
             }
             case "loyalty-token-gained": {
                 const region = this.world.regions.get(data.region);
                 return <p>
-                    House <b>{this.game.targaryen?.name ?? "Targaryen"}</b> gained {data.count} Loyalty&nbsp;token{data.count != 1 ? "s" : ""} in <b>{region.name}</b>.
+                    House <b>{this.game.targaryen?.name ?? "Targaryen"}</b> gained {data.count} Loyalty&nbsp;token{data.count != 1 ? "s" : ""} in <b>{this.fogOfWar ? "somewhere" : region.name}</b>.
                 </p>
             }
             case "fire-made-flesh-choice": {
@@ -1539,7 +1562,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 } else if (data.dragonKilledInRegion) {
                     const region = this.world.regions.get(data.dragonKilledInRegion);
                     return <p>
-                        <b>Fire Made Flesh</b>: House <b>{house.name}</b> decided to destroy a dragon in <b>{region.name}</b>.
+                        <b>Fire Made Flesh</b>: House <b>{house.name}</b> decided to destroy a dragon in <b>{this.fogOfWar ? "somewhere" : region.name}</b>.
                     </p>
                 } else if (data.removedDragonStrengthToken) {
                     return <p>
@@ -1548,7 +1571,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 } else if (data.regainedDragonRegion) {
                     const region = this.world.regions.get(data.regainedDragonRegion);
                     return <p>
-                        <b>Fire Made Flesh</b>: House <b>{house.name}</b> decided to place a dragon in <b>{region.name}</b>.
+                        <b>Fire Made Flesh</b>: House <b>{house.name}</b> decided to place a dragon in <b>{this.fogOfWar ? "somewhere" : region.name}</b>.
                     </p>
                 } else {
                     return <></>;
@@ -1560,7 +1583,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const unitType = unitTypes.get(data.unitType);
 
                 return <p>
-                    <b>Playing with Fire</b>: House <b>{house.name}</b> chose to place a <b>{unitType.name}</b> in <b>{region.name}</b>.
+                    <b>Playing with Fire</b>: House <b>{house.name}</b> chose to place a <b>{unitType.name}</b> in <b>{this.fogOfWar ? "somewhere" : region.name}</b>.
                 </p>
             }
             case "the-long-plan-choice": {
@@ -1587,7 +1610,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     const regionTo = this.world.regions.get(data.regionTo);
 
                     return <p>
-                        House <b>{house.name}</b> moved a loyalty&nbsp;token from <b>{regionFrom.name}</b> to <b>{regionTo.name}</b>.
+                        House <b>{house.name}</b> moved a loyalty&nbsp;token from <b>{this.fogOfWar ? "somewhere" : regionFrom.name}</b> to <b>{this.fogOfWar ? "somewhere" : regionTo.name}</b>.
                     </p>
                 } else {
                     return <></>;
@@ -1601,7 +1624,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <>
                     <p>
                         House <b>{house.name}</b> resolved an <b>Iron&nbsp;Bank</b> order in <b>
-                            {region.name}</b> and paid <b>{data.paid}</b> Power&nbsp;token{data.paid != 1 ? "s" : ""} for
+                            {this.fogOfWar ? "somewhere" : region.name}</b> and paid <b>{data.paid}</b> Power&nbsp;token{data.paid != 1 ? "s" : ""} for
                     </p>
                     <div style={{ display: 'flex', justifyContent: 'center' }}>
                         <LoanCardComponent loanCard={loan}/>
@@ -1615,11 +1638,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return house ?
                     <p>
-                        House <b>{house.name}</b> removed their <b>{orderType.name}</b> order in <b>{region.name}</b>.
+                        House <b>{house.name}</b> removed their <b>{orderType.name}</b> order in <b>{this.fogOfWar ? "somewhere" : region.name}</b>.
                     </p>
                     :
                     <p>
-                        A <b>{orderType.name}</b> order has been removed from <b>{region.name}</b>.
+                        A <b>{orderType.name}</b> order has been removed from <b>{this.fogOfWar ? "somewhere" : region.name}</b>.
                     </p>
             }
             case "interest-paid": {
@@ -1637,7 +1660,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <p>
                     <b>Debts to the Iron&nbsp;Bank</b>: {units.length > 0
                     ? (<>House <b>{resolver.name}</b> chose to destroy {joinReactNodes(units.map(([region, unitTypes]) =>
-                            <span key={`pay-debt_${region.id}_${house.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`pay-debt_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), ", ")} of House <b>{house.name}</b>.</>)
+                            <span key={`pay-debt_${region.id}_${house.id}`}>{joinReactNodes(unitTypes.map((ut, i) => <b key={`pay-debt_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{this.fogOfWar ? "somewhere" : region.name}</b></span>), ", ")} of House <b>{house.name}</b>.</>)
                     : <>House <b>{house.name} </b> had no units to destroy.</>}
                 </p>;
             }
@@ -1654,7 +1677,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <p>
                     <b>{loan.name}</b>: House <b>{house.name}</b>{placedSellswords.length > 0 ? (<> chose to
                         place {joinReactNodes(placedSellswords.map(([region, unitTypes]) => <span key={`place-sellsword_${region.id}`}>
-                            {joinReactNodes(unitTypes.map((ut, i) => <b key={`place-sellsword_${region.id}_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{region.name}</b></span>), " and ")}.</>)
+                            {joinReactNodes(unitTypes.map((ut, i) => <b key={`place-sellsword_${region.id}_${ut.id}_${i}`}>{ut.name}</b>), ", ")} in <b>{this.fogOfWar ? "somewhere" : region.name}</b></span>), " and ")}.</>)
                         : <> placed no sellswords.</>}
                 </p>;
             }
@@ -1675,35 +1698,35 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const region = this.world.regions.get(data.region);
                 return <p>
-                    <b>Pyromancer</b>: House <b>{house.name}</b> chose to degrade <b>{region.name}</b> and place a <b>{data.upgradeType}</b> there.
+                    <b>Pyromancer</b>: House <b>{house.name}</b> chose to degrade <b>{this.fogOfWar ? "somewhere" : region.name}</b> and place a <b>{data.upgradeType}</b> there.
                 </p>;
             }
             case "expert-artificer-executed": {
                 const house = this.game.houses.get(data.house);
                 const region = this.world.regions.get(data.region);
                 return <p>
-                    <b>Expert Artificer</b>: House <b>{house.name}</b> chose to place a <b>Crown</b> in <b>{region.name}</b> and gained <b>{data.gainedPowerTokens}</b> Power token{data.gainedPowerTokens != 1 ? "s" : ""}.
+                    <b>Expert Artificer</b>: House <b>{house.name}</b> chose to place a <b>Crown</b> in <b>{this.fogOfWar ? "somewhere" : region.name}</b> and gained <b>{data.gainedPowerTokens}</b> Power token{data.gainedPowerTokens != 1 ? "s" : ""}.
                 </p>;
             }
             case "loyal-maester-executed": {
                 const house = this.game.houses.get(data.house);
                 const regions = data.regions.map(rid => this.world.regions.get(rid));
                 return <p>
-                    <b>Loyal Maester</b>: House <b>{house.name}</b> chose to place a <b>Barrel</b> in {joinReactNodes(regions.map(r => <b key={`loyal_maester_${r.id}`}>{r.name}</b>), ' and in ')}.
+                    <b>Loyal Maester</b>: House <b>{house.name}</b> chose to place a <b>Barrel</b> in {joinReactNodes(regions.map(r => <b key={`loyal_maester_${r.id}`}>{this.fogOfWar ? "somewhere" : r.name}</b>), ' and in ')}.
                 </p>;
             }
             case "master-at-arms-executed": {
                 const house = this.game.houses.get(data.house);
                 const regions = data.regions.map(rid => this.world.regions.get(rid));
                 return <p>
-                    <b>Master-at-Arms</b>: House <b>{house.name}</b> chose to upgrade the castles in {joinReactNodes(regions.map(r => <b key={`master-at-arms_${r.id}`}>{r.name}</b>), ' and in ')}.
+                    <b>Master-at-Arms</b>: House <b>{house.name}</b> chose to upgrade the castles in {joinReactNodes(regions.map(r => <b key={`master-at-arms_${r.id}`}>{this.fogOfWar ? "somewhere" : r.name}</b>), ' and in ')}.
                 </p>;
             }
             case "savvy-steward-executed": {
                 const house = this.game.houses.get(data.house);
                 const region = this.world.regions.get(data.region);
                 return <p>
-                    <b>Savvy Steward</b>: House <b>{house.name}</b> chose to place a <b>Barrel</b> in <b>{region.name}</b>. Their new supply level is <b>{data.newSupply}</b>.
+                    <b>Savvy Steward</b>: House <b>{house.name}</b> chose to place a <b>Barrel</b> in <b>{this.fogOfWar ? "somewhere" : region.name}</b>. Their new supply level is <b>{data.newSupply}</b>.
                 </p>;
             }
             case "spymaster-executed": {
@@ -1817,14 +1840,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const region = this.world.regions.get(data.region);
 
                 return <p>
-                    A <b>garrison token</b> with strength <b>{data.strength}</b> was <b>removed</b> from <b>{region.name}</b>.
+                    A <b>garrison token</b> with strength <b>{data.strength}</b> was <b>removed</b> from <b>{this.fogOfWar ? "somewhere" : region.name}</b>.
                 </p>;
             }
             case "garrison-returned": {
                 const region = this.world.regions.get(data.region);
 
                 return <p>
-                    A <b>garrison token</b> with strength <b>{data.strength}</b> was <b>returned</b> to <b>{region.name}</b>.
+                    A <b>garrison token</b> with strength <b>{data.strength}</b> was <b>returned</b> to <b>{this.fogOfWar ? "somewhere" : region.name}</b>.
                 </p>;
             }
             case "objective-deck-empty": {
@@ -1869,7 +1892,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const order = orders.get(data.order);
 
                 return <p>
-                    <b>Mace Tyrell</b>: House <b>{house.name}</b> decided to place a <b>{order.type.name}</b> order in <b>{region.name}</b>.
+                    <b>Mace Tyrell</b>: House <b>{house.name}</b> decided to place a <b>{order.type.name}</b> order in <b>{this.fogOfWar ? "somewhere" : region.name}</b>.
                 </p>;
             }
             case "bran-stark-used": {
@@ -1958,7 +1981,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.houseId);
 
                 return <p>
-                    A <b>Power token</b> of House <b>{house.name}</b> was removed from <b>{region.name}</b>.
+                    A <b>Power token</b> of House <b>{house.name}</b> was removed from <b>{this.fogOfWar ? "somewhere" : region.name}</b>.
                 </p>;
             }
             case "game-paused": {
@@ -1979,7 +2002,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <p>
                     House <b>{supporter.name}</b> {data.refused
                         ? <>refused to grant support to House <b>{house.name}</b></>
-                        : <>would support House <b>{house.name}</b></>} to attack the Neutral Force in <b>{region.name}</b>.
+                        : <>would support House <b>{house.name}</b></>} to attack the Neutral Force in <b>{this.fogOfWar ? "somewhere" : region.name}</b>.
                 </p>;
             }
             case "houses-swapped": {
@@ -2004,7 +2027,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const region = this.world.regions.get(data.region);
 
                 return <p>
-                    There was no further loyalty token available that could have been placed in <b>{region.name}</b>.
+                    There was no further loyalty token available that could have been placed in <b>{this.fogOfWar ? "somewhere" : region.name}</b>.
                 </p>;
             }
         }
