@@ -325,16 +325,11 @@ export default class MapComponent extends Component<MapComponentProps> {
                     ...neighboringToMarkedRegion.map(region => region.id)
                 ])
             } else if (adjacent.includes(markedRegion.id)) {
-                // Adjacent to region being entered: check if this region includes your units.
-                if (this.ingame.world.hasUnitsInRegion(markedRegion.id, this?.props?.authenticatedPlayer?.house)) {
+                // Adjacent to region being entered: check if this region includes your units or vassal units.
+                if (this.ingame.world.hasUnitsInRegion(markedRegion.id, this?.props?.authenticatedPlayer?.house)
+                    || vassalsOwned.some((house) => this.ingame.world.hasUnitsInRegion(markedRegion.id, house))
+                ) {
                     // If so, a battle is starting and you should include the source unit's region.
-                    return _.uniq([
-                        ...adjacent, 
-                        markedUnit.region.id,
-                        markedRegion.id,
-                    ])
-                } else if (vassalsOwned.some((house) => this.ingame.world.hasUnitsInRegion(markedRegion.id, house))) {
-                    // Your vassal is being attacked and you can also see this.
                     return _.uniq([
                         ...adjacent, 
                         markedUnit.region.id,
