@@ -61,7 +61,7 @@ export default class MapComponent extends Component<MapComponentProps> {
     backgroundImage: string = westerosImage;
     mapWidth: number = MAP_WIDTH;
     fogOfWarObject = {
-        fogOfWar: false,
+        fogOfWar: true,
     };
 
     get ingame(): IngameGameState {
@@ -82,7 +82,7 @@ export default class MapComponent extends Component<MapComponentProps> {
 
         this.mapWidth = this.ingame.entireGame.gameSettings.playerCount >= 8 ? DELUXE_MAT_WIDTH : MAP_WIDTH;
 
-        this.fogOfWarObject.fogOfWar = this.ingame.entireGame.gameSettings.fogOfWar;
+        // this.fogOfWarObject.fogOfWar = this.ingame.entireGame.gameSettings.fogOfWar;
         // Make sure this can't be toggled client-side.
         Object.freeze(this.fogOfWarObject)
     }
@@ -299,6 +299,17 @@ export default class MapComponent extends Component<MapComponentProps> {
             this.props.authenticatedPlayer.house,
         ) : [];
 
+        const vassalsOwned = this.ingame.game.vassalRelations.entries
+            .filter(([_, owner]) => owner.id === this?.props?.authenticatedPlayer?.house?.id)
+            .map(([vassal]) => vassal)
+
+        vassalsOwned.forEach((vassal) => {
+            const adjacentToVassal = this.props.authenticatedPlayer ? this.ingame.world.getRegionIdsAdjacent(
+                vassal,
+            ) : [];
+            adjacent.push(...adjacentToVassal)
+        })
+
         const markers = this.getMarkers(propertiesForUnits)
 
         if (markers.length) {
@@ -306,8 +317,6 @@ export default class MapComponent extends Component<MapComponentProps> {
 
             if (markedUnit.allegiance.id === this.props?.authenticatedPlayer?.house.id) {
                 // Player is attacker, reveal surrounding regions
-                console.log('marked Unit: ' + markedUnit.allegiance.id)
-                console.log(markedUnit)
                 const neighboringToMarkedRegion = this.ingame.world.getNeighbouringRegions(markedRegion)
                 return _.uniq([
                     ...adjacent, 
@@ -324,6 +333,13 @@ export default class MapComponent extends Component<MapComponentProps> {
                         markedUnit.region.id,
                         markedRegion.id,
                     ])
+                } else if (vassalsOwned.some((house) => this.ingame.world.hasUnitsInRegion(markedRegion.id, house))) {
+                    // Your vassal is being attacked and you can also see this.
+                    return _.uniq([
+                        ...adjacent, 
+                        markedUnit.region.id,
+                        markedRegion.id,
+                    ])
                 } else {
                     // You don't have units there and should not see the region the unit is coming from.
                     return _.uniq([
@@ -332,7 +348,6 @@ export default class MapComponent extends Component<MapComponentProps> {
                     ])
                 }
             } else if (adjacent.includes(markedUnit.region.id)) {
-                console.log('current unit region: ' + markedUnit.region.id)
                 return _.uniq([
                     ...adjacent,
                     markedUnit.region.id,
