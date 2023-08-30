@@ -43,6 +43,7 @@ import invertColor from "./utils/invertColor";
 import ImagePopover from "./utils/ImagePopover";
 import renderLoanCardsToolTip from "./loanCardsTooltip";
 import Xarrow from "react-xarrows";
+import Player from "../common/ingame-game-state/Player";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -52,12 +53,16 @@ interface MapComponentProps {
     gameClient: GameClient;
     ingameGameState: IngameGameState;
     mapControls: MapControls;
+    authenticatedPlayer: Player | null;
 }
 
 @observer
 export default class MapComponent extends Component<MapComponentProps> {
     backgroundImage: string = westerosImage;
     mapWidth: number = MAP_WIDTH;
+    fogOfWarObject = {
+        fogOfWar: true,
+    };
 
     get ingame(): IngameGameState {
         return this.props.ingameGameState;
@@ -76,6 +81,10 @@ export default class MapComponent extends Component<MapComponentProps> {
                     : westerosImage;
 
         this.mapWidth = this.ingame.entireGame.gameSettings.playerCount >= 8 ? DELUXE_MAT_WIDTH : MAP_WIDTH;
+
+        // this.fogOfWarObject.fogOfWar = this.ingame.entireGame.gameSettings.fogOfWar;
+        // Make sure this can't be toggled client-side.
+        Object.freeze(this.fogOfWarObject)
     }
 
     render(): ReactNode {
@@ -122,13 +131,15 @@ export default class MapComponent extends Component<MapComponentProps> {
             { }
         );
 
+        const nonFoggedRegions = this.getNonFoggedRegions(propertiesForUnits)
+
         return (
             <div className="map"
                 style={{ backgroundImage: `url(${this.backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem" }}>
                 <div style={{ position: "relative" }}>
                     {this.ingame.world.regions.values.map(r => (
                         <div key={`map_${r.id}`}>
-                            {castleModifiers.has(r.id) && (
+                            {(!this.getIsFoggedRegion(nonFoggedRegions, r.id)) && castleModifiers.has(r.id) && (
                                 <OverlayTrigger
                                     overlay={renderRegionTooltip(r)}
                                     delay={{ show: 750, hide: 100 }}
@@ -144,7 +155,9 @@ export default class MapComponent extends Component<MapComponentProps> {
                                     />
                                 </OverlayTrigger>
                             )}
-                            {(barrelModifiers.has(r.id) || crownModifiers.has(r.id)) && this.renderImprovements(r)}
+                            {(barrelModifiers.has(r.id) || crownModifiers.has(r.id)) 
+                            && (!this.getIsFoggedRegion(nonFoggedRegions, r.id))
+                            && this.renderImprovements(r)}
                             {r.overwrittenSuperControlPowerToken &&
                                 <OverlayTrigger
                                     overlay={<Tooltip id={"power-token-" + r.id}>
@@ -166,7 +179,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                                     </div>
                                 </OverlayTrigger>
                             }
-                            {r.controlPowerToken && (
+                            {(!this.getIsFoggedRegion(nonFoggedRegions, r.id)) && r.controlPowerToken && (
                                 <OverlayTrigger
                                     overlay={<Tooltip id={"power-token-" + r.id}>
                                         <div className="text-center"><b>Power token</b><small> of <b>{r.controlPowerToken.name}<br />{r.name}</b></small></div>
@@ -190,7 +203,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                         </div>
                     ))}
                     {this.renderUnits(propertiesForUnits, garrisons, disablePointerEventsForUnits)}
-                    {this.renderOrders()}
+                    {this.renderOrders(propertiesForUnits)}
                     {this.renderRegionTexts(propertiesForRegions)}
                     {this.renderIronBankInfos(ironBankView)}
                     {this.renderLoanCardDeck(ironBankView)}
@@ -198,19 +211,20 @@ export default class MapComponent extends Component<MapComponentProps> {
                     {this.renderMarchMarkers(propertiesForUnits)}
                 </div>
                 <svg style={{ width: `${this.mapWidth}px`, height: `${MAP_HEIGHT}px` }}>
-                    {this.renderRegions(propertiesForRegions)}
+                    {this.renderRegions(propertiesForRegions, propertiesForUnits)}
                 </svg>
             </div>
         )
     }
 
     renderMarchMarkers(propertiesForUnits: BetterMap<Unit, UnitOnMapProperties>): ReactNode[] {
-        const markers = _.unionBy(
-            propertiesForUnits.entries.filter(([_u, uprop]) => uprop.targetRegion != undefined).map(([u, uprop]) => [u, uprop.targetRegion] as [Unit, Region]),
-            this.ingame.marchMarkers.entries, ([u, _r]) => u.id)
-            .filter(([u, r]) => u.region != r);
+        const markers = this.getMarkers(propertiesForUnits)
 
-        return markers.map(([unit, to]) =>
+        const nonFoggedRegions = this.getNonFoggedRegions(propertiesForUnits)
+
+        return markers
+        .filter(([unit, to]) => nonFoggedRegions.includes(unit.region.id) && nonFoggedRegions.includes(to.id))
+        .map(([unit, to]) =>
             <Xarrow
                 key={`arrow-${unit.id}-${to.id}`}
                 start={`centered-unit-div-for-march-markers-${unit.id}`}
@@ -273,9 +287,135 @@ export default class MapComponent extends Component<MapComponentProps> {
         </div>;
     }
 
-    renderRegions(propertiesForRegions: BetterMap<Region, RegionOnMapProperties>): ReactNode {
+    private getMarkers(propertiesForUnits: BetterMap<Unit, UnitOnMapProperties>) {
+        return _.unionBy(
+            propertiesForUnits.entries.filter(([_u, uprop]) => uprop.targetRegion != undefined).map(([u, uprop]) => [u, uprop.targetRegion] as [Unit, Region]),
+            this.ingame.marchMarkers.entries, ([u, _r]) => u.id)
+            .filter(([u, r]) => u.region != r);
+    }
+
+    private getNonFoggedRegions(propertiesForUnits: BetterMap<Unit, UnitOnMapProperties>): string[] {
+        const adjacent = this.props.authenticatedPlayer ? this.ingame.world.getRegionIdsAdjacent(
+            this.props.authenticatedPlayer.house,
+        ) : [];
+
+        const vassalsOwned = this.ingame.game.vassalRelations.entries
+            .filter(([_, owner]) => owner.id === this?.props?.authenticatedPlayer?.house?.id)
+            .map(([vassal]) => vassal)
+
+        vassalsOwned.forEach((vassal) => {
+            const adjacentToVassal = this.props.authenticatedPlayer ? this.ingame.world.getRegionIdsAdjacent(
+                vassal,
+            ) : [];
+            adjacent.push(...adjacentToVassal)
+        })
+
+        const markers = this.getMarkers(propertiesForUnits)
+
+        if (markers.length) {
+            const [markedUnit, markedRegion] = markers[0]
+
+            if (markedUnit.allegiance.id === this.props?.authenticatedPlayer?.house.id) {
+                // Player is attacker, reveal surrounding regions
+                const neighboringToMarkedRegion = this.ingame.world.getNeighbouringRegions(markedRegion)
+                return _.uniq([
+                    ...adjacent, 
+                    markedRegion.id,
+                    markedUnit.region.id,
+                    ...neighboringToMarkedRegion.map(region => region.id)
+                ])
+            } else if (adjacent.includes(markedRegion.id)) {
+                // Adjacent to region being entered: check if this region includes your units or vassal units.
+                if (this.ingame.world.hasUnitsInRegion(markedRegion.id, this?.props?.authenticatedPlayer?.house)
+                    || vassalsOwned.some((house) => this.ingame.world.hasUnitsInRegion(markedRegion.id, house))
+                ) {
+                    // If so, a battle is starting and you should include the source unit's region.
+                    return _.uniq([
+                        ...adjacent, 
+                        markedUnit.region.id,
+                        markedRegion.id,
+                    ])
+                } else {
+                    // You don't have units there and should not see the region the unit is coming from.
+                    return _.uniq([
+                        ...adjacent,
+                        markedRegion.id,
+                    ])
+                }
+            } else if (adjacent.includes(markedUnit.region.id)) {
+                return _.uniq([
+                    ...adjacent,
+                    markedUnit.region.id,
+                ])
+            }
+        }
+
+        return adjacent
+    }
+
+    private isFoggedForUnit(
+        unitId: number,
+        regionId: string,
+        isFoggedRegion: boolean,
+        propertiesForUnits: BetterMap<Unit, UnitOnMapProperties>
+    ): boolean {
+        if (!this.fogOfWarObject.fogOfWar) return false
+
+        const markers = this.getMarkers(propertiesForUnits)
+
+        if (!markers.length) {
+            return isFoggedRegion
+        }
+
+        const [markedUnit, markedRegion] = markers[0]
+
+        // Units belong to player - show all units
+        if (markedUnit.allegiance.id === this.props?.authenticatedPlayer?.house.id) {
+            return false
+        }
+
+        // Region being attacked should also show all units
+        if (markedRegion.id === regionId) return false
+
+        const matchingUnit = markers.find(markerArray => {
+            const [unit] = markerArray
+            return unit.id === unitId
+        })
+
+        // If one of the units attacking matches the unit ID, show it
+        if (matchingUnit) return false
+
+        const adjacent = this.props.authenticatedPlayer ? this.ingame.world.getRegionIdsAdjacent(
+            this.props.authenticatedPlayer.house,
+        ) : [];
+
+        // Show all units if the region the units are attacking from is adjacent.
+        if (markedUnit.region.id === regionId && !adjacent.includes(regionId)) {
+            return true
+        }
+
+        // Hide the unit if the area is fogged in general
+        return isFoggedRegion
+    }
+
+    private getIsFoggedRegion(nonFoggedRegions: string[], regionId: string): boolean {
+        const isFogged = !nonFoggedRegions.includes(regionId)
+        return this.fogOfWarObject.fogOfWar ? isFogged : false
+    }
+
+    renderRegions(
+        propertiesForRegions: BetterMap<Region, RegionOnMapProperties>,
+        propertiesForUnits: BetterMap<Unit, UnitOnMapProperties>
+    ): ReactNode {
+        const nonFoggedRegions = this.getNonFoggedRegions(propertiesForUnits)
+
         return propertiesForRegions.entries.map(([region, properties]) => {
             const wrap = properties.wrap;
+
+            const isFoggedRegion = this.getIsFoggedRegion(nonFoggedRegions, region.id)
+
+            const fillColor = region.isBlocked ? "black" 
+            : (isFoggedRegion ? "#3d3d3d" : properties.highlight.color)
 
             return (
                 <ConditionalWrap condition={!region.isBlocked}
@@ -293,10 +433,11 @@ export default class MapComponent extends Component<MapComponentProps> {
                 >
                     <polygon
                         points={this.getRegionPath(region)}
-                        fill={region.isBlocked ? "black" : properties.highlight.color}
+                        fill={fillColor}
                         fillRule="evenodd"
                         className={classNames(
                             region.isBlocked ? "blocked-region" : "region-area",
+                            isFoggedRegion ? "region-area-fogged" : "",
                             { "clickable" : properties.onClick != undefined || properties.wrap != undefined },
                             properties.highlight.active && {
                                 // Whatever the strength of the highlight defined, show the same
@@ -334,6 +475,8 @@ export default class MapComponent extends Component<MapComponentProps> {
 
     renderUnits(propertiesForUnits: BetterMap<Unit, UnitOnMapProperties>, garrisons: BetterMap<string, string | null>, disablePointerEvents: boolean): ReactNode {
         const garrisonControllers = new BetterMap(garrisons.keys.map(rid => [rid, this.ingame.world.regions.get(rid).getController()]));
+        
+        const nonFoggedRegions = this.getNonFoggedRegions(propertiesForUnits)
 
         return this.ingame.world.regions.values.map(r => {
             let disablePointerEventsForCurrentRegion = disablePointerEvents;
@@ -342,13 +485,19 @@ export default class MapComponent extends Component<MapComponentProps> {
                 disablePointerEventsForCurrentRegion = false;
             }
 
+            const isFoggedRegion = this.getIsFoggedRegion(nonFoggedRegions, r.id)
+
             const controller = r.getController();
+
             return <div
                 key={`map-units_${r.id}`}
                 className={classNames("units-container", { "disable-pointer-events": disablePointerEventsForCurrentRegion })}
                 style={{ left: r.unitSlot.point.x, top: r.unitSlot.point.y, width: r.unitSlot.width, flexWrap: r.type == land ? "wrap-reverse" : "wrap" }}
             >
-                {r.allUnits.map(u => {
+                {!isFoggedRegion
+                && r.allUnits
+                .filter(u => !this.isFoggedForUnit(u.id, r.id, isFoggedRegion, propertiesForUnits))
+                .map(u => {
                     const property = propertiesForUnits.get(u);
                     let opacity: number;
                     // css transform
@@ -405,7 +554,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                         </div>
                     </OverlayTrigger>
                 })}
-                {garrisons.has(r.id) && (
+                {!isFoggedRegion && garrisons.has(r.id) && (
                     <OverlayTrigger
                         overlay={<Tooltip id={"garrison-tooltip-" + r.id}>
                             <div className="text-center">
@@ -430,7 +579,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                         </div>
                     </OverlayTrigger>
                 )}
-                {r.loyaltyTokens > 0 && (
+                {!isFoggedRegion && r.loyaltyTokens > 0 && (
                     <OverlayTrigger
                         overlay={<Tooltip id={"loyalty-tooltip-" + r.id}>
                             <div className="text-center"><b>Loyalty token</b><br /><small><b>{r.name}</b></small></div>
@@ -499,16 +648,25 @@ export default class MapComponent extends Component<MapComponentProps> {
         </div>
     }
 
-    renderOrders(): ReactNode {
+    renderOrders(
+        propertiesForUnits: BetterMap<Unit, UnitOnMapProperties>
+    ): ReactNode {
         const propertiesForOrders = this.getModifiedPropertiesForEntities<Region, OrderOnMapProperties>(
             _.flatMap(this.ingame.world.regions.values),
             this.props.mapControls.modifyOrdersOnMap,
             { }
         );
 
+        const nonFoggedRegions = this.getNonFoggedRegions(propertiesForUnits)
+
         return propertiesForOrders.map((region, properties) => {
             let order: Order | null = null;
             let orderPresent = false;
+
+            if (this.fogOfWarObject.fogOfWar && !nonFoggedRegions.includes(region.id)) {
+                return null
+            }
+
             if (this.ingame.childGameState instanceof PlanningGameState && this.ingame.childGameState.childGameState instanceof PlaceOrdersGameState) {
                 const placeOrders = this.ingame.childGameState.childGameState;
                 orderPresent = placeOrders.placedOrders.has(region);

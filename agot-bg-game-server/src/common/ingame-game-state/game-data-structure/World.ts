@@ -173,6 +173,45 @@ export default class World {
         return this.regions.values.filter(r => r.getController() == house);
     }
 
+    hasUnitsInRegion(
+        regionId: string,
+        house?: House,
+    ): boolean {
+        if (!house) return false
+
+        // Find regions controlled by house.
+        const controlledRegions = this.getControlledRegions(house);
+
+        const [controlledWithUnits] = _.partition(
+            controlledRegions,
+            (region) => (region.units.entries.length)
+        )
+
+        return controlledWithUnits
+            .map((region) => region.id)
+            .includes(regionId)
+    }
+    
+    getRegionIdsAdjacent(
+        house: House,
+    ): string[] {
+        // Find regions controlled by house.
+        const controlledRegions = this.getControlledRegions(house);
+
+        const [controlledWithUnits, controlledWithoutUnits] = _.partition(
+            controlledRegions,
+            (region) => (region.units.entries.length)
+        )
+
+        const neighboring = controlledWithUnits.map((region) => this.getNeighbouringRegions(region)).flat(1)
+
+        return [
+            ...controlledWithUnits.map(region => region.id),
+            ...controlledWithoutUnits.map(region => region.id),
+            ...neighboring.map(region => region.id),
+        ]
+    }
+
     getValidRetreatRegions(startingRegion: Region, house: House, army: Unit[]): Region[] {
         return this.getReachableRegions(startingRegion, house, army, false, true)
             // A retreat can be done in a port only if the adjacent land area is controlled
