@@ -95,6 +95,13 @@ export default class ResolveSinglePayDebtGameState extends GameState<PayDebtsGam
         return [this.parentGameState.ingame.getControllerOfHouse(this.resolver).user];
     }
 
+    getRequiredVisibleRegionsForPlayer(player: Player): Region[] {
+        if (this.ingame.getControllerOfHouse(this.resolver) == player) {
+            return _.uniq(this.availableUnitsOfHouse.map(u => u.region));
+        }
+        return [];
+    }
+
     serializeToClient(_admin: boolean, _player: Player | null): SerializedResolveSinglePayDebtGameState {
         return {
             type: "resolve-single-pay-debt",

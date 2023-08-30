@@ -13,6 +13,7 @@ import { CombatStats } from "../common/ingame-game-state/action-game-state/resol
 import { DraftStep } from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import { SerializedLoanCard } from "../common/ingame-game-state/game-data-structure/loan-card/LoanCard";
 import { SerializedWaitedForData } from "../common/ingame-game-state/Player";
+import { SerializedRegion } from "../common/ingame-game-state/game-data-structure/Region";
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady | PlayerUnready
     | HouseCardChosen | SupportDeclared | SupportRefused | NewTurn | RemovePlacedOrder
@@ -34,7 +35,7 @@ export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | Ord
     | StartPlayerClock | StopPlayerClock | GamePaused | GameResumed | LaterHouseCardsApplied
     | WildlingTiesResolved | PreemptiveRaidNewAttack | GameStarted | ReadyCheck | HousesSwapped
     | RevealOrders | RemoveOrders | AcceptAllLoyaltyTokenMovementsChanged | UpdateWaitedForData
-    | UserBanned | UserUnbanned;
+    | UserBanned | UserUnbanned | UpdateVisibleRegions | UpdatePublicVisibleRegionsForSpectators;
 
 interface AuthenticationResponse {
     type: "authenticate-response";
@@ -557,4 +558,20 @@ interface UserBanned {
 interface UserUnbanned {
     type: "user-unbanned";
     userId: string;
+}
+
+interface UpdateVisibleRegions {
+    type: "update-visible-regions";
+    playerUserId: string;
+    regionsToMakeVisible: SerializedRegion[];
+    regionsToHide: string[];
+    ordersToMakeVisible: [string, number][];
+}
+
+interface UpdatePublicVisibleRegionsForSpectators {
+    type: "update-public-visible-regions";
+    regionsToMakeVisible?: SerializedRegion[];
+    ordersToMakeVisible?: [string, number][];
+    clear?: boolean;
+    applyChangesNow?: boolean;
 }

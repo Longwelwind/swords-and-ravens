@@ -271,7 +271,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     <h4><Badge variant="primary"><FontAwesomeIcon icon={faTriangleExclamation} /></Badge></h4>
                 </OverlayTrigger>
             </Col>}
-            {false &&
+            {this.props.entireGame.gameSettings.fogOfWar &&
             <Col xs="auto">
                 <h4><Badge variant="warning">BETA</Badge></h4>
             </Col>}

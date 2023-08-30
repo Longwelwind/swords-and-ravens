@@ -63,10 +63,6 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
         return this.combat.stats;
     }
 
-    get fogOfWar(): boolean {
-        return this.props.gameClient.entireGame?.gameSettings.fogOfWar || false
-    }
-
     render(): ReactNode {
         // If combatStats have been set by PostCombatState show the fixed dialog, otherwise the dynamic one!
         const winners = this.combatStats.filter(cs => cs.isWinner);
@@ -127,28 +123,12 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                 <Col xs={12}>
                     {this.combat.rerender >= 0 && (
                         <>
-                            {
-                                this.fogOfWar ? 
-                                (
-                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                        <h5>
-                                            Battle {this.combatStats.length > 0 && "results "}
-                                        </h5>
-                                    </div>
-                                )
-                                :
-                                (
-                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                        <h5>
-                                            Battle {this.combatStats.length > 0 && "results "} for <b>{this.combat.defendingRegion.name}</b>
-                                        </h5>
-                                    </div>
-                                )
-                            }
+                            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                <h5>Battle {this.combatStats.length > 0 && "results "} for <b>{this.combat.defendingRegion.name}</b></h5>
+                            </div>
                             <div style={{ display: 'flex', justifyContent: 'center' }}>
                                 <CombatInfoComponent
                                     housesCombatData={houseCombatDatas}
-                                    fogOfWar={this.fogOfWar}
                                 />
                             </div>
                         </>

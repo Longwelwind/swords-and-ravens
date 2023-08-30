@@ -199,11 +199,7 @@ export default class PlayerMusteringGameState extends GameState<ParentGameState>
                 });
 
                 if (createdUnits.length > 0) {
-                    this.entireGame.broadcastToClients({
-                        type: "add-units",
-                        regionId: region.id,
-                        units: createdUnits.map(u => u.serializeToClient())
-                    });
+                    this.ingame.broadcastAddUnits(region, createdUnits);
                 }
             });
 

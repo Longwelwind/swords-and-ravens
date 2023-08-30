@@ -694,7 +694,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                 <Tooltip id="fog-of-war-setting-tooltip">
                                     Limit visibility to controlled regions, adjacent regions, and regions you attack or are attacked from.
                                 </Tooltip>}>
-                                <label htmlFor="fog-of-war-setting">Fog of War</label>
+                                <label htmlFor="fog-of-war-setting">Fog of War <i>(BETA!)</i></label>
                             </OverlayTrigger>}
                         checked={this.gameSettings.fogOfWar}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.fogOfWar = !this.gameSettings.fogOfWar)}

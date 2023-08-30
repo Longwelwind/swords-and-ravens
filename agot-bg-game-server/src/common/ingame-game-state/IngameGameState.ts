@@ -68,6 +68,8 @@ export default class IngameGameState extends GameState<
     game: Game;
     gameLogManager: GameLogManager = new GameLogManager(this);
     @observable ordersOnBoard: BetterMap<Region, Order> = new BetterMap();
+    @observable visibleRegionsPerPlayer: BetterMap<Player, Region[]> = new BetterMap();
+    @observable publicVisibleRegions: Region[] = [];
 
     votes: BetterMap<string, Vote> = new BetterMap();
     @observable paused: Date | null = null;
@@ -112,8 +114,16 @@ export default class IngameGameState extends GameState<
         return this.childGameState instanceof CancelledGameState;
     }
 
+    get fogOfWar(): boolean {
+        return this.entireGame.gameSettings.fogOfWar;
+    }
+
     constructor(entireGame: EntireGame) {
         super(entireGame);
+
+        entireGame.onBeforeGameStateChangedTransmitted = () => {
+            this.updateVisibleRegions();
+        }
     }
 
     beginGame(housesToCreate: string[], futurePlayers: BetterMap<string, User>): void {
@@ -123,6 +133,10 @@ export default class IngameGameState extends GameState<
 
         this.game = createGame(this, housesToCreate, futurePlayers.keys);
         this.players = new BetterMap(futurePlayers.map((house, user) => [user, new Player(user, this.game.houses.get(house))]));
+
+        if (this.fogOfWar) {
+            this.players.values.forEach(p => this.visibleRegionsPerPlayer.set(p, this.calculateVisibleRegionsForPlayer(p)));
+        }
 
         if (this.entireGame.isDanceWithMotherOfDragons) {
             applyChangesForDanceWithMotherOfDragons(this);
@@ -261,16 +275,29 @@ export default class IngameGameState extends GameState<
     proceedPlanningGameState(planningRestrictions: PlanningRestriction[] = [], revealedWesterosCards: WesterosCard[] = []): void {
         this.game.vassalRelations = new BetterMap();
         this.broadcastVassalRelations();
+        this.updateVisibleRegions(true);
         this.setChildGameState(new PlanningGameState(this)).firstStart(planningRestrictions, revealedWesterosCards);
     }
 
     proceedToActionGameState(placedOrders: BetterMap<Region, Order>, planningRestrictions: PlanningRestriction[]): void {
         this.ordersOnBoard = placedOrders;
+        const mappedOrders = placedOrders.mapOver(r => r.id, o => o.id);
 
-        this.entireGame.broadcastToClients({
-            type: "reveal-orders",
-            orders: placedOrders.mapOver(r => r.id, o => o.id)
-        });
+        if (!this.fogOfWar) {
+            this.entireGame.broadcastToClients({
+                type: "reveal-orders",
+                orders: mappedOrders
+            });
+        } else {
+            this.entireGame.users.values.forEach(u => {
+                const p = this.players.tryGet(u, null);
+                const visibleRegionIds = this.getVisibleRegionsForPlayer(p).map(r => r.id);
+                this.entireGame.sendMessageToClients([u], {
+                    type: "reveal-orders",
+                    orders: mappedOrders.filter(([rid, _oid]) => visibleRegionIds.includes(rid))
+                });
+            });
+        }
 
         this.setChildGameState(new ActionGameState(this)).firstStart(planningRestrictions);
     }
@@ -336,6 +363,19 @@ export default class IngameGameState extends GameState<
             type: "new-turn"
         });
 
+        this.publicVisibleRegions = [];
+
+        this.entireGame.users.values.filter(u => u.connected).forEach(u => {
+            this.entireGame.sendMessageToClients([u], {
+                type: "update-public-visible-regions",
+                regionsToMakeVisible: [],
+                ordersToMakeVisible: [],
+                clear: true,
+                applyChangesNow: !this.players.has(u)
+            });
+        });
+
+        this.updateVisibleRegions(true);
 
         if (this.game.turn > 1) {
             const unpaidInterest = this.game.ironBank?.payInterest() ?? []
@@ -360,6 +400,7 @@ export default class IngameGameState extends GameState<
             return;
         }
 
+        this.updateVisibleRegions(true);
         this.setChildGameState(new WesterosGameState(this)).firstStart();
     }
 
@@ -712,23 +753,9 @@ export default class IngameGameState extends GameState<
             return newUnit;
         });
 
-        this.entireGame.broadcastToClients({
-            type: "add-units",
-            regionId: region.id,
-            units: transformed.map(u => u.serializeToClient()),
-            isTransform: true
-        });
+        this.broadcastAddUnits(region, transformed, true);
 
         return transformed;
-    }
-
-    broadcastRemoveUnits(region: Region, units: Unit[], animate = true): void {
-        this.entireGame.broadcastToClients({
-            type: "remove-units",
-            regionId: region.id,
-            unitIds: units.map(u => u.id),
-            animate: animate
-        });
     }
 
     checkVictoryConditions(isCheckAtEndOfRound = false): boolean {
@@ -1035,13 +1062,15 @@ export default class IngameGameState extends GameState<
                 return unit;
             });
 
-            units.forEach(u =>
-                this.unitsToBeAnimated.set(u, {
-                    highlight: {active: true, color: message.isTransform ? "yellow": "green"},
-                    animateAttention: message.isTransform,
-                    animateFadeIn: !message.isTransform
-                }));
-            window.setTimeout(() => units.forEach(u => this.unitsToBeAnimated.delete(u)), 4000);
+            if (!this.fogOfWar) {
+                units.forEach(u =>
+                    this.unitsToBeAnimated.set(u, {
+                        highlight: {active: true, color: message.isTransform ? "yellow": "green"},
+                        animateAttention: message.isTransform,
+                        animateFadeIn: !message.isTransform
+                    }));
+                window.setTimeout(() => units.forEach(u => this.unitsToBeAnimated.delete(u)), 4000);
+            }
         } else if (message.type == "change-garrison") {
             const region = this.world.regions.get(message.region);
 
@@ -1050,7 +1079,7 @@ export default class IngameGameState extends GameState<
             const region = this.world.regions.get(message.regionId);
             const units = message.unitIds.map(uid => region.units.get(uid));
 
-            if (message.animate) {
+            if (message.animate && !this.fogOfWar) {
                 units.forEach(u =>
                     this.unitsToBeAnimated.set(u, {
                         highlight: {active: true, color: "red"},
@@ -1307,20 +1336,27 @@ export default class IngameGameState extends GameState<
             initiator.house = swappingHouse;
             this.forceRerender();
         } else if (message.type == "reveal-orders") {
-            message.orders.forEach(([rid, _oid]) => {
-                const r = this.world.regions.get(rid);
-                this.ordersToBeAnimated.set(r, {animateFlip: true })
-            });
-            window.setTimeout(() => {
+            if (!this.fogOfWar) {
+                message.orders.forEach(([rid, _oid]) => {
+                    const r = this.world.regions.get(rid);
+                    this.ordersToBeAnimated.set(r, {animateFlip: true })
+                });
+                window.setTimeout(() => {
+                    this.ordersOnBoard = new BetterMap(message.orders.map(([rid, oid]) => {
+                        const r = this.world.regions.get(rid);
+                        this.ordersToBeAnimated.delete(r);
+                        return [r, orders.get(oid)];
+                    }));
+                }, 1200);
+            } else {
                 this.ordersOnBoard = new BetterMap(message.orders.map(([rid, oid]) => {
                     const r = this.world.regions.get(rid);
-                    this.ordersToBeAnimated.delete(r);
                     return [r, orders.get(oid)];
                 }));
-            }, 1200);
+            }
         } else if (message.type == "remove-orders") {
             message.regions.map(rid => this.world.regions.get(rid)).forEach(r => {
-                this.ordersOnBoard.delete(r);
+                if (this.ordersOnBoard.has(r)) this.ordersOnBoard.delete(r);
             });
         } else if (message.type == "manipulate-combat-house-card") {
             message.manipulatedHouseCards.forEach(([hcid, shc]) => {
@@ -1350,8 +1386,242 @@ export default class IngameGameState extends GameState<
             this.bannedUsers.add(message.userId);
         } else if (message.type == "user-unbanned") {
             this.bannedUsers.delete(message.userId);
+        } else if (message.type == "update-visible-regions") {
+            if (this.fogOfWar) {
+                const player = this.players.get(this.entireGame.users.get(message.playerUserId));
+
+                if (!this.visibleRegionsPerPlayer.has(player)) {
+                    this.visibleRegionsPerPlayer.set(player, []);
+                }
+
+                const visibleRegions = message.regionsToMakeVisible.map(sr => Region.deserializeFromServer(this.game, sr));
+
+                visibleRegions.forEach(vr => {
+                    const region = this.world.regions.get(vr.id);
+
+                    region.units = vr.units;
+                    region.garrison = vr.garrison;
+                    region.controlPowerToken = vr.controlPowerToken;
+                    region.loyaltyTokens = vr.loyaltyTokens;
+                    region.castleModifier = vr.castleModifier;
+                    region.crownModifier = vr.crownModifier;
+                    region.barrelModifier = vr.barrelModifier;
+
+                    this.visibleRegionsPerPlayer.get(player).push(region);
+                });
+
+                const toHide = message.regionsToHide.map(rid => this.world.regions.get(rid));
+
+                this.visibleRegionsPerPlayer.set(player, _.difference(this.visibleRegionsPerPlayer.get(player), toHide));
+
+                toHide.forEach(region => {
+                    if (this.ordersOnBoard.has(region)) {
+                        this.ordersOnBoard.delete(region);
+                    }
+
+                    region.units.clear();
+                    region.garrison = 0;
+                    region.controlPowerToken = null;
+                    region.loyaltyTokens = 0;
+                    region.castleModifier = 0;
+                    region.crownModifier = 0;
+                    region.barrelModifier = 0;
+                });
+
+                message.ordersToMakeVisible.map(([rid, oid]) => {
+                    const region = this.world.regions.get(rid);
+                    const order = orders.get(oid);
+
+                    this.ordersOnBoard.set(region, order);
+                });
+            }
+        } else if (message.type == "update-public-visible-regions") {
+            if (!this.fogOfWar) {
+                return;
+            }
+            // client side visibleRegionsPerPlayer only contains own regions
+            if (message.clear) {
+                if (message.applyChangesNow) {
+                    this.publicVisibleRegions.forEach(region => {
+                        if (this.ordersOnBoard.has(region)) {
+                            this.ordersOnBoard.delete(region);
+                        }
+
+                        region.units.clear();
+                        region.garrison = 0;
+                        region.controlPowerToken = null;
+                        region.loyaltyTokens = 0;
+                        region.castleModifier = 0;
+                        region.crownModifier = 0;
+                        region.barrelModifier = 0;
+                    });
+                }
+                this.publicVisibleRegions = [];
+            } else if (message.regionsToMakeVisible) {
+                this.publicVisibleRegions.push(...message.regionsToMakeVisible.map(sr => this.world.regions.get(sr.id)));
+
+                if (message.applyChangesNow) {
+                    const visibleRegions = message.regionsToMakeVisible.map(sr => Region.deserializeFromServer(this.game, sr));
+
+                    visibleRegions.forEach(vr => {
+                        const region = this.world.regions.get(vr.id);
+
+                        region.units = vr.units;
+                        region.garrison = vr.garrison;
+                        region.controlPowerToken = vr.controlPowerToken;
+                        region.loyaltyTokens = vr.loyaltyTokens;
+                        region.castleModifier = vr.castleModifier;
+                        region.crownModifier = vr.crownModifier;
+                        region.barrelModifier = vr.barrelModifier;
+                    });
+
+                    if (message.ordersToMakeVisible) {
+                        message.ordersToMakeVisible.map(([rid, oid]) => {
+                            const region = this.world.regions.get(rid);
+                            const order = orders.get(oid);
+
+                            this.ordersOnBoard.set(region, order);
+                        });
+                    }
+                }
+            }
         } else {
             this.childGameState.onServerMessage(message);
+        }
+    }
+
+    broadcastAddUnits(region: Region, units: Unit[], isTransform = false): void {
+        this.sendMessageToUsersWhoCanSeeRegion({
+            type: "add-units",
+            regionId: region.id,
+            units: units.map(u => u.serializeToClient()),
+            isTransform: isTransform
+        }, region);
+    }
+
+    broadcastRemoveUnits(region: Region, units: Unit[], animate = true): void {
+        this.sendMessageToUsersWhoCanSeeRegion({
+            type: "remove-units",
+            regionId: region.id,
+            unitIds: units.map(u => u.id),
+            animate: animate && !this.fogOfWar
+        }, region);
+
+    }
+
+    sendMessageToUsersWhoCanSeeRegion(message: ServerMessage, region: Region, ...exceptTo: User[]): void {
+        if (!this.fogOfWar) {
+            this.entireGame.broadcastToClients(message, ...exceptTo);
+            return;
+        }
+
+        this.entireGame.users.forEach(u => {
+            const p = this.players.tryGet(u, null);
+            const visibleRegions = this.getVisibleRegionsForPlayer(p);
+            if (visibleRegions.includes(region) && !exceptTo.includes(u)) {
+                this.entireGame.sendMessageToClients([u], message);
+            }
+        });
+    }
+
+    updateVisibleRegions(hideNonVisibleAreas = false): void {
+        if (!this.fogOfWar) {
+            return;
+        }
+
+        this.players.values.forEach(p => {
+            const oldVisibleRegions = this.visibleRegionsPerPlayer.tryGet(p, null) ?? [];
+            const visibleRegions = hideNonVisibleAreas
+                ? this.calculateVisibleRegionsForPlayer(p)
+                : _.uniq(_.concat(oldVisibleRegions, this.calculateVisibleRegionsForPlayer(p)));
+
+                this.visibleRegionsPerPlayer.set(p, visibleRegions);
+                const makeVisible =  _.difference(visibleRegions, oldVisibleRegions);
+                const toHide = _.difference(oldVisibleRegions, visibleRegions);
+
+                if (makeVisible.length > 0 || toHide.length > 0) {
+                    this.entireGame.sendMessageToClients([p.user], {
+                        type: "update-visible-regions",
+                        playerUserId: p.user.id,
+                        regionsToMakeVisible: makeVisible.map(r => r.serializeToClient(true, null)),
+                        regionsToHide: toHide.map(r => r.id),
+                        ordersToMakeVisible: makeVisible.filter(r => this.ordersOnBoard.has(r)).map(r => [r.id, this.ordersOnBoard.get(r).id])
+                    });
+                }
+        });
+
+        const removedPlayers = _.difference(this.visibleRegionsPerPlayer.keys, this.players.values);
+        removedPlayers.forEach(p => this.visibleRegionsPerPlayer.delete(p));
+    }
+
+    getVisibleRegionsForPlayer(player: Player | null): Region[] {
+        if (!this.fogOfWar || this.isCancelled || this.isEnded) {
+            return this.world.regions.values;
+        }
+
+        if (!player || !this.visibleRegionsPerPlayer.has(player)) {
+            return this.publicVisibleRegions;
+        }
+
+        return this.visibleRegionsPerPlayer.get(player);
+    }
+
+    calculateVisibleRegionsForPlayer(player: Player | null, unitVisibilityRange = 1): Region[] {
+        if (!this.fogOfWar || !player) {
+            return [];
+        }
+
+        if (this.isCancelled || this.isEnded) {
+            return this.world.regions.values;
+        }
+
+        const controlledHouses: (House | null)[] = [player.house, ...this.getVassalsControlledByPlayer(player)];
+        const allRegionsWithControllers = this.world.getAllRegionsWithControllers();
+
+        // We begin with all controlled areas of own and vassal units. We definitely always see them
+        const result: Region[] = allRegionsWithControllers.filter(([_r, h]) => controlledHouses.includes(h)).map(([r, _h]) => r);
+        let regionsWithUnits = result.filter(r => r.units.size > 0);
+        const checkedRegions: Region[] = [];
+
+        // Additionally we see regions adjacents to our regions with units
+        for(let i=0; i<unitVisibilityRange; i++) {
+            const additionalRegionsToCheck: Region[] = [];
+            for (let j=0; j<regionsWithUnits.length; j++) {
+                const region = regionsWithUnits[j];
+                let adjacent: Region[] = [];
+                if (!checkedRegions.includes(region)) {
+                    adjacent = this.world.getNeighbouringRegions(region);
+                    result.push(...adjacent);
+                    additionalRegionsToCheck.push(...adjacent)
+                    checkedRegions.push(region);
+                }
+            }
+
+            if (unitVisibilityRange > 1) {
+                regionsWithUnits.push(...additionalRegionsToCheck);
+                regionsWithUnits = _.uniq(regionsWithUnits);
+            }
+        }
+
+        result.push(...this.leafState.getRequiredVisibleRegionsForPlayer(player));
+        result.push(...this.publicVisibleRegions)
+
+        return _.uniq(result);
+    }
+
+    addPublicVisibleRegions(regions: Region[]): void {
+        if (this.fogOfWar) {
+            const addedRegions = regions.filter(r => !this.publicVisibleRegions.includes(r));
+            this.publicVisibleRegions.push(...addedRegions);
+
+            this.entireGame.users.values.filter(u => u.connected).forEach(u => {
+                this.entireGame.sendMessageToClients([u], {
+                    type: "update-public-visible-regions",
+                    regionsToMakeVisible: addedRegions.map(r => r.serializeToClient(true, null)),
+                    ordersToMakeVisible: addedRegions.filter(r => this.ordersOnBoard.has(r)).map(r => [r.id, this.ordersOnBoard.get(r).id]),
+                    applyChangesNow: !this.players.has(u)
+                });
+            });
         }
     }
 
@@ -1924,16 +2194,26 @@ export default class IngameGameState extends GameState<
                 : null)
             : null;
 
+        let ordersOnBoard = this.ordersOnBoard.mapOver(r => r.id, o => o.id);
+        if (!admin && this.fogOfWar && player != null) {
+            const visibleRegionIds = this.getVisibleRegionsForPlayer(player).map(r => r.id);
+            ordersOnBoard = ordersOnBoard.filter(([rid, _oid]) => visibleRegionIds.includes(rid));
+        }
+
         return {
             type: "ingame",
             players: this.players.values.map(p => p.serializeToClient()),
+            visibleRegionsPerPlayer: admin
+                ? this.visibleRegionsPerPlayer.entries.map(([p, regions]) => [p.user.id, regions.map(r => r.id)])
+                : this.visibleRegionsPerPlayer.entries.filter(([p, _regions]) => p.user == user).map(([p, regions]) => [p.user.id, regions.map(r => r.id)]),
+            publicVisibleRegions: this.publicVisibleRegions.map(r => r.id),
             oldPlayerIds: this.oldPlayerIds,
             replacerIds: this.replacerIds,
             timeoutPlayerIds: this.timeoutPlayerIds,
             housesTimedOut: this.housesTimedOut.map(h => h.id),
             game: this.game.serializeToClient(admin, player),
             gameLogManager: this.gameLogManager.serializeToClient(admin, user),
-            ordersOnBoard: this.ordersOnBoard.mapOver(r => r.id, o => o.id),
+            ordersOnBoard: ordersOnBoard,
             votes: this.votes.values.map(v => v.serializeToClient(admin, player)),
             paused: this.paused ? this.paused.getTime() : null,
             willBeAutoResumedAt: this.willBeAutoResumedAt ? this.willBeAutoResumedAt.getTime() : null,
@@ -1949,6 +2229,10 @@ export default class IngameGameState extends GameState<
         ingameGameState.players = new BetterMap(
             data.players.map(p => [entireGame.users.get(p.userId), Player.deserializeFromServer(ingameGameState, p)])
         );
+        ingameGameState.visibleRegionsPerPlayer = new BetterMap(
+            data.visibleRegionsPerPlayer.map(([uid, rids]) => [ingameGameState.players.get(entireGame.users.get(uid)), rids.map(rid => ingameGameState.world.regions.get(rid))])
+        );
+        ingameGameState.publicVisibleRegions = data.publicVisibleRegions.map(rid => ingameGameState.world.regions.get(rid));
         ingameGameState.oldPlayerIds = data.oldPlayerIds;
         ingameGameState.replacerIds = data.replacerIds;
         ingameGameState.timeoutPlayerIds = data.timeoutPlayerIds;
@@ -1995,6 +2279,8 @@ export default class IngameGameState extends GameState<
 export interface SerializedIngameGameState {
     type: "ingame";
     players: SerializedPlayer[];
+    visibleRegionsPerPlayer: [string, string[]][];
+    publicVisibleRegions: string[];
     oldPlayerIds: string[];
     replacerIds: string[];
     timeoutPlayerIds: string[];

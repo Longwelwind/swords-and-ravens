@@ -190,17 +190,17 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
                     region: region.id
                 });
 
-                this.entireGame.broadcastToClients({
+                this.ingame.sendMessageToUsersWhoCanSeeRegion({
                     type: "order-placed",
                     region: region.id,
                     order: null
-                }, player.user);
+                }, region, player.user);
             } else if (this.placedOrders.has(region)) {
                 this.placedOrders.delete(region);
-                this.entireGame.broadcastToClients({
+                this.ingame.sendMessageToUsersWhoCanSeeRegion({
                     type: "remove-placed-order",
                     regionId: region.id
-                });
+                }, region);
             }
         } else if (message.type == "ready") {
             this.setReady(player);
@@ -240,7 +240,7 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
     }
 
     serializeToClient(admin: boolean, player: Player | null): SerializedPlaceOrdersGameState {
-        const placedOrders = this.placedOrders.mapOver(r => r.id, (o, r) => {
+        let placedOrders = this.placedOrders.mapOver(r => r.id, (o, r) => {
             // Hide orders that doesn't belong to the player
             // If admin, send all orders.
             const controller = r.getController();
@@ -249,6 +249,11 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
             }
             return null;
         });
+
+        if (this.entireGame.gameSettings.fogOfWar && !admin && player != null) {
+            const visibleRegionIds = this.ingame.getVisibleRegionsForPlayer(player).map(r => r.id);
+            placedOrders = placedOrders.filter(([rid, _oid]) => visibleRegionIds.includes(rid));
+        }
 
         return {
             type: "place-orders",

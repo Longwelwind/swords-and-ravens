@@ -112,11 +112,11 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                     });
                 }
 
-                this.entireGame.broadcastToClients({
+                this.ingame.sendMessageToUsersWhoCanSeeRegion({
                     type: "change-control-power-token",
                     regionId: startingRegion.id,
                     houseId: this.house.id
-                });
+                }, startingRegion);
 
                 leftPowerToken = true;
             }
@@ -206,11 +206,11 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
                     region.garrison = 0;
                     this.resolveMarchOrderGameState.moveUnits(startingRegion, army, region);
 
-                    this.entireGame.broadcastToClients({
+                    this.ingame.sendMessageToUsersWhoCanSeeRegion({
                         type: "change-garrison",
                         region: region.id,
                         newGarrison: region.garrison
-                    });
+                    }, region);
 
                     this.ingame.log({
                         type: "garrison-removed",

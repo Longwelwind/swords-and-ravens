@@ -70,6 +70,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     onCaptureSentryMessage?: (message: string, severity: "info" | "warning" | "error" | "fatal") => void;
     onSaveGame?: (updateLastActive: boolean) => void;
     onGetUser?: (userId: string) => Promise<StoredUserData | null>;
+    onBeforeGameStateChangedTransmitted?: () => void;
 
     // Throttled saveGame so we don't spam the website client
     saveGame: (updateLastActive: boolean) => void = _.throttle(this.privateSaveGame, 2000);
@@ -130,7 +131,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
 
     get minPlayerCount(): number {
         // For Debug we can manipulate this to allow games with only 1 player
-        //return 1;
+        // return 1;
         return this.gameSettings.playerCount >= 8 ? 4 : 3;
     }
 
@@ -174,6 +175,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             // The GameState tree has been changed, broadcast a message to transmit to them
             // the new game state.
             this.broadcastCustomToClients(u => {
+                if (this.onBeforeGameStateChangedTransmitted != null) {
+                    this.onBeforeGameStateChangedTransmitted();
+                }
                 // To serialize the specific game state that has changed, the code serializes the entire
                 // game state tree and pick the appropriate serializedGameState.
                 // TODO: Find less wasteful way of doing this
