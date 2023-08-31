@@ -25,16 +25,25 @@ export default class GameLogManager {
         this.ingameGameState = ingameGameState;
     }
 
+    private logFilter = (log: GameLog): boolean => {
+        if (!this.ingameGameState.fogOfWar) return true;
+        if (this.ingameGameState.isEnded || this.ingameGameState.isCancelled) return true;
+        return !fogOfWarBannedLogs.includes(log.data.type);
+    }
+
     log(data: GameLogData, resolvedAutomatically = false): void {
         const time = new Date();
-        this.logs.push({data, time, resolvedAutomatically});
+        const log = {data, time, resolvedAutomatically};
+        this.logs.push(log);
 
-        this.ingameGameState.entireGame.broadcastToClients({
-            type: "add-game-log",
-            data: data,
-            time: Math.round(time.getTime() / 1000),
-            resolvedAutomatically: resolvedAutomatically
-        });
+        if (this.logFilter(log)) {
+            this.ingameGameState.entireGame.broadcastToClients({
+                type: "add-game-log",
+                data: data,
+                time: Math.round(time.getTime() / 1000),
+                resolvedAutomatically: resolvedAutomatically
+            });
+        }
     }
 
     sendGameLogSeen(time: number): void {
@@ -45,13 +54,7 @@ export default class GameLogManager {
     }
 
     serializeToClient(admin: boolean, user: User | null): SerializedGameLogManager {
-        const fogOfWar = this.ingameGameState.fogOfWar;
-
-        const filteredLogs = admin ? this.logs : this.logs.filter((log) => {
-            if (!fogOfWar) return true;
-            if (this.ingameGameState.isEnded || this.ingameGameState.isCancelled) return true;
-            return !fogOfWarBannedLogs.includes(log.data.type);
-        });
+        const filteredLogs = admin ? this.logs : this.logs.filter(this.logFilter);
 
         return {
             logs: filteredLogs.map(l => ({time: timeToTicks(l.time), data: l.data, resolvedAutomatically: l.resolvedAutomatically})),
