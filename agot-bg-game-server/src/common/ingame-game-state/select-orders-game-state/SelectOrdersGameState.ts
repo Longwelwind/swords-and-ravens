@@ -73,6 +73,13 @@ export default class SelectOrdersGameState<P extends ParentGameState> extends Ga
         return [this.parentGameState.ingame.getControllerOfHouse(this.house).user];
     }
 
+    getRequiredVisibleRegionsForPlayer(player: Player): Region[] {
+        if (this.game.ingame.getControllerOfHouse(this.house) == player) {
+            return this.possibleRegions;
+        }
+        return [];
+    }
+
     selectOrders(regions: Region[]): void {
         this.entireGame.sendMessageToServer({
             type: "select-orders",

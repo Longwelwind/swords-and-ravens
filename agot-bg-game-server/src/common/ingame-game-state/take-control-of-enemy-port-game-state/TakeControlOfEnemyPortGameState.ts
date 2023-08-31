@@ -89,12 +89,7 @@ export default class TakeControlOfEnemyPortGameState extends GameState<ParentGam
 
             shipsToAdd.forEach(ship => this.port.units.set(ship.id, ship));
 
-            this.entireGame.broadcastToClients({
-                type: "add-units",
-                regionId: this.port.id,
-                units: shipsToAdd.map(ship => ship.serializeToClient()),
-                isTransform: true
-            });
+            this.ingame.broadcastAddUnits(this.port, shipsToAdd, true);
         }
 
         this.ingame.log({

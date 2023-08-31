@@ -14,7 +14,7 @@ export function ticksToTime(ticks: number): Date {
 
 const fogOfWarBannedLogs = [
     'orders-revealed'
-]
+];
 
 export default class GameLogManager {
     ingameGameState: IngameGameState;
@@ -45,14 +45,14 @@ export default class GameLogManager {
     }
 
     serializeToClient(admin: boolean, user: User | null): SerializedGameLogManager {
-        const fogOfWar = this.ingameGameState.entireGame.gameSettings.fogOfWar
+        const fogOfWar = this.ingameGameState.fogOfWar;
 
         const filteredLogs = this.logs.filter((log) => {
-            if (!fogOfWar) return true
-            if (this.ingameGameState.isEnded) return true
-            if (this.ingameGameState.isCancelled) return true
-            return !fogOfWarBannedLogs.includes(log.data.type)
-        })
+            if (!fogOfWar) return true;
+            if (this.ingameGameState.isEnded) return true;
+            if (this.ingameGameState.isCancelled) return true;
+            return !fogOfWarBannedLogs.includes(log.data.type);
+        });
 
         return {
             logs: filteredLogs.map(l => ({time: timeToTicks(l.time), data: l.data, resolvedAutomatically: l.resolvedAutomatically})),

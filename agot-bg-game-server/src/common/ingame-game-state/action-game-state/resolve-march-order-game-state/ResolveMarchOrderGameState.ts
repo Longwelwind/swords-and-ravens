@@ -94,11 +94,11 @@ export default class ResolveMarchOrderGameState extends GameState<
             const region = this.world.getRegion(staticRegion);
             if (region.getController() == region.superControlPowerToken && region.garrison != staticRegion.startingGarrison) {
                 region.garrison = staticRegion.startingGarrison;
-                this.entireGame.broadcastToClients({
+                this.ingame.sendMessageToPlayersWhoCanSeeRegion({
                     type: "change-garrison",
                     region: region.id,
                     newGarrison: region.garrison
-                });
+                }, region);
                 this.ingameGameState.log({
                     type: "garrison-returned",
                     region: region.id,
@@ -194,11 +194,11 @@ export default class ResolveMarchOrderGameState extends GameState<
 
                 to.controlPowerToken = null;
 
-                this.entireGame.broadcastToClients({
+                this.ingame.sendMessageToPlayersWhoCanSeeRegion({
                     type: "change-control-power-token",
                     regionId: to.id,
                     houseId: null
-                });
+                }, to);
             }
         }
 
@@ -208,12 +208,30 @@ export default class ResolveMarchOrderGameState extends GameState<
             u.region = to;
         });
 
-        this.entireGame.broadcastToClients({
-            type: "move-units",
-            from: from.id,
-            to: to.id,
-            units: units.map(u => u.id)
-        });
+        if (!this.ingame.fogOfWar) {
+            this.entireGame.broadcastToClients({
+                type: "move-units",
+                from: from.id,
+                to: to.id,
+                units: units.map(u => u.id)
+            });
+        } else {
+            this.ingame.players.values.forEach(p => {
+                const visibleRegions = this.ingame.getVisibleRegionsForPlayer(p);
+                if (visibleRegions.includes(from) && visibleRegions.includes(to)) {
+                    this.entireGame.sendMessageToClients([p.user], {
+                        type: "move-units",
+                        from: from.id,
+                        to: to.id,
+                        units: units.map(u => u.id)
+                    });
+                } else {
+                    this.ingame.broadcastRemoveUnits(from, units, false);
+                    this.ingame.broadcastAddUnits(to, units);
+                }
+            });
+        }
+
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {

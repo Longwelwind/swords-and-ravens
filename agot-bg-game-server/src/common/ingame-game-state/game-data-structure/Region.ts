@@ -11,6 +11,7 @@ import _ from "lodash";
 import getStaticWorld from "./static-data-structure/getStaticWorld";
 import { port } from "./regionTypes";
 import SnrError from "../../../utils/snrError";
+import Player from "../Player";
 
 export default class Region {
     game: Game;
@@ -188,16 +189,22 @@ export default class Region {
         return result;
     }
 
-    serializeToClient(): SerializedRegion {
+    serializeToClient(admin: boolean, player: Player | null): SerializedRegion {
+        const visible = admin || this.game.ingame.getVisibleRegionsForPlayer(player).includes(this);
+
         return {
             id: this.id,
-            units: this.units.values.map(u => u.serializeToClient()),
-            garrison: this.garrison,
-            controlPowerToken: this.controlPowerToken ? this.controlPowerToken.id : null,
-            loyaltyTokens: this.loyaltyTokens,
-            castleModifier: this.castleModifier,
-            barrelModifier: this.barrelModifier,
-            crownModifier: this.crownModifier,
+            units: visible ? this.units.values.map(u => u.serializeToClient()) : [],
+            garrison: visible ? this.garrison : 0,
+            controlPowerToken: visible
+                ? this.controlPowerToken
+                    ? this.controlPowerToken.id
+                    : null
+                : null,
+            loyaltyTokens: visible ? this.loyaltyTokens : 0,
+            castleModifier: visible ? this.castleModifier : 0,
+            barrelModifier: visible ? this.barrelModifier : 0,
+            crownModifier: visible ? this.crownModifier : 0,
             overwrittenSuperControlPowerToken: this.overwrittenSuperControlPowerToken ? this.overwrittenSuperControlPowerToken.id : null
         }
     }

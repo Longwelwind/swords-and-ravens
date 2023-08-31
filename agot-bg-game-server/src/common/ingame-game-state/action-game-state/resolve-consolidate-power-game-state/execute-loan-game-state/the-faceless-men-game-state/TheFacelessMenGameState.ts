@@ -106,6 +106,13 @@ export default class TheFacelessMenGameState extends GameState<ExecuteLoanGameSt
         return [this.parentGameState.ingame.getControllerOfHouse(this.house).user];
     }
 
+    getRequiredVisibleRegionsForPlayer(player: Player): Region[] {
+        if (this.game.ingame.getControllerOfHouse(this.house) == player) {
+            return _.uniq(this.availableUnits.map(u => u.region));
+        }
+        return [];
+    }
+
     serializeToClient(_admin: boolean, _player: Player | null): SerializedTheFacelessMenGameState {
         return {
             type: "the-faceless-men",

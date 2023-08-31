@@ -585,7 +585,7 @@ export default class Game {
         return {
             lastUnitId: this.lastUnitId,
             houses: this.houses.values.map(h => h.serializeToClient(admin, player, this)),
-            world: this.world.serializeToClient(),
+            world: this.world.serializeToClient(admin, player),
             turn: this.turn,
             ironThroneTrack: this.ironThroneTrack.map(h => h.id),
             fiefdomsTrack: this.fiefdomsTrack.map(h => h.id),
