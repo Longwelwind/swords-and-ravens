@@ -47,10 +47,9 @@ export default class GameLogManager {
     serializeToClient(admin: boolean, user: User | null): SerializedGameLogManager {
         const fogOfWar = this.ingameGameState.fogOfWar;
 
-        const filteredLogs = this.logs.filter((log) => {
+        const filteredLogs = admin ? this.logs : this.logs.filter((log) => {
             if (!fogOfWar) return true;
-            if (this.ingameGameState.isEnded) return true;
-            if (this.ingameGameState.isCancelled) return true;
+            if (this.ingameGameState.isEnded || this.ingameGameState.isCancelled) return true;
             return !fogOfWarBannedLogs.includes(log.data.type);
         });
 
