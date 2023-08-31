@@ -124,6 +124,13 @@ export default class SelectUnitsGameState<P extends SelectUnitsParentGameState> 
         return [this.parentGameState.ingame.getControllerOfHouse(this.house).user];
     }
 
+    getRequiredVisibleRegionsForPlayer(player: Player): Region[] {
+        if (this.game.ingame.getControllerOfHouse(this.house) == player) {
+            return _.uniq(this.possibleUnits.map(u => u.region));
+        }
+        return [];
+    }
+
     onServerMessage(_message: ServerMessage): void { }
 
     canPickUnit(u: Unit): boolean {

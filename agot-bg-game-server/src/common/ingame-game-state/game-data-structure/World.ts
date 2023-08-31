@@ -14,6 +14,7 @@ import { dragon } from "./unitTypes";
 import staticWorld7p from "./static-data-structure/globalStaticWorld7p";
 import StaticIronBankView from "./static-data-structure/StaticIronBankView";
 import { GameSettings } from "../../../common/EntireGame";
+import Player from "../Player";
 
 export default class World {
     settings: GameSettings;
@@ -173,6 +174,10 @@ export default class World {
         return this.regions.values.filter(r => r.getController() == house);
     }
 
+    getAllRegionsWithControllers(): [Region, House | null][] {
+        return this.regions.values.map(r => [r, r.getController()]);
+    }
+
     getValidRetreatRegions(startingRegion: Region, house: House, army: Unit[]): Region[] {
         return this.getReachableRegions(startingRegion, house, army, false, true)
             // A retreat can be done in a port only if the adjacent land area is controlled
@@ -243,9 +248,9 @@ export default class World {
         return this.regions.values.map(r => r.getSnapshot());
     }
 
-    serializeToClient(): SerializedWorld {
+    serializeToClient(admin: boolean, player: Player | null): SerializedWorld {
         return {
-            regions: this.regions.values.map(r => r.serializeToClient()),
+            regions: this.regions.values.map(r => r.serializeToClient(admin, player)),
             settings: this.settings
         };
     }

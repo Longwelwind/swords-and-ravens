@@ -117,12 +117,9 @@ export default class PlayingWithFireGameState extends GameState<WesterosDeck4Gam
             }
             const chosenUnitType = unitTypes.get(this.getChoices(house).values[choice]);
             const newUnit = this.game.createUnit(this.region, chosenUnitType, house);
+
             this.region.units.set(newUnit.id, newUnit);
-            this.entireGame.broadcastToClients({
-                type: "add-units",
-                regionId: this.region.id,
-                units: [newUnit.serializeToClient()]
-            });
+            this.ingame.broadcastAddUnits(this.region, [newUnit]);
 
             this.ingame.log({
                 type: "playing-with-fire-choice",

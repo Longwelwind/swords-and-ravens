@@ -112,11 +112,8 @@ export default class JonConningtonAbilityGameState extends GameState<
                 });
                 const unit = this.game.createUnit(region, knight, house);
                 region.units.set(unit.id, unit);
-                this.entireGame.broadcastToClients({
-                    type: "add-units",
-                    regionId: region.id,
-                    units: [unit.serializeToClient()]
-                });
+
+                this.ingame.broadcastAddUnits(region, [unit]);
             }
 
             this.parentGameState.onHouseCardResolutionFinish(house);

@@ -145,11 +145,11 @@ export default class PostCombatGameState extends GameState<
             const oldGarrisonStrength = this.combat.defendingRegion.garrison;
             this.combat.defendingRegion.garrison = 0;
 
-            this.entireGame.broadcastToClients({
+            this.combat.ingameGameState.sendMessageToUsersWhoCanSeeRegion({
                 type: "change-garrison",
                 region: this.combat.defendingRegion.id,
                 newGarrison: 0
-            });
+            }, this.combat.defendingRegion);
 
             this.parentGameState.ingameGameState.log({
                 type: "garrison-removed",

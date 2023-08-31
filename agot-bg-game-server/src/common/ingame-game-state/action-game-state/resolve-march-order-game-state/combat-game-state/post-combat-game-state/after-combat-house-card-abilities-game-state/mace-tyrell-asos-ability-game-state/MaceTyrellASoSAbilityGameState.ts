@@ -93,12 +93,12 @@ export default class MaceTyrellASoSAbilityGameState extends GameState<
             // Remove a possible order and log this for the case the defender decides to change the current order to Support or Defense
             this.combatGameState.actionGameState.removeOrderFromRegion(this.combatGameState.defendingRegion, true);
             this.combatGameState.actionGameState.ordersOnBoard.set(this.combatGameState.defendingRegion, chosenOrder);
-            this.combatGameState.entireGame.broadcastToClients({
+            this.ingame.sendMessageToUsersWhoCanSeeRegion({
                 type: "action-phase-change-order",
                 region: this.combatGameState.defendingRegion.id,
                 order: chosenOrder.id,
                 animate: "white"
-            });
+            }, this.combatGameState.defendingRegion);
             this.ingame.log({
                 type: "mace-tyrell-asos-order-placed",
                 house: this.childGameState.house.id,

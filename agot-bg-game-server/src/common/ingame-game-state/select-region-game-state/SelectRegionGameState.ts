@@ -70,6 +70,13 @@ export default class SelectRegionGameState<P extends ParentGameState> extends Ga
         return [this.parentGameState.ingame.getControllerOfHouse(this.house).user];
     }
 
+    getRequiredVisibleRegionsForPlayer(player: Player): Region[] {
+        if (this.game.ingame.getControllerOfHouse(this.house) == player) {
+            return this.regions;
+        }
+        return [];
+    }
+
     serializeToClient(_admin: boolean, _player: Player | null): SerializedSelectRegionGameState {
         return {
             type: "select-region",

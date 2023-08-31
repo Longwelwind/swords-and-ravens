@@ -1,6 +1,6 @@
 import IngameGameState from "../IngameGameState";
 import GameState from "../../GameState";
-import Region, { RegionSnapshot } from "../game-data-structure/Region";
+import Region from "../game-data-structure/Region";
 import Order from "../game-data-structure/Order";
 import EntireGame from "../../EntireGame";
 import ResolveMarchOrderGameState, {SerializedResolveMarchOrderGameState} from "./resolve-march-order-game-state/ResolveMarchOrderGameState";
@@ -14,7 +14,7 @@ import RaidOrderType from "../game-data-structure/order-types/RaidOrderType";
 import UseRavenGameState, {SerializedUseRavenGameState} from "./use-raven-game-state/UseRavenGameState";
 import ResolveRaidOrderGameState, {SerializedResolveRaidOrderGameState} from "./resolve-raid-order-game-state/ResolveRaidOrderGameState";
 import BetterMap from "../../../utils/BetterMap";
-import Game, { GameSnapshot } from "../game-data-structure/Game";
+import Game from "../game-data-structure/Game";
 import ResolveConsolidatePowerGameState, {SerializedResolveConsolidatePowerGameState} from "./resolve-consolidate-power-game-state/ResolveConsolidatePowerGameState";
 import ConsolidatePowerOrderType from "../game-data-structure/order-types/ConsolidatePowerOrderType";
 import SupportOrderType from "../game-data-structure/order-types/SupportOrderType";
@@ -30,7 +30,6 @@ import IronBankOrderType from "../game-data-structure/order-types/IronBankOrderT
 import ReconcileArmiesGameState, { SerializedReconcileArmiesGameState } from "../westeros-game-state/reconcile-armies-game-state/ReconcileArmiesGameState";
 import popRandom from "../../../utils/popRandom";
 import ScoreObjectivesGameState, { SerializedScoreObjectivesGameState } from "./score-objectives-game-state/ScoreObjectivesGameState";
-import _ from "lodash";
 
 export default class ActionGameState extends GameState<IngameGameState, UseRavenGameState | ResolveRaidOrderGameState
                                                                         | ResolveMarchOrderGameState | ResolveConsolidatePowerGameState
@@ -102,12 +101,12 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
         if (this.ordersOnBoard.has(region)) {
             const order = this.ordersOnBoard.get(region);
             this.ordersOnBoard.delete(region);
-            this.entireGame.broadcastToClients({
+            this.ingame.sendMessageToUsersWhoCanSeeRegion({
                 type: "action-phase-change-order",
                 region: region.id,
                 order: null,
                 animate: animate
-            });
+            }, region);
 
             if (log) {
                 this.ingame.log({
@@ -193,7 +192,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
 
             if (order) {
                 this.ordersOnBoard.set(region, order);
-                if (message.animate) {
+                if (message.animate && !this.ingame.fogOfWar) {
                     this.ingame.ordersToBeAnimated.set(region,
                         {highlight: {active: true, color: message.animate}, animateAttention: true});
                     window.setTimeout(() => {
@@ -202,7 +201,7 @@ export default class ActionGameState extends GameState<IngameGameState, UseRaven
                 }
             } else {
                 if (this.ordersOnBoard.has(region)) {
-                    if (message.animate) {
+                    if (message.animate && !this.ingame.fogOfWar) {
                         this.ingame.ordersToBeAnimated.set(region,
                             {highlight: {active: true, color: message.animate}, animateFadeOut: true});
                         window.setTimeout(() => {

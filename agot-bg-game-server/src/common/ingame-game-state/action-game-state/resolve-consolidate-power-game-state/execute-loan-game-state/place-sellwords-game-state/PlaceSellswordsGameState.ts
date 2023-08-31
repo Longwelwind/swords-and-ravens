@@ -73,11 +73,8 @@ export default class PlaceSellswordsGameState extends GameState<ExecuteLoanGameS
                     region.units.set(unit.id, unit);
                     return unit;
                 });
-                this.entireGame.broadcastToClients({
-                    type: "add-units",
-                    regionId: region.id,
-                    units: addedUnits.map(u => u.serializeToClient())
-                });
+
+                this.ingame.broadcastAddUnits(region, addedUnits);
             });
 
             this.ingame.log({

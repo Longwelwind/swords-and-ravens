@@ -122,6 +122,8 @@ export default class MapComponent extends Component<MapComponentProps> {
             { }
         );
 
+        const visibleRegions = _.uniq(_.concat(this.ingame.publicVisibleRegions, this.ingame.getVisibleRegionsForPlayer(this.props.gameClient.authenticatedPlayer)));
+
         return (
             <div className="map"
                 style={{ backgroundImage: `url(${this.backgroundImage})`, backgroundSize: "cover", borderRadius: "0.25rem" }}>
@@ -190,7 +192,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                         </div>
                     ))}
                     {this.renderUnits(propertiesForUnits, garrisons, disablePointerEventsForUnits)}
-                    {this.renderOrders()}
+                    {this.renderOrders(visibleRegions)}
                     {this.renderRegionTexts(propertiesForRegions)}
                     {this.renderIronBankInfos(ironBankView)}
                     {this.renderLoanCardDeck(ironBankView)}
@@ -198,7 +200,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                     {this.renderMarchMarkers(propertiesForUnits)}
                 </div>
                 <svg style={{ width: `${this.mapWidth}px`, height: `${MAP_HEIGHT}px` }}>
-                    {this.renderRegions(propertiesForRegions)}
+                    {this.renderRegions(propertiesForRegions, visibleRegions)}
                 </svg>
             </div>
         )
@@ -273,9 +275,16 @@ export default class MapComponent extends Component<MapComponentProps> {
         </div>;
     }
 
-    renderRegions(propertiesForRegions: BetterMap<Region, RegionOnMapProperties>): ReactNode {
+    renderRegions(propertiesForRegions: BetterMap<Region, RegionOnMapProperties>, visibleRegions: Region[]): ReactNode {
         return propertiesForRegions.entries.map(([region, properties]) => {
             const wrap = properties.wrap;
+
+            const isFoggedRegion = !visibleRegions.includes(region);
+            const fillColor = region.isBlocked
+                ? "black"
+                : isFoggedRegion
+                    ? "#3d3d3d"
+                    : properties.highlight.color;
 
             return (
                 <ConditionalWrap condition={!region.isBlocked}
@@ -293,10 +302,11 @@ export default class MapComponent extends Component<MapComponentProps> {
                 >
                     <polygon
                         points={this.getRegionPath(region)}
-                        fill={region.isBlocked ? "black" : properties.highlight.color}
+                        fill={fillColor}
                         fillRule="evenodd"
                         className={classNames(
                             region.isBlocked ? "blocked-region" : "region-area",
+                            isFoggedRegion ? "region-area-fogged" : "",
                             { "clickable" : properties.onClick != undefined || properties.wrap != undefined },
                             properties.highlight.active && {
                                 // Whatever the strength of the highlight defined, show the same
@@ -499,7 +509,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         </div>
     }
 
-    renderOrders(): ReactNode {
+    renderOrders(visibleRegions: Region[]): ReactNode {
         const propertiesForOrders = this.getModifiedPropertiesForEntities<Region, OrderOnMapProperties>(
             _.flatMap(this.ingame.world.regions.values),
             this.props.mapControls.modifyOrdersOnMap,
@@ -507,6 +517,10 @@ export default class MapComponent extends Component<MapComponentProps> {
         );
 
         return propertiesForOrders.map((region, properties) => {
+            if (!visibleRegions.includes(region)) {
+                return null;
+            }
+
             let order: Order | null = null;
             let orderPresent = false;
             if (this.ingame.childGameState instanceof PlanningGameState && this.ingame.childGameState.childGameState instanceof PlaceOrdersGameState) {

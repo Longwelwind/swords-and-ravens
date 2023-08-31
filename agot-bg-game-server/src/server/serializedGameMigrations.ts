@@ -2155,6 +2155,19 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "110",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                ingame.visibleRegionsPerPlayer = [];
+                ingame.publicVisibleRegions = [];
+            }
+
+            return serializedGame;
+        }
     }
 ];
 
