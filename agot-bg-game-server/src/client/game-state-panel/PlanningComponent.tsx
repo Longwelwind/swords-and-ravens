@@ -21,9 +21,9 @@ export default class PlanningComponent extends Component<GameStateComponentProps
     render(): ReactNode {
         return (
             <>
-                {this.props.gameState.revealeadWesterosCards.length > 0 && (
+                {this.props.gameState.revealedWesterosCards.length > 0 && (
                     <Row className="justify-content-around mb-2">
-                        {this.props.gameState.revealeadWesterosCards.map((wc, i) => (
+                        {this.props.gameState.revealedWesterosCards.map((wc, i) => (
                             <Col xs="auto" key={`planning_revealed-wcs_${wc.id}_${i}`}>
                                 <WesterosCardComponent
                                     cardType={wc.type}

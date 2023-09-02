@@ -32,7 +32,7 @@ export default class PlaceOrdersComponent extends Component<GameStateComponentPr
         [noDefenseOrder, { deckId: 2, westerosCardType: stormOfSwords }],
         [noSupportOrder, { deckId: 2, westerosCardType: webOfLies }],
         [noRaidOrder, { deckId: 2, westerosCardType: seaOfStorms }],
-        [noConsolidatePowerOrder, { deckId: 2, westerosCardType: feastForCrows }]
+        [noConsolidatePowerOrder, { deckId: 2, westerosCardType: feastForCrows }],
     ]);
 
     modifyRegionsOnMapCallback: any;
