@@ -26,7 +26,7 @@ export default class PlanningGameState extends GameState<IngameGameState, PlaceO
     // it thus represents a face-down order (this player can't see it).
     @observable placedOrders: BetterMap<Region, Order | null> = new BetterMap<Region, Order | null>();
     planningRestrictions: PlanningRestriction[];
-    revealeadWesterosCards: WesterosCard[];
+    revealedWesterosCards: WesterosCard[];
 
     get ingame(): IngameGameState {
         return this.parentGameState;
@@ -44,9 +44,9 @@ export default class PlanningGameState extends GameState<IngameGameState, PlaceO
         return this.ingame.entireGame;
     }
 
-    firstStart(planningRestrictions: PlanningRestriction[], revealeadWesterosCards: WesterosCard[]): void {
+    firstStart(planningRestrictions: PlanningRestriction[], revealedWesterosCards: WesterosCard[]): void {
         this.planningRestrictions = planningRestrictions;
-        this.revealeadWesterosCards = revealeadWesterosCards;
+        this.revealedWesterosCards = revealedWesterosCards;
         this.setChildGameState(new ClaimVassalsGameState(this)).firstStart();
     }
 
@@ -103,7 +103,7 @@ export default class PlanningGameState extends GameState<IngameGameState, PlaceO
             type: "planning",
             placedOrders: placedOrders,
             planningRestrictions: this.planningRestrictions.map(pr => pr.id),
-            revealedWesterosCardIds: this.revealeadWesterosCards.map(wc => wc.id),
+            revealedWesterosCardIds: this.revealedWesterosCards.map(wc => wc.id),
             childGameState: this.childGameState.serializeToClient(admin, player)
         };
     }
@@ -112,7 +112,7 @@ export default class PlanningGameState extends GameState<IngameGameState, PlaceO
         const planningGameState = new PlanningGameState(ingameGameState);
 
         planningGameState.planningRestrictions = data.planningRestrictions.map(prid => planningRestrictions.get(prid));
-        planningGameState.revealeadWesterosCards = data.revealedWesterosCardIds.map((cid, i) => getById(ingameGameState.game.westerosDecks[i], cid));
+        planningGameState.revealedWesterosCards = data.revealedWesterosCardIds.map((cid, i) => getById(ingameGameState.game.westerosDecks[i], cid));
         planningGameState.placedOrders = new BetterMap(
             data.placedOrders.map(
                 ([regionId, orderId]) => [
@@ -121,6 +121,7 @@ export default class PlanningGameState extends GameState<IngameGameState, PlaceO
                 ]
             )
         );
+
         planningGameState.childGameState = planningGameState.deserializeChildGameState(data.childGameState);
 
         return planningGameState;
