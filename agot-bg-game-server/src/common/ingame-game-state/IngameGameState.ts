@@ -1,5 +1,5 @@
 import EntireGame, { NotificationType } from "../EntireGame";
-import GameState from "../GameState";
+import GameState, { AnyGameState } from "../GameState";
 import {ClientMessage} from "../../messages/ClientMessage";
 import {ServerMessage} from "../../messages/ServerMessage";
 import User from "../../server/User";
@@ -1388,9 +1388,34 @@ export default class IngameGameState extends GameState<
             this.bannedUsers.delete(message.userId);
         } else if (message.type == "update-visible-regions") {
             if (this.fogOfWar) {
-                const player = this.players.get(this.entireGame.users.get(message.playerUserId));
+                const toHide = message.regionsToHide.map(rid => this.world.regions.get(rid));
+
+                toHide.forEach(region => {
+                    if (this.ordersOnBoard.has(region)) {
+                        this.ordersOnBoard.delete(region);
+                    }
+
+                    region.units.keys.forEach(uid => region.units.delete(uid));
+                    region.garrison = 0;
+                    region.controlPowerToken = null;
+                    region.loyaltyTokens = 0;
+                    region.castleModifier = 0;
+                    region.crownModifier = 0;
+                    region.barrelModifier = 0;
+                });
+
+                const user = this.entireGame.users.get(message.playerUserId);
+                const player = this.players.has(user)
+                    ? this.players.get(user)
+                    : null;
+
+                if (!player) {
+                    this.visibleRegionsPerPlayer.clear();
+                    return;
+                }
 
                 if (!this.visibleRegionsPerPlayer.has(player)) {
+                    this.visibleRegionsPerPlayer.clear();
                     this.visibleRegionsPerPlayer.set(player, []);
                 }
 
@@ -1410,30 +1435,14 @@ export default class IngameGameState extends GameState<
                     this.visibleRegionsPerPlayer.get(player).push(region);
                 });
 
-                const toHide = message.regionsToHide.map(rid => this.world.regions.get(rid));
-
-                this.visibleRegionsPerPlayer.set(player, _.difference(this.visibleRegionsPerPlayer.get(player), toHide));
-
-                toHide.forEach(region => {
-                    if (this.ordersOnBoard.has(region)) {
-                        this.ordersOnBoard.delete(region);
-                    }
-
-                    region.units.clear();
-                    region.garrison = 0;
-                    region.controlPowerToken = null;
-                    region.loyaltyTokens = 0;
-                    region.castleModifier = 0;
-                    region.crownModifier = 0;
-                    region.barrelModifier = 0;
-                });
-
                 message.ordersToMakeVisible.map(([rid, oid]) => {
                     const region = this.world.regions.get(rid);
                     const order = orders.get(oid);
 
                     this.ordersOnBoard.set(region, order);
                 });
+
+                this.visibleRegionsPerPlayer.set(player, _.difference(this.visibleRegionsPerPlayer.get(player), toHide));
             }
         } else if (message.type == "update-public-visible-regions") {
             if (!this.fogOfWar) {
@@ -1551,6 +1560,17 @@ export default class IngameGameState extends GameState<
         });
 
         const removedPlayers = _.difference(this.visibleRegionsPerPlayer.keys, this.players.values);
+
+        removedPlayers.forEach(p => {
+            this.entireGame.sendMessageToClients([p.user], {
+                type: "update-visible-regions",
+                playerUserId: p.user.id,
+                regionsToMakeVisible: [],
+                regionsToHide: _.difference(this.world.regions.keys, this.publicVisibleRegions.map(r => r.id)),
+                ordersToMakeVisible: []
+            });
+        });
+
         removedPlayers.forEach(p => this.visibleRegionsPerPlayer.delete(p));
     }
 
@@ -1603,9 +1623,20 @@ export default class IngameGameState extends GameState<
             }
         }
 
-        result.push(...this.leafState.getRequiredVisibleRegionsForPlayer(player));
+        result.push(...this.calculateRequiredVisibleRegionsForPlayer(player));
         result.push(...this.publicVisibleRegions)
 
+        return _.uniq(result);
+    }
+
+    calculateRequiredVisibleRegionsForPlayer(player: Player): Region[] {
+        const result: Region[] = [];
+        let state: AnyGameState = this.entireGame;
+
+        while (state != null) {
+            result.push(...state.getRequiredVisibleRegionsForPlayer(player));
+            state = state.childGameState;
+        }
         return _.uniq(result);
     }
 
