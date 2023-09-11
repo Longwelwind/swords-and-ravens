@@ -819,6 +819,14 @@ export default class CombatGameState extends GameState<
         return combatGameState;
     }
 
+    getRequiredVisibleRegionsForPlayer(player: Player): Region[] {
+        if (this.isCommandingHouseInCombat(player.house)) {
+            return this.world.getNeighbouringRegions(this.defendingRegion);
+        }
+
+        return [];
+    }
+
     deserializeChildGameState(data: SerializedCombatGameState["childGameState"]): CombatGameState["childGameState"] {
         switch (data.type) {
             case "support":

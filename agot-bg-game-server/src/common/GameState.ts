@@ -7,7 +7,7 @@ import { v4 } from "uuid";
 import Region from "./ingame-game-state/game-data-structure/Region";
 import Player from "./ingame-game-state/Player";
 
-type AnyGameState = GameState<any, any> | null;
+export type AnyGameState = GameState<any, any> | null;
 
 export default class GameState<ParentGameState extends AnyGameState, ChildGameState extends AnyGameState = null> {
     @observable parentGameState: ParentGameState;

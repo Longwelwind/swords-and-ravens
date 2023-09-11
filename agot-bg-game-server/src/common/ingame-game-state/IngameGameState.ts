@@ -1,5 +1,5 @@
 import EntireGame, { NotificationType } from "../EntireGame";
-import GameState from "../GameState";
+import GameState, { AnyGameState } from "../GameState";
 import {ClientMessage} from "../../messages/ClientMessage";
 import {ServerMessage} from "../../messages/ServerMessage";
 import User from "../../server/User";
@@ -1603,9 +1603,20 @@ export default class IngameGameState extends GameState<
             }
         }
 
-        result.push(...this.leafState.getRequiredVisibleRegionsForPlayer(player));
+        result.push(...this.calculateRequiredVisibleRegionsForPlayer(player));
         result.push(...this.publicVisibleRegions)
 
+        return _.uniq(result);
+    }
+
+    calculateRequiredVisibleRegionsForPlayer(player: Player): Region[] {
+        const result: Region[] = [];
+        let state: AnyGameState = this.entireGame;
+
+        while (state != null) {
+            result.push(...state.getRequiredVisibleRegionsForPlayer(player));
+            state = state.childGameState;
+        }
         return _.uniq(result);
     }
 
