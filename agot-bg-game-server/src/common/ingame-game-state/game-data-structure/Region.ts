@@ -194,6 +194,8 @@ export default class Region {
             || this.game.ingame.publicVisibleRegions.includes(this)
             || this.game.ingame.getVisibleRegionsForPlayer(player).includes(this);
 
+        const playerControlsTargaryen = this.game.targaryen != null && player != null && player.house == this.game.targaryen;
+
         return {
             id: this.id,
             units: visible ? this.units.values.map(u => u.serializeToClient()) : [],
@@ -203,7 +205,7 @@ export default class Region {
                     ? this.controlPowerToken.id
                     : null
                 : null,
-            loyaltyTokens: visible ? this.loyaltyTokens : 0,
+            loyaltyTokens: visible || playerControlsTargaryen ? this.loyaltyTokens : 0,
             castleModifier: visible ? this.castleModifier : 0,
             barrelModifier: visible ? this.barrelModifier : 0,
             crownModifier: visible ? this.crownModifier : 0,

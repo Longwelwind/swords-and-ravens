@@ -1725,7 +1725,7 @@ export default class IngameGameState extends GameState<
                     this.entireGame.sendMessageToClients([p.user], {
                         type: "update-visible-regions",
                         playerUserId: p.user.id,
-                        regionsToMakeVisible: makeVisible.map(r => r.serializeToClient(true, null)),
+                        regionsToMakeVisible: makeVisible.map(r => r.serializeToClient(true, p)),
                         regionsToHide: toHide.map(r => r.id),
                         ordersToMakeVisible: makeVisible.filter(r => this.ordersOnBoard.has(r)).map(r => [r.id, this.ordersOnBoard.get(r).id])
                     });
