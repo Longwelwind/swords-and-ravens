@@ -40,7 +40,7 @@ export default abstract class WildlingCardEffectInTurnOrderGameState<C extends G
             return;
         }
 
-        const consequence = this.ingame.processPossibleConsequencesOfUnitLoss();
+        const consequence = this.ingame.processPossibleConsequencesOfUnitLossAndCheckWinningConditions();
         if (consequence.victoryConditionsFulfilled) {
             return;
         } else if (consequence.takeOverPort) {

@@ -311,7 +311,7 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
             wildlingStrength: this.game.wildlingStrength
         });
 
-        const consequence = this.ingame.processPossibleConsequencesOfUnitLoss();
+        const consequence = this.ingame.processPossibleConsequencesOfUnitLossAndCheckWinningConditions();
         if (consequence.victoryConditionsFulfilled) {
             return;
         } else if (consequence.takeOverPort) {

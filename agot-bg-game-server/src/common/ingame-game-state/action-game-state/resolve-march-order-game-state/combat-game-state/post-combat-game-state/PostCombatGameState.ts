@@ -319,12 +319,6 @@ export default class PostCombatGameState extends GameState<
         if (this.doesVictoriousDefenderNeedToRetreat() && !this.originalLoser) {
             // For the sake of simplicity, declare the winner the loser for the upcoming retreat phase.
             // This way we do not have to complicate the code and handle the possible retreat of the winner in ResolveRetreatGameState.
-            this.combat.ingameGameState.log({
-                type: "arianne-martell-force-retreat",
-                house: this.loser.id,
-                enemyHouse: this.winner.id
-            });
-
             this.originalLoser = this.loser;
             this.loser = this.winner;
             this.proceedRetreat();
@@ -426,6 +420,22 @@ export default class PostCombatGameState extends GameState<
                 });
             }
         });
+
+        if (this.combat.ingameGameState.fogOfWar) {
+            // Hide combat areas after combat
+            this.combat.ingameGameState.publicVisibleRegions = [];
+            this.entireGame.users.values.filter(u => u.connected).forEach(u => {
+                this.entireGame.sendMessageToClients([u], {
+                    type: "update-public-visible-regions",
+                    regionsToMakeVisible: [],
+                    ordersToMakeVisible: [],
+                    clear: true,
+                    applyChangesNow: !this.combat.ingameGameState.players.has(u)
+                });
+            });
+            this.combat.ingameGameState.updateVisibleRegions(true);
+        }
+
         this.combat.resolveMarchOrderGameState.onResolveSingleMarchOrderGameStateFinish(this.attacker);
     }
 

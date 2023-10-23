@@ -192,49 +192,20 @@ export default class ResolveRetreatGameState extends GameState<
 
             const from = this.postCombat.loserCombatData.region;
 
-            if (!this.ingame.fogOfWar) {
-                this.entireGame.broadcastToClients({
-                    type: "move-units",
-                    from: from.id,
-                    to: this.retreatRegion.id,
-                    units: armyLeft.map(u => u.id),
-                    isRetreat: true
-                });
-            } else {
-                const to = this.retreatRegion as Region;
-                const userVisibilityList = this.entireGame.users.values.map(u => {
-                    const p = this.ingame.players.tryGet(u, null);
-                    const visibleRegions = this.ingame.getVisibleRegionsForPlayer(p);
-                    return {
-                        user: u,
-                        seesFrom: visibleRegions.includes(from),
-                        seesTo: visibleRegions.includes(to)
-                    }
-                });
+            // As the army units are necessary in the world
+            // to deserialize combat state properly,
+            // we add the chosen retreat region to public visible regions
+            // and clear this list afer combat.
+            this.ingame.addPublicVisibleRegions(this.retreatRegion);
+            this.ingame.updateVisibleRegions();
 
-                const usersWhoSeeFromAndTo = userVisibilityList.filter(item => item.seesFrom && item.seesTo).map(item => item.user);
-                this.entireGame.sendMessageToClients(usersWhoSeeFromAndTo, {
-                    type: "move-units",
-                    from: from.id,
-                    to: to.id,
-                    units: armyLeft.map(u => u.id)
-                });
-
-                const userWhoOnlySeeFrom = userVisibilityList.filter(dict => dict.seesFrom && !dict.seesTo).map(dict => dict.user);
-                this.entireGame.sendMessageToClients(userWhoOnlySeeFrom, {
-                    type: "remove-units",
-                    regionId: from.id,
-                    unitIds: armyLeft.map(u => u.id),
-                    animate: false
-                });
-
-                const userWhoOnlySeeTo = userVisibilityList.filter(dict => !dict.seesFrom && dict.seesTo).map(dict => dict.user);
-                this.entireGame.sendMessageToClients(userWhoOnlySeeTo, {
-                    type: "add-units",
-                    regionId: to.id,
-                    units: armyLeft.map(u => u.serializeToClient())
-                });
-            }
+            this.entireGame.broadcastToClients({
+                type: "move-units",
+                from: from.id,
+                to: this.retreatRegion.id,
+                units: armyLeft.map(u => u.id),
+                isRetreat: true
+            });
         }
 
         this.postCombat.onResolveRetreatFinish();

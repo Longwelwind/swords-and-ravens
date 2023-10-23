@@ -197,7 +197,7 @@ export default class CombatGameState extends GameState<
             this.proceedToChooseGeneral();
         }
 
-        this.ingameGameState.addPublicVisibleRegions([attackerComingFrom, combatRegion]);
+        this.ingameGameState.addPublicVisibleRegions(attackerComingFrom, combatRegion);
     }
 
     declareSupport(supportingHouse: House, supportedHouse: House | null, writeToGameLog: boolean): void {

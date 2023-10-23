@@ -26,7 +26,7 @@ export default class PayDebtsGameState extends GameState<IngameGameState, Resolv
     }
 
     proceedNextResolve(): void {
-        const consequence = this.ingame.processPossibleConsequencesOfUnitLoss();
+        const consequence = this.ingame.processPossibleConsequencesOfUnitLossAndCheckWinningConditions();
         if (consequence.victoryConditionsFulfilled) {
             return;
         } else if (consequence.takeOverPort) {
