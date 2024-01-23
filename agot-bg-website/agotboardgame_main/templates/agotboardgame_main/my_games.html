@@ -95,8 +95,36 @@ Your Games -
         <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Your Games</h4>
-                    {% games_table my_games user perms %}
+                    <h4 class="card-title">
+                        <div class="row justify-content-between">
+                            <div class="col">
+                                Your Games
+                            </div>
+                            <div class="col d-flex justify-content-end">
+                                <button class="btn btn-primary"
+                                    type="button"
+                                    data-toggle="collapse"
+                                    data-target="#collapsed_create_your_game"
+                                >
+                                    <i class="fa fa-plus fa-lg" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </h4>
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8 collapse" id="collapsed_create_your_game">
+                            <form action="/games/" method="POST">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="game-name-input">Game name</label>
+                                    <input id="game-name-input" name="name" class="form-control" maxlength="200" required {% if not perms.agotboardgame_main.add_game %}disabled{% endif %}/>
+                                </div>
+                                <button type="submit" class="btn btn-block btn-primary" {% if not perms.agotboardgame_main.add_game %}disabled{% endif %}>
+                                    Create game
+                                </button>
+                            </form>
+                        </div>
+                    </div>{% games_table my_games user perms %}
                 </div>
             </div>
         </div>
@@ -132,7 +160,36 @@ Your Games -
         <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title mb-0"><a href="/games">All Games</a></h4>
+                    <h4 class="card-title mb-0">
+                        <div class="row justify-content-between">
+                            <div class="col">
+                                <a href="/games">All Games</a>
+                            </div>
+                            <div class="col d-flex justify-content-end">
+                                <button class="btn btn-primary"
+                                    type="button"
+                                    data-toggle="collapse"
+                                    data-target="#collapsed_create_game"
+                                >
+                                    <i class="fa fa-plus fa-lg" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </h4>
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8 collapse" id="collapsed_create_game">
+                            <form action="/games/" method="POST">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="game-name-input">Game name</label>
+                                    <input id="game-name-input" name="name" class="form-control" maxlength="200" required {% if not perms.agotboardgame_main.add_game %}disabled{% endif %} />
+                                </div>
+                                <button type="submit" class="btn btn-block btn-primary" {% if not perms.agotboardgame_main.add_game %}disabled{% endif %}>
+                                    Create game
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
