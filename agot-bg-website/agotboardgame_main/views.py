@@ -191,11 +191,15 @@ def my_games(request):
     my_games = games_query.filter((Q(state=IN_LOBBY) | Q(state=ONGOING)) & Q(user_is_in_game=1)).order_by("state", "-last_active_at")
     enrich_games(request, my_games, True, False, True)
 
+    my_created_games = games_query.filter((Q(state=IN_LOBBY) | Q(state=ONGOING)) & Q(owner=request.user)).order_by("state", "-last_active_at")
+    enrich_games(request, my_created_games, False, False, False)
+
     last_finished_game = Game.objects.filter(state=FINISHED).annotate(players_count=Count('players')).latest()
     public_room_id = Room.objects.get(name='public').id
 
     return render(request, "agotboardgame_main/my_games.html", {
         "my_games": my_games,
+        "my_created_games": my_created_games,
         "open_live_games": open_live_games,
         "running_live_games": running_live_games,
         "last_finished_game": last_finished_game,
@@ -311,24 +315,21 @@ def games(request):
             "last_finished_game": last_finished_game
         })
     elif request.method == "POST":
-        if not request.user.has_perm("agotboardgame_main.add_game"):
-            return HttpResponseRedirect("/")
-
         name = request.POST.get("name", "")
+
+        if not request.user.has_perm("agotboardgame_main.add_game") or len(name) > 200:
+            return HttpResponseRedirect("/games")
 
         game = Game()
         game.name = name
         game.owner = request.user
         game.save()
 
-        if len(name) > 200:
-            return HttpResponseRedirect("/games")
-
         return HttpResponseRedirect(f"/play/{game.id}")
 
 def cancel_game(request, game_id):
     if not request.user.has_perm("agotboardgame_main.cancel_game"):
-        return HttpResponseRedirect("/")
+        return HttpResponseRedirect("/games")
 
     game = get_object_or_404(Game, id=game_id)
 
