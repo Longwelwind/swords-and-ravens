@@ -1,5 +1,6 @@
 {% extends "./base.html" %}
 {% load games_table %}
+{% load custom_filters %}
 
 {% block title %}
 Games -
@@ -42,10 +43,10 @@ Games -
                     </h4>
                     {% for user in request.online_now %}
                     {% if user.is_admin %}
-                        <a style="margin-right: 10px; font-size: 1.125rem; color:brown" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">
-                            {{ user.username }}
+                        <a style="margin-right: 10px; font-size: 1.125rem; color:brown; white-space: nowrap; display: inline-block;" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">
+                            <span>{{ user.username }}</span>
                             {% if user.last_won_tournament %}
-                                <span style="color: goldenrod"
+                                <span style="color: goldenrod; display: inline-block;"
                                     data-toggle="tooltip"
                                     data-html="true"
                                     title="Winner of </br><b>{{ user.last_won_tournament }}</b>"
@@ -55,10 +56,10 @@ Games -
                             {% endif %}
                         </a>
                     {% elif user.is_high_member %}
-                        <a style="margin-right: 10px; font-size: 1.125rem; color:darkgoldenrod" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">
-                            {{ user.username }}
+                        <a style="margin-right: 10px; font-size: 1.125rem; color:darkgoldenrod; white-space: nowrap; display: inline-block;" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">
+                            <span>{{ user.username }}</span>
                             {% if user.last_won_tournament %}
-                                <span style="color: goldenrod"
+                                <span style="color: goldenrod; display: inline-block;"
                                     data-toggle="tooltip"
                                     data-html="true"
                                     title="Winner of </br><b>{{ user.last_won_tournament }}</b>"
@@ -68,10 +69,10 @@ Games -
                             {% endif %}
                         </a>
                     {% else %}
-                        <a style="margin-right: 10px; font-size: 1.125rem;" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">
-                            {{ user.username }}
+                        <a style="margin-right: 10px; font-size: 1.125rem; white-space: nowrap; display: inline-block;" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">
+                            <span>{{ user.username }}</span>
                             {% if user.last_won_tournament %}
-                                <span style="color: goldenrod"
+                                <span style="color: goldenrod; display: inline-block;"
                                     data-toggle="tooltip"
                                     data-html="true"
                                     title="Winner of </br><b>{{ user.last_won_tournament }}</b>"
@@ -119,8 +120,9 @@ Games -
                     <h4 class="card-title">
                         <div class="row justify-content-between">
                             <div class="col">
-                                <a href="/my_games">Your Games</a>
+                                <a href="/my_games">Your Games <small>({{ my_games|get_length }})</small></a>
                             </div>
+                            {% if perms.agotboardgame_main.add_game %}
                             <div class="col d-flex justify-content-end">
                                 <button class="btn btn-primary"
                                     type="button"
@@ -130,6 +132,7 @@ Games -
                                     <i class="fa fa-plus fa-lg" aria-hidden="true"></i>
                                 </button>
                             </div>
+                            {% endif %}
                         </div>
                     </h4>
                     <div class="row justify-content-center">
@@ -157,8 +160,9 @@ Games -
                     <h4 class="card-title">
                         <div class="row justify-content-between">
                             <div class="col">
-                                All Games
+                                All Games <small>({{ all_games|get_length }})</small>
                             </div>
+                            {% if perms.agotboardgame_main.add_game %}
                             <div class="col d-flex justify-content-end">
                                 <button class="btn btn-primary"
                                     type="button"
@@ -168,6 +172,7 @@ Games -
                                     <i class="fa fa-plus fa-lg" aria-hidden="true"></i>
                                 </button>
                             </div>
+                            {% endif %}
                         </div>
                     </h4>
                     <div class="row justify-content-center">
@@ -190,33 +195,11 @@ Games -
                 </div>
             </div>
         </div>
-        {% if perms.agotboardgame_main.add_game %}
-        <div class="col-lg-11 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-8">
-                            <form action="/games/" method="POST">
-                                {% csrf_token %}
-                                <div class="form-group">
-                                    <label for="game-name-input">Game name</label>
-                                    <input id="game-name-input" name="name" class="form-control" maxlength="200" required />
-                                </div>
-                                <button type="submit" class="btn btn-block btn-primary">
-                                    Create game
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
         {% if perms.agotboardgame_main.can_play_as_another_player and inactive_games %}
         <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Games without a move for 5 days</h4>
+                    <h4 class="card-title">Games without a move for 5 days <small>({{ inactive_games|get_length }})</small></h4>
                     <div style="max-height: 300px; overflow-y: auto">
                         {% games_table inactive_games user perms True %}
                     </div>
@@ -228,7 +211,7 @@ Games -
         <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Tournament Games without a move for 2 days</h4>
+                    <h4 class="card-title">Tournament Games without a move for 2 days <small>({{ inactive_tournament_games|get_length }})</small></h4>
                     <div style="max-height: 300px; overflow-y: auto">
                         {% games_table inactive_tournament_games user perms True %}
                     </div>
@@ -244,7 +227,7 @@ Games -
                         data-toggle="tooltip"
                         title="These are games where the last move was more than 2 days ago and the player being waited on has not logged in for 8 days."
                     >
-                        Games waiting for inactive players
+                        Games waiting for inactive players <small>({{ replacement_needed_games|get_length }})</small>
                     </h4>
                     <div style="max-height: 300px; overflow-y: auto">
                         {% games_table replacement_needed_games user perms True %}
@@ -258,7 +241,7 @@ Games -
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">
-                        Inactive Private Games
+                        Inactive Private Games <small>({{ inactive_private_games|get_length }})</small>
                     </h4>
                     <div style="max-height: 300px; overflow-y: auto">
                         {% games_table inactive_private_games user perms %}

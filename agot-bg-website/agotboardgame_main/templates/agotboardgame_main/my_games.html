@@ -1,5 +1,6 @@
 {% extends "./base.html" %}
 {% load games_table %}
+{% load custom_filters %}
 
 {% block title %}
 Your Games -
@@ -41,10 +42,10 @@ Your Games -
                     </h4>
                     {% for user in request.online_now %}
                     {% if user.is_admin %}
-                        <a style="margin-right: 10px; font-size: 1.125rem; color:brown" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">
-                            {{ user.username }}
+                        <a style="margin-right: 10px; font-size: 1.125rem; color:brown; white-space: nowrap; display: inline-block;" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">
+                            <span>{{ user.username }}</span>
                             {% if user.last_won_tournament %}
-                                <span style="color: goldenrod"
+                                <span style="color: goldenrod; display: inline-block;"
                                     data-toggle="tooltip"
                                     data-html="true"
                                     title="Winner of </br><b>{{ user.last_won_tournament }}</b>"
@@ -54,10 +55,10 @@ Your Games -
                             {% endif %}
                         </a>
                     {% elif user.is_high_member %}
-                        <a style="margin-right: 10px; font-size: 1.125rem; color:darkgoldenrod" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">
-                            {{ user.username }}
+                        <a style="margin-right: 10px; font-size: 1.125rem; color:darkgoldenrod; white-space: nowrap; display: inline-block;" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">
+                            <span>{{ user.username }}</span>
                             {% if user.last_won_tournament %}
-                                <span style="color: goldenrod"
+                                <span style="color: goldenrod; display: inline-block;"
                                     data-toggle="tooltip"
                                     data-html="true"
                                     title="Winner of </br><b>{{ user.last_won_tournament }}</b>"
@@ -67,10 +68,10 @@ Your Games -
                             {% endif %}
                         </a>
                     {% else %}
-                        <a style="margin-right: 10px; font-size: 1.125rem;" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">
-                            {{ user.username }}
+                        <a style="margin-right: 10px; font-size: 1.125rem; white-space: nowrap; display: inline-block;" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">
+                            <span>{{ user.username }}</span>
                             {% if user.last_won_tournament %}
-                                <span style="color: goldenrod"
+                                <span style="color: goldenrod; display: inline-block;"
                                     data-toggle="tooltip"
                                     data-html="true"
                                     title="Winner of </br><b>{{ user.last_won_tournament }}</b>"
@@ -91,28 +92,29 @@ Your Games -
                 </div>
             </div>
         </div>
-        {% if my_games %}
         <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">
                         <div class="row justify-content-between">
                             <div class="col">
-                                Your Games
+                                Your Games <small>({{ my_games|get_length }})</small>
                             </div>
+                            {% if perms.agotboardgame_main.add_game %}
                             <div class="col d-flex justify-content-end">
                                 <button class="btn btn-primary"
                                     type="button"
                                     data-toggle="collapse"
-                                    data-target="#collapsed_create_your_game"
+                                    data-target="#collapsed_cg_for_your_games"
                                 >
                                     <i class="fa fa-plus fa-lg" aria-hidden="true"></i>
                                 </button>
                             </div>
+                            {% endif %}
                         </div>
                     </h4>
                     <div class="row justify-content-center">
-                        <div class="col-lg-8 collapse" id="collapsed_create_your_game">
+                        <div class="col-lg-8 collapse" id="collapsed_cg_for_your_games">
                             <form action="/games/" method="POST">
                                 {% csrf_token %}
                                 <div class="form-group">
@@ -128,15 +130,6 @@ Your Games -
                 </div>
             </div>
         </div>
-        {% else %}
-        <div class="col-lg-11 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <p class="mb-0">You currently have no running games!</p>
-                </div>
-            </div>
-        </div>
-        {% endif %}
         {% if open_live_games %}
         <div class="col-lg-11 mb-4">
             <div class="card">
@@ -157,6 +150,47 @@ Your Games -
             </div>
         </div>
         {% endif %}
+        {% if my_created_games %}
+        <div class="col-lg-11 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">
+                        <div class="row justify-content-between">
+                            <div class="col">
+                                Your Created Games <small>({{ my_created_games|get_length }})</small>
+                            </div>
+                            {% if perms.agotboardgame_main.add_game %}
+                            <div class="col d-flex justify-content-end">
+                                <button class="btn btn-primary"
+                                    type="button"
+                                    data-toggle="collapse"
+                                    data-target="#collapsed_cg_for_created_games"
+                                >
+                                    <i class="fa fa-plus fa-lg" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </h4>
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8 collapse" id="collapsed_cg_for_created_games">
+                            <form action="/games/" method="POST">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="game-name-input">Game name</label>
+                                    <input id="game-name-input" name="name" class="form-control" maxlength="200" required {% if not perms.agotboardgame_main.add_game %}disabled{% endif %}/>
+                                </div>
+                                <button type="submit" class="btn btn-block btn-primary" {% if not perms.agotboardgame_main.add_game %}disabled{% endif %}>
+                                    Create game
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% games_table my_created_games user perms %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
         <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
@@ -165,31 +199,8 @@ Your Games -
                             <div class="col">
                                 <a href="/games">All Games</a>
                             </div>
-                            <div class="col d-flex justify-content-end">
-                                <button class="btn btn-primary"
-                                    type="button"
-                                    data-toggle="collapse"
-                                    data-target="#collapsed_create_game"
-                                >
-                                    <i class="fa fa-plus fa-lg" aria-hidden="true"></i>
-                                </button>
-                            </div>
                         </div>
                     </h4>
-                    <div class="row justify-content-center">
-                        <div class="col-lg-8 collapse" id="collapsed_create_game">
-                            <form action="/games/" method="POST">
-                                {% csrf_token %}
-                                <div class="form-group">
-                                    <label for="game-name-input">Game name</label>
-                                    <input id="game-name-input" name="name" class="form-control" maxlength="200" required {% if not perms.agotboardgame_main.add_game %}disabled{% endif %} />
-                                </div>
-                                <button type="submit" class="btn btn-block btn-primary" {% if not perms.agotboardgame_main.add_game %}disabled{% endif %}>
-                                    Create game
-                                </button>
-                            </form>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
