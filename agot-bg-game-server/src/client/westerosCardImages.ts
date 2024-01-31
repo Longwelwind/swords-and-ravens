@@ -5,6 +5,7 @@ import feastForCrows from "../../public/images/westeros-cards/FeastForCrows.png"
 import gameOfThrones from "../../public/images/westeros-cards/GameOfThrones.png";
 import lastDaysOfSummer from "../../public/images/westeros-cards/LastDaysOfSummer.png";
 import lastDaysOfSummerII from "../../public/images/westeros-cards/LastDaysOfSummerII.png";
+import denseFog from "../../public/images/westeros-cards/DenseFog.png";
 import mustering from "../../public/images/westeros-cards/Mustering.png";
 import putToTheSword from "../../public/images/westeros-cards/PutToTheSword.png";
 import rainsOfAutumn from "../../public/images/westeros-cards/RainsOfAutumn.png";
@@ -64,6 +65,7 @@ const westerosCardImages = new BetterMap([
         ["storm-of-swords", stormOfSwords],
         ["web-of-lies", webOfLies],
         ["wildlings-attack", wildlingsAttackIII],
+        ['dense-fog', denseFog],
     ])],
     [3, new BetterMap([
         ["domestic-disputes", domesticDisputes],

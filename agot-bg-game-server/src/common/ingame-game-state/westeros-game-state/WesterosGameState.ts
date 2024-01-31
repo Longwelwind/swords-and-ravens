@@ -93,7 +93,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
                     this.revealedCards.push(card);
                 }
 
-                // Burry the card at the bottom of the deck
+                // Bury the card at the bottom of the deck
                 deck.push(card);
             }
         } else {
@@ -103,7 +103,7 @@ export default class WesterosGameState extends GameState<IngameGameState,
                 card.discarded = true;
                 this.revealedCards.push(card);
 
-                // Burry the card at the bottom of the deck
+                // Bury the card at the bottom of the deck
                 this.game.westerosDecks[3].push(card);
             }
         }

@@ -1790,6 +1790,9 @@
       {
         "type": "wildlings-attack",
         "quantity": 3
+      },
+      {
+        "type": "dense-fog"
       }
     ]
   ],

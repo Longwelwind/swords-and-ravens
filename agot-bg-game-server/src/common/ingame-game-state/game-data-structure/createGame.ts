@@ -404,17 +404,24 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
 
     // Load Westeros Cards
     let lastWesterosCardId = 0;
-    game.westerosDecks = baseGameData.westerosCards.map(westerosDeckData => {
+    game.westerosDecks = baseGameData.westerosCards
+    .map(westerosDeckData => {
         const cards: WesterosCard[] = [];
-        westerosDeckData.forEach((westerosCardData: WesterosCardData) => {
-            const westerosCardType = westerosCardTypes.get(westerosCardData.type);
-            const quantity = westerosCardData.quantity ? westerosCardData.quantity : 1;
-            for (let i = 0;i < quantity;i++) {
-                const id = ++lastWesterosCardId;
-
-                cards.push(new WesterosCard(id, westerosCardType));
-            }
-        });
+        westerosDeckData
+            .filter((westerosCardData: WesterosCardData) => {
+                if (!gameSettings.fogOfWar) {
+                    return westerosCardData.type !== "dense-fog"
+                }
+                return true
+            })
+            .forEach((westerosCardData: WesterosCardData) => {
+                const westerosCardType = westerosCardTypes.get(westerosCardData.type);
+                const quantity = westerosCardData.quantity ? westerosCardData.quantity : 1;
+                for (let i = 0;i < quantity;i++) {
+                    const id = ++lastWesterosCardId;
+                    cards.push(new WesterosCard(id, westerosCardType));
+                }
+            });
 
         return shuffleInPlace(cards);
     });
