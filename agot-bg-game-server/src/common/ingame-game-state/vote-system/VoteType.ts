@@ -183,7 +183,7 @@ export class ExtendPlayerClocks extends VoteType {
     }
 
     getPositiveCountToPass(vote: Vote): number {
-        return vote.participatingHouses.length;
+        return vote.participatingHouses.length - 1;
     }
 
     executeAccepted(vote: Vote): void {
