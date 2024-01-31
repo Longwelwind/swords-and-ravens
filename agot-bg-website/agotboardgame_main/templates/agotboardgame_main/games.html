@@ -1,6 +1,5 @@
 {% extends "./base.html" %}
 {% load games_table %}
-{% load custom_filters %}
 
 {% block title %}
 Games -
@@ -23,7 +22,7 @@ Games -
         <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Online Users <small class="ml-2">({{ request.online_now | length }})</small>
+                    <h4 class="card-title">Online Users<small class="ml-2">({{ request.online_now | length }})</small>
                         <span
                             id="westerosi-time"
                             class="float-right badge badge-secondary"
@@ -120,7 +119,7 @@ Games -
                     <h4 class="card-title">
                         <div class="row justify-content-between">
                             <div class="col">
-                                <a href="/my_games">Your Games <small>({{ my_games|get_length }})</small></a>
+                                <a href="/my_games">Your Games<small class="ml-2">({{ my_games|length }})</small></a>
                             </div>
                             {% if perms.agotboardgame_main.add_game %}
                             <div class="col d-flex justify-content-end">
@@ -160,7 +159,7 @@ Games -
                     <h4 class="card-title">
                         <div class="row justify-content-between">
                             <div class="col">
-                                All Games <small>({{ all_games|get_length }})</small>
+                                All Games<small class="ml-2">({{ all_games|length }})</small>
                             </div>
                             {% if perms.agotboardgame_main.add_game %}
                             <div class="col d-flex justify-content-end">
@@ -199,7 +198,7 @@ Games -
         <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Games without a move for 5 days <small>({{ inactive_games|get_length }})</small></h4>
+                    <h4 class="card-title">Games without a move for 5 days<small class="ml-2">({{ inactive_games|length }})</small></h4>
                     <div style="max-height: 300px; overflow-y: auto">
                         {% games_table inactive_games user perms True %}
                     </div>
@@ -211,7 +210,7 @@ Games -
         <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Tournament Games without a move for 2 days <small>({{ inactive_tournament_games|get_length }})</small></h4>
+                    <h4 class="card-title">Tournament Games without a move for 2 days<small class="ml-2">({{ inactive_tournament_games|length }})</small></h4>
                     <div style="max-height: 300px; overflow-y: auto">
                         {% games_table inactive_tournament_games user perms True %}
                     </div>
@@ -227,7 +226,7 @@ Games -
                         data-toggle="tooltip"
                         title="These are games where the last move was more than 2 days ago and the player being waited on has not logged in for 8 days."
                     >
-                        Games waiting for inactive players <small>({{ replacement_needed_games|get_length }})</small>
+                        Games waiting for inactive players<small class="ml-2">({{ replacement_needed_games|length }})</small>
                     </h4>
                     <div style="max-height: 300px; overflow-y: auto">
                         {% games_table replacement_needed_games user perms True %}
@@ -241,7 +240,7 @@ Games -
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">
-                        Inactive Private Games <small>({{ inactive_private_games|get_length }})</small>
+                        Inactive Private Games<small class="ml-2">({{ inactive_private_games|length }})</small>
                     </h4>
                     <div style="max-height: 300px; overflow-y: auto">
                         {% games_table inactive_private_games user perms %}

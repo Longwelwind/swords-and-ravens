@@ -37,7 +37,7 @@ import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
 import ThematicDraftHouseCardsGameState from "../common/ingame-game-state/thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 import { toast } from "react-toastify";
 import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
-import CombatGameState from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
+import ChooseHouseCardGameState from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/choose-house-card-game-state/ChooseHouseCardGameState";
 import houseCardsBackImages from "./houseCardsBackImages";
 
 interface HouseRowComponentProps {
@@ -349,8 +349,8 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     }
 
     renderPlayerHouseCards(): ReactNode {
-        const combat = this.ingame.hasChildGameState(CombatGameState) ? this.ingame.getChildGameState(CombatGameState) as CombatGameState : null;
-        const isCommandingVassalInCombat = combat?.isCommandingVassalInCombat(this.house) ?? false;
+        const chooseHouseCards = this.ingame.hasChildGameState(ChooseHouseCardGameState) ? this.ingame.getChildGameState(ChooseHouseCardGameState) as ChooseHouseCardGameState : null;
+        const isCommandingVassalInCombat = chooseHouseCards?.combatGameState.isCommandingVassalInCombat(this.house) ?? false;
 
         return isCommandingVassalInCombat
             ? _.range(0, 3).map(i => <Col xs="auto" key={`vassal-combat_back_${this.house.id}_${i}`}>

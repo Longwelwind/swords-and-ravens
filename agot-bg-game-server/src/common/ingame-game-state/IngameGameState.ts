@@ -1855,7 +1855,7 @@ export default class IngameGameState extends GameState<
         }
 
         const refusedVotes = this.votes.values.filter(v => v.state == VoteState.REFUSED && v.type instanceof ExtendPlayerClocks);
-        if (this.game.turn != this.game.maxTurns && refusedVotes.length > 1) {
+        if (this.game.turn != this.game.maxTurns && refusedVotes.length > 2) {
             return {result: false, reason: "max-vote-count-reached"};
         }
 
