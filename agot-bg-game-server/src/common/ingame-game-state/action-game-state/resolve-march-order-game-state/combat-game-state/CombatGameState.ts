@@ -572,6 +572,11 @@ export default class CombatGameState extends GameState<
         }
     }
 
+    isCommandingVassalInCombat(commanderHouse: House): boolean {
+        return (this.ingameGameState.isVassalHouse(this.attacker) && this.ingameGameState.getControllerOfHouse(this.attacker).house == commanderHouse)
+            || (this.ingameGameState.isVassalHouse(this.defender) && this.ingameGameState.getControllerOfHouse(this.defender).house == commanderHouse);
+    }
+
     isCommandingHouseInCombat(commanderHouse: House): boolean {
         return this.ingameGameState.getControllerOfHouse(this.attacker).house == commanderHouse
             || this.ingameGameState.getControllerOfHouse(this.defender).house == commanderHouse;
