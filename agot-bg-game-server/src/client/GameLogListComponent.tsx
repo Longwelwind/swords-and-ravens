@@ -793,7 +793,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const houseCard = this.allHouseCards.get(data.houseCard);
                 return <p>
-                   <b>Melisandre</b>: House <b>{house.name}</b> decided to return <b>
+                   <b>Melisandre</b>: House <b>{house.name}</b> discarded <b>{houseCard.combatStrength}</b> Power token{houseCard.combatStrength != 1 ? "s" : ""} to return <b>
                         {houseCard.name}</b> to hand.
                 </p>;
             }
@@ -1376,7 +1376,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                     return <p>{vassals.length > 0
                         ? (<>House <b>{house.name}</b> claimed {joinReactNodes(vassals.map(v => <b key={`vassals-claimed_${v.id}`}>{v.name}</b>), ", ")} as
-                                vassal{vassals.length > 0 && "s"}.</>)
+                                vassal{vassals.length > 1 && "s"}.</>)
                         : (<>House <b>{house.name}</b> has declined to command a vassal
                                 and has handed their set of vassal order tokens to the next player on the Iron Throne track.</>)
                     }</p>;
