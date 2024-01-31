@@ -123,8 +123,8 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                                 style={{
                                     backgroundImage: `url(${houseCardsBackImages.get(this.attacker.houseCardBackId)})`
                                 }}/>
-                    : <div className="vertical-game-card game-card-slot small"/>}
-
+                            : <div className="vertical-game-card game-card-slot small"/>
+                    }
                 </div>
 
                 <div style={{gridRow: "3 / span 4", gridColumn: "5"}}>
@@ -139,7 +139,8 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
                                 style={{
                                     backgroundImage: `url(${houseCardsBackImages.get(this.defender.houseCardBackId)})`
                                 }}/>
-                    : <div className="vertical-game-card game-card-slot small"/>}
+                            : <div className="vertical-game-card game-card-slot small"/>
+                    }
                 </div>
 
                 <div style={{gridRow: "3", gridColumn: "2"}}>

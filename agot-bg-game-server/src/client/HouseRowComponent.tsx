@@ -37,6 +37,8 @@ import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
 import ThematicDraftHouseCardsGameState from "../common/ingame-game-state/thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 import { toast } from "react-toastify";
 import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
+import CombatGameState from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
+import houseCardsBackImages from "./houseCardsBackImages";
 
 interface HouseRowComponentProps {
     house: House;
@@ -114,9 +116,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         let player: Player | null = null;
         let clock: number | null = null;
 
-        const showAllOtherPlayerHouseCards = !this.ingame.hasChildGameState(ThematicDraftHouseCardsGameState);
-
-        try {
+                try {
             if (!isVassal) {
                 player = this.player;
                 isWaitedFor = this.ingame.getWaitedUsers().includes(player.user);
@@ -298,40 +298,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     )}
                     <Col xs="auto">
                         <Row className="justify-content-center">
-                            {!isVassal ?
-                                (showAllOtherPlayerHouseCards || this.props.gameClient.doesControlHouse(this.house)) &&
-                                _.sortBy(this.house.houseCards.values, hc => hc.combatStrength).map(hc => (
-                                    <Col xs="auto" key={`house-card_${this.house.id}_${hc.id}`}>
-                                        {hc.state == HouseCardState.AVAILABLE ? (
-                                            <HouseCardComponent
-                                                houseCard={hc}
-                                                size="tiny"
-                                            />
-                                        ) : (
-                                            <HouseCardBackComponent
-                                                house={this.house}
-                                                houseCard={hc}
-                                                size="tiny"
-                                            />
-                                        )}
-                                    </Col>
-                                ))
-                                : _.sortBy(this.game.vassalHouseCards.values, hc => hc.combatStrength).map(hc => (
-                                    <Col xs="auto" key={`vassal-cards_${this.house.id}_${hc.id}`}>
-                                        {hc.state == HouseCardState.AVAILABLE ? (
-                                            <HouseCardComponent
-                                                houseCard={hc}
-                                                size="tiny"
-                                            />
-                                        ) : (
-                                            <HouseCardBackComponent
-                                                house={null}
-                                                houseCard={hc}
-                                                size="tiny"
-                                            />
-                                        )}
-                                    </Col>
-                                ))}
+                            {this.renderHouseCards(isVassal)}
                         </Row>
                         {this.house.laterHouseCards != null && !isVassal &&
                             <Row className="justify-content-center">
@@ -356,6 +323,55 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                 </div>
             </ListGroupItem>
         </>;
+    }
+
+    private renderHouseCards(isVassal: boolean): ReactNode {
+        const showAllOtherPlayerHouseCards = !this.ingame.hasChildGameState(ThematicDraftHouseCardsGameState);
+
+        return !isVassal
+            ? (showAllOtherPlayerHouseCards || this.props.gameClient.doesControlHouse(this.house))
+                ? this.renderPlayerHouseCards()
+                : null
+            : _.sortBy(this.game.vassalHouseCards.values, hc => hc.combatStrength).map(hc => (
+                <Col xs="auto" key={`vassal-cards_${this.house.id}_${hc.id}`}>
+                    {hc.state == HouseCardState.AVAILABLE ? (
+                        <HouseCardComponent
+                            houseCard={hc}
+                            size="tiny" />
+                    ) : (
+                        <HouseCardBackComponent
+                            house={null}
+                            houseCard={hc}
+                            size="tiny" />
+                    )}
+                </Col>
+            ));
+    }
+
+    renderPlayerHouseCards(): ReactNode {
+        const combat = this.ingame.hasChildGameState(CombatGameState) ? this.ingame.getChildGameState(CombatGameState) as CombatGameState : null;
+        const isCommandingVassalInCombat = combat?.isCommandingVassalInCombat(this.house) ?? false;
+
+        return isCommandingVassalInCombat
+            ? _.range(0, 3).map(i => <Col xs="auto" key={`vassal-combat_back_${this.house.id}_${i}`}>
+                <div className="vertical-game-card tiny" style={{
+                    backgroundImage: `url(${houseCardsBackImages.get("vassal")})`
+                }}/>
+            </Col>)
+            : _.sortBy(this.house.houseCards.values, hc => hc.combatStrength).map(hc => (
+            <Col xs="auto" key={`house-card_${this.house.id}_${hc.id}`}>
+                {hc.state == HouseCardState.AVAILABLE ? (
+                    <HouseCardComponent
+                        houseCard={hc}
+                        size="tiny" />
+                ) : (
+                    <HouseCardBackComponent
+                        house={this.house}
+                        houseCard={hc}
+                        size="tiny" />
+                )}
+            </Col>
+        ));
     }
 
     renderVassalDropDownItems(): ReactNode {

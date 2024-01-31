@@ -124,10 +124,11 @@ export default class ChooseHouseCardComponent extends Component<GameStateCompone
                                         checked={this.burnValyrianSteelBlade}
                                         onChange={() => {
                                             if (!this.burnValyrianSteelBlade && !window.confirm(
-                                                "Are you sure you want to use the VSB right now without knowing which House card the opponent has selected?\n\n"
-                                                + "This could be useful, for example, if you think Doran Martell or Ser Gerris Drinkwater will take your blade soon. "
-                                                + "Then it might make sense to burn the blade now in any case, because the game might not ask you later "
-                                                + "if the blade can't be used usefully."
+                                                "Are you sure you want to pre-mark the Valyrian Steel Blade for use without knowing which House card the opponent has selected?\n\n"
+                                                + "This could be useful if you anticipate effects like those of Doran Martell or Ser Gerris Drinkwater, "
+                                                + "potentially causing you to lose your first-place position on the fiefdoms track.\n"
+                                                + "However, exercise caution, as facing Doran in this battle would render it too late to hand over a used blade. "
+                                                + "Doran's immediate effect takes precedence and transfers the blade before you have the chance to burn it."
                                             )) {
                                                 return;
                                             }

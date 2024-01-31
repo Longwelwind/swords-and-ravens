@@ -182,6 +182,10 @@ export class ExtendPlayerClocks extends VoteType {
         return "extend all player clocks by 15 minutes";
     }
 
+    getPositiveCountToPass(vote: Vote): number {
+        return vote.participatingHouses.length;
+    }
+
     executeAccepted(vote: Vote): void {
         const ingame = vote.ingame;
 
