@@ -45,7 +45,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
         const isIngame = this.props.entireGame.childGameState instanceof IngameGameState;
         return (
             <Col id="game-settings-container" xs={12} className="mt-2">
-                <Row id="live-pbem-row" className="justify-content-center mb-3">
+                <Row id="live-pbem-row" className="justify-content-center mb-2">
                     {isIngame && (
                         <Col xs={12} className="text-center mb-2">
                             {this.selectedGameSetupName}

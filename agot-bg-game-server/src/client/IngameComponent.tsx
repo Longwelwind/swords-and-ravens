@@ -261,8 +261,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         style={{ maxHeight: this.mapScrollbarEnabled ? "100%" : "none", maxWidth: "600px" }}
                         className={classNames(
                             this.columnSwapAnimationClassName,
-                            { "d-none d-xxl-block": !isMobile && this.gameSettings.playerCount < 8,
-                              "d-none d-xxxl-block": !isMobile && this.gameSettings.playerCount >= 8 }
+                            { "d-none d-xl-block": !isMobile && this.gameSettings.playerCount < 8,
+                              "d-none d-xxl-block": !isMobile && this.gameSettings.playerCount >= 8 }
                         )}
                     >
                         {this.renderHousesColumn(true, tracks)}
@@ -290,8 +290,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             rootClose
         >
             <div className={classNames("clickable btn btn-sm btn-secondary p-1", {
-                "d-xxl-none d-xxxl-none": !isMobile && this.gameSettings.playerCount < 8,
-                "d-xxxl-none": !isMobile && this.gameSettings.playerCount >= 8
+                "d-xl-none d-xxl-none": !isMobile && this.gameSettings.playerCount < 8,
+                "d-xxl-none": !isMobile && this.gameSettings.playerCount >= 8
             })}
                 style={{ position: "fixed", right: this.user?.settings.responsiveLayout ? "auto" : "4px", left: this.user?.settings.responsiveLayout ? "4px" : "auto", top: "45px", padding: "4px", borderStyle: "none" }}
             >
@@ -347,8 +347,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             show={this.tracksPopoverVisible}
         >
             <div className={classNames("clickable btn btn-sm btn-secondary p-1", {
-                    "d-xxl-none d-xxxl-none": !isMobile && this.gameSettings.playerCount < 8,
-                    "d-xxxl-none": !isMobile && this.gameSettings.playerCount >= 8
+                    "d-xl-none d-xxl-none": !isMobile && this.gameSettings.playerCount < 8,
+                    "d-xxl-none": !isMobile && this.gameSettings.playerCount >= 8
                 })}
                 onClick={() => {
                     this.tracksPopoverVisible = !this.tracksPopoverVisible;

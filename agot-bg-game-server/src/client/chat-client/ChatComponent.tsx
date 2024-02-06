@@ -113,7 +113,6 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                     )}
                     {messages.map((m, i) => {
                         const onlyEmojis = this.containsOnlyEmojis(m.text);
-                        const divideOwnAndForeignMessages: boolean = this.containerWidth != null && this.containerWidth > 550;
                         return <>
                             {/* Inject before the first message */}
                             {i == 0 && (
@@ -127,7 +126,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                     "align-items-center": onlyEmojis
                                 })}
                             >
-                                {this.renderMessage(divideOwnAndForeignMessages, i, messages, m, onlyEmojis)}
+                                {this.renderMessage(i, messages, m, onlyEmojis)}
                             </Row>
                             {/* Inject between all messages and after the last */}
                             <React.Fragment key={"injected-after-" + m.id}>
@@ -207,66 +206,42 @@ export default class ChatComponent extends Component<ChatComponentProps> {
         );
     }
 
-    private renderMessage(divideOwnAndForeignMessages: boolean, currentMsgIndex: number, messages: Message[], currentMessage: Message, onlyEmojis: boolean): ReactNode {
-        if (!divideOwnAndForeignMessages) {
-            return <Col className={classNames(
-                {
+    private renderMessage(currentMsgIndex: number, messages: Message[], currentMessage: Message, onlyEmojis: boolean): ReactNode {
+        return <>
+            <Col xs="12" className={classNames("p-0 m-0", {
+                "px-2": this.props.gameClient.authenticatedUser == currentMessage.user,
+                "d-none": currentMsgIndex > 0 && messages[currentMsgIndex - 1].user == currentMessage.user && getTimeDeltaInSeconds(currentMessage.createdAt, messages[currentMsgIndex - 1].createdAt) <= 90
+            })}>
+                <div style={{width: "fit-content"}} className={classNames("p-1 pl-2", {
+                    "float-right": this.props.gameClient.authenticatedUser == currentMessage.user,
                     "own-message": this.props.gameClient.authenticatedUser == currentMessage.user,
                     "foreign-message": this.props.gameClient.authenticatedUser != currentMessage.user
                 })}>
-                <div className={currentMsgIndex > 0 && messages[currentMsgIndex - 1].user == currentMessage.user && getTimeDeltaInSeconds(currentMessage.createdAt, messages[currentMsgIndex - 1].createdAt) <= 180 ? "d-none" : ""}>
                     {this.props.getUserDisplayName(currentMessage.user)}{this.getMoment(currentMessage)}
                 </div>
-                <OverlayTrigger
-                    overlay={<Tooltip id={"current-message-date-" + currentMessage.id}>{currentMessage.createdAt.toLocaleString()}</Tooltip>}
-                    placement="auto"
-                    popperConfig={{modifiers: [preventOverflow]}}
-                    delay={{hide: 0, show: 400}}
-                >
-                    <div className={onlyEmojis ? "make-emojis-large" : ""}
-                        style={{ minWidth: 200, overflowWrap: "anywhere" }}
-                    >
-                        {currentMessage.text}
-                    </div>
-                </OverlayTrigger>
-            </Col>;
-        } else {
-            return <>
-                <Col xs="12" className={classNames("p-0 m-0", {
+            </Col>
+            {this.props.gameClient.authenticatedUser == currentMessage.user && <Col xs="4"/>}
+            <OverlayTrigger
+                overlay={<Tooltip id={"current-message-date-" + currentMessage.id}>{currentMessage.createdAt.toLocaleString()}</Tooltip>}
+                placement="auto"
+                popperConfig={{modifiers: [preventOverflow]}}
+                delay={{hide: 0, show: 250}}
+            >
+                <Col xs="8"className={classNames("px-0", {
                     "px-2": this.props.gameClient.authenticatedUser == currentMessage.user,
-                    "d-none": currentMsgIndex > 0 && messages[currentMsgIndex - 1].user == currentMessage.user && getTimeDeltaInSeconds(currentMessage.createdAt, messages[currentMsgIndex - 1].createdAt) <= 90
-                })}>
-                    <div style={{width: "fit-content"}} className={classNames("p-1 pl-2", {
+                })}
+                >
+                    <div style={{width: "fit-content", overflowWrap: "anywhere"}} className={classNames("p-1 px-2", {
+                        "make-emojis-large": onlyEmojis,
                         "float-right": this.props.gameClient.authenticatedUser == currentMessage.user,
                         "own-message": this.props.gameClient.authenticatedUser == currentMessage.user,
                         "foreign-message": this.props.gameClient.authenticatedUser != currentMessage.user
                     })}>
-                        {this.props.getUserDisplayName(currentMessage.user)}{this.getMoment(currentMessage)}
+                        {currentMessage.text}
                     </div>
                 </Col>
-                {this.props.gameClient.authenticatedUser == currentMessage.user && <Col xs="4"/>}
-                <OverlayTrigger
-                    overlay={<Tooltip id={"current-message-date-" + currentMessage.id}>{currentMessage.createdAt.toLocaleString()}</Tooltip>}
-                    placement="auto"
-                    popperConfig={{modifiers: [preventOverflow]}}
-                    delay={{hide: 0, show: 400}}
-                >
-                    <Col xs="8"className={classNames("px-0", {
-                        "px-2": this.props.gameClient.authenticatedUser == currentMessage.user,
-                    })}
-                    >
-                        <div style={{width: "fit-content", overflowWrap: "anywhere"}} className={classNames("p-1 px-2", {
-                            "make-emojis-large": onlyEmojis,
-                            "float-right": this.props.gameClient.authenticatedUser == currentMessage.user,
-                            "own-message": this.props.gameClient.authenticatedUser == currentMessage.user,
-                            "foreign-message": this.props.gameClient.authenticatedUser != currentMessage.user
-                        })}>
-                            {currentMessage.text}
-                        </div>
-                    </Col>
-                </OverlayTrigger>
-            </>;
-        }
+            </OverlayTrigger>
+        </>;
     }
 
     getMoment(message: Message): ReactNode {
