@@ -206,9 +206,11 @@ export default class IngameGameState extends GameState<
 
             this.game.draftableHouseCards.clear();
 
-            this.setInfluenceTrack(0, this.getRandomTrackOrder());
-            this.setInfluenceTrack(1, this.getRandomTrackOrder());
-            this.setInfluenceTrack(2, this.getRandomTrackOrder());
+            do {
+                this.setInfluenceTrack(0, this.getRandomTrackOrder());
+                this.setInfluenceTrack(1, this.getRandomTrackOrder());
+                this.setInfluenceTrack(2, this.getRandomTrackOrder());
+            } while (this.hasAnyHouseTooMuchDominanceTokens());
 
             this.onDraftingFinish();
         } else {
@@ -250,6 +252,18 @@ export default class IngameGameState extends GameState<
         const vassalHouses = _.without(this.game.houses.values, ...playerHouses);
 
         return _.concat(shuffleInPlace(playerHouses), shuffleInPlace(vassalHouses));
+    }
+
+    private hasAnyHouseTooMuchDominanceTokens(): boolean {
+        const dominanceHolders = _.uniqBy(this.game.influenceTracks.map(track => track[0]), h => h.id);
+        return this.players.size == 1
+            // Ensure a single player can hold all 3 dominance tokens in a debug game:
+            ? false
+            : this.players.size > 2
+                // Ensure every domininance token is held by another house
+                ? dominanceHolders.length != this.game.influenceTracks.length
+                // Ensure a player does not get all dominance tokens in 2p games
+                : dominanceHolders.length == 1;
     }
 
     log(data: GameLogData, resolvedAutomatically = false): void {
