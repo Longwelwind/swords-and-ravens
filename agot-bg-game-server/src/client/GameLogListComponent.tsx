@@ -79,7 +79,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
     }
 
     get fogOfWar(): boolean {
-        return !this.ingame.isEnded && !this.ingame.isCancelled && this.ingame.fogOfWar;
+        return !this.ingame.isEndedOrCancelled && this.ingame.fogOfWar;
     }
 
     createHouseCards(data: [string, HouseCardData][]): [string, HouseCard][] {

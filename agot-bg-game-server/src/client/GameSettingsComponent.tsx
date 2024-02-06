@@ -613,7 +613,8 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="blind-draft-tooltip">
-                                    Players receive random House cards and Influence positions. Can be combined with <i>Limited Draft</i>.
+                                    Players receive random House cards and Influence positions. House cards remain hidden throughout the game.
+                                    Can be combined with <i>Limited Draft</i>.
                                 </Tooltip>}>
                                 <label htmlFor="blind-draft-setting">Blind Draft</label>
                             </OverlayTrigger>}

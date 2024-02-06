@@ -260,7 +260,7 @@ export default class GlobalServer {
         }
 
         if (!entireGame.gameSettings.onlyLive || !entireGame.ingameGameState
-            || entireGame.ingameGameState.isEnded || entireGame.ingameGameState.isCancelled) {
+            || entireGame.ingameGameState.isEndedOrCancelled) {
             return;
         }
 
@@ -553,7 +553,7 @@ export default class GlobalServer {
 
         if (entireGame.gameSettings.onlyLive && entireGame.ingameGameState) {
             const ingame = entireGame.ingameGameState;
-            if (!ingame.isEnded && !ingame.isCancelled) {
+            if (!ingame.isEndedOrCancelled) {
                 // Do not unload running clock games until they are finished
                 return;
             }

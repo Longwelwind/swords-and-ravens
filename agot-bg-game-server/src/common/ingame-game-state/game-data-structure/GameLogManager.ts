@@ -16,6 +16,13 @@ const fogOfWarBannedLogs = [
     'orders-revealed'
 ];
 
+const blindDraftBannedLogs = [
+    'orders-revealed',
+    'house-cards-returned',
+    'roose-bolton-house-cards-returned',
+    'massing-on-the-milkwater-house-cards-back'
+];
+
 export default class GameLogManager {
     ingameGameState: IngameGameState;
     @observable logs: GameLog[] = [];
@@ -26,9 +33,18 @@ export default class GameLogManager {
     }
 
     private logFilter = (log: GameLog): boolean => {
+        if (this.ingameGameState.isEndedOrCancelled) return true;
+        return this.fogOfWarFilter(log) && this.blindDraftFilter(log);
+    }
+
+    private fogOfWarFilter = (log: GameLog): boolean => {
         if (!this.ingameGameState.fogOfWar) return true;
-        if (this.ingameGameState.isEnded || this.ingameGameState.isCancelled) return true;
         return !fogOfWarBannedLogs.includes(log.data.type);
+    }
+
+    private blindDraftFilter = (log: GameLog): boolean => {
+        if (!this.ingameGameState.entireGame.gameSettings.blindDraft) return true;
+        return !blindDraftBannedLogs.includes(log.data.type);
     }
 
     log(data: GameLogData, resolvedAutomatically = false): void {

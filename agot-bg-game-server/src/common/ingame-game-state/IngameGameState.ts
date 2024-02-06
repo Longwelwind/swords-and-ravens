@@ -114,6 +114,10 @@ export default class IngameGameState extends GameState<
         return this.childGameState instanceof CancelledGameState;
     }
 
+    get isEndedOrCancelled(): boolean {
+        return this.isEnded || this.isCancelled;
+    }
+
     get fogOfWar(): boolean {
         return this.entireGame.gameSettings.fogOfWar;
     }
@@ -1589,7 +1593,7 @@ export default class IngameGameState extends GameState<
     }
 
     getVisibleRegionsForPlayer(player: Player | null): Region[] {
-        if (!this.fogOfWar || this.isCancelled || this.isEnded) {
+        if (!this.fogOfWar || this.isEndedOrCancelled) {
             return this.world.regions.values;
         }
 
@@ -1605,7 +1609,7 @@ export default class IngameGameState extends GameState<
             return [];
         }
 
-        if (this.isCancelled || this.isEnded) {
+        if (this.isEndedOrCancelled) {
             return this.world.regions.values;
         }
 

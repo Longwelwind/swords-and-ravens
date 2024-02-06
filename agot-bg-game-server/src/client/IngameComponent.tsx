@@ -829,7 +829,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             this.authenticatedPlayer.house.knowsNextWildlingCard;
         const nextWildlingCard = this.game.wildlingDeck.find(c => c.id == this.game.clientNextWildlingCardId);
 
-        const gameRunning = !this.ingame.isEnded && !this.ingame.isCancelled;
+        const gameRunning = !this.ingame.isEndedOrCancelled;
         const roundWarning = gameRunning && (this.game.maxTurns - this.game.turn) == 1;
         const roundCritical = gameRunning && (this.game.turn == this.game.maxTurns);
 

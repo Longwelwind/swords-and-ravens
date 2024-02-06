@@ -7,7 +7,6 @@ import Game from "./Game";
 import { ObjectiveCard, SpecialObjectiveCard } from "./static-data-structure/ObjectiveCard";
 import Player from "../Player";
 import { objectiveCards, specialObjectiveCards } from "./static-data-structure/objectiveCards";
-import ThematicDraftHouseCardsGameState from "../thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 
 export default class House {
     id: string;
