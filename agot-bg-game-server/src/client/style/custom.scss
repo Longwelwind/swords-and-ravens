@@ -4,18 +4,16 @@ $grid-breakpoints: (
         sm: 576px,
         md: 768px,
         lg: 992px,
-        xl: 1565px,
-        xxl: 1800px,
-        xxxl: 2290px
+        xl: 1800px,
+        xxl: 2290px
 );
 
 $container-max-widths: (
         sm: 540px,
         md: 720px,
         lg: 960px,
-        xl: 1500px,
-        xxl: 1800px,
-        xxxl: 2290px
+        xl: 1800px,
+        xxl: 2290px
 );
 
 @import './theme/_variables';
