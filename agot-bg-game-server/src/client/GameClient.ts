@@ -9,7 +9,7 @@ import House from "../common/ingame-game-state/game-data-structure/House";
 import ChatClient from "./chat-client/ChatClient";
 import BetterMap from "../utils/BetterMap";
 import { compress, decompress } from "./utils/compression";
-import { playSoundWhenClickingMarchOrder, playSoundForLogEvent, stopRunningSoundEffect } from "./utils/sound-effects";
+import SfxManager from "./utils/SfxManager";
 
 export interface AuthData {
     userId: string;
@@ -40,6 +40,7 @@ export default class GameClient {
     @observable isReconnecting = false;
 
     chatClient: ChatClient = new ChatClient(this);
+    sfxManager: SfxManager = new SfxManager(this);
 
     get muted(): boolean {
         if (!this.authenticatedUser) {
@@ -55,6 +56,9 @@ export default class GameClient {
         }
 
         this.authenticatedUser.settings.muted = value;
+        if (value == true) {
+            this.authenticatedUser.settings.notificationsVolume = 0;
+        }
         this.authenticatedUser.syncSettings();
     }
 
@@ -72,6 +76,45 @@ export default class GameClient {
         }
 
         this.authenticatedUser.settings.musicMuted = value;
+        if (value == true) {
+            this.authenticatedUser.settings.musicVolume = 0;
+        }
+        this.authenticatedUser.syncSettings();
+    }
+
+    get notificationsVolume(): number {
+        if (!this.authenticatedUser) {
+            throw new Error("Game client must have an authenticated user");
+        }
+
+        return this.authenticatedUser.settings.notificationsVolume;
+    }
+
+    set notificationsVolume(value: number) {
+        if (!this.authenticatedUser) {
+            throw new Error("Game client must have an authenticated user");
+        }
+
+        this.authenticatedUser.settings.notificationsVolume = value;
+        this.authenticatedUser.settings.muted = value == 0;
+        this.authenticatedUser.syncSettings();
+    }
+
+    get musicVolume(): number {
+        if (!this.authenticatedUser) {
+            throw new Error("Game client must have an authenticated user");
+        }
+
+        return this.authenticatedUser.settings.musicVolume;
+    }
+
+    set musicVolume(value: number) {
+        if (!this.authenticatedUser) {
+            throw new Error("Game client must have an authenticated user");
+        }
+
+        this.authenticatedUser.settings.musicVolume = value;
+        this.authenticatedUser.settings.musicMuted = value == 0;
         this.authenticatedUser.syncSettings();
     }
 
@@ -300,8 +343,4 @@ export default class GameClient {
         this.authenticatedUser = null;
         this.isReconnecting = false;
     }
-
-    public playSoundWhenClickingMarchOrder = playSoundWhenClickingMarchOrder;
-    public playSoundForLogEvent = playSoundForLogEvent;
-    public stopRunningSoundEffect = stopRunningSoundEffect;
 }

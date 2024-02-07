@@ -3,6 +3,7 @@ import * as WebSocket from "ws";
 import EntireGame from "../common/EntireGame";
 import {UserSettings} from "../messages/ClientMessage";
 import {observable} from "mobx";
+import _ from "lodash";
 
 export default class User {
     id: string;
@@ -15,6 +16,13 @@ export default class User {
     @observable connected: boolean;
     @observable note = "";
     onConnectionStateChanged: ((user: User) => void) | null = null;
+
+    debouncedSyncSettings = _.debounce(() => {
+        this.entireGame.sendMessageToServer({
+            type: "change-settings",
+            settings: this.settings
+        });
+    }, 500, { trailing: true });
 
     constructor(id: string, name: string, facelessName: string, game: EntireGame, settings: UserSettings, connected = false, otherUsersFromSameNetwork: string[] = []) {
         this.id = id;
@@ -31,10 +39,7 @@ export default class User {
     }
 
     syncSettings(): void {
-        this.entireGame.sendMessageToServer({
-            type: "change-settings",
-            settings: this.settings
-        });
+        this.debouncedSyncSettings();
     }
 
     updateConnectionStatus(): void {
@@ -60,7 +65,7 @@ export default class User {
             id: this.id,
             name: admin ? this.name : hideUserName ? this.facelessName : this.name,
             facelessName: this.facelessName,
-            settings: this.settings,
+            settings:  admin || user == this ? this.settings : undefined,
             connected: this.connected,
             otherUsersFromSameNetwork: this.otherUsersFromSameNetwork,
             note: admin || user == this ? this.note : ""
@@ -68,7 +73,19 @@ export default class User {
     }
 
     static deserializeFromServer(game: EntireGame, data: SerializedUser): User {
-        const user = new User(data.id, data.name, data.facelessName, game, data.settings, data.connected, data.otherUsersFromSameNetwork);
+        const emptySettings: UserSettings = {
+            chatHouseNames: false,
+            lastOpenedTab: '',
+            mapScrollbar: false,
+            musicMuted: false,
+            muted: false,
+            responsiveLayout: false,
+            showMapWhenDrafting: false,
+            tracksColumnCollapsed: false,
+            musicVolume: 0,
+            notificationsVolume: 0
+        };
+        const user = new User(data.id, data.name, data.facelessName, game, data.settings ?? emptySettings, data.connected, data.otherUsersFromSameNetwork);
         user.note = data.note;
         return user;
     }
@@ -78,7 +95,7 @@ export interface SerializedUser {
     id: string;
     name: string;
     facelessName: string;
-    settings: UserSettings;
+    settings?: UserSettings;
     connected: boolean;
     otherUsersFromSameNetwork: string[];
     note: string;

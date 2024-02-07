@@ -2176,6 +2176,20 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             serializedGame.gameSettings.blindDraft = false;
             return serializedGame;
         }
+    },
+    {
+        version: "112",
+        migrate: (serializedGame: any) => {
+            serializedGame.users.forEach((u: any) => {
+                if (!u.settings) {
+                    return;
+                }
+
+                u.settings.notificationsVolume = u.settings.muted ? 0 : 1;
+                u.settings.musicVolume = u.settings.muted ? 0 : 1;
+            });
+            return serializedGame;
+        }
     }
 ];
 

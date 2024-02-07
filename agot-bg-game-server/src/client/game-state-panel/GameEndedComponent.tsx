@@ -6,7 +6,6 @@ import GameEndedGameState from "../../common/ingame-game-state/game-ended-game-s
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import crownImage from "../../../public/images/icons/crown.svg";
-import introSound from "../../../public/sounds/game-of-thrones-intro.ogg";
 import HouseIconComponent from "./utils/HouseIconComponent";
 import { houseColorFilters } from "../houseColorFilters";
 
@@ -62,8 +61,11 @@ export default class GameEndedComponent extends Component<GameStateComponentProp
                             </Col>
                     </Row>
                 </Col>
-                {!this.props.gameClient.musicMuted && <audio id="game-ended-sound" src={introSound} autoPlay />}
             </>
         );
+    }
+
+    componentDidMount(): void {
+        this.props.gameClient.sfxManager.playGotTheme();
     }
 }
