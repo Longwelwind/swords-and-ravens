@@ -608,6 +608,22 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 </Col>
                 <Col xs="12">
                     <FormCheck
+                        id="random-draft-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="random-draft-tooltip">
+                                    Players receive random House cards and Influence positions.
+                                    Can be combined with <i>Limited Draft</i>.
+                                </Tooltip>}>
+                                <label htmlFor="random-draft-setting">Random Draft</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.randomDraft}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.randomDraft = !this.gameSettings.randomDraft)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
                         id="blind-draft-setting"
                         type="switch"
                         label={

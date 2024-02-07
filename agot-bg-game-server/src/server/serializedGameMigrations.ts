@@ -2168,6 +2168,14 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
 
             return serializedGame;
         }
+    },
+    {
+        version: "111",
+        migrate: (serializedGame: any) => {
+            serializedGame.gameSettings.randomDraft = serializedGame.gameSettings.blindDraft;
+            serializedGame.gameSettings.blindDraft = false;
+            return serializedGame;
+        }
     }
 ];
 

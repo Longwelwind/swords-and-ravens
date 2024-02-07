@@ -195,7 +195,7 @@ export default class IngameGameState extends GameState<
     beginDraftingHouseCards(): void {
         if (this.entireGame.gameSettings.thematicDraft) {
             this.setChildGameState(new ThematicDraftHouseCardsGameState(this)).firstStart();
-        } else if (this.entireGame.gameSettings.blindDraft) {
+        } else if (this.entireGame.gameSettings.blindDraft || this.entireGame.gameSettings.randomDraft) {
             houseCardCombatStrengthAllocations.entries.forEach(([hcStrength, count]) => {
                 for(let i=0; i<count; i++) {
                     this.players.values.forEach(p => {
@@ -259,15 +259,26 @@ export default class IngameGameState extends GameState<
     }
 
     private hasAnyHouseTooMuchDominanceTokens(): boolean {
-        const dominanceHolders = _.uniqBy(this.game.influenceTracks.map(track => track[0]), h => h.id);
-        return this.players.size == 1
-            // Ensure a single player can hold all 3 dominance tokens in a debug game:
-            ? false
-            : this.players.size > 2
-                // Ensure every domininance token is held by another house
-                ? dominanceHolders.length != this.game.influenceTracks.length
+        const uniqDominanceHolders = _.uniq(this.game.influenceTracks.map(track => this.game.getTokenHolder(track)));
+
+        switch (this.players.size) {
+            case 0:
+                throw new Error("Games with 0 players cannot start");
+            case 1:
+                // Ensure a single player can hold all 3 dominance tokens in a debug game:
+                return false;
+            case 2:
                 // Ensure a player does not get all dominance tokens in 2p games
-                : dominanceHolders.length == 1;
+                // With Targaryen the other player can hold all 3 tokens.
+                return this.game.targaryen ? uniqDominanceHolders.length != 1 : uniqDominanceHolders.length != 2;
+            case 3:
+                // Ensure every dominance token is held by another house
+                // With Targaryen the other player can hold all 3 tokens.
+                return this.game.targaryen ? uniqDominanceHolders.length != 2 : uniqDominanceHolders.length != 3;
+            default:
+                // Ensure every dominance token is held by another house
+                return uniqDominanceHolders.length != 3;
+        }
     }
 
     log(data: GameLogData, resolvedAutomatically = false): void {
