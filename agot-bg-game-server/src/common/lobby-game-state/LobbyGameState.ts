@@ -212,6 +212,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.thematicDraft = false;
                 settings.limitedDraft = false;
                 settings.blindDraft = false;
+                settings.randomDraft = false;
             }
 
             if (settings.setupId == "a-feast-for-crows") {
