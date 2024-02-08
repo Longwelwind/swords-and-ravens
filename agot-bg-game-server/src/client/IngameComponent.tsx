@@ -113,6 +113,7 @@ import { houseColorFilters } from "./houseColorFilters";
 import LocalStorageService from "./utils/localStorageService";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
 import VolumeSliderComponent from "./utils/VolumeSliderComponent";
+import { houseThemes } from "./utils/SfxManager";
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -219,6 +220,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             unitImages.set("stark", unitImages.get("bolton"));
             houseIconImages.set("stark", houseIconImages.get("bolton"));
             houseColorFilters.set("stark", houseColorFilters.get("bolton"));
+            houseThemes.set("stark", houseThemes.get("bolton"));
         }
     }
 

@@ -26,6 +26,29 @@ import voteSound from "../../../public/sounds/vote-started.ogg";
 import introSound from "../../../public/sounds/game-of-thrones-intro.ogg";
 import combatSound from "../../../public/sounds/combat.ogg";
 
+import baratheonTheme from "../../../public/sounds/house-themes/baratheon.ogg"
+import lannisterrTheme from "../../../public/sounds/house-themes/lannister.ogg"
+import starkTheme from "../../../public/sounds/house-themes/stark.ogg"
+import martellTheme from "../../../public/sounds/house-themes/martell.ogg"
+import greyjoyTheme from "../../../public/sounds/house-themes/greyjoy.ogg"
+import tyrellTheme from "../../../public/sounds/house-themes/tyrell.ogg"
+import arrynTheme from "../../../public/sounds/house-themes/arryn.ogg"
+import targaryenTheme from "../../../public/sounds/house-themes/targaryen.ogg"
+
+import BetterMap from "../../utils/BetterMap";
+
+export const houseThemes = new BetterMap([
+    ["baratheon", baratheonTheme],
+    ["lannister", lannisterrTheme],
+    ["stark", starkTheme],
+    ["martell", martellTheme],
+    ["greyjoy", greyjoyTheme],
+    ["tyrell", tyrellTheme],
+    ["arryn", arrynTheme],
+    ["targaryen", targaryenTheme],
+    ["bolton", starkTheme]
+]);
+
 const soundsForKnights = [
     intenseHorseStallionNeighSound,
     footmanYesMyLordSound,
@@ -184,12 +207,13 @@ class SfxManager {
         this.playMusic(introSound, this.gameClient.musicVolume, false);
     }
 
-    playCombatSound(): void {
+    playCombatSound(attackerId?: string): void {
         if (this.gameClient.musicMuted) {
             return;
         }
 
-        this.playMusic(combatSound, this.gameClient.musicVolume, false);
+        const sound = attackerId ? houseThemes.tryGet(attackerId, combatSound) : combatSound;
+        this.playMusic(sound, this.gameClient.musicVolume, false);
     }
 
     playSoundWhenClickingMarchOrder(region: Region): void {

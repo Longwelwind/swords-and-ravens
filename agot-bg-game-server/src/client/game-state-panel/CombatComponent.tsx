@@ -204,7 +204,7 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
         this.props.mapControls.modifyUnitsOnMap.push(this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap());
         this.props.mapControls.modifyOrdersOnMap.push(this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap());
 
-        this.props.gameClient.sfxManager.playCombatSound();
+        this.props.gameClient.sfxManager.playCombatSound(this.props.gameState.attacker.id);
     }
 
     componentWillUnmount(): void {
