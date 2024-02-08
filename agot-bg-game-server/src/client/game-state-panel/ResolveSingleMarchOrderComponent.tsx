@@ -42,11 +42,11 @@ export default class ResolveSingleMarchOrderComponent extends Component<GameStat
 
     set selectedMarchOrderRegion(val: Region | null) {
         if (val && this._selectedMarchOrderRegion == null) {
-            this.props.gameClient.playSoundWhenClickingMarchOrder(val);
+            this.props.gameClient.sfxManager.playSoundWhenClickingMarchOrder(val);
         }
 
         if (val == null) {
-            this.props.gameClient.stopRunningSoundEffect();
+            this.props.gameClient.sfxManager.fadeOutCurrentSfx();
         }
 
         this._selectedMarchOrderRegion = val;

@@ -182,10 +182,12 @@ export interface UserSettings {
     lastOpenedTab: string | null;
     chatHouseNames: boolean;
     responsiveLayout: boolean;
-    muted: boolean;
     tracksColumnCollapsed: boolean;
     showMapWhenDrafting: boolean;
+    muted: boolean;
     musicMuted: boolean;
+    notificationsVolume: number;
+    musicVolume: number;
 }
 
 export interface ChangeGameSettings {

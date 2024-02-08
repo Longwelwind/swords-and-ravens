@@ -16,7 +16,6 @@ import User from "../../server/User";
 import { preventOverflow } from "@popperjs/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFaceSmile, faSyncAlt } from "@fortawesome/free-solid-svg-icons";
-import notificationSound from "../../../public/sounds/raven_call.ogg";
 import EmojiPicker, { EmojiStyle, SuggestionMode, Theme } from 'emoji-picker-react';
 import { isMobile } from "react-device-detect";
 import classNames from "classnames";
@@ -346,10 +345,8 @@ export default class ChatComponent extends Component<ChatComponentProps> {
         if (this.props.currentlyViewed) {
             this.chatClient.markAsViewed(this.channel);
             this.audioPlayed = false;
-        } else if (singleMessageRetrieved && !this.audioPlayed && !this.props.gameClient.muted) {
-            const audio = new Audio(notificationSound);
-            audio.play();
-            this.audioPlayed = true;
+        } else if (singleMessageRetrieved && !this.audioPlayed) {
+            this.props.gameClient.sfxManager.playNewMessageReceivedSound();
         }
 
         if (noMoreMessages) {

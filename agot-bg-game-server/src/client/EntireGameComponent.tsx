@@ -10,7 +10,6 @@ import CancelledComponent from "./CancelledComponent";
 import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
 import Col from "react-bootstrap/Col";
 import Badge from "react-bootstrap/Badge";
-import notificationSound from "../../public/sounds/notification.ogg";
 import faviconNormal from "../../public/images/favicon.ico";
 import faviconAlert from "../../public/images/favicon-alert.ico";
 import rollingDicesImage from "../../public/images/icons/rolling-dices.svg";
@@ -25,7 +24,6 @@ import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
-import introSound from "../../public/sounds/game-of-thrones-intro.ogg";
 import CombatGameState from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import { toast, ToastContainer } from "react-toastify";
 import { cssTransition } from "react-toastify";
@@ -48,7 +46,6 @@ interface EntireGameComponentProps {
 @observer
 export default class EntireGameComponent extends Component<EntireGameComponentProps> {
     @observable showMapWhenDrafting = false;
-    @observable playWelcomeSound = false;
     setIntervalId = -1;
 
     get entireGame(): EntireGame {
@@ -120,9 +117,6 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                         : this.entireGame.childGameState instanceof IngameGameState
                             ? <IngameComponent gameClient={this.props.gameClient} gameState={this.entireGame.childGameState} />
                             : this.entireGame.childGameState instanceof CancelledGameState && <CancelledComponent gameClient={this.props.gameClient} gameState={this.entireGame.childGameState} />
-            }
-            {this.playWelcomeSound && !this.props.gameClient.musicMuted &&
-                <audio id="welcome-sound" src={introSound} autoPlay onEnded={() => this.playWelcomeSound = false} />
             }
             <ToastContainer
                 autoClose={7500}
@@ -350,24 +344,12 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     }
 
     onGameStarted(): void {
-        const audio = document.getElementById("welcome-sound") as HTMLAudioElement;
-        // Make sure it's not playing right now
-        if (audio && !audio.paused) {
-            return;
-        }
-
-        if (!this.props.gameClient.musicMuted) {
-            const intro = new Audio(introSound);
-            intro.play();
-        }
+        this.props.gameClient.sfxManager.playGotTheme();
     }
 
     onClientGameStateChange(): void {
         if (this.props.gameClient.isOwnTurn()) {
-            if (!this.props.gameClient.muted) {
-                const audio = new Audio(notificationSound);
-                audio.play();
-            }
+            this.props.gameClient.sfxManager.playNotificationSound();
 
             const player = this.props.gameClient.authenticatedPlayer;
             if (player) {
@@ -411,10 +393,6 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         }
 
         this.setIntervalId = window.setInterval(() => this.setNow(), 1000);
-
-        /* if (!this.isInCombat) {
-            this.playWelcomeSound = true;
-        } */
     }
 
     componentWillUnmount(): void {

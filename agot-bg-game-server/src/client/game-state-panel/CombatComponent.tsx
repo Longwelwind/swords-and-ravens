@@ -39,7 +39,6 @@ import { tidesOfBattleCards } from "../../common/ingame-game-state/game-data-str
 import unitTypes from "../../common/ingame-game-state/game-data-structure/unitTypes";
 import SelectUnitsGameState from "../../common/ingame-game-state/select-units-game-state/SelectUnitsGameState";
 import AfterCombatHouseCardAbilitiesGameState from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-combat-house-card-abilities-game-state/AfterCombatHouseCardAbilitiesGameState";
-import combatSound from "../../../public/sounds/combat.ogg";
 
 @observer
 export default class CombatComponent extends Component<GameStateComponentProps<CombatGameState>> {
@@ -146,7 +145,6 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
                     [CancelHouseCardAbilitiesGameState, CancelHouseCardAbilitiesComponent],
                     [BeforeCombatHouseCardAbilitiesGameState, BeforeCombatHouseCardAbilitiesComponent]
                 ])}
-                {!this.props.gameClient.musicMuted && <audio id="combat-sound" src={combatSound} autoPlay />}
             </>
         );
     }
@@ -205,11 +203,15 @@ export default class CombatComponent extends Component<GameStateComponentProps<C
         this.props.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
         this.props.mapControls.modifyUnitsOnMap.push(this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap());
         this.props.mapControls.modifyOrdersOnMap.push(this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap());
+
+        this.props.gameClient.sfxManager.playCombatSound(this.props.gameState.attacker.id);
     }
 
     componentWillUnmount(): void {
         _.pull(this.props.mapControls.modifyRegionsOnMap, this.modifyRegionsOnMapCallback);
         _.pull(this.props.mapControls.modifyUnitsOnMap, this.modifyUnitsOnMapCallback);
         _.pull(this.props.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
+
+        this.props.gameClient.sfxManager.fadeOutCurrentMusic();
     }
 }
