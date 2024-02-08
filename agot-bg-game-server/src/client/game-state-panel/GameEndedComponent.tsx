@@ -66,6 +66,11 @@ export default class GameEndedComponent extends Component<GameStateComponentProp
     }
 
     componentDidMount(): void {
-        this.props.gameClient.sfxManager.playGotTheme();
+        window.setTimeout(() => {
+            document.body.click();
+            window.setTimeout(() => {
+                this.props.gameClient.sfxManager.playGotTheme();
+            }, 100);
+        }, 100);
     }
 }

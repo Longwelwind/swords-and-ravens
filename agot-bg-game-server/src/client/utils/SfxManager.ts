@@ -175,50 +175,50 @@ class SfxManager {
         }, fadeOutInterval);
     }
 
-    playNotificationSound(): void {
+    playNotificationSound(): Promise<void> {
         if (this.gameClient.muted) {
-            return;
+            return Promise.resolve();
         }
 
-        this.playNotification(notificationSound, this.gameClient.notificationsVolume);
+        return this.playNotification(notificationSound, this.gameClient.notificationsVolume);
     }
 
-    playVoteNotificationSound(): void {
+    playVoteNotificationSound(): Promise<void> {
         if (this.gameClient.muted) {
-            return;
+            return Promise.resolve();
         }
 
-        this.playNotification(voteSound, this.gameClient.notificationsVolume);
+        return this.playNotification(voteSound, this.gameClient.notificationsVolume);
     }
 
-    playNewMessageReceivedSound(): void {
+    playNewMessageReceivedSound(): Promise<void> {
         if (this.gameClient.muted) {
-            return;
+            return Promise.resolve();
         }
 
-        this.playNotification(ravenCallSound, this.gameClient.notificationsVolume);
+        return this.playNotification(ravenCallSound, this.gameClient.notificationsVolume);
     }
 
-    playGotTheme(): void {
+    playGotTheme(): Promise<void> {
         if (this.gameClient.musicMuted) {
-            return;
+            return Promise.resolve();
         }
 
-        this.playMusic(introSound, this.gameClient.musicVolume, false);
+        return this.playMusic(introSound, this.gameClient.musicVolume, false);
     }
 
-    playCombatSound(attackerId?: string): void {
+    playCombatSound(attackerId?: string): Promise<void> {
         if (this.gameClient.musicMuted) {
-            return;
+            return Promise.resolve();
         }
 
         const sound = attackerId ? houseThemes.tryGet(attackerId, combatSound) : combatSound;
-        this.playMusic(sound, this.gameClient.musicVolume, false);
+        return this.playMusic(sound, this.gameClient.musicVolume, false);
     }
 
-    playSoundWhenClickingMarchOrder(region: Region): void {
+    playSoundWhenClickingMarchOrder(region: Region): Promise<void> {
         if (this.gameClient.musicMuted) {
-            return;
+            return Promise.resolve();
         }
 
         const army = region.units.values;
@@ -240,12 +240,12 @@ class SfxManager {
                             ? soundsForShips
                             : soundsForFootmenOnly;
 
-        this.playRandomMusic(files, this.gameClient.musicVolume, true);
+        return this.playRandomMusic(files, this.gameClient.musicVolume, true);
     }
 
-    playSoundForLogEvent(log: GameLogData): void {
+    playSoundForLogEvent(log: GameLogData): Promise<void> {
         if (this.gameClient.musicMuted) {
-            return;
+            return Promise.resolve();
         }
 
         switch(log.type) {
@@ -256,9 +256,9 @@ class SfxManager {
             case "killed-after-combat": {
                 const units = log.killed.map(ut => unitTypes.get(ut));
                 if (units.includes(dragon)) {
-                    this.playRandomMusic(soundsWhenDragonsAreDestroyed, this.gameClient.musicVolume, false);
+                    return this.playRandomMusic(soundsWhenDragonsAreDestroyed, this.gameClient.musicVolume, false);
                 } else {
-                    this.playRandomMusic(soundsWhenUnitsAreDestroyedBySwords, this.gameClient.musicVolume, false);
+                    return this.playRandomMusic(soundsWhenUnitsAreDestroyedBySwords, this.gameClient.musicVolume, false);
                 }
                 break;
             }
@@ -266,45 +266,47 @@ class SfxManager {
                 const killed = _.concat(log.killedBecauseCantRetreat, log.killedBecauseWounded);
                 const units = killed.map(ut => unitTypes.get(ut));
                 if (units.includes(dragon)) {
-                    this.playRandomMusic(soundsWhenDragonsAreDestroyed, this.gameClient.musicVolume, false);
+                    return this.playRandomMusic(soundsWhenDragonsAreDestroyed, this.gameClient.musicVolume, false);
                 }
                 break;
             }
             case "retreat-casualties-suffered": {
                 const units = log.units.map(ut => unitTypes.get(ut));
                 if (units.includes(dragon)) {
-                    this.playRandomMusic(soundsWhenDragonsAreDestroyed, this.gameClient.musicVolume, false);
+                    return this.playRandomMusic(soundsWhenDragonsAreDestroyed, this.gameClient.musicVolume, false);
                 }
                 break;
             }
         }
+
+        return Promise.resolve();
     }
 
-    private playRandomMusic(files: string[], volume: number, withCurrentPlayingCheck: boolean): void {
+    private playRandomMusic(files: string[], volume: number, withCurrentPlayingCheck: boolean): Promise<void> {
         const randomFile = pickRandom(files);
         if (!randomFile) {
-            return;
+            return Promise.resolve();
         }
-        this.playMusic(randomFile, volume, withCurrentPlayingCheck);
+        return this.playMusic(randomFile, volume, withCurrentPlayingCheck);
     }
 
-    private playMusic(file: string, volume: number, withCurrentPlayingCheck: boolean): void {
+    private playMusic(file: string, volume: number, withCurrentPlayingCheck: boolean): Promise<void> {
         if (withCurrentPlayingCheck && this.currentlyPlayingMusic.length > 0) {
-            return;
+            return Promise.resolve();
         }
         const audio = new Audio(file);
         this.currentlyPlayingMusic.push(audio);
         audio.onended = () => _.pull(this.currentlyPlayingMusic, audio);
         audio.volume = volume;
-        audio.play();
+        return audio.play();
     }
 
-    private playNotification(file: string, volume: number): void {
+    private playNotification(file: string, volume: number): Promise<void> {
         const audio = new Audio(file);
         this.currentlyPlayingNotifications.push(audio);
         audio.onended = () => _.pull(this.currentlyPlayingNotifications, audio);
         audio.volume = volume;
-        audio.play();
+        return audio.play();
     }
 }
 
