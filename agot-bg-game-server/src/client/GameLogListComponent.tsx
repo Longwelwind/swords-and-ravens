@@ -155,7 +155,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </Col>}
                     <Col>
                         <div className="game-log-content">
-                            {this.renderGameLogData(l.data, this.currentRound, i)}
+                            {this.renderGameLogData(l.data, this.currentRound, i, l.time)}
                         </div>
                     </Col>
                 </Row>
@@ -172,7 +172,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         ));
     }
 
-    renderGameLogData(data: GameLogData, currentRound: number, currentLogIndex: number): ReactNode {
+    renderGameLogData(data: GameLogData, currentRound: number, currentLogIndex: number, logTime: Date): ReactNode {
         switch (data.type) {
             case "player-action": {
                 const house = this.game.houses.get(data.house);
@@ -243,12 +243,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const army = data.units.map(utid => unitTypes.get(utid));
                 const orderImgUrl = data.orderType ? orderImages.get(data.orderType) : null;
 
-                const showDottedLine = this.logManager.logs[currentLogIndex - 1]?.data.type != "march-resolved";
+                const previousLog = this.logManager.logs[currentLogIndex - 1];
+                let showDottedLine = true;
+
+                if (previousLog.data.type == "action-phase-resolve-march-began") {
+                    showDottedLine = false;
+                } else if (previousLog.data.type == "march-resolved") {
+                    if (previousLog.data.house == data.attacker && (logTime.getTime() - previousLog.time.getTime()) <= 100) {
+                        showDottedLine = false;
+                    }
+                }
 
                 return (
                     <Row className="align-items-center">
                         {showDottedLine && <Col xs="12">
-                            <hr style={{ borderTop: "dotted 3px" }} />
+                            <hr style={{ borderTop: "dotted 1px", color: "grey" }} />
                         </Col>}
                         {orderImgUrl && <Col xs="auto">
                             <img src={orderImgUrl} width="42px"/>
