@@ -678,7 +678,8 @@ interface PlayerReplaced {
     oldUser: string;
     newUser?: string;
     house: string;
-    reason?: ReplacementReason
+    reason?: ReplacementReason;
+    newCommanderHouse?: string;
 }
 
 interface VassalReplaced {

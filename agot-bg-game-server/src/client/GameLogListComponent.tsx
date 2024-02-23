@@ -205,9 +205,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const assignments = data.assignments.map(([houseId, userId]) =>
                     [this.game.houses.get(houseId), this.ingame.entireGame.users.get(userId)]) as [House, User][];
                 return <>
-                    <div id="gamelog-round-0" className="text-center"><h5>The war of the {assignments.length} kings has begun!</h5></div>
+                    <div id="gamelog-round-0" className="text-center mb-4"><h4>The war of the {assignments.length} kings has begun!</h4></div>
                     {assignments.map(([house, user]) =>
-                        <p  key={`${house.id}_${user.id}`}>House <b>{house.name}</b> is controlled by <b>{getUserLinkOrLabel(this.ingame.entireGame, user, this.ingame.players.tryGet(user, null))}</b>.</p>
+                        <p  key={`${house.id}_${user.id}`}>{this.renderHouseName(house)} is controlled by <b>{getUserLinkOrLabel(this.ingame.entireGame, user, this.ingame.players.tryGet(user, null))}</b>.</p>
                     )}
                 </>;
             case "turn-begin":
@@ -215,7 +215,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <Row className="justify-content-center">
                     <Col xs={true}><hr/></Col>
                     <Col xs="auto">
-                        <h4 id={`gamelog-round-${data.turn}`}>Round <b>{data.turn}</b></h4>
+                        <h3 id={`gamelog-round-${data.turn}`}>Round <b>{data.turn}</b></h3>
                     </Col>
                     <Col xs={true}><hr/></Col>
                 </Row>;
@@ -486,7 +486,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "winner-declared": {
                 const winner = this.game.houses.get(data.winner);
                 return (
-                    <h5 className="text-center">Game has ended.<br/>House <b style={{color: winner.color}}>{winner.name}</b> has won this Game of Thrones!</h5>
+                    <h4 className="text-center">Game has ended.<br/>{this.renderHouseName(winner)} has won this Game of Thrones!</h4>
                 );
             }
             case "raven-holder-wildling-card-put-bottom": {
@@ -637,7 +637,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "westeros-phase-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h5><b>Westeros Phase</b></h5>
+                        <h4><b>Westeros Phase</b></h4>
                     </Col>
                 </Row>;
 
@@ -649,9 +649,10 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 </Row>;
 
             case "planning-phase-began":
+                const content = <b>{data.forVassals && "Vassal "}Planning Phase</b>;
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h5><b>{data.forVassals && "Vassal "}Planning Phase</b></h5>
+                        {data.forVassals ? <h5>{content}</h5> : <h4>{content}</h4>}
                     </Col>
                 </Row>;
 
@@ -680,28 +681,28 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             case "action-phase-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h5><b>Action Phase</b></h5>
+                        <h4><b>Action Phase</b></h4>
                     </Col>
                 </Row>;
 
             case "action-phase-resolve-raid-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h6><b>Resolve Raid Orders</b></h6>
+                        <h5><b>Resolve Raid Orders</b></h5>
                     </Col>
                 </Row>;
 
             case "action-phase-resolve-march-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h6><b>Resolve March Orders</b></h6>
+                        <h5><b>Resolve March Orders</b></h5>
                     </Col>
                 </Row>;
 
             case "action-phase-resolve-consolidate-power-began":
                 return <Row className="justify-content-center">
                     <Col xs="auto">
-                        <h6><b>Resolve Consolidate Power Orders</b></h6>
+                        <h5><b>Resolve Consolidate Power Orders</b></h5>
                     </Col>
                 </Row>;
 
@@ -1373,6 +1374,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const oldUser = this.ingame.entireGame.users.get(data.oldUser);
                 const newUser = data.newUser ? this.ingame.entireGame.users.get(data.newUser) : null;
                 const house = this.game.houses.get(data.house);
+                const newCommanderHouse = data.newCommanderHouse ? this.game.houses.get(data.newCommanderHouse) : null;
                 const newUserLabel = newUser ? getUserLinkOrLabel(this.ingame.entireGame, newUser, this.ingame.players.tryGet(newUser, null)) : null;
                 const reason = data.reason == ReplacementReason.CLOCK_TIMEOUT
                     ? " due to clock timeout"
@@ -1381,8 +1383,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         : "";
 
                 return <>
-                    <b>{getUserLinkOrLabel(this.ingame.entireGame, oldUser, this.ingame.players.tryGet(oldUser, null))}</b> (House <b>{house.name}</b>) was
-                    replaced by {newUserLabel ? <b>{newUserLabel}</b> : " a vassal"}{reason}.
+                    <b>{getUserLinkOrLabel(this.ingame.entireGame, oldUser, this.ingame.players.tryGet(oldUser, null))}</b> ({this.renderHouseName(house)}) was
+                    replaced by {newUserLabel ? <b>{newUserLabel}</b> : " a vassal"}{reason}.<br/>
+                    {newCommanderHouse && <>Until the next vassal claim phase, {this.renderHouseName(house)} has been randomly assigned to {this.renderHouseName(newCommanderHouse)}.</>}
                 </>;
             }
             case "vassal-replaced": {
@@ -2058,6 +2061,10 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 </p>;
             }
         }
+    }
+
+    renderHouseName(house: House): ReactNode {
+        return <>House <b style={{color: house.color}}>{house.name}</b></>;
     }
 
     debounceSendGameLogSeen = _.debounce(time => {
