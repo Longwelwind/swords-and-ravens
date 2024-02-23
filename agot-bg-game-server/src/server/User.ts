@@ -77,13 +77,13 @@ export default class User {
             chatHouseNames: false,
             lastOpenedTab: '',
             mapScrollbar: false,
-            musicMuted: false,
             muted: false,
             responsiveLayout: false,
             showMapWhenDrafting: false,
             tracksColumnCollapsed: false,
             musicVolume: 0,
-            notificationsVolume: 0
+            notificationsVolume: 0,
+            sfxVolume: 0
         };
         const user = new User(data.id, data.name, data.facelessName, game, data.settings ?? emptySettings, data.connected, data.otherUsersFromSameNetwork);
         user.note = data.note;

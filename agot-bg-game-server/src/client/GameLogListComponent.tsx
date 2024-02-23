@@ -155,7 +155,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     </Col>}
                     <Col>
                         <div className="game-log-content">
-                            {this.renderGameLogData(l.data, this.currentRound)}
+                            {this.renderGameLogData(l.data, this.currentRound, i)}
                         </div>
                     </Col>
                 </Row>
@@ -172,7 +172,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         ));
     }
 
-    renderGameLogData(data: GameLogData, currentRound: number): ReactNode {
+    renderGameLogData(data: GameLogData, currentRound: number, currentLogIndex: number): ReactNode {
         switch (data.type) {
             case "player-action": {
                 const house = this.game.houses.get(data.house);
@@ -243,8 +243,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const army = data.units.map(utid => unitTypes.get(utid));
                 const orderImgUrl = data.orderType ? orderImages.get(data.orderType) : null;
 
+                const showDottedLine = this.logManager.logs[currentLogIndex - 1]?.data.type != "march-resolved";
+
                 return (
                     <Row className="align-items-center">
+                        {showDottedLine && <Col xs="12">
+                            <hr style={{ borderTop: "dotted 3px" }} />
+                        </Col>}
                         {orderImgUrl && <Col xs="auto">
                             <img src={orderImgUrl} width="42px"/>
                         </Col>}
@@ -260,11 +265,19 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
             case "march-resolved": {
                 const house = this.game.houses.get(data.house);
+                const showDottedLine = this.logManager.logs[currentLogIndex - 1]?.data.type != "action-phase-resolve-march-began";
 
                 if (this.fogOfWar) {
-                    return <p>
-                        House <b>{house.name}</b> resolved a <b>March</b> order.
-                    </p>;
+                    return <Row className="align-items-center">
+                        {showDottedLine && <Col xs="12">
+                            <hr style={{ borderTop: "dotted 1px", borderColor: "grey" }} />
+                        </Col>}
+                        <Col>
+                            <p>
+                                House <b>{house.name}</b> resolved a <b>March</b> order.
+                            </p>
+                        </Col>
+                    </Row>;
                 }
 
                 const startingRegion = this.world.regions.get(data.startingRegion);
@@ -273,6 +286,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return (
                     <Row className="align-items-center">
+                        {showDottedLine && <Col xs="12">
+                            <hr style={{borderTop: "dotted 1px", borderColor: "grey"}} />
+                        </Col>}
                         {orderImgUrl && <Col xs="auto">
                             <img src={orderImgUrl} width="42px"/>
                         </Col>}

@@ -103,6 +103,7 @@ import unitTypes, { dragon, knight, ship, siegeEngine } from "../../common/ingam
 class SfxManager {
     currentlyPlayingMusic: HTMLAudioElement[] = [];
     currentlyPlayingNotifications: HTMLAudioElement[] = [];
+    currentlyPlayingSfx: HTMLAudioElement[] = [];
 
     constructor(private gameClient: GameClient) {}
 
@@ -122,30 +123,51 @@ class SfxManager {
         this.gameClient.musicVolume = newVal;
     }
 
-    stopCurrentMusicAndSfx(): void {
-        this.currentlyPlayingMusic.forEach(currentlyPlayingAudio => {
-            currentlyPlayingAudio.pause();
-            currentlyPlayingAudio.currentTime = 0;
+    sfxVolumeChanged(newVal: number): void {
+        this.currentlyPlayingSfx.forEach(cpsfx => {
+            cpsfx.volume = newVal;
         });
 
-        while (this.currentlyPlayingMusic.length > 0) {
-            const cpa = this.currentlyPlayingMusic.shift();
-            if (cpa) {
-                cpa.pause();
-                cpa.currentTime = 0;
-            }
-        }
+        this.gameClient.sfxVolume = newVal;
+    }
+
+    muteAll(): void {
+        this.currentlyPlayingMusic.forEach(cpm => {
+            cpm.volume = 0;
+        });
+
+        this.currentlyPlayingSfx.forEach(cpsfx => {
+            cpsfx.volume = 0;
+        });
+
+        this.currentlyPlayingNotifications.forEach(cpn => {
+            cpn.volume = 0;
+        });
+    }
+
+    unmuteAll(): void {
+        this.currentlyPlayingMusic.forEach(cpm => {
+            cpm.volume = this.gameClient.musicVolume;
+        });
+
+        this.currentlyPlayingSfx.forEach(cpsfx => {
+            cpsfx.volume = this.gameClient.sfxVolume;
+        });
+
+        this.currentlyPlayingNotifications.forEach(cpn => {
+            cpn.volume = this.gameClient.notificationsVolume;
+        });
     }
 
     fadeOutCurrentSfx(): void {
-        this.fadeOut(1000, 10);
+        this.fadeOutSfx(1000, 10);
     }
 
     fadeOutCurrentMusic(): void {
-        this.fadeOut(4000, 40);
+        this.fadeOutMusic(4000, 40);
     }
 
-    private fadeOut(fadeOutDuration: number, fadeOutSteps: number): void {
+    private fadeOutMusic(fadeOutDuration: number, fadeOutSteps: number): void {
         if (this.currentlyPlayingMusic.length === 0) {
             return;
         }
@@ -161,6 +183,36 @@ class SfxManager {
             }
 
             this.currentlyPlayingMusic.forEach(audio => {
+                if (audio.volume - volumeStep > 0) {
+                    audio.volume -= volumeStep;
+                } else {
+                    audio.volume = 0;
+                    if (!audio.paused) {
+                        audio.pause();
+                        audio.currentTime = 0;
+                    }
+                    audio.dispatchEvent(new Event('ended'));
+                }
+            });
+        }, fadeOutInterval);
+    }
+
+    private fadeOutSfx(fadeOutDuration: number, fadeOutSteps: number): void {
+        if (this.currentlyPlayingSfx.length === 0) {
+            return;
+        }
+
+        const fadeOutInterval = fadeOutDuration / fadeOutSteps;
+        const volumeStep = this.gameClient.sfxVolume / fadeOutSteps;
+
+        let interval = window.setInterval(() => {
+            if (this.currentlyPlayingSfx.length === 0 && interval > 0) {
+                clearInterval(interval);
+                interval = 0;
+                return;
+            }
+
+            this.currentlyPlayingSfx.forEach(audio => {
                 if (audio.volume - volumeStep > 0) {
                     audio.volume -= volumeStep;
                 } else {
@@ -200,24 +252,24 @@ class SfxManager {
     }
 
     playGotTheme(): Promise<void> {
-        if (this.gameClient.musicMuted) {
+        if (this.gameClient.muted) {
             return Promise.resolve();
         }
 
-        return this.playMusic(introSound, this.gameClient.musicVolume, false);
+        return this.playMusic(introSound, this.gameClient.musicVolume);
     }
 
     playCombatSound(attackerId?: string): Promise<void> {
-        if (this.gameClient.musicMuted) {
+        if (this.gameClient.muted) {
             return Promise.resolve();
         }
 
         const sound = attackerId ? houseThemes.tryGet(attackerId, combatSound) : combatSound;
-        return this.playMusic(sound, this.gameClient.musicVolume, false);
+        return this.playMusic(sound, this.gameClient.musicVolume);
     }
 
     playSoundWhenClickingMarchOrder(region: Region): Promise<void> {
-        if (this.gameClient.musicMuted) {
+        if (this.gameClient.muted) {
             return Promise.resolve();
         }
 
@@ -240,25 +292,25 @@ class SfxManager {
                             ? soundsForShips
                             : soundsForFootmenOnly;
 
-        return this.playRandomMusic(files, this.gameClient.musicVolume, true);
+        return this.playRandomEffect(files, this.gameClient.sfxVolume, true);
     }
 
     playSoundForLogEvent(log: GameLogData): Promise<void> {
-        if (this.gameClient.musicMuted) {
+        if (this.gameClient.muted) {
             return Promise.resolve();
         }
 
         switch(log.type) {
             case "doran-martell-asos-used":
             case "doran-used":
-                this.playMusic(hystericalLaughSound, this.gameClient.musicVolume, false);
+                this.playEffect(hystericalLaughSound, this.gameClient.musicVolume, false);
                 break;
             case "killed-after-combat": {
                 const units = log.killed.map(ut => unitTypes.get(ut));
                 if (units.includes(dragon)) {
-                    return this.playRandomMusic(soundsWhenDragonsAreDestroyed, this.gameClient.musicVolume, false);
+                    return this.playRandomEffect(soundsWhenDragonsAreDestroyed, this.gameClient.musicVolume, false);
                 } else {
-                    return this.playRandomMusic(soundsWhenUnitsAreDestroyedBySwords, this.gameClient.musicVolume, false);
+                    return this.playRandomEffect(soundsWhenUnitsAreDestroyedBySwords, this.gameClient.musicVolume, false);
                 }
                 break;
             }
@@ -266,14 +318,14 @@ class SfxManager {
                 const killed = _.concat(log.killedBecauseCantRetreat, log.killedBecauseWounded);
                 const units = killed.map(ut => unitTypes.get(ut));
                 if (units.includes(dragon)) {
-                    return this.playRandomMusic(soundsWhenDragonsAreDestroyed, this.gameClient.musicVolume, false);
+                    return this.playRandomEffect(soundsWhenDragonsAreDestroyed, this.gameClient.musicVolume, false);
                 }
                 break;
             }
             case "retreat-casualties-suffered": {
                 const units = log.units.map(ut => unitTypes.get(ut));
                 if (units.includes(dragon)) {
-                    return this.playRandomMusic(soundsWhenDragonsAreDestroyed, this.gameClient.musicVolume, false);
+                    return this.playRandomEffect(soundsWhenDragonsAreDestroyed, this.gameClient.musicVolume, false);
                 }
                 break;
             }
@@ -282,18 +334,26 @@ class SfxManager {
         return Promise.resolve();
     }
 
-    private playRandomMusic(files: string[], volume: number, withCurrentPlayingCheck: boolean): Promise<void> {
+    private playRandomEffect(files: string[], volume: number, withCurrentPlayingCheck: boolean): Promise<void> {
         const randomFile = pickRandom(files);
         if (!randomFile) {
             return Promise.resolve();
         }
-        return this.playMusic(randomFile, volume, withCurrentPlayingCheck);
+        return this.playEffect(randomFile, volume, withCurrentPlayingCheck);
     }
 
-    private playMusic(file: string, volume: number, withCurrentPlayingCheck: boolean): Promise<void> {
-        if (withCurrentPlayingCheck && this.currentlyPlayingMusic.length > 0) {
+    private playEffect(file: string, volume: number, withCurrentPlayingCheck: boolean): Promise<void> {
+        if (withCurrentPlayingCheck && this.currentlyPlayingSfx.length > 0) {
             return Promise.resolve();
         }
+        const audio = new Audio(file);
+        this.currentlyPlayingSfx.push(audio);
+        audio.onended = () => _.pull(this.currentlyPlayingSfx, audio);
+        audio.volume = volume;
+        return audio.play();
+    }
+
+    private playMusic(file: string, volume: number): Promise<void> {
         const audio = new Audio(file);
         this.currentlyPlayingMusic.push(audio);
         audio.onended = () => _.pull(this.currentlyPlayingMusic, audio);

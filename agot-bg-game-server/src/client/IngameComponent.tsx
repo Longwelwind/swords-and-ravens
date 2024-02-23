@@ -41,9 +41,8 @@ import settingsKnobsImage from "../../public/images/icons/settings-knobs.svg";
 import hourglassImage from "../../public/images/icons/hourglass.svg";
 import mammothImage from "../../public/images/icons/mammoth.svg";
 import spikedDragonHeadImage from "../../public/images/icons/spiked-dragon-head.svg";
-import megaphoneImage from "../../public/images/icons/megaphone.svg";
+import speakerImage from "../../public/images/icons/speaker.svg";
 import speakerOffImage from "../../public/images/icons/speaker-off.svg";
-import musicalNotesImage from "../../public/images/icons/musical-notes.svg";
 import cardRandomImage from "../../public/images/icons/card-random.svg";
 import podiumWinnerImage from "../../public/images/icons/podium-winner.svg";
 import House from "../common/ingame-game-state/game-data-structure/House";
@@ -281,23 +280,49 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             return null;
         }
 
-        return <OverlayTrigger
-            overlay={this.renderGameControlsPopover()}
-            placement="auto"
-            trigger="click"
-            rootClose
-        >
-            <div className="clickable btn btn-sm btn-secondary p-1" style={{
-                position: "fixed",
-                right: this.user?.settings.responsiveLayout ? "auto" : "4px",
-                left: this.user?.settings.responsiveLayout ? "4px" : "auto",
-                top: "45px",
-                padding: "4px",
-                borderStyle: "none" }}
+        return <>
+            <OverlayTrigger
+                overlay={this.renderGameControlsPopover()}
+                placement="auto"
+                trigger="click"
+                rootClose
             >
-                <img src={settingsKnobsImage} width={24} />
-            </div>
-        </OverlayTrigger>;
+                <div className="clickable btn btn-sm btn-secondary" style={{
+                    position: "fixed",
+                    right: this.user?.settings.responsiveLayout ? "auto" : "4px",
+                    left: this.user?.settings.responsiveLayout ? "4px" : "auto",
+                    top: "45px",
+                    padding: "4px",
+                    borderStyle: "none" }}
+                >
+                    <img src={settingsKnobsImage} width={24} />
+                </div>
+            </OverlayTrigger>
+            <button type="button" className="btn btn-sm btn-secondary"
+                onClick={() => this.gameClient.muted = !this.gameClient.muted}
+                style={{
+                    position: "fixed",
+                    right: this.user?.settings.responsiveLayout ? "auto" : "4px",
+                    left: this.user?.settings.responsiveLayout ? "4px" : "auto",
+                    top: "85px",
+                    paddingBottom: "4px",
+                    paddingTop: "4px",
+                    paddingLeft: "2px",
+                    paddingRight: "4px"
+                }}
+            >
+                <OverlayTrigger
+                    placement="auto"
+                    overlay={<Tooltip id="mute-tooltip">
+                        {this.gameClient.muted
+                            ? "Unmute"
+                            : "Mute"}
+                    </Tooltip>}
+                >
+                    <img src={this.gameClient.muted ? speakerOffImage : speakerImage} width={24} />
+                </OverlayTrigger>
+            </button>
+        </>;
     }
 
     renderTracksPopoverButton(tracks: InfluenceTrackDetails[]): ReactNode {
@@ -563,14 +588,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         return <Row className={this.mapScrollbarEnabled ? "flex-footer mt-2" : "mt-2"} id="game-controls">
             <Col xs="auto">
                 <div className="btn btn-outline-light btn-sm">
-                <OverlayTrigger
-                    overlay={this.renderGameControlsPopover()}
-                    placement="top"
-                    trigger="click"
-                    rootClose
-                >
-                    <img src={settingsKnobsImage} width={32} />
-                </OverlayTrigger>
+                    <OverlayTrigger
+                        overlay={this.renderGameControlsPopover()}
+                        placement="top"
+                        trigger="click"
+                        rootClose
+                    >
+                        <img src={settingsKnobsImage} width={32} />
+                    </OverlayTrigger>
                 </div>
             </Col>
             <Col xs="auto">
@@ -579,25 +604,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                         placement="auto"
                         overlay={<Tooltip id="mute-tooltip">
                             {this.gameClient.muted
-                                ? "Unmute notifications"
-                                : "Mute notifications"}
+                                ? "Unmute"
+                                : "Mute"}
                         </Tooltip>}
                     >
-                        <img src={this.gameClient.muted ? speakerOffImage : megaphoneImage} width={32} />
-                    </OverlayTrigger>
-                </button>
-            </Col>
-            <Col xs="auto">
-                <button type="button" className="btn btn-outline-light btn-sm" onClick={() => this.gameClient.musicMuted = !this.gameClient.musicMuted}>
-                    <OverlayTrigger
-                        placement="auto"
-                        overlay={<Tooltip id="mute-tooltip">
-                            {this.gameClient.musicMuted
-                                ? "Unmute music and sound effects"
-                                : "Mute music and sound effects"}
-                        </Tooltip>}
-                    >
-                        <img src={this.gameClient.musicMuted ? speakerOffImage : musicalNotesImage} width={32} />
+                        <img src={this.gameClient.muted ? speakerOffImage : speakerImage} width={32} />
                     </OverlayTrigger>
                 </button>
             </Col>
@@ -614,7 +625,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         return <Popover id="game-controls-popover" style={{ maxWidth: "100%", borderColor: "white"}}>
             <Col className="m-2 p-2">
                 <VolumeSliderComponent volume={this.gameClient.notificationsVolume * 100} name="Notifications" onVolumeChange={(val) => this.gameClient.sfxManager.notificationVolumeChanged(val / 100)}/>
-                <VolumeSliderComponent volume={this.gameClient.musicVolume * 100} name="Music and Sfx" onVolumeChange={(val) => this.gameClient.sfxManager.musicVolumeChanged(val / 100)}/>
+                <VolumeSliderComponent volume={this.gameClient.musicVolume * 100} name="Music" onVolumeChange={(val) => this.gameClient.sfxManager.musicVolumeChanged(val / 100)}/>
+                <VolumeSliderComponent volume={this.gameClient.sfxVolume * 100} name="Sfx" onVolumeChange={(val) => this.gameClient.sfxManager.sfxVolumeChanged(val / 100)}/>
                 {this.authenticatedPlayer && <Row className="justify-content-center mt-3">
                     <Col xs="auto">
                         <button type="button"
@@ -1610,7 +1622,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         this.ingame.onVoteStarted = null;
     }
 
-    componentDidUpdate(_prevProps: Readonly<IngameComponentProps>, _prevState: Readonly<{}>, _snapshot?: any): void {
+    componentDidUpdate(_prevProps: Readonly<IngameComponentProps>, _prevState: Readonly<any>, _snapshot?: any): void {
         if (this.currentOpenedTab == "note") {
             this.unseenNotes = false;
         }

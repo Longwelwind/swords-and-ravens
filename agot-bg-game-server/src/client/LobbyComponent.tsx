@@ -14,7 +14,7 @@ import ChatComponent from "./chat-client/ChatComponent";
 import GameSettingsComponent from "./GameSettingsComponent";
 import User from "../server/User";
 import ConditionalWrap from "./utils/ConditionalWrap";
-import { Badge, OverlayTrigger, Spinner } from "react-bootstrap";
+import { Badge, OverlayTrigger, Popover, Spinner } from "react-bootstrap";
 import Tooltip from "react-bootstrap/Tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faTimes} from "@fortawesome/free-solid-svg-icons/faTimes";
@@ -25,13 +25,15 @@ import { observable } from "mobx";
 import DebouncedPasswordComponent from "./utils/DebouncedPasswordComponent";
 import { faCheck, faLock } from "@fortawesome/free-solid-svg-icons";
 import { setBoltonIconImage, setStarkIconImage } from "./houseIconImages";
-import megaphoneImage from "../../public/images/icons/megaphone.svg";
+import settingsKnobsImage from "../../public/images/icons/settings-knobs.svg";
+import speakerImage from "../../public/images/icons/speaker.svg";
 import speakerOffImage from "../../public/images/icons/speaker-off.svg";
-import musicalNotesImage from "../../public/images/icons/musical-notes.svg";
 import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 // @ts-expect-error Somehow ts complains that this module cannot be found while it is
 import ScrollToBottom from "react-scroll-to-bottom";
 import _ from "lodash";
+import VolumeSliderComponent from "./utils/VolumeSliderComponent";
+import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 
 
 interface LobbyComponentProps {
@@ -213,29 +215,26 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                                                 overlay={
                                                     <Tooltip id="mute-tooltip">
                                                         {this.props.gameClient.muted
-                                                            ? "Unmute notifications"
-                                                            : "Mute notifications"}
+                                                            ? "Unmute"
+                                                            : "Mute"}
                                                     </Tooltip>
                                                 }
                                             >
-                                                <img src={this.props.gameClient.muted ? speakerOffImage : megaphoneImage} height={26} />
+                                                <img src={this.props.gameClient.muted ? speakerOffImage : speakerImage} height={26} />
                                             </OverlayTrigger>
                                         </button>
                                     </Col>
                                     <Col xs="auto">
-                                        <button type="button" className="btn btn-outline-light btn-sm" onClick={() => this.props.gameClient.musicMuted = !this.props.gameClient.musicMuted}>
+                                        <div className="btn btn-outline-light btn-sm">
                                             <OverlayTrigger
-                                                overlay={
-                                                    <Tooltip id="mute-tooltip">
-                                                        {this.props.gameClient.musicMuted
-                                                            ? "Unmute music"
-                                                            : "Mute music"}
-                                                    </Tooltip>
-                                                }
+                                                overlay={this.renderVolumeControlPopover()}
+                                                placement="top"
+                                                trigger="click"
+                                                rootClose
                                             >
-                                                <img src={this.props.gameClient.musicMuted ? speakerOffImage : musicalNotesImage} height={26} />
+                                                <img src={settingsKnobsImage} height={26} />
                                             </OverlayTrigger>
-                                        </button>
+                                        </div>
                                     </Col>
                                 </Row>
                             </Card.Body>
@@ -243,6 +242,19 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                     </Row>
                 </Col>
         </>;
+    }
+
+    renderVolumeControlPopover(): OverlayChildren {
+        return <Popover id="game-controls-popover" style={{ maxWidth: "100%", borderColor: "white"}}>
+            <Col className="m-2 p-2">
+                <VolumeSliderComponent volume={this.props.gameClient.notificationsVolume * 100} name="Notifications"
+                    onVolumeChange={(val) => this.props.gameClient.sfxManager.notificationVolumeChanged(val / 100)} />
+                <VolumeSliderComponent volume={this.props.gameClient.musicVolume * 100} name="Music"
+                    onVolumeChange={(val) => this.props.gameClient.sfxManager.musicVolumeChanged(val / 100)} />
+                <VolumeSliderComponent volume={this.props.gameClient.sfxVolume * 100} name="Sfx"
+                    onVolumeChange={(val) => this.props.gameClient.sfxManager.sfxVolumeChanged(val / 100)} />
+            </Col>
+        </Popover>;
     }
 
     renderPasswordInput(): ReactNode {

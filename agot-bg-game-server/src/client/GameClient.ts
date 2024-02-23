@@ -57,28 +57,29 @@ export default class GameClient {
 
         this.authenticatedUser.settings.muted = value;
         if (value == true) {
+            const oldVolumes = {
+                notificationsVolume: this.authenticatedUser.settings.notificationsVolume,
+                musicVolume: this.authenticatedUser.settings.musicVolume,
+                sfxVolume: this.authenticatedUser.settings.sfxVolume
+            };
+            localStorage.setItem('oldVolumes', JSON.stringify(oldVolumes));
+
             this.authenticatedUser.settings.notificationsVolume = 0;
-        }
-        this.authenticatedUser.syncSettings();
-    }
-
-    get musicMuted(): boolean {
-        if (!this.authenticatedUser) {
-            throw new Error("Game client must have an authenticated user");
-        }
-
-        return this.authenticatedUser.settings.musicMuted;
-    }
-
-    set musicMuted(value: boolean) {
-        if (!this.authenticatedUser) {
-            throw new Error("Game client must have an authenticated user");
-        }
-
-        this.authenticatedUser.settings.musicMuted = value;
-        if (value == true) {
             this.authenticatedUser.settings.musicVolume = 0;
+            this.authenticatedUser.settings.sfxVolume = 0;
+
+            this.sfxManager.muteAll();
+        } else {
+            const oldVolumesFromStorage = JSON.parse(localStorage.getItem('oldVolumes') || '{}');
+            this.authenticatedUser.settings.notificationsVolume = oldVolumesFromStorage.notificationsVolume ?? 1;
+            this.authenticatedUser.settings.musicVolume = oldVolumesFromStorage.musicVolume ?? 1;
+            this.authenticatedUser.settings.sfxVolume = oldVolumesFromStorage.sfxVolume ?? 1;
+
+            localStorage.removeItem('oldVolumes');
+
+            this.sfxManager.unmuteAll();
         }
+
         this.authenticatedUser.syncSettings();
     }
 
@@ -96,7 +97,8 @@ export default class GameClient {
         }
 
         this.authenticatedUser.settings.notificationsVolume = value;
-        this.authenticatedUser.settings.muted = value == 0;
+        this.setCurrentMutedState(value);
+
         this.authenticatedUser.syncSettings();
     }
 
@@ -114,7 +116,27 @@ export default class GameClient {
         }
 
         this.authenticatedUser.settings.musicVolume = value;
-        this.authenticatedUser.settings.musicMuted = value == 0;
+        this.setCurrentMutedState(value);
+
+        this.authenticatedUser.syncSettings();
+    }
+
+    get sfxVolume(): number {
+        if (!this.authenticatedUser) {
+            throw new Error("Game client must have an authenticated user");
+        }
+
+        return this.authenticatedUser.settings.sfxVolume;
+    }
+
+    set sfxVolume(value: number) {
+        if (!this.authenticatedUser) {
+            throw new Error("Game client must have an authenticated user");
+        }
+
+        this.authenticatedUser.settings.sfxVolume = value;
+        this.setCurrentMutedState(value);
+
         this.authenticatedUser.syncSettings();
     }
 
@@ -131,6 +153,18 @@ export default class GameClient {
             return this.entireGame.childGameState.players.get(this.authenticatedUser);
         } else {
             return null;
+        }
+    }
+
+    private setCurrentMutedState(value: number): void {
+        if (!this.authenticatedUser) {
+            return;
+        }
+
+        if (value > 0) {
+            this.authenticatedUser.settings.muted = false;
+        } else if (this.musicVolume == 0 && this.notificationsVolume == 0 && this.sfxVolume == 0) {
+            this.authenticatedUser.settings.muted = true;
         }
     }
 
