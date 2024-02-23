@@ -2190,6 +2190,19 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             });
             return serializedGame;
         }
+    },
+    {
+        version: "113",
+        migrate: (serializedGame: any) => {
+            serializedGame.users.forEach((u: any) => {
+                if (!u.settings) {
+                    return;
+                }
+
+                u.settings.sfxVolume = u.settings.muted ? 0 : 1;
+            });
+            return serializedGame;
+        }
     }
 ];
 

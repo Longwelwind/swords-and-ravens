@@ -185,9 +185,9 @@ export interface UserSettings {
     tracksColumnCollapsed: boolean;
     showMapWhenDrafting: boolean;
     muted: boolean;
-    musicMuted: boolean;
     notificationsVolume: number;
     musicVolume: number;
+    sfxVolume: number;
 }
 
 export interface ChangeGameSettings {

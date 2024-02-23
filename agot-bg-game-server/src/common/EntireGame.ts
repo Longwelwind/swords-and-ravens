@@ -317,9 +317,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             lastOpenedTab: null,
             tracksColumnCollapsed: false,
             showMapWhenDrafting: false,
-            musicMuted: profileSettings.muted,
             musicVolume: profileSettings.muted ? 0 : 1,
-            notificationsVolume: profileSettings.muted ? 0 : 1
+            notificationsVolume: profileSettings.muted ? 0 : 1,
+            sfxVolume: profileSettings.muted ? 0 : 1
         });
         this.users.set(user.id, user);
 
