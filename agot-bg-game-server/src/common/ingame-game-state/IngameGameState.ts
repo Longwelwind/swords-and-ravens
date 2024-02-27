@@ -211,9 +211,10 @@ export default class IngameGameState extends GameState<
             this.game.draftableHouseCards.clear();
 
             do {
-                this.setInfluenceTrack(0, this.getRandomTrackOrder());
-                this.setInfluenceTrack(1, this.getRandomTrackOrder());
-                this.setInfluenceTrack(2, this.getRandomTrackOrder());
+                this.setInfluenceTrack(0, this.getRandomInitialInfluenceTrack());
+                this.setInfluenceTrack(1, this.getRandomInitialInfluenceTrack());
+                // Move blade holder to bottom of kings court
+                this.setInfluenceTrack(2, this.getRandomInitialInfluenceTrack(this.game.valyrianSteelBladeHolder));
             } while (this.hasAnyHouseTooMuchDominanceTokens());
 
             this.onDraftingFinish();
@@ -251,11 +252,25 @@ export default class IngameGameState extends GameState<
         return _.concat(_.without(track, this.game.targaryen), this.game.targaryen);
     }
 
-    getRandomTrackOrder(): House[] {
-        const playerHouses = this.game.houses.values.filter(h => !this.isVassalHouse(h));
-        const vassalHouses = _.without(this.game.houses.values, ...playerHouses);
+    getRandomInitialInfluenceTrack(moveToBottom: House | null = null): House[] {
+        let track = shuffleInPlace(this.game.houses.values);
 
-        return _.concat(shuffleInPlace(playerHouses), shuffleInPlace(vassalHouses));
+        if (moveToBottom) {
+            track = _.without(track, moveToBottom);
+            track.push(moveToBottom);
+        }
+
+        const playerHouses = this.players.values.map(p => p.house);
+        const areVassalsInTopThreeSpaces = _.take(track, 3).some(h => !playerHouses.includes(h));
+
+        if (areVassalsInTopThreeSpaces) {
+            const vassals = track.filter(h => !playerHouses.includes(h));
+            const newTrack = _.difference(track, vassals);
+            newTrack.push(...vassals);
+            return newTrack;
+        }
+
+        return track;
     }
 
     private hasAnyHouseTooMuchDominanceTokens(): boolean {
