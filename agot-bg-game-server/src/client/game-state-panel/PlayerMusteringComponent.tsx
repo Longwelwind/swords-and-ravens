@@ -105,6 +105,11 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                                 </Col>
                             </Row>
                         </Col>
+                        {this.isStarredConsolidatePowerMusteringType && this.musterings.size == 0 && (
+                            <Col xs={12} className="text-center">
+                                <small>Note: If you dont recruit any units, your order will be resolved to gain Power&nbsp;tokens.</small>
+                            </Col>
+                        )}
                     </>}
                 {(!this.doesControlCurrentHouse || this.props.gameState.ingame.isVassalHouse(this.house)) &&
                 <Col xs={12} className="text-center">

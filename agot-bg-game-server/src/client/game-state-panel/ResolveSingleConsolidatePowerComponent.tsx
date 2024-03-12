@@ -1,9 +1,9 @@
 import { observer } from "mobx-react";
-import React, { Component, ReactNode } from "react";
+import React, { Component, ReactElement, ReactNode } from "react";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
 import { observable } from "mobx";
 import House from "../../common/ingame-game-state/game-data-structure/House";
-import { Button } from "react-bootstrap";
+import { Button, OverlayTrigger, Popover } from "react-bootstrap";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -58,88 +58,92 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<Ga
                         : <>House <b>{this.house.name}</b> must resolve one of its Consolidate&nbsp;Power{availableOrders.values.some(ot => ot instanceof IronBankOrderType) ? " or Iron\xa0Bank" : ""} orders.</>}
                 </Col>
                 {this.doesControlCurrentHouse ?
-                    this.selectedOrderRegion && this.selectedOrderType ?
-                        <>
-                            <Col xs={12} className="text-center">
-                                <p><b>{this.selectedOrderType.name}</b> in <b>{this.selectedOrderRegion.name}</b></p>
-                            </Col>
-                            <Col xs={12}>
-                                <Row className="justify-content-center">
-                                    {this.selectedOrderType instanceof DefenseMusterOrderType && <>
-                                        <Col xs={12} className="d-flex justify-content-center">
-                                            <Button type="button" variant="success" onClick={() => {
-                                                this.gameState.chooseMustering(this.selectedOrderRegion as Region);
-                                                this.reset();
-                                            }}>
-                                                Muster in {this.selectedOrderRegion.name}
-                                            </Button>
-                                        </Col>
-                                        <Col xs={12} className="d-flex justify-content-center">
-                                            <Button type="button" variant="warning" onClick={() => {
-                                                this.gameState.chooseRemoveOrder(this.selectedOrderRegion as Region);
-                                                this.reset();
-                                            }}>
-                                                Ignore and remove order
-                                            </Button>
-                                        </Col>
-                                    </>}
-                                    {this.selectedOrderType instanceof ConsolidatePowerOrderType && <>
-                                        {this.selectedOrderType.starred && this.selectedOrderRegion.castleLevel > 0 &&
-                                        <Col xs="auto">
-                                            <Button type="button" variant="success" onClick={() => {
-                                                this.gameState.chooseMustering(this.selectedOrderRegion as Region);
-                                                this.reset();
-                                            }}>
-                                                Muster in {this.selectedOrderRegion.name}
-                                            </Button>
-                                        </Col>}
-                                        <Col xs="auto">
-                                            <Button type="button" onClick={() => {
-                                                this.gameState.chooseGainPowerTokens(this.selectedOrderRegion as Region);
-                                                this.reset();
-                                            }}>
-                                                {this.getPowerTokenButtonText(this.gameState.getPotentialGainedPowerTokens(this.selectedOrderRegion, this.house))}
-                                            </Button>
-                                        </Col>
-                                    </>}
-                                    {this.selectedOrderType instanceof IronBankOrderType && this.ironBank && <>
-                                        {this.ironBank.getPurchasableLoans(this.house).map(purchasable =>
-                                            <Col xs={12} className="d-flex justify-content-center" key={`loan-button-${purchasable.loan.id}`}>
-                                                <Button type="button" variant="success" onClick={() => {
-                                                    this.gameState.choosePurchaseLoan(purchasable.slotIndex, this.selectedOrderRegion as Region);
-                                                    this.reset();
-                                                }}>
-                                                    Pay {purchasable.costs} Power token{purchasable.costs != 1 ? "s" : ""} to purchase {purchasable.loan.name}
-                                                </Button>
-                                            </Col>
-                                        )}
-                                        <Col xs={12} className="d-flex justify-content-center">
-                                            <Button type="button" variant="warning" onClick={() => {
-                                                this.gameState.chooseRemoveOrder(this.selectedOrderRegion as Region);
-                                                this.reset();
-                                            }}>
-                                                Ignore and remove order
-                                            </Button>
-                                        </Col>
-                                    </>}
-                                    <Col xs={12} className="d-flex justify-content-center">
-                                        <Button type="button"
-                                            variant="danger"
-                                            onClick={() => this.reset()}
-                                        >
-                                            Reset
-                                        </Button>
-                                    </Col>
-                                </Row>
-                            </Col>
-                        </>
-                        : <Col xs={12} className="text-center"><p>Click the order you want to resolve.</p></Col>
+                    <>{this.selectedOrderRegion && this.selectedOrderType
+                        ? this.renderGameStateControls(this.selectedOrderRegion, this.selectedOrderType)
+                        : <Col xs={12} className="text-center"><p>Click the order you want to resolve.</p></Col>}
+                        <Col xs={12} className="d-flex justify-content-center">
+                            <Button type="button"
+                                variant="danger"
+                                onClick={() => this.reset()}
+                            >
+                                Reset
+                            </Button>
+                        </Col>
+                    </>
                     :
                     <Col xs={12} className="text-center">
                         Waiting for {this.gameState.ingame.getControllerOfHouse(this.house).house.name}...
                     </Col>}
             </>
         );
+    }
+
+    private renderGameStateControls(orderRegion: Region, orderType: ConsolidatePowerOrderType | IronBankOrderType | DefenseMusterOrderType) {
+        return <>
+            <Col xs={12} className="text-center">
+                <p><b>{orderType.name}</b> in <b>{orderRegion.name}</b></p>
+            </Col>
+            <Col xs={12}>
+                <Row className="justify-content-center">
+                    {orderType instanceof DefenseMusterOrderType && <>
+                        <Col xs={12} className="d-flex justify-content-center">
+                            <Button type="button" variant="success" onClick={() => {
+                                this.gameState.chooseMustering(orderRegion as Region);
+                                this.reset();
+                            } }>
+                                Muster in {orderRegion.name}
+                            </Button>
+                        </Col>
+                        <Col xs={12} className="d-flex justify-content-center">
+                            <Button type="button" variant="warning" onClick={() => {
+                                this.gameState.chooseRemoveOrder(orderRegion as Region);
+                                this.reset();
+                            } }>
+                                Ignore and remove order
+                            </Button>
+                        </Col>
+                    </>}
+                    {orderType instanceof ConsolidatePowerOrderType && <>
+                        {orderType.starred && orderRegion.castleLevel > 0 &&
+                            <Col xs="auto">
+                                <Button type="button" variant="success" onClick={() => {
+                                    this.gameState.chooseMustering(orderRegion as Region);
+                                    this.reset();
+                                } }>
+                                    Muster in {orderRegion.name}
+                                </Button>
+                            </Col>}
+                        <Col xs="auto">
+                            <Button type="button" onClick={() => {
+                                this.gameState.chooseGainPowerTokens(orderRegion as Region);
+                                this.reset();
+                            } }>
+                                {this.getPowerTokenButtonText(this.gameState.getPotentialGainedPowerTokens(orderRegion, this.house))}
+                            </Button>
+                        </Col>
+                    </>}
+                    {orderType instanceof IronBankOrderType && this.ironBank && <>
+                        {this.ironBank.getPurchasableLoans(this.house).map(purchasable => <Col xs={12} className="d-flex justify-content-center" key={`loan-button-${purchasable.loan.id}`}>
+                            <Button type="button" variant="success" onClick={() => {
+                                this.gameState.choosePurchaseLoan(purchasable.slotIndex, orderRegion as Region);
+                                this.reset();
+                            } }>
+                                Pay {purchasable.costs} Power token{purchasable.costs != 1 ? "s" : ""} to purchase {purchasable.loan.name}
+                            </Button>
+                        </Col>
+                        )}
+                        <Col xs={12} className="d-flex justify-content-center">
+                            <Button type="button" variant="warning" onClick={() => {
+                                this.gameState.chooseRemoveOrder(orderRegion as Region);
+                                this.reset();
+                            } }>
+                                Ignore and remove order
+                            </Button>
+                        </Col>
+                    </>}
+                </Row>
+            </Col>
+        </>;
     }
 
     private getPowerTokenButtonText(powerTokenCount: number): string {
@@ -149,15 +153,25 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<Ga
     private modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
         if (this.doesControlCurrentHouse) {
             const availableOrders = this.gameState.parentGameState.getAvailableOrdersOfHouse(this.gameState.house);
-            if (this.selectedOrderRegion && this.selectedOrderType) {
-                availableOrders.clear();
-                availableOrders.set(this.selectedOrderRegion, this.selectedOrderType);
-            }
             return availableOrders.entries.map(([r, ot]) => [
                 r,
                 {
                     highlight: { active: true },
-                    onClick: () => this.onOrderClick(r, ot)
+                    onClick: () => this.onOrderClick(r, ot),
+                    wrap: (child: ReactElement) => (
+                        <OverlayTrigger
+                            placement="auto-start"
+                            trigger="click"
+                            rootClose
+                            overlay={
+                                <Popover id={"resolve-cp-order-popover_region_" + r.id} className="p-1">
+                                    {this.renderGameStateControls(r, ot)}
+                                </Popover>
+                            }
+                        >
+                            {child}
+                        </OverlayTrigger>
+                    )
                 }
             ]);
         }
@@ -166,17 +180,18 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<Ga
     }
 
     private onOrderClick(region: Region, orderType: ConsolidatePowerOrderType | IronBankOrderType | DefenseMusterOrderType): void {
-        if (!this.selectedOrderRegion) {
+        if (this.selectedOrderRegion == region) {
+            this.reset();
+        } else {
             this.selectedOrderRegion = region;
             this.selectedOrderType = orderType;
-        } else if (this.selectedOrderRegion == region) {
-            this.reset();
         }
     }
 
     private reset(): void {
         this.selectedOrderRegion = null;
         this.selectedOrderType = null;
+        document.body.click();
     }
 
     componentDidMount(): void {
