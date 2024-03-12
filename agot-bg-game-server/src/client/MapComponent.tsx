@@ -589,12 +589,14 @@ export default class MapComponent extends Component<MapComponentProps> {
         let planningOrAction = (this.ingame.childGameState instanceof PlanningGameState || this.ingame.childGameState instanceof ActionGameState) ? this.ingame.childGameState : null;
 
         if (planningOrAction instanceof ActionGameState && !(planningOrAction.childGameState instanceof UseRavenGameState)) {
-            // Do not show restricted orders after Raven state because Doran may cause a restricted order to be shown which still can be executed
+            // Do not highlight restricted orders after Raven state (during whole action phase)
+            // because abilities like Doran may cause an order to be shown as restricted suddenly though it isn't
             planningOrAction = null;
         }
 
         const drawBorder = order?.type.restrictedTo == sea.kind;
-        const controller = drawBorder ? region.getController() : null;
+        const hasPlaceOrders = this.ingame.hasChildGameState(PlaceOrdersGameState);
+        const controller = drawBorder  || hasPlaceOrders ? region.getController() : null;
         const color = drawBorder && controller
             ? controller.id != "greyjoy"
                 ? controller.color
@@ -603,6 +605,29 @@ export default class MapComponent extends Component<MapComponentProps> {
 
         const wrap = properties.wrap;
         const clickable = properties.onClick != undefined || wrap != undefined;
+
+        let placeAnimation = '';
+
+        if (hasPlaceOrders && controller) {
+            switch (controller.id) {
+                case "stark":
+                case "arryn":
+                    placeAnimation = 'scale-in-top';
+                    break;
+                case "targaryen":
+                case "baratheon":
+                    placeAnimation = 'scale-in-right';
+                    break;
+                case "martell":
+                case "tyrell":
+                    placeAnimation = 'scale-in-bottom';
+                    break;
+                case "greyjoy":
+                case "lannister":
+                    placeAnimation = 'scale-in-left';
+                    break;
+            }
+        }
 
         return (
             <ConditionalWrap condition={true}
@@ -634,7 +659,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                         id={`map-order-container_${region.id}`}
                     >
                         <div style={{ backgroundImage: `url(${backgroundUrl})`, borderColor: color }}
-                            className={classNames("order-icon", {
+                            className={classNames(`order-icon ${placeAnimation}`, {
                                 "order-border": drawBorder,
                                 "pulsate-bck": properties.animateAttention,
                                 "pulsate-bck_fade-out": properties.animateFadeOut,

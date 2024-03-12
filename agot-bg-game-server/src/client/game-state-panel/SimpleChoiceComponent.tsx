@@ -18,11 +18,16 @@ export default class SimpleChoiceComponent extends Component<GameStateComponentP
                 <Col xs={12} className="text-center">
                     {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
                         <Row className="justify-content-center">
-                            {this.props.gameState.choices.map((s, i) => (
-                                <Col xs="auto" key={`simple-choice_${i}`}>
-                                    <Button type="button" onClick={() => this.choose(i)}>{s}</Button>
-                                </Col>
-                            ))}
+                            {this.props.gameState.choices.map((s, i) => {
+                                const variant = s == "Ignore"
+                                    ? "danger"
+                                    : s == "Activate"
+                                        ? "success"
+                                        : undefined;
+                                return <Col xs="auto" key={`simple-choice_${i}`}>
+                                    <Button type="button" variant={variant} onClick={() => this.choose(i)}>{s}</Button>
+                                </Col>;
+                            })}
                         </Row>
                     ) : (
                         <>Waiting for {this.props.gameState.parentGameState.ingame.getControllerOfHouse(this.props.gameState.house).house.name}...</>
