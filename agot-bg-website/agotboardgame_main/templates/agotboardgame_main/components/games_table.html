@@ -11,7 +11,9 @@
             <th style="width: 1px">
                 Players
             </th>
-            {% if show_join_as and perms.agotboardgame_main.can_play_as_another_player %}
+            {% if show_join_as_waited and perms.agotboardgame_main.can_play_as_another_player %}
+                <th style="width: 190px"></th>
+            {% elif show_join_as_owner and perms.agotboardgame_main.can_play_as_another_player %}
                 <th style="width: 190px"></th>
             {% elif perms.agotboardgame_main.cancel_game %}
                 <th style="width: 120px"></th>
@@ -148,7 +150,7 @@
                         {% endif %}
                     </a>
                     {% endif %}
-                    {% if show_join_as and game.inactive_user_id and perms.agotboardgame_main.can_play_as_another_player %}
+                    {% if show_join_as_waited and game.inactive_user_id and perms.agotboardgame_main.can_play_as_another_player %}
                         <a class="btn btn-primary btn-sm"
                             href="/play/{{ game.id }}/{{ game.inactive_user_id }}"
                             target="_blank"
@@ -157,6 +159,17 @@
                             title="Join as the waited for player"
                         >
                             Join as ...
+                        </a>
+                    {% endif %}
+                    {% if show_join_as_owner and perms.agotboardgame_main.can_play_as_another_player and game.state == "IN_LOBBY" %}
+                        <a class="btn btn-primary btn-sm"
+                            href="/play/{{ game.id }}/{{ game.owner.id }}"
+                            target="_blank"
+                            data-toggle="tooltip"
+                            data-placement="right"
+                            title="Join as game host"
+                        >
+                            Join as host
                         </a>
                     {% endif %}
                     {% if perms.agotboardgame_main.cancel_game %}
