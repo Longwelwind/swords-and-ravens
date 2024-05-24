@@ -2203,6 +2203,13 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             });
             return serializedGame;
         }
+    },
+    {
+        version: "114",
+        migrate: (serializedGame: any) => {
+            serializedGame.gameSettings.selectedDraftDecks = 7; // Currently All: Base + Dwd / FfC + ASoS
+            return serializedGame;
+        }
     }
 ];
 
