@@ -3,7 +3,7 @@ import { Component, ReactNode } from "react";
 import * as React from "react";
 import FormCheck from "react-bootstrap/FormCheck";
 import GameClient from "./GameClient";
-import { GameSettings } from "../common/EntireGame";
+import { GameSettings, HouseCardDecks } from "../common/EntireGame";
 import EntireGame from "../common/EntireGame";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -558,87 +558,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     />
                 </Col>
             </Col>
-            <Col xs="6" lg="auto" id="draft-settings-col" className="no-gutters">
-                <Col xs="12">
-                    <FormCheck
-                        id="draft-house-cards-settings"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="draft-house-cards-tooltip">
-                                    Players will draft their House cards or a position on a chosen Influence track step by step
-                                    in a randomly chosen order before the game starts. House cards can be chosen from all 2nd Edition Base Game House cards
-                                    and from all expansions (ASoS, ADwD, AFfC, MoD) House cards.
-                                </Tooltip>}>
-                                <label htmlFor="draft-house-cards-settings">Draft House cards</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.draftHouseCards}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.draftHouseCards = !this.gameSettings.draftHouseCards)}
-                    />
-                </Col>
-                <Col xs="12">
-                    <FormCheck
-                        id="limited-draft-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="limited-draft-tooltip">
-                                    Same as normal draft mode but House cards can be chosen from the selected game scenario only.
-                                </Tooltip>}>
-                                <label htmlFor="limited-draft-setting">Limited Draft</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.limitedDraft}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.limitedDraft = !this.gameSettings.limitedDraft)}
-                    />
-                </Col>
-                <Col xs="12">
-                    <FormCheck
-                        id="thematic-draft-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="thematic-draft-tooltip">
-                                    Players will draft their House cards simultaneously from the available decks of their house.
-                                </Tooltip>}>
-                                <label htmlFor="thematic-draft-setting">Thematic Draft</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.thematicDraft}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.thematicDraft = !this.gameSettings.thematicDraft)}
-                    />
-                </Col>
-                <Col xs="12">
-                    <FormCheck
-                        id="random-draft-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="random-draft-tooltip">
-                                    Players receive random House cards and Influence positions.
-                                    Can be combined with <i>Limited Draft</i>.
-                                </Tooltip>}>
-                                <label htmlFor="random-draft-setting">Random Draft</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.randomDraft}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.randomDraft = !this.gameSettings.randomDraft)}
-                    />
-                </Col>
-                <Col xs="12">
-                    <FormCheck
-                        id="blind-draft-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="blind-draft-tooltip">
-                                    Players receive random House cards and Influence positions. House cards remain hidden throughout the game.
-                                    Can be combined with <i>Limited Draft</i>.
-                                </Tooltip>}>
-                                <label htmlFor="blind-draft-setting">Blind Draft</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.blindDraft}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.blindDraft = !this.gameSettings.blindDraft)}
-                    />
-                </Col>
-            </Col>
             <Col xs="6" lg="auto" id="custom-settings-col" className="no-gutters">
                 <Col xs="12">
                     <FormCheck
@@ -812,6 +731,135 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     />
                 </Col>
             </Col>
+            <Col xs="6" lg="auto" id="draft-settings-col" className="no-gutters">
+                <Col xs="12">
+                    <FormCheck
+                        id="draft-house-cards-settings"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="draft-house-cards-tooltip">
+                                    Players will draft their House cards or a position on a chosen Influence track step by step
+                                    in a randomly chosen order before the game starts. House cards can be chosen from all 2nd Edition Base Game House cards
+                                    and from all expansions (ASoS, ADwD, AFfC, MoD) House cards.
+                                </Tooltip>}>
+                                <label htmlFor="draft-house-cards-settings">Draft House cards</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.draftHouseCards}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.draftHouseCards = !this.gameSettings.draftHouseCards)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="thematic-draft-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="thematic-draft-tooltip">
+                                    Players will draft their House cards simultaneously from the available decks of their house.
+                                </Tooltip>}>
+                                <label htmlFor="thematic-draft-setting">Thematic Draft</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.thematicDraft}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.thematicDraft = !this.gameSettings.thematicDraft)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="random-draft-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="random-draft-tooltip">
+                                    Players receive random House cards and Influence positions.
+                                    Can be combined with <i>Limited Draft</i>.
+                                </Tooltip>}>
+                                <label htmlFor="random-draft-setting">Random Draft</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.randomDraft}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.randomDraft = !this.gameSettings.randomDraft)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="blind-draft-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="blind-draft-tooltip">
+                                    Players receive random House cards and Influence positions. House cards remain hidden throughout the game.
+                                    Can be combined with <i>Limited Draft</i>.
+                                </Tooltip>}>
+                                <label htmlFor="blind-draft-setting">Blind Draft</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.blindDraft}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.blindDraft = !this.gameSettings.blindDraft)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="limited-draft-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="limited-draft-tooltip">
+                                    This option will remove house card decks from houses that are not in play.
+                                </Tooltip>}>
+                                <label htmlFor="limited-draft-setting">Limited Draft</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.limitedDraft}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.limitedDraft = !this.gameSettings.limitedDraft)}
+                    />
+                </Col>
+            </Col>
+            {this.gameSettings.draftHouseCards && <Col xs="6" lg="auto" id="draft-decks-settings-col" className="no-gutters">
+                <Col xs="12">
+                    <FormCheck
+                        id="base-deck-setting"
+                        type="checkbox"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="base-deck-setting-tooltip">
+                                    This option will add the 2nd edition base game decks and the Mother of Dragons A decks for Arryn and Targaryen.
+                                </Tooltip>}>
+                                <label htmlFor="base-deck-setting">2nd ed base and MoD A</label>
+                            </OverlayTrigger>}
+                        checked={(this.gameSettings.selectedDraftDecks & HouseCardDecks.BaseAndModA) == HouseCardDecks.BaseAndModA}
+                        onChange={(e) => this.selectHouseCardDeck(e, HouseCardDecks.BaseAndModA)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="alternative-deck-setting"
+                        type="checkbox"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="alternative-deck-setting-tooltip">
+                                    This option will add the decks from the Dance with Dragons expansion for the base game houses, the Feast For Crows deck for Arryn
+                                    and the Mother of Dragons B Deck for Targaryen.
+                                </Tooltip>}>
+                                <label htmlFor="alternative-deck-setting">DwD, FfC and MoD B</label>
+                            </OverlayTrigger>}
+                        checked={(this.gameSettings.selectedDraftDecks & HouseCardDecks.DwdFfcModB) == HouseCardDecks.DwdFfcModB}
+                        onChange={(e) => this.selectHouseCardDeck(e, HouseCardDecks.DwdFfcModB)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="sos-deck-setting"
+                        type="checkbox"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="sos-deck-setting-tooltip">
+                                    This option will add the decks from the Storm of Swords expansion and the Mother of Dragons A decks for Arryn and Targaryen.
+                                </Tooltip>}>
+                                <label htmlFor="sos-deck-setting">SoS and MoD A</label>
+                            </OverlayTrigger>}
+                        checked={(this.gameSettings.selectedDraftDecks & HouseCardDecks.StormOfSwords) == HouseCardDecks.StormOfSwords}
+                        onChange={(e) => this.selectHouseCardDeck(e, HouseCardDecks.StormOfSwords)}
+                    />
+                </Col>
+            </Col>}
         </Row>
     }
 
@@ -930,5 +978,14 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
         action();
 
         this.props.entireGame.updateGameSettings(this.gameSettings);
+    }
+
+    selectHouseCardDeck(e: React.ChangeEvent<HTMLInputElement>, deck: HouseCardDecks): void {
+        if (e.target.checked) {
+            this.gameSettings.selectedDraftDecks |= deck;
+        } else {
+            this.gameSettings.selectedDraftDecks &= ~deck;
+        }
+        this.changeGameSettings();
     }
 }

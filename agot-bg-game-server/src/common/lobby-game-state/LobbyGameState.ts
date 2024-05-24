@@ -1,4 +1,4 @@
-import EntireGame, { GameSettings, NotificationType } from "../EntireGame";
+import EntireGame, { GameSettings, HouseCardDecks, NotificationType } from "../EntireGame";
 import GameState from "../GameState";
 import User from "../../server/User";
 import {ClientMessage} from "../../messages/ClientMessage";
@@ -178,6 +178,15 @@ export default class LobbyGameState extends GameState<EntireGame> {
         } else if (message.type == "change-game-settings") {
             const settings =  message.settings as GameSettings;
 
+            if (!this.isValidDraftDeckChoice(this.entireGame.gameSettings.thematicDraft, this.entireGame.gameSettings.selectedDraftDecks)) {
+                this.entireGame.gameSettings.selectedDraftDecks = HouseCardDecks.All;
+            }
+
+            if (!this.isValidDraftDeckChoice(settings.thematicDraft, settings.selectedDraftDecks)) {
+                settings.thematicDraft = this.entireGame.gameSettings.thematicDraft;
+                settings.selectedDraftDecks = this.entireGame.gameSettings.selectedDraftDecks;
+            }
+
             // Allow change of game settings only if the selected variant has enough seats
             // for all already connected players
             if (this.players.size > settings.playerCount || settings.playerCount < 2 || settings.playerCount > 8) {
@@ -242,14 +251,14 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.randomDraft = false;
             }
 
-            if (settings.draftHouseCards && !settings.limitedDraft) {
-                settings.adwdHouseCards = false;
-                settings.asosHouseCards = false;
-            }
-
             if (settings.limitedDraft) {
                 settings.draftHouseCards = true;
                 settings.thematicDraft = false;
+            }
+
+            if (settings.draftHouseCards) {
+                settings.adwdHouseCards = false;
+                settings.asosHouseCards = false;
             }
 
             // Allow disabling MoD options but enable them when switching to this setup
@@ -329,6 +338,28 @@ export default class LobbyGameState extends GameState<EntireGame> {
         }
 
         return updateLastActive;
+    }
+
+    isValidDraftDeckChoice(thematicDraft: boolean, decks: HouseCardDecks): boolean {
+        if (thematicDraft) {
+            return this.hasAtLeastTwoBitsSet(decks);
+        }
+
+        return decks >= 1;
+    }
+
+    hasAtLeastTwoBitsSet(num: number): boolean {
+        let count = 0;
+        while (num > 0) {
+            if ((num & 1) === 1) {
+                count++;
+            }
+            num >>= 1;
+            if (count >= 2) {
+                return true;
+            }
+        }
+        return false;
     }
 
     launchGame(): void {

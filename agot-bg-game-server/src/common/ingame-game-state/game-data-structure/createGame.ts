@@ -21,6 +21,7 @@ import loanCardTypes from "./loan-card/loanCardTypes";
 import LoanCard from "./loan-card/LoanCard";
 import { specialObjectiveCards } from "./static-data-structure/objectiveCards";
 import popRandom from "../../../utils/popRandom";
+import { HouseCardDecks } from "../../../common/EntireGame";
 
 interface HouseCardContainer {
     houseCards: {[key: string]: HouseCardData};
@@ -322,37 +323,33 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         const modBHouseCards = getHouseCardSet(baseGameData.modBHouseCards);
         const asosHouseCards = getHouseCardSet(baseGameData.asosHouseCards);
 
+        const selectedHouseCards = new BetterMap<string, HouseCard>();
+
+        if ((gameSettings.selectedDraftDecks & HouseCardDecks.BaseAndModA) == HouseCardDecks.BaseAndModA) {
+            baseGameHouseCards.forEach(hc => selectedHouseCards.set(hc.id, hc));
+        }
+
+        if ((gameSettings.selectedDraftDecks & HouseCardDecks.DwdFfcModB) == HouseCardDecks.DwdFfcModB) {
+            adwdHouseCards.forEach(hc => selectedHouseCards.set(hc.id, hc));
+            ffcHouseCards.forEach(hc => selectedHouseCards.set(hc.id, hc));
+            modBHouseCards.forEach(hc => selectedHouseCards.set(hc.id, hc));
+        }
+
+        if ((gameSettings.selectedDraftDecks & HouseCardDecks.StormOfSwords) == HouseCardDecks.StormOfSwords) {
+            asosHouseCards.forEach(hc => selectedHouseCards.set(hc.id, hc));
+            baseGameHouseCards.filter(hc => hc.houseId == "arryn" || hc.houseId == "targaryen").forEach(hc => selectedHouseCards.set(hc.id, hc));
+        }
+
         if (gameSettings.limitedDraft) {
-            let limitedHouseCards: HouseCard[] = [];
-
-            if (gameSettings.setupId == 'a-feast-for-crows') {
-                if (gameSettings.adwdHouseCards) {
-                    limitedHouseCards = _.concat(adwdHouseCards, ffcHouseCards);
-                } else if (gameSettings.asosHouseCards) {
-                    limitedHouseCards = _.concat(asosHouseCards, ffcHouseCards);
-                } else {
-                    limitedHouseCards = _.concat(baseGameHouseCards, ffcHouseCards);
-                }
-            } else {
-                if (gameSettings.adwdHouseCards) {
-                    limitedHouseCards = _.concat(adwdHouseCards, ffcHouseCards, modBHouseCards);
-                } else if (gameSettings.asosHouseCards) {
-                    limitedHouseCards = _.concat(asosHouseCards, baseGameHouseCards.filter(hc => hc.houseId == "arryn" || hc.houseId == "targaryen"));
-                } else {
-                    limitedHouseCards = baseGameHouseCards;
-                }
-            }
-
-            limitedHouseCards = limitedHouseCards.filter(hc => {
+            const limited = selectedHouseCards.values.filter(hc => {
                 if (!hc.houseId) {
                     return false;
                 }
                 return housesToCreate.includes(hc.houseId);
             });
-            game.draftableHouseCards = new BetterMap(limitedHouseCards.map(hc => [hc.id, hc]));
+            game.draftableHouseCards = new BetterMap(limited.map(hc => [hc.id, hc]));
         } else {
-            const allHouseCards = _.concat(baseGameHouseCards, adwdHouseCards, ffcHouseCards, modBHouseCards, asosHouseCards);
-            game.draftableHouseCards = new BetterMap(allHouseCards.map(hc => [hc.id, hc]));
+            game.draftableHouseCards = selectedHouseCards;
         }
 
         game.houses.forEach(h => {
