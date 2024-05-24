@@ -51,7 +51,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         addPortToTheEyrie: false, adwdHouseCards: false, asosHouseCards: false, houseCardsEvolution: false,
         vassals: true, ironBank: true, seaOrderTokens: true, allowGiftingPowerTokens: true, randomVassalAssignment: false, customBalancing: false,
         randomHouses: false, randomChosenHouses: false, tidesOfBattle: false, removeTob3: false, removeTobSkulls: false, limitTob2: false,
-        draftHouseCards: false, thematicDraft: false, limitedDraft: false, randomDraft: false, blindDraft: false,
+        draftHouseCards: false, thematicDraft: false, limitedDraft: false, randomDraft: false, blindDraft: false, selectedDraftDecks: HouseCardDecks.All,
         mixedWesterosDeck1: false, cokWesterosPhase: false, fogOfWar: false, victoryPointsCountNeededToWin: 7, loyaltyTokenCountNeededToWin: 7, endless: false,  faceless: false,
         useVassalPositions: false, precedingMustering: false, randomStartPositions: false, initialLiveClock: 60,
         noPrivateChats: false, tournamentMode: false, fixedClock: false, holdVictoryPointsUntilEndOfRound: false
@@ -768,6 +768,14 @@ export interface SerializedEntireGame {
     leafStateId: string;
 }
 
+export enum HouseCardDecks {
+    None = 0,
+    BaseAndModA = 1 << 0, // 001
+    DwdFfcModB = 1 << 1,  // 010
+    StormOfSwords = 1 << 2,  // 100
+    All = ~(~0 << 3)      // 111
+}
+
 export interface GameSettings {
     setupId: string;
     playerCount: number;
@@ -790,6 +798,7 @@ export interface GameSettings {
     limitedDraft: boolean;
     randomDraft: boolean;
     blindDraft: boolean;
+    selectedDraftDecks: HouseCardDecks;
     endless: boolean;
     useVassalPositions: boolean;
     precedingMustering: boolean;
