@@ -243,7 +243,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const tracks = this.tracks;
 
         return <>
-                <Row className="justify-content-center" style={{maxHeight: this.mapScrollbarEnabled ? "95vh" : "none"}}>
+                <Row className="justify-content-center" style={{maxHeight: this.mapScrollbarEnabled ? "100vh" : "none"}}>
                     <Col xs={{order: columnOrders.gameStateColumn}} className={this.columnSwapAnimationClassName}
                         style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none", minWidth: col1MinWidth, maxWidth: draftHouseCards ? "1200px" : "800px"}}
                     >

@@ -143,7 +143,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
 
         const col1MinWidth = this.gameSettings.playerCount >= 8 ? "485px" : "470px";
 
-        return <Row className="justify-content-center" style={{maxHeight: this.mapScrollbarEnabled ? "95vh" : "none"}}>
+        return <Row className="justify-content-center" style={{maxHeight: this.mapScrollbarEnabled ? "100vh" : "none"}}>
             <Col xs={{order: columnOrders.gameStateColumn}} className={this.columnSwapAnimationClassName}
                 style={{maxHeight: this.mapScrollbarEnabled ? "100%" : "none", minWidth: col1MinWidth, maxWidth: "800px"}}
             >
