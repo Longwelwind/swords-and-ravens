@@ -7,7 +7,7 @@ import shuffleInPlace from "../../../../utils/shuffleInPlace";
 import _ from "lodash";
 
 export default class JaqenHGharHouseCardAbility extends HouseCardAbility {
-    cancel(cancelResolutionState: CancelHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {
+    cancel(cancelResolutionState: CancelHouseCardAbilitiesGameState, house: House, houseCard: HouseCard): void {
         const combat = cancelResolutionState.combatGameState;
         const enemy = combat.getEnemy(house);
 
@@ -19,7 +19,8 @@ export default class JaqenHGharHouseCardAbility extends HouseCardAbility {
                 house: house.id,
                 affectedHouse: enemy.id,
                 oldHouseCard: (combat.houseCombatDatas.get(enemy).houseCard as HouseCard).id,
-                newHouseCard: newHouseCard.id
+                newHouseCard: newHouseCard.id,
+                usedById: houseCard.id
         });
 
         // Change the new house card to the chosen one

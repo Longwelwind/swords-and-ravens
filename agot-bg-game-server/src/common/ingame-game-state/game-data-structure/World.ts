@@ -239,9 +239,12 @@ export default class World {
         return region.units.get(unitId);
     }
 
-    getCapitalOfHouse(house: House): Region | null {
+    getCapitalOfHouse(house: House): Region {
         const capital = this.regions.values.filter(r => r.superControlPowerToken == house);
-        return capital.length == 1 ? capital[0] : null;
+        if (capital.length != 1) {
+            throw new Error("Every house must have exactly one capital");
+        }
+        return capital[0];
     }
 
     getSnapshot(): RegionSnapshot[] {

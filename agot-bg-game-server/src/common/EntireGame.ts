@@ -54,7 +54,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         draftHouseCards: false, thematicDraft: false, limitedDraft: false, randomDraft: false, blindDraft: false, selectedDraftDecks: HouseCardDecks.All,
         mixedWesterosDeck1: false, cokWesterosPhase: false, fogOfWar: false, victoryPointsCountNeededToWin: 7, loyaltyTokenCountNeededToWin: 7, endless: false,  faceless: false,
         useVassalPositions: false, precedingMustering: false, randomStartPositions: false, initialLiveClock: 60,
-        noPrivateChats: false, tournamentMode: false, fixedClock: false, holdVictoryPointsUntilEndOfRound: false
+        noPrivateChats: false, tournamentMode: false, fixedClock: false, holdVictoryPointsUntilEndOfRound: false, dragonWar: false
     };
 
     onSendClientMessage?: (message: ClientMessage) => void;
@@ -820,4 +820,5 @@ export interface GameSettings {
     fixedClock: boolean;
     holdVictoryPointsUntilEndOfRound: boolean;
     fogOfWar: boolean;
+    dragonWar: boolean;
 }

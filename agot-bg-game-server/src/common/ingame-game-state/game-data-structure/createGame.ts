@@ -5,7 +5,8 @@ import Region from "./Region";
 import World from "./World";
 import WesterosCard from "./westeros-card/WesterosCard";
 import {fireMadeFlesh, westerosCardTypes} from "./westeros-card/westerosCardTypes";
-import unitTypes, { ship } from "./unitTypes";
+import unitTypes from "./unitTypes";
+import Unit from "./Unit";
 import Game from "./Game";
 import WildlingCard from "./wildling-card/WildlingCard";
 import wildlingCardTypes from "./wildling-card/wildlingCardTypes";
@@ -20,7 +21,7 @@ import IronBank from "./IronBank";
 import loanCardTypes from "./loan-card/loanCardTypes";
 import LoanCard from "./loan-card/LoanCard";
 import { specialObjectiveCards } from "./static-data-structure/objectiveCards";
-import popRandom from "../../../utils/popRandom";
+import popRandom, { pickRandom } from "../../../utils/popRandom";
 import { HouseCardDecks } from "../../../common/EntireGame";
 
 interface HouseCardContainer {
@@ -103,7 +104,7 @@ function getTrackWithAdjustedVassalPositions(track: House[], playerHouses: strin
     return track;
 }
 
-function createHouseCard(id: string, houseCardData: HouseCardData, houseId: string): HouseCard {
+export function createHouseCard(id: string, houseCardData: HouseCardData, houseId: string): HouseCard {
     return new HouseCard(
         id,
         houseCardData.name,
@@ -523,7 +524,7 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
         const redwyneStraights = game.world.regions.get("redwyne-straights");
         const house = redwyneStraights.units.size > 0 ? redwyneStraights.units.values[0].allegiance : null;
         if (house && playerHouses.includes(house.id)) {
-            const newShip = game.createUnit(redwyneStraights, ship, house);
+            const newShip = game.createUnit(redwyneStraights, unitTypes.get("ship"), house);
             redwyneStraights.units.set(newShip.id, newShip);
         }
     }
@@ -590,5 +591,65 @@ export function applyChangesForDanceWithMotherOfDragons(ingame: IngameGameState)
     // to allow revealing and resolving the top 2 cards
     while (_.some(_.take(game.westerosDecks[3], 2), wc => wc.type == fireMadeFlesh)) {
         shuffleInPlace(game.westerosDecks[3]);
+    }
+}
+
+export function applyChangesForDragonWar(ingame: IngameGameState): void {
+    const game = ingame.game;
+    const houses = _.without(game.houses.values, game.targaryen) as House[];
+
+    for (const house of houses) {
+        let unit = findUnitToReplace(ingame, house, "knight");
+
+        if (!unit) {
+            unit = findUnitToReplace(ingame, house, "footman");
+
+            if (!unit) {
+                throw new Error("Every house starts with at least one footman");
+            }
+        }
+
+        const region = unit.region;
+        region.units.delete(unit.id);
+        const newDragon = game.createUnit(region, unitTypes.get("dragon"), house);
+        region.units.set(newDragon.id, newDragon);
+    }
+
+    if (game.dragonStrengthTokens.length == 0) {
+        game.dragonStrengthTokens = ingame.entireGame.isDanceWithDragons
+            ? [2, 4, 5, 6]
+            : [2, 4, 6, 8, 10];
+    }
+
+    nervHouseCard(game, "balon-greyjoy", "jaqen-h-ghar");
+    nervHouseCard(game, "aeron-damphair-dwd", "aeron-damphair");
+
+    game.world.regions.values.filter(r => r.superControlPowerToken != null && r.garrison == 4).forEach(r => r.garrison = 6);
+    game.world.regions.values.filter(r => r.superControlPowerToken != null && r.garrison == 2).forEach(r => r.garrison = 4);
+}
+
+function findUnitToReplace(ingame: IngameGameState, house: House, unitType: string): Unit | null {
+    const capital = ingame.world.getCapitalOfHouse(house);
+    const unit = _.first(capital.units.values.filter(u => u.type.id == unitType));
+
+    // Return either the first unit in the capital or any random unit on the board.
+    return unit
+        ? unit
+        : pickRandom(ingame.world.getUnitsOfHouse(house).filter(u => u.type.id == unitType));
+}
+
+function nervHouseCard(game: Game, hcId: string, newAbilityId: string): void {
+    const houseCard = game.draftableHouseCards.has(hcId)
+        ? game.draftableHouseCards.get(hcId)
+        : _.flatMap(game.houses.values.map(h => h.houseCards.values)).find(hc => hc.id == hcId);
+
+    if (houseCard) {
+        houseCard.id = hcId + "-nerved";
+        houseCard.ability = houseCardAbilities.get(newAbilityId);
+
+        if (game.draftableHouseCards.has(hcId)) {
+            game.draftableHouseCards.delete(hcId);
+            game.draftableHouseCards.set(hcId + "-nerved", houseCard);
+        }
     }
 }

@@ -716,6 +716,7 @@ interface JaqenHGharUsed {
     affectedHouse: string;
     oldHouseCard: string;
     newHouseCard: string;
+    usedById: string;
 }
 
 interface JonConningtonUsed {

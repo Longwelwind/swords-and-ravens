@@ -11,7 +11,7 @@ import ActionGameState, {SerializedActionGameState} from "./action-game-state/Ac
 import Order from "./game-data-structure/Order";
 import Game, {SerializedGame} from "./game-data-structure/Game";
 import WesterosGameState, {SerializedWesterosGameState} from "./westeros-game-state/WesterosGameState";
-import createGame, { applyChangesForDanceWithMotherOfDragons } from "./game-data-structure/createGame";
+import createGame, { applyChangesForDanceWithMotherOfDragons, applyChangesForDragonWar } from "./game-data-structure/createGame";
 import BetterMap from "../../utils/BetterMap";
 import House from "./game-data-structure/House";
 import Unit from "./game-data-structure/Unit";
@@ -144,6 +144,10 @@ export default class IngameGameState extends GameState<
 
         if (this.entireGame.isDanceWithMotherOfDragons) {
             applyChangesForDanceWithMotherOfDragons(this);
+        }
+
+        if (this.entireGame.gameSettings.dragonWar) {
+            applyChangesForDragonWar(this);
         }
 
         if (this.entireGame.gameSettings.onlyLive) {

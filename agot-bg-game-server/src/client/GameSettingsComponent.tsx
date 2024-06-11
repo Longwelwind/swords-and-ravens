@@ -811,6 +811,22 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         onChange={() => this.changeGameSettings(() => this.gameSettings.limitedDraft = !this.gameSettings.limitedDraft)}
                     />
                 </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="dragon-war-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="dragon-war-tooltip">
+                                    All houses, except Targaryen, will replace their starting knight by a dragon. <small><i>
+                                    (Inspired by LordWazza)</i></small>
+                                </Tooltip>}>
+                                <label htmlFor="dragon-war-setting">Dragon war</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.dragonWar}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.dragonWar = !this.gameSettings.dragonWar)}
+                    />
+                </Col>
             </Col>
             {this.gameSettings.draftHouseCards && <Col xs="6" lg="auto" id="draft-decks-settings-col" className="no-gutters">
                 <Col xs="12">

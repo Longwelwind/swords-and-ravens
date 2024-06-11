@@ -126,37 +126,42 @@ export default class Game {
             return -1;
         }
 
-        if (this.ingame.entireGame.isMotherOfDragons) {
-            if ((this.removedDragonStrengthToken == 0 && this.dragonStrengthTokens.length != 5)
-                || (this.removedDragonStrengthToken != 0 && this.dragonStrengthTokens.length != 4)) {
+        const isMoD = this.ingame.entireGame.isMotherOfDragons;
+        const isADwMoD = this.ingame.entireGame.isDanceWithMotherOfDragons || this.ingame.entireGame.isDanceWithDragons;
+        const dragonTokens = this.dragonStrengthTokens;
+        const removedToken = this.removedDragonStrengthToken;
+
+        if (isMoD) {
+            if ((removedToken == 0 && dragonTokens.length != 5)
+                || (removedToken != 0 && dragonTokens.length != 4)) {
                 throw new SnrError(this.ingame.entireGame, "Dragon strength tokens array is corrupted");
             }
-        } else if (this.ingame.entireGame.isDanceWithMotherOfDragons) {
-            if ((this.removedDragonStrengthToken == 0 && this.dragonStrengthTokens.length != 4)
-                || (this.removedDragonStrengthToken != 0 && this.dragonStrengthTokens.length != 3)) {
+        } else if (isADwMoD) {
+            if ((removedToken == 0 && dragonTokens.length != 4)
+                || (removedToken != 0 && dragonTokens.length != 3)) {
                 throw new SnrError(this.ingame.entireGame, "Dragon strength tokens array is corrupted");
             }
         }
 
-        if (this.turn > (_.last(this.dragonStrengthTokens) as number)) {
+        if (this.turn > (_.last(dragonTokens) as number)) {
             return 5;
         }
 
         // If a dragon strength token has been removed from the round track
         // the initial value is 1 instead of 0
-        const result = this.ingame.entireGame.isDanceWithMotherOfDragons
-            ? this.removedDragonStrengthToken == 0
+        const result = isADwMoD
+            ? removedToken == 0
                 ? 1
                 : 2
-            : this.removedDragonStrengthToken == 0
+            : removedToken == 0
                 ? 0
                 : 1;
 
-        for (let i=0; i<this.dragonStrengthTokens.length; i++) {
-            if (this.dragonStrengthTokens[i] == this.turn) {
+        for (let i=0; i < dragonTokens.length; i++) {
+            if (dragonTokens[i] == this.turn) {
                 return result + i + 1; // +1 because of the 0-based index
             }
-            if (this.dragonStrengthTokens[i] > this.turn) {
+            if (dragonTokens[i] > this.turn) {
                 // If the current token value is greater than current round we add the current index,
                 // which is the value of the previous dragon strength token on the round track (0-based index)
                 return result + i;

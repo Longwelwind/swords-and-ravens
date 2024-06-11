@@ -6,8 +6,8 @@ import House from "../House";
 
 export default class LittlefingerHouseCardAbility extends HouseCardAbility {
     afterCombat(afterCombat: AfterCombatHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {
-        const capitalOfHouse = afterCombat.combatGameState.world.getCapitalOfHouse(house);
-        if (capitalOfHouse && capitalOfHouse.getController() == house) {
+        const capital = afterCombat.combatGameState.world.getCapitalOfHouse(house);
+        if (capital.getController() == house) {
             const enemy = afterCombat.combatGameState.getEnemy(house);
             const enemyHouseCard = afterCombat.combatGameState.houseCombatDatas.get(enemy).houseCard;
             const gainedPowerTokens = afterCombat.combatGameState.ingameGameState.changePowerTokens(house, enemyHouseCard ? enemyHouseCard.combatStrength * 2 : 0);
