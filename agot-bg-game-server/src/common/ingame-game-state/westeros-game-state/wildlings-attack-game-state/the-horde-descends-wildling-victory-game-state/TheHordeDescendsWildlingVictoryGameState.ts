@@ -11,7 +11,7 @@ import House from "../../../game-data-structure/House";
 import _ from "lodash";
 import IngameGameState from "../../../IngameGameState";
 import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameState } from "../../../take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
-import { TakeControlOfEnemyPortResult } from "../../../port-helper/PortHelper";
+import { TakeOverPort } from "../../../port-helper/PortHelper";
 import ActionGameState from "../../../action-game-state/ActionGameState";
 
 
@@ -101,8 +101,8 @@ export default class TheHordeDescendsWildlingVictoryGameState extends WildlingCa
         this.proceedNextHouse(house);
     }
 
-    onTakeControlOfEnemyPortGameStateRequired(takeControlOfEnemyPortResult: TakeControlOfEnemyPortResult, previousHouse: House): void {
-        this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(takeControlOfEnemyPortResult.port, takeControlOfEnemyPortResult.newController, previousHouse);
+    onTakeControlOfEnemyPortGameStateRequired(takeOver: TakeOverPort, previousHouse: House): void {
+        this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(takeOver.port, takeOver.newController, previousHouse);
     }
 
     onTakeControlOfEnemyPortFinish(previousHouse: House | null): void {

@@ -827,6 +827,21 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         onChange={() => this.changeGameSettings(() => this.gameSettings.dragonWar = !this.gameSettings.dragonWar)}
                     />
                 </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="dragon-revenge-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="dragon-revenge-tooltip">
+                                    If a player has only one remaining non-dragon land unit and no more castles, it will turn into a dragon.
+                                </Tooltip>}>
+                                <label htmlFor="dragon-revenge-setting">Dragon revenge</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.dragonRevenge}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.dragonRevenge = !this.gameSettings.dragonRevenge)}
+                    />
+                </Col>
             </Col>
             {this.gameSettings.draftHouseCards && <Col xs="6" lg="auto" id="draft-decks-settings-col" className="no-gutters">
                 <Col xs="12">

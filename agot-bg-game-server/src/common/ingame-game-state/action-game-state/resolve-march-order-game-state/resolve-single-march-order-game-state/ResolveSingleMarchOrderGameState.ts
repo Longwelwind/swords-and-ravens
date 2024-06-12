@@ -144,10 +144,10 @@ export default class ResolveSingleMarchOrderGameState extends GameState<ResolveM
 
             // It may be possible, that a user left a castle with ships in port empty.
             // If so, the ships in the port have to be destroyed.
-            // It would be nice to use findOrphanedShipsAndDestroyThem here.
+            // It would be nice to use ingame.processPossibleConsequencesOfUnitLoss here.
             // But for time being we have to reimplement this a bit different
             // as the units which will march to combat stay in the startingRegion until the combat is resolved.
-            // Therefore getController() calls inside findOrphanedShipsAndDestroyThem() will prevent
+            // Therefore getController() calls inside processPossibleConsequencesOfUnitLoss() will prevent
             // us from finding orphaned ships.
             // On the other hand destroying the ships after the march has been fully resolved is too late
             // as a possible attacker may have retreated to the starting region

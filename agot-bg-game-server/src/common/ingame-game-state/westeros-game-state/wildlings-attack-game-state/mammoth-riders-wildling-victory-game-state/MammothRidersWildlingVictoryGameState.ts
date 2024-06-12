@@ -8,7 +8,7 @@ import {ClientMessage} from "../../../../../messages/ClientMessage";
 import {ServerMessage} from "../../../../../messages/ServerMessage";
 import WildlingsAttackGameState from "../WildlingsAttackGameState";
 import IngameGameState from "../../../IngameGameState";
-import { TakeControlOfEnemyPortResult } from "../../../port-helper/PortHelper";
+import { TakeOverPort } from "../../../port-helper/PortHelper";
 import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameState } from "../../../take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
 import ActionGameState from "../../../action-game-state/ActionGameState";
 
@@ -47,8 +47,8 @@ export default class MammothRidersWildlingVictoryGameState extends WildlingCardE
         }
     }
 
-    onTakeControlOfEnemyPortGameStateRequired(takeControlOfEnemyPortResult: TakeControlOfEnemyPortResult, previousHouse: House): void {
-        this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(takeControlOfEnemyPortResult.port, takeControlOfEnemyPortResult.newController, previousHouse);
+    onTakeControlOfEnemyPortGameStateRequired(takeOver: TakeOverPort, previousHouse: House): void {
+        this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(takeOver.port, takeOver.newController, previousHouse);
     }
 
     onTakeControlOfEnemyPortFinish(previousHouse: House | null): void {

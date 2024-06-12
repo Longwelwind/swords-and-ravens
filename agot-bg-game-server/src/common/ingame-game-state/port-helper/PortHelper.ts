@@ -59,7 +59,7 @@ export function findOrphanedShipsAndDestroyThem(ingame: IngameGameState, actionG
     })
 }
 
-export function isTakeControlOfEnemyPortGameStateRequired(ingame: IngameGameState): TakeControlOfEnemyPortResult | null {
+export function isTakeControlOfEnemyPortRequired(ingame: IngameGameState): TakeOverPort | null {
     // Find ports with enemy ships
     const portsWithEnemyShips = ingame.world.regions.values.filter(r => r.type == port
         && r.units.size > 0
@@ -85,7 +85,7 @@ export function isTakeControlOfEnemyPortGameStateRequired(ingame: IngameGameStat
     throw new Error(`Port with id '${portRegion.id}' contains orphaned ships which should have been removed before!`);
 }
 
-export interface TakeControlOfEnemyPortResult {
+export interface TakeOverPort {
     port: Region;
     newController: House;
 }

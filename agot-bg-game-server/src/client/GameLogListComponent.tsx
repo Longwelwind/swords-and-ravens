@@ -2072,6 +2072,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     There was no further loyalty token available that could have been placed in <b>{this.fogOfWar ? fogOfWarPlaceholder : region.name}</b>.
                 </p>;
             }
+            case "last-land-unit-transformed-to-dragon": {
+                const house = this.game.houses.get(data.house);
+                const unitType = unitTypes.get(data.transformedUnitType);
+                const region = this.world.regions.get(data.region);
+
+                return <>
+                    <b>Dragon revenge</b>: The last <b>{unitType.name}</b> of House <b>{house.name}</b> has been transformed into a <b>Dragon</b> in <b>{region.name}</b>.
+                </>;
+            }
         }
     }
 

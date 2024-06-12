@@ -265,7 +265,33 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     <h4><Badge variant="primary"><FontAwesomeIcon icon={faTriangleExclamation} /></Badge></h4>
                 </OverlayTrigger>
             </Col>}
-            {this.props.entireGame.gameSettings.fogOfWar &&
+            {(this.settings.dragonWar || this.settings.dragonRevenge) &&
+            <Col xs="auto">
+                <OverlayTrigger
+                    placement="auto"
+                    overlay={
+                        <Tooltip id="dragon-mode-tooltip" className="tooltip-w-100">
+                            <div className="text-center">
+                                {this.settings.dragonWar && <>
+                                    <p>
+                                        <h6>Dragon war</h6>
+                                        <small>Balon Greyjoy and Aeron Damphair (DwD) have been nerfed!</small>
+                                    </p>
+                                </>}
+                                {this.settings.dragonRevenge && <>
+                                    <p>
+                                        <h6>Dragon revenge</h6>
+                                        <small>The last remaining non-dragon land unit will transform into a dragon!</small>
+                                    </p>
+                                </>}
+                            </div>
+                        </Tooltip>}
+                    popperConfig={{ modifiers: [preventOverflow] }}
+                >
+                    <h4><Badge variant="primary">🐉</Badge></h4>
+                </OverlayTrigger>
+            </Col>}
+            {this.settings.fogOfWar &&
             <Col xs="auto">
                 <h4><Badge variant="warning">BETA</Badge></h4>
             </Col>}

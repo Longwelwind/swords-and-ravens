@@ -30,7 +30,7 @@ import IngameGameState from "../../IngameGameState";
 import { observable } from "mobx";
 import BetterMap from "../../../../utils/BetterMap";
 import User from "../../../../server/User";
-import { findOrphanedShipsAndDestroyThem, isTakeControlOfEnemyPortGameStateRequired } from "../../port-helper/PortHelper";
+import { isTakeControlOfEnemyPortRequired } from "../../port-helper/PortHelper";
 import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameState } from "../../take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
 import ActionGameState from "../../action-game-state/ActionGameState";
 
@@ -311,12 +311,12 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
             wildlingStrength: this.game.wildlingStrength
         });
 
-        // Orphaned units may be present here, remove them
-        findOrphanedShipsAndDestroyThem(this.ingame);
-        //   ... check if ships can be converted
-        const analyzePortResult = isTakeControlOfEnemyPortGameStateRequired(this.parentGameState.ingame);
-        if (analyzePortResult) {
-            this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(analyzePortResult.port, analyzePortResult.newController);
+        const consequence = this.ingame.processPossibleConsequencesOfUnitLoss();
+        if (consequence.victoryConditionsFulfilled) {
+            return;
+        } else if (consequence.takeOverPort) {
+            this.setChildGameState(new TakeControlOfEnemyPortGameState(this))
+                .firstStart(consequence.takeOverPort.port, consequence.takeOverPort.newController);
             return;
         }
 
@@ -324,9 +324,9 @@ export default class WildlingsAttackGameState extends GameState<WesterosGameStat
     }
 
     onTakeControlOfEnemyPortFinish(_previousHouse: House | null): void {
-        const analyzePortResult = isTakeControlOfEnemyPortGameStateRequired(this.parentGameState.ingame);
-        if (analyzePortResult) {
-            this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(analyzePortResult.port, analyzePortResult.newController);
+        const takeOverRequired = isTakeControlOfEnemyPortRequired(this.parentGameState.ingame);
+        if (takeOverRequired) {
+            this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(takeOverRequired.port, takeOverRequired.newController);
             return;
         }
 

@@ -24,7 +24,7 @@ export default class World {
         return getStaticWorld(this.settings).staticBorders;
     }
 
-    get regionsWhichCanRegainGarrison(): StaticRegion[] {
+    get regionsThatRegainGarrison(): StaticRegion[] {
         return getStaticWorld(this.settings).staticRegions.values.filter(region => region.canRegainGarrison);
     }
 
