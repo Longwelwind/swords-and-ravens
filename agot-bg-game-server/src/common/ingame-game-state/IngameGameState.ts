@@ -11,7 +11,7 @@ import ActionGameState, {SerializedActionGameState} from "./action-game-state/Ac
 import Order from "./game-data-structure/Order";
 import Game, {SerializedGame} from "./game-data-structure/Game";
 import WesterosGameState, {SerializedWesterosGameState} from "./westeros-game-state/WesterosGameState";
-import createGame, { applyChangesForDanceWithMotherOfDragons } from "./game-data-structure/createGame";
+import createGame, { applyChangesForDanceWithMotherOfDragons, applyChangesForDragonWar } from "./game-data-structure/createGame";
 import BetterMap from "../../utils/BetterMap";
 import House from "./game-data-structure/House";
 import Unit from "./game-data-structure/Unit";
@@ -46,12 +46,19 @@ import orders from "./game-data-structure/orders";
 import { OrderOnMapProperties, UnitOnMapProperties } from "../../client/MapControls";
 import houseCardAbilities from "./game-data-structure/house-card/houseCardAbilities";
 import SnrError from "../../utils/snrError";
+import { TakeOverPort, findOrphanedShipsAndDestroyThem, isTakeControlOfEnemyPortRequired } from "./port-helper/PortHelper";
+import { dragon } from "./game-data-structure/unitTypes";
 
 export const NOTE_MAX_LENGTH = 5000;
 
 export const enum ReplacementReason {
     VOTE,
     CLOCK_TIMEOUT
+}
+
+export interface UnitLossConsequence {
+    victoryConditionsFulfilled?: true;
+    takeOverPort?: TakeOverPort;
 }
 
 export default class IngameGameState extends GameState<
@@ -122,6 +129,12 @@ export default class IngameGameState extends GameState<
         return this.entireGame.gameSettings.fogOfWar;
     }
 
+    get isDragonGame(): boolean {
+        return this.entireGame.gameSettings.playerCount == 8 ||
+            this.entireGame.gameSettings.dragonWar ||
+            this.entireGame.gameSettings.dragonRevenge;
+    }
+
     constructor(entireGame: EntireGame) {
         super(entireGame);
 
@@ -144,6 +157,10 @@ export default class IngameGameState extends GameState<
 
         if (this.entireGame.isDanceWithMotherOfDragons) {
             applyChangesForDanceWithMotherOfDragons(this);
+        }
+
+        if (this.entireGame.gameSettings.dragonWar) {
+            applyChangesForDragonWar(this);
         }
 
         if (this.entireGame.gameSettings.onlyLive) {
@@ -1084,6 +1101,65 @@ export default class IngameGameState extends GameState<
         if (newCommanderPlayer && this.leafState.getWaitedUsers().includes(newCommanderPlayer.user)) {
             this.entireGame.notifyWaitedUsers([newCommanderPlayer.user]);
         }
+    }
+
+    // returns true, if game is over and calling state needs to exit from processing
+    processPossibleConsequencesOfUnitLoss(): UnitLossConsequence {
+        // Check for last unit in dragon revenge
+        if (this.entireGame.gameSettings.dragonRevenge) {
+            for (const house of this.game.houses.values) {
+                const noCastles = this.world.regions.values.filter(r => r.castleLevel > 0 && r.getController() == house).length == 0;
+
+                if (noCastles) {
+                    const nonDragonLandUnits = this.world.getUnitsOfHouse(house).filter(u => u.type.id != "ship" && u.type.id != "dragon");
+                    if (nonDragonLandUnits.length == 1) {
+                        const unit = nonDragonLandUnits[0];
+                        this.log({
+                            type: "last-land-unit-transformed-to-dragon",
+                            house: house.id,
+                            transformedUnitType: unit.type.id,
+                            region: unit.region.id
+                        }, true);
+                        this.transformUnits(unit.region, [unit], dragon);
+                    }
+                }
+            }
+        }
+
+        // Restore Pentos garrison
+        this.world.regionsThatRegainGarrison.forEach(staticRegion => {
+            const region = this.world.getRegion(staticRegion);
+            if (region.getController() == region.superControlPowerToken && region.garrison != staticRegion.startingGarrison) {
+                region.garrison = staticRegion.startingGarrison;
+                this.sendMessageToUsersWhoCanSeeRegion({
+                    type: "change-garrison",
+                    region: region.id,
+                    newGarrison: region.garrison
+                }, region);
+                this.log({
+                    type: "garrison-returned",
+                    region: region.id,
+                    strength: region.garrison
+                });
+            }
+        });
+
+        // Destroy orphaned ships in ports
+        findOrphanedShipsAndDestroyThem(this, this.actionState);
+
+        // Check for Port take over
+        const takeOverRequired = isTakeControlOfEnemyPortRequired(this);
+        if (takeOverRequired) {
+            return { takeOverPort: takeOverRequired };
+        }
+
+        // A unit loss may result in a win, if the lost unit
+        // was located in an enemy capital => check winning conditions
+        if (this.checkVictoryConditions()) {
+            return { victoryConditionsFulfilled: true };
+        }
+
+        return { };
     }
 
     onServerMessage(message: ServerMessage): void {

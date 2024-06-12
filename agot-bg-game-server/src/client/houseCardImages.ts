@@ -5,6 +5,7 @@ import aeroImage from "../../public/images/house-cards/Areo.png";
 import arianneImage from "../../public/images/house-cards/Arianne.png";
 import ashaImage from "../../public/images/house-cards/Asha.png";
 import balonImage from "../../public/images/house-cards/Balon.png";
+import balonNervedImage from "../../public/images/house-cards/Balon-nerved.png";
 import blackfishImage from "../../public/images/house-cards/Blackfish.png";
 import brienneImage from "../../public/images/house-cards/Brienne.png";
 import catelynImage from "../../public/images/house-cards/Catelyn.png";
@@ -41,11 +42,13 @@ import theonImage from "../../public/images/house-cards/Theon.png";
 import tyrionImage from "../../public/images/house-cards/Tyrion.png";
 import tywinImage from "../../public/images/house-cards/Tywin.png";
 import victarionImage from "../../public/images/house-cards/Victarion.png";
+
 import rayderImage from "../../public/images/house-cards/Rayder.png";
 import melisandreDwDImage from "../../public/images/house-cards/Melisandre_DwD.png";
 import jonSnow from "../../public/images/house-cards/JonSnow.png";
 import stannisDwDImage from "../../public/images/house-cards/StannisBaratheonDwD.png";
 import aeronDwDImage from "../../public/images/house-cards/AeronDamphairDwD.png";
+import aeronDwDNervedImage from "../../public/images/house-cards/AeronDamphairDwD-nerved.png";
 import qarlTheMaidImage from "../../public/images/house-cards/QarlTheMaid.png";
 import rodrikTheReaderImage from "../../public/images/house-cards/RodrikTheReader.png";
 import euronDwDImage from "../../public/images/house-cards/EuronCrowsEye.png";
@@ -61,30 +64,24 @@ import ramsayBoltonImage from "../../public/images/house-cards/RamsayBolton.png"
 import queenOfThornsDwDImage from "../../public/images/house-cards/QueenOfThorns.png";
 import paxterRedwyneImage from "../../public/images/house-cards/PaxterRedwyne.png";
 import margaeryTyrellDwDImage from "../../public/images/house-cards/MargaeryTyrell.png";
-
 import maceTyrellDwDImage from "../../public/images/house-cards/MaceTyrell.png";
 import randyllTarlyDwDImage from "../../public/images/house-cards/RandyllTarly.png";
 import willasTyrellImage from "../../public/images/house-cards/WillasTyrell.png";
 import serJonFossowayImage from "../../public/images/house-cards/SerJonFossoway.png";
-
 import nymeriaSandDwDImage from "../../public/images/house-cards/NymeriaSand.png";
 import areoHotahDwDImage from "../../public/images/house-cards/AreoHotah.png";
 import bastardOfGodsgraceImage from "../../public/images/house-cards/BastardOfGodsgrace.png";
 import bigManImage from "../../public/images/house-cards/BigMan.png";
-
 import serHarrasHarlawImage from "../../public/images/house-cards/SerHarrasHarlaw.png";
 import victarionGreyjoyDwDImage from "../../public/images/house-cards/VictarionGreyjoy.png";
 import ashaGreyjoyDwDImage from "../../public/images/house-cards/AshaGreyjoy.png";
-
 import bastardOfNightsongImage from "../../public/images/house-cards/BastardOfNightsong.png";
 import serDavosSeaworthDwDImage from "../../public/images/house-cards/SerDavosSeaworth.png";
 import serAxellFlorentImage from "../../public/images/house-cards/SerAxellFlorent.png";
-
 import blackWalderImage from "../../public/images/house-cards/BlackWalder.png";
 import steelshanksWaltonImage from "../../public/images/house-cards/SteelshanksWalton.png";
 import damonDanceForMeImage from "../../public/images/house-cards/DamonDanceForMe.png";
 import rooseBoltonDwDImage from "../../public/images/house-cards/RooseBolton.png";
-
 import cerseiLannisterDwDImage from "../../public/images/house-cards/CerseiLannister.png";
 import serJaimeLannisterDwDImage from "../../public/images/house-cards/SerJaimeLannister.png";
 import serKevanLannisterDwDImage from "../../public/images/house-cards/SerKevanLannister.png";
@@ -178,6 +175,7 @@ const houseCardImages = new BetterMap([
     ["areo-hotah", aeroImage],
     ["asha-greyjoy", ashaImage],
     ["balon-greyjoy", balonImage],
+    ["balon-greyjoy-nerved", balonNervedImage],
     ["the-blackfish", blackfishImage],
     ["brienne-of-tarth", brienneImage],
     ["catelyn-stark", catelynImage],
@@ -219,6 +217,7 @@ const houseCardImages = new BetterMap([
     ["jon-snow", jonSnow],
     ["stannis-baratheon-dwd", stannisDwDImage],
     ["aeron-damphair-dwd", aeronDwDImage],
+    ["aeron-damphair-dwd-nerved", aeronDwDNervedImage],
     ["qarl-the-maid", qarlTheMaidImage],
     ["rodrik-the-reader", rodrikTheReaderImage],
     ["euron-crows-eye-dwd", euronDwDImage],

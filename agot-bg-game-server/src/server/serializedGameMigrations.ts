@@ -2210,6 +2210,18 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             serializedGame.gameSettings.selectedDraftDecks = 7; // Currently All: Base + Dwd / FfC + ASoS
             return serializedGame;
         }
+    },
+    {
+        version: "115",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                const jaqenLogs = ingame.gameLogManager.logs.filter((l: any) => l.data.type == "jaqen-h-ghar-house-card-replaced");
+                jaqenLogs.forEach((l: any) => l.data.usedById = "jaqen-h-ghar");
+            }
+            return serializedGame;
+        }
     }
 ];
 

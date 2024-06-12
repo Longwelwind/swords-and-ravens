@@ -24,7 +24,7 @@ export default class World {
         return getStaticWorld(this.settings).staticBorders;
     }
 
-    get regionsWhichCanRegainGarrison(): StaticRegion[] {
+    get regionsThatRegainGarrison(): StaticRegion[] {
         return getStaticWorld(this.settings).staticRegions.values.filter(region => region.canRegainGarrison);
     }
 
@@ -239,9 +239,12 @@ export default class World {
         return region.units.get(unitId);
     }
 
-    getCapitalOfHouse(house: House): Region | null {
+    getCapitalOfHouse(house: House): Region {
         const capital = this.regions.values.filter(r => r.superControlPowerToken == house);
-        return capital.length == 1 ? capital[0] : null;
+        if (capital.length != 1) {
+            throw new Error("Every house must have exactly one capital");
+        }
+        return capital[0];
     }
 
     getSnapshot(): RegionSnapshot[] {

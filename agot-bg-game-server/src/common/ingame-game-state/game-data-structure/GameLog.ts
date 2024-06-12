@@ -50,7 +50,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | BalonGreyjoyASoSPowerTokensGained | MaceTyrellASoSOrderPlaced | BranStarkUsed | CerseiLannisterASoSPowerTokensDiscarded
     | DoranMartellASoSUsed | MelisandreOfAsshaiPowerTokensGained | SalladharSaanASoSPowerTokensChanged | SerDavosSeaworthASoSFortificationGained
     | CasualtiesPrevented | SerIlynPayneASoSCasualtySuffered | StannisBaratheonASoSUsed | AeronDamphairHouseCardChanged | ControlPowerTokenRemoved
-    | GamePaused | GameResumed | SupportAttackAgainstNeutralForce | HousesSwapped | NoLoyaltyTokenAvailable;
+    | GamePaused | GameResumed | SupportAttackAgainstNeutralForce | HousesSwapped | NoLoyaltyTokenAvailable | LastLandUnitTransformedToDragon;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -716,6 +716,7 @@ interface JaqenHGharUsed {
     affectedHouse: string;
     oldHouseCard: string;
     newHouseCard: string;
+    usedById: string;
 }
 
 interface JonConningtonUsed {
@@ -1172,5 +1173,12 @@ export interface WesterosDeck4Skipped {
 
 export interface NoLoyaltyTokenAvailable {
     type: "no-loyalty-token-available";
+    region: string;
+}
+
+export interface LastLandUnitTransformedToDragon {
+    type: "last-land-unit-transformed-to-dragon";
+    house: string;
+    transformedUnitType: string;
     region: string;
 }

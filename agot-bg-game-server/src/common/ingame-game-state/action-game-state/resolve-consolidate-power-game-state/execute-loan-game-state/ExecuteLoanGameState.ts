@@ -17,7 +17,7 @@ import LoyalMaesterGameState, { SerializedLoyalMaesterGameState } from "./loyal-
 import MasterAtArmsGameState, { SerializedMasterAtArmsGameState } from "./master-at-arms-game-state/MasterAtArmsGameState";
 import SavvyStewardGameState, { SerializedSavvyStewardGameState } from "./savvy-steward-game-state/SavvyStewardGameState";
 import SpymasterGameState, { SerializedSpymasterGameState } from "./spymaster-game-state/SpymasterGameState";
-import { findOrphanedShipsAndDestroyThem, isTakeControlOfEnemyPortGameStateRequired } from "../../../../../common/ingame-game-state/port-helper/PortHelper";
+import { isTakeControlOfEnemyPortRequired } from "../../../../../common/ingame-game-state/port-helper/PortHelper";
 import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameState } from "../../../take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
 import ActionGameState from "../../ActionGameState";
 
@@ -86,19 +86,12 @@ export default class ExecuteLoanGameState extends GameState<ResolveConsolidatePo
     }
 
     onExecuteLoanFinish(house: House): void {
-        // There might be orphaned CP* orders now so we remove them.
-        this.parentGameState.actionGameState.findOrphanedOrdersAndRemoveThem();
-        findOrphanedShipsAndDestroyThem(this.ingame, this.parentGameState.actionGameState);
-        //   ... check if ships can be converted
-        const analyzePortResult = isTakeControlOfEnemyPortGameStateRequired(this.parentGameState.ingame);
-        if (analyzePortResult) {
-            this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(analyzePortResult.port, analyzePortResult.newController, house);
+        const consequence = this.ingame.processPossibleConsequencesOfUnitLoss();
+        if (consequence.victoryConditionsFulfilled) {
             return;
-        }
-
-        // Faceless men may remove a unit in an enemy home town.
-        // If the enemy regains this castle, he might win the game.
-        if (this.ingame.checkVictoryConditions()) {
+        } else if (consequence.takeOverPort) {
+            this.setChildGameState(new TakeControlOfEnemyPortGameState(this))
+                .firstStart(consequence.takeOverPort.port, consequence.takeOverPort.newController, house);
             return;
         }
 
@@ -109,9 +102,9 @@ export default class ExecuteLoanGameState extends GameState<ResolveConsolidatePo
         if (!previousHouse) {
             throw new Error("previousHouse must be set here!");
         }
-        const analyzePortResult = isTakeControlOfEnemyPortGameStateRequired(this.parentGameState.ingame);
-        if (analyzePortResult) {
-            this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(analyzePortResult.port, analyzePortResult.newController, previousHouse);
+        const takeOverRequired = isTakeControlOfEnemyPortRequired(this.parentGameState.ingame);
+        if (takeOverRequired) {
+            this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(takeOverRequired.port, takeOverRequired.newController, previousHouse);
             return;
         }
 

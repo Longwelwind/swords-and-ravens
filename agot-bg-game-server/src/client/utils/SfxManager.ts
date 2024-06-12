@@ -105,6 +105,10 @@ class SfxManager {
     currentlyPlayingNotifications: HTMLAudioElement[] = [];
     currentlyPlayingSfx: HTMLAudioElement[] = [];
 
+    get currentDragonStrengthIsLessOrEqualThanTwo(): boolean {
+        return (this.gameClient.entireGame?.ingameGameState?.game.currentDragonStrength ?? -1) <= 2;
+    }
+
     constructor(private gameClient: GameClient) {}
 
     notificationVolumeChanged(newVal: number): void {
@@ -167,6 +171,156 @@ class SfxManager {
         this.fadeOutMusic(4000, 40);
     }
 
+    playNotificationSound(): Promise<void> {
+        if (this.gameClient.muted) {
+            return Promise.resolve();
+        }
+
+        return this.playNotification(notificationSound);
+    }
+
+    playVoteNotificationSound(): Promise<void> {
+        if (this.gameClient.muted) {
+            return Promise.resolve();
+        }
+
+        return this.playNotification(voteSound);
+    }
+
+    playNewMessageReceivedSound(): Promise<void> {
+        if (this.gameClient.muted) {
+            return Promise.resolve();
+        }
+
+        return this.playNotification(ravenCallSound);
+    }
+
+    playGotTheme(): Promise<void> {
+        if (this.gameClient.muted) {
+            return Promise.resolve();
+        }
+
+        return this.playMusic(introSound);
+    }
+
+    playCombatSound(attackerId?: string): Promise<void> {
+        if (this.gameClient.muted) {
+            return Promise.resolve();
+        }
+
+        const sound = attackerId ? houseThemes.tryGet(attackerId, combatSound) : combatSound;
+        return this.playMusic(sound);
+    }
+
+    playSoundWhenClickingMarchOrder(region: Region): Promise<void> {
+        if (this.gameClient.muted) {
+            return Promise.resolve();
+        }
+
+        const army = region.units.values;
+
+        const hasKnights = army.some(u => u.type == knight);
+        const hasShips = army.some(u => u.type == ship);
+        const hasSiegeEngines = army.some(u => u.type == siegeEngine);
+        const hasDragons = army.some(u => u.type == dragon);
+
+        const files = hasDragons && this.currentDragonStrengthIsLessOrEqualThanTwo
+            ? soundsForSmallDragons
+            : hasDragons
+                ? soundsForBigDragons
+                : hasSiegeEngines
+                    ? soundsForSiegeEngines
+                    : hasKnights
+                        ? soundsForKnights
+                        : hasShips
+                            ? soundsForShips
+                            : soundsForFootmenOnly;
+
+        return this.playRandomEffect(files, true);
+    }
+
+    playSoundForLogEvent(log: GameLogData): Promise<void> {
+        if (this.gameClient.muted) {
+            return Promise.resolve();
+        }
+
+        switch(log.type) {
+            case "doran-martell-asos-used":
+            case "doran-used":
+                this.playEffect(hystericalLaughSound, false);
+                break;
+            case "killed-after-combat": {
+                const units = log.killed.map(ut => unitTypes.get(ut));
+                if (units.includes(dragon)) {
+                    return this.playRandomEffect(soundsWhenDragonsAreDestroyed, false);
+                } else {
+                    return this.playRandomEffect(soundsWhenUnitsAreDestroyedBySwords, false);
+                }
+                break;
+            }
+            case "immediatly-killed-after-combat": {
+                const killed = _.concat(log.killedBecauseCantRetreat, log.killedBecauseWounded);
+                const units = killed.map(ut => unitTypes.get(ut));
+                if (units.includes(dragon)) {
+                    return this.playRandomEffect(soundsWhenDragonsAreDestroyed, false);
+                }
+                break;
+            }
+            case "retreat-casualties-suffered": {
+                const units = log.units.map(ut => unitTypes.get(ut));
+                if (units.includes(dragon)) {
+                    return this.playRandomEffect(soundsWhenDragonsAreDestroyed, false);
+                }
+                break;
+            }
+            case "last-land-unit-transformed-to-dragon": {
+                this.playRandomEffect(
+                    this.currentDragonStrengthIsLessOrEqualThanTwo
+                        ? soundsForSmallDragons
+                        : soundsForBigDragons
+                , false);
+                break;
+            }
+        }
+
+        return Promise.resolve();
+    }
+
+    private playRandomEffect(files: string[], withCurrentPlayingCheck: boolean): Promise<void> {
+        const randomFile = pickRandom(files);
+        if (!randomFile) {
+            return Promise.resolve();
+        }
+        return this.playEffect(randomFile, withCurrentPlayingCheck);
+    }
+
+    private playEffect(file: string, withCurrentPlayingCheck: boolean): Promise<void> {
+        if (withCurrentPlayingCheck && this.currentlyPlayingSfx.length > 0) {
+            return Promise.resolve();
+        }
+        const audio = new Audio(file);
+        this.currentlyPlayingSfx.push(audio);
+        audio.onended = () => _.pull(this.currentlyPlayingSfx, audio);
+        audio.volume = this.gameClient.sfxVolume;
+        return audio.play();
+    }
+
+    private playMusic(file: string): Promise<void> {
+        const audio = new Audio(file);
+        this.currentlyPlayingMusic.push(audio);
+        audio.onended = () => _.pull(this.currentlyPlayingMusic, audio);
+        audio.volume = this.gameClient.musicVolume;
+        return audio.play();
+    }
+
+    private playNotification(file: string): Promise<void> {
+        const audio = new Audio(file);
+        this.currentlyPlayingNotifications.push(audio);
+        audio.onended = () => _.pull(this.currentlyPlayingNotifications, audio);
+        audio.volume = this.gameClient.notificationsVolume;
+        return audio.play();
+    }
+
     private fadeOutMusic(fadeOutDuration: number, fadeOutSteps: number): void {
         if (this.currentlyPlayingMusic.length === 0) {
             return;
@@ -225,148 +379,6 @@ class SfxManager {
                 }
             });
         }, fadeOutInterval);
-    }
-
-    playNotificationSound(): Promise<void> {
-        if (this.gameClient.muted) {
-            return Promise.resolve();
-        }
-
-        return this.playNotification(notificationSound, this.gameClient.notificationsVolume);
-    }
-
-    playVoteNotificationSound(): Promise<void> {
-        if (this.gameClient.muted) {
-            return Promise.resolve();
-        }
-
-        return this.playNotification(voteSound, this.gameClient.notificationsVolume);
-    }
-
-    playNewMessageReceivedSound(): Promise<void> {
-        if (this.gameClient.muted) {
-            return Promise.resolve();
-        }
-
-        return this.playNotification(ravenCallSound, this.gameClient.notificationsVolume);
-    }
-
-    playGotTheme(): Promise<void> {
-        if (this.gameClient.muted) {
-            return Promise.resolve();
-        }
-
-        return this.playMusic(introSound, this.gameClient.musicVolume);
-    }
-
-    playCombatSound(attackerId?: string): Promise<void> {
-        if (this.gameClient.muted) {
-            return Promise.resolve();
-        }
-
-        const sound = attackerId ? houseThemes.tryGet(attackerId, combatSound) : combatSound;
-        return this.playMusic(sound, this.gameClient.musicVolume);
-    }
-
-    playSoundWhenClickingMarchOrder(region: Region): Promise<void> {
-        if (this.gameClient.muted) {
-            return Promise.resolve();
-        }
-
-        const army = region.units.values;
-
-        const hasKnights = army.some(u => u.type == knight);
-        const hasShips = army.some(u => u.type == ship);
-        const hasSiegeEngines = army.some(u => u.type == siegeEngine);
-        const hasDragons = army.some(u => u.type == dragon);
-
-        const files = hasDragons && (this.gameClient.entireGame?.ingameGameState?.game.currentDragonStrength ?? -1) <= 2
-            ? soundsForSmallDragons
-            : hasDragons
-                ? soundsForBigDragons
-                : hasSiegeEngines
-                    ? soundsForSiegeEngines
-                    : hasKnights
-                        ? soundsForKnights
-                        : hasShips
-                            ? soundsForShips
-                            : soundsForFootmenOnly;
-
-        return this.playRandomEffect(files, this.gameClient.sfxVolume, true);
-    }
-
-    playSoundForLogEvent(log: GameLogData): Promise<void> {
-        if (this.gameClient.muted) {
-            return Promise.resolve();
-        }
-
-        switch(log.type) {
-            case "doran-martell-asos-used":
-            case "doran-used":
-                this.playEffect(hystericalLaughSound, this.gameClient.musicVolume, false);
-                break;
-            case "killed-after-combat": {
-                const units = log.killed.map(ut => unitTypes.get(ut));
-                if (units.includes(dragon)) {
-                    return this.playRandomEffect(soundsWhenDragonsAreDestroyed, this.gameClient.musicVolume, false);
-                } else {
-                    return this.playRandomEffect(soundsWhenUnitsAreDestroyedBySwords, this.gameClient.musicVolume, false);
-                }
-                break;
-            }
-            case "immediatly-killed-after-combat": {
-                const killed = _.concat(log.killedBecauseCantRetreat, log.killedBecauseWounded);
-                const units = killed.map(ut => unitTypes.get(ut));
-                if (units.includes(dragon)) {
-                    return this.playRandomEffect(soundsWhenDragonsAreDestroyed, this.gameClient.musicVolume, false);
-                }
-                break;
-            }
-            case "retreat-casualties-suffered": {
-                const units = log.units.map(ut => unitTypes.get(ut));
-                if (units.includes(dragon)) {
-                    return this.playRandomEffect(soundsWhenDragonsAreDestroyed, this.gameClient.musicVolume, false);
-                }
-                break;
-            }
-        }
-
-        return Promise.resolve();
-    }
-
-    private playRandomEffect(files: string[], volume: number, withCurrentPlayingCheck: boolean): Promise<void> {
-        const randomFile = pickRandom(files);
-        if (!randomFile) {
-            return Promise.resolve();
-        }
-        return this.playEffect(randomFile, volume, withCurrentPlayingCheck);
-    }
-
-    private playEffect(file: string, volume: number, withCurrentPlayingCheck: boolean): Promise<void> {
-        if (withCurrentPlayingCheck && this.currentlyPlayingSfx.length > 0) {
-            return Promise.resolve();
-        }
-        const audio = new Audio(file);
-        this.currentlyPlayingSfx.push(audio);
-        audio.onended = () => _.pull(this.currentlyPlayingSfx, audio);
-        audio.volume = volume;
-        return audio.play();
-    }
-
-    private playMusic(file: string, volume: number): Promise<void> {
-        const audio = new Audio(file);
-        this.currentlyPlayingMusic.push(audio);
-        audio.onended = () => _.pull(this.currentlyPlayingMusic, audio);
-        audio.volume = volume;
-        return audio.play();
-    }
-
-    private playNotification(file: string, volume: number): Promise<void> {
-        const audio = new Audio(file);
-        this.currentlyPlayingNotifications.push(audio);
-        audio.onended = () => _.pull(this.currentlyPlayingNotifications, audio);
-        audio.volume = volume;
-        return audio.play();
     }
 }
 

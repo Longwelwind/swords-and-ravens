@@ -21,7 +21,7 @@ import orders from "../common/ingame-game-state/game-data-structure/orders";
 import CombatInfoComponent from "./CombatInfoComponent";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import User from "../server/User";
-import { baseHouseCardsData, adwdHouseCardsData, ffcHouseCardsData, modBHouseCardsData , HouseCardData, asosHouseCardsData } from "../common/ingame-game-state/game-data-structure/createGame";
+import { baseHouseCardsData, adwdHouseCardsData, ffcHouseCardsData, modBHouseCardsData , HouseCardData, asosHouseCardsData, createHouseCard } from "../common/ingame-game-state/game-data-structure/createGame";
 import HouseCard from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import houseCardAbilities from "../common/ingame-game-state/game-data-structure/house-card/houseCardAbilities";
 import BetterMap from "../utils/BetterMap";
@@ -97,6 +97,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         });
     }
 
+    createNervedHouseCards(): [string, HouseCard][] {
+        const balonNerved = createHouseCard("balon-greyjoy-nerved", { name: "Balon Greyjoy", combatStrength: 2, ability: "jaqen-h-ghar" }, "greyjoy");
+        const aeronDwdNerved = createHouseCard("aeron-damphair-dwd-nerved", { name: "Aeron Damphair", ability: "aeron-damphair" }, "greyjoy");
+
+        return [
+            [balonNerved.id, balonNerved],
+            [aeronDwdNerved.id, aeronDwdNerved]
+        ];
+    }
+
     getAllHouseCards(): [string, HouseCard][] {
         return _.concat(
             this.createHouseCards(baseHouseCardsData),
@@ -104,7 +114,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             this.createHouseCards(ffcHouseCardsData),
             this.createHouseCards(modBHouseCardsData),
             this.createHouseCards(asosHouseCardsData),
-            this.game.vassalHouseCards.entries);
+            this.game.vassalHouseCards.entries,
+            this.createNervedHouseCards());
     }
 
     render(): ReactNode {
@@ -1432,9 +1443,10 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const affectedHouse = this.game.houses.get(data.affectedHouse);
                 const newHouseCard = this.allHouseCards.get(data.newHouseCard);
+                const usedByHouseCard = this.allHouseCards.get(data.usedById);
 
                 return <p>
-                    <b>Jaqen H&apos;ghar</b>: House <b>{house.name}</b> randomly chose <b>{newHouseCard.name}</b> as <b>
+                    <b>{usedByHouseCard.name}</b>: House <b>{house.name}</b> randomly chose <b>{newHouseCard.name}</b> as <b>
                         {affectedHouse.name}&apos;s</b> new House card.
                 </p>;
             }
@@ -2059,6 +2071,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 return <p>
                     There was no further loyalty token available that could have been placed in <b>{this.fogOfWar ? fogOfWarPlaceholder : region.name}</b>.
                 </p>;
+            }
+            case "last-land-unit-transformed-to-dragon": {
+                const house = this.game.houses.get(data.house);
+                const unitType = unitTypes.get(data.transformedUnitType);
+                const region = this.world.regions.get(data.region);
+
+                return <>
+                    <b>Dragon revenge</b>: The last <b>{unitType.name}</b> of House <b>{house.name}</b> has been transformed into a <b>Dragon</b> in <b>{region.name}</b>.
+                </>;
             }
         }
     }

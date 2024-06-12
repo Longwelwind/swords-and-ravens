@@ -326,6 +326,10 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.randomVassalAssignment = false;
             }
 
+            if (settings.dragonWar && !this.settings.dragonWar) {
+                settings.dragonRevenge = true;
+            }
+
             const hideOrRevealUserNames = settings.faceless != this.settings.faceless;
 
             this.entireGame.gameSettings = settings;

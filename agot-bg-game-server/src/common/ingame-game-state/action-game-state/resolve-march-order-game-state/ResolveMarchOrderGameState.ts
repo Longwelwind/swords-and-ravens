@@ -14,7 +14,6 @@ import Unit from "../../game-data-structure/Unit";
 import Game from "../../game-data-structure/Game";
 import Order from "../../game-data-structure/Order";
 import TakeControlOfEnemyPortGameState, { SerializedTakeControlOfEnemyPortGameState } from "../../take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
-import { findOrphanedShipsAndDestroyThem, isTakeControlOfEnemyPortGameStateRequired } from "../../port-helper/PortHelper";
 import BetterMap from "../../../../utils/BetterMap";
 import CallForSupportAgainstNeutralForceGameState, { SerializedCallForSupportAgainstNeutralForceGameState } from "./call-for-support-against-neutral-force-game-state/CallForSupportAgainstNeutralForceGameState";
 
@@ -62,8 +61,8 @@ export default class ResolveMarchOrderGameState extends GameState<
 
     onResolveSingleMarchOrderGameStateFinish(house: House): void {
         // Last march is completely handled
-        // Now is the time to ...
-        //   ... remove orphaned orders (e.g. caused by Mace Tyrell or Ilyn Payne or due to failed retreat)
+
+        // Remove orphaned orders (e.g. caused by Mace Tyrell or Ilyn Payne or due to failed retreat)
         this.actionGameState.findOrphanedOrdersAndRemoveThem();
 
         // Reset all card abilities (e.g. due to DWD Queen of Thorns)
@@ -89,42 +88,20 @@ export default class ResolveMarchOrderGameState extends GameState<
             });
         }
 
-        // Restore Garrisons (Pentos)
-        this.world.regionsWhichCanRegainGarrison.forEach(staticRegion => {
-            const region = this.world.getRegion(staticRegion);
-            if (region.getController() == region.superControlPowerToken && region.garrison != staticRegion.startingGarrison) {
-                region.garrison = staticRegion.startingGarrison;
-                this.ingame.sendMessageToUsersWhoCanSeeRegion({
-                    type: "change-garrison",
-                    region: region.id,
-                    newGarrison: region.garrison
-                }, region);
-                this.ingameGameState.log({
-                    type: "garrison-returned",
-                    region: region.id,
-                    strength: region.garrison
-                });
-            }
-        })
-
         // Gain Loyalty tokens
         this.ingameGameState.gainLoyaltyTokens();
 
-        //   ... destroy orphaned ships (e.g. caused by Arianne)
-        findOrphanedShipsAndDestroyThem(this.ingameGameState, this.actionGameState);
-        //   ... check if ships can be converted
-        const analyzePortResult = isTakeControlOfEnemyPortGameStateRequired(this.ingameGameState);
-        if (analyzePortResult) {
-            this.setChildGameState(new TakeControlOfEnemyPortGameState(this)).firstStart(analyzePortResult.port, analyzePortResult.newController, house);
+        // Handle possible unit loss consequences (checks winning condition)
+        const consequence = this.ingame.processPossibleConsequencesOfUnitLoss();
+        if (consequence.victoryConditionsFulfilled) {
+            return;
+        } else if (consequence.takeOverPort) {
+            this.setChildGameState(new TakeControlOfEnemyPortGameState(this))
+                .firstStart(consequence.takeOverPort.port, consequence.takeOverPort.newController, house);
             return;
         }
 
-        //   ... check victory conditions
-        if (this.ingameGameState.checkVictoryConditions()) {
-            return;
-        }
-
-        //   ... check if an other march order can be resolved
+        // Find next march order to resolve
         this.proceedNextResolveSingleMarchOrder();
     }
 
