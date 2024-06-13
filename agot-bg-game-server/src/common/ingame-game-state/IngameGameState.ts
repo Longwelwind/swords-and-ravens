@@ -11,7 +11,7 @@ import ActionGameState, {SerializedActionGameState} from "./action-game-state/Ac
 import Order from "./game-data-structure/Order";
 import Game, {SerializedGame} from "./game-data-structure/Game";
 import WesterosGameState, {SerializedWesterosGameState} from "./westeros-game-state/WesterosGameState";
-import createGame, { applyChangesForDanceWithMotherOfDragons, applyChangesForDragonWar } from "./game-data-structure/createGame";
+import createGame, { applyChangesForDanceWithMotherOfDragons, applyChangesForDragonWar, ensureDragonStrengthTokensArePresent } from "./game-data-structure/createGame";
 import BetterMap from "../../utils/BetterMap";
 import House from "./game-data-structure/House";
 import Unit from "./game-data-structure/Unit";
@@ -96,6 +96,8 @@ export default class IngameGameState extends GameState<
     onVoteStarted: (() => void) | null = null;
     onPreemptiveRaidNewAttack: ((biddings: [number, House[]][], highestBidder: House) => void) | null = null;
     onLogReceived: ((log: GameLogData) => void) | null = null;
+    onGamePaused: (() => void) | null = null;
+    onGameResumed: (() => void) | null = null;
 
     get entireGame(): EntireGame {
         return this.parentGameState;
@@ -132,7 +134,8 @@ export default class IngameGameState extends GameState<
     get isDragonGame(): boolean {
         return this.entireGame.gameSettings.playerCount == 8 ||
             this.entireGame.gameSettings.dragonWar ||
-            this.entireGame.gameSettings.dragonRevenge;
+            (this.entireGame.gameSettings.dragonRevenge
+                && _.some(_.flatMap(this.world.regions.values.map(r => r.units.values)), u => u.type.id == "dragon"));
     }
 
     constructor(entireGame: EntireGame) {
@@ -161,6 +164,16 @@ export default class IngameGameState extends GameState<
 
         if (this.entireGame.gameSettings.dragonWar) {
             applyChangesForDragonWar(this);
+        }
+
+        if (this.entireGame.gameSettings.dragonRevenge) {
+            ensureDragonStrengthTokensArePresent(this);
+        }
+
+        if (this.game.dragonStrengthTokens.length == 4) {
+            // If the dragons will only raise in 4 rounds instead of 5 (6 round only scenarios)
+            // we push one dummy token from round 10 to removed tokens for correct calculation.
+            this.game.removedDragonStrengthTokens.push(10);
         }
 
         if (this.entireGame.gameSettings.onlyLive) {
@@ -778,6 +791,37 @@ export default class IngameGameState extends GameState<
         }
     }
 
+    calculatePossibleGainsForGameOfThrones(): BetterMap<House, number> {
+        // Each player gains a power tokens for each power icon (crowns) in controlled regions,
+        // plus one for each controlled port containing at least one ship adjacent to a self-controlled or a free sea.
+        return new BetterMap(this.game.houses.values.filter(h => !this.isVassalHouse(h))
+                .map<[House, number]>(house => {
+                    const controlledPowerIcons = _.sum(this.world.regions.values.filter(r => r.crownIcons > 0 && r.getController() == house).map(r => r.crownIcons));
+                    // Count number of controlled ports where the adjacent sea area is un-constested
+                    const powerTokensForShipsInPort = this.world.regions.values
+                        .filter(r => r.type.id == "port" && r.units.size > 0 && r.getController() == house)
+                        .filter(r =>
+                            this.world.getAdjacentSeaOfPort(r).getController() == null
+                            || this.world.getAdjacentSeaOfPort(r).getController() == house
+                        ).length;
+                    return ([house, controlledPowerIcons + powerTokensForShipsInPort]);
+                }).filter(([_house, gain]) => gain > 0));
+    }
+
+    assumeChangePowerTokens(house: House, delta: number): number {
+        if (this.isVassalHouse(house)) {
+            return 0;
+        }
+
+        const powerTokensOnBoardCount = this.game.countPowerTokensOnBoard(house);
+        const maxPowerTokenCount = house.maxPowerTokens - powerTokensOnBoardCount;
+
+        let newValue = house.powerTokens + delta;
+        newValue = Math.max(0, Math.min(newValue, maxPowerTokenCount));
+
+        return newValue - house.powerTokens;
+    }
+
     changePowerTokens(house: House, delta: number): number {
         if (this.isVassalHouse(house)) {
             return 0;
@@ -1255,6 +1299,10 @@ export default class IngameGameState extends GameState<
             if (this.onLogReceived) {
                 this.onLogReceived(message.data);
             }
+
+            if (message.data.type == "last-land-unit-transformed-to-dragon") {
+                this.forceRerender();
+            }
         } else if (message.type == "change-tracker") {
             const newOrder = message.tracker.map(hid => this.game.houses.get(hid));
 
@@ -1387,7 +1435,7 @@ export default class IngameGameState extends GameState<
             region.loyaltyTokens = message.newLoyaltyTokenCount;
         } else if (message.type == "dragon-strength-token-removed") {
             _.pull(this.game.dragonStrengthTokens, message.fromRound);
-            this.game.removedDragonStrengthToken = message.fromRound;
+            this.game.removedDragonStrengthTokens.push(message.fromRound);
         } else if (message.type == "update-loan-cards") {
             this.game.theIronBank.loanCardDeck = message.loanCardDeck.map(lc => LoanCard.deserializeFromServer(this.game, lc));
             this.game.theIronBank.purchasedLoans = message.purchasedLoans.map(lc => LoanCard.deserializeFromServer(this.game, lc));
@@ -1439,9 +1487,13 @@ export default class IngameGameState extends GameState<
             if (message.willBeAutoResumedAt) {
                 this.willBeAutoResumedAt = new Date(message.willBeAutoResumedAt);
             }
+
+            if (this.onGamePaused) this.onGamePaused();
         } else if (message.type == "game-resumed") {
             this.paused = null;
             this.willBeAutoResumedAt = null;
+
+            if (this.onGameResumed) this.onGameResumed();
         } else if (message.type == "preemptive-raid-new-attack" && this.onPreemptiveRaidNewAttack) {
             // Todo: Handle this in WildlingAttackGameState
             const biddings = message.biddings.map(([bid, hids]) =>

@@ -388,7 +388,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                     >
                         <div onClick={property.onClick ? property.onClick : undefined}
                             className={classNames(
-                                "unit-icon",
+                                u.type.id == "dragon" ? "dragon-icon" : "unit-icon",
                                 {
                                     "hover-weak-outline": !property.highlight?.active,
                                     "clickable hover-strong-outline": clickable,

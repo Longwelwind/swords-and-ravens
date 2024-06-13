@@ -50,7 +50,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | BalonGreyjoyASoSPowerTokensGained | MaceTyrellASoSOrderPlaced | BranStarkUsed | CerseiLannisterASoSPowerTokensDiscarded
     | DoranMartellASoSUsed | MelisandreOfAsshaiPowerTokensGained | SalladharSaanASoSPowerTokensChanged | SerDavosSeaworthASoSFortificationGained
     | CasualtiesPrevented | SerIlynPayneASoSCasualtySuffered | StannisBaratheonASoSUsed | AeronDamphairHouseCardChanged | ControlPowerTokenRemoved
-    | GamePaused | GameResumed | SupportAttackAgainstNeutralForce | HousesSwapped | NoLoyaltyTokenAvailable | LastLandUnitTransformedToDragon;
+    | GamePaused | GameResumed | SupportAttackAgainstNeutralForce | HousesSwapped | NoLoyaltyTokenAvailable | LastLandUnitTransformedToDragon | LivePbemSwitch;
 
 export enum PlayerActionType {
     ORDERS_PLACED,
@@ -1181,4 +1181,9 @@ export interface LastLandUnitTransformedToDragon {
     house: string;
     transformedUnitType: string;
     region: string;
+}
+
+export interface LivePbemSwitch {
+    type: "live-pbem-switch";
+    isNowPbem: boolean;
 }

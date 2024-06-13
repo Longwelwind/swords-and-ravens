@@ -2222,6 +2222,41 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "116",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                ingame.game.removedDragonStrengthTokens = [];
+
+                if (ingame.game.removedDragonStrengthToken > 0) {
+                    ingame.game.removedDragonStrengthTokens = [ingame.game.removedDragonStrengthToken];
+                }
+
+                if (ingame.game.maxTurns == 6 && ingame.game.dragonStrengthTokens.length > 0) {
+                    ingame.game.removedDragonStrengthTokens.push(10);
+                }
+
+                // Fix wrong id for players house cards map with nerved cards
+                if (serializedGame.gameSettings.dragonWar) {
+                    ingame.game.houses.forEach((h: any) => {
+                        const balon = h.houseCards.find(([id, shc]: any) => id == "balon-greyjoy" && shc.id == "balon-greyjoy-nerved");
+                        const aeron = h.houseCards.find(([id, shc]: any) => id == "aeron-damphair-dwd" && shc.id == "aeron-damphair-dwd-nerved");
+
+                        if (balon) {
+                            balon[0] = "balon-greyjoy-nerved";
+                        }
+
+                        if (aeron) {
+                            aeron[0] = "aeron-damphair-dwd-nerved";
+                        }
+                    });
+                }
+            }
+            return serializedGame;
+        }
     }
 ];
 

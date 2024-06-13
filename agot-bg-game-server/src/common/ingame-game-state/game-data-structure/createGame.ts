@@ -353,6 +353,10 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             game.draftableHouseCards = selectedHouseCards;
         }
 
+        if (gameSettings.setupId == "a-feast-for-crows" && game.draftableHouseCards.has("margaery-tyrell-dwd")) {
+            game.draftableHouseCards.delete("margaery-tyrell-dwd");
+        }
+
         game.houses.forEach(h => {
             // Reset already assigned house cards
             if (playerHouses.includes(h.id)) {
@@ -615,17 +619,22 @@ export function applyChangesForDragonWar(ingame: IngameGameState): void {
         region.units.set(newDragon.id, newDragon);
     }
 
-    if (game.dragonStrengthTokens.length == 0) {
-        game.dragonStrengthTokens = ingame.entireGame.isDanceWithDragons
-            ? [2, 4, 5, 6]
-            : [2, 4, 6, 8, 10];
-    }
+    ensureDragonStrengthTokensArePresent(ingame);
 
     nervHouseCard(game, "balon-greyjoy", "jaqen-h-ghar");
     nervHouseCard(game, "aeron-damphair-dwd", "aeron-damphair");
 
     game.world.regions.values.filter(r => r.superControlPowerToken != null && r.garrison == 4).forEach(r => r.garrison = 6);
     game.world.regions.values.filter(r => r.superControlPowerToken != null && r.garrison == 2).forEach(r => r.garrison = 4);
+}
+
+export function ensureDragonStrengthTokensArePresent(ingame: IngameGameState): void {
+    const game = ingame.game;
+    if (game.dragonStrengthTokens.length == 0) {
+        game.dragonStrengthTokens = ingame.game.maxTurns == 6
+            ? [2, 4, 5, 6]
+            : [2, 4, 6, 8, 10];
+    }
 }
 
 function findUnitToReplace(ingame: IngameGameState, house: House, unitType: string): Unit | null {
@@ -644,8 +653,15 @@ function nervHouseCard(game: Game, hcId: string, newAbilityId: string): void {
         : _.flatMap(game.houses.values.map(h => h.houseCards.values)).find(hc => hc.id == hcId);
 
     if (houseCard) {
+        const originalId = houseCard.id;
         houseCard.id = hcId + "-nerved";
         houseCard.ability = houseCardAbilities.get(newAbilityId);
+
+        const house = game.houses.values.find(h => h.houseCards.has(originalId));
+        if (house) {
+            house.houseCards.delete(originalId);
+            house.houseCards.set(houseCard.id, houseCard);
+        }
 
         if (game.draftableHouseCards.has(hcId)) {
             game.draftableHouseCards.delete(hcId);

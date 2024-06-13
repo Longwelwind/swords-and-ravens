@@ -125,7 +125,7 @@ export default class FireMadeFleshGameState extends GameState<WesterosDeck4GameS
             }, resolvedAutomatically);
 
             _.pull(this.game.dragonStrengthTokens, decision);
-            this.game.removedDragonStrengthToken = decision;
+            this.game.removedDragonStrengthTokens.push(decision);
 
             this.entireGame.broadcastToClients({
                 type: "dragon-strength-token-removed",

@@ -358,7 +358,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 message.settings = this.gameSettings;
             }
 
-            // Only allow PBEM and Private to be changed ingame
+            // Only allow PBEM to be changed ingame
             const settings = message.settings as GameSettings;
 
             if (!this.gameSettings.pbem && this.gameSettings.onlyLive) {
@@ -370,11 +370,21 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 if (settings.pbem && !this.gameSettings.pbem) {
                     this.gameSettings.pbem = settings.pbem;
                     // Notify waited users due to ingame PBEM change
-                    this.notifyWaitedUsers();
                     // Do not activate waitedForData now. We start calculating with the next game state change
+                    this.notifyWaitedUsers();
+
+                    this.ingameGameState.log({
+                        type: "live-pbem-switch",
+                        isNowPbem: true
+                    });
                 } else if (this.gameSettings.pbem && !settings.pbem) {
                     // Reset waitedFor as we are now Live
                     this.ingameGameState.resetAllWaitedForData();
+
+                    this.ingameGameState.log({
+                        type: "live-pbem-switch",
+                        isNowPbem: false
+                    });
                 }
             }
 
