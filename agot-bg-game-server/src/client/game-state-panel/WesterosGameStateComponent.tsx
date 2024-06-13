@@ -34,6 +34,7 @@ import ShiftingAmbitionsGameState from "../../common/ingame-game-state/westeros-
 import ShiftingAmbitionsComponent from "./ShiftingAmbitionsComponent";
 import NewInformationGameState from "../../common/ingame-game-state/westeros-game-state/new-information-game-state/NewInformationGameState";
 import NewInformationComponent from "./NewInformationComponent";
+import PossiblePowerTokenGainsComponent from "../PossiblePowerTokenGainsComponent";
 
 @observer
 export default class WesterosGameStateComponent extends Component<GameStateComponentProps<WesterosGameState>> {
@@ -72,6 +73,11 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
                     [ShiftingAmbitionsGameState, ShiftingAmbitionsComponent],
                     [NewInformationGameState, NewInformationComponent]
                 ])}
+                {this.props.gameState.childGameState instanceof DarkWingsDarkWordsGameState && (
+                    <Row className="mt-3 justify-content-center">
+                        <PossiblePowerTokenGainsComponent ingame={this.props.gameState.ingame} />
+                    </Row>
+                )}
             </>
         );
     }

@@ -791,6 +791,37 @@ export default class IngameGameState extends GameState<
         }
     }
 
+    calculatePossibleGainsForGameOfThrones(): BetterMap<House, number> {
+        // Each player gains a power tokens for each power icon (crowns) in controlled regions,
+        // plus one for each controlled port containing at least one ship adjacent to a self-controlled or a free sea.
+        return new BetterMap(this.game.houses.values.filter(h => !this.isVassalHouse(h))
+                .map<[House, number]>(house => {
+                    const controlledPowerIcons = _.sum(this.world.regions.values.filter(r => r.crownIcons > 0 && r.getController() == house).map(r => r.crownIcons));
+                    // Count number of controlled ports where the adjacent sea area is un-constested
+                    const powerTokensForShipsInPort = this.world.regions.values
+                        .filter(r => r.type.id == "port" && r.units.size > 0 && r.getController() == house)
+                        .filter(r =>
+                            this.world.getAdjacentSeaOfPort(r).getController() == null
+                            || this.world.getAdjacentSeaOfPort(r).getController() == house
+                        ).length;
+                    return ([house, controlledPowerIcons + powerTokensForShipsInPort]);
+                }).filter(([_house, gain]) => gain > 0));
+    }
+
+    assumeChangePowerTokens(house: House, delta: number): number {
+        if (this.isVassalHouse(house)) {
+            return 0;
+        }
+
+        const powerTokensOnBoardCount = this.game.countPowerTokensOnBoard(house);
+        const maxPowerTokenCount = house.maxPowerTokens - powerTokensOnBoardCount;
+
+        let newValue = house.powerTokens + delta;
+        newValue = Math.max(0, Math.min(newValue, maxPowerTokenCount));
+
+        return newValue - house.powerTokens;
+    }
+
     changePowerTokens(house: House, delta: number): number {
         if (this.isVassalHouse(house)) {
             return 0;
