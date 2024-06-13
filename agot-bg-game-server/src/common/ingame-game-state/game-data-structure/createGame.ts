@@ -353,6 +353,10 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
             game.draftableHouseCards = selectedHouseCards;
         }
 
+        if (gameSettings.setupId == "a-feast-for-crows" && game.draftableHouseCards.has("margaery-tyrell-dwd")) {
+            game.draftableHouseCards.delete("margaery-tyrell-dwd");
+        }
+
         game.houses.forEach(h => {
             // Reset already assigned house cards
             if (playerHouses.includes(h.id)) {
