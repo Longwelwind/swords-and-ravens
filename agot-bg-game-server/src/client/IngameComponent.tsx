@@ -978,7 +978,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     </div>
                                 </div>
                             </Row>
-                            {this.ingame.isDragonGame && <Row className="mx-0 mt-3">
+                            {this.ingame.rerender >= 0 && this.ingame.isDragonGame && <Row className="mx-0 mt-3">
                                 <OverlayTrigger overlay={this.renderDragonStrengthTooltip()}
                                     placement="auto">
                                     <div>

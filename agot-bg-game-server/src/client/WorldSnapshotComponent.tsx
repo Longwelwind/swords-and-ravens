@@ -205,7 +205,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
 
                     return <div
                         key={`world-state_unit-${u.type}-${u.house}-${i}-in-${r.id}`}
-                        className="unit-icon"
+                        className={u.type == "dragon" ? "dragon-icon" : "unit-icon"}
                         style={{
                             backgroundImage: `url(${unitImages.get(u.house).get(u.type)})`,
                             opacity: opacity,

@@ -132,7 +132,8 @@ export default class IngameGameState extends GameState<
     get isDragonGame(): boolean {
         return this.entireGame.gameSettings.playerCount == 8 ||
             this.entireGame.gameSettings.dragonWar ||
-            this.entireGame.gameSettings.dragonRevenge;
+            (this.entireGame.gameSettings.dragonRevenge
+                && _.some(_.flatMap(this.world.regions.values.map(r => r.units.values)), u => u.type.id == "dragon"));
     }
 
     constructor(entireGame: EntireGame) {
@@ -1264,6 +1265,10 @@ export default class IngameGameState extends GameState<
             this.gameLogManager.logs.push({data: message.data, time: new Date(message.time * 1000), resolvedAutomatically: message.resolvedAutomatically});
             if (this.onLogReceived) {
                 this.onLogReceived(message.data);
+            }
+
+            if (message.data.type == "last-land-unit-transformed-to-dragon") {
+                this.forceRerender();
             }
         } else if (message.type == "change-tracker") {
             const newOrder = message.tracker.map(hid => this.game.houses.get(hid));
