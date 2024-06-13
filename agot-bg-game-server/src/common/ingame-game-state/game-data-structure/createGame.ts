@@ -653,8 +653,15 @@ function nervHouseCard(game: Game, hcId: string, newAbilityId: string): void {
         : _.flatMap(game.houses.values.map(h => h.houseCards.values)).find(hc => hc.id == hcId);
 
     if (houseCard) {
+        const originalId = houseCard.id;
         houseCard.id = hcId + "-nerved";
         houseCard.ability = houseCardAbilities.get(newAbilityId);
+
+        const house = game.houses.values.find(h => h.houseCards.has(originalId));
+        if (house) {
+            house.houseCards.delete(originalId);
+            house.houseCards.set(houseCard.id, houseCard);
+        }
 
         if (game.draftableHouseCards.has(hcId)) {
             game.draftableHouseCards.delete(hcId);
