@@ -2085,6 +2085,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     <b>Dragon revenge</b>: The last <b>{unitType.name}</b> of House <b>{house.name}</b> has been transformed into a <b>Dragon</b> in <b>{region.name}</b>.
                 </>;
             }
+            case "live-pbem-switch": {
+                return <p>
+                    <h5 className="text-center">Game type has been changed</h5>
+                    <div className="text-center">It is now <b>{data.isNowPbem ? "PBEM" : "Live"}</b>.</div>
+                </p>
+                break;
+            }
         }
     }
 
