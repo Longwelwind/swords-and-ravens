@@ -45,6 +45,7 @@ import { secondsToString } from "./utils/secondsToString";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
 import orderImages from "./orderImages";
 import presentImage from "../../public/images/icons/present.svg"
+import HouseCardComponent from "./game-state-panel/utils/HouseCardComponent";
 
 const fogOfWarPlaceholder = "a region"
 
@@ -892,6 +893,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
                 return <p>
                     <b>Qyburn</b>: House <b>{house.name}</b> decided to use the combat strength <b>{houseCard.combatStrength}</b> from <b>{houseCard.name}</b>.
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <HouseCardComponent houseCard={houseCard} size="small"/>
+                    </div>
                 </p>;
             }
             case "aeron-damphair-used": {
