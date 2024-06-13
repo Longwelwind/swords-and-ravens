@@ -11,7 +11,7 @@ import ActionGameState, {SerializedActionGameState} from "./action-game-state/Ac
 import Order from "./game-data-structure/Order";
 import Game, {SerializedGame} from "./game-data-structure/Game";
 import WesterosGameState, {SerializedWesterosGameState} from "./westeros-game-state/WesterosGameState";
-import createGame, { applyChangesForDanceWithMotherOfDragons, applyChangesForDragonWar } from "./game-data-structure/createGame";
+import createGame, { applyChangesForDanceWithMotherOfDragons, applyChangesForDragonWar, ensureDragonStrengthTokensArePresent } from "./game-data-structure/createGame";
 import BetterMap from "../../utils/BetterMap";
 import House from "./game-data-structure/House";
 import Unit from "./game-data-structure/Unit";
@@ -161,6 +161,16 @@ export default class IngameGameState extends GameState<
 
         if (this.entireGame.gameSettings.dragonWar) {
             applyChangesForDragonWar(this);
+        }
+
+        if (this.entireGame.gameSettings.dragonRevenge) {
+            ensureDragonStrengthTokensArePresent(this);
+        }
+
+        if (this.game.dragonStrengthTokens.length == 4) {
+            // If the dragons will only raise in 4 rounds instead of 5 (6 round only scenarios)
+            // we push one dummy token from round 10 to removed tokens for correct calculation.
+            this.game.removedDragonStrengthTokens.push(10);
         }
 
         if (this.entireGame.gameSettings.onlyLive) {
@@ -1387,7 +1397,7 @@ export default class IngameGameState extends GameState<
             region.loyaltyTokens = message.newLoyaltyTokenCount;
         } else if (message.type == "dragon-strength-token-removed") {
             _.pull(this.game.dragonStrengthTokens, message.fromRound);
-            this.game.removedDragonStrengthToken = message.fromRound;
+            this.game.removedDragonStrengthTokens.push(message.fromRound);
         } else if (message.type == "update-loan-cards") {
             this.game.theIronBank.loanCardDeck = message.loanCardDeck.map(lc => LoanCard.deserializeFromServer(this.game, lc));
             this.game.theIronBank.purchasedLoans = message.purchasedLoans.map(lc => LoanCard.deserializeFromServer(this.game, lc));

@@ -57,7 +57,7 @@ export default class Game {
     oldPlayerHouseCards: BetterMap<House, BetterMap<string, HouseCard>> = new BetterMap();
     previousPlayerHouseCards: BetterMap<House, BetterMap<string, HouseCard>> = new BetterMap();
     dragonStrengthTokens: number[] = [];
-    @observable removedDragonStrengthToken = 0;
+    @observable removedDragonStrengthTokens: number[] = [];
     ironBank: IronBank | null;
     @observable objectiveDeck: ObjectiveCard[] = [];
 
@@ -126,49 +126,15 @@ export default class Game {
             return -1;
         }
 
-        const isMoD = this.ingame.entireGame.isMotherOfDragons;
-        const isADwMoD = this.ingame.entireGame.isDanceWithMotherOfDragons || this.ingame.entireGame.isDanceWithDragons;
-        const dragonTokens = this.dragonStrengthTokens;
-        const removedToken = this.removedDragonStrengthToken;
-
-        if (isMoD) {
-            if ((removedToken == 0 && dragonTokens.length != 5)
-                || (removedToken != 0 && dragonTokens.length != 4)) {
-                throw new SnrError(this.ingame.entireGame, "Dragon strength tokens array is corrupted");
-            }
-        } else if (isADwMoD) {
-            if ((removedToken == 0 && dragonTokens.length != 4)
-                || (removedToken != 0 && dragonTokens.length != 3)) {
-                throw new SnrError(this.ingame.entireGame, "Dragon strength tokens array is corrupted");
-            }
-        }
-
-        if (this.turn > (_.last(dragonTokens) as number)) {
+        if (this.turn >= (_.last(this.dragonStrengthTokens) as number)) {
             return 5;
         }
 
-        // If a dragon strength token has been removed from the round track
-        // the initial value is 1 instead of 0
-        const result = isADwMoD
-            ? removedToken == 0
-                ? 1
-                : 2
-            : removedToken == 0
-                ? 0
-                : 1;
+        // We calculate the current dragon strength based on the count of removed tokens
+        // and tokens on the dragon strength track which are equal or lower to current round.
+        // For the 6 round-only scenarios, we drop one of the tokens to removedTokens.
 
-        for (let i=0; i < dragonTokens.length; i++) {
-            if (dragonTokens[i] == this.turn) {
-                return result + i + 1; // +1 because of the 0-based index
-            }
-            if (dragonTokens[i] > this.turn) {
-                // If the current token value is greater than current round we add the current index,
-                // which is the value of the previous dragon strength token on the round track (0-based index)
-                return result + i;
-            }
-        }
-
-        throw new SnrError(this.ingame.entireGame, "Error in calculating currentDragonStrength");
+        return this.removedDragonStrengthTokens.length + this.dragonStrengthTokens.filter(dst => dst <= this.turn).length;
     }
 
     get loyaltyTokensOnBoardCount(): number {
@@ -627,7 +593,7 @@ export default class Game {
             oldPlayerHouseCards: this.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])]),
             previousPlayerHouseCards: this.previousPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])]),
             dragonStrengthTokens: this.dragonStrengthTokens,
-            removedDragonStrengthToken: this.removedDragonStrengthToken,
+            removedDragonStrengthTokens: this.removedDragonStrengthTokens,
             ironBank: this.ironBank ? this.ironBank.serializeToClient(admin) : null,
             objectiveDeck: admin ? this.objectiveDeck.map(oc => oc.id) : [],
             usurper: this.usurper ? this.usurper.id : null
@@ -667,7 +633,7 @@ export default class Game {
             [game.houses.get(hid), new BetterMap(hcs.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]))]
         ));
         game.dragonStrengthTokens = data.dragonStrengthTokens;
-        game.removedDragonStrengthToken = data.removedDragonStrengthToken;
+        game.removedDragonStrengthTokens = data.removedDragonStrengthTokens;
         game.ironBank = data.ironBank ? IronBank.deserializeFromServer(game, data.ironBank) : null;
         game.objectiveDeck = data.objectiveDeck.map(ocid => objectiveCards.get(ocid));
         game.usurper = data.usurper ? game.houses.get(data.usurper) : null;
@@ -703,7 +669,7 @@ export interface SerializedGame {
     oldPlayerHouseCards: [string, [string, SerializedHouseCard][]][];
     previousPlayerHouseCards: [string, [string, SerializedHouseCard][]][];
     dragonStrengthTokens: number[];
-    removedDragonStrengthToken: number;
+    removedDragonStrengthTokens: number[];
     ironBank: SerializedIronBank | null;
     objectiveDeck: string[];
     usurper: string | null;

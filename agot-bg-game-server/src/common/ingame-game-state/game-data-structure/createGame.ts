@@ -615,17 +615,22 @@ export function applyChangesForDragonWar(ingame: IngameGameState): void {
         region.units.set(newDragon.id, newDragon);
     }
 
-    if (game.dragonStrengthTokens.length == 0) {
-        game.dragonStrengthTokens = ingame.entireGame.isDanceWithDragons
-            ? [2, 4, 5, 6]
-            : [2, 4, 6, 8, 10];
-    }
+    ensureDragonStrengthTokensArePresent(ingame);
 
     nervHouseCard(game, "balon-greyjoy", "jaqen-h-ghar");
     nervHouseCard(game, "aeron-damphair-dwd", "aeron-damphair");
 
     game.world.regions.values.filter(r => r.superControlPowerToken != null && r.garrison == 4).forEach(r => r.garrison = 6);
     game.world.regions.values.filter(r => r.superControlPowerToken != null && r.garrison == 2).forEach(r => r.garrison = 4);
+}
+
+export function ensureDragonStrengthTokensArePresent(ingame: IngameGameState): void {
+    const game = ingame.game;
+    if (game.dragonStrengthTokens.length == 0) {
+        game.dragonStrengthTokens = ingame.game.maxTurns == 6
+            ? [2, 4, 5, 6]
+            : [2, 4, 6, 8, 10];
+    }
 }
 
 function findUnitToReplace(ingame: IngameGameState, house: House, unitType: string): Unit | null {

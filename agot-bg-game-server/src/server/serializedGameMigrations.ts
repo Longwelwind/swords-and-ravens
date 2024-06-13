@@ -2222,6 +2222,25 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "116",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                ingame.game.removedDragonStrengthTokens = [];
+
+                if (ingame.game.removedDragonStrengthToken > 0) {
+                    ingame.game.removedDragonStrengthTokens = [ingame.game.removedDragonStrengthToken];
+                }
+
+                if (ingame.game.maxTurns == 6 && ingame.game.dragonStrengthTokens.length > 0) {
+                    ingame.game.removedDragonStrengthTokens.push(10);
+                }
+            }
+            return serializedGame;
+        }
     }
 ];
 
