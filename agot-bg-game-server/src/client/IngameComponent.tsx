@@ -31,6 +31,7 @@ import Tooltip from "react-bootstrap/Tooltip";
 import cancelImage from "../../public/images/icons/cancel.svg";
 import truceImage from "../../public/images/icons/truce.svg";
 import stopwatchPlus15Image from "../../public/images/icons/stopwatch-plus-15.svg";
+import stopwatchImage from "../../public/images/icons/stopwatch.svg";
 import pauseImage from "../../public/images/icons/pause-button.svg";
 import playImage from "../../public/images/icons/play-button.svg";
 import stoneThroneImage from "../../public/images/icons/stone-throne.svg";
@@ -1593,6 +1594,40 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
         this.ingame.onLogReceived = log => {
             this.gameClient.sfxManager.playSoundForLogEvent(log);
+        };
+
+        this.ingame.onGamePaused = () => {
+            toast(<div>
+                <Card>
+                    <Card.Body className="d-flex align-items-center">
+                        <img src={stopwatchImage} width={64} />
+                        <h4 className="d-inline ml-3" style={{ color: "white" }}>
+                            Game has been paused!
+                        </h4>
+                    </Card.Body>
+                </Card>
+            </div>, {
+                autoClose: 3000,
+                toastId: "game-paused-toast",
+                theme: "light"
+            });
+        };
+
+        this.ingame.onGameResumed = () => {
+            toast(<div>
+                <Card>
+                    <Card.Body className="d-flex align-items-center">
+                        <img src={stopwatchImage} width={64} />
+                        <h4 className="d-inline ml-3" style={{ color: "white" }}>
+                            Game has resumed!
+                        </h4>
+                    </Card.Body>
+                </Card>
+            </div>, {
+                autoClose: 3000,
+                toastId: "game-paused-toast",
+                theme: "light"
+            });
         };
 
         if (this.gameClient.authenticatedUser?.note.length ?? 0 > 0) {

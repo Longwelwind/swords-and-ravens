@@ -96,6 +96,8 @@ export default class IngameGameState extends GameState<
     onVoteStarted: (() => void) | null = null;
     onPreemptiveRaidNewAttack: ((biddings: [number, House[]][], highestBidder: House) => void) | null = null;
     onLogReceived: ((log: GameLogData) => void) | null = null;
+    onGamePaused: (() => void) | null = null;
+    onGameResumed: (() => void) | null = null;
 
     get entireGame(): EntireGame {
         return this.parentGameState;
@@ -1454,9 +1456,13 @@ export default class IngameGameState extends GameState<
             if (message.willBeAutoResumedAt) {
                 this.willBeAutoResumedAt = new Date(message.willBeAutoResumedAt);
             }
+
+            if (this.onGamePaused) this.onGamePaused();
         } else if (message.type == "game-resumed") {
             this.paused = null;
             this.willBeAutoResumedAt = null;
+
+            if (this.onGameResumed) this.onGameResumed();
         } else if (message.type == "preemptive-raid-new-attack" && this.onPreemptiveRaidNewAttack) {
             // Todo: Handle this in WildlingAttackGameState
             const biddings = message.biddings.map(([bid, hids]) =>
