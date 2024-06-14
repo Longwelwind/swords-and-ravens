@@ -2257,6 +2257,18 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "117",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame" && serializedGame.gameSettings.dragonWar) {
+                const kingsLanding = serializedGame.childGameState.game.world.regions.find((sr: any) => sr.id == "kings-landing");
+                if (kingsLanding && kingsLanding.garrison == 5) {
+                    kingsLanding.garrison = 3;
+                }
+            }
+            return serializedGame;
+        }
     }
 ];
 

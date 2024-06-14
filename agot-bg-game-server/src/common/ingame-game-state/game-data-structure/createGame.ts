@@ -626,6 +626,8 @@ export function applyChangesForDragonWar(ingame: IngameGameState): void {
 
     game.world.regions.values.filter(r => r.superControlPowerToken != null && r.garrison == 4).forEach(r => r.garrison = 6);
     game.world.regions.values.filter(r => r.superControlPowerToken != null && r.garrison == 2).forEach(r => r.garrison = 4);
+
+    game.world.regions.get("kings-landing").garrison = 3;
 }
 
 export function ensureDragonStrengthTokensArePresent(ingame: IngameGameState): void {
