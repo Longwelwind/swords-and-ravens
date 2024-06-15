@@ -14,10 +14,11 @@ import facelessMenNames from "../../data/facelessMenNames.json";
 import popRandom from "../utils/popRandom";
 //import { SerializedEntireGame } from "../common/EntireGame";
 
-function replaceHouseCard(deck: [string, any][], idToRemove: string, cardToAdd: [string, any]): void {
-    deck = deck.filter(([id, _shc]) => id != idToRemove);
-    deck.push(cardToAdd);
-    deck.sort(([_id, shc]) => shc.combatStrength);
+function replaceHouseCard(deck: [string, any][], idToRemove: string, cardToAdd: [string, any]): [string, any][] {
+    const result = deck.filter(([id, _shc]) => id != idToRemove);
+    result.push(cardToAdd);
+    result.sort(([_id, shc]) => shc.combatStrength);
+    return result;
 }
 
 const serializedGameMigrations: {version: string; migrate: (serializeGamed: any) => any}[] = [
@@ -2252,11 +2253,11 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                         const aeron = h.houseCards.find(([id, shc]: any) => id == "aeron-damphair-dwd" && shc.id == "aeron-damphair-dwd-nerved");
 
                         if (balon) {
-                            replaceHouseCard(h.houseCards, "balon-greyjoy", balon);
+                            h.houseCards = replaceHouseCard(h.houseCards, "balon-greyjoy", balon);
                         }
 
                         if (aeron) {
-                            replaceHouseCard(h.houseCards, "aeron-damphair-dwd", aeron);
+                            h.houseCards = replaceHouseCard(h.houseCards, "aeron-damphair-dwd", aeron);
                         }
                     });
                 }
@@ -2271,25 +2272,28 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                 const ingame = serializedGame.childGameState;
 
                 ingame.game.houses.forEach((h: any) => {
-                    applyMigrations(h.houseCards);
+                    h.houseCards = applyMigrations(h.houseCards);
                  });
 
-                 applyMigrations(ingame.game.draftableHouseCards);
+                 ingame.game.draftableHouseCards = applyMigrations(ingame.game.draftableHouseCards);
             }
             return serializedGame;
 
-            function applyMigrations(houseCards: any): void {
-                const aeronDwdNerfed = houseCards.find(([id, _shc]: any) => id == "aeron-damphair-dwd-nerved");
+            function applyMigrations(houseCards: [string, any][]): [string, any][] {
+                let result = [...houseCards];
+                const aeronDwdNerfed = result.find(([id, _shc]: any) => id == "aeron-damphair-dwd-nerved");
                 if (aeronDwdNerfed) {
                     aeronDwdNerfed[1].abilityId = "quentyn-martell";
-                    replaceHouseCard(houseCards, "aeron-damphair-dwd-nerved", aeronDwdNerfed);
+                    result = replaceHouseCard(result, "aeron-damphair-dwd-nerved", aeronDwdNerfed);
                 }
 
                 // Fix typo in nerfed:
-                houseCards.filter(([id, _shc]: any) => id.endsWith("-nerved")).forEach(([id, shc]: any) => {
+                result.filter(([id, _shc]: any) => id.endsWith("-nerved")).forEach(([id, shc]: any) => {
                     shc.id = shc.id.replace("-nerved", "-nerfed");
-                    replaceHouseCard(houseCards, id, [shc.id, shc]);
+                    result = replaceHouseCard(result, id, [shc.id, shc]);
                 });
+
+                return result;
             }
         }
     }
