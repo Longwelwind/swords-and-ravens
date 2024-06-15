@@ -28,6 +28,44 @@ logger = logging.getLogger(__name__)
 def index(request):
     posts = [
         {
+            "title": "Victory Proclaimed: Triumphs in the Realm",
+            "content": """
+            <p>Lords and ladies,</p>
+
+            <p>Sorry for the radio silence since Longwelwind stepped back from development. I just couldn't find the muse to write until now.</p>
+
+            <p>I've got some exciting updates to share. I've been busy behind the scenes, and I&apos;m thrilled to announce that all three&nbsp;official&nbsp;expansions&nbsp;—&nbsp;<b>
+            Dance with Dragons</b>, <b>Feast for Crows</b> and <b>Mother of Dragons</b>&nbsp;—&nbsp;are now fully integrated into the platform!&nbsp;🎉 But that's not all;
+            I&apos;ve also added a bunch of custom variants to keep your games fresh and exciting.</p>
+
+            <p>One of the coolest new features is the <b>Dragon War</b> mode, where each house starts with their very own dragon.
+            This is sure to add a fiery twist to your strategies.</p>
+
+            <p>In addition to these expansions, we&apos;ve rolled out several fundamental features to enhance your gaming experience:</p>
+
+            <ul>
+                <li><b>Modular Integration of MoD Elements:</b> You can now enjoy elements from Mother of Dragons like the Iron Bank in any scenario, even
+                without the Essos side board.</li>
+                <li><b>Draft House Cards:</b> A fan-favorite that lets you draft house cards and influence positions before the game begins, adding
+                a strategic layer from the start.</li>
+                <li><b>Live Game Clock:</b> Keep the game moving with timed turns, just like in chess.</li>
+                <li><b>Ingame Replacement by Vote:</b> Seamlessly replace players during ongoing games.</li>
+                <li><b>Vassal System as a Player Elimination Mechanic:</b> Available in every game, this is the official solution for handling players
+                who leave or can be considered eliminated in live games.</li>
+                <li><b>Animations, Sound, and Ingame Music:</b> Special thanks to <b><a href="https://liliannecoeverden.com/" target="_blank" style="color: white">Lilianne Coeverden</a></b> for contributing the sounds for the 8 houses.</li>
+                <li><b>Many More Fun Variants:</b> Explore exciting options like House Card Evolution, Blind Draft, and more.</li>
+            </ul>
+
+            <p>Thanks for your patience and continued support. Enjoy crossing swords and mastering ravens!</p>
+
+            <p>Happy gaming,<br>
+            Gereon</p>
+
+            <img src="/static/ingame-screenshot.png" style="max-width: 100%; height: auto;">
+        """,
+            "created_at": date(day=15, month=6, year=2024)
+        },
+        {
             "title": "An update on Swords and Ravens",
             "content": """
             <p>
@@ -71,14 +109,14 @@ def index(request):
                 The game also evolved a lot since launch: variants for games with less than 6 players have
                 appeared, a forum has been added to discuss everything about the game, a lot of UI improvements
                 were made and a ton of bugs have been squashed. Around 800 commits were made on the codebase,
-                available on <a href="https://github.com/Longwelwind/swords-and-ravens">GitHub</a>, some of
-                them done by <a href="https://github.com/Longwelwind/swords-and-ravens/graphs/contributors">external
+                available on <a href="https://github.com/Longwelwind/swords-and-ravens" target="_blank">GitHub</a>, some of
+                them done by <a href="https://github.com/Longwelwind/swords-and-ravens/graphs/contributors" target="_blank">external
                 contributors</a>. All the changes done can be found
-                in <a href="https://community.swordsandravens.net/viewtopic.php?f=4&t=7">the changelog</a>.
+                in <a href="https://community.swordsandravens.net/viewtopic.php?f=4&t=7" target="_blank">the changelog</a>.
             </p>
 
             <p>
-                The <a href="https://community.swordsandravens.net">forum</a> has been launched, to discuss
+                The <a href="https://community.swordsandravens.net" target="_blank">forum</a> has been launched, to discuss
                 everything related to the game and the development of Swords and Ravens, don't hesitate to check
                 it out!
             </p>
@@ -101,18 +139,18 @@ def index(request):
             "title": "Welcome to Swords and Ravens!",
             "content": """
                 <p>
-                    <strong>Swords and Ravens</strong> is a platform to play the board game "A Game of Thrones:
+                    <b>Swords and Ravens</b> is a platform to play the board game "A Game of Thrones:
                     Board Game - Second Edition", edited by Fantasy Flight Games, online with players around the world!
                 </p>
                 <p>
                     At the moment, this website only features the base game. Extensions (with
-                    <strong>Mother of Dragons</strong>) are currently planned to be implemented.
+                    <b>Mother of Dragons</b>) are currently planned to be implemented.
                 </p>
                 <p>
                     Feedbacks, bug reports and other remarks can also be posted on
-                    the <a href="https://discord.gg/wWgCdvM">Discord</a>!
+                    the <a href="https://discord.gg/wWgCdvM" target="_blank">Discord</a>!
                     The source code can be found
-                    on <a href="https://github.com/Longwelwind/swords-and-ravens">the Github of the project</a>.
+                    on <a href="https://github.com/Longwelwind/swords-and-ravens" target="_blank">the Github of the project</a>.
                 </p>
             """,
             "created_at": date(day=14, month=3, year=2020)

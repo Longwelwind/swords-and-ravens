@@ -4,12 +4,26 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col col-sm-6 offset-sm-6 col-lg-3 offset-lg-7">
-        <div class="card mb-4">
-                <div class="card-body">
-                    <b>{{ active_games_count }}</b> active games
+    <div class="col col-sm-12 col-lg-10">
+        <div class="row justify-content-between">
+            <div class="col col-auto">
+                <div class="card mb-4">
+                    <div class="card-body d-flex align-items-center">
+                        <span class="mr-2">Join us on</span>
+                        <a href="https://discord.gg/wWgCdvM" target="_blank" class="d-flex align-items-center">
+                            <h4 class="fab fa-discord m-0"></h4>
+                        </a>
+                    </div>
                 </div>
             </div>
+            <div class="col col-auto">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <b>{{ active_games_count }}</b> active games
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="col col-sm-12 col-lg-10">
         {% for post in posts %}
