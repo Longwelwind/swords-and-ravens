@@ -2239,7 +2239,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                     ingame.game.removedDragonStrengthTokens.push(10);
                 }
 
-                // Fix wrong id for players house cards map with nerved cards
+                // Fix wrong id for players house cards map with nerfed cards
                 if (serializedGame.gameSettings.dragonWar) {
                     ingame.game.houses.forEach((h: any) => {
                         const balon = h.houseCards.find(([id, shc]: any) => id == "balon-greyjoy" && shc.id == "balon-greyjoy-nerved");
@@ -2253,6 +2253,23 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                             aeron[0] = "aeron-damphair-dwd-nerved";
                         }
                     });
+                }
+            }
+            return serializedGame;
+        }
+    },
+    {
+        version: "117",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                const houseCards = _.flatMap(ingame.game.houses.map((h: any) => h.houseCards));
+                houseCards.push(...ingame.game.draftableHouseCards);
+
+                const aeronDwdNerfed: any = houseCards.find(([id, _shc]: any) => id == "aeron-damphair-dwd-nerved");
+                if (aeronDwdNerfed) {
+                    aeronDwdNerfed[1].abilityId = "quentyn-martell";
                 }
             }
             return serializedGame;
