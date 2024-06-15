@@ -2276,6 +2276,8 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                  });
 
                  ingame.game.draftableHouseCards = applyMigrations(ingame.game.draftableHouseCards);
+
+                 traverseAndFixNerfedTypo(ingame.gameLogManager.logs);
             }
             return serializedGame;
 
@@ -2294,6 +2296,30 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                 });
 
                 return result;
+            }
+
+            function fixNerfedTypo(value: string): string {
+                return value.replace("-nerved", "-nerfed");
+            }
+
+            function traverseAndFixNerfedTypo(obj: object | any[]): void {
+                if (Array.isArray(obj)) {
+                    for (let i = 0; i < obj.length; i++) {
+                        if (typeof obj[i] === "object" && obj[i] !== null) {
+                            traverseAndFixNerfedTypo(obj[i]);
+                        } else if (typeof obj[i] === "string") {
+                            obj[i] = fixNerfedTypo(obj[i]);
+                        }
+                    }
+                } else if (typeof obj === "object" && obj !== null) {
+                    for (const key in obj) {
+                        if (typeof (obj as any)[key] === "object" && (obj as any)[key] !== null) {
+                            traverseAndFixNerfedTypo((obj as any)[key]);
+                        } else if (typeof (obj as any)[key] === "string") {
+                            (obj as any)[key] = fixNerfedTypo((obj as any)[key]);
+                        }
+                    }
+                }
             }
         }
     }
