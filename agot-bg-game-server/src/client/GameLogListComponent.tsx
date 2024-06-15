@@ -98,13 +98,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         });
     }
 
-    createNervedHouseCards(): [string, HouseCard][] {
-        const balonNerved = createHouseCard("balon-greyjoy-nerved", { name: "Balon Greyjoy", combatStrength: 2, ability: "jaqen-h-ghar" }, "greyjoy");
-        const aeronDwdNerved = createHouseCard("aeron-damphair-dwd-nerved", { name: "Aeron Damphair", ability: "aeron-damphair" }, "greyjoy");
+    createNerfedHouseCards(): [string, HouseCard][] {
+        const balonNerfed = createHouseCard("balon-greyjoy-nerfed", { name: "Balon Greyjoy", combatStrength: 2, ability: "jaqen-h-ghar" }, "greyjoy");
+        const aeronDwdNerfed = createHouseCard("aeron-damphair-dwd-nerfed", { name: "Aeron Damphair", ability: "quentyn-martell" }, "greyjoy");
 
         return [
-            [balonNerved.id, balonNerved],
-            [aeronDwdNerved.id, aeronDwdNerved]
+            [balonNerfed.id, balonNerfed],
+            [aeronDwdNerfed.id, aeronDwdNerfed]
         ];
     }
 
@@ -116,7 +116,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             this.createHouseCards(modBHouseCardsData),
             this.createHouseCards(asosHouseCardsData),
             this.game.vassalHouseCards.entries,
-            this.createNervedHouseCards());
+            this.createNerfedHouseCards());
     }
 
     render(): ReactNode {

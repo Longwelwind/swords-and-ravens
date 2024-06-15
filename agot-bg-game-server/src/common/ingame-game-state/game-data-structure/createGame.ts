@@ -621,8 +621,8 @@ export function applyChangesForDragonWar(ingame: IngameGameState): void {
 
     ensureDragonStrengthTokensArePresent(ingame);
 
-    nervHouseCard(game, "balon-greyjoy", "jaqen-h-ghar");
-    nervHouseCard(game, "aeron-damphair-dwd", "aeron-damphair");
+    nerfHouseCard(game, "balon-greyjoy", "jaqen-h-ghar");
+    nerfHouseCard(game, "aeron-damphair-dwd", "quentyn-martell");
 
     game.world.regions.values.filter(r => r.superControlPowerToken != null && r.garrison == 4).forEach(r => r.garrison = 6);
     game.world.regions.values.filter(r => r.superControlPowerToken != null && r.garrison == 2).forEach(r => r.garrison = 4);
@@ -647,25 +647,24 @@ function findUnitToReplace(ingame: IngameGameState, house: House, unitType: stri
         : pickRandom(ingame.world.getUnitsOfHouse(house).filter(u => u.type.id == unitType));
 }
 
-function nervHouseCard(game: Game, hcId: string, newAbilityId: string): void {
+function nerfHouseCard(game: Game, hcId: string, newAbilityId: string): void {
     const houseCard = game.draftableHouseCards.has(hcId)
         ? game.draftableHouseCards.get(hcId)
         : _.flatMap(game.houses.values.map(h => h.houseCards.values)).find(hc => hc.id == hcId);
 
     if (houseCard) {
-        const originalId = houseCard.id;
-        houseCard.id = hcId + "-nerved";
+        houseCard.id = hcId + "-nerfed";
         houseCard.ability = houseCardAbilities.get(newAbilityId);
 
-        const house = game.houses.values.find(h => h.houseCards.has(originalId));
+        const house = game.houses.values.find(h => h.houseCards.has(hcId));
         if (house) {
-            house.houseCards.delete(originalId);
+            house.houseCards.delete(hcId);
             house.houseCards.set(houseCard.id, houseCard);
         }
 
         if (game.draftableHouseCards.has(hcId)) {
             game.draftableHouseCards.delete(hcId);
-            game.draftableHouseCards.set(hcId + "-nerved", houseCard);
+            game.draftableHouseCards.set(houseCard.id, houseCard);
         }
     }
 }

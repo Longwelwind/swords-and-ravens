@@ -5,7 +5,7 @@ import aeroImage from "../../public/images/house-cards/Areo.png";
 import arianneImage from "../../public/images/house-cards/Arianne.png";
 import ashaImage from "../../public/images/house-cards/Asha.png";
 import balonImage from "../../public/images/house-cards/Balon.png";
-import balonNervedImage from "../../public/images/house-cards/Balon-nerved.png";
+import balonNerfedImage from "../../public/images/house-cards/Balon-nerfed.png";
 import blackfishImage from "../../public/images/house-cards/Blackfish.png";
 import brienneImage from "../../public/images/house-cards/Brienne.png";
 import catelynImage from "../../public/images/house-cards/Catelyn.png";
@@ -48,7 +48,7 @@ import melisandreDwDImage from "../../public/images/house-cards/Melisandre_DwD.p
 import jonSnow from "../../public/images/house-cards/JonSnow.png";
 import stannisDwDImage from "../../public/images/house-cards/StannisBaratheonDwD.png";
 import aeronDwDImage from "../../public/images/house-cards/AeronDamphairDwD.png";
-import aeronDwDNervedImage from "../../public/images/house-cards/AeronDamphairDwD-nerved.png";
+import aeronDwDNerfedImage from "../../public/images/house-cards/AeronDamphairDwD-nerfed.png";
 import qarlTheMaidImage from "../../public/images/house-cards/QarlTheMaid.png";
 import rodrikTheReaderImage from "../../public/images/house-cards/RodrikTheReader.png";
 import euronDwDImage from "../../public/images/house-cards/EuronCrowsEye.png";
@@ -175,7 +175,7 @@ const houseCardImages = new BetterMap([
     ["areo-hotah", aeroImage],
     ["asha-greyjoy", ashaImage],
     ["balon-greyjoy", balonImage],
-    ["balon-greyjoy-nerved", balonNervedImage],
+    ["balon-greyjoy-nerfed", balonNerfedImage],
     ["the-blackfish", blackfishImage],
     ["brienne-of-tarth", brienneImage],
     ["catelyn-stark", catelynImage],
@@ -217,7 +217,7 @@ const houseCardImages = new BetterMap([
     ["jon-snow", jonSnow],
     ["stannis-baratheon-dwd", stannisDwDImage],
     ["aeron-damphair-dwd", aeronDwDImage],
-    ["aeron-damphair-dwd-nerved", aeronDwDNervedImage],
+    ["aeron-damphair-dwd-nerfed", aeronDwDNerfedImage],
     ["qarl-the-maid", qarlTheMaidImage],
     ["rodrik-the-reader", rodrikTheReaderImage],
     ["euron-crows-eye-dwd", euronDwDImage],
