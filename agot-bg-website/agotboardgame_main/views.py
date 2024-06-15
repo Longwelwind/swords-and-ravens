@@ -60,9 +60,12 @@ def index(request):
 
             <p>Happy gaming,<br>
             Gereon</p>
-
-            <img src="/static/ingame-screenshot.png" style="max-width: 100%; height: auto;">
         """,
+            "created_at": date(day=15, month=6, year=2024)
+        },
+        {
+            "title": "ingame-screenshot",
+            "content": "",
             "created_at": date(day=15, month=6, year=2024)
         },
         {
