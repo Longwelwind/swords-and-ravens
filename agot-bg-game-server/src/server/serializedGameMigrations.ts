@@ -2271,6 +2271,12 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                 if (aeronDwdNerfed) {
                     aeronDwdNerfed[1].abilityId = "quentyn-martell";
                 }
+
+                // Fix typo in nerfed:
+                houseCards.filter(([id, _shc]: any) => id.endsWith("-nerved")).forEach((item: any) => {
+                    item[0] = item[0].replace("-nerved", "-nerfed");
+                    item[1].id = item[0];
+                });
             }
             return serializedGame;
         }
