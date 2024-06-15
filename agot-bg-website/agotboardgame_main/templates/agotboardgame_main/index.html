@@ -29,9 +29,13 @@
         {% for post in posts %}
             <div class="card mb-4">
                 <div class="card-body">
-                    <h3 class="card-title">{{ post.title }}</h3>
-                    <h6 class="card-subtitle mb-3 text-muted">{{ post.created_at | date:"d F Y" }}</h6>
-                    {{ post.content | safe }}
+                    {% if post.title != "ingame-screenshot" %}
+                        <h3 class="card-title">{{ post.title }}</h3>
+                        <h6 class="card-subtitle mb-3 text-muted">{{ post.created_at | date:"d F Y" }}</h6>
+                        {{ post.content | safe }}
+                    {% else %}
+                        <img class="w-100" src="{% static 'ingame-screenshot.png' %}">
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}
