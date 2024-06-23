@@ -1,5 +1,6 @@
 import PlayerMusteringGameState, {
     Mustering,
+    MusteringRule,
     PlayerMusteringType
 } from "../../common/ingame-game-state/westeros-game-state/mustering-game-state/player-mustering-game-state/PlayerMusteringGameState";
 import {observer} from "mobx-react";
@@ -18,9 +19,10 @@ import PartialRecursive from "../../utils/PartialRecursive";
 import Unit from "../../common/ingame-game-state/game-data-structure/Unit";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import { renderRegionTooltip } from "../regionTooltip";
-import { faInfo } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight, faInfo } from "@fortawesome/free-solid-svg-icons";
 import { preventOverflow } from "@popperjs/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import UnitIconComponent from "../UnitIconComponent";
 
 @observer
 export default class PlayerMusteringComponent extends Component<GameStateComponentProps<PlayerMusteringGameState>> {
@@ -243,15 +245,15 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                     </OverlayTrigger>
                 </Col>
             </Row>
-            <Row>
+            <Row className="justify-content-center">
                 <>
                     {this.props.gameState.getValidMusteringRulesForRegion(modifiedRegion, this.musterings).length > 0 && (
                         <>
-                            {this.props.gameState.getValidMusteringRules(modifiedRegion, this.musterings).map(({ region, rules }) => (
+                            {this.props.gameState.getValidMusteringRules(modifiedRegion, this.musterings).map(({ rules }) => (
                                 rules.map((rule, i) => (
-                                    <Col xs={12} key={modifiedRegion.id + "_muster-rule_" + i}>
+                                    <Col xs="auto" key={modifiedRegion.id + "_muster-rule_" + i}>
                                         <Button type="button" onClick={() => this.addMustering(modifiedRegion, rule)}>
-                                            {rule.from ? "Upgrade to " : "Recruit "} a {rule.to.name}{region != modifiedRegion && (" in " + region.name)} [{rule.cost}]
+                                            {this.renderMusteringButton(modifiedRegion, rule)}
                                         </Button>
                                     </Col>
                                 ))
@@ -261,6 +263,24 @@ export default class PlayerMusteringComponent extends Component<GameStateCompone
                 </>
             </Row>
         </Popover>;
+    }
+
+    renderMusteringButton(initiatingRegion: Region, rule: MusteringRule): React.ReactNode {
+        return <div className="d-flex flex-nowrap overflow-x-auto">
+            {rule.from != null &&
+            <>
+                <UnitIconComponent house={this.house} unitType={rule.from.type}/>
+                <FontAwesomeIcon icon={faArrowRight} size="2x"/>
+            </>}
+            <UnitIconComponent house={this.house} unitType={rule.to}/>
+            {initiatingRegion != rule.region &&
+            <>
+                &nbsp;to&nbsp;<b>{rule.region.name}</b>
+            </>}
+            <>
+                <small style={{position: "absolute", bottom: 6, right: 10 }}>{rule.cost}</small>
+            </>
+        </div>;
     }
 
     private modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {

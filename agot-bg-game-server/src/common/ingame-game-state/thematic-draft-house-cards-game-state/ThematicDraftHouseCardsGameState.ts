@@ -120,7 +120,7 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
                     houseCards: []
                 });
 
-                this.ingame.onDraftingFinish();
+                this.ingame.onDraftHouseCardsFinish();
             }
         }
     }

@@ -2322,6 +2322,16 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                 }
             }
         }
+    },
+    {
+        version: "118",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.game.draftMapRegionsPerHouse = [];
+            }
+            return serializedGame;
+        }
     }
 ];
 

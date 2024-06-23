@@ -11,7 +11,7 @@ import ActionGameState, {SerializedActionGameState} from "./action-game-state/Ac
 import Order from "./game-data-structure/Order";
 import Game, {SerializedGame} from "./game-data-structure/Game";
 import WesterosGameState, {SerializedWesterosGameState} from "./westeros-game-state/WesterosGameState";
-import createGame, { applyChangesForDanceWithMotherOfDragons, applyChangesForDragonWar, ensureDragonStrengthTokensArePresent } from "./game-data-structure/createGame";
+import createGame, { applyCustomizationsOnCreatedGame } from "./game-data-structure/createGame";
 import BetterMap from "../../utils/BetterMap";
 import House from "./game-data-structure/House";
 import Unit from "./game-data-structure/Unit";
@@ -48,6 +48,7 @@ import houseCardAbilities from "./game-data-structure/house-card/houseCardAbilit
 import SnrError from "../../utils/snrError";
 import { TakeOverPort, findOrphanedShipsAndDestroyThem, isTakeControlOfEnemyPortRequired } from "./port-helper/PortHelper";
 import { dragon } from "./game-data-structure/unitTypes";
+import DraftGameState, { SerializedDraftGameState } from "./draft-game-state/DraftGameState";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -64,8 +65,8 @@ export interface UnitLossConsequence {
 export default class IngameGameState extends GameState<
     EntireGame,
     WesterosGameState | PlanningGameState | ActionGameState | CancelledGameState | GameEndedGameState
-    | DraftHouseCardsGameState | ThematicDraftHouseCardsGameState | PayDebtsGameState
-    | ChooseInitialObjectivesGameState
+    | DraftHouseCardsGameState | ThematicDraftHouseCardsGameState | DraftGameState
+    | PayDebtsGameState | ChooseInitialObjectivesGameState
 > {
     players: BetterMap<User, Player> = new BetterMap();
     oldPlayerIds: string[] = [];
@@ -131,13 +132,6 @@ export default class IngameGameState extends GameState<
         return this.entireGame.gameSettings.fogOfWar;
     }
 
-    get isDragonGame(): boolean {
-        return this.entireGame.gameSettings.playerCount == 8 ||
-            this.entireGame.gameSettings.dragonWar ||
-            (this.entireGame.gameSettings.dragonRevenge
-                && _.some(_.flatMap(this.world.regions.values.map(r => r.units.values)), u => u.type.id == "dragon"));
-    }
-
     constructor(entireGame: EntireGame) {
         super(entireGame);
 
@@ -158,23 +152,7 @@ export default class IngameGameState extends GameState<
             this.players.values.forEach(p => this.visibleRegionsPerPlayer.set(p, this.calculateVisibleRegionsForPlayer(p)));
         }
 
-        if (this.entireGame.isDanceWithMotherOfDragons) {
-            applyChangesForDanceWithMotherOfDragons(this);
-        }
-
-        if (this.entireGame.gameSettings.dragonWar) {
-            applyChangesForDragonWar(this);
-        }
-
-        if (this.entireGame.gameSettings.dragonRevenge) {
-            ensureDragonStrengthTokensArePresent(this);
-        }
-
-        if (this.game.dragonStrengthTokens.length == 4) {
-            // If the dragons will only raise in 4 rounds instead of 5 (6 round only scenarios)
-            // we push one dummy token from round 10 to removed tokens for correct calculation.
-            this.game.removedDragonStrengthTokens.push(10);
-        }
+        applyCustomizationsOnCreatedGame(this);
 
         if (this.entireGame.gameSettings.onlyLive) {
             this.players.values.forEach(p => p.liveClockData = {
@@ -197,7 +175,9 @@ export default class IngameGameState extends GameState<
             assignments: futurePlayers.map((house, user) => [house, user.id]) as [string, string][]
         });
 
-        if (this.entireGame.gameSettings.draftHouseCards) {
+        if (this.entireGame.gameSettings.draftMap) {
+            this.beginDraftMap();
+        } else if (this.entireGame.gameSettings.draftHouseCards) {
             this.beginDraftingHouseCards();
         } else if (this.entireGame.isFeastForCrows) {
             this.chooseObjectives();
@@ -220,6 +200,10 @@ export default class IngameGameState extends GameState<
 
     onChooseInitialObjectivesGameStateEnd(): void {
         this.beginNewRound();
+    }
+
+    beginDraftMap(): void {
+        this.setChildGameState(new DraftGameState(this)).firstStart();
     }
 
     beginDraftingHouseCards(): void {
@@ -247,7 +231,7 @@ export default class IngameGameState extends GameState<
                 this.setInfluenceTrack(2, this.getRandomInitialInfluenceTrack(this.game.valyrianSteelBladeHolder));
             } while (this.hasAnyHouseTooMuchDominanceTokens());
 
-            this.onDraftingFinish();
+            this.onDraftHouseCardsFinish();
         } else {
             this.setChildGameState(new DraftHouseCardsGameState(this)).firstStart();
         }
@@ -330,7 +314,17 @@ export default class IngameGameState extends GameState<
         this.gameLogManager.log(data, resolvedAutomatically);
     }
 
-    onDraftingFinish(): void {
+    onDraftMapFinish(): void {
+        if (this.entireGame.gameSettings.draftHouseCards) {
+            this.beginDraftingHouseCards();
+        } else if (this.entireGame.isFeastForCrows) {
+            this.chooseObjectives();
+        } else {
+            this.beginNewRound();
+        }
+    }
+
+    onDraftHouseCardsFinish(): void {
         if (this.entireGame.isFeastForCrows) {
             this.chooseObjectives();
         } else {
@@ -906,7 +900,10 @@ export default class IngameGameState extends GameState<
             // Vassal replacement during drafting would crash the game!
             // It's unlikely to happen, but if it does, let's handle it gracefully by ending the game
             // and declaring the player with the most time remaining the winner ...
-            if (this.hasChildGameState(ThematicDraftHouseCardsGameState) || this.hasChildGameState(DraftHouseCardsGameState)) {
+            if (this.hasChildGameState(ThematicDraftHouseCardsGameState)
+                || this.hasChildGameState(DraftHouseCardsGameState)
+                || this.hasChildGameState(DraftGameState)) // Todo: Refactor Thematic Draft and House Card Draft to be child of this
+            {
                 // Determine winner by finding the one with the most time left. On draw normal tie breaker is applied.
                 const winner = _.orderBy(this.game.getPotentialWinners().filter(h => h != player.house && !this.isVassalHouse(h)),
                     h => this.getControllerOfHouse(h).liveClockData?.remainingSeconds, "desc")[0];
@@ -2079,6 +2076,10 @@ export default class IngameGameState extends GameState<
             if (this.childGameState instanceof ThematicDraftHouseCardsGameState) {
                 return {result: false, reason: "ongoing-house-card-drafting"}
             }
+
+            if (this.childGameState instanceof DraftGameState) {
+                return {result: false, reason: "ongoing-house-card-drafting"}
+            }
         }
 
         const existingVotes = this.votes.values.filter(v => v.state == VoteState.ONGOING && ((!replaceWithVassal && v.type instanceof ReplacePlayer) || v.type instanceof ReplacePlayerByVassal));
@@ -2467,10 +2468,12 @@ export default class IngameGameState extends GameState<
                 return DraftHouseCardsGameState.deserializeFromServer(this, data);
             case "thematic-draft-house-cards":
                 return ThematicDraftHouseCardsGameState.deserializeFromServer(this, data);
+            case "draft":
+                return DraftGameState.deserializeFromServer(this, data);
             case "pay-debts":
                 return PayDebtsGameState.deserializeFromServer(this, data);
             case "choose-initial-objectives":
-                return ChooseInitialObjectivesGameState.deserializeFromServer(this, data);
+                return ChooseInitialObjectivesGameState.deserializeFromServer(this, data)
         }
     }
 }
@@ -2492,7 +2495,7 @@ export interface SerializedIngameGameState {
     willBeAutoResumedAt: number | null;
     bannedUsers: string[];
     childGameState: SerializedPlanningGameState | SerializedActionGameState | SerializedWesterosGameState
-        | SerializedGameEndedGameState | SerializedCancelledGameState | SerializedDraftHouseCardsGameState
-        | SerializedThematicDraftHouseCardsGameState | SerializedPayDebtsGameState
+        | SerializedGameEndedGameState | SerializedCancelledGameState | SerializedPayDebtsGameState
+        | SerializedDraftHouseCardsGameState | SerializedThematicDraftHouseCardsGameState | SerializedDraftGameState
         | SerializedChooseInitialObjectivesGameState;
 }
