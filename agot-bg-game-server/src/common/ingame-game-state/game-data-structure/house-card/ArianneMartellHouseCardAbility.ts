@@ -18,9 +18,18 @@ export default class ArianneMartellHouseCardAbility extends HouseCardAbility {
     }
 
     forcesRetreatOfVictoriousDefender(postCombat: PostCombatGameState, house: House, houseCard: HouseCard): boolean {
-        return houseCard.id == "arianne-martell-asos" &&
+        const result = houseCard.id == "arianne-martell-asos" &&
             postCombat.attacker == house &&
             postCombat.loser == house &&
             Math.abs(postCombat.combat.stats[0].total - postCombat.combat.stats[1].total) <= 2;
+
+        if (result) {
+            postCombat.combat.ingameGameState.log({
+                type: "arianne-martell-force-retreat",
+                house: postCombat.loser.id,
+                enemyHouse: postCombat.winner.id
+            });
+        }
+        return result;
     }
 }

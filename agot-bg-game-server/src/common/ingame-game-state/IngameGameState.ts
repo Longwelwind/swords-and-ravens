@@ -437,19 +437,19 @@ export default class IngameGameState extends GameState<
             type: "new-turn"
         });
 
-        this.publicVisibleRegions = [];
-
-        this.entireGame.users.values.filter(u => u.connected).forEach(u => {
-            this.entireGame.sendMessageToClients([u], {
-                type: "update-public-visible-regions",
-                regionsToMakeVisible: [],
-                ordersToMakeVisible: [],
-                clear: true,
-                applyChangesNow: !this.players.has(u)
+        if (this.fogOfWar) {
+            this.publicVisibleRegions = [];
+            this.entireGame.users.values.filter(u => u.connected).forEach(u => {
+                this.entireGame.sendMessageToClients([u], {
+                    type: "update-public-visible-regions",
+                    regionsToMakeVisible: [],
+                    ordersToMakeVisible: [],
+                    clear: true,
+                    applyChangesNow: !this.players.has(u)
+                });
             });
-        });
-
-        this.updateVisibleRegions(true);
+            this.updateVisibleRegions(true);
+        }
 
         if (this.game.turn > 1) {
             const unpaidInterest = this.game.ironBank?.payInterest() ?? []
@@ -468,13 +468,6 @@ export default class IngameGameState extends GameState<
     }
 
     onPayDebtsGameStateFinish(): void {
-        // The decider may remove a unit in an enemy home town.
-        // If the enemy regains this castle, he might win the game.
-        if (this.checkVictoryConditions()) {
-            return;
-        }
-
-        this.updateVisibleRegions(true);
         this.setChildGameState(new WesterosGameState(this)).firstStart();
     }
 
@@ -1148,7 +1141,7 @@ export default class IngameGameState extends GameState<
     }
 
     // returns true, if game is over and calling state needs to exit from processing
-    processPossibleConsequencesOfUnitLoss(): UnitLossConsequence {
+    processPossibleConsequencesOfUnitLossAndCheckWinningConditions(): UnitLossConsequence {
         // Check for last unit in dragon revenge
         if (this.entireGame.gameSettings.dragonRevenge) {
             for (const house of this.game.houses.values) {
@@ -1202,6 +1195,8 @@ export default class IngameGameState extends GameState<
         if (this.checkVictoryConditions()) {
             return { victoryConditionsFulfilled: true };
         }
+
+        this.updateVisibleRegions(true);
 
         return { };
     }
@@ -1725,7 +1720,7 @@ export default class IngameGameState extends GameState<
                     this.entireGame.sendMessageToClients([p.user], {
                         type: "update-visible-regions",
                         playerUserId: p.user.id,
-                        regionsToMakeVisible: makeVisible.map(r => r.serializeToClient(true, null)),
+                        regionsToMakeVisible: makeVisible.map(r => r.serializeToClient(true, p)),
                         regionsToHide: toHide.map(r => r.id),
                         ordersToMakeVisible: makeVisible.filter(r => this.ordersOnBoard.has(r)).map(r => [r.id, this.ordersOnBoard.get(r).id])
                     });
@@ -1813,7 +1808,7 @@ export default class IngameGameState extends GameState<
         return _.uniq(result);
     }
 
-    addPublicVisibleRegions(regions: Region[]): void {
+    addPublicVisibleRegions(...regions: Region[]): void {
         if (this.fogOfWar) {
             const addedRegions = regions.filter(r => !this.publicVisibleRegions.includes(r));
             this.publicVisibleRegions.push(...addedRegions);

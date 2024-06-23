@@ -92,7 +92,7 @@ export default class ResolveMarchOrderGameState extends GameState<
         this.ingameGameState.gainLoyaltyTokens();
 
         // Handle possible unit loss consequences (checks winning condition)
-        const consequence = this.ingame.processPossibleConsequencesOfUnitLoss();
+        const consequence = this.ingame.processPossibleConsequencesOfUnitLossAndCheckWinningConditions();
         if (consequence.victoryConditionsFulfilled) {
             return;
         } else if (consequence.takeOverPort) {

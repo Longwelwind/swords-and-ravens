@@ -821,7 +821,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     All houses, except Targaryen, will replace their starting knight by a dragon. <small><i>
                                     (Inspired by LordWazza)</i></small>
                                 </Tooltip>}>
-                                <label htmlFor="dragon-war-setting">Dragon war</label>
+                                <label htmlFor="dragon-war-setting">Dragon War</label>
                             </OverlayTrigger>}
                         checked={this.gameSettings.dragonWar}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.dragonWar = !this.gameSettings.dragonWar)}
@@ -836,7 +836,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                 <Tooltip id="dragon-revenge-tooltip">
                                     If a player has only one remaining non-dragon land unit and no more castles, it will turn into a dragon.
                                 </Tooltip>}>
-                                <label htmlFor="dragon-revenge-setting">Dragon revenge</label>
+                                <label htmlFor="dragon-revenge-setting">Dragon Revenge</label>
                             </OverlayTrigger>}
                         checked={this.gameSettings.dragonRevenge}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.dragonRevenge = !this.gameSettings.dragonRevenge)}

@@ -86,7 +86,7 @@ export default class ExecuteLoanGameState extends GameState<ResolveConsolidatePo
     }
 
     onExecuteLoanFinish(house: House): void {
-        const consequence = this.ingame.processPossibleConsequencesOfUnitLoss();
+        const consequence = this.ingame.processPossibleConsequencesOfUnitLossAndCheckWinningConditions();
         if (consequence.victoryConditionsFulfilled) {
             return;
         } else if (consequence.takeOverPort) {
