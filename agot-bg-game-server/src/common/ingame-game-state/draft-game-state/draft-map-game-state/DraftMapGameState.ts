@@ -98,15 +98,17 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
         } else if (message.type == "select-units") {
             if (!this.parentGameState.participatingHouses.includes(player.house)) return;
 
-            const unitId = _.flatMap(message.units.map(([_rid, units]) => units));
+            const unitIds = _.flatMap(message.units.map(([_rid, units]) => units));
+            if (unitIds.length != 1) return;
 
-            if (unitId.length != 1) {
-                return;
+            const unitId = unitIds[0];
+            const region = this.world.regions.values.find(r => r.units.has(unitId));
+
+            if (region) {
+                const unit = region.units.get(unitId);
+                this.ingame.broadcastRemoveUnits(unit.region, [unit], true);
+                unit.region.units.delete(unit.id);
             }
-
-            const unit = this.world.getUnitById(unitId[0]);
-            this.ingame.broadcastRemoveUnits(unit.region, [unit], true);
-            unit.region.units.delete(unit.id);
         } else if (message.type == "muster") {
             const house = player.house;
             if (!this.parentGameState.participatingHouses.includes(house)) return;
