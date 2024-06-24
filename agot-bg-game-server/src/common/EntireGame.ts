@@ -51,7 +51,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         addPortToTheEyrie: false, adwdHouseCards: false, asosHouseCards: false, houseCardsEvolution: false,
         vassals: true, ironBank: true, seaOrderTokens: true, allowGiftingPowerTokens: true, randomVassalAssignment: false, customBalancing: false,
         randomHouses: false, randomChosenHouses: false, tidesOfBattle: false, removeTob3: false, removeTobSkulls: false, limitTob2: false,
-        draftHouseCards: false, thematicDraft: false, limitedDraft: false, randomDraft: false, blindDraft: false, selectedDraftDecks: HouseCardDecks.All,
+        draftHouseCards: false, thematicDraft: false, limitedDraft: false, randomDraft: false, blindDraft: false, draftMap: false, selectedDraftDecks: HouseCardDecks.All,
         mixedWesterosDeck1: false, cokWesterosPhase: false, fogOfWar: false, victoryPointsCountNeededToWin: 7, loyaltyTokenCountNeededToWin: 7, endless: false,  faceless: false,
         useVassalPositions: false, precedingMustering: false, randomStartPositions: false, initialLiveClock: 60,
         noPrivateChats: false, tournamentMode: false, fixedClock: false, holdVictoryPointsUntilEndOfRound: false, dragonWar: false, dragonRevenge: false
@@ -620,6 +620,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         const oldPlayerIds = this.entireGame.ingameGameState?.oldPlayerIds ?? [];
         const timeoutPlayerIds = this.entireGame.ingameGameState?.timeoutPlayerIds ?? [];
         const replacerIds = this.entireGame.ingameGameState?.replacerIds ?? [];
+        const isPasswordProtected = this.entireGame.lobbyGameState?.password ? this.entireGame.lobbyGameState.password.length > 0 : false;
 
         return {
             turn,
@@ -632,6 +633,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             oldPlayerIds,
             timeoutPlayerIds,
             replacerIds,
+            isPasswordProtected,
             publicChatRoomId: this.publicChatRoomId
         };
     }
@@ -808,6 +810,7 @@ export interface GameSettings {
     limitedDraft: boolean;
     randomDraft: boolean;
     blindDraft: boolean;
+    draftMap: boolean;
     selectedDraftDecks: HouseCardDecks;
     endless: boolean;
     useVassalPositions: boolean;

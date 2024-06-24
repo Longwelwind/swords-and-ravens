@@ -19,7 +19,7 @@ import IngameGameState from "../../../IngameGameState";
 import User from "../../../../../server/User";
 import groupBy from "../../../../../utils/groupBy";
 
-type MusteringRule = (Mustering & {cost: number});
+export type MusteringRule = (Mustering & {cost: number});
 
 export type Mustering = {from: Unit | null; region: Region; to: UnitType; affectedUnit?: Unit};
 

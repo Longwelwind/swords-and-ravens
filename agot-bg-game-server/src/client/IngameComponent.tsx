@@ -72,10 +72,8 @@ import HouseRowComponent from "./HouseRowComponent";
 import UserSettingsComponent from "./UserSettingsComponent";
 import { GameSettings } from '../common/EntireGame';
 import {isMobile} from 'react-device-detect';
-import DraftHouseCardsGameState from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
-import DraftHouseCardsComponent from "./game-state-panel/DraftHouseCardsComponent";
-import ThematicDraftHouseCardsGameState from "../common/ingame-game-state/thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
-import ThematicDraftHouseCardsComponent from "./game-state-panel/ThematicDraftHouseCardsComponent";
+import DraftHouseCardsGameState from "../common/ingame-game-state/draft-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
+import DraftGameState from "../common/ingame-game-state/draft-game-state/DraftGameState";
 import ClashOfKingsGameState from "../common/ingame-game-state/westeros-game-state/clash-of-kings-game-state/ClashOfKingsGameState";
 import houseCardsBackImages from "./houseCardsBackImages";
 import houseInfluenceImages from "./houseInfluenceImages";
@@ -114,6 +112,9 @@ import LocalStorageService from "./utils/localStorageService";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
 import VolumeSliderComponent from "./utils/VolumeSliderComponent";
 import { houseThemes } from "./utils/SfxManager";
+import DraftComponent from "./game-state-panel/DraftComponent";
+
+
 
 interface ColumnOrders {
     gameStateColumn: number;
@@ -928,8 +929,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     { mapControls: this.mapControls, ...this.props },
                                     _.concat(
                                         phases.map(phase => [phase.gameState, phase.component] as [any, typeof Component]),
-                                        [[ThematicDraftHouseCardsGameState, ThematicDraftHouseCardsComponent]],
-                                        [[DraftHouseCardsGameState, DraftHouseCardsComponent]],
+                                        [[DraftGameState, DraftComponent]],
                                         [[GameEndedGameState, GameEndedComponent]],
                                         [[CancelledGameState, IngameCancelledComponent]],
                                         [[PayDebtsGameState, PayDebtsComponent]],
@@ -979,7 +979,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     </div>
                                 </div>
                             </Row>
-                            {this.ingame.rerender >= 0 && this.ingame.isDragonGame && <Row className="mx-0 mt-3">
+                            {this.ingame.rerender >= 0 && this.game.dragonStrengthTokens.length > 0 &&
+                            <Row className="mx-0 mt-3" onMouseEnter={() => this.highlightRegionsWithDragons()} onMouseLeave={() => this.highlightedRegions.clear()}>
                                 <OverlayTrigger overlay={this.renderDragonStrengthTooltip()}
                                     placement="auto">
                                     <div>
@@ -1267,10 +1268,27 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     highlightRegionsOfHouses(): void {
-        const regions = new BetterMap(this.ingame.world.regions.values.map(r => [r, r.getController()]));
+        const regions = new BetterMap(this.ingame.world.getAllRegionsWithControllers());
         this.highlightedRegions.clear();
 
         regions.entries.forEach(([r, controller]) => {
+            this.highlightedRegions.set(r, {
+                highlight: {
+                    active: controller != null ? true : false,
+                    color: controller?.id != "greyjoy" ? controller?.color ?? "#000000" : "#000000",
+                    light: r.type.id == "sea",
+                    strong: r.type.id == "land"
+                }
+            });
+        });
+    }
+
+    highlightRegionsWithDragons(): void {
+        const regions = this.ingame.world.regions.values.filter(r => r.units.size > 0 && r.units.values.some(u => u.type.id == "dragon"));
+        const map = new BetterMap(regions.map(r => [r, r.getController()]));
+        this.highlightedRegions.clear();
+
+        map.entries.forEach(([r, controller]) => {
             this.highlightedRegions.set(r, {
                 highlight: {
                     active: controller != null ? true : false,

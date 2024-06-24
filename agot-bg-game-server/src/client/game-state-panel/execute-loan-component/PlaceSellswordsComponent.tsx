@@ -14,6 +14,7 @@ import PartialRecursive from "../../../utils/PartialRecursive";
 import Unit from "../../../common/ingame-game-state/game-data-structure/Unit";
 import PlaceSellswordsGameState from "../../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/execute-loan-game-state/place-sellwords-game-state/PlaceSellswordsGameState";
 import UnitType from "../../../common/ingame-game-state/game-data-structure/UnitType";
+import UnitIconComponent from "../../../client/UnitIconComponent";
 
 @observer
 export default class PlaceSellswordsComponent extends Component<GameStateComponentProps<PlaceSellswordsGameState>> {
@@ -138,16 +139,18 @@ export default class PlaceSellswordsComponent extends Component<GameStateCompone
                                     rootClose
                                     overlay={
                                         <Popover id={"region-popover-" + modifiedRegion.id} className="p-2">
-                                            <h5 className="text-center">{modifiedRegion.name}</h5>
-                                            <>
-                                                {this.props.gameState.getValidUnitsForRegion(modifiedRegion, this.placedSellswordTypes).map((ut, i) =>
-                                                    <Col key={modifiedRegion.id + "_sellsword_" + i}>
-                                                        <Button type="button" onClick={() => this.addPlacement(modifiedRegion, ut)}>
-                                                            {ut.name}
-                                                        </Button>
-                                                    </Col>)
-                                                }
-                                            </>
+                                            <Col xs="12">
+                                                <h5 className="text-center">{modifiedRegion.name}</h5>
+                                                <Row className="justify-content-center">
+                                                    {this.props.gameState.getValidUnitsForRegion(modifiedRegion, this.placedSellswordTypes).map((ut, i) =>
+                                                        <Col xs="auto" key={modifiedRegion.id + "_sellsword_" + i}>
+                                                            <Button type="button" onClick={() => this.addPlacement(modifiedRegion, ut)}>
+                                                                <UnitIconComponent house={this.house} unitType={ut} />
+                                                            </Button>
+                                                        </Col>)
+                                                    }
+                                                </Row>
+                                            </Col>
                                         </Popover>
                                     }
                                 >

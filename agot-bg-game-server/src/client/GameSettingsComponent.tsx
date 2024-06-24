@@ -464,6 +464,37 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         onChange={() => this.changeGameSettings(() => this.gameSettings.randomVassalAssignment = !this.gameSettings.randomVassalAssignment)}
                     />
                 </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="dragon-war-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="dragon-war-tooltip">
+                                    All houses, except Targaryen, will replace their starting knight by a dragon. <small><i>
+                                    (Inspired by LordWazza)</i></small>
+                                </Tooltip>}>
+                                <label htmlFor="dragon-war-setting">Dragon War</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.dragonWar}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.dragonWar = !this.gameSettings.dragonWar)}
+                    />
+                </Col>
+                <Col xs="12">
+                    <FormCheck
+                        id="dragon-revenge-setting"
+                        type="switch"
+                        label={
+                            <OverlayTrigger overlay={
+                                <Tooltip id="dragon-revenge-tooltip">
+                                    If a player has only one remaining non-dragon land unit and no more castles, it will turn into a dragon.
+                                </Tooltip>}>
+                                <label htmlFor="dragon-revenge-setting">Dragon Revenge</label>
+                            </OverlayTrigger>}
+                        checked={this.gameSettings.dragonRevenge}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.dragonRevenge = !this.gameSettings.dragonRevenge)}
+                    />
+                </Col>
             </Col>
             <Col xs="6" lg="auto" id="extended-base-settings-col" className="no-gutters">
                 <Col xs="12">
@@ -813,33 +844,21 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 </Col>
                 <Col xs="12">
                     <FormCheck
-                        id="dragon-war-setting"
+                        id="draft-map-setting"
                         type="switch"
                         label={
                             <OverlayTrigger overlay={
-                                <Tooltip id="dragon-war-tooltip">
-                                    All houses, except Targaryen, will replace their starting knight by a dragon. <small><i>
-                                    (Inspired by LordWazza)</i></small>
+                                <Tooltip id="draft-map-tooltip">
+                                    This option allows all players to adjust their starting positions by adding and removing units
+                                    in their territories according to their supply limits before the game begins. The
+                                    game then distributes the unclaimed territories as fairly as possible among all houses. Territories
+                                    with only one neighboring house are assigned to that house, while those with multiple potential neighbors
+                                    remain unassigned. All players must confirm the changes before the game starts.
                                 </Tooltip>}>
-                                <label htmlFor="dragon-war-setting">Dragon War</label>
+                                <label htmlFor="draft-map-setting">Draft Map</label>
                             </OverlayTrigger>}
-                        checked={this.gameSettings.dragonWar}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.dragonWar = !this.gameSettings.dragonWar)}
-                    />
-                </Col>
-                <Col xs="12">
-                    <FormCheck
-                        id="dragon-revenge-setting"
-                        type="switch"
-                        label={
-                            <OverlayTrigger overlay={
-                                <Tooltip id="dragon-revenge-tooltip">
-                                    If a player has only one remaining non-dragon land unit and no more castles, it will turn into a dragon.
-                                </Tooltip>}>
-                                <label htmlFor="dragon-revenge-setting">Dragon Revenge</label>
-                            </OverlayTrigger>}
-                        checked={this.gameSettings.dragonRevenge}
-                        onChange={() => this.changeGameSettings(() => this.gameSettings.dragonRevenge = !this.gameSettings.dragonRevenge)}
+                        checked={this.gameSettings.draftMap}
+                        onChange={() => this.changeGameSettings(() => this.gameSettings.draftMap = !this.gameSettings.draftMap)}
                     />
                 </Col>
             </Col>

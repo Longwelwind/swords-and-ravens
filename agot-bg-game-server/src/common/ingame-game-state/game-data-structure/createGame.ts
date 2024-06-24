@@ -23,6 +23,7 @@ import LoanCard from "./loan-card/LoanCard";
 import { specialObjectiveCards } from "./static-data-structure/objectiveCards";
 import popRandom, { pickRandom } from "../../../utils/popRandom";
 import { HouseCardDecks } from "../../../common/EntireGame";
+import RegionKind from "./RegionKind";
 
 interface HouseCardContainer {
     houseCards: {[key: string]: HouseCardData};
@@ -576,7 +577,83 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     return game;
 }
 
-export function applyChangesForDanceWithMotherOfDragons(ingame: IngameGameState): void {
+export function applyCustomizationsOnCreatedGame(ingame: IngameGameState): void {
+    if (ingame.entireGame.isDanceWithMotherOfDragons) {
+        applyChangesForDanceWithMotherOfDragons(ingame);
+    }
+
+    if (ingame.entireGame.gameSettings.dragonWar) {
+        applyChangesForDragonWar(ingame);
+    }
+
+    if (ingame.entireGame.gameSettings.dragonRevenge) {
+        ensureDragonStrengthTokensArePresent(ingame);
+    }
+
+    if (ingame.game.dragonStrengthTokens.length == 4) {
+        // If the dragons will only raise in 4 rounds instead of 5 (6 round only scenarios)
+        // we push one dummy token from round 10 to removed tokens for correct calculation.
+        ingame.game.removedDragonStrengthTokens.push(10);
+    }
+
+    if (ingame.entireGame.gameSettings.draftMap) {
+        distributeUnassignedRegions(ingame);
+    }
+}
+
+function getAdjacentRegions(ingame: IngameGameState, region: Region): Region[] {
+    const adjacent = ingame.world.getNeighbouringRegions(region);
+
+    if (region.type.kind == RegionKind.SEA) {
+        return adjacent;
+    }
+
+    return adjacent.filter(r => r.type.kind != RegionKind.SEA);
+}
+
+function distributeUnassignedRegions(ingame: IngameGameState): void {
+    const houses = ingame.game.nonVassalHouses;
+    const world = ingame.world;
+    const regionsPerHouse = ingame.game.draftMapRegionsPerHouse;
+    const processedRegions: Region[] = [];
+    const blockedRegions: Region[] = [];
+
+    houses.forEach(h => regionsPerHouse.set(h, world.getControlledRegions(h)));
+
+    let assignmentDone = true;
+
+    while (assignmentDone) {
+        assignmentDone = false;
+        const newAssignments = new BetterMap<Region, House[]>();
+        const allAssignedRegions = _.flatMap(regionsPerHouse.values);
+        houses.forEach(h => {
+            const regionsToProcess = regionsPerHouse.get(h).filter(r => !processedRegions.includes(r));
+            processedRegions.push(...regionsToProcess);
+            const freeAdjacents = _.uniq(_.difference(_.flatMap(regionsToProcess.map(r => getAdjacentRegions(ingame, r))))
+                .filter(r => {
+                    const controller = r.getController();
+                    return (controller == null || controller == h) && !allAssignedRegions.includes(r) && r.garrison == 0;
+                }, regionsToProcess));
+            freeAdjacents.forEach(r => {
+                const possibleHouses = newAssignments.tryGet(r, [] as House[]);
+                possibleHouses.push(h);
+                newAssignments.set(r, possibleHouses);
+            });
+        });
+
+        newAssignments.entries.filter(([r, houses]) => !blockedRegions.includes(r) && houses.length == 1).forEach(([r, houses]) => {
+            assignmentDone = true;
+            regionsPerHouse.set(houses[0], _.union(regionsPerHouse.get(houses[0]), [r]));
+        });
+
+        newAssignments.entries.filter(([r, houses]) => !blockedRegions.includes(r) && houses.length > 1).forEach(([r, _houses]) => {
+            assignmentDone = true;
+            blockedRegions.push(r);
+        });
+    }
+}
+
+function applyChangesForDanceWithMotherOfDragons(ingame: IngameGameState): void {
     const game = ingame.game;
     const lannister = game.houses.tryGet("lannister", null);
     if (!game.targaryen || !game.ironBank || !lannister) {
@@ -598,7 +675,7 @@ export function applyChangesForDanceWithMotherOfDragons(ingame: IngameGameState)
     }
 }
 
-export function applyChangesForDragonWar(ingame: IngameGameState): void {
+function applyChangesForDragonWar(ingame: IngameGameState): void {
     const game = ingame.game;
     const houses = _.without(game.houses.values, game.targaryen) as House[];
 
@@ -628,7 +705,7 @@ export function applyChangesForDragonWar(ingame: IngameGameState): void {
     game.world.regions.values.filter(r => r.superControlPowerToken != null && r.garrison == 2).forEach(r => r.garrison = 4);
 }
 
-export function ensureDragonStrengthTokensArePresent(ingame: IngameGameState): void {
+function ensureDragonStrengthTokensArePresent(ingame: IngameGameState): void {
     const game = ingame.game;
     if (game.dragonStrengthTokens.length == 0) {
         game.dragonStrengthTokens = ingame.game.maxTurns == 6

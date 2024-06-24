@@ -1,22 +1,22 @@
-import IngameGameState from "../IngameGameState";
-import GameState from "../../GameState";
-import EntireGame from "../../EntireGame";
-import Player from "../Player";
-import {ClientMessage} from "../../../messages/ClientMessage";
-import {ServerMessage} from "../../../messages/ServerMessage";
-import House from "../game-data-structure/House";
-import Game from "../game-data-structure/Game";
-import HouseCard from "../game-data-structure/house-card/HouseCard";
+import IngameGameState from "../../IngameGameState";
+import GameState from "../../../GameState";
+import EntireGame from "../../../EntireGame";
+import Player from "../../Player";
+import {ClientMessage} from "../../../../messages/ClientMessage";
+import {ServerMessage} from "../../../../messages/ServerMessage";
+import House from "../../game-data-structure/House";
+import Game from "../../game-data-structure/Game";
+import HouseCard from "../../game-data-structure/house-card/HouseCard";
 import _ from "lodash";
-import User from "../../../server/User";
-import { houseCardCombatStrengthAllocations } from "../draft-house-cards-game-state/DraftHouseCardsGameState";
+import User from "../../../../server/User";
 import { observable } from "mobx";
+import DraftGameState, { houseCardCombatStrengthAllocations } from "../DraftGameState";
 
-export default class ThematicDraftHouseCardsGameState extends GameState<IngameGameState> {
+export default class ThematicDraftHouseCardsGameState extends GameState<DraftGameState> {
     @observable readyHouses: House[];
 
     get ingame(): IngameGameState {
-        return this.parentGameState;
+        return this.parentGameState.parentGameState;
     }
 
     get game(): Game {
@@ -31,8 +31,8 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
         return this.game.nonVassalHouses;
     }
 
-    constructor(ingameGameState: IngameGameState) {
-        super(ingameGameState);
+    constructor(draftGameState: DraftGameState) {
+        super(draftGameState);
     }
 
     firstStart(): void {
@@ -120,7 +120,7 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
                     houseCards: []
                 });
 
-                this.ingame.onDraftingFinish();
+                this.parentGameState.onDraftHouseCardsGameStateEnd();
             }
         }
     }
@@ -139,9 +139,9 @@ export default class ThematicDraftHouseCardsGameState extends GameState<IngameGa
         };
     }
 
-    static deserializeFromServer(ingame: IngameGameState, data: SerializedThematicDraftHouseCardsGameState): ThematicDraftHouseCardsGameState {
-        const thematicDraftHouseCardsGameState = new ThematicDraftHouseCardsGameState(ingame);
-        thematicDraftHouseCardsGameState.readyHouses = data.readyHouses.map(hid => ingame.game.houses.get(hid));
+    static deserializeFromServer(draft: DraftGameState, data: SerializedThematicDraftHouseCardsGameState): ThematicDraftHouseCardsGameState {
+        const thematicDraftHouseCardsGameState = new ThematicDraftHouseCardsGameState(draft);
+        thematicDraftHouseCardsGameState.readyHouses = data.readyHouses.map(hid => draft.ingame.game.houses.get(hid));
         return thematicDraftHouseCardsGameState;
     }
 }

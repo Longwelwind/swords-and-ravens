@@ -60,6 +60,7 @@ export default class Game {
     @observable removedDragonStrengthTokens: number[] = [];
     ironBank: IronBank | null;
     @observable objectiveDeck: ObjectiveCard[] = [];
+    draftMapRegionsPerHouse: BetterMap<House, Region[]> = new BetterMap();
 
     /**
      * Contains the vassal relations of the game.
@@ -592,6 +593,7 @@ export default class Game {
             deletedHouseCards: this.deletedHouseCards.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()]),
             oldPlayerHouseCards: this.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])]),
             previousPlayerHouseCards: this.previousPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.entries.map(([hcid, hc]) => [hcid, hc.serializeToClient()])]),
+            draftMapRegionsPerHouse: this.draftMapRegionsPerHouse.entries.map(([h, regions]) => [h.id, regions.map(r => r.id)]),
             dragonStrengthTokens: this.dragonStrengthTokens,
             removedDragonStrengthTokens: this.removedDragonStrengthTokens,
             ironBank: this.ironBank ? this.ironBank.serializeToClient(admin) : null,
@@ -632,6 +634,8 @@ export default class Game {
         game.previousPlayerHouseCards = new BetterMap(data.previousPlayerHouseCards.map(([hid, hcs]) =>
             [game.houses.get(hid), new BetterMap(hcs.map(([hcid, hc]) => [hcid, HouseCard.deserializeFromServer(hc)]))]
         ));
+        game.draftMapRegionsPerHouse = new BetterMap(data.draftMapRegionsPerHouse.map(([hid, rIds]) =>
+            [game.houses.get(hid), rIds.map(rid => game.world.regions.get(rid))]));
         game.dragonStrengthTokens = data.dragonStrengthTokens;
         game.removedDragonStrengthTokens = data.removedDragonStrengthTokens;
         game.ironBank = data.ironBank ? IronBank.deserializeFromServer(game, data.ironBank) : null;
@@ -665,6 +669,7 @@ export interface SerializedGame {
     vassalRelations: [string, string][];
     vassalHouseCards: [string, SerializedHouseCard][];
     draftableHouseCards: [string, SerializedHouseCard][];
+    draftMapRegionsPerHouse: [string, string[]][];
     deletedHouseCards: [string, SerializedHouseCard][];
     oldPlayerHouseCards: [string, [string, SerializedHouseCard][]][];
     previousPlayerHouseCards: [string, [string, SerializedHouseCard][]][];

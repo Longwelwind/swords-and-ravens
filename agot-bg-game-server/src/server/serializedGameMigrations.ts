@@ -6,7 +6,7 @@ import { CrowKillersStep } from "../common/ingame-game-state/westeros-game-state
 import { SerializedHouse } from "../common/ingame-game-state/game-data-structure/House";
 import { HouseCardState } from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import { vassalHouseCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/vassalHouseCards";
-import { DraftStep } from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
+import { DraftStep } from "../common/ingame-game-state/draft-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import _ from "lodash";
 import shuffleInPlace from "../utils/shuffleInPlace";
 import { v4 } from "uuid";
@@ -2321,6 +2321,23 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                     }
                 }
             }
+        }
+    },
+    {
+        version: "118",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                ingame.game.draftMapRegionsPerHouse = [];
+
+                if (ingame.childGameState.type == "draft-house-cards" || ingame.childGameState.type == "thematic-draft-house-cards") {
+                    ingame.childGameState = {
+                        type: "draft",
+                        childGameState: ingame.childGameState
+                    };
+                }
+            }
+            return serializedGame;
         }
     }
 ];
