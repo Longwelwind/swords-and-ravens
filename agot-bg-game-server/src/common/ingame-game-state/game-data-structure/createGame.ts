@@ -699,7 +699,7 @@ function applyChangesForDragonWar(ingame: IngameGameState): void {
     ensureDragonStrengthTokensArePresent(ingame);
 
     nerfHouseCard(game, "balon-greyjoy", "jaqen-h-ghar");
-    nerfHouseCard(game, "aeron-damphair-dwd", "quentyn-martell");
+    nerfHouseCard(game, "aeron-damphair-dwd", "aeron-damphair-dwd");
 
     game.world.regions.values.filter(r => r.superControlPowerToken != null && r.garrison == 4).forEach(r => r.garrison = 6);
     game.world.regions.values.filter(r => r.superControlPowerToken != null && r.garrison == 2).forEach(r => r.garrison = 4);

@@ -43,6 +43,7 @@ import invertColor from "./utils/invertColor";
 import ImagePopover from "./utils/ImagePopover";
 import renderLoanCardsToolTip from "./loanCardsTooltip";
 import Xarrow from "react-xarrows";
+import { getClassNameForDragonStrength } from "./WorldSnapshotComponent";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -388,7 +389,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                     >
                         <div onClick={property.onClick ? property.onClick : undefined}
                             className={classNames(
-                                u.type.id == "dragon" ? "dragon-icon" : "unit-icon",
+                                "unit-icon",
                                 {
                                     "hover-weak-outline": !property.highlight?.active,
                                     "clickable hover-strong-outline": clickable,
@@ -402,8 +403,9 @@ export default class MapComponent extends Component<MapComponentProps> {
                                     "disable-pointer-events": disablePointerEventsForCurrentRegion,
                                     "pulsate-bck": property.animateAttention,
                                     "pulsate-bck_fade-in": property.animateFadeIn,
-                                    "pulsate-bck_fade-out": property.animateFadeOut
-                                }
+                                    "pulsate-bck_fade-out": property.animateFadeOut,
+                                },
+                                getClassNameForDragonStrength(u.type.id, this.ingame.game.currentDragonStrength)
                             )}
                             style={{
                                 backgroundImage: `url(${unitImages.get(u.allegiance.id).get(u.upgradedType ? u.upgradedType.id : u.type.id)})`,

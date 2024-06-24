@@ -18,22 +18,36 @@ import BetterMap from "../utils/BetterMap";
 import _ from "lodash";
 import getGarrisonToken from "./garrisonTokens";
 import loyaltyTokenImage from "../../public/images/power-tokens/Loyalty.png"
-import { IronBankSnapshot } from "../common/ingame-game-state/game-data-structure/IronBank";
 import StaticIronBankView from "../common/ingame-game-state/game-data-structure/static-data-structure/StaticIronBankView";
 import { OverlayTrigger } from "react-bootstrap";
 import ImagePopover from "./utils/ImagePopover";
 import preventOverflow from "@popperjs/core/lib/modifiers/preventOverflow";
 import loanCardImages from "./loanCardImages";
 import IronBankSnapshotComponent from "./IronBankSnapshotComponent";
+import { GameSnapshot } from "../common/ingame-game-state/game-data-structure/Game";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
 export const DELUXE_MAT_WIDTH = 1204;
 
+export function getClassNameForDragonStrength(unitType: string, strength: number | undefined): string {
+    if (unitType != "dragon" || strength === undefined || strength <= -1) {
+        return "";
+    } else if(strength <= 1) {
+        return " baby-dragon";
+    } else if(strength <= 3) {
+        return "";
+    } else if(strength <= 5){
+        return " monster-dragon";
+    } else {
+        return "";
+    }
+}
+
 interface WorldSnapshotComponentProps {
     ingameGameState: IngameGameState;
     worldSnapshot: RegionSnapshot[];
-    ironBank?: IronBankSnapshot;
+    gameSnapshot?: GameSnapshot;
 }
 
 export default class WorldSnapshotComponent extends Component<WorldSnapshotComponentProps> {
@@ -124,7 +138,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
     }
 
     private renderLoanCardSlots(ironBankView: StaticIronBankView | null): ReactNode {
-        return ironBankView && this.props.ironBank && this.props.ironBank.loanSlots.map((lc, i) => (
+        return ironBankView && this.props.gameSnapshot?.ironBank && this.props.gameSnapshot?.ironBank.loanSlots.map((lc, i) => (
             <OverlayTrigger
                 key={`loan-slot_${i}`}
                 overlay={<ImagePopover className="vertical-game-card bring-to-front" style={{ backgroundImage: lc ? `url(${loanCardImages.get(lc)})` : "none" }} />}
@@ -153,14 +167,14 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
     }
 
     private renderIronBankInfos(ironBankView: StaticIronBankView | null): ReactNode {
-        return ironBankView && this.props.ironBank && <div id="iron-bank-info" style={{
+        return ironBankView && this.props.gameSnapshot?.ironBank && <div id="iron-bank-info" style={{
             position: "absolute",
             left: ironBankView.infoComponentSlot.point.x,
             top: ironBankView.infoComponentSlot.point.y,
             height: ironBankView.infoComponentSlot.height,
             width: ironBankView.infoComponentSlot.width
         }}>
-            <IronBankSnapshotComponent ingame={this.ingame} ironBank={this.props.ironBank} />
+            <IronBankSnapshotComponent ingame={this.ingame} ironBank={this.props.gameSnapshot?.ironBank} />
         </div>;
     }
 
@@ -205,7 +219,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
 
                     return <div
                         key={`world-state_unit-${u.type}-${u.house}-${i}-in-${r.id}`}
-                        className={u.type == "dragon" ? "dragon-icon" : "unit-icon"}
+                        className={"unit-icon" + getClassNameForDragonStrength(u.type, this.props.gameSnapshot?.dragonStrength)}
                         style={{
                             backgroundImage: `url(${unitImages.get(u.house).get(u.type)})`,
                             opacity: opacity,

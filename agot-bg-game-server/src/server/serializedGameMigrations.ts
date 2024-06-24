@@ -4,7 +4,8 @@ import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes
 import staticWorld from "../common/ingame-game-state/game-data-structure/static-data-structure/globalStaticWorld";
 import { CrowKillersStep } from "../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/crow-killers-wildling-victory-game-state/CrowKillersWildlingVictoryGameState";
 import { SerializedHouse } from "../common/ingame-game-state/game-data-structure/House";
-import { HouseCardState } from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { HouseCardState, SerializedHouseCard } from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import { vassalHouseCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/vassalHouseCards";
 import { DraftStep } from "../common/ingame-game-state/draft-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import _ from "lodash";
@@ -12,7 +13,8 @@ import shuffleInPlace from "../utils/shuffleInPlace";
 import { v4 } from "uuid";
 import facelessMenNames from "../../data/facelessMenNames.json";
 import popRandom from "../utils/popRandom";
-//import { SerializedEntireGame } from "../common/EntireGame";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { SerializedEntireGame } from "../common/EntireGame";
 
 function replaceHouseCard(deck: [string, any][], idToRemove: string, cardToAdd: [string, any]): [string, any][] {
     const result = deck.filter(([id, _shc]) => id != idToRemove);
@@ -2338,6 +2340,32 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                 }
             }
             return serializedGame;
+        }
+    },
+    {
+        version: "119",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+
+                ingame.game.houses.forEach((h: any) => {
+                    h.houseCards = applyMigrations(h.houseCards);
+                });
+
+                ingame.game.draftableHouseCards = applyMigrations(ingame.game.draftableHouseCards);
+            }
+            return serializedGame;
+
+            function applyMigrations(houseCards: [string, any][]): [string, any][] {
+                let result = [...houseCards];
+                const found = result.find(([id, _shc]) => id == "aeron-damphair-dwd-nerfed");
+                if (found) {
+                    found[1].abilityId = "aeron-damphair-dwd";
+                    result = replaceHouseCard(result, "aeron-damphair-dwd-nerfed", found);
+                }
+
+                return result;
+            }
         }
     }
 ];

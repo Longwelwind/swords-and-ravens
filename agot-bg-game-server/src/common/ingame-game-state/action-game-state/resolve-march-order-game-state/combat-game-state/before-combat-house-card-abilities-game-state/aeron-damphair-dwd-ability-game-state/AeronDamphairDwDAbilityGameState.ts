@@ -10,10 +10,12 @@ import BeforeCombatHouseCardAbilitiesGameState from "../BeforeCombatHouseCardAbi
 import User from "../../../../../../../server/User";
 import { aeronDamphairDwD } from "../../../../../game-data-structure/house-card/houseCardAbilities";
 import HouseCardModifier from "../../../../../game-data-structure/house-card/HouseCardModifier";
+import { HouseCardState } from "../../../../../../../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 
 export default class AeronDamphairDwDAbilityGameState extends GameState<
     BeforeCombatHouseCardAbilitiesGameState["childGameState"]> {
     house: House;
+    nerfed: boolean;
 
     get game(): Game {
         return this.parentGameState.game;
@@ -27,9 +29,16 @@ export default class AeronDamphairDwDAbilityGameState extends GameState<
         return this.parentGameState.parentGameState.parentGameState.ingameGameState;
     }
 
-    firstStart(house: House): void {
+    get maxAllowedPowerTokens(): number {
+        return this.nerfed
+            ? this.house.houseCards.values.filter(hc => hc.state == HouseCardState.USED).length
+            : this.house.powerTokens;
+    }
+
+    firstStart(house: House, nerfed: boolean): void {
         this.house = house;
-        if (house.powerTokens == 0) {
+        this.nerfed = nerfed;
+        if (house.powerTokens == 0 || this.maxAllowedPowerTokens == 0) {
             this.ingame.log({
                 type: "house-card-ability-not-used",
                 house: house.id,
@@ -46,7 +55,7 @@ export default class AeronDamphairDwDAbilityGameState extends GameState<
                 return;
             }
 
-            const pt = Math.max(0, Math.min(message.powerTokens, this.house.powerTokens));
+            const pt = Math.max(0, Math.min(message.powerTokens, this.maxAllowedPowerTokens));
             this.ingame.changePowerTokens(this.house, -pt);
 
             const houseCardModifier = new HouseCardModifier();
@@ -86,7 +95,8 @@ export default class AeronDamphairDwDAbilityGameState extends GameState<
     serializeToClient(_admin: boolean, _player: Player | null): SerializedAeronDamphairDwDAbilityGameState {
         return {
             type: "aeron-damphair-dwd-ability",
-            house: this.house.id
+            house: this.house.id,
+            nerfed: this.nerfed
         };
     }
 
@@ -94,6 +104,7 @@ export default class AeronDamphairDwDAbilityGameState extends GameState<
         const aeronDamphairDwDAbilityGameState = new AeronDamphairDwDAbilityGameState(houseCardResolution);
 
         aeronDamphairDwDAbilityGameState.house = houseCardResolution.game.houses.get(data.house);
+        aeronDamphairDwDAbilityGameState.nerfed = data.nerfed;
 
         return aeronDamphairDwDAbilityGameState;
     }
@@ -102,4 +113,5 @@ export default class AeronDamphairDwDAbilityGameState extends GameState<
 export interface SerializedAeronDamphairDwDAbilityGameState {
     type: "aeron-damphair-dwd-ability";
     house: string;
+    nerfed: boolean;
 }

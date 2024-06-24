@@ -20,7 +20,17 @@ export default class AeronDamphairAbilityComponent extends Component<GameStateCo
         return (
             <>
                 <Col xs={12} className="text-center">
-                    <b>Aeron Damphair:</b> House <b>{this.props.gameState.house.name}</b> may discard any number of available Power token to increase the combat strength of his card by the number of Power tokens discarded.
+                    {!this.props.gameState.nerfed
+                        ? <>
+                            <b>Aeron Damphair:</b> House <b>{this.props.gameState.house.name}</b> may discard any number of available Power tokens
+                            to increase the combat strength of their card by the number of Power tokens discarded.
+                        </>
+                        : <>
+                            <b>Aeron Damphair:</b> House <b>{this.props.gameState.house.name}</b> may discard one Power token for each House card
+                            in their discard pile to increase the combat strength of their card by the number of Power tokens discarded.
+                        </>
+                    }
+
                 </Col>
                 {this.authenticatedPlayer && this.props.gameClient.doesControlHouse(this.props.gameState.house) && (
                     <>
@@ -31,7 +41,7 @@ export default class AeronDamphairAbilityComponent extends Component<GameStateCo
                                         type="range"
                                         className="custom-range"
                                         min={0}
-                                        max={this.authenticatedPlayer.house.powerTokens}
+                                        max={this.props.gameState.maxAllowedPowerTokens}
                                         value={this.powerTokens}
                                         onChange={e => {
                                             this.powerTokens = parseInt(e.target.value);
