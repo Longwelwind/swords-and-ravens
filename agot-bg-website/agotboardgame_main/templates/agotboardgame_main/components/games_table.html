@@ -53,7 +53,11 @@
             >
                 <td class="text-center">
                     {% if game.state == "IN_LOBBY" %}
-                        <span class="badge badge-success">Open</span>
+                        {% if game.view_of_game.isPasswordProtected %}
+                            <span class="badge badge-danger"><i class="fas fa-lock"></i></span>
+                        {% else %}
+                            <span class="badge badge-success">Open</span>
+                        {% endif %}
                     {% elif game.state == "ONGOING" %}
                         <span class="badge badge-warning">Ongoing</span>
                     {% endif %}

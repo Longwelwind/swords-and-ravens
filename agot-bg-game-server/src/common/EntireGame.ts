@@ -620,6 +620,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
         const oldPlayerIds = this.entireGame.ingameGameState?.oldPlayerIds ?? [];
         const timeoutPlayerIds = this.entireGame.ingameGameState?.timeoutPlayerIds ?? [];
         const replacerIds = this.entireGame.ingameGameState?.replacerIds ?? [];
+        const isPasswordProtected = this.entireGame.lobbyGameState?.password ? this.entireGame.lobbyGameState.password.length > 0 : false;
 
         return {
             turn,
@@ -632,6 +633,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             oldPlayerIds,
             timeoutPlayerIds,
             replacerIds,
+            isPasswordProtected,
             publicChatRoomId: this.publicChatRoomId
         };
     }
