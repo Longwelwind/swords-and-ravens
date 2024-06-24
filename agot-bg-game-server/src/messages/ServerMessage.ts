@@ -10,7 +10,7 @@ import { SerializedVote } from "../common/ingame-game-state/vote-system/Vote";
 import { CrowKillersStep } from "../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/crow-killers-wildling-victory-game-state/CrowKillersWildlingVictoryGameState";
 import HouseCardModifier from "../common/ingame-game-state/game-data-structure/house-card/HouseCardModifier";
 import { CombatStats } from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
-import { DraftStep } from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
+import { DraftStep } from "../common/ingame-game-state/draft-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import { SerializedLoanCard } from "../common/ingame-game-state/game-data-structure/loan-card/LoanCard";
 import { SerializedWaitedForData } from "../common/ingame-game-state/Player";
 import { SerializedRegion } from "../common/ingame-game-state/game-data-structure/Region";

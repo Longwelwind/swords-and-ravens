@@ -4,7 +4,7 @@ import { observer } from "mobx-react";
 import renderChildGameState from "../utils/renderChildGameState";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Row from "react-bootstrap/Row";
-import DraftHouseCardsGameState, { DraftStep } from "../../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
+import DraftHouseCardsGameState, { DraftStep } from "../../common/ingame-game-state/draft-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import SelectHouseCardGameState from "../../common/ingame-game-state/select-house-card-game-state/SelectHouseCardGameState";
 import SelectHouseCardComponent from "./SelectHouseCardComponent";
 import Player from "../../common/ingame-game-state/Player";

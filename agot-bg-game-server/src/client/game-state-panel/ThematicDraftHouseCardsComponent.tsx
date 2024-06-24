@@ -6,7 +6,7 @@ import Row from "react-bootstrap/Row";
 import Player from "../../common/ingame-game-state/Player";
 import { Button, Col } from "react-bootstrap";
 import HouseCardComponent from "./utils/HouseCardComponent";
-import ThematicDraftHouseCardsGameState from "../../common/ingame-game-state/thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
+import ThematicDraftHouseCardsGameState from "../../common/ingame-game-state/draft-game-state/thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 import { observable } from "mobx";
 import HouseCard from "../../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 

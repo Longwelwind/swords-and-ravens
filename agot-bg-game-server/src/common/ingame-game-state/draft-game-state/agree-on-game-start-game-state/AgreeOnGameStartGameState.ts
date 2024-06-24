@@ -45,7 +45,7 @@ export default class AgreeOnGameStartGameState extends GameState<DraftGameState>
             });
 
             if (this.getNotReadyPlayers().length == 0) {
-                this.ingame.onDraftMapFinish();
+                this.parentGameState.onDraftMapGameStateEnd();
             }
         } else if (message.type == "unready") {
             this.parentGameState.setChildGameState(new DraftMapGameState(this.parentGameState)).firstStart();

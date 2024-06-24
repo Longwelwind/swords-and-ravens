@@ -849,8 +849,11 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="draft-map-tooltip">
-                                    This option allows all players to add and remove units to their territories according to their
-                                    supply limits before the game starts.
+                                    This option allows all players to adjust their starting positions by adding and removing units
+                                    in their territories according to their supply limits before the game begins. The
+                                    game then distributes the unclaimed territories as fairly as possible among all houses. Territories
+                                    with only one neighboring house are assigned to that house, while those with multiple potential neighbors
+                                    remain unassigned. All players must confirm the changes before the game starts.
                                 </Tooltip>}>
                                 <label htmlFor="draft-map-setting">Draft Map</label>
                             </OverlayTrigger>}

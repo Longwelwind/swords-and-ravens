@@ -9,7 +9,7 @@ import GameClient from "./GameClient";
 import LobbyGameState from "../common/lobby-game-state/LobbyGameState";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import { Col, Dropdown, Nav, Navbar, NavDropdown } from "react-bootstrap";
+import { Nav, Navbar, NavDropdown } from "react-bootstrap";
 import Player from "../common/ingame-game-state/Player";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import { faUserGear } from "@fortawesome/free-solid-svg-icons";
@@ -193,8 +193,8 @@ export default class UserLabel extends Component<UserLabelProps> {
                                             "To avoid abuse you can no longer vassalize yourself"
                                         : canLaunchReplacePlayerByVassalVoteReason == "only-possible-when-defeated" ?
                                             "Vassal replacement is allowed only when the house is considered defeated"
-                                        : canLaunchReplacePlayerByVassalVoteReason == "ongoing-house-card-drafting" ?
-                                            "During drafting houses cannot be replaced by vassals"
+                                        : canLaunchReplacePlayerByVassalVoteReason == "ongoing-draft" ?
+                                            "During draft mode players cannot be replaced by vassals"
                                         : "Vote not possible"
                                     }
                                 </Tooltip>

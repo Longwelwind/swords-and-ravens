@@ -1,82 +1,19 @@
-import IngameGameState from "../IngameGameState";
-import GameState from "../../GameState";
-import EntireGame from "../../EntireGame";
-import Player from "../Player";
-import {ClientMessage} from "../../../messages/ClientMessage";
-import {ServerMessage} from "../../../messages/ServerMessage";
-import House from "../game-data-structure/House";
-import BetterMap from "../../../utils/BetterMap";
-import Game from "../game-data-structure/Game";
-import SelectHouseCardGameState, { SerializedSelectHouseCardGameState } from "../select-house-card-game-state/SelectHouseCardGameState";
-import HouseCard from "../game-data-structure/house-card/HouseCard";
+import IngameGameState from "../../IngameGameState";
+import GameState from "../../../GameState";
+import EntireGame from "../../../EntireGame";
+import Player from "../../Player";
+import {ClientMessage} from "../../../../messages/ClientMessage";
+import {ServerMessage} from "../../../../messages/ServerMessage";
+import House from "../../game-data-structure/House";
+import BetterMap from "../../../../utils/BetterMap";
+import Game from "../../game-data-structure/Game";
+import SelectHouseCardGameState, { SerializedSelectHouseCardGameState } from "../../select-house-card-game-state/SelectHouseCardGameState";
+import HouseCard from "../../game-data-structure/house-card/HouseCard";
 import _ from "lodash";
 import { observable } from "mobx";
-import SimpleChoiceGameState, { SerializedSimpleChoiceGameState } from "../simple-choice-game-state/SimpleChoiceGameState";
-import shuffleInPlace from "../../../utils/shuffleInPlace";
-
-export const draftOrders: number[][][] = [
-        [
-            [ 0 ]
-        ],
-        [
-            [0, 1],
-            [1, 0]
-        ],
-        [
-            [0, 1, 2],
-            [1, 2, 0],
-            [2, 0, 1]
-        ],
-        [
-            [0, 1, 2, 3],
-            [2, 3, 1, 0],
-            [1, 0, 3, 2],
-            [3, 2, 0, 1]
-        ],
-        [
-            [0, 1, 2, 3, 4],
-            [2, 4, 3, 1, 0],
-            [1, 0, 4, 2, 3],
-            [4, 3, 1, 0, 2],
-            [3, 2, 0, 4, 1]
-        ],
-        [
-            [0, 1, 2, 3, 4, 5],
-            [3, 5, 4, 2, 1, 0],
-            [2, 0, 1, 4, 5, 3],
-            [4, 3, 5, 1, 0, 2],
-            [1, 2, 0, 5, 3, 4],
-            [5, 4, 3, 0, 2, 1]
-        ],
-        [
-            [0, 1, 2, 3, 4, 5, 6],
-            [3, 6, 5, 4, 1, 2, 0],
-            [2, 0, 6, 1, 5, 3, 4],
-            [1, 4, 3, 0, 2, 6, 5],
-            [6, 5, 4, 2, 0, 1, 3],
-            [4, 3, 1, 5, 6, 0, 2],
-            [5, 2, 0, 6, 3, 4, 1]
-        ],
-        [
-            [0, 1, 2, 3, 4, 5, 6, 7],
-            [4, 7, 6, 5, 3, 2, 1, 0],
-            [3, 0, 1, 2, 5, 6, 7, 4],
-            [2, 4, 5, 7, 6, 1, 0, 3],
-            [6, 3, 7, 0, 1, 4, 5, 2],
-            [5, 2, 4, 1, 7, 0, 3, 6],
-            [1, 6, 3, 4, 0, 7, 2, 5],
-            [7, 5, 0, 6, 2, 3, 4, 1]
-        ]
-    ];
-
-export const houseCardCombatStrengthAllocations = new BetterMap<number, number>(
-    [
-        [0, 1],
-        [1, 2],
-        [2, 2],
-        [3, 1],
-        [4, 1]
-    ]);
+import SimpleChoiceGameState, { SerializedSimpleChoiceGameState } from "../../simple-choice-game-state/SimpleChoiceGameState";
+import shuffleInPlace from "../../../../utils/shuffleInPlace";
+import DraftGameState, { draftOrders, houseCardCombatStrengthAllocations } from "../DraftGameState";
 
 export enum DraftStep {
     DECIDE,
@@ -84,7 +21,7 @@ export enum DraftStep {
     INFLUENCE_TRACK
 }
 
-export default class DraftHouseCardsGameState extends GameState<IngameGameState, SelectHouseCardGameState<DraftHouseCardsGameState> | SimpleChoiceGameState> {
+export default class DraftHouseCardsGameState extends GameState<DraftGameState, SelectHouseCardGameState<DraftHouseCardsGameState> | SimpleChoiceGameState> {
     houses: House[];
     draftOrder: number[][];
     @observable draftStep: DraftStep;
@@ -93,7 +30,7 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
     @observable currentColumnIndex: number;
 
     get ingame(): IngameGameState {
-        return this.parentGameState;
+        return this.parentGameState.parentGameState;
     }
 
     get game(): Game {
@@ -104,8 +41,8 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
         return this.ingame.entireGame;
     }
 
-    constructor(ingameGameState: IngameGameState) {
-        super(ingameGameState);
+    constructor(draftGameState: DraftGameState) {
+        super(draftGameState);
     }
 
     firstStart(): void {
@@ -138,7 +75,7 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
                 this.ingame.setInfluenceTrack(i, newInfluenceTrack);
             }
 
-            this.ingame.onDraftHouseCardsFinish();
+            this.parentGameState.onDraftHouseCardsGameStateEnd();
             return;
         }
 
@@ -332,13 +269,13 @@ export default class DraftHouseCardsGameState extends GameState<IngameGameState,
         };
     }
 
-    static deserializeFromServer(ingameGameState: IngameGameState, data: SerializedDraftHouseCardsGameState): DraftHouseCardsGameState {
-        const draftHouseCardsGameState = new DraftHouseCardsGameState(ingameGameState);
+    static deserializeFromServer(draft: DraftGameState, data: SerializedDraftHouseCardsGameState): DraftHouseCardsGameState {
+        const draftHouseCardsGameState = new DraftHouseCardsGameState(draft);
 
-        draftHouseCardsGameState.houses = data.houses.map(hid => ingameGameState.game.houses.get(hid));
+        draftHouseCardsGameState.houses = data.houses.map(hid => draft.game.houses.get(hid));
         draftHouseCardsGameState.draftOrder = data.draftOrder;
         draftHouseCardsGameState.draftStep = data.draftStep;
-        draftHouseCardsGameState.vassalsOnInfluenceTracks = data.vassalsOnInfluenceTracks.map(track => track.map(hid => ingameGameState.game.houses.get(hid)));
+        draftHouseCardsGameState.vassalsOnInfluenceTracks = data.vassalsOnInfluenceTracks.map(track => track.map(hid => draft.game.houses.get(hid)));
         draftHouseCardsGameState.currentRowIndex = data.currentRowIndex;
         draftHouseCardsGameState.currentColumnIndex = data.currentColumnIndex;
         draftHouseCardsGameState.childGameState = draftHouseCardsGameState.deserializeChildGameState(data.childGameState);

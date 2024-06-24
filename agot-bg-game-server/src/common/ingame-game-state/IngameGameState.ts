@@ -25,13 +25,11 @@ import Vote, { SerializedVote, VoteState } from "./vote-system/Vote";
 import VoteType, { CancelGame, EndGame, ExtendPlayerClocks, PauseGame, ReplacePlayer, ReplacePlayerByVassal, ReplaceVassalByPlayer, ResumeGame, SwapHouses, DeclareWinner } from "./vote-system/VoteType";
 import { v4 } from "uuid";
 import CancelledGameState, { SerializedCancelledGameState } from "../cancelled-game-state/CancelledGameState";
-import HouseCard from "./game-data-structure/house-card/HouseCard";
 import { observable } from "mobx";
 import _ from "lodash";
-import DraftHouseCardsGameState, { houseCardCombatStrengthAllocations, SerializedDraftHouseCardsGameState } from "./draft-house-cards-game-state/DraftHouseCardsGameState";
+import DraftGameState, { SerializedDraftGameState } from "./draft-game-state/DraftGameState";
 import CombatGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import DeclareSupportGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/declare-support-game-state/DeclareSupportGameState";
-import ThematicDraftHouseCardsGameState, { SerializedThematicDraftHouseCardsGameState } from "./thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 import shuffle from "../../utils/shuffle";
 import shuffleInPlace from "../../utils/shuffleInPlace";
 import popRandom from "../../utils/popRandom";
@@ -48,7 +46,6 @@ import houseCardAbilities from "./game-data-structure/house-card/houseCardAbilit
 import SnrError from "../../utils/snrError";
 import { TakeOverPort, findOrphanedShipsAndDestroyThem, isTakeControlOfEnemyPortRequired } from "./port-helper/PortHelper";
 import { dragon } from "./game-data-structure/unitTypes";
-import DraftGameState, { SerializedDraftGameState } from "./draft-game-state/DraftGameState";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -64,9 +61,8 @@ export interface UnitLossConsequence {
 
 export default class IngameGameState extends GameState<
     EntireGame,
-    WesterosGameState | PlanningGameState | ActionGameState | CancelledGameState | GameEndedGameState
-    | DraftHouseCardsGameState | ThematicDraftHouseCardsGameState | DraftGameState
-    | PayDebtsGameState | ChooseInitialObjectivesGameState
+    WesterosGameState | PlanningGameState | ActionGameState | CancelledGameState | GameEndedGameState |
+    DraftGameState | PayDebtsGameState | ChooseInitialObjectivesGameState
 > {
     players: BetterMap<User, Player> = new BetterMap();
     oldPlayerIds: string[] = [];
@@ -175,14 +171,10 @@ export default class IngameGameState extends GameState<
             assignments: futurePlayers.map((house, user) => [house, user.id]) as [string, string][]
         });
 
-        if (this.entireGame.gameSettings.draftMap) {
-            this.beginDraftMap();
-        } else if (this.entireGame.gameSettings.draftHouseCards) {
-            this.beginDraftingHouseCards();
-        } else if (this.entireGame.isFeastForCrows) {
-            this.chooseObjectives();
+        if (this.entireGame.gameSettings.draftHouseCards || this.entireGame.gameSettings.draftMap) {
+            this.setChildGameState(new DraftGameState(this)).firstStart();
         } else {
-            this.beginNewRound();
+            this.onDraftGameStateEnd();
         }
     }
 
@@ -194,47 +186,20 @@ export default class IngameGameState extends GameState<
         }
     }
 
-    chooseObjectives(): void {
+    proceedWithChooseObjectives(): void {
         this.setChildGameState(new ChooseInitialObjectivesGameState(this)).firstStart();
+    }
+
+    onDraftGameStateEnd(): void {
+        if (this.entireGame.isFeastForCrows) {
+            this.proceedWithChooseObjectives();
+        } else {
+            this.beginNewRound();
+        }
     }
 
     onChooseInitialObjectivesGameStateEnd(): void {
         this.beginNewRound();
-    }
-
-    beginDraftMap(): void {
-        this.setChildGameState(new DraftGameState(this)).firstStart();
-    }
-
-    beginDraftingHouseCards(): void {
-        if (this.entireGame.gameSettings.thematicDraft) {
-            this.setChildGameState(new ThematicDraftHouseCardsGameState(this)).firstStart();
-        } else if (this.entireGame.gameSettings.blindDraft || this.entireGame.gameSettings.randomDraft) {
-            houseCardCombatStrengthAllocations.entries.forEach(([hcStrength, count]) => {
-                for(let i=0; i<count; i++) {
-                    this.players.values.forEach(p => {
-                        const house = p.house;
-                        const availableCards = this.game.draftableHouseCards.values.filter(hc => hc.combatStrength == hcStrength);
-                        const houseCard = popRandom(availableCards) as HouseCard;
-                        house.houseCards.set(houseCard.id, houseCard);
-                        this.game.draftableHouseCards.delete(houseCard.id);
-                    });
-                }
-            });
-
-            this.game.draftableHouseCards.clear();
-
-            do {
-                this.setInfluenceTrack(0, this.getRandomInitialInfluenceTrack());
-                this.setInfluenceTrack(1, this.getRandomInitialInfluenceTrack());
-                // Move blade holder to bottom of kings court
-                this.setInfluenceTrack(2, this.getRandomInitialInfluenceTrack(this.game.valyrianSteelBladeHolder));
-            } while (this.hasAnyHouseTooMuchDominanceTokens());
-
-            this.onDraftHouseCardsFinish();
-        } else {
-            this.setChildGameState(new DraftHouseCardsGameState(this)).firstStart();
-        }
     }
 
     setInfluenceTrack(i: number, track: House[]): House[] {
@@ -266,70 +231,8 @@ export default class IngameGameState extends GameState<
         return _.concat(_.without(track, this.game.targaryen), this.game.targaryen);
     }
 
-    getRandomInitialInfluenceTrack(moveToBottom: House | null = null): House[] {
-        let track = shuffleInPlace(this.game.houses.values);
-
-        if (moveToBottom) {
-            track = _.without(track, moveToBottom);
-            track.push(moveToBottom);
-        }
-
-        const playerHouses = this.players.values.map(p => p.house);
-        const areVassalsInTopThreeSpaces = _.take(track, 3).some(h => !playerHouses.includes(h));
-
-        if (areVassalsInTopThreeSpaces) {
-            const vassals = track.filter(h => !playerHouses.includes(h));
-            const newTrack = _.difference(track, vassals);
-            newTrack.push(...vassals);
-            return newTrack;
-        }
-
-        return track;
-    }
-
-    private hasAnyHouseTooMuchDominanceTokens(): boolean {
-        const uniqDominanceHolders = _.uniq(this.game.influenceTracks.map(track => this.game.getTokenHolder(track)));
-
-        switch (this.players.size) {
-            case 0:
-                throw new Error("Games with 0 players cannot start");
-            case 1:
-                // Ensure a single player can hold all 3 dominance tokens in a debug game:
-                return false;
-            case 2:
-                // Ensure a player does not get all dominance tokens in 2p games
-                // With Targaryen the other player can hold all 3 tokens.
-                return this.game.targaryen ? uniqDominanceHolders.length != 1 : uniqDominanceHolders.length != 2;
-            case 3:
-                // Ensure every dominance token is held by another house
-                // With Targaryen the other player can hold all 3 tokens.
-                return this.game.targaryen ? uniqDominanceHolders.length != 2 : uniqDominanceHolders.length != 3;
-            default:
-                // Ensure every dominance token is held by another house
-                return uniqDominanceHolders.length != 3;
-        }
-    }
-
     log(data: GameLogData, resolvedAutomatically = false): void {
         this.gameLogManager.log(data, resolvedAutomatically);
-    }
-
-    onDraftMapFinish(): void {
-        if (this.entireGame.gameSettings.draftHouseCards) {
-            this.beginDraftingHouseCards();
-        } else if (this.entireGame.isFeastForCrows) {
-            this.chooseObjectives();
-        } else {
-            this.beginNewRound();
-        }
-    }
-
-    onDraftHouseCardsFinish(): void {
-        if (this.entireGame.isFeastForCrows) {
-            this.chooseObjectives();
-        } else {
-            this.beginNewRound();
-        }
     }
 
     onActionGameStateFinish(): void {
@@ -898,17 +801,10 @@ export default class IngameGameState extends GameState<
             }
 
             // Vassal replacement during drafting would crash the game!
-            // It's unlikely to happen, but if it does, let's handle it gracefully by ending the game
-            // and declaring the player with the most time remaining the winner ...
-            if (this.hasChildGameState(ThematicDraftHouseCardsGameState)
-                || this.hasChildGameState(DraftHouseCardsGameState)
-                || this.hasChildGameState(DraftGameState)) // Todo: Refactor Thematic Draft and House Card Draft to be child of this
+            // It's unlikely to happen, but if it does, let's handle it gracefully by cancelling the game
+            if (this.childGameState instanceof DraftGameState)
             {
-                // Determine winner by finding the one with the most time left. On draw normal tie breaker is applied.
-                const winner = _.orderBy(this.game.getPotentialWinners().filter(h => h != player.house && !this.isVassalHouse(h)),
-                    h => this.getControllerOfHouse(h).liveClockData?.remainingSeconds, "desc")[0];
-
-                this.setChildGameState(new GameEndedGameState(this)).firstStart(winner);
+                this.setChildGameState(new CancelledGameState(this)).firstStart();
                 updateLastActive = true;
                 return;
             }
@@ -2069,16 +1965,8 @@ export default class IngameGameState extends GameState<
                 return {result: false, reason: "min-player-count-reached"};
             }
 
-            if (this.childGameState instanceof DraftHouseCardsGameState) {
-                return {result: false, reason: "ongoing-house-card-drafting"}
-            }
-
-            if (this.childGameState instanceof ThematicDraftHouseCardsGameState) {
-                return {result: false, reason: "ongoing-house-card-drafting"}
-            }
-
             if (this.childGameState instanceof DraftGameState) {
-                return {result: false, reason: "ongoing-house-card-drafting"}
+                return {result: false, reason: "ongoing-draft"};
             }
         }
 
@@ -2464,16 +2352,12 @@ export default class IngameGameState extends GameState<
                 return GameEndedGameState.deserializeFromServer(this, data);
             case "cancelled":
                 return CancelledGameState.deserializeFromServer(this, data);
-            case "draft-house-cards":
-                return DraftHouseCardsGameState.deserializeFromServer(this, data);
-            case "thematic-draft-house-cards":
-                return ThematicDraftHouseCardsGameState.deserializeFromServer(this, data);
             case "draft":
                 return DraftGameState.deserializeFromServer(this, data);
             case "pay-debts":
                 return PayDebtsGameState.deserializeFromServer(this, data);
             case "choose-initial-objectives":
-                return ChooseInitialObjectivesGameState.deserializeFromServer(this, data)
+                return ChooseInitialObjectivesGameState.deserializeFromServer(this, data);
         }
     }
 }
@@ -2496,6 +2380,5 @@ export interface SerializedIngameGameState {
     bannedUsers: string[];
     childGameState: SerializedPlanningGameState | SerializedActionGameState | SerializedWesterosGameState
         | SerializedGameEndedGameState | SerializedCancelledGameState | SerializedPayDebtsGameState
-        | SerializedDraftHouseCardsGameState | SerializedThematicDraftHouseCardsGameState | SerializedDraftGameState
-        | SerializedChooseInitialObjectivesGameState;
+        | SerializedDraftGameState | SerializedChooseInitialObjectivesGameState;
 }

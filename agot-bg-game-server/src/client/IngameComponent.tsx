@@ -72,10 +72,7 @@ import HouseRowComponent from "./HouseRowComponent";
 import UserSettingsComponent from "./UserSettingsComponent";
 import { GameSettings } from '../common/EntireGame';
 import {isMobile} from 'react-device-detect';
-import DraftHouseCardsGameState from "../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
-import DraftHouseCardsComponent from "./game-state-panel/DraftHouseCardsComponent";
-import ThematicDraftHouseCardsGameState from "../common/ingame-game-state/thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
-import ThematicDraftHouseCardsComponent from "./game-state-panel/ThematicDraftHouseCardsComponent";
+import DraftHouseCardsGameState from "../common/ingame-game-state/draft-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import DraftGameState from "../common/ingame-game-state/draft-game-state/DraftGameState";
 import ClashOfKingsGameState from "../common/ingame-game-state/westeros-game-state/clash-of-kings-game-state/ClashOfKingsGameState";
 import houseCardsBackImages from "./houseCardsBackImages";
@@ -932,8 +929,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                     { mapControls: this.mapControls, ...this.props },
                                     _.concat(
                                         phases.map(phase => [phase.gameState, phase.component] as [any, typeof Component]),
-                                        [[ThematicDraftHouseCardsGameState, ThematicDraftHouseCardsComponent]],
-                                        [[DraftHouseCardsGameState, DraftHouseCardsComponent]],
                                         [[DraftGameState, DraftComponent]],
                                         [[GameEndedGameState, GameEndedComponent]],
                                         [[CancelledGameState, IngameCancelledComponent]],

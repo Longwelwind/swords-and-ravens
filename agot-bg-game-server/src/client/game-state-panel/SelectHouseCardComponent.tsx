@@ -10,7 +10,7 @@ import SelectHouseCardGameState
     from "../../common/ingame-game-state/select-house-card-game-state/SelectHouseCardGameState";
 import HouseCard from "../../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import HouseCardComponent from "./utils/HouseCardComponent";
-import DraftHouseCardsGameState from "../../common/ingame-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
+import DraftHouseCardsGameState from "../../common/ingame-game-state/draft-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import _ from "lodash";
 
 @observer

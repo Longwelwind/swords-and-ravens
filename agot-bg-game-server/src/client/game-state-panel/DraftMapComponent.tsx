@@ -44,6 +44,9 @@ export default class DraftMapComponent extends Component<GameStateComponentProps
                 </Row>
                 {this.isParticipatingInDraft && this.player != null &&
                 <Row className="justify-content-center">
+                    <Col xs="12" className="text-center text-normal">
+                        Click on a unit to remove it, or click on a highlighted region to add units.
+                    </Col>
                     <Col xs="auto">
                         <Button type="button"
                             disabled={this.props.gameState.readyHouses.includes(this.player.house)}

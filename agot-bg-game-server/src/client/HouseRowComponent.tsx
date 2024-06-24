@@ -34,7 +34,7 @@ import ConditionalWrap from "./utils/ConditionalWrap";
 import { port, sea } from "../common/ingame-game-state/game-data-structure/regionTypes";
 import { houseColorFilters } from "./houseColorFilters";
 import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
-import ThematicDraftHouseCardsGameState from "../common/ingame-game-state/thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
+import ThematicDraftHouseCardsGameState from "../common/ingame-game-state/draft-game-state/thematic-draft-house-cards-game-state/ThematicDraftHouseCardsGameState";
 import { toast } from "react-toastify";
 import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 import ChooseHouseCardGameState from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/choose-house-card-game-state/ChooseHouseCardGameState";
