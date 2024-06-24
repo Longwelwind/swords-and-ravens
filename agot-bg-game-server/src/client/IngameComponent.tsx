@@ -234,7 +234,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     render(): ReactNode {
-        const draftHouseCards = this.ingame.childGameState instanceof DraftHouseCardsGameState;
+        const draftHouseCards = this.ingame.hasChildGameState(DraftHouseCardsGameState);
 
         const columnOrders = this.getColumnOrders(this.user?.settings.responsiveLayout);
 
