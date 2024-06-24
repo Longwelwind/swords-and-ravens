@@ -632,7 +632,7 @@ function distributeUnassignedRegions(ingame: IngameGameState): void {
             const freeAdjacents = _.uniq(_.difference(_.flatMap(regionsToProcess.map(r => getAdjacentRegions(ingame, r))))
                 .filter(r => {
                     const controller = r.getController();
-                    return (controller == null || controller == h) && !allAssignedRegions.includes(r) && r.garrison == 0;
+                    return ((controller == null && r.type.id != "port") || controller == h) && !allAssignedRegions.includes(r) && r.garrison == 0;
                 }, regionsToProcess));
             freeAdjacents.forEach(r => {
                 const possibleHouses = newAssignments.tryGet(r, [] as House[]);
