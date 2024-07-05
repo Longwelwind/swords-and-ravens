@@ -12,12 +12,11 @@ import MusteringGameState from "../../common/ingame-game-state/westeros-game-sta
 import MusteringComponent from "./MusteringComponent";
 import { Row, Col } from "react-bootstrap";
 import WesterosCardComponent from "./utils/WesterosCardComponent";
+import PlaceOrdersForVassalsGameState from "../../common/ingame-game-state/planning-game-state/place-orders-for-vassals-game-state/PlaceOrdersForVassalsGameState";
+import PlaceOrdersForVassalsComponent from "./PlaceOrdersForVassalsComponent";
 
 @observer
 export default class PlanningComponent extends Component<GameStateComponentProps<PlanningGameState>> {
-    modifyRegionsOnMapCallback: any;
-    modifyOrdersOnMapCallback: any;
-
     render(): ReactNode {
         return (
             <>
@@ -38,6 +37,7 @@ export default class PlanningComponent extends Component<GameStateComponentProps
                 <Row className="justify-content-center">
                     {renderChildGameState(this.props, [
                         [PlaceOrdersGameState, PlaceOrdersComponent],
+                        [PlaceOrdersForVassalsGameState, PlaceOrdersForVassalsComponent],
                         [ClaimVassalsGameState, ClaimVassalsComponent],
                         [MusteringGameState, MusteringComponent]
                     ])}

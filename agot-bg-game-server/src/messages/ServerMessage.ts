@@ -17,7 +17,7 @@ import { SerializedRegion } from "../common/ingame-game-state/game-data-structur
 
 export type ServerMessage = NewUser | HouseChosen | AuthenticationResponse | OrderPlaced | PlayerReady | PlayerUnready
     | HouseCardChosen | SupportDeclared | SupportRefused | NewTurn | RemovePlacedOrder
-    | MoveUnits | CombatChangeArmy
+    | MoveUnits | CombatChangeArmy | NextHouse
     | UnitsWounded | ChangeCombatHouseCard | BeginSeeTopWildlingCard
     | RavenOrderReplaced | RevealTopWildlingCard | HideTopWildlingCard | ProceedWesterosCard | ChangeGarrison
     | BiddingBegin | BidDone | BiddingNextTrack | GameStateChange | SupplyAdjusted
@@ -574,4 +574,9 @@ interface UpdatePublicVisibleRegionsForSpectators {
     ordersToMakeVisible?: [string, number][];
     clear?: boolean;
     applyChangesNow?: boolean;
+}
+
+interface NextHouse {
+    type: "next-house";
+    house: string;
 }

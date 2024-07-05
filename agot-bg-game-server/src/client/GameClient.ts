@@ -42,9 +42,29 @@ export default class GameClient {
     chatClient: ChatClient = new ChatClient(this);
     sfxManager: SfxManager = new SfxManager(this);
 
+    get currentVolumeSettings(): { notifications: number, music: number, sfx: number} {
+        if (!this.authenticatedUser) {
+            throw new Error("Authenticated user required");
+        }
+        return {
+            notifications: this.authenticatedUser.settings.notificationsVolume,
+            music: this.authenticatedUser.settings.musicVolume,
+            sfx: this.authenticatedUser.settings.sfxVolume
+        };
+    }
+
+    private set currentVolumeSettings(value: { notifications: number, music: number, sfx: number}) {
+        if (!this.authenticatedUser) {
+            throw new Error("Authenticated user required");
+        }
+        this.authenticatedUser.settings.notificationsVolume = value.notifications ?? 1;
+        this.authenticatedUser.settings.musicVolume = value.music ?? 1;
+        this.authenticatedUser.settings.sfxVolume = value.sfx ?? 1;
+    }
+
     get muted(): boolean {
         if (!this.authenticatedUser) {
-            throw new Error("Game client must have an authenticated user");
+            throw new Error("Authenticated user required");
         }
 
         return this.authenticatedUser.settings.muted;
@@ -52,40 +72,33 @@ export default class GameClient {
 
     set muted(value: boolean) {
         if (!this.authenticatedUser) {
-            throw new Error("Game client must have an authenticated user");
+            throw new Error("Authenticated user required");
         }
 
         this.authenticatedUser.settings.muted = value;
         if (value == true) {
-            const oldVolumes = {
-                notificationsVolume: this.authenticatedUser.settings.notificationsVolume,
-                musicVolume: this.authenticatedUser.settings.musicVolume,
-                sfxVolume: this.authenticatedUser.settings.sfxVolume
-            };
-            localStorage.setItem('oldVolumes', JSON.stringify(oldVolumes));
+            sessionStorage.setItem('oldVolumes', JSON.stringify(this.currentVolumeSettings));
 
-            this.authenticatedUser.settings.notificationsVolume = 0;
-            this.authenticatedUser.settings.musicVolume = 0;
-            this.authenticatedUser.settings.sfxVolume = 0;
+            this.currentVolumeSettings = {notifications: 0, music: 0, sfx: 0};
 
             this.sfxManager.muteAll();
         } else {
-            const oldVolumesFromStorage = JSON.parse(localStorage.getItem('oldVolumes') || '{}');
-            this.authenticatedUser.settings.notificationsVolume = oldVolumesFromStorage.notificationsVolume ?? 1;
-            this.authenticatedUser.settings.musicVolume = oldVolumesFromStorage.musicVolume ?? 1;
-            this.authenticatedUser.settings.sfxVolume = oldVolumesFromStorage.sfxVolume ?? 1;
+            const oldVolumesFromStorage = JSON.parse(sessionStorage.getItem('oldVolumes') || '{}');
+            this.currentVolumeSettings = oldVolumesFromStorage;
 
-            localStorage.removeItem('oldVolumes');
+            localStorage.removeItem('oldVolumes'); // Todo: Remove this some day
+            sessionStorage.removeItem('oldVolumes');
 
             this.sfxManager.unmuteAll();
         }
 
+        localStorage.setItem('volumeSettings', JSON.stringify(this.currentVolumeSettings));
         this.authenticatedUser.syncSettings();
     }
 
     get notificationsVolume(): number {
         if (!this.authenticatedUser) {
-            throw new Error("Game client must have an authenticated user");
+            throw new Error("Authenticated user required");
         }
 
         return this.authenticatedUser.settings.notificationsVolume;
@@ -93,18 +106,18 @@ export default class GameClient {
 
     set notificationsVolume(value: number) {
         if (!this.authenticatedUser) {
-            throw new Error("Game client must have an authenticated user");
+            throw new Error("Authenticated user required");
         }
 
         this.authenticatedUser.settings.notificationsVolume = value;
-        this.setCurrentMutedState(value);
+        this.setCurrentMutedStateAndSaveVolumeSettingsToLocalStorage();
 
         this.authenticatedUser.syncSettings();
     }
 
     get musicVolume(): number {
         if (!this.authenticatedUser) {
-            throw new Error("Game client must have an authenticated user");
+            throw new Error("Authenticated user required");
         }
 
         return this.authenticatedUser.settings.musicVolume;
@@ -112,18 +125,18 @@ export default class GameClient {
 
     set musicVolume(value: number) {
         if (!this.authenticatedUser) {
-            throw new Error("Game client must have an authenticated user");
+            throw new Error("Authenticated user required");
         }
 
         this.authenticatedUser.settings.musicVolume = value;
-        this.setCurrentMutedState(value);
+        this.setCurrentMutedStateAndSaveVolumeSettingsToLocalStorage();
 
         this.authenticatedUser.syncSettings();
     }
 
     get sfxVolume(): number {
         if (!this.authenticatedUser) {
-            throw new Error("Game client must have an authenticated user");
+            throw new Error("Authenticated user required");
         }
 
         return this.authenticatedUser.settings.sfxVolume;
@@ -131,18 +144,18 @@ export default class GameClient {
 
     set sfxVolume(value: number) {
         if (!this.authenticatedUser) {
-            throw new Error("Game client must have an authenticated user");
+            throw new Error("Authenticated user required");
         }
 
         this.authenticatedUser.settings.sfxVolume = value;
-        this.setCurrentMutedState(value);
+        this.setCurrentMutedStateAndSaveVolumeSettingsToLocalStorage();
 
         this.authenticatedUser.syncSettings();
     }
 
     get authenticatedPlayer(): Player | null {
         if (!this.authenticatedUser) {
-            throw new Error("Game client must have an authenticated user");
+            throw new Error("Authenticated user required");
         }
 
         if (!this.entireGame || !(this.entireGame.childGameState instanceof IngameGameState)) {
@@ -156,16 +169,18 @@ export default class GameClient {
         }
     }
 
-    private setCurrentMutedState(value: number): void {
+    private setCurrentMutedStateAndSaveVolumeSettingsToLocalStorage(): void {
         if (!this.authenticatedUser) {
             return;
         }
 
-        if (value > 0) {
-            this.authenticatedUser.settings.muted = false;
-        } else if (this.musicVolume == 0 && this.notificationsVolume == 0 && this.sfxVolume == 0) {
+        if (this.musicVolume == 0 && this.notificationsVolume == 0 && this.sfxVolume == 0) {
             this.authenticatedUser.settings.muted = true;
+        } else {
+            this.authenticatedUser.settings.muted = false;
         }
+
+        localStorage.setItem('volumeSettings', JSON.stringify(this.currentVolumeSettings));
     }
 
     constructor(authData: AuthData) {
@@ -307,6 +322,7 @@ export default class GameClient {
 
             this.connectionState = ConnectionState.SYNCED;
             this.isReconnecting = false;
+            this.loadVolumeSettingsFromLocalStorage();
         } else if (message.type == "new-private-chat-room") {
             if (this.entireGame == null) {
                 return;
@@ -376,5 +392,16 @@ export default class GameClient {
         this.authenticated = false;
         this.authenticatedUser = null;
         this.isReconnecting = false;
+    }
+
+    private loadVolumeSettingsFromLocalStorage(): void {
+        const item = localStorage.getItem('volumeSettings');
+        if (!item) {
+            return;
+        }
+
+        const volumeSettings = JSON.parse(item);
+        this.currentVolumeSettings = volumeSettings;
+        this.setCurrentMutedStateAndSaveVolumeSettingsToLocalStorage();
     }
 }

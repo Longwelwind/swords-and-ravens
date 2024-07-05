@@ -174,7 +174,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                                             theme={Theme.DARK}
                                             autoFocusSearch={!isMobile}
                                             emojiStyle={isMobile ? EmojiStyle.NATIVE : EmojiStyle.APPLE}
-                                            suggestedEmojisMode={SuggestionMode.FREQUENT}
+                                            suggestedEmojisMode={SuggestionMode.RECENT}
                                             lazyLoadEmojis={true}
                                             onEmojiClick={(emoji) => {
                                                 const input = document.getElementById(`chat-client-input-${this.channel.id}`) as HTMLInputElement;
