@@ -106,7 +106,7 @@ export default class IngameGameState extends GameState<
     }
 
     get actionState(): ActionGameState | null {
-        return this.childGameState as ActionGameState;
+        return this.childGameState instanceof ActionGameState ? this.childGameState : null;
     }
 
     get sortedByLeadingPlayers(): Player[] {
@@ -1081,7 +1081,9 @@ export default class IngameGameState extends GameState<
         });
 
         // Remove orphaned orders
-        this.actionState?.findOrphanedOrdersAndRemoveThem();
+        if (this.actionState) {
+            this.actionState.findOrphanedOrdersAndRemoveThem();
+        }
 
         // Destroy orphaned ships in ports
         findOrphanedShipsAndDestroyThem(this, this.actionState);
