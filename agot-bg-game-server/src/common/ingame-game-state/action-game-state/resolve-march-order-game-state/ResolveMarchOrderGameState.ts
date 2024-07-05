@@ -62,9 +62,6 @@ export default class ResolveMarchOrderGameState extends GameState<
     onResolveSingleMarchOrderGameStateFinish(house: House): void {
         // Last march is completely handled
 
-        // Remove orphaned orders (e.g. caused by Mace Tyrell or Ilyn Payne or due to failed retreat)
-        this.actionGameState.findOrphanedOrdersAndRemoveThem();
-
         // Reset all card abilities (e.g. due to DWD Queen of Thorns)
         const manipulatedHouseCards = this.game.getAllHouseCardsInGame().values
             .filter(hc => hc.disabled || hc.originalCombatStrength !== undefined);

@@ -1074,6 +1074,9 @@ export default class IngameGameState extends GameState<
             }
         });
 
+        // Remove orphaned orders
+        this.actionState?.findOrphanedOrdersAndRemoveThem();
+
         // Destroy orphaned ships in ports
         findOrphanedShipsAndDestroyThem(this, this.actionState);
 
