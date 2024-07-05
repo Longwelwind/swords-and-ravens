@@ -525,10 +525,10 @@ export default class MapComponent extends Component<MapComponentProps> {
 
             let order: Order | null = null;
             let orderPresent = false;
-            if (this.ingame.childGameState instanceof PlanningGameState && this.ingame.childGameState.childGameState instanceof PlaceOrdersGameState) {
-                const placeOrders = this.ingame.childGameState.childGameState;
-                orderPresent = placeOrders.placedOrders.has(region);
-                order = orderPresent ? placeOrders.placedOrders.get(region) : null;
+            if (this.ingame.childGameState instanceof PlanningGameState) {
+                const planning = this.ingame.childGameState;
+                orderPresent = planning.placedOrders.has(region);
+                order = orderPresent ? planning.placedOrders.get(region) : null;
             } else {
                 orderPresent = this.ingame.ordersOnBoard.has(region);
                 order = orderPresent ? this.ingame.ordersOnBoard.get(region) : null;

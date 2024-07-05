@@ -2367,6 +2367,23 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
                 return result;
             }
         }
+    },
+    {
+        version: "120",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame" && serializedGame.childGameState.childGameState.type == "planning") {
+                const planning = serializedGame.childGameState.childGameState;
+
+                if (planning.childGameState.type == "place-orders") {
+                    planning.placedOrders = planning.childGameState.placedOrders;
+
+                    if (planning.childGameState.forVassals) {
+                        planning.childGameState.readyHouses = [];
+                    }
+                }
+            }
+            return serializedGame;
+        }
     }
 ];
 
