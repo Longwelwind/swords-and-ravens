@@ -32,7 +32,7 @@ import CombatGameState from "./action-game-state/resolve-march-order-game-state/
 import DeclareSupportGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/declare-support-game-state/DeclareSupportGameState";
 import shuffle from "../../utils/shuffle";
 import shuffleInPlace from "../../utils/shuffleInPlace";
-import popRandom from "../../utils/popRandom";
+import popRandom, { pickRandom } from "../../utils/popRandom";
 import LoanCard from "./game-data-structure/loan-card/LoanCard";
 import PayDebtsGameState, { SerializedPayDebtsGameState } from "./pay-debts-game-state/PayDebtsGameState";
 import { objectiveCards } from "./game-data-structure/static-data-structure/objectiveCards";
@@ -46,6 +46,7 @@ import houseCardAbilities from "./game-data-structure/house-card/houseCardAbilit
 import SnrError from "../../utils/snrError";
 import { TakeOverPort, findOrphanedShipsAndDestroyThem, isTakeControlOfEnemyPortRequired } from "./port-helper/PortHelper";
 import { dragon } from "./game-data-structure/unitTypes";
+import groupBy from "../../utils/groupBy";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -955,12 +956,17 @@ export default class IngameGameState extends GameState<
 
         // Find new random commander
         let newCommander: House | null = null;
-        for (const house of shuffle(this.game.getTurnOrder()).filter(h => !this.isVassalHouse(h))) {
-            if (!forbiddenCommanders.includes(house)) {
-                newCommander = house;
-                break;
-            }
+
+        const possibleCommanders = this.game.houses.values.filter(h => !this.isVassalHouse(h) && !forbiddenCommanders.includes(h));
+        const commandersByVassalCount = groupBy(possibleCommanders, h => this.getVassalsControlledByPlayer(this.getControllerOfHouse(h)).length);
+
+        const commanders = _.sortBy(commandersByVassalCount.entries, ([count, _commanders]) => count).shift();
+
+        if (!commanders) {
+            throw new SnrError(this.entireGame, "Unable to determine new commander");
         }
+
+        newCommander = pickRandom(commanders[1]);
 
         if (!newCommander) {
             throw new SnrError(this.entireGame, "Unable to determine new commander");
