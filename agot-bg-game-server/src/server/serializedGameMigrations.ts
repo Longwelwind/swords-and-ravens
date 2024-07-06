@@ -2391,6 +2391,20 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             serializedGame.gameSettings.houseCardsEvolutionRound = 5;
             return serializedGame;
         }
+    },
+    {
+        version: "122",
+        migrate: (serializedGame: any) => {
+            if (serializedGame.childGameState.type == "ingame") {
+                const ingame = serializedGame.childGameState;
+                if (ingame.unitVisibilityRange === undefined) {
+                    ingame.unitVisibilityRangeModifier = 0;
+                } else {
+                    ingame.unitVisibilityRangeModifier = ingame.unitVisibilityRange - 1;
+                }
+            }
+            return serializedGame;
+        }
     }
 ];
 

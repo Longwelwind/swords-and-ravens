@@ -9,6 +9,7 @@ export default class UnitType {
     walksOn: RegionKind;
     canTransport: RegionKind | null;
     canRetreat: boolean;
+    visibilityRange: number;
 
     constructor(
         id: string,
@@ -18,7 +19,8 @@ export default class UnitType {
         combatStrength: number,
         combatStrengthOnAttackStructure: number | null = null,
         canTransport: RegionKind | null = null,
-        canRetreat = true
+        canRetreat = true,
+        visibilityRange = 1
     ) {
         this.id = id;
         this.name = name;
@@ -28,5 +30,6 @@ export default class UnitType {
         this.combatStrength = combatStrength;
         this.combatStrengthOnAttackStructure = combatStrengthOnAttackStructure;
         this.canRetreat = canRetreat;
+        this.visibilityRange = visibilityRange;
     }
 }
