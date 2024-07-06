@@ -2384,6 +2384,13 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
             }
             return serializedGame;
         }
+    },
+    {
+        version: "121",
+        migrate: (serializedGame: any) => {
+            serializedGame.gameSettings.houseCardsEvolutionRound = 5;
+            return serializedGame;
+        }
     }
 ];
 

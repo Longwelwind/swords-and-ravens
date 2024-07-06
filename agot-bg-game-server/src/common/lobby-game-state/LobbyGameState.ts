@@ -214,6 +214,10 @@ export default class LobbyGameState extends GameState<EntireGame> {
                 settings.loyaltyTokenCountNeededToWin = 7;
             }
 
+            if (settings.houseCardsEvolutionRound < 2 || settings.houseCardsEvolutionRound > 10) {
+                settings.houseCardsEvolutionRound = 5;
+            }
+
             if (settings.houseCardsEvolution) {
                 settings.adwdHouseCards = false;
                 settings.asosHouseCards = false;

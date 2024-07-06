@@ -349,7 +349,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         onChange={() => this.changeGameSettings(() => this.gameSettings.asosHouseCards = !this.gameSettings.asosHouseCards)}
                     />
                 </Col>
-                <Col xs="12">
+                <Col xs="auto" className="d-flex justify-content-between">
                     <FormCheck
                         id="decks-evolution-setting"
                         type="switch"
@@ -363,12 +363,12 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         checked={this.gameSettings.houseCardsEvolution}
                         onChange={() => this.changeGameSettings(() => this.gameSettings.houseCardsEvolution = !this.gameSettings.houseCardsEvolution)}
                     />
-                </Col>
-                {
-                    this.gameSettings.houseCardsEvolution && (
-                        <Col xs="12">
+                    {
+                        this.gameSettings.houseCardsEvolution && (
                             <div>
+                                <span className="ml-1">- Round:</span>
                                 <select id="decks-evolution-setting-round"
+                                    className="ml-2"
                                     value={this.gameSettings.houseCardsEvolutionRound}
                                     onChange={(e) => this.onHouseCardsEvolutionRoundChange(e.target.value)}
                                     style={{marginBottom: "8px"}}
@@ -382,11 +382,11 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                                     <option key="8" value={8}>8</option>
                                     <option key="9" value={9}>9</option>
                                     <option key="10" value={10}>10</option>
-                                </select>&nbsp;House Card Evolution Round
+                                </select>
                             </div>
-                        </Col>
-                    )
-                }
+                        )
+                    }
+                </Col>
                 {this.props.entireGame.isCustomBalancingOptionAvailable(this.gameSettings) && <Col xs="12">
                     <FormCheck
                         id="custom-balancing-setting"
