@@ -94,7 +94,9 @@ export default class DoranMartellAbilityGameState extends GameState<
             currentIndex = (currentIndex + 1) % numberOfHouses;
             const currentHouseToCheck = turnOrder[currentIndex];
 
-            const regions = this.combatGameState.actionGameState.getRegionsWithMarchOrderOfHouse(currentHouseToCheck);
+            const regions = this.combatGameState.actionGameState.getRegionsWithMarchOrderOfHouse(currentHouseToCheck)
+                // Filter out the march order that initiated the combat
+                .filter(r => r != this.combatGameState.attackingRegion);
             if (regions.length > 0) {
                 return currentHouseToCheck;
             }
