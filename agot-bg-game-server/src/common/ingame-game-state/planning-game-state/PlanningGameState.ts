@@ -121,7 +121,6 @@ export default class PlanningGameState extends GameState<IngameGameState, PlaceO
                 ]
             )
         );
-
         planningGameState.childGameState = planningGameState.deserializeChildGameState(data.childGameState);
 
         return planningGameState;

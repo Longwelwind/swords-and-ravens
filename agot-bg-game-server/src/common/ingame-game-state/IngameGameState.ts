@@ -75,6 +75,7 @@ export default class IngameGameState extends GameState<
     @observable ordersOnBoard: BetterMap<Region, Order> = new BetterMap();
     @observable visibleRegionsPerPlayer: BetterMap<Player, Region[]> = new BetterMap();
     @observable publicVisibleRegions: Region[] = [];
+    unitVisibilityRange = 1;
 
     votes: BetterMap<string, Vote> = new BetterMap();
     @observable paused: Date | null = null;
@@ -336,6 +337,7 @@ export default class IngameGameState extends GameState<
         });
 
         if (this.fogOfWar) {
+            this.unitVisibilityRange = 1;
             this.publicVisibleRegions = [];
             this.entireGame.users.values.filter(u => u.connected).forEach(u => {
                 this.entireGame.sendMessageToClients([u], {
@@ -1658,7 +1660,7 @@ export default class IngameGameState extends GameState<
         return this.visibleRegionsPerPlayer.get(player);
     }
 
-    calculateVisibleRegionsForPlayer(player: Player | null, unitVisibilityRange = 1): Region[] {
+    calculateVisibleRegionsForPlayer(player: Player | null): Region[] {
         if (!this.fogOfWar || !player) {
             return [];
         }
@@ -1676,7 +1678,7 @@ export default class IngameGameState extends GameState<
         const checkedRegions: Region[] = [];
 
         // Additionally we see regions adjacents to our regions with units
-        for(let i=0; i<unitVisibilityRange; i++) {
+        for(let i=0; i < this.unitVisibilityRange; i++) {
             const additionalRegionsToCheck: Region[] = [];
             for (let j=0; j<regionsWithUnits.length; j++) {
                 const region = regionsWithUnits[j];
@@ -1689,7 +1691,7 @@ export default class IngameGameState extends GameState<
                 }
             }
 
-            if (unitVisibilityRange > 1) {
+            if (this.unitVisibilityRange > 1) {
                 regionsWithUnits.push(...additionalRegionsToCheck);
                 regionsWithUnits = _.uniq(regionsWithUnits);
             }
@@ -2306,6 +2308,7 @@ export default class IngameGameState extends GameState<
                 ? this.visibleRegionsPerPlayer.entries.map(([p, regions]) => [p.user.id, regions.map(r => r.id)])
                 : this.visibleRegionsPerPlayer.entries.filter(([p, _regions]) => p.user == user).map(([p, regions]) => [p.user.id, regions.map(r => r.id)]),
             publicVisibleRegions: this.publicVisibleRegions.map(r => r.id),
+            unitVisibilityRange: this.unitVisibilityRange,
             oldPlayerIds: this.oldPlayerIds,
             replacerIds: this.replacerIds,
             timeoutPlayerIds: this.timeoutPlayerIds,
@@ -2332,6 +2335,7 @@ export default class IngameGameState extends GameState<
             data.visibleRegionsPerPlayer.map(([uid, rids]) => [ingameGameState.players.get(entireGame.users.get(uid)), rids.map(rid => ingameGameState.world.regions.get(rid))])
         );
         ingameGameState.publicVisibleRegions = data.publicVisibleRegions.map(rid => ingameGameState.world.regions.get(rid));
+        ingameGameState.unitVisibilityRange = data.unitVisibilityRange;
         ingameGameState.oldPlayerIds = data.oldPlayerIds;
         ingameGameState.replacerIds = data.replacerIds;
         ingameGameState.timeoutPlayerIds = data.timeoutPlayerIds;
@@ -2378,6 +2382,7 @@ export interface SerializedIngameGameState {
     players: SerializedPlayer[];
     visibleRegionsPerPlayer: [string, string[]][];
     publicVisibleRegions: string[];
+    unitVisibilityRange: number;
     oldPlayerIds: string[];
     replacerIds: string[];
     timeoutPlayerIds: string[];

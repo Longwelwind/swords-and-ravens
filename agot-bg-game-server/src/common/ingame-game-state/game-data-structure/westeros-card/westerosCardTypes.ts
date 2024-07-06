@@ -60,7 +60,7 @@ export const stormOfSwords = new StormOfSwordsWesterosCardType("storm-of-swords"
 export const rainsOfAutumn = new RainsOfAutumnWesterosCardType("rains-of-autumn", "Rains\xa0of\xa0Autumn", "March +1 Orders cannot be played this Planning Phase.", "No\xa0M+1", 2);
 export const putToTheSword = new PutToTheSwordWesterosCardType("put-to-the-sword", "Put\xa0to\xa0the\xa0Sword", "The holder of the Valyrian Steel Blade chooses one of the following conditions for this Planning Phase: a) Defense Orders cannot be played b) March +1 Orders cannot be played, or c) no restrictions.", "VSB\xa0decides");
 export const wildlingsAttack = new WildlingsAttackWesterosCardType("wildlings-attack", "Wildlings\xa0Attack", "The wildlings attack Westeros.", "");
-export const denseFog = new DenseFogWesterosCardType("dense-fog", "Dense\xa0Fog", "Visibility distance is reduced by one this round.", "");
+export const denseFog = new DenseFogWesterosCardType("dense-fog", "Dense\xa0Fog", "Visibility distance is reduced by one this round.", "", 2);
 
 export const domesticDisputes = new DomesticDisputesWesterosCardType("domestic-disputes", "Domestic\xa0Disputes", "The Targaryen player may discard 1 Power\xa0token to choose up to 4 other houses. Place 1 loyalty\xa0token on the home areas of those houses.", "Loyalty\xa0tokens in home areas", 0, ["storms-end"]);
 export const emptyPromises = new EmptyPromisesWesterosCardType("empty-promises", "Empty\xa0Promises", "The Targaryen player may discard 1 Power\xa0token to place a loyalty\xa0token on either: The Mountains of the Moon or Moat Cailin.", "Place loyalty\xa0tokens", 0, ["the-stony-shore"], ["the-mountains-of-the-moon", "moat-cailin"]);
