@@ -322,6 +322,7 @@ interface DoranUsed {
     house: string;
     affectedHouse: string;
     influenceTrack: number;
+    skippedHouse?: string;
 }
 
 interface SerGerrisDrinkwaterUsed {

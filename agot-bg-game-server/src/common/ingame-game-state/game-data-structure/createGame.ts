@@ -410,14 +410,13 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
     game.westerosDecks = baseGameData.westerosCards.map(westerosDeckData => {
         const cards: WesterosCard[] = [];
         westerosDeckData.forEach((westerosCardData: WesterosCardData) => {
-            const westerosCardType = westerosCardTypes.get(westerosCardData.type);
-            const quantity = westerosCardData.quantity ? westerosCardData.quantity : 1;
-            for (let i = 0;i < quantity;i++) {
-                const id = ++lastWesterosCardId;
-
-                cards.push(new WesterosCard(id, westerosCardType));
-            }
-        });
+                const westerosCardType = westerosCardTypes.get(westerosCardData.type);
+                const quantity = westerosCardData.quantity ? westerosCardData.quantity : 1;
+                for (let i = 0;i < quantity;i++) {
+                    const id = ++lastWesterosCardId;
+                    cards.push(new WesterosCard(id, westerosCardType));
+                }
+            });
 
         return shuffleInPlace(cards);
     });
@@ -465,6 +464,12 @@ export default function createGame(ingame: IngameGameState, housesToCreate: stri
 
         shuffleInPlace(cards);
         game.westerosDecks[0] = cards;
+    }
+
+    if (gameSettings.fogOfWar) {
+        const id = ++lastWesterosCardId;
+        game.westerosDecks[2].push(new WesterosCard(id, westerosCardTypes.get("dense-fog")));
+        shuffleInPlace(game.westerosDecks[2]);
     }
 
     game.winterIsComingHappened = [];

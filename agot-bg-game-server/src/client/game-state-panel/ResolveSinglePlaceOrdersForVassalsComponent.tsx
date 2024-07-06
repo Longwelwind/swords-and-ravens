@@ -205,7 +205,7 @@ export default class ResolveSinglePlaceOrdersForVassalsComponent extends Compone
         const readyState = this.singlePlaceOrders.placeOrdersGameState.canSubmit(this.props.gameClient.authenticatedPlayer);
 
         if (readyState.reason == "not-all-regions-filled") {
-            if (!window.confirm("You may place up to two order tokens. Are you sure you want to continue with fewer?")) {
+            if (!window.confirm("You may place up to two order tokens per vassal. Are you sure you want to continue with fewer?")) {
                 return;
             }
         }

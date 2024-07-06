@@ -471,7 +471,7 @@ export default class PostCombatGameState extends GameState<
         if (house.houseCards.values.every(hc => hc.state == HouseCardState.USED)) {
             if (this.entireGame.gameSettings.houseCardsEvolution
                 && house.laterHouseCards != null
-                && this.combat.ingameGameState.game.turn >= 5) {
+                && this.combat.ingameGameState.game.turn >= this.entireGame.gameSettings.houseCardsEvolutionRound) {
 
                 // We need to swap to the new deck now
                 this.game.previousPlayerHouseCards.set(house, new BetterMap());

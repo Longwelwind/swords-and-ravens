@@ -29,10 +29,30 @@ export default class DoranMartellAbilityGameState extends GameState<
     onSimpleChoiceGameStateEnd(choice: number, resolvedAutomatically: boolean): void {
         const enemy = this.combatGameState.getEnemy(this.childGameState.house);
 
+        // Remember the house that currently would resolve next march order
+        const nextHouse = this.getHouseThatWouldResolveNextMarchOrder();
+
         // Put the enemy at the end of the influence track
         const influenceTrack = this.game.getInfluenceTrackByI(choice);
         const newInfluenceTrack = _.concat(_.without(influenceTrack, enemy), enemy);
         this.ingame.setInfluenceTrack(choice, newInfluenceTrack);
+
+        if (choice == 0) {
+            // Add the skippedTurnForHouse property if next player in order loses their turn.
+            const nextHouseAfterDoran = this.getHouseThatWouldResolveNextMarchOrder();
+
+            if (nextHouse && nextHouse != nextHouseAfterDoran) {
+                this.ingame.log({
+                    type: "doran-used",
+                    house: this.childGameState.house.id,
+                    affectedHouse: enemy.id,
+                    influenceTrack: choice,
+                    skippedHouse: nextHouse.id,
+                }, resolvedAutomatically);
+                this.parentGameState.onHouseCardResolutionFinish(this.childGameState.house);
+                return;
+            }
+        }
 
         this.ingame.log({
             type: "doran-used",
@@ -60,6 +80,28 @@ export default class DoranMartellAbilityGameState extends GameState<
             "",
             ["Iron Throne", "Fiefdoms", "King's Court"]
         );
+    }
+
+    getHouseThatWouldResolveNextMarchOrder(): House | null {
+        const turnOrder = this.game.getTurnOrder();
+        const numberOfHouses = turnOrder.length;
+
+        let currentIndex = this.combatGameState.parentGameState.currentTurnOrderIndex;
+
+        // Check each house in order to find one that has an available March order.
+        // Check at most once for each house
+        for (let i = 0;i < numberOfHouses;i++) {
+            currentIndex = (currentIndex + 1) % numberOfHouses;
+            const currentHouseToCheck = turnOrder[currentIndex];
+
+            const regions = this.combatGameState.actionGameState.getRegionsWithMarchOrderOfHouse(currentHouseToCheck);
+            if (regions.length > 0) {
+                return currentHouseToCheck;
+            }
+        }
+
+        // If no house has any march order available, return null
+        return null;
     }
 
     onPlayerMessage(player: Player, message: ClientMessage): void {
