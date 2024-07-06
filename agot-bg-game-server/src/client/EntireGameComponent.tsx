@@ -274,13 +274,13 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                             <div className="text-center">
                                 {this.settings.dragonWar && <>
                                     <p>
-                                        <h6>Dragon war</h6>
+                                        <h6>Dragon War</h6>
                                         <small>Balon Greyjoy and Aeron Damphair (DwD) have been nerfed!</small>
                                     </p>
                                 </>}
                                 {this.settings.dragonRevenge && <>
                                     <p>
-                                        <h6>Dragon revenge</h6>
+                                        <h6>Dragon Revenge</h6>
                                         <small>The last remaining non-dragon land unit will transform into a dragon!</small>
                                     </p>
                                 </>}

@@ -11,6 +11,8 @@ import Order from "../game-data-structure/Order";
 import _ from "lodash";
 import GameEndedGameState from "../game-ended-game-state/GameEndedGameState";
 import ChooseInitialObjectivesGameState from "../choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
+import PlanningGameState from "../planning-game-state/PlanningGameState";
+import PlaceOrdersForVassalsGameState from "../planning-game-state/place-orders-for-vassals-game-state/PlaceOrdersForVassalsGameState";
 
 export type SerializedVoteType = SerializedCancelGame | SerializedEndGame
     | SerializedReplacePlayer | SerializedReplacePlayerByVassal | SerializedReplaceVassalByPlayer
@@ -266,9 +268,9 @@ export class CancelGame extends VoteType {
             ingame.resumeGame(true);
         }
 
-        if (ingame.hasChildGameState(PlaceOrdersGameState)) {
-            const placeOrders = vote.ingame.getChildGameState(PlaceOrdersGameState) as PlaceOrdersGameState;
-            ingame.ordersOnBoard = placeOrders.placedOrders as BetterMap<Region, Order>;
+        if (ingame.hasChildGameState(PlanningGameState)) {
+            const planning = vote.ingame.getChildGameState(PlanningGameState) as PlanningGameState;
+            ingame.ordersOnBoard = planning.placedOrders as BetterMap<Region, Order>;
             ingame.entireGame.broadcastToClients({
                 type: "reveal-orders",
                 orders: vote.ingame.ordersOnBoard.mapOver(r => r.id, o => o.id)
@@ -595,9 +597,10 @@ export class ReplaceVassalByPlayer extends VoteType {
             houseCards: vote.ingame.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [h.id, hcs.values.map(hc => hc.id)])
         });
 
-        const placeOrders = vote.ingame.leafState instanceof PlaceOrdersGameState ? vote.ingame.leafState : null;
-        if (placeOrders) {
-            const planning = placeOrders.parentGameState;
+        const hasPlaceOrders = vote.ingame.hasChildGameState(PlanningGameState)
+            && (vote.ingame.hasChildGameState(PlaceOrdersGameState) || vote.ingame.hasChildGameState(PlaceOrdersForVassalsGameState));
+        if (hasPlaceOrders) {
+            const planning = vote.ingame.getChildGameState(PlanningGameState) as PlanningGameState;
 
             // Reset waitedFor data, to properly call ingame.setWaitedForPlayers() by the game-state-change
             vote.ingame.resetAllWaitedForData();

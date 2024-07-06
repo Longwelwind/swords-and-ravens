@@ -29,6 +29,7 @@ import _ from "lodash";
 import PartialRecursive from "../utils/PartialRecursive";
 import { land, sea } from "../common/ingame-game-state/game-data-structure/regionTypes";
 import PlaceOrdersGameState from "../common/ingame-game-state/planning-game-state/place-orders-game-state/PlaceOrdersGameState";
+import PlaceOrdersForVassalsGameState from "../common/ingame-game-state/planning-game-state/place-orders-for-vassals-game-state/PlaceOrdersForVassalsGameState";
 import UseRavenGameState from "../common/ingame-game-state/action-game-state/use-raven-game-state/UseRavenGameState";
 import { renderRegionTooltip } from "./regionTooltip";
 import getGarrisonToken from "./garrisonTokens";
@@ -377,10 +378,24 @@ export default class MapComponent extends Component<MapComponentProps> {
                     }
 
                     const clickable = property.onClick != undefined;
+                    const dragonStrength = this.ingame.game.currentDragonStrength;
+
+                    const dragonPrefix = u.type.id == "dragon"
+                        ? dragonStrength <= -1
+                            ? <></>
+                            : dragonStrength <= 1
+                                ? <>Baby </>
+                                : dragonStrength <= 3
+                                    ? <></>
+                                    : dragonStrength <= 5
+                                        ? <>Monster </>
+                                        : <></>
+                        : <>
+                        </>;
 
                     return <OverlayTrigger
                         overlay={<Tooltip id={"unit-tooltip-" + u.id} className="tooltip-w-100">
-                            <div className="text-center"><b>{u.type.name}</b><small> of <b>{controller?.name ?? "Unknown"}</b><br /><b>{r.name}</b></small></div>
+                            <div className="text-center"><b>{dragonPrefix}{u.type.name}</b><small> of <b>{controller?.name ?? "Unknown"}</b><br /><b>{r.name}</b></small></div>
                         </Tooltip>}
                         key={`map-unit-_${controller?.id ?? "must-be-controlled"}_${u.id}`}
                         delay={{ show: 500, hide: 100 }}
@@ -405,7 +420,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                                     "pulsate-bck_fade-in": property.animateFadeIn,
                                     "pulsate-bck_fade-out": property.animateFadeOut,
                                 },
-                                getClassNameForDragonStrength(u.type.id, this.ingame.game.currentDragonStrength)
+                                getClassNameForDragonStrength(u.type.id, dragonStrength)
                             )}
                             style={{
                                 backgroundImage: `url(${unitImages.get(u.allegiance.id).get(u.upgradedType ? u.upgradedType.id : u.type.id)})`,
@@ -597,7 +612,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         }
 
         const drawBorder = order?.type.restrictedTo == sea.kind;
-        const hasPlaceOrders = this.ingame.hasChildGameState(PlaceOrdersGameState);
+        const hasPlaceOrders = this.ingame.hasChildGameState(PlaceOrdersGameState) || this.ingame.hasChildGameState(PlaceOrdersForVassalsGameState);
         const controller = drawBorder  || hasPlaceOrders ? region.getController() : null;
         const color = drawBorder && controller
             ? controller.id != "greyjoy"
