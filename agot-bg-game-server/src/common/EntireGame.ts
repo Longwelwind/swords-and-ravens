@@ -70,7 +70,6 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     onCaptureSentryMessage?: (message: string, severity: "info" | "warning" | "error" | "fatal") => void;
     onSaveGame?: (updateLastActive: boolean) => void;
     onGetUser?: (userId: string) => Promise<StoredUserData | null>;
-    onBeforeGameStateChangedTransmitted?: () => void;
 
     // Throttled saveGame so we don't spam the website client
     saveGame: (updateLastActive: boolean) => void = _.throttle(this.privateSaveGame, 2000);
@@ -174,10 +173,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
             // console.log("===GAME STATE CHANGED===");
             // The GameState tree has been changed, broadcast a message to transmit to them
             // the new game state.
+            if (this.ingameGameState) {
+                this.ingameGameState.updateVisibleRegions();
+            }
             this.broadcastCustomToClients(u => {
-                if (this.onBeforeGameStateChangedTransmitted != null) {
-                    this.onBeforeGameStateChangedTransmitted();
-                }
                 // To serialize the specific game state that has changed, the code serializes the entire
                 // game state tree and pick the appropriate serializedGameState.
                 // TODO: Find less wasteful way of doing this
@@ -222,6 +221,9 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                 p.resetWaitedFor();
             });
 
+            if (this.ingameGameState) {
+                this.ingameGameState.updateVisibleRegions(true);
+            }
             this.notifyWaitedUsers();
             return true;
         }
@@ -642,8 +644,8 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
     getPlayersInGame(): {userId: string; data: object}[] {
         // eslint-disable-next-line @typescript-eslint/ban-types
         const players: {userId: string; data: object}[] = [];
-        if (this.childGameState instanceof LobbyGameState) {
-            this.childGameState.players.forEach((user, house) => {
+        if (this.lobbyGameState) {
+            this.lobbyGameState.players.forEach((user, house) => {
                 // If the game is in "randomize house" mode, don't specify any houses in the PlayerInGame data
                 const playerData: {[key: string]: any} = {};
 
@@ -656,11 +658,10 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                     data: playerData
                 });
             });
-        } else if (this.childGameState instanceof IngameGameState) {
-            const ingame = this.childGameState as IngameGameState;
-            const waitedForUsers = ingame.getWaitedUsers();
+        } else if (this.ingameGameState) {
+            const waitedForUsers = this.ingameGameState.getWaitedUsers();
 
-            ingame.players.forEach((player, user) => {
+            this.ingameGameState.players.forEach((player, user) => {
                 // "Important chat rooms" are chat rooms where unseen messages will display
                 // a badge next to the game in the website.
                 // In this case, it's all private rooms with this player in it. The next line
@@ -674,7 +675,7 @@ export default class EntireGame extends GameState<null, LobbyGameState | IngameG
                         "house": player.house.id,
                         "waited_for": waitedForUsers.includes(user),
                         "important_chat_rooms": importantChatRooms.map(cr => cr.roomId),
-                        "is_winner": ingame.childGameState instanceof GameEndedGameState ? ingame.childGameState.winner == player.house : false,
+                        "is_winner": this.ingameGameState!.childGameState instanceof GameEndedGameState ? this.ingameGameState!.childGameState.winner == player.house : false,
                         "needed_for_vote": player.isNeededForVote
                     }
                 });

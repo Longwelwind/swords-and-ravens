@@ -433,7 +433,6 @@ export default class PostCombatGameState extends GameState<
                     applyChangesNow: !this.combat.ingameGameState.players.has(u)
                 });
             });
-            this.combat.ingameGameState.updateVisibleRegions(true);
         }
 
         this.combat.resolveMarchOrderGameState.onResolveSingleMarchOrderGameStateFinish(this.attacker);

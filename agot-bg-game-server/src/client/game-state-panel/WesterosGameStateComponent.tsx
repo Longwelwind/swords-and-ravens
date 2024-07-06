@@ -73,7 +73,7 @@ export default class WesterosGameStateComponent extends Component<GameStateCompo
                     [ShiftingAmbitionsGameState, ShiftingAmbitionsComponent],
                     [NewInformationGameState, NewInformationComponent]
                 ])}
-                {this.props.gameState.childGameState instanceof DarkWingsDarkWordsGameState && (
+                {this.props.gameState.childGameState instanceof DarkWingsDarkWordsGameState && !this.props.gameState.ingame.fogOfWar && (
                     <Row className="mt-3 justify-content-center">
                         <PossiblePowerTokenGainsComponent ingame={this.props.gameState.ingame} />
                     </Row>

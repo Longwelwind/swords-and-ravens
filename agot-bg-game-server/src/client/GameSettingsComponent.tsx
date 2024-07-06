@@ -11,6 +11,7 @@ import LobbyGameState from "../common/lobby-game-state/LobbyGameState";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { allGameSetups, getGameSetupContainer } from "../common/ingame-game-state/game-data-structure/createGame";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
+import { isMobile } from "react-device-detect";
 
 interface GameSettingsComponentProps {
     gameClient: GameClient;
@@ -394,14 +395,22 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         label={
                             <OverlayTrigger overlay={
                                 <Tooltip id="custom-balancing-tooltip">
-                                    A community proposal to {this.props.entireGame.isMotherOfDragons ?
-                                        "avoid an early gang up against Targaryen" :
-                                        "improve Tyrell's starting position"}. For details see<br/>
-                                    <a href="https://community.swordsandravens.net/viewtopic.php?t=6" target="_blank" rel="noopener noreferrer">
-                                        Tex&apos;s balance proposal
-                                    </a>.
+                                    {this.props.entireGame.isMotherOfDragons
+                                        ? <>
+                                            A community proposal to avoid an early gang up against Targaryen. For
+                                            details see<br/>
+                                            <a href="https://www.boardgamedungeon.net/threads/my-balance-proposition-for-a-game-of-thrones-mother-of-dragons-expansion-targaryen.11/" target="_blank" rel="noopener noreferrer">
+                                                Tex&apos;s balance proposal
+                                            </a>.
+                                        </>
+                                        : <>
+                                            A community proposal to improve Tyrell&apos;s starting position by
+                                            adding a ship to Redwyne Straight&apos;s.
+                                        </>}
                                 </Tooltip>}
-                                delay={{show: 0, hide: 1500}}>
+                                delay={{show: 0, hide: 1500}}
+                                placement={isMobile ? "auto" : "bottom"}
+                            >
                                 <label htmlFor="custom-balancing-setting">Custom Balancing</label>
                             </OverlayTrigger>}
                         checked={this.gameSettings.customBalancing}
