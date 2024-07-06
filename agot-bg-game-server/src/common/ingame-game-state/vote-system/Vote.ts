@@ -9,7 +9,7 @@ import CombatGameState from "../action-game-state/resolve-march-order-game-state
 import ClaimVassalsGameState from "../planning-game-state/claim-vassals-game-state/ClaimVassalsGameState";
 import { getTimeDeltaInSeconds } from "../../../utils/getElapsedSeconds";
 import BiddingGameState from "../westeros-game-state/bidding-game-state/BiddingGameState";
-import PlaceOrdersGameState from "../planning-game-state/place-orders-game-state/PlaceOrdersGameState";
+import PlanningGameState from "../planning-game-state/PlanningGameState";
 
 export enum VoteState {
     ONGOING,
@@ -79,9 +79,9 @@ export default class Vote {
             }
 
             const swapHousesVoteType = this.type;
-            if (this.ingame.hasChildGameState(PlaceOrdersGameState)) {
-                const placeOrders = this.ingame.getChildGameState(PlaceOrdersGameState) as PlaceOrdersGameState;
-                if (placeOrders.placedOrders.keys.some(r => {
+            if (this.ingame.hasChildGameState(PlanningGameState)) {
+                const planning = this.ingame.getChildGameState(PlanningGameState) as PlanningGameState;
+                if (planning.placedOrders.keys.some(r => {
                         const controller = r.getController();
                         return controller == swapHousesVoteType.initiatorHouse || controller == swapHousesVoteType.swappingHouse})
                 ) {
