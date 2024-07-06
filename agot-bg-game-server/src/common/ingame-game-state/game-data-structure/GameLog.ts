@@ -19,7 +19,7 @@ export type GameLogData = TurnBegin | SupportDeclared | SupportRefused | Attack 
     | ActionPhaseBegan | ActionPhaseResolveRaidBegan | ActionPhaseResolveMarchBegan | ActionPhaseResolveConsolidatePowerBegan | PlanningPhaseBegan
     | WildlingStrengthTriggerWildlingsAttack
     | ConsolidatePowerOrderResolved | ArmiesReconciled | EnemyPortTaken | ShipsDestroyedByEmptyCastle
-    | HouseCardAbilityNotUsed | PatchfaceUsed | DoranUsed | DoranDelayedTurn
+    | HouseCardAbilityNotUsed | PatchfaceUsed | DoranUsed
     | TyrionLannisterHouseCardReplaced | TyrionLannisterChoiceMade
     | ArianneMartellPreventMovement | ArianneMartellForceRetreat | LorasTyrellAttackOrderMoved | TywinLannisterPowerTokensGained
     | RooseBoltonHouseCardsReturned | QueenOfThornsOrderRemoved | QueenOfThornsNoOrderAvailable
@@ -322,13 +322,7 @@ interface DoranUsed {
     house: string;
     affectedHouse: string;
     influenceTrack: number;
-}
-
-interface DoranDelayedTurn {
-    type: "doran-delayed-turn";
-    house: string;
-    affectedHouse: string;
-    influenceTrack: number;
+    skippedHouse?: string;
 }
 
 interface SerGerrisDrinkwaterUsed {

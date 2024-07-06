@@ -850,23 +850,19 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const affectedHouse = this.game.houses.get(data.affectedHouse);
                 const influenceTrack = this.game.getNameInfluenceTrack(data.influenceTrack);
+                const skippedHouse = data.skippedHouse
+                    ? this.game.houses.get(data.skippedHouse)
+                    : null;
+
+                const skippedAddition = skippedHouse
+                    ? <>, causing House <b>{skippedHouse.name}</b>&apos;s turn to be skipped
+                        until the next pass of the <b>Iron Throne</b> track</>
+                    : null;
 
                 return <p>
                     <b>Doran Martell</b>: House <b>{house.name}</b> decided to move House <b>
-                        {affectedHouse.name}</b> to the bottom of the <b>{influenceTrack}</b> track.
+                        {affectedHouse.name}</b> to the bottom of the <b>{influenceTrack}</b> track{skippedAddition}.
                 </p>;
-            }
-            case "doran-delayed-turn": {
-                const house = this.game.houses.get(data.house);
-                const affectedHouse = this.game.houses.get(data.affectedHouse);
-                const influenceTrack = this.game.getNameInfluenceTrack(data.influenceTrack);
-
-                return (
-                    <p>
-                        <b>Doran Martell</b>: House <b>{house.name}</b> delayed the turn of House <b>
-                        {affectedHouse.name}</b> until the next pass of the <b>{influenceTrack}</b> track.
-                    </p>
-                )
             }
             case "ser-gerris-drinkwater-used": {
                 const house = this.game.houses.get(data.house);
