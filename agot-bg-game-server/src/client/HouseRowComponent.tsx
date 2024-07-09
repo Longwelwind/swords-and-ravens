@@ -51,6 +51,7 @@ interface HouseRowComponentProps {
 export default class HouseRowComponent extends Component<HouseRowComponentProps> {
     modifyRegionsOnMapCallback: any;
     @observable highlightedRegions = new BetterMap<Region, PartialRecursive<RegionOnMapProperties>>();
+    timeoutWarningSent = false;
 
     get house(): House {
         return this.props.house;
@@ -64,7 +65,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         return this.ingame.game;
     }
 
-    get player(): Player {
+    get controllerOfHouse(): Player {
         return this.ingame.getControllerOfHouse(this.house);
     }
 
@@ -113,33 +114,34 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         let clockWarning = false;
         let clockCritical = false;
 
-        let player: Player | null = null;
+        let controllerOfHouse: Player | null = null;
         let clock: number | null = null;
 
                 try {
             if (!isVassal) {
-                player = this.player;
-                isWaitedFor = this.ingame.getWaitedUsers().includes(player.user);
+                controllerOfHouse = this.controllerOfHouse;
+                isWaitedFor = this.ingame.getWaitedUsers().includes(controllerOfHouse.user);
 
-                clock = player.liveClockData ? player.clientGetTotalRemainingSeconds(this.ingame.entireGame.now) : null;
+                clock = controllerOfHouse.liveClockData ? controllerOfHouse.clientGetTotalRemainingSeconds(this.ingame.entireGame.now) : null;
 
                 if (clock != null) {
                     clockCritical = gameRunning && clock > 0 && clock < (10 * 60);
                     clockWarning = gameRunning && !clockCritical && clock > 0 && clock < (20 * 60);
 
-                    if (clock == (5 * 60)) {
+                    if (clock == (5 * 60) && !this.timeoutWarningSent) {
+                        this.timeoutWarningSent = true;
                         toast(<div>
                             <Card>
                                 <Card.Body className="d-flex align-items-center">
                                     <img src={stopwatchImage} width={64} className="dye-critical" />
                                     <h4 className="d-inline ml-3" style={{ color: "white" }}>
-                                        {getUserLinkOrLabel(this.props.ingame.entireGame, player.user, player)} is runnig out of time!
+                                        {getUserLinkOrLabel(this.props.ingame.entireGame, controllerOfHouse.user, controllerOfHouse)} is runnig out of time!
                                     </h4>
                                 </Card.Body>
                             </Card>
                         </div>, {
                             autoClose: 3000,
-                            toastId: `${player.user.id}-timeout-warning`,
+                            toastId: `${controllerOfHouse.user.id}-timeout-warning`,
                             theme: "light"
                         });
                     }
@@ -149,14 +151,14 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
             console.warn("getControllerOfHouse has thrown an error but we should never see this error anymore!");
         }
 
-        const currentUserIsCommandingHouse = player && this.props.gameClient.isAuthenticatedUser(player.user);
+        const currentUserIsCommandingHouse = controllerOfHouse && this.props.gameClient.isAuthenticatedUser(controllerOfHouse.user);
 
         return this.ingame.rerender >= 0 && <>
             <ListGroupItem style={{padding: 0, margin: 0}}>
                 <div className={isWaitedFor ? "new-event" : ""} style={{paddingLeft: "8px", paddingRight: "10px", paddingTop: "12px", paddingBottom: "12px"}}>
                 <Row className="align-items-center flex-nowrap">
                     <Col xs="auto" className="pr-0" style={{ width: "32px" }} onMouseEnter={() => this.setHighlightedRegions()} onMouseLeave={() => this.highlightedRegions.clear()}>
-                        {player
+                        {controllerOfHouse
                             ? <div className={classNames({ "display-none": !currentUserIsCommandingHouse })}>
                                 <div style={{ margin: "-4px" }}>
                                     <HouseIconComponent house={this.house} small={true}/>
@@ -178,9 +180,9 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     </Col>
                     <Col onMouseEnter={() => this.setHighlightedRegions()} onMouseLeave={() => this.highlightedRegions.clear()} className="pr-0">
                         <h5 style={{ margin: 0, padding: 0 }}><b style={{ "color": this.house.color }}>{this.house.name}</b><br /></h5>
-                        {player ? (
+                        {controllerOfHouse ? (
                             <UserLabel
-                                user={player.user}
+                                user={controllerOfHouse.user}
                                 gameState={this.ingame}
                                 gameClient={this.props.gameClient}
                             />
@@ -282,7 +284,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     </div>
                 </Row>}
                 <Row className="justify-content-around align-items-center">
-                    {player && player.house.knowsNextWildlingCard && (
+                    {controllerOfHouse && controllerOfHouse.house.knowsNextWildlingCard && (
                         <Col xs="auto">
                             <OverlayTrigger
                                 placement="right"
@@ -322,7 +324,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                             </Row>
                         }
                     </Col>
-                    {player && player.house.knowsNextWildlingCard && (
+                    {controllerOfHouse && controllerOfHouse.house.knowsNextWildlingCard && (
                         <Col xs="auto">
                             <img src={thirdEyeImage} width={28} className="invisible" />
                         </Col>

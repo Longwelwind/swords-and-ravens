@@ -119,7 +119,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                             : this.entireGame.childGameState instanceof CancelledGameState && <CancelledComponent gameClient={this.props.gameClient} gameState={this.entireGame.childGameState} />
             }
             <ToastContainer
-                autoClose={7500}
+                autoClose={6000}
                 position="top-center"
                 closeOnClick={!isMobile}
                 pauseOnFocusLoss
@@ -388,7 +388,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                         </Card.Body>
                     </Card>
                 </div>, {
-                    autoClose: 3000,
+                    autoClose: 2000,
                     toastId: "your-turn-toast",
                     pauseOnHover: false,
                     theme: "light",
