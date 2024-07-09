@@ -2373,6 +2373,7 @@ const serializedGameMigrations: {version: string; migrate: (serializeGamed: any)
         migrate: (serializedGame: any) => {
             if (serializedGame.childGameState.type == "ingame" && serializedGame.childGameState.childGameState.type == "planning") {
                 const planning = serializedGame.childGameState.childGameState;
+                planning.placedOrders = [];
 
                 if (planning.childGameState.type == "place-orders") {
                     planning.placedOrders = planning.childGameState.placedOrders;
