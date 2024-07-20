@@ -62,6 +62,7 @@ export default class SerIlynPayneASoSAbilityGameState extends GameState<
                 houseCard: serIlynPayneASoS.id
             }, true);
             this.parentGameState.onHouseCardResolutionFinish(house);
+            return;
         }
 
         this.setChildGameState(new SelectUnitsGameState(this)).firstStart(
