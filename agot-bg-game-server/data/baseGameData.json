@@ -1160,7 +1160,7 @@
           "blockedRegions": [
             "highgarden", "oldtown", "port-of-oldtown", "sunspear", "port-of-sunspear", "salt-shore",
             "yronwood", "starfall", "three-towers", "dornish-marches", "princes-pass", "the-boneway",
-            "storms-end", "port-of-storms-end"
+            "storms-end", "port-of-storms-end", "sea-of-dorne"
           ]
         },
         {
@@ -1168,7 +1168,7 @@
           "houses": ["stark", "greyjoy", "lannister", "baratheon", "tyrell"],
           "blockedRegions": [
             "sunspear", "port-of-sunspear", "salt-shore", "yronwood", "starfall",
-            "storms-end", "port-of-storms-end"
+            "storms-end", "port-of-storms-end", "sea-of-dorne"
           ]
         }
       ]
