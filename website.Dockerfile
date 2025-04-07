@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y gcc libpq-dev
 WORKDIR /app
 
 COPY ./agot-bg-website/requirements.txt .
-RUN pip install --upgrade pip
+RUN pip install --upgrade pip setuptools wheel
 RUN pip install -r requirements.txt
 RUN pip install daphne==2.4.1
 
