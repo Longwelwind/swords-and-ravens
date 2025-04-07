@@ -50,6 +50,8 @@ import speakerImage from "../../public/images/icons/speaker.svg";
 import speakerOffImage from "../../public/images/icons/speaker-off.svg";
 import cardRandomImage from "../../public/images/icons/card-random.svg";
 import podiumWinnerImage from "../../public/images/icons/podium-winner.svg";
+import contractImage from "../../public/images/icons/contract.svg";
+import expandImage from "../../public/images/icons/expand.svg";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import GameLogListComponent from "./GameLogListComponent";
 import Game, {
@@ -161,6 +163,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
   @observable columnSwapAnimationClassName = "";
   @observable unseenNotes = false;
   @observable tracksPopoverVisible = false;
+  @observable isLogChatCardFullScren = false;
 
   modifyRegionsOnMapCallback: any;
   modifyOrdersOnMapCallback: any;
@@ -292,6 +295,32 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     const col1MinWidth = this.gameSettings.playerCount >= 8 ? "485px" : "470px";
 
     const tracks = this.tracks;
+
+    if (this.isLogChatCardFullScren) {
+      const isOwnTurn = this.gameClient.isOwnTurn();
+      const border = isOwnTurn
+        ? "warning"
+        : this.ingame.childGameState instanceof CancelledGameState
+          ? "danger"
+          : undefined;
+      return (
+        <Col xs="12" lg="8" xl="6">
+          {this.renderGameStateCard(border)}
+          <button
+            className="btn btn-secondary"
+            style={{
+              position: "absolute",
+              top: "20px",
+              right: "20px",
+              zIndex: 1000,
+            }}
+            onClick={() => (this.isLogChatCardFullScren = false)}
+          >
+            <img src={contractImage} width={24} />
+          </button>
+        </Col>
+      );
+    }
 
     return (
       <>
@@ -1493,229 +1522,355 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             />
           )}
         </Card>
-        <Card
-          style={{ height: this.mapScrollbarEnabled ? "auto" : "800px" }}
-          className={classNames(
-            { "flex-fill-remaining": this.mapScrollbarEnabled },
-            "text-large"
-          )}
+        {this.renderGameStateCard()}
+      </div>
+    );
+  }
+
+  private renderGameStateCard(
+    border: string | undefined = undefined
+  ): ReactNode {
+    return (
+      <Card
+        border={border}
+        style={{
+          height:
+            this.mapScrollbarEnabled || this.isLogChatCardFullScren
+              ? "auto"
+              : "800px",
+          borderWidth: "3px",
+        }}
+        className={classNames(
+          { "flex-fill-remaining": this.mapScrollbarEnabled },
+          "text-large"
+        )}
+      >
+        <Tab.Container
+          activeKey={this.currentOpenedTab}
+          onSelect={(k) => {
+            if (k) {
+              this.currentOpenedTab = k;
+            }
+          }}
         >
-          <Tab.Container
-            activeKey={this.currentOpenedTab}
-            onSelect={(k) => {
-              if (k) {
-                this.currentOpenedTab = k;
-              }
-            }}
-          >
-            <Card.Header>
-              <Nav variant="tabs">
-                <Nav.Item>
-                  <Nav.Link eventKey="game-logs">
+          <Card.Header>
+            <Nav variant="tabs">
+              <Nav.Item>
+                <Nav.Link eventKey="game-logs">
+                  <OverlayTrigger
+                    overlay={<Tooltip id="logs-tooltip">Game Logs</Tooltip>}
+                    placement="top"
+                  >
+                    <span>
+                      <FontAwesomeIcon
+                        style={{ color: "white" }}
+                        icon={faHistory}
+                      />
+                    </span>
+                  </OverlayTrigger>
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <div
+                  className={classNames({
+                    "new-event": this.publicChatRoom.areThereUnreadMessages,
+                    disconnected: !this.publicChatRoom.connected,
+                  })}
+                >
+                  <Nav.Link eventKey="chat">
                     <OverlayTrigger
-                      overlay={<Tooltip id="logs-tooltip">Game Logs</Tooltip>}
+                      overlay={<Tooltip id="chat-tooltip">Game Chat</Tooltip>}
                       placement="top"
                     >
                       <span>
                         <FontAwesomeIcon
                           style={{ color: "white" }}
-                          icon={faHistory}
+                          icon={faComments}
                         />
                       </span>
                     </OverlayTrigger>
                   </Nav.Link>
-                </Nav.Item>
+                </div>
+              </Nav.Item>
+              {this.ingame.votes.size > 0 && (
                 <Nav.Item>
                   <div
                     className={classNames({
-                      "new-event": this.publicChatRoom.areThereUnreadMessages,
-                      disconnected: !this.publicChatRoom.connected,
+                      "new-event":
+                        this.gameClient.authenticatedPlayer?.isNeededForVote,
                     })}
                   >
-                    <Nav.Link eventKey="chat">
+                    <Nav.Link eventKey="votes">
                       <OverlayTrigger
-                        overlay={<Tooltip id="chat-tooltip">Game Chat</Tooltip>}
+                        overlay={<Tooltip id="votes-tooltip">Votes</Tooltip>}
                         placement="top"
                       >
                         <span>
                           <FontAwesomeIcon
                             style={{ color: "white" }}
-                            icon={faComments}
+                            icon={faCheckToSlot}
                           />
                         </span>
                       </OverlayTrigger>
                     </Nav.Link>
                   </div>
                 </Nav.Item>
-                {this.ingame.votes.size > 0 && (
-                  <Nav.Item>
-                    <div
-                      className={classNames({
-                        "new-event":
-                          this.gameClient.authenticatedPlayer?.isNeededForVote,
-                      })}
-                    >
-                      <Nav.Link eventKey="votes">
-                        <OverlayTrigger
-                          overlay={<Tooltip id="votes-tooltip">Votes</Tooltip>}
-                          placement="top"
-                        >
-                          <span>
-                            <FontAwesomeIcon
-                              style={{ color: "white" }}
-                              icon={faCheckToSlot}
-                            />
-                          </span>
-                        </OverlayTrigger>
-                      </Nav.Link>
-                    </div>
-                  </Nav.Item>
-                )}
-                {this.ingame.entireGame.isFeastForCrows && (
-                  <Nav.Item>
-                    <Nav.Link eventKey="objectives">
-                      <OverlayTrigger
-                        overlay={
-                          <Tooltip id="objectives-tooltip">Objectives</Tooltip>
-                        }
-                        placement="top"
-                      >
-                        <span>
-                          <img src={cardRandomImage} width={20} />
-                        </span>
-                      </OverlayTrigger>
-                    </Nav.Link>
-                  </Nav.Item>
-                )}
-                {this.game.ironBank && this.gameSettings.playerCount < 8 && (
-                  <Nav.Item>
-                    <Nav.Link eventKey="iron-bank">
-                      <OverlayTrigger
-                        overlay={
-                          <Tooltip id="iron-bank-tooltip">
-                            The Iron Bank
-                          </Tooltip>
-                        }
-                        placement="top"
-                      >
-                        <span>
-                          <FontAwesomeIcon
-                            style={{ color: "white" }}
-                            icon={faUniversity}
-                          />
-                        </span>
-                      </OverlayTrigger>
-                    </Nav.Link>
-                  </Nav.Item>
-                )}
+              )}
+              {this.ingame.entireGame.isFeastForCrows && (
                 <Nav.Item>
-                  <div
-                    className={classNames({ "new-event": this.unseenNotes })}
-                  >
-                    <Nav.Link eventKey="note">
-                      <OverlayTrigger
-                        overlay={
-                          <Tooltip id="note-tooltip">Personal note</Tooltip>
-                        }
-                        placement="top"
-                      >
-                        <span>
-                          <FontAwesomeIcon
-                            style={{ color: "white" }}
-                            icon={faEdit}
-                          />
-                          {/* &nbsp;Notes */}
-                        </span>
-                      </OverlayTrigger>
-                    </Nav.Link>
-                  </div>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link eventKey="settings">
+                  <Nav.Link eventKey="objectives">
                     <OverlayTrigger
                       overlay={
-                        <Tooltip id="settings-tooltip">Settings</Tooltip>
+                        <Tooltip id="objectives-tooltip">Objectives</Tooltip>
+                      }
+                      placement="top"
+                    >
+                      <span>
+                        <img src={cardRandomImage} width={20} />
+                      </span>
+                    </OverlayTrigger>
+                  </Nav.Link>
+                </Nav.Item>
+              )}
+              {this.game.ironBank && this.gameSettings.playerCount < 8 && (
+                <Nav.Item>
+                  <Nav.Link eventKey="iron-bank">
+                    <OverlayTrigger
+                      overlay={
+                        <Tooltip id="iron-bank-tooltip">The Iron Bank</Tooltip>
                       }
                       placement="top"
                     >
                       <span>
                         <FontAwesomeIcon
                           style={{ color: "white" }}
-                          icon={faCog}
+                          icon={faUniversity}
                         />
-
-                        {/* &nbsp;Settings */}
                       </span>
                     </OverlayTrigger>
                   </Nav.Link>
                 </Nav.Item>
-                {this.authenticatedPlayer &&
-                  !this.gameSettings.noPrivateChats && (
-                    <Nav.Item>
-                      <Dropdown>
-                        <Dropdown.Toggle
-                          id="private-chat-room-dropdown"
-                          variant="link"
-                        >
-                          <OverlayTrigger
-                            overlay={
-                              <Tooltip id="private-chat-tooltip">
-                                Private Chat
-                              </Tooltip>
-                            }
-                            placement="top"
-                          >
-                            <FontAwesomeIcon
-                              style={{ color: "white" }}
-                              icon={faComment}
-                            />
-                            {/* &nbsp;Private Chat */}
-                          </OverlayTrigger>
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                          {this.getOtherPlayers().map((p) => (
-                            <Dropdown.Item
-                              onClick={() => this.onNewPrivateChatRoomClick(p)}
-                              key={`new-chat_${p.user.id}`}
-                            >
-                              {this.getUserDisplayNameLabel(p.user)}
-                            </Dropdown.Item>
-                          ))}
-                        </Dropdown.Menu>
-                      </Dropdown>
-                    </Nav.Item>
-                  )}
-                {this.getPrivateChatRooms().map(({ user, roomId }) => (
-                  <Nav.Item key={roomId}>
-                    <div
-                      className={classNames({
-                        "new-event":
-                          this.getPrivateChatRoomForPlayer(user)
-                            .areThereUnreadMessages,
-                        disconnected: !this.publicChatRoom.connected,
-                      })}
+              )}
+              <Nav.Item>
+                <div className={classNames({ "new-event": this.unseenNotes })}>
+                  <Nav.Link eventKey="note">
+                    <OverlayTrigger
+                      overlay={
+                        <Tooltip id="note-tooltip">Personal note</Tooltip>
+                      }
+                      placement="top"
                     >
-                      <Nav.Link eventKey={roomId}>
-                        {this.getUserDisplayNameLabel(user)}
-                      </Nav.Link>
-                    </div>
+                      <span>
+                        <FontAwesomeIcon
+                          style={{ color: "white" }}
+                          icon={faEdit}
+                        />
+                        {/* &nbsp;Notes */}
+                      </span>
+                    </OverlayTrigger>
+                  </Nav.Link>
+                </div>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="settings">
+                  <OverlayTrigger
+                    overlay={<Tooltip id="settings-tooltip">Settings</Tooltip>}
+                    placement="top"
+                  >
+                    <span>
+                      <FontAwesomeIcon
+                        style={{ color: "white" }}
+                        icon={faCog}
+                      />
+
+                      {/* &nbsp;Settings */}
+                    </span>
+                  </OverlayTrigger>
+                </Nav.Link>
+              </Nav.Item>
+              {this.authenticatedPlayer &&
+                !this.gameSettings.noPrivateChats && (
+                  <Nav.Item>
+                    <Dropdown>
+                      <Dropdown.Toggle
+                        id="private-chat-room-dropdown"
+                        variant="link"
+                      >
+                        <OverlayTrigger
+                          overlay={
+                            <Tooltip id="private-chat-tooltip">
+                              Private Chat
+                            </Tooltip>
+                          }
+                          placement="top"
+                        >
+                          <FontAwesomeIcon
+                            style={{ color: "white" }}
+                            icon={faComment}
+                          />
+                          {/* &nbsp;Private Chat */}
+                        </OverlayTrigger>
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        {this.getOtherPlayers().map((p) => (
+                          <Dropdown.Item
+                            onClick={() => this.onNewPrivateChatRoomClick(p)}
+                            key={`new-chat_${p.user.id}`}
+                          >
+                            {this.getUserDisplayNameLabel(p.user)}
+                          </Dropdown.Item>
+                        ))}
+                      </Dropdown.Menu>
+                    </Dropdown>
                   </Nav.Item>
-                ))}
-              </Nav>
-            </Card.Header>
-            <Card.Body id="game-log-panel">
-              {/* This is an invisible div to force the parent to stretch to its remaining width */}
-              <div style={{ visibility: "hidden", width: "850px" }} />
-              <Tab.Content className="h-100">
-                <Tab.Pane eventKey="chat" className="h-100">
+                )}
+              {this.getPrivateChatRooms().map(({ user, roomId }) => (
+                <Nav.Item key={roomId}>
+                  <div
+                    className={classNames({
+                      "new-event":
+                        this.getPrivateChatRoomForPlayer(user)
+                          .areThereUnreadMessages,
+                      disconnected: !this.publicChatRoom.connected,
+                    })}
+                  >
+                    <Nav.Link eventKey={roomId}>
+                      {this.getUserDisplayNameLabel(user)}
+                    </Nav.Link>
+                  </div>
+                </Nav.Item>
+              ))}
+            </Nav>
+            {isMobile && !this.isLogChatCardFullScren && (
+              <button
+                className="btn btn-secondary"
+                style={{
+                  position: "absolute",
+                  top: "10px",
+                  right: "10px",
+                  zIndex: 1000,
+                }}
+                onClick={() => (this.isLogChatCardFullScren = true)}
+              >
+                <img src={expandImage} width={24} />
+              </button>
+            )}
+          </Card.Header>
+          <Card.Body id="game-log-panel">
+            {/* This is an invisible div to force the parent to stretch to its remaining width */}
+            <div style={{ visibility: "hidden", width: "850px" }} />
+            <Tab.Content className="h-100">
+              <Tab.Pane eventKey="chat" className="h-100">
+                <ChatComponent
+                  gameClient={this.gameClient}
+                  entireGame={this.ingame.entireGame}
+                  roomId={this.ingame.entireGame.publicChatRoomId}
+                  currentlyViewed={this.currentOpenedTab == "chat"}
+                  injectBetweenMessages={(p, n) =>
+                    this.injectBetweenMessages(p, n)
+                  }
+                  getUserDisplayName={(u) => (
+                    <b>
+                      {getUserLinkOrLabel(
+                        this.ingame.entireGame,
+                        u,
+                        this.ingame.players.tryGet(u, null),
+                        this.user?.settings.chatHouseNames
+                      )}
+                    </b>
+                  )}
+                />
+              </Tab.Pane>
+              {this.ingame.votes.size > 0 && (
+                <Tab.Pane eventKey="votes" className="h-100">
+                  <ScrollToBottom
+                    className="h-100"
+                    scrollViewClassName="overflow-x-hidden"
+                  >
+                    <VotesListComponent
+                      gameClient={this.gameClient}
+                      ingame={this.ingame}
+                    />
+                  </ScrollToBottom>
+                </Tab.Pane>
+              )}
+              <Tab.Pane eventKey="game-logs" className="h-100">
+                <div className="d-flex flex-column h-100">
+                  <div className="d-flex flex-column align-items-center">
+                    <Dropdown className="mb-2">
+                      <Dropdown.Toggle variant="secondary" size="sm">
+                        Jump to
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        {this.renderGameLogRoundsDropDownItems()}
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </div>
+                  <ScrollToBottom
+                    className="flex-fill-remaining"
+                    scrollViewClassName="overflow-x-hidden"
+                  >
+                    <GameLogListComponent
+                      ingameGameState={this.ingame}
+                      gameClient={this.gameClient}
+                      currentlyViewed={this.currentOpenedTab == "game-logs"}
+                    />
+                  </ScrollToBottom>
+                </div>
+              </Tab.Pane>
+              <Tab.Pane eventKey="settings" className="h-100">
+                <GameSettingsComponent
+                  gameClient={this.gameClient}
+                  entireGame={this.ingame.entireGame}
+                />
+                <div style={{ marginTop: -20 }}>
+                  <UserSettingsComponent
+                    user={this.user}
+                    entireGame={this.ingame.entireGame}
+                  />
+                </div>
+              </Tab.Pane>
+              <Tab.Pane eventKey="objectives" className="h-100">
+                <div
+                  className="d-flex flex-column h-100"
+                  style={{ overflowY: "scroll" }}
+                >
+                  <ObjectivesInfoComponent
+                    ingame={this.ingame}
+                    gameClient={this.gameClient}
+                  />
+                </div>
+              </Tab.Pane>
+              {this.game.ironBank && (
+                <Tab.Pane eventKey="iron-bank" className="h-100">
+                  <div
+                    className="d-flex flex-column h-100"
+                    style={{ overflowY: "scroll" }}
+                  >
+                    <IronBankTabComponent
+                      ingame={this.ingame}
+                      ironBank={this.game.ironBank}
+                    />
+                  </div>
+                </Tab.Pane>
+              )}
+              <Tab.Pane eventKey="note" className="h-100">
+                <NoteComponent
+                  gameClient={this.gameClient}
+                  ingame={this.ingame}
+                />
+              </Tab.Pane>
+              {this.getPrivateChatRooms().map(({ roomId }) => (
+                <Tab.Pane
+                  eventKey={roomId}
+                  key={`chat_${roomId}`}
+                  className="h-100"
+                >
                   <ChatComponent
                     gameClient={this.gameClient}
                     entireGame={this.ingame.entireGame}
-                    roomId={this.ingame.entireGame.publicChatRoomId}
-                    currentlyViewed={this.currentOpenedTab == "chat"}
-                    injectBetweenMessages={(p, n) =>
-                      this.injectBetweenMessages(p, n)
-                    }
+                    roomId={roomId}
+                    currentlyViewed={this.currentOpenedTab == roomId}
                     getUserDisplayName={(u) => (
                       <b>
                         {getUserLinkOrLabel(
@@ -1728,114 +1883,19 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     )}
                   />
                 </Tab.Pane>
-                {this.ingame.votes.size > 0 && (
-                  <Tab.Pane eventKey="votes" className="h-100">
-                    <ScrollToBottom
-                      className="h-100"
-                      scrollViewClassName="overflow-x-hidden"
-                    >
-                      <VotesListComponent
-                        gameClient={this.gameClient}
-                        ingame={this.ingame}
-                      />
-                    </ScrollToBottom>
-                  </Tab.Pane>
-                )}
-                <Tab.Pane eventKey="game-logs" className="h-100">
-                  <div className="d-flex flex-column h-100">
-                    <div className="d-flex flex-column align-items-center">
-                      <Dropdown className="mb-2">
-                        <Dropdown.Toggle variant="secondary" size="sm">
-                          Jump to
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                          {this.renderGameLogRoundsDropDownItems()}
-                        </Dropdown.Menu>
-                      </Dropdown>
-                    </div>
-                    <ScrollToBottom
-                      className="flex-fill-remaining"
-                      scrollViewClassName="overflow-x-hidden"
-                    >
-                      <GameLogListComponent
-                        ingameGameState={this.ingame}
-                        gameClient={this.gameClient}
-                        currentlyViewed={this.currentOpenedTab == "game-logs"}
-                      />
-                    </ScrollToBottom>
-                  </div>
-                </Tab.Pane>
-                <Tab.Pane eventKey="settings" className="h-100">
-                  <GameSettingsComponent
-                    gameClient={this.gameClient}
-                    entireGame={this.ingame.entireGame}
-                  />
-                  <div style={{ marginTop: -20 }}>
-                    <UserSettingsComponent
-                      user={this.user}
-                      entireGame={this.ingame.entireGame}
-                    />
-                  </div>
-                </Tab.Pane>
-                <Tab.Pane eventKey="objectives" className="h-100">
-                  <div
-                    className="d-flex flex-column h-100"
-                    style={{ overflowY: "scroll" }}
-                  >
-                    <ObjectivesInfoComponent
-                      ingame={this.ingame}
-                      gameClient={this.gameClient}
-                    />
-                  </div>
-                </Tab.Pane>
-                {this.game.ironBank && (
-                  <Tab.Pane eventKey="iron-bank" className="h-100">
-                    <div
-                      className="d-flex flex-column h-100"
-                      style={{ overflowY: "scroll" }}
-                    >
-                      <IronBankTabComponent
-                        ingame={this.ingame}
-                        ironBank={this.game.ironBank}
-                      />
-                    </div>
-                  </Tab.Pane>
-                )}
-                <Tab.Pane eventKey="note" className="h-100">
-                  <NoteComponent
-                    gameClient={this.gameClient}
-                    ingame={this.ingame}
-                  />
-                </Tab.Pane>
-                {this.getPrivateChatRooms().map(({ roomId }) => (
-                  <Tab.Pane
-                    eventKey={roomId}
-                    key={`chat_${roomId}`}
-                    className="h-100"
-                  >
-                    <ChatComponent
-                      gameClient={this.gameClient}
-                      entireGame={this.ingame.entireGame}
-                      roomId={roomId}
-                      currentlyViewed={this.currentOpenedTab == roomId}
-                      getUserDisplayName={(u) => (
-                        <b>
-                          {getUserLinkOrLabel(
-                            this.ingame.entireGame,
-                            u,
-                            this.ingame.players.tryGet(u, null),
-                            this.user?.settings.chatHouseNames
-                          )}
-                        </b>
-                      )}
-                    />
-                  </Tab.Pane>
-                ))}
-              </Tab.Content>
-            </Card.Body>
-          </Tab.Container>
-        </Card>
-      </div>
+              ))}
+            </Tab.Content>
+          </Card.Body>
+        </Tab.Container>
+        {border && (
+          <Spinner
+            animation="grow"
+            variant="warning"
+            size="sm"
+            style={{ position: "absolute", bottom: "4px", left: "4px" }}
+          />
+        )}
+      </Card>
     );
   }
 
