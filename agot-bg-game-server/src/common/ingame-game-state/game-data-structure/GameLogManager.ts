@@ -13,7 +13,9 @@ export function ticksToTime(ticks: number): Date {
 }
 
 const fogOfWarBannedLogs = [
-    'orders-revealed'
+    'orders-revealed',
+    'garrison-removed',
+    'garrison-returned'
 ];
 
 const blindDraftBannedLogs = [

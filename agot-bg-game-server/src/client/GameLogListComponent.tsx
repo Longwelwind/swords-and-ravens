@@ -475,7 +475,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                                         <p>
                                             House <b>{house.name}</b> mustered in <b>{this.fogOfWar ? fogOfWarPlaceholder : originatingRegion.name}</b>.
                                         </p>
-                                        <ul>
+                                        {!this.fogOfWar && <ul>
                                             {recruitments.map(({ region, from, to }, i) => (
                                                 <li key={"recruitment-" + region.id + "-" + i}>
                                                     {from ? (
@@ -487,7 +487,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                                                         )}
                                                 </li>
                                             ))}
-                                         </ul>
+                                         </ul>}
                                     </div>)
                                 )}
                             </>
@@ -1104,11 +1104,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 const house = this.game.houses.get(data.house);
                 const region = this.world.regions.get(data.region);
 
-                return <p>{
-                    data.isAttacker ?
-                        <>House <b>{house.name}</b> was not able to retreat to <b>{region.name}</b>.</>   :
-                        <>House <b>{house.name}</b> was not able to retreat from <b>{region.name}</b>.</>
-                }</p>;
+                return <p>
+                    House <b>{house.name}</b> was not able to retreat {data.isAttacker ? "to" : "from"} <b>{this.fogOfWar ? fogOfWarPlaceholder : region.name}</b>.
+                </p>;
             }
             case "retreat-casualties-suffered": {
                 const house = this.game.houses.get(data.house);
