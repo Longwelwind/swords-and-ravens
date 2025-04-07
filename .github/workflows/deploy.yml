@@ -109,7 +109,7 @@ jobs:
     - name: Copy dev config
       run: mv .env.dev .env
     - name: Download static assets
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: front-end-game-server
         path: agot-bg-website/dist/
