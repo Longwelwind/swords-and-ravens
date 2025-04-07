@@ -457,6 +457,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                                 supplyRestrictions={this.game.supplyRestrictions}
                                 houses={this.game.houses.values}
                                 ingame={this.ingame}
+                                gameClient={this.gameClient}
                                 mapControls={this.mapControls}
                             />
                         </ListGroupItem>

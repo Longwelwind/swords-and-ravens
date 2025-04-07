@@ -15,8 +15,10 @@ import MapControls, { RegionOnMapProperties } from "../../../client/MapControls"
 import IngameGameState from "../../../common/ingame-game-state/IngameGameState";
 import { observable } from "mobx";
 import _ from "lodash";
+import GameClient from "../../GameClient";
 
 interface SupplyTrackComponentProps {
+    gameClient: GameClient;
     supplyRestrictions: number[][];
     houses: House[];
     ingame?: IngameGameState;
@@ -27,6 +29,10 @@ interface SupplyTrackComponentProps {
 export default class SupplyTrackComponent extends Component<SupplyTrackComponentProps> {
     modifyRegionsOnMapCallback: any;
     @observable highlightedRegions = new BetterMap<Region, PartialRecursive<RegionOnMapProperties>>();
+
+    get fogOfWar(): boolean {
+        return this.props.ingame != null && !this.props.ingame.isEndedOrCancelled && this.props.ingame.fogOfWar;
+    }
 
     render(): ReactNode {
         return (
@@ -104,7 +110,7 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
                                 </div>
                                 <div className="d-flex">
                                     <div style={{width: "18px", marginRight: "6px", marginTop: "10px"}}>
-                                        {this.getHousesAtSupplyLevel(i).map(h => (
+                                        {this.getHousesAtSupplyLevel(i).filter(h => !this.fogOfWar ? h : this.props.gameClient.doesControlHouse(h)).map(h => (
                                             <OverlayTrigger
                                                 key={`supply-for-house-tooltip_${h.id}`}
                                                 overlay={

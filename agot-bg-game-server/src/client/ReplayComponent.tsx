@@ -187,6 +187,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
                         {this.renderInfluenceTracks()}
                         <ListGroupItem style={{ minHeight: "130px" }}>
                             <SupplyTrackComponent
+                                gameClient={this.gameClient}
                                 supplyRestrictions={this.game.supplyRestrictions}
                                 houses={houses.values}
                             />
