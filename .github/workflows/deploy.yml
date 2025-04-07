@@ -52,7 +52,7 @@ jobs:
       run: yarn install --frozen-lockfile
     - name: Build assets
       run: yarn run generate-json-schemas && yarn run build-client
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: front-end-game-server
         path: agot-bg-game-server/dist
