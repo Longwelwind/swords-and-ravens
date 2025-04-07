@@ -141,6 +141,7 @@ interface GameStatePhaseProps {
 interface IngameComponentProps {
   gameClient: GameClient;
   gameState: IngameGameState;
+  onFullScreenToggle?: (isFullScreen: boolean) => void;
 }
 
 interface InfluenceTrackDetails {
@@ -200,7 +201,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     return this.props.gameClient;
   }
 
-  get tracks(): InfluenceTrackDetails[] {
+  calcInfluenceTrackDetails(): InfluenceTrackDetails[] {
     const influenceTracks: (House | null)[][] = this.game.influenceTracks.map(
       (track) => Array.from(track)
     );
@@ -282,20 +283,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
   }
 
   render(): ReactNode {
-    const draftHouseCards = this.ingame.hasChildGameState(
-      DraftHouseCardsGameState
-    );
-
-    const columnOrders = this.getColumnOrders(
-      this.user?.settings.responsiveLayout
-    );
-
-    const showMap = !draftHouseCards || this.user?.settings.showMapWhenDrafting;
-
-    const col1MinWidth = this.gameSettings.playerCount >= 8 ? "485px" : "470px";
-
-    const tracks = this.tracks;
-
+    const tracks = this.calcInfluenceTrackDetails();
     if (this.isLogChatCardFullScren) {
       const isOwnTurn = this.gameClient.isOwnTurn();
       const border = isOwnTurn
@@ -314,7 +302,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
               right: "20px",
               zIndex: 1000,
             }}
-            onClick={() => (this.isLogChatCardFullScren = false)}
+            onClick={() => {
+              this.isLogChatCardFullScren = false;
+              this.props.onFullScreenToggle?.(false);
+            }}
           >
             <img src={contractImage} width={24} />
           </button>
@@ -329,19 +320,22 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           style={{ maxHeight: this.mapScrollbarEnabled ? "95vh" : "none" }}
         >
           <Col
-            xs={{ order: columnOrders.gameStateColumn }}
+            xs={{ order: this.getColumnOrders().gameStateColumn }}
             className={this.columnSwapAnimationClassName}
             style={{
               maxHeight: this.mapScrollbarEnabled ? "100%" : "none",
-              minWidth: col1MinWidth,
-              maxWidth: draftHouseCards ? "1200px" : "800px",
+              minWidth: this.gameSettings.playerCount >= 8 ? "485px" : "470px",
+              maxWidth: this.ingame.hasChildGameState(DraftHouseCardsGameState)
+                ? "1200px"
+                : "800px",
             }}
           >
             {this.renderGameStateColumn()}
           </Col>
-          {showMap && (
+          {!this.ingame.hasChildGameState(DraftHouseCardsGameState) ||
+          this.user?.settings.showMapWhenDrafting ? (
             <Col
-              xs={{ span: "auto", order: columnOrders.mapColumn }}
+              xs={{ span: "auto", order: this.getColumnOrders().mapColumn }}
               style={{ maxHeight: this.mapScrollbarEnabled ? "100%" : "none" }}
             >
               <div
@@ -360,9 +354,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 />
               </div>
             </Col>
-          )}
+          ) : null}
           <Col
-            xs={{ span: "auto", order: columnOrders.housesInfosColumn }}
+            xs={{
+              span: "auto",
+              order: this.getColumnOrders().housesInfosColumn,
+            }}
             style={{
               maxHeight: this.mapScrollbarEnabled ? "100%" : "none",
               maxWidth: "600px",
@@ -1750,7 +1747,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                   right: "10px",
                   zIndex: 1000,
                 }}
-                onClick={() => (this.isLogChatCardFullScren = true)}
+                onClick={() => {
+                  this.isLogChatCardFullScren = true;
+                  this.props.onFullScreenToggle?.(true);
+                }}
               >
                 <img src={expandImage} width={24} />
               </button>
