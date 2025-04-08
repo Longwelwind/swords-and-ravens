@@ -21,6 +21,10 @@
   },
   "exclude": [
     "tests/**/*.ts",
-    "dist/*.js"
+    "dist/*.js",
+    "jest.config.js",
+    "webpack.client.dev.js",
+    "webpack.client.js",
+    "webpack.client.local.js"
   ]
 }

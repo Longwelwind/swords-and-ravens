@@ -298,7 +298,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           ? "danger"
           : undefined;
       return (
-        <Col xs="12" lg="8" xl="6">
+        <Col
+          xs="12"
+          lg="8"
+          xl="6"
+          style={{ maxHeight: "95vh", height: "95vh" }}
+        >
           {this.renderGameStateCard(border)}
           <button
             className="btn btn-secondary"
@@ -1532,14 +1537,18 @@ export default class IngameComponent extends Component<IngameComponentProps> {
   private renderGameStateCard(
     border: string | undefined = undefined
   ): ReactNode {
+    const height = this.logChatFullScreen
+      ? "100%"
+      : this.mapScrollbarEnabled
+        ? "auto"
+        : "800px";
+
     return (
       <Card
         border={border}
         style={{
-          height:
-            this.mapScrollbarEnabled || this.logChatFullScreen
-              ? "auto"
-              : "800px",
+          height: height,
+          maxHeight: height,
           borderWidth: "3px",
         }}
         className={classNames(
@@ -1891,7 +1900,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             </Tab.Content>
           </Card.Body>
         </Tab.Container>
-        {border && (
+        {this.logChatFullScreen && border && (
           <Spinner
             animation="grow"
             variant="warning"
