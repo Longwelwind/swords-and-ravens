@@ -1538,7 +1538,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     border: string | undefined = undefined
   ): ReactNode {
     const height = this.logChatFullScreen
-      ? "100%"
+      ? "85%"
       : this.mapScrollbarEnabled
         ? "auto"
         : "800px";
