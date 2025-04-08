@@ -141,7 +141,6 @@ interface GameStatePhaseProps {
 interface IngameComponentProps {
   gameClient: GameClient;
   gameState: IngameGameState;
-  onFullScreenToggle?: (isFullScreen: boolean) => void;
 }
 
 interface InfluenceTrackDetails {
@@ -164,7 +163,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
   @observable columnSwapAnimationClassName = "";
   @observable unseenNotes = false;
   @observable tracksPopoverVisible = false;
-  @observable isLogChatCardFullScren = false;
+
+  get logChatFullScreen(): boolean {
+    return this.props.gameClient.logChatFullScreen;
+  }
+
+  set logChatFullScreen(value: boolean) {
+    this.props.gameClient.logChatFullScreen = value;
+  }
 
   modifyRegionsOnMapCallback: any;
   modifyOrdersOnMapCallback: any;
@@ -284,7 +290,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
   render(): ReactNode {
     const tracks = this.calcInfluenceTrackDetails();
-    if (this.isLogChatCardFullScren) {
+    if (this.logChatFullScreen) {
       const isOwnTurn = this.gameClient.isOwnTurn();
       const border = isOwnTurn
         ? "warning"
@@ -303,8 +309,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
               zIndex: 1000,
             }}
             onClick={() => {
-              this.isLogChatCardFullScren = false;
-              this.props.onFullScreenToggle?.(false);
+              this.logChatFullScreen = false;
             }}
           >
             <img src={contractImage} width={24} />
@@ -1532,7 +1537,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         border={border}
         style={{
           height:
-            this.mapScrollbarEnabled || this.isLogChatCardFullScren
+            this.mapScrollbarEnabled || this.logChatFullScreen
               ? "auto"
               : "800px",
           borderWidth: "3px",
@@ -1738,7 +1743,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 </Nav.Item>
               ))}
             </Nav>
-            {isMobile && !this.isLogChatCardFullScren && (
+            {isMobile && !this.logChatFullScreen && (
               <button
                 className="btn btn-secondary"
                 style={{
@@ -1748,8 +1753,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                   zIndex: 1000,
                 }}
                 onClick={() => {
-                  this.isLogChatCardFullScren = true;
-                  this.props.onFullScreenToggle?.(true);
+                  this.logChatFullScreen = true;
                 }}
               >
                 <img src={expandImage} width={24} />

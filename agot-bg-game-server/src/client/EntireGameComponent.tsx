@@ -51,7 +51,6 @@ const yourTurnToastAnimation = cssTransition({
 interface EntireGameComponentProps {
   entireGame: EntireGame;
   gameClient: GameClient;
-  onFullScreenToggle?: (isFullScreen: boolean) => void;
 }
 
 @observer
@@ -161,9 +160,6 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
           <IngameComponent
             gameClient={this.props.gameClient}
             gameState={this.entireGame.childGameState}
-            onFullScreenToggle={(isFullScreen) =>
-              this.props.onFullScreenToggle?.(isFullScreen)
-            }
           />
         ) : (
           this.entireGame.childGameState instanceof CancelledGameState && (

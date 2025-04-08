@@ -13,7 +13,6 @@ import EntireGame from "../common/EntireGame";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotateRight } from "@fortawesome/free-solid-svg-icons";
-import { observable } from "mobx";
 
 interface AppProps {
   gameClient: GameClient;
@@ -21,8 +20,10 @@ interface AppProps {
 
 @observer
 export default class App extends Component<AppProps> {
-  @observable isFullscreen = false;
   //onVisibilityChangedCallback: (() => void) | null = null;
+  get isFullScreen(): boolean {
+    return this.props.gameClient.logChatFullScreen;
+  }
 
   get user(): User | null {
     return this.props.gameClient.authenticatedUser;
@@ -55,7 +56,7 @@ export default class App extends Component<AppProps> {
 
   render(): ReactNode {
     const minWidth =
-      isMobile && this.isGameRunning && !this.isFullscreen
+      isMobile && this.isGameRunning && !this.isFullScreen
         ? this.is8pGame
           ? "2550px"
           : "2000px"
@@ -69,7 +70,7 @@ export default class App extends Component<AppProps> {
           paddingBottom: "1rem",
           paddingRight: "3rem",
           paddingLeft: "3rem",
-          maxWidth: !this.isFullscreen ? "2800px" : "auto",
+          maxWidth: !this.isFullScreen ? "2800px" : "auto",
           minWidth: minWidth,
           overflowX: "hidden",
         }}
@@ -110,9 +111,6 @@ export default class App extends Component<AppProps> {
             <EntireGameComponent
               gameClient={this.props.gameClient}
               entireGame={this.props.gameClient.entireGame as EntireGame}
-              onFullScreenToggle={(isFullScreen) => {
-                this.isFullscreen = isFullScreen;
-              }}
             />
           ) : this.props.gameClient.connectionState ==
             ConnectionState.CLOSED ? (

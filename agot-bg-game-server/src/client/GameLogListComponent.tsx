@@ -3163,6 +3163,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             id={`gamelog-orders-revealed-round-${currentRound}`}
             className="clickable link-color"
             onClick={() => {
+              this.props.gameClient.logChatFullScreen = false;
               this.props.ingameGameState.entireGame.replaySnapshot = {
                 worldSnapshot: data.worldState,
                 gameSnapshot: data.gameSnapshot,
