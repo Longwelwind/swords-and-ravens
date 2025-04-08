@@ -96,15 +96,17 @@ export default class MapComponent extends Component<MapComponentProps> {
     const barrelModifiers = new BetterMap<string, number>();
     const crownModifiers = new BetterMap<string, number>();
 
-    const visibleRegions = _.uniq(
-      _.concat(
-        this.ingame.publicVisibleRegions,
-        this.ingame.getVisibleRegionsForPlayer(
-          this.props.gameClient.authenticatedPlayer
-        )
+    const visibleRegions = _.union(
+      this.ingame.publicVisibleRegions,
+      this.ingame.getVisibleRegionsForPlayer(
+        this.props.gameClient.authenticatedPlayer
       )
     );
+
     for (const region of this.ingame.world.regions.values) {
+      if (!visibleRegions.includes(region)) {
+        continue;
+      }
       if (region.garrison > 0 && !region.isBlocked) {
         garrisons.set(region.id, getGarrisonToken(region.garrison));
       }
