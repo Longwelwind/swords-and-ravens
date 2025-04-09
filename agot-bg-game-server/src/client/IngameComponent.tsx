@@ -1,7 +1,24 @@
 import * as React from "react";
 import { Component, ReactNode } from "react";
-import GameClient from "./GameClient";
 import { observer } from "mobx-react";
+import { observable } from "mobx";
+import {
+  Button,
+  FormCheck,
+  Modal,
+  Popover,
+  Tooltip,
+  OverlayTrigger,
+  Card,
+  Col,
+  Row,
+} from "react-bootstrap";
+import { toast } from "react-toastify";
+import * as _ from "lodash";
+import classNames from "classnames";
+import { isMobile } from "react-device-detect";
+
+import GameClient from "./GameClient";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import MapComponent, { MAP_HEIGHT } from "./MapComponent";
 import MapControls, {
@@ -9,13 +26,17 @@ import MapControls, {
   RegionOnMapProperties,
   UnitOnMapProperties,
 } from "./MapControls";
-import Card from "react-bootstrap/Card";
-import Col from "react-bootstrap/Col";
-import Row from "react-bootstrap/Row";
-import { toast } from "react-toastify";
-import * as _ from "lodash";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
+import GameStateColumn from "./game-state-panel/GameStateColumn";
+import HouseInfoColumn from "./game-state-panel/HouseInfoColumn";
+import GameTabsComponent from "./game-state-panel/GameTabsComponent";
+
+import { Channel } from "./chat-client/ChatClient";
+import House from "../common/ingame-game-state/game-data-structure/House";
+import Region from "../common/ingame-game-state/game-data-structure/Region";
+import Unit from "../common/ingame-game-state/game-data-structure/Unit";
+import BetterMap from "../utils/BetterMap";
+import PartialRecursive from "../utils/PartialRecursive";
+
 import cancelImage from "../../public/images/icons/cancel.svg";
 import truceImage from "../../public/images/icons/truce.svg";
 import stopwatchPlus15Image from "../../public/images/icons/stopwatch-plus-15.svg";
@@ -29,17 +50,10 @@ import ravenImage from "../../public/images/icons/raven.svg";
 import settingsKnobsImage from "../../public/images/icons/settings-knobs.svg";
 import speakerImage from "../../public/images/icons/speaker.svg";
 import speakerOffImage from "../../public/images/icons/speaker-off.svg";
-
 import podiumWinnerImage from "../../public/images/icons/podium-winner.svg";
 import contractImage from "../../public/images/icons/contract.svg";
-import House from "../common/ingame-game-state/game-data-structure/House";
-import Game from "../common/ingame-game-state/game-data-structure/Game";
-import User from "../server/User";
-import classNames from "classnames";
-import { Channel } from "./chat-client/ChatClient";
+
 import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
-import { GameSettings } from "../common/EntireGame";
-import { isMobile } from "react-device-detect";
 import DraftHouseCardsGameState from "../common/ingame-game-state/draft-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import ClashOfKingsGameState from "../common/ingame-game-state/westeros-game-state/clash-of-kings-game-state/ClashOfKingsGameState";
 import houseCardsBackImages from "./houseCardsBackImages";
@@ -49,13 +63,8 @@ import housePowerTokensImages from "./housePowerTokensImages";
 import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
 import unitImages from "./unitImages";
 import { tidesOfBattleCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import joinNaturalLanguage from "./utils/joinNaturalLanguage";
-import BetterMap from "../utils/BetterMap";
-import Region from "../common/ingame-game-state/game-data-structure/Region";
-import Unit from "../common/ingame-game-state/game-data-structure/Unit";
-import PartialRecursive from "../utils/PartialRecursive";
-import { Button, FormCheck, Modal, Popover } from "react-bootstrap";
+import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import WesterosCardComponent from "./game-state-panel/utils/WesterosCardComponent";
 import WildlingCardType from "../common/ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
 import WildlingCardComponent from "./game-state-panel/utils/WildlingCardComponent";
@@ -69,11 +78,6 @@ import LocalStorageService from "./utils/localStorageService";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
 import VolumeSliderComponent from "./utils/VolumeSliderComponent";
 import { houseThemes } from "./utils/SfxManager";
-import GameStateColumn from "./game-state-panel/GameStateColumn";
-import GameTabsComponent from "./game-state-panel/GameTabsComponent";
-import HouseInfoColumn from "./game-state-panel/HouseInfoColumn";
-import { observable } from "mobx";
-import Player from "../common/ingame-game-state/Player";
 
 export interface ColumnOrders {
   gameStateColumn: number;
@@ -104,42 +108,20 @@ export default class IngameComponent extends Component<IngameComponentProps> {
   @observable showMapScrollbarInfo = false;
   @observable showBrowserZoomInfo = false;
   @observable columnSwapAnimationClassName = "";
-
   @observable tracksPopoverVisible = false;
+
+  private ingame = this.props.gameState;
+  private gameClient = this.props.gameClient;
+  private user = this.props.gameClient.authenticatedUser;
+  private authenticatedPlayer = this.props.gameClient.authenticatedPlayer;
+  private game = this.ingame.game;
+  private gameSettings = this.ingame.entireGame.gameSettings;
+  private mapScrollbarEnabled =
+    !isMobile && (this.user?.settings.mapScrollbar ?? true);
 
   modifyRegionsOnMapCallback: any;
   modifyOrdersOnMapCallback: any;
   modifyUnitsOnMapCallback: any;
-
-  get game(): Game {
-    return this.ingame.game;
-  }
-
-  get gameSettings(): GameSettings {
-    return this.ingame.entireGame.gameSettings;
-  }
-
-  get user(): User | null {
-    return this.gameClient.authenticatedUser
-      ? this.gameClient.authenticatedUser
-      : null;
-  }
-
-  get ingame(): IngameGameState {
-    return this.props.gameState;
-  }
-
-  get authenticatedPlayer(): Player | null {
-    return this.gameClient.authenticatedPlayer;
-  }
-
-  get mapScrollbarEnabled(): boolean {
-    return !isMobile && (this.user?.settings.mapScrollbar ?? true);
-  }
-
-  get gameClient(): GameClient {
-    return this.props.gameClient;
-  }
 
   calcInfluenceTrackDetails(): InfluenceTrackDetails[] {
     const influenceTracks: (House | null)[][] = this.game.influenceTracks.map(
@@ -224,7 +206,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
   render(): ReactNode {
     const tracks = this.calcInfluenceTrackDetails();
-    if (this.props.gameClient.logChatFullScreen) {
+    if (this.gameClient.logChatFullScreen) {
       const isOwnTurn = this.gameClient.isOwnTurn();
       const border = isOwnTurn
         ? "warning"
@@ -256,7 +238,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
               zIndex: 1000,
             }}
             onClick={() => {
-              this.props.gameClient.logChatFullScreen = false;
+              this.gameClient.logChatFullScreen = false;
             }}
           >
             <img src={contractImage} width={24} />

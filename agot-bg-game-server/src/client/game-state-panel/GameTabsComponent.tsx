@@ -8,17 +8,31 @@ import {
   Nav,
   Dropdown,
 } from "react-bootstrap";
-import classNames from "classnames";
 // @ts-expect-error Somehow this module cannot be found while it is
 import ScrollToBottom from "react-scroll-to-bottom";
-import ConditionalWrap from "../utils/ConditionalWrap";
+
+import classNames from "classnames";
+import { observable } from "mobx";
+import { observer } from "mobx-react";
+import { isMobile } from "react-device-detect";
+import * as _ from "lodash";
+
 import IngameGameState from "../../common/ingame-game-state/IngameGameState";
+import Player from "../../common/ingame-game-state/Player";
+import User from "../../server/User";
 import GameClient from "../GameClient";
 import MapControls from "../MapControls";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ChatComponent from "../chat-client/ChatComponent";
+import VotesListComponent from "../VotesListComponent";
+import GameLogListComponent from "../GameLogListComponent";
+import GameSettingsComponent from "../GameSettingsComponent";
+import UserSettingsComponent from "../UserSettingsComponent";
+import ObjectivesInfoComponent from "../ObjectivesInfoComponent";
+import IronBankTabComponent from "../IronBankTabComponent";
+import NoteComponent from "../NoteComponent";
+
 import { Channel, Message } from "../chat-client/ChatClient";
-import cardRandomImage from "../../../public/images/icons/card-random.svg";
-import expandImage from "../../../public/images/icons/expand.svg";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheckToSlot,
   faCog,
@@ -28,21 +42,11 @@ import {
   faHistory,
   faUniversity,
 } from "@fortawesome/free-solid-svg-icons";
-import Player from "../../common/ingame-game-state/Player";
-import User from "../../server/User";
-import { isMobile } from "react-device-detect";
-import ChatComponent from "../chat-client/ChatComponent";
+
+import cardRandomImage from "../../../public/images/icons/card-random.svg";
+import expandImage from "../../../public/images/icons/expand.svg";
+import ConditionalWrap from "../utils/ConditionalWrap";
 import getUserLinkOrLabel from "../utils/getIngameUserLinkOrLabel";
-import VotesListComponent from "../VotesListComponent";
-import GameLogListComponent from "../GameLogListComponent";
-import GameSettingsComponent from "../GameSettingsComponent";
-import UserSettingsComponent from "../UserSettingsComponent";
-import ObjectivesInfoComponent from "../ObjectivesInfoComponent";
-import IronBankTabComponent from "../IronBankTabComponent";
-import NoteComponent from "../NoteComponent";
-import _ from "lodash";
-import { observable } from "mobx";
-import { observer } from "mobx-react";
 
 interface GameTabsComponentProps {
   ingame: IngameGameState;
@@ -62,16 +66,21 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
     this.props.user?.settings.lastOpenedTab ?? "chat";
   @observable unseenNotes = false;
 
+  private ingame = this.props.ingame;
+  private gameClient = this.props.gameClient;
+  private user = this.props.user;
+  private publicChatRoom = this.props.publicChatRoom;
+  private authenticatedPlayer = this.props.authenticatedPlayer;
+  private mapScrollbarEnabled =
+    !isMobile && (this.props.user?.settings.mapScrollbar ?? true);
+  private gameSettings = this.ingame.entireGame.gameSettings;
+
   get logChatFullScreen(): boolean {
-    return this.props.gameClient.logChatFullScreen;
+    return this.gameClient.logChatFullScreen;
   }
 
   set logChatFullScreen(value: boolean) {
-    this.props.gameClient.logChatFullScreen = value;
-  }
-
-  get mapScrollbarEnabled(): boolean {
-    return !isMobile && (this.props.user?.settings.mapScrollbar ?? true);
+    this.gameClient.logChatFullScreen = value;
   }
 
   render(): ReactNode {
@@ -120,9 +129,8 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
               <Nav.Item>
                 <div
                   className={classNames({
-                    "new-event":
-                      this.props.publicChatRoom.areThereUnreadMessages,
-                    disconnected: !this.props.publicChatRoom.connected,
+                    "new-event": this.publicChatRoom.areThereUnreadMessages,
+                    disconnected: !this.publicChatRoom.connected,
                   })}
                 >
                   <Nav.Link eventKey="chat">
@@ -140,13 +148,12 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                   </Nav.Link>
                 </div>
               </Nav.Item>
-              {this.props.ingame.votes.size > 0 && (
+              {this.ingame.votes.size > 0 && (
                 <Nav.Item>
                   <div
                     className={classNames({
                       "new-event":
-                        this.props.gameClient.authenticatedPlayer
-                          ?.isNeededForVote,
+                        this.gameClient.authenticatedPlayer?.isNeededForVote,
                     })}
                   >
                     <Nav.Link eventKey="votes">
@@ -165,7 +172,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                   </div>
                 </Nav.Item>
               )}
-              {this.props.ingame.entireGame.isFeastForCrows && (
+              {this.ingame.entireGame.isFeastForCrows && (
                 <Nav.Item>
                   <Nav.Link eventKey="objectives">
                     <OverlayTrigger
@@ -181,8 +188,8 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                   </Nav.Link>
                 </Nav.Item>
               )}
-              {this.props.ingame.game.ironBank &&
-                this.props.ingame.entireGame.gameSettings.playerCount < 8 && (
+              {this.ingame.game.ironBank &&
+                this.gameSettings.playerCount < 8 && (
                   <Nav.Item>
                     <Nav.Link eventKey="iron-bank">
                       <OverlayTrigger
@@ -217,7 +224,6 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                           style={{ color: "white" }}
                           icon={faEdit}
                         />
-                        {/* &nbsp;Notes */}
                       </span>
                     </OverlayTrigger>
                   </Nav.Link>
@@ -234,14 +240,12 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                         style={{ color: "white" }}
                         icon={faCog}
                       />
-
-                      {/* &nbsp;Settings */}
                     </span>
                   </OverlayTrigger>
                 </Nav.Link>
               </Nav.Item>
-              {this.props.authenticatedPlayer &&
-                !this.props.ingame.entireGame.gameSettings.noPrivateChats && (
+              {this.authenticatedPlayer &&
+                !this.gameSettings.noPrivateChats && (
                   <Nav.Item>
                     <Dropdown>
                       <Dropdown.Toggle
@@ -260,7 +264,6 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                             style={{ color: "white" }}
                             icon={faComment}
                           />
-                          {/* &nbsp;Private Chat */}
                         </OverlayTrigger>
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -283,7 +286,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                       "new-event":
                         this.getPrivateChatRoomForPlayer(user)
                           .areThereUnreadMessages,
-                      disconnected: !this.props.publicChatRoom.connected,
+                      disconnected: !this.publicChatRoom.connected,
                     })}
                   >
                     <Nav.Link eventKey={roomId}>
@@ -311,14 +314,13 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
             )}
           </Card.Header>
           <Card.Body id="game-log-panel">
-            {/* This is an invisible div to force the parent to stretch to its remaining width */}
             <div style={{ visibility: "hidden", width: "850px" }} />
             <Tab.Content className="h-100">
               <Tab.Pane eventKey="chat" className="h-100">
                 <ChatComponent
-                  gameClient={this.props.gameClient}
-                  entireGame={this.props.ingame.entireGame}
-                  roomId={this.props.ingame.entireGame.publicChatRoomId}
+                  gameClient={this.gameClient}
+                  entireGame={this.ingame.entireGame}
+                  roomId={this.ingame.entireGame.publicChatRoomId}
                   currentlyViewed={this.currentOpenedTab == "chat"}
                   injectBetweenMessages={(p, n) =>
                     this.injectBetweenMessages(p, n)
@@ -326,24 +328,24 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                   getUserDisplayName={(u) => (
                     <b>
                       {getUserLinkOrLabel(
-                        this.props.ingame.entireGame,
+                        this.ingame.entireGame,
                         u,
-                        this.props.ingame.players.tryGet(u, null),
-                        this.props.user?.settings.chatHouseNames
+                        this.ingame.players.tryGet(u, null),
+                        this.user?.settings.chatHouseNames
                       )}
                     </b>
                   )}
                 />
               </Tab.Pane>
-              {this.props.ingame.votes.size > 0 && (
+              {this.ingame.votes.size > 0 && (
                 <Tab.Pane eventKey="votes" className="h-100">
                   <ScrollToBottom
                     className="h-100"
                     scrollViewClassName="overflow-x-hidden"
                   >
                     <VotesListComponent
-                      gameClient={this.props.gameClient}
-                      ingame={this.props.ingame}
+                      gameClient={this.gameClient}
+                      ingame={this.ingame}
                     />
                   </ScrollToBottom>
                 </Tab.Pane>
@@ -365,8 +367,8 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                     scrollViewClassName="overflow-x-hidden"
                   >
                     <GameLogListComponent
-                      ingameGameState={this.props.ingame}
-                      gameClient={this.props.gameClient}
+                      ingameGameState={this.ingame}
+                      gameClient={this.gameClient}
                       currentlyViewed={this.currentOpenedTab == "game-logs"}
                     />
                   </ScrollToBottom>
@@ -374,13 +376,13 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
               </Tab.Pane>
               <Tab.Pane eventKey="settings" className="h-100">
                 <GameSettingsComponent
-                  gameClient={this.props.gameClient}
-                  entireGame={this.props.ingame.entireGame}
+                  gameClient={this.gameClient}
+                  entireGame={this.ingame.entireGame}
                 />
                 <div style={{ marginTop: -20 }}>
                   <UserSettingsComponent
-                    user={this.props.user}
-                    entireGame={this.props.ingame.entireGame}
+                    user={this.user}
+                    entireGame={this.ingame.entireGame}
                   />
                 </div>
               </Tab.Pane>
@@ -390,28 +392,28 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                   style={{ overflowY: "scroll" }}
                 >
                   <ObjectivesInfoComponent
-                    ingame={this.props.ingame}
-                    gameClient={this.props.gameClient}
+                    ingame={this.ingame}
+                    gameClient={this.gameClient}
                   />
                 </div>
               </Tab.Pane>
-              {this.props.ingame.game.ironBank && (
+              {this.ingame.game.ironBank && (
                 <Tab.Pane eventKey="iron-bank" className="h-100">
                   <div
                     className="d-flex flex-column h-100"
                     style={{ overflowY: "scroll" }}
                   >
                     <IronBankTabComponent
-                      ingame={this.props.ingame}
-                      ironBank={this.props.ingame.game.ironBank}
+                      ingame={this.ingame}
+                      ironBank={this.ingame.game.ironBank}
                     />
                   </div>
                 </Tab.Pane>
               )}
               <Tab.Pane eventKey="note" className="h-100">
                 <NoteComponent
-                  gameClient={this.props.gameClient}
-                  ingame={this.props.ingame}
+                  gameClient={this.gameClient}
+                  ingame={this.ingame}
                 />
               </Tab.Pane>
               {this.getPrivateChatRooms().map(({ roomId }) => (
@@ -421,17 +423,17 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                   className="h-100"
                 >
                   <ChatComponent
-                    gameClient={this.props.gameClient}
-                    entireGame={this.props.ingame.entireGame}
+                    gameClient={this.gameClient}
+                    entireGame={this.ingame.entireGame}
                     roomId={roomId}
                     currentlyViewed={this.currentOpenedTab == roomId}
                     getUserDisplayName={(u) => (
                       <b>
                         {getUserLinkOrLabel(
-                          this.props.ingame.entireGame,
+                          this.ingame.entireGame,
                           u,
-                          this.props.ingame.players.tryGet(u, null),
-                          this.props.user?.settings.chatHouseNames
+                          this.ingame.players.tryGet(u, null),
+                          this.user?.settings.chatHouseNames
                         )}
                       </b>
                     )}
@@ -454,9 +456,9 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
   }
 
   getUserDisplayNameLabel(user: User): React.ReactNode {
-    const player = this.props.ingame.players.tryGet(user, null);
+    const player = this.ingame.players.tryGet(user, null);
     const displayName =
-      !this.props.user?.settings.chatHouseNames || !player
+      !this.user?.settings.chatHouseNames || !player
         ? user.name
         : player.house.name;
 
@@ -477,55 +479,45 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
           </OverlayTrigger>
         )}
       >
-        {/* Spectators are shown in burlywood brown */}
         <b style={{ color: player?.house.color ?? "#deb887" }}>{displayName}</b>
       </ConditionalWrap>
     );
   }
 
   onNewPrivateChatRoomClick(p: Player): void {
-    const users = _.sortBy([this.props.user as User, p.user], (u) => u.id);
+    const users = _.sortBy([this.user as User, p.user], (u) => u.id);
 
     if (
-      !this.props.ingame.entireGame.privateChatRoomsIds.has(users[0]) ||
-      !this.props.ingame.entireGame.privateChatRoomsIds
-        .get(users[0])
-        .has(users[1])
+      !this.ingame.entireGame.privateChatRoomsIds.has(users[0]) ||
+      !this.ingame.entireGame.privateChatRoomsIds.get(users[0]).has(users[1])
     ) {
-      // Create a new chat room for this player
-      this.props.ingame.entireGame.sendMessageToServer({
+      this.ingame.entireGame.sendMessageToServer({
         type: "create-private-chat-room",
         otherUser: p.user.id,
       });
     } else {
-      // The room already exists
-      // Set the current tab to this user
-      this.currentOpenedTab = this.props.ingame.entireGame.privateChatRoomsIds
+      this.currentOpenedTab = this.ingame.entireGame.privateChatRoomsIds
         .get(users[0])
         .get(users[1]);
     }
   }
 
   getPrivateChatRooms(): { user: User; roomId: string }[] {
-    return this.props.ingame.entireGame.getPrivateChatRoomsOf(
-      this.props.user as User
-    );
+    return this.ingame.entireGame.getPrivateChatRoomsOf(this.user as User);
   }
 
   getPrivateChatRoomForPlayer(u: User): Channel {
-    const users = _.sortBy([this.props.user as User, u], (u) => u.id);
+    const users = _.sortBy([this.user as User, u], (u) => u.id);
 
-    return this.props.gameClient.chatClient.channels.get(
-      this.props.ingame.entireGame.privateChatRoomsIds
-        .get(users[0])
-        .get(users[1])
+    return this.gameClient.chatClient.channels.get(
+      this.ingame.entireGame.privateChatRoomsIds.get(users[0]).get(users[1])
     );
   }
 
   getOtherPlayers(): Player[] {
-    return _.sortBy(this.props.ingame.players.values, (p) =>
-      this.props.user?.settings.chatHouseNames ? p.house.name : p.user.name
-    ).filter((p) => p.user != this.props.user);
+    return _.sortBy(this.ingame.players.values, (p) =>
+      this.user?.settings.chatHouseNames ? p.house.name : p.user.name
+    ).filter((p) => p.user != this.user);
   }
 
   injectBetweenMessages(
@@ -552,8 +544,6 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
           className="text-center"
           key={`dropdownitem-for-${gameRoundElem.id}`}
           onClick={() => {
-            // When game log is the active tab, items get rendered before this logic here can work
-            // Therefore we search the item during onClick again to make it work
             const elemToScroll = document.getElementById(gameRoundElem.id);
             elemToScroll?.scrollIntoView();
           }}
@@ -571,8 +561,6 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
             className="text-center"
             key={`dropdownitem-for-${ordersRevealedElem.id}`}
             onClick={() => {
-              // When game log is the active tab, items get rendered before this logic here can work
-              // Therefore we search the item during onClick again to make it work
               const elemToScroll = document.getElementById(
                 ordersRevealedElem.id
               );
@@ -589,13 +577,13 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
   }
 
   onVisibilityChanged(): void {
-    if (document.visibilityState == "visible" || !this.props.user) {
+    if (document.visibilityState == "visible" || !this.user) {
       return;
     }
 
-    if (this.currentOpenedTab != this.props.user.settings.lastOpenedTab) {
-      this.props.user.settings.lastOpenedTab = this.currentOpenedTab;
-      this.props.user.syncSettings();
+    if (this.currentOpenedTab != this.user.settings.lastOpenedTab) {
+      this.user.settings.lastOpenedTab = this.currentOpenedTab;
+      this.user.syncSettings();
     }
   }
 
@@ -608,11 +596,10 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
     document.addEventListener("visibilitychange", visibilityChangedCallback);
     this.onVisibilityChangedCallback = visibilityChangedCallback;
 
-    this.props.ingame.entireGame.onNewPrivateChatRoomCreated = (
-      roomId: string
-    ) => this.onNewPrivateChatRoomCreated(roomId);
+    this.ingame.entireGame.onNewPrivateChatRoomCreated = (roomId: string) =>
+      this.onNewPrivateChatRoomCreated(roomId);
 
-    if (this.props.gameClient.authenticatedUser?.note.length ?? 0 > 0) {
+    if (this.gameClient.authenticatedUser?.note.length ?? 0 > 0) {
       this.unseenNotes = true;
     }
   }

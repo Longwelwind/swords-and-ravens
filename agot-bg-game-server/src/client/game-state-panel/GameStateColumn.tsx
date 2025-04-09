@@ -9,36 +9,42 @@ import {
   Tooltip,
   Spinner,
 } from "react-bootstrap";
-import classNames from "classnames";
-import _ from "lodash";
-import ConditionalWrap from "../utils/ConditionalWrap";
-import renderChildGameState from "../utils/renderChildGameState";
-import WesterosGameState from "../../common/ingame-game-state/westeros-game-state/WesterosGameState";
-import WesterosGameStateComponent from "./WesterosGameStateComponent";
-import PlanningGameState from "../../common/ingame-game-state/planning-game-state/PlanningGameState";
-import PlanningComponent from "./PlanningComponent";
-import ActionGameState from "../../common/ingame-game-state/action-game-state/ActionGameState";
-import ActionComponent from "./ActionComponent";
-import DraftGameState from "../../common/ingame-game-state/draft-game-state/DraftGameState";
-import DraftComponent from "./DraftComponent";
-import GameEndedGameState from "../../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
-import GameEndedComponent from "./GameEndedComponent";
-import CancelledGameState from "../../common/cancelled-game-state/CancelledGameState";
-import IngameCancelledComponent from "./IngameCancelledComponent";
-import PayDebtsGameState from "../../common/ingame-game-state/pay-debts-game-state/PayDebtsGameState";
-import PayDebtsComponent from "./PayDebtsComponent";
-import ChooseInitialObjectivesGameState from "../../common/ingame-game-state/choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
-import ChooseInitialObjectivesComponent from "./ChooseInitialObjectivesComponent";
+
+import { Channel } from "../chat-client/ChatClient";
 import { MAX_WILDLING_STRENGTH } from "../../common/ingame-game-state/game-data-structure/Game";
-import hourglassImage from "../../../public/images/icons/hourglass.svg";
-import mammothImage from "../../../public/images/icons/mammoth.svg";
+
+import classNames from "classnames";
+import * as _ from "lodash";
+
 import IngameGameState from "../../common/ingame-game-state/IngameGameState";
+import User from "../../server/User";
+import Player from "../../common/ingame-game-state/Player";
 import GameClient from "../GameClient";
 import MapControls from "../MapControls";
 import GameTabsComponent from "./GameTabsComponent";
-import Player from "../../common/ingame-game-state/Player";
-import { Channel } from "../chat-client/ChatClient";
-import User from "../../server/User";
+
+import WesterosGameState from "../../common/ingame-game-state/westeros-game-state/WesterosGameState";
+import PlanningGameState from "../../common/ingame-game-state/planning-game-state/PlanningGameState";
+import ActionGameState from "../../common/ingame-game-state/action-game-state/ActionGameState";
+import DraftGameState from "../../common/ingame-game-state/draft-game-state/DraftGameState";
+import GameEndedGameState from "../../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
+import CancelledGameState from "../../common/cancelled-game-state/CancelledGameState";
+import PayDebtsGameState from "../../common/ingame-game-state/pay-debts-game-state/PayDebtsGameState";
+import ChooseInitialObjectivesGameState from "../../common/ingame-game-state/choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
+
+import WesterosGameStateComponent from "./WesterosGameStateComponent";
+import PlanningComponent from "./PlanningComponent";
+import ActionComponent from "./ActionComponent";
+import DraftComponent from "./DraftComponent";
+import GameEndedComponent from "./GameEndedComponent";
+import IngameCancelledComponent from "./IngameCancelledComponent";
+import PayDebtsComponent from "./PayDebtsComponent";
+import ChooseInitialObjectivesComponent from "./ChooseInitialObjectivesComponent";
+
+import hourglassImage from "../../../public/images/icons/hourglass.svg";
+import mammothImage from "../../../public/images/icons/mammoth.svg";
+import ConditionalWrap from "../utils/ConditionalWrap";
+import renderChildGameState from "../utils/renderChildGameState";
 
 interface GameStateColumnProps {
   ingame: IngameGameState;
@@ -50,8 +56,12 @@ interface GameStateColumnProps {
 }
 
 export default class GameStateColumn extends Component<GameStateColumnProps> {
+  private ingame = this.props.ingame;
+  private gameClient = this.props.gameClient;
+  private mapControls = this.props.mapControls;
+
   render(): ReactNode {
-    const { ingame, gameClient, mapControls } = this.props;
+    const { authenticatedPlayer, publicChatRoom, user } = this.props;
 
     const phases = [
       {
@@ -71,28 +81,29 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
       },
     ];
 
-    const gameRunning = !ingame.isEndedOrCancelled;
+    const gameRunning = !this.ingame.isEndedOrCancelled;
     const roundWarning =
-      gameRunning && ingame.game.maxTurns - ingame.game.turn == 1;
+      gameRunning && this.ingame.game.maxTurns - this.ingame.game.turn == 1;
     const roundCritical =
-      gameRunning && ingame.game.turn == ingame.game.maxTurns;
+      gameRunning && this.ingame.game.turn == this.ingame.game.maxTurns;
 
     const wildlingsWarning =
-      gameRunning && ingame.game.wildlingStrength == MAX_WILDLING_STRENGTH - 4;
+      gameRunning &&
+      this.ingame.game.wildlingStrength == MAX_WILDLING_STRENGTH - 4;
     const wildlingsCritical =
       gameRunning &&
-      (ingame.game.wildlingStrength == MAX_WILDLING_STRENGTH ||
-        ingame.game.wildlingStrength == MAX_WILDLING_STRENGTH - 2);
+      (this.ingame.game.wildlingStrength == MAX_WILDLING_STRENGTH ||
+        this.ingame.game.wildlingStrength == MAX_WILDLING_STRENGTH - 2);
 
-    const isOwnTurn = gameClient.isOwnTurn();
+    const isOwnTurn = this.gameClient.isOwnTurn();
     const border = isOwnTurn
       ? "warning"
-      : ingame.childGameState instanceof CancelledGameState
+      : this.ingame.childGameState instanceof CancelledGameState
         ? "danger"
         : undefined;
 
     const isPhaseActive = (phase: any): boolean =>
-      ingame.childGameState instanceof phase.gameState;
+      this.ingame.childGameState instanceof phase.gameState;
 
     return (
       <div className="flex-ratio-container">
@@ -141,9 +152,9 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                 <ListGroupItem className="text-large">
                   {renderChildGameState(
                     {
-                      mapControls: mapControls,
-                      gameClient,
-                      gameState: ingame,
+                      mapControls: this.mapControls,
+                      gameClient: this.gameClient,
+                      gameState: this.ingame,
                     },
                     _.concat(
                       phases.map(
@@ -178,7 +189,8 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                     overlay={
                       <Tooltip id="round-tooltip">
                         <h5>
-                          Round {ingame.game.turn} / {ingame.game.maxTurns}
+                          Round {this.ingame.game.turn} /{" "}
+                          {this.ingame.game.maxTurns}
                         </h5>
                       </Tooltip>
                     }
@@ -202,7 +214,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                               : undefined,
                         }}
                       >
-                        {ingame.game.turn}
+                        {this.ingame.game.turn}
                       </div>
                     </div>
                   </OverlayTrigger>
@@ -212,7 +224,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                     <OverlayTrigger
                       overlay={
                         <Tooltip id="wildling-tooltip">
-                          Wildling Strength: {ingame.game.wildlingStrength}
+                          Wildling Strength: {this.ingame.game.wildlingStrength}
                         </Tooltip>
                       }
                       placement="auto"
@@ -243,12 +255,12 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
           )}
         </Card>
         <GameTabsComponent
-          authenticatedPlayer={this.props.authenticatedPlayer}
-          gameClient={this.props.gameClient}
-          ingame={this.props.ingame}
-          mapControls={this.props.mapControls}
-          publicChatRoom={this.props.publicChatRoom}
-          user={this.props.user}
+          authenticatedPlayer={authenticatedPlayer}
+          gameClient={this.gameClient}
+          ingame={this.ingame}
+          mapControls={this.mapControls}
+          publicChatRoom={publicChatRoom}
+          user={user}
         />
       </div>
     );
