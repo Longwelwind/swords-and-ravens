@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Component, ReactNode } from "react";
 import User from "../server/User";
 import React from "react";
