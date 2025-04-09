@@ -67,6 +67,7 @@ export default class EntireGame extends GameState<
   // Client-side callback fired whenever a new private chat-window was created
   leafStateId = v4();
   lastMessageReceivedAt: Date | null = null;
+  multiAccountProtectionMap: BetterMap<string, Set<string>> = new BetterMap();
 
   @observable gameSettings: GameSettings = {
     setupId: "mother-of-dragons",
@@ -653,7 +654,7 @@ export default class EntireGame extends GameState<
       user.connected = message.status;
     } else if (message.type == "update-other-users-with-same-ip") {
       const user = this.users.get(message.user);
-      user.otherUsersFromSameNetwork = message.otherUsers;
+      user.otherUsersFromSameNetwork = new Set(message.otherUsers);
     } else if (message.type == "hide-or-reveal-user-names") {
       message.names.forEach(([uid, name]) => (this.users.get(uid).name = name));
     } else if (message.type == "game-started") {
@@ -925,6 +926,12 @@ export default class EntireGame extends GameState<
         v.map((u2, rid) => [u2.id, rid]),
       ]),
       leafStateId: this.leafStateId,
+      multiAccountProtectionMap: admin
+        ? this.multiAccountProtectionMap.entries.map(([uid, uix]) => [
+            uid,
+            Array.from(uix),
+          ])
+        : [],
       childGameState: this.childGameState.serializeToClient(admin, user),
     };
   }
@@ -951,6 +958,9 @@ export default class EntireGame extends GameState<
     );
 
     entireGame.leafStateId = data.leafStateId;
+    entireGame.multiAccountProtectionMap = new BetterMap(
+      data.multiAccountProtectionMap.map(([uid, uix]) => [uid, new Set(uix)])
+    );
     entireGame.childGameState = entireGame.deserializeChildGameState(
       data.childGameState
     );
@@ -986,6 +996,7 @@ export interface SerializedEntireGame {
   privateChatRoomIds: [string, [string, string][]][];
   gameSettings: GameSettings;
   leafStateId: string;
+  multiAccountProtectionMap: [string, string[]][];
 }
 
 export enum HouseCardDecks {

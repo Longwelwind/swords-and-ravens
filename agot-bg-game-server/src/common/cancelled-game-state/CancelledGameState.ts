@@ -17,6 +17,7 @@ export default class CancelledGameState extends GameState<
   }
 
   firstStart(): void {
+    this.entireGame.multiAccountProtectionMap.clear();
     this.entireGame.hideOrRevealUserNames(true);
 
     this.ingame?.votes.values

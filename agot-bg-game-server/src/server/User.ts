@@ -12,7 +12,7 @@ export default class User {
   @observable settings: UserSettings;
   entireGame: EntireGame;
   connectedClients: WebSocket[] = [];
-  @observable otherUsersFromSameNetwork: string[] = [];
+  @observable otherUsersFromSameNetwork: Set<string> = new Set<string>();
   @observable connected: boolean;
   @observable note = "";
   onConnectionStateChanged: ((user: User) => void) | null = null;
@@ -43,7 +43,7 @@ export default class User {
     this.settings = settings;
     this.entireGame = game;
     this.connected = connected;
-    this.otherUsersFromSameNetwork = otherUsersFromSameNetwork;
+    this.otherUsersFromSameNetwork = new Set(otherUsersFromSameNetwork);
   }
 
   send(message: ServerMessage): void {
@@ -83,7 +83,7 @@ export default class User {
       facelessName: this.facelessName,
       settings: admin || user == this ? this.settings : undefined,
       connected: this.connected,
-      otherUsersFromSameNetwork: this.otherUsersFromSameNetwork,
+      otherUsersFromSameNetwork: Array.from(this.otherUsersFromSameNetwork),
       note: admin || user == this ? this.note : "",
     };
   }

@@ -5,10 +5,7 @@ import * as WebSocket from "ws";
 import * as http from "http";
 import EntireGame, { SerializedEntireGame } from "../common/EntireGame";
 import { ServerMessage } from "../messages/ServerMessage";
-import WebsiteClient, {
-  StoredGameData,
-  StoredUserData,
-} from "./website-client/WebsiteClient";
+import WebsiteClient, { StoredGameData } from "./website-client/WebsiteClient";
 import LocalWebsiteClient from "./website-client/LocalWebsiteClient";
 import LiveWebsiteClient from "./website-client/LiveWebsiteClient";
 import BetterMap from "../utils/BetterMap";
@@ -16,19 +13,11 @@ import schema from "./ClientMessage.json";
 import Ajv, { ValidateFunction } from "ajv";
 import _ from "lodash";
 import serializedGameMigrations from "./serializedGameMigrations";
-import { v4 } from "uuid";
 import sleep from "../utils/sleep";
 import { compress, decompress } from "./utils/compression";
 import * as Sentry from "@sentry/node";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import { getTimeDeltaInSeconds } from "../utils/getElapsedSeconds";
-
-interface UserConnectionInfo {
-  userId: string;
-  userName: string;
-  userIp: string;
-  invalidatesAt?: Date;
-}
 
 export default class GlobalServer {
   server: Server;
@@ -37,13 +26,6 @@ export default class GlobalServer {
   loadedGames = new BetterMap<string, EntireGame>();
   clientToUser: Map<WebSocket, User> = new Map<WebSocket, User>();
   clientMessageValidator: ValidateFunction;
-  // The key of the outer map is the entireGameId. The key of the inner map is the socket id
-  // So we can invalidate the correct UserConnectionInfo object after a defined period of time
-  multiAccountingProtection = new BetterMap<
-    string,
-    BetterMap<string, UserConnectionInfo>
-  >();
-  socketIds = new BetterMap<WebSocket, string>();
   debug = false;
 
   get latestSerializedGameVersion(): string {
@@ -75,12 +57,10 @@ export default class GlobalServer {
     this.server.on(
       "connection",
       (client: WebSocket, incomingMsg: http.IncomingMessage) => {
-        const clientIp = this.parseClientIp(incomingMsg);
-        console.log("New user connected: " + clientIp);
-        const socketId = v4();
-        this.socketIds.set(client, socketId);
+        const ix = this.parseClientIx(incomingMsg);
+        console.log("New user connected: " + ix);
         client.on("message", (data: WebSocket.Data) => {
-          this.onMessage(client, data as Buffer, clientIp, socketId);
+          this.onMessage(client, data as Buffer, ix);
         });
         client.on("close", () => {
           this.onClose(client);
@@ -107,8 +87,7 @@ export default class GlobalServer {
   async onMessage(
     client: WebSocket,
     data: Buffer,
-    clientIp: string,
-    socketId: string
+    clientIp: string
   ): Promise<void> {
     let message: ClientMessage | null = null;
     try {
@@ -178,26 +157,18 @@ export default class GlobalServer {
         }
       }
 
-      const oldOtherUsersFromSameNetworkLength =
-        user.otherUsersFromSameNetwork.length;
-      user.otherUsersFromSameNetwork = _.union(
-        user.otherUsersFromSameNetwork,
-        this.getOtherUsersFromSameNetworkInSameGame(
-          entireGame,
-          userData,
-          socketId,
-          clientIp
-        )
+      const oldSize = user.otherUsersFromSameNetwork.size;
+      this.getUsersFromSameNetwork(entireGame, userData.id, clientIp).forEach(
+        (userName) => {
+          user.otherUsersFromSameNetwork.add(userName);
+        }
       );
 
-      if (
-        oldOtherUsersFromSameNetworkLength <
-        user.otherUsersFromSameNetwork.length
-      ) {
+      if (oldSize < user.otherUsersFromSameNetwork.size) {
         entireGame.broadcastToClients({
           type: "update-other-users-with-same-ip",
           user: user.id,
-          otherUsers: user.otherUsersFromSameNetwork,
+          otherUsers: Array.from(user.otherUsersFromSameNetwork),
         });
       }
 
@@ -538,7 +509,7 @@ export default class GlobalServer {
     return entireGame;
   }
 
-  parseClientIp(incomingMessage: http.IncomingMessage): string {
+  parseClientIx(incomingMessage: http.IncomingMessage): string {
     const xForwardedForHeader = incomingMessage.headers["x-forwarded-for"];
     if (!xForwardedForHeader) {
       return incomingMessage.socket.remoteAddress
@@ -643,61 +614,38 @@ export default class GlobalServer {
       this.clientToUser.delete(client);
 
       user.updateConnectionStatus();
-
-      //this.addIpToMultiAccountProtectionMap(client, user);
     }
   }
 
-  private addIpToMultiAccountProtectionMap(
-    client: WebSocket,
-    user: User
-  ): void {
-    if (this.socketIds.has(client)) {
-      const socketId = this.socketIds.get(client);
-      if (this.multiAccountingProtection.has(user.entireGame.id)) {
-        const userConnectionInfos = this.multiAccountingProtection.get(
-          user.entireGame.id
-        );
-        if (userConnectionInfos.has(socketId)) {
-          const date = new Date();
-          date.setHours(date.getHours() + 16);
-          userConnectionInfos.get(socketId).invalidatesAt = date;
-        }
-      }
-      this.socketIds.delete(client);
-    }
-  }
-
-  getOtherUsersFromSameNetworkInSameGame(
+  getUsersFromSameNetwork(
     entireGame: EntireGame,
-    userData: StoredUserData,
-    socketId: string,
+    userId: string,
     clientIp: string
   ): string[] {
-    return [];
-
-    // TODO
-    if (!this.multiAccountingProtection.has(entireGame.id)) {
-      this.multiAccountingProtection.set(entireGame.id, new BetterMap());
+    if (entireGame.ingameGameState?.isEndedOrCancelled) {
+      return [];
     }
 
-    const userConnectionInfos = this.multiAccountingProtection.get(
-      entireGame.id
+    const data = entireGame.multiAccountProtectionMap.tryGet(
+      userId,
+      new Set<string>()
     );
-    userConnectionInfos.set(socketId, {
-      userId: userData.id,
-      userName: userData.name,
-      userIp: clientIp,
-    });
+    data.add(clientIp);
+    entireGame.multiAccountProtectionMap.set(userId, data);
 
-    const otherUsersWithSameIp = userConnectionInfos.values.filter(
-      (uci) => uci.userId != userData.id && uci.userIp == clientIp
+    const result = entireGame.multiAccountProtectionMap.entries.filter(
+      ([id, uix]) => {
+        return (
+          id != userId &&
+          _.intersection(Array.from(uix), Array.from(data)).length > 0
+        );
+      }
     );
 
-    return otherUsersWithSameIp.map((uci) => uci.userName);
+    return result.map(([userId, _]) => entireGame.users.get(userId).name);
   }
 
-  unloadGame(entireGame: EntireGame) {
+  unloadGame(entireGame: EntireGame): void {
     if (!this.loadedGames.has(entireGame.id)) {
       console.warn(
         "Tried to unload game that was not loaded: " + entireGame.id
@@ -774,23 +722,6 @@ export default class GlobalServer {
             this.unloadGame(game);
           }
         });
-
-      // Invalidate outdated Ip entries:
-      /*
-            this.multiAccountingProtection.keys.forEach(entireGameId => {
-                const userConnectionInfos = this.multiAccountingProtection.get(entireGameId);
-                userConnectionInfos.keys.forEach(socketId => {
-                    const uci = userConnectionInfos.get(socketId);
-                    if (uci.invalidatesAt && now.getTime() > uci.invalidatesAt.getTime()) {
-                        userConnectionInfos.delete(socketId);
-                    }
-                });
-
-                if (userConnectionInfos.size == 0) {
-                    this.multiAccountingProtection.delete(entireGameId);
-                }
-            });
-            */
     }
   }
 }

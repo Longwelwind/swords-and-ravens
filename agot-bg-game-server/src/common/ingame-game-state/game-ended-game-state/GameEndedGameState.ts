@@ -18,6 +18,7 @@ export default class GameEndedGameState extends GameState<IngameGameState> {
   firstStart(winner: House): void {
     this.winner = winner;
 
+    this.entireGame.multiAccountProtectionMap.clear();
     this.ingame.entireGame.hideOrRevealUserNames(true);
 
     // Send reveal-all-objectives before winner-declared

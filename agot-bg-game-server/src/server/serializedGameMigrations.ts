@@ -17,7 +17,7 @@ import { v4 } from "uuid";
 import facelessMenNames from "../../data/facelessMenNames.json";
 import popRandom from "../utils/popRandom";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { SerializedEntireGame } from "../common/EntireGame";
+//import { SerializedEntireGame } from "../common/EntireGame";
 
 function replaceHouseCard(
   deck: [string, any][],
@@ -2889,6 +2889,7 @@ const serializedGameMigrations: {
   {
     version: "123",
     migrate: (serializedGame: any) => {
+      serializedGame.multiAccountProtectionMap = [];
       return serializedGame;
     },
   },

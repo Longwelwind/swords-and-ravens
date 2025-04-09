@@ -82,7 +82,7 @@ export default class UserLabel extends Component<UserLabelProps> {
               />
             </OverlayTrigger>
             {!this.props.gameState.entireGame.gameSettings.private &&
-              this.user.otherUsersFromSameNetwork.length > 0 &&
+              this.user.otherUsersFromSameNetwork.size > 0 &&
               this.renderOtherUsersFromSameNetworkTooltip()}
           </small>
         </Navbar.Brand>
@@ -171,7 +171,7 @@ export default class UserLabel extends Component<UserLabelProps> {
             as {this.user.name}:
             <br />
             <br />
-            {this.user.otherUsersFromSameNetwork.map((usr) => (
+            {Array.from(this.user.otherUsersFromSameNetwork).map((usr) => (
               <div key={`same-network-user_${usr}`}>{usr}</div>
             ))}
           </Tooltip>
