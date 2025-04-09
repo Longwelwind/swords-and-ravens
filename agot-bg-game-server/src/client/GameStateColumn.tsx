@@ -1,4 +1,7 @@
 import React, { Component, ReactNode } from "react";
+import { observer } from "mobx-react";
+import { observable } from "mobx";
+
 import {
   Col,
   Row,
@@ -10,41 +13,44 @@ import {
   Spinner,
 } from "react-bootstrap";
 
-import { Channel } from "../chat-client/ChatClient";
-import { MAX_WILDLING_STRENGTH } from "../../common/ingame-game-state/game-data-structure/Game";
+import { Channel } from "./chat-client/ChatClient";
+import { MAX_WILDLING_STRENGTH } from "../common/ingame-game-state/game-data-structure/Game";
 
 import classNames from "classnames";
 import * as _ from "lodash";
 
-import IngameGameState from "../../common/ingame-game-state/IngameGameState";
-import User from "../../server/User";
-import Player from "../../common/ingame-game-state/Player";
-import GameClient from "../GameClient";
-import MapControls from "../MapControls";
+import IngameGameState from "../common/ingame-game-state/IngameGameState";
+import User from "../server/User";
+import Player from "../common/ingame-game-state/Player";
+import GameClient from "./GameClient";
+import MapControls from "./MapControls";
+
+import WesterosGameState from "../common/ingame-game-state/westeros-game-state/WesterosGameState";
+import PlanningGameState from "../common/ingame-game-state/planning-game-state/PlanningGameState";
+import ActionGameState from "../common/ingame-game-state/action-game-state/ActionGameState";
+import DraftGameState from "../common/ingame-game-state/draft-game-state/DraftGameState";
+import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
+import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
+import PayDebtsGameState from "../common/ingame-game-state/pay-debts-game-state/PayDebtsGameState";
+import ChooseInitialObjectivesGameState from "../common/ingame-game-state/choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
+
 import GameTabsComponent from "./GameTabsComponent";
+import ColumnSwapButton from "./game-state-panel/utils/ColumnSwapButton";
 
-import WesterosGameState from "../../common/ingame-game-state/westeros-game-state/WesterosGameState";
-import PlanningGameState from "../../common/ingame-game-state/planning-game-state/PlanningGameState";
-import ActionGameState from "../../common/ingame-game-state/action-game-state/ActionGameState";
-import DraftGameState from "../../common/ingame-game-state/draft-game-state/DraftGameState";
-import GameEndedGameState from "../../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
-import CancelledGameState from "../../common/cancelled-game-state/CancelledGameState";
-import PayDebtsGameState from "../../common/ingame-game-state/pay-debts-game-state/PayDebtsGameState";
-import ChooseInitialObjectivesGameState from "../../common/ingame-game-state/choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
+import WesterosGameStateComponent from "./game-state-panel/WesterosGameStateComponent";
+import PlanningComponent from "./game-state-panel/PlanningComponent";
+import ActionComponent from "./game-state-panel/ActionComponent";
+import DraftComponent from "./game-state-panel/DraftComponent";
+import GameEndedComponent from "./game-state-panel/GameEndedComponent";
+import IngameCancelledComponent from "./game-state-panel/IngameCancelledComponent";
+import PayDebtsComponent from "./game-state-panel/PayDebtsComponent";
+import ChooseInitialObjectivesComponent from "./game-state-panel/ChooseInitialObjectivesComponent";
 
-import WesterosGameStateComponent from "./WesterosGameStateComponent";
-import PlanningComponent from "./PlanningComponent";
-import ActionComponent from "./ActionComponent";
-import DraftComponent from "./DraftComponent";
-import GameEndedComponent from "./GameEndedComponent";
-import IngameCancelledComponent from "./IngameCancelledComponent";
-import PayDebtsComponent from "./PayDebtsComponent";
-import ChooseInitialObjectivesComponent from "./ChooseInitialObjectivesComponent";
+import hourglassImage from "../../public/images/icons/hourglass.svg";
+import mammothImage from "../../public/images/icons/mammoth.svg";
 
-import hourglassImage from "../../../public/images/icons/hourglass.svg";
-import mammothImage from "../../../public/images/icons/mammoth.svg";
-import ConditionalWrap from "../utils/ConditionalWrap";
-import renderChildGameState from "../utils/renderChildGameState";
+import ConditionalWrap from "./utils/ConditionalWrap";
+import renderChildGameState from "./utils/renderChildGameState";
 
 interface GameStateColumnProps {
   ingame: IngameGameState;
@@ -53,9 +59,14 @@ interface GameStateColumnProps {
   authenticatedPlayer: Player | null;
   publicChatRoom: Channel;
   user: User | null;
+  colSwapAnimationClassChanged: (classname: string) => void;
+  tracksPopoverVisibleChanged: (visible: boolean) => void;
 }
 
+@observer
 export default class GameStateColumn extends Component<GameStateColumnProps> {
+  @observable columnSwapAnimationClassName = "";
+
   private ingame = this.props.ingame;
   private gameClient = this.props.gameClient;
   private mapControls = this.props.mapControls;
@@ -245,6 +256,14 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
               </Col>
             </Col>
           </Row>
+          <ColumnSwapButton
+            user={this.props.user}
+            columnSwapAnimationClassName={this.columnSwapAnimationClassName}
+            colSwapAnimationClassChanged={
+              this.props.colSwapAnimationClassChanged
+            }
+            tracksPopoverVisibleChanged={this.props.tracksPopoverVisibleChanged}
+          />
           {isOwnTurn && (
             <Spinner
               animation="grow"

@@ -17,21 +17,21 @@ import { observer } from "mobx-react";
 import { isMobile } from "react-device-detect";
 import * as _ from "lodash";
 
-import IngameGameState from "../../common/ingame-game-state/IngameGameState";
-import Player from "../../common/ingame-game-state/Player";
-import User from "../../server/User";
-import GameClient from "../GameClient";
-import MapControls from "../MapControls";
-import ChatComponent from "../chat-client/ChatComponent";
-import VotesListComponent from "../VotesListComponent";
-import GameLogListComponent from "../GameLogListComponent";
-import GameSettingsComponent from "../GameSettingsComponent";
-import UserSettingsComponent from "../UserSettingsComponent";
-import ObjectivesInfoComponent from "../ObjectivesInfoComponent";
-import IronBankTabComponent from "../IronBankTabComponent";
-import NoteComponent from "../NoteComponent";
+import IngameGameState from "../common/ingame-game-state/IngameGameState";
+import Player from "../common/ingame-game-state/Player";
+import User from "../server/User";
+import GameClient from "./GameClient";
+import MapControls from "./MapControls";
+import ChatComponent from "./chat-client/ChatComponent";
+import VotesListComponent from "./VotesListComponent";
+import GameLogListComponent from "./GameLogListComponent";
+import GameSettingsComponent from "./GameSettingsComponent";
+import UserSettingsComponent from "./UserSettingsComponent";
+import ObjectivesInfoComponent from "./ObjectivesInfoComponent";
+import IronBankTabComponent from "./IronBankTabComponent";
+import NoteComponent from "./NoteComponent";
 
-import { Channel, Message } from "../chat-client/ChatClient";
+import { Channel, Message } from "./chat-client/ChatClient";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheckToSlot,
@@ -43,10 +43,10 @@ import {
   faUniversity,
 } from "@fortawesome/free-solid-svg-icons";
 
-import cardRandomImage from "../../../public/images/icons/card-random.svg";
-import expandImage from "../../../public/images/icons/expand.svg";
-import ConditionalWrap from "../utils/ConditionalWrap";
-import getUserLinkOrLabel from "../utils/getIngameUserLinkOrLabel";
+import cardRandomImage from "../../public/images/icons/card-random.svg";
+import expandImage from "../../public/images/icons/expand.svg";
+import ConditionalWrap from "./utils/ConditionalWrap";
+import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 
 interface GameTabsComponentProps {
   ingame: IngameGameState;

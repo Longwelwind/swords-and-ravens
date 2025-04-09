@@ -11,33 +11,35 @@ import {
   Tooltip,
 } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRightLeft, faStar } from "@fortawesome/free-solid-svg-icons";
+import { faStar } from "@fortawesome/free-solid-svg-icons";
 import classNames from "classnames";
 import _ from "lodash";
 
-import IngameGameState from "../../common/ingame-game-state/IngameGameState";
-import GameClient from "../GameClient";
-import MapControls from "../MapControls";
-import Player from "../../common/ingame-game-state/Player";
-import { Channel } from "../chat-client/ChatClient";
-import User from "../../server/User";
+import IngameGameState from "../common/ingame-game-state/IngameGameState";
+import GameClient from "./GameClient";
+import MapControls from "./MapControls";
+import Player from "../common/ingame-game-state/Player";
+import { Channel } from "./chat-client/ChatClient";
+import User from "../server/User";
 import { isMobile } from "react-device-detect";
-import { ColumnOrders, InfluenceTrackDetails } from "../IngameComponent";
+import { InfluenceTrackDetails } from "./IngameComponent";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 
-import SupplyTrackComponent from "./utils/SupplyTrackComponent";
-import getUserLinkOrLabel from "../utils/getIngameUserLinkOrLabel";
-import InfluenceIconComponent from "./utils/InfluenceIconComponent";
-import HouseRowComponent from "../HouseRowComponent";
+import ColumnSwapButton from "./game-state-panel/utils/ColumnSwapButton";
 
-import settingsKnobsImage from "../../../public/images/icons/settings-knobs.svg";
-import speakerImage from "../../../public/images/icons/speaker.svg";
-import speakerOffImage from "../../../public/images/icons/speaker-off.svg";
-import stoneThroneImage from "../../../public/images/icons/stone-throne.svg";
-import diamondHiltImage from "../../../public/images/icons/diamond-hilt.svg";
-import diamondHiltUsedImage from "../../../public/images/icons/diamond-hilt-used.svg";
-import ravenImage from "../../../public/images/icons/raven.svg";
-import podiumWinnerImage from "../../../public/images/icons/podium-winner.svg";
+import SupplyTrackComponent from "./game-state-panel/utils/SupplyTrackComponent";
+import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
+import InfluenceIconComponent from "./game-state-panel/utils/InfluenceIconComponent";
+import HouseRowComponent from "./HouseRowComponent";
+
+import settingsKnobsImage from "../../public/images/icons/settings-knobs.svg";
+import speakerImage from "../../public/images/icons/speaker.svg";
+import speakerOffImage from "../../public/images/icons/speaker-off.svg";
+import stoneThroneImage from "../../public/images/icons/stone-throne.svg";
+import diamondHiltImage from "../../public/images/icons/diamond-hilt.svg";
+import diamondHiltUsedImage from "../../public/images/icons/diamond-hilt-used.svg";
+import ravenImage from "../../public/images/icons/raven.svg";
+import podiumWinnerImage from "../../public/images/icons/podium-winner.svg";
 
 interface HouseInfoColumnProps {
   ingame: IngameGameState;
@@ -48,7 +50,6 @@ interface HouseInfoColumnProps {
   user: User | null;
   tracks: InfluenceTrackDetails[];
   gameControlsPopover: OverlayChildren;
-  columnOrders: ColumnOrders;
   colSwapAnimationClassChanged: (classname: string) => void;
   tracksPopoverVisibleChanged: (visible: boolean) => void;
   showGameControls?: boolean;
@@ -60,7 +61,6 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
 
   private ingame = this.props.ingame;
   private game = this.props.ingame.game;
-  private gameSettings = this.ingame.entireGame.gameSettings;
   private mapScrollbarEnabled =
     !isMobile && (this.props.user?.settings.mapScrollbar ?? true);
   private gameClient = this.props.gameClient;
@@ -92,36 +92,14 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
               />
             </ListGroupItem>
           </ListGroup>
-          <button
-            type="button"
-            className="close"
-            onClick={(e: any) => {
-              if (this.user && this.columnSwapAnimationClassName == "") {
-                e.currentTarget.blur();
-                this.columnSwapAnimationClassName =
-                  "animate__animated animate__fadeIn";
-                this.props.colSwapAnimationClassChanged(
-                  this.columnSwapAnimationClassName
-                );
-                this.user.settings.responsiveLayout =
-                  !this.user.settings.responsiveLayout;
-                this.props.tracksPopoverVisibleChanged(false);
-                window.setTimeout(() => {
-                  this.columnSwapAnimationClassName = "";
-                  this.props.colSwapAnimationClassChanged(
-                    this.columnSwapAnimationClassName
-                  );
-                }, 2050);
-              }
-            }}
-            style={{ position: "absolute", left: "0px", padding: "4px" }}
-          >
-            <FontAwesomeIcon
-              icon={faRightLeft}
-              style={{ color: "white" }}
-              size="2xs"
-            />
-          </button>
+          <ColumnSwapButton
+            user={this.user}
+            columnSwapAnimationClassName={this.columnSwapAnimationClassName}
+            colSwapAnimationClassChanged={
+              this.props.colSwapAnimationClassChanged
+            }
+            tracksPopoverVisibleChanged={this.props.tracksPopoverVisibleChanged}
+          />
         </Card>
         <Card className={this.mapScrollbarEnabled ? "flex-fill-remaining" : ""}>
           <Card.Body id="houses-panel" className="no-space-around">
