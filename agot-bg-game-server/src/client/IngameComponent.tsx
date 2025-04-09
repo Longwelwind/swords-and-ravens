@@ -26,9 +26,9 @@ import MapControls, {
   RegionOnMapProperties,
   UnitOnMapProperties,
 } from "./MapControls";
-import GameStateColumn from "./game-state-panel/GameStateColumn";
-import HouseInfoColumn from "./game-state-panel/HouseInfoColumn";
-import GameTabsComponent from "./game-state-panel/GameTabsComponent";
+import GameStateColumn from "./GameStateColumn";
+import HouseInfoColumn from "./HouseInfoColumn";
+import GameTabsComponent from "./GameTabsComponent";
 
 import { Channel } from "./chat-client/ChatClient";
 import House from "../common/ingame-game-state/game-data-structure/House";

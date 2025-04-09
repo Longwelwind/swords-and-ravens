@@ -15,31 +15,31 @@ import { faStar } from "@fortawesome/free-solid-svg-icons";
 import classNames from "classnames";
 import _ from "lodash";
 
-import IngameGameState from "../../common/ingame-game-state/IngameGameState";
-import GameClient from "../GameClient";
-import MapControls from "../MapControls";
-import Player from "../../common/ingame-game-state/Player";
-import { Channel } from "../chat-client/ChatClient";
-import User from "../../server/User";
+import IngameGameState from "../common/ingame-game-state/IngameGameState";
+import GameClient from "./GameClient";
+import MapControls from "./MapControls";
+import Player from "../common/ingame-game-state/Player";
+import { Channel } from "./chat-client/ChatClient";
+import User from "../server/User";
 import { isMobile } from "react-device-detect";
-import { InfluenceTrackDetails } from "../IngameComponent";
+import { InfluenceTrackDetails } from "./IngameComponent";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 
-import ColumnSwapButton from "./utils/ColumnSwapButton";
+import ColumnSwapButton from "./game-state-panel/utils/ColumnSwapButton";
 
-import SupplyTrackComponent from "./utils/SupplyTrackComponent";
-import getUserLinkOrLabel from "../utils/getIngameUserLinkOrLabel";
-import InfluenceIconComponent from "./utils/InfluenceIconComponent";
-import HouseRowComponent from "../HouseRowComponent";
+import SupplyTrackComponent from "./game-state-panel/utils/SupplyTrackComponent";
+import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
+import InfluenceIconComponent from "./game-state-panel/utils/InfluenceIconComponent";
+import HouseRowComponent from "./HouseRowComponent";
 
-import settingsKnobsImage from "../../../public/images/icons/settings-knobs.svg";
-import speakerImage from "../../../public/images/icons/speaker.svg";
-import speakerOffImage from "../../../public/images/icons/speaker-off.svg";
-import stoneThroneImage from "../../../public/images/icons/stone-throne.svg";
-import diamondHiltImage from "../../../public/images/icons/diamond-hilt.svg";
-import diamondHiltUsedImage from "../../../public/images/icons/diamond-hilt-used.svg";
-import ravenImage from "../../../public/images/icons/raven.svg";
-import podiumWinnerImage from "../../../public/images/icons/podium-winner.svg";
+import settingsKnobsImage from "../../public/images/icons/settings-knobs.svg";
+import speakerImage from "../../public/images/icons/speaker.svg";
+import speakerOffImage from "../../public/images/icons/speaker-off.svg";
+import stoneThroneImage from "../../public/images/icons/stone-throne.svg";
+import diamondHiltImage from "../../public/images/icons/diamond-hilt.svg";
+import diamondHiltUsedImage from "../../public/images/icons/diamond-hilt-used.svg";
+import ravenImage from "../../public/images/icons/raven.svg";
+import podiumWinnerImage from "../../public/images/icons/podium-winner.svg";
 
 interface HouseInfoColumnProps {
   ingame: IngameGameState;
